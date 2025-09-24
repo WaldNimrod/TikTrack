@@ -724,6 +724,20 @@ class HeaderSystem {
                         <span class="nav-text" style="color: #ff0000; font-size: 1.2rem;">🧹</span>
                       </a>
                     </li>
+                    
+                    <li class="tiktrack-nav-item">
+                      <a href="#" class="tiktrack-nav-link" onclick="clearStaticFilesCache(event)" 
+                         title="נקה מטמון קבצים סטטיים (אייקונים, CSS)">
+                        <span class="nav-text" style="color: #ff6600; font-size: 1.2rem;">🖼️</span>
+                      </a>
+                    </li>
+                    
+                    <li class="tiktrack-nav-item">
+                      <a href="#" class="tiktrack-nav-link" onclick="forceIconRefresh(event)" 
+                         title="כפה רענון אייקונים (פתרון 404)">
+                        <span class="nav-text" style="color: #00aa00; font-size: 1.2rem;">🔄</span>
+                      </a>
+                    </li>
                   </ul>
                 </nav>
               </div>
@@ -4986,6 +5000,11 @@ async function clearDevelopmentCache(event) {
     if (typeof window.clearAllCache === 'function') {
       window.clearAllCache();
     }
+    
+    // Clear static files cache specifically
+    if (typeof window.clearStaticFilesCache === 'function') {
+      window.clearStaticFilesCache();
+    }
 
     // ===== הצגת הודעת הצלחה =====
     console.log('🔔 Attempting to show success notification...');
@@ -5033,8 +5052,113 @@ async function clearDevelopmentCache(event) {
 
 // Old function implementation removed - now using updated local function
 
+/**
+ * ניקוי Cache של קבצים סטטיים בלבד
+ */
+async function clearStaticFilesCache(event) {
+  console.log('🖼️ Clearing static files cache...');
+  
+  try {
+    // מניעת התנהגות ברירת מחדל
+    if (event) {
+      event.preventDefault();
+    }
+    
+    // ניקוי cache של קבצים סטטיים
+    if (typeof window.clearStaticFilesCache === 'function') {
+      window.clearStaticFilesCache();
+    } else {
+      // fallback - ניקוי ידני
+      console.log('🖼️ Using fallback static files cache clearing...');
+      
+      // הוספת timestamp לקבצים סטטיים
+      const staticFiles = [
+        'images/icons/trading_accounts.svg',
+        'images/icons/accounts.svg',
+        'images/icons/alerts.svg',
+        'images/icons/trades.svg',
+        'images/icons/tickers.svg'
+      ];
+      
+      staticFiles.forEach(filePath => {
+        const elements = document.querySelectorAll(`img[src*="${filePath}"]`);
+        elements.forEach(element => {
+          const currentSrc = element.src;
+          if (currentSrc && !currentSrc.includes('?t=')) {
+            const separator = currentSrc.includes('?') ? '&' : '?';
+            element.src = currentSrc + separator + 't=' + Date.now();
+            console.log(`🖼️ Added timestamp to: ${filePath}`);
+          }
+        });
+      });
+      
+      // הצגת התראה
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('הצלחה', 'מטמון הקבצים הסטטיים נוקה בהצלחה', 3000, 'system');
+      }
+    }
+    
+    console.log('✅ Static files cache cleared');
+  } catch (error) {
+    console.error('❌ Error clearing static files cache:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'שגיאה בניקוי מטמון הקבצים הסטטיים', 3000, 'system');
+    }
+  }
+}
+
+/**
+ * כפיית רענון אייקונים - פונקציה מיוחדת לפתרון בעיות 404
+ */
+async function forceIconRefresh(event) {
+  console.log('🔄 Forcing icon refresh from header...');
+  
+  try {
+    // מניעת התנהגות ברירת מחדל
+    if (event) {
+      event.preventDefault();
+    }
+    
+    // קריאה לפונקציה הגלובלית
+    if (typeof window.forceIconRefresh === 'function') {
+      window.forceIconRefresh();
+    } else {
+      // fallback - רענון ידני
+      console.log('🔄 Using fallback icon refresh...');
+      
+      // חיפוש כל האייקונים בעמוד
+      const icons = document.querySelectorAll('img[src*="images/icons/"]');
+      let refreshedCount = 0;
+      
+      icons.forEach(icon => {
+        const originalSrc = icon.src;
+        if (originalSrc && !originalSrc.includes('cache_bust=')) {
+          const separator = originalSrc.includes('?') ? '&' : '?';
+          icon.src = originalSrc + separator + 'cache_bust=' + Date.now() + '_' + Math.random();
+          console.log(`🔄 Refreshed icon: ${originalSrc}`);
+          refreshedCount++;
+        }
+      });
+      
+      // הצגת התראה
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('הצלחה', `רוענו ${refreshedCount} אייקונים`, 2000, 'system');
+      }
+    }
+    
+    console.log('✅ Icon refresh completed');
+  } catch (error) {
+    console.error('❌ Error forcing icon refresh:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'שגיאה ברענון האייקונים', 2000, 'system');
+    }
+  }
+}
+
 // Export to global scope
 window.clearDevelopmentCache = clearDevelopmentCache;
+window.clearStaticFilesCache = clearStaticFilesCache;
+window.forceIconRefresh = forceIconRefresh;
 
 // אתחול מערכת ראש הדף
 document.addEventListener('DOMContentLoaded', function() {

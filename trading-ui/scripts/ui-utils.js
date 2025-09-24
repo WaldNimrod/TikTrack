@@ -845,117 +845,8 @@ async function autoRefreshCurrentPage(operationName = 'פעולה') {
  * Toggle top section (header section with alerts/summary)
  * Handles opening/closing of top sections across all pages
  */
-window.toggleTopSection = function () {
-  console.log('🔧 toggleTopSection called');
-  const currentPath = window.location.pathname;
-  console.log(`🔍 Current path: ${currentPath}`);
 
-  // Special handling for notes page
-  if (currentPath.includes('/notes')) {
-    console.log('🔍 Special handling for notes page');
-    const section = document.getElementById('notesTopSection');
-    const toggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
-    const icon = toggleBtn ? toggleBtn.querySelector('.section-toggle-icon, .filter-icon, .filter-arrow') : null;
-
-    console.log(`🔍 Notes section found:`, section ? 'YES' : 'NO');
-    console.log(`🔍 Toggle button found:`, toggleBtn ? 'YES' : 'NO');
-    console.log(`🔍 Icon found:`, icon ? 'YES' : 'NO');
-
-    if (section && toggleBtn) {
-      const isHidden = section.style.display === 'none';
-      console.log(`🔍 Current state - isHidden: ${isHidden}`);
-      
-      section.style.display = isHidden ? 'block' : 'none';
-      console.log(`✅ Notes top section ${isHidden ? 'EXPANDED' : 'COLLAPSED'}`);
-
-      // Update icon only
-      if (icon) {
-        const newIcon = isHidden ? '▲' : '▼';
-        icon.textContent = newIcon;
-        console.log(`🎨 Icon updated to: "${newIcon}"`);
-      }
-
-      // Save state
-      localStorage.setItem('notesTopSectionHidden', !isHidden);
-      console.log(`💾 State saved: notesTopSectionHidden = ${!isHidden}`);
-    }
-    return;
-  }
-
-  // Regular handling for other pages
-  console.log('🔍 Regular handling for other pages');
-  const section = document.querySelector('.top-section .section-body');
-  const toggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
-  const icon = toggleBtn ? toggleBtn.querySelector('.section-toggle-icon, .filter-icon, .filter-arrow') : null;
-  
-  console.log(`🔍 Top section found:`, section ? 'YES' : 'NO');
-  console.log(`🔍 Toggle button found:`, toggleBtn ? 'YES' : 'NO');
-  console.log(`🔍 Icon found:`, icon ? 'YES' : 'NO');
-  
-  if (section) {
-    const isCollapsed = section.classList.contains('collapsed') || section.style.display === 'none';
-    console.log(`🔍 Current state - isCollapsed: ${isCollapsed}, display: "${section.style.display}"`);
-
-    if (isCollapsed) {
-      section.classList.remove('collapsed');
-      section.style.display = 'block';
-      console.log(`✅ Top section EXPANDED`);
-    } else {
-      section.classList.add('collapsed');
-      section.style.display = 'none';
-      console.log(`✅ Top section COLLAPSED`);
-    }
-
-    // Update icon
-    if (icon) {
-      const newIcon = isCollapsed ? '▲' : '▼';
-      icon.textContent = newIcon;
-      console.log(`🎨 Icon updated to: "${newIcon}"`);
-    }
-
-    // Determine localStorage key based on current page
-    let storageKey = 'topSectionCollapsed';
-    console.log(`🔍 Determining storage key for path: ${currentPath}`);
-
-    if (currentPath.includes('/alerts')) {
-      storageKey = 'alertsTopSectionCollapsed';
-    } else if (currentPath.includes('/planning') || currentPath.includes('/trade_plans')) {
-      storageKey = 'planningTopSectionCollapsed';
-    } else if (currentPath.includes('/trades')) {
-      storageKey = 'tradesTopSectionCollapsed';
-    } else if (currentPath.includes('/accounts')) {
-      storageKey = 'accountsTopSectionCollapsed';
-    } else if (currentPath.includes('/tickers')) {
-      storageKey = 'tickersTopSectionCollapsed';
-    } else if (currentPath.includes('/cash_flows')) {
-      storageKey = 'cashFlowsTopSectionCollapsed';
-    } else if (currentPath.includes('/executions')) {
-      storageKey = 'executionsTopSectionCollapsed';
-    } else if (currentPath.includes('/research')) {
-      storageKey = 'researchTopSectionCollapsed';
-    } else if (currentPath.includes('/constraints')) {
-      storageKey = 'constraintsTopSectionCollapsed';
-    } else if (currentPath.includes('/db_display')) {
-      storageKey = 'dbDisplayTopSectionCollapsed';
-    } else if (currentPath.includes('/db_extradata')) {
-      storageKey = 'dbExtradataTopSectionCollapsed';
-    } else if (currentPath.includes('/designs')) {
-      storageKey = 'topSectionCollapsed';
-    }
-
-    console.log(`🔍 Using storage key: "${storageKey}"`);
-
-    // Save state to localStorage
-    localStorage.setItem(storageKey, !isCollapsed);
-    console.log(`💾 State saved: ${storageKey} = ${!isCollapsed}`);
-  } else {
-    console.log(`⚠️ No top section found`);
-  }
-  
-  console.log(`✅ toggleTopSection completed`);
-};
-
-// toggleMainSection function removed - use toggleSection('main') instead
+// toggleSection removed - use toggleSection('main') instead
 
 /**
  * Toggle specific section by ID
@@ -1071,7 +962,7 @@ window.restoreSectionStates = function () {
   // Restore top section state
   const topSectionHidden = localStorage.getItem('topSectionHidden') === 'true';
   const topSection = document.querySelector('.top-section .section-body');
-  const topToggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
+  const topToggleBtn = document.querySelector('.top-section button[onclick*="toggleSection"]');
   const topIcon = topToggleBtn ? topToggleBtn.querySelector('.filter-icon, .filter-arrow') : null;
 
   if (topSection && topSectionHidden) {
@@ -1216,7 +1107,7 @@ window.autoRefreshCurrentPage = autoRefreshCurrentPage;
 window.showSecondConfirmationModal = showSecondConfirmationModal;
 
 // Export section toggle system functions
-window.toggleTopSection = window.toggleTopSection;
+// toggleSection removed - use toggleSection('top') instead
 // window.toggleSection export removed - using global version from ui-utils.js
 window.toggleAllSections = window.toggleAllSections;
 window.restoreSectionStates = window.restoreSectionStates;
@@ -1321,42 +1212,6 @@ document.addEventListener('DOMContentLoaded', () => {
  * Toggle top section visibility
  * Used for the main top section of each page
  */
-function toggleTopSection() {
-  
-  const topSection = document.querySelector('.top-section');
-  if (!topSection) {
-    console.warn('⚠️ Top section not found');
-    return;
-  }
-  
-  const sectionBody = topSection.querySelector('.section-body');
-  const toggleIcon = topSection.querySelector('.section-toggle-icon');
-  
-  if (!sectionBody || !toggleIcon) {
-    console.warn('⚠️ Section body or toggle icon not found');
-    return;
-  }
-  
-  // Toggle visibility
-  const isVisible = sectionBody.style.display !== 'none';
-  sectionBody.style.display = isVisible ? 'none' : 'block';
-  
-  // Update icon
-  toggleIcon.textContent = isVisible ? '▶' : '▼';
-  
-  // Save state to localStorage
-  localStorage.setItem('topSectionCollapsed', isVisible.toString());
-  
-  console.log(`✅ Top section ${isVisible ? 'collapsed' : 'expanded'}`);
-}
-
-/**
- * Toggle any section by ID
- * Generic function that works with all section types
- * @param {string} sectionId - The ID of the section to toggle
- */
-function toggleSection(sectionId) {
-  const section = document.getElementById(sectionId);
   if (!section) {
     console.warn(`⚠️ Section ${sectionId} not found`);
     return;
@@ -1410,7 +1265,7 @@ function toggleSection(sectionId) {
   localStorage.setItem(`${sectionId}_collapsed`, (!isCollapsed).toString());
 }
 
-// toggleMainSection function removed - use toggleSection('main') instead
+// toggleSection function removed - use toggleSection('main') instead
 
 /**
  * Toggle all sections on the page
@@ -1488,7 +1343,7 @@ function loadSectionStates() {
 }
 
 // Export functions to global scope
-window.toggleTopSection = toggleTopSection;
+// toggleSection removed - use toggleSection('top') instead
 // window.toggleSection export removed - using global version from ui-utils.js
 window.toggleAllSections = toggleAllSections;
 window.toggleSectionGlobal = window.toggleSection;

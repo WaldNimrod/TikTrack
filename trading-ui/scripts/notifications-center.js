@@ -1294,7 +1294,7 @@ function testInfoNotification() {
   }
 }
 
-function toggleTopSection() {
+function toggleSection() {
     const topSection = document.querySelector('.top-section .section-body');
     if (topSection) {
         if (topSection.style.display === 'none') {
@@ -1366,7 +1366,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.testErrorNotification = testErrorNotification;
   window.testWarningNotification = testWarningNotification;
   window.testInfoNotification = testInfoNotification;
-  window.toggleTopSection = toggleTopSection;
+  window.toggleSection = toggleSection;
   // window.toggleAllSections export removed - using global version from ui-utils.js
   // window.toggleSection export removed - using global version from ui-utils.js
 

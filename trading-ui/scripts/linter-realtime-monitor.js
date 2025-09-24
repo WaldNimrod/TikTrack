@@ -788,20 +788,6 @@ async function startFileScan() {
 
 // REMOVED: copyDetailedLog function - development mechanism, page-specific only
 
-function toggleTopSection() {
-    if (typeof window.toggleTopSection === 'function') {
-        window.toggleTopSection();
-                } else {
-        console.warn('toggleTopSection function not found');
-                    }
-                }
-
-
-function refreshFileList() {
-  if (window.showInfoNotification) {
-    window.showInfoNotification('רענון רשימת קבצים', 'רשימת הקבצים תתעדכן בעתיד', 4000, 'development');
-  }
-}
 
 function clearFileCache() {
   if (window.showInfoNotification) {
@@ -2385,7 +2371,7 @@ window.checkExistingScanResults = checkExistingScanResults;
 window.loadExistingFileMapping = loadExistingFileMapping;
 // // window.copyDetailedLog export removed - using global version from system-management.js // REMOVED: Development mechanism - page-specific only
 // window.copyLinterDetailedLog = copyDetailedLog; // REMOVED: Development mechanism - page-specific only
-window.toggleTopSection = toggleTopSection;
+window.toggleSection = toggleSection;
 // window.toggleSection export removed - using global version from ui-utils.js
 window.refreshFileList = refreshFileList;
 window.clearFileCache = clearFileCache;

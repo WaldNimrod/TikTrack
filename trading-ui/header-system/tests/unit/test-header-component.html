@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>בדיקת HeaderComponent - Header System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            direction: rtl;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 3px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #test-element {
+            padding: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            margin: 10px 0;
+        }
+        .theme-light {
+            background-color: #ffffff;
+            color: #000000;
+        }
+        .theme-dark {
+            background-color: #000000;
+            color: #ffffff;
+        }
+        .compact-mode {
+            font-size: 12px;
+        }
+        .filters-visible {
+            display: block !important;
+        }
+        .filters-container:not(.filters-visible) {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <h1>🏗️ בדיקת HeaderComponent - Header System</h1>
+    
+    <div class="test-section">
+        <h2>HeaderComponent Tests</h2>
+        <button onclick="testHeaderComponent()">בדוק HeaderComponent</button>
+        <div id="headercomponent-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Header Styles Tests</h2>
+        <button onclick="testHeaderStyles()">בדוק סגנונות כותרת</button>
+        <div id="headerstyles-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Header Integration Tests</h2>
+        <button onclick="testHeaderIntegration()">בדוק אינטגרציה</button>
+        <div id="headerintegration-results"></div>
+    </div>
+    
+    <!-- אלמנט לבדיקות -->
+    <div id="test-element">
+        <div id="unified-header">
+            <div class="header-top">
+                <div class="logo-section">
+                    <div class="logo">
+                        <img src="/trading-ui/assets/logo.png" alt="TikTrack" class="logo-image">
+                        <span class="logo-text">TikTrack</span>
+                    </div>
+                </div>
+                <div class="header-nav">
+                    <nav class="main-nav" id="mainNavigation"></nav>
+                </div>
+                <div class="header-actions">
+                    <button class="cache-clear-btn" id="cacheClearBtn" title="ניקוי מטמון">
+                        <span class="cache-icon">🗑️</span>
+                    </button>
+                    <button class="menu-filter-toggle-section" id="filterToggleBtn" title="הצג/הסתר פילטרים">
+                        <span class="filter-icon">🔍</span>
+                    </button>
+                </div>
+            </div>
+            <div class="filters-container" id="headerFilters">
+                <div class="header-filters" id="headerFiltersContent"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- טעינת קבצי המערכת -->
+    <script src="../utils/DOMUtils.js"></script>
+    <script src="../utils/EventUtils.js"></script>
+    <script src="../utils/StateUtils.js"></script>
+    <script src="../constants/Events.js"></script>
+    <script src="../constants/Selectors.js"></script>
+    <script src="../constants/Config.js"></script>
+    <script src="../services/EventService.js"></script>
+    <script src="../services/StateService.js"></script>
+    <script src="../services/UIService.js"></script>
+    <script src="../components/StateComponent.js"></script>
+    <script src="../components/UIComponent.js"></script>
+    <script src="../components/TranslationComponent.js"></script>
+    <script src="../components/PreferencesComponent.js"></script>
+    <script src="../components/MenuComponent.js"></script>
+    <script src="../components/FilterComponent.js"></script>
+    <script src="../components/NavigationComponent.js"></script>
+    <script src="../components/HeaderComponent.js"></script>
+    <script src="../index.js"></script>
+    
+    <script>
+        // פונקציות בדיקה
+        
+        function addResult(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.textContent = message;
+            container.appendChild(div);
+        }
+        
+        function clearResults(containerId) {
+            document.getElementById(containerId).innerHTML = '';
+        }
+        
+        function testHeaderComponent() {
+            clearResults('headercomponent-results');
+            addResult('headercomponent-results', 'מתחיל בדיקת HeaderComponent...', 'info');
+            
+            try {
+                // בדיקת קיום
+                if (typeof HeaderComponent === 'undefined') {
+                    addResult('headercomponent-results', '❌ HeaderComponent לא קיים', 'error');
+                    return;
+                }
+                addResult('headercomponent-results', '✅ HeaderComponent קיים', 'success');
+                
+                // יצירת מופע
+                const headerSystem = new HeaderSystem();
+                const headerComponent = new HeaderComponent(headerSystem);
+                
+                if (headerComponent) {
+                    addResult('headercomponent-results', '✅ יצירת מופע HeaderComponent עובד', 'success');
+                } else {
+                    addResult('headercomponent-results', '❌ יצירת מופע HeaderComponent לא עובד', 'error');
+                }
+                
+                // בדיקת פונקציות
+                const methods = ['createHeader', 'updateHeader', 'refreshHeader', 'destroyHeader', 'updateHeaderTheme', 'updateHeaderLanguage', 'updateHeaderAnimations', 'updateHeaderCompactMode'];
+                
+                methods.forEach(method => {
+                    if (typeof headerComponent[method] === 'function') {
+                        addResult('headercomponent-results', `✅ HeaderComponent.${method} קיים`, 'success');
+                    } else {
+                        addResult('headercomponent-results', `❌ HeaderComponent.${method} לא קיים`, 'error');
+                    }
+                });
+                
+                // בדיקת יצירת כותרת
+                const headerElement = headerComponent.createHeader();
+                if (headerElement && headerElement.tagName === 'DIV') {
+                    addResult('headercomponent-results', '✅ HeaderComponent.createHeader עובד', 'success');
+                } else {
+                    addResult('headercomponent-results', '❌ HeaderComponent.createHeader לא עובד', 'error');
+                }
+                
+                // בדיקת עדכון נושא
+                headerComponent.updateHeaderTheme('dark');
+                const headerElement2 = DOMUtils.select('#unified-header');
+                if (headerElement2 && DOMUtils.hasClass(headerElement2, 'theme-dark')) {
+                    addResult('headercomponent-results', '✅ HeaderComponent.updateHeaderTheme עובד', 'success');
+                } else {
+                    addResult('headercomponent-results', '❌ HeaderComponent.updateHeaderTheme לא עובד', 'error');
+                }
+                
+                // בדיקת עדכון שפה
+                headerComponent.updateHeaderLanguage('en');
+                const headerElement3 = DOMUtils.select('#unified-header');
+                if (headerElement3 && headerElement3.dir === 'ltr') {
+                    addResult('headercomponent-results', '✅ HeaderComponent.updateHeaderLanguage עובד', 'success');
+                } else {
+                    addResult('headercomponent-results', '❌ HeaderComponent.updateHeaderLanguage לא עובד', 'error');
+                }
+                
+                // בדיקת getInfo
+                const info = headerComponent.getInfo();
+                if (info && typeof info === 'object') {
+                    addResult('headercomponent-results', '✅ HeaderComponent.getInfo עובד', 'success');
+                } else {
+                    addResult('headercomponent-results', '❌ HeaderComponent.getInfo לא עובד', 'error');
+                }
+                
+                addResult('headercomponent-results', '✅ בדיקת HeaderComponent הושלמה בהצלחה', 'success');
+                
+            } catch (error) {
+                addResult('headercomponent-results', `❌ שגיאה בבדיקת HeaderComponent: ${error.message}`, 'error');
+            }
+        }
+        
+        function testHeaderStyles() {
+            clearResults('headerstyles-results');
+            addResult('headerstyles-results', 'מתחיל בדיקת סגנונות כותרת...', 'info');
+            
+            try {
+                // בדיקת קיום קובץ סגנונות
+                const styleSheet = document.querySelector('link[href*="header-styles.css"]');
+                if (styleSheet) {
+                    addResult('headerstyles-results', '✅ קובץ סגנונות כותרת נטען', 'success');
+                } else {
+                    addResult('headerstyles-results', '⚠️ קובץ סגנונות כותרת לא נטען (נורמלי בבדיקה)', 'info');
+                }
+                
+                // בדיקת אלמנט כותרת
+                const headerElement = DOMUtils.select('#unified-header');
+                if (headerElement) {
+                    addResult('headerstyles-results', '✅ אלמנט כותרת קיים', 'success');
+                    
+                    // בדיקת מחלקות CSS
+                    const hasHeaderContainer = DOMUtils.hasClass(headerElement, 'header-container');
+                    if (hasHeaderContainer) {
+                        addResult('headerstyles-results', '✅ מחלקת header-container קיימת', 'success');
+                    } else {
+                        addResult('headerstyles-results', '❌ מחלקת header-container לא קיימת', 'error');
+                    }
+                    
+                    // בדיקת מבנה HTML
+                    const headerTop = headerElement.querySelector('.header-top');
+                    if (headerTop) {
+                        addResult('headerstyles-results', '✅ מבנה header-top קיים', 'success');
+                    } else {
+                        addResult('headerstyles-results', '❌ מבנה header-top לא קיים', 'error');
+                    }
+                    
+                    const logoSection = headerElement.querySelector('.logo-section');
+                    if (logoSection) {
+                        addResult('headerstyles-results', '✅ מבנה logo-section קיים', 'success');
+                    } else {
+                        addResult('headerstyles-results', '❌ מבנה logo-section לא קיים', 'error');
+                    }
+                    
+                    const headerNav = headerElement.querySelector('.header-nav');
+                    if (headerNav) {
+                        addResult('headerstyles-results', '✅ מבנה header-nav קיים', 'success');
+                    } else {
+                        addResult('headerstyles-results', '❌ מבנה header-nav לא קיים', 'error');
+                    }
+                    
+                    const headerActions = headerElement.querySelector('.header-actions');
+                    if (headerActions) {
+                        addResult('headerstyles-results', '✅ מבנה header-actions קיים', 'success');
+                    } else {
+                        addResult('headerstyles-results', '❌ מבנה header-actions לא קיים', 'error');
+                    }
+                    
+                    const filtersContainer = headerElement.querySelector('.filters-container');
+                    if (filtersContainer) {
+                        addResult('headerstyles-results', '✅ מבנה filters-container קיים', 'success');
+                    } else {
+                        addResult('headerstyles-results', '❌ מבנה filters-container לא קיים', 'error');
+                    }
+                    
+                } else {
+                    addResult('headerstyles-results', '❌ אלמנט כותרת לא קיים', 'error');
+                }
+                
+                addResult('headerstyles-results', '✅ בדיקת סגנונות כותרת הושלמה בהצלחה', 'success');
+                
+            } catch (error) {
+                addResult('headerstyles-results', `❌ שגיאה בבדיקת סגנונות כותרת: ${error.message}`, 'error');
+            }
+        }
+        
+        function testHeaderIntegration() {
+            clearResults('headerintegration-results');
+            addResult('headerintegration-results', 'מתחיל בדיקת אינטגרציה של כותרת...', 'info');
+            
+            try {
+                // יצירת מערכת
+                const headerSystem = new HeaderSystem();
+                
+                // בדיקת יצירת HeaderComponent
+                const headerComponent = new HeaderComponent(headerSystem);
+                
+                if (headerComponent) {
+                    addResult('headerintegration-results', '✅ HeaderComponent נוצר בהצלחה', 'success');
+                } else {
+                    addResult('headerintegration-results', '❌ HeaderComponent לא נוצר', 'error');
+                }
+                
+                // בדיקת אינטגרציה עם רכיבים אחרים
+                const stateComponent = headerSystem.getComponent('state');
+                const uiComponent = headerSystem.getComponent('ui');
+                const translationComponent = headerSystem.getComponent('translation');
+                const preferencesComponent = headerSystem.getComponent('preferences');
+                const menuComponent = headerSystem.getComponent('menu');
+                const filterComponent = headerSystem.getComponent('filter');
+                const navigationComponent = headerSystem.getComponent('navigation');
+                
+                if (stateComponent && uiComponent && translationComponent && preferencesComponent && 
+                    menuComponent && filterComponent && navigationComponent) {
+                    addResult('headerintegration-results', '✅ כל הרכיבים זמינים לאינטגרציה', 'success');
+                } else {
+                    addResult('headerintegration-results', '❌ חלק מהרכיבים לא זמינים לאינטגרציה', 'error');
+                }
+                
+                // בדיקת אינטגרציה עם שירותים
+                const eventService = headerSystem.getService('event');
+                const stateService = headerSystem.getService('state');
+                const uiService = headerSystem.getService('ui');
+                
+                if (eventService && stateService && uiService) {
+                    addResult('headerintegration-results', '✅ כל השירותים זמינים לאינטגרציה', 'success');
+                } else {
+                    addResult('headerintegration-results', '❌ חלק מהשירותים לא זמינים לאינטגרציה', 'error');
+                }
+                
+                // בדיקת אינטגרציה מלאה
+                const allComponentsWorking = headerComponent && stateComponent && uiComponent && 
+                    translationComponent && preferencesComponent && menuComponent && 
+                    filterComponent && navigationComponent;
+                
+                if (allComponentsWorking) {
+                    addResult('headerintegration-results', '✅ אינטגרציה מלאה של כותרת עובדת', 'success');
+                } else {
+                    addResult('headerintegration-results', '❌ אינטגרציה מלאה של כותרת לא עובדת', 'error');
+                }
+                
+                addResult('headerintegration-results', '✅ בדיקת אינטגרציה הושלמה בהצלחה', 'success');
+                
+            } catch (error) {
+                addResult('headerintegration-results', `❌ שגיאה בבדיקת אינטגרציה: ${error.message}`, 'error');
+            }
+        }
+        
+        // בדיקה אוטומטית בטעינת העמוד
+        window.addEventListener('load', () => {
+            addResult('headercomponent-results', 'עמוד נטען - מוכן לבדיקות HeaderComponent', 'info');
+        });
+    </script>
+</body>
+</html>

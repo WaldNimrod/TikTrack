@@ -3189,7 +3189,7 @@ function generateDetailedLog() {
                 showAddTradeModal: typeof window.showAddTradeModal === 'function' ? 'זמין' : 'לא זמין',
                 editTradeRecord: typeof window.editTradeRecord === 'function' ? 'זמין' : 'לא זמין',
                 deleteTradeRecord: typeof window.deleteTradeRecord === 'function' ? 'זמין' : 'לא זמין',
-                toggleTopSection: typeof window.toggleTopSection === 'function' ? 'זמין' : 'לא זמין',
+                toggleSection: typeof window.toggleSection === 'function' ? 'זמין' : 'לא זמין',
                 toggleSection: typeof window.toggleSection === 'function' ? 'זמין' : 'לא זמין',
                 sortTableData: typeof window.sortTableData === 'function' ? 'זמין' : 'לא זמין'
             },

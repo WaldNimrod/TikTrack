@@ -57,6 +57,7 @@
     
     <!-- Core System Files -->
     <script src="scripts/notification-system.js"></script>
+    <script src="scripts/system-management.js"></script>
     <script src="scripts/warning-system.js"></script>
   <script src="scripts/global-notification-collector.js"></script>
     <script src="scripts/translation-utils.js"></script>
@@ -119,7 +120,7 @@
             <button class="btn btn-sm btn-outline-primary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והטריידים">
               <i class="fas fa-copy"></i> העתק לוג מפורט
             </button>
-            <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור מעקב טריידים">
+            <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר אזור מעקב טריידים">
               <span class="filter-icon">▲</span>
             </button>
           </div>

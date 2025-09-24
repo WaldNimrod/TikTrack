@@ -210,7 +210,7 @@ Loading order: Bootstrap → ITCSS files → Header styles
 // These functions are loaded from ui-utils.js and provide:
 // - toggleAllSections() - toggles all content sections and top section
 // - toggleSection(sectionId) - toggles a specific section by ID
-// - toggleTopSection() - toggles only the top section
+// - toggleSection() - toggles only the top section
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', function() {
@@ -248,7 +248,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Export functions to global scope for onclick attributes
 // window.toggleAllSections export removed - using global version from ui-utils.js
 // window.toggleSection export removed - using global version from ui-utils.js
-window.toggleTopSection = toggleTopSection;
+window.toggleSection = toggleSection;
 window.toggleLayer = toggleLayer;
 window.enableAllStyles = enableAllStyles;
 window.disableAllStyles = disableAllStyles;

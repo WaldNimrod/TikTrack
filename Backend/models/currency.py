@@ -11,7 +11,7 @@ class Currency(BaseModel):
     usd_rate = Column(Numeric(10, 6), nullable=False, default=1.000000)
     
     # Relationships
-    accounts = relationship("TradingAccount", back_populates="currency")
+    trading_accounts = relationship("TradingAccount", back_populates="currency")
     cash_flows = relationship("CashFlow", back_populates="currency")
     tickers = relationship("Ticker", back_populates="currency")
     

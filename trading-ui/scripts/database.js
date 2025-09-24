@@ -382,15 +382,8 @@ function handleDataLoadError(error, tableType) {
 /**
  * Toggle top section visibility
  */
-function toggleTopSection() {
-    if (typeof window.toggleTopSection === 'function') {
-        window.toggleTopSection();
-    } else {
-        console.warn('toggleTopSection function not found');
-    }
-}
 
-// toggleMainSection function removed - use toggleSection('main') instead
+// toggleSection function removed - use toggleSection('main') instead
 
 /**
  * Add new record (placeholder function)
@@ -420,8 +413,8 @@ function addRecord() {
 window.initDatabaseDisplay = initDatabaseDisplay;
 window.loadTableData = loadTableData;
 window.filterTableData = filterTableData;
-window.toggleTopSection = toggleTopSection;
-// toggleMainSection export removed - use toggleSection('main') instead
+window.toggleSection = toggleSection;
+// toggleSection export removed - use toggleSection('main') instead
 window.addRecord = addRecord;
 // window.sortTable export removed - using global version from tables.js
 // window.copyDetailedLog export removed - using global version from system-management.js

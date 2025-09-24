@@ -1057,26 +1057,6 @@ function populateSelect(selectId, data, field, prefix = '') {
 
   // console.log('🔧 populateSelect completed for:', selectId, 'with', data.length, 'items');
 }
-
-/**
- * סגירת מודל - שימוש בפונקציה גלובלית
- * @deprecated Use window.closeModal from main.js instead
- */
-function closeModal(modalId) {
-  // Fallback אם הפונקציה הגלובלית לא קיימת
-  const modalElement = document.getElementById(modalId);
-  if (modalElement) {
-    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-      const modal = bootstrap.Modal.getInstance(modalElement);
-      if (modal) {
-        modal.hide();
-      }
-    } else {
-      modalElement.style.display = 'none';
-      modalElement.classList.remove('show');
-      document.body.classList.remove('modal-open');
-    }
-  }
 }
 
 
@@ -2212,13 +2192,13 @@ function restoreAlertsSectionState() {
 }
 
 // הגנה - וידוא שהפונקציות הגלובליות זמינות
-if (typeof window.toggleTopSection !== 'function') {
-  window.toggleTopSection = function () {
-    // console.warn('toggleTopSection fallback called - main.js may not be loaded properly');
+if (typeof window.toggleSection !== 'function') {
+  window.toggleSection = function () {
+    // console.warn('toggleSection fallback called - main.js may not be loaded properly');
   };
 }
 
-// toggleMainSection fallback removed - use toggleSection('main') instead
+// toggleSection fallback removed - use toggleSection('main') instead
 
 // toggleSection function removed - using global version from ui-utils.js
 
@@ -2678,13 +2658,6 @@ document.addEventListener("DOMContentLoaded", () => {
 // ===== MISSING FUNCTIONS FOR ONCLICK ATTRIBUTES =====
 
 // Toggle functions
-function toggleTopSection() {
-    if (typeof window.toggleTopSection === 'function') {
-        window.toggleTopSection();
-    } else {
-        console.warn('toggleTopSection function not found');
-    }
-}
 
 
 // Filter functions
@@ -2763,7 +2736,7 @@ function generateDetailedLog() {
                 showAddAlertModal: typeof window.showAddAlertModal === 'function' ? 'זמין' : 'לא זמין',
                 editAlert: typeof window.editAlert === 'function' ? 'זמין' : 'לא זמין',
                 deleteAlert: typeof window.deleteAlert === 'function' ? 'זמין' : 'לא זמין',
-                toggleTopSection: typeof window.toggleTopSection === 'function' ? 'זמין' : 'לא זמין',
+                toggleSection: typeof window.toggleSection === 'function' ? 'זמין' : 'לא זמין',
                 toggleSection: typeof window.toggleSection === 'function' ? 'זמין' : 'לא זמין',
                 filterAlertsByRelatedObjectType: typeof window.filterAlertsByRelatedObjectType === 'function' ? 'זמין' : 'לא זמין',
                 sortTableData: typeof window.sortTableData === 'function' ? 'זמין' : 'לא זמין'
@@ -2803,7 +2776,7 @@ function generateDetailedLog() {
 
 
 // Export functions to global scope for onclick attributes
-window.toggleTopSection = toggleTopSection;
+window.toggleSection = toggleSection;
 // window.toggleSection export removed - using global version from ui-utils.js
 window.filterAlertsByRelatedObjectType = filterAlertsByRelatedObjectType;
 window.loadAlertsData = loadAlertsData;

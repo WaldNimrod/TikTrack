@@ -33,7 +33,7 @@ No connection to testing system!
     /api/cash_flows          # Cash flows
     /api/notes               # Notes
     /api/executions          # Executions
-    /api/v1/tests/run        # Run tests (testing system)
+    /api/tests/run        # Run tests (testing system)
 
 📝 Logs:
     server_detailed.log
@@ -225,7 +225,7 @@ app.register_blueprint(wal_bp)
 # External Data Integration blueprints
 app.register_blueprint(quotes_bp)
 app.register_blueprint(status_bp)
-# API v1 quotes endpoints (specification compliant)
+# API quotes endpoints (specification compliant)
 app.register_blueprint(quotes_v1_bp)
 
 app.register_blueprint(pages_bp)
@@ -1132,7 +1132,7 @@ def update_all_tickers_open_status() -> None:
 
 
 
-# API for trades - now defined in blueprint /api/v1/trades
+# API for trades - now defined in blueprint /api/trades
 
 
 
@@ -1526,7 +1526,7 @@ def serve_static_files(filename):
 
 # File listing endpoint moved to /api/file-scanner/files
 
-@app.route("/api/v1/files/save", methods=["POST"])
+@app.route("/api/files/save", methods=["POST"])
 @rate_limit_api(requests_per_minute=1000)
 def save_file():
     """Save file content after auto-fix"""

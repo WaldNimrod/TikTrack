@@ -125,19 +125,19 @@ CREATE TABLE constraint_validations (
 ## API Endpoints
 
 ### Constraint Management
-- `GET /api/v1/constraints/` - Get all constraints
-- `POST /api/v1/constraints/` - Add new constraint
-- `PUT /api/v1/constraints/<id>` - Update constraint
-- `DELETE /api/v1/constraints/<id>` - Delete constraint
+- `GET /api/constraints/` - Get all constraints
+- `POST /api/constraints/` - Add new constraint
+- `PUT /api/constraints/<id>` - Update constraint
+- `DELETE /api/constraints/<id>` - Delete constraint
 
 ### Validation
-- `POST /api/v1/constraints/validate` - Validate specific field
-- `GET /api/v1/constraints/health` - System health check
+- `POST /api/constraints/validate` - Validate specific field
+- `GET /api/constraints/health` - System health check
 
 ### Enum Values
-- `GET /api/v1/constraints/enum-values/<constraint_name>` - Get enum values
-- `POST /api/v1/constraints/enum-values/` - Add enum value
-- `DELETE /api/v1/constraints/enum-values/<id>` - Delete enum value
+- `GET /api/constraints/enum-values/<constraint_name>` - Get enum values
+- `POST /api/constraints/enum-values/` - Add enum value
+- `DELETE /api/constraints/enum-values/<id>` - Delete enum value
 
 ## Usage Examples
 
@@ -276,7 +276,7 @@ CREATE TABLE constraint_validations (
 The database page (`/db_display`) now displays constraints dynamically from the API:
 
 #### **Features**
-- **Real-time Loading**: Constraints are loaded from `/api/v1/constraints/` endpoint
+- **Real-time Loading**: Constraints are loaded from `/api/constraints/` endpoint
 - **Automatic Updates**: Constraints list updates automatically when page loads
 - **Visual Indicators**: Different constraint types have distinct colors and icons
 - **Unique Section IDs**: Each table section has unique ID for targeting

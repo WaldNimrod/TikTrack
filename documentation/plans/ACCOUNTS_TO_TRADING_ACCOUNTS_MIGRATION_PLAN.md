@@ -221,7 +221,7 @@
 - `/api/accounts/<id>` → `/api/trading-accounts/<id>`
 - `/api/accounts/<id>/trades` → `/api/trading-accounts/<id>/trades`
 
-**הערה:** המערכת עוברת לארכיטקטורה נקייה ללא v1. כל ה-API endpoints יהיו בפורמט `/api/` במקום `/api/v1/`.
+**הערה:** המערכת עוברת לארכיטקטורה נקייה ללא v1. כל ה-API endpoints יהיו בפורמט `/api/` במקום `/api/`.
 
 ---
 

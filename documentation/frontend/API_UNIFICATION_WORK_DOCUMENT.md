@@ -88,7 +88,7 @@ import logging
 
 #### **2. Blueprint Creation (24 מקרים):**
 ```python
-{entity}_bp = Blueprint('{entity}', __name__, url_prefix='/api/v1/{entity}')
+{entity}_bp = Blueprint('{entity}', __name__, url_prefix='/api/{entity}')
 ```
 
 #### **3. Error Handling (1,215 מקרים):**
@@ -462,9 +462,9 @@ done
 #### **3. בדיקות Performance:**
 ```bash
 # בדיקת זמני תגובה
-ab -n 100 -c 10 http://localhost:8080/api/v1/accounts/
-ab -n 100 -c 10 http://localhost:8080/api/v1/trades/
-ab -n 100 -c 10 http://localhost:8080/api/v1/tickers/
+ab -n 100 -c 10 http://localhost:8080/api/accounts/
+ab -n 100 -c 10 http://localhost:8080/api/trades/
+ab -n 100 -c 10 http://localhost:8080/api/tickers/
 ```
 
 #### **4. בדיקות Memory:**

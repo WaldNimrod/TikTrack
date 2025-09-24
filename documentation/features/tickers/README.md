@@ -120,17 +120,17 @@ def update_all_ticker_statuses(session) -> None:
 ## פעולות ידניות
 
 ### ביטול טיקר
-- **API**: `POST /api/v1/tickers/{id}/cancel`
+- **API**: `POST /api/tickers/{id}/cancel`
 - **סטטוס**: משתנה ל-'cancelled'
 - **השפעה**: לא משתנה אוטומטית
 
 ### הפעלה מחדש
-- **API**: `PUT /api/v1/tickers/{id}` עם status: 'open'
+- **API**: `PUT /api/tickers/{id}` עם status: 'open'
 - **סטטוס**: משתנה ל-'open'
 - **השפעה**: נבדק מול פריטים מקושרים
 
 ### מחיקת טיקר
-- **API**: `DELETE /api/v1/tickers/{id}`
+- **API**: `DELETE /api/tickers/{id}`
 - **בדיקה**: מונע מחיקה אם יש פריטים מקושרים
 - **השפעה**: מוחק רק אם אין פריטים מקושרים
 
@@ -157,32 +157,32 @@ python Backend/scripts/fix_ticker_statuses.py
 ## תהליכים שמפעילים טריגרים
 
 ### 1. יצירת Trade
-- **API**: `POST /api/v1/trades/`
+- **API**: `POST /api/trades/`
 - **טריגר**: `trade_inserted`
 - **עדכון**: סטטוס טיקר ל-'open' אם יש trades פתוחים
 
 ### 2. עדכון Trade
-- **API**: `PUT /api/v1/trades/{id}`
+- **API**: `PUT /api/trades/{id}`
 - **טריגר**: `trade_updated`
 - **עדכון**: סטטוס טיקר בהתאם לסטטוס ה-trade
 
 ### 3. מחיקת Trade
-- **API**: `DELETE /api/v1/trades/{id}`
+- **API**: `DELETE /api/trades/{id}`
 - **טריגר**: `trade_deleted`
 - **עדכון**: סטטוס טיקר ל-'closed' אם אין trades פתוחים
 
 ### 4. יצירת TradePlan
-- **API**: `POST /api/v1/trade_plans/`
+- **API**: `POST /api/trade_plans/`
 - **טריגר**: `trade_plan_inserted`
 - **עדכון**: סטטוס טיקר ל-'open' אם יש plans פתוחים
 
 ### 5. עדכון TradePlan
-- **API**: `PUT /api/v1/trade_plans/{id}`
+- **API**: `PUT /api/trade_plans/{id}`
 - **טריגר**: `trade_plan_updated`
 - **עדכון**: סטטוס טיקר בהתאם לסטטוס ה-plan
 
 ### 6. מחיקת TradePlan
-- **API**: `DELETE /api/v1/trade_plans/{id}`
+- **API**: `DELETE /api/trade_plans/{id}`
 - **טריגר**: `trade_plan_deleted`
 - **עדכון**: סטטוס טיקר ל-'closed' אם אין plans פתוחים
 

@@ -66,10 +66,10 @@ start_wal_background_service()
 #### שכבה 5: API Endpoints לניהול WAL
 ```bash
 # API endpoints לניהול ידני
-GET /api/v1/wal/status
-POST /api/v1/wal/checkpoint
-POST /api/v1/wal/cleanup
-GET /api/v1/wal/health
+GET /api/wal/status
+POST /api/wal/checkpoint
+POST /api/wal/cleanup
+GET /api/wal/health
 ```
 
 **יתרונות:**
@@ -118,7 +118,7 @@ PRAGMA foreign_keys=ON
 
 #### 1. מצב WAL
 ```bash
-GET /api/v1/wal/status
+GET /api/wal/status
 ```
 **תגובה:**
 ```json
@@ -139,7 +139,7 @@ GET /api/v1/wal/status
 
 #### 2. כפיית Checkpoint
 ```bash
-POST /api/v1/wal/checkpoint
+POST /api/wal/checkpoint
 Content-Type: application/json
 
 {
@@ -149,12 +149,12 @@ Content-Type: application/json
 
 #### 3. ניקוי WAL
 ```bash
-POST /api/v1/wal/cleanup
+POST /api/wal/cleanup
 ```
 
 #### 4. דוח בריאות
 ```bash
-GET /api/v1/wal/health
+GET /api/wal/health
 ```
 
 ### מעקב ובקרה
@@ -178,7 +178,7 @@ ERROR: WAL checkpoint failed: Database is busy
 #### בעיה: WAL file גדול
 **פתרון:**
 ```bash
-curl -X POST http://localhost:8080/api/v1/wal/checkpoint \
+curl -X POST http://localhost:8080/api/wal/checkpoint \
   -H "Content-Type: application/json" \
   -d '{"mode": "TRUNCATE"}'
 ```
@@ -200,16 +200,16 @@ curl -X POST http://localhost:8080/api/v1/wal/checkpoint \
 #### בדיקה יומית:
 ```bash
 # בדיקת מצב WAL
-curl http://localhost:8080/api/v1/wal/status
+curl http://localhost:8080/api/wal/status
 
 # בדיקת בריאות
-curl http://localhost:8080/api/v1/wal/health
+curl http://localhost:8080/api/wal/health
 ```
 
 #### בדיקה שבועית:
 ```bash
 # ניקוי WAL
-curl -X POST http://localhost:8080/api/v1/wal/cleanup
+curl -X POST http://localhost:8080/api/wal/cleanup
 ```
 
 ### הגדרות ייצור

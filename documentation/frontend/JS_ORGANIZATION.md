@@ -154,7 +154,7 @@ function colorAmountByValue(amount) {
 // Load cash flows from server
 async function loadCashFlows() {
     try {
-        const response = await fetch('/api/v1/cash_flows/');
+        const response = await fetch('/api/cash_flows/');
         const cashFlows = await response.json();
         renderCashFlowsTable(cashFlows);
     } catch (error) {
@@ -211,7 +211,7 @@ function showDeleteCashFlowModal(id) {
 // Load accounts from server
 async function loadAccounts() {
     try {
-        const response = await fetch('/api/v1/accounts/');
+        const response = await fetch('/api/accounts/');
         const accounts = await response.json();
         renderAccountsTable(accounts);
     } catch (error) {
@@ -247,7 +247,7 @@ function renderAccountsTable(accounts) {
 // Load alerts from server
 async function loadAlerts() {
     try {
-        const response = await fetch('/api/v1/alerts/');
+        const response = await fetch('/api/alerts/');
         const alerts = await response.json();
         renderAlertsTable(alerts);
     } catch (error) {
@@ -338,7 +338,7 @@ formatCurrencyWithCommas(amount, currency);
 ### 2. API Integration
 ```javascript
 // Consistent API pattern
-const API_BASE = '/api/v1/';
+const API_BASE = '/api/';
 
 async function apiCall(endpoint, options = {}) {
     const url = `${API_BASE}${endpoint}`;

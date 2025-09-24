@@ -195,7 +195,7 @@ External (Yahoo) ──┐     │
 External (Google) ──┼─── Adapter → Normalizer → Ingest API → Cache (short TTL) → DB
                     │     │
                     │     ↓
-                    └─── UI via /api/v1/quotes[/batch] (renders in user timezone)
+                    └─── UI via /api/quotes[/batch] (renders in user timezone)
 ```
 
 **Principles**
@@ -365,13 +365,13 @@ Users can override the default minutes per category **without code changes**. Se
 ## 5) API
 
 ### 5.1 Quotes (unchanged; UTC)
-- `GET /api/v1/quotes/batch?ticker_ids=...` — **preferred for UI**  
-- `GET /api/v1/quotes/{ticker_id}`  
+- `GET /api/quotes/batch?ticker_ids=...` — **preferred for UI**  
+- `GET /api/quotes/{ticker_id}`  
 - Responses include UTC `asof_utc`, `fetched_at` (no local fields in Stage‑1).
 
 ### 5.2 Preferences
-- `GET /api/v1/user/preferences` → returns `timezone` and `refresh_overrides_json`.  
-- `PUT /api/v1/user/preferences` → updates `timezone` and/or `refresh_overrides_json` (server validates guardrails).
+- `GET /api/user/preferences` → returns `timezone` and `refresh_overrides_json`.  
+- `PUT /api/user/preferences` → updates `timezone` and/or `refresh_overrides_json` (server validates guardrails).
 
 **Note:** The **scheduler uses NY clock** for rule evaluation; UI uses **user timezone** to render all timestamps.
 

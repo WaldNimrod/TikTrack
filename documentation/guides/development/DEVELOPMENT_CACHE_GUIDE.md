@@ -69,7 +69,7 @@ npm run dev:production
 npm run cache:clear
 
 # או ישירות
-curl -X POST http://localhost:8080/api/v1/cache/clear
+curl -X POST http://localhost:8080/api/cache/clear
 ```
 
 ## 🚀 האופציה המומלצת לפיתוח
@@ -107,10 +107,10 @@ export TIKTRACK_CACHE_DISABLED=true
 ### בעיה: Cache לא מתנקה
 ```bash
 # בדיקת מצב Cache
-curl http://localhost:8080/api/v1/cache/stats
+curl http://localhost:8080/api/cache/stats
 
 # ניקוי ידני
-curl -X POST http://localhost:8080/api/v1/cache/clear
+curl -X POST http://localhost:8080/api/cache/clear
 ```
 
 ### בעיה: השינויים לא נראים
@@ -146,9 +146,9 @@ chmod +x dev_mode_toggle.sh
 
 ## 🔗 API Endpoints רלוונטיים
 
-- `GET /api/v1/cache/stats` - סטטיסטיקות Cache
-- `POST /api/v1/cache/clear` - ניקוי Cache
-- `GET /api/v1/cache/health` - בריאות Cache
+- `GET /api/cache/stats` - סטטיסטיקות Cache
+- `POST /api/cache/clear` - ניקוי Cache
+- `GET /api/cache/health` - בריאות Cache
 
 ---
 

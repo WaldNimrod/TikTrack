@@ -109,7 +109,7 @@
 
 #### **שלב 2: תיקון ResponseOptimizer ✅**
 - **זיהוי endpoints מתאימים למטמון:** הוספת סוג `cacheable_api` עם `max-age=300`
-- **endpoints שזוהו:** `/api/v1/accounts`, `/api/v1/tickers`, `/api/v1/trades`, `/api/v1/trade_plans`, `/api/v1/cash_flows`, `/api/v1/notes`, `/api/v1/executions`, `/api/v1/alerts`, `/api/v1/background-tasks`, `/api/external-data/status`, `/api/external-data/quotes`
+- **endpoints שזוהו:** `/api/accounts`, `/api/tickers`, `/api/trades`, `/api/trade_plans`, `/api/cash_flows`, `/api/notes`, `/api/executions`, `/api/alerts`, `/api/background-tasks`, `/api/external-data/status`, `/api/external-data/quotes`
 - **קובץ שעודכן:** `Backend/utils/response_optimizer.py`
 
 #### **שלב 3: הפעלת המטמון ✅**
@@ -220,7 +220,7 @@
 **מה שהושלם:**
 - ✅ **AdvancedCacheService**: שירות caching מתקדם עם dependency management
 - ✅ **CacheEntry**: מודל לרשומות cache עם TTL ו-access tracking
-- ✅ **API Endpoints**: 5 endpoints מלאים (`/api/v1/cache/*`)
+- ✅ **API Endpoints**: 5 endpoints מלאים (`/api/cache/*`)
 - ✅ **דף בדיקה מתקדם**: `/cache-test` עם UI מלא
 - ✅ **Decorators**: `@cache_for` ו-`@cache_with_deps` לשימוש קל
 - ✅ **Memory Optimization**: ניהול זיכרון אוטומטי עם cleanup threads
@@ -236,11 +236,11 @@
 - 📁 `Backend/services/README_ADVANCED_CACHE.md` - תיעוד מפורט
 
 **API Endpoints זמינים:**
-- `GET /api/v1/cache/status` - מצב המערכת
-- `GET /api/v1/cache/health` - בדיקת בריאות
-- `GET /api/v1/cache/stats` - סטטיסטיקות
-- `POST /api/v1/cache/clear` - ניקוי cache
-- `POST /api/v1/cache/invalidate` - invalidate by dependency
+- `GET /api/cache/status` - מצב המערכת
+- `GET /api/cache/health` - בדיקת בריאות
+- `GET /api/cache/stats` - סטטיסטיקות
+- `POST /api/cache/clear` - ניקוי cache
+- `POST /api/cache/invalidate` - invalidate by dependency
 
 #### 2. **Query Optimization System - Frontend Complete, Backend APIs Pending** 🚧
 **סטטוס:** ✅ **Frontend 100% הושלם** | 🔄 **Backend APIs 80% הושלמו**  
@@ -267,30 +267,30 @@
 - 📁 `Backend/routes/api/query_optimization.py` - API endpoints (80% הושלמו)
 
 **API Endpoints זמינים (Simulated):**
-- `GET /api/v1/query-optimization/` - מצב המערכת
-- `GET /api/v1/query-optimization/stats` - סטטיסטיקות
-- `GET /api/v1/query-optimization/slow-queries` - queries איטיים
-- `GET /api/v1/query-optimization/optimization-opportunities` - הזדמנויות
-- `GET /api/v1/query-optimization/info` - מידע על המערכת
+- `GET /api/query-optimization/` - מצב המערכת
+- `GET /api/query-optimization/stats` - סטטיסטיקות
+- `GET /api/query-optimization/slow-queries` - queries איטיים
+- `GET /api/query-optimization/optimization-opportunities` - הזדמנויות
+- `GET /api/query-optimization/info` - מידע על המערכת
 
 #### 3. **Core Data Systems - עובדים ב-100%** 🎉
 **סטטוס:** ✅ **100% עובדים**  
 
 **מערכות נתונים זמינות:**
-- ✅ **Accounts**: `/api/v1/accounts/` - 13 accounts
-- ✅ **Trades**: `/api/v1/trades/` - 7 trades  
-- ✅ **Alerts**: `/api/v1/alerts/` - 15 alerts
-- ✅ **Executions**: `/api/v1/executions/` - 5 executions
-- ✅ **Trade Plans**: `/api/v1/trade_plans/` - 15 plans
-- ✅ **Notes**: `/api/v1/notes/` - 3 notes
-- ✅ **Constraints**: `/api/v1/constraints/` - 84 constraints
-- ✅ **Currencies**: `/api/v1/currencies/` - 3 currencies
-- ✅ **Users**: `/api/v1/users/` - 1 user
-- ✅ **Preferences**: `/api/v1/preferences/` - config מלא
-- ✅ **Tickers**: `/api/v1/tickers/` - 17 tickers
-- ✅ **Cash Flows**: `/api/v1/cash_flows/` - 9 cash flows
-- ✅ **Note Relation Types**: `/api/v1/note_relation_types/` - 4 types
-- ✅ **Linked Items**: `/api/v1/linked-items/types` - 8 entity types
+- ✅ **Accounts**: `/api/accounts/` - 13 accounts
+- ✅ **Trades**: `/api/trades/` - 7 trades  
+- ✅ **Alerts**: `/api/alerts/` - 15 alerts
+- ✅ **Executions**: `/api/executions/` - 5 executions
+- ✅ **Trade Plans**: `/api/trade_plans/` - 15 plans
+- ✅ **Notes**: `/api/notes/` - 3 notes
+- ✅ **Constraints**: `/api/constraints/` - 84 constraints
+- ✅ **Currencies**: `/api/currencies/` - 3 currencies
+- ✅ **Users**: `/api/users/` - 1 user
+- ✅ **Preferences**: `/api/preferences/` - config מלא
+- ✅ **Tickers**: `/api/tickers/` - 17 tickers
+- ✅ **Cash Flows**: `/api/cash_flows/` - 9 cash flows
+- ✅ **Note Relation Types**: `/api/note_relation_types/` - 4 types
+- ✅ **Linked Items**: `/api/linked-items/types` - 8 entity types
 
 #### 4. **Unified Test Center - הושלם לחלוטין** 🎉
 **סטטוס:** ✅ **100% הושלם**  
@@ -360,7 +360,7 @@
 **מה שהושלם:**
 - ✅ **AdvancedCacheService**: שירות caching מתקדם עם dependency management
 - ✅ **CacheEntry**: מודל לרשומות cache עם TTL ו-access tracking
-- ✅ **API Endpoints**: 5 endpoints לניהול ה-cache (`/api/v1/cache/*`)
+- ✅ **API Endpoints**: 5 endpoints לניהול ה-cache (`/api/cache/*`)
 - ✅ **דף בדיקה**: דף בדיקה מלא עם UI מתקדם (`/cache-test`)
 - ✅ **Decorators**: `@cache_for` ו-`@cache_with_deps` לשימוש קל
 - ✅ **Memory Optimization**: ניהול זיכרון אוטומטי עם cleanup threads
@@ -683,8 +683,8 @@ class RealTimeNotificationService:
 - **דף בדיקת Cache:** http://localhost:8080/cache-test
 - **מרכז בדיקות מערכת:** http://localhost:8080/system-test-center
 - **API Health:** http://localhost:8080/api/health
-- **Cache Status:** http://localhost:8080/api/v1/cache/status
-- **Query Optimization:** http://localhost:8080/api/v1/query-optimization/
+- **Cache Status:** http://localhost:8080/api/cache/status
+- **Query Optimization:** http://localhost:8080/api/query-optimization/
 
 ---
 

@@ -181,12 +181,12 @@ trading-ui/
 - [account-service.js](../../../trading-ui/scripts/account-service.js)
 
 ### API endpoints:
-- `/api/v1/executions/` - עסקאות
-- `/api/v1/trades/` - טריידים
-- `/api/v1/tickers/` - טיקרים
-- `/api/v1/accounts/` - חשבונות
-- `/api/v1/alerts/` - התראות
-- `/api/v1/notes/` - הערות
+- `/api/executions/` - עסקאות
+- `/api/trades/` - טריידים
+- `/api/tickers/` - טיקרים
+- `/api/accounts/` - חשבונות
+- `/api/alerts/` - התראות
+- `/api/notes/` - הערות
 
 ## 📝 הערות חשובות
 

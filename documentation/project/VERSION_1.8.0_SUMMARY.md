@@ -50,16 +50,16 @@ window.validateCurrencyForm()                 // Complete form validation
 ### 2. **API Endpoints**
 ```javascript
 // Currency API
-GET /api/v1/currencies/                    // Get all currencies
-POST /api/v1/currencies/                   // Create currency
-PUT /api/v1/currencies/{id}                // Update currency
-DELETE /api/v1/currencies/{id}             // Delete currency
+GET /api/currencies/                    // Get all currencies
+POST /api/currencies/                   // Create currency
+PUT /api/currencies/{id}                // Update currency
+DELETE /api/currencies/{id}             // Delete currency
 
 // Note Relation Types API
-GET /api/v1/note_relation_types/           // Get all note relation types
-POST /api/v1/note_relation_types/          // Create note relation type
-PUT /api/v1/note_relation_types/{id}       // Update note relation type
-DELETE /api/v1/note_relation_types/{id}    // Delete note relation type
+GET /api/note_relation_types/           // Get all note relation types
+POST /api/note_relation_types/          // Create note relation type
+PUT /api/note_relation_types/{id}       // Update note relation type
+DELETE /api/note_relation_types/{id}    // Delete note relation type
 ```
 
 ### 3. **UI/UX Improvements**

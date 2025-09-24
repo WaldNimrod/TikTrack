@@ -141,15 +141,15 @@ trading-ui/
 - **ResponseOptimizer תוקן:** הוספת סוג `cacheable_api` עם `max-age=300`
 
 #### **endpoints שזוהו למטמון ✅**
-- `/api/v1/accounts` - חשבונות
-- `/api/v1/tickers` - טיקרים
-- `/api/v1/trades` - עסקאות
-- `/api/v1/trade_plans` - תוכניות עסקאות
-- `/api/v1/cash_flows` - תזרימי מזומן
-- `/api/v1/notes` - הערות
-- `/api/v1/executions` - ביצועים
-- `/api/v1/alerts` - התראות
-- `/api/v1/background-tasks` - משימות רקע
+- `/api/accounts` - חשבונות
+- `/api/tickers` - טיקרים
+- `/api/trades` - עסקאות
+- `/api/trade_plans` - תוכניות עסקאות
+- `/api/cash_flows` - תזרימי מזומן
+- `/api/notes` - הערות
+- `/api/executions` - ביצועים
+- `/api/alerts` - התראות
+- `/api/background-tasks` - משימות רקע
 - `/api/external-data/status` - סטטוס נתונים חיצוניים
 - `/api/external-data/quotes` - ציטוטים
 

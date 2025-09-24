@@ -72,15 +72,15 @@
 ## ✅ מה שהושלם מאז הדוח הקודם
 
 ### 1. **API Endpoints שהושלמו**
-- `/api/v1/cache/clear` - ניקוי מטמון ✅ עובד (POST)
-- `/api/v1/cache/invalidate` - ניקוי מטמון ספציפי ✅ עובד (POST)
-- `/api/v1/cache/status` - סטטוס מטמון ✅ עובד
-- `/api/v1/cache/stats` - סטטיסטיקות מטמון ✅ עובד
+- `/api/cache/clear` - ניקוי מטמון ✅ עובד (POST)
+- `/api/cache/invalidate` - ניקוי מטמון ספציפי ✅ עובד (POST)
+- `/api/cache/status` - סטטוס מטמון ✅ עובד
+- `/api/cache/stats` - סטטיסטיקות מטמון ✅ עובד
 
 ### 2. **פונקציונליות שהושלמה**
 - ניקוי מטמון ✅ עובד
 - בדיקות מטמון ✅ עובד
-- Query optimization ✅ עובד (`/api/v1/query-optimization/`)
+- Query optimization ✅ עובד (`/api/query-optimization/`)
 - Performance monitoring ✅ עובד
 
 ## 🔄 מה שצריך הפעלה

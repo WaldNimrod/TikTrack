@@ -22,7 +22,7 @@
 
     <!-- TikTrack ITCSS Main CSS - אחרי Bootstrap כדי לדרוס אותו -->
     <!-- CSS Architecture: ראו documentation/frontend/CSS_ARCHITECTURE_GUIDE.md -->
-    <link rel="stylesheet" href="styles-new/main.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/main.css?v=1.0.0">
 
     <!-- Header Styles - נפרד מ-ITCSS -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=20250115_level3_fix">

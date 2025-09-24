@@ -69,14 +69,14 @@ linked_items = TickerService.check_linked_items_generic(db, 'account', account_i
 
 #### בדיקת פריטים מקושרים כללית
 ```http
-GET /api/v1/linked-items/{entity_type}/{entity_id}
+GET /api/linked-items/{entity_type}/{entity_id}
 ```
 
 **דוגמה:**
 ```http
-GET /api/v1/linked-items/ticker/1
-GET /api/v1/linked-items/trade/5
-GET /api/v1/linked-items/account/3
+GET /api/linked-items/ticker/1
+GET /api/linked-items/trade/5
+GET /api/linked-items/account/3
 ```
 
 **תגובה:**
@@ -102,12 +102,12 @@ GET /api/v1/linked-items/account/3
 
 #### בדיקת בטיחות מחיקה
 ```http
-GET /api/v1/linked-items/{entity_type}/{entity_id}/check-deletion
+GET /api/linked-items/{entity_type}/{entity_id}/check-deletion
 ```
 
 **דוגמה:**
 ```http
-GET /api/v1/linked-items/ticker/1/check-deletion
+GET /api/linked-items/ticker/1/check-deletion
 ```
 
 **תגובה:**
@@ -146,7 +146,7 @@ GET /api/v1/linked-items/ticker/1/check-deletion
 // בדיקת פריטים מקושרים באמצעות API החדש
 async function performCancelTickerWithLinkedItemsCheck(id) {
     try {
-        const linkedItemsResponse = await fetch(`/api/v1/linked-items/ticker/${id}/check-deletion`);
+        const linkedItemsResponse = await fetch(`/api/linked-items/ticker/${id}/check-deletion`);
         if (linkedItemsResponse.ok) {
             const linkedItems = await linkedItemsResponse.json();
             
@@ -245,7 +245,7 @@ async function performCancelTickerWithLinkedItemsCheck(id) {
 // פונקציה גנרית לבדיקת פריטים מקושרים
 async function checkLinkedItemsForEntity(entityType, entityId) {
     try {
-        const response = await fetch(`/api/v1/linked-items/${entityType}/${entityId}/check-deletion`);
+        const response = await fetch(`/api/linked-items/${entityType}/${entityId}/check-deletion`);
         if (response.ok) {
             const result = await response.json();
             return result;
@@ -320,7 +320,7 @@ const blockingData = {
 ### בדיקת בטיחות מחיקת טיקר
 ```javascript
 // בדיקה אם ניתן למחוק טיקר
-const safetyCheck = await fetch('/api/v1/linked-items/ticker/1/check-deletion');
+const safetyCheck = await fetch('/api/linked-items/ticker/1/check-deletion');
 const result = await safetyCheck.json();
 
 if (!result.can_delete) {
@@ -332,7 +332,7 @@ if (!result.can_delete) {
 ### בדיקת פריטים מקושרים לטרייד
 ```javascript
 // בדיקת פריטים מקושרים לטרייד
-const linkedItems = await fetch('/api/v1/linked-items/trade/5');
+const linkedItems = await fetch('/api/linked-items/trade/5');
 const result = await linkedItems.json();
 
 console.log('פריטים מקושרים:', result.child_entities);
@@ -591,8 +591,8 @@ const newColor = window.getEntityColor('new_entity');
 - **Services**: `Backend/services/ticker_service.py` (פונקציה `check_linked_items_generic`)
 - **Frontend**: `trading-ui/scripts/ui-utils.js` (פונקציות UI)
 - **API Endpoints**: 
-  - `GET /api/v1/linked-items/{entity_type}/{entity_id}`
-  - `GET /api/v1/linked-items/{entity_type}/{entity_id}/check-deletion`
+  - `GET /api/linked-items/{entity_type}/{entity_id}`
+  - `GET /api/linked-items/{entity_type}/{entity_id}/check-deletion`
 
 ## 🎓 **למידות מהעבודה על עמוד טיקרים - 29 באוגוסט 2025**
 
@@ -734,7 +734,7 @@ function createCSVFromLinkedItems(data, itemType, itemId) {
 #### **1. שימוש במערכת הגנרית**
 ```javascript
 // ✅ תמיד להשתמש ב-API הגנרי
-const response = await fetch(`/api/v1/linked-items/${entityType}/${entityId}`);
+const response = await fetch(`/api/linked-items/${entityType}/${entityId}`);
 const data = await response.json();
 
 // ✅ תמיד לסנן child_entities

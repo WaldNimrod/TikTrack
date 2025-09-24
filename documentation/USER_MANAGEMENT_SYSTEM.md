@@ -169,19 +169,19 @@ def display_name(self) -> str:
 ##### 1. קבלת משתמשים
 
 ```http
-GET /api/v1/users/
-GET /api/v1/users/<int:user_id>
-GET /api/v1/users/default
-GET /api/v1/users/current
+GET /api/users/
+GET /api/users/<int:user_id>
+GET /api/users/default
+GET /api/users/current
 ```
 
 ##### 2. ניהול משתמשים
 
 ```http
-POST /api/v1/users/
-PUT /api/v1/users/<int:user_id>
-DELETE /api/v1/users/<int:user_id>
-POST /api/v1/users/ensure-default
+POST /api/users/
+PUT /api/users/<int:user_id>
+DELETE /api/users/<int:user_id>
+POST /api/users/ensure-default
 ```
 
 #### דוגמאות תגובה
@@ -240,10 +240,10 @@ POST /api/v1/users/ensure-default
 #### נתיבים
 
 ```http
-GET /api/v1/preferences/
-POST /api/v1/preferences/
-PUT /api/v1/preferences/<key>
-POST /api/v1/preferences/reset
+GET /api/preferences/
+POST /api/preferences/
+PUT /api/preferences/<key>
+POST /api/preferences/reset
 ```
 
 #### דוגמאות
@@ -328,13 +328,13 @@ preferences = UserService.get_user_preferences(db, 999)
 
 ```bash
 # בדיקת משתמש ברירת מחדל
-curl -s http://localhost:8080/api/v1/users/default | jq
+curl -s http://localhost:8080/api/users/default | jq
 
 # בדיקת העדפות
-curl -s http://localhost:8080/api/v1/preferences/ | jq
+curl -s http://localhost:8080/api/preferences/ | jq
 
 # שמירת העדפות
-curl -s -X POST http://localhost:8080/api/v1/preferences/ \
+curl -s -X POST http://localhost:8080/api/preferences/ \
   -H "Content-Type: application/json" \
   -d '{"preferences": {"defaultStopLoss": 15}}' | jq
 ```
@@ -358,14 +358,14 @@ SELECT id, username, preferences FROM users WHERE id = 1;
 
 ```javascript
 // קבלת העדפות משתמש
-fetch('/api/v1/preferences/')
+fetch('/api/preferences/')
   .then(response => response.json())
   .then(preferences => {
     console.log('User preferences:', preferences);
   });
 
 // שמירת העדפות
-fetch('/api/v1/preferences/', {
+fetch('/api/preferences/', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({

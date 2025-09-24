@@ -111,28 +111,28 @@ trading-ui/
 ### Trade Plans API
 ```javascript
 // Get all trade plans
-GET /api/v1/trade_plans/
+GET /api/trade_plans/
 
 // Get specific trade plan
-GET /api/v1/trade_plans/{id}
+GET /api/trade_plans/{id}
 
 // Create new trade plan
-POST /api/v1/trade_plans/
+POST /api/trade_plans/
 
 // Update trade plan
-PUT /api/v1/trade_plans/{id}
+PUT /api/trade_plans/{id}
 
 // Cancel trade plan
-POST /api/v1/trade_plans/{id}/cancel
+POST /api/trade_plans/{id}/cancel
 
 // Delete trade plan
-DELETE /api/v1/trade_plans/{id}
+DELETE /api/trade_plans/{id}
 ```
 
 ### Linked Items API
 ```javascript
 // Check linked items for trade plan
-GET /api/v1/linked-items/trade_plan/{id}
+GET /api/linked-items/trade_plan/{id}
 ```
 
 ## 🚨 Known Limitations

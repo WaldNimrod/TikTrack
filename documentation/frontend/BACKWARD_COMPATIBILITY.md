@@ -67,9 +67,9 @@ window.convertTradeStatusToHebrew = translateTradeStatus;
 ```javascript
 // New API endpoints
 const newEndpoints = {
-    cash_flows: '/api/v1/cash_flows/',
-    currencies: '/api/v1/currencies/',
-    alerts: '/api/v1/alerts/'
+    cash_flows: '/api/cash_flows/',
+    currencies: '/api/currencies/',
+    alerts: '/api/alerts/'
 };
 
 // Legacy endpoint support
@@ -146,7 +146,7 @@ window.translateAlertCondition(condition);
 fetch('/api/cash_flows/')
 
 // New way
-fetch('/api/v1/cash_flows/')
+fetch('/api/cash_flows/')
 
 // Step 3: Update styling
 // Old way
@@ -171,7 +171,7 @@ function testBackwardCompatibility() {
         console.log('Legacy API test:', response.ok);
     });
     
-    fetch('/api/v1/cash_flows/').then(response => {
+    fetch('/api/cash_flows/').then(response => {
         console.log('New API test:', response.ok);
     });
 }
@@ -310,7 +310,7 @@ function debugCompatibility() {
     
     console.log('API endpoints:', {
         legacy: '/api/cash_flows/',
-        new: '/api/v1/cash_flows/'
+        new: '/api/cash_flows/'
     });
     
     console.log('CSS classes:', {

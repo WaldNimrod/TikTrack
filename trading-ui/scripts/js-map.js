@@ -190,7 +190,7 @@ class JsMapSystem {
         };
 
         this.pageMapping = {
-            'accounts.html': ['main.js', 'ui-utils.js', 'data-utils.js'],
+            'trading_accounts.html': ['main.js', 'ui-utils.js', 'data-utils.js'],
             'trades.html': ['main.js', 'data-utils.js'],
             'alerts.html': ['main.js', 'ui-utils.js'],
             'js-map.html': ['main.js', 'ui-utils.js', 'js-map.js']

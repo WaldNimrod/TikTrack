@@ -35,8 +35,8 @@ def create_namespaces(api):
     # Tickers namespace
     tickers_ns = api.namespace('tickers', description='Ticker operations')
     
-    # Accounts namespace
-    accounts_ns = api.namespace('accounts', description='Account operations')
+    # Trading Accounts namespace
+    accounts_ns = api.namespace('trading-accounts', description='Trading Account operations')
     
     # Trades namespace
     trades_ns = api.namespace('trades', description='Trade operations')

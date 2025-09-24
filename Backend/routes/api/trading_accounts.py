@@ -33,7 +33,7 @@ def get_open_trading_accounts():
     """Get all open trading accounts - custom implementation"""
     try:
         db: Session = g.db
-        trading_accounts = TradingAccountService.get_open_accounts(db)
+        trading_accounts = TradingAccountService.get_open_trading_accounts(db)
         return jsonify({
             "status": "success",
             "data": [trading_account.to_dict() for trading_account in trading_accounts],

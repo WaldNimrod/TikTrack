@@ -447,7 +447,7 @@ function toggleSection(sectionId) {
 1. **🔴 כפילות `clearAllCache`:**
    - **מקום 1:** `central-refresh-system.js` (שורה 546) - מערכת מרכזית מתקדמת
    - **מקום 2:** `cache-test.js` (שורה 350) - מערכת מקומית פשוטה
-   - **בעיה:** API endpoints שונים (`/api/cache/clear` vs `/api/v1/cache/clear`)
+   - **בעיה:** API endpoints שונים (`/api/cache/clear` vs `/api/cache/clear`)
 
 2. **🟠 פונקציות חסרות גלובלית:**
    - `clearExpiredCache` - רק ב-`cache-test.js`

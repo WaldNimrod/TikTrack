@@ -18,7 +18,7 @@ from models.ticker import Ticker
 from models.trade import Trade
 from models.trade_plan import TradePlan
 from models.execution import Execution
-from models.trading_account import TradingTradingAccount
+from models.trading_account import TradingAccount
 from models.alert import Alert
 from models.cash_flow import CashFlow
 from models.note import Note

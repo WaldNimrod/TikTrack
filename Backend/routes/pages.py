@@ -37,7 +37,7 @@ def tracking() -> Any:
 @pages_bp.route('/accounts')
 def accounts() -> Any:
     """Accounts page"""
-    return send_from_directory(UI_DIR, "accounts.html")
+    return send_from_directory(UI_DIR, "trading_accounts.html")
 
 @pages_bp.route('/alerts')
 def alerts() -> Any:

@@ -22,7 +22,7 @@ from services.user_service import UserService
 logger = logging.getLogger(__name__)
 
 # Create blueprint
-users_bp = Blueprint('users', __name__, url_prefix='/api/v1/users')
+users_bp = Blueprint('users', __name__, url_prefix='/api/users')
 
 # Initialize base API and user service
 user_service = UserService()
@@ -50,19 +50,19 @@ def get_all_users():
                 "status": "success",
                 "data": [default_user],  # Return as array for consistency
                 "message": "Default user retrieved successfully",
-                "version": "v1"
+                "version": "1.0"
             }), 200
         else:
             return jsonify({
                 "status": "error",
                 "error": {"message": "No default user found"},
-                "version": "v1"
+                "version": "1.0"
             }), 404
     except Exception as e:
         return jsonify({
             "status": "error",
             "error": {"message": f"Error: {str(e)}"},
-            "version": "v1"
+            "version": "1.0"
         }), 500
 
 @users_bp.route('/<int:user_id>', methods=['GET'])
@@ -76,19 +76,19 @@ def get_user(user_id: int):
                 "status": "success",
                 "data": default_user,
                 "message": "Default user retrieved successfully",
-                "version": "v1"
+                "version": "1.0"
             }), 200
         else:
             return jsonify({
                 "status": "error",
                 "error": {"message": "No default user found"},
-                "version": "v1"
+                "version": "1.0"
             }), 404
     except Exception as e:
         return jsonify({
             "status": "error",
             "error": {"message": f"Error: {str(e)}"},
-            "version": "v1"
+            "version": "1.0"
         }), 500
 
 @users_bp.route('/username/<username>', methods=['GET'])

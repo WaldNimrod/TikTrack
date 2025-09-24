@@ -1934,7 +1934,7 @@ window.deleteTicker = deleteTicker;
 window.cancelTicker = cancelTicker;
 window.performCancelTicker = performCancelTicker;
 window.updateAllTickerStatuses = updateAllTickerStatuses;
-window.toggleTopSection = toggleTopSection;
+window.toggleSection = toggleSection;
 window.toggleTickersSection = toggleTickersSection;
 window.restoreTickersSectionState = restoreTickersSectionState;
 window.clearTickersCache = clearTickersCache;
@@ -2257,11 +2257,11 @@ function getTypeDisplayName(type) {
 // ===== MISSING FUNCTIONS FOR ONCLICK ATTRIBUTES =====
 
 // Toggle functions
-function toggleTopSection() {
-    if (typeof window.toggleTopSection === 'function') {
-        window.toggleTopSection();
+function toggleSection() {
+    if (typeof window.toggleSection === 'function') {
+        window.toggleSection();
     } else {
-        console.warn('toggleTopSection function not found');
+        console.warn('toggleSection function not found');
     }
 }
 
@@ -2371,7 +2371,7 @@ function generateDetailedLog() {
                 editTicker: typeof window.editTicker === 'function' ? 'זמין' : 'לא זמין',
                 confirmDeleteTicker: typeof window.confirmDeleteTicker === 'function' ? 'זמין' : 'לא זמין',
                 refreshYahooFinanceData: typeof window.refreshYahooFinanceData === 'function' ? 'זמין' : 'לא זמין',
-                toggleTopSection: typeof window.toggleTopSection === 'function' ? 'זמין' : 'לא זמין',
+                toggleSection: typeof window.toggleSection === 'function' ? 'זמין' : 'לא זמין',
                 toggleTickersSection: typeof window.toggleTickersSection === 'function' ? 'זמין' : 'לא זמין',
                 filterTickersByType: typeof window.filterTickersByType === 'function' ? 'זמין' : 'לא זמין'
             },
@@ -2415,7 +2415,7 @@ function generateDetailedLog() {
 
 window.filterTickersByType = filterTickersByType;
 window.getTypeDisplayName = getTypeDisplayName;
-window.toggleTopSection = toggleTopSection;
+window.toggleSection = toggleSection;
 window.toggleTickersSection = toggleTickersSection;
 window.showAddTickerModal = showAddTickerModal;
 window.saveTicker = saveTicker;

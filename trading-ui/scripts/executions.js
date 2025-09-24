@@ -2092,13 +2092,6 @@ window.toggleExecutionsSection = toggleExecutionsSection;
 window.restoreExecutionsSectionState = restoreExecutionsSectionState;
 
 // פונקציה לסגירה/פתיחה של top-section
-function toggleTopSection() {
-  if (typeof window.toggleTopSection === 'function') {
-    window.toggleTopSection();
-  } else {
-    console.warn('toggleTopSection function not found');
-  }
-}
 
 // פונקציה לאיפוס פילטרים וטעינה מחדש
 // resetAllFiltersAndReloadData() - לא בשימוש, הוסרה
@@ -2869,7 +2862,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Fallback: restore top section state manually
     const topSectionHidden = localStorage.getItem('executionsTopSectionCollapsed') === 'true';
     const topSection = document.querySelector('.top-section .section-body');
-    const topToggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
+    const topToggleBtn = document.querySelector('.top-section button[onclick*="toggleSection"]');
     const topIcon = topToggleBtn ? topToggleBtn.querySelector('.filter-icon') : null;
 
     if (topSection && topIcon) {
@@ -3570,13 +3563,6 @@ window.updateTickersList = updateTickersList;
 // ===== MISSING FUNCTIONS FOR ONCLICK ATTRIBUTES =====
 
 // Toggle functions
-function toggleTopSection() {
-    if (typeof window.toggleTopSection === 'function') {
-        window.toggleTopSection();
-    } else {
-        console.warn('toggleTopSection function not found');
-    }
-}
 
 function toggleExecutionsSection() {
     if (typeof window.toggleSection === 'function') {
@@ -3646,7 +3632,7 @@ function addNewTicker() {
 
 // ===== GLOBAL EXPORTS =====
 // Export functions to global scope for onclick attributes
-window.toggleTopSection = toggleTopSection;
+window.toggleSection = toggleSection;
 window.toggleExecutionsSection = toggleExecutionsSection;
 window.openExecutionDetails = openExecutionDetails;
 window.saveExecution = saveExecution;

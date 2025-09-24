@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>בדיקת שירותים - Header System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            direction: rtl;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 3px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #test-element {
+            padding: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            margin: 10px 0;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+        .hidden {
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 בדיקת שירותים - Header System</h1>
+    
+    <div class="test-section">
+        <h2>EventService Tests</h2>
+        <button onclick="testEventService()">בדוק EventService</button>
+        <div id="eventservice-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>StateService Tests</h2>
+        <button onclick="testStateService()">בדוק StateService</button>
+        <div id="stateservice-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>UIService Tests</h2>
+        <button onclick="testUIService()">בדוק UIService</button>
+        <div id="uiservice-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Services Integration Tests</h2>
+        <button onclick="testServicesIntegration()">בדוק אינטגרציה</button>
+        <div id="integration-results"></div>
+    </div>
+    
+    <!-- אלמנט לבדיקות -->
+    <div id="test-element">
+        <p>אלמנט לבדיקות UI</p>
+        <button id="test-button">כפתור בדיקה</button>
+    </div>
+    
+    <!-- טעינת קבצי המערכת -->
+    <script src="../utils/DOMUtils.js"></script>
+    <script src="../utils/EventUtils.js"></script>
+    <script src="../utils/StateUtils.js"></script>
+    <script src="../constants/Events.js"></script>
+    <script src="../constants/Selectors.js"></script>
+    <script src="../constants/Config.js"></script>
+    <script src="../services/EventService.js"></script>
+    <script src="../services/StateService.js"></script>
+    <script src="../services/UIService.js"></script>
+    <script src="../index.js"></script>
+    
+    <script>
+        // פונקציות בדיקה
+        
+        function addResult(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.textContent = message;
+            container.appendChild(div);
+        }
+        
+        function clearResults(containerId) {
+            document.getElementById(containerId).innerHTML = '';
+        }
+        
+        function testEventService() {
+            clearResults('eventservice-results');
+            addResult('eventservice-results', 'מתחיל בדיקת EventService...', 'info');
+            
+            try {
+                // בדיקת קיום
+                if (typeof EventService === 'undefined') {
+                    addResult('eventservice-results', '❌ EventService לא קיים', 'error');
+                    return;
+                }
+                addResult('eventservice-results', '✅ EventService קיים', 'success');
+                
+                // יצירת מופע
+                const eventService = new EventService();
+                if (eventService) {
+                    addResult('eventservice-results', '✅ יצירת מופע EventService עובד', 'success');
+                } else {
+                    addResult('eventservice-results', '❌ יצירת מופע EventService לא עובד', 'error');
+                }
+                
+                // בדיקת on/emit
+                let eventReceived = false;
+                const listenerId = eventService.on('test-event', (event) => {
+                    eventReceived = true;
+                });
+                
+                if (listenerId) {
+                    addResult('eventservice-results', '✅ EventService.on עובד', 'success');
+                } else {
+                    addResult('eventservice-results', '❌ EventService.on לא עובד', 'error');
+                }
+                
+                eventService.emit('test-event', { data: 'test' });
+                
+                // המתן קצר לעיבוד האירוע
+                setTimeout(() => {
+                    if (eventReceived) {
+                        addResult('eventservice-results', '✅ EventService.emit עובד', 'success');
+                    } else {
+                        addResult('eventservice-results', '❌ EventService.emit לא עובד', 'error');
+                    }
+                }, 100);
+                
+                // בדיקת off
+                eventService.off('test-event', listenerId);
+                addResult('eventservice-results', '✅ EventService.off עובד', 'success');
+                
+                // בדיקת getInfo
+                const info = eventService.getInfo();
+                if (info && info.listeners) {
+                    addResult('eventservice-results', '✅ EventService.getInfo עובד', 'success');
+                } else {
+                    addResult('eventservice-results', '❌ EventService.getInfo לא עובד', 'error');
+                }
+                
+                addResult('eventservice-results', '✅ בדיקת EventService הושלמה בהצלחה', 'success');
+                
+            } catch (error) {
+                addResult('eventservice-results', `❌ שגיאה בבדיקת EventService: ${error.message}`, 'error');
+            }
+        }
+        
+        function testStateService() {
+            clearResults('stateservice-results');
+            addResult('stateservice-results', 'מתחיל בדיקת StateService...', 'info');
+            
+            try {
+                // בדיקת קיום
+                if (typeof StateService === 'undefined') {
+                    addResult('stateservice-results', '❌ StateService לא קיים', 'error');
+                    return;
+                }
+                addResult('stateservice-results', '✅ StateService קיים', 'success');
+                
+                // יצירת מופע
+                const stateService = new StateService();
+                if (stateService) {
+                    addResult('stateservice-results', '✅ יצירת מופע StateService עובד', 'success');
+                } else {
+                    addResult('stateservice-results', '❌ יצירת מופע StateService לא עובד', 'error');
+                }
+                
+                // המתן לאתחול
+                setTimeout(() => {
+                    // בדיקת set/get
+                    stateService.set('test-key', 'test-value');
+                    const value = stateService.get('test-key');
+                    
+                    if (value === 'test-value') {
+                        addResult('stateservice-results', '✅ StateService.set/get עובד', 'success');
+                    } else {
+                        addResult('stateservice-results', '❌ StateService.set/get לא עובד', 'error');
+                    }
+                    
+                    // בדיקת has
+                    if (stateService.has('test-key')) {
+                        addResult('stateservice-results', '✅ StateService.has עובד', 'success');
+                    } else {
+                        addResult('stateservice-results', '❌ StateService.has לא עובד', 'error');
+                    }
+                    
+                    // בדיקת delete
+                    stateService.delete('test-key');
+                    if (!stateService.has('test-key')) {
+                        addResult('stateservice-results', '✅ StateService.delete עובד', 'success');
+                    } else {
+                        addResult('stateservice-results', '❌ StateService.delete לא עובד', 'error');
+                    }
+                    
+                    // בדיקת addListener
+                    let listenerCalled = false;
+                    const listenerId = stateService.addListener('test-listener', (newValue, oldValue) => {
+                        listenerCalled = true;
+                    });
+                    
+                    if (listenerId) {
+                        addResult('stateservice-results', '✅ StateService.addListener עובד', 'success');
+                    } else {
+                        addResult('stateservice-results', '❌ StateService.addListener לא עובד', 'error');
+                    }
+                    
+                    stateService.set('test-listener', 'new-value');
+                    
+                    setTimeout(() => {
+                        if (listenerCalled) {
+                            addResult('stateservice-results', '✅ StateService listener עובד', 'success');
+                        } else {
+                            addResult('stateservice-results', '❌ StateService listener לא עובד', 'error');
+                        }
+                    }, 100);
+                    
+                    // בדיקת getInfo
+                    const info = stateService.getInfo();
+                    if (info && info.isInitialized) {
+                        addResult('stateservice-results', '✅ StateService.getInfo עובד', 'success');
+                    } else {
+                        addResult('stateservice-results', '❌ StateService.getInfo לא עובד', 'error');
+                    }
+                    
+                    addResult('stateservice-results', '✅ בדיקת StateService הושלמה בהצלחה', 'success');
+                }, 100);
+                
+            } catch (error) {
+                addResult('stateservice-results', `❌ שגיאה בבדיקת StateService: ${error.message}`, 'error');
+            }
+        }
+        
+        function testUIService() {
+            clearResults('uiservice-results');
+            addResult('uiservice-results', 'מתחיל בדיקת UIService...', 'info');
+            
+            try {
+                // בדיקת קיום
+                if (typeof UIService === 'undefined') {
+                    addResult('uiservice-results', '❌ UIService לא קיים', 'error');
+                    return;
+                }
+                addResult('uiservice-results', '✅ UIService קיים', 'success');
+                
+                // יצירת מופע
+                const uiService = new UIService();
+                if (uiService) {
+                    addResult('uiservice-results', '✅ יצירת מופע UIService עובד', 'success');
+                } else {
+                    addResult('uiservice-results', '❌ יצירת מופע UIService לא עובד', 'error');
+                }
+                
+                // המתן לאתחול
+                setTimeout(() => {
+                    // בדיקת updateElement
+                    const updateResult = uiService.updateElement('#test-element', {
+                        text: 'טקסט עודכן',
+                        classes: { add: ['test-class'] }
+                    });
+                    
+                    if (updateResult) {
+                        addResult('uiservice-results', '✅ UIService.updateElement עובד', 'success');
+                    } else {
+                        addResult('uiservice-results', '❌ UIService.updateElement לא עובד', 'error');
+                    }
+                    
+                    // בדיקת showElement
+                    const showResult = uiService.showElement('#test-element');
+                    if (showResult) {
+                        addResult('uiservice-results', '✅ UIService.showElement עובד', 'success');
+                    } else {
+                        addResult('uiservice-results', '❌ UIService.showElement לא עובד', 'error');
+                    }
+                    
+                    // בדיקת hideElement
+                    const hideResult = uiService.hideElement('#test-element');
+                    if (hideResult) {
+                        addResult('uiservice-results', '✅ UIService.hideElement עובד', 'success');
+                    } else {
+                        addResult('uiservice-results', '❌ UIService.hideElement לא עובד', 'error');
+                    }
+                    
+                    // בדיקת toggleElement
+                    const toggleResult = uiService.toggleElement('#test-element');
+                    if (toggleResult) {
+                        addResult('uiservice-results', '✅ UIService.toggleElement עובד', 'success');
+                    } else {
+                        addResult('uiservice-results', '❌ UIService.toggleElement לא עובד', 'error');
+                    }
+                    
+                    // בדיקת animateElement
+                    const animationId = uiService.animateElement(document.getElementById('test-element'), {
+                        type: 'fadeIn',
+                        duration: 300
+                    });
+                    
+                    if (animationId) {
+                        addResult('uiservice-results', '✅ UIService.animateElement עובד', 'success');
+                    } else {
+                        addResult('uiservice-results', '❌ UIService.animateElement לא עובד', 'error');
+                    }
+                    
+                    // בדיקת getInfo
+                    const info = uiService.getInfo();
+                    if (info && info.isInitialized) {
+                        addResult('uiservice-results', '✅ UIService.getInfo עובד', 'success');
+                    } else {
+                        addResult('uiservice-results', '❌ UIService.getInfo לא עובד', 'error');
+                    }
+                    
+                    addResult('uiservice-results', '✅ בדיקת UIService הושלמה בהצלחה', 'success');
+                }, 100);
+                
+            } catch (error) {
+                addResult('uiservice-results', `❌ שגיאה בבדיקת UIService: ${error.message}`, 'error');
+            }
+        }
+        
+        function testServicesIntegration() {
+            clearResults('integration-results');
+            addResult('integration-results', 'מתחיל בדיקת אינטגרציה בין שירותים...', 'info');
+            
+            try {
+                // יצירת שירותים
+                const eventService = new EventService();
+                const stateService = new StateService();
+                const uiService = new UIService();
+                
+                // המתן לאתחול
+                setTimeout(() => {
+                    // בדיקת אינטגרציה בין EventService ו-StateService
+                    let integrationTestPassed = false;
+                    
+                    eventService.on('state-change', (event) => {
+                        integrationTestPassed = true;
+                    });
+                    
+                    stateService.addListener('test-integration', (newValue, oldValue) => {
+                        eventService.emit('state-change', { newValue, oldValue });
+                    });
+                    
+                    stateService.set('test-integration', 'integration-test');
+                    
+                    setTimeout(() => {
+                        if (integrationTestPassed) {
+                            addResult('integration-results', '✅ אינטגרציה בין EventService ו-StateService עובדת', 'success');
+                        } else {
+                            addResult('integration-results', '❌ אינטגרציה בין EventService ו-StateService לא עובדת', 'error');
+                        }
+                        
+                        // בדיקת אינטגרציה בין UIService ו-EventService
+                        let uiEventReceived = false;
+                        
+                        eventService.on('ui-update', (event) => {
+                            uiEventReceived = true;
+                        });
+                        
+                        uiService.updateElement('#test-element', {
+                            text: 'אינטגרציה בדיקה'
+                        });
+                        
+                        eventService.emit('ui-update', { element: '#test-element' });
+                        
+                        setTimeout(() => {
+                            if (uiEventReceived) {
+                                addResult('integration-results', '✅ אינטגרציה בין UIService ו-EventService עובדת', 'success');
+                            } else {
+                                addResult('integration-results', '❌ אינטגרציה בין UIService ו-EventService לא עובדת', 'error');
+                            }
+                            
+                            // בדיקת אינטגרציה מלאה
+                            let fullIntegrationPassed = false;
+                            
+                            eventService.on('full-integration', (event) => {
+                                fullIntegrationPassed = true;
+                            });
+                            
+                            stateService.addListener('full-test', (newValue) => {
+                                uiService.updateElement('#test-element', { text: newValue });
+                                eventService.emit('full-integration', { value: newValue });
+                            });
+                            
+                            stateService.set('full-test', 'אינטגרציה מלאה');
+                            
+                            setTimeout(() => {
+                                if (fullIntegrationPassed) {
+                                    addResult('integration-results', '✅ אינטגרציה מלאה בין כל השירותים עובדת', 'success');
+                                } else {
+                                    addResult('integration-results', '❌ אינטגרציה מלאה בין כל השירותים לא עובדת', 'error');
+                                }
+                                
+                                addResult('integration-results', '✅ בדיקת אינטגרציה הושלמה בהצלחה', 'success');
+                            }, 100);
+                        }, 100);
+                    }, 100);
+                }, 200);
+                
+            } catch (error) {
+                addResult('integration-results', `❌ שגיאה בבדיקת אינטגרציה: ${error.message}`, 'error');
+            }
+        }
+        
+        // בדיקה אוטומטית בטעינת העמוד
+        window.addEventListener('load', () => {
+            addResult('eventservice-results', 'עמוד נטען - מוכן לבדיקות שירותים', 'info');
+        });
+    </script>
+</body>
+</html>

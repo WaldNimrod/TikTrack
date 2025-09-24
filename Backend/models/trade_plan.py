@@ -26,7 +26,7 @@ class TradePlan(BaseModel):
     cancel_reason = Column(String(500), nullable=True)
     
     # Relationships
-    trading_account = relationship("TradingAccount", back_populates="trade_plans")
+    account = relationship("TradingAccount", back_populates="trade_plans")
     ticker = relationship("Ticker")
     trades = relationship("Trade", back_populates="trade_plan")
     # Notes relationship removed - notes now use related_type and related_id
@@ -66,11 +66,11 @@ class TradePlan(BaseModel):
             result['ticker'] = {'id': self.ticker_id, 'symbol': f'Ticker_{self.ticker_id}', 'name': f'Ticker {self.ticker_id}'}
         
         try:
-            if hasattr(self, 'trading_account') and self.trading_account:
-                logger.info(f"Trade plan {self.id}: Using loaded trading_account relationship")
+            if hasattr(self, 'account') and self.account:
+                logger.info(f"Trade plan {self.id}: Using loaded account relationship")
                 result['account'] = {
-                    'id': self.trading_account.id,
-                    'name': self.trading_account.name
+                    'id': self.account.id,
+                    'name': self.account.name
                 }
             else:
                 logger.info(f"Trade plan {self.id}: TradingAccount relationship not loaded, using trading_account_id")

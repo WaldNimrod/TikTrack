@@ -618,13 +618,6 @@ function initializeSectionToggles() {
 /**
  * Toggle top section visibility
  */
-function toggleTopSection() {
-    if (typeof window.toggleTopSection === 'function') {
-        window.toggleTopSection();
-    } else {
-        console.warn('toggleTopSection function not found');
-    }
-}
 
 /**
  * Toggle all sections visibility

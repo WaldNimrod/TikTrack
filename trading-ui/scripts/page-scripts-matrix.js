@@ -2499,34 +2499,25 @@ class PageScriptsMatrixSystem {
     }
 
     /**
-     * Check dependencies
+     * Check dependencies - using global function
      */
     async checkDependencies() {
-        const violations = [];
-        const files = await this.loadJavaScriptFilesList();
-        
-        // Check for circular dependencies (simplified)
-        const dependencies = {};
-        files.forEach(file => {
-            dependencies[file] = [];
-        });
-        
-        // Simulate dependency check
-        const circularDeps = [];
-        if (circularDeps.length > 0) {
-            violations.push({
-                type: 'dependency',
-                file: 'Multiple files',
-                message: `נמצאו ${circularDeps.length} תלויות מעגליות`,
-                severity: 'error'
-            });
+        // Use global checkDependencies function
+        if (typeof window.checkDependencies === 'function') {
+            return await window.checkDependencies();
+        } else {
+            console.warn('Global checkDependencies function not available');
+            return {
+                totalFiles: 0,
+                violations: [{
+                    type: 'dependency',
+                    file: 'page-scripts-matrix.js',
+                    message: 'Global checkDependencies function not available',
+                    severity: 'warning'
+                }],
+                score: 0
+            };
         }
-        
-        return {
-            totalFiles: files.length,
-            violations: violations,
-            score: Math.max(0, 100 - (violations.length * 15))
-        };
     }
 
     /**

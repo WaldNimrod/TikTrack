@@ -47,16 +47,16 @@ class TradingAccount(BaseModel):
     currency = relationship("Currency", back_populates="trading_accounts")
     
     # Each account can have multiple trades
-    trades = relationship("Trade", back_populates="trading_account", cascade="all, delete-orphan")
+    trades = relationship("Trade", back_populates="account", cascade="all, delete-orphan")
     
     # Each account can have multiple trade plans
-    trade_plans = relationship("TradePlan", back_populates="trading_account", cascade="all, delete-orphan")
+    trade_plans = relationship("TradePlan", back_populates="account", cascade="all, delete-orphan")
     
     # Each account can have multiple alerts (through related_type_id and related_id)
     # alerts = relationship("Alert", back_populates="account", cascade="all, delete-orphan")
     
     # Each account can have multiple cash flows
-    cash_flows = relationship("CashFlow", back_populates="trading_account", cascade="all, delete-orphan")
+    cash_flows = relationship("CashFlow", back_populates="account", cascade="all, delete-orphan")
     
     # Notes relationship removed - notes now use related_type and related_id
     

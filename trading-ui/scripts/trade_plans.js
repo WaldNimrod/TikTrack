@@ -2057,25 +2057,6 @@ async function deleteTradePlan(tradePlanId) {
 }
 
 
-/**
- * סגירת מודל - שימוש בפונקציה גלובלית
- * @deprecated Use window.closeModal from main.js instead
- */
-function closeModal(modalId) {
-  // שימוש בפונקציה הגלובלית
-  if (typeof window.closeModalGlobal === 'function') {
-    window.closeModalGlobal(modalId);
-  } else {
-    // Fallback to Bootstrap modal
-    const modal = document.getElementById(modalId);
-    if (modal) {
-      const bootstrapModal = bootstrap.Modal.getInstance(modal);
-      if (bootstrapModal) {
-        bootstrapModal.hide();
-      }
-    }
-  }
-}
 
 /**
  * פילטור נתוני תכנונים
@@ -2706,8 +2687,8 @@ window.restoreSortState = restoreSortState;
 window.restoreDesignsSectionState = restoreDesignsSectionState;
 
 // Adding toggle functions to global scope
-window.toggleTopSection = toggleTopSection;
-// toggleMainSection export removed - use toggleSection('main') instead
+window.toggleSection = toggleSection;
+// toggleSection export removed - use toggleSection('main') instead
 window.restorePlanningSectionState = restorePlanningSectionState;
 
 
@@ -2742,15 +2723,15 @@ function setupSortableHeadersLocal() {
 }
 
 // פונקציות לפתיחה/סגירה של סקשנים
-function toggleTopSection() {
-    if (typeof window.toggleTopSection === 'function') {
-        window.toggleTopSection();
+function toggleSection() {
+    if (typeof window.toggleSection === 'function') {
+        window.toggleSection();
     } else {
-        console.warn('toggleTopSection function not found');
+        console.warn('toggleSection function not found');
     }
 }
 
-// toggleMainSection function removed - use toggleSection('main') instead
+// toggleSection function removed - use toggleSection('main') instead
 
 // פונקציה לשחזור מצב הסגירה
 function restorePlanningSectionState() {
@@ -2760,7 +2741,7 @@ function restorePlanningSectionState() {
 
   if (topSection) {
     const sectionBody = topSection.querySelector('.section-body');
-    const toggleBtn = topSection.querySelector('button[onclick="toggleTopSection()"]');
+    const toggleBtn = topSection.querySelector('button[onclick="toggleSection()"]');
     const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
 
     if (sectionBody && topCollapsed) {
@@ -3173,7 +3154,7 @@ function generateDetailedLog() {
             functions: {
                 openAddTradePlanModal: typeof window.openAddTradePlanModal === 'function' ? 'זמין' : 'לא זמין',
                 showAddTradePlanModal: typeof window.showAddTradePlanModal === 'function' ? 'זמין' : 'לא זמין',
-                toggleTopSection: typeof window.toggleTopSection === 'function' ? 'זמין' : 'לא זמין',
+                toggleSection: typeof window.toggleSection === 'function' ? 'זמין' : 'לא זמין',
                 toggleSection: typeof window.toggleSection === 'function' ? 'זמין' : 'לא זמין',
                 sortTable: typeof window.sortTable === 'function' ? 'זמין' : 'לא זמין'
             },

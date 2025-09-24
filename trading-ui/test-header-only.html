@@ -56,14 +56,14 @@
     <!-- Button Icons System -->
     <script src="scripts/button-icons.js"></script>
     
-    <!-- Header Styles -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=v42_unified_header">
+    <!-- New Header Styles -->
+    <link rel="stylesheet" href="header-system/styles/header-styles.css?v=v6.0.0">
     
     <!-- Filter System Script -->
     <script src="scripts/filter-system.js"></script>
     
-    <!-- Header System Script -->
-    <script src="scripts/header-system.js?v=v35_updated"></script>
+    <!-- New Header System Script -->
+    <script src="header-system/index.js?v=v6.0.0"></script>
     
     <!-- Dynamic Color System Scripts -->
     <script src="scripts/color-scheme-system.js"></script>
@@ -91,35 +91,46 @@
                 <div class="top-section">
                     <div class="section-header">
                         <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
-                        <h1>🔧 בדיקת ראש הדף</h1>
+                        <h1>🔧 בדיקת ראש הדף - מערכת חדשה v6.0.0</h1>
                         <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
                     <div class="section-body">
-                        <h2>🔍 מידע דיבאג - מצב המערכות והפילטרים</h2>
+                        <h2>🔍 בדיקות מקיפות - מערכת הכותרת החדשה</h2>
                         
-                        <div class="alert alert-info">
-                            <h5>🔍 מידע דיבאג - מצב המערכות</h5>
-                            <p>מידע על מצב המערכות והפילטרים:</p>
-                            <div id="systemStatusInfo">
-                                <p><strong>מערכת הכותרת:</strong> <span id="headerSystemStatus">טוען...</span></p>
-                                <p><strong>מערכת הפילטרים:</strong> <span id="filterSystemStatus">טוען...</span></p>
-                                <p><strong>מערכת התרגום:</strong> <span id="translationSystemStatus">טוען...</span></p>
-                                <p><strong>מספר שורות בטבלה:</strong> <span id="tableRowCount">טוען...</span></p>
+                        <div class="alert alert-success">
+                            <h5>✅ בדיקות יחידה - רכיבים</h5>
+                            <p>בדיקת כל הרכיבים של המערכת החדשה:</p>
+                            <div id="unitTestsInfo">
+                                <p><strong>StateComponent:</strong> <span id="stateComponentStatus">טוען...</span></p>
+                                <p><strong>UIComponent:</strong> <span id="uiComponentStatus">טוען...</span></p>
+                                <p><strong>TranslationComponent:</strong> <span id="translationComponentStatus">טוען...</span></p>
+                                <p><strong>PreferencesComponent:</strong> <span id="preferencesComponentStatus">טוען...</span></p>
+                                <p><strong>MenuComponent:</strong> <span id="menuComponentStatus">טוען...</span></p>
+                                <p><strong>FilterComponent:</strong> <span id="filterComponentStatus">טוען...</span></p>
+                                <p><strong>NavigationComponent:</strong> <span id="navigationComponentStatus">טוען...</span></p>
+                                <p><strong>HeaderComponent:</strong> <span id="headerComponentStatus">טוען...</span></p>
                             </div>
                         </div>
                         
-                        <div class="alert alert-success">
-                            <h5>🔍 מצב פילטרים (Debug)</h5>
-                            <p>מידע מפורט על מצב הפילטרים:</p>
-                            <div id="filterDebugInfo" class="debug-info">
-                                <p><strong>פילטר סטטוס:</strong> <span id="statusFilterInfo">לא נבחר</span></p>
-                                <p><strong>פילטר סוג השקעה:</strong> <span id="typeFilterInfo">לא נבחר</span></p>
-                                <p><strong>פילטר חשבון:</strong> <span id="accountFilterInfo">לא נבחר</span></p>
-                                <p><strong>פילטר תאריך:</strong> <span id="dateFilterInfo">לא נבחר</span></p>
-                                <p><strong>פילטר חיפוש:</strong> <span id="searchFilterInfo">ריק</span></p>
-                                <p><strong>שורות מוצגות:</strong> <span id="visibleRowsInfo">כל השורות</span></p>
+                        <div class="alert alert-info">
+                            <h5>🔧 בדיקות שירותים</h5>
+                            <p>בדיקת השירותים של המערכת החדשה:</p>
+                            <div id="servicesTestsInfo">
+                                <p><strong>EventService:</strong> <span id="eventServiceStatus">טוען...</span></p>
+                                <p><strong>StateService:</strong> <span id="stateServiceStatus">טוען...</span></p>
+                                <p><strong>UIService:</strong> <span id="uiServiceStatus">טוען...</span></p>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <h5>🧪 בדיקות אינטגרציה</h5>
+                            <p>בדיקת אינטגרציה בין רכיבים ושירותים:</p>
+                            <div id="integrationTestsInfo">
+                                <p><strong>אינטגרציה רכיבים:</strong> <span id="componentsIntegrationStatus">טוען...</span></p>
+                                <p><strong>אינטגרציה שירותים:</strong> <span id="servicesIntegrationStatus">טוען...</span></p>
+                                <p><strong>אינטגרציה מלאה:</strong> <span id="fullIntegrationStatus">טוען...</span></p>
                             </div>
                         </div>
                         
@@ -128,14 +139,15 @@
                             <div class="col-md-6">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h5>🔍 מידע דיבאג - מצב המערכות</h5>
+                                        <h5>📊 סטטיסטיקות מערכת</h5>
                                     </div>
                                     <div class="card-body">
-                                        <div id="systemStatusInfo">
-                                            <p><strong>מערכת הכותרת:</strong> <span id="headerSystemStatus">טוען...</span></p>
-                                            <p><strong>מערכת הפילטרים:</strong> <span id="filterSystemStatus">טוען...</span></p>
-                                            <p><strong>מערכת התרגום:</strong> <span id="translationSystemStatus">טוען...</span></p>
-                                            <p><strong>מספר שורות בטבלה:</strong> <span id="tableRowCount">טוען...</span></p>
+                                        <div id="systemStatsInfo">
+                                            <p><strong>מספר רכיבים:</strong> <span id="componentsCount">טוען...</span></p>
+                                            <p><strong>מספר שירותים:</strong> <span id="servicesCount">טוען...</span></p>
+                                            <p><strong>מספר כלי עזר:</strong> <span id="utilsCount">טוען...</span></p>
+                                            <p><strong>מספר קבועים:</strong> <span id="constantsCount">טוען...</span></p>
+                                            <p><strong>סה"כ שורות קוד:</strong> <span id="totalLinesCount">טוען...</span></p>
                                         </div>
                                     </div>
                                 </div>
@@ -144,16 +156,33 @@
                             <div class="col-md-6">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h5>🔍 מצב פילטרים (Debug)</h5>
+                                        <h5>🎯 בדיקות ביצועים</h5>
                                     </div>
                                     <div class="card-body">
-                                        <div id="filterDebugInfo" class="debug-info">
-                                            <p><strong>פילטר סטטוס:</strong> <span id="statusFilterInfo">לא נבחר</span></p>
-                                            <p><strong>פילטר סוג השקעה:</strong> <span id="typeFilterInfo">לא נבחר</span></p>
-                                            <p><strong>פילטר חשבון:</strong> <span id="accountFilterInfo">לא נבחר</span></p>
-                                            <p><strong>פילטר תאריך:</strong> <span id="dateFilterInfo">לא נבחר</span></p>
-                                            <p><strong>פילטר חיפוש:</strong> <span id="searchFilterInfo">ריק</span></p>
-                                            <p><strong>שורות מוצגות:</strong> <span id="visibleRowsInfo">כל השורות</span></p>
+                                        <div id="performanceTestsInfo">
+                                            <p><strong>זמן טעינה:</strong> <span id="loadTime">טוען...</span></p>
+                                            <p><strong>זיכרון בשימוש:</strong> <span id="memoryUsage">טוען...</span></p>
+                                            <p><strong>מספר אירועים:</strong> <span id="eventsCount">טוען...</span></p>
+                                            <p><strong>מצב אתחול:</strong> <span id="initializationStatus">טוען...</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>🔧 פקדי בדיקה</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-primary" onclick="runUnitTests()">בדיקות יחידה</button>
+                                            <button type="button" class="btn btn-success" onclick="runIntegrationTests()">בדיקות אינטגרציה</button>
+                                            <button type="button" class="btn btn-info" onclick="runPerformanceTests()">בדיקות ביצועים</button>
+                                            <button type="button" class="btn btn-warning" onclick="runAllTests()">כל הבדיקות</button>
+                                            <button type="button" class="btn btn-secondary" onclick="resetSystem()">איפוס מערכת</button>
                                         </div>
                                     </div>
                                 </div>

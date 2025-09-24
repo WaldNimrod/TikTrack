@@ -594,13 +594,6 @@ function markPagePartial(pageName) {
 
 // פונקציה להעתקת לוג מפורט
 
-function toggleTopSection() {
-    if (typeof window.toggleTopSection === 'function') {
-        window.toggleTopSection();
-    } else {
-        console.warn('toggleTopSection function not found');
-    }
-}
 
 
 
@@ -617,7 +610,7 @@ window.checkConnection = checkConnection;
 window.markPageComplete = markPageComplete;
 window.markPagePartial = markPagePartial;
 // window.copyDetailedLog export removed - using global version from system-management.js
-window.toggleTopSection = toggleTopSection;
+window.toggleSection = toggleSection;
 // window.toggleAllSections export removed - using global version from ui-utils.js
 // window.toggleSection export removed - using global version from ui-utils.js
 

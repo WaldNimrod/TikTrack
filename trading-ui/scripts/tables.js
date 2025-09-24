@@ -542,6 +542,9 @@ window.tables = {
 // ייצוא פונקציית sortTable גלובלית
 window.sortTable = sortTable;
 
+// ייצוא closeModalGlobal ככינוי ל-closeModal
+window.closeModalGlobal = window.closeModal;
+
 /**
  * Global function for loading table data
  * Generic implementation that can be used across all pages

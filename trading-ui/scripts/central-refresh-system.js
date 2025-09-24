@@ -690,6 +690,50 @@ window.clearGlobalCache = (pageType) => window.centralRefresh.clearGlobalCache(p
 window.clearCacheBeforeCRUD = (pageType, operation = 'full', itemId = null) => window.centralRefresh.clearCacheBeforeCRUD(pageType, operation, itemId);
 window.getRefreshStats = () => window.centralRefresh.getStats();
 
+// פונקציה מיוחדת לניקוי cache של קבצים סטטיים בלבד
+window.clearStaticFilesCache = () => {
+  console.log('🧹 Clearing static files cache...');
+  
+  try {
+    // ניקוי Browser Cache לקבצים סטטיים
+    clearBrowserCache();
+    
+    // הצגת התראה למשתמש
+    if (typeof showNotification === 'function') {
+      showNotification('מטמון הקבצים הסטטיים נוקה בהצלחה', 'success', 'הצלחה', 3000, 'system');
+    }
+    
+    console.log('✅ Static files cache cleared');
+  } catch (error) {
+    console.error('❌ Error clearing static files cache:', error);
+    if (typeof showNotification === 'function') {
+      showNotification('שגיאה בניקוי מטמון הקבצים הסטטיים', 'error', 'שגיאה', 3000, 'system');
+    }
+  }
+};
+
+// פונקציה מיוחדת לכפיית רענון אייקונים
+window.forceIconRefresh = () => {
+  console.log('🖼️ Forcing icon refresh...');
+  
+  try {
+    // כפיית רענון אייקונים
+    forceIconRefresh();
+    
+    // הצגת התראה למשתמש
+    if (typeof showNotification === 'function') {
+      showNotification('האייקונים רוענו בהצלחה', 'success', 'הצלחה', 2000, 'system');
+    }
+    
+    console.log('✅ Icon refresh forced');
+  } catch (error) {
+    console.error('❌ Error forcing icon refresh:', error);
+    if (typeof showNotification === 'function') {
+      showNotification('שגיאה ברענון האייקונים', 'error', 'שגיאה', 2000, 'system');
+    }
+  }
+};
+
 // פונקציה לניקוי מטמון מלא
 window.clearAllCache = () => {
   console.log('🧹 Clearing all global cache...');
@@ -727,15 +771,172 @@ window.clearAllCache = () => {
     window.centralRefresh.clearCache();
   }
   
+  // ניקוי Browser Cache - הוספה חדשה!
+  clearBrowserCache();
+  
   console.log('✅ All global cache cleared');
   
   // הצגת התראה למשתמש
   if (typeof showNotification === 'function') {
-    showNotification('המטמון נוקה בהצלחה', 'success', 'הצלחה', 4000, 'system');
+    showNotification('המטמון נוקה בהצלחה (כולל קבצים סטטיים)', 'success', 'הצלחה', 4000, 'system');
   }
   
   // Note: Linter-specific cache clearing is handled by the linter system itself
 };
+
+/**
+ * ניקוי Browser Cache - פונקציה חדשה
+ * מנקה את מטמון הדפדפן לקבצים סטטיים
+ */
+function clearBrowserCache() {
+  console.log('🧹 Clearing browser cache...');
+  
+  try {
+    // ניקוי localStorage ו-sessionStorage
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    // ניקוי IndexedDB
+    if (window.indexedDB && window.indexedDB.deleteDatabase) {
+      // רשימת מסדי נתונים לנקות
+      const dbNames = ['UnifiedIndexedDB', 'TikTrackCache', 'ProjectFilesCache'];
+      
+      dbNames.forEach(dbName => {
+        try {
+          const deleteReq = window.indexedDB.deleteDatabase(dbName);
+          deleteReq.onsuccess = () => console.log(`✅ Deleted database: ${dbName}`);
+          deleteReq.onerror = () => console.warn(`⚠️ Failed to delete database: ${dbName}`);
+        } catch (e) {
+          console.warn(`⚠️ Error deleting database ${dbName}:`, e);
+        }
+      });
+    }
+    
+    // ניקוי Service Worker cache אם קיים
+    if ('caches' in window) {
+      caches.keys().then(cacheNames => {
+        cacheNames.forEach(cacheName => {
+          caches.delete(cacheName).then(() => {
+            console.log(`✅ Deleted cache: ${cacheName}`);
+          }).catch(err => {
+            console.warn(`⚠️ Failed to delete cache ${cacheName}:`, err);
+          });
+        });
+      }).catch(err => {
+        console.warn('⚠️ Error getting cache names:', err);
+      });
+    }
+    
+    // הוספת timestamp לקבצים סטטיים כדי לשבור cache
+    addTimestampToStaticFiles();
+    
+    console.log('✅ Browser cache cleared');
+  } catch (error) {
+    console.error('❌ Error clearing browser cache:', error);
+  }
+}
+
+/**
+ * הוספת timestamp לקבצים סטטיים כדי לשבור cache
+ */
+function addTimestampToStaticFiles() {
+  console.log('🕒 Adding timestamps to static files...');
+  
+  try {
+    // רשימת קבצים סטטיים שעלולים להיות במטמון
+    const staticFiles = [
+      'images/icons/trading_accounts.svg',
+      'images/icons/accounts.svg',
+      'images/icons/alerts.svg',
+      'images/icons/trades.svg',
+      'images/icons/tickers.svg',
+      'styles-new/main.css',
+      'scripts/trading_accounts.js',
+      'scripts/accounts.js'
+    ];
+    
+    let updatedFiles = 0;
+    
+    staticFiles.forEach(filePath => {
+      // חיפוש כל האלמנטים שמשתמשים בקבצים האלה
+      const selectors = [
+        `img[src*="${filePath}"]`,
+        `link[href*="${filePath}"]`,
+        `script[src*="${filePath}"]`
+      ];
+      
+      selectors.forEach(selector => {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(element => {
+          const currentSrc = element.src || element.href;
+          if (currentSrc && !currentSrc.includes('?t=')) {
+            const separator = currentSrc.includes('?') ? '&' : '?';
+            const newSrc = currentSrc + separator + 't=' + Date.now();
+            
+            if (element.src) {
+              element.src = newSrc;
+            } else if (element.href) {
+              element.href = newSrc;
+            }
+            
+            console.log(`🕒 Added timestamp to: ${filePath}`);
+            updatedFiles++;
+          }
+        });
+      });
+    });
+    
+    // אם לא מצאנו קבצים לעדכון, ננסה לכפות רענון של כל האייקונים
+    if (updatedFiles === 0) {
+      console.log('🔄 No files found with timestamps, forcing icon refresh...');
+      forceIconRefresh();
+    }
+    
+    console.log(`✅ Timestamps added to ${updatedFiles} static files`);
+  } catch (error) {
+    console.error('❌ Error adding timestamps to static files:', error);
+  }
+}
+
+/**
+ * כפיית רענון אייקונים - פונקציה חדשה
+ */
+function forceIconRefresh() {
+  console.log('🔄 Forcing icon refresh...');
+  
+  try {
+    // רשימת אייקונים שעלולים להיות במטמון
+    const iconSelectors = [
+      'img[src*="images/icons/"]',
+      'img[src*="trading_accounts.svg"]',
+      'img[src*="accounts.svg"]'
+    ];
+    
+    iconSelectors.forEach(selector => {
+      const elements = document.querySelectorAll(selector);
+      elements.forEach(element => {
+        const originalSrc = element.src;
+        if (originalSrc) {
+          // הוספת timestamp ייחודי לכל אייקון
+          const separator = originalSrc.includes('?') ? '&' : '?';
+          const newSrc = originalSrc + separator + 'cache_bust=' + Date.now() + '_' + Math.random();
+          
+          // שמירת המקור המקורי
+          element.setAttribute('data-original-src', originalSrc);
+          
+          // עדכון המקור
+          element.src = newSrc;
+          
+          console.log(`🔄 Forced refresh for icon: ${originalSrc}`);
+        }
+      });
+    });
+    
+    console.log('✅ Icon refresh forced');
+  } catch (error) {
+    console.error('❌ Error forcing icon refresh:', error);
+  }
+}
 
 // פונקציה לניקוי מטמון פג תוקף
 window.clearExpiredCache = async () => {

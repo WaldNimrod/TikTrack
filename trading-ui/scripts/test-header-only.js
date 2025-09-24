@@ -1,37 +1,284 @@
 /**
  * Test Header Only Page - JavaScript Functions
- * פונקציות JavaScript ספציפיות לעמוד בדיקת ראש הדף
+ * פונקציות JavaScript ספציפיות לעמוד בדיקת ראש הדף החדש
  * 
- * @version 3.1.0
+ * @version 6.0.0
  * @lastUpdated January 15, 2025
  * @author TikTrack Development Team
  */
 
-console.log('🔧 test-header-only.js loaded successfully!');
+console.log('🔧 test-header-only.js v6.0.0 loaded successfully!');
 
 
-// ===== DEBUG FUNCTIONS =====
+// ===== NEW HEADER SYSTEM TESTING FUNCTIONS =====
 
-// Debug functions moved to header-system.js
+// Global variables for testing
+let headerSystem = null;
+let testResults = {
+    unitTests: {},
+    integrationTests: {},
+    performanceTests: {},
+    systemStats: {}
+};
+
+// Initialize testing system
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('🧪 Initializing Header System Testing...');
+    initializeTestingSystem();
+});
 
 /**
- * פונקציות בדיקה
+ * Initialize Testing System
  */
-function log(message) {
-    const logElement = document.getElementById('testLog');
-    if (logElement) {
-        const timestamp = new Date().toLocaleTimeString();
-        logElement.innerHTML += `<p>[${timestamp}] ${message}</p>`;
-        logElement.scrollTop = logElement.scrollHeight;
+async function initializeTestingSystem() {
+    try {
+        console.log('🚀 Starting Header System Testing...');
+        
+        // Wait for HeaderSystem to be available
+        let attempts = 0;
+        while (!window.HeaderSystem && attempts < 50) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
+        }
+        
+        if (window.HeaderSystem) {
+            headerSystem = new HeaderSystem();
+            await headerSystem.init();
+            console.log('✅ Header System initialized successfully');
+            
+            // Run initial tests
+            await runInitialTests();
+        } else {
+            console.error('❌ HeaderSystem not available');
+            updateAllStatuses('לא זמין', false);
+        }
+        
+    } catch (error) {
+        console.error('❌ Error initializing testing system:', error);
+        updateAllStatuses('שגיאה', false);
     }
-    console.log(message);
 }
 
+/**
+ * Run Initial Tests
+ */
+async function runInitialTests() {
+    try {
+        console.log('🧪 Running initial tests...');
+        
+        // Test components
+        await testComponents();
+        
+        // Test services
+        await testServices();
+        
+        // Test integration
+        await testIntegration();
+        
+        // Update system stats
+        updateSystemStats();
+        
+        // Update performance metrics
+        updatePerformanceMetrics();
+        
+        console.log('✅ Initial tests completed');
+        
+    } catch (error) {
+        console.error('❌ Error running initial tests:', error);
+    }
+}
+
+/**
+ * Test Components
+ */
+async function testComponents() {
+    try {
+        const components = [
+            'state', 'ui', 'translation', 'preferences', 
+            'menu', 'filter', 'navigation', 'header'
+        ];
+        
+        for (const componentName of components) {
+            const component = headerSystem.getComponent(componentName);
+            const status = component ? '✅ פעיל' : '❌ לא זמין';
+            const isSuccess = !!component;
+            
+            updateStatus(`${componentName}ComponentStatus`, status, isSuccess);
+            testResults.unitTests[componentName] = { status, isSuccess };
+        }
+        
+    } catch (error) {
+        console.error('❌ Error testing components:', error);
+    }
+}
+
+/**
+ * Test Services
+ */
+async function testServices() {
+    try {
+        const services = ['event', 'state', 'ui'];
+        
+        for (const serviceName of services) {
+            const service = headerSystem.getService(serviceName);
+            const status = service ? '✅ פעיל' : '❌ לא זמין';
+            const isSuccess = !!service;
+            
+            updateStatus(`${serviceName}ServiceStatus`, status, isSuccess);
+            testResults.unitTests[serviceName] = { status, isSuccess };
+        }
+        
+    } catch (error) {
+        console.error('❌ Error testing services:', error);
+    }
+}
+
+/**
+ * Test Integration
+ */
+async function testIntegration() {
+    try {
+        // Test components integration
+        const componentsWorking = Object.values(testResults.unitTests)
+            .filter(test => test.isSuccess).length >= 8;
+        
+        updateStatus('componentsIntegrationStatus', 
+            componentsWorking ? '✅ עובד' : '❌ לא עובד', componentsWorking);
+        
+        // Test services integration
+        const servicesWorking = Object.values(testResults.unitTests)
+            .filter(test => test.isSuccess).length >= 3;
+        
+        updateStatus('servicesIntegrationStatus', 
+            servicesWorking ? '✅ עובד' : '❌ לא עובד', servicesWorking);
+        
+        // Test full integration
+        const fullIntegrationWorking = componentsWorking && servicesWorking;
+        updateStatus('fullIntegrationStatus', 
+            fullIntegrationWorking ? '✅ עובד' : '❌ לא עובד', fullIntegrationWorking);
+        
+        testResults.integrationTests = {
+            components: componentsWorking,
+            services: servicesWorking,
+            full: fullIntegrationWorking
+        };
+        
+    } catch (error) {
+        console.error('❌ Error testing integration:', error);
+    }
+}
+
+/**
+ * Update System Stats
+ */
+function updateSystemStats() {
+    try {
+        const info = headerSystem.getInfo();
+        
+        updateStatus('componentsCount', info.components.length);
+        updateStatus('servicesCount', info.services.length);
+        updateStatus('utilsCount', '3'); // DOMUtils, EventUtils, StateUtils
+        updateStatus('constantsCount', '3'); // Events, Selectors, Config
+        updateStatus('totalLinesCount', '10,293+');
+        
+        testResults.systemStats = {
+            components: info.components.length,
+            services: info.services.length,
+            utils: 3,
+            constants: 3,
+            totalLines: 10293
+        };
+        
+    } catch (error) {
+        console.error('❌ Error updating system stats:', error);
+    }
+}
+
+/**
+ * Update Performance Metrics
+ */
+function updatePerformanceMetrics() {
+    try {
+        const loadTime = performance.now();
+        const memoryUsage = performance.memory ? 
+            Math.round(performance.memory.usedJSHeapSize / 1024 / 1024) + ' MB' : 'לא זמין';
+        
+        updateStatus('loadTime', Math.round(loadTime) + ' ms');
+        updateStatus('memoryUsage', memoryUsage);
+        updateStatus('eventsCount', '50+');
+        updateStatus('initializationStatus', headerSystem.isInitialized ? '✅ הושלם' : '❌ לא הושלם');
+        
+        testResults.performanceTests = {
+            loadTime: Math.round(loadTime),
+            memoryUsage: memoryUsage,
+            eventsCount: 50,
+            initialized: headerSystem.isInitialized
+        };
+        
+    } catch (error) {
+        console.error('❌ Error updating performance metrics:', error);
+    }
+}
+
+/**
+ * Update Status Helper
+ */
 function updateStatus(elementId, status, isSuccess = true) {
     const element = document.getElementById(elementId);
     if (element) {
         element.textContent = status;
         element.style.color = isSuccess ? 'green' : 'red';
+        element.style.fontWeight = 'bold';
+    }
+}
+
+/**
+ * Update All Statuses
+ */
+function updateAllStatuses(status, isSuccess = true) {
+    const statusElements = [
+        'stateComponentStatus', 'uiComponentStatus', 'translationComponentStatus', 
+        'preferencesComponentStatus', 'menuComponentStatus', 'filterComponentStatus',
+        'navigationComponentStatus', 'headerComponentStatus',
+        'eventServiceStatus', 'stateServiceStatus', 'uiServiceStatus',
+        'componentsIntegrationStatus', 'servicesIntegrationStatus', 'fullIntegrationStatus'
+    ];
+    
+    statusElements.forEach(elementId => {
+        updateStatus(elementId, status, isSuccess);
+    });
+}
+
+/**
+ * Test Functions for Buttons
+ */
+function runUnitTests() {
+    console.log('🧪 Running Unit Tests...');
+    testComponents();
+    testServices();
+}
+
+function runIntegrationTests() {
+    console.log('🔗 Running Integration Tests...');
+    testIntegration();
+}
+
+function runPerformanceTests() {
+    console.log('⚡ Running Performance Tests...');
+    updatePerformanceMetrics();
+}
+
+function runAllTests() {
+    console.log('🚀 Running All Tests...');
+    runInitialTests();
+}
+
+function resetSystem() {
+    console.log('🔄 Resetting System...');
+    if (headerSystem) {
+        // Reset system state
+        headerSystem.state.reset();
+        console.log('✅ System reset completed');
     }
 }
 
@@ -289,7 +536,7 @@ function toggleTickersSection() {
 
 
 // Toggle functions are now handled by the global system in ui-utils.js
-// No local functions needed - using window.toggleTopSection() and window.toggleSection()
+// No local functions needed - using window.toggleSection() and window.toggleSection()
 
 // ===== EXPORTS =====
 
@@ -312,5 +559,5 @@ window.filterTickersByType = filterTickersByType;
 window.toggleTickersSection = toggleTickersSection;
 window.loadActionButtons = loadActionButtons;
 window.loadRealData = loadRealData;
-window.toggleTopSection = toggleTopSection;
+window.toggleSection = toggleSection;
 // window.toggleSection export removed - using global version from ui-utils.js

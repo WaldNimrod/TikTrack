@@ -167,7 +167,7 @@ let cashFlowsData = window.cashFlowsData;
 
 // פונקציות לפתיחה/סגירה של סקשנים - משתמשות בפונקציות הגלובליות
 // הפונקציות הבאות זמינות גלובלית:
-// - window.toggleTopSection()
+// - window.toggleSection()
 // - window.toggleSection('cash_flows')
 // - window.restoreSectionStates()
 
@@ -1761,13 +1761,6 @@ function showEditCashFlowModal(cashFlowId) {
 // ===== MISSING FUNCTIONS FOR ONCLICK ATTRIBUTES =====
 
 // Toggle functions
-function toggleTopSection() {
-    if (typeof window.toggleTopSection === 'function') {
-        window.toggleTopSection();
-    } else {
-        console.warn('toggleTopSection function not found');
-    }
-}
 
 // Cash Flow CRUD functions
 function editCashFlow(id) {
@@ -1794,7 +1787,7 @@ window.initializeExternalIdFields = initializeExternalIdFields;
 window.deleteCashFlow = deleteCashFlow;
 window.showAddCashFlowModal = showAddCashFlowModal;
 window.showEditCashFlowModal = showEditCashFlowModal;
-window.toggleTopSection = toggleTopSection;
+window.toggleSection = toggleSection;
 window.editCashFlow = editCashFlow;
 window.loadCashFlowsData = loadCashFlowsData;
 window.updateCashFlowsTable = updateCashFlowsTable;

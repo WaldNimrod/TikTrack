@@ -9,13 +9,6 @@ document.addEventListener('DOMContentLoaded', function () {
 // ===== MISSING FUNCTIONS FOR ONCLICK ATTRIBUTES =====
 
 // Toggle functions
-function toggleTopSection() {
-    if (typeof window.toggleTopSection === 'function') {
-        window.toggleTopSection();
-    } else {
-        console.warn('toggleTopSection function not found');
-    }
-}
 
 
 // Sorting functions
@@ -41,7 +34,7 @@ function testTrigger(triggerId) {
 
 // ===== GLOBAL EXPORTS =====
 // Export functions to global scope for onclick attributes
-window.toggleTopSection = toggleTopSection;
+window.toggleSection = toggleSection;
 // window.toggleSection export removed - using global version from ui-utils.js
 // window.sortTable export removed - using global version from tables.js
 window.showTriggerDetails = showTriggerDetails;

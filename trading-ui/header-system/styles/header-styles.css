@@ -1,0 +1,788 @@
+/**
+ * Header Styles - Header System
+ * סגנונות כותרת למערכת הכותרת
+ * 
+ * @version 1.0.0
+ * @lastUpdated $(date)
+ * @author TikTrack Development Team
+ * 
+ * SCOPE RULE: כל הסלקטורים חייבים להתחיל ב-#unified-header
+ * זהו חריג למערכת ITCSS - כל הסגנונות כאן ספציפיים לכותרת
+ */
+
+/* ==========================================================================
+   Header Container
+   ========================================================================== */
+
+#unified-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+#unified-header.compact-mode {
+  padding: 5px 0;
+}
+
+#unified-header.theme-dark {
+  background: #1a1a1a;
+  border-bottom-color: #333333;
+  color: #ffffff;
+}
+
+#unified-header.theme-light {
+  background: #ffffff;
+  border-bottom-color: #e0e0e0;
+  color: #000000;
+}
+
+#unified-header.no-animations * {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* ==========================================================================
+   Header Top Section
+   ========================================================================== */
+
+#unified-header .header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  min-height: 60px;
+}
+
+#unified-header .header-top.compact-mode {
+  padding: 5px 15px;
+  min-height: 40px;
+}
+
+/* ==========================================================================
+   Logo Section
+   ========================================================================== */
+
+#unified-header .logo-section {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+#unified-header .logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+}
+
+#unified-header .logo:hover {
+  opacity: 0.8;
+}
+
+#unified-header .logo-image {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+#unified-header .logo-text {
+  font-size: 20px;
+  font-weight: bold;
+  color: #2c5aa0;
+}
+
+#unified-header.theme-dark .logo-text {
+  color: #4a9eff;
+}
+
+#unified-header.compact-mode .logo-image {
+  width: 24px;
+  height: 24px;
+}
+
+#unified-header.compact-mode .logo-text {
+  font-size: 16px;
+}
+
+/* ==========================================================================
+   Header Navigation
+   ========================================================================== */
+
+#unified-header .header-nav {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  margin: 0 20px;
+}
+
+#unified-header .main-nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+#unified-header .main-nav.menu-visible {
+  display: flex;
+}
+
+#unified-header .main-nav:not(.menu-visible) {
+  display: none;
+}
+
+/* ==========================================================================
+   Navigation List
+   ========================================================================== */
+
+#unified-header .tiktrack-nav-list {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#unified-header .tiktrack-nav-item {
+  position: relative;
+}
+
+#unified-header .tiktrack-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  text-decoration: none;
+  color: #333333;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+#unified-header .tiktrack-nav-link:hover {
+  background-color: #f5f5f5;
+  color: #2c5aa0;
+}
+
+#unified-header .tiktrack-nav-item.active .tiktrack-nav-link {
+  background-color: #2c5aa0;
+  color: #ffffff;
+}
+
+#unified-header.theme-dark .tiktrack-nav-link {
+  color: #ffffff;
+}
+
+#unified-header.theme-dark .tiktrack-nav-link:hover {
+  background-color: #333333;
+  color: #4a9eff;
+}
+
+#unified-header.theme-dark .tiktrack-nav-item.active .tiktrack-nav-link {
+  background-color: #4a9eff;
+  color: #000000;
+}
+
+#unified-header.compact-mode .tiktrack-nav-link {
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+/* ==========================================================================
+   Menu Icons
+   ========================================================================== */
+
+#unified-header .menu-icon {
+  font-size: 16px;
+}
+
+#unified-header .menu-text {
+  white-space: nowrap;
+}
+
+#unified-header.compact-mode .menu-icon {
+  font-size: 14px;
+}
+
+/* ==========================================================================
+   Dropdown Menus
+   ========================================================================== */
+
+#unified-header .tiktrack-dropdown-arrow {
+  font-size: 12px;
+  transition: transform 0.2s ease;
+}
+
+#unified-header .tiktrack-nav-item:hover .tiktrack-dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+#unified-header .tiktrack-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 200px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+  z-index: 1001;
+  list-style: none;
+  margin: 0;
+  padding: 5px 0;
+}
+
+#unified-header .tiktrack-nav-item:hover .tiktrack-dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+#unified-header.theme-dark .tiktrack-dropdown-menu {
+  background: #2a2a2a;
+  border-color: #444444;
+}
+
+#unified-header .tiktrack-dropdown-item {
+  margin: 0;
+}
+
+#unified-header .tiktrack-dropdown-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 15px;
+  text-decoration: none;
+  color: #333333;
+  transition: background-color 0.2s ease;
+  font-size: 14px;
+}
+
+#unified-header .tiktrack-dropdown-link:hover {
+  background-color: #f5f5f5;
+  color: #2c5aa0;
+}
+
+#unified-header.theme-dark .tiktrack-dropdown-link {
+  color: #ffffff;
+}
+
+#unified-header.theme-dark .tiktrack-dropdown-link:hover {
+  background-color: #444444;
+  color: #4a9eff;
+}
+
+/* ==========================================================================
+   Header Actions
+   ========================================================================== */
+
+#unified-header .header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+#unified-header .cache-clear-btn,
+#unified-header .menu-filter-toggle-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #e0e0e0;
+  background: #ffffff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 16px;
+}
+
+#unified-header .cache-clear-btn:hover,
+#unified-header .menu-filter-toggle-section:hover {
+  background-color: #f5f5f5;
+  border-color: #2c5aa0;
+}
+
+#unified-header.theme-dark .cache-clear-btn,
+#unified-header.theme-dark .menu-filter-toggle-section {
+  background: #2a2a2a;
+  border-color: #444444;
+  color: #ffffff;
+}
+
+#unified-header.theme-dark .cache-clear-btn:hover,
+#unified-header.theme-dark .menu-filter-toggle-section:hover {
+  background-color: #444444;
+  border-color: #4a9eff;
+}
+
+#unified-header.compact-mode .cache-clear-btn,
+#unified-header.compact-mode .menu-filter-toggle-section {
+  width: 30px;
+  height: 30px;
+  font-size: 14px;
+}
+
+/* ==========================================================================
+   Filters Container
+   ========================================================================== */
+
+#unified-header .filters-container {
+  background: #f8f9fa;
+  border-top: 1px solid #e0e0e0;
+  padding: 15px 20px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+#unified-header .filters-container.filters-visible {
+  max-height: 200px;
+  opacity: 1;
+}
+
+#unified-header .filters-container:not(.filters-visible) {
+  max-height: 0;
+  opacity: 0;
+  padding: 0 20px;
+}
+
+#unified-header.theme-dark .filters-container {
+  background: #1a1a1a;
+  border-top-color: #333333;
+}
+
+#unified-header.compact-mode .filters-container {
+  padding: 10px 15px;
+}
+
+/* ==========================================================================
+   Header Filters
+   ========================================================================== */
+
+#unified-header .header-filters {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+#unified-header.compact-mode .header-filters {
+  gap: 10px;
+}
+
+/* ==========================================================================
+   Filter Groups
+   ========================================================================== */
+
+#unified-header .filter-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+#unified-header .filter-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  color: #333333;
+  min-width: 120px;
+}
+
+#unified-header .filter-toggle:hover {
+  background-color: #f5f5f5;
+  border-color: #2c5aa0;
+}
+
+#unified-header.theme-dark .filter-toggle {
+  background: #2a2a2a;
+  border-color: #444444;
+  color: #ffffff;
+}
+
+#unified-header.theme-dark .filter-toggle:hover {
+  background-color: #444444;
+  border-color: #4a9eff;
+}
+
+#unified-header.compact-mode .filter-toggle {
+  padding: 6px 10px;
+  font-size: 12px;
+  min-width: 100px;
+}
+
+#unified-header .filter-text {
+  flex: 1;
+  text-align: right;
+}
+
+#unified-header .filter-arrow {
+  font-size: 12px;
+  transition: transform 0.2s ease;
+}
+
+#unified-header .filter-toggle:hover .filter-arrow {
+  transform: rotate(180deg);
+}
+
+/* ==========================================================================
+   Filter Menus
+   ========================================================================== */
+
+#unified-header .filter-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+  z-index: 1001;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+#unified-header .filter-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+#unified-header.theme-dark .filter-menu {
+  background: #2a2a2a;
+  border-color: #444444;
+}
+
+#unified-header .filter-option {
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-size: 14px;
+  color: #333333;
+}
+
+#unified-header .filter-option:hover {
+  background-color: #f5f5f5;
+  color: #2c5aa0;
+}
+
+#unified-header.theme-dark .filter-option {
+  color: #ffffff;
+}
+
+#unified-header.theme-dark .filter-option:hover {
+  background-color: #444444;
+  color: #4a9eff;
+}
+
+#unified-header.compact-mode .filter-option {
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+/* ==========================================================================
+   Search Input
+   ========================================================================== */
+
+#unified-header .search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+#unified-header .search-filter-input {
+  padding: 8px 35px 8px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #333333;
+  background: #ffffff;
+  min-width: 200px;
+  transition: all 0.2s ease;
+}
+
+#unified-header .search-filter-input:focus {
+  outline: none;
+  border-color: #2c5aa0;
+  box-shadow: 0 0 0 2px rgba(44, 90, 160, 0.1);
+}
+
+#unified-header.theme-dark .search-filter-input {
+  background: #2a2a2a;
+  border-color: #444444;
+  color: #ffffff;
+}
+
+#unified-header.theme-dark .search-filter-input:focus {
+  border-color: #4a9eff;
+  box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.1);
+}
+
+#unified-header.compact-mode .search-filter-input {
+  padding: 6px 30px 6px 10px;
+  font-size: 12px;
+  min-width: 150px;
+}
+
+#unified-header .search-clear-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #999999;
+  transition: color 0.2s ease;
+}
+
+#unified-header .search-clear-btn:hover {
+  color: #2c5aa0;
+}
+
+#unified-header.theme-dark .search-clear-btn {
+  color: #666666;
+}
+
+#unified-header.theme-dark .search-clear-btn:hover {
+  color: #4a9eff;
+}
+
+/* ==========================================================================
+   Action Buttons
+   ========================================================================== */
+
+#unified-header .action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#unified-header .reset-btn,
+#unified-header .clear-btn {
+  padding: 8px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #333333;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+#unified-header .reset-btn:hover,
+#unified-header .clear-btn:hover {
+  background-color: #f5f5f5;
+  border-color: #2c5aa0;
+  color: #2c5aa0;
+}
+
+#unified-header.theme-dark .reset-btn,
+#unified-header.theme-dark .clear-btn {
+  background: #2a2a2a;
+  border-color: #444444;
+  color: #ffffff;
+}
+
+#unified-header.theme-dark .reset-btn:hover,
+#unified-header.theme-dark .clear-btn:hover {
+  background-color: #444444;
+  border-color: #4a9eff;
+  color: #4a9eff;
+}
+
+#unified-header.compact-mode .reset-btn,
+#unified-header.compact-mode .clear-btn {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+/* ==========================================================================
+   Responsive Design
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  #unified-header .header-top {
+    padding: 8px 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  #unified-header .header-nav {
+    order: 3;
+    width: 100%;
+    margin: 10px 0 0 0;
+  }
+  
+  #unified-header .main-nav {
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  #unified-header .tiktrack-nav-list {
+    gap: 10px;
+  }
+  
+  #unified-header .tiktrack-nav-link {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+  
+  #unified-header .header-filters {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  
+  #unified-header .filter-toggle {
+    min-width: auto;
+    width: 100%;
+  }
+  
+  #unified-header .search-filter-input {
+    min-width: auto;
+    width: 100%;
+  }
+  
+  #unified-header .action-buttons {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  #unified-header .header-top {
+    padding: 5px 10px;
+  }
+  
+  #unified-header .logo-text {
+    display: none;
+  }
+  
+  #unified-header .tiktrack-nav-link {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+  
+  #unified-header .filter-toggle {
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+  
+  #unified-header .search-filter-input {
+    padding: 6px 25px 6px 8px;
+    font-size: 12px;
+  }
+  
+  #unified-header .reset-btn,
+  #unified-header .clear-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+}
+
+/* ==========================================================================
+   High Contrast Mode
+   ========================================================================== */
+
+#unified-header.high-contrast {
+  border-bottom: 2px solid #000000;
+}
+
+#unified-header.high-contrast .tiktrack-nav-link {
+  border: 1px solid transparent;
+}
+
+#unified-header.high-contrast .tiktrack-nav-link:hover {
+  border-color: #000000;
+}
+
+#unified-header.high-contrast .tiktrack-nav-item.active .tiktrack-nav-link {
+  border-color: #000000;
+}
+
+#unified-header.high-contrast .filter-toggle {
+  border-width: 2px;
+}
+
+#unified-header.high-contrast .search-filter-input {
+  border-width: 2px;
+}
+
+#unified-header.high-contrast .reset-btn,
+#unified-header.high-contrast .clear-btn {
+  border-width: 2px;
+}
+
+/* ==========================================================================
+   Large Text Mode
+   ========================================================================== */
+
+#unified-header.large-text {
+  font-size: 18px;
+}
+
+#unified-header.large-text .tiktrack-nav-link {
+  font-size: 16px;
+  padding: 10px 14px;
+}
+
+#unified-header.large-text .filter-toggle {
+  font-size: 16px;
+  padding: 10px 14px;
+}
+
+#unified-header.large-text .search-filter-input {
+  font-size: 16px;
+  padding: 10px 40px 10px 14px;
+}
+
+#unified-header.large-text .reset-btn,
+#unified-header.large-text .clear-btn {
+  font-size: 16px;
+  padding: 10px 18px;
+}
+
+/* ==========================================================================
+   Reduced Motion
+   ========================================================================== */
+
+#unified-header.reduced-motion * {
+  transition: none !important;
+  animation: none !important;
+}
+
+#unified-header.reduced-motion .tiktrack-dropdown-arrow {
+  transform: none !important;
+}
+
+#unified-header.reduced-motion .filter-arrow {
+  transform: none !important;
+}

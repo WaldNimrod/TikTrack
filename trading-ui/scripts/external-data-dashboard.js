@@ -1138,13 +1138,6 @@ ${detailedLog.consoleLogs.join('\n')}
 }
 
 // Global functions for button onclick handlers
-function toggleTopSection() {
-  if (typeof window.toggleTopSection === 'function') {
-    window.toggleTopSection();
-  } else {
-    console.warn('toggleTopSection function not found');
-  }
-}
 
 window.testProvider = function(providerId) {
   // console.log('🧪 Testing provider:', providerId);

@@ -252,7 +252,7 @@ function deleteNote(id) {
 
 // פונקציות לפתיחה/סגירה של סקשנים
 
-// toggleMainSection function removed - use toggleSection('main') instead
+// toggleSection function removed - use toggleSection('main') instead
 
 // פונקציה לשחזור מצב הסגירה
 function restoreNotesSectionState() {
@@ -262,7 +262,7 @@ function restoreNotesSectionState() {
 
   if (topSection) {
     const sectionBody = topSection.querySelector('.section-body');
-    const toggleBtn = topSection.querySelector('button[onclick="toggleTopSection()"]');
+    const toggleBtn = topSection.querySelector('button[onclick="toggleSection()"]');
     const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
 
     if (sectionBody && topCollapsed) {
@@ -298,8 +298,8 @@ function restoreNotesSectionState() {
 window.openNoteDetails = openNoteDetails;
 window.editNote = editNote;
 window.deleteNote = deleteNote;
-window.toggleTopSection = toggleTopSection;
-// toggleMainSection export removed - use toggleSection('main') instead
+window.toggleSection = toggleSection;
+// toggleSection export removed - use toggleSection('main') instead
 window.restoreNotesSectionState = restoreNotesSectionState;
 
 // פונקציה לטעינת נתונים
@@ -2129,15 +2129,15 @@ function replaceCurrentAttachment() {
 // ===== MISSING FUNCTIONS FOR ONCLICK ATTRIBUTES =====
 
 // Toggle functions
-function toggleTopSection() {
-    if (typeof window.toggleTopSection === 'function') {
-        window.toggleTopSection();
+function toggleSection() {
+    if (typeof window.toggleSection === 'function') {
+        window.toggleSection();
     } else {
-        console.warn('toggleTopSection function not found');
+        console.warn('toggleSection function not found');
     }
 }
 
-// toggleMainSection function removed - use toggleSection('main') instead
+// toggleSection function removed - use toggleSection('main') instead
 
 // Note CRUD functions
 function openNoteDetails() {
@@ -2193,8 +2193,8 @@ function loadNotesData() {
 
 // ===== GLOBAL EXPORTS =====
 // Export functions to global scope for onclick attributes
-window.toggleTopSection = toggleTopSection;
-// toggleMainSection export removed - use toggleSection('main') instead
+window.toggleSection = toggleSection;
+// toggleSection export removed - use toggleSection('main') instead
 window.openNoteDetails = openNoteDetails;
 window.editNote = editNote;
 // Detailed Log Functions for Notes Page
@@ -2261,7 +2261,7 @@ function generateDetailedLog() {
                 addNote: typeof window.addNote === 'function' ? 'זמין' : 'לא זמין',
                 editNote: typeof window.editNote === 'function' ? 'זמין' : 'לא זמין',
                 deleteNote: typeof window.deleteNote === 'function' ? 'זמין' : 'לא זמין',
-                toggleTopSection: typeof window.toggleTopSection === 'function' ? 'זמין' : 'לא זמין',
+                toggleSection: typeof window.toggleSection === 'function' ? 'זמין' : 'לא זמין',
                 filterNotesByRelatedObjectType: typeof window.filterNotesByRelatedObjectType === 'function' ? 'זמין' : 'לא זמין',
                 uploadFile: typeof window.uploadFile === 'function' ? 'זמין' : 'לא זמין',
                 formatText: typeof window.formatText === 'function' ? 'זמין' : 'לא זמין'

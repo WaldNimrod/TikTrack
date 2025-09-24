@@ -2057,25 +2057,6 @@ async function deleteTradePlan(tradePlanId) {
 }
 
 
-/**
- * סגירת מודל - שימוש בפונקציה גלובלית
- * @deprecated Use window.closeModal from main.js instead
- */
-function closeModal(modalId) {
-  // שימוש בפונקציה הגלובלית
-  if (typeof window.closeModalGlobal === 'function') {
-    window.closeModalGlobal(modalId);
-  } else {
-    // Fallback to Bootstrap modal
-    const modal = document.getElementById(modalId);
-    if (modal) {
-      const bootstrapModal = bootstrap.Modal.getInstance(modal);
-      if (bootstrapModal) {
-        bootstrapModal.hide();
-      }
-    }
-  }
-}
 
 /**
  * פילטור נתוני תכנונים

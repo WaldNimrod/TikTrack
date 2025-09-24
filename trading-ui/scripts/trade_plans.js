@@ -2114,21 +2114,6 @@ function filterDesignsData(statuses, types, accounts, dateRange, searchTerm) {
  *
  * @since 2.0
  */
-function sortTable(columnIndex) {
-  // Using global function from tables.js
-  if (typeof window.sortTableData === 'function') {
-    window.sortTableData(
-      columnIndex,
-      window.filteredTradePlansData || window.tradePlansData,
-      'trade_plans',
-      updateDesignsTable,
-    );
-  } else {
-    handleFunctionNotFound('sortTableData');
-    // Fallback to local sorting if global function not available
-    performLocalSort(columnIndex);
-  }
-}
 
 /**
  * פונקציה מקומית לסידור (fallback)
@@ -2713,7 +2698,7 @@ window.saveNewTradePlan = saveNewTradePlan;
 window.editTradePlan = editTradePlan;
 window.deleteTradePlan = deleteTradePlan;
 window.filterTradePlansData = filterTradePlansData;
-window.sortTable = sortTable;
+// window.sortTable export removed - using global version from tables.js
 window.filterTradePlansLocally = filterTradePlansLocally;
 window.updateFilterDebugPanel = updateFilterDebugPanel;
 window.translateDateRangeToDates = translateDateRangeToDates;
@@ -3096,7 +3081,7 @@ window.updateSharesFromAmount = updateSharesFromAmount;
 window.updateAmountFromShares = updateAmountFromShares;
 window.addEntryCondition = addEntryCondition;
 window.addReason = addReason;
-window.sortTable = sortTable;
+// window.sortTable export removed - using global version from tables.js
 
 
 // Checking if functions are available
@@ -3225,37 +3210,9 @@ function generateDetailedLog() {
     }
 }
 
-function copyDetailedLog() {
-    try {
-        const logContent = generateDetailedLog();
-        navigator.clipboard.writeText(logContent).then(() => {
-            if (window.showNotification) {
-                window.showNotification('לוג מפורט הועתק ללוח', 'success');
-            } else {
-                alert('לוג מפורט הועתק ללוח');
-            }
-        }).catch(err => {
-            console.error('Failed to copy log:', err);
-            // Fallback: show in console
-            console.log('Detailed Log:', logContent);
-            if (window.showNotification) {
-                window.showNotification('לוג מפורט הוצג בקונסול', 'info');
-            } else {
-                alert('לוג מפורט הוצג בקונסול');
-            }
-        });
-    } catch (error) {
-        console.error('Error copying log:', error);
-        if (window.showNotification) {
-            window.showNotification('שגיאה בהעתקת הלוג', 'error');
-        } else {
-            alert('שגיאה בהעתקת הלוג');
-        }
-    }
-}
 
 // Export log functions to global scope
-window.copyDetailedLog = copyDetailedLog;
+// window.copyDetailedLog export removed - using global version from system-management.js
 window.generateDetailedLog = generateDetailedLog;
 
 // קריאה ב-DOMContentLoaded

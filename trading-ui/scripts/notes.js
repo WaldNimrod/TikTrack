@@ -1663,18 +1663,6 @@ function clearSelectedFile() {
  *
  * @requires window.sortTableData - פונקציה גלובלית מ-main.js
  */
-function sortTable(columnIndex) {
-  if (typeof window.sortTableData === 'function') {
-    window.sortTableData(
-      columnIndex,
-      window.notesData || [],
-      'notes',
-      updateNotesTable,
-    );
-  } else {
-    handleFunctionNotFound('sortTableData', 'פונקציית מיון טבלה לא נמצאה');
-  }
-}
 
 /**
  * שחזור מצב סידור - שימוש בפונקציה גלובלית
@@ -1695,7 +1683,7 @@ function restoreSortState() {
 }
 
 // הגדרת הפונקציה כגלובלית
-window.sortTable = sortTable;
+// window.sortTable export removed - using global version from tables.js
 
 /**
  * פונקציה להצגת דף טיקר (כרגע הודעת "בפיתוח")
@@ -2311,34 +2299,6 @@ function generateDetailedLog() {
     }
 }
 
-function copyDetailedLog() {
-    try {
-        const logContent = generateDetailedLog();
-        navigator.clipboard.writeText(logContent).then(() => {
-            if (window.showNotification) {
-                window.showNotification('לוג מפורט הועתק ללוח', 'success');
-            } else {
-                alert('לוג מפורט הועתק ללוח');
-            }
-        }).catch(err => {
-            console.error('Failed to copy log:', err);
-            // Fallback: show in console
-            console.log('Detailed Log:', logContent);
-            if (window.showNotification) {
-                window.showNotification('לוג מפורט הוצג בקונסול', 'info');
-            } else {
-                alert('לוג מפורט הוצג בקונסול');
-            }
-        });
-    } catch (error) {
-        console.error('Error copying log:', error);
-        if (window.showNotification) {
-            window.showNotification('שגיאה בהעתקת הלוג', 'error');
-        } else {
-            alert('שגיאה בהעתקת הלוג');
-        }
-    }
-}
 
 window.deleteNote = deleteNote;
 window.filterNotesByRelatedObjectType = filterNotesByRelatedObjectType;
@@ -2348,6 +2308,6 @@ window.addNote = addNote;
 window.uploadFile = uploadFile;
 window.removeCurrentAttachment = removeCurrentAttachment;
 window.replaceCurrentAttachment = replaceCurrentAttachment;
-window.copyDetailedLog = copyDetailedLog;
+// window.copyDetailedLog export removed - using global version from system-management.js
 window.generateDetailedLog = generateDetailedLog;
 

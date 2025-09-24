@@ -236,27 +236,6 @@ function updateLogDisplay() {
  * העתקת לוג מפורט
  * Copy detailed log
  */
-function copyDetailedLog() {
-    const logs = getAllLogEntries();
-    
-    if (logs.length === 0) {
-        console.warn('⚠️ No logs available for copying');
-        return;
-    }
-    
-    // Format logs for copying
-    const formattedLogs = logs.map(log => {
-        const timestamp = new Date(log.timestamp).toLocaleString('he-IL');
-        return `[${timestamp}] ${log.level}: ${log.message}`;
-    }).join('\n');
-    
-    // Copy to clipboard
-    navigator.clipboard.writeText(formattedLogs).then(() => {
-        console.log('✅ Detailed log copied to clipboard');
-    }).catch(error => {
-        console.error('❌ Error copying log:', error);
-    });
-}
 
 /**
  * העתקת לוג בעיות לא פתורות

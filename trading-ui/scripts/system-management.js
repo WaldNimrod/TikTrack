@@ -2212,7 +2212,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.runBackup = SystemManagement.runBackup;
   window.restoreFromBackup = SystemManagement.restoreFromBackup;
   window.copyCheckResultsToClipboard = SystemManagement.copyCheckResultsToClipboard;
-  window.toggleAllSections = SystemManagement.toggleAllSections;
+  // window.toggleAllSections export removed - using global version from ui-utils.js
   // window.toggleSection export removed - using global version from ui-utils.js
 });
 

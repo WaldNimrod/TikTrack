@@ -23,11 +23,11 @@ from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
 
-quotes_v1_bp = Blueprint('quotes_v1', __name__, url_prefix='/api')
+quotes_bp = Blueprint('quotes', __name__, url_prefix='/api')
 
 # Initialize base API (quotes is complex, so we'll use it selectively)
 
-@quotes_v1_bp.route('/quotes/batch', methods=['GET'])
+@quotes_bp.route('/quotes/batch', methods=['GET'])
 def get_quotes_batch():
     """
     GET /api/quotes/batch?ticker_ids=... 
@@ -118,7 +118,7 @@ def get_quotes_batch():
         }), 500
 
 
-@quotes_v1_bp.route('/quotes/<int:ticker_id>', methods=['GET'])  
+@quotes_bp.route('/quotes/<int:ticker_id>', methods=['GET'])  
 def get_quote(ticker_id: int):
     """
     GET /api/quotes/{ticker_id}
@@ -183,7 +183,7 @@ def get_quote(ticker_id: int):
         }), 500
 
 
-@quotes_v1_bp.route('/user/preferences', methods=['GET'])
+@quotes_bp.route('/user/preferences', methods=['GET'])
 def get_user_preferences():
     """
     GET /api/user/preferences
@@ -231,7 +231,7 @@ def get_user_preferences():
         }), 500
 
 
-@quotes_v1_bp.route('/user/preferences', methods=['PUT'])
+@quotes_bp.route('/user/preferences', methods=['PUT'])
 def update_user_preferences():
     """
     PUT /api/user/preferences

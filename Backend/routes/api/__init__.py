@@ -17,7 +17,7 @@ from .note_relation_types import note_relation_types_bp
 from .notes import notes_bp
 from .preferences import preferences_bp
 from .query_optimization import query_optimization_bp
-from .quotes_v1 import quotes_v1_bp
+from .quotes_v1 import quotes_bp
 from .server_management import server_management_bp
 from .system_overview import system_overview_bp
 from .tickers import tickers_bp
@@ -55,7 +55,7 @@ __all__ = [
     'notes_bp',
     'preferences_bp',
     'query_optimization_bp',
-    'quotes_v1_bp',
+    'quotes_bp',
     'server_management_bp',
     'system_overview_bp',
     'tickers_bp',

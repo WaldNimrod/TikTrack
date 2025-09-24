@@ -1114,21 +1114,7 @@ window.toggleAllSections = function() {
   }
 };
 
-window.toggleSection = function(sectionId) {
-  const section = document.getElementById(sectionId);
-  if (!section) return;
-  
-  const body = section.querySelector('.section-body');
-  const icon = section.querySelector('.section-toggle-icon');
-  
-  if (body) {
-    const isHidden = body.style.display === 'none';
-    body.style.display = isHidden ? 'block' : 'none';
-    if (icon) {
-      icon.textContent = isHidden ? '▼' : '▶';
-    }
-  }
-};
+// window.toggleSection export removed - using global version from ui-utils.js
 
 window.startScheduler = function() {
   eventHandlers.startScheduler();
@@ -1375,24 +1361,6 @@ function generateDetailedLog() {
 /**
  * Copy detailed log to clipboard
  */
-async function copyDetailedLog() {
-    try {
-        const log = generateDetailedLog();
-        await navigator.clipboard.writeText(log);
-        window.showNotification('הלוג המפורט הועתק בהצלחה ללוח!', 'success');
-        console.log('=== לוג מפורט שהועתק ===');
-        console.log(log);
-        console.log('=== סוף הלוג ===');
-    } catch (error) {
-        console.error('Failed to copy log:', error);
-        window.showNotification('שגיאה בהעתקת הלוג: ' + error.message, 'error');
-        // Fallback: show in console
-        const log = generateDetailedLog();
-        console.log('=== לוג מפורט (לא הועתק) ===');
-        console.log(log);
-        console.log('=== סוף הלוג ===');
-    }
-}
 
 // ייצוא לגלובל scope
-window.copyDetailedLog = copyDetailedLog;
+// window.copyDetailedLog export removed - using global version from system-management.js

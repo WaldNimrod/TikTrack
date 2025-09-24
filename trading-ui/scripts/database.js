@@ -407,106 +407,12 @@ function addRecord() {
  * @param {number} columnIndex - The column index to sort by
  * @param {string} tableType - The table type identifier
  */
-function sortTable(columnIndex, tableType) {
-  if (!tableData[tableType] || tableData[tableType].length === 0) {
-    return;
-  }
-
-  const data = [...tableData[tableType]];
-  const tableMapping = window.TABLE_COLUMN_MAPPINGS?.[tableType];
-
-  if (!tableMapping) {
-    // console.error(`❌ No table mapping found for ${tableType}`);
-    return;
-  }
-
-  // Get the field name for the column
-  const fieldName = tableMapping[columnIndex];
-  if (!fieldName) {
-    // console.error(`❌ Invalid column index: ${columnIndex}`);
-    return;
-  }
-
-  // Sort the data
-  data.sort((a, b) => {
-    const aVal = a[fieldName];
-    const bVal = b[fieldName];
-
-    if (aVal === null || aVal === undefined) {return 1;}
-    if (bVal === null || bVal === undefined) {return -1;}
-
-    if (typeof aVal === 'number' && typeof bVal === 'number') {
-      return aVal - bVal;
-    }
-
-    return String(aVal).localeCompare(String(bVal), 'he');
-  });
-
-  // Update the display with sorted data
-  updateTableDisplay(data, tableType);
-}
 
 // ===== UTILITY FUNCTIONS =====
 
 /**
  * Copy detailed log with all database information
  */
-function copyDetailedLog() {
-  try {
-    let detailedLog = `=== בסיס נתונים - לוג מפורט ===\n`;
-    detailedLog += `תאריך ושעה: ${new Date().toLocaleString('he-IL')}\n\n`;
-    
-    // Database summary
-    const summaryStats = document.getElementById('summaryStats');
-    if (summaryStats) {
-      detailedLog += `=== סיכום נתונים ===\n`;
-      const accounts = document.getElementById('accountsStats')?.textContent || '0';
-      const trades = document.getElementById('tradesStats')?.textContent || '0';
-      const tickers = document.getElementById('tickersStats')?.textContent || '0';
-      const tradePlans = document.getElementById('tradePlansStats')?.textContent || '0';
-      const alerts = document.getElementById('alertsStats')?.textContent || '0';
-      
-      detailedLog += `סה"כ חשבונות: ${accounts}\n`;
-      detailedLog += `סה"כ טריידים: ${trades}\n`;
-      detailedLog += `סה"כ טיקרים: ${tickers}\n`;
-      detailedLog += `סה"כ תוכניות: ${tradePlans}\n`;
-      detailedLog += `סה"כ התראות: ${alerts}\n\n`;
-    }
-
-    // Tables status
-    detailedLog += `=== סטטוס טבלאות ===\n`;
-    const tables = ['accounts', 'trades', 'tickers', 'trade_plans', 'executions', 'alerts', 'notes'];
-    tables.forEach(tableType => {
-      const count = document.getElementById(`${tableType}Count`)?.textContent || 'לא ידוע';
-      detailedLog += `${tableType}: ${count}\n`;
-    });
-
-    // Current table data
-    if (currentTableType && tableData[currentTableType]) {
-      detailedLog += `\n=== טבלה פעילה: ${currentTableType} ===\n`;
-      detailedLog += `מספר רשומות: ${tableData[currentTableType].length}\n`;
-    }
-
-    detailedLog += `\n=== סיום לוג ===`;
-
-    // Copy to clipboard
-    navigator.clipboard.writeText(detailedLog).then(() => {
-      if (window.notifications && window.notifications.success) {
-        window.notifications.success('לוג מפורט הועתק ללוח בהצלחה');
-      }
-    }).catch(err => {
-      console.error('שגיאה בהעתקת לוג:', err);
-      if (window.notifications && window.notifications.error) {
-        window.notifications.error('שגיאה בהעתקת לוג מפורט');
-      }
-    });
-  } catch (error) {
-    console.error('שגיאה ביצירת לוג מפורט:', error);
-    if (window.notifications && window.notifications.error) {
-      window.notifications.error('שגיאה ביצירת לוג מפורט');
-    }
-  }
-}
 
 // ===== GLOBAL EXPORTS =====
 
@@ -517,8 +423,8 @@ window.filterTableData = filterTableData;
 window.toggleTopSection = toggleTopSection;
 // toggleMainSection export removed - use toggleSection('main') instead
 window.addRecord = addRecord;
-window.sortTable = sortTable;
-window.copyDetailedLog = copyDetailedLog;
+// window.sortTable export removed - using global version from tables.js
+// window.copyDetailedLog export removed - using global version from system-management.js
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {

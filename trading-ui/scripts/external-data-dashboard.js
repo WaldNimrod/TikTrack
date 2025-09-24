@@ -1238,8 +1238,8 @@ document.addEventListener('DOMContentLoaded', () => {
   window.externalDataDashboard.init();
   
   // Make functions globally available
-  window.copyDetailedLog = ExternalDataDashboard.copyDetailedLog;
-  window.toggleAllSections = ExternalDataDashboard.toggleAllSections;
+  // window.copyDetailedLog export removed - using global version from system-management.js
+  // window.toggleAllSections export removed - using global version from ui-utils.js
   // window.toggleSection export removed - using global version from ui-utils.js
 });
 
@@ -1324,25 +1324,7 @@ function generateDetailedLog() {
 /**
  * Copy detailed log to clipboard
  */
-async function copyDetailedLog() {
-    try {
-        const log = generateDetailedLog();
-        await navigator.clipboard.writeText(log);
-        window.showNotification('הלוג המפורט הועתק בהצלחה ללוח!', 'success');
-        console.log('=== לוג מפורט שהועתק ===');
-        console.log(log);
-        console.log('=== סוף הלוג ===');
-    } catch (error) {
-        console.error('Failed to copy log:', error);
-        window.showNotification('שגיאה בהעתקת הלוג: ' + error.message, 'error');
-        // Fallback: show in console
-        const log = generateDetailedLog();
-        console.log('=== לוג מפורט (לא הועתק) ===');
-        console.log(log);
-        console.log('=== סוף הלוג ===');
-    }
-}
 
 // ייצוא לגלובל scope
-window.copyDetailedLog = copyDetailedLog;
+// window.copyDetailedLog export removed - using global version from system-management.js
 

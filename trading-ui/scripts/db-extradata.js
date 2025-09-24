@@ -19,17 +19,6 @@ function toggleTopSection() {
 
 
 // Sorting functions
-function sortTable(columnIndex, tableId) {
-    if (typeof window.sortTableData === 'function') {
-        // Get data based on tableId and call global function
-        const data = getTableDataById(tableId);
-        if (data) {
-            window.sortTableData(columnIndex, data, tableId, updateTableDisplay);
-        }
-    } else {
-        console.warn('sortTableData function not found');
-    }
-}
 
 // Trigger functions
 function showTriggerDetails(triggerId) {
@@ -54,6 +43,6 @@ function testTrigger(triggerId) {
 // Export functions to global scope for onclick attributes
 window.toggleTopSection = toggleTopSection;
 // window.toggleSection export removed - using global version from ui-utils.js
-window.sortTable = sortTable;
+// window.sortTable export removed - using global version from tables.js
 window.showTriggerDetails = showTriggerDetails;
 window.testTrigger = testTrigger;

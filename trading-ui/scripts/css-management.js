@@ -1903,13 +1903,6 @@ async function openCssEditor() {
 /**
  * טוגל סקשן
  */
-function toggleAllSections() {
-  if (typeof window.toggleAllSections === 'function') {
-    window.toggleAllSections();
-  } else {
-    console.warn('toggleAllSections function not found');
-  }
-}
 
 
 /**
@@ -2053,62 +2046,9 @@ window.showDeleteFileSelectionModal = showDeleteFileSelectionModal;
 window.executeDeleteFromFile = executeDeleteFromFile;
 
 // פונקציה להעתקת לוג מפורט
-function copyDetailedLog() {
-  try {
-    console.log('📋 יצירת לוג מפורט...');
-    
-    let log = '=== לוג מפורט - CSS Management TikTrack ===\n\n';
-    log += `📅 תאריך: ${new Date().toLocaleString('he-IL')}\n`;
-    log += `🌐 URL: ${window.location.href}\n`;
-    log += `👤 User Agent: ${navigator.userAgent}\n\n`;
-    
-    // סטטיסטיקות CSS
-    log += '📊 סטטיסטיקות CSS:\n';
-    const activeFiles = document.getElementById('activeCssFiles')?.textContent || 'לא זמין';
-    const totalSize = document.getElementById('totalCssSize')?.textContent || 'לא זמין';
-    const totalRules = document.getElementById('totalCssRules')?.textContent || 'לא זמין';
-    log += `קבצים פעילים: ${activeFiles}\n`;
-    log += `גודל כולל: ${totalSize}\n`;
-    log += `כללים כולל: ${totalRules}\n\n`;
-    
-    // מידע על כפילויות
-    log += '🔍 מידע על כפילויות:\n';
-    log += `כפילויות שזוהו: ${mergedDuplicates.size}\n`;
-    log += `כפילויות שהוסרו: ${removedDuplicates.size}\n\n`;
-    
-    // מידע נוסף
-    log += '🔧 מידע נוסף:\n';
-    log += `גודל localStorage: ${JSON.stringify(localStorage).length} תווים\n`;
-    log += `זמן טעינת דף: ${performance.timing ? (performance.timing.loadEventEnd - performance.timing.navigationStart) + 'ms' : 'לא זמין'}\n`;
-    log += `זיכרון זמין: ${navigator.deviceMemory ? navigator.deviceMemory + 'GB' : 'לא זמין'}\n`;
-    log += `חיבור: ${navigator.onLine ? 'מחובר' : 'לא מחובר'}\n\n`;
-    
-    log += '=== סוף לוג מפורט ===';
-    
-    // העתקה ללוח
-    navigator.clipboard.writeText(log).then(() => {
-      console.log('✅ לוג מפורט הועתק ללוח בהצלחה');
-      if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification('העתקה ללוח', 'לוג מפורט הועתק ללוח בהצלחה', 3000);
-      }
-    }).catch(err => {
-      console.error('❌ שגיאה בהעתקה ללוח:', err);
-      // Fallback - הצגת הלוג בחלון נפרד
-      const newWindow = window.open('', '_blank');
-      newWindow.document.write(`<pre style="direction: rtl; text-align: right; font-family: monospace; white-space: pre-wrap;">${log}</pre>`);
-      newWindow.document.title = 'לוג מפורט - CSS Management';
-    });
-    
-  } catch (error) {
-    console.error('❌ שגיאה ביצירת לוג מפורט:', error);
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה', 'שגיאה ביצירת לוג מפורט: ' + error.message, 5000);
-    }
-  }
-}
 
-window.copyDetailedLog = copyDetailedLog;
-window.toggleAllSections = toggleAllSections;
+// window.copyDetailedLog export removed - using global version from system-management.js
+// window.toggleAllSections export removed - using global version from ui-utils.js
 // window.toggleSection export removed - using global version from ui-utils.js
 
 // Initialize on page load
@@ -2213,25 +2153,7 @@ function generateDetailedLog() {
 /**
  * Copy detailed log to clipboard
  */
-async function copyDetailedLog() {
-    try {
-        const log = generateDetailedLog();
-        await navigator.clipboard.writeText(log);
-        window.showNotification('הלוג המפורט הועתק בהצלחה ללוח!', 'success');
-        console.log('=== לוג מפורט שהועתק ===');
-        console.log(log);
-        console.log('=== סוף הלוג ===');
-    } catch (error) {
-        console.error('Failed to copy log:', error);
-        window.showNotification('שגיאה בהעתקת הלוג: ' + error.message, 'error');
-        // Fallback: show in console
-        const log = generateDetailedLog();
-        console.log('=== לוג מפורט (לא הועתק) ===');
-        console.log(log);
-        console.log('=== סוף הלוג ===');
-    }
-}
 
 // ייצוא לגלובל scope
-window.copyDetailedLog = copyDetailedLog;
+// window.copyDetailedLog export removed - using global version from system-management.js
 

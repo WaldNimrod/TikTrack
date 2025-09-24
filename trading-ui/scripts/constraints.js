@@ -624,9 +624,7 @@ window.refreshConstraints = function() {
  * Get current page name for the system
  * @returns {string} Current page name
  */
-window.getCurrentPageName = function() {
-    return 'constraints';
-};
+// window.getCurrentPageName export removed - using global version from page-utils.js
 
 /**
  * View constraint details
@@ -1286,79 +1284,10 @@ window.initializeConstraints = function() {
 };
 
 // פונקציה להעתקת לוג מפורט
-function copyDetailedLog() {
-  try {
-    console.log('📋 יצירת לוג מפורט...');
-    
-    let log = '=== לוג מפורט - Constraints Monitor TikTrack ===\n\n';
-    log += `📅 תאריך: ${new Date().toLocaleString('he-IL')}\n`;
-    log += `🌐 URL: ${window.location.href}\n`;
-    log += `👤 User Agent: ${navigator.userAgent}\n\n`;
-    
-    // סטטיסטיקות אילוצים
-    log += '📊 סטטיסטיקות אילוצים:\n';
-    const totalConstraints = document.getElementById('total-constraints')?.textContent || 'לא זמין';
-    const totalTables = document.getElementById('total-tables')?.textContent || 'לא זמין';
-    const constraintTypes = document.getElementById('constraint-types')?.textContent || 'לא זמין';
-    const activeConstraints = document.getElementById('active-constraints')?.textContent || 'לא זמין';
-    log += `סה"כ אילוצים: ${totalConstraints}\n`;
-    log += `טבלאות עם אילוצים: ${totalTables}\n`;
-    log += `סוגי אילוצים: ${constraintTypes}\n`;
-    log += `אילוצים פעילים: ${activeConstraints}\n\n`;
-    
-    // מידע על ConstraintsMonitor
-    log += '🔍 מידע על ConstraintsMonitor:\n';
-    if (window.constraintsMonitor) {
-      log += `API Base: ${window.constraintsMonitor.apiBase}\n`;
-      log += `Current Layer: ${window.constraintsMonitor.currentLayer}\n`;
-      log += `Constraints Count: ${window.constraintsMonitor.constraints?.length || 0}\n`;
-      log += `Tables Count: ${window.constraintsMonitor.tables?.length || 0}\n`;
-    } else {
-      log += 'ConstraintsMonitor לא אותחל\n';
-    }
-    log += '\n';
-    
-    // מידע נוסף
-    log += '🔧 מידע נוסף:\n';
-    log += `גודל localStorage: ${JSON.stringify(localStorage).length} תווים\n`;
-    log += `זמן טעינת דף: ${performance.timing ? (performance.timing.loadEventEnd - performance.timing.navigationStart) + 'ms' : 'לא זמין'}\n`;
-    log += `זיכרון זמין: ${navigator.deviceMemory ? navigator.deviceMemory + 'GB' : 'לא זמין'}\n`;
-    log += `חיבור: ${navigator.onLine ? 'מחובר' : 'לא מחובר'}\n\n`;
-    
-    log += '=== סוף לוג מפורט ===';
-    
-    // העתקה ללוח
-    navigator.clipboard.writeText(log).then(() => {
-      console.log('✅ לוג מפורט הועתק ללוח בהצלחה');
-      if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification('העתקה ללוח', 'לוג מפורט הועתק ללוח בהצלחה', 3000);
-      }
-    }).catch(err => {
-      console.error('❌ שגיאה בהעתקה ללוח:', err);
-      // Fallback - הצגת הלוג בחלון נפרד
-      const newWindow = window.open('', '_blank');
-      newWindow.document.write(`<pre style="direction: rtl; text-align: right; font-family: monospace; white-space: pre-wrap;">${log}</pre>`);
-      newWindow.document.title = 'לוג מפורט - Constraints Monitor';
-    });
-    
-  } catch (error) {
-    console.error('❌ שגיאה ביצירת לוג מפורט:', error);
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה', 'שגיאה ביצירת לוג מפורט: ' + error.message, 5000);
-    }
-  }
-}
-
-function toggleAllSections() {
-  if (typeof window.toggleAllSections === 'function') {
-    window.toggleAllSections();
-  } else {
-    console.warn('toggleAllSections function not found');
-  }
-}
 
 
-window.toggleAllSections = toggleAllSections;
+
+// window.toggleAllSections export removed - using global version from ui-utils.js
 // window.toggleSection export removed - using global version from ui-utils.js
 
 /**
@@ -1433,24 +1362,6 @@ function generateDetailedLog() {
 /**
  * Copy detailed log to clipboard
  */
-async function copyDetailedLog() {
-    try {
-        const log = generateDetailedLog();
-        await navigator.clipboard.writeText(log);
-        window.showNotification('הלוג המפורט הועתק בהצלחה ללוח!', 'success');
-        console.log('=== לוג מפורט שהועתק ===');
-        console.log(log);
-        console.log('=== סוף הלוג ===');
-    } catch (error) {
-        console.error('Failed to copy log:', error);
-        window.showNotification('שגיאה בהעתקת הלוג: ' + error.message, 'error');
-        // Fallback: show in console
-        const log = generateDetailedLog();
-        console.log('=== לוג מפורט (לא הועתק) ===');
-        console.log(log);
-        console.log('=== סוף הלוג ===');
-    }
-}
 
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', function() {
@@ -1466,4 +1377,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ייצוא לגלובל scope
-window.copyDetailedLog = copyDetailedLog;
+// window.copyDetailedLog export removed - using global version from system-management.js

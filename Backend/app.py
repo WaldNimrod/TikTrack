@@ -128,7 +128,7 @@ from pathlib import Path
 # External Data Integration blueprints
 from routes.external_data.quotes import quotes_bp
 from routes.external_data.status import status_bp
-from routes.api.quotes_v1 import quotes_v1_bp
+from routes.api.quotes_v1 import quotes_bp
 
 from routes.pages import pages_bp
 
@@ -226,7 +226,7 @@ app.register_blueprint(wal_bp)
 app.register_blueprint(quotes_bp)
 app.register_blueprint(status_bp)
 # API quotes endpoints (specification compliant)
-app.register_blueprint(quotes_v1_bp)
+app.register_blueprint(quotes_bp)
 
 app.register_blueprint(pages_bp)
 

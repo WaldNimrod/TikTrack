@@ -2383,7 +2383,7 @@ window.updateFileMappingStatus = updateFileMappingStatus;
 window.startFileScan = startFileScan;
 window.checkExistingScanResults = checkExistingScanResults;
 window.loadExistingFileMapping = loadExistingFileMapping;
-// window.copyDetailedLog = copyDetailedLog; // REMOVED: Development mechanism - page-specific only
+// // window.copyDetailedLog export removed - using global version from system-management.js // REMOVED: Development mechanism - page-specific only
 // window.copyLinterDetailedLog = copyDetailedLog; // REMOVED: Development mechanism - page-specific only
 window.toggleTopSection = toggleTopSection;
 // window.toggleSection export removed - using global version from ui-utils.js

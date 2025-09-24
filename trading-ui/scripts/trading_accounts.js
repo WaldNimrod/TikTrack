@@ -54,7 +54,7 @@ async function loadCurrenciesFromServer() {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const response = await fetch('http://127.0.0.1:8080/api/currencies/', {
+     const response = await fetch('http://127.0.0.1:8080/api/currencies/', {
       method: 'GET',
       headers,
     });
@@ -166,8 +166,8 @@ async function loadAccountsFromServer() {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    console.log('📡 שליחת בקשה ל-API:', '/api/trading_accounts/');
-    const response = await fetch('/api/trading_accounts/', {
+    console.log('📡 שליחת בקשה ל-API:', '/api/accounts/');
+    const response = await fetch('/api/accounts/', {
       method: 'GET',
       headers,
     });
@@ -219,7 +219,7 @@ async function loadAllAccountsFromServer() {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const response = await fetch('/api/trading_accounts/', {
+    const response = await fetch('/api/accounts/', {
       method: 'GET',
       headers,
     });
@@ -287,7 +287,7 @@ async function loadAccountsData() {
     // בדיקה אם יש פונקציה apiCall זמינה
     if (typeof window.apiCall === 'function') {
       console.log('📡 משתמש ב-apiCall');
-      const response = await window.apiCall('/api/trading_accounts/');
+      const response = await window.apiCall('/api/accounts/');
       const trading_accounts = response.data || response;
       console.log('📊 חשבונות מ-apiCall:', trading_accounts.length, 'חשבונות');
       // חשבונות שהתקבלו
@@ -296,7 +296,7 @@ async function loadAccountsData() {
       console.log('📡 apiCall לא זמין - משתמש ב-loadAccountsFromServer');
       // קריאה ישירה ל-API
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-      const response = await fetch(`${base}/api/trading_accounts/`);
+      const response = await fetch(`${base}/api/accounts/`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -607,7 +607,7 @@ window.debugAccountsFilter = function () {
   window.checkAccountsStatus();
 
   // בדיקה מהירה של השרת
-  fetch('http://127.0.0.1:8080/api/trading_accounts/')
+  fetch('http://127.0.0.1:8080/api/accounts/')
     .then(response => response.json())
     .then(data => {
       const trading_accounts = data.data || data;
@@ -1052,7 +1052,7 @@ async function saveAccount(mode, accountId = null) {
  */
 async function addAccountToAPI(accountData) {
   try {
-    const response = await fetch('/api/trading_accounts/', {
+    const response = await fetch('/api/accounts/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1081,7 +1081,7 @@ async function addAccountToAPI(accountData) {
  */
 async function updateAccountInAPI(accountId, accountData) {
   try {
-    const response = await fetch(`/api/trading_accounts/${accountId}`, {
+    const response = await fetch(`/api/accounts/${accountId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -1125,7 +1125,7 @@ async function showEditAccountModalById(accountId) {
 
   try {
     // טעינת נתוני החשבון מהשרת
-    const response = await fetch(`/api/trading_accounts/${accountId}`);
+    const response = await fetch(`/api/accounts/${accountId}`);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -1191,8 +1191,8 @@ function showEditAccountModal(account) {
 async function loadAccountsDataFromAPI() {
   console.log('🚀🚀🚀 loadAccountsDataFromAPI התחיל 🚀🚀🚀');
   try {
-    console.log('📡 שליחת בקשה ל-API:', '/api/trading_accounts/');
-    const response = await fetch('/api/trading_accounts/');
+    console.log('📡 שליחת בקשה ל-API:', '/api/accounts/');
+    const response = await fetch('/api/accounts/');
     console.log('📡 תגובת שרת:', response.status, response.ok);
 
     if (!response.ok) {
@@ -1229,7 +1229,7 @@ async function loadAccountsDataFromAPI() {
  */
 async function deleteAccountFromAPI(accountId, accountName) {
   try {
-    const response = await fetch(`/api/trading_accounts/${accountId}`, {
+    const response = await fetch(`/api/accounts/${accountId}`, {
       method: 'DELETE',
     });
 
@@ -1366,7 +1366,7 @@ async function cancelAccount(accountId, accountName) {
       }
     }
 
-    const response = await fetch(`/api/trading_accounts/${accountId}`, {
+    const response = await fetch(`/api/accounts/${accountId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -1468,7 +1468,7 @@ async function deleteAccount(accountId, accountName) {
   }
 
   try {
-    const response = await fetch(`/api/trading_accounts/${accountId}`, {
+    const response = await fetch(`/api/accounts/${accountId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -1988,7 +1988,7 @@ async function cancelAccountWithLinkedItemsCheck(accountId, _accountName) {
     // קבלת פרטי החשבון לצורך הודעת האישור
     let accountDetails = '';
     try {
-      const response = await fetch(`/api/trading_accounts/${accountId}`);
+      const response = await fetch(`/api/accounts/${accountId}`);
       if (response.ok) {
         const accountData = await response.json();
         const account = accountData.data;
@@ -2048,7 +2048,7 @@ async function deleteAccountWithLinkedItemsCheck(accountId, _accountName) {
     // קבלת פרטי החשבון לצורך הודעת האישור
     let accountDetails = '';
     try {
-      const response = await fetch(`/api/trading_accounts/${accountId}`);
+      const response = await fetch(`/api/accounts/${accountId}`);
       if (response.ok) {
         const accountData = await response.json();
         const account = accountData.data;
@@ -2137,7 +2137,7 @@ async function restoreAccount(accountId, accountName) {
   }
 
   try {
-    const response = await fetch(`/api/trading_accounts/${accountId}`, {
+    const response = await fetch(`/api/accounts/${accountId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -2208,7 +2208,7 @@ async function performAccountCancellation(accountId) {
     }
     
     // שליחה לשרת
-    const response = await fetch(`/api/trading_accounts/${accountId}`, {
+    const response = await fetch(`/api/accounts/${accountId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: 'cancelled' }),
@@ -2287,7 +2287,7 @@ async function performAccountDeletion(accountId) {
     }
     
     // שליחה לשרת
-    const response = await fetch(`/api/trading_accounts/${accountId}`, {
+    const response = await fetch(`/api/accounts/${accountId}`, {
       method: 'DELETE',
     });
 
@@ -2559,7 +2559,7 @@ function updateAccount(accountId, accountData) {
     }
     
     // שליחה לשרת
-    fetch('/api/trading_accounts/' + accountId, {
+    fetch('/api/accounts/' + accountId, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -2714,7 +2714,7 @@ setTimeout(() => {
       // ניסיון לטעון נתונים ישירות
       if (typeof window.apiCall === 'function') {
         console.log('📡 משתמש ב-apiCall ישירות');
-        window.apiCall('/api/trading_accounts/', 'GET')
+        window.apiCall('/api/accounts/', 'GET')
           .then(data => {
             console.log('✅ נתונים נטענו ישירות:', data);
             if (data && data.length > 0) {

@@ -100,6 +100,20 @@ const TABLE_COLUMN_MAPPINGS = {
     'status_default',        // 9 - Status Default
   ],
 
+  // טבלת חשבונות מסחר (Trading Accounts) - Trading Accounts Page Structure
+  'trading_accounts': [
+    'id',                    // 0 - ID
+    'name',                  // 1 - Name
+    'currency_id',           // 2 - Currency ID
+    'status',                // 3 - Status
+    'cash_balance',          // 4 - Cash Balance
+    'total_value',           // 5 - Total Value
+    'total_pl',              // 6 - Total P&L
+    'notes',                 // 7 - Notes
+    'created_at',            // 8 - Created At
+    'status_default',        // 9 - Status Default
+  ],
+
   // טבלת טיקרים (Tickers) - Enhanced with Yahoo Finance Data
   'tickers': [
     'id',                    // 0 - ID
@@ -341,7 +355,7 @@ function getColumnValue(item, columnIndex, tableType) {
   }
 
   // Database Display Page - Direct field mapping
-  if (tableType === 'trade_plans' || tableType === 'trades' || tableType === 'accounts' ||
+  if (tableType === 'trade_plans' || tableType === 'trades' || tableType === 'accounts' || tableType === 'trading_accounts' ||
         tableType === 'tickers' || tableType === 'notes' ||
         tableType === 'executions' || tableType === 'cash_flows') {
 

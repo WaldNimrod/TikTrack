@@ -230,7 +230,7 @@ class ProjectFilesScanner {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 35000); // 35 seconds timeout
             
-            const response = await fetch('/api/v1/files/discover', {
+            const response = await fetch('/api/file-scanner/files', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'

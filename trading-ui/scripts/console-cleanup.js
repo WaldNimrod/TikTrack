@@ -16,10 +16,14 @@ function clearConsole() {
 
   // בדוק אם יש מערכת מובנית לניקוי console
   if (window.manualClearConsole) {
-    // console.log('ℹ️ ניקוי console מבוצע דרך המערכת המובנית');
     window.manualClearConsole();
+    if (typeof window.showNotification === 'function') {
+      window.showNotification('ניקוי console בוצע בהצלחה', 'success', 'ניקוי זיכרון', 2000, 'system');
+    }
   } else {
-    // console.log('ℹ️ מערכת מובנית לא זמינה - ניקוי console מבוטל');
+    if (typeof window.showNotification === 'function') {
+      window.showNotification('מערכת ניקוי console לא זמינה', 'warning', 'ניקוי זיכרון', 3000, 'system');
+    }
   }
 }
 
@@ -174,13 +178,19 @@ document.addEventListener('DOMContentLoaded', function() {
   // המתן קצת לפני שחרור הדגל למניעת ניקוי console
   setTimeout(() => {
     isPageInitializing = false; // סיימנו את טעינת הדף
-    console.log('✅ הדגל למניעת ניקוי console שוחרר - מערכת מובנית פעילה');
+    if (typeof window.showNotification === 'function') {
+      window.showNotification('הדגל למניעת ניקוי console שוחרר - מערכת מובנית פעילה', 'success', 'ניקוי זיכרון', 3000, 'system');
+    }
 
     // בדוק אם יש מערכת מובנית לניקוי console
     if (window.manualClearConsole) {
-      console.log('🔗 מערכת מובנית לניקוי console זמינה (preferences-new.js)');
+      if (typeof window.showNotification === 'function') {
+        window.showNotification('מערכת מובנית לניקוי console זמינה', 'info', 'ניקוי זיכרון', 2000, 'system');
+      }
     } else {
-      console.log('ℹ️ מערכת מובנית לניקוי console לא זמינה - ניקוי ידני בלבד');
+      if (typeof window.showNotification === 'function') {
+        window.showNotification('מערכת מובנית לניקוי console לא זמינה - ניקוי ידני בלבד', 'warning', 'ניקוי זיכרון', 4000, 'system');
+      }
     }
   }, 5000); // הגדלתי ל-5 שניות כדי לוודא שכל הסקריפטים נטענו
 });

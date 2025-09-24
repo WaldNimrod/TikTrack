@@ -5,7 +5,7 @@ Date: August 23, 2025
 Description: API routes for managing database constraints dynamically
 """
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, g
 from typing import Dict, Any, List
 import logging
 import sys
@@ -16,19 +16,28 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'services'))
 from constraint_service import ConstraintService
 from services.advanced_cache_service import cache_for, invalidate_cache
 
+# Import base classes
+from .base_entity import BaseEntityAPI
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_utils import BaseEntityUtils
+
 # Create blueprint
 constraints_bp = Blueprint('constraints', __name__)
 
 # Initialize constraint service
 constraint_service = ConstraintService()
 
+# Initialize base API (constraints is complex, so we'll use it selectively)
+
 logger = logging.getLogger(__name__)
 
 @constraints_bp.route('/api/v1/constraints/', methods=['GET'])
+@api_endpoint(cache_ttl=300, rate_limit=60)
+@handle_database_session()
 @cache_for(ttl=300)  # Cache for 5 minutes - constraints don't change frequently
 def get_constraints():
     """
-    Get all constraints or constraints for a specific table
+    Get all constraints or constraints for a specific table using base API patterns
     
     Query parameters:
     - table: Optional table name to filter constraints

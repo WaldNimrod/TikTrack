@@ -93,35 +93,37 @@ except ImportError as e:
     DataRefreshScheduler = None
 from utils.rate_limiter import rate_limiter, rate_limit_api
 
-# Import blueprints
-from routes.api.accounts import accounts_bp
-from routes.api.tickers import tickers_bp
-from routes.api.trades import trades_bp
-from routes.api.trade_plans import trade_plans_bp
-from routes.api.alerts import alerts_bp
+# Import blueprints from unified API package
+from routes.api import (
+    accounts_bp,
+    tickers_bp,
+    trades_bp,
+    trade_plans_bp,
+    alerts_bp,
+    cash_flows_bp,
+    notes_bp,
+    executions_bp,
+    users_bp,
+    background_tasks_bp,
+    entity_details_bp,
+    constraints_bp,
+    currencies_bp,
+    linked_items_bp,
+    note_relation_types_bp,
+    file_scanner_bp,
+    cache_management_bp,
+    query_optimization_bp,
+    server_management_bp,
+    system_overview_bp,
+    css_management_bp,
+    preferences_bp,
+    wal_bp
+)
 
 # Import CRUD testing modules
 import subprocess
 import json
 from pathlib import Path
-from routes.api.cash_flows import cash_flows_bp
-from routes.api.notes import notes_bp
-from routes.api.executions import executions_bp
-from routes.api.users import users_bp
-from routes.api.background_tasks import background_tasks_bp
-from routes.api.entity_details import entity_details_bp
-
-from routes.api.constraints import constraints_bp
-from routes.api.currencies import currencies_bp
-from routes.api.linked_items import linked_items_bp
-from routes.api.note_relation_types import note_relation_types_bp
-from routes.api.file_scanner import file_scanner_bp
-from routes.api.cache_management import cache_management_bp
-from routes.api.query_optimization import query_optimization_bp
-from routes.api.server_management import server_management_bp
-from routes.api.system_overview import system_overview_bp
-from routes.api.css_management import css_management_bp
-from routes.api.preferences import preferences_bp
 
 # External Data Integration blueprints
 from routes.external_data.quotes import quotes_bp
@@ -217,6 +219,7 @@ app.register_blueprint(query_optimization_bp)
 app.register_blueprint(server_management_bp)
 app.register_blueprint(system_overview_bp)
 app.register_blueprint(css_management_bp)
+app.register_blueprint(wal_bp)
 
 # Register External Data Integration blueprints - DISABLED due to import issues
 # External Data Integration blueprints

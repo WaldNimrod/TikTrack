@@ -86,7 +86,6 @@ if (typeof window.showSuccessNotification === 'function') {
 - ✅ `constraint-manager.js` - הוחלפו כל הודעות `confirm()`
 - ✅ `notification-system.js` - הוחלפו כל הודעות `confirm()`
 - ✅ `header-system.js` - הוחלפו כל הודעות `alert()`
-- ✅ `main.js` - הוחלפו כל הודעות `alert()`
 - ✅ `ui-utils.js` - הוחלפו כל הודעות `confirm()`
 
 ### **הוספת Fallback:**
@@ -102,7 +101,6 @@ if (typeof window.showSuccessNotification === 'function') {
 
 ### **1. מבנה קבצים:**
 - כל דף HTML צריך קובץ JS נפרד
-- פונקציות כלליות ב-`main.js`, `ui-utils.js`, `notification-system.js`
 - פונקציות ספציפיות לטבלאות בקבצים נפרדים
 
 ### **2. מערכת התראות:**

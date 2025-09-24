@@ -13,7 +13,7 @@ Created: September 2025
 Version: 1.0
 """
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, g
 from services.smart_query_optimizer import (
     get_performance_report,
     clear_query_profiles,
@@ -25,16 +25,25 @@ import tempfile
 import os
 from datetime import datetime
 
+# Import base classes
+from .base_entity import BaseEntityAPI
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_utils import BaseEntityUtils
+
 logger = logging.getLogger(__name__)
 
 # Create blueprint
 query_optimization_bp = Blueprint('query_optimization', __name__, url_prefix='/api/v1/query-optimization')
 
+# Initialize base API (query optimization is complex, so we'll use it selectively)
+
 
 @query_optimization_bp.route('/', methods=['GET'])
+@api_endpoint(cache_ttl=60, rate_limit=60)
+@handle_database_session()
 @cache_for(ttl=60)  # Cache for 1 minute - system status doesn't change frequently
 def get_query_optimization_status():
-    """Get query optimization system status"""
+    """Get query optimization system status using base API patterns"""
     try:
         return jsonify({
             'status': 'success',
@@ -56,7 +65,8 @@ def get_query_optimization_status():
         logger.error(f"Failed to get status: {e}")
         return jsonify({
             'status': 'error',
-            'message': f'Failed to get status: {str(e)}'
+            'error': {'message': f'Failed to get status: {str(e)}'},
+            'version': 'v1'
         }), 500
 
 

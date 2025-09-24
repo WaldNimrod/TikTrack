@@ -42,23 +42,31 @@ import tracemalloc
 from config.database import init_db
 from config.logging import setup_logging
 
-# Import blueprints
-from routes.api.accounts import accounts_bp
-from routes.api.tickers import tickers_bp
-from routes.api.trades import trades_bp
-from routes.api.trade_plans import trade_plans_bp
-from routes.api.alerts import alerts_bp
-from routes.api.cash_flows import cash_flows_bp
-from routes.api.notes import notes_bp
-from routes.api.executions import executions_bp
-from routes.api.preferences import preferences_bp
+# Import blueprints from unified API package
+from routes.api import (
+    accounts_bp,
+    tickers_bp,
+    trades_bp,
+    trade_plans_bp,
+    alerts_bp
+)
+from routes.api import (
+    cash_flows_bp,
+    notes_bp,
+    executions_bp,
+    preferences_bp
+)
 
 
-from routes.api.constraints import constraints_bp
-from routes.api.currencies import currencies_bp
-from routes.api.linked_items import linked_items_bp
-from routes.api.note_relation_types import note_relation_types_bp
-from routes.api.file_scanner import file_scanner_bp
+from routes.api import (
+    constraints_bp,
+    currencies_bp,
+    linked_items_bp
+)
+from routes.api import (
+    note_relation_types_bp,
+    file_scanner_bp
+)
 from routes.pages import pages_bp
 
 # Memory monitoring class
@@ -112,6 +120,7 @@ try:
 except Exception as e:
 
 # Register blueprints
+app.register_blueprint(file_scanner_bp)
 
 # Memory optimization middleware
 @app.before_request

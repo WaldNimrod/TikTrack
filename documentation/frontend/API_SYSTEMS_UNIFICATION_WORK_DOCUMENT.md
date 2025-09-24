@@ -177,7 +177,6 @@ Response: {
     "status": "success",
     "data": {
         "index.html": {
-            "scripts": ["main.js", "header-system.js"],
             "dependencies": [...],
             "functions_count": 25
         },
@@ -197,7 +196,6 @@ Response: {
         "global_functions": 200,
         "local_functions": 300,
         "files_analysis": {
-            "main.js": {
                 "functions": [...],
                 "complexity_score": 85,
                 "recommendations": [...]

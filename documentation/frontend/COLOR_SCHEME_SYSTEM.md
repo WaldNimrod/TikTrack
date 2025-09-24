@@ -391,7 +391,6 @@ const color = window.getEntityColor('trade'); // אם swing ממופה ל-trade
 המערכת כעת יוצרת CSS דינמי באופן אוטומטי בכל עמוד:
 
 ```javascript
-// נקרא אוטומטית בכל עמוד דרך main.js
 function initializeDynamicColorScheme() {
   // יצירת CSS לישויות
   const entityCSS = window.generateEntityCSS();
@@ -485,7 +484,6 @@ updateEntityColors({
 
 ### Frontend Core
 - **מערכת צבעים ראשית**: `trading-ui/scripts/color-scheme-system.js`
-- **אתחול דינמי**: `trading-ui/scripts/main.js` (פונקצית `initializeDynamicColorScheme`)
 - **CSS Variables**: `trading-ui/styles/apple-theme.css` (משתני :root)
 - **מערכת דוגמאות**: `trading-ui/scripts/color-demo-toggle.js`
 
@@ -606,7 +604,6 @@ function updateCSSVariablesFromPreferences(preferences) {
 
 ### 3. אתחול אוטומטי גלובלי
 ```javascript
-// הוספה ל-main.js
 function initializeCoreSystems() {
   // Initialize dynamic color scheme system
   initializeDynamicColorScheme();

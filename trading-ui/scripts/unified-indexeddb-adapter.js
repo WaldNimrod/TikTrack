@@ -103,8 +103,81 @@ class PerformanceMonitor {
  */
 class SchemaMigrator {
     constructor() {
-        this.currentVersion = 1;
+        this.currentVersion = 4;
         this.migrations = new Map();
+        
+        // Add migration for version 2 - Notification System
+        this.addMigration(2, (database) => {
+            console.log('🔄 Running migration to version 2: Adding Notification System stores');
+            
+            // Create notificationHistory store
+            if (!database.objectStoreNames.contains('notificationHistory')) {
+                const store = database.createObjectStore('notificationHistory', { keyPath: 'id', autoIncrement: true });
+                store.createIndex('timestamp', 'timestamp', { unique: false });
+                store.createIndex('type', 'type', { unique: false });
+                console.log('📦 Created object store: notificationHistory');
+            }
+            
+            // Create notificationStats store
+            if (!database.objectStoreNames.contains('notificationStats')) {
+                const store = database.createObjectStore('notificationStats', { keyPath: 'id', autoIncrement: true });
+                store.createIndex('timestamp', 'timestamp', { unique: false });
+                console.log('📦 Created object store: notificationStats');
+            }
+        });
+        
+        // Add migration for version 3 - Header System
+        this.addMigration(3, (database) => {
+            console.log('🔄 Running migration to version 3: Adding Header System stores');
+            
+            // Create headerStates store
+            if (!database.objectStoreNames.contains('headerStates')) {
+                const store = database.createObjectStore('headerStates', { keyPath: 'id', autoIncrement: true });
+                store.createIndex('timestamp', 'timestamp', { unique: false });
+                console.log('📦 Created object store: headerStates');
+            }
+            
+            // Create filterStates store
+            if (!database.objectStoreNames.contains('filterStates')) {
+                const store = database.createObjectStore('filterStates', { keyPath: 'id', autoIncrement: true });
+                store.createIndex('timestamp', 'timestamp', { unique: false });
+                console.log('📦 Created object store: filterStates');
+            }
+            
+            // Create sectionStates store
+            if (!database.objectStoreNames.contains('sectionStates')) {
+                const store = database.createObjectStore('sectionStates', { keyPath: 'id', autoIncrement: true });
+                store.createIndex('timestamp', 'timestamp', { unique: false });
+                store.createIndex('sectionId', 'sectionId', { unique: false });
+                console.log('📦 Created object store: sectionStates');
+            }
+            
+            // Create accountsData store
+            if (!database.objectStoreNames.contains('accountsData')) {
+                const store = database.createObjectStore('accountsData', { keyPath: 'id', autoIncrement: true });
+                store.createIndex('timestamp', 'timestamp', { unique: false });
+                console.log('📦 Created object store: accountsData');
+            }
+        });
+        
+        // Add migration for version 4 - Linter Monitor System
+        this.addMigration(4, (database) => {
+            console.log('🔄 Running migration to version 4: Adding Linter Monitor System stores');
+            
+            // Create linterScanningResults store
+            if (!database.objectStoreNames.contains('linterScanningResults')) {
+                const store = database.createObjectStore('linterScanningResults', { keyPath: 'id', autoIncrement: true });
+                store.createIndex('timestamp', 'timestamp', { unique: false });
+                console.log('📦 Created object store: linterScanningResults');
+            }
+            
+            // Create linterLogEntries store
+            if (!database.objectStoreNames.contains('linterLogEntries')) {
+                const store = database.createObjectStore('linterLogEntries', { keyPath: 'id', autoIncrement: true });
+                store.createIndex('timestamp', 'timestamp', { unique: false });
+                console.log('📦 Created object store: linterLogEntries');
+            }
+        });
     }
 
     addMigration(version, migrationFunction) {
@@ -137,7 +210,7 @@ class SchemaMigrator {
 class UnifiedIndexedDBAdapter {
     constructor() {
         this.dbName = 'TikTrackUnifiedDB';
-        this.version = 1;
+        this.version = 4;
         this.db = null;
         this.isInitialized = false;
         this.performanceMonitor = new PerformanceMonitor();
@@ -165,7 +238,21 @@ class UnifiedIndexedDBAdapter {
             chartHistory: { keyPath: 'id', autoIncrement: true },
             
             // System Management
-            userPreferences: { keyPath: 'id', autoIncrement: true }
+            userPreferences: { keyPath: 'id', autoIncrement: true },
+            
+            // Notification System
+            notificationHistory: { keyPath: 'id', autoIncrement: true },
+            notificationStats: { keyPath: 'id', autoIncrement: true },
+            
+            // Header System
+            headerStates: { keyPath: 'id', autoIncrement: true },
+            filterStates: { keyPath: 'id', autoIncrement: true },
+            sectionStates: { keyPath: 'id', autoIncrement: true },
+            accountsData: { keyPath: 'id', autoIncrement: true },
+            
+            // Linter Monitor System
+            linterScanningResults: { keyPath: 'id', autoIncrement: true },
+            linterLogEntries: { keyPath: 'id', autoIncrement: true }
         };
     }
 
@@ -205,7 +292,17 @@ class UnifiedIndexedDBAdapter {
                 
                 request.onupgradeneeded = (event) => {
                     this.db = event.target.result;
+                    const oldVersion = event.oldVersion;
+                    const newVersion = event.newVersion;
+                    
+                    console.log(`🔄 Database upgrade needed: ${oldVersion} -> ${newVersion}`);
+                    
+                    // Run migrations
+                    this.schemaMigrator.migrate(this.db, oldVersion, newVersion);
+                    
+                    // Create any new object stores
                     this.createObjectStores();
+                    
                     console.log('🔄 Database schema created/updated');
                 };
             });
@@ -737,6 +834,83 @@ class UnifiedIndexedDBAdapter {
         return allPrefs.length > 0 ? allPrefs[allPrefs.length - 1] : null;
     }
 
+    // Notification System Methods
+    async saveNotificationHistory(notification, source = 'notification-system') {
+        return await this.save('notificationHistory', notification, source);
+    }
+
+    async getNotificationHistory() {
+        return await this.getAll('notificationHistory');
+    }
+
+    async saveNotificationStats(stats, source = 'notification-system') {
+        return await this.save('notificationStats', stats, source);
+    }
+
+    async getNotificationStats() {
+        const allStats = await this.getAll('notificationStats');
+        return allStats.length > 0 ? allStats[allStats.length - 1] : null;
+    }
+
+    // Header System Methods
+    async saveHeaderState(state, source = 'header-system') {
+        return await this.save('headerStates', state, source);
+    }
+
+    async getHeaderState() {
+        const allStates = await this.getAll('headerStates');
+        return allStates.length > 0 ? allStates[allStates.length - 1] : null;
+    }
+
+    async saveFilterStates(states, source = 'header-system') {
+        return await this.save('filterStates', states, source);
+    }
+
+    async getFilterStates() {
+        const allStates = await this.getAll('filterStates');
+        return allStates.length > 0 ? allStates[allStates.length - 1] : null;
+    }
+
+    async saveSectionState(sectionId, isCollapsed, source = 'header-system') {
+        const state = {
+            sectionId: sectionId,
+            isCollapsed: isCollapsed
+        };
+        return await this.save('sectionStates', state, source);
+    }
+
+    async getSectionStates() {
+        return await this.getAll('sectionStates');
+    }
+
+    async saveAccountsData(accounts, source = 'header-system') {
+        return await this.save('accountsData', { accounts }, source);
+    }
+
+    async getAccountsData() {
+        const allData = await this.getAll('accountsData');
+        return allData.length > 0 ? allData[allData.length - 1] : null;
+    }
+
+    // Linter Monitor System Methods
+    async saveLinterScanningResults(results, source = 'linter-realtime-monitor') {
+        return await this.save('linterScanningResults', results, source);
+    }
+
+    async getLinterScanningResults() {
+        const allResults = await this.getAll('linterScanningResults');
+        return allResults.length > 0 ? allResults[allResults.length - 1] : null;
+    }
+
+    async saveLinterLogEntries(entries, source = 'linter-realtime-monitor') {
+        return await this.save('linterLogEntries', { entries }, source);
+    }
+
+    async getLinterLogEntries() {
+        const allData = await this.getAll('linterLogEntries');
+        return allData.length > 0 ? allData[allData.length - 1] : null;
+    }
+
     // ============================================================================
     // DATA MANAGEMENT
     // ============================================================================
@@ -947,3 +1121,4 @@ if (typeof module !== 'undefined' && module.exports) {
 }
 
 console.log('🔧 Unified IndexedDB Adapter loaded successfully');
+

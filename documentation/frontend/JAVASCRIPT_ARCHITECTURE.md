@@ -4,24 +4,22 @@
 
 This document describes the comprehensive JavaScript architecture implemented in TikTrack, featuring a modular system with 40+ organized script files, clear separation of concerns, and a complete Chart Management System.
 
-**🔄 Last Updated:** September 22, 2025 - Completed Unified IndexedDB Migration
 
 ## 🗂️ Global Functions Index
 
-### 📊 Core System Functions (`main.js`)
+### 📊 Core System Functions (`page-utils.js`)
 | Function | Description |
 |----------|-------------|
-| `window.initializeApplication()` | Initialize the entire application |
-| `window.checkDependencies()` | Check if all required modules are available |
-| `window.initializeCoreSystems()` | Initialize header, notification systems, and global confirm replacement |
-| `window.initializeCurrentPage()` | Initialize current page functionality |
-| `window.initializeDynamicColorScheme()` | Initialize dynamic color scheme system |
-| `window.isModuleAvailable(moduleName, functionName)` | Check if a module/function is available |
-| `window.getSystemInfo()` | Get system information and status |
-| `window.closeModalGlobal(modalId)` | Close modal globally |
-| `window.filterDataByFilters(data, pageName)` | Filter data by page-specific filters |
-| `window.updateSortIcons(tableType, activeColumnIndex, direction)` | Update sort icons in tables |
-| `window.restoreAllSectionStates()` | Restore all section states from localStorage |
+| `window.initializePage(pageName)` | Initialize current page functionality |
+| `window.initializePageFilters(pageName)` | Initialize page-specific filters |
+| `window.getCurrentPageName()` | Get current page name from URL |
+| `window.savePageState(pageName, state)` | Save page state to localStorage |
+| `window.loadPageState(pageName)` | Load page state from localStorage |
+| `window.clearPageState(pageName)` | Clear saved page state |
+| `window.navigateToPage(pageName, options)` | Navigate to specific page |
+| `window.isCurrentPage(pageName)` | Check if current page matches |
+| `window.isPageAvailable(pageName)` | Check if page is available |
+| `window.getPageInfo(pageName)` | Get page information |
 
 ### 🔄 Global confirm() Replacement System (NEW!)
 | Function | Description |
@@ -507,7 +505,7 @@ This document describes the comprehensive JavaScript architecture implemented in
 ```
 trading-ui/scripts/
 ├── 🏛️ Core Files
-│   ├── main.js                    # Global initialization and core functions
+│   ├── page-utils.js              # Page initialization and management
 │   ├── header-system.js           # Unified header system
 │   ├── notification-system.js     # Global notification system
 │   └── console-cleanup.js         # Console cleanup
@@ -605,12 +603,12 @@ trading-ui/scripts/
 
 ## 🏛️ Core Files
 
-### main.js
-**Purpose**: Global initialization and core functions
-- Global variables and constants
-- Core utility functions
-- System initialization
-- Error handling
+### page-utils.js
+**Purpose**: Page initialization and management
+- Page-specific initialization
+- State management
+- Navigation utilities
+- Filter management
 
 ### header-system.js
 **Purpose**: Unified header system

@@ -8,7 +8,6 @@ The Section Toggle System is a centralized JavaScript system that handles openin
 
 ### Core Files
 - **`ui-utils.js`** - Contains all toggle functions
-- **`main.js`** - Initialization and state restoration (functions moved to ui-utils.js)
 
 ### System Components
 1. **Toggle Functions** - Core functionality for opening/closing sections
@@ -126,7 +125,6 @@ The system uses page-specific localStorage keys to maintain section states:
 - `{sectionId}SectionCollapsed` - For each specific section
 
 ### State Restoration
-The system automatically restores section states on page load through the initialization process in `main.js`.
 
 ## 🔧 Technical Implementation
 

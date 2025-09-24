@@ -2145,7 +2145,7 @@ class SystemManagement {
       copyBtn.disabled = false;
     }
   }
-  }
+}
 
   /**
    * Toggle all sections (expand/collapse)

@@ -527,7 +527,7 @@ async function discoverProjectFiles() {
         }
         
         const data = await response.json();
-        const discoveredFiles = data.files || {};
+        const discoveredFiles = data.data || {};
         
         console.log('📁 Discovered files from API:', discoveredFiles);
         console.log('📊 Discovery timestamp:', data.discovery_timestamp);
@@ -600,7 +600,17 @@ async function discoverProjectFiles() {
                 progressElement.style.display = 'none';
             }
             
-            // Save updated scanning results to localStorage
+            // Save updated scanning results to UnifiedIndexedDB
+            if (window.UnifiedIndexedDB) {
+                try {
+                    await window.UnifiedIndexedDB.saveLinterScanningResults(window.scanningResults, 'linter-realtime-monitor');
+                    console.log('✅ Saved updated scanning results to UnifiedIndexedDB:', window.scanningResults);
+                } catch (error) {
+                    console.warn('Failed to save updated scanning results to UnifiedIndexedDB:', error);
+                }
+            }
+            
+            // Fallback to localStorage
             try {
                 localStorage.setItem('linterScanningResults', JSON.stringify(window.scanningResults));
                 console.log('✅ Saved updated scanning results to localStorage:', window.scanningResults);
@@ -679,7 +689,17 @@ async function discoverProjectFilesFallback() {
     // REMOVED setTimeout that was calling updateRealtimeProgress - it was causing fake progress!
     console.log('🔄 Skipped realtime progress update after fallback - no scanning in progress');
     
-    // Save empty results to localStorage
+    // Save empty results to UnifiedIndexedDB
+    if (window.UnifiedIndexedDB) {
+        try {
+            await window.UnifiedIndexedDB.saveLinterScanningResults(window.scanningResults, 'linter-realtime-monitor');
+            console.log('✅ Saved empty scanning results to UnifiedIndexedDB');
+        } catch (error) {
+            console.warn('Failed to save empty scanning results to UnifiedIndexedDB:', error);
+        }
+    }
+    
+    // Fallback to localStorage
     try {
         localStorage.setItem('linterScanningResults', JSON.stringify(window.scanningResults));
         console.log('✅ Saved empty scanning results to localStorage');
@@ -1019,7 +1039,9 @@ async function scanSingleFile(fileName) {
         
         // Update UI with real-time progress - ONLY if actually scanning
         if (window.scanningResults && window.scanningResults.scannedFiles > 0) {
-            updateRealtimeProgress();
+            updateRealtimeProgress().catch(error => {
+                console.warn('Failed to update realtime progress:', error);
+            });
             // Also update dashboard statistics in real-time
             updateScanningDetailedStats();
         }
@@ -1031,7 +1053,9 @@ async function scanSingleFile(fileName) {
         console.error(`❌ Error scanning file ${fileName}:`, error);
         // Don't count as scanned if there was an error - ONLY if actually scanning
         if (window.scanningResults && window.scanningResults.scannedFiles > 0) {
-            updateRealtimeProgress();
+            updateRealtimeProgress().catch(error => {
+                console.warn('Failed to update realtime progress:', error);
+            });
             // Also update dashboard statistics in real-time
             updateScanningDetailedStats();
         }
@@ -1113,16 +1137,22 @@ async function finishScan() {
     // Update traffic lights based on scan results
     updateTrafficLights();
     
-            // Save results to both localStorage and IndexedDB
+            // Save results to UnifiedIndexedDB
+            if (window.UnifiedIndexedDB) {
+                try {
+                    await window.UnifiedIndexedDB.saveLinterScanningResults(window.scanningResults, 'linter-realtime-monitor');
+                    console.log('✅ Saved scanning results to UnifiedIndexedDB');
+                } catch (error) {
+                    console.warn('Failed to save scanning results to UnifiedIndexedDB:', error);
+                }
+            }
+            
+            // Fallback to localStorage
             try {
                 localStorage.setItem('linterScanningResults', JSON.stringify(window.scanningResults));
                 console.log('✅ Saved scanning results to localStorage');
-                
-                // Also save to IndexedDB for reliable fallback using global system
-                await window.UnifiedIndexedDB.saveScanningResults(window.scanningResults, 'linter-realtime-monitor');
-                console.log('✅ Saved scanning results to IndexedDB');
             } catch (error) {
-                console.warn('Failed to save scanning results:', error);
+                console.warn('Failed to save scanning results to localStorage:', error);
             }
     
     // SUCCESS MESSAGE - ONLY IF WE ACTUALLY SCANNED FILES!
@@ -1137,7 +1167,7 @@ async function finishScan() {
     console.log('🏁 ===== END FINISH SCAN =====');
 }
 
-function updateRealtimeProgress() {
+async function updateRealtimeProgress() {
     try {
         console.log('🔄 updateRealtimeProgress called');
         console.log('📊 Current state:', {
@@ -1530,10 +1560,37 @@ function updateFileMappingStatus() {
     }
     
     if (logEntriesCountElement) {
-        // Get log entries count from local storage or global log system
-        const logEntries = localStorage.getItem('linterLogEntries');
-        const logCount = logEntries ? JSON.parse(logEntries).length : 0;
-        logEntriesCountElement.textContent = logCount;
+        // Get log entries count from UnifiedIndexedDB or localStorage fallback
+        let logCount = 0;
+        
+        if (window.UnifiedIndexedDB) {
+            // Use Promise to handle async operation
+            window.UnifiedIndexedDB.getLinterLogEntries().then(savedData => {
+                if (savedData && savedData.entries) {
+                    logCount = savedData.entries.length;
+                    logEntriesCountElement.textContent = logCount;
+                }
+            }).catch(error => {
+                console.warn('Failed to get log entries from UnifiedIndexedDB:', error);
+                // Fallback to localStorage
+                try {
+                    const logEntries = localStorage.getItem('linterLogEntries');
+                    logCount = logEntries ? JSON.parse(logEntries).length : 0;
+                    logEntriesCountElement.textContent = logCount;
+                } catch (e) {
+                    console.warn('Failed to get log entries from localStorage:', e);
+                }
+            });
+        } else {
+            // Fallback to localStorage
+            try {
+                const logEntries = localStorage.getItem('linterLogEntries');
+                logCount = logEntries ? JSON.parse(logEntries).length : 0;
+                logEntriesCountElement.textContent = logCount;
+            } catch (error) {
+                console.warn('Failed to get log entries from localStorage:', error);
+            }
+        }
     }
     
     if (chartsStatusElement) {

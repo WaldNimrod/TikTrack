@@ -17,7 +17,7 @@ Version: 1.0
 Date: August 2025
 """
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, g
 from sqlalchemy.orm import Session
 from config.database import get_db
 from services.ticker_service import TickerService
@@ -25,16 +25,25 @@ from services.advanced_cache_service import cache_for, invalidate_cache
 import logging
 from typing import Dict, Any, Optional
 
+# Import base classes
+from .base_entity import BaseEntityAPI
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_utils import BaseEntityUtils
+
 logger = logging.getLogger(__name__)
 
 tickers_bp = Blueprint('tickers', __name__, url_prefix='/api/v1/tickers')
 
+# Initialize base API
+base_api = BaseEntityAPI('tickers', TickerService, 'tickers')
+
 @tickers_bp.route('/', methods=['GET'])
-@cache_for(ttl=300)  # Cache for 5 minutes - tickers don't change frequently
+@api_endpoint(cache_ttl=300, rate_limit=60)
+@handle_database_session()
 def get_tickers():
-    """Get all tickers"""
+    """Get all tickers - enhanced with market data"""
+    db: Session = g.db
     try:
-        db: Session = next(get_db())
         tickers = TickerService.get_all(db)
         
         # Convert tickers to dict with market data
@@ -71,14 +80,14 @@ def get_tickers():
             "error": {"message": "Failed to retrieve tickers"},
             "version": "v1"
         }), 500
-    finally:
-        db.close()
 
 @tickers_bp.route('/<int:ticker_id>', methods=['GET'])
+@api_endpoint(cache_ttl=300, rate_limit=60)
+@handle_database_session()
 def get_ticker(ticker_id: int):
     """Get ticker by ID with market data"""
+    db: Session = g.db
     try:
-        db: Session = next(get_db())
         ticker = TickerService.get_by_id(db, ticker_id)
         if ticker:
             # Add market data like in get_all method
@@ -115,8 +124,6 @@ def get_ticker(ticker_id: int):
             "error": {"message": "Failed to retrieve ticker"},
             "version": "v1"
         }), 500
-    finally:
-        db.close()
 
 @tickers_bp.route('/<int:ticker_id>/linked-items', methods=['GET'])
 def check_linked_items(ticker_id: int):

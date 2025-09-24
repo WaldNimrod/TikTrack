@@ -16,7 +16,7 @@ Version: 1.0
 Date: September 2025
 """
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, g
 from datetime import datetime, timedelta
 from typing import Dict, Any, List, Optional
 import logging
@@ -33,15 +33,24 @@ from config.database import get_db
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
+# Import base classes
+from .base_entity import BaseEntityAPI
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_utils import BaseEntityUtils
+
 logger = logging.getLogger(__name__)
 
 # Create blueprint
 system_overview_bp = Blueprint('system_overview', __name__, url_prefix='/api/system')
 
+# Initialize base API (system overview is complex, so we'll use it selectively)
+
 @system_overview_bp.route('/overview', methods=['GET'])
+@api_endpoint(cache_ttl=60, rate_limit=60)
+@handle_database_session()
 def get_system_overview():
     """
-    Get comprehensive system overview
+    Get comprehensive system overview using base API patterns
     
     Returns:
         JSON: Complete system overview including health, metrics, and status
@@ -89,14 +98,17 @@ def get_system_overview():
         
         return jsonify({
             'status': 'success',
-            'data': overview
+            'data': overview,
+            'message': 'System overview retrieved successfully',
+            'version': 'v1'
         }), 200
         
     except Exception as e:
         logger.error(f"Error getting system overview: {e}")
         return jsonify({
             'status': 'error',
-            'message': f'Failed to get system overview: {str(e)}'
+            'error': {'message': f'Failed to get system overview: {str(e)}'},
+            'version': 'v1'
         }), 500
 
 @system_overview_bp.route('/health', methods=['GET'])

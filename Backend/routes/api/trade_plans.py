@@ -1,91 +1,39 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, g
 from sqlalchemy.orm import Session
 from config.database import get_db
 from services.trade_plan_service import TradePlanService
 from services.advanced_cache_service import cache_for, invalidate_cache
 import logging
 
+# Import base classes
+from .base_entity import BaseEntityAPI
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_utils import BaseEntityUtils
+
 logger = logging.getLogger(__name__)
 
 trade_plans_bp = Blueprint('trade_plans', __name__, url_prefix='/api/v1/trade_plans')
 
+# Initialize base API
+base_api = BaseEntityAPI('trade_plans', TradePlanService, 'trade_plans')
+
 @trade_plans_bp.route('/', methods=['GET'])
-@cache_for(ttl=60)  # Cache for 1 minute - trade plans don't change frequently
+@api_endpoint(cache_ttl=60, rate_limit=60)
+@handle_database_session()
 def get_trade_plans():
-    """Get all trade plans"""
-    try:
-        db: Session = next(get_db())
-        logger.info("Fetching all trade plans from database")
-        plans = TradePlanService.get_all(db)
-        logger.info(f"Retrieved {len(plans)} trade plans")
-        
-        # Convert to dictionaries
-        plans_data = []
-        for plan in plans:
-            try:
-                plan_dict = plan.to_dict()
-                plans_data.append(plan_dict)
-                logger.debug(f"Converted plan {plan.id} to dict: {plan_dict}")
-            except Exception as e:
-                logger.error(f"Error converting plan {plan.id} to dict: {str(e)}")
-                # Try basic conversion
-                basic_dict = {
-                    'id': plan.id,
-                    'ticker_id': plan.ticker_id,
-                    'account_id': plan.account_id,
-                    'investment_type': plan.investment_type,
-                    'side': plan.side,
-                    'status': plan.status,
-                    'planned_amount': plan.planned_amount,
-                    'target_price': plan.target_price,
-                    'stop_loss': plan.stop_loss,
-                    'created_at': plan.created_at.strftime('%Y-%m-%d %H:%M:%S') if plan.created_at else None
-                }
-                plans_data.append(basic_dict)
-        
-        return jsonify({
-            "status": "success",
-            "data": plans_data,
-            "message": "Trade plans retrieved successfully",
-            "version": "v1"
-        })
-    except Exception as e:
-        logger.error(f"Error getting trade plans: {str(e)}")
-        return jsonify({
-            "status": "error",
-            "error": {"message": "שגיאה בטעינת תכנונים"},
-            "version": "v1"
-        }), 500
-    finally:
-        db.close()
+    """Get all trade plans using base API"""
+    db: Session = g.db
+    response, status_code = base_api.get_all(db)
+    return jsonify(response), status_code
 
 @trade_plans_bp.route('/<int:plan_id>', methods=['GET'])
+@api_endpoint(cache_ttl=60, rate_limit=60)
+@handle_database_session()
 def get_trade_plan(plan_id: int):
-    """Get trade plan by ID"""
-    try:
-        db: Session = next(get_db())
-        plan = TradePlanService.get_by_id(db, plan_id)
-        if plan:
-            return jsonify({
-                "status": "success",
-                "data": plan.to_dict(),
-                "message": "Trade plan retrieved successfully",
-                "version": "v1"
-            })
-        return jsonify({
-            "status": "error",
-            "error": {"message": "תכנון לא נמצא"},
-            "version": "v1"
-        }), 404
-    except Exception as e:
-        logger.error(f"Error getting trade plan {plan_id}: {str(e)}")
-        return jsonify({
-            "status": "error",
-            "error": {"message": "שגיאה בטעינת התכנון"},
-            "version": "v1"
-        }), 500
-    finally:
-        db.close()
+    """Get trade plan by ID using base API"""
+    db: Session = g.db
+    response, status_code = base_api.get_by_id(db, plan_id)
+    return jsonify(response), status_code
 
 @trade_plans_bp.route('/account/<int:account_id>', methods=['GET'])
 def get_trade_plans_by_account(account_id: int):

@@ -102,7 +102,6 @@
   sessionId: "session_123",
   fileHashes: {
     // hash של קבצים שנסרקו
-    "main.js": "abc123...",
     "ui-utils.js": "def456..."
   }
 }
@@ -466,7 +465,6 @@ cleanup_old_analyses()
 {
   "status": "success",
   "data": {
-    "index.html": ["main.js", "header-system.js"],
     "trades.html": ["trades.js", "ui-utils.js"]
   },
   "metadata": {
@@ -482,7 +480,6 @@ cleanup_old_analyses()
 {
   "status": "success",
   "data": {
-    "main.js": [
       {
         "name": "initializeApplication",
         "description": "Initialize the entire application",

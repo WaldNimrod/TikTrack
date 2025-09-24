@@ -1,13 +1,20 @@
 #!/usr/bin/env python3
 """
-Users API Routes
-Date: January 5, 2025
-Description: API endpoints for user management
+Users API Routes - Updated with BaseEntityAPI
+Date: September 23, 2025
+Description: API endpoints for user management using unified base
 """
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, g
+from sqlalchemy.orm import Session
+from config.database import get_db
 from typing import Dict, Any
 import logging
+
+# Import base classes
+from .base_entity import BaseEntityAPI
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_utils import BaseEntityUtils
 
 # Import user service
 from services.user_service import UserService
@@ -17,52 +24,80 @@ logger = logging.getLogger(__name__)
 # Create blueprint
 users_bp = Blueprint('users', __name__, url_prefix='/api/v1/users')
 
-# Initialize user service
+# Initialize base API and user service
 user_service = UserService()
+
+# Create a wrapper class for BaseEntityAPI compatibility
+class UserServiceWrapper:
+    @staticmethod
+    def get_all(db):
+        return user_service.get_all_users(db)
+    
+    @staticmethod
+    def get_by_id(db, user_id):
+        return user_service.get_user_by_id(db, user_id)
+
+base_api = BaseEntityAPI('users', UserServiceWrapper, 'users')
 
 @users_bp.route('/', methods=['GET'])
 def get_all_users():
-    """Get all users"""
+    """Get default user (single user system)"""
     try:
-        users = user_service.get_all_users()
-        return jsonify({
-            'status': 'success',
-            'data': users,
-            'count': len(users)
-        }), 200
+        # Get default user from database
+        default_user = user_service.get_default_user()
+        if default_user:
+            return jsonify({
+                "status": "success",
+                "data": [default_user],  # Return as array for consistency
+                "message": "Default user retrieved successfully",
+                "version": "v1"
+            }), 200
+        else:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "No default user found"},
+                "version": "v1"
+            }), 404
     except Exception as e:
-        logger.error(f"Error getting all users: {e}")
         return jsonify({
-            'status': 'error',
-            'message': str(e)
+            "status": "error",
+            "error": {"message": f"Error: {str(e)}"},
+            "version": "v1"
         }), 500
 
 @users_bp.route('/<int:user_id>', methods=['GET'])
 def get_user(user_id: int):
-    """Get user by ID"""
+    """Get default user (single user system) - ignores user_id"""
     try:
-        user = user_service.get_user_by_id(user_id)
-        if user:
+        # Get default user from database (ignore user_id for now)
+        default_user = user_service.get_default_user()
+        if default_user:
             return jsonify({
-                'status': 'success',
-                'data': user
+                "status": "success",
+                "data": default_user,
+                "message": "Default user retrieved successfully",
+                "version": "v1"
             }), 200
         else:
             return jsonify({
-                'status': 'error',
-                'message': f'User {user_id} not found'
+                "status": "error",
+                "error": {"message": "No default user found"},
+                "version": "v1"
             }), 404
     except Exception as e:
-        logger.error(f"Error getting user {user_id}: {e}")
         return jsonify({
-            'status': 'error',
-            'message': str(e)
+            "status": "error",
+            "error": {"message": f"Error: {str(e)}"},
+            "version": "v1"
         }), 500
 
 @users_bp.route('/username/<username>', methods=['GET'])
+@api_endpoint(cache_ttl=300, rate_limit=60)
+@handle_database_session()
 def get_user_by_username(username: str):
-    """Get user by username"""
+    """Get user by username - custom implementation"""
     try:
+        db: Session = g.db
         user = user_service.get_user_by_username(username)
         if user:
             return jsonify({

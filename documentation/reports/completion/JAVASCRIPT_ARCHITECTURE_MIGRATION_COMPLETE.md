@@ -70,7 +70,6 @@
 ### מבנה נכון שהושג:
 
 #### ✅ קבצי ליבה (Core Files)
-- `main.js` ✅
 - `header-system.js` ✅
 - `notification-system.js` ✅  
 - `console-cleanup.js` ✅

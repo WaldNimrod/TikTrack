@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, send_from_directory
+from flask import Blueprint, jsonify, request, send_from_directory, g
 from config.database import get_db
 from models.note import Note
 from services.validation_service import ValidationService
@@ -13,9 +13,17 @@ from werkzeug.datastructures import FileStorage
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 
+# Import base classes
+from .base_entity import BaseEntityAPI
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_utils import BaseEntityUtils
+
 logger = logging.getLogger(__name__)
 
 notes_bp = Blueprint('notes', __name__, url_prefix='/api/v1/notes')
+
+# Initialize base API (Note doesn't have a service, so we'll use the model directly)
+# For now, we'll skip the base API for notes due to its complexity
 
 # File settings
 UPLOAD_FOLDER = 'uploads/notes'

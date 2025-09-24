@@ -382,7 +382,6 @@
 - [ ] Item relationship visualization
 - [ ] Navigation between linked items
 
-**Location:** `linked-items.js:824`, `main.js:1508`
 
 ---
 

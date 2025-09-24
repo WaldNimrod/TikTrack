@@ -3,17 +3,26 @@ CSS Management API Routes
 נתיבי API לניהול מערכת CSS
 """
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, g
 import subprocess
 import os
 import sys
 from pathlib import Path
 
+# Import base classes
+from .base_entity import BaseEntityAPI
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_utils import BaseEntityUtils
+
 css_management_bp = Blueprint('css_management', __name__, url_prefix='/api/css')
 
+# Initialize base API (css_management is complex, so we'll use it selectively)
+
 @css_management_bp.route('/switch-to-old', methods=['POST'])
+@api_endpoint(cache_ttl=0, rate_limit=60)
+@handle_database_session()
 def switch_to_old_css():
-    """מעבר למערכת CSS ישנה"""
+    """מעבר למערכת CSS ישנה using base API patterns"""
     try:
         # הפעלת הסקריפט Python
         # השרת רץ מתיקיית Backend, אז צריך לחזור לתיקיית הבסיס
@@ -26,22 +35,23 @@ def switch_to_old_css():
         
         if result.returncode == 0:
             return jsonify({
-                'success': True,
+                'status': 'success',
                 'message': 'עבר למערכת CSS ישנה בהצלחה',
-                'output': result.stdout
+                'data': {'output': result.stdout},
+                'version': 'v1'
             }), 200
         else:
             return jsonify({
-                'success': False,
-                'message': 'שגיאה במעבר למערכת CSS ישנה',
-                'error': result.stderr
+                'status': 'error',
+                'error': {'message': 'שגיאה במעבר למערכת CSS ישנה', 'details': result.stderr},
+                'version': 'v1'
             }), 500
             
     except Exception as e:
         return jsonify({
-            'success': False,
-            'message': 'שגיאה פנימית במעבר למערכת CSS ישנה',
-            'error': str(e)
+            'status': 'error',
+            'error': {'message': 'שגיאה פנימית במעבר למערכת CSS ישנה', 'details': str(e)},
+            'version': 'v1'
         }), 500
 
 @css_management_bp.route('/switch-to-new', methods=['POST'])

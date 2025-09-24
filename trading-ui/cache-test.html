@@ -427,8 +427,147 @@
                 <!-- UI Content Section 4 Start-->
                 <div class="content-section" id="section4">
                     <div class="section-header">
-                        <h2>🔗 תלויות מטמון</h2>
+                        <h2>🗄️ ניטור UnifiedIndexedDB</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <div class="button-row mb-3">
+                            <button class="btn btn-sm btn-outline-primary" onclick="window.comprehensiveSystemCheck()">
+                                <i class="fas fa-search"></i> בדיקה מקיפה
+                            </button>
+                            <button class="btn btn-sm btn-outline-success" onclick="window.testUnifiedIndexedDB()">
+                                <i class="fas fa-vial"></i> בדיקת פונקציונליות
+                            </button>
+                            <button class="btn btn-sm btn-outline-info" onclick="refreshUnifiedIndexedDBStats()">
+                                <i class="fas fa-sync-alt"></i> רענן סטטיסטיקות
+                            </button>
+                            <button class="btn btn-sm btn-outline-warning" onclick="clearUnifiedIndexedDB()">
+                                <i class="fas fa-trash-alt"></i> נקה UnifiedIndexedDB
+                            </button>
+                        </div>
+
+                        <!-- UnifiedIndexedDB Overview -->
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-header">
+                                        <h3 class="stat-title">File Mapping</h3>
+                                    </div>
+                                    <div class="stat-content">
+                                        <div class="stat-row">
+                                            <span>סוגי קבצים</span>
+                                            <span class="badge bg-primary" id="fileMappingTypes">--</span>
+                                        </div>
+                                        <div class="stat-row">
+                                            <span>סך קבצים</span>
+                                            <span class="badge bg-info" id="fileMappingTotal">--</span>
+                                        </div>
+                                        <div class="stat-row">
+                                            <span>גודל נתונים</span>
+                                            <span class="badge bg-success" id="fileMappingSize">--</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-header">
+                                        <h3 class="stat-title">Notifications</h3>
+                                    </div>
+                                    <div class="stat-content">
+                                        <div class="stat-row">
+                                            <span>התראות היום</span>
+                                            <span class="badge bg-warning" id="notificationsToday">--</span>
+                                        </div>
+                                        <div class="stat-row">
+                                            <span>סך התראות</span>
+                                            <span class="badge bg-info" id="notificationsTotal">--</span>
+                                        </div>
+                                        <div class="stat-row">
+                                            <span>קטגוריות</span>
+                                            <span class="badge bg-success" id="notificationsCategories">--</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-header">
+                                        <h3 class="stat-title">Header System</h3>
+                                    </div>
+                                    <div class="stat-content">
+                                        <div class="stat-row">
+                                            <span>מצב פילטרים</span>
+                                            <span class="badge bg-primary" id="headerFilterState">--</span>
+                                        </div>
+                                        <div class="stat-row">
+                                            <span>מצב סקשנים</span>
+                                            <span class="badge bg-info" id="headerSectionState">--</span>
+                                        </div>
+                                        <div class="stat-row">
+                                            <span>נתוני חשבונות</span>
+                                            <span class="badge bg-success" id="headerAccountsData">--</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-header">
+                                        <h3 class="stat-title">Linter Monitor</h3>
+                                    </div>
+                                    <div class="stat-content">
+                                        <div class="stat-row">
+                                            <span>סריקות היום</span>
+                                            <span class="badge bg-warning" id="linterScansToday">--</span>
+                                        </div>
+                                        <div class="stat-row">
+                                            <span>קבצים נסרקים</span>
+                                            <span class="badge bg-info" id="linterFilesScanned">--</span>
+                                        </div>
+                                        <div class="stat-row">
+                                            <span>לוגים</span>
+                                            <span class="badge bg-success" id="linterLogEntries">--</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Object Stores Status -->
+                        <div class="mt-4">
+                            <h4>סטטוס Object Stores</h4>
+                            <div class="table-container">
+                                <div class="table-responsive">
+                                    <table class="data-table" id="objectStoresTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Store Name</th>
+                                                <th>Records</th>
+                                                <th>Size</th>
+                                                <th>Last Update</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="objectStoresTableBody">
+                                            <!-- Object stores data will be populated here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 4 End -->
+
+                <!-- UI Content Section 5 Start-->
+                <div class="content-section" id="section5">
+                    <div class="section-header">
+                        <h2>🔗 תלויות מטמון</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section5')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
@@ -534,10 +673,17 @@
   <script src="scripts/global-notification-collector.js"></script>
     
     <!-- Main Utilities -->
-    <script src="scripts/main.js"></script>
     <script src="scripts/tables.js"></script>
     <script src="scripts/global-favicon.js"></script>
     <script src="scripts/ui-utils.js"></script>
+    
+    <!-- Unified IndexedDB System -->
+    <script src="scripts/unified-indexeddb-adapter.js"></script>
+    <script src="scripts/project-files-scanner.js"></script>
+    <script src="scripts/central-refresh-system.js"></script>
+    
+    <!-- Page Utils -->
+    <script src="scripts/page-utils.js"></script>
     
     <!-- Cache Test Script -->
     <script src="scripts/cache-test.js"></script>

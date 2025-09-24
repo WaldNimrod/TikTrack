@@ -87,11 +87,9 @@ Comprehensive improvements were made to the database page in the TikTrack system
 The open/close status of sections was saved globally for all pages, causing confusion.
 
 #### 3.2 Solution
-- **Updated `toggleSection` function in `main.js`**:
   - Added automatic page name identification by URL
   - Created unique keys for each page: `database_${sectionId}Collapsed`, `accounts_${sectionId}Collapsed`, etc.
 
-- **Added new function `loadSectionStates` in `main.js`**:
   - General function for loading section states according to current page
   - Available globally via `window.loadSectionStates`
 
@@ -138,7 +136,6 @@ The open/close status of sections was saved globally for all pages, causing conf
 
 ### Frontend
 - `trading-ui/database.html` - Fixed all tables, button design, state saving
-- `trading-ui/scripts/main.js` - Added global functions for state saving
 - `trading-ui/accounts.html` - Added call to `loadSectionStates`
 - `trading-ui/planning.html` - Added call to `loadSectionStates`
 - `trading-ui/alerts.html` - Added call to `loadSectionStates`

@@ -8,7 +8,6 @@ The TikTrack JavaScript system is organized with a modular architecture that pro
 ### File Structure
 ```
 trading-ui/scripts/
-├── main.js                    # General utilities and functions
 ├── warning-system.js          # Centralized warning modal system
 ├── translation-utils.js       # Global translation utilities
 ├── header-system.js          # Header navigation and menu management
@@ -34,7 +33,6 @@ trading-ui/scripts/
 ### Module Categories
 
 #### 1. Global Systems ✅ **RECENTLY ENHANCED**
-- **`main.js`**: General utilities, number formatting, global functions
 - **`warning-system.js`**: Centralized modal system for confirmations and warnings
 - **`translation-utils.js`**: Global translation utilities for consistent text display
 - **`header-system.js`**: Header navigation and menu management
@@ -127,7 +125,6 @@ function getCashFlowCurrencyDisplay(currencyId) {
 
 ### 3. Number Formatting System
 ```javascript
-// File: main.js
 // Purpose: Global number and currency formatting
 
 function formatNumberWithCommas(number) {
@@ -331,7 +328,6 @@ function setupEventListeners() {
 ### 1. Global System Integration
 ```javascript
 // Import global systems
-// warning-system.js, translation-utils.js, main.js
 
 // Use global functions
 window.showDeleteWarning(message, callback);

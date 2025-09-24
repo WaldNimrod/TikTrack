@@ -61,14 +61,19 @@ window.detectNotificationCategory = function(message, type, title, context = {})
  */
 function isDevelopmentContext(fileName, functionName, message) {
   const devKeywords = [
-    'cache-test', 'linter', 'debug', 'test', 'development', 'dev',
+    'cache-test', 'linter', 'debug', 'development', 'dev',
     'console', 'log', 'debugging', 'testing', 'mock', 'stub'
   ];
   
   const devMessages = [
-    'לוג', 'debug', 'test', 'development', 'cache', 'מטמון',
-    'פיתוח', 'בדיקה', 'דיבוג', 'ניקוי'
+    'לוג', 'debug', 'development', 'cache', 'מטמון',
+    'פיתוח', 'בדיקה', 'דיבוג', 'ניקוי', 'loading', 'file'
   ];
+  
+  // Check if it's actually a test file (not just containing "test")
+  if (fileName && fileName.includes('test') && !fileName.includes('tester')) {
+    return false; // Don't classify test files as development
+  }
   
   return checkKeywords(fileName, functionName, message, devKeywords, devMessages);
 }
@@ -84,7 +89,7 @@ function isSystemContext(fileName, functionName, message, type) {
   
   const systemMessages = [
     'מערכת', 'שרת', 'מסד נתונים', 'שגיאה', 'חיבור', 'רשת',
-    'timeout', 'connection', 'api', 'server'
+    'timeout', 'connection', 'api', 'server', 'cache', 'נוקה', 'מטמון'
   ];
   
   // Errors are usually system-related
@@ -106,7 +111,8 @@ function isBusinessContext(fileName, functionName, message, type) {
   
   const businessMessages = [
     'עסקה', 'חשבון', 'התראה', 'ביצוע', 'תיק', 'עמדה',
-    'הזמנה', 'עסקאות', 'יתרה', 'רווח', 'הפסד', 'מסחר'
+    'הזמנה', 'עסקאות', 'יתרה', 'רווח', 'הפסד', 'מסחר',
+    'טרייד', 'נשמר', 'הצלחה'
   ];
   
   return checkKeywords(fileName, functionName, message, businessKeywords, businessMessages);
@@ -194,7 +200,7 @@ window.showNotificationSmart = async function(message, type = 'info', title = '�
   }
   
   // Use the original showNotification function directly (avoid recursion)
-  if (typeof window.showNotification === 'function') {
+  if (typeof window.showNotification === 'function' && window.showNotification !== window.showNotificationSmart) {
     return window.showNotification(message, type, title, duration, category);
   } else {
     console.log(`🔔 ${type.toUpperCase()}: ${title} - ${message}`);
@@ -216,7 +222,11 @@ window.showSuccessNotificationSmart = async function(title, message, duration = 
     category = window.detectNotificationCategory(message, 'success', title, context);
   }
   
-  return await window.showSuccessNotification(title, message, duration, category);
+  if (typeof window.showSuccessNotification === 'function' && window.showSuccessNotification !== window.showSuccessNotificationSmart) {
+    return await window.showSuccessNotification(title, message, duration, category);
+  } else {
+    console.log(`✅ SUCCESS: ${title} - ${message}`);
+  }
 };
 
 /**
@@ -234,7 +244,11 @@ window.showErrorNotificationSmart = async function(title, message, duration = 60
     category = window.detectNotificationCategory(message, 'error', title, context);
   }
   
-  return await window.showErrorNotification(title, message, duration, category);
+  if (typeof window.showErrorNotification === 'function' && window.showErrorNotification !== window.showErrorNotificationSmart) {
+    return await window.showErrorNotification(title, message, duration, category);
+  } else {
+    console.error(`❌ ERROR: ${title} - ${message}`);
+  }
 };
 
 /**
@@ -252,7 +266,11 @@ window.showWarningNotificationSmart = async function(title, message, duration = 
     category = window.detectNotificationCategory(message, 'warning', title, context);
   }
   
-  return await window.showWarningNotification(title, message, duration, category);
+  if (typeof window.showWarningNotification === 'function' && window.showWarningNotification !== window.showWarningNotificationSmart) {
+    return await window.showWarningNotification(title, message, duration, category);
+  } else {
+    console.warn(`⚠️ WARNING: ${title} - ${message}`);
+  }
 };
 
 /**
@@ -270,7 +288,11 @@ window.showInfoNotificationSmart = async function(title, message, duration = 400
     category = window.detectNotificationCategory(message, 'info', title, context);
   }
   
-  return await window.showInfoNotification(title, message, duration, category);
+  if (typeof window.showInfoNotification === 'function' && window.showInfoNotification !== window.showInfoNotificationSmart) {
+    return await window.showInfoNotification(title, message, duration, category);
+  } else {
+    console.log(`ℹ️ INFO: ${title} - ${message}`);
+  }
 };
 
 // ===== UTILITY FUNCTIONS =====

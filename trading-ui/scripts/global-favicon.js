@@ -102,3 +102,4 @@ window.setPageSpecificFavicon = setPageSpecificFavicon;
 window.autoSetFavicon = autoSetFavicon;
 
 console.log('🔧 Global Favicon Manager loaded successfully');
+

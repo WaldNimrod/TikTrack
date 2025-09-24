@@ -1417,7 +1417,6 @@ grep "color-scheme-system.js" trading-ui/designs.html
 grep "preferences-v2.js" trading-ui/designs.html
 grep "ui-utils.js" trading-ui/designs.html
 grep "central-refresh-system.js" trading-ui/designs.html
-grep "main.js" trading-ui/designs.html
 ```
 
 **כל הסקריפטים הבאים כבר כלולים בתבנית:**
@@ -2008,7 +2007,6 @@ grep "color-scheme-system.js" trading-ui/designs.html
 grep "preferences-v2.js" trading-ui/designs.html
 grep "ui-utils.js" trading-ui/designs.html
 grep "central-refresh-system.js" trading-ui/designs.html
-grep "main.js" trading-ui/designs.html
 ```
 
 **כל הסקריפטים הבאים כבר כלולים בתבנית:**
@@ -2029,7 +2027,6 @@ grep "main.js" trading-ui/designs.html
 grep "color-scheme-system\|preferences-v2" trading-ui/page-name.html
 
 # בדוק סקריפטים בסוף העמוד
-grep "console-cleanup\|ui-utils\|main.js" trading-ui/page-name.html
 ```
 
 #### 17.3 הוספת סקריפטים חסרים
@@ -2060,7 +2057,6 @@ grep "console-cleanup\|ui-utils\|main.js" trading-ui/page-name.html
 <script src="scripts/tables.js"></script>
 <script src="scripts/linked-items.js"></script>
 <script src="scripts/page-utils.js"></script>
-<script src="scripts/main.js"></script>
 
 <!-- Notification System Scripts -->
 <script src="scripts/notification-system.js"></script>

@@ -1269,7 +1269,7 @@ async function performScan() {
         try {
             console.log('🔍 Trying direct API call...');
             
-            const response = await fetch('/api/v1/files/discover');
+            const response = await fetch('/api/file-scanner/files');
             if (response.ok) {
                 const data = await response.json();
                 console.log('🔍 Direct API call successful:', data);

@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, g
 from sqlalchemy.orm import Session, joinedload
 from config.database import get_db
 from models.cash_flow import CashFlow
@@ -7,47 +7,58 @@ from services.validation_service import ValidationService
 from services.advanced_cache_service import cache_for, invalidate_cache
 import logging
 
+# Import base classes
+from .base_entity import BaseEntityAPI
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_utils import BaseEntityUtils
+
 logger = logging.getLogger(__name__)
 
 cash_flows_bp = Blueprint('cash_flows', __name__, url_prefix='/api/v1/cash_flows')
 
-@cash_flows_bp.route('/', methods=['GET'])
-# @cache_for(ttl=60)  # Cache for 1 minute - cash flows don't change frequently - temporarily disabled
-def get_cash_flows():
-    """Get all cash flows"""
-    try:
-        db: Session = next(get_db())
-        cash_flows = db.query(CashFlow).options(
+# Create a service class for cash flows
+class CashFlowService:
+    def __init__(self):
+        self.model = CashFlow
+    
+    def get_all(self, db: Session, filters=None):
+        return db.query(CashFlow).options(
             joinedload(CashFlow.account),
             joinedload(CashFlow.currency)
         ).all()
-        
-        # Convert to dictionary with additional information
-        cash_flows_data = []
-        for cf in cash_flows:
-            cf_dict = cf.to_dict()
-            if cf.account:
-                cf_dict['account_name'] = cf.account.name
-            if cf.currency:
-                cf_dict['currency_symbol'] = cf.currency.symbol
-                cf_dict['currency_name'] = cf.currency.name
-            cash_flows_data.append(cf_dict)
-        
-        return jsonify({
-            "status": "success",
-            "data": cash_flows_data,
-            "message": "Cash flows retrieved successfully",
-            "version": "v1"
-        })
-    except Exception as e:
-        logger.error(f"Error getting cash flows: {str(e)}")
-        return jsonify({
-            "status": "error",
-            "error": {"message": "Failed to retrieve cash flows"},
-            "version": "v1"
-        }), 500
-    finally:
-        db.close()
+    
+    def get_by_id(self, db: Session, cash_flow_id: int):
+        return db.query(CashFlow).options(
+            joinedload(CashFlow.account),
+            joinedload(CashFlow.currency)
+        ).filter(CashFlow.id == cash_flow_id).first()
+
+# Initialize base API
+cash_flow_service = CashFlowService()
+base_api = BaseEntityAPI('cash_flows', cash_flow_service, 'cash_flows')
+
+@cash_flows_bp.route('/', methods=['GET'])
+@api_endpoint(cache_ttl=60, rate_limit=60)
+@handle_database_session()
+def get_cash_flows():
+    """Get all cash flows using base API with custom data enhancement"""
+    db: Session = g.db
+    response, status_code = base_api.get_all(db)
+    
+    # Enhance data with additional information
+    if response.get('status') == 'success' and response.get('data'):
+        enhanced_data = []
+        for cf_dict in response['data']:
+            # Add additional fields if they exist
+            if 'account' in cf_dict and cf_dict['account']:
+                cf_dict['account_name'] = cf_dict['account'].get('name', '')
+            if 'currency' in cf_dict and cf_dict['currency']:
+                cf_dict['currency_symbol'] = cf_dict['currency'].get('symbol', '')
+                cf_dict['currency_name'] = cf_dict['currency'].get('name', '')
+            enhanced_data.append(cf_dict)
+        response['data'] = enhanced_data
+    
+    return jsonify(response), status_code
 
 @cash_flows_bp.route('/<int:cash_flow_id>', methods=['GET'])
 def get_cash_flow(cash_flow_id: int):

@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, g
 from sqlalchemy.orm import Session
 from config.database import get_db
 from models.execution import Execution
@@ -6,60 +6,47 @@ from services.validation_service import ValidationService
 from services.advanced_cache_service import cache_for, cache_with_deps, invalidate_cache
 import logging
 
+# Import base classes
+from .base_entity import BaseEntityAPI
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_utils import BaseEntityUtils
+
 logger = logging.getLogger(__name__)
 
 executions_bp = Blueprint('executions', __name__, url_prefix='/api/v1/executions')
 
+# Create a simple service class for executions
+class ExecutionService:
+    def __init__(self):
+        self.model = Execution
+    
+    def get_all(self, db: Session, filters=None):
+        return db.query(Execution).all()
+    
+    def get_by_id(self, db: Session, execution_id: int):
+        return db.query(Execution).filter(Execution.id == execution_id).first()
+
+# Initialize base API
+execution_service = ExecutionService()
+base_api = BaseEntityAPI('executions', execution_service, 'executions')
+
 @executions_bp.route('/', methods=['GET'])
-@cache_with_deps(ttl=30, dependencies=['executions'])  # Cache for 30 seconds - critical data
+@api_endpoint(cache_ttl=30, dependencies=['executions'], rate_limit=60)
+@handle_database_session()
 def get_executions():
-    """Get all executions"""
-    try:
-        db: Session = next(get_db())
-        executions = db.query(Execution).all()
-        return jsonify({
-            "status": "success",
-            "data": [execution.to_dict() for execution in executions],
-            "message": "Executions retrieved successfully",
-            "version": "v1"
-        })
-    except Exception as e:
-        logger.error(f"Error getting executions: {str(e)}")
-        return jsonify({
-            "status": "error",
-            "error": {"message": "Failed to retrieve executions"},
-            "version": "v1"
-        }), 500
-    finally:
-        db.close()
+    """Get all executions using base API"""
+    db: Session = g.db
+    response, status_code = base_api.get_all(db)
+    return jsonify(response), status_code
 
 @executions_bp.route('/<int:execution_id>', methods=['GET'])
+@api_endpoint(cache_ttl=30, rate_limit=60)
+@handle_database_session()
 def get_execution(execution_id: int):
-    """Get execution by ID"""
-    try:
-        db: Session = next(get_db())
-        execution = db.query(Execution).filter(Execution.id == execution_id).first()
-        if execution:
-            return jsonify({
-                "status": "success",
-                "data": execution.to_dict(),
-                "message": "Execution retrieved successfully",
-                "version": "v1"
-            })
-        return jsonify({
-            "status": "error",
-            "error": {"message": "Execution not found"},
-            "version": "v1"
-        }), 404
-    except Exception as e:
-        logger.error(f"Error getting execution {execution_id}: {str(e)}")
-        return jsonify({
-            "status": "error",
-            "error": {"message": "Failed to retrieve execution"},
-            "version": "v1"
-        }), 500
-    finally:
-        db.close()
+    """Get execution by ID using base API"""
+    db: Session = g.db
+    response, status_code = base_api.get_by_id(db, execution_id)
+    return jsonify(response), status_code
 
 @executions_bp.route('/', methods=['POST'])
 @invalidate_cache(['executions', 'trades', 'dashboard'])  # Invalidate cache after creating execution

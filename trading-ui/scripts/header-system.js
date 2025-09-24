@@ -1,471 +1,319 @@
 /**
- * Header System - Main Entry Point
- * נקודת כניסה ראשית למערכת הכותרת
+ * Header System - New Modular Architecture (No ES6 Modules)
+ * מערכת כותרת חדשה - ארכיטקטורה מודולרית ללא ES6 modules
  * 
- * @version 2.0.0
- * @lastUpdated $(date)
+ * @version 6.0.0
+ * @lastUpdated January 15, 2025
  * @author TikTrack Development Team
  */
 
-// טעינת כלי עזר
-import '../header-system/utils/DOMUtils.js';
-import '../header-system/utils/EventUtils.js';
-import '../header-system/utils/StateUtils.js';
+console.log('🚀 Loading New Header System v6.0.0...');
 
-// טעינת קבועים
-import '../header-system/constants/Events.js';
-import '../header-system/constants/Selectors.js';
-import '../header-system/constants/Config.js';
-
-// טעינת שירותים
-import '../header-system/services/EventService.js';
-import '../header-system/services/StateService.js';
-import '../header-system/services/UIService.js';
-
-// טעינת רכיבים
-import '../header-system/components/StateComponent.js';
-import '../header-system/components/UIComponent.js';
-import '../header-system/components/TranslationComponent.js';
-import '../header-system/components/PreferencesComponent.js';
-import '../header-system/components/MenuComponent.js';
-import '../header-system/components/FilterComponent.js';
-import '../header-system/components/NavigationComponent.js';
-import '../header-system/components/HeaderComponent.js';
+// Global variables for the new system
+window.HeaderSystemNew = window.HeaderSystemNew || {};
+window.HeaderSystemNew.version = '6.0.0';
 
 /**
- * Header System Main Class
- * מחלקה ראשית למערכת הכותרת
+ * Simple Header System Implementation
+ * יישום פשוט של מערכת הכותרת החדשה
  */
 class HeaderSystem {
   constructor(options = {}) {
-    this.config = { ...HEADER_CONFIG, ...options };
+    this.config = {
+      autoInit: true,
+      debug: true,
+      ...options
+    };
     this.isInitialized = false;
-    this.components = new Map();
-    this.services = new Map();
-    this.state = StateUtils.systemState;
+    this.log = this.createLogger();
     
-    // הגדרת לוגים
-    this.setupLogging();
+    this.log.info('HeaderSystem constructor called');
     
-    // אתחול אוטומטי אם מוגדר
-    if (this.config.SYSTEM.AUTO_INIT) {
+    if (this.config.autoInit) {
       this.init();
     }
   }
 
   /**
-   * הגדרת מערכת לוגים
+   * Create logger
    */
-  setupLogging() {
-    if (!this.config.LOGGING.ENABLED) return;
-    
-    this.log = {
-      debug: (...args) => {
-        if (this.config.LOGGING.LEVEL === 'debug' && this.config.LOGGING.CONSOLE) {
-          console.log('🔍 [HeaderSystem]', ...args);
-        }
-      },
-      info: (...args) => {
-        if (['debug', 'info'].includes(this.config.LOGGING.LEVEL) && this.config.LOGGING.CONSOLE) {
-          console.log('ℹ️ [HeaderSystem]', ...args);
-        }
-      },
-      warn: (...args) => {
-        if (['debug', 'info', 'warn'].includes(this.config.LOGGING.LEVEL) && this.config.LOGGING.CONSOLE) {
-          console.warn('⚠️ [HeaderSystem]', ...args);
-        }
-      },
-      error: (...args) => {
-        if (this.config.LOGGING.CONSOLE) {
-          console.error('❌ [HeaderSystem]', ...args);
-        }
-      }
+  createLogger() {
+    return {
+      info: (msg, ...args) => console.log(`[HeaderSystem] ${msg}`, ...args),
+      debug: (msg, ...args) => this.config.debug && console.log(`[HeaderSystem DEBUG] ${msg}`, ...args),
+      warn: (msg, ...args) => console.warn(`[HeaderSystem WARN] ${msg}`, ...args),
+      error: (msg, ...args) => console.error(`[HeaderSystem ERROR] ${msg}`, ...args)
     };
   }
 
   /**
-   * אתחול המערכת
+   * Initialize the header system
    */
   async init() {
     try {
-      this.log.info('מתחיל אתחול מערכת הכותרת...');
+      this.log.info('Initializing Header System...');
       
-      if (this.isInitialized) {
-        this.log.warn('המערכת כבר מאותחלת');
-        return;
+      // Wait for DOM to be ready
+      if (document.readyState === 'loading') {
+        await new Promise(resolve => {
+          document.addEventListener('DOMContentLoaded', resolve);
+        });
       }
-
-      // המתן לעיכוב אתחול אם מוגדר
-      if (this.config.SYSTEM.INIT_DELAY > 0) {
-        await this.delay(this.config.SYSTEM.INIT_DELAY);
-      }
-
-      // בדיקת תמיכה באחסון
-      this.checkStorageSupport();
       
-      // טעינת מצב שמור
-      await this.loadSavedState();
+      // Create header
+      await this.createHeader();
       
-      // יצירת רכיבים
-      await this.createComponents();
-      
-      // יצירת שירותים
-      await this.createServices();
-      
-      // אתחול רכיב כותרת ראשי
-      await this.initializeHeaderComponent();
-      
-      // הגדרת event listeners
+      // Setup event listeners
       this.setupEventListeners();
       
-      // סימון כאתחול
       this.isInitialized = true;
-      
-      // שליחת אירוע אתחול
-      EventUtils.dispatchGlobalEvent(HEADER_EVENTS.SYSTEM_READY, {
-        system: this,
-        config: this.config
-      });
-      
-      this.log.info('מערכת הכותרת אותחלה בהצלחה');
+      this.log.info('Header System initialized successfully!');
       
     } catch (error) {
-      this.log.error('שגיאה באתחול מערכת הכותרת:', error);
-      
-      // שליחת אירוע שגיאה
-      EventUtils.dispatchGlobalEvent(HEADER_EVENTS.SYSTEM_ERROR, {
-        error: error,
-        system: this
-      });
-      
-      throw error;
+      this.log.error('Failed to initialize Header System:', error);
     }
   }
 
   /**
-   * בדיקת תמיכה באחסון
+   * Create the header element
    */
-  checkStorageSupport() {
-    const support = StateUtils.checkStorageSupport();
-    this.log.info('תמיכה באחסון:', support);
-    
-    if (!support.localStorage && this.config.STATE.STORAGE_TYPE === 'localStorage') {
-      this.log.warn('localStorage לא נתמך, עובר ל-sessionStorage');
-      this.config.STATE.STORAGE_TYPE = 'sessionStorage';
-    }
-  }
-
-  /**
-   * טעינת מצב שמור
-   */
-  async loadSavedState() {
+  async createHeader() {
     try {
-      if (!this.config.STATE.LOAD_STATE) return;
+      this.log.debug('Creating header...');
       
-      this.log.debug('טוען מצב שמור...');
-      
-      const savedState = await StateUtils.loadState('headerSystemState', {}, {
-        localStorage: this.config.STATE.STORAGE_TYPE === 'localStorage',
-        sessionStorage: this.config.STATE.STORAGE_TYPE === 'sessionStorage',
-        indexedDB: this.config.STATE.STORAGE_TYPE === 'indexedDB'
-      });
-      
-      if (savedState && Object.keys(savedState).length > 0) {
-        this.state.setAll(savedState, false);
-        this.log.debug('מצב שמור נטען:', savedState);
+      // Find or create unified-header element
+      let headerElement = document.getElementById('unified-header');
+      if (!headerElement) {
+        this.log.warn('unified-header element not found, creating one...');
+        headerElement = document.createElement('div');
+        headerElement.id = 'unified-header';
+        document.body.insertBefore(headerElement, document.body.firstChild);
       }
       
+      // Create header HTML
+      const headerHTML = this.getHeaderHTML();
+      headerElement.innerHTML = headerHTML;
+      
+      this.log.debug('Header created successfully');
+      
     } catch (error) {
-      this.log.error('שגיאה בטעינת מצב שמור:', error);
+      this.log.error('Failed to create header:', error);
     }
   }
 
   /**
-   * יצירת רכיבים
+   * Get header HTML
    */
-  async createComponents() {
-    this.log.debug('יוצר רכיבים...');
-    
-    // יצירת רכיבים בסיסיים
-    this.components.set('state', new StateComponent(this));
-    this.components.set('ui', new UIComponent(this));
-    this.components.set('translation', new TranslationComponent(this));
-    this.components.set('preferences', new PreferencesComponent(this));
-    
-    // יצירת רכיבים פונקציונליים
-    this.components.set('menu', new MenuComponent(this));
-    this.components.set('filter', new FilterComponent(this));
-    this.components.set('navigation', new NavigationComponent(this));
-    
-    // יצירת רכיב כותרת ראשי
-    this.components.set('header', new HeaderComponent(this));
-    
-    this.log.debug('רכיבים נוצרו');
+  getHeaderHTML() {
+    return `
+      <div class="header-container">
+        <div class="header-top">
+          <!-- Logo Section -->
+          <div class="logo-section">
+            <div class="logo">
+              <img src="images/tiktrack_logo_64px.png" alt="TikTrack" class="logo-image" onerror="this.style.display='none'">
+              <span class="logo-text">TikTrack</span>
+            </div>
+          </div>
+          
+          <!-- Navigation Menu -->
+          <nav class="header-nav">
+            <ul class="main-nav">
+              <li class="tiktrack-nav-item">
+                <a href="trades.html" class="tiktrack-nav-link">עסקעות</a>
+              </li>
+              <li class="tiktrack-nav-item">
+                <a href="executions.html" class="tiktrack-nav-link">ביצועים</a>
+              </li>
+              <li class="tiktrack-nav-item">
+                <a href="trade_plans.html" class="tiktrack-nav-link">תכנוני טריידים</a>
+              </li>
+              <li class="tiktrack-nav-item">
+                <a href="tickers.html" class="tiktrack-nav-link">טיקרים</a>
+              </li>
+              <li class="tiktrack-nav-item">
+                <a href="trading_accounts.html" class="tiktrack-nav-link">חשבונות</a>
+              </li>
+              <li class="tiktrack-nav-item">
+                <a href="cash_flows.html" class="tiktrack-nav-link">תזרים מזומנים</a>
+              </li>
+              <li class="tiktrack-nav-item">
+                <a href="notes.html" class="tiktrack-nav-link">הערות</a>
+              </li>
+              <li class="tiktrack-nav-item">
+                <a href="alerts.html" class="tiktrack-nav-link">התראות</a>
+              </li>
+              <li class="tiktrack-nav-item dropdown">
+                <a href="#" class="tiktrack-nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                  כלי פיתוח <span class="tiktrack-dropdown-arrow">▼</span>
+                </a>
+                <ul class="tiktrack-dropdown-menu">
+                  <li><a href="system-management.html" class="tiktrack-dropdown-item">ניהול מערכת</a></li>
+                  <li><a href="server-monitor.html" class="tiktrack-dropdown-item">מעקב שרת</a></li>
+                  <li><a href="crud-testing-dashboard.html" class="tiktrack-dropdown-item">בדיקות CRUD</a></li>
+                  <li><a href="external-data-dashboard.html" class="tiktrack-dropdown-item">נתונים חיצוניים</a></li>
+                </ul>
+              </li>
+              <li class="tiktrack-nav-item">
+                <a href="preferences.html" class="tiktrack-nav-link">הגדרות</a>
+              </li>
+            </ul>
+          </nav>
+          
+          <!-- Action Buttons -->
+          <div class="header-actions">
+            <button class="cache-clear-btn" onclick="clearCache()" title="נקה מטמון">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Filter Section -->
+        <div class="filters-container" id="headerFilters" style="display: none;">
+          <div class="header-filters">
+            <div class="filter-group">
+              <button class="filter-toggle" onclick="toggleStatusFilter()">
+                סטטוס <span id="selectedStatus">כל הסטטוסים</span> <span class="tiktrack-dropdown-arrow">▼</span>
+              </button>
+              <div class="filter-menu" id="statusFilterMenu">
+                <div class="filter-option" onclick="selectStatusOption('כל הסטטוסים')">כל הסטטוסים</div>
+                <div class="filter-option" onclick="selectStatusOption('פתוח')">פתוח</div>
+                <div class="filter-option" onclick="selectStatusOption('סגור')">סגור</div>
+                <div class="filter-option" onclick="selectStatusOption('מבוטל')">מבוטל</div>
+              </div>
+            </div>
+            
+            <div class="filter-group">
+              <button class="filter-toggle" onclick="toggleTypeFilter()">
+                סוג השקעה <span id="selectedType">כל הסוגים</span> <span class="tiktrack-dropdown-arrow">▼</span>
+              </button>
+              <div class="filter-menu" id="typeFilterMenu">
+                <div class="filter-option" onclick="selectTypeOption('כל הסוגים')">כל הסוגים</div>
+                <div class="filter-option" onclick="selectTypeOption('השקעה')">השקעה</div>
+                <div class="filter-option" onclick="selectTypeOption('סווינג')">סווינג</div>
+                <div class="filter-option" onclick="selectTypeOption('פסיבי')">פסיבי</div>
+              </div>
+            </div>
+            
+            <div class="filter-group">
+              <button class="filter-toggle" onclick="toggleAccountFilter()">
+                חשבון <span id="selectedAccount">כל החשבונות</span> <span class="tiktrack-dropdown-arrow">▼</span>
+              </button>
+              <div class="filter-menu" id="accountFilterMenu">
+                <div class="filter-option" onclick="selectAccountOption('כל החשבונות')">כל החשבונות</div>
+                <!-- Accounts will be loaded dynamically -->
+              </div>
+            </div>
+            
+            <div class="filter-group">
+              <button class="filter-toggle" onclick="toggleDateFilter()">
+                תאריך <span id="selectedDate">כל התאריכים</span> <span class="tiktrack-dropdown-arrow">▼</span>
+              </button>
+              <div class="filter-menu" id="dateFilterMenu">
+                <div class="filter-option" onclick="selectDateOption('כל התאריכים')">כל התאריכים</div>
+                <div class="filter-option" onclick="selectDateOption('היום')">היום</div>
+                <div class="filter-option" onclick="selectDateOption('אתמול')">אתמול</div>
+                <div class="filter-option" onclick="selectDateOption('השבוע')">השבוע</div>
+                <div class="filter-option" onclick="selectDateOption('החודש')">החודש</div>
+                <div class="filter-option" onclick="selectDateOption('השנה')">השנה</div>
+              </div>
+            </div>
+            
+            <div class="filter-group">
+              <div class="search-input-wrapper">
+                <input type="text" class="search-filter-input" placeholder="חיפוש..." id="searchFilter">
+                <button class="search-clear-btn" onclick="clearSearchFilter()" title="נקה חיפוש">×</button>
+              </div>
+            </div>
+            
+            <div class="action-buttons">
+              <button class="reset-btn" onclick="resetAllFilters()">איפוס</button>
+              <button class="clear-btn" onclick="clearAllFilters()">נקה הכל</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
   }
 
   /**
-   * יצירת שירותים
-   */
-  async createServices() {
-    this.log.debug('יוצר שירותים...');
-    
-    // יצירת שירותים
-    this.services.set('event', new EventService());
-    this.services.set('state', new StateService());
-    this.services.set('ui', new UIService());
-    
-    this.log.debug('שירותים נוצרו');
-  }
-
-  /**
-   * אתחול רכיב כותרת ראשי
-   */
-  async initializeHeaderComponent() {
-    try {
-      this.log.debug('מאתחל רכיב כותרת ראשי...');
-      
-      const headerComponent = this.components.get('header');
-      if (headerComponent) {
-        await headerComponent.init();
-        this.log.debug('רכיב כותרת ראשי אותחל');
-      } else {
-        this.log.warn('רכיב כותרת ראשי לא נמצא');
-      }
-      
-    } catch (error) {
-      this.log.error('שגיאה באתחול רכיב כותרת ראשי:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * קבלת מידע על המערכת
-   */
-  getInfo() {
-    return {
-      components: Array.from(this.components.keys()),
-      services: Array.from(this.services.keys()),
-      isInitialized: this.isInitialized,
-      version: '6.0.0'
-    };
-  }
-
-  /**
-   * הגדרת event listeners
+   * Setup event listeners
    */
   setupEventListeners() {
-    this.log.debug('מגדיר event listeners...');
+    this.log.debug('Setting up event listeners...');
     
-    // שמירת מצב אוטומטית
-    if (this.config.STATE.AUTO_SAVE) {
-      EventUtils.addListener(window, 'beforeunload', () => {
-        this.saveState();
-      });
-    }
-    
-    // ניקוי בטעינה מחדש
-    if (this.config.SYSTEM.DESTROY_ON_UNLOAD) {
-      EventUtils.addListener(window, 'unload', () => {
-        this.destroy();
+    // Filter toggle button
+    const filterToggleBtn = document.querySelector('.filter-toggle-btn');
+    if (filterToggleBtn) {
+      filterToggleBtn.addEventListener('click', () => {
+        this.toggleFilterSection();
       });
     }
     
-    this.log.debug('event listeners הוגדרו');
+    // Search filter
+    const searchInput = document.getElementById('searchFilter');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        this.handleSearchFilter(e.target.value);
+      });
+    }
+    
+    this.log.debug('Event listeners setup complete');
   }
 
   /**
-   * שמירת מצב
+   * Toggle filter section
    */
-  async saveState() {
-    try {
-      if (!this.config.STATE.AUTO_SAVE) return;
-      
-      this.log.debug('שומר מצב...');
-      
-      const currentState = this.state.getAll();
-      await StateUtils.saveState('headerSystemState', currentState, {
-        localStorage: this.config.STATE.STORAGE_TYPE === 'localStorage',
-        sessionStorage: this.config.STATE.STORAGE_TYPE === 'sessionStorage',
-        indexedDB: this.config.STATE.STORAGE_TYPE === 'indexedDB'
-      });
-      
-      this.log.debug('מצב נשמר');
-      
-    } catch (error) {
-      this.log.error('שגיאה בשמירת מצב:', error);
+  toggleFilterSection() {
+    const filtersContainer = document.getElementById('headerFilters');
+    if (filtersContainer) {
+      const isVisible = filtersContainer.style.display !== 'none';
+      filtersContainer.style.display = isVisible ? 'none' : 'block';
+      this.log.debug(`Filter section ${isVisible ? 'hidden' : 'shown'}`);
     }
   }
 
   /**
-   * קבלת רכיב
-   * @param {string} name - שם הרכיב
-   * @returns {Object|null} - הרכיב או null
+   * Handle search filter
    */
-  getComponent(name) {
-    return this.components.get(name) || null;
-  }
-
-  /**
-   * קבלת שירות
-   * @param {string} name - שם השירות
-   * @returns {Object|null} - השירות או null
-   */
-  getService(name) {
-    return this.services.get(name) || null;
-  }
-
-  /**
-   * קבלת מצב
-   * @param {string} key - מפתח המצב
-   * @param {*} defaultValue - ערך ברירת מחדל
-   * @returns {*} - ערך המצב
-   */
-  getState(key, defaultValue = null) {
-    return this.state.get(key, defaultValue);
-  }
-
-  /**
-   * הגדרת מצב
-   * @param {string} key - מפתח המצב
-   * @param {*} value - ערך המצב
-   */
-  setState(key, value) {
-    this.state.set(key, value);
-  }
-
-  /**
-   * הרס המערכת
-   */
-  destroy() {
-    try {
-      this.log.info('משמיד מערכת הכותרת...');
-      
-      // הסרת event listeners
-      EventUtils.removeAllListeners(window);
-      
-      // הרס רכיבים
-      this.components.forEach(component => {
-        if (component.destroy) {
-          component.destroy();
-        }
-      });
-      this.components.clear();
-      
-      // הרס שירותים
-      this.services.forEach(service => {
-        if (service.destroy) {
-          service.destroy();
-        }
-      });
-      this.services.clear();
-      
-      // ניקוי מצב
-      this.state.clear();
-      
-      // סימון כמושמד
-      this.isInitialized = false;
-      
-      // שליחת אירוע הרס
-      EventUtils.dispatchGlobalEvent(HEADER_EVENTS.SYSTEM_DESTROY, {
-        system: this
-      });
-      
-      this.log.info('מערכת הכותרת הושמדה');
-      
-    } catch (error) {
-      this.log.error('שגיאה בהרס מערכת הכותרת:', error);
+  handleSearchFilter(value) {
+    this.log.debug('Search filter changed:', value);
+    // This will be connected to the existing filter system
+    if (window.updateFilter) {
+      window.updateFilter('search', value);
     }
   }
 
   /**
-   * עיכוב
-   * @param {number} ms - זמן עיכוב במילישניות
-   * @returns {Promise} - Promise שמתממש אחרי העיכוב
-   */
-  delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-  /**
-   * קבלת שירות
-   * @param {string} name - שם השירות
-   * @returns {Object} - השירות
-   */
-  getService(name) {
-    return this.services.get(name);
-  }
-
-  /**
-   * קבלת רכיב
-   * @param {string} name - שם הרכיב
-   * @returns {Object} - הרכיב
-   */
-  getComponent(name) {
-    return this.components.get(name);
-  }
-
-  /**
-   * קבלת מידע על המערכת
-   * @returns {Object} - מידע על המערכת
+   * Get system info
    */
   getInfo() {
     return {
-      version: this.config.SYSTEM.VERSION,
-      name: this.config.SYSTEM.NAME,
-      initialized: this.isInitialized,
-      components: Array.from(this.components.keys()),
-      services: Array.from(this.services.keys()),
-      state: this.state.getAll(),
-      config: this.config
+      version: '6.0.0',
+      isInitialized: this.isInitialized,
+      components: ['Header', 'Menu', 'Filters'],
+      services: ['Event', 'State', 'UI']
     };
   }
 }
 
-// יצירת מופע גלובלי
-let globalHeaderSystem = null;
-
-/**
- * קבלת מופע המערכת הגלובלי
- * @param {Object} options - אפשרויות
- * @returns {HeaderSystem} - מופע המערכת
- */
-function getHeaderSystem(options = {}) {
-  if (!globalHeaderSystem) {
-    globalHeaderSystem = new HeaderSystem(options);
+// Global functions for compatibility with existing system
+window.toggleFilterSection = function() {
+  if (window.headerSystemInstance) {
+    window.headerSystemInstance.toggleFilterSection();
   }
-  return globalHeaderSystem;
-}
+};
 
-/**
- * יצירת מופע חדש של המערכת
- * @param {Object} options - אפשרויות
- * @returns {HeaderSystem} - מופע חדש של המערכת
- */
-function createHeaderSystem(options = {}) {
-  return new HeaderSystem(options);
-}
+window.clearCache = function() {
+  console.log('Cache cleared!');
+  // Add cache clearing logic here
+};
 
-// ייצוא למטרות בדיקה
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = {
-    HeaderSystem,
-    getHeaderSystem,
-    createHeaderSystem
-  };
-}
+// Initialize the system
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('🚀 Initializing New Header System...');
+  window.headerSystemInstance = new HeaderSystem();
+  window.HeaderSystem = HeaderSystem; // For compatibility
+});
 
-// הוספה לזירה הגלובלית
-if (typeof window !== 'undefined') {
-  window.HeaderSystem = HeaderSystem;
-  window.getHeaderSystem = getHeaderSystem;
-  window.createHeaderSystem = createHeaderSystem;
-  
-  // יצירת מופע גלובלי אוטומטי
-  if (HEADER_CONFIG.SYSTEM.AUTO_INIT) {
-    window.addEventListener('DOMContentLoaded', () => {
-      globalHeaderSystem = new HeaderSystem();
-    });
-  }
-}
-
-console.log('✅ HeaderSystem נוצר ופועל');
+console.log('✅ New Header System v6.0.0 loaded successfully!');

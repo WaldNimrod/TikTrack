@@ -231,8 +231,8 @@ detect_current_cache_state() {
     log_info "🔍 Detecting current cache state..."
     
     # Check if server is running and get cache status
-    if curl -s "http://localhost:8080/api/v1/cache/status" > /dev/null 2>&1; then
-        local cache_response=$(curl -s "http://localhost:8080/api/v1/cache/status" 2>/dev/null)
+    if curl -s "http://localhost:8080/api/cache/status" > /dev/null 2>&1; then
+        local cache_response=$(curl -s "http://localhost:8080/api/cache/status" 2>/dev/null)
         if [ $? -eq 0 ] && [ -n "$cache_response" ]; then
             # Try to extract cache TTL from response
             local cache_ttl=$(echo "$cache_response" | grep -o '"cache_ttl":[0-9]*' | cut -d: -f2)
@@ -489,7 +489,7 @@ check_system_status() {
     echo "🌐 Server Access:"
     echo "================="
     echo "   URL: http://localhost:8080"
-    echo "   API: http://localhost:8080/api/v1/"
+    echo "   API: http://localhost:8080/api/"
     echo ""
     
     # Show environment variables

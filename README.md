@@ -97,7 +97,7 @@
 
 > 📋 **משימות מערכת הנתונים החיצוניים**: [external_data_integration_server/EXTERNAL_DATA_TASKS_TODO.md](external_data_integration_server/EXTERNAL_DATA_TASKS_TODO.md)
 
-> 📋 **אפיון מפורט**: [EXTERNAL_DATA_INTEGRATION_SPECIFICATION_v1.3.1.md](EXTERNAL_DATA_INTEGRATION_SPECIFICATION_v1.3.1.md)
+> 📋 **אפיון מפורט**: [EXTERNAL_DATA_INTEGRATION_SPECIFICATION_1.3.1.md](EXTERNAL_DATA_INTEGRATION_SPECIFICATION_1.3.1.md)
 
 > 📋 **מדריך RTL לעברית**: [documentation/RTL_HEBREW_GUIDE.md](documentation/RTL_HEBREW_GUIDE.md)
 
@@ -155,8 +155,8 @@
   - `Backend/models/user_preferences_v2.py` - מודל מתקדם 573 שורות
   - `Backend/services/preferences_service_v2.py` - שירות מתקדם 633 שורות 
   - `Backend/routes/api/preferences_v2.py` - API מלא 558 שורות
-  - `Backend/scripts/simple_migrate_v1_to_v2.py` - כלי מיגרציה
-  - `Backend/scripts/migrate_preferences_v1_to_v2.py` - מיגרציה מתקדמת
+  - `Backend/scripts/simple_migrate_legacy_to_v2.py` - כלי מיגרציה
+  - `Backend/scripts/migrate_preferences_legacy_to_v2.py` - מיגרציה מתקדמת
   - `Backend/test_v2_system.py` - בדיקות מערכת
 - **Frontend חדש:**
   - `trading-ui/preferences-v2.html` - ממשק מתקדם 1,056 שורות

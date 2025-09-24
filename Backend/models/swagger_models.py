@@ -90,8 +90,8 @@ def create_swagger_models(api: Api) -> Dict[str, Any]:
         'usd_rate': fields.Float(required=True, example=1.0)
     })
     
-    # Account models
-    account_model = api.model('Account', {
+    # Trading Account models
+    account_model = api.model('TradingAccount', {
         'id': fields.Integer(example=1),
         'name': fields.String(required=True, example='Main Account'),
         'currency_id': fields.Integer(example=1),
@@ -109,8 +109,8 @@ def create_swagger_models(api: Api) -> Dict[str, Any]:
         'created_at': fields.String(example='2025-01-15T10:30:00Z')
     })
     
-    account_create = api.model('AccountCreate', {
-        'name': fields.String(required=True, example='Main Account'),
+    account_create = api.model('TradingAccountCreate', {
+        'name': fields.String(required=True, example='Main Trading Account'),
         'currency_id': fields.Integer(required=True, example=1),
         'status': fields.String(example='open'),
         'cash_balance': fields.Float(example=10000.0),

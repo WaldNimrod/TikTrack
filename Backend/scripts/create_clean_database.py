@@ -551,7 +551,7 @@ def create_tables(cursor):
             advanced_alerts_json TEXT, 
             import_export_settings_json TEXT, 
             version VARCHAR(20), 
-            migrated_from_v1 BOOLEAN, 
+            migrated_from_legacy BOOLEAN, 
             migration_date DATETIME, 
             last_validation DATETIME, 
             validation_errors_json TEXT, 

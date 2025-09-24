@@ -163,7 +163,7 @@ class V2IntegrationTester:
         """בדוק שהגיבוי של V1 קיים"""
         backup_dirs = []
         for item in os.listdir('backups/'):
-            if 'preferences_v1_legacy_backup' in item:
+            if 'preferences_legacy_backup' in item:
                 backup_dirs.append(item)
         
         if not backup_dirs:

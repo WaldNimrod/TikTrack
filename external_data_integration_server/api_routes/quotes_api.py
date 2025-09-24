@@ -10,7 +10,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 # Create blueprint
-quotes_bp = Blueprint('quotes', __name__, url_prefix='/api/v1/quotes')
+quotes_bp = Blueprint('quotes', __name__, url_prefix='/api/quotes')
 
 
 @quotes_bp.route('/<int:ticker_id>', methods=['GET'])

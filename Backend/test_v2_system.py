@@ -28,7 +28,7 @@ def test_v2_api_endpoints():
         endpoints_to_test = [
             '/api/v2/preferences/',
             '/api/v2/preferences/profiles',
-            '/api/v2/preferences/compatibility/v1'
+            '/api/v2/preferences/compatibility/legacy'
         ]
         
         for endpoint in endpoints_to_test:
@@ -74,7 +74,7 @@ def test_v2_data_integrity():
         
         # בדוק יושרת הנתונים
         cursor.execute("""
-            SELECT pp.profile_name, up2.primary_currency, up2.migrated_from_v1
+            SELECT pp.profile_name, up2.primary_currency, up2.migrated_from_legacy
             FROM preference_profiles pp
             JOIN user_preferences_v2 up2 ON pp.id = up2.profile_id
             WHERE pp.user_id = 1

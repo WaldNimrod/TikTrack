@@ -279,8 +279,10 @@ window.appInitializer.registerStageFunction('core', async (pageConfig) => {
     console.log('🔧 Initializing Core Systems...');
     
     // Initialize notification system
-    if (typeof window.NotificationSystem !== 'undefined') {
+    if (typeof window.NotificationSystem !== 'undefined' && typeof window.NotificationSystem.initialize === 'function') {
         await window.NotificationSystem.initialize();
+    } else {
+        console.log('⚠️ NotificationSystem.initialize not available');
     }
     
     // Initialize preferences system

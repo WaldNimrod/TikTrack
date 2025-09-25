@@ -298,7 +298,7 @@ function restoreNotesSectionState() {
 window.openNoteDetails = openNoteDetails;
 window.editNote = editNote;
 window.deleteNote = deleteNote;
-window.toggleSection = toggleSection;
+// window.toggleSection removed - using global version from ui-utils.js
 // toggleSection export removed - use toggleSection('main') instead
 window.restoreNotesSectionState = restoreNotesSectionState;
 
@@ -2193,7 +2193,7 @@ function loadNotesData() {
 
 // ===== GLOBAL EXPORTS =====
 // Export functions to global scope for onclick attributes
-window.toggleSection = toggleSection;
+// window.toggleSection removed - using global version from ui-utils.js
 // toggleSection export removed - use toggleSection('main') instead
 window.openNoteDetails = openNoteDetails;
 window.editNote = editNote;

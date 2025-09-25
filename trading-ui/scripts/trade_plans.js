@@ -2687,7 +2687,7 @@ window.restoreSortState = restoreSortState;
 window.restoreDesignsSectionState = restoreDesignsSectionState;
 
 // Adding toggle functions to global scope
-window.toggleSection = toggleSection;
+// window.toggleSection removed - using global version from ui-utils.js
 // toggleSection export removed - use toggleSection('main') instead
 window.restorePlanningSectionState = restorePlanningSectionState;
 

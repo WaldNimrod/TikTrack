@@ -3632,7 +3632,7 @@ function addNewTicker() {
 
 // ===== GLOBAL EXPORTS =====
 // Export functions to global scope for onclick attributes
-window.toggleSection = toggleSection;
+// window.toggleSection removed - using global version from ui-utils.js
 window.toggleExecutionsSection = toggleExecutionsSection;
 window.openExecutionDetails = openExecutionDetails;
 window.saveExecution = saveExecution;

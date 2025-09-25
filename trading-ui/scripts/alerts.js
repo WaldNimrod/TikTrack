@@ -2192,11 +2192,7 @@ function restoreAlertsSectionState() {
 }
 
 // הגנה - וידוא שהפונקציות הגלובליות זמינות
-if (typeof window.toggleSection !== 'function') {
-  window.toggleSection = function () {
-    // console.warn('toggleSection fallback called - main.js may not be loaded properly');
-  };
-}
+// toggleSection fallback removed - using global version from ui-utils.js
 
 // toggleSection fallback removed - use toggleSection('main') instead
 
@@ -2776,7 +2772,7 @@ function generateDetailedLog() {
 
 
 // Export functions to global scope for onclick attributes
-window.toggleSection = toggleSection;
+// window.toggleSection removed - using global version from ui-utils.js
 // window.toggleSection export removed - using global version from ui-utils.js
 window.filterAlertsByRelatedObjectType = filterAlertsByRelatedObjectType;
 window.loadAlertsData = loadAlertsData;

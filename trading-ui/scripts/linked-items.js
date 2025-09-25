@@ -2,6 +2,10 @@
  * Linked Items - TikTrack Linked Items Management
  * ===============================================
  *
+ * 🔗 מערכת האובייקטים המקושרים - כוללת גם פילטרים
+ * 
+ * קשור ל: related-object-filters.js (פילטרים לפי סוג אובייקט מקושר)
+ * 
  * REFACTORING HISTORY:
  * ===================
  *

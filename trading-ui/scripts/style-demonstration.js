@@ -248,7 +248,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Export functions to global scope for onclick attributes
 // window.toggleAllSections export removed - using global version from ui-utils.js
 // window.toggleSection export removed - using global version from ui-utils.js
-window.toggleSection = toggleSection;
+// window.toggleSection removed - using global version from ui-utils.js
 window.toggleLayer = toggleLayer;
 window.enableAllStyles = enableAllStyles;
 window.disableAllStyles = disableAllStyles;

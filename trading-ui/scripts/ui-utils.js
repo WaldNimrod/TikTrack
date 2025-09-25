@@ -955,6 +955,56 @@ window.toggleAllSections = function () {
 };
 
 /**
+ * Restore all section states from localStorage
+ * This function restores the collapsed/expanded state of all sections after page refresh
+ * Works with the unified section toggle system
+ */
+window.restoreAllSectionStates = function () {
+  console.log(`🔧 restoreAllSectionStates called`);
+  
+  const sections = document.querySelectorAll('.content-section, .top-section');
+  console.log(`🔍 Found ${sections.length} sections to restore`);
+  
+  let restoredCount = 0;
+  
+  sections.forEach((section, index) => {
+    const sectionId = section.getAttribute('data-section') || section.id;
+    const sectionBody = section.querySelector('.section-body');
+    const toggleBtn = section.querySelector('button[onclick*="toggleSection"]');
+    const icon = toggleBtn ? toggleBtn.querySelector('.section-toggle-icon, .filter-icon, .filter-arrow') : null;
+
+    console.log(`🔧 Processing section ${index + 1}/${sections.length}: ID="${sectionId}"`);
+
+    if (sectionBody && sectionId) {
+      // Check localStorage for saved state
+      const isHidden = localStorage.getItem(`${sectionId}SectionHidden`) === 'true';
+      console.log(`💾 Retrieved state for "${sectionId}": hidden=${isHidden}`);
+
+      if (isHidden) {
+        // Restore collapsed state
+        sectionBody.classList.add('collapsed');
+        sectionBody.style.display = 'none';
+        if (icon) { icon.textContent = '▼'; }
+        console.log(`✅ Section "${sectionId}" RESTORED to COLLAPSED`);
+      } else {
+        // Restore expanded state (default)
+        sectionBody.classList.remove('collapsed');
+        sectionBody.style.display = 'block';
+        if (icon) { icon.textContent = '▲'; }
+        console.log(`✅ Section "${sectionId}" RESTORED to EXPANDED`);
+      }
+      
+      restoredCount++;
+    } else {
+      console.log(`⚠️ No section body or ID found for section ${index + 1}`);
+    }
+  });
+  
+  console.log(`✅ restoreAllSectionStates completed - restored ${restoredCount}/${sections.length} sections`);
+  return restoredCount;
+};
+
+/**
  * Restore section states from localStorage
  * Called on page load to restore previous section states
  */
@@ -1350,6 +1400,7 @@ function loadSectionStates() {
 window.toggleAllSections = toggleAllSections;
 window.toggleSectionGlobal = window.toggleSection;
 window.toggleAllSectionsGlobal = window.toggleAllSections;
+window.toggleTopSection = toggleTopSection;
 window.loadSectionStates = loadSectionStates;
 
 // Load section states when DOM is ready

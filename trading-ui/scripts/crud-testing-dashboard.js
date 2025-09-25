@@ -610,7 +610,7 @@ window.checkConnection = checkConnection;
 window.markPageComplete = markPageComplete;
 window.markPagePartial = markPagePartial;
 // window.copyDetailedLog export removed - using global version from system-management.js
-window.toggleSection = toggleSection;
+// window.toggleSection removed - using global version from ui-utils.js
 // window.toggleAllSections export removed - using global version from ui-utils.js
 // window.toggleSection export removed - using global version from ui-utils.js
 

@@ -1194,3 +1194,287 @@ window.clearCacheAndRefresh = async (pageType) => {
   
   console.log(`✅ Cache cleared and page refreshed: ${pageType}`);
 };
+
+// ===== CENTRAL REFRESH HANDLER FUNCTIONS =====
+// פונקציות ניהול רענון מרכזיות
+
+/**
+ * Register refresh handler for a specific page or component
+ * רישום מטפל רענון לעמוד או רכיב ספציפי
+ * 
+ * @param {string} handlerId - מזהה ייחודי למטפל
+ * @param {Function} refreshFunction - פונקציית הרענון
+ * @param {Object} options - אפשרויות נוספות
+ */
+function registerRefreshHandler(handlerId, refreshFunction, options = {}) {
+  try {
+    console.log(`📝 Registering refresh handler: ${handlerId}`);
+    
+    // בדיקה שהפונקציה תקינה
+    if (typeof refreshFunction !== 'function') {
+      throw new Error('Refresh function must be a valid function');
+    }
+    
+    // יצירת מטפל רענון
+    const handler = {
+      id: handlerId,
+      function: refreshFunction,
+      options: {
+        autoRefresh: options.autoRefresh || false,
+        interval: options.interval || 30000, // 30 seconds default
+        enabled: options.enabled !== false, // enabled by default
+        priority: options.priority || 'normal', // low, normal, high
+        dependencies: options.dependencies || [],
+        ...options
+      },
+      lastRefresh: 0,
+      refreshCount: 0,
+      isActive: false
+    };
+    
+    // שמירה במערכת המרכזית
+    if (!window.centralRefresh.refreshHandlers) {
+      window.centralRefresh.refreshHandlers = new Map();
+    }
+    
+    window.centralRefresh.refreshHandlers.set(handlerId, handler);
+    
+    // הפעלת רענון אוטומטי אם מוגדר
+    if (handler.options.autoRefresh && handler.options.enabled) {
+      startAutoRefresh(handlerId);
+    }
+    
+    console.log(`✅ Refresh handler registered: ${handlerId}`);
+    return true;
+    
+  } catch (error) {
+    console.error(`❌ Error registering refresh handler ${handlerId}:`, error);
+    return false;
+  }
+}
+
+/**
+ * Trigger page refresh for a specific handler
+ * הפעלת רענון עמוד עבור מטפל ספציפי
+ * 
+ * @param {string} handlerId - מזהה המטפל
+ * @param {Object} options - אפשרויות רענון
+ */
+async function triggerPageRefresh(handlerId, options = {}) {
+  try {
+    console.log(`🔄 Triggering page refresh: ${handlerId}`);
+    
+    // בדיקה שהמטפל קיים
+    if (!window.centralRefresh.refreshHandlers || !window.centralRefresh.refreshHandlers.has(handlerId)) {
+      console.warn(`⚠️ Refresh handler not found: ${handlerId}`);
+      return false;
+    }
+    
+    const handler = window.centralRefresh.refreshHandlers.get(handlerId);
+    
+    // בדיקה שהמטפל מופעל
+    if (!handler.options.enabled) {
+      console.log(`⏭️ Refresh handler disabled: ${handlerId}`);
+      return false;
+    }
+    
+    // בדיקה אם צריך רענון (לא יותר מדי תכוף)
+    const now = Date.now();
+    if (!options.force && (now - handler.lastRefresh) < 1000) {
+      console.log(`⏭️ Refresh too recent for handler: ${handlerId}`);
+      return true;
+    }
+    
+    // הפעלת הפונקציה
+    try {
+      await handler.function(options);
+      
+      // עדכון סטטיסטיקות
+      handler.lastRefresh = now;
+      handler.refreshCount++;
+      
+      console.log(`✅ Page refresh completed: ${handlerId} (count: ${handler.refreshCount})`);
+      return true;
+      
+    } catch (error) {
+      console.error(`❌ Error in refresh function for ${handlerId}:`, error);
+      return false;
+    }
+    
+  } catch (error) {
+    console.error(`❌ Error triggering page refresh ${handlerId}:`, error);
+    return false;
+  }
+}
+
+/**
+ * Check if auto refresh is enabled for a handler
+ * בדיקה אם רענון אוטומטי מופעל עבור מטפל
+ * 
+ * @param {string} handlerId - מזהה המטפל
+ * @returns {boolean} האם רענון אוטומטי מופעל
+ */
+function autoRefreshEnabled(handlerId) {
+  try {
+    if (!window.centralRefresh.refreshHandlers || !window.centralRefresh.refreshHandlers.has(handlerId)) {
+      return false;
+    }
+    
+    const handler = window.centralRefresh.refreshHandlers.get(handlerId);
+    return handler.options.autoRefresh && handler.options.enabled;
+    
+  } catch (error) {
+    console.error(`❌ Error checking auto refresh status for ${handlerId}:`, error);
+    return false;
+  }
+}
+
+/**
+ * Start auto refresh for a handler
+ * הפעלת רענון אוטומטי עבור מטפל
+ * 
+ * @param {string} handlerId - מזהה המטפל
+ */
+function startAutoRefresh(handlerId) {
+  try {
+    if (!window.centralRefresh.refreshHandlers || !window.centralRefresh.refreshHandlers.has(handlerId)) {
+      console.warn(`⚠️ Cannot start auto refresh - handler not found: ${handlerId}`);
+      return;
+    }
+    
+    const handler = window.centralRefresh.refreshHandlers.get(handlerId);
+    
+    // בדיקה אם כבר מופעל
+    if (handler.isActive) {
+      console.log(`⏭️ Auto refresh already active for: ${handlerId}`);
+      return;
+    }
+    
+    // הפעלת הרענון האוטומטי
+    handler.isActive = true;
+    handler.intervalId = setInterval(async () => {
+      if (handler.options.enabled && handler.options.autoRefresh) {
+        await triggerPageRefresh(handlerId);
+      } else {
+        stopAutoRefresh(handlerId);
+      }
+    }, handler.options.interval);
+    
+    console.log(`✅ Auto refresh started for: ${handlerId} (interval: ${handler.options.interval}ms)`);
+    
+  } catch (error) {
+    console.error(`❌ Error starting auto refresh for ${handlerId}:`, error);
+  }
+}
+
+/**
+ * Stop auto refresh for a handler
+ * עצירת רענון אוטומטי עבור מטפל
+ * 
+ * @param {string} handlerId - מזהה המטפל
+ */
+function stopAutoRefresh(handlerId) {
+  try {
+    if (!window.centralRefresh.refreshHandlers || !window.centralRefresh.refreshHandlers.has(handlerId)) {
+      console.warn(`⚠️ Cannot stop auto refresh - handler not found: ${handlerId}`);
+      return;
+    }
+    
+    const handler = window.centralRefresh.refreshHandlers.get(handlerId);
+    
+    if (handler.intervalId) {
+      clearInterval(handler.intervalId);
+      handler.intervalId = null;
+    }
+    
+    handler.isActive = false;
+    console.log(`✅ Auto refresh stopped for: ${handlerId}`);
+    
+  } catch (error) {
+    console.error(`❌ Error stopping auto refresh for ${handlerId}:`, error);
+  }
+}
+
+/**
+ * Enable/disable a refresh handler
+ * הפעלה/השבתה של מטפל רענון
+ * 
+ * @param {string} handlerId - מזהה המטפל
+ * @param {boolean} enabled - האם להפעיל
+ */
+function setRefreshHandlerEnabled(handlerId, enabled) {
+  try {
+    if (!window.centralRefresh.refreshHandlers || !window.centralRefresh.refreshHandlers.has(handlerId)) {
+      console.warn(`⚠️ Cannot set enabled status - handler not found: ${handlerId}`);
+      return false;
+    }
+    
+    const handler = window.centralRefresh.refreshHandlers.get(handlerId);
+    handler.options.enabled = enabled;
+    
+    // הפעלה/עצירה של רענון אוטומטי
+    if (enabled && handler.options.autoRefresh) {
+      startAutoRefresh(handlerId);
+    } else if (!enabled) {
+      stopAutoRefresh(handlerId);
+    }
+    
+    console.log(`✅ Refresh handler ${enabled ? 'enabled' : 'disabled'}: ${handlerId}`);
+    return true;
+    
+  } catch (error) {
+    console.error(`❌ Error setting enabled status for ${handlerId}:`, error);
+    return false;
+  }
+}
+
+/**
+ * Get refresh handler statistics
+ * קבלת סטטיסטיקות מטפלי רענון
+ * 
+ * @returns {Object} סטטיסטיקות
+ */
+function getRefreshHandlerStats() {
+  try {
+    if (!window.centralRefresh.refreshHandlers) {
+      return { totalHandlers: 0, activeHandlers: 0, handlers: {} };
+    }
+    
+    const stats = {
+      totalHandlers: window.centralRefresh.refreshHandlers.size,
+      activeHandlers: 0,
+      handlers: {}
+    };
+    
+    for (const [handlerId, handler] of window.centralRefresh.refreshHandlers) {
+      stats.handlers[handlerId] = {
+        enabled: handler.options.enabled,
+        autoRefresh: handler.options.autoRefresh,
+        isActive: handler.isActive,
+        refreshCount: handler.refreshCount,
+        lastRefresh: handler.lastRefresh,
+        interval: handler.options.interval,
+        priority: handler.options.priority
+      };
+      
+      if (handler.isActive) {
+        stats.activeHandlers++;
+      }
+    }
+    
+    return stats;
+    
+  } catch (error) {
+    console.error('❌ Error getting refresh handler stats:', error);
+    return { totalHandlers: 0, activeHandlers: 0, handlers: {} };
+  }
+}
+
+// Export refresh handler functions
+window.registerRefreshHandler = registerRefreshHandler;
+window.triggerPageRefresh = triggerPageRefresh;
+window.autoRefreshEnabled = autoRefreshEnabled;
+window.startAutoRefresh = startAutoRefresh;
+window.stopAutoRefresh = stopAutoRefresh;
+window.setRefreshHandlerEnabled = setRefreshHandlerEnabled;
+window.getRefreshHandlerStats = getRefreshHandlerStats;

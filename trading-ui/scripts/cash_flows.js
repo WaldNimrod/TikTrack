@@ -1787,7 +1787,7 @@ window.initializeExternalIdFields = initializeExternalIdFields;
 window.deleteCashFlow = deleteCashFlow;
 window.showAddCashFlowModal = showAddCashFlowModal;
 window.showEditCashFlowModal = showEditCashFlowModal;
-window.toggleSection = toggleSection;
+// window.toggleSection removed - using global version from ui-utils.js
 window.editCashFlow = editCashFlow;
 window.loadCashFlowsData = loadCashFlowsData;
 window.updateCashFlowsTable = updateCashFlowsTable;

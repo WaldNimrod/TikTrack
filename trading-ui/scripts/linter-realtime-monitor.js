@@ -2371,7 +2371,7 @@ window.checkExistingScanResults = checkExistingScanResults;
 window.loadExistingFileMapping = loadExistingFileMapping;
 // // window.copyDetailedLog export removed - using global version from system-management.js // REMOVED: Development mechanism - page-specific only
 // window.copyLinterDetailedLog = copyDetailedLog; // REMOVED: Development mechanism - page-specific only
-window.toggleSection = toggleSection;
+// window.toggleSection removed - using global version from ui-utils.js
 // window.toggleSection export removed - using global version from ui-utils.js
 window.refreshFileList = refreshFileList;
 window.clearFileCache = clearFileCache;

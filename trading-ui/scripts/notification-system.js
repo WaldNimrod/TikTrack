@@ -874,7 +874,15 @@ window.NotificationSystem = {
     getGlobal: window.getGlobalNotifications,
     clearGlobal: window.clearGlobalNotifications,
     migrate: window.migrateNotifications,
-    isMigrationNeeded: window.isMigrationNeeded
+    isMigrationNeeded: window.isMigrationNeeded,
+    initialize: function() {
+        console.log('🚀 NotificationSystem.initialize called');
+        // Initialize notification system if needed
+        if (window.notificationSystemTester) {
+            window.notificationSystemTester.runAllTests();
+        }
+        return true;
+    }
 };
 
 // בדיקת פונקציות בסוף טעינת notification-system.js

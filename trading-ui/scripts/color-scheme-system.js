@@ -2156,8 +2156,236 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+// ===== COLOR SCHEME MANAGEMENT FUNCTIONS =====
+// פונקציות ניהול סכמות צבעים
+
+/**
+ * Apply color scheme to the application
+ * יישום סכמת צבעים על האפליקציה
+ * 
+ * @param {string} schemeName - שם הסכמה (light, dark, custom)
+ * @param {Object} customColors - צבעים מותאמים אישית (אופציונלי)
+ */
+function applyColorScheme(schemeName = 'light', customColors = null) {
+  try {
+    console.log(`🎨 Applying color scheme: ${schemeName}`);
+    
+    // Remove existing scheme classes
+    document.body.classList.remove('light-scheme', 'dark-scheme', 'custom-scheme');
+    
+    // Apply new scheme
+    document.body.classList.add(`${schemeName}-scheme`);
+    
+    // Store current scheme
+    localStorage.setItem('colorScheme', schemeName);
+    
+    // Apply scheme-specific colors
+    switch (schemeName) {
+      case 'light':
+        applyLightScheme();
+        break;
+      case 'dark':
+        applyDarkScheme();
+        break;
+      case 'custom':
+        if (customColors) {
+          applyCustomScheme(customColors);
+        }
+        break;
+      default:
+        console.warn(`⚠️ Unknown color scheme: ${schemeName}`);
+        applyLightScheme();
+    }
+    
+    // Update CSS variables
+    updateCSSVariablesFromPreferences(window.currentPreferences || {});
+    
+    // Dispatch event for other systems
+    window.dispatchEvent(new CustomEvent('colorSchemeChanged', {
+      detail: { scheme: schemeName, customColors }
+    }));
+    
+    console.log(`✅ Color scheme ${schemeName} applied successfully`);
+    
+  } catch (error) {
+    console.error('❌ Error applying color scheme:', error);
+  }
+}
+
+/**
+ * Toggle between light and dark color schemes
+ * החלפה בין סכמות צבעים בהירות וכהה
+ */
+function toggleColorScheme() {
+  try {
+    const currentScheme = getCurrentColorScheme();
+    const newScheme = currentScheme === 'light' ? 'dark' : 'light';
+    
+    console.log(`🔄 Toggling color scheme from ${currentScheme} to ${newScheme}`);
+    applyColorScheme(newScheme);
+    
+  } catch (error) {
+    console.error('❌ Error toggling color scheme:', error);
+  }
+}
+
+/**
+ * Load color scheme from localStorage
+ * טעינת סכמת צבעים מ-localStorage
+ * 
+ * @returns {string} שם הסכמה הנוכחית
+ */
+function loadColorScheme() {
+  try {
+    const savedScheme = localStorage.getItem('colorScheme') || 'light';
+    console.log(`📥 Loading color scheme: ${savedScheme}`);
+    
+    // Apply the saved scheme
+    applyColorScheme(savedScheme);
+    
+    return savedScheme;
+    
+  } catch (error) {
+    console.error('❌ Error loading color scheme:', error);
+    return 'light';
+  }
+}
+
+/**
+ * Save color scheme to localStorage
+ * שמירת סכמת צבעים ב-localStorage
+ * 
+ * @param {string} schemeName - שם הסכמה לשמירה
+ * @param {Object} customColors - צבעים מותאמים אישית (אופציונלי)
+ */
+function saveColorScheme(schemeName, customColors = null) {
+  try {
+    console.log(`💾 Saving color scheme: ${schemeName}`);
+    
+    // Save scheme name
+    localStorage.setItem('colorScheme', schemeName);
+    
+    // Save custom colors if provided
+    if (customColors && schemeName === 'custom') {
+      localStorage.setItem('customColorScheme', JSON.stringify(customColors));
+    }
+    
+    // Update current preferences
+    if (window.currentPreferences) {
+      window.currentPreferences.colorScheme = schemeName;
+      if (customColors) {
+        window.currentPreferences.customColors = customColors;
+      }
+    }
+    
+    console.log(`✅ Color scheme ${schemeName} saved successfully`);
+    
+  } catch (error) {
+    console.error('❌ Error saving color scheme:', error);
+  }
+}
+
+/**
+ * Get current color scheme
+ * קבלת סכמת הצבעים הנוכחית
+ * 
+ * @returns {string} שם הסכמה הנוכחית
+ */
+function getCurrentColorScheme() {
+  try {
+    return localStorage.getItem('colorScheme') || 'light';
+  } catch (error) {
+    console.error('❌ Error getting current color scheme:', error);
+    return 'light';
+  }
+}
+
+/**
+ * Apply light color scheme
+ * יישום סכמת צבעים בהירה
+ */
+function applyLightScheme() {
+  try {
+    // Light scheme is the default - no special changes needed
+    console.log('☀️ Applying light color scheme');
+    
+    // Ensure light theme variables are set
+    document.documentElement.style.setProperty('--scheme-background', '#ffffff');
+    document.documentElement.style.setProperty('--scheme-text', '#212529');
+    document.documentElement.style.setProperty('--scheme-border', '#dee2e6');
+    document.documentElement.style.setProperty('--scheme-card', '#ffffff');
+    
+  } catch (error) {
+    console.error('❌ Error applying light scheme:', error);
+  }
+}
+
+/**
+ * Apply dark color scheme
+ * יישום סכמת צבעים כהה
+ */
+function applyDarkScheme() {
+  try {
+    console.log('🌙 Applying dark color scheme');
+    
+    // Set dark theme variables
+    document.documentElement.style.setProperty('--scheme-background', '#1a1a1a');
+    document.documentElement.style.setProperty('--scheme-text', '#ffffff');
+    document.documentElement.style.setProperty('--scheme-border', '#404040');
+    document.documentElement.style.setProperty('--scheme-card', '#2d2d2d');
+    
+    // Note: Dark mode support was removed in January 2025
+    // This function is kept for future implementation
+    
+  } catch (error) {
+    console.error('❌ Error applying dark scheme:', error);
+  }
+}
+
+/**
+ * Apply custom color scheme
+ * יישום סכמת צבעים מותאמת אישית
+ * 
+ * @param {Object} customColors - צבעים מותאמים אישית
+ */
+function applyCustomScheme(customColors) {
+  try {
+    console.log('🎨 Applying custom color scheme');
+    
+    // Apply custom colors to CSS variables
+    Object.entries(customColors).forEach(([key, value]) => {
+      document.documentElement.style.setProperty(`--custom-${key}`, value);
+    });
+    
+  } catch (error) {
+    console.error('❌ Error applying custom scheme:', error);
+  }
+}
+
+/**
+ * Get available color schemes
+ * קבלת סכמות צבעים זמינות
+ * 
+ * @returns {Array} רשימת סכמות צבעים זמינות
+ */
+function getAvailableColorSchemes() {
+  return [
+    { name: 'light', label: 'בהיר', description: 'סכמת צבעים בהירה' },
+    { name: 'dark', label: 'כהה', description: 'סכמת צבעים כהה (לא נתמכת כרגע)' },
+    { name: 'custom', label: 'מותאם אישית', description: 'סכמת צבעים מותאמת אישית' }
+  ];
+}
+
 // ===== EXPORTS =====
 // ייצוא הפונקציות
+
+// Export color scheme management functions
+window.applyColorScheme = applyColorScheme;
+window.toggleColorScheme = toggleColorScheme;
+window.loadColorScheme = loadColorScheme;
+window.saveColorScheme = saveColorScheme;
+window.getCurrentColorScheme = getCurrentColorScheme;
+window.getAvailableColorSchemes = getAvailableColorSchemes;
 
 // Export to global scope for backward compatibility
 window.getInvestmentTypeColor = getInvestmentTypeColor;

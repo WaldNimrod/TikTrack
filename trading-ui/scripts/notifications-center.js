@@ -1366,7 +1366,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.testErrorNotification = testErrorNotification;
   window.testWarningNotification = testWarningNotification;
   window.testInfoNotification = testInfoNotification;
-  window.toggleSection = toggleSection;
+  // window.toggleSection removed - using global version from ui-utils.js
   // window.toggleAllSections export removed - using global version from ui-utils.js
   // window.toggleSection export removed - using global version from ui-utils.js
 

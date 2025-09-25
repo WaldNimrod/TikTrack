@@ -34,7 +34,7 @@ function testTrigger(triggerId) {
 
 // ===== GLOBAL EXPORTS =====
 // Export functions to global scope for onclick attributes
-window.toggleSection = toggleSection;
+// window.toggleSection removed - using global version from ui-utils.js
 // window.toggleSection export removed - using global version from ui-utils.js
 // window.sortTable export removed - using global version from tables.js
 window.showTriggerDetails = showTriggerDetails;

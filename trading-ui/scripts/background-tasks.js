@@ -867,9 +867,7 @@ window.showHistoryDetails = function(executionId) {
   utils.showNotification('פונקציונליות זו תתווסף בקרוב', 'info');
 };
 
-window.closeModal = function() {
-  modalManager.closeModal();
-};
+// window.closeModal removed - using global version from tables.js
 
 // Auto-refresh functionality
 const autoRefresh = {

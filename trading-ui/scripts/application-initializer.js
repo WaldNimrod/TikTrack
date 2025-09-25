@@ -288,6 +288,21 @@ window.appInitializer.registerStageFunction('core', async (pageConfig) => {
         window.preferencesCache.clear();
     }
     
+    // Initialize favicon system
+    if (typeof window.restoreFaviconFromStatus === 'function') {
+        window.restoreFaviconFromStatus();
+    }
+    
+    // Initialize color scheme system
+    if (typeof window.loadColorScheme === 'function') {
+        window.loadColorScheme();
+    }
+    
+    // Initialize central refresh system
+    if (typeof window.centralRefresh !== 'undefined') {
+        console.log('✅ Central refresh system initialized');
+    }
+    
     console.log('✅ Core Systems initialized');
 }, { name: 'CoreSystemsInit', required: true });
 
@@ -352,6 +367,12 @@ window.appInitializer.registerStageFunction('validation', async (pageConfig) => 
 // Stage 5: Finalization
 window.appInitializer.registerStageFunction('final', async (pageConfig) => {
     console.log('🔧 Finalizing Application...');
+    
+    // Restore section states
+    if (typeof window.restoreAllSectionStates === 'function') {
+        const restoredCount = window.restoreAllSectionStates();
+        console.log(`✅ Restored ${restoredCount} section states`);
+    }
     
     // Restore page state
     if (typeof window.loadPageState === 'function') {

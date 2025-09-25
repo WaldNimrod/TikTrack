@@ -1934,7 +1934,7 @@ window.deleteTicker = deleteTicker;
 window.cancelTicker = cancelTicker;
 window.performCancelTicker = performCancelTicker;
 window.updateAllTickerStatuses = updateAllTickerStatuses;
-window.toggleSection = toggleSection;
+// window.toggleSection removed - using global version from ui-utils.js
 window.toggleTickersSection = toggleTickersSection;
 window.restoreTickersSectionState = restoreTickersSectionState;
 window.clearTickersCache = clearTickersCache;
@@ -2415,7 +2415,7 @@ function generateDetailedLog() {
 
 window.filterTickersByType = filterTickersByType;
 window.getTypeDisplayName = getTypeDisplayName;
-window.toggleSection = toggleSection;
+// window.toggleSection removed - using global version from ui-utils.js
 window.toggleTickersSection = toggleTickersSection;
 window.showAddTickerModal = showAddTickerModal;
 window.saveTicker = saveTicker;

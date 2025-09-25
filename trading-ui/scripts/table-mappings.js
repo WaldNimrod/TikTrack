@@ -643,6 +643,178 @@ function isTableSupported(tableType) {
   return tableType in TABLE_COLUMN_MAPPINGS;
 }
 
+/**
+ * Get table configuration object
+ * Returns complete configuration for a table including columns, headers, and settings
+ *
+ * @param {string} tableName - Table identifier
+ * @returns {Object} Table configuration object
+ */
+function getTableConfig(tableName) {
+  const columns = TABLE_COLUMN_MAPPINGS[tableName] || [];
+  
+  // Default configuration
+  const defaultConfig = {
+    name: tableName,
+    columns: columns,
+    sortable: true,
+    filterable: true,
+    searchable: true,
+    pagination: {
+      enabled: true,
+      pageSize: 50,
+      pageSizeOptions: [10, 25, 50, 100]
+    },
+    display: {
+      showActions: true,
+      showStatus: true,
+      showDates: true
+    }
+  };
+
+  // Table-specific configurations
+  const tableConfigs = {
+    'trades': {
+      ...defaultConfig,
+      sortable: true,
+      filterable: true,
+      display: {
+        ...defaultConfig.display,
+        showActions: true,
+        showStatus: true,
+        showDates: true
+      }
+    },
+    'executions': {
+      ...defaultConfig,
+      sortable: true,
+      filterable: false,
+      display: {
+        ...defaultConfig.display,
+        showActions: false,
+        showStatus: false,
+        showDates: true
+      }
+    },
+    'alerts': {
+      ...defaultConfig,
+      sortable: true,
+      filterable: true,
+      display: {
+        ...defaultConfig.display,
+        showActions: true,
+        showStatus: true,
+        showDates: true
+      }
+    },
+    'tickers': {
+      ...defaultConfig,
+      sortable: true,
+      filterable: true,
+      display: {
+        ...defaultConfig.display,
+        showActions: true,
+        showStatus: true,
+        showDates: false
+      }
+    }
+  };
+
+  return tableConfigs[tableName] || defaultConfig;
+}
+
+/**
+ * Get column definition for a specific table and column
+ * Returns detailed information about a specific column
+ *
+ * @param {string} tableName - Table identifier
+ * @param {string} columnName - Column name or index
+ * @returns {Object} Column definition object
+ */
+function getColumnDefinition(tableName, columnName) {
+  const tableMapping = TABLE_COLUMN_MAPPINGS[tableName];
+  if (!tableMapping) {
+    return null;
+  }
+
+  let columnIndex = -1;
+  let fieldName = '';
+
+  // Handle both string column names and numeric indices
+  if (typeof columnName === 'string') {
+    columnIndex = tableMapping.indexOf(columnName);
+    fieldName = columnName;
+  } else if (typeof columnName === 'number') {
+    columnIndex = columnName;
+    fieldName = tableMapping[columnName];
+  }
+
+  if (columnIndex === -1 || !fieldName) {
+    return null;
+  }
+
+  // Default column definition
+  const defaultDefinition = {
+    index: columnIndex,
+    name: fieldName,
+    sortable: true,
+    filterable: true,
+    searchable: true,
+    type: 'string',
+    display: 'text',
+    width: 'auto'
+  };
+
+  // Column-specific definitions
+  const columnDefinitions = {
+    // Date columns
+    'created_at': { ...defaultDefinition, type: 'date', sortable: true, display: 'date' },
+    'updated_at': { ...defaultDefinition, type: 'date', sortable: true, display: 'date' },
+    'opened_at': { ...defaultDefinition, type: 'date', sortable: true, display: 'date' },
+    'closed_at': { ...defaultDefinition, type: 'date', sortable: true, display: 'date' },
+    'cancelled_at': { ...defaultDefinition, type: 'date', sortable: true, display: 'date' },
+    'date': { ...defaultDefinition, type: 'date', sortable: true, display: 'date' },
+    'triggered_at': { ...defaultDefinition, type: 'date', sortable: true, display: 'date' },
+
+    // Numeric columns
+    'id': { ...defaultDefinition, type: 'number', sortable: true, display: 'number', width: '80px' },
+    'quantity': { ...defaultDefinition, type: 'number', sortable: true, display: 'number' },
+    'price': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency' },
+    'amount': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency' },
+    'fee': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency' },
+    'total_pl': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency' },
+    'cash_balance': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency' },
+    'total_value': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency' },
+    'planned_amount': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency' },
+    'stop_price': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency' },
+    'target_price': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency' },
+
+    // Status columns
+    'status': { ...defaultDefinition, type: 'status', sortable: true, display: 'status', filterable: true },
+    'investment_type': { ...defaultDefinition, type: 'enum', sortable: true, display: 'badge', filterable: true },
+    'side': { ...defaultDefinition, type: 'enum', sortable: true, display: 'badge', filterable: true },
+    'type': { ...defaultDefinition, type: 'enum', sortable: true, display: 'badge', filterable: true },
+    'action': { ...defaultDefinition, type: 'enum', sortable: true, display: 'badge', filterable: true },
+
+    // Boolean columns
+    'is_triggered': { ...defaultDefinition, type: 'boolean', sortable: true, display: 'boolean', filterable: true },
+    'active_trades': { ...defaultDefinition, type: 'boolean', sortable: true, display: 'boolean', filterable: true },
+
+    // Text columns (non-sortable)
+    'notes': { ...defaultDefinition, sortable: false, filterable: true, searchable: true, display: 'text' },
+    'message': { ...defaultDefinition, sortable: false, filterable: true, searchable: true, display: 'text' },
+    'description': { ...defaultDefinition, sortable: false, filterable: true, searchable: true, display: 'text' },
+    'content': { ...defaultDefinition, sortable: false, filterable: true, searchable: true, display: 'text' },
+    'reasons': { ...defaultDefinition, sortable: false, filterable: true, searchable: true, display: 'text' },
+    'entry_conditions': { ...defaultDefinition, sortable: false, filterable: true, searchable: true, display: 'text' },
+
+    // Action columns (non-sortable, non-filterable)
+    'actions': { ...defaultDefinition, sortable: false, filterable: false, searchable: false, display: 'actions', width: '120px' }
+  };
+
+  return columnDefinitions[fieldName] || defaultDefinition;
+}
+
 // ===== ייצוא הפונקציות והמיפויים =====
 // Export functions and mappings to global scope
 //
@@ -653,6 +825,8 @@ window.TABLE_COLUMN_MAPPINGS = TABLE_COLUMN_MAPPINGS;
 window.getColumnValue = getColumnValue;
 window.getTableMapping = getTableMapping;
 window.isTableSupported = isTableSupported;
+window.getTableConfig = getTableConfig;
+window.getColumnDefinition = getColumnDefinition;
 
 // ייצוא המודול עצמו
 window.tableMappings = {

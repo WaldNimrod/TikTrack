@@ -54,20 +54,20 @@
 
 ```
 trading-ui/scripts/
-├── header-system.js          # מערכת הכותרת המאוחדת
+├── header-system-new.js     # מערכת הכותרת המאוחדת החדשה (כולל פילטרים)
 ├── tables.js                 # פונקציות טבלאות
 ├── translation-utils.js      # פונקציות תרגום
 ├── data-utils.js            # פונקציות נתונים
 ├── ui-utils.js              # פונקציות ממשק
 ├── page-utils.js            # פונקציות עמודים
 ├── linked-items.js          # פונקציות פריטים מקושרים
+├── related-object-filters.js # פילטרים לאובייקטים מקושרים
 ├── alerts.js                # פונקציות התראות
 ├── active-alerts-component.js # רכיב התראות פעילות
 ├── notification-system.js   # מערכת התראות
 ├── validation-utils.js      # פונקציות ולידציה
 ├── accounts.js              # פונקציות חשבונות
 ├── trades.js                # פונקציות טריידים
-├── alerts.js                # פונקציות התראות
 ├── cash_flows.js            # פונקציות תזרימי מזומן
 └── external_data.js         # פונקציות מידע חיצוני
 ```
@@ -210,7 +210,15 @@ console.log('❌ Error loading data:', error);
 
 ## Version History
 
-### Version 3.0 (August 31, 2025) - CURRENT
+### Version 4.0 (January 15, 2025) - CURRENT
+- **UNIFIED HEADER SYSTEM**: Complete integration of header and filter systems
+- **SINGLE FILE SOLUTION**: All filter functionality now in header-system-new.js
+- **MODULAR ARCHITECTURE**: Clean separation of concerns with integrated filter system
+- **FULL COMPATIBILITY**: All existing filter functions maintained and working
+- **ENHANCED PERFORMANCE**: Optimized filter application and state management
+- **SIMPLIFIED MAINTENANCE**: Single source of truth for all header and filter functionality
+
+### Version 3.0 (August 31, 2025)
 - **COMPLETE FILTER SYSTEM REFACTORING**: Simplified architecture by removing complex functions
 - **NEW FILTER FUNCTIONS**: Replaced complex system with simple, direct filter application
 - **ENGLISH-ONLY LOGIC**: All internal filter logic now uses English column names

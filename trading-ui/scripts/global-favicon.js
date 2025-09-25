@@ -96,10 +96,100 @@ if (document.readyState === 'loading') {
     autoSetFavicon();
 }
 
+/**
+ * Set favicon (alias for setGlobalFavicon)
+ * מגדיר favicon (כינוי ל-setGlobalFavicon)
+ * 
+ * @param {string} iconPath - Path to the icon file
+ * @param {string} iconType - MIME type of the icon
+ */
+function setFavicon(iconPath = 'favicon.ico', iconType = 'image/svg+xml') {
+    return setGlobalFavicon(iconPath, iconType);
+}
+
+/**
+ * Update favicon based on application status
+ * מעדכן favicon לפי סטטוס האפליקציה
+ * 
+ * @param {string} status - Application status (online, offline, error, loading, etc.)
+ */
+function updateFaviconBasedOnStatus(status = 'online') {
+    const statusIcons = {
+        'online': {
+            path: 'favicon.ico',
+            type: 'image/x-icon'
+        },
+        'offline': {
+            path: 'images/icons/offline.svg',
+            type: 'image/svg+xml'
+        },
+        'error': {
+            path: 'images/icons/error.svg',
+            type: 'image/svg+xml'
+        },
+        'loading': {
+            path: 'images/icons/loading.svg',
+            type: 'image/svg+xml'
+        },
+        'warning': {
+            path: 'images/icons/warning.svg',
+            type: 'image/svg+xml'
+        },
+        'success': {
+            path: 'images/icons/success.svg',
+            type: 'image/svg+xml'
+        },
+        'development': {
+            path: 'images/icons/development.svg',
+            type: 'image/svg+xml'
+        },
+        'maintenance': {
+            path: 'images/icons/maintenance.svg',
+            type: 'image/svg+xml'
+        }
+    };
+
+    const iconConfig = statusIcons[status] || statusIcons['online'];
+    
+    try {
+        setGlobalFavicon(iconConfig.path, iconConfig.type);
+        
+        // Store current status in localStorage for persistence
+        localStorage.setItem('appStatus', status);
+        
+        console.log(`✅ Favicon updated for status: ${status}`);
+    } catch (error) {
+        console.warn(`⚠️ Failed to update favicon for status ${status}:`, error);
+    }
+}
+
+/**
+ * Get current application status from localStorage
+ * מקבל סטטוס אפליקציה נוכחי מ-localStorage
+ * 
+ * @returns {string} Current application status
+ */
+function getCurrentAppStatus() {
+    return localStorage.getItem('appStatus') || 'online';
+}
+
+/**
+ * Restore favicon based on saved status
+ * משחזר favicon לפי סטטוס שמור
+ */
+function restoreFaviconFromStatus() {
+    const savedStatus = getCurrentAppStatus();
+    updateFaviconBasedOnStatus(savedStatus);
+}
+
 // Global exposure
 window.setGlobalFavicon = setGlobalFavicon;
 window.setPageSpecificFavicon = setPageSpecificFavicon;
 window.autoSetFavicon = autoSetFavicon;
+window.setFavicon = setFavicon;
+window.updateFaviconBasedOnStatus = updateFaviconBasedOnStatus;
+window.getCurrentAppStatus = getCurrentAppStatus;
+window.restoreFaviconFromStatus = restoreFaviconFromStatus;
 
 console.log('🔧 Global Favicon Manager loaded successfully');
 

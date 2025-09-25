@@ -413,7 +413,7 @@ function addRecord() {
 window.initDatabaseDisplay = initDatabaseDisplay;
 window.loadTableData = loadTableData;
 window.filterTableData = filterTableData;
-window.toggleSection = toggleSection;
+// window.toggleSection removed - using global version from ui-utils.js
 // toggleSection export removed - use toggleSection('main') instead
 window.addRecord = addRecord;
 // window.sortTable export removed - using global version from tables.js

@@ -54,8 +54,15 @@ async function initializeTestingSystem() {
             await headerSystem.init();
             console.log('✅ Header System initialized successfully');
             
-            // Run initial tests
-            await runInitialTests();
+            // Wait a bit for the filter system to be ready
+            setTimeout(() => {
+                console.log('🔧 Filter system should be ready now, registering tables...');
+                // Register tables with filter system
+                registerTablesWithFilterSystem();
+                
+                // Run initial tests
+                runInitialTests();
+            }, 100);
         } else {
             console.error('❌ HeaderSystem not available');
             updateAllStatuses('לא זמין', false);
@@ -64,6 +71,44 @@ async function initializeTestingSystem() {
     } catch (error) {
         console.error('❌ Error initializing testing system:', error);
         updateAllStatuses('שגיאה', false);
+    }
+}
+
+/**
+ * Register Tables with Filter System
+ */
+function registerTablesWithFilterSystem() {
+    try {
+        console.log('🔧 Registering tables with filter system...');
+        
+        // Wait for filter system to be available
+        if (window.filterSystem && typeof window.filterSystem.registerTable === 'function') {
+            
+            // Register tickers table
+            const tickersConfig = {
+                fields: ['symbol', 'status', 'has_trades', 'current_price', 'change_percent', 'investment_type', 'name', 'remarks', 'date'],
+                renderFunction: null
+            };
+            console.log('🔧 Registering tickersTable with config:', tickersConfig);
+            window.filterSystem.registerTable('tickersTable', tickersConfig);
+            console.log('✅ Tickers table registered with filter system');
+            
+            // Register trade plans table
+            const tradePlansConfig = {
+                fields: ['symbol', 'date', 'investment_type', 'side', 'amount', 'target', 'stop', 'current', 'status', 'account'],
+                renderFunction: null
+            };
+            console.log('🔧 Registering tradePlansTable with config:', tradePlansConfig);
+            window.filterSystem.registerTable('tradePlansTable', tradePlansConfig);
+            console.log('✅ Trade plans table registered with filter system');
+            
+            console.log('✅ All tables registered successfully');
+        } else {
+            console.warn('⚠️ Filter system not available for table registration');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error registering tables with filter system:', error);
     }
 }
 
@@ -573,7 +618,7 @@ window.filterTickersByType = filterTickersByType;
 window.toggleTickersSection = toggleTickersSection;
 window.loadActionButtons = loadActionButtons;
 window.loadRealData = loadRealData;
-window.toggleSection = toggleSection;
+// window.toggleSection removed - using global version from ui-utils.js
 // window.toggleSection export removed - using global version from ui-utils.js
 
 // ===== DETAILED LOG FUNCTIONS =====
@@ -841,3 +886,4 @@ async function copyTestHeaderDetailedLog() {
 // Export functions
 window.copyTestHeaderDetailedLog = copyTestHeaderDetailedLog;
 window.generateDetailedLog = generateDetailedLog;
+window.registerTablesWithFilterSystem = registerTablesWithFilterSystem;

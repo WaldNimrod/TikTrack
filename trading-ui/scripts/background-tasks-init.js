@@ -9,17 +9,8 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🔧 Initializing Background Tasks page...');
     
-    // Initialize unified header system
-    if (typeof HeaderSystem !== 'undefined' && window.headerSystem) {
-        console.log("✅ HeaderSystem found, initializing...");
-        window.headerSystem.init();
-    } else {
-        console.log("❌ HeaderSystem not found, creating new instance...");
-        if (typeof HeaderSystem !== 'undefined') {
-            window.headerSystem = new HeaderSystem();
-            window.headerSystem.init();
-        }
-    }
+    // מערכת הכותרת מאותחלת אוטומטית על ידי header-system.js
+    console.log("✅ Header system initialized by header-system.js");
     
     // Initialize filter system
     if (window.filterSystem) {

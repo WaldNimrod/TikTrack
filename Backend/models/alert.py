@@ -8,7 +8,7 @@ class Alert(BaseModel):
     __tablename__ = "alerts"
     
     # Fields that exist in the database
-    account_id = Column(Integer, nullable=True)
+    trading_account_id = Column(Integer, nullable=True)
     ticker_id = Column(Integer, ForeignKey('tickers.id'), nullable=True)
     message = Column(String(500), nullable=True)
     triggered_at = Column(DateTime, nullable=True)
@@ -94,7 +94,7 @@ class Alert(BaseModel):
         # Create result dictionary manually to avoid accessing non-existent columns
         result: Dict[str, Any] = {
             'id': self.id,
-            'account_id': self.account_id,
+            'trading_account_id': self.trading_account_id,
             'ticker_id': self.ticker_id,
             'message': self.message,
             'triggered_at': self.triggered_at.strftime('%Y-%m-%d %H:%M:%S') if self.triggered_at else None,
@@ -124,15 +124,15 @@ class Alert(BaseModel):
         
         # Add fields for backward compatibility
         if self.related_type_id == 1:  # account
-            result['account_id'] = self.related_id
+            result['trading_account_id'] = self.related_id
             result['trade_id'] = None
             result['trade_plan_id'] = None
         elif self.related_type_id == 2:  # trade
-            result['account_id'] = None
+            result['trading_account_id'] = None
             result['trade_id'] = self.related_id
             result['trade_plan_id'] = None
         elif self.related_type_id == 3:  # trade_plan
-            result['account_id'] = None
+            result['trading_account_id'] = None
             result['trade_id'] = None
             result['trade_plan_id'] = self.related_id
         

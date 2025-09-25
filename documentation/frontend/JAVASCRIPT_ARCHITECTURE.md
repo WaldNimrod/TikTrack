@@ -332,12 +332,27 @@ The new unified initialization system replaces 111 DOMContentLoaded listeners ac
 
 ### 🔧 System Functions
 
-#### Filter System (`filter-system.js`)
+#### Header System (`header-system.js`) - **UNIFIED SYSTEM**
 | Function | Description |
 |----------|-------------|
-| `window.resetFiltersManually()` | Reset filters manually |
+| `window.HeaderSystem` | Main header system class |
+| `window.HeaderSystem.FilterSystem` | Integrated filter system class |
+| `window.toggleHeaderFilters()` | Toggle header filters visibility |
+| `window.selectStatusOption(status)` | Select status filter option |
+| `window.selectTypeOption(type)` | Select type filter option |
+| `window.selectAccountOption(account)` | Select account filter option |
+| `window.selectDateRangeOption(dateRange)` | Select date range filter option |
+| `window.updateStatusFilterText()` | Update status filter display text |
+| `window.updateTypeFilterText()` | Update type filter display text |
+| `window.updateAccountFilterText()` | Update account filter display text |
+| `window.updateDateRangeFilterText()` | Update date range filter display text |
+| `window.applyStatusFilter()` | Apply status filter to tables |
+| `window.applyTypeFilter()` | Apply type filter to tables |
+| `window.applyAccountFilter()` | Apply account filter to tables |
+| `window.applyDateRangeFilter(dateRange)` | Apply date range filter to tables |
 | `window.clearAllFilters()` | Clear all filters |
-| `window.loadTradingAccountsForFilter()` | Load trading accounts for filter |
+| `window.resetAllFilters()` | Reset all filters to default |
+| `window.clearSearchFilter()` | Clear search filter |
 
 #### Related Object Filters (`related-object-filters.js`)
 ⚠️ **חשוב**: זהו חלק ממערכת האובייקטים המקושרים (linked-items.js)
@@ -346,17 +361,6 @@ The new unified initialization system replaces 111 DOMContentLoaded listeners ac
 | `window.filterByRelatedObjectType(type, data, updateFunction, countSelector, itemName)` | פילטר לפי סוג אובייקט מקושר |
 | `window.filterAlertsByRelatedObjectType(type)` | פילטר התראות לפי סוג אובייקט |
 | `window.filterNotesByRelatedObjectType(type)` | פילטר הודעות לפי סוג אובייקט |
-| `window.updateTradingAccountFilterOptions()` | Update trading account filter options |
-| `window.useTradingAccountFilterFallback()` | Use trading account filter fallback |
-| `window.getTradingAccountIdByName(tradingAccountName)` | Get trading account ID by name |
-
-#### Header System (`header-system.js`)
-| Function | Description |
-|----------|-------------|
-| `window.HeaderSystem` | Header system class |
-| `window.resetFiltersManually()` | Reset filters manually |
-| `window.clearAllFilters()` | Clear all filters |
-| `window.loadTradingAccountsForFilter()` | Load trading accounts for filter |
 | `window.updateTradingAccountFilterOptions()` | Update trading account filter options |
 | `window.useTradingAccountFilterFallback()` | Use trading account filter fallback |
 | `window.getTradingAccountIdByName(tradingAccountName)` | Get trading account ID by name |
@@ -603,7 +607,7 @@ trading-ui/scripts/
 │   └── db-extradata.js            # Auxiliary tables management
 │
 └── 🔧 System Files
-    ├── filter-system.js           # Advanced filter system
+    ├── header-system.js           # Unified header and filter system
     ├── constraint-manager.js      # Constraint manager
     ├── condition-translator.js    # Condition translator
     └── button-icons.js            # Button icon system
@@ -1015,12 +1019,15 @@ function translateTableData(data, tableType) {
 
 ## 🔧 System Files
 
-### filter-system.js
-**Purpose**: Advanced filter system
-- Complex filtering
-- Filter combinations
+### header-system.js
+**Purpose**: Unified header and filter system
+- Navigation menu
+- Multi-select filters (status, type, account)
+- Single-select filters (date range)
+- Search functionality
 - Filter persistence
 - Filter reset
+- Table integration
 
 ### constraint-manager.js
 **Purpose**: Constraint manager

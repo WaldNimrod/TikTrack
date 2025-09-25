@@ -242,6 +242,129 @@ function formatTimeOnly(dateString) {
 
 // ===== DATE CONVERSION UTILITIES =====
 /**
+ * Parse date string to Date object with multiple format support
+ *
+ * Parses various date string formats and returns a valid Date object
+ * Supports multiple input formats including ISO, Hebrew locale, and custom formats
+ *
+ * @param {string} dateString - Date string to parse
+ * @param {Object} options - Parsing options
+ * @returns {Date|null} Parsed Date object or null for invalid dates
+ */
+function parseDate(dateString, options = {}) {
+  if (!dateString) {return null;}
+
+  try {
+    // Handle different input types
+    if (dateString instanceof Date) {
+      return isNaN(dateString.getTime()) ? null : dateString;
+    }
+
+    if (typeof dateString !== 'string') {
+      return null;
+    }
+
+    // Clean the input string
+    const cleanString = dateString.trim();
+    if (!cleanString) {return null;}
+
+    // Try different parsing strategies
+    let parsedDate = null;
+
+    // Strategy 1: Direct Date constructor (handles most ISO formats)
+    parsedDate = new Date(cleanString);
+    if (!isNaN(parsedDate.getTime())) {
+      return parsedDate;
+    }
+
+    // Strategy 2: Handle Hebrew date format (DD/MM/YYYY)
+    const hebrewDateMatch = cleanString.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (hebrewDateMatch) {
+      const [, day, month, year] = hebrewDateMatch;
+      // Note: JavaScript Date constructor expects MM/DD/YYYY format
+      parsedDate = new Date(`${month}/${day}/${year}`);
+      if (!isNaN(parsedDate.getTime())) {
+        return parsedDate;
+      }
+    }
+
+    // Strategy 3: Handle YYYY-MM-DD format
+    const isoDateMatch = cleanString.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+    if (isoDateMatch) {
+      const [, year, month, day] = isoDateMatch;
+      parsedDate = new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`);
+      if (!isNaN(parsedDate.getTime())) {
+        return parsedDate;
+      }
+    }
+
+    // Strategy 4: Handle DD-MM-YYYY format
+    const europeanDateMatch = cleanString.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
+    if (europeanDateMatch) {
+      const [, day, month, year] = europeanDateMatch;
+      parsedDate = new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`);
+      if (!isNaN(parsedDate.getTime())) {
+        return parsedDate;
+      }
+    }
+
+    // Strategy 5: Handle timestamp (milliseconds)
+    if (/^\d+$/.test(cleanString)) {
+      const timestamp = parseInt(cleanString, 10);
+      // Check if it's a reasonable timestamp (between 1970 and 2100)
+      if (timestamp > 0 && timestamp < 4102444800000) {
+        parsedDate = new Date(timestamp);
+        if (!isNaN(parsedDate.getTime())) {
+          return parsedDate;
+        }
+      }
+    }
+
+    // Strategy 6: Try with custom format if provided
+    if (options.format) {
+      try {
+        // This is a simplified custom format parser
+        // In a full implementation, you might want to use a library like moment.js
+        const formatPatterns = {
+          'DD/MM/YYYY': /^(\d{2})\/(\d{2})\/(\d{4})$/,
+          'MM/DD/YYYY': /^(\d{2})\/(\d{2})\/(\d{4})$/,
+          'YYYY-MM-DD': /^(\d{4})-(\d{2})-(\d{2})$/,
+          'DD-MM-YYYY': /^(\d{2})-(\d{2})-(\d{4})$/
+        };
+
+        const pattern = formatPatterns[options.format];
+        if (pattern) {
+          const match = cleanString.match(pattern);
+          if (match) {
+            let year, month, day;
+            
+            if (options.format === 'DD/MM/YYYY' || options.format === 'DD-MM-YYYY') {
+              [, day, month, year] = match;
+            } else {
+              [, year, month, day] = match;
+            }
+            
+            parsedDate = new Date(`${year}-${month}-${day}`);
+            if (!isNaN(parsedDate.getTime())) {
+              return parsedDate;
+            }
+          }
+        }
+      } catch (error) {
+        // Ignore custom format errors
+      }
+    }
+
+    // If all strategies failed, return null
+    return null;
+
+  } catch (error) {
+    console.warn('⚠️ Error parsing date:', dateString, error);
+    return null;
+  }
+}
+
+/**
  * Convert date to ISO string format
  *
  * Converts any date input to ISO 8601 string format
@@ -436,6 +559,7 @@ window.formatDateOnly = formatDateOnly;
 window.formatShortDate = formatShortDate;
 window.formatLongDate = formatLongDate;
 window.formatTimeOnly = formatTimeOnly;
+window.parseDate = parseDate;
 window.toISOString = toISOString;
 window.toDate = toDate;
 window.isValidDate = isValidDate;
@@ -458,6 +582,7 @@ window.dateUtils = {
   formatShortDate,
   formatLongDate,
   formatTimeOnly,
+  parseDate,
   toISOString,
   toDate,
   isValidDate,

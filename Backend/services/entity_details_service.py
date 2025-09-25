@@ -468,7 +468,7 @@ class EntityDetailsService:
         
         try:
             # Get related trades
-            trades = db.query(Trade).filter(Trade.account_id == account_id).all()
+            trades = db.query(Trade).filter(Trade.trading_account_id == account_id).all()
             for trade in trades:
                 linked_items.append({
                     'id': trade.id,
@@ -479,7 +479,7 @@ class EntityDetailsService:
                 })
             
             # Get related trade plans
-            trade_plans = db.query(TradePlan).filter(TradePlan.account_id == account_id).all()
+            trade_plans = db.query(TradePlan).filter(TradePlan.trading_account_id == account_id).all()
             for plan in trade_plans:
                 linked_items.append({
                     'id': plan.id,
@@ -490,7 +490,7 @@ class EntityDetailsService:
                 })
             
             # Get related cash flows
-            cash_flows = db.query(CashFlow).filter(CashFlow.account_id == account_id).all()
+            cash_flows = db.query(CashFlow).filter(CashFlow.trading_account_id == account_id).all()
             for flow in cash_flows:
                 linked_items.append({
                     'id': flow.id,

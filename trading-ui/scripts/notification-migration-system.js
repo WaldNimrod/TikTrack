@@ -164,6 +164,220 @@ document.addEventListener('DOMContentLoaded', function() {
   }, 1000);
 });
 
+// ===== MIGRATION FUNCTIONS =====
+
+/**
+ * Migrate notifications from old format to new format
+ * מיגרציה של התראות מפורמט ישן לחדש
+ * 
+ * @param {Array} oldNotifications - Array of old format notifications
+ * @returns {Array} Array of migrated notifications
+ */
+function migrateNotifications(oldNotifications) {
+  try {
+    console.log('🔄 Migrating notifications from old format to new format...');
+    
+    if (!Array.isArray(oldNotifications)) {
+      console.warn('⚠️ Invalid notifications array provided');
+      return [];
+    }
+    
+    const migratedNotifications = oldNotifications.map((notification, index) => {
+      try {
+        // Handle different old formats
+        let migratedNotification;
+        
+        if (typeof notification === 'string') {
+          // Simple string notification
+          migratedNotification = {
+            id: Date.now() + index,
+            type: 'info',
+            title: 'הודעה',
+            message: notification,
+            timestamp: Date.now(),
+            time: new Date(),
+            page: window.location.pathname.replace('.html', '').replace('/', '') || 'home',
+            url: window.location.href,
+            migrated: true,
+            originalFormat: 'string'
+          };
+        } else if (notification.message && notification.type) {
+          // Already in new format or close to it
+          migratedNotification = {
+            id: notification.id || Date.now() + index,
+            type: notification.type || 'info',
+            title: notification.title || 'הודעה',
+            message: notification.message,
+            timestamp: notification.timestamp || Date.now(),
+            time: notification.time || new Date(),
+            page: notification.page || window.location.pathname.replace('.html', '').replace('/', '') || 'home',
+            url: notification.url || window.location.href,
+            migrated: true,
+            originalFormat: 'object'
+          };
+        } else if (notification.text) {
+          // Old format with 'text' property
+          migratedNotification = {
+            id: Date.now() + index,
+            type: notification.level || notification.severity || 'info',
+            title: notification.title || 'הודעה',
+            message: notification.text,
+            timestamp: notification.timestamp || Date.now(),
+            time: notification.time || new Date(),
+            page: notification.page || window.location.pathname.replace('.html', '').replace('/', '') || 'home',
+            url: notification.url || window.location.href,
+            migrated: true,
+            originalFormat: 'text_property'
+          };
+        } else {
+          // Unknown format, create basic notification
+          migratedNotification = {
+            id: Date.now() + index,
+            type: 'info',
+            title: 'הודעה',
+            message: JSON.stringify(notification),
+            timestamp: Date.now(),
+            time: new Date(),
+            page: window.location.pathname.replace('.html', '').replace('/', '') || 'home',
+            url: window.location.href,
+            migrated: true,
+            originalFormat: 'unknown'
+          };
+        }
+        
+        return migratedNotification;
+        
+      } catch (error) {
+        console.error(`❌ Error migrating notification at index ${index}:`, error);
+        return {
+          id: Date.now() + index,
+          type: 'error',
+          title: 'שגיאת מיגרציה',
+          message: `Failed to migrate notification: ${error.message}`,
+          timestamp: Date.now(),
+          time: new Date(),
+          page: 'migration',
+          url: window.location.href,
+          migrated: true,
+          originalFormat: 'error'
+        };
+      }
+    });
+    
+    console.log(`✅ Successfully migrated ${migratedNotifications.length} notifications`);
+    return migratedNotifications;
+    
+  } catch (error) {
+    console.error('❌ Error in migrateNotifications:', error);
+    return [];
+  }
+}
+
+/**
+ * Check if migration is needed
+ * בדיקה אם נדרשת מיגרציה
+ * 
+ * @param {Object} options - Migration check options
+ * @returns {Object} Migration status and recommendations
+ */
+function isMigrationNeeded(options = {}) {
+  try {
+    console.log('🔍 Checking if notification migration is needed...');
+    
+    const migrationStatus = {
+      needed: false,
+      reasons: [],
+      recommendations: [],
+      oldFormatCount: 0,
+      newFormatCount: 0,
+      totalCount: 0
+    };
+    
+    // Check localStorage for old format notifications
+    const oldFormatKeys = [
+      'tiktrack_notifications',
+      'notifications_history',
+      'alert_history',
+      'notification_log',
+      'system_notifications'
+    ];
+    
+    let oldNotifications = [];
+    let newNotifications = [];
+    
+    // Check for old format notifications
+    oldFormatKeys.forEach(key => {
+      try {
+        const data = localStorage.getItem(key);
+        if (data) {
+          const parsed = JSON.parse(data);
+          if (Array.isArray(parsed)) {
+            oldNotifications = oldNotifications.concat(parsed);
+            migrationStatus.reasons.push(`Found old format notifications in ${key}`);
+          }
+        }
+      } catch (error) {
+        // Ignore parsing errors
+      }
+    });
+    
+    // Check for new format notifications
+    try {
+      const newData = localStorage.getItem('tiktrack_global_notifications_history');
+      if (newData) {
+        newNotifications = JSON.parse(newData);
+      }
+    } catch (error) {
+      // Ignore parsing errors
+    }
+    
+    migrationStatus.oldFormatCount = oldNotifications.length;
+    migrationStatus.newFormatCount = newNotifications.length;
+    migrationStatus.totalCount = oldNotifications.length + newNotifications.length;
+    
+    // Determine if migration is needed
+    if (oldNotifications.length > 0) {
+      migrationStatus.needed = true;
+      migrationStatus.reasons.push(`${oldNotifications.length} notifications in old format found`);
+    }
+    
+    // Check for mixed formats
+    if (oldNotifications.length > 0 && newNotifications.length > 0) {
+      migrationStatus.reasons.push('Mixed old and new format notifications detected');
+    }
+    
+    // Generate recommendations
+    if (migrationStatus.needed) {
+      migrationStatus.recommendations.push('Run migrateNotifications() to convert old format notifications');
+      migrationStatus.recommendations.push('Consider clearing old format data after successful migration');
+    }
+    
+    if (migrationStatus.totalCount > 1000) {
+      migrationStatus.recommendations.push('Consider implementing notification cleanup to prevent storage bloat');
+    }
+    
+    if (migrationStatus.newFormatCount === 0 && migrationStatus.oldFormatCount > 0) {
+      migrationStatus.recommendations.push('No new format notifications found - migration highly recommended');
+    }
+    
+    console.log(`✅ Migration check completed: ${migrationStatus.needed ? 'NEEDED' : 'NOT NEEDED'}`);
+    console.log(`📊 Old format: ${migrationStatus.oldFormatCount}, New format: ${migrationStatus.newFormatCount}`);
+    
+    return migrationStatus;
+    
+  } catch (error) {
+    console.error('❌ Error checking migration status:', error);
+    return {
+      needed: false,
+      reasons: [`Error checking migration: ${error.message}`],
+      recommendations: ['Check console for detailed error information'],
+      oldFormatCount: 0,
+      newFormatCount: 0,
+      totalCount: 0
+    };
+  }
+}
+
 // ===== EXPORT TO GLOBAL SCOPE =====
 
 window.notificationMigrationSystem = {
@@ -171,7 +385,13 @@ window.notificationMigrationSystem = {
   rollbackNotificationCalls,
   testNotificationMigration,
   collectNotificationStats,
-  generateMigrationReport
+  generateMigrationReport,
+  migrateNotifications,
+  isMigrationNeeded
 };
+
+// Export individual functions
+window.migrateNotifications = migrateNotifications;
+window.isMigrationNeeded = isMigrationNeeded;
 
 console.log('🔄 Notification Migration System loaded successfully');

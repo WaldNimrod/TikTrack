@@ -337,6 +337,174 @@ function getCurrentFunctionName(stack) {
   return '';
 }
 
+// ===== CATEGORY ICON FUNCTIONS =====
+
+/**
+ * Get icon for notification category
+ * קבלת אייקון לקטגוריית התראה
+ * 
+ * @param {string} category - Category name
+ * @param {Object} options - Icon options
+ * @returns {string} Icon HTML or emoji
+ */
+function getCategoryIcon(category, options = {}) {
+  try {
+    console.log(`🎨 Getting icon for category: ${category}`);
+    
+    const iconMap = {
+      'development': {
+        emoji: '🛠️',
+        icon: 'fas fa-tools',
+        color: '#6c757d',
+        title: 'פיתוח'
+      },
+      'system': {
+        emoji: '⚙️',
+        icon: 'fas fa-cog',
+        color: '#dc3545',
+        title: 'מערכת'
+      },
+      'business': {
+        emoji: '💼',
+        icon: 'fas fa-briefcase',
+        color: '#28a745',
+        title: 'עסקי'
+      },
+      'performance': {
+        emoji: '⚡',
+        icon: 'fas fa-tachometer-alt',
+        color: '#ffc107',
+        title: 'ביצועים'
+      },
+      'ui': {
+        emoji: '🎨',
+        icon: 'fas fa-palette',
+        color: '#17a2b8',
+        title: 'ממשק משתמש'
+      },
+      'security': {
+        emoji: '🔒',
+        icon: 'fas fa-shield-alt',
+        color: '#6f42c1',
+        title: 'אבטחה'
+      },
+      'network': {
+        emoji: '🌐',
+        icon: 'fas fa-network-wired',
+        color: '#20c997',
+        title: 'רשת'
+      },
+      'database': {
+        emoji: '🗄️',
+        icon: 'fas fa-database',
+        color: '#fd7e14',
+        title: 'מסד נתונים'
+      },
+      'api': {
+        emoji: '🔌',
+        icon: 'fas fa-plug',
+        color: '#e83e8c',
+        title: 'API'
+      },
+      'cache': {
+        emoji: '💾',
+        icon: 'fas fa-memory',
+        color: '#6c757d',
+        title: 'מטמון'
+      }
+    };
+    
+    const categoryInfo = iconMap[category] || {
+      emoji: '📋',
+      icon: 'fas fa-info-circle',
+      color: '#6c757d',
+      title: 'כללי'
+    };
+    
+    // Return format based on options
+    if (options.format === 'html') {
+      return `<i class="${categoryInfo.icon}" style="color: ${categoryInfo.color};" title="${categoryInfo.title}"></i>`;
+    } else if (options.format === 'emoji') {
+      return categoryInfo.emoji;
+    } else if (options.format === 'object') {
+      return categoryInfo;
+    } else {
+      // Default: return emoji
+      return categoryInfo.emoji;
+    }
+    
+  } catch (error) {
+    console.error('❌ Error getting category icon:', error);
+    return '📋'; // Default fallback
+  }
+}
+
+/**
+ * Get all available category icons
+ * קבלת כל האייקונים הזמינים
+ * 
+ * @param {Object} options - Display options
+ * @returns {Object|Array} Category icons information
+ */
+function getAllCategoryIcons(options = {}) {
+  try {
+    console.log('🎨 Getting all category icons...');
+    
+    const categories = ['development', 'system', 'business', 'performance', 'ui', 'security', 'network', 'database', 'api', 'cache'];
+    
+    if (options.format === 'array') {
+      return categories.map(category => ({
+        category,
+        icon: getCategoryIcon(category, { format: 'object' })
+      }));
+    } else {
+      const icons = {};
+      categories.forEach(category => {
+        icons[category] = getCategoryIcon(category, { format: 'object' });
+      });
+      return icons;
+    }
+    
+  } catch (error) {
+    console.error('❌ Error getting all category icons:', error);
+    return {};
+  }
+}
+
+/**
+ * Get category color
+ * קבלת צבע הקטגוריה
+ * 
+ * @param {string} category - Category name
+ * @returns {string} Color code
+ */
+function getCategoryColor(category) {
+  try {
+    const categoryInfo = getCategoryIcon(category, { format: 'object' });
+    return categoryInfo.color || '#6c757d';
+  } catch (error) {
+    console.error('❌ Error getting category color:', error);
+    return '#6c757d';
+  }
+}
+
+/**
+ * Get category title in Hebrew
+ * קבלת כותרת הקטגוריה בעברית
+ * 
+ * @param {string} category - Category name
+ * @returns {string} Hebrew title
+ */
+function getCategoryTitle(category) {
+  try {
+    const categoryInfo = getCategoryIcon(category, { format: 'object' });
+    return categoryInfo.title || 'כללי';
+  } catch (error) {
+    console.error('❌ Error getting category title:', error);
+    return 'כללי';
+  }
+}
+
 // ===== EXPORT TO GLOBAL SCOPE =====
 
 window.notificationCategoryDetector = {
@@ -345,8 +513,18 @@ window.notificationCategoryDetector = {
   showSuccessNotificationSmart,
   showErrorNotificationSmart,
   showWarningNotificationSmart,
-  showInfoNotificationSmart
+  showInfoNotificationSmart,
+  getCategoryIcon,
+  getAllCategoryIcons,
+  getCategoryColor,
+  getCategoryTitle
 };
+
+// Export individual functions
+window.getCategoryIcon = getCategoryIcon;
+window.getAllCategoryIcons = getAllCategoryIcons;
+window.getCategoryColor = getCategoryColor;
+window.getCategoryTitle = getCategoryTitle;
 
 console.log('🧠 Notification Category Auto-Detector loaded successfully');
 console.log('🔍 Available smart functions:', {

@@ -644,7 +644,13 @@ def get_database_overview() -> Dict[str, Any]:
             FROM sqlite_master 
             WHERE type='table' AND name NOT LIKE 'sqlite_%'
         """))
-        tables = [dict(row) for row in result]
+        tables = []
+        for row in result:
+            tables.append({
+                'name': row[0],
+                'type': row[1], 
+                'sql': row[2]
+            })
         
         # Get record counts
         record_counts = {}
@@ -801,8 +807,8 @@ def get_external_data_overview() -> Dict[str, Any]:
         result = db.execute(text("""
             SELECT MAX(asof_utc) as last_update, 
                    COUNT(*) as total_quotes,
-                   COUNT(DISTINCT symbol) as unique_symbols
-            FROM quotes 
+                   COUNT(DISTINCT ticker_id) as unique_symbols
+            FROM market_data_quotes 
             WHERE asof_utc > datetime('now', '-24 hours')
         """))
         

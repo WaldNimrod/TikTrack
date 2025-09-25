@@ -33,7 +33,7 @@ class TradePlanService:
     @staticmethod
     def get_by_account(db: Session, account_id: int) -> List[TradePlan]:
         """Get trade plans by account"""
-        return db.query(TradePlan).filter(TradePlan.account_id == account_id).all()
+        return db.query(TradePlan).filter(TradePlan.trading_account_id == account_id).all()
     
     @staticmethod
     def get_by_ticker(db: Session, ticker_id: int) -> List[TradePlan]:
@@ -187,7 +187,7 @@ class TradePlanService:
         """Get trade plan summary"""
         query = db.query(TradePlan)
         if account_id:
-            query = query.filter(TradePlan.account_id == account_id)
+            query = query.filter(TradePlan.trading_account_id == account_id)
         
         plans = query.all()
         
@@ -221,7 +221,7 @@ class TradePlanService:
         query = db.query(TradePlan)
         
         if 'account_id' in conditions:
-            query = query.filter(TradePlan.account_id == conditions['account_id'])
+            query = query.filter(TradePlan.trading_account_id == conditions['account_id'])
         
         if 'ticker_id' in conditions:
             query = query.filter(TradePlan.ticker_id == conditions['ticker_id'])

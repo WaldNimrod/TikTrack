@@ -14,7 +14,7 @@ console.log('📁 trading_accounts.js נטען - מתחיל אתחול');
  * - table-mappings.js (for column mappings and sorting)
  * - main.js (global utilities and sorting functions)
  * - translation-utils.js (translation functions)
- * - filter-system.js (filter functionality)
+ * - header-system.js (header and filter functionality)
  *
  * Table Mapping:
  * - Uses 'trading_accounts' table type from table-mappings.js

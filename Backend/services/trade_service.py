@@ -26,7 +26,7 @@ class TradeService:
         if trades:
             first_trade = trades[0]
             logger.info(f"First trade ID: {first_trade.id}")
-            logger.info(f"First trade account_id: {first_trade.account_id}")
+            logger.info(f"First trade trading_account_id: {first_trade.trading_account_id}")
             logger.info(f"First trade ticker_id: {first_trade.ticker_id}")
             logger.info(f"First trade has account attribute: {hasattr(first_trade, 'account')}")
             logger.info(f"First trade account object: {first_trade.account}")
@@ -50,7 +50,7 @@ class TradeService:
     @staticmethod
     def get_by_account(db: Session, account_id: int) -> List[Trade]:
         """Get trades by account"""
-        return db.query(Trade).filter(Trade.account_id == account_id).all()
+        return db.query(Trade).filter(Trade.trading_account_id == account_id).all()
     
     @staticmethod
     def get_by_ticker(db: Session, ticker_id: int) -> List[Trade]:
@@ -80,7 +80,7 @@ class TradeService:
         logger.info(f"Total trades in system: {len(all_trades)}")
         
         # Check trades by account
-        account_trades = db.query(Trade).filter(Trade.account_id == account_id).all()
+        account_trades = db.query(Trade).filter(Trade.trading_account_id == account_id).all()
         logger.info(f"Trades for account {account_id}: {len(account_trades)}")
         
         # Check trades by status
@@ -89,7 +89,7 @@ class TradeService:
         
         # Combined filtering
         filtered_trades = db.query(Trade).filter(
-            Trade.account_id == account_id,
+            Trade.trading_account_id == account_id,
             Trade.status == status
         ).all()
         
@@ -281,7 +281,7 @@ class TradeService:
         """Get trade summary"""
         query = db.query(Trade)
         if account_id:
-            query = query.filter(Trade.account_id == account_id)
+            query = query.filter(Trade.trading_account_id == account_id)
         
         trades = query.all()
         

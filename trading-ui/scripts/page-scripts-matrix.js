@@ -818,9 +818,9 @@ class PageScriptsMatrixSystem {
             );
             
             const utilityScripts = files.filter(f => 
-                ['main.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js', 'translation-utils.js', 
+                ['main.js', 'header-system.js', 'ui-utils.js', 'translation-utils.js', 
                  'data-utils.js', 'table-mappings.js', 'date-utils.js', 'tables.js', 'linked-items.js', 
-                 'page-utils.js', 'filter-system.js', 'console-cleanup.js', 'notification-system.js', 
+                 'page-utils.js', 'console-cleanup.js', 'notification-system.js', 
                  'validation-utils.js', 'crud-utils.js'].includes(f)
             );
             

@@ -415,7 +415,7 @@ def get_account_child_entities(cursor, account_id: int) -> List[Dict[str, Any]]:
                created_at, status
         FROM trades t
         JOIN tickers tk ON t.ticker_id = tk.id
-        WHERE t.account_id = ?
+        WHERE t.trading_account_id = ?
     """, (account_id,))
     
     for row in cursor.fetchall():
@@ -563,7 +563,7 @@ def get_trade_parent_entities(cursor, trade_id: int) -> List[Dict[str, Any]]:
                a.name as description,
                a.created_at, a.status
         FROM trades t
-        JOIN accounts a ON t.account_id = a.id
+        JOIN trading_accounts a ON t.trading_account_id = a.id
         WHERE t.id = ?
     """, (trade_id,))
     

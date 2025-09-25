@@ -891,8 +891,8 @@ window.toggleSection = function (sectionId) {
 
     // Save state
     const isHidden = sectionBody.style.display === 'none';
-    localStorage.setItem(`${sectionId}SectionHidden`, isHidden);
-    console.log(`💾 State saved to localStorage: ${sectionId}SectionHidden = ${isHidden}`);
+    localStorage.setItem(`${sectionId}SectionHidden`, isHidden.toString());
+    console.log(`💾 State saved to localStorage: ${sectionId}SectionHidden = "${isHidden}"`);
     
   } else {
     console.warn(`❌ Section ${sectionId} not found`);

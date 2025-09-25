@@ -12,10 +12,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // מערכת הכותרת מאותחלת אוטומטית על ידי header-system.js
     console.log("✅ Header system initialized by header-system.js");
     
-    // Initialize filter system
-    if (window.filterSystem) {
-        window.filterSystem.initialize();
-    }
+    // Filter system is handled by the unified initialization system
+    // No need to initialize manually
     
     console.log('✅ Background Tasks page initialized successfully');
 });

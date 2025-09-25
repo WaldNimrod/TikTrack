@@ -79,13 +79,18 @@
             <!-- Main content limited in width -->
             <div class="main-content">
                 <!-- UI Content Section Top Start-->
-                <div class="top-section">
+                <div class="top-section" data-section="top">
                     <div class="section-header">
                         <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
                         <h1>📋 טבלאות עזר - כותרת סקשן עליון</h1>
-                        <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר סקשן">
-                            <span class="filter-arrow">▼</span>
-                        </button>
+                        <div class="header-actions">
+                            <button class="btn btn-sm btn-outline-primary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים מטבלאות העזר">
+                                <i class="fas fa-copy"></i> העתק לוג מפורט
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר סקשן">
+                                <span class="filter-arrow">▼</span>
+                            </button>
+                        </div>
                     </div>
                     <div class="section-body">
                         <h2>כרטיסיות התראות וסיכום נתונים</h2>

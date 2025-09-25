@@ -370,10 +370,12 @@ window.appInitializer.registerStageFunction('validation', async (pageConfig) => 
 window.appInitializer.registerStageFunction('final', async (pageConfig) => {
     console.log('🔧 Finalizing Application...');
     
-    // Restore section states
+    // Restore section states with small delay to ensure DOM is ready
     if (typeof window.restoreAllSectionStates === 'function') {
-        const restoredCount = window.restoreAllSectionStates();
-        console.log(`✅ Restored ${restoredCount} section states`);
+        setTimeout(() => {
+            const restoredCount = window.restoreAllSectionStates();
+            console.log(`✅ Restored ${restoredCount} section states`);
+        }, 100);
     }
     
     // Restore page state

@@ -14,9 +14,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // מערכת הכותרת מאותחלת אוטומטית על ידי header-system.js
     console.log("✅ Header system initialized by header-system.js");
     
-    if (window.filterSystem) {
-        window.filterSystem.initialize();
-    }
+    // Filter system is handled by the unified initialization system
+    // No need to initialize manually
 
     // וידוא שהמודולים נסגרים בלחיצה על הרקע
     const modals = document.querySelectorAll('.modal');

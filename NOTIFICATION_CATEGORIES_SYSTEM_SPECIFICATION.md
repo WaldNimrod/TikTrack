@@ -25,7 +25,7 @@
 - **מערכת התראות:** `documentation/frontend/NOTIFICATION_SYSTEM.md`
 - **מערכת העדפות:** `documentation/features/preferences/PREFERENCES_SYSTEM.md`
 - **ארכיטקטורת JavaScript:** `documentation/frontend/JAVASCRIPT_ARCHITECTURE.md`
-- **מטריצת מערכות כלליות:** `GENERAL_SYSTEMS_MATRIX_WORK.md`
+- **מטריצת מערכות כלליות:** `GENERAL_SYSTEMS_MATRIX.md`
 
 ### קבצי CSS:
 - **עיצוב התראות:** `trading-ui/styles/styles.css`

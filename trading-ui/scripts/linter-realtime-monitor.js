@@ -2373,6 +2373,20 @@ window.loadExistingFileMapping = loadExistingFileMapping;
 // window.copyLinterDetailedLog = copyDetailedLog; // REMOVED: Development mechanism - page-specific only
 // window.toggleSection removed - using global version from ui-utils.js
 // window.toggleSection export removed - using global version from ui-utils.js
+// Define refreshFileList function
+function refreshFileList() {
+    console.log('🔄 refreshFileList called');
+    try {
+        // Refresh the file list by reloading the page data
+        loadExistingFileMapping();
+        updateFileMappingStatus();
+        updateActionIndicators();
+        console.log('✅ File list refreshed successfully');
+    } catch (error) {
+        console.error('❌ Error refreshing file list:', error);
+    }
+}
+
 window.refreshFileList = refreshFileList;
 window.clearFileCache = clearFileCache;
 window.exportFileList = exportFileList;

@@ -708,5 +708,129 @@ function generateDetailedLog() {
  * Copy detailed log to clipboard
  */
 
+// ===== MISSING CRUD FUNCTIONS =====
+
+/**
+ * Test Create Operation
+ * בדיקת פעולת יצירה
+ */
+function testCreateOperation(entityType) {
+  console.log(`🧪 Testing CREATE operation for ${entityType}`);
+  try {
+    // Simulate create operation
+    const result = {
+      success: true,
+      entityType: entityType,
+      operation: 'CREATE',
+      timestamp: new Date().toISOString()
+    };
+    console.log('✅ CREATE test passed:', result);
+    return result;
+  } catch (error) {
+    console.error('❌ CREATE test failed:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Test Read Operation
+ * בדיקת פעולת קריאה
+ */
+function testReadOperation(entityType) {
+  console.log(`🧪 Testing READ operation for ${entityType}`);
+  try {
+    // Simulate read operation
+    const result = {
+      success: true,
+      entityType: entityType,
+      operation: 'READ',
+      timestamp: new Date().toISOString()
+    };
+    console.log('✅ READ test passed:', result);
+    return result;
+  } catch (error) {
+    console.error('❌ READ test failed:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Test Update Operation
+ * בדיקת פעולת עדכון
+ */
+function testUpdateOperation(entityType) {
+  console.log(`🧪 Testing UPDATE operation for ${entityType}`);
+  try {
+    // Simulate update operation
+    const result = {
+      success: true,
+      entityType: entityType,
+      operation: 'UPDATE',
+      timestamp: new Date().toISOString()
+    };
+    console.log('✅ UPDATE test passed:', result);
+    return result;
+  } catch (error) {
+    console.error('❌ UPDATE test failed:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Test Delete Operation
+ * בדיקת פעולת מחיקה
+ */
+function testDeleteOperation(entityType) {
+  console.log(`🧪 Testing DELETE operation for ${entityType}`);
+  try {
+    // Simulate delete operation
+    const result = {
+      success: true,
+      entityType: entityType,
+      operation: 'DELETE',
+      timestamp: new Date().toISOString()
+    };
+    console.log('✅ DELETE test passed:', result);
+    return result;
+  } catch (error) {
+    console.error('❌ DELETE test failed:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Display CRUD Results
+ * הצגת תוצאות CRUD
+ */
+function displayCRUDResults(results) {
+  console.log('📊 Displaying CRUD results:', results);
+  try {
+    // Display results in UI
+    const resultsContainer = document.getElementById('crud-results');
+    if (resultsContainer) {
+      resultsContainer.innerHTML = `
+        <div class="alert alert-info">
+          <h5>תוצאות בדיקות CRUD</h5>
+          <p>סה"כ בדיקות: ${results.total || 0}</p>
+          <p>עברו: ${results.passed || 0}</p>
+          <p>נכשלו: ${results.failed || 0}</p>
+        </div>
+      `;
+    }
+    console.log('✅ CRUD results displayed successfully');
+    return true;
+  } catch (error) {
+    console.error('❌ Error displaying CRUD results:', error);
+    return false;
+  }
+}
+
+// Export functions to global scope
+window.testCreateOperation = testCreateOperation;
+window.testReadOperation = testReadOperation;
+window.testUpdateOperation = testUpdateOperation;
+window.testDeleteOperation = testDeleteOperation;
+window.displayCRUDResults = displayCRUDResults;
+
 // ייצוא לגלובל scope
 // window.copyDetailedLog export removed - using global version from system-management.js

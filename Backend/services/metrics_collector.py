@@ -197,10 +197,10 @@ class MetricsCollector:
             open_trades = result.fetchone()[0]
             
             # TradingAccount metrics
-            result = db.execute(text("SELECT COUNT(*) as total FROM accounts"))
+            result = db.execute(text("SELECT COUNT(*) as total FROM trading_accounts"))
             total_accounts = result.fetchone()[0]
             
-            result = db.execute(text("SELECT COUNT(*) as active FROM accounts WHERE status = 'open'"))
+            result = db.execute(text("SELECT COUNT(*) as active FROM trading_accounts WHERE status = 'open'"))
             active_accounts = result.fetchone()[0]
             
             # Alert metrics

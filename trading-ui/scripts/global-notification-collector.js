@@ -414,7 +414,154 @@ if (document.readyState === 'loading') {
   }
 }
 
+// ===== GLOBAL FUNCTIONS =====
+
+/**
+ * Add a notification to the global notification system
+ * הוספת התראה למערכת ההתראות הגלובלית
+ * 
+ * @param {string} type - Type of notification (error, success, warning, info)
+ * @param {string} title - Notification title
+ * @param {string} message - Notification message
+ * @param {Object} options - Additional options
+ */
+function addGlobalNotification(type, title, message, options = {}) {
+  try {
+    console.log(`🔔 Adding global notification: ${type} - ${title}`);
+    
+    // Create notification object
+    const notification = {
+      id: Date.now() + Math.random(),
+      type: type || 'info',
+      title: title || 'הודעה',
+      message: message || '',
+      timestamp: Date.now(),
+      time: new Date(),
+      page: window.location.pathname.replace('.html', '').replace('/', '') || 'home',
+      url: window.location.href,
+      ...options
+    };
+    
+    // Add to global history
+    const existingHistory = JSON.parse(localStorage.getItem('tiktrack_global_notifications_history') || '[]');
+    existingHistory.unshift(notification);
+    
+    // Keep only last 1000 notifications
+    const trimmedHistory = existingHistory.slice(0, 1000);
+    localStorage.setItem('tiktrack_global_notifications_history', JSON.stringify(trimmedHistory));
+    
+    // Show notification if system is available
+    if (typeof window.showNotification === 'function') {
+      window.showNotification(message, type, { title });
+    }
+    
+    console.log(`✅ Global notification added: ${notification.id}`);
+    return notification.id;
+    
+  } catch (error) {
+    console.error('❌ Error adding global notification:', error);
+    return null;
+  }
+}
+
+/**
+ * Get all global notifications
+ * קבלת כל ההתראות הגלובליות
+ * 
+ * @param {Object} filters - Filter options
+ * @returns {Array} Array of notifications
+ */
+function getGlobalNotifications(filters = {}) {
+  try {
+    console.log('🔍 Getting global notifications with filters:', filters);
+    
+    const existingHistory = JSON.parse(localStorage.getItem('tiktrack_global_notifications_history') || '[]');
+    
+    let filteredNotifications = [...existingHistory];
+    
+    // Apply filters
+    if (filters.type) {
+      filteredNotifications = filteredNotifications.filter(n => n.type === filters.type);
+    }
+    
+    if (filters.page) {
+      filteredNotifications = filteredNotifications.filter(n => n.page === filters.page);
+    }
+    
+    if (filters.since) {
+      const sinceTime = new Date(filters.since).getTime();
+      filteredNotifications = filteredNotifications.filter(n => n.timestamp >= sinceTime);
+    }
+    
+    if (filters.limit) {
+      filteredNotifications = filteredNotifications.slice(0, filters.limit);
+    }
+    
+    console.log(`✅ Retrieved ${filteredNotifications.length} global notifications`);
+    return filteredNotifications;
+    
+  } catch (error) {
+    console.error('❌ Error getting global notifications:', error);
+    return [];
+  }
+}
+
+/**
+ * Clear global notifications
+ * ניקוי התראות גלובליות
+ * 
+ * @param {Object} filters - Clear options
+ */
+function clearGlobalNotifications(filters = {}) {
+  try {
+    console.log('🧹 Clearing global notifications with filters:', filters);
+    
+    if (filters.all) {
+      // Clear all notifications
+      localStorage.removeItem('tiktrack_global_notifications_history');
+      console.log('✅ All global notifications cleared');
+      return;
+    }
+    
+    // Get existing notifications
+    const existingHistory = JSON.parse(localStorage.getItem('tiktrack_global_notifications_history') || '[]');
+    
+    let filteredNotifications = [...existingHistory];
+    
+    // Apply filters for selective clearing
+    if (filters.type) {
+      filteredNotifications = filteredNotifications.filter(n => n.type !== filters.type);
+    }
+    
+    if (filters.page) {
+      filteredNotifications = filteredNotifications.filter(n => n.page !== filters.page);
+    }
+    
+    if (filters.before) {
+      const beforeTime = new Date(filters.before).getTime();
+      filteredNotifications = filteredNotifications.filter(n => n.timestamp >= beforeTime);
+    }
+    
+    if (filters.keepLast) {
+      // Keep only the last N notifications
+      filteredNotifications = filteredNotifications.slice(0, filters.keepLast);
+    }
+    
+    // Save filtered notifications back
+    localStorage.setItem('tiktrack_global_notifications_history', JSON.stringify(filteredNotifications));
+    
+    const clearedCount = existingHistory.length - filteredNotifications.length;
+    console.log(`✅ Cleared ${clearedCount} global notifications`);
+    
+  } catch (error) {
+    console.error('❌ Error clearing global notifications:', error);
+  }
+}
+
 // ===== EXPORT =====
 
 // Export for global access
 window.GlobalNotificationCollector = GlobalNotificationCollector;
+window.addGlobalNotification = addGlobalNotification;
+window.getGlobalNotifications = getGlobalNotifications;
+window.clearGlobalNotifications = clearGlobalNotifications;

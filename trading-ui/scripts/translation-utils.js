@@ -253,9 +253,202 @@ function translateTestCategory(category) {
   return categoryNames[category] || category;
 }
 
+// ===== LANGUAGE MANAGEMENT =====
+
+/**
+ * Set application language and update UI accordingly
+ * הגדרת שפת האפליקציה ועדכון הממשק בהתאם
+ * 
+ * @param {string} language - Language code (he, en, etc.)
+ * @param {Object} options - Language setting options
+ */
+function setLanguage(language, options = {}) {
+  try {
+    console.log(`🌐 Setting application language to: ${language}`);
+    
+    // Validate language code
+    const supportedLanguages = ['he', 'en', 'ar'];
+    if (!supportedLanguages.includes(language)) {
+      console.warn(`⚠️ Unsupported language: ${language}. Supported languages: ${supportedLanguages.join(', ')}`);
+      language = 'he'; // Default to Hebrew
+    }
+    
+    // Store language preference
+    localStorage.setItem('tiktrack_language', language);
+    
+    // Update document language attribute
+    document.documentElement.lang = language;
+    
+    // Update document direction based on language
+    if (language === 'he' || language === 'ar') {
+      document.documentElement.dir = 'rtl';
+    } else {
+      document.documentElement.dir = 'ltr';
+    }
+    
+    // Update page title if needed
+    if (options.updateTitle !== false) {
+      const currentTitle = document.title;
+      // You can add language-specific title logic here
+      console.log(`📄 Page title: ${currentTitle}`);
+    }
+    
+    // Trigger language change event
+    const languageChangeEvent = new CustomEvent('languageChanged', {
+      detail: {
+        language,
+        direction: document.documentElement.dir,
+        timestamp: Date.now()
+      }
+    });
+    window.dispatchEvent(languageChangeEvent);
+    
+    // Update any language-dependent elements
+    updateLanguageDependentElements(language);
+    
+    // Show notification if requested
+    if (options.showNotification !== false) {
+      const languageNames = {
+        'he': 'עברית',
+        'en': 'English',
+        'ar': 'العربية'
+      };
+      
+      if (typeof window.showNotification === 'function') {
+        window.showNotification(
+          `שפת הממשק שונתה ל-${languageNames[language]}`,
+          'success',
+          { title: 'הגדרות שפה' }
+        );
+      }
+    }
+    
+    console.log(`✅ Language set to ${language} successfully`);
+    return true;
+    
+  } catch (error) {
+    console.error('❌ Error setting language:', error);
+    return false;
+  }
+}
+
+/**
+ * Get current application language
+ * קבלת שפת האפליקציה הנוכחית
+ * 
+ * @returns {string} Current language code
+ */
+function getCurrentLanguage() {
+  try {
+    // First check localStorage
+    const storedLanguage = localStorage.getItem('tiktrack_language');
+    if (storedLanguage) {
+      return storedLanguage;
+    }
+    
+    // Fallback to document language
+    const documentLanguage = document.documentElement.lang;
+    if (documentLanguage) {
+      return documentLanguage;
+    }
+    
+    // Fallback to browser language
+    const browserLanguage = navigator.language.split('-')[0];
+    return browserLanguage || 'he'; // Default to Hebrew
+    
+  } catch (error) {
+    console.error('❌ Error getting current language:', error);
+    return 'he'; // Default to Hebrew
+  }
+}
+
+/**
+ * Update language-dependent UI elements
+ * עדכון אלמנטי ממשק התלויים בשפה
+ * 
+ * @param {string} language - Language code
+ */
+function updateLanguageDependentElements(language) {
+  try {
+    console.log(`🔄 Updating language-dependent elements for: ${language}`);
+    
+    // Update date formatting
+    if (typeof window.formatDate === 'function') {
+      // Date formatting will automatically use the correct locale
+      console.log('📅 Date formatting updated for new language');
+    }
+    
+    // Update number formatting
+    if (typeof window.formatNumberWithCommas === 'function') {
+      // Number formatting will automatically use the correct locale
+      console.log('🔢 Number formatting updated for new language');
+    }
+    
+    // Update currency formatting
+    if (typeof window.formatCurrencyWithCommas === 'function') {
+      // Currency formatting will automatically use the correct locale
+      console.log('💰 Currency formatting updated for new language');
+    }
+    
+    // Update any custom language-dependent elements
+    const languageElements = document.querySelectorAll('[data-language]');
+    languageElements.forEach(element => {
+      const elementLanguage = element.getAttribute('data-language');
+      if (elementLanguage === language) {
+        element.style.display = 'block';
+      } else {
+        element.style.display = 'none';
+      }
+    });
+    
+    console.log(`✅ Language-dependent elements updated for ${language}`);
+    
+  } catch (error) {
+    console.error('❌ Error updating language-dependent elements:', error);
+  }
+}
+
+/**
+ * Initialize language system
+ * אתחול מערכת השפה
+ */
+function initializeLanguageSystem() {
+  try {
+    console.log('🌐 Initializing language system...');
+    
+    // Get current language
+    const currentLanguage = getCurrentLanguage();
+    
+    // Set language if not already set
+    if (!localStorage.getItem('tiktrack_language')) {
+      setLanguage(currentLanguage, { showNotification: false });
+    }
+    
+    // Listen for language change events
+    window.addEventListener('languageChanged', (event) => {
+      console.log('🌐 Language changed event received:', event.detail);
+      
+      // Update any components that need to know about language changes
+      if (typeof window.updateComponentsForLanguage === 'function') {
+        window.updateComponentsForLanguage(event.detail.language);
+      }
+    });
+    
+    console.log('✅ Language system initialized successfully');
+    
+  } catch (error) {
+    console.error('❌ Error initializing language system:', error);
+  }
+}
+
 // ===== ייצוא פונקציות =====
 
 // Export functions to global scope
+window.setLanguage = setLanguage;
+window.getLanguage = getCurrentLanguage;
+window.getCurrentLanguage = getCurrentLanguage;
+window.updateLanguageDependentElements = updateLanguageDependentElements;
+window.initializeLanguageSystem = initializeLanguageSystem;
 window.translateAccountStatus = translateAccountStatus;
 window.translateTickerStatus = translateTickerStatus;
 window.translateNoteStatus = translateNoteStatus;
@@ -396,6 +589,12 @@ window.colorAmount = colorAmountByValue;
 
 // ייצוא המודול עצמו
 window.translationUtils = {
+  // Language management
+  setLanguage,
+  getCurrentLanguage,
+  updateLanguageDependentElements,
+  initializeLanguageSystem,
+  // Translation functions
   translateAccountStatus,
   translateTickerStatus,
   translateNoteStatus,
@@ -409,6 +608,7 @@ window.translationUtils = {
   translateCashFlowSource,
   translateTestCategory,
   translateExecutionAction,
+  // Formatting functions
   formatNumberWithCommas,
   formatCurrencyWithCommas,
   colorAmountByValue,

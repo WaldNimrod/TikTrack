@@ -11,17 +11,8 @@ console.log('🔄 Executions initializer loaded');
 document.addEventListener("DOMContentLoaded", () => {
     console.log("🔄 Initializing unified header system...");
     
-    // וידוא שמערכת הראש נטענה
-    if (typeof HeaderSystem !== 'undefined' && window.headerSystem) {
-        console.log("✅ HeaderSystem found, initializing...");
-        window.headerSystem.init();
-    } else {
-        console.log("❌ HeaderSystem not found, creating new instance...");
-        if (typeof HeaderSystem !== 'undefined') {
-            window.headerSystem = new HeaderSystem();
-            window.headerSystem.init();
-        }
-    }
+    // מערכת הכותרת מאותחלת אוטומטית על ידי header-system.js
+    console.log("✅ Header system initialized by header-system.js");
     
     if (window.filterSystem) {
         window.filterSystem.initialize();

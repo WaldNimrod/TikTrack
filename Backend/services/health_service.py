@@ -219,8 +219,8 @@ class HealthService:
         }
         
         try:
-            # CPU usage
-            cpu_percent = psutil.cpu_percent(interval=1)
+            # CPU usage (use non-blocking call for better performance)
+            cpu_percent = psutil.cpu_percent(interval=None)
             
             # Memory usage
             memory = psutil.virtual_memory()

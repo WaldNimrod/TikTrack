@@ -184,7 +184,7 @@ def update_trade(trade_id: int):
                 # Return basic trade data without relationships
                 basic_data = {
                     "id": trade.id,
-                    "account_id": trade.account_id,
+                    "trading_account_id": trade.trading_account_id,
                     "ticker_id": trade.ticker_id,
                     "trade_plan_id": trade.trade_plan_id,
                     "status": trade.status,

@@ -39,6 +39,9 @@
 /* רווח מתחת לסקשן העליון */
 .top-section {
   margin-bottom: 10px;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .hero-bg-illustration {

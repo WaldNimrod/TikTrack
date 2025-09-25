@@ -13,14 +13,14 @@ table,
 .table,
 .data-table {
   width: 100%;
-  min-width: 100%;
-  max-width: 1400px; /* רוחב מסך מלא */
-  table-layout: auto;
+  min-width: 0; /* מאפשר לטבלה להתכווץ */
+  max-width: 100%; /* רוחב מלא של הקונטיינר */
+  table-layout: fixed; /* טבלה עם רוחב קבוע */
   direction: rtl;
   border-collapse: separate;
   border-spacing: 0;
   font-family: var(--font-family-primary);
-  overflow-x: visible; /* ללא גלילה אופקית */
+  overflow-x: hidden; /* מונע גלילה אופקית */
 }
 
 /* כותרות טבלה */
@@ -28,9 +28,9 @@ table th,
 .table th,
 .data-table th {
   white-space: nowrap;
-  overflow: visible;
-  text-overflow: clip;
-  min-width: fit-content;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0; /* מאפשר לעמודה להתכווץ */
   max-width: none;
   word-wrap: normal;
   word-break: keep-all;
@@ -60,6 +60,9 @@ table td,
   vertical-align: middle;
   word-wrap: break-word;
   overflow-wrap: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0; /* מאפשר לתא להתכווץ */
 }
 
 /* Hover effect לשורות */
@@ -90,6 +93,7 @@ table td,
   display: table-cell;
   white-space: nowrap;
   padding: 8px 4px;
+  overflow: hidden;
 }
 
 .actions-cell .btn {
@@ -116,6 +120,8 @@ table td,
 
 /* Table responsive */
 .table-responsive {
+  width: 100%;
+  max-width: 100%;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
 }

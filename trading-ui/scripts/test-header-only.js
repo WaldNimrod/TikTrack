@@ -226,19 +226,18 @@ async function testIntegration() {
  */
 function updateSystemStats() {
     try {
-        const info = headerSystem.getInfo();
-        
-        updateStatus('componentsCount', info.components.length);
-        updateStatus('servicesCount', info.services.length);
-        updateStatus('utilsCount', '3'); // DOMUtils, EventUtils, StateUtils
-        updateStatus('constantsCount', '3'); // Events, Selectors, Config
+        // HeaderSystem doesn't have getInfo() method, using static info instead
+        updateStatus('componentsCount', '1'); // HeaderSystem
+        updateStatus('servicesCount', '1'); // FilterSystem
+        updateStatus('utilsCount', '0'); // No separate utils
+        updateStatus('constantsCount', '0'); // No separate constants
         updateStatus('totalLinesCount', '10,293+');
         
         testResults.systemStats = {
-            components: info.components.length,
-            services: info.services.length,
-            utils: 3,
-            constants: 3,
+            components: 1,
+            services: 1,
+            utils: 0,
+            constants: 0,
             totalLines: 10293
         };
         

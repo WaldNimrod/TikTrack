@@ -997,8 +997,7 @@ class SystemManagement {
       'preferences.js',
       'system-management.js',
       'page-utils.js',
-      'header-system.js',
-      'filter-system.js'
+      'header-system.js'
     ];
   }
 

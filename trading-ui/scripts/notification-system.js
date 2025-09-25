@@ -860,6 +860,23 @@ window.notificationSystem = {
   loadLinkedItemsData,
 };
 
+// Global NotificationSystem object for compatibility
+window.NotificationSystem = {
+    show: window.showNotification,
+    showSuccess: window.showSuccessNotification,
+    showError: window.showErrorNotification,
+    showWarning: window.showWarningNotification,
+    showInfo: window.showInfoNotification,
+    shouldShow: window.shouldShowNotification,
+    logWithCategory: window.logWithCategory,
+    getCategoryIcon: window.getCategoryIcon,
+    addGlobal: window.addGlobalNotification,
+    getGlobal: window.getGlobalNotifications,
+    clearGlobal: window.clearGlobalNotifications,
+    migrate: window.migrateNotifications,
+    isMigrationNeeded: window.isMigrationNeeded
+};
+
 // בדיקת פונקציות בסוף טעינת notification-system.js
 // notification-system.js נטען
 // WARNING FUNCTIONS moved to warning-system.js

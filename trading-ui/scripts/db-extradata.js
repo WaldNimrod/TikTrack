@@ -1,9 +1,8 @@
 // DB Extra Data Page Script
 document.addEventListener('DOMContentLoaded', function () {
     console.log('טבלאות עזר - עמוד נטען');
-    if (window.filterSystem) {
-        window.filterSystem.initialize();
-    }
+    // Filter system is handled by the unified initialization system
+    // No need to initialize manually
 });
 
 // ===== MISSING FUNCTIONS FOR ONCLICK ATTRIBUTES =====

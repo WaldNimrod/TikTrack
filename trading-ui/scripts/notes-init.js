@@ -13,8 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (window.headerSystem) {
         window.headerSystem.init();
     }
-    if (window.filterSystem) {
-        window.filterSystem.initialize();
-    }
+    // Filter system is handled by the unified initialization system
+    // No need to initialize manually
 });
 

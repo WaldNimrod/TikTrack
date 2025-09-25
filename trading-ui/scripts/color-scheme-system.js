@@ -2527,4 +2527,36 @@ window.colorSchemeSystem = {
   NUMERIC_VALUE_COLORS,
 };
 
+// ===== DYNAMIC COLORS LOADER =====
+/**
+ * Load dynamic colors from preferences
+ * טען צבעים דינמיים מהעדפות
+ */
+async function loadDynamicColors() {
+  console.log('🎨 Loading dynamic colors...');
+  try {
+    // Load color scheme from preferences
+    if (typeof window.loadColorScheme === 'function') {
+      await window.loadColorScheme();
+    }
+    
+    // Apply current color scheme
+    if (typeof window.applyColorScheme === 'function') {
+      window.applyColorScheme();
+    }
+    
+    console.log('✅ Dynamic colors loaded successfully');
+    return true;
+  } catch (error) {
+    console.error('❌ Error loading dynamic colors:', error);
+    return false;
+  }
+}
+
+// Export functions
+window.loadDynamicColors = loadDynamicColors;
+
+// Auto-load on DOM ready
+document.addEventListener('DOMContentLoaded', loadDynamicColors);
+
 // Color Scheme System loaded successfully

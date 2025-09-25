@@ -1,0 +1,82 @@
+INFO:services.smart_query_optimizer:Smart Query Optimizer initialized
+INFO:constraint_service:ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+INFO:services.realtime_notifications:Real-time Notifications Service initialized
+INFO:services.background_tasks:Background Task Manager initialized with real-time notifications support
+INFO:services.data_refresh_scheduler:Data Refresh Scheduler initialized with NY market clock
+INFO:root:🚀 Starting TikTrack server...
+2025-09-18 12:09:23,300 - root - INFO - 🚀 Starting TikTrack server...
+INFO:root:📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
+2025-09-18 12:09:23,301 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
+INFO:root:🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-09-18 12:09:23,301 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+INFO:root:📦 Flask version: 2.3.3
+2025-09-18 12:09:23,301 - root - INFO - 📦 Flask version: 2.3.3
+INFO:root:🗄️ Initializing database...
+2025-09-18 12:09:23,301 - root - INFO - 🗄️ Initializing database...
+INFO:utils.performance_monitor:Starting operation: Database initialization
+2025-09-18 12:09:23,301 - utils.performance_monitor - INFO - Starting operation: Database initialization
+INFO:utils.performance_monitor:Completed operation: Database initialization - Duration: 0.004s
+2025-09-18 12:09:23,304 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.004s
+INFO:root:✅ Database initialized successfully
+2025-09-18 12:09:23,305 - root - INFO - ✅ Database initialized successfully
+INFO:utils.performance_monitor:System metrics: CPU: 20.3%, Memory: 70.6%, Disk: 12.2%
+2025-09-18 12:09:24,310 - utils.performance_monitor - INFO - System metrics: CPU: 20.3%, Memory: 70.6%, Disk: 12.2%
+INFO:root:✅ Database initialized successfully
+2025-09-18 12:09:24,310 - root - INFO - ✅ Database initialized successfully
+INFO:root:✅ Server initialization completed
+2025-09-18 12:09:24,310 - root - INFO - ✅ Server initialization completed
+INFO:root:🚀 Starting background task scheduler...
+2025-09-18 12:09:24,340 - root - INFO - 🚀 Starting background task scheduler...
+INFO:services.background_tasks:Registered background task: cleanup_expired_data (1d)
+2025-09-18 12:09:24,341 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+INFO:services.realtime_notifications:Broadcasted background_task_started to all clients
+2025-09-18 12:09:24,341 - services.realtime_notifications - INFO - Broadcasted background_task_started to all clients
+INFO:services.background_tasks:Registered background task: cleanup_cache (1h)
+2025-09-18 12:09:24,341 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+INFO:services.realtime_notifications:Broadcasted background_task_started to all clients
+2025-09-18 12:09:24,341 - services.realtime_notifications - INFO - Broadcasted background_task_started to all clients
+INFO:services.background_tasks:Registered background task: rotate_logs (1w)
+2025-09-18 12:09:24,341 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+INFO:services.realtime_notifications:Broadcasted background_task_started to all clients
+2025-09-18 12:09:24,341 - services.realtime_notifications - INFO - Broadcasted background_task_started to all clients
+INFO:services.background_tasks:Registered background task: collect_metrics (30m)
+2025-09-18 12:09:24,341 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+INFO:services.realtime_notifications:Broadcasted background_task_started to all clients
+2025-09-18 12:09:24,341 - services.realtime_notifications - INFO - Broadcasted background_task_started to all clients
+INFO:services.background_tasks:Registered background task: database_maintenance (1w)
+2025-09-18 12:09:24,341 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+INFO:services.realtime_notifications:Broadcasted background_task_started to all clients
+2025-09-18 12:09:24,341 - services.realtime_notifications - INFO - Broadcasted background_task_started to all clients
+INFO:services.background_tasks:Registered background task: system_health_check (1h)
+2025-09-18 12:09:24,341 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+INFO:services.realtime_notifications:Broadcasted background_task_started to all clients
+2025-09-18 12:09:24,341 - services.realtime_notifications - INFO - Broadcasted background_task_started to all clients
+INFO:services.background_tasks:Registered background task: update_closed_tickers_daily (1d)
+2025-09-18 12:09:24,341 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+INFO:services.realtime_notifications:Broadcasted background_task_started to all clients
+2025-09-18 12:09:24,341 - services.realtime_notifications - INFO - Broadcasted background_task_started to all clients
+INFO:services.background_tasks:Background task scheduler started
+2025-09-18 12:09:24,342 - services.background_tasks - INFO - Background task scheduler started
+INFO:root:✅ Background task scheduler started successfully
+2025-09-18 12:09:24,342 - root - INFO - ✅ Background task scheduler started successfully
+INFO:root:🚀 Starting external data refresh scheduler...
+2025-09-18 12:09:24,342 - root - INFO - 🚀 Starting external data refresh scheduler...
+INFO:services.data_refresh_scheduler:Data Refresh Scheduler started
+2025-09-18 12:09:24,348 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+INFO:root:✅ External data refresh scheduler started successfully
+2025-09-18 12:09:24,368 - root - INFO - ✅ External data refresh scheduler started successfully
+INFO:services.data_refresh_scheduler:Refreshing 3 active tickers during off-hours
+2025-09-18 12:09:24,390 - services.data_refresh_scheduler - INFO - Refreshing 3 active tickers during off-hours
+INFO:services.data_refresh_scheduler:Group refresh started: active_trades/off_hours - 3 tickers (ID: 17371)
+2025-09-18 12:09:24,394 - services.data_refresh_scheduler - INFO - Group refresh started: active_trades/off_hours - 3 tickers (ID: 17371)
+INFO:services.external_data.yahoo_finance_adapter:Loaded provider config: yahoo_finance - Yahoo Finance
+2025-09-18 12:09:24,396 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: yahoo_finance - Yahoo Finance
+✅ Data Refresh Scheduler initialized successfully
+ * Serving Flask app 'app'
+ * Debug mode: on
+Address already in use
+Port 8080 is in use by another program. Either identify and stop that program, or start the server with a different port.
+INFO:services.external_data.yahoo_finance_adapter:Loaded user timezone: Asia/Jerusalem
+2025-09-18 12:09:24,402 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem

@@ -124,6 +124,7 @@ table td,
   max-width: 100%;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  display: block; /* מאפשר לטבלה להתאים לרוחב */
 }
 
 /* Data table עם עיצוב מתקדם */
@@ -240,4 +241,23 @@ table th.actions-cell {
   justify-content: space-between;
   align-items: center;
   gap: 0.5rem;
+}
+
+/* הגדרות ספציפיות לטבלאות בדף הבדיקה */
+#tickersTable,
+#tradePlansTable {
+  width: 100% !important;
+  max-width: 100% !important;
+  table-layout: fixed !important;
+  overflow: hidden !important;
+}
+
+#tickersTable th,
+#tickersTable td,
+#tradePlansTable th,
+#tradePlansTable td {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  min-width: 0 !important;
 }

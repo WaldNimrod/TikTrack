@@ -62,7 +62,7 @@
         <!-- Page body - All content after header -->
         <div class="page-body">
             <!-- Cash flows area - top-Section -->
-            <div class="top-section">
+            <div class="top-section" data-section="top">
                 <!-- Main header -->
                 <div class="section-header">
                     <div class="table-title">
@@ -70,6 +70,9 @@
                         תזרימי מזומנים
                     </div>
                     <div class="table-actions">
+                        <button class="btn btn-sm btn-outline-primary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים ותזרימי המזומנים">
+                            <i class="fas fa-copy"></i> העתק לוג מפורט
+                        </button>
                         <button class="filter-toggle-btn" onclick="toggleSection('top')"
                             title="הצג/הסתר אזור תזרימי מזומנים">
                             <span class="filter-icon">▲</span>

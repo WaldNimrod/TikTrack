@@ -16,10 +16,11 @@ Flask-CORS==4.0.0
 Werkzeug==2.3.7
 SQLAlchemy==2.0.23
 
-# Real-time communications
+# Real-time communications - ADVANCED VERSIONS
 Flask-SocketIO==5.3.6
-python-socketio==5.9.0
+python-socketio==5.8.0
 python-engineio==4.7.1
+# ✅ ADVANCED VERSIONS - Socket.IO Client 2.0.3
 
 # Production server dependencies
 gunicorn==21.2.0

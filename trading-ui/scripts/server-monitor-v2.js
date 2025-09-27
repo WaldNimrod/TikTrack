@@ -357,7 +357,7 @@ class ServerMonitor {
           );
         });
       } else {
-        confirmed = window.confirm('האם אתה בטוח שברצונך לנקות את כל הלוגים?');
+        confirmed = window.window.showConfirmationDialog('אישור', 'האם אתה בטוח שברצונך לנקות את כל הלוגים?');
       }
       
       if (confirmed) {
@@ -669,7 +669,7 @@ class ServerMonitor {
     try {
       console.log('🛑 ServerMonitor - מבצע עצירת חירום');
 
-      if (!confirm('האם אתה בטוח שברצונך לבצע עצירת חירום? זה יעצור את השרת מיידית!')) {
+      if (!window.showConfirmationDialog('אישור', 'האם אתה בטוח שברצונך לבצע עצירת חירום? זה יעצור את השרת מיידית!')) {
         return;
       }
 
@@ -741,7 +741,8 @@ window.serverMonitor = new ServerMonitor();
 // window.toggleSection export removed - using global version from ui-utils.js
 
 // הוספת פונקציות גלובליות
-window.copyDetailedLog = () => {
+// Local copyDetailedLog function for server-monitor page
+async function copyDetailedLog() {
   if (window.serverMonitor) {
     return window.serverMonitor.copyDetailedLog();
   } else {
@@ -750,7 +751,7 @@ window.copyDetailedLog = () => {
       window.showErrorNotification('שגיאה', 'serverMonitor לא אותחל');
     }
   }
-};
+}
 
 
 
@@ -785,60 +786,124 @@ function generateDetailedLog() {
     log.push(`עמוד: ${window.location.href}`);
     log.push('');
 
-    // סטטוס כללי
-    log.push('--- סטטוס כללי ---');
-    const topSection = document.querySelector('.top-section .section-body');
-    const isTopOpen = topSection && topSection.style.display !== 'none';
-    log.push(`סקשן עליון: ${isTopOpen ? 'פתוח' : 'סגור'}`);
-    
-    // תצוגה מפורטת לפי סקשנים
-    log.push('--- תצוגה מפורטת לפי סקשנים ---');
-    
-    // סקשן עליון - סטטוס ניטור
-    const statusText = document.getElementById('statusText')?.textContent || 'לא זמין';
-    const monitoringStatus = document.getElementById('monitoringStatus');
-    if (monitoringStatus) {
-        const statusIndicator = monitoringStatus.querySelector('.status-indicator');
-        const status = statusIndicator?.classList.contains('active') ? 'פעיל' : 'לא פעיל';
-        log.push(`סקשן עליון - סטטוס ניטור: ${statusText} (${status})`);
-    }
-
-    // טבלאות ונתונים
-    log.push('--- טבלאות ונתונים ---');
-    const alertCards = document.querySelectorAll('.alert-card');
-    alertCards.forEach((card, index) => {
-        const title = card.querySelector('.alert-title')?.textContent || 'לא זמין';
-        const status = card.querySelector('.alert-status')?.textContent || 'לא זמין';
-        const time = card.querySelector('.alert-time')?.textContent || 'לא זמין';
-        log.push(`התראה ${index + 1}: ${title} | סטטוס: ${status} | זמן: ${time}`);
+    // 1. מצב כללי של העמוד
+    log.push('--- מצב כללי של העמוד ---');
+    const sections = document.querySelectorAll('.content-section, .section');
+    sections.forEach((section, index) => {
+        const header = section.querySelector('.section-header, h2, h3');
+        const body = section.querySelector('.section-body, .card-body');
+        const isOpen = body && body.style.display !== 'none' && !section.classList.contains('collapsed');
+        const title = header ? header.textContent.trim() : `סקשן ${index + 1}`;
+        log.push(`  ${index + 1}. "${title}": ${isOpen ? 'פתוח' : 'סגור'}`);
     });
 
-    // סטטיסטיקות וביצועים
-    log.push('--- סטטיסטיקות וביצועים ---');
-    log.push(`זמן טעינת עמוד: ${Date.now() - performance.timing.navigationStart}ms`);
-    if (window.performance && window.performance.memory) {
-        const memory = window.performance.memory;
-        log.push(`זיכרון בשימוש: ${(memory.usedJSHeapSize / 1024 / 1024).toFixed(2)} MB`);
+    // 2. סטטוס ניטור
+    log.push('');
+    log.push('--- סטטוס ניטור ---');
+    const monitoringElements = [
+        'monitoringStatus', 'statusText', 'lastCheck', 'summaryStats',
+        'serverStatusStats', 'databaseStatusStats', 'cacheStatusStats', 'overallStatus'
+    ];
+    
+    monitoringElements.forEach(elementId => {
+        const element = document.getElementById(elementId);
+        if (element) {
+            const value = element.textContent.trim();
+            const visible = element.offsetParent !== null ? 'נראה' : 'לא נראה';
+            log.push(`${elementId}: ${value} (${visible})`);
+        }
+    });
+
+    // 3. סטטוס שרת
+    log.push('');
+    log.push('--- סטטוס שרת ---');
+    const serverElements = [
+        'serverStatus', 'uptime', 'memoryUsage', 'cpuUsage'
+    ];
+    
+    serverElements.forEach(elementId => {
+        const element = document.getElementById(elementId);
+        if (element) {
+            const value = element.textContent.trim();
+            const visible = element.offsetParent !== null ? 'נראה' : 'לא נראה';
+            log.push(`${elementId}: ${value} (${visible})`);
+        }
+    });
+
+    // 4. סטטוס בסיס נתונים
+    log.push('');
+    log.push('--- סטטוס בסיס נתונים ---');
+    const databaseElements = [
+        'databaseStatus', 'databaseSize', 'databaseConnections', 'databaseQueries'
+    ];
+    
+    databaseElements.forEach(elementId => {
+        const element = document.getElementById(elementId);
+        if (element) {
+            const value = element.textContent.trim();
+            const visible = element.offsetParent !== null ? 'נראה' : 'לא נראה';
+            log.push(`${elementId}: ${value} (${visible})`);
+        }
+    });
+
+    // 5. לוגים
+    log.push('');
+    log.push('--- לוגים ---');
+    const logsContainer = document.getElementById('logsContainer');
+    if (logsContainer) {
+        const visible = logsContainer.offsetParent !== null ? 'נראה' : 'לא נראה';
+        const content = logsContainer.textContent.trim().substring(0, 200) + '...';
+        log.push(`logsContainer: ${visible} - "${content}"`);
     }
 
-    // לוגים ושגיאות
-    log.push('--- לוגים ושגיאות ---');
-    if (window.consoleLogs && window.consoleLogs.length > 0) {
-        const recentLogs = window.consoleLogs.slice(-10);
-        recentLogs.forEach(entry => {
-            log.push(`[${entry.timestamp}] ${entry.level}: ${entry.message}`);
-        });
-    } else {
-        log.push('אין לוגים זמינים');
-    }
+    // 6. כפתורים וקונטרולים
+    log.push('');
+    log.push('--- כפתורים וקונטרולים ---');
+    const buttonIds = [
+        'refreshBtn', 'startMonitoringBtn', 'stopMonitoringBtn', 'clearLogsBtn',
+        'exportLogsBtn', 'copyDetailedLogBtn'
+    ];
+    
+    buttonIds.forEach(btnId => {
+        const btn = document.getElementById(btnId);
+        if (btn) {
+            const visible = btn.offsetParent !== null ? 'נראה' : 'לא נראה';
+            const disabled = btn.disabled ? 'מבוטל' : 'פעיל';
+            const text = btn.textContent.trim() || btn.value || 'ללא טקסט';
+            log.push(`${btnId}: ${visible} - ${disabled} - "${text}"`);
+        }
+    });
 
-    // מידע טכני
+    // 7. מידע טכני
+    log.push('');
     log.push('--- מידע טכני ---');
-    log.push(`User Agent: ${navigator.userAgent}`);
-    log.push(`Language: ${navigator.language}`);
-    log.push(`Platform: ${navigator.platform}`);
+    log.push(`זמן יצירת הלוג: ${timestamp}`);
+    log.push(`גרסת דפדפן: ${navigator.userAgent}`);
+    log.push(`רזולוציה מסך: ${screen.width}x${screen.height}`);
+    log.push(`גודל חלון: ${window.innerWidth}x${window.innerHeight}`);
+    
+    if (performance.timing) {
+        const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+        log.push(`זמן טעינת עמוד: ${loadTime}ms`);
+    }
+    
+    if (navigator.deviceMemory) {
+        log.push(`זיכרון זמין: ${navigator.deviceMemory}GB`);
+    }
+    
+    log.push(`שפת דפדפן: ${navigator.language}`);
+    log.push(`פלטפורמה: ${navigator.platform}`);
 
-    log.push('=== סוף הלוג ===');
+    // 8. שגיאות והערות מהקונסולה
+    log.push('');
+    log.push('--- שגיאות והערות מהקונסולה ---');
+    log.push('⚠️ חשוב: הלוג המפורט חייב לכלול שגיאות קונסולה לאבחון בעיות');
+    log.push('📋 הוראות: פתח את Developer Tools (F12) > Console');
+    log.push('📋 העתק את כל השגיאות וההערות מהקונסולה');
+    log.push('📋 הוסף אותן ללוג המפורט לפני שליחה');
+
+    log.push('');
+    log.push('=== סוף לוג ===');
     return log.join('\n');
 }
 

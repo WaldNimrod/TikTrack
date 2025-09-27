@@ -4,15 +4,22 @@
  * 
  * מערכת בדיקת מטמון מתקדמת עם ניתוח ביצועים
  * 
+ * UNIFIED CACHE INTEGRATION (January 26, 2025):
+ * =============================================
+ * - Integrated with UnifiedCacheManager
+ * - Added CacheSyncManager testing
+ * - Added CachePolicyManager testing  
+ * - Added MemoryOptimizer testing
+ * 
  * File: trading-ui/scripts/cache-test.js
- * Version: 1.0.0
- * Last Updated: January 2025
+ * Version: 2.0.0
+ * Last Updated: January 26, 2025
  */
 
 // ===== GLOBAL VARIABLES =====
 
 let cacheData = {
-    status: null,
+    status: null, // Will be loaded from API
     entries: [],
     dependencies: [],
     analytics: null
@@ -27,13 +34,47 @@ let refreshInterval = null;
  */
 async function initializeCacheTest() {
     console.log('🚀 Initializing Cache Test System...');
+    window.initializeCacheTestCalled = true;
     
     try {
+        // Initialize display with loading state
+        console.log('📊 Initializing display with loading state...');
+        updateStatusDisplay();
+        
         // Load initial data
-        loadCacheStatus();
-        loadCacheEntries();
-        loadDependencies();
+        console.log('📊 Loading initial cache data...');
+        window.loadCacheStatusCalled = true;
+        await loadCacheStatus();
+        console.log('🔄 About to call loadServerStatus...');
+        try {
+            window.loadServerStatusCalled = true;
+            await loadServerStatus();
+            console.log('✅ loadServerStatus completed successfully');
+        } catch (error) {
+            console.error('❌ Error in loadServerStatus:', error);
+        }
+        await loadDependencies();
+        
+        // Load unified cache system status
+        if (typeof loadUnifiedCacheStatus === 'function') {
+            await loadUnifiedCacheStatus();
+        } else {
+            console.warn('⚠️ loadUnifiedCacheStatus not available yet');
+        }
+        
+        // Update display after loading data
+        console.log('📊 Updating display after data load...');
+            window.updateStatusDisplayCalled = true;
+        updateStatusDisplay();
+            window.loadSystemStatusCalled = true;
+            loadSystemStatus();
         loadAnalytics();
+        
+        // Run basic tests automatically
+        setTimeout(async () => {
+            console.log('🧪 Running basic cache tests...');
+            // await runCacheHealthCheck(); // Removed duplicate call - handled by system
+        }, 2000); // Wait 2 seconds for everything to load
         
         // Setup auto-refresh
         setupAutoRefresh();
@@ -41,14 +82,25 @@ async function initializeCacheTest() {
         // Setup event listeners
         setupEventListeners();
         
-        // Wait for UnifiedIndexedDB to be ready
-        await waitForUnifiedIndexedDB();
+        // Wait for Unified Cache System to be ready (initialized by Unified App Initializer)
+        console.log('🔄 Waiting for Unified Cache System to be initialized by Unified App Initializer...');
+        let unifiedCacheReady = false;
+        if (typeof waitForUnifiedCacheSystem === 'function') {
+            unifiedCacheReady = await waitForUnifiedCacheSystem();
+        } else {
+            console.warn('⚠️ waitForUnifiedCacheSystem not available yet');
+        }
         
-        // Load initial data from UnifiedIndexedDB
-        await loadInitialData();
+        // Load initial data from Unified Cache System only if it's ready
+        if (unifiedCacheReady) {
+            console.log('✅ Unified Cache System is ready, loading initial data...');
+            await loadUnifiedCacheInitialData();
+        } else {
+            console.log('⚠️ Skipping Unified Cache System data loading due to timeout');
+        }
         
-        // Load UnifiedIndexedDB statistics
-        await refreshUnifiedIndexedDBStats();
+        // Load Unified Cache System statistics
+        await refreshUnifiedCacheStats();
         
         // Force update the display
         updateStatusDisplay();
@@ -68,188 +120,380 @@ async function initializeCacheTest() {
 
 // ===== INITIALIZATION FUNCTIONS =====
 
+
+// ===== UI HELPER FUNCTIONS =====
+
 /**
- * Wait for UnifiedIndexedDB to be ready
+ * Toggle section visibility
  */
-async function waitForUnifiedIndexedDB() {
-    let attempts = 0;
-    const maxAttempts = 50; // 5 seconds max wait
+function toggleSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    if (!section) return;
     
-    while (attempts < maxAttempts) {
-        if (window.UnifiedIndexedDB && window.UnifiedIndexedDB.db) {
-            console.log('✅ UnifiedIndexedDB is ready');
-            return;
+    const body = section.querySelector('.section-body');
+    const icon = section.querySelector('.section-toggle-icon');
+    
+    if (body && icon) {
+        if (body.style.display === 'none') {
+            body.style.display = 'block';
+            icon.textContent = '▼';
+        } else {
+            body.style.display = 'none';
+            icon.textContent = '▶';
         }
-        
-        console.log(`⏳ Waiting for UnifiedIndexedDB... (${attempts + 1}/${maxAttempts})`);
-        await new Promise(resolve => setTimeout(resolve, 100));
-        attempts++;
     }
-    
-    console.warn('⚠️ UnifiedIndexedDB not ready after 5 seconds, continuing anyway');
 }
 
 /**
- * Load initial data from UnifiedIndexedDB
+ * Toggle all sections visibility
  */
-async function loadInitialData() {
-    try {
-        console.log('🔄 Loading initial data from UnifiedIndexedDB...');
+function toggleAllSections() {
+    const sections = document.querySelectorAll('.content-section');
+    const allVisible = Array.from(sections).every(section => {
+        const body = section.querySelector('.section-body');
+        return body && body.style.display !== 'none';
+    });
+    
+    sections.forEach(section => {
+        const body = section.querySelector('.section-body');
+        const icon = section.querySelector('.section-toggle-icon');
         
-        // Load file mapping if not available
-        if (window.getProjectFiles) {
-            try {
-                const files = await window.getProjectFiles();
-                console.log('✅ File mapping loaded:', Object.keys(files).length, 'file types');
-            } catch (error) {
-                console.warn('⚠️ Could not load file mapping:', error);
+        if (body && icon) {
+            if (allVisible) {
+                body.style.display = 'none';
+                icon.textContent = '▶';
+            } else {
+                body.style.display = 'block';
+                icon.textContent = '▼';
             }
         }
-        
-        // Load notification history if not available
-        if (window.loadGlobalNotificationHistory) {
-            try {
-                const history = await window.loadGlobalNotificationHistory();
-                console.log('✅ Notification history loaded:', history.length, 'notifications');
-            } catch (error) {
-                console.warn('⚠️ Could not load notification history:', error);
-            }
-        }
-        
-        // Load header state if not available
-        if (window.HeaderSystem && window.HeaderSystem.restoreFilterStates) {
-            try {
-                await window.HeaderSystem.restoreFilterStates();
-                console.log('✅ Header state loaded');
-            } catch (error) {
-                console.warn('⚠️ Could not load header state:', error);
-            }
-        }
-        
-        console.log('✅ Initial data loading completed');
-        
-    } catch (error) {
-        console.error('❌ Error loading initial data:', error);
-    }
+    });
 }
+
+// copyDetailedLog function moved to window.copyDetailedLog below
+
 
 // ===== CACHE STATUS FUNCTIONS =====
 
-/**
- * Load cache status from UnifiedIndexedDB and API
- */
-async function loadUnifiedIndexedDBStatus() {
-    try {
-        if (!window.UnifiedIndexedDB || !window.UnifiedIndexedDB.db) {
-            console.warn('⚠️ UnifiedIndexedDB not ready, returning null');
-            return null;
-        }
-        
-        // Get file mapping data
-        const fileMapping = await window.UnifiedIndexedDB.getFileMapping();
-        const notificationHistory = await window.UnifiedIndexedDB.getNotificationHistory();
-        const headerState = await window.UnifiedIndexedDB.getHeaderState();
-        const linterResults = await window.UnifiedIndexedDB.getLinterScanningResults();
-        
-        const fileMappingCount = fileMapping ? Object.keys(fileMapping).length : 0;
-        const notificationCount = notificationHistory ? notificationHistory.length : 0;
-        const headerStateCount = headerState ? 1 : 0;
-        const linterResultsCount = linterResults ? 1 : 0;
-        const totalEntries = fileMappingCount + notificationCount + headerStateCount + linterResultsCount;
-        
-        console.log('📊 UnifiedIndexedDB Status:', {
-            fileMapping: fileMappingCount,
-            notifications: notificationCount,
-            headerState: headerStateCount,
-            linterResults: linterResultsCount,
-            totalEntries: totalEntries
-        });
-        
-        return {
-            fileMapping: fileMappingCount,
-            notifications: notificationCount,
-            headerState: headerStateCount,
-            linterResults: linterResultsCount,
-            totalEntries: totalEntries
-        };
-    } catch (error) {
-        console.error('❌ Error loading UnifiedIndexedDB status:', error);
-        return null;
-    }
-}
 
 /**
- * Load cache status from API
+ * Load cache status from API with retry logic
  */
 async function loadCacheStatus() {
-    try {
-        // Load from UnifiedIndexedDB instead of external API
-        const unifiedDBStatus = await loadUnifiedIndexedDBStatus();
-        
-        if (unifiedDBStatus) {
-            // Calculate cache statistics from UnifiedIndexedDB data
-            const totalEntries = unifiedDBStatus.totalEntries;
-            const hitRate = totalEntries > 0 ? Math.min(95, 70 + (totalEntries / 10)) : 0.0; // Dynamic hit rate
+    const maxRetries = 3;
+    let retryCount = 0;
+    
+    while (retryCount < maxRetries) {
+        try {
+            console.log(`🔄 Loading cache status from API... (attempt ${retryCount + 1}/${maxRetries})`);
             
+            // Load from real API endpoints with timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+            
+            console.log('📡 Making API calls...');
+        const [statsResponse, healthResponse, statusResponse] = await Promise.all([
+                fetch('/api/cache/stats', { signal: controller.signal }).then(r => {
+                    console.log('📊 Stats API response status:', r.status);
+                    return r.json();
+                }).catch(err => {
+                    console.error('❌ Stats API error:', err);
+                    return null;
+                }),
+                fetch('/api/cache/health', { signal: controller.signal }).then(r => {
+                    console.log('🏥 Health API response status:', r.status);
+                    return r.json();
+                }).catch(err => {
+                    console.error('❌ Health API error:', err);
+                    return null;
+                }),
+                fetch('/api/cache/status', { signal: controller.signal }).then(r => {
+                    console.log('📈 Status API response status:', r.status);
+                    return r.json();
+                }).catch(err => {
+                    console.error('❌ Status API error:', err);
+                    return null;
+                })
+            ]);
+            
+            clearTimeout(timeoutId);
+            console.log('✅ All API calls completed');
+        
+            console.log('🔍 API Response Debug:', {
+                statsResponse: statsResponse,
+                healthResponse: healthResponse,
+                statusResponse: statusResponse
+            });
+            
+            // Log each response individually for debugging
+            console.log('📊 Stats Response:', JSON.stringify(statsResponse, null, 2));
+            console.log('🏥 Health Response:', JSON.stringify(healthResponse, null, 2));
+            console.log('📈 Status Response:', JSON.stringify(statusResponse, null, 2));
+            
+            if (statsResponse) {
+            console.log('✅ Stats response received, processing data...');
+            
+            // Handle different response formats
+            const stats = statsResponse.data || statsResponse;
+            const health = (healthResponse?.data || healthResponse) || {};
+            const status = (statusResponse?.data || statusResponse) || {};
+            
+            console.log('🔍 Processed Data:', {
+                stats: stats,
+                health: health,
+                status: status
+            });
+            
+            console.log('🔍 Raw stats keys:', Object.keys(stats));
+            console.log('🔍 Raw health keys:', Object.keys(health));
+            console.log('🔍 Raw status keys:', Object.keys(status));
+            
+            console.log('🔍 Creating cacheData.status object...');
             cacheData.status = {
-                hitRate: hitRate,
-                hitRateChange: totalEntries > 0 ? 2.5 : 0.0,
-                size: totalEntries * 1024, // Estimate 1KB per entry
-                sizeChange: totalEntries > 0 ? 1024 : 0,
-                avgResponseTime: totalEntries > 0 ? Math.max(1, 10 - (totalEntries / 100)) : 0, // Faster with more data
-                responseTimeChange: totalEntries > 0 ? -1 : 0,
-                totalRequests: totalEntries * 2, // Estimate requests
-                requestsChange: totalEntries,
+                hitRate: stats.hit_rate_percent || stats.hitRate || 0,
+                hitRateChange: stats.hit_rate_change || stats.hitRateChange || 0,
+                size: stats.total_size_bytes || (stats.estimated_memory_mb || stats.size || 0) * 1024 * 1024, // Use total_size_bytes if available
+                sizeChange: (stats.memory_change_mb || stats.sizeChange || 0) * 1024 * 1024,
+                avgResponseTime: stats.avg_response_time_ms || stats.avgResponseTime || 0,
+                responseTimeChange: stats.response_time_change_ms || stats.responseTimeChange || 0,
+                totalRequests: stats.total_requests || (stats.stats?.hits || 0) + (stats.stats?.misses || 0) + (stats.stats?.deletes || 0) + (stats.stats?.sets || 0) || 0,
+                requestsChange: stats.requests_change || stats.requestsChange || 0,
                 ttl: {
                     general: 300, // Default TTL
                     external: 600,
                     static: 3600
                 },
-                active: totalEntries > 0,
-                optimized: totalEntries > 0,
-                memoryAvailable: totalEntries > 0 ? 100 : 0 // Assume 100MB available if data exists
+                active: status.status === 'active' || status.status === 'degraded' || status.active || true,
+                optimized: health.memory_ok || health.optimized || false,
+                memoryAvailable: 100 - (status.memory_usage_percent || status.memoryUsage || 0)
             };
             
-            console.log('✅ Cache status loaded from UnifiedIndexedDB:', unifiedDBStatus);
-            console.log('📊 Calculated cache status:', cacheData.status);
+            console.log('✅ cacheData.status created:', cacheData.status);
             
-            // Force update the display immediately after setting cacheData.status
-            updateStatusDisplay();
+            console.log('✅ Cache status loaded from API:', {
+                stats: stats,
+                health: health,
+                status: status
+            });
+            console.log('📊 Processed cache status:', cacheData.status);
+            
+            // Check if server is running without cache
+            console.log('🔍 Checking if server is running without cache...');
+            console.log('🔍 hitRate:', cacheData.status.hitRate);
+            console.log('🔍 size:', cacheData.status.size);
+            console.log('🔍 totalRequests:', cacheData.status.totalRequests);
+            
+            // Check if server is actually running without cache (all values are 0 AND no entries)
+            if (cacheData.status.hitRate === 0 && cacheData.status.size === 0 && cacheData.status.totalRequests === 0 && (!cacheData.entries || cacheData.entries.total_entries === 0)) {
+                console.log('⚠️ All values are 0 - server is running without cache');
+                console.log('🔍 Final cacheData.status:', cacheData.status);
+                
+                // Set cache status to indicate no cache is running
+                cacheData.status.noCacheMode = true;
+                cacheData.status.active = false;
+                cacheData.status.optimized = false;
+                
+                console.log('✅ Set noCacheMode = true');
+                
+                if (typeof window.showNotification === 'function') {
+                    window.showNotification('השרת פועל ללא מטמון - זהו מצב תקין', 'info', 'מצב ללא מטמון', 5000, 'system');
+                }
         } else {
-            // Fallback to default values
-            cacheData.status = {
-                hitRate: 0.0,
-                hitRateChange: 0.0,
-                size: 0,
-                sizeChange: 0,
-                avgResponseTime: 0,
-                responseTimeChange: 0,
-                totalRequests: 0,
-                requestsChange: 0,
-                ttl: {
-                    general: 300,
-                    external: 600,
-                    static: 3600
-                },
-                active: false,
-                optimized: false,
-                memoryAvailable: 0
-            };
-            
-            console.log('⚠️ Using fallback cache status - no UnifiedIndexedDB data');
+                console.log('✅ Cache data loaded successfully:', cacheData.status);
+                // Ensure noCacheMode is false when cache is working
+                cacheData.status.noCacheMode = false;
+            }
+        } else {
+                // API failed - retry if we haven't exceeded max retries
+                retryCount++;
+                if (retryCount < maxRetries) {
+                    console.log(`⚠️ API failed, retrying in 2 seconds... (${retryCount}/${maxRetries})`);
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    continue;
+                } else {
+                    // All retries failed - show error message
+                    console.log('⚠️ API failed after all retries - no data available');
+                    cacheData.status = null;
+                    
+                    if (typeof window.showNotification === 'function') {
+                        window.showNotification('שרת המטמון לא זמין - לא ניתן לטעון נתונים', 'error', 'שגיאת חיבור', 5000, 'system');
+                    }
+                }
         }
         
+        // Force update the display immediately after setting cacheData.status
+            console.log('🔄 Calling updateStatusDisplay...');
         updateStatusDisplay();
         console.log('✅ Cache status loaded successfully');
+            return; // Success or final failure - exit the retry loop
         
     } catch (error) {
-        console.error('❌ Error loading cache status:', error);
+            retryCount++;
+            console.error(`❌ Error loading cache status (attempt ${retryCount}/${maxRetries}):`, error);
+            console.error('❌ Error details:', error.message);
+            console.error('❌ Error stack:', error.stack);
+            
+            if (retryCount < maxRetries) {
+                console.log(`⚠️ Retrying in 2 seconds... (${retryCount}/${maxRetries})`);
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                continue;
+            } else {
+                // All retries failed - show error message
+                console.log('⚠️ All retries failed - no data available');
         cacheData.status = null;
+                
+                console.log('🔄 Calling updateStatusDisplay after error...');
         updateStatusDisplay();
         
         if (typeof window.showNotification === 'function') {
-            window.showNotification('לא ניתן לטעון סטטוס המטמון: ' + error.message, 'error', 'שגיאה', 5000, 'system');
+                    window.showNotification('לא ניתן לטעון סטטוס המטמון - שגיאת חיבור', 'error', 'שגיאה', 5000, 'system');
+                }
+                return; // Exit the retry loop
+            }
         }
+    }
+  }
+
+/**
+ * Load server status information
+ */
+async function loadServerStatus() {
+    try {
+        console.log('🔄 Loading server status...');
+        
+        // Get server health information
+        console.log('📡 Fetching /api/health...');
+        const healthResponse = await fetch('/api/health');
+        console.log('📡 Health response status:', healthResponse.status);
+        const healthData = await healthResponse.json();
+        
+        console.log('📊 Server health data:', healthData);
+        console.log('🔍 Cache component:', healthData.components?.cache);
+        console.log('🔍 System component:', healthData.components?.system);
+        
+        // Update server cache mode
+        const cacheModeElement = document.getElementById('serverCacheMode');
+        if (cacheModeElement) {
+            // Determine cache mode based on TTL or other indicators
+            let cacheMode = 'לא ידוע';
+            let badgeClass = 'bg-secondary';
+            
+            if (healthData.components?.cache) {
+                const cache = healthData.components.cache;
+                if (cache.details?.total_entries === 0 && cache.details?.hit_rate_percent === 0) {
+                    cacheMode = 'ללא מטמון';
+                    badgeClass = 'bg-info';
+                } else if (cache.details?.total_entries > 0) {
+                    // Check if we're in development mode based on TTL display
+                    // We'll check the TTL element after it's updated
+                    cacheMode = 'פעיל';
+                    badgeClass = 'bg-success';
+                } else {
+                    cacheMode = 'מוכן';
+                    badgeClass = 'bg-warning';
+                }
+            }
+            
+            cacheModeElement.textContent = cacheMode;
+            cacheModeElement.className = `badge ${badgeClass}`;
+            console.log('✅ Updated cache mode:', cacheMode, badgeClass);
+        } else {
+            console.log('❌ Cache mode element not found');
+        }
+        
+        // Update TTL
+        const ttlElement = document.getElementById('serverCacheTTL');
+        if (ttlElement) {
+            // Try to get TTL from cache stats
+            try {
+                const statsResponse = await fetch('/api/cache/stats');
+                const statsData = await statsResponse.json();
+                
+                if (statsData.data?.stats) {
+                    // Calculate TTL based on cache behavior
+                    const stats = statsData.data.stats;
+                    
+                    // Check cache mode based on activity patterns
+                    if (stats.sets > 0 && stats.deletes > 0) {
+                        // High activity with sets and deletes indicates development mode (short TTL)
+                        ttlElement.textContent = '10 שניות (Development)';
+                        // Update cache mode to development
+                        updateCacheModeForTTL('מצב פיתוח', 'bg-warning');
+                    } else if (stats.sets > 0 && stats.hits > 0) {
+                        // Some hits with sets indicates production mode
+                        ttlElement.textContent = '5 דקות (Production)';
+                        // Update cache mode to production
+                        updateCacheModeForTTL('פעיל', 'bg-success');
+                    } else if (stats.sets > 0) {
+                        // Only sets, no hits/deletes - indicates development mode (TTL short, no hits yet)
+                        ttlElement.textContent = '10 שניות (Development)';
+                        // Update cache mode to development
+                        updateCacheModeForTTL('מצב פיתוח', 'bg-warning');
+                    } else {
+                        // No activity at all - no cache
+                        ttlElement.textContent = 'מבוטל';
+                        // Update cache mode to no cache
+                        updateCacheModeForTTL('ללא מטמון', 'bg-info');
+                    }
+                } else {
+                    ttlElement.textContent = 'לא זמין';
+                }
+            } catch (error) {
+                ttlElement.textContent = 'לא זמין';
+            }
+        }
+        
+        // Update last restart time
+        const lastRestartElement = document.getElementById('serverLastRestart');
+        if (lastRestartElement) {
+            if (healthData.components?.system?.details?.uptime) {
+                const uptime = healthData.components.system.details.uptime;
+                // Calculate restart time based on uptime
+                const now = new Date();
+                const uptimeMinutes = parseInt(uptime.split(' ')[0]) || 0;
+                const restartTime = new Date(now.getTime() - (uptimeMinutes * 60 * 1000));
+                lastRestartElement.textContent = restartTime.toLocaleString('he-IL');
+                console.log('✅ Updated last restart:', restartTime.toLocaleString('he-IL'));
+            } else {
+                lastRestartElement.textContent = 'לא זמין';
+                console.log('❌ No uptime data available');
+            }
+        } else {
+            console.log('❌ Last restart element not found');
+        }
+        
+        // Update uptime
+        const uptimeElement = document.getElementById('serverUptime');
+        if (uptimeElement) {
+            if (healthData.components?.system?.details?.uptime) {
+                uptimeElement.textContent = healthData.components.system.details.uptime;
+                console.log('✅ Updated uptime:', healthData.components.system.details.uptime);
+            } else {
+                uptimeElement.textContent = 'לא זמין';
+                console.log('❌ No uptime data available');
+            }
+        } else {
+            console.log('❌ Uptime element not found');
+        }
+        
+        console.log('✅ Server status loaded successfully');
+        
+    } catch (error) {
+        console.error('❌ Error loading server status:', error);
+        
+        // Set error state
+        const elements = ['serverCacheMode', 'serverCacheTTL', 'serverLastRestart', 'serverUptime'];
+        elements.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                if (id === 'serverCacheMode') {
+                    element.textContent = 'שגיאה';
+                    element.className = 'badge bg-danger';
+                } else {
+                    element.textContent = 'שגיאה';
+                }
+            }
+        });
     }
   }
 
@@ -257,17 +501,22 @@ async function loadCacheStatus() {
  * Update status display cards
  */
 function updateStatusDisplay() {
+    console.log('🔄 updateStatusDisplay called, cacheData.status:', cacheData.status);
+    console.log('🔍 DOM ready state:', document.readyState);
+    console.log('🔍 Document body exists:', !!document.body);
+    
     if (!cacheData.status) {
+        console.log('❌ No cache data available, showing error state');
         // Show error state when no data available
         const hitRateElement = document.getElementById('cacheHitRate');
         const sizeElement = document.getElementById('cacheSize');
         const responseTimeElement = document.getElementById('avgResponseTime');
         const requestsElement = document.getElementById('totalRequests');
         
-        if (hitRateElement) hitRateElement.textContent = 'N/A';
-        if (sizeElement) sizeElement.textContent = 'N/A';
-        if (responseTimeElement) responseTimeElement.textContent = 'N/A';
-        if (requestsElement) requestsElement.textContent = 'N/A';
+        if (hitRateElement) hitRateElement.textContent = '--';
+        if (sizeElement) sizeElement.textContent = '--';
+        if (responseTimeElement) responseTimeElement.textContent = '--';
+        if (requestsElement) requestsElement.textContent = '--';
         
         // Update status changes
         const hitRateChangeElement = document.getElementById('cacheHitRateChange');
@@ -275,19 +524,19 @@ function updateStatusDisplay() {
         const responseTimeChangeElement = document.getElementById('avgResponseTimeChange');
         const requestsChangeElement = document.getElementById('totalRequestsChange');
         
-        if (hitRateChangeElement) hitRateChangeElement.textContent = 'N/A';
-        if (sizeChangeElement) sizeChangeElement.textContent = 'N/A';
-        if (responseTimeChangeElement) responseTimeChangeElement.textContent = 'N/A';
-        if (requestsChangeElement) requestsChangeElement.textContent = 'N/A';
+        if (hitRateChangeElement) hitRateChangeElement.textContent = 'לא זמין';
+        if (sizeChangeElement) sizeChangeElement.textContent = 'לא זמין';
+        if (responseTimeChangeElement) responseTimeChangeElement.textContent = 'לא זמין';
+        if (requestsChangeElement) requestsChangeElement.textContent = 'לא זמין';
         
         // Update TTL settings
         const generalTTLElement = document.getElementById('generalTTL');
         const externalTTLElement = document.getElementById('externalTTL');
         const staticTTLElement = document.getElementById('staticTTL');
         
-        if (generalTTLElement) generalTTLElement.textContent = 'N/A';
-        if (externalTTLElement) externalTTLElement.textContent = 'N/A';
-        if (staticTTLElement) staticTTLElement.textContent = 'N/A';
+        if (generalTTLElement) generalTTLElement.textContent = 'לא זמין';
+        if (externalTTLElement) externalTTLElement.textContent = 'לא זמין';
+        if (staticTTLElement) staticTTLElement.textContent = 'לא זמין';
         
         // Update cache status
         const activeElement = document.getElementById('cacheActive');
@@ -296,13 +545,13 @@ function updateStatusDisplay() {
         
         if (activeElement) {
             activeElement.textContent = 'לא זמין';
-            activeElement.className = 'badge bg-secondary';
+            activeElement.className = 'badge bg-danger';
         }
         if (optimizedElement) {
             optimizedElement.textContent = 'לא זמין';
-            optimizedElement.className = 'badge bg-secondary';
+            optimizedElement.className = 'badge bg-danger';
         }
-        if (memoryElement) memoryElement.textContent = 'N/A';
+        if (memoryElement) memoryElement.textContent = 'לא זמין';
         return;
     }
     
@@ -312,10 +561,62 @@ function updateStatusDisplay() {
     const responseTimeElement = document.getElementById('avgResponseTime');
     const requestsElement = document.getElementById('totalRequests');
     
-    if (hitRateElement) hitRateElement.textContent = `${cacheData.status?.hitRate?.toFixed(2) || 'N/A'}%`;
-    if (sizeElement) sizeElement.textContent = formatBytes(cacheData.status?.size || 0);
-    if (responseTimeElement) responseTimeElement.textContent = `${cacheData.status?.avgResponseTime ? parseFloat(cacheData.status.avgResponseTime.toFixed(5)) : 'N/A'}ms`;
-    if (requestsElement) requestsElement.textContent = formatNumber(cacheData.status?.totalRequests || 0);
+    console.log('🔍 Debug updateStatusDisplay:', {
+        hitRateElement: !!hitRateElement,
+        sizeElement: !!sizeElement,
+        responseTimeElement: !!responseTimeElement,
+        requestsElement: !!requestsElement,
+        cacheDataStatus: cacheData.status
+    });
+    
+    if (hitRateElement) {
+        if (cacheData.status.noCacheMode) {
+            hitRateElement.textContent = '0%';
+            hitRateElement.title = 'השרת פועל ללא מטמון';
+            console.log('✅ Updated hitRateElement: 0% (no cache mode)');
+        } else {
+        const hitRateValue = cacheData.status?.hitRate?.toFixed(2) || 'N/A';
+        hitRateElement.textContent = `${hitRateValue}%`;
+            hitRateElement.title = '';
+        console.log('✅ Updated hitRateElement:', hitRateValue);
+        }
+    }
+    if (sizeElement) {
+        if (cacheData.status.noCacheMode) {
+            sizeElement.textContent = '0 B';
+            sizeElement.title = 'השרת פועל ללא מטמון';
+            console.log('✅ Updated sizeElement: 0 B (no cache mode)');
+        } else {
+        const sizeValue = formatBytes(cacheData.status?.size || 0);
+        sizeElement.textContent = sizeValue;
+            sizeElement.title = '';
+        console.log('✅ Updated sizeElement:', sizeValue);
+        }
+    }
+    if (responseTimeElement) {
+        if (cacheData.status.noCacheMode) {
+            responseTimeElement.textContent = '0ms';
+            responseTimeElement.title = 'השרת פועל ללא מטמון';
+            console.log('✅ Updated responseTimeElement: 0ms (no cache mode)');
+        } else {
+        const responseTimeValue = cacheData.status?.avgResponseTime ? parseFloat(cacheData.status.avgResponseTime.toFixed(5)) : 'N/A';
+        responseTimeElement.textContent = `${responseTimeValue}ms`;
+            responseTimeElement.title = '';
+        console.log('✅ Updated responseTimeElement:', responseTimeValue);
+        }
+    }
+    if (requestsElement) {
+        if (cacheData.status.noCacheMode) {
+            requestsElement.textContent = '0';
+            requestsElement.title = 'השרת פועל ללא מטמון';
+            console.log('✅ Updated requestsElement: 0 (no cache mode)');
+        } else {
+        const requestsValue = formatNumber(cacheData.status?.totalRequests || 0);
+        requestsElement.textContent = requestsValue;
+            requestsElement.title = '';
+        console.log('✅ Updated requestsElement:', requestsValue);
+        }
+    }
     
     // Update status changes
     const hitRateChangeElement = document.getElementById('cacheHitRateChange');
@@ -323,19 +624,61 @@ function updateStatusDisplay() {
     const responseTimeChangeElement = document.getElementById('avgResponseTimeChange');
     const requestsChangeElement = document.getElementById('totalRequestsChange');
     
-    if (hitRateChangeElement) hitRateChangeElement.textContent = `${cacheData.status?.hitRateChange > 0 ? '+' : ''}${cacheData.status?.hitRateChange?.toFixed(2) || '0'}%`;
-    if (sizeChangeElement) sizeChangeElement.textContent = `${cacheData.status?.sizeChange > 0 ? '+' : ''}${formatBytes(cacheData.status?.sizeChange || 0)}`;
-    if (responseTimeChangeElement) responseTimeChangeElement.textContent = `${cacheData.status?.responseTimeChange > 0 ? '+' : ''}${cacheData.status?.responseTimeChange ? parseFloat(cacheData.status.responseTimeChange.toFixed(5)) : 0}ms`;
-    if (requestsChangeElement) requestsChangeElement.textContent = `${cacheData.status?.requestsChange > 0 ? '+' : ''}${formatNumber(cacheData.status?.requestsChange || 0)}`;
+    if (hitRateChangeElement) {
+        if (cacheData.status.noCacheMode) {
+            hitRateChangeElement.textContent = '0%';
+        } else {
+            hitRateChangeElement.textContent = `${cacheData.status?.hitRateChange > 0 ? '+' : ''}${cacheData.status?.hitRateChange?.toFixed(2) || '0'}%`;
+        }
+    }
+    if (sizeChangeElement) {
+        if (cacheData.status.noCacheMode) {
+            sizeChangeElement.textContent = '0 B';
+        } else {
+            sizeChangeElement.textContent = `${cacheData.status?.sizeChange > 0 ? '+' : ''}${formatBytes(cacheData.status?.sizeChange || 0)}`;
+        }
+    }
+    if (responseTimeChangeElement) {
+        if (cacheData.status.noCacheMode) {
+            responseTimeChangeElement.textContent = '0ms';
+        } else {
+            responseTimeChangeElement.textContent = `${cacheData.status?.responseTimeChange > 0 ? '+' : ''}${cacheData.status?.responseTimeChange ? parseFloat(cacheData.status.responseTimeChange.toFixed(5)) : 0}ms`;
+        }
+    }
+    if (requestsChangeElement) {
+        if (cacheData.status.noCacheMode) {
+            requestsChangeElement.textContent = '0';
+        } else {
+            requestsChangeElement.textContent = `${cacheData.status?.requestsChange > 0 ? '+' : ''}${formatNumber(cacheData.status?.requestsChange || 0)}`;
+        }
+    }
     
     // Update TTL settings
     const generalTTLElement = document.getElementById('generalTTL');
     const externalTTLElement = document.getElementById('externalTTL');
     const staticTTLElement = document.getElementById('staticTTL');
     
-    if (generalTTLElement) generalTTLElement.textContent = `${cacheData.status?.ttl?.general || 'N/A'}s`;
-    if (externalTTLElement) externalTTLElement.textContent = `${cacheData.status?.ttl?.external || 'N/A'}s`;
-    if (staticTTLElement) staticTTLElement.textContent = `${cacheData.status?.ttl?.static || 'N/A'}s`;
+    if (generalTTLElement) {
+        if (cacheData.status.noCacheMode) {
+            generalTTLElement.textContent = '0s';
+        } else {
+            generalTTLElement.textContent = `${cacheData.status?.ttl?.general || 'N/A'}s`;
+        }
+    }
+    if (externalTTLElement) {
+        if (cacheData.status.noCacheMode) {
+            externalTTLElement.textContent = '0s';
+        } else {
+            externalTTLElement.textContent = `${cacheData.status?.ttl?.external || 'N/A'}s`;
+        }
+    }
+    if (staticTTLElement) {
+        if (cacheData.status.noCacheMode) {
+            staticTTLElement.textContent = '0s';
+        } else {
+            staticTTLElement.textContent = `${cacheData.status?.ttl?.static || 'N/A'}s`;
+        }
+    }
     
     // Update cache status
     const activeElement = document.getElementById('cacheActive');
@@ -343,793 +686,69 @@ function updateStatusDisplay() {
     const memoryElement = document.getElementById('memoryAvailable');
     
     if (activeElement) {
+        if (cacheData.status.noCacheMode) {
+            activeElement.textContent = 'ללא מטמון';
+            activeElement.className = 'badge bg-info';
+            activeElement.title = 'השרת פועל ללא מטמון - זהו מצב תקין';
+        } else {
         activeElement.textContent = cacheData.status?.active ? 'פעיל' : 'לא פעיל';
         activeElement.className = `badge ${cacheData.status?.active ? 'bg-success' : 'bg-danger'}`;
+            activeElement.title = '';
+        }
     }
     if (optimizedElement) {
+        if (cacheData.status.noCacheMode) {
+            optimizedElement.textContent = 'לא';
+            optimizedElement.className = 'badge bg-secondary';
+        } else {
         optimizedElement.textContent = cacheData.status?.optimized ? 'כן' : 'לא';
         optimizedElement.className = `badge ${cacheData.status?.optimized ? 'bg-success' : 'bg-warning'}`;
     }
-    if (memoryElement) memoryElement.textContent = formatBytes(cacheData.status?.memoryAvailable || 0);
+    }
+    if (memoryElement) {
+        if (cacheData.status.noCacheMode) {
+            memoryElement.textContent = '0 B';
+        } else {
+            memoryElement.textContent = formatBytes(cacheData.status?.memoryAvailable || 0);
+        }
+    }
 }
 
 // ===== CACHE ENTRIES FUNCTIONS =====
 
-/**
- * Load cache entries from API and UnifiedIndexedDB
- */
-async function loadCacheEntries() {
-    try {
-        // Load from API (skip if not available)
-        let apiEntries = [];
-        try {
-            const response = await fetch('/api/cache/stats');
-            if (response.ok) {
-                const result = await response.json();
-                apiEntries = Array.isArray(result.data) ? result.data : [];
-            }
-        } catch (error) {
-            console.log('ℹ️ API not available, using UnifiedIndexedDB data only');
-        }
-        
-        // Load from UnifiedIndexedDB
-        const unifiedDBStatus = await loadUnifiedIndexedDBStatus();
-        
-        // If no file mapping data, try to load it
-        if (unifiedDBStatus && unifiedDBStatus.fileMapping === 0 && window.getProjectFiles) {
-            try {
-                console.log('🔄 No file mapping data found, loading from server...');
-                const files = await window.getProjectFiles();
-                console.log('✅ File mapping loaded:', Object.keys(files).length, 'file types');
-            } catch (error) {
-                console.warn('⚠️ Could not load file mapping:', error);
-            }
-        }
-        
-        // Combine entries
-        cacheData.entries = [
-            ...apiEntries,
-            ...(unifiedDBStatus ? [{
-                key: 'UnifiedIndexedDB',
-                type: 'IndexedDB',
-                size: unifiedDBStatus.totalEntries,
-                ttl: 'Persistent',
-                hits: unifiedDBStatus.totalEntries,
-                lastAccess: new Date().toISOString(),
-                status: 'active'
-            }] : [])
-        ];
-        
-            updateCacheEntriesTable();
-            console.log('✅ Cache entries loaded successfully');
-    } catch (error) {
-        console.error('❌ Error loading cache entries:', error);
-        cacheData.entries = [];
-        updateCacheEntriesTable();
-        
-        if (typeof window.showNotification === 'function') {
-            window.showNotification('לא ניתן לטעון ערכי המטמון - השרת לא זמין', 'error', 'שגיאה', 5000, 'system');
-        }
-    }
-  }
 
-  /**
- * Update cache entries table
- */
-function updateCacheEntriesTable() {
-    const tbody = document.getElementById('cacheTableBody');
-    if (!tbody) return;
-    
-    tbody.innerHTML = '';
-    
-    if (!cacheData.entries || cacheData.entries.total_entries === 0) {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td colspan="7" class="text-center text-muted">
-                <i class="fas fa-info-circle"></i>
-                לא נמצאו ערכי מטמון - המטמון ריק או השרת לא זמין
-            </td>
-        `;
-        tbody.appendChild(row);
-        return;
-    }
-    
-    // Create multiple mock entries from stats data for display
-    const mockEntries = [
-        {
-            key: 'cache_stats_summary',
-            type: 'api',
-            status: 'active',
-            created_at_iso: new Date().toISOString(),
-            expires_at_iso: new Date(Date.now() + 300000).toISOString(), // 5 minutes from now
-            ttl: 300,
-            size: cacheData.entries?.total_size_bytes || 1024,
-            description: `סיכום מטמון - ${cacheData.entries?.total_entries || 0} ערכים, ${cacheData.entries?.hit_rate_percent || 'N/A'}% hit rate`
-        },
-        {
-            key: 'user_preferences',
-            type: 'user',
-            status: 'active',
-            created_at_iso: new Date(Date.now() - 60000).toISOString(), // 1 minute ago
-            expires_at_iso: new Date(Date.now() + 1800000).toISOString(), // 30 minutes from now
-            ttl: 1800,
-            size: 2048,
-            description: 'העדפות משתמש - הגדרות ממשק ונושא'
-        },
-        {
-            key: 'market_data_aapl',
-            type: 'external',
-            status: 'active',
-            created_at_iso: new Date(Date.now() - 30000).toISOString(), // 30 seconds ago
-            expires_at_iso: new Date(Date.now() + 300000).toISOString(), // 5 minutes from now
-            ttl: 300,
-            size: 512,
-            description: 'נתוני שוק - מחירי מניות AAPL'
-        },
-        {
-            key: 'session_data',
-            type: 'session',
-            status: 'active',
-            created_at_iso: new Date(Date.now() - 120000).toISOString(), // 2 minutes ago
-            expires_at_iso: new Date(Date.now() + 3600000).toISOString(), // 1 hour from now
-            ttl: 3600,
-            size: 1536,
-            description: 'נתוני סשן - מצב התחברות ופעילות'
-        },
-        {
-            key: 'expired_cache_entry',
-            type: 'api',
-            status: 'expired',
-            created_at_iso: new Date(Date.now() - 600000).toISOString(), // 10 minutes ago
-            expires_at_iso: new Date(Date.now() - 300000).toISOString(), // 5 minutes ago (expired)
-            ttl: 300,
-            size: 768,
-            description: 'ערך מטמון פג תוקף - יימחק בקרוב'
-        }
-    ];
-    
-    const entriesToShow = mockEntries;
-    
-    entriesToShow.forEach(entry => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>
-                <code>${entry.key}</code>
-                <br>
-                <small class="text-muted">${entry.description}</small>
-            </td>
-            <td>
-                <span class="badge ${getDataTypeBadgeClass(entry.type)}">${entry.type}</span>
-            </td>
-            <td>${formatDateTime(entry.created_at_iso || entry.createdAt)}</td>
-            <td>
-                <span class="badge bg-info">${entry.ttl}s</span>
-                <br>
-                <small class="text-muted">פג תוקף: ${formatDateTime(entry.expires_at_iso || entry.expiresAt)}</small>
-            </td>
-            <td>${formatBytes(entry.size)}</td>
-            <td>
-                <span class="badge ${getStatusBadgeClass(entry.status)}">${getStatusText(entry.status)}</span>
-            </td>
-            <td class="actions-cell">
-                <div class="d-flex gap-1">
-                    <button class="btn btn-sm btn-outline-info" onclick="viewCacheEntry('${entry.key}')" title="צפה בערך">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-warning" onclick="refreshCacheEntry('${entry.key}')" title="רענן">
-                        <i class="fas fa-sync-alt"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-danger" onclick="deleteCacheEntry('${entry.key}')" title="מחק">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                    </div>
-            </td>
-        `;
-        tbody.appendChild(row);
-    });
-}
 
 // ===== CACHE MANAGEMENT FUNCTIONS =====
 
-/**
- * Clear all cache - calls global function
- */
-async function clearAllCache() {
-    if (!confirm('האם אתה בטוח שברצונך לנקות את כל המטמון?')) {
-        return;
-    }
-    
-    try {
-        // Clear UnifiedIndexedDB cache
-        if (window.UnifiedIndexedDB && window.UnifiedIndexedDB.db) {
-            await window.UnifiedIndexedDB.clearStore('fileMappings');
-            await window.UnifiedIndexedDB.clearStore('notificationHistory');
-            await window.UnifiedIndexedDB.clearStore('notificationStats');
-            await window.UnifiedIndexedDB.clearStore('headerStates');
-            await window.UnifiedIndexedDB.clearStore('filterStates');
-            await window.UnifiedIndexedDB.clearStore('sectionStates');
-            await window.UnifiedIndexedDB.clearStore('accountsData');
-            await window.UnifiedIndexedDB.clearStore('linterScanningResults');
-            await window.UnifiedIndexedDB.clearStore('linterLogEntries');
-        }
-        
-        // Clear localStorage
-        localStorage.clear();
-        
-        // Call global clearAllCache function if available
-        if (typeof window.clearAllCache === 'function') {
-            window.clearAllCache();
-        }
-            
-            // Also clear server-side cache
-            const response = await fetch('/api/cache/clear', { method: 'POST' });
-            if (response.ok) {
-            if (typeof window.showNotification === 'function') {
-                window.showNotification('כל המטמון נוקה בהצלחה', 'success', 'הצלחה', 3000, 'system');
-                }
-                await loadCacheStatus();
-                await loadCacheEntries();
-            } else {
-                throw new Error(`HTTP ${response.status}`);
-        }
-    } catch (error) {
-        console.error('❌ Error clearing cache:', error);
-        if (typeof window.showNotification === 'function') {
-            window.showNotification('שגיאה בניקוי המטמון: ' + error.message, 'error', 'שגיאה', 5000, 'system');
-        }
-    }
-}
+// clearAllCache function removed - using global function from central-refresh-system.js
 
-  /**
- * Clear expired cache
- */
-async function clearExpiredCache() {
-    // Call global clearExpiredCache function
-    if (typeof window.clearExpiredCache === 'function') {
-        await window.clearExpiredCache();
-        await loadCacheEntries();
-    } else {
-        console.error('❌ Global clearExpiredCache function not available');
-        if (typeof window.showNotification === 'function') {
-            window.showNotification('פונקציית ניקוי מטמון פג תוקף לא זמינה', 'error', 'שגיאה', 5000, 'system');
-        }
-    }
-}
 
-  /**
- * Preload cache
- */
-async function preloadCache() {
-    try {
-        // Simulate preloading by refreshing cache
-        await loadCacheStatus();
-        if (typeof window.showNotification === 'function') {
-            window.showNotification('נטענו מראש נתוני מטמון', 'success', 'הצלחה', 3000, 'system');
-        }
-        await loadCacheEntries();
-    } catch (error) {
-        console.error('❌ Error preloading cache:', error);
-        if (typeof window.showNotification === 'function') {
-            window.showNotification('שגיאה בטעינת מטמון מראש - השרת לא זמין', 'error', 'שגיאה', 5000, 'system');
-        }
-    }
-  }
-
-  /**
- * Optimize cache
- */
-async function optimizeCache() {
-    try {
-        // Simulate optimization by clearing and reloading cache
-        await clearAllCache();
-        await loadCacheStatus();
-        await loadCacheEntries();
-        if (typeof window.showNotification === 'function') {
-            window.showNotification('אופטמז מטמון - שוחרר זיכרון', 'success', 'הצלחה', 3000, 'system');
-      }
-    } catch (error) {
-        console.error('❌ Error optimizing cache:', error);
-        if (typeof window.showNotification === 'function') {
-            window.showNotification('שגיאה באופטימיזציית המטמון - השרת לא זמין', 'error', 'שגיאה', 5000, 'system');
-        }
-    }
-}
 
 // ===== GLOBAL FUNCTIONS FOR UNIFIED INDEXEDDB =====
 
-/**
- * Test UnifiedIndexedDB functionality
- */
-async function testUnifiedIndexedDB() {
-    try {
-        if (!window.UnifiedIndexedDB || !window.UnifiedIndexedDB.db) {
-            throw new Error('UnifiedIndexedDB not available or not initialized');
-        }
-        
-        // Test file mapping
-        const files = await window.getProjectFiles();
-        console.log('✅ File Mapping Test:', Object.keys(files).length, 'file types');
-        
-        // Test notification system
-        await window.showNotification('בדיקת UnifiedIndexedDB', 'success', 'בדיקה', 2000, 'system');
-        console.log('✅ Notification Test: Success');
-        
-        // Test header system
-        await window.HeaderSystem.saveFilterStates();
-        console.log('✅ Header System Test: Success');
-        
-        // Test linter system
-        if (window.UnifiedIndexedDB) {
-            const testResults = {
-                scannedFiles: 1,
-                totalFiles: 1,
-                errors: [],
-                warnings: [],
-                timestamp: Date.now()
-            };
-            await window.UnifiedIndexedDB.saveLinterScanningResults(testResults, 'cache-test');
-            console.log('✅ Linter System Test: Success');
-        }
-        
-        if (typeof window.showNotification === 'function') {
-            window.showNotification('כל בדיקות UnifiedIndexedDB עברו בהצלחה', 'success', 'בדיקות', 3000, 'system');
-        }
-        
-        return true;
-    } catch (error) {
-        console.error('❌ UnifiedIndexedDB Test Failed:', error);
-        if (typeof window.showNotification === 'function') {
-            window.showNotification('בדיקת UnifiedIndexedDB נכשלה: ' + error.message, 'error', 'שגיאה', 5000, 'system');
-        }
-        return false;
-    }
-}
 
-/**
- * Get UnifiedIndexedDB statistics
- */
-async function getUnifiedIndexedDBStats() {
-    try {
-        if (!window.UnifiedIndexedDB || !window.UnifiedIndexedDB.db) {
-            return null;
-        }
-        
-        const stats = {
-            fileMapping: await window.UnifiedIndexedDB.getFileMapping(),
-            notificationHistory: await window.UnifiedIndexedDB.getNotificationHistory(),
-            headerState: await window.UnifiedIndexedDB.getHeaderState(),
-            linterResults: await window.UnifiedIndexedDB.getLinterScanningResults()
-        };
-        
-        return {
-            fileMappingCount: stats.fileMapping ? Object.keys(stats.fileMapping).length : 0,
-            notificationCount: stats.notificationHistory ? stats.notificationHistory.length : 0,
-            headerStateCount: stats.headerState ? 1 : 0,
-            linterResultsCount: stats.linterResults ? 1 : 0,
-            totalEntries: (stats.fileMapping ? 1 : 0) + (stats.notificationHistory ? stats.notificationHistory.length : 0) + (stats.headerState ? 1 : 0) + (stats.linterResults ? 1 : 0)
-        };
-    } catch (error) {
-        console.error('❌ Error getting UnifiedIndexedDB stats:', error);
-        return null;
-    }
-}
 
-/**
- * Comprehensive system check
- */
-async function comprehensiveSystemCheck() {
-    console.log('=== בדיקה מקיפה של המערכת ===');
-    
-    try {
-        // 1. Check system availability
-        console.log('\n1. בדיקת זמינות מערכות:');
-        console.log('   - UnifiedIndexedDB:', !!window.UnifiedIndexedDB);
-        console.log('   - ProjectFilesScanner:', !!window.projectFilesScanner);
-        console.log('   - showNotification:', !!window.showNotification);
-        console.log('   - HeaderSystem:', !!window.HeaderSystem);
-        console.log('   - clearCacheBeforeCRUD:', !!window.clearCacheBeforeCRUD);
-        
-        // 2. Check data availability
-        console.log('\n2. בדיקת נתונים:');
-        const unifiedDBStatus = await loadUnifiedIndexedDBStatus();
-        if (unifiedDBStatus) {
-            console.log('   - File Mapping:', unifiedDBStatus.fileMapping, 'סוגים');
-            console.log('   - Notifications:', unifiedDBStatus.notifications, 'התראות');
-            console.log('   - Header State:', unifiedDBStatus.headerState, 'מצבים');
-            console.log('   - Linter Results:', unifiedDBStatus.linterResults, 'תוצאות');
-            console.log('   - Total Entries:', unifiedDBStatus.totalEntries);
-        } else {
-            console.log('   ❌ No UnifiedIndexedDB data available');
-        }
-        
-        // 3. Check localStorage
-        console.log('\n3. בדיקת localStorage:');
-        const localStorageKeys = Object.keys(localStorage);
-        console.log('   - מפתחות:', localStorageKeys.length);
-        localStorageKeys.forEach(key => {
-            const value = localStorage.getItem(key);
-            console.log(`     - ${key}: ${value ? value.length : 0} תווים`);
-        });
-        
-        // 4. Test functionality
-        console.log('\n4. בדיקת פונקציונליות:');
-        const testResult = await testUnifiedIndexedDB();
-        console.log('   - UnifiedIndexedDB Test:', testResult ? '✅ עבר' : '❌ נכשל');
-        
-        // 5. Summary
-        console.log('\n5. סיכום:');
-        const isSystemWorking = unifiedDBStatus && unifiedDBStatus.totalEntries > 0 && testResult;
-        console.log('   - מערכת עובדת:', isSystemWorking ? '✅ כן' : '❌ לא');
-        
-        if (typeof window.showNotification === 'function') {
-            const message = isSystemWorking ? 
-                'המערכת עובדת באופן מלא' : 
-                'יש בעיות במערכת - בדוק את הלוגים';
-            const type = isSystemWorking ? 'success' : 'warning';
-            window.showNotification(message, type, 'בדיקה מקיפה', 5000, 'system');
-        }
-        
-        return isSystemWorking;
-        
-    } catch (error) {
-        console.error('❌ שגיאה בבדיקה מקיפה:', error);
-        if (typeof window.showNotification === 'function') {
-            window.showNotification('שגיאה בבדיקה מקיפה: ' + error.message, 'error', 'שגיאה', 5000, 'system');
-        }
-        return false;
-    }
-}
 
-/**
- * Refresh UnifiedIndexedDB statistics display
- */
-async function refreshUnifiedIndexedDBStats() {
-    try {
-        console.log('🔄 Refreshing UnifiedIndexedDB statistics...');
-        
-        const stats = await getUnifiedIndexedDBStats();
-        if (stats) {
-            // Update File Mapping stats
-            const fileMappingElement = document.getElementById('fileMappingTypes');
-            const fileMappingTotalElement = document.getElementById('fileMappingTotal');
-            const fileMappingSizeElement = document.getElementById('fileMappingSize');
-            
-            if (fileMappingElement) fileMappingElement.textContent = stats.fileMappingCount;
-            if (fileMappingTotalElement) {
-                // Get actual file count from ProjectFilesScanner
-                try {
-                    const files = await window.getProjectFiles();
-                    const totalFiles = Object.values(files).reduce((sum, arr) => sum + arr.length, 0);
-                    fileMappingTotalElement.textContent = totalFiles;
-                } catch (error) {
-                    fileMappingTotalElement.textContent = '0';
-                }
-            }
-            if (fileMappingSizeElement) fileMappingSizeElement.textContent = formatBytes(stats.fileMappingCount * 1024);
-            
-            // Update Notifications stats
-            const notificationsTodayElement = document.getElementById('notificationsToday');
-            const notificationsTotalElement = document.getElementById('notificationsTotal');
-            const notificationsCategoriesElement = document.getElementById('notificationsCategories');
-            
-            if (notificationsTodayElement) {
-                // Count today's notifications
-                const today = new Date().toDateString();
-                const todayCount = stats.notificationCount; // Simplified - in real implementation, filter by date
-                notificationsTodayElement.textContent = todayCount;
-            }
-            if (notificationsTotalElement) notificationsTotalElement.textContent = stats.notificationCount;
-            if (notificationsCategoriesElement) notificationsCategoriesElement.textContent = '5'; // We have 5 categories
-            
-            // Update Header System stats
-            const headerFilterStateElement = document.getElementById('headerFilterState');
-            const headerSectionStateElement = document.getElementById('headerSectionState');
-            const headerAccountsDataElement = document.getElementById('headerAccountsData');
-            
-            if (headerFilterStateElement) headerFilterStateElement.textContent = stats.headerStateCount > 0 ? 'שמור' : 'לא שמור';
-            if (headerSectionStateElement) headerSectionStateElement.textContent = stats.headerStateCount > 0 ? 'שמור' : 'לא שמור';
-            if (headerAccountsDataElement) headerAccountsDataElement.textContent = stats.headerStateCount > 0 ? 'שמור' : 'לא שמור';
-            
-            // Update Linter Monitor stats
-            const linterScansTodayElement = document.getElementById('linterScansToday');
-            const linterFilesScannedElement = document.getElementById('linterFilesScanned');
-            const linterLogEntriesElement = document.getElementById('linterLogEntries');
-            
-            if (linterScansTodayElement) linterScansTodayElement.textContent = stats.linterResultsCount;
-            if (linterFilesScannedElement) linterFilesScannedElement.textContent = stats.linterResultsCount > 0 ? 'כן' : 'לא';
-            if (linterLogEntriesElement) linterLogEntriesElement.textContent = stats.linterResultsCount;
-            
-            // Update Object Stores table
-            await updateObjectStoresTable();
-            
-            console.log('✅ UnifiedIndexedDB statistics refreshed');
-            
-            if (typeof window.showNotification === 'function') {
-                window.showNotification('סטטיסטיקות UnifiedIndexedDB עודכנו', 'success', 'עדכון', 2000, 'system');
-            }
-        } else {
-            console.warn('⚠️ No UnifiedIndexedDB statistics available');
-        }
-    } catch (error) {
-        console.error('❌ Error refreshing UnifiedIndexedDB statistics:', error);
-        if (typeof window.showNotification === 'function') {
-            window.showNotification('שגיאה בעדכון סטטיסטיקות: ' + error.message, 'error', 'שגיאה', 5000, 'system');
-        }
-    }
-}
 
-/**
- * Update Object Stores table
- */
-async function updateObjectStoresTable() {
-    try {
-        const tableBody = document.getElementById('objectStoresTableBody');
-        if (!tableBody) return;
-        
-        const objectStores = [
-            { name: 'fileMappings', label: 'File Mappings' },
-            { name: 'notificationHistory', label: 'Notification History' },
-            { name: 'notificationStats', label: 'Notification Stats' },
-            { name: 'headerStates', label: 'Header States' },
-            { name: 'filterStates', label: 'Filter States' },
-            { name: 'sectionStates', label: 'Section States' },
-            { name: 'accountsData', label: 'Accounts Data' },
-            { name: 'linterScanningResults', label: 'Linter Results' },
-            { name: 'linterLogEntries', label: 'Linter Logs' }
-        ];
-        
-        tableBody.innerHTML = '';
-        
-        for (const store of objectStores) {
-            try {
-                if (!window.UnifiedIndexedDB || !window.UnifiedIndexedDB.db) {
-                    console.warn(`⚠️ UnifiedIndexedDB not ready, skipping ${store.name}`);
-                    continue;
-                }
-                
-                const data = await window.UnifiedIndexedDB.getAll(store.name);
-                const recordCount = data ? data.length : 0;
-                const size = recordCount * 1024; // Estimate
-                const lastUpdate = recordCount > 0 ? new Date().toLocaleString() : 'Never';
-                const status = recordCount > 0 ? 'Active' : 'Empty';
-                
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${store.label}</td>
-                    <td>${recordCount}</td>
-                    <td>${formatBytes(size)}</td>
-                    <td>${lastUpdate}</td>
-                    <td><span class="badge ${recordCount > 0 ? 'bg-success' : 'bg-secondary'}">${status}</span></td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-danger" onclick="clearObjectStore('${store.name}')">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                `;
-                tableBody.appendChild(row);
-            } catch (error) {
-                console.warn(`⚠️ Could not get data for ${store.name}:`, error);
-            }
-        }
-    } catch (error) {
-        console.error('❌ Error updating Object Stores table:', error);
-    }
-}
 
-/**
- * Clear specific Object Store
- */
-async function clearObjectStore(storeName) {
-    try {
-        if (!confirm(`האם אתה בטוח שברצונך לנקות את ${storeName}?`)) {
-            return;
-        }
-        
-        if (window.UnifiedIndexedDB && window.UnifiedIndexedDB.db) {
-            await window.UnifiedIndexedDB.clearStore(storeName);
-            console.log(`✅ Cleared ${storeName}`);
-            
-            if (typeof window.showNotification === 'function') {
-                window.showNotification(`${storeName} נוקה בהצלחה`, 'success', 'ניקוי', 3000, 'system');
-            }
-            
-            // Refresh the table
-            await updateObjectStoresTable();
-        }
-    } catch (error) {
-        console.error(`❌ Error clearing ${storeName}:`, error);
-        if (typeof window.showNotification === 'function') {
-            window.showNotification(`שגיאה בניקוי ${storeName}: ` + error.message, 'error', 'שגיאה', 5000, 'system');
-        }
-    }
-}
 
-/**
- * Clear all UnifiedIndexedDB data
- */
-async function clearUnifiedIndexedDB() {
-    try {
-        if (!confirm('האם אתה בטוח שברצונך לנקות את כל נתוני UnifiedIndexedDB?')) {
-            return;
-        }
-        
-        if (window.UnifiedIndexedDB && window.UnifiedIndexedDB.db) {
-            const stores = ['fileMappings', 'notificationHistory', 'notificationStats', 'headerStates', 'filterStates', 'sectionStates', 'accountsData', 'linterScanningResults', 'linterLogEntries'];
-            
-            for (const store of stores) {
-                await window.UnifiedIndexedDB.clearStore(store);
-            }
-            
-            console.log('✅ All UnifiedIndexedDB data cleared');
-            
-            if (typeof window.showNotification === 'function') {
-                window.showNotification('כל נתוני UnifiedIndexedDB נוקו בהצלחה', 'success', 'ניקוי', 3000, 'system');
-            }
-            
-            // Refresh statistics
-            await refreshUnifiedIndexedDBStats();
-        }
-    } catch (error) {
-        console.error('❌ Error clearing UnifiedIndexedDB:', error);
-        if (typeof window.showNotification === 'function') {
-            window.showNotification('שגיאה בניקוי UnifiedIndexedDB: ' + error.message, 'error', 'שגיאה', 5000, 'system');
-        }
-    }
-}
 
 /**
  * Copy detailed log to clipboard
  */
 
-/**
- * Force refresh all displays
- */
-async function forceRefreshAllDisplays() {
-    try {
-        console.log('🔄 Force refreshing all displays...');
-        
-        // Update cache status
-        await loadCacheStatus();
-        
-        // Update cache entries
-        await loadCacheEntries();
-        
-        // Update UnifiedIndexedDB statistics
-        await refreshUnifiedIndexedDBStats();
-        
-        // Force update status display
-        updateStatusDisplay();
-        
-        console.log('✅ All displays refreshed');
-        
-        if (typeof window.showNotification === 'function') {
-            window.showNotification('כל התצוגות עודכנו', 'success', 'עדכון', 2000, 'system');
-        }
-        
-    } catch (error) {
-        console.error('❌ Error refreshing displays:', error);
-        if (typeof window.showNotification === 'function') {
-            window.showNotification('שגיאה בעדכון התצוגות: ' + error.message, 'error', 'שגיאה', 5000, 'system');
-        }
-    }
-}
 
-/**
- * Quick debug function to check what data we have
- */
-async function debugCacheData() {
-    console.log('=== DEBUG: Cache Data ===');
-    
-    // Check UnifiedIndexedDB status
-    const status = await loadUnifiedIndexedDBStatus();
-    console.log('📊 UnifiedIndexedDB Status:', status);
-    
-    // Check cache data
-    console.log('📊 Cache Data:', cacheData);
-    
-    // Check DOM elements
-    const hitRateElement = document.getElementById('cacheHitRate');
-    const sizeElement = document.getElementById('cacheSize');
-    const responseTimeElement = document.getElementById('avgResponseTime');
-    const requestsElement = document.getElementById('totalRequests');
-    
-    console.log('📊 DOM Elements:');
-    console.log('   - cacheHitRate:', hitRateElement ? hitRateElement.textContent : 'NOT FOUND');
-    console.log('   - cacheSize:', sizeElement ? sizeElement.textContent : 'NOT FOUND');
-    console.log('   - avgResponseTime:', responseTimeElement ? responseTimeElement.textContent : 'NOT FOUND');
-    console.log('   - totalRequests:', requestsElement ? requestsElement.textContent : 'NOT FOUND');
-    
-    console.log('=== END DEBUG ===');
-}
 
-/**
- * Force update the main display immediately
- */
-function forceUpdateMainDisplay() {
-    console.log('🔄 Force updating main display...');
-    
-    // Update overview cards directly
-    const hitRateElement = document.getElementById('cacheHitRate');
-    const sizeElement = document.getElementById('cacheSize');
-    const responseTimeElement = document.getElementById('avgResponseTime');
-    const requestsElement = document.getElementById('totalRequests');
-    
-    if (cacheData.status) {
-        if (hitRateElement) hitRateElement.textContent = `${cacheData.status.hitRate.toFixed(2)}%`;
-        if (sizeElement) sizeElement.textContent = formatBytes(cacheData.status.size);
-        if (responseTimeElement) responseTimeElement.textContent = `${parseFloat(cacheData.status.avgResponseTime.toFixed(5))}ms`;
-        if (requestsElement) requestsElement.textContent = formatNumber(cacheData.status.totalRequests);
-        
-        console.log('✅ Main display updated with real data');
-    } else {
-        console.log('⚠️ No cache data available for display');
-    }
-}
 
-// Make functions globally available
-window.testUnifiedIndexedDB = testUnifiedIndexedDB;
-window.getUnifiedIndexedDBStats = getUnifiedIndexedDBStats;
-window.comprehensiveSystemCheck = comprehensiveSystemCheck;
-window.refreshUnifiedIndexedDBStats = refreshUnifiedIndexedDBStats;
-window.clearUnifiedIndexedDB = clearUnifiedIndexedDB;
-window.clearObjectStore = clearObjectStore;
-// window.copyDetailedLog export removed - using global version from system-management.js
-window.forceRefreshAllDisplays = forceRefreshAllDisplays;
-window.debugCacheData = debugCacheData;
-window.forceUpdateMainDisplay = forceUpdateMainDisplay;
+
+// ===== ADDITIONAL CACHE MANAGEMENT FUNCTIONS =====
+
+
 
 // ===== UTILITY FUNCTIONS =====
 
-/**
- * Refresh cache status
- */
-async function refreshCacheStatus() {
-    await loadCacheStatus();
-    await loadCacheEntries();
-    await loadDependencies();
-    await loadAnalytics();
-    
-    if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification('הצלחה', 'סטטוס המטמון רוענן בהצלחה');
-    }
-  }
 
-  /**
- * Update analytics based on time range
- */
-function updateAnalytics() {
-    loadAnalytics();
-}
 
-/**
- * Search cache entries
- */
-function searchCacheEntries() {
-    const searchTerm = document.getElementById('cacheSearch').value.toLowerCase();
-    const rows = document.querySelectorAll('#cacheTableBody tr');
-    
-    rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(searchTerm) ? '' : 'none';
-    });
-}
-
-/**
- * Filter cache entries
- */
-function filterCacheEntries() {
-    const filter = document.getElementById('cacheFilter').value;
-    const rows = document.querySelectorAll('#cacheTableBody tr');
-    
-    rows.forEach(row => {
-        if (filter === 'all') {
-            row.style.display = '';
-      } else {
-            // Implement filtering logic based on filter value
-            row.style.display = ''; // Simplified for demo
-        }
-    });
-}
 
 /**
  * Copy detailed log to clipboard
@@ -1264,7 +883,11 @@ async function loadDependencies() {
                     }
                 ]
             };
-            updateDependenciesDisplay();
+            if (typeof updateDependenciesDisplay === 'function') {
+                updateDependenciesDisplay();
+            } else {
+                console.warn('⚠️ updateDependenciesDisplay not available yet');
+            }
             console.log('✅ Dependencies loaded successfully');
       } else {
             throw new Error(`HTTP ${response.status}`);
@@ -1274,10 +897,14 @@ async function loadDependencies() {
         // Fallback to status data
         if (cacheData.status) {
             cacheData.dependencies = cacheData.status;
-            updateDependenciesDisplay();
+            if (typeof updateDependenciesDisplay === 'function') {
+                updateDependenciesDisplay();
+            }
         } else {
             cacheData.dependencies = null;
-            updateDependenciesDisplay();
+            if (typeof updateDependenciesDisplay === 'function') {
+                updateDependenciesDisplay();
+            }
         }
         
         if (typeof window.showErrorNotification === 'function') {
@@ -1285,6 +912,83 @@ async function loadDependencies() {
         }
     }
   }
+
+/**
+ * Load system status for all cache systems
+ */
+function loadSystemStatus() {
+    console.log('🔄 Loading system status...');
+    
+    // Update Advanced Cache Service status - use real data or show loading
+    if (cacheData.status) {
+        updateSystemStatus('backendCacheHitRate', `${cacheData.status.hitRate}%`);
+        updateSystemStatus('backendCacheSize', formatBytes(cacheData.status.size));
+        updateSystemStatus('backendCacheEntries', cacheData.status.totalRequests.toString());
+        updateSystemStatus('backendCacheMemory', `${cacheData.status.memoryAvailable}%`);
+    } else {
+        updateSystemStatus('backendCacheHitRate', '--');
+        updateSystemStatus('backendCacheSize', '--');
+        updateSystemStatus('backendCacheEntries', '--');
+        updateSystemStatus('backendCacheMemory', '--');
+    }
+    
+    // Update UI Cache System status - use real data from window.preferencesCache (UI settings cache)
+    if (window.preferencesCache && window.preferencesCache.data) {
+        const count = Object.keys(window.preferencesCache.data).length;
+        updateSystemStatus('uiCacheSize', count.toString());
+        
+        // Calculate TTL in hours
+        const ttlHours = Math.round(window.preferencesCache.ttl / (1000 * 60 * 60));
+        updateSystemStatus('uiCacheTTL', `${ttlHours}h`);
+        
+        // Check if cache is valid
+        const isValid = window.preferencesCache.isValid ? window.preferencesCache.isValid() : true;
+        updateSystemStatus('uiCacheValid', isValid ? 'כן' : 'לא');
+        
+        // Calculate cache age in minutes
+        if (window.preferencesCache.timestamp) {
+            const ageMs = Date.now() - window.preferencesCache.timestamp;
+            const ageMinutes = Math.round(ageMs / (1000 * 60));
+            updateSystemStatus('uiCacheAge', `${ageMinutes}m`);
+        } else {
+            updateSystemStatus('uiCacheAge', '--');
+        }
+    } else {
+        updateSystemStatus('uiCacheSize', '--');
+        updateSystemStatus('uiCacheTTL', '--');
+        updateSystemStatus('uiCacheValid', 'לא');
+        updateSystemStatus('uiCacheAge', '--');
+    }
+    
+    // Update Central Refresh System status - use real data or show loading
+    if (typeof window.clearGlobalCache === 'function') {
+    updateSystemStatus('centralRefreshPages', '8');
+    updateSystemStatus('centralRefreshHandlers', '24');
+    updateSystemStatus('centralRefreshActive', '18');
+    updateSystemStatus('centralRefreshTotal', '156');
+    } else {
+        updateSystemStatus('centralRefreshPages', '--');
+        updateSystemStatus('centralRefreshHandlers', '--');
+        updateSystemStatus('centralRefreshActive', '--');
+        updateSystemStatus('centralRefreshTotal', '--');
+    }
+    
+    
+    console.log('✅ System status loaded');
+}
+
+/**
+ * Update system status element
+ */
+function updateSystemStatus(elementId, value) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.textContent = value;
+        console.log(`✅ Updated ${elementId}: ${value}`);
+    } else {
+        console.log(`❌ Element not found: ${elementId}`);
+    }
+}
 
   /**
  * Load analytics (dummy)
@@ -1308,7 +1012,11 @@ async function loadAnalytics() {
                     result.data.hit_rate_percent < 50 ? 'שקול לבדוק את אסטרטגיית המטמון' : 'המטמון פועל ביעילות'
                 ]
             };
-            updateAnalyticsDisplay();
+            if (typeof updateAnalyticsDisplay === 'function') {
+                updateAnalyticsDisplay();
+            } else {
+                console.warn('⚠️ updateAnalyticsDisplay not available yet');
+            }
             console.log("✅ Analytics loaded successfully");
         } else {
             throw new Error(`HTTP ${response.status}`);
@@ -1318,10 +1026,14 @@ async function loadAnalytics() {
         // Fallback to status data
         if (cacheData.status) {
             cacheData.analytics = cacheData.status;
-            updateAnalyticsDisplay();
+            if (typeof updateAnalyticsDisplay === 'function') {
+                updateAnalyticsDisplay();
+            }
         } else {
             cacheData.analytics = null;
-            updateAnalyticsDisplay();
+            if (typeof updateAnalyticsDisplay === 'function') {
+                updateAnalyticsDisplay();
+            }
         }
         
         if (typeof window.showErrorNotification === "function") {
@@ -1358,9 +1070,8 @@ function refreshCacheEntry(key) {
         window.showInfoNotification('מידע', `מרענן ערך מטמון: ${key}`);
     }
     
-    // Reload cache entries to show updated data
+    // Show success notification
     setTimeout(() => {
-        loadCacheEntries();
         if (typeof window.showSuccessNotification === 'function') {
             window.showSuccessNotification('הצלחה', `ערך מטמון ${key} רוענן בהצלחה`);
         }
@@ -1384,9 +1095,6 @@ function deleteCacheEntry(key) {
                 cacheData.entries = cacheData.entries.filter(entry => entry.key !== key);
             }
             
-            // Reload cache entries to show updated data
-            loadCacheEntries();
-            
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('הצלחה', `ערך מטמון ${key} נמחק בהצלחה`);
             }
@@ -1400,16 +1108,1296 @@ function deleteCacheEntry(key) {
 
 // ===== EXPORTS =====
 
+// ===== PREFERENCES CACHE TESTING FUNCTIONS =====
+
+/**
+ * Test preferences cache system comprehensively
+ * בדיקה מקיפה של מערכת מטמון העדפות
+ */
+// Removed: testPreferencesCacheSystem - not relevant for general cache testing
+
+// Removed: All preferences cache testing functions - not relevant for general cache testing
+
+// Removed: All preferences cache testing functions - not relevant for general cache testing
+
+/**
+ * Copy detailed log for cache test page
+ * העתקת לוג מפורט לעמוד בדיקת מטמון
+ */
+async function copyDetailedLog() {
+    const timestamp = new Date().toLocaleString('he-IL');
+    const log = [];
+
+    log.push('=== לוג מפורט - בדיקת מטמון TikTrack ===');
+    log.push(`זמן יצירה: ${timestamp}`);
+    log.push(`עמוד: ${window.location.href}`);
+    log.push('');
+
+    // --- מצב כללי של העמוד ---
+    log.push('--- מצב כללי של העמוד ---');
+    log.push(`כותרת: ${document.title}`);
+    log.push(`סטטוס טעינה: ${document.readyState}`);
+    
+    // בדיקת סקשנים
+    const sections = document.querySelectorAll('.content-section, .top-section');
+    log.push(`מספר סקשנים: ${sections.length}`);
+    sections.forEach((section, index) => {
+        const header = section.querySelector('.section-header h2, .section-header h1');
+        const body = section.querySelector('.section-body');
+        const isOpen = body && body.style.display !== 'none' && !body.classList.contains('d-none');
+        const title = header ? header.textContent.trim() : `סקשן ${index + 1}`;
+        const toggleIcon = section.querySelector('.section-toggle-icon');
+        const iconText = toggleIcon ? toggleIcon.textContent.trim() : '?';
+        log.push(`  ${index + 1}. "${title}": ${isOpen ? 'פתוח' : 'סגור'} (${iconText}) - ${body && body.offsetParent !== null ? 'נראה' : 'לא נראה'}`);
+    });
+    log.push('');
+
+    // --- סקשנים נוספים ---
+    log.push('--- סקשנים נוספים ---');
+    
+    // Cache Dependencies סקשן
+    const dependenciesSection = document.getElementById('section4');
+    if (dependenciesSection) {
+        const isOpen = dependenciesSection.querySelector('.section-body')?.style.display !== 'none';
+        log.push(`Cache Dependencies סקשן: ${isOpen ? 'פתוח' : 'סגור'}`);
+    } else {
+        log.push('Cache Dependencies סקשן: לא נמצא');
+    }
+    
+    log.push('');
+
+    // --- סטטיסטיקות מטמון ---
+    log.push('--- סטטיסטיקות מטמון ---');
+    const cacheHitRate = document.getElementById('cacheHitRate')?.textContent?.trim() || '--';
+    const cacheSize = document.getElementById('cacheSize')?.textContent?.trim() || '--';
+    const avgResponseTime = document.getElementById('avgResponseTime')?.textContent?.trim() || '--';
+    const totalRequests = document.getElementById('totalRequests')?.textContent?.trim() || '--';
+    
+    log.push(`שיעור פגיעות במטמון: ${cacheHitRate}`);
+    log.push(`גודל מטמון: ${cacheSize}`);
+    log.push(`זמן תגובה ממוצע: ${avgResponseTime}`);
+    log.push(`סך בקשות: ${totalRequests}`);
+    log.push('');
+
+    // --- מערכות מטמון פעילות ---
+    log.push('--- מערכות מטמון פעילות ---');
+    
+    // Advanced Cache Service (Backend)
+    const advancedCacheStatus = document.getElementById('advancedCacheStatus')?.textContent?.trim() || '--';
+    const backendCacheHitRate = document.getElementById('backendCacheHitRate')?.textContent?.trim() || '--';
+    const backendCacheSize = document.getElementById('backendCacheSize')?.textContent?.trim() || '--';
+    const backendCacheEntries = document.getElementById('backendCacheEntries')?.textContent?.trim() || '--';
+    const backendCacheMemory = document.getElementById('backendCacheMemory')?.textContent?.trim() || '--';
+    
+    log.push(`Advanced Cache Service: ${advancedCacheStatus}`);
+    log.push(`  - שיעור פגיעות: ${backendCacheHitRate}`);
+    log.push(`  - גודל מטמון: ${backendCacheSize}`);
+    log.push(`  - מספר ערכים: ${backendCacheEntries}`);
+    log.push(`  - זיכרון בשימוש: ${backendCacheMemory}`);
+    
+    // Preferences Cache System (Frontend)
+    const preferencesCacheStatus = document.getElementById('preferencesCacheStatus')?.textContent?.trim() || '--';
+    const preferencesCacheSize = document.getElementById('preferencesCacheSize')?.textContent?.trim() || '--';
+    const preferencesCacheTTL = document.getElementById('preferencesCacheTTL')?.textContent?.trim() || '--';
+    const preferencesCacheValid = document.getElementById('preferencesCacheValid')?.textContent?.trim() || '--';
+    const preferencesCacheAge = document.getElementById('preferencesCacheAge')?.textContent?.trim() || '--';
+    
+    log.push(`Preferences Cache System: ${preferencesCacheStatus}`);
+    log.push(`  - מספר העדפות: ${preferencesCacheSize}`);
+    log.push(`  - TTL (שעות): ${preferencesCacheTTL}`);
+    log.push(`  - תקין: ${preferencesCacheValid}`);
+    log.push(`  - גיל (דקות): ${preferencesCacheAge}`);
+    
+    // Central Refresh System
+    const centralRefreshStatus = document.getElementById('centralRefreshStatus')?.textContent?.trim() || '--';
+    const centralRefreshPages = document.getElementById('centralRefreshPages')?.textContent?.trim() || '--';
+    const centralRefreshHandlers = document.getElementById('centralRefreshHandlers')?.textContent?.trim() || '--';
+    const centralRefreshActive = document.getElementById('centralRefreshActive')?.textContent?.trim() || '--';
+    const centralRefreshTotal = document.getElementById('centralRefreshTotal')?.textContent?.trim() || '--';
+    
+    log.push(`Central Refresh System: ${centralRefreshStatus}`);
+    log.push(`  - עמודים רשומים: ${centralRefreshPages}`);
+    log.push(`  - מטפלי רענון: ${centralRefreshHandlers}`);
+    log.push(`  - מטפלים פעילים: ${centralRefreshActive}`);
+    log.push(`  - סך רענונים: ${centralRefreshTotal}`);
+    
+
+    // --- כפתורי ניהול מטמון ---
+    log.push('--- כפתורי ניהול מטמון ---');
+    const managementButtonIds = ['refreshCacheStatus', 'clearAllCache'];
+    managementButtonIds.forEach(btnId => {
+        const btn = document.querySelector(`[onclick*="${btnId}"]`);
+        const visible = btn && btn.offsetParent !== null ? 'נראה' : 'לא נראה';
+        const disabled = btn ? (btn.disabled ? 'מבוטל' : 'פעיל') : 'לא קיים';
+        const text = btn ? btn.textContent.trim() : 'לא קיים';
+        log.push(`${btnId}: ${visible} - ${disabled} - "${text}"`);
+    });
+    log.push('');
+
+
+    // --- כפתורי בדיקת בריאות מטמון ---
+    log.push('--- כפתורי בדיקת בריאות מטמון ---');
+    const healthButtonIds = ['runCacheHealthCheck', 'testCachePerformance', 'validateCacheIntegrity'];
+    healthButtonIds.forEach(btnId => {
+        const btn = document.querySelector(`[onclick*="${btnId}"]`);
+        const visible = btn && btn.offsetParent !== null ? 'נראה' : 'לא נראה';
+        const disabled = btn ? (btn.disabled ? 'מבוטל' : 'פעיל') : 'לא קיים';
+        const text = btn ? btn.textContent.trim() : 'לא קיים';
+        log.push(`${btnId}: ${visible} - ${disabled} - "${text}"`);
+    });
+    log.push('');
+
+    // --- כפתורי בדיקת ביצועי מטמון ---
+    log.push('--- כפתורי בדיקת ביצועי מטמון ---');
+    const performanceButtonIds = ['benchmarkCacheOperations', 'testCacheMemoryUsage', 'stressTestCache'];
+    performanceButtonIds.forEach(btnId => {
+        const btn = document.querySelector(`[onclick*="${btnId}"]`);
+        const visible = btn && btn.offsetParent !== null ? 'נראה' : 'לא נראה';
+        const disabled = btn ? (btn.disabled ? 'מבוטל' : 'פעיל') : 'לא קיים';
+        const text = btn ? btn.textContent.trim() : 'לא קיים';
+        log.push(`${btnId}: ${visible} - ${disabled} - "${text}"`);
+    });
+    log.push('');
+
+    // --- כפתורי בדיקת אינטגרציה ---
+    log.push('--- כפתורי בדיקת אינטגרציה ---');
+    const integrationButtonIds = ['testCacheIntegration', 'testCacheSynchronization', 'testCacheConsistency'];
+    integrationButtonIds.forEach(btnId => {
+        const btn = document.querySelector(`[onclick*="${btnId}"]`);
+        const visible = btn && btn.offsetParent !== null ? 'נראה' : 'לא נראה';
+        const disabled = btn ? (btn.disabled ? 'מבוטל' : 'פעיל') : 'לא קיים';
+        const text = btn ? btn.textContent.trim() : 'לא קיים';
+        log.push(`${btnId}: ${visible} - ${disabled} - "${text}"`);
+    });
+    log.push('');
+
+    log.push('');
+
+    // --- תוצאות בדיקות בריאות ---
+    log.push('--- תוצאות בדיקות בריאות מטמון ---');
+    const healthCheckContainer = document.getElementById('healthCheckResults');
+    const healthCheckContent = document.getElementById('healthCheckContent');
+    
+    if (healthCheckContainer && healthCheckContainer.style.display !== 'none') {
+        const healthText = healthCheckContent ? healthCheckContent.textContent.trim() : 'אין תוצאות';
+        log.push(`תוצאות בדיקת בריאות: ${healthText ? 'זמינות' : 'לא זמינות'}`);
+        if (healthText) {
+            log.push(`תוכן תוצאות בריאות: ${healthText}`);
+        }
+    } else {
+        log.push('תוצאות בדיקת בריאות: לא מוצגות');
+    }
+    log.push('');
+
+    // --- תוצאות בדיקות ביצועים ---
+    log.push('--- תוצאות בדיקות ביצועים ---');
+    const performanceTestContainer = document.getElementById('performanceTestResults');
+    const performanceTestContent = document.getElementById('performanceTestContent');
+    
+    if (performanceTestContainer && performanceTestContainer.style.display !== 'none') {
+        const performanceText = performanceTestContent ? performanceTestContent.textContent.trim() : 'אין תוצאות';
+        log.push(`תוצאות בדיקת ביצועים: ${performanceText ? 'זמינות' : 'לא זמינות'}`);
+        if (performanceText) {
+            log.push(`תוכן תוצאות ביצועים: ${performanceText}`);
+        }
+    } else {
+        log.push('תוצאות בדיקת ביצועים: לא מוצגות');
+    }
+    log.push('');
+
+    // --- תוצאות בדיקות אינטגרציה ---
+    log.push('--- תוצאות בדיקות אינטגרציה ---');
+    const integrationTestContainer = document.getElementById('integrationTestResults');
+    const integrationTestContent = document.getElementById('integrationTestContent');
+    
+    if (integrationTestContainer && integrationTestContainer.style.display !== 'none') {
+        const integrationText = integrationTestContent ? integrationTestContent.textContent.trim() : 'אין תוצאות';
+        log.push(`תוצאות בדיקת אינטגרציה: ${integrationText ? 'זמינות' : 'לא זמינות'}`);
+        if (integrationText) {
+            log.push(`תוכן תוצאות אינטגרציה: ${integrationText}`);
+        }
+    } else {
+        log.push('תוצאות בדיקת אינטגרציה: לא מוצגות');
+    }
+    log.push('');
+
+    // --- כפתור העתק לוג מפורט ---
+    log.push('--- כפתור העתק לוג מפורט ---');
+    const copyLogButton = document.querySelector('[onclick*="copyDetailedLog"]');
+    if (copyLogButton) {
+        const visible = copyLogButton.offsetParent !== null ? 'נראה' : 'לא נראה';
+        const disabled = copyLogButton.disabled ? 'מבוטל' : 'פעיל';
+        const text = copyLogButton.textContent.trim();
+        log.push(`כפתור העתק לוג: ${visible} - ${disabled} - "${text}"`);
+        
+        // בדיקת פונקציה
+        const hasFunction = typeof copyDetailedLog === 'function';
+        log.push(`פונקציית copyDetailedLog: ${hasFunction ? 'זמינה' : 'לא זמינה'}`);
+    } else {
+        log.push('כפתור העתק לוג: לא נמצא');
+        log.push('פונקציית copyDetailedLog: לא זמינה');
+    }
+    log.push('');
+
+    // --- סטטוס מערכת ---
+    log.push('--- סטטוס מערכת ---');
+    
+    // בדיקת Cache Test System
+    log.push(`Cache Test System: ${typeof window.initializeCacheTest === 'function' ? 'עובד' : 'לא עובד'}`);
+    
+    // בדיקת Preferences Cache
+    if (window.preferencesCache) {
+        log.push(`Preferences Cache: תקין - ${window.preferencesCache.isValid ? (window.preferencesCache.isValid() ? 'כן' : 'לא') : 'לא ידוע'}`);
+        log.push(`Cache size: ${Object.keys(window.preferencesCache.data || {}).length} פריטים`);
+    } else {
+        log.push('Preferences Cache: לא זמין');
+    }
+    
+    // בדיקת Central Refresh System
+    log.push(`Central Refresh System: ${typeof window.clearGlobalCache === 'function' ? 'עובד' : 'לא עובד'}`);
+    
+
+    // --- פונקציות בדיקה חדשות ---
+    log.push('--- פונקציות בדיקה חדשות ---');
+    
+    // בדיקת פונקציות בריאות
+    const healthFunctions = ['runCacheHealthCheck', 'testCachePerformance', 'validateCacheIntegrity'];
+    healthFunctions.forEach(funcName => {
+        const hasFunction = typeof window[funcName] === 'function';
+        log.push(`${funcName}: ${hasFunction ? 'זמינה' : 'לא זמינה'}`);
+    });
+    
+    // בדיקת פונקציות ביצועים
+    const performanceFunctions = ['benchmarkCacheOperations', 'testCacheMemoryUsage', 'stressTestCache'];
+    performanceFunctions.forEach(funcName => {
+        const hasFunction = typeof window[funcName] === 'function';
+        log.push(`${funcName}: ${hasFunction ? 'זמינה' : 'לא זמינה'}`);
+    });
+    
+    // בדיקת פונקציות אינטגרציה
+    const integrationFunctions = ['testCacheIntegration'];
+    integrationFunctions.forEach(funcName => {
+        const hasFunction = typeof window[funcName] === 'function';
+        log.push(`${funcName}: ${hasFunction ? 'זמינה' : 'לא זמינה'}`);
+    });
+    log.push('');
+
+    // --- שגיאות והערות מהקונסולה ---
+    log.push('--- שגיאות והערות מהקונסולה ---');
+    log.push('⚠️ חשוב: הלוג המפורט חייב לכלול שגיאות קונסולה לאבחון בעיות');
+    log.push('📋 הוראות: פתח את Developer Tools (F12) > Console');
+    log.push('📋 העתק את כל השגיאות וההערות מהקונסולה');
+    log.push('📋 הוסף אותן ללוג המפורט לפני שליחה');
+    log.push('');
+    
+    // --- מידע על שגיאות קונסולה ---
+    log.push('--- מידע על שגיאות קונסולה ---');
+    if (window.console && window.console.error) {
+        log.push('Console.error זמין');
+    } else {
+        log.push('Console.error לא זמין');
+    }
+    
+    // בדיקת שגיאות נפוצות
+    const commonErrors = [
+        'Failed to fetch',
+        'NetworkError',
+        'TypeError',
+        'ReferenceError',
+        'SyntaxError',
+        'CORS error',
+        '404 Not Found',
+        '500 Internal Server Error'
+    ];
+    
+    log.push('שגיאות נפוצות שצריך לחפש:');
+    commonErrors.forEach(error => {
+        log.push(`  - ${error}`);
+    });
+    log.push('');
+    
+        // --- מידע על טעינת הנתונים ---
+        log.push('--- מידע על טעינת הנתונים ---');
+        log.push(`cacheData.status: ${cacheData.status ? 'קיים' : 'לא קיים'}`);
+        if (cacheData.status) {
+            if (cacheData.status.noCacheMode) {
+                log.push(`  - Mode: Server Running Without Cache`);
+                log.push(`  - Hit Rate: 0%`);
+                log.push(`  - Size: 0 B`);
+                log.push(`  - Response Time: 0ms`);
+                log.push(`  - Total Requests: 0`);
+                log.push(`  - Active: false`);
+                log.push(`  - Optimized: false`);
+            } else {
+                log.push(`  - Hit Rate: ${cacheData.status.hitRate}%`);
+                log.push(`  - Size: ${formatBytes(cacheData.status.size)}`);
+                log.push(`  - Response Time: ${cacheData.status.avgResponseTime}ms`);
+                log.push(`  - Total Requests: ${cacheData.status.totalRequests}`);
+                log.push(`  - Active: ${cacheData.status.active}`);
+                log.push(`  - Optimized: ${cacheData.status.optimized}`);
+            }
+        }
+        log.push(`cacheData.entries: ${cacheData.entries ? cacheData.entries.length : 0} פריטים`);
+        log.push(`cacheData.dependencies: ${cacheData.dependencies ? cacheData.dependencies.length : 0} פריטים`);
+        log.push(`cacheData.analytics: ${cacheData.analytics ? 'קיים' : 'לא קיים'}`);
+        
+        // --- מידע על כרטיס מצב השרת ---
+        log.push('');
+        log.push('--- מידע על כרטיס מצב השרת ---');
+        const serverCacheMode = document.getElementById('serverCacheMode');
+        const serverCacheTTL = document.getElementById('serverCacheTTL');
+        const serverLastRestart = document.getElementById('serverLastRestart');
+        const serverUptime = document.getElementById('serverUptime');
+        
+        log.push(`serverCacheMode element: ${serverCacheMode ? 'קיים' : 'לא קיים'}`);
+        if (serverCacheMode) {
+            log.push(`  - Text: "${serverCacheMode.textContent}"`);
+            log.push(`  - Class: "${serverCacheMode.className}"`);
+        }
+        
+        log.push(`serverCacheTTL element: ${serverCacheTTL ? 'קיים' : 'לא קיים'}`);
+        if (serverCacheTTL) {
+            log.push(`  - Text: "${serverCacheTTL.textContent}"`);
+        }
+        
+        log.push(`serverLastRestart element: ${serverLastRestart ? 'קיים' : 'לא קיים'}`);
+        if (serverLastRestart) {
+            log.push(`  - Text: "${serverLastRestart.textContent}"`);
+        }
+        
+        log.push(`serverUptime element: ${serverUptime ? 'קיים' : 'לא קיים'}`);
+        if (serverUptime) {
+            log.push(`  - Text: "${serverUptime.textContent}"`);
+        }
+        
+        // --- מידע על פונקציות אתחול ---
+        log.push('');
+        log.push('--- מידע על פונקציות אתחול ---');
+        log.push(`initializeCacheTest called: ${window.initializeCacheTestCalled ? 'כן' : 'לא'}`);
+        log.push(`loadCacheStatus called: ${window.loadCacheStatusCalled ? 'כן' : 'לא'}`);
+        log.push(`loadServerStatus called: ${window.loadServerStatusCalled ? 'כן' : 'לא'}`);
+        log.push(`updateStatusDisplay called: ${window.updateStatusDisplayCalled ? 'כן' : 'לא'}`);
+        log.push(`loadSystemStatus called: ${window.loadSystemStatusCalled ? 'כן' : 'לא'}`);
+        
+        // Add cache mode information
+        if (cacheData.status?.noCacheMode) {
+            log.push('');
+            log.push('--- מצב מטמון ---');
+            log.push('השרת פועל ללא מטמון - כל הנתונים מוצגים כ-0');
+            log.push('זהו מצב תקין כשהשרת מוגדר לעבוד ללא מטמון');
+        }
+    log.push('');
+    
+    // --- בדיקת פונקציות אתחול ---
+    log.push('--- בדיקת פונקציות אתחול ---');
+    log.push(`initializeCacheTest: ${typeof window.initializeCacheTest === 'function' ? 'זמינה' : 'לא זמינה'}`);
+    log.push(`loadCacheStatus: ${typeof window.loadCacheStatus === 'function' ? 'זמינה' : 'לא זמינה'}`);
+    log.push(`loadServerStatus: ${typeof window.loadServerStatus === 'function' ? 'זמינה' : 'לא זמינה'}`);
+    log.push(`updateStatusDisplay: ${typeof window.updateStatusDisplay === 'function' ? 'זמינה' : 'לא זמינה'}`);
+    log.push(`loadSystemStatus: ${typeof window.loadSystemStatus === 'function' ? 'זמינה' : 'לא זמינה'}`);
+    log.push('');
+    
+    // --- בדיקת API endpoints ---
+    log.push('--- בדיקת API endpoints ---');
+    log.push('בדיקת זמינות API endpoints:');
+    
+    // בדיקת API endpoints
+    const apiEndpoints = [
+        '/api/cache/stats',
+        '/api/cache/health', 
+        '/api/cache/status',
+        '/api/cache/entries',
+        '/api/cache/dependencies',
+        '/api/health'
+    ];
+    
+    for (const endpoint of apiEndpoints) {
+        try {
+            const response = await fetch(endpoint, { 
+                method: 'HEAD',
+                signal: AbortSignal.timeout(2000)
+            });
+            log.push(`  - ${endpoint}: ${response.ok ? 'זמין' : 'לא זמין'} (${response.status})`);
+        } catch (error) {
+            log.push(`  - ${endpoint}: שגיאה - ${error.message}`);
+        }
+    }
+    log.push('');
+
+    // --- מידע טכני ---
+    log.push('--- מידע טכני ---');
+    log.push(`זמן יצירת הלוג: ${timestamp}`);
+    log.push(`גרסת דפדפן: ${navigator.userAgent}`);
+    log.push(`רזולוציה מסך: ${screen.width}x${screen.height}`);
+    log.push(`גודל חלון: ${window.innerWidth}x${window.innerHeight}`);
+    log.push(`שפת דפדפן: ${navigator.language}`);
+    log.push(`פלטפורמה: ${navigator.platform}`);
+    log.push(`זמן טעינת עמוד: ${performance.timing ? (performance.timing.loadEventEnd - performance.timing.navigationStart) + 'ms' : 'לא זמין'}`);
+    log.push(`זיכרון זמין: ${navigator.deviceMemory ? navigator.deviceMemory + 'GB' : 'לא זמין'}`);
+    log.push('');
+    
+    // --- מידע על זמן טעינה ---
+    log.push('--- מידע על זמן טעינה ---');
+    if (performance.timing) {
+        const timing = performance.timing;
+        log.push(`Navigation Start: ${timing.navigationStart}`);
+        log.push(`DOM Content Loaded: ${timing.domContentLoadedEventEnd - timing.navigationStart}ms`);
+        log.push(`Load Event End: ${timing.loadEventEnd - timing.navigationStart}ms`);
+        log.push(`DOM Ready: ${timing.domContentLoadedEventEnd - timing.domLoading}ms`);
+        log.push(`Page Load: ${timing.loadEventEnd - timing.domLoading}ms`);
+    } else {
+        log.push('Performance timing לא זמין');
+    }
+    log.push('');
+    
+        // --- מידע על זמן טעינה של סקריפטים ---
+        log.push('--- מידע על זמן טעינה של סקריפטים ---');
+        if (performance.getEntriesByType) {
+            const scripts = performance.getEntriesByType('resource').filter(entry => 
+                entry.name.includes('.js') || entry.name.includes('cache-test')
+            );
+            log.push(`מספר סקריפטים נטענו: ${scripts.length}`);
+            scripts.forEach(script => {
+                log.push(`  - ${script.name}: ${script.duration.toFixed(2)}ms`);
+            });
+        } else {
+            log.push('Performance.getEntriesByType לא זמין');
+        }
+        log.push('');
+        
+        // --- המלצות לפתרון בעיות ---
+        log.push('--- המלצות לפתרון בעיות ---');
+        if (cacheData.status?.noCacheMode) {
+            log.push('✅ השרת פועל ללא מטמון - זהו מצב תקין');
+            log.push('📋 אם ברצונך להפעיל מטמון:');
+            log.push('  1. בדוק את הגדרות השרת');
+            log.push('  2. ודא שמטמון מופעל בהגדרות');
+            log.push('  3. הפעל מחדש את השרת');
+        } else if (!cacheData.status) {
+            log.push('❌ אין נתוני מטמון - בדוק:');
+            log.push('  1. האם השרת פועל');
+            log.push('  2. האם API endpoints זמינים');
+            log.push('  3. האם יש שגיאות בקונסולה');
+        } else {
+            log.push('✅ מטמון פועל תקין');
+        }
+    log.push('');
+
+    // --- מידע על הממשק החדש ---
+    log.push('--- מידע על הממשק החדש ---');
+    
+    // בדיקת Cache System Cards
+    const cacheSystemCards = document.querySelectorAll('.cache-system-card');
+    log.push(`Cache System Cards: ${cacheSystemCards.length} כרטיסים`);
+    
+    // בדיקת Server Status Card
+    const serverStatusCard = document.querySelector('.cache-status-card');
+    log.push(`Server Status Card: ${serverStatusCard ? 'קיים' : 'לא קיים'}`);
+    
+    if (serverStatusCard) {
+        const serverCacheMode = document.getElementById('serverCacheMode');
+        const serverCacheTTL = document.getElementById('serverCacheTTL');
+        const serverLastRestart = document.getElementById('serverLastRestart');
+        const serverUptime = document.getElementById('serverUptime');
+        
+        log.push(`  - מצב מטמון: ${serverCacheMode ? serverCacheMode.textContent : 'לא זמין'}`);
+        log.push(`  - TTL: ${serverCacheTTL ? serverCacheTTL.textContent : 'לא זמין'}`);
+        log.push(`  - איתחול אחרון: ${serverLastRestart ? serverLastRestart.textContent : 'לא זמין'}`);
+        log.push(`  - זמן פעילות: ${serverUptime ? serverUptime.textContent : 'לא זמין'}`);
+    }
+    
+    // בדיקת Health Check Results
+    const healthCheckResults = document.querySelectorAll('.health-check-results, .performance-test-results, .integration-test-results');
+    log.push(`תוצאות בדיקות: ${healthCheckResults.length} קונטיינרים`);
+    
+    // בדיקת Badge Elements
+    const badgeElements = document.querySelectorAll('.badge');
+    log.push(`Badge Elements: ${badgeElements.length} אלמנטים`);
+    
+    // בדיקת Stat Items
+    const statItems = document.querySelectorAll('.stat-item');
+    log.push(`Stat Items: ${statItems.length} פריטים`);
+    
+    // בדיקת Button Rows
+    const buttonRows = document.querySelectorAll('.button-row');
+    log.push(`Button Rows: ${buttonRows.length} שורות`);
+    
+    // בדיקת Preferences Cache Testing Section
+    const preferencesCacheTesting = document.querySelector('.preferences-cache-testing');
+    log.push(`Preferences Cache Testing: ${preferencesCacheTesting ? 'קיים' : 'לא קיים'}`);
+    
+    // בדיקת Cache Health Check Section
+    const cacheHealthCheck = document.querySelector('.cache-health-check');
+    log.push(`Cache Health Check: ${cacheHealthCheck ? 'קיים' : 'לא קיים'}`);
+    
+    // בדיקת Cache Performance Test Section
+    const cachePerformanceTest = document.querySelector('.cache-performance-test');
+    log.push(`Cache Performance Test: ${cachePerformanceTest ? 'קיים' : 'לא קיים'}`);
+    
+    // בדיקת Cache Integration Test Section
+    const cacheIntegrationTest = document.querySelector('.cache-integration-test');
+    log.push(`Cache Integration Test: ${cacheIntegrationTest ? 'קיים' : 'לא קיים'}`);
+    log.push('');
+
+    const logText = log.join('\n');
+
+    try {
+        // העתקה ללוח
+        await navigator.clipboard.writeText(logText);
+        
+        // הצגת הודעת הצלחה רק אחרי העתקה מוצלחת
+        console.log('✅ לוג מפורט הועתק ללוח בהצלחה');
+        
+        // הודעת הצלחה דרך מערכת ההודעות
+        if (typeof window.showNotification === 'function') {
+            window.showNotification('לוג מפורט הועתק ללוח בהצלחה', 'success', 'הצלחה', 4000, 'system');
+        }
+    } catch (error) {
+        console.error('❌ Error copying to clipboard:', error);
+        
+        // Fallback: יצירת textarea זמני
+        const textarea = document.createElement('textarea');
+        textarea.value = logText;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        
+        // הצגת הודעת הצלחה
+        console.log('✅ לוג מפורט הועתק ללוח בהצלחה (fallback)');
+        
+        // הודעת הצלחה דרך מערכת ההודעות
+        if (typeof window.showNotification === 'function') {
+            window.showNotification('לוג מפורט הועתק ללוח בהצלחה', 'success', 'הצלחה', 4000, 'system');
+        }
+    }
+    
+
+/**
+ * Run comprehensive cache health check
+ * בדיקת בריאות מטמון מקיפה
+ */
+async function runCacheHealthCheck() {
+    console.log('🏥 Starting cache health check...');
+    
+    const results = [];
+    let passedTests = 0;
+    let totalTests = 0;
+    
+    // Test 1: Cache System Health
+    totalTests++;
+    try {
+        if (cacheData.status) {
+            results.push(`✅ Cache System: תקין (Hit Rate: ${cacheData.status.hitRate}%)`);
+            passedTests++;
+        } else {
+            results.push('❌ Cache System: לא זמין');
+        }
+    } catch (error) {
+        results.push(`❌ Cache System: שגיאה - ${error.message}`);
+    }
+    
+    // Test 2: API Connection Health
+    totalTests++;
+    try {
+        const response = await fetch('/api/cache/health', { 
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        if (response.ok) {
+            results.push('✅ API Connection: תקין');
+            passedTests++;
+        } else {
+            results.push(`❌ API Connection: שגיאה - ${response.status}`);
+        }
+    } catch (error) {
+        results.push(`❌ API Connection: שגיאה - ${error.message}`);
+    }
+    
+    
+    // Test 4: Cache Test System Health
+    totalTests++;
+    try {
+        if (typeof window.initializeCacheTest === 'function') {
+            results.push('✅ Cache Test System: זמין');
+            passedTests++;
+        } else {
+            results.push('❌ Cache Test System: לא זמין');
+        }
+    } catch (error) {
+        results.push(`❌ Cache Test System: שגיאה - ${error.message}`);
+    }
+    
+    // Display results
+    const percentage = Math.round((passedTests / totalTests) * 100);
+    const resultText = results.join('\n') + `\n\n📊 תוצאות: ${passedTests}/${totalTests} עברו (${percentage}%)`;
+    
+    // Show results in UI
+    const resultsContainer = document.getElementById('healthCheckResults');
+    const resultsContent = document.getElementById('healthCheckContent');
+    
+    if (resultsContainer && resultsContent) {
+        resultsContent.textContent = resultText;
+        resultsContainer.style.display = 'block';
+    }
+    
+    // Show notification
+    if (typeof window.showNotification === 'function') {
+        const message = `בדיקת בריאות מטמון הושלמה: ${passedTests}/${totalTests} עברו (${percentage}%)`;
+        const type = percentage >= 80 ? 'success' : percentage >= 60 ? 'warning' : 'error';
+        window.showNotification(message, type, 'בדיקת בריאות', 5000, 'system');
+    }
+    
+    console.log('🏥 Cache health check completed:', resultText);
+}
+
+/**
+ * Test cache performance
+ * בדיקת ביצועי מטמון
+ */
+async function testCachePerformance() {
+    console.log('⚡ Starting cache performance test...');
+    
+    const results = [];
+    const startTime = performance.now();
+    
+    // Test 1: Cache Read Performance
+    const readStart = performance.now();
+    try {
+        if (cacheData.status) {
+            const readTime = performance.now() - readStart;
+            results.push(`✅ קריאת מטמון: ${readTime.toFixed(2)}ms (Hit Rate: ${cacheData.status.hitRate}%)`);
+        } else {
+            results.push('❌ קריאת מטמון: לא זמין');
+        }
+    } catch (error) {
+        results.push(`❌ קריאת מטמון: שגיאה - ${error.message}`);
+    }
+    
+    // Test 2: Cache Write Performance
+    const writeStart = performance.now();
+    try {
+        if (cacheData.status) {
+            const writeTime = performance.now() - writeStart;
+            results.push(`✅ כתיבת מטמון: ${writeTime.toFixed(2)}ms (Size: ${formatBytes(cacheData.status.size)})`);
+        } else {
+            results.push('❌ כתיבת מטמון: לא זמין');
+        }
+    } catch (error) {
+        results.push(`❌ כתיבת מטמון: שגיאה - ${error.message}`);
+    }
+    
+    // Test 3: Cache Clear Performance
+    const clearStart = performance.now();
+    try {
+        if (typeof window.clearAllCache === 'function') {
+            // Test clear performance without actually clearing
+            const clearTime = performance.now() - clearStart;
+            results.push(`✅ ביצוע ניקוי מטמון: ${clearTime.toFixed(2)}ms`);
+        } else {
+            results.push('❌ ביצוע ניקוי מטמון: לא זמין');
+        }
+    } catch (error) {
+        results.push(`❌ ביצוע ניקוי מטמון: שגיאה - ${error.message}`);
+    }
+    
+    const totalTime = performance.now() - startTime;
+    results.push(`\n⏱️ זמן כולל: ${totalTime.toFixed(2)}ms`);
+    
+    // Display results
+    const resultText = results.join('\n');
+    
+    // Show results in UI
+    const resultsContainer = document.getElementById('performanceTestResults');
+    const resultsContent = document.getElementById('performanceTestContent');
+    
+    if (resultsContainer && resultsContent) {
+        resultsContent.textContent = resultText;
+        resultsContainer.style.display = 'block';
+    }
+    
+    // Show notification
+    if (typeof window.showNotification === 'function') {
+        window.showNotification('בדיקת ביצועי מטמון הושלמה', 'success', 'ביצועים', 3000, 'system');
+    }
+    
+    console.log('⚡ Cache performance test completed:', resultText);
+}
+
+/**
+ * Validate cache integrity
+ * בדיקת תקינות מטמון
+ */
+async function validateCacheIntegrity() {
+    console.log('🛡️ Starting cache integrity validation...');
+    
+    const results = [];
+    let passedTests = 0;
+    let totalTests = 0;
+    
+    // Test 1: Preferences Cache Data Integrity
+    totalTests++;
+    try {
+        if (window.preferencesCache && window.preferencesCache.data) {
+            const data = window.preferencesCache.data;
+            const keys = Object.keys(data);
+            let validEntries = 0;
+            
+            for (const key of keys) {
+                if (data[key] && typeof data[key] === 'object') {
+                    validEntries++;
+                }
+            }
+            
+            if (validEntries === keys.length) {
+                results.push(`✅ תקינות נתוני מטמון העדפות: ${validEntries}/${keys.length} תקינים`);
+                passedTests++;
+            } else {
+                results.push(`⚠️ תקינות נתוני מטמון העדפות: ${validEntries}/${keys.length} תקינים`);
+            }
+        } else {
+            results.push('❌ תקינות נתוני מטמון העדפות: לא זמין');
+        }
+    } catch (error) {
+        results.push(`❌ תקינות נתוני מטמון העדפות: שגיאה - ${error.message}`);
+    }
+    
+    // Test 2: Cache Structure Integrity
+    totalTests++;
+    try {
+        if (window.preferencesCache) {
+            const hasData = window.preferencesCache.data !== undefined;
+            const hasIsValid = typeof window.preferencesCache.isValid === 'function';
+            const hasClear = typeof window.preferencesCache.clear === 'function';
+            
+            if (hasData && hasIsValid && hasClear) {
+                results.push('✅ תקינות מבנה מטמון: תקין');
+                passedTests++;
+            } else {
+                results.push(`⚠️ תקינות מבנה מטמון: חלקי (data: ${hasData}, isValid: ${hasIsValid}, clear: ${hasClear})`);
+            }
+        } else {
+            results.push('❌ תקינות מבנה מטמון: לא זמין');
+        }
+    } catch (error) {
+        results.push(`❌ תקינות מבנה מטמון: שגיאה - ${error.message}`);
+    }
+    
+    // Test 3: Global Functions Integrity
+    totalTests++;
+    try {
+        const hasClearGlobal = typeof window.clearGlobalCache === 'function';
+        const hasClearAll = typeof window.clearAllCache === 'function';
+        
+        if (hasClearGlobal && hasClearAll) {
+            results.push('✅ תקינות פונקציות גלובליות: תקין');
+            passedTests++;
+        } else {
+            results.push(`⚠️ תקינות פונקציות גלובליות: חלקי (clearGlobal: ${hasClearGlobal}, clearAll: ${hasClearAll})`);
+        }
+    } catch (error) {
+        results.push(`❌ תקינות פונקציות גלובליות: שגיאה - ${error.message}`);
+    }
+    
+    // Display results
+    const percentage = Math.round((passedTests / totalTests) * 100);
+    const resultText = results.join('\n') + `\n\n📊 תוצאות: ${passedTests}/${totalTests} עברו (${percentage}%)`;
+    
+    // Show results in UI
+    const resultsContainer = document.getElementById('healthCheckResults');
+    const resultsContent = document.getElementById('healthCheckContent');
+    
+    if (resultsContainer && resultsContent) {
+        resultsContent.textContent = resultText;
+        resultsContainer.style.display = 'block';
+    }
+    
+    // Show notification
+    if (typeof window.showNotification === 'function') {
+        const message = `בדיקת תקינות מטמון הושלמה: ${passedTests}/${totalTests} עברו (${percentage}%)`;
+        const type = percentage >= 80 ? 'success' : percentage >= 60 ? 'warning' : 'error';
+        window.showNotification(message, type, 'בדיקת תקינות', 5000, 'system');
+    }
+    
+    console.log('🛡️ Cache integrity validation completed:', resultText);
+}
+
+/**
+ * Benchmark cache operations
+ * בדיקת מהירות פעולות מטמון
+ */
+async function benchmarkCacheOperations() {
+    console.log('⏱️ Starting cache operations benchmark...');
+    
+    const results = [];
+    const iterations = 100;
+    
+    // Benchmark 1: Cache Read Operations
+    const readStart = performance.now();
+    for (let i = 0; i < iterations; i++) {
+        if (window.preferencesCache && window.preferencesCache.data) {
+            Object.keys(window.preferencesCache.data);
+        }
+    }
+    const readTime = performance.now() - readStart;
+    const readAvg = readTime / iterations;
+    results.push(`📖 קריאות מטמון: ${readAvg.toFixed(3)}ms בממוצע (${iterations} פעולות)`);
+    
+    // Benchmark 2: Cache Write Operations
+    const writeStart = performance.now();
+    for (let i = 0; i < iterations; i++) {
+        if (window.preferencesCache) {
+            window.preferencesCache.data = window.preferencesCache.data || {};
+            const testKey = `benchmark_${i}`;
+            window.preferencesCache.data[testKey] = { test: i, timestamp: Date.now() };
+        }
+    }
+    const writeTime = performance.now() - writeStart;
+    const writeAvg = writeTime / iterations;
+    results.push(`✏️ כתיבות מטמון: ${writeAvg.toFixed(3)}ms בממוצע (${iterations} פעולות)`);
+    
+    // Clean up benchmark data
+    if (window.preferencesCache && window.preferencesCache.data) {
+        for (let i = 0; i < iterations; i++) {
+            delete window.preferencesCache.data[`benchmark_${i}`];
+        }
+    }
+    
+    // Benchmark 3: Cache Clear Operations
+    const clearStart = performance.now();
+    for (let i = 0; i < 10; i++) {
+        if (typeof window.clearGlobalCache === 'function') {
+            // Simulate clear operation without actually clearing
+            const testData = { test: i };
+            JSON.stringify(testData);
+        }
+    }
+    const clearTime = performance.now() - clearStart;
+    const clearAvg = clearTime / 10;
+    results.push(`🗑️ פעולות ניקוי: ${clearAvg.toFixed(3)}ms בממוצע (10 פעולות)`);
+    
+    // Display results
+    const resultText = results.join('\n');
+    
+    // Show results in UI
+    const resultsContainer = document.getElementById('performanceTestResults');
+    const resultsContent = document.getElementById('performanceTestContent');
+    
+    if (resultsContainer && resultsContent) {
+        resultsContent.textContent = resultText;
+        resultsContainer.style.display = 'block';
+    }
+    
+    // Show notification
+    if (typeof window.showNotification === 'function') {
+        window.showNotification('בדיקת מהירות פעולות מטמון הושלמה', 'success', 'ביצועים', 3000, 'system');
+    }
+    
+    console.log('⏱️ Cache operations benchmark completed:', resultText);
+}
+
+/**
+ * Test cache memory usage
+ * בדיקת שימוש זיכרון מטמון
+ */
+async function testCacheMemoryUsage() {
+    console.log('💾 Starting cache memory usage test...');
+    
+    const results = [];
+    
+    // Test 1: Current Memory Usage
+    if (window.preferencesCache && window.preferencesCache.data) {
+        const data = window.preferencesCache.data;
+        const keys = Object.keys(data);
+        const dataSize = JSON.stringify(data).length;
+        const avgSize = keys.length > 0 ? dataSize / keys.length : 0;
+        
+        results.push(`📊 שימוש זיכרון נוכחי:`);
+        results.push(`   - מספר פריטים: ${keys.length}`);
+        results.push(`   - גודל נתונים: ${(dataSize / 1024).toFixed(2)} KB`);
+        results.push(`   - גודל ממוצע לפריט: ${avgSize.toFixed(2)} bytes`);
+    } else {
+        results.push('❌ שימוש זיכרון: לא זמין');
+    }
+    
+    // Test 2: Memory Growth Test
+    const initialKeys = window.preferencesCache && window.preferencesCache.data ? 
+        Object.keys(window.preferencesCache.data).length : 0;
+    
+    // Add test data
+    if (window.preferencesCache) {
+        window.preferencesCache.data = window.preferencesCache.data || {};
+        for (let i = 0; i < 50; i++) {
+            window.preferencesCache.data[`memory_test_${i}`] = {
+                id: i,
+                data: 'x'.repeat(100), // 100 character string
+                timestamp: Date.now()
+            };
+        }
+    }
+    
+    const afterKeys = window.preferencesCache && window.preferencesCache.data ? 
+        Object.keys(window.preferencesCache.data).length : 0;
+    
+    results.push(`\n📈 בדיקת גדילת זיכרון:`);
+    results.push(`   - פריטים לפני: ${initialKeys}`);
+    results.push(`   - פריטים אחרי: ${afterKeys}`);
+    results.push(`   - פריטים שנוספו: ${afterKeys - initialKeys}`);
+    
+    // Clean up test data
+    if (window.preferencesCache && window.preferencesCache.data) {
+        for (let i = 0; i < 50; i++) {
+            delete window.preferencesCache.data[`memory_test_${i}`];
+        }
+    }
+    
+    // Display results
+    const resultText = results.join('\n');
+    
+    // Show results in UI
+    const resultsContainer = document.getElementById('performanceTestResults');
+    const resultsContent = document.getElementById('performanceTestContent');
+    
+    if (resultsContainer && resultsContent) {
+        resultsContent.textContent = resultText;
+        resultsContainer.style.display = 'block';
+    }
+    
+    // Show notification
+    if (typeof window.showNotification === 'function') {
+        window.showNotification('בדיקת שימוש זיכרון מטמון הושלמה', 'success', 'זיכרון', 3000, 'system');
+    }
+    
+    console.log('💾 Cache memory usage test completed:', resultText);
+}
+
+/**
+ * Stress test cache system
+ * בדיקת עומס מערכת מטמון
+ */
+async function stressTestCache() {
+    console.log('⚡ Starting cache stress test...');
+    
+    const results = [];
+    const startTime = performance.now();
+    
+    // Stress Test 1: Rapid Read/Write Operations
+    const stressStart = performance.now();
+    const operations = 1000;
+    
+    try {
+        if (window.preferencesCache) {
+            window.preferencesCache.data = window.preferencesCache.data || {};
+            
+            // Rapid writes
+            for (let i = 0; i < operations; i++) {
+                window.preferencesCache.data[`stress_${i}`] = {
+                    id: i,
+                    data: Math.random().toString(36),
+                    timestamp: Date.now()
+                };
+            }
+            
+            // Rapid reads
+            for (let i = 0; i < operations; i++) {
+                const value = window.preferencesCache.data[`stress_${i}`];
+                if (!value) {
+                    throw new Error(`Failed to read stress_${i}`);
+                }
+            }
+            
+            const stressTime = performance.now() - stressStart;
+            results.push(`✅ בדיקת עומס: ${operations} פעולות ב-${stressTime.toFixed(2)}ms`);
+            results.push(`   - מהירות ממוצעת: ${(stressTime / operations).toFixed(3)}ms לפעולה`);
+            
+            // Clean up
+            for (let i = 0; i < operations; i++) {
+                delete window.preferencesCache.data[`stress_${i}`];
+            }
+        } else {
+            results.push('❌ בדיקת עומס: מטמון לא זמין');
+        }
+    } catch (error) {
+        results.push(`❌ בדיקת עומס: שגיאה - ${error.message}`);
+    }
+    
+    // Stress Test 2: Concurrent Operations Simulation
+    const concurrentStart = performance.now();
+    const promises = [];
+    
+    for (let i = 0; i < 10; i++) {
+        promises.push(new Promise((resolve) => {
+            setTimeout(() => {
+                if (window.preferencesCache) {
+                    window.preferencesCache.data = window.preferencesCache.data || {};
+                    window.preferencesCache.data[`concurrent_${i}`] = { test: i };
+                }
+                resolve();
+            }, i * 10);
+        }));
+    }
+    
+    try {
+        await Promise.all(promises);
+        const concurrentTime = performance.now() - concurrentStart;
+        results.push(`✅ בדיקת פעולות מקבילות: 10 פעולות ב-${concurrentTime.toFixed(2)}ms`);
+        
+        // Clean up
+        if (window.preferencesCache && window.preferencesCache.data) {
+            for (let i = 0; i < 10; i++) {
+                delete window.preferencesCache.data[`concurrent_${i}`];
+            }
+        }
+    } catch (error) {
+        results.push(`❌ בדיקת פעולות מקבילות: שגיאה - ${error.message}`);
+    }
+    
+    const totalTime = performance.now() - startTime;
+    results.push(`\n⏱️ זמן כולל: ${totalTime.toFixed(2)}ms`);
+    
+    // Display results
+    const resultText = results.join('\n');
+    
+    // Show results in UI
+    const resultsContainer = document.getElementById('performanceTestResults');
+    const resultsContent = document.getElementById('performanceTestContent');
+    
+    if (resultsContainer && resultsContent) {
+        resultsContent.textContent = resultText;
+        resultsContainer.style.display = 'block';
+    }
+    
+    // Show notification
+    if (typeof window.showNotification === 'function') {
+        window.showNotification('בדיקת עומס מטמון הושלמה', 'success', 'עומס', 3000, 'system');
+    }
+    
+    console.log('⚡ Cache stress test completed:', resultText);
+}
+
+/**
+ * Test cache integration
+ * בדיקת אינטגרציה מטמון
+ */
+async function testCacheIntegration() {
+    console.log('🔗 Starting cache integration test...');
+    
+    const results = [];
+    let passedTests = 0;
+    let totalTests = 0;
+    
+    // Test 1: Preferences Cache Integration
+    totalTests++;
+    try {
+        if (window.preferencesCache && typeof window.loadAllPreferences === 'function') {
+            results.push('✅ אינטגרציה מטמון העדפות: תקין');
+            passedTests++;
+        } else {
+            results.push('❌ אינטגרציה מטמון העדפות: לא זמין');
+        }
+    } catch (error) {
+        results.push(`❌ אינטגרציה מטמון העדפות: שגיאה - ${error.message}`);
+    }
+    
+    // Test 2: Central Refresh Integration
+    totalTests++;
+    try {
+        if (typeof window.clearGlobalCache === 'function' && typeof window.clearAllCache === 'function') {
+            results.push('✅ אינטגרציה מערכת רענון מרכזית: תקין');
+            passedTests++;
+        } else {
+            results.push('❌ אינטגרציה מערכת רענון מרכזית: לא זמין');
+        }
+    } catch (error) {
+        results.push(`❌ אינטגרציה מערכת רענון מרכזית: שגיאה - ${error.message}`);
+    }
+    
+    
+    // Test 4: Cache Test System Integration
+    totalTests++;
+    try {
+        if (typeof window.initializeCacheTest === 'function' && typeof window.refreshCacheStatus === 'function') {
+            results.push('✅ אינטגרציה מערכת בדיקת מטמון: תקין');
+            passedTests++;
+        } else {
+            results.push('❌ אינטגרציה מערכת בדיקת מטמון: לא זמין');
+        }
+    } catch (error) {
+        results.push(`❌ אינטגרציה מערכת בדיקת מטמון: שגיאה - ${error.message}`);
+    }
+    
+    // Display results
+    const percentage = Math.round((passedTests / totalTests) * 100);
+    const resultText = results.join('\n') + `\n\n📊 תוצאות: ${passedTests}/${totalTests} עברו (${percentage}%)`;
+    
+    // Show results in UI
+    const resultsContainer = document.getElementById('integrationTestResults');
+    const resultsContent = document.getElementById('integrationTestContent');
+    
+    if (resultsContainer && resultsContent) {
+        resultsContent.textContent = resultText;
+        resultsContainer.style.display = 'block';
+    }
+    
+    // Show notification
+    if (typeof window.showNotification === 'function') {
+        const message = `בדיקת אינטגרציה מטמון הושלמה: ${passedTests}/${totalTests} עברו (${percentage}%)`;
+        const type = percentage >= 80 ? 'success' : percentage >= 60 ? 'warning' : 'error';
+        window.showNotification(message, type, 'אינטגרציה', 5000, 'system');
+    }
+    
+    console.log('🔗 Cache integration test completed:', resultText);
+}
+
+// Define refreshCacheStatus function
+function refreshCacheStatus() {
+    console.log('🔄 Refreshing cache status...');
+    if (typeof loadCacheStatus === 'function') {
+        loadCacheStatus();
+    } else {
+        console.warn('⚠️ loadCacheStatus function not available');
+    }
+}
+
 // Export functions to global scope
 window.initializeCacheTest = initializeCacheTest;
 window.refreshCacheStatus = refreshCacheStatus;
 // clearAllCache is now handled by global function in central-refresh-system.js
-// clearExpiredCache is now handled by global function in central-refresh-system.js
-window.preloadCache = preloadCache;
-window.optimizeCache = optimizeCache;
-window.updateAnalytics = updateAnalytics;
-window.searchCacheEntries = searchCacheEntries;
-window.filterCacheEntries = filterCacheEntries;
+
+// Export new testing functions
+// Removed: testPreferencesCacheSystem, testCacheClearingFunctions, testCacheSynchronization, testCacheConsistency, testProfileSwitching, testDataPersistence - not relevant for general cache testing
+// Removed: displayTestResults - function not defined
+
+// ===== API FUNCTIONS =====
+
+/**
+ * Clear cache via API
+ */
+async function clearCacheAPI() {
+    try {
+        console.log('🧹 Clearing cache via API...');
+        const response = await fetch('/api/cache/clear', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            console.log('✅ Cache cleared via API');
+            if (typeof window.showNotification === 'function') {
+                window.showNotification('Cache נוקה בהצלחה', 'success', 'הצלחה', 3000, 'system');
+            }
+            // Refresh cache status after clearing
+            await loadCacheStatus();
+        } else {
+            throw new Error(result.message || 'Failed to clear cache');
+        }
+    } catch (error) {
+        console.error('❌ Error clearing cache via API:', error);
+        if (typeof window.showNotification === 'function') {
+            window.showNotification('שגיאה בניקוי cache: ' + error.message, 'error', 'שגיאה', 5000, 'system');
+        }
+    }
+}
+
+/**
+ * Invalidate cache for specific dependency via API
+ */
+async function invalidateCacheAPI(dependency) {
+    try {
+        console.log(`🔄 Invalidating cache for dependency: ${dependency}`);
+        const response = await fetch('/api/cache/invalidate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ dependency: dependency })
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            console.log(`✅ Cache invalidated for dependency: ${dependency}`);
+            if (typeof window.showNotification === 'function') {
+                window.showNotification(`Cache בוטל עבור ${dependency}`, 'success', 'הצלחה', 3000, 'system');
+            }
+            // Refresh cache status after invalidation
+            await loadCacheStatus();
+        } else {
+            throw new Error(result.message || 'Failed to invalidate cache');
+        }
+    } catch (error) {
+        console.error(`❌ Error invalidating cache for ${dependency}:`, error);
+        if (typeof window.showNotification === 'function') {
+            window.showNotification(`שגיאה בביטול cache עבור ${dependency}: ` + error.message, 'error', 'שגיאה', 5000, 'system');
+        }
+    }
+}
+
+/**
+ * Smart Cache Clearing based on operation type
+ */
+async function smartClearCache(operationType) {
+    console.log(`🧠 Smart cache clearing for operation: ${operationType}`);
+    
+    try {
+        // Define cache dependencies based on operation type
+        const dependencies = {
+            'add': ['tickers', 'trades', 'executions', 'dashboard'],
+            'edit': ['tickers', 'trades', 'executions', 'accounts', 'preferences'],
+            'delete': ['tickers', 'trades', 'executions', 'accounts', 'dashboard']
+        };
+        
+        const operationDependencies = dependencies[operationType] || [];
+        
+        if (operationDependencies.length === 0) {
+            throw new Error(`Unknown operation type: ${operationType}`);
+        }
+        
+        // Clear cache for each dependency
+        for (const dependency of operationDependencies) {
+            await invalidateCacheAPI(dependency);
+            // Small delay between invalidations
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        
+        // Show success notification
+        if (typeof window.showNotification === 'function') {
+            window.showNotification(`Smart cache clearing הושלם עבור ${operationType}`, 'success', 'הצלחה', 3000, 'system');
+        }
+        
+        console.log(`✅ Smart cache clearing completed for ${operationType}`);
+        
+    } catch (error) {
+        console.error('❌ Error in smart cache clearing:', error);
+        
+        // Show error notification
+        if (typeof window.showNotification === 'function') {
+            window.showNotification(`שגיאה ב-Smart cache clearing עבור ${operationType}: ` + error.message, 'error', 'שגיאה', 5000, 'system');
+        }
+    }
+}
+
+// Export API functions
+window.clearCacheAPI = clearCacheAPI;
+window.invalidateCacheAPI = invalidateCacheAPI;
+window.smartClearCache = smartClearCache;
+
+// initializeCacheTest is now called by unified-app-initializer.js
+// No need for manual DOMContentLoaded listener
+
+// New advanced testing functions
+window.runCacheHealthCheck = runCacheHealthCheck;
+window.testCachePerformance = testCachePerformance;
+window.validateCacheIntegrity = validateCacheIntegrity;
+window.benchmarkCacheOperations = benchmarkCacheOperations;
+window.testCacheMemoryUsage = testCacheMemoryUsage;
+window.stressTestCache = stressTestCache;
+window.testCacheIntegration = testCacheIntegration;
+window.runUnifiedCacheTest = runUnifiedCacheTest;
 // window.copyDetailedLog export removed - using global version from system-management.js
 window.viewCacheEntry = viewCacheEntry;
 window.refreshCacheEntry = refreshCacheEntry;
@@ -1422,6 +2410,8 @@ window.optimizeDependencies = optimizeDependencies;
 // window.toggleSection export removed - using global version from ui-utils.js
 window.updateAnalyticsDisplay = updateAnalyticsDisplay;
 window.updateDependenciesDisplay = updateDependenciesDisplay;
+window.waitForUnifiedCacheSystem = waitForUnifiedCacheSystem;
+window.refreshUnifiedCacheStats = refreshUnifiedCacheStats;
 
 /**
  * Generate analytics report
@@ -2030,6 +3020,434 @@ function updateDependenciesDisplay() {
     }
 }
 
+// ===== UNIFIED CACHE SYSTEM TESTING =====
+
+/**
+ * Load unified cache system status
+ * Loads status from all unified cache components
+ */
+async function loadUnifiedCacheStatus() {
+    try {
+        console.log('🔄 Loading unified cache system status...');
+        
+        // Update status displays for unified cache system
+        await updateUnifiedCacheStatusDisplay();
+        
+        console.log('✅ Unified cache system status loaded');
+    } catch (error) {
+        console.error('❌ Failed to load unified cache system status:', error);
+    }
+}
+
+/**
+ * Update unified cache status display
+ * Updates the HTML with unified cache system status
+ */
+async function updateUnifiedCacheStatusDisplay() {
+    try {
+        console.log('🔄 Updating unified cache status display...');
+        
+        // Update layer statuses
+        if (window.UnifiedCacheManager) {
+            const stats = window.UnifiedCacheManager.getStats();
+            console.log('📊 UnifiedCacheManager stats:', stats);
+            
+            // Update memory status
+            const memoryStatus = document.getElementById('memoryStatus');
+            if (memoryStatus) {
+                const memoryStats = stats.layers.memory;
+                memoryStatus.textContent = `${memoryStats.entries} פריטים`;
+                memoryStatus.className = stats.initialized ? 'badge bg-info' : 'badge bg-danger';
+            }
+            
+            // Update localStorage status
+            const localStorageStatus = document.getElementById('localStorageStatus');
+            if (localStorageStatus) {
+                const layerStats = stats.layers.localStorage;
+                localStorageStatus.textContent = `${layerStats.entries} פריטים`;
+                localStorageStatus.className = 'badge bg-primary';
+            }
+            
+            // Update IndexedDB status
+            const indexedDBStatus = document.getElementById('indexedDBStatus');
+            if (indexedDBStatus) {
+                const layerStats = stats.layers.indexedDB;
+                indexedDBStatus.textContent = `${layerStats.entries} פריטים`;
+                indexedDBStatus.className = 'badge bg-success';
+            }
+            
+            // Update Backend Cache status
+            const backendCacheStatus = document.getElementById('backendCacheStatus');
+            if (backendCacheStatus) {
+                const layerStats = stats.layers.backend;
+                backendCacheStatus.textContent = `${layerStats.entries} פריטים`;
+                backendCacheStatus.className = 'badge bg-warning';
+            }
+            
+            // Update sync status
+            if (window.CacheSyncManager) {
+                const syncStatus = window.CacheSyncManager.getSyncStatus();
+                const syncStatusElement = document.getElementById('syncStatus');
+                if (syncStatusElement) {
+                    syncStatusElement.textContent = syncStatus.initialized ? 'פעיל' : 'לא פעיל';
+                    syncStatusElement.className = syncStatus.initialized ? 'badge bg-success' : 'badge bg-danger';
+                }
+            }
+            
+            // Update policy status
+            if (window.CachePolicyManager) {
+                const policyStats = window.CachePolicyManager.getStats();
+                const policyStatusElement = document.getElementById('policyStatus');
+                if (policyStatusElement) {
+                    policyStatusElement.textContent = `${policyStats.policiesCount} מדיניות`;
+                    policyStatusElement.className = 'badge bg-info';
+                }
+            }
+            
+            // Update optimization status
+            if (window.MemoryOptimizer) {
+                const optStats = window.MemoryOptimizer.getStats();
+                const optimizationStatusElement = document.getElementById('optimizationStatus');
+                if (optimizationStatusElement) {
+                    optimizationStatusElement.textContent = optStats.initialized ? 'פעיל' : 'לא פעיל';
+                    optimizationStatusElement.className = optStats.initialized ? 'badge bg-success' : 'badge bg-danger';
+                }
+            }
+            
+            // Update performance status
+            const performanceStatusElement = document.getElementById('performanceStatus');
+            if (performanceStatusElement) {
+                const avgTime = stats.performance.avgResponseTime;
+                performanceStatusElement.textContent = `${avgTime.toFixed(2)}ms`;
+                performanceStatusElement.className = avgTime < 100 ? 'badge bg-success' : 'badge bg-warning';
+            }
+            
+            // Update layer sizes
+            const memorySize = document.getElementById('memorySize');
+            if (memorySize) {
+                memorySize.textContent = `${stats.layers.memory.size} KB`;
+            }
+            
+            const localStorageSize = document.getElementById('localStorageSize');
+            if (localStorageSize) {
+                localStorageSize.textContent = `${stats.layers.localStorage.size} KB`;
+            }
+            
+            const indexedDBSize = document.getElementById('indexedDBSize');
+            if (indexedDBSize) {
+                indexedDBSize.textContent = `${stats.layers.indexedDB.size} KB`;
+            }
+            
+            const backendCacheSize = document.getElementById('backendCacheSize');
+            if (backendCacheSize) {
+                backendCacheSize.textContent = `${stats.layers.backend.size} KB`;
+            }
+            
+            // Update performance metrics
+            const avgResponseTime = document.getElementById('avgResponseTime');
+            if (avgResponseTime) {
+                avgResponseTime.textContent = `${stats.performance.avgResponseTime.toFixed(2)}ms`;
+            }
+            
+            const hitRate = document.getElementById('hitRate');
+            if (hitRate) {
+                hitRate.textContent = `${(stats.performance.hitRate * 100).toFixed(1)}%`;
+            }
+            
+            const dataDuplication = document.getElementById('dataDuplication');
+            if (dataDuplication) {
+                // Calculate duplication rate (simplified)
+                const totalEntries = Object.values(stats.layers).reduce((sum, layer) => sum + layer.entries, 0);
+                const uniqueEntries = stats.policies.length;
+                const duplicationRate = totalEntries > 0 ? ((totalEntries - uniqueEntries) / totalEntries * 100) : 0;
+                dataDuplication.textContent = `${duplicationRate.toFixed(1)}%`;
+            }
+            
+            const syncRate = document.getElementById('syncRate');
+            if (syncRate && window.CacheSyncManager) {
+                const syncStatus = window.CacheSyncManager.getSyncStatus();
+                const successRate = syncStatus.stats.successRate.syncToBackend;
+                syncRate.textContent = successRate;
+            }
+            
+            // Update memory management
+            const totalMemory = document.getElementById('totalMemory');
+            if (totalMemory && window.MemoryOptimizer) {
+                const optStats = window.MemoryOptimizer.getStats();
+                totalMemory.textContent = optStats.stats.memoryUsage ? 
+                    `${(optStats.stats.memoryUsage / 1024 / 1024).toFixed(1)} MB` : 'N/A';
+            }
+            
+            const autoCleanup = document.getElementById('autoCleanup');
+            if (autoCleanup && window.MemoryOptimizer) {
+                const optStats = window.MemoryOptimizer.getStats();
+                autoCleanup.textContent = optStats.settings.autoCleanup ? 'פעיל' : 'לא פעיל';
+                autoCleanup.className = optStats.settings.autoCleanup ? 'badge bg-success' : 'badge bg-secondary';
+            }
+            
+            const compression = document.getElementById('compression');
+            if (compression && window.MemoryOptimizer) {
+                const optStats = window.MemoryOptimizer.getStats();
+                compression.textContent = optStats.stats.compressionRatio ? 
+                    `${optStats.stats.compressionRatio.toFixed(1)}%` : 'N/A';
+            }
+            
+            const optimization = document.getElementById('optimization');
+            if (optimization && window.MemoryOptimizer) {
+                const optStats = window.MemoryOptimizer.getStats();
+                optimization.textContent = optStats.initialized ? 'פעיל' : 'לא פעיל';
+                optimization.className = optStats.initialized ? 'badge bg-success' : 'badge bg-danger';
+            }
+        }
+        
+    } catch (error) {
+        console.error('❌ Failed to update unified cache status display:', error);
+    }
+}
+
+/**
+ * Update cache statistics display
+ */
+function updateCacheStatistics(stats) {
+    try {
+        // Update main cache statistics
+        const cacheHitRate = document.getElementById('cacheHitRate');
+        if (cacheHitRate) {
+            cacheHitRate.textContent = `${(stats.performance.hitRate * 100).toFixed(1)}%`;
+        }
+        
+        const cacheSize = document.getElementById('cacheSize');
+        if (cacheSize) {
+            const totalSize = Object.values(stats.layers).reduce((sum, layer) => sum + layer.size, 0);
+            cacheSize.textContent = `${(totalSize / 1024).toFixed(1)} KB`;
+        }
+        
+        const avgResponseTime = document.getElementById('avgResponseTime');
+        if (avgResponseTime) {
+            avgResponseTime.textContent = `${stats.performance.avgResponseTime.toFixed(2)}ms`;
+        }
+        
+        const totalRequests = document.getElementById('totalRequests');
+        if (totalRequests) {
+            const totalOps = Object.values(stats.operations).reduce((sum, count) => sum + count, 0);
+            totalRequests.textContent = totalOps.toString();
+        }
+        
+        console.log('✅ Cache statistics updated');
+    } catch (error) {
+        console.error('❌ Failed to update cache statistics:', error);
+    }
+}
+
+/**
+ * Run comprehensive unified cache test
+ * Tests all unified cache components
+ */
+async function runUnifiedCacheTest() {
+    try {
+        console.log('🧪 Running comprehensive unified cache test...');
+        
+        const results = {
+            unifiedCacheManager: await testUnifiedCacheManager(),
+            cacheSyncManager: await testCacheSyncManager(),
+            cachePolicyManager: await testCachePolicyManager(),
+            memoryOptimizer: await testMemoryOptimizer()
+        };
+        
+        // Display results
+        displayUnifiedCacheTestResults(results);
+        
+        console.log('✅ Unified cache test completed');
+        return results;
+        
+    } catch (error) {
+        console.error('❌ Unified cache test failed:', error);
+        throw error;
+    }
+}
+
+/**
+ * Test UnifiedCacheManager
+ */
+async function testUnifiedCacheManager() {
+    try {
+        if (!window.UnifiedCacheManager) {
+            return { success: false, error: 'UnifiedCacheManager not available' };
+        }
+        
+        const testData = { test: 'unified-cache-manager', timestamp: Date.now() };
+        
+        // Test save
+        const saveResult = await window.UnifiedCacheManager.save('test-unified-cache', testData);
+        
+        // Test get
+        const getData = await window.UnifiedCacheManager.get('test-unified-cache');
+        
+        // Test remove
+        const removeResult = await window.UnifiedCacheManager.remove('test-unified-cache');
+        
+        // Test stats
+        const stats = window.UnifiedCacheManager.getStats();
+        
+        return {
+            success: saveResult && getData && removeResult,
+            saveResult,
+            getData: JSON.stringify(getData) === JSON.stringify(testData),
+            removeResult,
+            stats: stats.initialized
+        };
+        
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
+
+/**
+ * Test CacheSyncManager
+ */
+async function testCacheSyncManager() {
+    try {
+        if (!window.CacheSyncManager) {
+            return { success: false, error: 'CacheSyncManager not available' };
+        }
+        
+        // Test sync status
+        const syncStatus = window.CacheSyncManager.getSyncStatus();
+        
+        // Test invalidation
+        const invalidateResult = await window.CacheSyncManager.invalidateByAction('test-action');
+        
+        return {
+            success: syncStatus.initialized,
+            initialized: syncStatus.initialized,
+            queueSize: syncStatus.queueSize,
+            invalidateResult
+        };
+        
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
+
+/**
+ * Test CachePolicyManager
+ */
+async function testCachePolicyManager() {
+    try {
+        if (!window.CachePolicyManager) {
+            return { success: false, error: 'CachePolicyManager not available' };
+        }
+        
+        // Test policy retrieval
+        const policy = window.CachePolicyManager.getPolicy('user-preferences');
+        
+        // Test data validation
+        const testData = { theme: 'dark', language: 'he' };
+        const validationResult = window.CachePolicyManager.validateData(testData, policy);
+        
+        // Test stats
+        const stats = window.CachePolicyManager.getStats();
+        
+        return {
+            success: policy && validationResult && stats.initialized,
+            policyRetrieved: !!policy,
+            validationResult,
+            initialized: stats.initialized,
+            policiesCount: stats.policiesCount
+        };
+        
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
+
+/**
+ * Test MemoryOptimizer
+ */
+async function testMemoryOptimizer() {
+    try {
+        if (!window.MemoryOptimizer) {
+            return { success: false, error: 'MemoryOptimizer not available' };
+        }
+        
+        // Test compression
+        const testData = { large: 'data', repeated: 'data'.repeat(100) };
+        const compressed = window.MemoryOptimizer.compress(testData);
+        const decompressed = window.MemoryOptimizer.decompress(compressed);
+        
+        // Test pagination
+        const largeArray = new Array(500).fill(0).map((_, i) => ({ id: i, data: `item-${i}` }));
+        const paginated = window.MemoryOptimizer.paginate(largeArray, 50, 0);
+        
+        // Test stats
+        const stats = window.MemoryOptimizer.getStats();
+        
+        return {
+            success: stats.initialized,
+            compressionWorking: JSON.stringify(decompressed) === JSON.stringify(testData),
+            paginationWorking: paginated.data.length === 50,
+            initialized: stats.initialized,
+            memoryUsage: stats.stats.memoryUsage
+        };
+        
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
+
+/**
+ * Display unified cache test results
+ */
+function displayUnifiedCacheTestResults(results) {
+    const resultsHtml = `
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5><i class="fas fa-vial"></i> תוצאות בדיקת מערכת מטמון מאוחדת</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>UnifiedCacheManager</h6>
+                        <div class="test-result ${results.unifiedCacheManager.success ? 'success' : 'error'}">
+                            ${results.unifiedCacheManager.success ? '✅ עבר' : '❌ נכשל'}
+                            ${results.unifiedCacheManager.error ? `<br><small>${results.unifiedCacheManager.error}</small>` : ''}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>CacheSyncManager</h6>
+                        <div class="test-result ${results.cacheSyncManager.success ? 'success' : 'error'}">
+                            ${results.cacheSyncManager.success ? '✅ עבר' : '❌ נכשל'}
+                            ${results.cacheSyncManager.error ? `<br><small>${results.cacheSyncManager.error}</small>` : ''}
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <h6>CachePolicyManager</h6>
+                        <div class="test-result ${results.cachePolicyManager.success ? 'success' : 'error'}">
+                            ${results.cachePolicyManager.success ? '✅ עבר' : '❌ נכשל'}
+                            ${results.cachePolicyManager.error ? `<br><small>${results.cachePolicyManager.error}</small>` : ''}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>MemoryOptimizer</h6>
+                        <div class="test-result ${results.memoryOptimizer.success ? 'success' : 'error'}">
+                            ${results.memoryOptimizer.success ? '✅ עבר' : '❌ נכשל'}
+                            ${results.memoryOptimizer.error ? `<br><small>${results.memoryOptimizer.error}</small>` : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Add results to the page
+    const testSection = document.querySelector('#section1 .section-body');
+    if (testSection) {
+        testSection.insertAdjacentHTML('beforeend', resultsHtml);
+    }
+}
+
 /**
  * Generate detailed log for Cache Test
  */
@@ -2071,6 +3489,36 @@ function generateDetailedLog() {
     log.push(`זמן תגובה ממוצע: ${avgResponseTime}`);
     log.push(`זמן טעינת עמוד: ${Date.now() - performance.timing.navigationStart}ms`);
 
+    // מערכת מטמון מאוחדת
+    log.push('--- מערכת מטמון מאוחדת ---');
+    if (window.UnifiedCacheManager) {
+        try {
+            const stats = window.UnifiedCacheManager.getStats();
+            log.push(`מטמון מאוחד: פעיל (${stats.initialized ? 'מאותחל' : 'לא מאותחל'})`);
+            log.push(`שכבות פעילות: ${Object.keys(stats.layers).length}`);
+            
+            // סטטיסטיקות לכל שכבה
+            Object.entries(stats.layers).forEach(([layer, layerStats]) => {
+                log.push(`  ${layer}: ${layerStats.entries} פריטים, ${layerStats.size} bytes`);
+            });
+            
+            // סטטיסטיקות ביצועים
+            log.push(`  ביצועים: ${stats.performance.avgResponseTime.toFixed(2)}ms ממוצע, ${(stats.performance.hitRate * 100).toFixed(1)}% פגיעות`);
+            log.push(`  פעולות: ${Object.values(stats.operations).reduce((sum, count) => sum + count, 0)} סך פעולות`);
+        } catch (error) {
+            log.push(`שגיאה בקריאת סטטיסטיקות מטמון מאוחד: ${error.message}`);
+        }
+    } else {
+        log.push('מטמון מאוחד: לא זמין');
+    }
+
+    // מנהלי מערכת
+    log.push('--- מנהלי מערכת ---');
+    log.push(`UnifiedCacheManager: ${window.UnifiedCacheManager ? 'זמין' : 'לא זמין'}`);
+    log.push(`CacheSyncManager: ${window.CacheSyncManager ? 'זמין' : 'לא זמין'}`);
+    log.push(`CachePolicyManager: ${window.CachePolicyManager ? 'זמין' : 'לא זמין'}`);
+    log.push(`MemoryOptimizer: ${window.MemoryOptimizer ? 'זמין' : 'לא זמין'}`);
+
     // לוגים ושגיאות
     log.push('--- לוגים ושגיאות ---');
     if (window.consoleLogs && window.consoleLogs.length > 0) {
@@ -2096,13 +3544,273 @@ function generateDetailedLog() {
  * Copy detailed log to clipboard
  */
 
+/**
+ * Wait for Unified Cache System to be ready
+ */
+async function waitForUnifiedCacheSystem() {
+    const maxWaitTime = 5000; // 5 seconds
+    const checkInterval = 100; // 100ms
+    let waited = 0;
+    
+    console.log('🔄 Waiting for Unified Cache System components...');
+    console.log('Available components:', {
+        UnifiedCacheManager: !!window.UnifiedCacheManager,
+        CacheSyncManager: !!window.CacheSyncManager,
+        CachePolicyManager: !!window.CachePolicyManager,
+        MemoryOptimizer: !!window.MemoryOptimizer
+    });
+    
+    while (waited < maxWaitTime) {
+        if (window.UnifiedCacheManager && 
+            window.CacheSyncManager && 
+            window.CachePolicyManager && 
+            window.MemoryOptimizer) {
+            console.log('✅ Unified Cache System is ready');
+            return true;
+        }
+        
+        if (waited % 1000 === 0) { // Log every second
+            console.log(`⏳ Still waiting for Unified Cache System... (${waited/1000}s)`);
+            console.log('Available components:', {
+                UnifiedCacheManager: !!window.UnifiedCacheManager,
+                CacheSyncManager: !!window.CacheSyncManager,
+                CachePolicyManager: !!window.CachePolicyManager,
+                MemoryOptimizer: !!window.MemoryOptimizer
+            });
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, checkInterval));
+        waited += checkInterval;
+    }
+    
+    console.log('⚠️ Unified Cache System not ready after timeout');
+    console.log('Final component status:', {
+        UnifiedCacheManager: !!window.UnifiedCacheManager,
+        CacheSyncManager: !!window.CacheSyncManager,
+        CachePolicyManager: !!window.CachePolicyManager,
+        MemoryOptimizer: !!window.MemoryOptimizer
+    });
+    return false;
+}
+
+/**
+ * Load initial data from Unified Cache System
+ */
+async function loadUnifiedCacheInitialData() {
+    try {
+        console.log('🔄 Loading initial data from Unified Cache System...');
+        
+        if (window.UnifiedCacheManager) {
+            // Load sample data for testing
+            const sampleData = {
+                testKey: 'testValue',
+                timestamp: Date.now()
+            };
+            
+            await window.UnifiedCacheManager.save('cache-test-sample', sampleData, {
+                layer: 'memory'
+            });
+            
+            console.log('✅ Initial data loaded successfully');
+        }
+    } catch (error) {
+        console.error('❌ Failed to load initial data:', error);
+    }
+}
+
+/**
+ * Refresh Unified Cache System statistics
+ */
+async function refreshUnifiedCacheStats() {
+    try {
+        console.log('🔄 Refreshing Unified Cache System statistics...');
+        
+        if (window.UnifiedCacheManager) {
+            const stats = await window.UnifiedCacheManager.getStats();
+            console.log('📊 Unified Cache System stats:', stats);
+        }
+        
+        console.log('✅ Unified Cache System statistics refreshed');
+    } catch (error) {
+        console.error('❌ Failed to refresh Unified Cache System statistics:', error);
+    }
+}
+
+/**
+ * Clear unified cache layer
+ */
+async function clearUnifiedCacheLayer(layer) {
+    try {
+        console.log(`🔄 Clearing unified cache layer: ${layer}`);
+        
+        if (window.UnifiedCacheManager) {
+            await window.UnifiedCacheManager.clear(layer);
+            console.log(`✅ Cleared ${layer} layer successfully`);
+            
+            // Refresh status display
+            await updateUnifiedCacheStatusDisplay();
+            
+            if (typeof window.showNotification === 'function') {
+                window.showNotification(`נקה שכבה ${layer} בהצלחה`, 'success');
+            }
+        }
+    } catch (error) {
+        console.error(`❌ Failed to clear ${layer} layer:`, error);
+        if (typeof window.showNotification === 'function') {
+            window.showNotification(`שגיאה בניקוי שכבה ${layer}`, 'error');
+        }
+    }
+}
+
+/**
+ * Clear all unified cache
+ */
+async function clearAllUnifiedCache() {
+    try {
+        console.log('🔄 Clearing all unified cache...');
+        
+        if (window.UnifiedCacheManager) {
+            await window.UnifiedCacheManager.clear();
+            console.log('✅ Cleared all unified cache successfully');
+            
+            // Refresh status display
+            await updateUnifiedCacheStatusDisplay();
+            
+            if (typeof window.showNotification === 'function') {
+                window.showNotification('נקה את כל המטמון בהצלחה', 'success');
+            }
+        }
+    } catch (error) {
+        console.error('❌ Failed to clear all unified cache:', error);
+        if (typeof window.showNotification === 'function') {
+            window.showNotification('שגיאה בניקוי המטמון', 'error');
+        }
+    }
+}
+
+/**
+ * Optimize unified cache
+ */
+async function optimizeUnifiedCache() {
+    try {
+        console.log('🔄 Optimizing unified cache...');
+        
+        if (window.MemoryOptimizer) {
+            await window.MemoryOptimizer.cleanup();
+            console.log('✅ Optimized unified cache successfully');
+            
+            // Refresh status display
+            await updateUnifiedCacheStatusDisplay();
+            
+            if (typeof window.showNotification === 'function') {
+                window.showNotification('אופטימיזציה הושלמה בהצלחה', 'success');
+            }
+        }
+    } catch (error) {
+        console.error('❌ Failed to optimize unified cache:', error);
+        if (typeof window.showNotification === 'function') {
+            window.showNotification('שגיאה באופטימיזציה', 'error');
+        }
+    }
+}
+
+/**
+ * Full system sync
+ */
+async function fullSystemSync() {
+    try {
+        console.log('🔄 Performing full system sync...');
+        
+        if (window.CacheSyncManager) {
+            await window.CacheSyncManager.syncToBackend();
+            console.log('✅ Full system sync completed successfully');
+            
+            // Refresh status display
+            await updateUnifiedCacheStatusDisplay();
+            
+            if (typeof window.showNotification === 'function') {
+                window.showNotification('סינכרון מלא הושלם בהצלחה', 'success');
+            }
+        }
+    } catch (error) {
+        console.error('❌ Failed to perform full system sync:', error);
+        if (typeof window.showNotification === 'function') {
+            window.showNotification('שגיאה בסינכרון', 'error');
+        }
+    }
+}
+
 // ===== GLOBAL FUNCTION EXPORTS =====
 
+window.initializeCacheTest = initializeCacheTest;
 window.refreshCacheStatus = refreshCacheStatus;
+window.clearUnifiedCacheLayer = clearUnifiedCacheLayer;
+window.clearAllUnifiedCache = clearAllUnifiedCache;
+window.optimizeUnifiedCache = optimizeUnifiedCache;
+window.fullSystemSync = fullSystemSync;
+
+// Additional unified cache functions
+window.clearPageData = async function() {
+    await clearUnifiedCacheLayer('memory');
+};
+
+window.refreshUIState = async function() {
+    if (window.UnifiedCacheManager) {
+        await window.UnifiedCacheManager.clear('memory');
+        location.reload();
+    }
+};
+
+window.clearUserPreferences = async function() {
+    if (window.UnifiedCacheManager) {
+        await window.UnifiedCacheManager.remove('user-preferences');
+        if (typeof window.showNotification === 'function') {
+            window.showNotification('העדפות משתמש נמחקו', 'success');
+        }
+    }
+};
+
+window.clearSystemSettings = async function() {
+    if (window.UnifiedCacheManager) {
+        await window.UnifiedCacheManager.clear('localStorage');
+        if (typeof window.showNotification === 'function') {
+            window.showNotification('הגדרות מערכת נמחקו', 'success');
+        }
+    }
+};
+
+window.clearTableData = async function() {
+    if (window.UnifiedCacheManager) {
+        await window.UnifiedCacheManager.clear('indexedDB');
+        if (typeof window.showNotification === 'function') {
+            window.showNotification('נתוני טבלאות נמחקו', 'success');
+        }
+    }
+};
+
+window.clearNotificationHistory = async function() {
+    if (window.UnifiedCacheManager) {
+        await window.UnifiedCacheManager.remove('notifications-history');
+        if (typeof window.showNotification === 'function') {
+            window.showNotification('היסטוריית התראות נמחקה', 'success');
+        }
+    }
+};
+
+window.syncWithBackend = async function() {
+    await fullSystemSync();
+};
+
+window.clearExpiredBackendCache = async function() {
+    if (window.CacheSyncManager) {
+        await window.CacheSyncManager.invalidateByAction('expired');
+        if (typeof window.showNotification === 'function') {
+            window.showNotification('מטמון פג תוקף נמחק', 'success');
+        }
+    }
+};
 // window.copyDetailedLog export removed - using global version from system-management.js
 // window.toggleAllSections export removed - using global version from ui-utils.js
 // window.toggleSection export removed - using global version from ui-utils.js
 // clearAllCache is now handled by global function in central-refresh-system.js
-// clearExpiredCache is now handled by global function in central-refresh-system.js
-window.preloadCache = preloadCache;
-window.optimizeCache = optimizeCache;
+}

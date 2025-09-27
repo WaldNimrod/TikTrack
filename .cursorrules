@@ -1,0 +1,166 @@
+# TikTrack Development Rules - .cursorrules
+# ===============================================
+# קובץ חוקי פיתוח קבועים למערכת TikTrack
+# נטען אוטומטית בכל צ'אט חדש
+
+## 🌐 שפה ותקשורת (Language & Communication)
+1. Always respond in Hebrew - all code, documentation, database data, and folder names should be in English only
+2. Use clear, organized responses - don't stop mid-response
+3. Work methodically, step by step, without skipping steps - for complex processes, create temporary documentation file with detailed work steps and work against the file. Delete temporary file when work is complete
+4. If unsure about user's suggestion, propose alternatives before implementation
+5. If missing information for action or doubt about requested action - ask user and propose alternatives + reasoned recommendation
+
+## 🏗️ ארכיטקטורה וקוד (Architecture & Code)
+
+### פונקציות כלליות
+6. The system has various general systems - their details are in the general systems list documentation file. Must read the documentation file before starting work. Before creating a new page-specific function that parallels an existing general system, explicit user approval must be obtained
+7. Must follow the script architecture described in documentation. Includes proper division of functions between different files, relevant and generic function and variable names. Must refer to mandatory reading of script architecture documentation file
+8. Prohibition on inserting scripts into page files - use only script files according to architecture
+9. After writing any new function, ensure no duplicates were created and delete old functions that are no longer relevant if needed. Then ensure all calls to the old function are updated to work with the current version
+
+### מבנה קבצים
+10. The system currently operates with Hebrew interface only. Translation is performed only in the user interface and includes a general translation system
+11. Use '-service.js' suffix for entity service files (not '-utils.js')
+12. **Core JavaScript Files** - Use existing core files: `ui-utils.js`, `notification-system.js`, `tables.js`, `page-utils.js`, `unified-app-initializer.js`
+13. **Unified Initialization System** - Must use the unified initialization system (`unified-app-initializer.js`) with 5-stage initialization process. No individual `DOMContentLoaded` listeners allowed
+14. **File Structure Rules** - Follow modular structure: general systems in `/scripts/`, page-specific functions in page files, service files with `-service.js` suffix
+15. **System Architecture** - Check `GENERAL_SYSTEMS_LIST.md` for available general systems before creating new functions. Use existing systems from the 95 implemented systems
+16. **Prohibited Practices** - No inline scripts in HTML files, no duplicate functions across files, use existing global systems before creating new ones
+
+## 🗄️ מערכת מטמון (Cache System)
+17. **Unified Cache System** - Use the 4-layer cache system: Frontend Memory, localStorage, IndexedDB, Backend Cache
+18. **Cache Managers** - Use `unified-cache-manager.js`, `cache-sync-manager.js`, `cache-policy-manager.js`, `memory-optimizer.js`
+19. **Cache Operations** - All cache operations must go through the unified cache system, not direct localStorage/IndexedDB calls
+20. **Cache Invalidation** - Use dependency-based cache invalidation, not pattern-based
+21. **Cache Documentation** - Follow cache architecture documentation: `CACHE_ARCHITECTURE_REDESIGN_PLAN.md`, `CACHE_IMPLEMENTATION_GUIDE.md`
+22. **Section State Persistence** - Use automatic section state saving/restoration across page navigation with 100ms delay for DOM readiness
+
+## 🎨 עיצוב ממשק משתמש (UI Design)
+
+### הנחיות כלליות לממשק משתמש
+23. **ITCSS Architecture** - Work only according to the ITCSS architecture rules of the system. Reference: `documentation/frontend/CSS_ARCHITECTURE_GUIDE.md`
+24. **CSS Loading Order** - Bootstrap CSS must load first, then ITCSS files to override Bootstrap styles
+25. **ITCSS Hierarchy** - Follow the 9-layer ITCSS structure: Settings → Tools → Generic → Elements → Objects → Components → Pages → Themes → Utilities
+26. **CSS File Organization** - Use 23 organized files in advanced ITCSS structure for 83.4% performance improvement
+27. **No Inline Code** - No inline CSS, JavaScript, or HTML code in any element
+28. **Minimal Classes** - Always search for existing classes to use before creating new classes
+29. **No !important** - Don't use !important. If absolutely necessary, must get specific user approval before using
+
+### צבעים דינמיים והעדפות משתמש
+30. **Dynamic Color System** - Use the dynamic color system based on user preferences. Reference: `documentation/frontend/DYNAMIC_COLORS_GUIDE.md`. Work with this system as much as possible
+31. **Light Backgrounds Only** - The system currently works with light backgrounds only, no dark mode
+32. **Logo Colors Default** - When needed, use logo colors as default: Green `#28a745`, Orange `#fd7e14`, Black `#000000`
+
+### מיקום ופריסה
+33. **RTL Hebrew Layout** - The system works right-to-left in Hebrew. Must read the RTL work guide. Reference: `documentation/RTL_HEBREW_GUIDE.md`
+34. **Logical Alignment** - Prefer alignment by start/end of line: in Hebrew right=start of line, left=end of line. Example: main menu aligned right, logo aligned left in header element
+35. **Full Width Backgrounds** - System operates with full-width backgrounds, content limited to 1400px width
+36. **Fixed Page Template** - All pages built on fixed template of containers and sections including comments and locks. Never break this structure. Reference: `documentation/frontend/PAGE_STRUCTURE_TEMPLATE.md`
+37. All button rows should display inline side by side (not stacked) and be aligned to end of line by default
+38. **RTL Alignment Examples** - Correct alignment examples in Hebrew:
+   - Close button for module always in header at end of line (left)
+   - Headers always at start of line (right)  
+   - Action buttons for module always at end of line (left)
+   - Checkboxes - checkbox itself before the label to its right in Hebrew
+
+### עיצוב טבלאות
+39. **Table Design System** - All table styling centralized in table styles file for uniform appearance and convenient management
+40. **Table Width** - Total width of all tables should be 100% of their container by default
+41. **Column Width** - Column widths should be defined in percentages by default
+42. **Actions Column** - Take into account the actions column (if exists) added to table after creation so table displays fully without horizontal scrolling
+43. **Responsive Tables** - All tables must support various screen sizes
+
+## 🗄️ בסיס נתונים (Database)
+44. **Time Zones** - Single fixed clock for code and data (UTC), display according to user preferences timezone
+45. **Database Constraints** - All database data must work according to existing system constraints. Reference: `documentation/database/CONSTRAINTS_IMPLEMENTATION.md`
+46. **Dynamic Validation** - Use ValidationService for real-time database constraint validation with 89 custom constraints
+47. **Constraint Management** - Work with dynamic constraint tables: `constraints`, `enum_values`, `constraint_validations`
+48. **Database File** - Use Backend/db/simpleTrade_new.db as database file
+
+## 🔧 כלי פיתוח (Development Tools)
+
+### הפעלת שרת
+49. **Server Restart Command** - Use `./restart` command for server initialization. Learn exact usage and all parameters from script documentation at `documentation/server/RESTART_SCRIPT_GUIDE.md`. Available modes: quick, complete, auto with cache mode options
+50. **Development Server** - Development server runs on port 8080
+51. **Cache vs Restart Strategy** - When possible - clear cache, when required - restart according to rules. Use `./restart` with appropriate cache mode flags
+
+### עבודה עם קונסול
+52. **Custom Console System** - Use the custom console cleanup system (`console-cleanup.js`) for console operations instead of direct console.* calls. The system provides controlled console clearing and message management
+
+## 🌐 מערכת נתונים חיצוניים (External Data System)
+53. **External Data Integration** - Use Yahoo Finance as first step in complete external data system. Reference: `documentation/features/external-data/README.md`
+54. **External Data Architecture** - Each external data connector in separate directory, distinct from core system parts for clean future additions
+55. **External Data Dashboard** - Use external data dashboard for monitoring and management with real-time updates every 30 seconds
+56. **External Data Caching** - Use advanced caching with dependency management for external data with TTL optimization
+57. **External Data API** - Use 8 REST endpoints for external data management and monitoring
+58. **External Data Status** - System is 90% complete with one critical issue identified on September 4, 2025. Data is collected from Yahoo Finance API but not saved to database
+59. **External Data Dashboard Status** - Fully functional dashboard with real-time updates every 30 seconds, advanced monitoring and management capabilities
+
+## ⚙️ מערכת העדפות (Preferences System)
+60. **Advanced Preferences** - Use the new preferences system with multiple profiles, import/export and history. Reference: `documentation/PREFERENCES_IMPLEMENTATION_REPORT.md`
+61. **Preferences Architecture** - Work with unified preferences system that includes both traditional and advanced preferences with shared global filters
+62. **Preferences UI** - Use unified and advanced user interface with support for both versions
+63. **Preferences Profiles** - Support multiple user profiles with individual settings and preferences
+64. **Preferences Management Interface** - Full interface for adding, updating, deleting profiles and setting active profile
+65. **Preferences System Status** - Two identical profiles currently exist, full interface for profile management available
+
+## 🎛️ מערכת פרטי ישויות (Entity Details System)
+66. **Entity Details Modal** - Use unified popup window for all 8 entity types in the system with dynamic rendering
+67. **Entity Details Integration** - Use real-time integration with Yahoo Finance data for tickers with advanced caching
+68. **Entity Quick Actions** - Use 4 quick actions: edit, open page, linked items, export
+69. **Entity RTL Support** - Use full Hebrew support with Apple Design System for entity details
+70. **Entity Details Status** - Currently in development tools completion phase, will be addressed after current phase completion
+
+## 📊 מערכת ביצועים (Performance System)
+71. **Performance Monitoring** - Use built-in performance metrics collection with 4 types of performance indicators + trend analysis
+72. **Performance Optimization** - Use QueryOptimizer with lazy loading and advanced query optimization
+73. **Performance Metrics** - Monitor System Health Score (3.8/4.0), Response Time (1010ms), Availability (100%), Error Rate (0%)
+
+## 🔄 מערכת משימות ברקע (Background Tasks)
+74. **Background Task Management** - Use 6 automatic background tasks with monitoring and management capabilities
+75. **Background Task Integration** - Integrate with global notification system for background task status updates
+76. **Background Task Monitoring** - Use background tasks dashboard for monitoring and management
+77. **Background Tasks Status** - Control page available for task management, comprehensive system documentation available
+
+## 🔒 מערכת אבטחה (Security System)
+78. **Rate Limiting** - Use protection against overload with 5 different rate limiting levels
+79. **Response Headers** - Use 12 headers for security and performance optimization
+80. **Error Handling** - Use advanced error handling with custom error classes and centralized handling
+81. **Security Validation** - Use comprehensive security pattern detection and vulnerability scanning
+
+## 🎨 מערכת עיצוב מתקדמת (Advanced Design System)
+82. **New Colors Implementation** - New colors only with explicit user approval and coordinated collaborative work
+83. **ITCSS Documentation** - All ITCSS questions should be answered by the comprehensive documentation available
+84. **Design System Consistency** - Maintain consistency with existing design patterns and user experience guidelines
+
+## 📚 חובות קריאה חובה (Mandatory Reading Requirements)
+85. **General Systems Documentation** - Must read `GENERAL_SYSTEMS_LIST.md` before starting any development work
+86. **Script Architecture Documentation** - Must read script architecture documentation before creating new functions
+87. **CSS Architecture Guide** - Must read `CSS_ARCHITECTURE_GUIDE.md` before making any CSS changes
+88. **RTL Hebrew Guide** - Must read `RTL_HEBREW_GUIDE.md` before making any layout changes
+89. **Cache Implementation Guide** - Must read cache documentation before working with caching systems
+90. **Database Constraints Documentation** - Must read constraints documentation before working with database data
+91. **Server Restart Guide** - Must read restart script documentation before server operations
+92. **External Data Documentation** - Must read external data documentation before working with external APIs
+93. **Preferences System Documentation** - Must read preferences documentation before working with user preferences
+94. **Background Tasks Documentation** - Must read background tasks documentation before working with automated tasks
+
+## 🚫 איסורים חשובים (Important Restrictions)
+95. **No Inline Code** - Absolutely no inline CSS, JavaScript, or HTML code in any element
+96. **No Duplicate Functions** - No duplicate functions across files, use existing global systems
+97. **No !important Usage** - No !important usage without explicit user approval
+98. **No Individual DOMContentLoaded** - No individual DOMContentLoaded listeners, use unified initialization system
+99. **No Direct Cache Operations** - No direct localStorage/IndexedDB calls, use unified cache system
+100. **No Pattern-Based Cache Invalidation** - Use dependency-based cache invalidation only
+101. **No Breaking Page Structure** - Never break the fixed page template structure
+102. **No Creating New Systems** - Check existing general systems before creating new page-specific functions
+103. **No Mock/Static Data Usage** - Never use mock data or static data without explicit user approval. Fallback modes or errors must display clear and detailed feedback to user and system, not mock data
+104. **Mock Data Detection** - When encountering mock data or static data replacing real data in code, must report to user immediately
+105. **Approved Static Data Documentation** - When using approved static data, add comments before and after relevant code indicating which user gave approval and on what date and time
+
+---
+
+**Total Rules:** 105 comprehensive development rules
+**Last Updated:** December 2024
+**Status:** Complete and ready for use
+**Coverage:** All major system components and architectural patterns

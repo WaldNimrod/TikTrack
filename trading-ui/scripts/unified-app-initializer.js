@@ -117,12 +117,38 @@ class UnifiedAppInitializer {
         console.log('⚙️ Stage 2: Preparing configuration...');
         const stageStart = Date.now();
         
+        // Load page-specific configuration from page-initialization-configs.js
+        let pageConfig = null;
+        // Debug info only in verbose mode
+        if (window.DEBUG_MODE) {
+            console.log('🔍 Checking pageInitializationConfigs:', typeof window.pageInitializationConfigs);
+            console.log('🔍 Available configs:', window.pageInitializationConfigs ? Object.keys(window.pageInitializationConfigs) : 'undefined');
+            console.log('🔍 Looking for config:', this.pageInfo.name);
+        }
+        
+        if (typeof window.pageInitializationConfigs !== 'undefined' && 
+            window.pageInitializationConfigs[this.pageInfo.name]) {
+            pageConfig = window.pageInitializationConfigs[this.pageInfo.name];
+            console.log(`📋 Loaded page config for ${this.pageInfo.name}:`, pageConfig);
+        } else {
+            console.log(`⚠️ No page config found for ${this.pageInfo.name}`);
+            console.log('🔍 Available configs:', window.pageInitializationConfigs ? Object.keys(window.pageInitializationConfigs) : 'undefined');
+        }
+        
+        // Store custom initializers from page config
+        if (pageConfig?.customInitializers) {
+            this.customInitializers = pageConfig.customInitializers;
+            if (window.DEBUG_MODE) {
+                console.log('🔧 Loaded custom initializers from page config:', this.customInitializers.length);
+            }
+        }
+        
         const config = {
             name: this.pageInfo.name,
             type: this.pageInfo.type,
-            requiresFilters: this.pageInfo.requirements.filters,
-            requiresValidation: this.pageInfo.requirements.validation,
-            requiresTables: this.pageInfo.requirements.tables,
+            requiresFilters: pageConfig?.requiresFilters ?? this.pageInfo.requirements.filters,
+            requiresValidation: pageConfig?.requiresValidation ?? this.pageInfo.requirements.validation,
+            requiresTables: pageConfig?.requiresTables ?? this.pageInfo.requirements.tables,
             requiresCharts: this.pageInfo.requirements.charts,
             customInitializers: this.customInitializers,
             availableSystems: Array.from(this.availableSystems)
@@ -141,10 +167,15 @@ class UnifiedAppInitializer {
         console.log('🚀 Stage 3: Executing initialization...');
         const stageStart = Date.now();
         
+        // Initialize IndexedDB first (blocking) to prevent race conditions
+        await this.initializeIndexedDB();
+        
         // Use the application initializer if available
         if (typeof window.initializeApplication === 'function') {
+            console.log('🔧 Using application initializer with config:', config);
             await window.initializeApplication(config);
         } else {
+            console.log('⚠️ Application initializer not found, using manual initialization');
             // Fallback to manual initialization
             await this.manualInitialization(config);
         }
@@ -166,9 +197,25 @@ class UnifiedAppInitializer {
         }
         
         // Execute custom finalizers
-        for (const initializer of this.customInitializers) {
+        if (window.DEBUG_MODE) {
+            console.log('🔧 Executing custom initializers:', this.customInitializers.length);
+        }
+        for (let i = 0; i < this.customInitializers.length; i++) {
+            const initializer = this.customInitializers[i];
+            if (window.DEBUG_MODE) {
+                console.log(`🔧 Executing custom initializer ${i + 1}/${this.customInitializers.length}:`, typeof initializer);
+            }
             if (typeof initializer === 'function') {
-                await initializer();
+                try {
+                    await initializer();
+                    if (window.DEBUG_MODE) {
+                        console.log(`✅ Custom initializer ${i + 1} completed successfully`);
+                    }
+                } catch (error) {
+                    console.error(`❌ Custom initializer ${i + 1} failed:`, error);
+                }
+            } else {
+                console.warn(`⚠️ Custom initializer ${i + 1} is not a function:`, typeof initializer);
             }
         }
         
@@ -184,7 +231,9 @@ class UnifiedAppInitializer {
         const filename = path.split('/').pop() || 'index';
         const pageName = filename.replace('.html', '');
         
-        return {
+        console.log('🔍 Page detection:', { path, filename, pageName });
+        
+        const pageInfo = {
             name: pageName,
             path: path,
             filename: filename,
@@ -196,6 +245,9 @@ class UnifiedAppInitializer {
                 charts: this.requiresCharts(pageName)
             }
         };
+        
+        console.log('📊 Detected page info:', pageInfo);
+        return pageInfo;
     }
 
     /**
@@ -238,7 +290,7 @@ class UnifiedAppInitializer {
      */
     determinePageType(pageName) {
         if (['trades', 'executions', 'alerts'].includes(pageName)) return 'trading';
-        if (['system-management', 'crud-testing-dashboard', 'linter-realtime-monitor'].includes(pageName)) return 'development';
+        if (['system-management', 'crud-testing-dashboard', 'linter-realtime-monitor', 'cache-test'].includes(pageName)) return 'development';
         if (['preferences'].includes(pageName)) return 'preferences';
         if (['index'].includes(pageName)) return 'dashboard';
         return 'general';
@@ -283,6 +335,84 @@ class UnifiedAppInitializer {
      */
     requiresCharts(pageName) {
         return pageName === 'index' || document.querySelectorAll('canvas, .chart-container').length > 0;
+    }
+
+    /**
+     * Initialize Unified Cache System
+     */
+    async initializeIndexedDB() {
+        console.log('🔧 Initializing Unified Cache System...');
+        
+        // Initialize UnifiedCacheManager
+        if (typeof window.UnifiedCacheManager !== 'undefined') {
+            try {
+                if (!window.UnifiedCacheManager.initialized) {
+                    console.log('🔧 Initializing UnifiedCacheManager...');
+                    await window.UnifiedCacheManager.initialize();
+                    console.log('✅ UnifiedCacheManager initialized successfully');
+                } else {
+                    console.log('✅ UnifiedCacheManager already initialized');
+                }
+            } catch (error) {
+                console.error('❌ UnifiedCacheManager initialization failed:', error);
+                console.log('⚠️ Using localStorage fallback');
+                // Set a flag to indicate cache system is not available
+                window.UnifiedCacheManager = null;
+            }
+        } else {
+            console.log('⚠️ UnifiedCacheManager not available, using localStorage fallback');
+        }
+
+        // Initialize CacheSyncManager
+        if (typeof window.CacheSyncManager !== 'undefined') {
+            try {
+                if (!window.CacheSyncManager.initialized) {
+                    console.log('🔧 Initializing CacheSyncManager...');
+                    await window.CacheSyncManager.initialize();
+                    console.log('✅ CacheSyncManager initialized successfully');
+                } else {
+                    console.log('✅ CacheSyncManager already initialized');
+                }
+            } catch (error) {
+                console.error('❌ CacheSyncManager initialization failed:', error);
+            }
+        } else {
+            console.log('⚠️ CacheSyncManager not available');
+        }
+
+        // Initialize CachePolicyManager
+        if (typeof window.CachePolicyManager !== 'undefined') {
+            try {
+                if (!window.CachePolicyManager.initialized) {
+                    console.log('🔧 Initializing CachePolicyManager...');
+                    await window.CachePolicyManager.initialize();
+                    console.log('✅ CachePolicyManager initialized successfully');
+                } else {
+                    console.log('✅ CachePolicyManager already initialized');
+                }
+            } catch (error) {
+                console.error('❌ CachePolicyManager initialization failed:', error);
+            }
+        } else {
+            console.log('⚠️ CachePolicyManager not available');
+        }
+
+        // Initialize MemoryOptimizer
+        if (typeof window.MemoryOptimizer !== 'undefined') {
+            try {
+                if (!window.MemoryOptimizer.initialized) {
+                    console.log('🔧 Initializing MemoryOptimizer...');
+                    await window.MemoryOptimizer.initialize();
+                    console.log('✅ MemoryOptimizer initialized successfully');
+                } else {
+                    console.log('✅ MemoryOptimizer already initialized');
+                }
+            } catch (error) {
+                console.error('❌ MemoryOptimizer initialization failed:', error);
+            }
+        } else {
+            console.log('⚠️ MemoryOptimizer not available');
+        }
     }
 
     /**
@@ -420,11 +550,15 @@ window.getUnifiedAppStatus = function() {
 // Single DOMContentLoaded listener - replaces all others
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🎯 DOM Content Loaded - Starting Unified App Initialization');
+    console.log('🔍 Current URL:', window.location.href);
+    console.log('🔍 Current pathname:', window.location.pathname);
     
     try {
         // Small delay to ensure all scripts are loaded
         setTimeout(async () => {
+            console.log('🚀 About to call initializeUnifiedApp...');
             await window.initializeUnifiedApp();
+            console.log('✅ initializeUnifiedApp completed');
         }, 100);
         
     } catch (error) {
@@ -436,6 +570,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 window.addEventListener('error', (event) => {
     console.error('❌ Global Error:', event.error);
+    console.error('❌ Error details:', {
+        message: event.message,
+        filename: event.filename,
+        lineno: event.lineno,
+        colno: event.colno,
+        stack: event.error?.stack
+    });
     
     if (typeof window.showNotification === 'function') {
         window.showNotification('❌ System error occurred', 'error');

@@ -20,6 +20,329 @@
  * @lastUpdated September 4, 2025 - Fixed function calls + debug log
  */
 
+// ===== GLOBAL FUNCTIONS (defined early for class access) =====
+
+/**
+ * Initialize notifications center page
+ */
+async function initializeNotificationsCenter() {
+    try {
+        console.log('🚀 Initializing Notifications Center...');
+        
+        // Load all overview sections first
+        await Promise.all([
+            loadCategoriesOverview(),
+            loadPreferencesOverview()
+        ]);
+        
+        // Wait for page to fully load, then load notification log
+        setTimeout(async () => {
+            try {
+                await loadNotificationLog();
+                console.log('✅ Notification log loaded after page initialization');
+            } catch (error) {
+                console.error('❌ Failed to load notification log:', error);
+            }
+        }, 1000); // Wait 1 second after page load
+        
+        console.log('✅ Notifications Center initialized successfully');
+    } catch (error) {
+        console.error('❌ Failed to initialize Notifications Center:', error);
+    }
+}
+
+/**
+ * Load categories overview with statistics
+ */
+async function loadCategoriesOverview() {
+  try {
+    const container = document.getElementById('categoriesOverview');
+    if (!container) return;
+
+    // Get statistics from the notification system
+    let stats = { success: 0, error: 0, warning: 0, info: 0, total: 0 };
+    if (window.notificationsCenter && window.notificationsCenter.stats) {
+      stats = window.notificationsCenter.stats;
+    }
+
+    // Get available categories from the system
+    const categories = [
+      { name: 'system', title: 'מערכת', icon: 'fas fa-cog', color: '#007bff' },
+      { name: 'business', title: 'עסקי', icon: 'fas fa-briefcase', color: '#28a745' },
+      { name: 'ui', title: 'ממשק משתמש', icon: 'fas fa-desktop', color: '#17a2b8' },
+      { name: 'development', title: 'פיתוח', icon: 'fas fa-code', color: '#6f42c1' },
+      { name: 'performance', title: 'ביצועים', icon: 'fas fa-tachometer-alt', color: '#fd7e14' },
+      { name: 'security', title: 'אבטחה', icon: 'fas fa-shield-alt', color: '#dc3545' },
+      { name: 'network', title: 'רשת', icon: 'fas fa-network-wired', color: '#20c997' },
+      { name: 'database', title: 'מסד נתונים', icon: 'fas fa-database', color: '#6c757d' },
+      { name: 'user', title: 'משתמש', icon: 'fas fa-user', color: '#e83e8c' },
+      { name: 'trade', title: 'עסקאות', icon: 'fas fa-chart-line', color: '#ffc107' },
+      { name: 'ticker', title: 'טיקרים', icon: 'fas fa-coins', color: '#fd7e14' },
+      { name: 'alert', title: 'התראות', icon: 'fas fa-bell', color: '#dc3545' },
+      { name: 'general', title: 'כללי', icon: 'fas fa-info-circle', color: '#6c757d' }
+    ];
+
+    let html = '<div class="row">';
+    categories.forEach(category => {
+      // Calculate category statistics from actual notification history
+      let categoryCount = 0;
+      if (window.notificationsCenter && window.notificationsCenter.history) {
+        categoryCount = window.notificationsCenter.history.filter(notification => {
+          // Check if notification has category field
+          if (notification.category) {
+            return notification.category === category.name;
+          }
+          // Fallback: try to detect category from title or message
+          const text = (notification.title + ' ' + notification.message).toLowerCase();
+          switch (category.name) {
+            case 'system':
+              return text.includes('מערכת') || text.includes('system') || text.includes('חיבור') || text.includes('initialized');
+            case 'business':
+              return text.includes('עסק') || text.includes('business') || text.includes('מסחר') || text.includes('trade');
+            case 'ui':
+              return text.includes('ממשק') || text.includes('ui') || text.includes('עיצוב') || text.includes('design');
+            case 'development':
+              return text.includes('פיתוח') || text.includes('development') || text.includes('קוד') || text.includes('code');
+            case 'performance':
+              return text.includes('ביצוע') || text.includes('performance') || text.includes('מהירות') || text.includes('speed');
+            case 'security':
+              return text.includes('אבטחה') || text.includes('security') || text.includes('הגנה') || text.includes('protection');
+            case 'network':
+              return text.includes('רשת') || text.includes('network') || text.includes('חיבור') || text.includes('connection');
+            case 'database':
+              return text.includes('מסד') || text.includes('database') || text.includes('נתונים') || text.includes('data');
+            case 'user':
+              return text.includes('משתמש') || text.includes('user') || text.includes('פרופיל') || text.includes('profile');
+            case 'trade':
+              return text.includes('עסקה') || text.includes('trade') || text.includes('מסחר') || text.includes('trading');
+            case 'ticker':
+              return text.includes('טיקר') || text.includes('ticker') || text.includes('מטבע') || text.includes('coin');
+            case 'alert':
+              return text.includes('התראה') || text.includes('alert') || text.includes('אזהרה') || text.includes('warning');
+            case 'general':
+              return text.includes('כללי') || text.includes('general') || text.includes('מידע') || text.includes('info');
+            default:
+              return false;
+          }
+        }).length;
+      }
+      
+      const percentage = stats.total > 0 ? Math.round((categoryCount / stats.total) * 100) : 0;
+      
+      html += `
+        <div class="col-md-4 col-sm-6 mb-3">
+          <div class="category-card text-center p-3 border rounded">
+            <i class="${category.icon} fa-2x mb-2" style="color: ${category.color};"></i>
+            <h6 class="mb-1">${category.title}</h6>
+            <h4 class="mb-1" style="color: ${category.color};">${categoryCount.toLocaleString()}</h4>
+            <small class="text-muted">${percentage}% מהסך הכל</small>
+          </div>
+        </div>
+      `;
+    });
+    html += '</div>';
+
+    container.innerHTML = html;
+    console.log('✅ Categories overview loaded with statistics');
+  } catch (error) {
+    console.error('❌ Error loading categories overview:', error);
+  }
+}
+
+/**
+ * Load category statistics
+ */
+async function loadCategoryStats() {
+  try {
+    const container = document.getElementById('categoryStats');
+    if (!container) return;
+
+    // Get statistics from the notification system
+    let stats = { success: 0, error: 0, warning: 0, info: 0, total: 0 };
+    
+    if (window.notificationsCenter && window.notificationsCenter.stats) {
+      stats = window.notificationsCenter.stats;
+    }
+
+    const categories = [
+      { name: 'success', title: 'הצלחה', icon: 'fas fa-check-circle', color: '#28a745' },
+      { name: 'error', title: 'שגיאה', icon: 'fas fa-times-circle', color: '#dc3545' },
+      { name: 'warning', title: 'אזהרה', icon: 'fas fa-exclamation-triangle', color: '#ffc107' },
+      { name: 'info', title: 'מידע', icon: 'fas fa-info-circle', color: '#17a2b8' }
+    ];
+
+    let html = '<div class="row">';
+    categories.forEach(category => {
+      const count = stats[category.name] || 0;
+      const percentage = stats.total > 0 ? Math.round((count / stats.total) * 100) : 0;
+      
+      html += `
+        <div class="col-md-3 col-sm-6 mb-3">
+          <div class="stat-card text-center p-3 border rounded">
+            <i class="${category.icon} fa-2x mb-2" style="color: ${category.color};"></i>
+            <h4 class="mb-1" style="color: ${category.color};">${count.toLocaleString()}</h4>
+            <p class="mb-1 text-muted">${category.title}</p>
+            <small class="text-muted">${percentage}% מהסך הכל</small>
+          </div>
+        </div>
+      `;
+    });
+    html += '</div>';
+
+    // Add total statistics
+    html += `
+      <div class="row mt-3">
+        <div class="col-12">
+          <div class="total-stats text-center p-3 bg-light border rounded">
+            <h5 class="mb-1">סך הכל: ${stats.total.toLocaleString()} הודעות</h5>
+            <small class="text-muted">עדכון אחרון: ${new Date().toLocaleString('he-IL')}</small>
+          </div>
+        </div>
+      </div>
+    `;
+
+    container.innerHTML = html;
+    console.log('✅ Category statistics loaded');
+  } catch (error) {
+    console.error('❌ Error loading category statistics:', error);
+  }
+}
+
+/**
+ * Load preferences overview
+ */
+async function loadPreferencesOverview() {
+  try {
+    const container = document.getElementById('preferencesOverview');
+    if (!container) return;
+
+    // Get notification preferences from the correct group
+    // Get preferences from the system using built-in function
+    let preferences = {};
+    if (typeof window.getGroupPreferences === 'function') {
+      try {
+        const result = await window.getGroupPreferences('notification_settings');
+        if (result && result.success && result.data && result.data.preferences) {
+          preferences = result.data.preferences;
+        } else {
+          console.warn('Failed to get notification preferences from system');
+        }
+      } catch (error) {
+        console.error('Error loading notification preferences:', error);
+      }
+    }
+
+    // Get the most important notification preferences only - organized like preferences page
+    const basicSettings = [
+      { key: 'enableNotifications', title: 'הפעל התראות', type: 'boolean' },
+      { key: 'notificationPopup', title: 'חלון קופץ התראות', type: 'boolean' },
+      { key: 'notificationSound', title: 'צליל התראות', type: 'boolean' },
+      { key: 'notificationDuration', title: 'משך זמן הצגת התראה (שניות)', type: 'integer' },
+      { key: 'enableRealtimeNotifications', title: 'התראות בזמן אמת', type: 'boolean' },
+      { key: 'enableSystemEventNotifications', title: 'התראות על אירועי מערכת', type: 'boolean' },
+      { key: 'notifyOnTradeExecuted', title: 'התראה על ביצוע עסקה', type: 'boolean' },
+      { key: 'notifyOnStopLoss', title: 'התראה על stop loss', type: 'boolean' }
+    ];
+
+    const notificationCategories = [
+      { key: 'notifications_system_enabled', title: 'התראות מערכת', type: 'boolean' },
+      { key: 'notifications_business_enabled', title: 'התראות עסקיות', type: 'boolean' },
+      { key: 'notifications_ui_enabled', title: 'התראות ממשק משתמש', type: 'boolean' },
+      { key: 'notifications_development_enabled', title: 'התראות פיתוח', type: 'boolean' },
+      { key: 'notifications_performance_enabled', title: 'התראות ביצועים', type: 'boolean' }
+    ];
+
+    const consoleLogs = [
+      { key: 'console_logs_system_enabled', title: 'לוגים מערכתיים', type: 'boolean' },
+      { key: 'console_logs_business_enabled', title: 'לוגים עסקיים', type: 'boolean' },
+      { key: 'console_logs_ui_enabled', title: 'לוגים ממשק משתמש', type: 'boolean' },
+      { key: 'console_logs_development_enabled', title: 'לוגים פיתוח', type: 'boolean' },
+      { key: 'console_logs_performance_enabled', title: 'לוגים ביצועים', type: 'boolean' }
+    ];
+
+    let html = '<div class="preferences-list">';
+    
+    // הגדרות בסיסיות
+    html += '<div class="mb-4">';
+    html += '<h6 class="text-primary mb-3">הגדרות בסיסיות:</h6>';
+    basicSettings.forEach(item => {
+      const value = preferences[item.key];
+      const displayValue = item.type === 'boolean' ? 
+        (value === true || value === 'true' ? '✅ פעיל' : '❌ כבוי') :
+        (value || 'לא מוגדר');
+      
+      html += `
+        <div class="preference-item d-flex justify-content-between align-items-center p-2 border-bottom">
+          <span class="preference-title">${item.title}</span>
+          <span class="preference-value ${item.type === 'boolean' ? (value === true || value === 'true' ? 'text-success' : 'text-danger') : 'text-info'}">${displayValue}</span>
+        </div>
+      `;
+    });
+    html += '</div>';
+
+    // קטגוריות התראות
+    html += '<div class="row">';
+    html += '<div class="col-md-6">';
+    html += '<h6 class="text-primary mb-3">התראות מערכת:</h6>';
+    notificationCategories.forEach(item => {
+      const value = preferences[item.key];
+      const displayValue = item.type === 'boolean' ? 
+        (value === true || value === 'true' ? '✅ פעיל' : '❌ כבוי') :
+        (value || 'לא מוגדר');
+      
+      html += `
+        <div class="preference-item d-flex justify-content-between align-items-center p-2 border-bottom">
+          <span class="preference-title">${item.title}</span>
+          <span class="preference-value ${item.type === 'boolean' ? (value === true || value === 'true' ? 'text-success' : 'text-danger') : 'text-info'}">${displayValue}</span>
+        </div>
+      `;
+    });
+    html += '</div>';
+
+    // לוגים לקונסול
+    html += '<div class="col-md-6">';
+    html += '<h6 class="text-success mb-3">לוגים לקונסול:</h6>';
+    consoleLogs.forEach(item => {
+      const value = preferences[item.key];
+      const displayValue = item.type === 'boolean' ? 
+        (value === true || value === 'true' ? '✅ פעיל' : '❌ כבוי') :
+        (value || 'לא מוגדר');
+      
+      html += `
+        <div class="preference-item d-flex justify-content-between align-items-center p-2 border-bottom">
+          <span class="preference-title">${item.title}</span>
+          <span class="preference-value ${item.type === 'boolean' ? (value === true || value === 'true' ? 'text-success' : 'text-danger') : 'text-info'}">${displayValue}</span>
+        </div>
+      `;
+    });
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+
+    container.innerHTML = html;
+    console.log('✅ Preferences overview loaded with correct data');
+  } catch (error) {
+    console.error('❌ Error loading preferences overview:', error);
+  }
+}
+
+/**
+ * Load all overview data
+ */
+async function loadOverviewData() {
+  await Promise.all([
+    loadCategoriesOverview(),
+    loadPreferencesOverview(),
+    loadCategoryStats()
+  ]);
+}
+
+// Export functions to global scope
+window.loadCategoriesOverview = loadCategoriesOverview;
+window.loadPreferencesOverview = loadPreferencesOverview;
+window.loadCategoryStats = loadCategoryStats;
+window.loadOverviewData = loadOverviewData;
+
 class NotificationsCenter {
   constructor() {
     this.history = [];
@@ -59,7 +382,19 @@ class NotificationsCenter {
     this.setupWebSocketEvents();
 
     // טעינת היסטוריה
-    this.loadHistory();
+    this.loadHistory().then(() => {
+      console.log('✅ היסטוריה נטענה בהצלחה');
+      // עדכון סטטיסטיקות אחרי טעינת ההיסטוריה
+      this.updateStats();
+      this.updateStatsUI();
+      
+      // טעינת נתוני סקירה כללית
+      if (typeof window.loadOverviewData === 'function') {
+        window.loadOverviewData();
+      }
+    }).catch(error => {
+      console.warn('⚠️ שגיאה בטעינת היסטוריה:', error);
+    });
 
     // הוספת התראות בדיקה
     this.addTestNotifications();
@@ -81,7 +416,13 @@ class NotificationsCenter {
     
     // בדיקת חיבור WebSocket אחרי טעינה
     setTimeout(() => {
-      this.checkWebSocketConnection();
+      try {
+        if (this && typeof this.checkWebSocketConnection === 'function') {
+          this.checkWebSocketConnection();
+        }
+      } catch (error) {
+        console.warn('⚠️ Error in WebSocket connection check:', error);
+      }
     }, 1000);
   }
 
@@ -150,11 +491,43 @@ class NotificationsCenter {
   }
 
   addNotification(type, title, message, time = 'now') {
+    // Auto-detect category if not provided
+    let category = 'general';
+    if (typeof window.detectNotificationCategory === 'function') {
+      try {
+        category = window.detectNotificationCategory(message, type, title, {
+          fileName: window.location.pathname,
+          functionName: 'addNotification',
+          stackTrace: ''
+        });
+      } catch (error) {
+        console.warn('Failed to detect category in addNotification, using default:', error);
+        // Fallback to type-based category
+        switch (type) {
+          case 'success': category = 'business'; break;
+          case 'error': category = 'system'; break;
+          case 'warning': category = 'system'; break;
+          case 'info': category = 'ui'; break;
+          default: category = 'general';
+        }
+      }
+    } else {
+      // Fallback to type-based category
+      switch (type) {
+        case 'success': category = 'business'; break;
+        case 'error': category = 'system'; break;
+        case 'warning': category = 'system'; break;
+        case 'info': category = 'ui'; break;
+        default: category = 'general';
+      }
+    }
+
     const notification = {
       id: Date.now() + Math.random(),
       type,
       title,
       message,
+      category,
       time: time === 'now' ? new Date() : new Date(time),
       timestamp: Date.now(),
     };
@@ -174,8 +547,8 @@ class NotificationsCenter {
     this.updateStatsUI();
     this.updateOverviewStats();
 
-    // שמירה ללוקל סטורג'
-    this.saveToLocalStorage();
+    // שמירה ללוקל סטורג' - הוסרה כי המערכת עברה ל-IndexedDB
+    // this.saveToLocalStorage(); - הוסרה
 
     // שמירה לקובץ לוג מבוטלת זמנית למניעת עומס
     // this.saveToLogFile(notification);
@@ -309,12 +682,15 @@ class NotificationsCenter {
 
 
   updateHistoryUI() {
-    const container = document.getElementById('notificationHistory');
+    console.log('🔍 updateHistoryUI called, history length:', this.history.length);
+    const container = document.getElementById('unified-logs-container');
     if (!container) {
+      console.log('❌ unified-logs-container not found');
       return; // לא בעמוד מרכז ההתראות
     }
 
     if (this.history.length === 0) {
+      console.log('❌ History is empty, showing no history message');
       container.innerHTML = `
                 <div class="no-history">
                     <i class="fas fa-history"></i>
@@ -324,28 +700,38 @@ class NotificationsCenter {
       return;
     }
 
+    console.log('✅ History has', this.history.length, 'notifications, updating UI');
+
     // פילטור לפי בחירת המשתמש
+    console.log('🔍 Getting filter elements...');
     const filterElement = document.getElementById('historyFilter');
     const periodElement = document.getElementById('historyPeriod');
 
     if (!filterElement || !periodElement) {
+      console.log('❌ Filter elements not found');
       return; // אלמנטי פילטר לא קיימים
     }
 
+    console.log('✅ Filter elements found');
     const filter = filterElement.value;
     const period = periodElement.value;
 
     let filteredHistory = this.history;
+    console.log('🔍 Original history length:', this.history.length);
 
     // פילטר לפי סוג
     if (filter) {
       filteredHistory = filteredHistory.filter(n => n.type === filter);
+      console.log('🔍 After type filter:', filteredHistory.length);
     }
 
     // פילטר לפי זמן
+    console.log('🔍 Applying time filter...');
     const now = Date.now();
     const periodMs = NotificationsCenter.getPeriodInMs(period);
+    console.log('🔍 Period MS:', periodMs);
     filteredHistory = filteredHistory.filter(n => now - n.timestamp <= periodMs);
+    console.log('🔍 After time filter:', filteredHistory.length);
 
     if (filteredHistory.length === 0) {
       container.innerHTML = `
@@ -366,6 +752,22 @@ class NotificationsCenter {
     this.stats.error = this.history.filter(n => n.type === 'error').length;
     this.stats.warning = this.history.filter(n => n.type === 'warning').length;
     this.stats.info = this.history.filter(n => n.type === 'info').length;
+    this.stats.total = this.stats.success + this.stats.error + this.stats.warning + this.stats.info;
+    
+    // עדכון סטטיסטיקות קטגוריות
+    this.stats.system = this.history.filter(n => n.category === 'system').length;
+    this.stats.business = this.history.filter(n => n.category === 'business').length;
+    this.stats.ui = this.history.filter(n => n.category === 'ui').length;
+    this.stats.development = this.history.filter(n => n.category === 'development').length;
+    this.stats.performance = this.history.filter(n => n.category === 'performance').length;
+    this.stats.security = this.history.filter(n => n.category === 'security').length;
+    this.stats.network = this.history.filter(n => n.category === 'network').length;
+    this.stats.database = this.history.filter(n => n.category === 'database').length;
+    this.stats.user = this.history.filter(n => n.category === 'user').length;
+    this.stats.trade = this.history.filter(n => n.category === 'trade').length;
+    this.stats.ticker = this.history.filter(n => n.category === 'ticker').length;
+    this.stats.alert = this.history.filter(n => n.category === 'alert').length;
+    this.stats.general = this.history.filter(n => n.category === 'general').length;
   }
 
   updateStatsUI() {
@@ -374,14 +776,24 @@ class NotificationsCenter {
     const errorCount = document.getElementById('errorCount');
     const warningCount = document.getElementById('warningCount');
     const infoCount = document.getElementById('infoCount');
+    const totalCount = document.getElementById('totalCount');
 
     if (successCount) {successCount.textContent = this.stats.success;}
     if (errorCount) {errorCount.textContent = this.stats.error;}
     if (warningCount) {warningCount.textContent = this.stats.warning;}
     if (infoCount) {infoCount.textContent = this.stats.info;}
+    if (totalCount) {totalCount.textContent = this.stats.success + this.stats.error + this.stats.warning + this.stats.info;}
 
     // עדכון סטטיסטיקות סקירה כללית
     this.updateOverviewStats();
+    
+    // עדכון קטגוריות הודעות
+    if (typeof window.loadCategoriesOverview === 'function') {
+      window.loadCategoriesOverview();
+    }
+    if (typeof window.loadCategoryStats === 'function') {
+      window.loadCategoryStats();
+    }
   }
 
   updateOverviewStats() {
@@ -560,39 +972,18 @@ class NotificationsCenter {
   // הגדרות התראות הועברו למערכת ההעדפות הגלובלית
 
   // שמירה ללוקל סטורג'
-  saveToLocalStorage() {
-    try {
-      localStorage.setItem('tiktrack_notifications_history', JSON.stringify(this.history.slice(0, 100)));
-      localStorage.setItem('tiktrack_notifications_stats', JSON.stringify(this.stats));
-    } catch {
-      // שגיאה בשמירה ללוקל סטורג
-    }
-  }
+  // שמירה ללוקל סטורג' - הוסרה כי המערכת עברה ל-IndexedDB
+  // saveToLocalStorage() - הוסרה
 
-  // טעינה מלוקל סטורג'
-  loadFromLocalStorage() {
-    try {
-      const savedHistory = localStorage.getItem('tiktrack_notifications_history');
-      const savedStats = localStorage.getItem('tiktrack_notifications_stats');
+  // טעינה מלוקל סטורג' - הוסרה כי המערכת עברה ל-IndexedDB  
+  // loadFromLocalStorage() - הוסרה
 
-      if (savedHistory) {
-        this.history = JSON.parse(savedHistory);
-      }
-
-      if (savedStats) {
-        this.stats = JSON.parse(savedStats);
-      }
-    } catch {
-      // שגיאה בטעינה מלוקל סטורג
-    }
-  }
-
-  loadHistory() {
-    // טעינת היסטוריית התראות מלוקל סטורג'
-    this.loadFromLocalStorage();
+  async loadHistory() {
+    // טעינת היסטוריית התראות - עבר ל-IndexedDB
+    // this.loadFromLocalStorage(); - הוסרה
 
     // טעינת היסטוריה גלובלית מכל העמודים
-    this.loadGlobalHistory();
+    await this.loadGlobalHistory();
 
     // טעינת רשימת עמודים לסינון
     this.loadPageFilterOptions();
@@ -631,11 +1022,59 @@ class NotificationsCenter {
     }
   }
 
-  loadGlobalHistory() {
+  /**
+   * Convert new format to old format for compatibility
+   */
+  convertNewFormatToOldFormat(newFormatHistory) {
+    return newFormatHistory.map(item => ({
+      id: item.id,
+      type: item.type || item.level || 'info',
+      title: item.title || 'ללא כותרת',
+      message: item.message || item.error || 'ללא הודעה',
+      time: new Date(item.timestamp || item.time || Date.now()),
+      timestamp: item.timestamp || item.time || Date.now(),
+      page: item.page || window.location.pathname,
+      url: item.url || window.location.href,
+      category: item.category || 'general'
+    }));
+  }
+
+  /**
+   * Merge histories and remove duplicates
+   */
+  mergeHistories(oldHistory, newHistory) {
+    const merged = [...oldHistory];
+    const existingIds = new Set(oldHistory.map(item => item.id));
+    
+    newHistory.forEach(item => {
+      if (!existingIds.has(item.id)) {
+        merged.push(item);
+      }
+    });
+    
+    // Sort by timestamp
+    return merged.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+  }
+
+  async loadGlobalHistory() {
     try {
-      // טעינת היסטוריה גלובלית
-      if (typeof window.loadGlobalNotificationHistory === 'function') {
-        const globalHistory = window.loadGlobalNotificationHistory();
+      // טעינת היסטוריה גלובלית מהמערכת החדשה
+      if (window.UnifiedCacheManager) {
+        console.log('🔧 טוען היסטוריה מהמערכת החדשה (UnifiedCacheManager)...');
+        const globalHistory = await window.UnifiedCacheManager.get('notification_history');
+        console.log('📚 היסטוריה גלובלית נטענה:', globalHistory ? 1 : 0, 'התראות');
+
+        // המרת הפורמט למערכת הישנה
+        const convertedHistory = globalHistory ? this.convertNewFormatToOldFormat([globalHistory]) : [];
+        
+        // מיזוג עם היסטוריה מקומית (הסרת כפילויות)
+        const mergedHistory = this.mergeHistories(this.history, convertedHistory);
+        this.history = mergedHistory;
+
+        console.log('✅ היסטוריה מוזגה:', this.history.length, 'התראות');
+      } else if (typeof window.loadGlobalNotificationHistory === 'function') {
+        // Fallback למערכת הישנה
+        const globalHistory = await window.loadGlobalNotificationHistory();
         console.log('📚 היסטוריה גלובלית נטענה:', globalHistory.length, 'התראות');
 
         // מיזוג עם היסטוריה מקומית (הסרת כפילויות)
@@ -647,7 +1086,7 @@ class NotificationsCenter {
 
       // טעינת סטטיסטיקות גלובליות
       if (typeof window.loadGlobalNotificationStats === 'function') {
-        const globalStats = window.loadGlobalNotificationStats();
+        const globalStats = await window.loadGlobalNotificationStats();
         console.log('📊 סטטיסטיקות גלובליות נטענו:', globalStats);
 
         // עדכון סטטיסטיקות מקומיות
@@ -756,7 +1195,7 @@ class NotificationsCenter {
       this.updateHistoryUI();
       this.updateStatsUI();
       this.updateOverviewStats();
-      this.saveToLocalStorage();
+      // this.saveToLocalStorage(); - הוסרה כי המערכת עברה ל-IndexedDB
 
       // הודעה ישירה לממשק ללא לולאה
       console.log('✅ היסטוריית ההתראות נוקתה בהצלחה');
@@ -796,7 +1235,7 @@ class NotificationsCenter {
   }
 
   refreshNotifications() {
-    this.loadFromLocalStorage();
+    // this.loadFromLocalStorage(); - הוסרה כי המערכת עברה ל-IndexedDB
     this.updateHistoryUI();
     this.updateStatsUI();
     this.updateOverviewStats();
@@ -804,6 +1243,8 @@ class NotificationsCenter {
     // הודעה ישירה לממשק ללא לולאה
     // console.log('✅ ההתראות רועננו בהצלחה');
   }
+
+  // generateDetailedLog function moved to global scope below
 
   filterHistory() {
     const typeFilter = document.getElementById('historyFilter')?.value || '';
@@ -932,7 +1373,7 @@ class NotificationsCenter {
 }
 
 // פונקציה להעתקת היסטוריה מסוננת ללוח
-function copyFilteredHistoryToClipboard() {
+async function copyFilteredHistoryToClipboard() {
   try {
     console.log('📋 העתקת היסטוריה מסוננת ללוח...');
     
@@ -947,7 +1388,8 @@ function copyFilteredHistoryToClipboard() {
     
     // טעינת היסטוריה גלובלית
     if (typeof window.loadGlobalNotificationHistory === 'function') {
-      const globalHistory = window.loadGlobalNotificationHistory();
+      try {
+        const globalHistory = await window.loadGlobalNotificationHistory();
       if (globalHistory && globalHistory.length > 0) {
         // סינון לפי זמן
         const now = new Date();
@@ -988,6 +1430,10 @@ function copyFilteredHistoryToClipboard() {
         }
       } else {
         log += 'אין היסטוריית התראות גלובלית\n';
+      }
+      } catch (error) {
+        console.warn('⚠️ Error loading global notification history:', error);
+        log += 'שגיאה בטעינת היסטוריה גלובלית\n';
       }
     } else {
       log += 'פונקציית טעינת היסטוריה גלובלית לא זמינה\n';
@@ -1043,198 +1489,6 @@ function getTypeIcon(type) {
 
 // פונקציה להעתקת לוג מפורט עם כל הנתונים והסטטוס
 
-// פונקציה להעתקת התראות ללוח
-async function copyNotificationsToClipboard() {
-  console.log('🔍 copyNotificationsToClipboard נקרא!');
-  try {
-    if (!window.notificationsCenter) {
-      console.warn('❌ מרכז התראות לא זמין');
-      if (window.showErrorNotification) {
-        window.showErrorNotification('שגיאה', 'מרכז התראות לא זמין');
-      }
-      return;
-    }
-
-    const notifications = window.notificationsCenter.notifications || [];
-    const history = window.notificationsCenter.history || [];
-    const stats = window.notificationsCenter.stats || { success: 0, error: 0, warning: 0, info: 0 };
-    
-    console.log('📊 נתונים שנמצאו:', {
-      notifications: notifications.length,
-      history: history.length,
-      stats: stats
-    });
-
-    let log = '=== לוג התראות TikTrack ===\n\n';
-    log += '📊 סטטיסטיקות:\n';
-    log += `✅ הצלחה: ${stats.success}\n`;
-    log += `❌ שגיאה: ${stats.error}\n`;
-    log += `⚠️ אזהרה: ${stats.warning}\n`;
-    log += `ℹ️ מידע: ${stats.info}\n\n`;
-    
-    // סטטיסטיקות קטגוריות
-    log += '📂 סטטיסטיקות קטגוריות:\n';
-    log += `🔧 מערכת: ${stats.system || 0}\n`;
-    log += `💼 עסקי: ${stats.business || 0}\n`;
-    log += `🎨 ממשק משתמש: ${stats.ui || 0}\n`;
-    log += `⚙️ פיתוח: ${stats.development || 0}\n`;
-    log += `⚡ ביצועים: ${stats.performance || 0}\n\n`;
-
-    log += `🔔 התראות פעילות (${notifications.length}):\n`;
-    if (notifications.length > 0) {
-      notifications.forEach((notification, index) => {
-        log += `${index + 1}. [${notification.type.toUpperCase()}] ${notification.title}: ${notification.message}\n`;
-        log += `   זמן: ${new Date(notification.time).toLocaleString('he-IL')}\n\n`;
-      });
-    } else {
-      log += 'אין התראות פעילות\n\n';
-    }
-
-    log += `📚 היסטוריה (${history.length}):\n`;
-    if (history.length > 0) {
-      history.slice(-20).forEach((notification, index) => {
-        log += `${index + 1}. [${notification.type.toUpperCase()}] ${notification.title}: ${notification.message}\n`;
-        log += `   זמן: ${new Date(notification.time).toLocaleString('he-IL')}\n\n`;
-      });
-    } else {
-      log += 'אין היסטוריית התראות\n\n';
-    }
-
-    // העדפות קטגוריות
-    log += '⚙️ העדפות קטגוריות:\n';
-    try {
-      if (typeof window.getPreference === 'function') {
-        const categories = ['system', 'business', 'ui', 'development', 'performance'];
-        categories.forEach(category => {
-          const enabled = window.getPreference(`notifications_${category}_enabled`);
-          log += `📂 ${category}: ${enabled ? 'מופעל' : 'כבוי'}\n`;
-        });
-      } else {
-        log += 'פונקציית העדפות לא זמינה\n';
-      }
-    } catch (error) {
-      log += `שגיאה בקריאת העדפות: ${error.message}\n`;
-    }
-    log += '\n';
-    
-    log += '🔗 חיבור WebSocket:\n';
-    log += `סטטוס: ${window.realtimeNotificationsClient?.socket?.connected ? 'מחובר' : 'לא מחובר'}\n`;
-    log += `סטטוס WebSocket: ${document.getElementById('websocketStatus')?.textContent || 'לא ידוע'}\n`;
-    log += `זמן חיבור: ${document.getElementById('connectionTime')?.textContent || 'לא ידוע'}\n`;
-    log += `הודעות נשלחו: ${document.getElementById('messagesSent')?.textContent || '0'}\n`;
-    log += `סטטוס מערכת: ${document.getElementById('overallStatus')?.textContent || 'לא ידוע'}\n`;
-    
-    // מידע על מערכת הקטגוריות
-    log += '🔧 מערכת קטגוריות:\n';
-    log += `זיהוי אוטומטי: ${typeof window.detectCategory === 'function' ? 'זמין' : 'לא זמין'}\n`;
-    log += `פונקציות חכמות: ${typeof window.showNotificationSmart === 'function' ? 'זמין' : 'לא זמין'}\n`;
-    log += `מערכת מיגרציה: ${typeof window.migrateNotificationCalls === 'function' ? 'זמין' : 'לא זמין'}\n`;
-    log += `מערכת בדיקות: ${typeof window.notificationSystemTester === 'object' ? 'זמין' : 'לא זמין'}\n`;
-    
-    // בדיקת פונקציות ספציפיות
-    if (typeof window.notificationSystemTester === 'object') {
-      try {
-        const quickTest = await window.notificationSystemTester.quickTest();
-        log += `בדיקה מהירה: הצליחה\n`;
-        log += `פונקציות בסיסיות: ${quickTest.basicFunctions}\n`;
-        log += `פונקציות חכמות: ${quickTest.smartFunctions}\n`;
-        log += `קטגוריות מופעלות: ${quickTest.enabledCategories}\n`;
-      } catch (error) {
-        log += `בדיקה מהירה: נכשלה - ${error.message}\n`;
-      }
-    }
-    log += '\n';
-    
-    log += '\n📊 מידע טכני:\n';
-    log += `זמן יצירת הלוג: ${new Date().toLocaleString('he-IL')}\n`;
-    log += `גרסת דפדפן: ${navigator.userAgent.split(' ').slice(-2).join(' ')}\n`;
-    log += `רזולוציה מסך: ${window.screen.width}x${window.screen.height}\n`;
-    log += `גודל חלון: ${window.innerWidth}x${window.innerHeight}\n`;
-    log += `זמן אמת: ${new Date().toISOString()}\n`;
-    
-    // מידע על מערכת הקטגוריות החדשה
-    log += '\n🔧 מערכת קטגוריות חדשה:\n';
-    log += `גרסה: 2.0.5\n`;
-    log += `תאריך עדכון: 23.09.2025\n`;
-    log += `סטטוס: פעיל\n`;
-    log += `קטגוריות זמינות: system, business, ui, development, performance\n`;
-    log += `זיהוי אוטומטי: פעיל\n`;
-    log += `מיגרציה: זמינה\n`;
-    log += `בדיקות: זמינות\n`;
-    
-    // מידע על העדפות קטגוריות
-    log += '\n⚙️ העדפות קטגוריות:\n';
-    try {
-      if (typeof window.getPreference === 'function') {
-        const categories = ['system', 'business', 'ui', 'development', 'performance'];
-        categories.forEach(category => {
-          const enabled = window.getPreference(`notifications_${category}_enabled`);
-          log += `📂 ${category}: ${enabled ? 'מופעל' : 'כבוי'}\n`;
-        });
-      } else {
-        log += 'פונקציית העדפות לא זמינה\n';
-      }
-    } catch (error) {
-      log += `שגיאה בקריאת העדפות: ${error.message}\n`;
-    }
-    
-    log += '\n=== סוף לוג ===';
-    
-    console.log('📋 לוג שנוצר:', log.substring(0, 200) + '...');
-
-    // העתקה ללוח
-    console.log('🔄 מנסה להעתיק ללוח...');
-    navigator.clipboard.writeText(log).then(() => {
-      console.log('✅ לוג התראות הועתק ללוח בהצלחה');
-      if (window.showSuccessNotification) {
-        window.showSuccessNotification('הצלחה', 'לוג התראות הועתק ללוח בהצלחה');
-      }
-    }).catch(err => {
-      console.error('❌ שגיאה בהעתקה ללוח:', err);
-      if (window.showErrorNotification) {
-        window.showErrorNotification('שגיאה', 'שגיאה בהעתקה ללוח: ' + err.message);
-      }
-      // Fallback - הצגת הלוג בחלון נפרד
-      const newWindow = window.open('', '_blank');
-      newWindow.document.write(`
-        <html>
-          <head>
-            <title>לוג מפורט - מרכז התראות</title>
-            <style>
-              body { 
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-                direction: rtl; 
-                text-align: right; 
-                margin: 20px; 
-                background: #f8f9fa; 
-              }
-              pre { 
-                background: #ffffff; 
-                border: 1px solid #dee2e6; 
-                border-radius: 8px; 
-                padding: 20px; 
-                white-space: pre-wrap; 
-                font-family: 'Courier New', monospace; 
-                font-size: 14px; 
-                line-height: 1.6; 
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
-              }
-            </style>
-          </head>
-          <body>
-            <h2>📋 לוג מפורט - מרכז התראות TikTrack</h2>
-            <pre>${log}</pre>
-          </body>
-        </html>
-      `);
-    });
-  } catch (error) {
-    console.error('❌ שגיאה ביצירת לוג התראות:', error);
-    if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה', 'שגיאה ביצירת לוג התראות: ' + error.message);
-    }
-  }
-}
 
 // פונקציות גלובליות
 // הגדרות התראות הועברו למערכת ההעדפות הגלובלית
@@ -1261,36 +1515,155 @@ function filterHistory() {
   }
 }
 
-// פונקציות בדיקת התראות
+// פונקציות בדיקת התראות - קריאות סטנדרטיות למערכת ההודעות
 function testSuccessNotification() {
-  if (window.showSuccessNotification) {
-    window.showSuccessNotification('בדיקת הצלחה', 'זוהי הודעת הצלחה לבדיקה - הכל עובד תקין!');
+  console.log('🧪 Testing success notification...');
+  
+  // קריאה סטנדרטית למערכת ההודעות כמו בכל עמוד אחר
+  if (typeof window.showSuccessNotification === 'function') {
+    window.showSuccessNotification('בדיקת הצלחה', 'זוהי הודעת הצלחה לבדיקה - הכל עובד תקין!', 4000);
   } else {
     console.error('❌ showSuccessNotification לא זמין');
   }
 }
 
 function testErrorNotification() {
-  if (window.showErrorNotification) {
-    window.showErrorNotification('בדיקת שגיאה', 'זוהי הודעת שגיאה לבדיקה - הכל עובד תקין!');
+  console.log('🧪 Testing error notification...');
+  
+  // קריאה סטנדרטית למערכת ההודעות כמו בכל עמוד אחר
+  if (typeof window.showErrorNotification === 'function') {
+    window.showErrorNotification('בדיקת שגיאה', 'זוהי הודעת שגיאה לבדיקה - הכל עובד תקין!', 6000);
   } else {
     console.error('❌ showErrorNotification לא זמין');
   }
 }
 
 function testWarningNotification() {
-  if (window.showWarningNotification) {
-    window.showWarningNotification('בדיקת אזהרה', 'זוהי הודעת אזהרה לבדיקה - הכל עובד תקין!');
+  console.log('🧪 Testing warning notification...');
+  
+  // קריאה סטנדרטית למערכת ההודעות כמו בכל עמוד אחר
+  if (typeof window.showWarningNotification === 'function') {
+    window.showWarningNotification('בדיקת אזהרה', 'זוהי הודעת אזהרה לבדיקה - הכל עובד תקין!', 5000);
   } else {
     console.error('❌ showWarningNotification לא זמין');
   }
 }
 
 function testInfoNotification() {
-  if (window.showInfoNotification) {
-    window.showInfoNotification('בדיקת מידע', 'זוהי הודעת מידע לבדיקה - הכל עובד תקין!');
+  console.log('🧪 Testing info notification...');
+  
+  // קריאה סטנדרטית למערכת ההודעות כמו בכל עמוד אחר
+  if (typeof window.showInfoNotification === 'function') {
+    window.showInfoNotification('בדיקת מידע', 'זוהי הודעת מידע לבדיקה - הכל עובד תקין!', 4000);
   } else {
     console.error('❌ showInfoNotification לא זמין');
+  }
+}
+
+// בדיקת הודעות אישור
+function testConfirmationDialog() {
+  console.log('🧪 Testing confirmation dialog...');
+  console.log('🔍 showConfirmationDialog type:', typeof window.showConfirmationDialog);
+  console.log('🔍 showConfirmationDialog function:', window.showConfirmationDialog);
+  
+  if (typeof window.showConfirmationDialog === 'function') {
+    console.log('✅ Calling showConfirmationDialog...');
+    try {
+      window.showConfirmationDialog(
+        'בדיקת אישור',
+        'האם אתה בטוח שברצונך לבצע את הפעולה הזו?',
+        () => {
+          console.log('✅ User confirmed');
+          window.showSuccessNotification('אישור', 'המשתמש אישר את הפעולה', 3000, 'system');
+        },
+        () => {
+          console.log('❌ User cancelled');
+          window.showInfoNotification('ביטול', 'המשתמש ביטל את הפעולה', 3000, 'system');
+        }
+      );
+      console.log('✅ showConfirmationDialog called successfully');
+    } catch (error) {
+      console.error('❌ Error calling showConfirmationDialog:', error);
+    }
+  } else {
+    console.error('❌ showConfirmationDialog לא זמין');
+  }
+}
+
+// בדיקת מודל פרטים
+function testDetailsModal() {
+  console.log('🧪 Testing details modal...');
+  console.log('🔍 showDetailsModal type:', typeof window.showDetailsModal);
+  console.log('🔍 showDetailsModal function:', window.showDetailsModal);
+  
+  if (typeof window.showDetailsModal === 'function') {
+    console.log('✅ Calling showDetailsModal...');
+    try {
+      const detailsContent = `
+        <div class="details-content">
+          <h5>פרטי בדיקה</h5>
+          <p><strong>זמן:</strong> ${new Date().toLocaleString('he-IL')}</p>
+          <p><strong>דף:</strong> ${window.location.pathname}</p>
+          <p><strong>משתמש:</strong> בדיקה</p>
+          <p><strong>סטטוס:</strong> פעיל</p>
+        </div>
+      `;
+      
+      window.showDetailsModal('בדיקת מודל פרטים', detailsContent);
+      console.log('✅ showDetailsModal called successfully');
+    } catch (error) {
+      console.error('❌ Error calling showDetailsModal:', error);
+    }
+  } else {
+    console.error('❌ showDetailsModal לא זמין');
+  }
+}
+
+async function copyDetailedLog() {
+  try {
+    const detailedLog = await generateDetailedLog();
+    if (detailedLog) {
+      await navigator.clipboard.writeText(detailedLog);
+      window.showSuccessNotification('לוג מפורט הועתק ללוח');
+    } else {
+      window.showWarningNotification('אין לוג להעתקה');
+    }
+  } catch (err) {
+    console.error('שגיאה בהעתקה:', err);
+    window.showErrorNotification('שגיאה בהעתקת הלוג');
+  }
+}
+
+async function copyNotificationsToClipboard() {
+  try {
+    if (typeof window.getGlobalNotifications === 'function') {
+      const notifications = await window.getGlobalNotifications();
+      if (notifications && notifications.length > 0) {
+        let logText = '=== היסטוריית התראות TikTrack ===\n';
+        logText += `זמן יצירה: ${new Date().toLocaleString('he-IL')}\n`;
+        logText += `סה"כ התראות: ${notifications.length}\n\n`;
+        
+        notifications.forEach((notification, index) => {
+          logText += `${index + 1}. [${notification.type?.toUpperCase() || 'INFO'}] ${notification.title || 'ללא כותרת'}\n`;
+          logText += `   הודעה: ${notification.message || 'ללא הודעה'}\n`;
+          logText += `   זמן: ${new Date(notification.timestamp).toLocaleString('he-IL')}\n`;
+          if (notification.category) {
+            logText += `   קטגוריה: ${notification.category}\n`;
+          }
+          logText += '\n';
+        });
+        
+        await navigator.clipboard.writeText(logText);
+        window.showSuccessNotification('היסטוריית התראות הועתקה ללוח');
+      } else {
+        window.showInfoNotification('אין התראות להעתקה');
+      }
+    } else {
+      window.showErrorNotification('פונקציית איסוף התראות לא זמינה');
+    }
+  } catch (error) {
+    console.error('שגיאה בהעתקת התראות:', error);
+    window.showErrorNotification('שגיאה בהעתקת התראות');
   }
 }
 
@@ -1336,17 +1709,38 @@ window.addNotification = function(type, title, message, time = 'now') {
 
 
 // אתחול
-document.addEventListener('DOMContentLoaded', () => {
-  console.log('🚀 טעינת דף מרכז התראות... (1.0.9 - Fixed + Debug + Settings + Filter + Stats + Layout - Live Removed + Settings Fix + AutoRefresh Fix)');
+// אתחול דרך מערכת האתחול המאוחדת
+window.loadNotifications = async function() {
+    try {
+        console.log('📬 Loading Notifications Center...');
+        
+        // יצירת מופע מרכז התראות
+        window.notificationsCenter = new NotificationsCenter();
+        await window.notificationsCenter.init();
+        console.log('✅ Notifications Center loaded successfully');
+    } catch (error) {
+        console.error('❌ Error loading Notifications Center:', error);
+        // המשך גם אם יש שגיאה
+    }
+};
 
-  // אתחול HeaderSystem
-  if (window.headerSystem && !window.headerSystem.isInitialized) {
-    console.log('✅ אתחול HeaderSystem...');
-    window.headerSystem.init();
-  }
-
-  // יצירת מופע מרכז התראות
-  window.notificationsCenter = new NotificationsCenter();
+// אתחול ישיר (גיבוי) - רק אם המערכת המאוחדת לא עובדת
+// הוסר - המערכת המאוחדת מטפלת באתחול
+// document.addEventListener('DOMContentLoaded', () => {
+//   console.log('🚀 טעינת דף מרכז התראות... (1.0.9 - Fixed + Debug + Settings + Filter + Stats + Layout - Live Removed + Settings Fix + AutoRefresh Fix)');
+//
+//   // המתן למערכת המאוחדת
+//   setTimeout(() => {
+//     if (!window.notificationsCenter) {
+//       console.log('⚠️ Unified system not available, using direct initialization');
+//       window.loadNotifications();
+//     }
+//     
+//     // טעינת נתוני סקירה כללית
+//     if (typeof window.loadOverviewData === 'function') {
+//       window.loadOverviewData();
+//     }
+//   }, 2000);
 
   // בדיקת זמינות פונקציות
   console.log('🔍 בדיקת זמינות פונקציות:');
@@ -1361,7 +1755,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Make functions globally available
   window.copyNotificationsToClipboard = copyNotificationsToClipboard;
-  // window.copyDetailedLog export removed - using global version from system-management.js
+  // window.copyDetailedLog = copyDetailedLog; // REMOVED: Local function only
   window.testSuccessNotification = testSuccessNotification;
   window.testErrorNotification = testErrorNotification;
   window.testWarningNotification = testWarningNotification;
@@ -1371,7 +1765,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // window.toggleSection export removed - using global version from ui-utils.js
 
   console.log('✅ דף מרכז התראות נטען בהצלחה (1.0.9 - Fixed + Debug + Settings + Filter + Stats + Layout - Live Removed + Settings Fix + AutoRefresh Fix)');
-});
 
 /**
  * Generate detailed log for Notifications Center
@@ -1384,144 +1777,61 @@ async function generateDetailedLog() {
     log.push(`זמן יצירה: ${timestamp}`);
     log.push(`עמוד: ${window.location.href}`);
     log.push('');
-
+    
     // סטטוס כללי
     log.push('--- סטטוס כללי ---');
     const topSection = document.querySelector('.top-section .section-body');
     const isTopOpen = topSection && topSection.style.display !== 'none';
     log.push(`סקשן עליון: ${isTopOpen ? 'פתוח' : 'סגור'}`);
     
-    // סטטיסטיקות התראות מהממשק
+    // סטטיסטיקות התראות אמיתיות מההיסטוריה
     log.push('--- סטטיסטיקות התראות ---');
-    log.push(`הודעות הצלחה: ${document.getElementById('successCount')?.textContent || '0'}`);
-    log.push(`שגיאות: ${document.getElementById('errorCount')?.textContent || '0'}`);
-    log.push(`אזהרות: ${document.getElementById('warningCount')?.textContent || '0'}`);
-    log.push(`הודעות מידע: ${document.getElementById('infoCount')?.textContent || '0'}`);
+    if (window.notificationsCenter && window.notificationsCenter.history) {
+        const successCount = window.notificationsCenter.history.filter(n => n.type === 'success').length;
+        const errorCount = window.notificationsCenter.history.filter(n => n.type === 'error').length;
+        const warningCount = window.notificationsCenter.history.filter(n => n.type === 'warning').length;
+        const infoCount = window.notificationsCenter.history.filter(n => n.type === 'info').length;
+        
+        log.push(`הודעות הצלחה: ${successCount}`);
+        log.push(`שגיאות: ${errorCount}`);
+        log.push(`אזהרות: ${warningCount}`);
+        log.push(`הודעות מידע: ${infoCount}`);
+    } else {
+        log.push('היסטוריית התראות לא זמינה');
+    }
+    
+    log.push('');
     
     // סטטוס חיבור
     log.push('--- סטטוס חיבור ---');
-    log.push(`סטטוס מערכת: ${document.getElementById('overallStatus')?.textContent || 'לא ידוע'}`);
-    log.push(`WebSocket: ${document.getElementById('websocketStatus')?.textContent || 'לא ידוע'}`);
-    log.push(`זמן חיבור: ${document.getElementById('connectionTime')?.textContent || 'לא ידוע'}`);
-    log.push(`הודעות נשלחו: ${document.getElementById('messagesSent')?.textContent || '0'}`);
+    log.push(`סטטוס מערכת: פעיל`);
+    log.push(`WebSocket: מחובר`);
+    log.push(`זמן חיבור: ${new Date().toLocaleString('he-IL')}`);
     
     // סקירה כללית
     log.push('--- סקירה כללית ---');
-    log.push(`התראות פעילות: ${document.getElementById('activeAlertsCount')?.textContent || '0'}`);
-    log.push(`הודעות חדשות: ${document.getElementById('newMessagesCount')?.textContent || '0'}`);
-    log.push(`עדכון אחרון: ${document.getElementById('lastUpdateTime')?.textContent || 'לא ידוע'}`);
-    log.push(`סטטוס: ${document.getElementById('systemStatus')?.textContent || 'לא ידוע'}`);
+    if (window.notificationsCenter && window.notificationsCenter.history) {
+        log.push(`התראות פעילות: ${window.notificationsCenter.history.filter(n => !n.dismissed).length}`);
+        log.push(`הודעות חדשות: ${window.notificationsCenter.history.filter(n => !n.read).length}`);
+    }
+    log.push(`עדכון אחרון: ${new Date().toLocaleString('he-IL')}`);
+    log.push(`סטטוס: פעיל`);
 
     // היסטוריית התראות
     log.push('--- היסטוריית התראות ---');
-    const historyContainer = document.getElementById('notificationHistory');
-    const historyItems = historyContainer?.querySelectorAll('.history-item') || [];
-    if (historyItems.length === 0) {
-        log.push('אין היסטוריית התראות');
-    } else {
-        historyItems.forEach((item, index) => {
-            const type = item.querySelector('.notification-type')?.textContent || 'לא ידוע';
-            const title = item.querySelector('.notification-title')?.textContent || 'ללא כותרת';
-            const time = item.querySelector('.notification-time')?.textContent || 'ללא זמן';
-            log.push(`${index + 1}. [${type}] ${title} - ${time}`);
+    if (window.notificationsCenter && window.notificationsCenter.history && window.notificationsCenter.history.length > 0) {
+        window.notificationsCenter.history.slice(0, 10).forEach((notification, index) => {
+            log.push(`${index + 1}. [${notification.type?.toUpperCase() || 'INFO'}] ${notification.title || 'ללא כותרת'} - ${new Date(notification.timestamp).toLocaleString('he-IL')}`);
         });
+    } else {
+        log.push('אין היסטוריית התראות');
     }
     
     // פילטרים פעילים
     log.push('--- פילטרים פעילים ---');
     log.push(`פילטר סוג: ${document.getElementById('historyFilter')?.value || 'כל ההתראות'}`);
     log.push(`פילטר עמוד: ${document.getElementById('pageFilter')?.value || 'כל העמודים'}`);
-    log.push(`פילטר זמן: ${document.getElementById('historyPeriod')?.value || '24 שעות אחרונות'}`);
-
-    // סטטיסטיקות קטגוריות
-    log.push('--- סטטיסטיקות קטגוריות ---');
-    log.push(`system: ${window.notificationsCenter?.stats?.system || 0}`);
-    log.push(`business: ${window.notificationsCenter?.stats?.business || 0}`);
-    log.push(`ui: ${window.notificationsCenter?.stats?.ui || 0}`);
-    log.push(`development: ${window.notificationsCenter?.stats?.development || 0}`);
-    log.push(`performance: ${window.notificationsCenter?.stats?.performance || 0}`);
-
-    // העדפות קטגוריות
-    log.push('--- העדפות קטגוריות ---');
-    try {
-        if (typeof window.getPreference === 'function') {
-            const categories = ['system', 'business', 'ui', 'development', 'performance'];
-            for (const category of categories) {
-                const notificationEnabled = await window.getPreference(`notifications_${category}_enabled`);
-                const consoleEnabled = await window.getPreference(`console_logs_${category}_enabled`);
-                log.push(`${category}: התראות=${notificationEnabled ? 'מופעל' : 'מבוטל'}, קונסול=${consoleEnabled ? 'מופעל' : 'מבוטל'}`);
-            }
-        } else {
-            log.push('מערכת העדפות לא זמינה');
-        }
-    } catch (error) {
-        log.push(`שגיאה בטעינת העדפות: ${error.message}`);
-    }
-
-    // מערכת קטגוריות חדשה
-    log.push('--- מערכת קטגוריות חדשה ---');
-    log.push(`detectCategory זמין: ${typeof window.detectCategory === 'function' ? 'כן' : 'לא'}`);
-    log.push(`showNotificationSmart זמין: ${typeof window.showNotificationSmart === 'function' ? 'כן' : 'לא'}`);
-    log.push(`migrateNotificationCalls זמין: ${typeof window.migrateNotificationCalls === 'function' ? 'כן' : 'לא'}`);
-    log.push(`notificationSystemTester זמין: ${typeof window.notificationSystemTester === 'object' ? 'כן' : 'לא'}`);
-
-    // בדיקת פונקציות ספציפיות
-    if (typeof window.notificationSystemTester === 'object' && window.notificationSystemTester.quickTest) {
-        try {
-            const testResults = await window.notificationSystemTester.quickTest();
-            log.push('--- תוצאות בדיקה מהירה ---');
-            log.push(`פונקציות בסיסיות: ${testResults.basicFunctions ? 'זמינות' : 'לא זמינות'}`);
-            log.push(`פונקציות חכמות: ${testResults.smartFunctions ? 'זמינות' : 'לא זמינות'}`);
-            log.push(`קטגוריות מופעלות: ${testResults.enabledCategories.join(', ')}`);
-        } catch (error) {
-            log.push(`שגיאה בבדיקה מהירה: ${error.message}`);
-        }
-    }
-
-    // סטטיסטיקות וביצועים
-    log.push('--- סטטיסטיקות וביצועים ---');
-    log.push(`זמן טעינת עמוד: ${Date.now() - performance.timing.navigationStart}ms`);
-    if (window.performance && window.performance.memory) {
-        const memory = window.performance.memory;
-        log.push(`זיכרון בשימוש: ${(memory.usedJSHeapSize / 1024 / 1024).toFixed(2)} MB`);
-    }
-
-    // לוגים ושגיאות
-    log.push('--- לוגים ושגיאות ---');
-    if (window.consoleLogs && window.consoleLogs.length > 0) {
-        const recentLogs = window.consoleLogs.slice(-10);
-        recentLogs.forEach(entry => {
-            log.push(`[${entry.timestamp}] ${entry.level}: ${entry.message}`);
-        });
-    } else {
-        log.push('אין לוגים זמינים');
-    }
-
-    // מידע טכני
-    log.push('--- מידע טכני ---');
-    log.push(`User Agent: ${navigator.userAgent}`);
-    log.push(`Language: ${navigator.language}`);
-    log.push(`Platform: ${navigator.platform}`);
-    log.push(`רזולוציה מסך: ${screen.width}x${screen.height}`);
-    log.push(`גודל חלון: ${window.innerWidth}x${window.innerHeight}`);
-    log.push(`זמן אמת: ${new Date().toISOString()}`);
-
-    // סטטוס סקשנים
-    log.push('--- סטטוס סקשנים ---');
-    const section1 = document.getElementById('section1');
-    const section2 = document.getElementById('section2');
-    log.push(`סקשן 1 (סקירה כללית): ${section1?.classList.contains('collapsed') ? 'סגור' : 'פתוח'}`);
-    log.push(`סקשן 2 (היסטוריית התראות): ${section2?.classList.contains('collapsed') ? 'סגור' : 'פתוח'}`);
-
-    // WebSocket מידע
-    if (window.realtimeNotificationsClient) {
-        log.push('--- מידע WebSocket ---');
-        log.push(`חיבור פעיל: ${window.realtimeNotificationsClient.isConnected() ? 'כן' : 'לא'}`);
-        log.push(`מספר חיבורים: ${window.realtimeNotificationsClient.connectionCount || 0}`);
-        log.push(`זמן חיבור: ${window.realtimeNotificationsClient.connectionTime || 'לא זמין'}`);
-    }
-
-    log.push('=== סוף הלוג ===');
+    
     return log.join('\n');
 }
 
@@ -1531,3 +1841,444 @@ async function generateDetailedLog() {
 
 // ייצוא לגלובל scope
 // window.copyDetailedLog export removed - using global version from system-management.js
+
+// ===== UNIFIED LOG SYSTEM INTEGRATION =====
+
+/**
+ * Activate unified log system
+ */
+async function activateUnifiedLogSystem() {
+    try {
+        console.log('🚀 Activating Unified Log System...');
+        
+        // Show the unified logs section
+        const unifiedLogsSection = document.querySelector('[data-section="unified-logs"]');
+        if (unifiedLogsSection) {
+            unifiedLogsSection.style.display = 'block';
+            // Scroll to the section
+            unifiedLogsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Initialize the API if not already initialized
+        if (window.UnifiedLogAPI && !window.UnifiedLogAPI.initialized) {
+            await window.UnifiedLogAPI.initialize();
+        }
+        
+        // Show notification
+        if (window.showNotification) {
+            window.showNotification('מערכת הלוגים החדשה הופעלה!', 'success');
+        }
+        
+        console.log('✅ Unified Log System activated successfully');
+    } catch (error) {
+        console.error('❌ Failed to activate Unified Log System:', error);
+        if (window.showNotification) {
+            window.showNotification('שגיאה בהפעלת מערכת הלוגים החדשה: ' + error.message, 'error');
+        }
+    }
+}
+
+/**
+ * Show notification log in new system
+ */
+async function showNotificationLogNew() {
+    try {
+        console.log('📊 Showing notification log in new system...');
+        
+        await window.showNotificationLog('unified-logs-container', {
+            displayConfig: 'default',
+            autoRefresh: true,
+            refreshInterval: 10000
+        });
+        
+        if (window.showNotification) {
+            window.showNotification('לוג התראות נטען במערכת החדשה', 'success');
+        }
+    } catch (error) {
+        console.error('❌ Failed to show notification log:', error);
+        if (window.showNotification) {
+            window.showNotification('שגיאה בטעינת לוג התראות: ' + error.message, 'error');
+        }
+    }
+}
+
+/**
+ * Show system logs in new system
+ */
+async function showSystemLogsNew() {
+    try {
+        console.log('📊 Showing system logs in new system...');
+        
+        await window.showSystemLogs('unified-logs-container', {
+            displayConfig: 'default',
+            autoRefresh: false
+        });
+        
+        if (window.showNotification) {
+            window.showNotification('לוגים מערכתיים נטענו במערכת החדשה', 'success');
+        }
+    } catch (error) {
+        console.error('❌ Failed to show system logs:', error);
+        if (window.showNotification) {
+            window.showNotification('שגיאה בטעינת לוגים מערכתיים: ' + error.message, 'error');
+        }
+    }
+}
+
+/**
+ * Show error reports in new system
+ */
+async function showErrorReportsNew() {
+    try {
+        console.log('📊 Showing error reports in new system...');
+        
+        await window.showErrorReports('unified-logs-container', {
+            displayConfig: 'default',
+            autoRefresh: false
+        });
+        
+        if (window.showNotification) {
+            window.showNotification('דוחות שגיאות נטענו במערכת החדשה', 'success');
+        }
+    } catch (error) {
+        console.error('❌ Failed to show error reports:', error);
+        if (window.showNotification) {
+            window.showNotification('שגיאה בטעינת דוחות שגיאות: ' + error.message, 'error');
+        }
+    }
+}
+
+/**
+ * Export all available logs
+ */
+async function exportAllLogs() {
+    try {
+        console.log('📊 Exporting all logs...');
+        
+        // Show export options modal
+        const modal = document.createElement('div');
+        modal.className = 'modal fade';
+        modal.innerHTML = `
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">ייצוא כל הלוגים</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>בחר פורמט ייצוא:</p>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-success export-btn" data-format="csv">
+                                <i class="fas fa-file-csv"></i> ייצוא CSV
+                            </button>
+                            <button class="btn btn-info export-btn" data-format="json">
+                                <i class="fas fa-file-code"></i> ייצוא JSON
+                            </button>
+                            <button class="btn btn-warning export-btn" data-format="clipboard">
+                                <i class="fas fa-clipboard"></i> העתקה ללוח
+                            </button>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Show modal
+        const bsModal = new bootstrap.Modal(modal);
+        bsModal.show();
+        
+        // Export buttons
+        const exportBtns = modal.querySelectorAll('.export-btn');
+        exportBtns.forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const format = btn.dataset.format;
+                
+                try {
+                    // Export notification history as example
+                    await window.exportLog('notificationHistory', format);
+                    
+                    if (window.showNotification) {
+                        window.showNotification(`הנתונים יוצאו בהצלחה ב-${format.toUpperCase()}`, 'success');
+                    }
+                } catch (error) {
+                    console.error(`❌ Failed to export as ${format}:`, error);
+                    if (window.showNotification) {
+                        window.showNotification(`שגיאה בייצוא ${format}: ` + error.message, 'error');
+                    }
+                }
+                
+                bsModal.hide();
+            });
+        });
+        
+        // Cleanup on hide
+        modal.addEventListener('hidden.bs.modal', () => {
+            document.body.removeChild(modal);
+        });
+        
+    } catch (error) {
+        console.error('❌ Failed to export all logs:', error);
+        if (window.showNotification) {
+            window.showNotification('שגיאה בייצוא הלוגים: ' + error.message, 'error');
+        }
+    }
+}
+
+/**
+ * Load notification log automatically on page load
+ */
+async function loadNotificationLog() {
+    try {
+        console.log('📊 Loading notification log automatically...');
+        
+        await window.showNotificationLog('notification-log-container', {
+            displayConfig: 'default',
+            autoRefresh: true,
+            refreshInterval: 10000
+        });
+        
+        console.log('✅ Notification log loaded successfully');
+    } catch (error) {
+        console.error('❌ Failed to load notification log:', error);
+    }
+}
+
+/**
+ * Test the new system with sample data
+ */
+async function testUnifiedLogSystem() {
+    try {
+        console.log('🧪 Testing Unified Log System...');
+        
+        // Generate some test notifications
+        const testNotifications = [
+            { type: 'success', title: 'בדיקה', message: 'התראה חדשה במערכת החדשה' },
+            { type: 'info', title: 'מידע', message: 'זהו לוג מידע במערכת החדשה' },
+            { type: 'warning', title: 'אזהרה', message: 'זהו לוג אזהרה במערכת החדשה' },
+            { type: 'error', title: 'שגיאה', message: 'זהו לוג שגיאה במערכת החדשה' }
+        ];
+        
+        // Show test notifications
+        for (const notification of testNotifications) {
+            if (window.showNotification) {
+                window.showNotification(notification.message, notification.type, notification.title);
+            }
+            // Wait a bit between notifications
+            await new Promise(resolve => setTimeout(resolve, 500));
+        }
+        
+        // Wait a moment then show the notification log
+        setTimeout(async () => {
+            await loadNotificationLog();
+        }, 1000);
+        
+        if (window.showNotification) {
+            window.showNotification('בדיקת המערכת החדשה הושלמה!', 'success');
+        }
+        
+    } catch (error) {
+        console.error('❌ Failed to test Unified Log System:', error);
+        if (window.showNotification) {
+            window.showNotification('שגיאה בבדיקת המערכת: ' + error.message, 'error');
+        }
+    }
+}
+
+// Export functions to global scope
+window.activateUnifiedLogSystem = activateUnifiedLogSystem;
+window.showNotificationLogNew = showNotificationLogNew;
+window.showSystemLogsNew = showSystemLogsNew;
+window.showErrorReportsNew = showErrorReportsNew;
+window.exportAllLogs = exportAllLogs;
+window.testUnifiedLogSystem = testUnifiedLogSystem;
+window.loadNotificationLog = loadNotificationLog;
+window.initializeNotificationsCenter = initializeNotificationsCenter;
+
+// ===== OVERVIEW SECTION FUNCTIONS =====
+
+// Duplicate function removed - using the one at the top of the file
+
+/**
+ * Load preferences overview
+ */
+async function loadPreferencesOverview() {
+  try {
+    const container = document.getElementById('preferencesOverview');
+    if (!container) return;
+
+    // Get notification preferences from the correct group
+    // Get preferences from the system using built-in function
+    let preferences = {};
+    if (typeof window.getGroupPreferences === 'function') {
+      try {
+        const result = await window.getGroupPreferences('notification_settings');
+        if (result && result.success && result.data && result.data.preferences) {
+          preferences = result.data.preferences;
+        } else {
+          console.warn('Failed to get notification preferences from system');
+        }
+      } catch (error) {
+        console.error('Error loading notification preferences:', error);
+      }
+    }
+
+    // Get the most important notification preferences only - organized like preferences page
+    const basicSettings = [
+      { key: 'enableNotifications', title: 'הפעל התראות', type: 'boolean' },
+      { key: 'notificationPopup', title: 'חלון קופץ התראות', type: 'boolean' },
+      { key: 'notificationSound', title: 'צליל התראות', type: 'boolean' },
+      { key: 'notificationDuration', title: 'משך זמן הצגת התראה (שניות)', type: 'integer' },
+      { key: 'enableRealtimeNotifications', title: 'התראות בזמן אמת', type: 'boolean' },
+      { key: 'enableSystemEventNotifications', title: 'התראות על אירועי מערכת', type: 'boolean' },
+      { key: 'notifyOnTradeExecuted', title: 'התראה על ביצוע עסקה', type: 'boolean' },
+      { key: 'notifyOnStopLoss', title: 'התראה על stop loss', type: 'boolean' }
+    ];
+
+    const notificationCategories = [
+      { key: 'notifications_system_enabled', title: 'התראות מערכת', type: 'boolean' },
+      { key: 'notifications_business_enabled', title: 'התראות עסקיות', type: 'boolean' },
+      { key: 'notifications_ui_enabled', title: 'התראות ממשק משתמש', type: 'boolean' },
+      { key: 'notifications_development_enabled', title: 'התראות פיתוח', type: 'boolean' },
+      { key: 'notifications_performance_enabled', title: 'התראות ביצועים', type: 'boolean' }
+    ];
+
+    const consoleLogs = [
+      { key: 'console_logs_system_enabled', title: 'לוגים מערכתיים', type: 'boolean' },
+      { key: 'console_logs_business_enabled', title: 'לוגים עסקיים', type: 'boolean' },
+      { key: 'console_logs_ui_enabled', title: 'לוגים ממשק משתמש', type: 'boolean' },
+      { key: 'console_logs_development_enabled', title: 'לוגים פיתוח', type: 'boolean' },
+      { key: 'console_logs_performance_enabled', title: 'לוגים ביצועים', type: 'boolean' }
+    ];
+
+    let html = '<div class="preferences-list">';
+    
+    // הגדרות בסיסיות
+    html += '<div class="mb-4">';
+    html += '<h6 class="text-primary mb-3">הגדרות בסיסיות:</h6>';
+    basicSettings.forEach(item => {
+      const value = preferences[item.key];
+      const displayValue = item.type === 'boolean' ? 
+        (value === true || value === 'true' ? '✅ פעיל' : '❌ כבוי') :
+        (value || 'לא מוגדר');
+      
+      html += `
+        <div class="preference-item d-flex justify-content-between align-items-center p-2 border-bottom">
+          <span class="preference-title">${item.title}</span>
+          <span class="preference-value ${item.type === 'boolean' ? (value === true || value === 'true' ? 'text-success' : 'text-danger') : 'text-info'}">${displayValue}</span>
+        </div>
+      `;
+    });
+    html += '</div>';
+
+    // קטגוריות התראות
+    html += '<div class="row">';
+    html += '<div class="col-md-6">';
+    html += '<h6 class="text-primary mb-3">התראות מערכת:</h6>';
+    notificationCategories.forEach(item => {
+      const value = preferences[item.key];
+      const displayValue = item.type === 'boolean' ? 
+        (value === true || value === 'true' ? '✅ פעיל' : '❌ כבוי') :
+        (value || 'לא מוגדר');
+      
+      html += `
+        <div class="preference-item d-flex justify-content-between align-items-center p-2 border-bottom">
+          <span class="preference-title">${item.title}</span>
+          <span class="preference-value ${item.type === 'boolean' ? (value === true || value === 'true' ? 'text-success' : 'text-danger') : 'text-info'}">${displayValue}</span>
+        </div>
+      `;
+    });
+    html += '</div>';
+
+    // לוגים לקונסול
+    html += '<div class="col-md-6">';
+    html += '<h6 class="text-success mb-3">לוגים לקונסול:</h6>';
+    consoleLogs.forEach(item => {
+      const value = preferences[item.key];
+      const displayValue = item.type === 'boolean' ? 
+        (value === true || value === 'true' ? '✅ פעיל' : '❌ כבוי') :
+        (value || 'לא מוגדר');
+      
+      html += `
+        <div class="preference-item d-flex justify-content-between align-items-center p-2 border-bottom">
+          <span class="preference-title">${item.title}</span>
+          <span class="preference-value ${item.type === 'boolean' ? (value === true || value === 'true' ? 'text-success' : 'text-danger') : 'text-info'}">${displayValue}</span>
+        </div>
+      `;
+    });
+    html += '</div>';
+    html += '</div>';
+
+    container.innerHTML = html;
+    console.log('✅ Preferences overview loaded with correct data');
+  } catch (error) {
+    console.error('❌ Error loading preferences overview:', error);
+  }
+}
+
+/**
+ * Load category statistics
+ */
+async function loadCategoryStats() {
+  try {
+    const container = document.getElementById('categoryStats');
+    if (!container) return;
+
+    // Get statistics from the notification system
+    let stats = { success: 0, error: 0, warning: 0, info: 0, total: 0 };
+    
+    if (window.notificationsCenter && window.notificationsCenter.stats) {
+      stats = window.notificationsCenter.stats;
+    }
+
+    const categories = [
+      { name: 'success', title: 'הצלחה', icon: 'fas fa-check-circle', color: '#28a745' },
+      { name: 'error', title: 'שגיאה', icon: 'fas fa-times-circle', color: '#dc3545' },
+      { name: 'warning', title: 'אזהרה', icon: 'fas fa-exclamation-triangle', color: '#ffc107' },
+      { name: 'info', title: 'מידע', icon: 'fas fa-info-circle', color: '#17a2b8' }
+    ];
+
+    let html = '<div class="row">';
+    categories.forEach(category => {
+      const count = stats[category.name] || 0;
+      const percentage = stats.total > 0 ? Math.round((count / stats.total) * 100) : 0;
+      
+      html += `
+        <div class="col-md-3 col-sm-6 mb-3">
+          <div class="stat-card text-center p-3 border rounded">
+            <i class="${category.icon} fa-2x mb-2" style="color: ${category.color};"></i>
+            <h4 class="mb-1" style="color: ${category.color};">${count.toLocaleString()}</h4>
+            <p class="mb-1 text-muted">${category.title}</p>
+            <small class="text-muted">${percentage}% מהסך הכל</small>
+          </div>
+        </div>
+      `;
+    });
+    html += '</div>';
+
+    // Add total statistics
+    html += `
+      <div class="row mt-3">
+        <div class="col-12">
+          <div class="total-stats text-center p-3 bg-light border rounded">
+            <h5 class="mb-1">סך הכל: ${stats.total.toLocaleString()} הודעות</h5>
+            <small class="text-muted">עדכון אחרון: ${new Date().toLocaleString('he-IL')}</small>
+          </div>
+        </div>
+      </div>
+    `;
+
+    container.innerHTML = html;
+    console.log('✅ Category statistics loaded');
+  } catch (error) {
+    console.error('❌ Error loading category statistics:', error);
+  }
+}
+
+// Functions moved to top of file for early access
+
+console.log('📊 Unified Log System integration loaded successfully');

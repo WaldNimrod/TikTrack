@@ -1378,3 +1378,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // ייצוא לגלובל scope
 // window.copyDetailedLog export removed - using global version from system-management.js
+// window.generateDetailedLog export removed - local function only

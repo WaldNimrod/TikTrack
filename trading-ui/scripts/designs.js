@@ -110,5 +110,6 @@ function generateDetailedLog() {
 // window.toggleAllSections export removed - using global version from ui-utils.js
 // window.toggleSection export removed - using global version from ui-utils.js
 // window.copyDetailedLog export removed - using global version from system-management.js
+// window.generateDetailedLog export removed - local function only
 
 console.log('✅ Designs page script ready');

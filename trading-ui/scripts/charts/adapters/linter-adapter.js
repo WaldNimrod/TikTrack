@@ -37,17 +37,17 @@ class LinterAdapter {
         }
 
         try {
-            // For now, return mock data since we don't have a real API
-            const mockData = this.generateMockData(params);
+            // Return empty data - no real linter data available yet
+            const emptyData = { timestamps: [], quality: [], counts: [] };
             
-            // Cache the data
+            // Cache the empty data
             this.cache.set(cacheKey, {
-                data: mockData,
+                data: emptyData,
                 timestamp: Date.now()
             });
             
-            console.log('🔍 Linter data retrieved');
-            return mockData;
+            console.log('🔍 Linter data retrieved (empty - no real data available)');
+            return emptyData;
         } catch (error) {
             console.error('❌ Error fetching linter data:', error);
             return { timestamps: [], quality: [], counts: [] };

@@ -1522,7 +1522,7 @@ function getColorPreferences() {
  */
 function updateCSSVariablesFromPreferences(preferences) {
   try {
-    console.log('🎨 עדכון CSS Variables מהעדפות...');
+    // console.log('🎨 עדכון CSS Variables מהעדפות...');
 
       // עדכון צבעי ערכים מספריים - לפי השמות במערכת ההעדפות
       if (preferences.valuePositiveColor) {
@@ -1803,14 +1803,14 @@ function updateCSSVariablesFromPreferences(preferences) {
     }
 
     console.log('✅ CSS Variables עודכנו בהצלחה');
-    console.log('🎨 צבעים מעודכנים:', {
-      primary: preferences.primaryColor,
-      secondary: preferences.secondaryColor,
-      trade: preferences.entityTradeColor,
-      trading_account: preferences.entityTradingAccountColor,
-      positive: preferences.valuePositiveColor,
-      negative: preferences.valueNegativeColor
-    });
+    // console.log('🎨 צבעים מעודכנים:', {
+    //   primary: preferences.primaryColor,
+    //   secondary: preferences.secondaryColor,
+    //   trade: preferences.entityTradeColor,
+    //   trading_account: preferences.entityTradingAccountColor,
+    //   positive: preferences.valuePositiveColor,
+    //   negative: preferences.valueNegativeColor
+    // });
 
     // Dispatch event to notify chart theme system
     if (window.dispatchEvent) {

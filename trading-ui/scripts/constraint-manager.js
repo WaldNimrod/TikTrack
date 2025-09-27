@@ -307,7 +307,7 @@ class ConstraintManager {
             'ביטול'
           );
         }) : 
-        window.confirm('האם אתה בטוח שברצונך למחוק את האילוץ הזה?');
+        window.window.showConfirmationDialog('אישור', 'האם אתה בטוח שברצונך למחוק את האילוץ הזה?');
       if (!confirmed) {
         return;
       }

@@ -48,13 +48,15 @@
     <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=1.0.1">
+    <link rel="stylesheet" href="styles-new/06-components/_unified-log-display.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_pagination-system.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=1.0.0">
     
     <!-- Header Styles -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=v38_fixed">
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">
     
     <!-- Dynamic Color System Scripts -->
     <script src="scripts/color-scheme-system.js"></script>
@@ -83,8 +85,8 @@
                     <div class="section-header">
                         <h2>🌐 דשבורד נתונים חיצוניים</h2>
                         <div class="header-actions">
-                            <button class="btn btn-sm btn-outline-info" onclick="copyDetailedLog()" title="העתק לוג מפורט">
-                                📋 העתק לוג
+                            <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט">
+                                <i class="fas fa-copy"></i> העתק לוג מפורט
                             </button>
                             <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
                                 <span class="section-toggle-icon">▼</span>
@@ -234,6 +236,23 @@
                     </div>
                 </div>
                 <!-- UI Content Section 3 End--> 
+
+                <!-- UI Content Section 4 Start - External Data Log -->
+                <div class="content-section" id="section4">
+                    <div class="section-header">
+                        <h2>📊 לוג נתונים חיצוניים</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <!-- External Data Log Container -->
+                        <div id="external-data-log-container" style="min-height: 400px;">
+                            <!-- הלוג יטען אוטומטית -->
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 4 End - External Data Log -->
             </div>
         </div>
     </div>
@@ -247,19 +266,45 @@
     <script src="scripts/notification-system.js"></script>
     <script src="scripts/system-management.js"></script>
     <script src="scripts/notification-category-detector.js"></script>
-    <script src="scripts/notification-migration-system.js"></script>
     <script src="scripts/global-notification-collector.js"></script>
     <script src="scripts/tables.js"></script>
     <script src="scripts/page-utils.js"></script>
-    <script src="scripts/central-refresh-system.js"></script>
     <script src="scripts/external-data-dashboard.js"></script>
     
+    <!-- Unified Log System -->
+    <script src="scripts/pagination-system.js"></script>
+    <script src="scripts/unified-log-manager.js"></script>
+    <script src="scripts/unified-log-display.js"></script>
+    <script src="scripts/unified-log-api.js"></script>
+    
     <!-- New Unified Initialization System -->
-    <script src="scripts/application-initializer.js"></script>
     <script src="scripts/page-initialization-configs.js"></script>
     <script src="scripts/unified-app-initializer.js"></script>
 
     <!-- 🔓 TEMPLATE ZONE 6 - Page-Specific Scripts (ADD NEW SCRIPTS HERE) -->
     <!-- No manual DOMContentLoaded listener needed - handled by unified system -->
+    <!-- Local copyDetailedLog function for external-data-dashboard page -->
+    <script>
+        // Make the local copyDetailedLog function available globally for this page only
+        window.copyDetailedLog = copyDetailedLog;
+        
+        // External Data Log System Functions
+        window.loadExternalDataLog = function() {
+            try {
+                console.log('📊 Loading external data log...');
+                
+                // Use externalDataLog log type for external data
+                window.UnifiedLogAPI.showLog('externalDataLog', 'external-data-log-container', {
+                    displayConfig: 'default',
+                    autoRefresh: true,
+                    refreshInterval: 15000
+                });
+                
+                console.log('✅ External data log loaded successfully');
+            } catch (error) {
+                console.error('❌ Failed to load external data log:', error);
+            }
+        };
+    </script>
 </body>
 </html>

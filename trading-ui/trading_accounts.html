@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>חשבונות מסחר - TikTrack</title>
+</head>
+<body>
 <!--
   ========================================
   דף חשבונות מסחר - Trading Accounts Page
@@ -86,7 +93,8 @@
     <script src="scripts/header-system.js"></script>
 
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=v33_green_orange"></head>
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">
+</head>
 
 <body class="trading_accounts-page">
     <!-- Unified Header Container -->
@@ -109,7 +117,7 @@
             חשבונות מסחר
           </div>
           <div class="table-actions">
-            <button class="btn btn-sm btn-outline-primary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והחשבונות">
+            <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והחשבונות">
               <i class="fas fa-copy"></i> העתק לוג מפורט
             </button>
             <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר אזור סיכום">
@@ -262,15 +270,12 @@
     <script src="scripts/notification-system.js"></script>
     <script src="scripts/system-management.js"></script>
     <script src="scripts/notification-category-detector.js"></script>
-    <script src="scripts/notification-migration-system.js"></script>
     <script src="scripts/global-notification-collector.js"></script>
     <script src="scripts/tables.js"></script>
     <script src="scripts/page-utils.js"></script>
-    <script src="scripts/central-refresh-system.js"></script>
     <script src="scripts/trading_accounts.js"></script>
     
     <!-- New Unified Initialization System -->
-    <script src="scripts/application-initializer.js"></script>
     <script src="scripts/page-initialization-configs.js"></script>
     <script src="scripts/unified-app-initializer.js"></script>
 
@@ -411,6 +416,11 @@
         </div>
     </div>
 
+    <!-- Local copyDetailedLog function for trading_accounts page -->
+    <script>
+        // Make the local copyDetailedLog function available globally for this page only
+        window.copyDetailedLog = copyDetailedLog;
+    </script>
 </body>
 
 </html>

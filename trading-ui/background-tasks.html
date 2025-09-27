@@ -55,7 +55,7 @@
     <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=1.0.0">
     
     <!-- Header Styles -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=v39_background_tasks">
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">
     
     <!-- Background Tasks Styles -->
     <link rel="stylesheet" href="styles-new/06-components/_background-tasks.css?v=1.0.0">
@@ -89,7 +89,7 @@
                     <div class="section-header">
                         <h1>🔧 ניהול משימות רקע</h1>
                         <div class="header-actions">
-                            <button class="btn btn-outline-primary btn-sm" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
                                 <i class="fas fa-copy"></i> העתק לוג מפורט
                             </button>
                             <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
@@ -369,10 +369,18 @@
     <script src="scripts/tables.js"></script>
     <script src="scripts/linked-items.js"></script>
     <script src="scripts/page-utils.js"></script>
-    <script src="scripts/central-refresh-system.js"></script>
+    
+    <!-- Unified Initialization System -->
+    <script src="scripts/page-initialization-configs.js"></script>
+    <script src="scripts/unified-app-initializer.js"></script>
     
     <!-- Page-specific scripts -->
     <script src="scripts/background-tasks.js"></script>
-    <script src="scripts/background-tasks-init.js"></script>
+    
+    <!-- Local copyDetailedLog function for background-tasks page -->
+    <script>
+        // Make the local copyDetailedLog function available globally for this page only
+        window.copyDetailedLog = copyDetailedLog;
+    </script>
 </body>
 </html>

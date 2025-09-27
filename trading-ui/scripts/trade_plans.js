@@ -3194,7 +3194,35 @@ function generateDetailedLog() {
 
 // Export log functions to global scope
 // window.copyDetailedLog export removed - using global version from system-management.js
-window.generateDetailedLog = generateDetailedLog;
+// window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
+
+// Local copyDetailedLog function for trade_plans page
+async function copyDetailedLog() {
+    try {
+        const detailedLog = await generateDetailedLog();
+        if (detailedLog) {
+            await navigator.clipboard.writeText(detailedLog);
+            if (window.showSuccessNotification) {
+                window.showSuccessNotification('לוג מפורט הועתק ללוח');
+            } else {
+                alert('לוג מפורט הועתק ללוח!');
+            }
+        } else {
+            if (window.showWarningNotification) {
+                window.showWarningNotification('אין לוג להעתקה');
+            } else {
+                alert('אין לוג להעתקה');
+            }
+        }
+    } catch (err) {
+        console.error('שגיאה בהעתקה:', err);
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה בהעתקת הלוג');
+        } else {
+            alert('שגיאה בהעתקת הלוג');
+        }
+    }
+}
 
 // קריאה ב-DOMContentLoaded
 document.addEventListener('DOMContentLoaded', function() {

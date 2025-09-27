@@ -1001,117 +1001,6 @@ class SystemManagement {
     ];
   }
 
-  /**
-   * Copy detailed debug log to clipboard
-   * העתקת לוג מפורט ללוח
-   */
-  static copyDetailedLog() {
-    const logData = {
-      timestamp: new Date().toLocaleString('he-IL'),
-      page: 'system-management',
-      url: window.location.href,
-      sections: {
-        healthSummary: document.getElementById('healthSummary') ? 'exists' : 'missing',
-        performanceSummary: document.getElementById('performanceSummary') ? 'exists' : 'missing',
-        externalDataSection: document.getElementById('section2') ? 'exists' : 'missing',
-        alertsSection: document.getElementById('section3') ? 'exists' : 'missing',
-        securitySummary: document.getElementById('securitySummary') ? 'exists' : 'missing',
-        logsSection: document.getElementById('section5') ? 'exists' : 'missing',
-        backupSection: document.getElementById('section6') ? 'exists' : 'missing'
-      },
-      stats: {
-        overallHealth: document.getElementById('overallHealthStatus')?.textContent || 'not found',
-        systemScore: document.getElementById('systemScore')?.textContent || 'not found',
-        responseTime: document.getElementById('responseTime')?.textContent || 'not found',
-        uptime: document.getElementById('uptime')?.textContent || 'not found'
-      },
-      performance: {
-        cpuUsage: document.getElementById('cpuUsage')?.textContent || 'not found',
-        memoryUsage: document.getElementById('memoryUsage')?.textContent || 'not found',
-        diskUsage: document.getElementById('diskUsage')?.textContent || 'not found',
-        networkStatus: document.getElementById('networkStatus')?.textContent || 'not found'
-      },
-      // Charts will be managed by the new chart system
-      backup: {
-        lastBackupSize: document.getElementById('lastBackupSize')?.textContent || 'not found',
-        lastBackupDate: document.getElementById('lastBackupDate')?.textContent || 'not found',
-        backupStatus: document.getElementById('backupStatus')?.textContent || 'not found'
-      },
-      security: {
-        securityStatus: document.getElementById('securityStatus')?.textContent || 'not found',
-        encryptionStatus: document.getElementById('encryptionStatus')?.textContent || 'not found',
-        activeUsers: document.getElementById('activeUsers')?.textContent || 'not found',
-        securityAlerts: document.getElementById('securityAlerts')?.textContent || 'not found'
-      },
-      console: {
-        errors: window.console?.error ? 'console.error available' : 'console.error missing',
-        warnings: window.console?.warn ? 'console.warn available' : 'console.warn missing',
-        logs: window.console?.log ? 'console.log available' : 'console.log missing'
-      }
-    };
-    
-    const logText = `🔧 SYSTEM MANAGEMENT DEBUG LOG
-=====================================
-📅 זמן: ${logData.timestamp}
-🌐 עמוד: ${logData.page}
-🔗 URL: ${logData.url}
-
-📋 סקשנים:
-- סיכום בריאות מערכת: ${logData.sections.healthSummary}
-- סיכום ביצועי מערכת: ${logData.sections.performanceSummary}
-- סקשן נתונים חיצוניים: ${logData.sections.externalDataSection}
-- סקשן התראות מערכת: ${logData.sections.alertsSection}
-- סיכום אבטחה: ${logData.sections.securitySummary}
-- סקשן לוגים וניטור: ${logData.sections.logsSection}
-- סקשן גיבויים ושחזור: ${logData.sections.backupSection}
-
-📊 סטטיסטיקות בריאות:
-- בריאות כללית: ${logData.stats.overallHealth}
-- ציון מערכת: ${logData.stats.systemScore}
-- זמן תגובה: ${logData.stats.responseTime}
-- זמן פעילות: ${logData.stats.uptime}
-
-⚡ ביצועים:
-- מעבד: ${logData.performance.cpuUsage}
-- זיכרון: ${logData.performance.memoryUsage}
-- דיסק: ${logData.performance.diskUsage}
-- רשת: ${logData.performance.networkStatus}
-
-📈 גרפים:
-- מערכת גרפים: ${logData.charts ? 'פעילה' : 'לא זמינה'}
-
-💾 גיבויים:
-- גודל גיבוי אחרון: ${logData.backup.lastBackupSize}
-- תאריך גיבוי אחרון: ${logData.backup.lastBackupDate}
-- סטטוס גיבוי: ${logData.backup.backupStatus}
-
-🔒 אבטחה:
-- סטטוס אבטחה: ${logData.security.securityStatus}
-- סטטוס הצפנה: ${logData.security.encryptionStatus}
-- משתמשים פעילים: ${logData.security.activeUsers}
-- התראות אבטחה: ${logData.security.securityAlerts}
-
-🔧 קונסול:
-- console.error: ${logData.console.errors}
-- console.warn: ${logData.console.warnings}
-- console.log: ${logData.console.logs}
-
-=====================================`;
-    
-    navigator.clipboard.writeText(logText).then(() => {
-      if (window.showSuccessNotification) {
-        window.showSuccessNotification('הצלחה', 'לוג מפורט הועתק ללוח!');
-      } else {
-        alert('לוג מפורט הועתק ללוח!');
-      }
-    }).catch(err => {
-      if (window.showErrorNotification) {
-        window.showErrorNotification('שגיאה', 'לא ניתן להעתיק ללוח: ' + err.message);
-      } else {
-        alert('שגיאה בהעתקה: ' + err.message);
-      }
-    });
-  }
 
   static initializeDashboard() {
     // Initialize header system
@@ -1119,8 +1008,13 @@ class SystemManagement {
       window.headerSystem.init();
     }
 
-    // Set page title
-    document.title = 'מנהל מערכת - TikTrack';
+    // Set page title (only for system-management page)
+    if (window.location.pathname === '/system-management.html' || window.location.pathname.includes('system-management')) {
+      document.title = 'מנהל מערכת - TikTrack';
+    } else {
+      // Don't override other pages' titles
+      console.log('🔧 Not overriding page title for:', window.location.pathname, 'Current title:', document.title);
+    }
   }
 
   async loadSystemData() {
@@ -2130,72 +2024,6 @@ class SystemManagement {
     this.isInitialized = false;
   }
 
-  /**
-   * Copy detailed log to clipboard
-   * העתקת לוג מפורט ללוח
-   */
-  static async copyDetailedLog() {
-  try {
-    console.log('📋 Generating detailed log...');
-    
-    // Show loading state
-    const copyBtn = document.querySelector('.copy-log-btn');
-    if (copyBtn) {
-      copyBtn.textContent = '🔄 מייצר לוג...';
-      copyBtn.disabled = true;
-    }
-    
-    // Get detailed log from API
-    const response = await fetch('/api/system/detailed-log');
-    const data = await response.json();
-    
-    if (data.status === 'success') {
-      const detailedLog = data.data.log;
-      
-      // Copy to clipboard
-      await navigator.clipboard.writeText(detailedLog);
-      
-      // Show success message with additional info
-      const logInfo = `לוג מפורט הועתק ללוח!\n\n📊 מידע על הלוג:\n• זמן יצירה: ${new Date().toLocaleString('he-IL')}\n• גודל: ${detailedLog.length} תווים\n• מקור: מערכת ניהול TikTrack`;
-      
-      if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification('הצלחה', logInfo);
-      } else {
-        if (typeof showNotification === 'function') {
-          showNotification(logInfo, 'success');
-        } else {
-          alert(logInfo);
-        }
-      }
-      
-      console.log('✅ Detailed log copied to clipboard');
-    } else {
-      throw new Error(data.message || 'Failed to generate detailed log');
-    }
-    
-  } catch (error) {
-    console.error('❌ Error copying detailed log:', error);
-    
-    const errorMsg = `שגיאה בהעתקת לוג: ${error.message}\n\n🔧 פתרונות אפשריים:\n• בדוק את החיבור לשרת\n• נסה לרענן את הדף\n• פנה לתמיכה טכנית`;
-    
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה', errorMsg);
-    } else {
-      if (typeof showNotification === 'function') {
-        showNotification(errorMsg, 'error');
-      } else {
-        alert(errorMsg);
-      }
-    }
-  } finally {
-    // Reset button
-    const copyBtn = document.querySelector('.copy-log-btn');
-    if (copyBtn) {
-      copyBtn.textContent = '📋 העתק לוג מפורט';
-      copyBtn.disabled = false;
-    }
-  }
-}
 
   /**
    * Toggle all sections (expand/collapse)
@@ -2249,13 +2077,159 @@ class SystemManagement {
       if (toggleBtn) toggleBtn.innerHTML = '▶';
     }
   }
-}// Initialize dashboard when DOM is ready
+}
+
+/**
+ * Generate detailed log for System Management
+ */
+function generateDetailedLog() {
+    const timestamp = new Date().toLocaleString('he-IL');
+    const log = [];
+
+    log.push('=== לוג מפורט - ניהול מערכת ===');
+    log.push(`זמן יצירה: ${timestamp}`);
+    log.push(`עמוד: ${window.location.href}`);
+    log.push('');
+
+    // 1. מצב כללי של העמוד
+    log.push('--- מצב כללי של העמוד ---');
+    const sections = document.querySelectorAll('.content-section, .section');
+    sections.forEach((section, index) => {
+        const header = section.querySelector('.section-header, h2, h3');
+        const body = section.querySelector('.section-body, .card-body');
+        const isOpen = body && body.style.display !== 'none' && !section.classList.contains('collapsed');
+        const title = header ? header.textContent.trim() : `סקשן ${index + 1}`;
+        log.push(`  ${index + 1}. "${title}": ${isOpen ? 'פתוח' : 'סגור'}`);
+    });
+
+    // 2. סטטיסטיקות מערכת
+    log.push('');
+    log.push('--- סטטיסטיקות מערכת ---');
+    const systemStats = [
+        'overallHealthStatus', 'systemScore', 'responseTime', 'uptime',
+        'serverHealthStats', 'databaseHealthStats', 'cacheHealthStats', 'networkHealthStats',
+        'cpuUsage', 'memoryUsage', 'diskUsage', 'networkStatus',
+        'activeProvidersCount', 'lastDataUpdate', 'dataAccuracy', 'cacheStatus',
+        'errorCount', 'warningCount', 'infoCount', 'totalAlerts'
+    ];
+    
+    systemStats.forEach(statId => {
+        const element = document.getElementById(statId);
+        if (element) {
+            const value = element.textContent.trim();
+            const visible = element.offsetParent !== null ? 'נראה' : 'לא נראה';
+            log.push(`${statId}: ${value} (${visible})`);
+        }
+    });
+
+    // 3. כפתורים וקונטרולים
+    log.push('');
+    log.push('--- כפתורים וקונטרולים ---');
+    const buttonIds = [
+        'refreshSystemDataBtn', 'runSystemCheckBtn', 'clearCacheBtn', 'runBackupBtn',
+        'restoreFromBackupBtn', 'checkDependenciesBtn', 'copyCheckResultsBtn',
+        'copyDetailedLogBtn', 'toggleAllSectionsBtn'
+    ];
+    
+    buttonIds.forEach(btnId => {
+        const btn = document.getElementById(btnId);
+        if (btn) {
+            const visible = btn.offsetParent !== null ? 'נראה' : 'לא נראה';
+            const disabled = btn.disabled ? 'מבוטל' : 'פעיל';
+            const text = btn.textContent.trim() || btn.value || 'ללא טקסט';
+            log.push(`${btnId}: ${visible} - ${disabled} - "${text}"`);
+        }
+    });
+
+    // 4. תוצאות בדיקות מערכת
+    log.push('');
+    log.push('--- תוצאות בדיקות מערכת ---');
+    const checkResults = document.querySelectorAll('.check-result, .system-check-item, .health-check-item');
+    log.push(`מספר בדיקות: ${checkResults.length}`);
+    checkResults.forEach((result, index) => {
+        const status = result.querySelector('.status, .badge, .status-value')?.textContent.trim() || 'לא ידוע';
+        const description = result.querySelector('.description, .text, .check-name')?.textContent.trim() || 'ללא תיאור';
+        log.push(`  ${index + 1}. ${status}: ${description}`);
+    });
+
+    // 5. רשימת ספקים
+    log.push('');
+    log.push('--- רשימת ספקים ---');
+    const providerList = document.getElementById('providerList');
+    if (providerList) {
+        const providers = providerList.querySelectorAll('.provider-item, .provider-card');
+        log.push(`מספר ספקים: ${providers.length}`);
+        providers.forEach((provider, index) => {
+            const name = provider.querySelector('.provider-name, .card-title')?.textContent.trim() || 'ללא שם';
+            const status = provider.querySelector('.provider-status, .badge')?.textContent.trim() || 'לא ידוע';
+            log.push(`  ${index + 1}. ${name}: ${status}`);
+        });
+    }
+
+    // 6. מידע טכני
+    log.push('');
+    log.push('--- מידע טכני ---');
+    log.push(`זמן יצירת הלוג: ${timestamp}`);
+    log.push(`גרסת דפדפן: ${navigator.userAgent}`);
+    log.push(`רזולוציה מסך: ${screen.width}x${screen.height}`);
+    log.push(`גודל חלון: ${window.innerWidth}x${window.innerHeight}`);
+    
+    if (performance.timing) {
+        const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+        log.push(`זמן טעינת עמוד: ${loadTime}ms`);
+    }
+    
+    if (navigator.deviceMemory) {
+        log.push(`זיכרון זמין: ${navigator.deviceMemory}GB`);
+    }
+    
+    log.push(`שפת דפדפן: ${navigator.language}`);
+    log.push(`פלטפורמה: ${navigator.platform}`);
+
+    // 7. שגיאות והערות מהקונסולה
+    log.push('');
+    log.push('--- שגיאות והערות מהקונסולה ---');
+    log.push('⚠️ חשוב: הלוג המפורט חייב לכלול שגיאות קונסולה לאבחון בעיות');
+    log.push('📋 הוראות: פתח את Developer Tools (F12) > Console');
+    log.push('📋 העתק את כל השגיאות וההערות מהקונסולה');
+    log.push('📋 הוסף אותן ללוג המפורט לפני שליחה');
+
+    log.push('');
+    log.push('=== סוף לוג ===');
+    return log.join('\n');
+}
+
+// Local copyDetailedLog function for system-management page
+async function copyDetailedLog() {
+    try {
+        const detailedLog = await generateDetailedLog();
+        if (detailedLog) {
+            await navigator.clipboard.writeText(detailedLog);
+            
+            if (typeof window.showSuccessNotification === 'function') {
+                window.showSuccessNotification('לוג מפורט הועתק ללוח', 'הלוג מכיל את כל מה שרואה המשתמש בעמוד');
+            } else if (typeof window.showNotification === 'function') {
+                window.showNotification('לוג מפורט הועתק ללוח', 'success');
+            } else {
+                alert('לוג מפורט הועתק ללוח!');
+            }
+        }
+    } catch (error) {
+        console.error('שגיאה בהעתקת הלוג המפורט:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בהעתקת הלוג', error.message);
+        } else {
+            alert('שגיאה בהעתקת הלוג: ' + error.message);
+        }
+    }
+}
+
+// Initialize dashboard when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
   window.systemManagement = new SystemManagement();
   window.systemManagement.init();
   
-  // Make functions globally available
-  window.copyDetailedLog = SystemManagement.copyDetailedLog;
+  // Make functions globally available (only if not already defined by page-specific script)
   window.refreshSystemData = SystemManagement.refreshSystemData;
   window.runSystemCheck = SystemManagement.runSystemCheck;
   window.clearCache = SystemManagement.clearCache;
@@ -2268,96 +2242,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Cleanup on page unload
-/**
- * Generate detailed log for System Management
- */
-function generateDetailedLog() {
-    const timestamp = new Date().toLocaleString('he-IL');
-    const log = [];
 
-    log.push('=== לוג מפורט - מנהל מערכת ===');
-    log.push(`זמן יצירה: ${timestamp}`);
-    log.push(`עמוד: ${window.location.href}`);
-    log.push('');
-
-    // סטטוס כללי
-    log.push('--- סטטוס כללי ---');
-    const topSection = document.querySelector('.top-section .section-body');
-    const isTopOpen = topSection && topSection.style.display !== 'none';
-    log.push(`סקשן עליון: ${isTopOpen ? 'פתוח' : 'סגור'}`);
-    
-    // תצוגה מפורטת לפי סקשנים
-    log.push('--- תצוגה מפורטת לפי סקשנים ---');
-    
-    // סקשן עליון - בריאות מערכת
-    const healthSummary = document.getElementById('healthSummary');
-    if (healthSummary) {
-        const summaryItems = healthSummary.querySelectorAll('.summary-item');
-        summaryItems.forEach((item, index) => {
-            const label = item.querySelector('.summary-label')?.textContent || 'לא זמין';
-            const value = item.querySelector('.summary-value')?.textContent || 'לא זמין';
-            log.push(`סקשן עליון - פריט ${index + 1}: ${label} = "${value}"`);
-        });
-    }
-
-    // סטטיסטיקות וביצועים
-    log.push('--- סטטיסטיקות וביצועים ---');
-    const overallHealth = document.getElementById('overallHealthStatus')?.textContent || 'לא זמין';
-    const systemScore = document.getElementById('systemScore')?.textContent || 'לא זמין';
-    const responseTime = document.getElementById('responseTime')?.textContent || 'לא זמין';
-    const uptime = document.getElementById('uptime')?.textContent || 'לא זמין';
-    
-    log.push(`בריאות מערכת: ${overallHealth}`);
-    log.push(`ציון כללי: ${systemScore}`);
-    log.push(`זמן תגובה: ${responseTime}`);
-    log.push(`זמן פעילות: ${uptime}`);
-    log.push(`זמן טעינת עמוד: ${Date.now() - performance.timing.navigationStart}ms`);
-
-    // לוגים ושגיאות
-    log.push('--- לוגים ושגיאות ---');
-    if (window.consoleLogs && window.consoleLogs.length > 0) {
-        const recentLogs = window.consoleLogs.slice(-10);
-        recentLogs.forEach(entry => {
-            log.push(`[${entry.timestamp}] ${entry.level}: ${entry.message}`);
-        });
-    } else {
-        log.push('אין לוגים זמינים');
-    }
-
-    // מידע טכני
-    log.push('--- מידע טכני ---');
-    log.push(`User Agent: ${navigator.userAgent}`);
-    log.push(`Language: ${navigator.language}`);
-    log.push(`Platform: ${navigator.platform}`);
-
-    log.push('=== סוף הלוג ===');
-    return log.join('\n');
-}
-
-/**
- * Copy detailed log to clipboard
- */
-async function copyDetailedLog() {
-    try {
-        const log = generateDetailedLog();
-        await navigator.clipboard.writeText(log);
-        window.showNotification('הלוג המפורט הועתק בהצלחה ללוח!', 'success');
-        console.log('=== לוג מפורט שהועתק ===');
-        console.log(log);
-        console.log('=== סוף הלוג ===');
-    } catch (error) {
-        console.error('Failed to copy log:', error);
-        window.showNotification('שגיאה בהעתקת הלוג: ' + error.message, 'error');
-        // Fallback: show in console
-        const log = generateDetailedLog();
-        console.log('=== לוג מפורט (לא הועתק) ===');
-        console.log(log);
-        console.log('=== סוף הלוג ===');
-    }
-}
-
-// ייצוא לגלובל scope
-window.copyDetailedLog = copyDetailedLog;
 
 window.addEventListener('beforeunload', () => {
   if (window.systemManagement) {

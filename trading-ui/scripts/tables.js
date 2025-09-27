@@ -8,6 +8,12 @@
  * This file was created during the main.js modular split (Phase 6 - August 24, 2025)
  * by combining table-sorting.js and table-grid.js into a single comprehensive module.
  *
+ * UNIFIED CACHE INTEGRATION (January 26, 2025):
+ * =============================================
+ * - Integrated with UnifiedCacheManager for table data caching
+ * - Added table state management with unified cache
+ * - Improved performance with smart caching strategies
+ *
  * ORIGINAL STATE:
  * - Table functions scattered across main.js (2153 lines)
  * - Duplicate sorting logic in multiple files
@@ -48,6 +54,12 @@
  *    - sortAnyTable() - Universal table sorter
  *    - sortTable() - Legacy compatibility wrapper
  *    - isDateValue() - Date validation helper
+ *
+ * 2. UNIFIED CACHE INTEGRATION:
+ *    - loadTableDataFromCache() - Load table data from unified cache
+ *    - saveTableDataToCache() - Save table data to unified cache
+ *    - saveTableState() - Save table UI state to cache
+ *    - loadTableState() - Load table UI state from cache
  *
  * 2. SORT STATE MANAGEMENT:
  *    - saveSortState() - Save current sort configuration
@@ -634,6 +646,141 @@ window.refreshTable = async function(tableType, updateFunction) {
     }
     
     throw error;
+  }
+};
+
+// ===== UNIFIED CACHE INTEGRATION =====
+
+/**
+ * Load table data from unified cache
+ * Loads table data from the unified cache system with fallback to server
+ *
+ * @param {string} tableId - Table identifier
+ * @param {Object} filters - Table filters
+ * @param {Function} serverLoader - Server data loader function
+ * @returns {Promise<Array>} Table data
+ */
+window.loadTableDataFromCache = async function(tableId, filters = {}, serverLoader = null) {
+  try {
+    if (!window.UnifiedCacheManager) {
+      console.warn('⚠️ UnifiedCacheManager not available, using direct server load');
+      return serverLoader ? await serverLoader() : [];
+    }
+
+    // יצירת מפתח cache ייחודי
+    const cacheKey = `table-${tableId}-${JSON.stringify(filters)}`;
+    
+    // טעינה ממטמון מאוחד
+    const data = await window.UnifiedCacheManager.get(cacheKey, {
+      fallback: serverLoader,
+      ttl: 300000 // 5 דקות
+    });
+    
+    console.log(`✅ Loaded table ${tableId} data from cache`);
+    return data || [];
+    
+  } catch (error) {
+    console.error(`❌ Failed to load table ${tableId} from cache:`, error);
+    return serverLoader ? await serverLoader() : [];
+  }
+};
+
+/**
+ * Save table data to unified cache
+ * Saves table data to the unified cache system
+ *
+ * @param {string} tableId - Table identifier
+ * @param {Array} data - Table data
+ * @param {Object} filters - Table filters
+ * @returns {Promise<boolean>} Success status
+ */
+window.saveTableDataToCache = async function(tableId, data, filters = {}) {
+  try {
+    if (!window.UnifiedCacheManager) {
+      console.warn('⚠️ UnifiedCacheManager not available, skipping cache save');
+      return false;
+    }
+
+    // יצירת מפתח cache ייחודי
+    const cacheKey = `table-${tableId}-${JSON.stringify(filters)}`;
+    
+    // שמירה במטמון מאוחד
+    const result = await window.UnifiedCacheManager.save(cacheKey, data, {
+      ttl: 300000, // 5 דקות
+      syncToBackend: false
+    });
+    
+    if (result) {
+      console.log(`✅ Saved table ${tableId} data to cache`);
+    }
+    
+    return result;
+    
+  } catch (error) {
+    console.error(`❌ Failed to save table ${tableId} to cache:`, error);
+    return false;
+  }
+};
+
+/**
+ * Save table UI state to cache
+ * Saves table UI state (sorting, filtering, pagination) to cache
+ *
+ * @param {string} tableId - Table identifier
+ * @param {Object} state - Table UI state
+ * @returns {Promise<boolean>} Success status
+ */
+window.saveTableState = async function(tableId, state) {
+  try {
+    if (!window.UnifiedCacheManager) {
+      console.warn('⚠️ UnifiedCacheManager not available, skipping state save');
+      return false;
+    }
+
+    // שמירת מצב UI ב-localStorage
+    const result = await window.UnifiedCacheManager.save(`table-${tableId}-state`, state, {
+      layer: 'localStorage',
+      ttl: 3600000 // שעה
+    });
+    
+    if (result) {
+      console.log(`✅ Saved table ${tableId} state to cache`);
+    }
+    
+    return result;
+    
+  } catch (error) {
+    console.error(`❌ Failed to save table ${tableId} state to cache:`, error);
+    return false;
+  }
+};
+
+/**
+ * Load table UI state from cache
+ * Loads table UI state (sorting, filtering, pagination) from cache
+ *
+ * @param {string} tableId - Table identifier
+ * @returns {Promise<Object|null>} Table UI state or null
+ */
+window.loadTableState = async function(tableId) {
+  try {
+    if (!window.UnifiedCacheManager) {
+      console.warn('⚠️ UnifiedCacheManager not available, returning null state');
+      return null;
+    }
+
+    // טעינת מצב UI מ-localStorage
+    const state = await window.UnifiedCacheManager.get(`table-${tableId}-state`);
+    
+    if (state) {
+      console.log(`✅ Loaded table ${tableId} state from cache`);
+    }
+    
+    return state;
+    
+  } catch (error) {
+    console.error(`❌ Failed to load table ${tableId} state from cache:`, error);
+    return null;
   }
 };
 

@@ -87,7 +87,7 @@ class HeaderSystem {
     headerElement.innerHTML = headerHTML;
     
     // בדיקה אם הפונקציות מוגדרות
-    console.log('🔧 Checking if filter functions are defined:');
+    // console.log('🔧 Checking if filter functions are defined:');
     console.log('selectStatusOption:', typeof window.selectStatusOption);
     console.log('updateStatusFilterText:', typeof window.updateStatusFilterText);
     console.log('applyStatusFilter:', typeof window.applyStatusFilter);
@@ -208,6 +208,14 @@ class HeaderSystem {
                   <img src="images/logo.svg" alt="TikTrack Logo" class="logo-image">
                   <span class="logo-text">פשוט לנהל תיק</span>
                 </div>
+              </div>
+              
+              <!-- כפתור פתיחה/סגירה של הפילטר - בתוך התפריט הראשי -->
+              <div class="filter-toggle-section filter-toggle-main">
+                <button class="header-filter-toggle-btn" id="headerFilterToggleBtnMain" title="הצג/הסתר פילטרים" 
+                        onclick="toggleHeaderFilters()">
+                  <span class="header-filter-arrow">▲</span>
+                </button>
               </div>
 
             </div>
@@ -346,23 +354,37 @@ class HeaderSystem {
                 <span class="btn-text">×</span>
               </button>
             </div>
+            
+            <!-- כפתור פתיחה/סגירה של הפילטר - בתוך הפילטר -->
+            <div class="filter-toggle-section filter-toggle-secondary">
+              <button class="header-filter-toggle-btn" id="headerFilterToggleBtnSecondary" title="הצג/הסתר פילטרים" 
+                      onclick="toggleHeaderFilters()">
+                <span class="header-filter-arrow">▼</span>
+              </button>
+            </div>
           </div>
         </div>
         
-        <!-- כפתור פתיחה/סגירה של הפילטר -->
-        <div class="filter-toggle-section">
-          <button class="header-filter-toggle-btn" id="headerFilterToggleBtn" title="הצג/הסתר פילטרים" 
-                  onclick="toggleHeaderFilters()">
-            <span class="header-filter-arrow">▲</span>
-          </button>
-        </div>
         </div>
     `;
   }
 
   static setupEventListeners() {
+    // הגדרת מצב הכפתורים בהתאם למצב הפילטר
+    window.updateToggleButtons();
+    
     // הוספת סגנונות CSS
     HeaderSystem.addStyles();
+    
+    // עדכון מצב הכפתורים בטעינה הראשונית
+    setTimeout(() => {
+      window.updateToggleButtons();
+    }, 100);
+    
+    // עדכון נוסף לאחר טעינה מלאה
+    setTimeout(() => {
+      window.updateToggleButtons();
+    }, 500);
     
     // הוספת event listeners לתפריט משנה של ניקוי
     setTimeout(() => {
@@ -405,6 +427,7 @@ class HeaderSystem {
         position: relative;
         max-width: 1400px;
         margin: 0 auto;
+        z-index: 960;
       }
 
       .header-top {
@@ -417,6 +440,7 @@ class HeaderSystem {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        overflow: visible;
       }
 
       /* דריסת CSS חיצוני */
@@ -496,7 +520,7 @@ class HeaderSystem {
         visibility: hidden;
         transform: translateY(-10px);
         transition: all 0.3s ease;
-        z-index: 1001;
+        z-index: 954;
       }
 
       .tiktrack-nav-item.dropdown:hover .tiktrack-dropdown-menu {
@@ -548,15 +572,25 @@ class HeaderSystem {
       }
 
       /* Filter Toggle Button */
-      .filter-toggle-section {
-        position: absolute;
+            .filter-toggle-section {
+                position: absolute;
+                bottom: -10px;
+                left: 50%;
+                transform: translateX(-50%);
+        display: none;
+        visibility: visible;
+        opacity: 1;
+      }
+      
+      /* כפתור ראשי - בתוך התפריט הראשי, מתחת לתפריטי המשנה */
+      .filter-toggle-main {
         bottom: -10px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 1002;
-        display: block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
+        z-index: 951;
+      }
+      
+      /* כפתור משני - בתוך הפילטר, מתחת לתפריטי המשנה */
+      .filter-toggle-secondary {
+        z-index: 951;
       }
 
       .header-filter-toggle-btn {
@@ -579,6 +613,8 @@ class HeaderSystem {
         margin: 0;
         visibility: visible !important;
         opacity: 1 !important;
+        position: relative;
+        z-index: 952;
       }
 
       .header-filter-toggle-btn:hover {
@@ -673,7 +709,7 @@ class HeaderSystem {
         visibility: hidden;
         transform: translateY(-10px);
         transition: all 0.3s ease;
-        z-index: 1001;
+        z-index: 953;
         max-height: 200px;
         overflow-y: auto;
       }
@@ -1283,6 +1319,9 @@ window.toggleHeaderFilters = function() {
     }
     
     console.log(`✅ Header filters ${isVisible ? 'hidden' : 'shown'}`);
+    
+    // עדכון מצב הכפתורים
+    window.updateToggleButtons();
   }
 };
 
@@ -1607,6 +1646,15 @@ window.clearAllFilters = function() {
     if (typeof window.updateTypeFilterText === 'function') window.updateTypeFilterText();
     if (typeof window.updateAccountFilterText === 'function') window.updateAccountFilterText();
     if (typeof window.updateDateRangeFilterText === 'function') window.updateDateRangeFilterText();
+    
+    console.log('✅ כל הפילטרים נמחקו');
+    
+    // הצגת הודעת הצלחה
+    if (typeof window.showNotification === 'function') {
+      window.showNotification('כל הפילטרים נמחקו בהצלחה', 'success', 'הצלחה', 2000, 'system');
+    } else {
+      console.log('🔔 הודעת הצלחה: כל הפילטרים נמחקו בהצלחה');
+    }
   }
 };
 
@@ -1724,6 +1772,15 @@ window.resetAllFilters = async function() {
       
     }
     
+    console.log('✅ פילטרים אופסו לערכי ברירת מחדל');
+    
+    // הצגת הודעת הצלחה
+    if (typeof window.showNotification === 'function') {
+      window.showNotification('פילטרים אופסו לערכי ברירת מחדל', 'success', 'הצלחה', 2000, 'system');
+    } else {
+      console.log('🔔 הודעת הצלחה: פילטרים אופסו לערכי ברירת מחדל');
+    }
+    
   } catch (error) {
     console.error('❌ שגיאה בטעינת העדפות:', error);
     console.error('❌ פרטי השגיאה:', error.message, error.stack);
@@ -1749,6 +1806,14 @@ window.clearSearchFilter = function() {
       window.filterSystem.currentFilters.search = '';
       window.filterSystem.saveFilters();
       window.filterSystem.applyAllFilters();
+    }
+    console.log('✅ חיפוש נוקה');
+    
+    // הצגת הודעת הצלחה
+    if (typeof window.showNotification === 'function') {
+      window.showNotification('חיפוש נוקה בהצלחה', 'success', 'הצלחה', 1500, 'system');
+    } else {
+      console.log('🔔 הודעת הצלחה: חיפוש נוקה בהצלחה');
     }
   }
 };
@@ -1795,7 +1860,7 @@ window.HeaderSystem = {
 
 // Initialize the header system
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('🔧 DOMContentLoaded - checking filter functions:');
+  // console.log('🔧 DOMContentLoaded - checking filter functions:');
   console.log('selectStatusOption:', typeof window.selectStatusOption);
   console.log('updateStatusFilterText:', typeof window.updateStatusFilterText);
   console.log('applyStatusFilter:', typeof window.applyStatusFilter);
@@ -1820,7 +1885,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // בדיקה נוספת אחרי האתחול
     setTimeout(() => {
-      console.log('🔧 After init - checking filter functions again:');
+      // console.log('🔧 After init - checking filter functions again:');
       console.log('selectStatusOption:', typeof window.selectStatusOption);
       console.log('updateStatusFilterText:', typeof window.updateStatusFilterText);
       console.log('applyStatusFilter:', typeof window.applyStatusFilter);
@@ -1829,6 +1894,108 @@ document.addEventListener('DOMContentLoaded', function() {
     console.error('❌ HeaderSystem class not found');
   }
 });
+
+// Update Toggle Buttons Function - עדכון מצב הכפתורים
+window.updateToggleButtons = function() {
+  const headerFilters = document.querySelector('.header-filters');
+  const mainBtn = document.querySelector('.filter-toggle-main');
+  const secondaryBtn = document.querySelector('.filter-toggle-secondary');
+  
+  console.log('🔧 updateToggleButtons called');
+  console.log('headerFilters:', headerFilters);
+  console.log('mainBtn:', mainBtn);
+  console.log('secondaryBtn:', secondaryBtn);
+  
+  if (!headerFilters || !mainBtn || !secondaryBtn) {
+    console.log('❌ Missing elements');
+    return;
+  }
+  
+  const isOpen = headerFilters.style.display !== 'none';
+  console.log('isOpen:', isOpen);
+  
+  if (isOpen) {
+    // פילטר פתוח - הצג כפתור משני (בתוך הפילטר)
+    console.log('📤 Hiding main button, showing secondary button');
+    mainBtn.style.display = 'none';
+    secondaryBtn.style.display = 'block';
+  } else {
+    // פילטר סגור - הצג כפתור ראשי (בתוך התפריט הראשי)
+    console.log('📥 Showing main button, hiding secondary button');
+    mainBtn.style.display = 'block';
+    secondaryBtn.style.display = 'none';
+  }
+};
+
+// Z-Index Debug Function - בדיקת מצב z-index בפועל
+window.debugZIndexStatus = function() {
+    console.log('🔍 בדיקת מצב Z-Index במערכת ראש הדף');
+    console.log('=====================================');
+    
+    // בדיקת אלמנטים רלוונטיים
+    const elements = [
+        { selector: '#unified-header', name: 'Header Container' },
+        { selector: '.header-top', name: 'Header Top' },
+        { selector: '.tiktrack-dropdown-menu', name: 'Dropdown Menus' },
+        { selector: '.filter-toggle-section', name: 'Filter Toggle Button' },
+        { selector: '.header-filter-toggle-btn', name: 'Filter Button' },
+        { selector: '.header-filters', name: 'Header Filters' },
+        { selector: '.filter-menu', name: 'Filter Menu' }
+    ];
+    
+    elements.forEach(element => {
+        const el = document.querySelector(element.selector);
+        if (el) {
+            const computedStyle = window.getComputedStyle(el);
+            const zIndex = computedStyle.zIndex;
+            const position = computedStyle.position;
+            const display = computedStyle.display;
+            const visibility = computedStyle.visibility;
+            
+            console.log(`📍 ${element.name}:`);
+            console.log(`   Selector: ${element.selector}`);
+            console.log(`   Z-Index: ${zIndex}`);
+            console.log(`   Position: ${position}`);
+            console.log(`   Display: ${display}`);
+            console.log(`   Visibility: ${visibility}`);
+            console.log(`   Visible: ${el.offsetParent !== null}`);
+            console.log('---');
+        } else {
+            console.log(`❌ ${element.name} (${element.selector}): לא נמצא`);
+        }
+    });
+    
+    // בדיקת כל התפריטים הפתוחים
+    console.log('🎯 בדיקת תפריטים פתוחים:');
+    const openMenus = document.querySelectorAll('.tiktrack-dropdown-menu:not([style*="display: none"])');
+    console.log(`תפריטים פתוחים: ${openMenus.length}`);
+    
+    openMenus.forEach((menu, index) => {
+        const computedStyle = window.getComputedStyle(menu);
+        console.log(`תפריט ${index + 1}: z-index = ${computedStyle.zIndex}`);
+    });
+    
+    // בדיקת כפתור הפילטר
+    console.log('🔘 בדיקת כפתור פילטר:');
+    const filterBtn = document.querySelector('.header-filter-toggle-btn');
+    if (filterBtn) {
+        const computedStyle = window.getComputedStyle(filterBtn);
+        console.log(`כפתור פילטר: z-index = ${computedStyle.zIndex}`);
+        console.log(`כפתור פילטר: position = ${computedStyle.position}`);
+        console.log(`כפתור פילטר: visible = ${filterBtn.offsetParent !== null}`);
+    }
+    
+    // בדיקת תפריטי פילטר
+    console.log('🔍 בדיקת תפריטי פילטר:');
+    const filterMenus = document.querySelectorAll('.filter-menu');
+    filterMenus.forEach((menu, index) => {
+        const computedStyle = window.getComputedStyle(menu);
+        console.log(`תפריט פילטר ${index + 1}: z-index = ${computedStyle.zIndex}`);
+    });
+    
+    console.log('=====================================');
+    console.log('✅ בדיקת Z-Index הושלמה');
+};
 
 console.log('✅ Header System v6.0.0 loaded successfully!');
 

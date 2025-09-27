@@ -53,16 +53,22 @@ def api_endpoint(cache_ttl: int = 60, dependencies: List[str] = None,
             
             # Apply caching
             if cache_ttl > 0:
-                if dependencies:
-                    @cache_with_deps(ttl=cache_ttl, dependencies=dependencies)
-                    def cached_func():
-                        return func(*args, **kwargs)
-                    return cached_func()
-                else:
-                    @cache_for(ttl=cache_ttl)
-                    def cached_func():
-                        return func(*args, **kwargs)
-                    return cached_func()
+                # Generate cache key based on function and request
+                import hashlib
+                func_name = f"{func.__module__}.{func.__name__}"
+                request_data = str(request.args) + str(request.get_json() or {})
+                cache_key = f"{func_name}:{hashlib.md5(request_data.encode()).hexdigest()}"
+                
+                # Check cache first
+                from services.advanced_cache_service import advanced_cache_service
+                cached_result = advanced_cache_service.get(cache_key)
+                if cached_result is not None:
+                    return cached_result
+                
+                # Cache miss - execute function and cache result
+                result = func(*args, **kwargs)
+                advanced_cache_service.set(cache_key, result, ttl=cache_ttl, dependencies=dependencies)
+                return result
             
             return func(*args, **kwargs)
         return wrapper

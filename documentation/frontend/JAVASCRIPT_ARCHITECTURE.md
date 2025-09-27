@@ -201,6 +201,7 @@ The unified initialization system includes a comprehensive section state persist
 | `window.showErrorNotification(title, message)` | Show error notification |
 | `window.showWarningNotification(title, message)` | Show warning notification |
 | `window.showInfoNotification(title, message)` | Show info notification |
+| `window.showDetailsModal(title, content, options)` | Show details modal with close button |
 | `window.loadLinkedItemsData(itemId, itemType)` | Load linked items data |
 
 ### 📋 Table System (`tables.js`)

@@ -91,12 +91,12 @@ echo ""
 # Function to check if server is running
 check_server() {
     # Check if there are Python processes running app.py or dev_server.py
-    if pgrep -f "python3.*\(app\.py\|dev_server\.py\)" > /dev/null; then
+    if pgrep -f "\(python3\|Python\).*\(app\.py\|dev_server\.py\)" > /dev/null; then
         return 0
     fi
     
     # Also check if port is responding
-    if curl -s -o /dev/null -w "%{http_code}" "http://$SERVER_HOST:$SERVER_PORT/" | grep -q "200"; then
+    if curl -s -o /dev/null -w "%{http_code}" "http://$SERVER_HOST:$SERVER_PORT/" --max-time 2 | grep -q "200"; then
         return 0
     fi
     
@@ -108,16 +108,16 @@ stop_server() {
     log_info "🛑 Stopping server..."
     
     # Kill all Python processes running app.py or dev_server.py
-    local processes=$(pgrep -f "python3.*\(app\.py\|dev_server\.py\)" 2>/dev/null || true)
+    local processes=$(pgrep -f "\(python3\|Python\).*\(app\.py\|dev_server\.py\)" 2>/dev/null || true)
     if [ -n "$processes" ]; then
         log_info "Found server processes: $processes"
-        pkill -f "python3.*\(app\.py\|dev_server\.py\)"
+        pkill -f "\(python3\|Python\).*\(app\.py\|dev_server\.py\)"
         sleep 2
         
         # Force kill if still running
         if check_server; then
             log_warning "Force killing remaining processes..."
-            pkill -9 -f "python3.*\(app\.py\|dev_server\.py\)"
+            pkill -9 -f "\(python3\|Python\).*\(app\.py\|dev_server\.py\)"
             sleep 1
         fi
     fi
@@ -185,10 +185,10 @@ start_server() {
         fi
     fi
     
-    # Start server with environment variables
+    # Start server with environment variables and redirect output to avoid hanging
     TIKTRACK_DEV_MODE="$TIKTRACK_DEV_MODE" \
     TIKTRACK_CACHE_DISABLED="$TIKTRACK_CACHE_DISABLED" \
-    python3 dev_server.py &
+    nohup python3 dev_server.py > /dev/null 2>&1 &
     
     local server_pid=$!
     cd ..
@@ -198,17 +198,19 @@ start_server() {
     # Wait for server to start with multiple checks
     log_info "⏳ Waiting for server to start (max $MAX_STARTUP_TIME seconds)..."
     for i in $(seq 1 $MAX_STARTUP_TIME); do
-        if check_server; then
-            log_success "Server started successfully after $i seconds"
-            return 0
-        fi
-        sleep 1
-        
-        # Check if process is still running
+        # Check if process is still running first
         if ! kill -0 $server_pid 2>/dev/null; then
             log_error "Server process died during startup (PID: $server_pid)"
             return 1
         fi
+        
+        # Check if server is responding
+        if check_server; then
+            log_success "Server started successfully after $i seconds"
+            return 0
+        fi
+        
+        sleep 1
     done
     
     log_error "Failed to start server after $MAX_STARTUP_TIME seconds"
@@ -229,7 +231,7 @@ test_api() {
     fi
     
     # Test API endpoint
-    local api_status=$(curl -s -o /dev/null -w "%{http_code}" "http://$SERVER_HOST:$SERVER_PORT/api/accounts/")
+    local api_status=$(curl -s -o /dev/null -w "%{http_code}" "http://$SERVER_HOST:$SERVER_PORT/api/trading-accounts/")
     if [ "$api_status" = "200" ]; then
         log_success "API is working (HTTP $api_status)"
         return 0

@@ -882,7 +882,7 @@ class EntityDetailsAPI {
                         'ביטול'
                     );
                 } else {
-                    const result = confirm(`האם אתה בטוח שברצונך למחוק את ${entityType} #${entityId}?`);
+                    const result = window.showConfirmationDialog('אישור', `האם אתה בטוח שברצונך למחוק את ${entityType} #${entityId}?`);
                     resolve(result);
                 }
             }

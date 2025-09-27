@@ -52,6 +52,11 @@ const PAGE_CONFIGS = {
                     await window.loadAllPreferences();
                 }
                 
+                // Load default colors if not set
+                if (typeof window.loadDefaultColors === 'function') {
+                    window.loadDefaultColors();
+                }
+                
                 // Setup preference change handlers
                 if (typeof window.setupPreferenceHandlers === 'function') {
                     window.setupPreferenceHandlers();
@@ -198,6 +203,16 @@ const PAGE_CONFIGS = {
                 if (typeof window.loadSystemInfo === 'function') {
                     await window.loadSystemInfo();
                 }
+                
+                // Initialize Unified Log System
+                if (window.UnifiedLogAPI && !window.UnifiedLogAPI.initialized) {
+                    try {
+                        await window.UnifiedLogAPI.initialize();
+                        console.log('✅ Unified Log System initialized for System Management');
+                    } catch (error) {
+                        console.warn('⚠️ Failed to initialize Unified Log System:', error);
+                    }
+                }
             }
         ]
     },
@@ -230,6 +245,28 @@ const PAGE_CONFIGS = {
                 if (typeof window.loadExternalData === 'function') {
                     await window.loadExternalData();
                 }
+                
+                // Initialize Unified Log System
+                if (window.UnifiedLogAPI && !window.UnifiedLogAPI.initialized) {
+                    try {
+                        await window.UnifiedLogAPI.initialize();
+                        console.log('✅ Unified Log System initialized for External Data Dashboard');
+                    } catch (error) {
+                        console.warn('⚠️ Failed to initialize Unified Log System:', error);
+                    }
+                }
+                
+                // Load external data log after page initialization
+                setTimeout(async () => {
+                    try {
+                        if (typeof window.loadExternalDataLog === 'function') {
+                            await window.loadExternalDataLog();
+                            console.log('✅ External data log loaded after page initialization');
+                        }
+                    } catch (error) {
+                        console.error('❌ Failed to load external data log:', error);
+                    }
+                }, 1000); // Wait 1 second after page load
             }
         ]
     },
@@ -259,8 +296,70 @@ const PAGE_CONFIGS = {
             async (pageConfig) => {
                 console.log('📬 Initializing Notifications Center...');
                 
-                if (typeof window.loadNotifications === 'function') {
+                if (typeof window.initializeNotificationsCenter === 'function') {
+                    await window.initializeNotificationsCenter();
+                } else if (typeof window.loadNotifications === 'function') {
                     await window.loadNotifications();
+                }
+            }
+        ]
+    },
+    'notifications-center.html': {
+        name: 'Notifications Center HTML',
+        requiresFilters: false,
+        requiresValidation: false,
+        requiresTables: false,
+        customInitializers: [
+            async (pageConfig) => {
+                console.log('📬 Initializing Notifications Center HTML...');
+                
+                if (typeof window.initializeNotificationsCenter === 'function') {
+                    await window.initializeNotificationsCenter();
+                } else if (typeof window.loadNotifications === 'function') {
+                    await window.loadNotifications();
+                }
+                
+                // Initialize Unified Log System if available
+                if (window.UnifiedLogAPI) {
+                    console.log('📊 Initializing Unified Log System for notifications center...');
+                    try {
+                        await window.UnifiedLogAPI.initialize();
+                        
+                        // Load notification log in the correct container
+                        const logContainer = document.getElementById('notification-log-container');
+                        if (logContainer && !logContainer.querySelector('.unified-log-display')) {
+                            console.log('🔄 Loading notification log in container...');
+                            await window.showNotificationLog('notification-log-container', {
+                                displayConfig: 'default',
+                                autoRefresh: true,
+                                refreshInterval: 10000
+                            });
+                        }
+                    } catch (error) {
+                        console.warn('⚠️ Failed to initialize Unified Log System:', error);
+                    }
+                }
+            }
+        ]
+    },
+
+    'unified-logs-demo.html': {
+        name: 'Unified Logs Demo',
+        requiresFilters: false,
+        requiresValidation: false,
+        requiresTables: false,
+        customInitializers: [
+            async (pageConfig) => {
+                console.log('📊 Initializing Unified Logs Demo...');
+                
+                // Initialize Unified Log System
+                if (window.UnifiedLogAPI) {
+                    try {
+                        await window.UnifiedLogAPI.initialize();
+                        console.log('✅ Unified Log System initialized for demo');
+                    } catch (error) {
+                        console.warn('⚠️ Failed to initialize Unified Log System for demo:', error);
+                    }
                 }
             }
         ]
@@ -293,6 +392,36 @@ const PAGE_CONFIGS = {
                 
                 if (typeof window.initializeResearchTools === 'function') {
                     await window.initializeResearchTools();
+                }
+            }
+        ]
+    },
+    
+    'cache-test': {
+        name: 'Cache Test',
+        requiresFilters: false,
+        requiresValidation: false,
+        requiresTables: false,
+        customInitializers: [
+            async (pageConfig) => {
+                console.log('🧪 Initializing Cache Test...');
+                console.log('🔍 Page config received:', pageConfig);
+                console.log('🔍 Checking if initializeCacheTest function exists:', typeof window.initializeCacheTest);
+                console.log('🔍 Document ready state:', document.readyState);
+                console.log('🔍 DOM elements loaded:', document.body ? 'Yes' : 'No');
+                console.log('🔍 Available functions:', Object.keys(window).filter(k => k.includes('Cache')));
+                
+                if (typeof window.initializeCacheTest === 'function') {
+                    console.log('✅ Calling initializeCacheTest...');
+                    try {
+                        await window.initializeCacheTest();
+                        console.log('✅ initializeCacheTest completed successfully');
+                    } catch (error) {
+                        console.error('❌ Error in initializeCacheTest:', error);
+                    }
+                } else {
+                    console.error('❌ initializeCacheTest function not found!');
+                    console.error('❌ Available window functions:', Object.keys(window).filter(k => k.includes('initialize')));
                 }
             }
         ]
@@ -371,4 +500,5 @@ window.getPageInitSummary = function(pageName) {
 // ===== GLOBAL EXPORT =====
 
 window.PAGE_CONFIGS = PAGE_CONFIGS;
+window.pageInitializationConfigs = PAGE_CONFIGS;
 

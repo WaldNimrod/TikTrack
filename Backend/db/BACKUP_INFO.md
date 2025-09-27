@@ -2,19 +2,17 @@
 
 ## Current Database
 - **File**: `simpleTrade_new.db`
-- **Size**: 151,552 bytes (as of August 23, 2025)
-- **Last Modified**: August 23, 2025 04:58
+- **Size**: 30,846,976 bytes (as of September 25, 2025)
+- **Last Modified**: September 25, 2025 23:28
+- **Integrity**: ✅ Verified (PRAGMA integrity_check = "ok")
+- **Mode**: WAL (Write-Ahead Logging)
 
 ## Backup Files
-1. **simpleTrade_new_backup_20250823_012252.db**
-   - Created: August 23, 2025 01:22
-   - Size: 110,592 bytes
-   - Purpose: Pre-constraint system backup
-
-2. **simpleTrade_new_backup_20250823_045811.db**
-   - Created: August 23, 2025 04:58
-   - Size: 151,552 bytes
-   - Purpose: Post-constraint system implementation backup
+1. **simpleTrade_new_backup_20250925_233733.db**
+   - Created: September 25, 2025 23:37
+   - Size: 30,846,976 bytes
+   - Purpose: Pre-version 2.1.0 standardization backup
+   - Status: ✅ Current and verified
 
 ## Backup Strategy
 - Database backups are stored locally in `Backend/db/`
@@ -34,6 +32,14 @@ To restore from a backup:
 - Keep multiple backup versions for safety
 - Consider automated backup scheduling for production
 
+## Database Statistics
+- **Total Tables**: 21 tables
+- **Main Data Tables**: 7 tables with 71 records
+- **System Tables**: 14 tables for configuration and management
+- **WAL File Size**: 2.1 MB (active transactions)
+- **SHM File Size**: 32 KB (shared memory)
+
 ---
-**Last Updated**: August 23, 2025  
-**Backup Count**: 2 files
+**Last Updated**: September 25, 2025  
+**Backup Count**: 1 file (current)
+**Version**: 2.1.0 compatible

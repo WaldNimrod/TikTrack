@@ -230,35 +230,55 @@ log_debug() {
 detect_current_cache_state() {
     log_info "🔍 Detecting current cache state..."
     
-    # Check if server is running and get cache status
-    if curl -s "http://localhost:8080/api/cache/status" > /dev/null 2>&1; then
-        local cache_response=$(curl -s "http://localhost:8080/api/cache/status" 2>/dev/null)
+    # Check if server is running and get cache stats
+    if curl -s "http://localhost:8080/api/cache/stats" > /dev/null 2>&1; then
+        local cache_response=$(curl -s "http://localhost:8080/api/cache/stats" 2>/dev/null)
         if [ $? -eq 0 ] && [ -n "$cache_response" ]; then
-            # Try to extract cache TTL from response
-            local cache_ttl=$(echo "$cache_response" | grep -o '"cache_ttl":[0-9]*' | cut -d: -f2)
-            if [ -n "$cache_ttl" ]; then
-                case $cache_ttl in
-                    0)
-                        log_info "Current cache state: NO-CACHE (disabled)"
-                        echo "no-cache"
-                        return 0
-                        ;;
-                    10)
-                        log_info "Current cache state: DEVELOPMENT (10 seconds)"
-                        echo "development"
-                        return 0
-                        ;;
-                    300)
-                        log_info "Current cache state: PRODUCTION (5 minutes)"
-                        echo "production"
-                        return 0
-                        ;;
-                    *)
-                        log_info "Current cache state: CUSTOM (${cache_ttl} seconds)"
-                        echo "custom"
-                        return 0
-                        ;;
-                esac
+            # Extract cache statistics using jq if available, otherwise use grep
+            if command -v jq >/dev/null 2>&1; then
+                local total_entries=$(echo "$cache_response" | jq -r '.data.total_entries // 0')
+                local total_requests=$(echo "$cache_response" | jq -r '.data.total_requests // 0')
+                local sets=$(echo "$cache_response" | jq -r '.data.stats.sets // 0')
+                local hits=$(echo "$cache_response" | jq -r '.data.stats.hits // 0')
+                local deletes=$(echo "$cache_response" | jq -r '.data.stats.deletes // 0')
+            else
+                local total_entries=$(echo "$cache_response" | grep -o '"total_entries":[0-9]*' | cut -d: -f2 || echo "0")
+                local total_requests=$(echo "$cache_response" | grep -o '"total_requests":[0-9]*' | cut -d: -f2 || echo "0")
+                local sets=$(echo "$cache_response" | grep -o '"sets":[0-9]*' | cut -d: -f2 || echo "0")
+                local hits=$(echo "$cache_response" | grep -o '"hits":[0-9]*' | cut -d: -f2 || echo "0")
+                local deletes=$(echo "$cache_response" | grep -o '"deletes":[0-9]*' | cut -d: -f2 || echo "0")
+            fi
+            
+            # Ensure all values are numbers
+            total_entries=${total_entries:-0}
+            total_requests=${total_requests:-0}
+            sets=${sets:-0}
+            hits=${hits:-0}
+            deletes=${deletes:-0}
+            
+            log_info "Cache stats: entries=$total_entries, requests=$total_requests, sets=$sets, hits=$hits, deletes=$deletes"
+            
+            # Determine cache state based on statistics
+            if [ "$total_entries" -eq 0 ] && [ "$total_requests" -eq 0 ] && [ "$sets" -eq 0 ]; then
+                log_info "Current cache state: NO-CACHE (all stats are 0)"
+                echo "no-cache"
+                return 0
+            elif [ "$sets" -gt 0 ] && [ "$deletes" -gt 0 ]; then
+                log_info "Current cache state: DEVELOPMENT (high activity with deletes)"
+                echo "development"
+                return 0
+            elif [ "$sets" -gt 0 ] && [ "$hits" -gt 0 ]; then
+                log_info "Current cache state: PRODUCTION (activity with hits)"
+                echo "production"
+                return 0
+            elif [ "$sets" -gt 0 ]; then
+                log_info "Current cache state: DEVELOPMENT (initial activity)"
+                echo "development"
+                return 0
+            else
+                log_info "Current cache state: NO-CACHE (no activity)"
+                echo "no-cache"
+                return 0
             fi
         fi
     fi
@@ -549,15 +569,17 @@ run_quick_restart() {
     
     if [ "$VERBOSE" = "true" ]; then
         bash "$QUICK_SCRIPT"
+        local exit_code=$?
     else
         bash "$QUICK_SCRIPT" > /dev/null 2>&1
+        local exit_code=$?
     fi
     
-    if [ $? -eq 0 ]; then
+    if [ $exit_code -eq 0 ]; then
         log_success "Quick restart completed successfully"
         return 0
     else
-        log_error "Quick restart failed"
+        log_error "Quick restart failed with exit code: $exit_code"
         return 1
     fi
 }
@@ -577,15 +599,17 @@ run_complete_restart() {
     
     if [ "$VERBOSE" = "true" ]; then
         bash "$COMPLETE_SCRIPT"
+        local exit_code=$?
     else
-        bash "$COMPLETE_SCRIPT"
+        bash "$COMPLETE_SCRIPT" > /dev/null 2>&1
+        local exit_code=$?
     fi
     
-    if [ $? -eq 0 ]; then
+    if [ $exit_code -eq 0 ]; then
         log_success "Complete restart completed successfully"
         return 0
     else
-        log_error "Complete restart failed"
+        log_error "Complete restart failed with exit code: $exit_code"
         return 1
     fi
 }
@@ -856,7 +880,8 @@ main() {
     esac
     
     # Final status
-    if [ $? -eq 0 ]; then
+    local final_exit_code=$?
+    if [ $final_exit_code -eq 0 ]; then
         log_success "✅ Server restart completed successfully"
         echo ""
         echo "🎉 Restart completed!"
@@ -889,7 +914,7 @@ main() {
             echo ""
         fi
     else
-        log_error "❌ Server restart failed"
+        log_error "❌ Server restart failed with exit code: $final_exit_code"
         echo ""
         echo "💡 TROUBLESHOOTING REQUIRED:"
         echo "============================="
@@ -911,7 +936,7 @@ main() {
         echo "The complete mode performs comprehensive system analysis"
         echo "and automatic problem fixing that the quick mode doesn't include."
         echo ""
-        exit 1
+        exit $final_exit_code
     fi
 }
 

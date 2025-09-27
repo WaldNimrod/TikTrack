@@ -9,6 +9,12 @@
  * @since September 2025
  */
 
+// ===== PRESERVE ORIGINAL FUNCTIONS =====
+// שמירת הפניות המקוריות למניעת לולאות אין סופיות
+// נשמור את הפונקציות אחרי שהן מוגדרות
+
+// ===== CATEGORY DETECTION SYSTEM =====
+
 // ===== CATEGORY DETECTION RULES =====
 
 /**
@@ -27,6 +33,11 @@ window.detectNotificationCategory = function(message, type, title, context = {})
   const functionName = context.functionName || '';
   const stackTrace = context.stackTrace || '';
   
+  // Business indicators (check first for success messages)
+  if (isBusinessContext(fileName, functionName, message, type)) {
+    return 'business';
+  }
+  
   // Development indicators
   if (isDevelopmentContext(fileName, functionName, message)) {
     return 'development';
@@ -35,11 +46,6 @@ window.detectNotificationCategory = function(message, type, title, context = {})
   // System indicators
   if (isSystemContext(fileName, functionName, message, type)) {
     return 'system';
-  }
-  
-  // Business indicators
-  if (isBusinessContext(fileName, functionName, message, type)) {
-    return 'business';
   }
   
   // Performance indicators
@@ -67,7 +73,7 @@ function isDevelopmentContext(fileName, functionName, message) {
   
   const devMessages = [
     'לוג', 'debug', 'development', 'cache', 'מטמון',
-    'פיתוח', 'בדיקה', 'דיבוג', 'ניקוי', 'loading', 'file'
+    'פיתוח', 'דיבוג', 'ניקוי', 'loading', 'file'
   ];
   
   // Check if it's actually a test file (not just containing "test")
@@ -83,19 +89,19 @@ function isDevelopmentContext(fileName, functionName, message) {
  */
 function isSystemContext(fileName, functionName, message, type) {
   const systemKeywords = [
-    'system', 'server', 'api', 'database', 'error', 'exception',
+    'system', 'server', 'api', 'database', 'exception',
     'connection', 'timeout', 'network', 'http', 'fetch'
   ];
   
   const systemMessages = [
-    'מערכת', 'שרת', 'מסד נתונים', 'שגיאה', 'חיבור', 'רשת',
+    'מערכת', 'שרת', 'מסד נתונים', 'חיבור', 'רשת',
     'timeout', 'connection', 'api', 'server', 'cache', 'נוקה', 'מטמון'
   ];
   
-  // Errors are usually system-related
-  if (type === 'error') {
-    return true;
-  }
+  // Don't automatically classify errors as system - let content analysis decide
+  // if (type === 'error') {
+  //   return true;
+  // }
   
   return checkKeywords(fileName, functionName, message, systemKeywords, systemMessages);
 }
@@ -166,6 +172,8 @@ function checkKeywords(fileName, functionName, message, keywords, messages) {
  * Get default category based on message type
  */
 function getDefaultCategoryByType(type) {
+  // Type and category are separate concepts
+  // Type determines color, category determines icon and context
   switch (type) {
     case 'success':
       return 'business'; // Success messages are usually business-related
@@ -176,124 +184,21 @@ function getDefaultCategoryByType(type) {
     case 'info':
       return 'ui';       // Info messages are usually UI-related
     default:
-      return 'system';
+      return 'general';  // Default to general
   }
 }
 
 // ===== ENHANCED NOTIFICATION FUNCTIONS =====
 
-/**
- * Enhanced showNotification with auto-category detection
- */
-window.showNotificationSmart = async function(message, type = 'info', title = 'מערכת', duration = 5000, category = null) {
-  // Auto-detect category if not provided
-  if (!category) {
-    // Get current stack trace for context
-    const stack = new Error().stack;
-    const context = {
-      fileName: getCurrentFileName(stack),
-      functionName: getCurrentFunctionName(stack),
-      stackTrace: stack
-    };
-    
-    category = window.detectNotificationCategory(message, type, title, context);
-  }
-  
-  // Use the original showNotification function directly (avoid recursion)
-  if (typeof window.showNotification === 'function' && window.showNotification !== window.showNotificationSmart) {
-    return window.showNotification(message, type, title, duration, category);
-  } else {
-    console.log(`🔔 ${type.toUpperCase()}: ${title} - ${message}`);
-  }
-};
+// Smart functions removed - use standard functions directly
 
-/**
- * Enhanced showSuccessNotification with auto-category detection
- */
-window.showSuccessNotificationSmart = async function(title, message, duration = 4000, category = null) {
-  if (!category) {
-    const stack = new Error().stack;
-    const context = {
-      fileName: getCurrentFileName(stack),
-      functionName: getCurrentFunctionName(stack),
-      stackTrace: stack
-    };
-    
-    category = window.detectNotificationCategory(message, 'success', title, context);
-  }
-  
-  if (typeof window.showSuccessNotification === 'function' && window.showSuccessNotification !== window.showSuccessNotificationSmart) {
-    return await window.showSuccessNotification(title, message, duration, category);
-  } else {
-    console.log(`✅ SUCCESS: ${title} - ${message}`);
-  }
-};
+// Smart functions removed - use standard functions directly
 
-/**
- * Enhanced showErrorNotification with auto-category detection
- */
-window.showErrorNotificationSmart = async function(title, message, duration = 6000, category = null) {
-  if (!category) {
-    const stack = new Error().stack;
-    const context = {
-      fileName: getCurrentFileName(stack),
-      functionName: getCurrentFunctionName(stack),
-      stackTrace: stack
-    };
-    
-    category = window.detectNotificationCategory(message, 'error', title, context);
-  }
-  
-  if (typeof window.showErrorNotification === 'function' && window.showErrorNotification !== window.showErrorNotificationSmart) {
-    return await window.showErrorNotification(title, message, duration, category);
-  } else {
-    console.error(`❌ ERROR: ${title} - ${message}`);
-  }
-};
+// Smart functions removed - use standard functions directly
 
-/**
- * Enhanced showWarningNotification with auto-category detection
- */
-window.showWarningNotificationSmart = async function(title, message, duration = 5000, category = null) {
-  if (!category) {
-    const stack = new Error().stack;
-    const context = {
-      fileName: getCurrentFileName(stack),
-      functionName: getCurrentFunctionName(stack),
-      stackTrace: stack
-    };
-    
-    category = window.detectNotificationCategory(message, 'warning', title, context);
-  }
-  
-  if (typeof window.showWarningNotification === 'function' && window.showWarningNotification !== window.showWarningNotificationSmart) {
-    return await window.showWarningNotification(title, message, duration, category);
-  } else {
-    console.warn(`⚠️ WARNING: ${title} - ${message}`);
-  }
-};
+// Smart functions removed - use standard functions directly
 
-/**
- * Enhanced showInfoNotification with auto-category detection
- */
-window.showInfoNotificationSmart = async function(title, message, duration = 4000, category = null) {
-  if (!category) {
-    const stack = new Error().stack;
-    const context = {
-      fileName: getCurrentFileName(stack),
-      functionName: getCurrentFunctionName(stack),
-      stackTrace: stack
-    };
-    
-    category = window.detectNotificationCategory(message, 'info', title, context);
-  }
-  
-  if (typeof window.showInfoNotification === 'function' && window.showInfoNotification !== window.showInfoNotificationSmart) {
-    return await window.showInfoNotification(title, message, duration, category);
-  } else {
-    console.log(`ℹ️ INFO: ${title} - ${message}`);
-  }
-};
+// Smart functions removed - use standard functions directly
 
 // ===== UTILITY FUNCTIONS =====
 
@@ -411,6 +316,12 @@ function getCategoryIcon(category, options = {}) {
         icon: 'fas fa-memory',
         color: '#6c757d',
         title: 'מטמון'
+      },
+      'general': {
+        emoji: '📢',
+        icon: 'fas fa-bullhorn',
+        color: '#6c757d',
+        title: 'כללי'
       }
     };
     
@@ -509,11 +420,6 @@ function getCategoryTitle(category) {
 
 window.notificationCategoryDetector = {
   detectNotificationCategory,
-  showNotificationSmart,
-  showSuccessNotificationSmart,
-  showErrorNotificationSmart,
-  showWarningNotificationSmart,
-  showInfoNotificationSmart,
   getCategoryIcon,
   getAllCategoryIcons,
   getCategoryColor,

@@ -553,6 +553,125 @@ button.btn-secondary-custom:hover {
   min-width: 30px;
 }
 
+/* מניעת טקסט גדול מדי בכפתורים */
+.btn, .btn-sm, .btn-lg {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+  min-width: fit-content;
+}
+
+/* כפתורים קטנים - הגבלת גודל טקסט */
+.btn-sm {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  max-width: 150px;
+}
+
+/* כפתורי פעולות קטנים מרובעים - ברירת מחדל */
+.btn-action {
+  width: 32px !important;
+  height: 32px !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 4px !important;
+  font-size: 0.875rem !important;
+  border: 1px solid #dee2e6 !important;
+  background: white !important;
+  color: #6c757d !important;
+  transition: all 0.2s ease !important;
+  min-width: 32px !important;
+  max-width: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+}
+
+.btn-action:hover {
+  background: #f8f9fa;
+  color: #495057;
+  border-color: #adb5bd;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* כפתורי פעולות עם צבעים */
+.btn-action.btn-primary {
+  color: #ff9c05;
+  border-color: #ff9c05;
+}
+
+.btn-action.btn-primary:hover {
+  background: #ff9c05;
+  color: white;
+}
+
+.btn-action.btn-secondary {
+  color: #29a6a8;
+  border-color: #29a6a8;
+}
+
+.btn-action.btn-secondary:hover {
+  background: #29a6a8;
+  color: white;
+}
+
+.btn-action.btn-success {
+  color: #28a745;
+  border-color: #28a745;
+}
+
+.btn-action.btn-success:hover {
+  background: #28a745;
+  color: white;
+}
+
+.btn-action.btn-danger {
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+.btn-action.btn-danger:hover {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-action.btn-warning {
+  color: #ffc107;
+  border-color: #ffc107;
+}
+
+.btn-action.btn-warning:hover {
+  background: #ffc107;
+  color: #212529;
+}
+
+.btn-action.btn-info {
+  color: #17a2b8;
+  border-color: #17a2b8;
+}
+
+.btn-action.btn-info:hover {
+  background: #17a2b8;
+  color: white;
+}
+
+/* ===== MODAL DETAILS CONTENT ===== */
+.details-content {
+  white-space: pre-line;
+  line-height: 1.6;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  direction: rtl;
+  text-align: right;
+}
+
+.details-content br {
+  display: block;
+  margin: 0.5em 0;
+}
+
 /* ===== DISABLED BUTTON STATES ===== */
 /* מצבים מושבתים לכפתורים - סגנונות עקביים */
 .btn:disabled.btn-danger {

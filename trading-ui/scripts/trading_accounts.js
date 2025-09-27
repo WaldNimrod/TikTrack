@@ -1988,7 +1988,7 @@ async function cancelTradingAccountWithLinkedItemsCheck(tradingAccountId, _accou
           );
         });
         if (!confirmed) return;
-      } else if (!window.confirm(`האם אתה בטוח שברצונך לבטל חשבון זה?${accountDetails}`)) {
+      } else if (!window.window.showConfirmationDialog('אישור', `האם אתה בטוח שברצונך לבטל חשבון זה?${accountDetails}`)) {
         return;
       }
       await checkLinkedItemsAndCancelTradingAccount(tradingAccountId);
@@ -2048,7 +2048,7 @@ async function deleteTradingAccountWithLinkedItemsCheck(tradingAccountId, _accou
           );
         });
         if (!confirmed) return;
-      } else if (!window.confirm(`האם אתה בטוח שברצונך למחוק חשבון זה?${accountDetails}`)) {
+      } else if (!window.window.showConfirmationDialog('אישור', `האם אתה בטוח שברצונך למחוק חשבון זה?${accountDetails}`)) {
         return;
       }
       await checkLinkedItemsAndDeleteTradingAccount(tradingAccountId);
@@ -2852,7 +2852,7 @@ function copyDetailedLog() {
             if (window.showNotification) {
                 window.showNotification('לוג מפורט הועתק ללוח', 'success', 'הצלחה', 4000, 'development');
             } else {
-                alert('לוג מפורט הועתק ללוח');
+                window.showInfoNotification('לוג מפורט הועתק ללוח');
             }
         }).catch(err => {
             console.error('Failed to copy log:', err);
@@ -2861,7 +2861,7 @@ function copyDetailedLog() {
             if (window.showNotification) {
                 window.showNotification('לוג מפורט הוצג בקונסול', 'info', 'מידע', 4000, 'development');
             } else {
-                alert('לוג מפורט הוצג בקונסול');
+                window.showInfoNotification('לוג מפורט הוצג בקונסול');
             }
         });
     } catch (error) {
@@ -2869,7 +2869,7 @@ function copyDetailedLog() {
         if (window.showNotification) {
             window.showNotification('שגיאה בהעתקת הלוג', 'error', 'שגיאה', 6000, 'development');
         } else {
-            alert('שגיאה בהעתקת הלוג');
+            window.showInfoNotification('שגיאה בהעתקת הלוג');
         }
     }
 }
@@ -2898,8 +2898,8 @@ function getTradingAccounts() {
 
 // Define function as global
 window.sortTable = sortTable;
-window.copyDetailedLog = copyDetailedLog;
-window.generateDetailedLog = generateDetailedLog;
+// window.copyDetailedLog = copyDetailedLog; // REMOVED: Local function only
+// window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 window.getTradingAccounts = getTradingAccounts;
 
 // סיום הקובץ

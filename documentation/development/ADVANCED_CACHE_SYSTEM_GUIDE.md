@@ -242,6 +242,26 @@ def create_my_entity():
 8. **💾 חיסכון** - פחות ניקויים מיותרים (חדש!)
 9. **⚡ תגובה מיידית** - עדכונים מהירים יותר (חדש!)
 
+## ⚠️ **בעיות שזוהו וזקוקות לתיקון**
+
+### **1. כפילות מערכות מטמון:**
+- **Backend:** AdvancedCacheService + CacheService (שתי מערכות!)
+- **Frontend:** localStorage + sessionStorage + IndexedDB + Global Variables
+- **אין תיאום** בין Frontend ו-Backend
+
+### **2. חוסר סינכרון:**
+- Frontend מנקה מטמון מקומי
+- Backend מנקה מטמון שרת  
+- **אין תיאום** בין השניים
+
+### **3. ניהול זיכרון לא אופטימלי:**
+- **721 אזכורים** של localStorage/IndexedDB ב-40 קבצים
+- **כפילויות** בפונקציות ניקוי מטמון
+- **אין מדיניות אחידה** לניהול זיכרון
+
+### **📋 תוכנית תיקון:**
+ראה: [Cache Architecture Redesign Plan](../frontend/CACHE_ARCHITECTURE_REDESIGN_PLAN.md)
+
 ## 📋 דוגמאות שימוש
 
 ### **דוגמה 1: endpoint בסיסי**

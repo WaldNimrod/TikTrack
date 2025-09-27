@@ -461,18 +461,30 @@ class JsMapSystem {
     async clearSystemCache() {
         console.log('🗑️ Clearing system cache...');
         try {
-        // Clear JS-Map localStorage
-        const keys = Object.keys(localStorage);
-        keys.forEach(key => {
-            if (key.startsWith('jsMap') || key.startsWith('js-map')) {
-                localStorage.removeItem(key);
+            // Clear JS-Map localStorage
+            const keys = Object.keys(localStorage);
+            let clearedCount = 0;
+            keys.forEach(key => {
+                if (key.startsWith('jsMap') || key.startsWith('js-map')) {
+                    localStorage.removeItem(key);
+                    clearedCount++;
+                }
+            });
+            
+            console.log(`✅ Cleared ${clearedCount} JS-Map cache entries`);
+            
+            // Show success notification
+            if (typeof window.showNotification === 'function') {
+                window.showNotification(`מטמון מערכת נוקה בהצלחה (${clearedCount} פריטים)`, 'success', 'הצלחה', 3000, 'system');
             }
-        });
             
             this.addRecentAction('ניקוי מטמון');
             this.updateSystemStatus();
         } catch (error) {
             console.error('❌ Failed to clear cache:', error);
+            if (typeof window.showNotification === 'function') {
+                window.showNotification('שגיאה בניקוי מטמון מערכת: ' + error.message, 'error', 'שגיאה', 5000, 'system');
+            }
         }
     }
 
@@ -1472,7 +1484,7 @@ function initializeJsMapPage() {
  * Copy detailed log using global system
  * מעתיק לוג מפורט באמצעות המערכת הכללית
  */
-async function copyJsMapDetailedLog() {
+async function copyDetailedLog() {
     console.log('📋 Copying JS-Map detailed log...');
     
     try {
@@ -2830,8 +2842,36 @@ window.initializeDevelopmentSections = initializeDevelopmentSections;
 window.toggleDevelopmentSection = toggleDevelopmentSection;
 
 // Export log and refresh functions
-window.copyJsMapDetailedLog = copyJsMapDetailedLog;
-// // window.copyDetailedLog export removed - using global version from system-management.js // REMOVED: Causes conflicts with other pages
+window.copyDetailedLog = copyDetailedLog;
+// // window.copyDetailedLog export removed - using global version from system-management.js
+
+// Local copyDetailedLog function for js-map page
+async function copyDetailedLog() {
+    try {
+        const detailedLog = await generateDetailedLog();
+        if (detailedLog) {
+            await navigator.clipboard.writeText(detailedLog);
+            if (window.showSuccessNotification) {
+                window.showSuccessNotification('לוג מפורט הועתק ללוח');
+            } else {
+                alert('לוג מפורט הועתק ללוח!');
+            }
+        } else {
+            if (window.showWarningNotification) {
+                window.showWarningNotification('אין לוג להעתקה');
+            } else {
+                alert('אין לוג להעתקה');
+            }
+        }
+    } catch (err) {
+        console.error('שגיאה בהעתקה:', err);
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה בהעתקת הלוג');
+        } else {
+            alert('שגיאה בהעתקת הלוג');
+        }
+    }
+}
 
 // Export missing functions to global scope
 window.refreshJsMapData = refreshJsMapData;
@@ -2922,6 +2962,9 @@ window.clearSystemCache = async function() {
         return await window.jsMapSystem.clearSystemCache();
     }
     console.error('❌ jsMapSystem not available');
+    if (typeof window.showNotification === 'function') {
+        window.showNotification('מערכת JS-Map לא זמינה', 'error', 'שגיאה', 3000, 'system');
+    }
 };
 
 window.reloadSystemData = function() {

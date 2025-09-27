@@ -22,7 +22,7 @@ function editTicker(tickerId) {
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בעריכת טיקר', error.message);
     } else if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה בעריכת טיקר', 'error');
+      window.showErrorNotification('שגיאה בעריכת טיקר');
     }
   }
 }
@@ -82,7 +82,7 @@ function viewTickerDetails(tickerId) {
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בהצגת פרטי טיקר', error.message);
     } else if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה בהצגת פרטי טיקר', 'error');
+      window.showErrorNotification('שגיאה בהצגת פרטי טיקר');
     }
   }
 }
@@ -98,7 +98,7 @@ function refreshTickerData(tickerId) {
     
     // הצגת אינדיקטור טעינה
     if (typeof window.showNotification === 'function') {
-      window.showNotification('מרענן נתוני טיקר...', 'info');
+      window.showInfoNotification('מרענן נתוני טיקר...');
     }
     
     // שליחה לשרת לרענון נתוני הטיקר
@@ -124,7 +124,7 @@ function refreshTickerData(tickerId) {
       if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('נתוני טיקר רוענו בהצלחה');
       } else if (typeof window.showNotification === 'function') {
-        window.showNotification('נתוני טיקר רוענו בהצלחה', 'success');
+        window.showSuccessNotification('נתוני טיקר רוענו בהצלחה');
       }
     })
     .catch(error => {
@@ -132,7 +132,7 @@ function refreshTickerData(tickerId) {
       if (typeof window.showErrorNotification === 'function') {
         window.showErrorNotification('שגיאה ברענון נתוני טיקר', error.message);
       } else if (typeof window.showNotification === 'function') {
-        window.showNotification('שגיאה ברענון נתוני טיקר', 'error');
+        window.showErrorNotification('שגיאה ברענון נתוני טיקר');
       }
     });
     
@@ -141,7 +141,7 @@ function refreshTickerData(tickerId) {
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה ברענון נתוני טיקר', error.message);
     } else if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה ברענון נתוני טיקר', 'error');
+      window.showErrorNotification('שגיאה ברענון נתוני טיקר');
     }
   }
 }
@@ -977,7 +977,7 @@ async function cancelTicker(id) {
             'חזור'
           );
         }) : 
-        window.confirm(`האם אתה בטוח שברצונך לבטל טיקר זה?${tickerDetails}`);
+        window.window.showConfirmationDialog('אישור', `האם אתה בטוח שברצונך לבטל טיקר זה?${tickerDetails}`);
       if (!confirmed) {
         return;
       }
@@ -1404,7 +1404,7 @@ async function reactivateTicker(tickerId) {
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בהפעלה מחדש', error.message);
     } else if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה בהפעלה מחדש', 'error');
+      window.showErrorNotification('שגיאה בהפעלה מחדש');
     }
   }
 }
@@ -2425,5 +2425,33 @@ window.refreshYahooFinanceData = refreshYahooFinanceData;
 window.editTicker = editTicker;
 window.viewTickerDetails = viewTickerDetails;
 // window.copyDetailedLog export removed - using global version from system-management.js
-window.generateDetailedLog = generateDetailedLog;
+// window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
+
+// Local copyDetailedLog function for tickers page
+async function copyDetailedLog() {
+    try {
+        const detailedLog = await generateDetailedLog();
+        if (detailedLog) {
+            await navigator.clipboard.writeText(detailedLog);
+            if (window.showSuccessNotification) {
+                window.showSuccessNotification('לוג מפורט הועתק ללוח');
+            } else {
+                alert('לוג מפורט הועתק ללוח!');
+            }
+        } else {
+            if (window.showWarningNotification) {
+                window.showWarningNotification('אין לוג להעתקה');
+            } else {
+                alert('אין לוג להעתקה');
+            }
+        }
+    } catch (err) {
+        console.error('שגיאה בהעתקה:', err);
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה בהעתקת הלוג');
+        } else {
+            alert('שגיאה בהעתקת הלוג');
+        }
+    }
+}
 

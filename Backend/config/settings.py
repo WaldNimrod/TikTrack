@@ -15,15 +15,16 @@ PORT = 8080
 DEVELOPMENT_MODE = os.getenv('TIKTRACK_DEV_MODE', 'false').lower() == 'true'
 CACHE_DISABLED = os.getenv('TIKTRACK_CACHE_DISABLED', 'false').lower() == 'true'
 
-# Cache settings for development
+# Cache settings
 if DEVELOPMENT_MODE:
     # מצב פיתוח - Cache מופחת
     DEFAULT_CACHE_TTL = 10  # 10 שניות במקום 300
-    CACHE_ENABLED = not CACHE_DISABLED
 else:
     # מצב ייצור - Cache רגיל
     DEFAULT_CACHE_TTL = 300  # 5 דקות
-    CACHE_ENABLED = True
+
+# Cache enabled/disabled setting applies to both modes
+CACHE_ENABLED = not CACHE_DISABLED
 
 # Database settings
 DATABASE_URL = f"sqlite:///{DB_PATH}"

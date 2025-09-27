@@ -572,7 +572,7 @@ async function cancelTradeRecord(tradeId) {
                 'חזור'
               );
             }) : 
-            window.confirm(`האם אתה בטוח שברצונך לבטל טרייד זה?${tradeDetails}`);
+            window.window.showConfirmationDialog('אישור', `האם אתה בטוח שברצונך לבטל טרייד זה?${tradeDetails}`);
           if (!confirmed) {
             return;
           }
@@ -709,7 +709,7 @@ async function deleteTradeRecord(tradeId) {
           if (!confirmed) {return;}
         } else {
           // Fallback למקרה שמערכת התראות לא זמינה
-          if (!window.confirm('האם אתה בטוח שברצונך למחוק טרייד זה? פעולה זו אינה הפיכה.')) {
+          if (!window.window.showConfirmationDialog('אישור', 'האם אתה בטוח שברצונך למחוק טרייד זה? פעולה זו אינה הפיכה.')) {
             return;
           }
         }
@@ -2979,7 +2979,7 @@ async function reactivateTrade(tradeId) {
       if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('טרייד הופעל מחדש בהצלחה!');
       } else if (typeof window.showNotification === 'function') {
-        window.showNotification('טרייד הופעל מחדש בהצלחה!', 'success');
+        window.showSuccessNotification('טרייד הופעל מחדש בהצלחה!');
       }
     }
 
@@ -2995,7 +2995,7 @@ async function reactivateTrade(tradeId) {
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בהפעלה מחדש', error.message);
     } else if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה בהפעלה מחדש', 'error');
+      window.showErrorNotification('שגיאה בהפעלה מחדש');
     }
   }
 }
@@ -3010,7 +3010,7 @@ function refreshTrades() {
     
     // הצגת אינדיקטור טעינה
     if (typeof window.showNotification === 'function') {
-      window.showNotification('מרענן נתוני טריידים...', 'info');
+      window.showInfoNotification('מרענן נתוני טריידים...');
     }
     
     // טעינת נתונים מחדש
@@ -3020,7 +3020,7 @@ function refreshTrades() {
     if (typeof window.showSuccessNotification === 'function') {
       window.showSuccessNotification('נתוני טריידים רוענו בהצלחה');
     } else if (typeof window.showNotification === 'function') {
-      window.showNotification('נתוני טריידים רוענו בהצלחה', 'success');
+      window.showSuccessNotification('נתוני טריידים רוענו בהצלחה');
     }
     
   } catch (error) {
@@ -3028,7 +3028,7 @@ function refreshTrades() {
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה ברענון טריידים', error.message);
     } else if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה ברענון טריידים', 'error');
+      window.showErrorNotification('שגיאה ברענון טריידים');
     }
   }
 }
@@ -3071,7 +3071,7 @@ function updateTrade(tradeId, tradeData) {
       if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('טרייד עודכן בהצלחה');
       } else if (typeof window.showNotification === 'function') {
-        window.showNotification('טרייד עודכן בהצלחה', 'success');
+        window.showSuccessNotification('טרייד עודכן בהצלחה');
       }
     })
     .catch(error => {
@@ -3079,7 +3079,7 @@ function updateTrade(tradeId, tradeData) {
       if (typeof window.showErrorNotification === 'function') {
         window.showErrorNotification('שגיאה בעדכון טרייד', error.message);
       } else if (typeof window.showNotification === 'function') {
-        window.showNotification('שגיאה בעדכון טרייד', 'error');
+        window.showErrorNotification('שגיאה בעדכון טרייד');
       }
     });
     
@@ -3088,7 +3088,7 @@ function updateTrade(tradeId, tradeData) {
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בעדכון טרייד', error.message);
     } else if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה בעדכון טרייד', 'error');
+      window.showErrorNotification('שגיאה בעדכון טרייד');
     }
   }
 }
@@ -3125,7 +3125,7 @@ function confirmDeleteTrade(tradeId) {
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה באישור מחיקת טרייד', error.message);
     } else if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה באישור מחיקת טרייד', 'error');
+      window.showErrorNotification('שגיאה באישור מחיקת טרייד');
     }
   }
 }
@@ -3234,5 +3234,33 @@ function generateDetailedLog() {
 
 // Export log functions to global scope
 // window.copyDetailedLog export removed - using global version from system-management.js
-window.generateDetailedLog = generateDetailedLog;
+// window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
+
+// Local copyDetailedLog function for trades page
+async function copyDetailedLog() {
+    try {
+        const detailedLog = await generateDetailedLog();
+        if (detailedLog) {
+            await navigator.clipboard.writeText(detailedLog);
+            if (window.showSuccessNotification) {
+                window.showSuccessNotification('לוג מפורט הועתק ללוח');
+            } else {
+                alert('לוג מפורט הועתק ללוח!');
+            }
+        } else {
+            if (window.showWarningNotification) {
+                window.showWarningNotification('אין לוג להעתקה');
+            } else {
+                alert('אין לוג להעתקה');
+            }
+        }
+    } catch (err) {
+        console.error('שגיאה בהעתקה:', err);
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה בהעתקת הלוג');
+        } else {
+            alert('שגיאה בהעתקת הלוג');
+        }
+    }
+}
 

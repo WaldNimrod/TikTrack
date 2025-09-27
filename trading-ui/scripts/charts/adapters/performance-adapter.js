@@ -37,17 +37,17 @@ class PerformanceAdapter {
         }
 
         try {
-            // For now, return mock data since we don't have a real API
-            const mockData = this.generateMockData(params);
+            // Return empty data - no real performance data available yet
+            const emptyData = { dates: [], values: [] };
             
-            // Cache the data
+            // Cache the empty data
             this.cache.set(cacheKey, {
-                data: mockData,
+                data: emptyData,
                 timestamp: Date.now()
             });
             
-            console.log('📊 Performance data retrieved');
-            return mockData;
+            console.log('📊 Performance data retrieved (empty - no real data available)');
+            return emptyData;
         } catch (error) {
             console.error('❌ Error fetching performance data:', error);
             return { dates: [], values: [] };

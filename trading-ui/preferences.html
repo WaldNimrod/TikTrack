@@ -47,7 +47,7 @@
     <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=1.0.0">
 
     <!-- Header Styles - נפרד מ-ITCSS -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=20250115_level3_fix">
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">
     
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
@@ -65,10 +65,10 @@
         <div class="top-section" data-section="top">
         <div class="section-header">
             <div class="d-flex justify-content-between align-items-center">
-                <h2><i class="bi bi-info-circle"></i> מידע כללי על ההעדפות</h2>
+                <h2><i class="bi bi-gear-fill"></i> העדפות</h2>
                 <div class="section-header-controls">
-                    <button class="btn btn-outline-primary btn-sm" onclick="copyDetailedLog()" title="העתק לוג מפורט">
-                        <i class="fas fa-copy"></i> העתק לוג
+                    <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט">
+                        <i class="fas fa-copy"></i> העתק לוג מפורט
                     </button>
                     <button class="btn btn-outline-secondary btn-sm" onclick="window.toggleSection('infoSummary')" id="toggleInfoBtn">
                         <i class="bi bi-chevron-down"></i>
@@ -129,25 +129,22 @@
         </div>
         </div>
         </div>
-      </div>
         </div>
         <!-- UI Content Section Top End -->  
       
         <!-- UI Content Section 1 Start-->
       <div class="content-section" id="section1">
         <div class="section-header">
-            <div class="d-flex justify-content-between align-items-center">
-                <h2>👤 ניהול פרופילים</h2>
-                <button class="filter-toggle-btn" onclick="window.toggleSection('section1')" title="הצג/הסתר סקשן">
-            <span class="section-toggle-icon">▼</span>
-          </button>
+            <h2>👤 ניהול פרופילים</h2>
+            <button class="filter-toggle-btn" onclick="window.toggleSection('section1')" title="הצג/הסתר סקשן">
+                <span class="section-toggle-icon">▼</span>
+            </button>
         </div>
-              </div>
         <div class="section-body">
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label class="form-label">פרופיל נוכחי</label>
+                            <label class="form-label" id="activeProfileInfo">פרופיל נוכחי</label>
                             <select id="profileSelect" class="form-select">
                                 <option>ברירת מחדל</option>
                     </select>
@@ -179,13 +176,11 @@
         <!-- UI Content Section 2 Start-->
       <div class="content-section" id="section2">
         <div class="section-header">
-            <div class="d-flex justify-content-between align-items-center">
-                <h2>🏦 הגדרות בסיסיות</h2>
-                <button class="filter-toggle-btn" onclick="window.toggleSection('section2')" title="הצג/הסתר סקשן">
-            <span class="section-toggle-icon">▼</span>
-          </button>
+            <h2>🏦 הגדרות בסיסיות</h2>
+            <button class="filter-toggle-btn" onclick="window.toggleSection('section2')" title="הצג/הסתר סקשן">
+                <span class="section-toggle-icon">▼</span>
+            </button>
         </div>
-              </div>
         <div class="section-body">
                 <div class="row">
                     <div class="col-md-6">
@@ -321,6 +316,12 @@
                                 </label>
                             </div>
                             <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="notifications_general_enabled" checked>
+                                <label class="form-check-label" for="notifications_general_enabled">
+                                    התראות כלליות
+                                </label>
+                            </div>
+                            <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="notifications_performance_enabled">
                                 <label class="form-check-label" for="notifications_performance_enabled">
                                     התראות ביצועים
@@ -379,12 +380,10 @@
         <!-- UI Content Section 3 Start-->
       <div class="content-section" id="section3">
         <div class="section-header">
-            <div class="d-flex justify-content-between align-items-center">
-                <h2>📈 הגדרות מסחר</h2>
-                <button class="filter-toggle-btn" onclick="window.toggleSection('section3')" title="הצג/הסתר סקשן">
-            <span class="section-toggle-icon">▼</span>
-          </button>
-            </div>
+            <h2>📈 הגדרות מסחר</h2>
+            <button class="filter-toggle-btn" onclick="window.toggleSection('section3')" title="הצג/הסתר סקשן">
+                <span class="section-toggle-icon">▼</span>
+            </button>
         </div>
         <div class="section-body">
                 <div class="row">
@@ -432,12 +431,10 @@
         <!-- UI Content Section 4 Start-->
       <div class="content-section" id="section4">
         <div class="section-header">
-            <div class="d-flex justify-content-between align-items-center">
-                <h2>🔍 פילטרים ברירת מחדל</h2>
-                <button class="filter-toggle-btn" onclick="window.toggleSection('section4')" title="הצג/הסתר סקשן">
-            <span class="section-toggle-icon">▼</span>
-          </button>
-            </div>
+            <h2>🔍 פילטרים ברירת מחדל</h2>
+            <button class="filter-toggle-btn" onclick="window.toggleSection('section4')" title="הצג/הסתר סקשן">
+                <span class="section-toggle-icon">▼</span>
+            </button>
         </div>
         <div class="section-body">
                 <div class="row">
@@ -503,12 +500,10 @@
         <!-- UI Content Section 5 Start-->
       <div class="content-section" id="section5">
         <div class="section-header">
-            <div class="d-flex justify-content-between align-items-center">
-                <h2>🎨 צבעים</h2>
-                <button class="filter-toggle-btn" onclick="window.toggleSection('section5')" title="הצג/הסתר סקשן">
-            <span class="section-toggle-icon">▼</span>
-          </button>
-            </div>
+            <h2>🎨 צבעים</h2>
+            <button class="filter-toggle-btn" onclick="window.toggleSection('section5')" title="הצג/הסתר סקשן">
+                <span class="section-toggle-icon">▼</span>
+            </button>
         </div>
         <div class="section-body">
                 <!-- Basic System Colors -->
@@ -568,7 +563,8 @@
                                 <input type="color" id="entityTradePlanColor" class="form-control form-control-color color-picker" data-color-key="entityTradePlanColor">
                                 <label class="form-label mb-0">בהיר:</label>
                                 <input type="color" id="entityTradePlanColorLight" class="form-control form-control-color color-picker" data-color-key="entityTradePlanColorLight">
-                                <!-- Dark mode color removed - light mode only -->
+                                <label class="form-label mb-0">כהה:</label>
+                                <input type="color" id="entityTradePlanColorDark" class="form-control form-control-color color-picker" data-color-key="entityTradePlanColorDark">
                   </div>
                   </div>
                         <!-- Trades -->
@@ -579,7 +575,8 @@
                                 <input type="color" id="entityTradeColor" class="form-control form-control-color color-picker" data-color-key="entityTradeColor">
                                 <label class="form-label mb-0">בהיר:</label>
                                 <input type="color" id="entityTradeColorLight" class="form-control form-control-color color-picker" data-color-key="entityTradeColorLight">
-                                <!-- Dark mode color removed - light mode only -->
+                                <label class="form-label mb-0">כהה:</label>
+                                <input type="color" id="entityTradeColorDark" class="form-control form-control-color color-picker" data-color-key="entityTradeColorDark">
                   </div>
                   </div>
                         <!-- Alerts -->
@@ -590,7 +587,8 @@
                                 <input type="color" id="entityAlertColor" class="form-control form-control-color color-picker" data-color-key="entityAlertColor">
                                 <label class="form-label mb-0">בהיר:</label>
                                 <input type="color" id="entityAlertColorLight" class="form-control form-control-color color-picker" data-color-key="entityAlertColorLight">
-                                <!-- Dark mode color removed - light mode only -->
+                                <label class="form-label mb-0">כהה:</label>
+                                <input type="color" id="entityAlertColorDark" class="form-control form-control-color color-picker" data-color-key="entityAlertColorDark">
                 </div>
               </div>
                         <!-- Notes -->
@@ -601,7 +599,8 @@
                                 <input type="color" id="entityNoteColor" class="form-control form-control-color color-picker" data-color-key="entityNoteColor">
                                 <label class="form-label mb-0">בהיר:</label>
                                 <input type="color" id="entityNoteColorLight" class="form-control form-control-color color-picker" data-color-key="entityNoteColorLight">
-                                <!-- Dark mode color removed - light mode only -->
+                                <label class="form-label mb-0">כהה:</label>
+                                <input type="color" id="entityNoteColorDark" class="form-control form-control-color color-picker" data-color-key="entityNoteColorDark">
             </div>
           </div>
         </div>
@@ -614,7 +613,8 @@
                                 <input type="color" id="entityTradingAccountColor" class="form-control form-control-color color-picker" data-color-key="entityTradingAccountColor">
                                 <label class="form-label mb-0">בהיר:</label>
                                 <input type="color" id="entityTradingAccountColorLight" class="form-control form-control-color color-picker" data-color-key="entityTradingAccountColorLight">
-                                <!-- Dark mode color removed - light mode only -->
+                                <label class="form-label mb-0">כהה:</label>
+                                <input type="color" id="entityTradingAccountColorDark" class="form-control form-control-color color-picker" data-color-key="entityTradingAccountColorDark">
                 </div>
               </div>
                         <!-- Tickers -->
@@ -625,7 +625,8 @@
                                 <input type="color" id="entityTickerColor" class="form-control form-control-color color-picker" data-color-key="entityTickerColor">
                                 <label class="form-label mb-0">בהיר:</label>
                                 <input type="color" id="entityTickerColorLight" class="form-control form-control-color color-picker" data-color-key="entityTickerColorLight">
-                                <!-- Dark mode color removed - light mode only -->
+                                <label class="form-label mb-0">כהה:</label>
+                                <input type="color" id="entityTickerColorDark" class="form-control form-control-color color-picker" data-color-key="entityTickerColorDark">
             </div>
           </div>
                         <!-- Executions -->
@@ -636,7 +637,8 @@
                                 <input type="color" id="entityExecutionColor" class="form-control form-control-color color-picker" data-color-key="entityExecutionColor">
                                 <label class="form-label mb-0">בהיר:</label>
                                 <input type="color" id="entityExecutionColorLight" class="form-control form-control-color color-picker" data-color-key="entityExecutionColorLight">
-                                <!-- Dark mode color removed - light mode only -->
+                                <label class="form-label mb-0">כהה:</label>
+                                <input type="color" id="entityExecutionColorDark" class="form-control form-control-color color-picker" data-color-key="entityExecutionColorDark">
       </div>
         </div>
                         <!-- Cash Flows -->
@@ -647,7 +649,8 @@
                                 <input type="color" id="entityCashFlowColor" class="form-control form-control-color color-picker" data-color-key="entityCashFlowColor">
                                 <label class="form-label mb-0">בהיר:</label>
                                 <input type="color" id="entityCashFlowColorLight" class="form-control form-control-color color-picker" data-color-key="entityCashFlowColorLight">
-                                <!-- Dark mode color removed - light mode only -->
+                                <label class="form-label mb-0">כהה:</label>
+                                <input type="color" id="entityCashFlowColorDark" class="form-control form-control-color color-picker" data-color-key="entityCashFlowColorDark">
               </div>
                   </div>
                     </div>
@@ -659,12 +662,10 @@
         <!-- UI Content Section 6 Start-->
       <div class="content-section" id="section6">
         <div class="section-header">
-            <div class="d-flex justify-content-between align-items-center">
-                <h2>📊 צבעי ערכים מספריים</h2>
-                <button class="filter-toggle-btn" onclick="window.toggleSection('section6')" title="הצג/הסתר סקשן">
-            <span class="section-toggle-icon">▼</span>
-          </button>
-            </div>
+            <h2>📊 צבעי ערכים מספריים</h2>
+            <button class="filter-toggle-btn" onclick="window.toggleSection('section6')" title="הצג/הסתר סקשן">
+                <span class="section-toggle-icon">▼</span>
+            </button>
         </div>
         <div class="section-body">
                 <div class="row">
@@ -682,7 +683,8 @@
                                 <input type="color" id="valuePositiveColor" class="form-control form-control-color color-picker" data-color-key="valuePositiveColor">
                                 <label class="form-label mb-0">בהיר:</label>
                                 <input type="color" id="valuePositiveColorLight" class="form-control form-control-color color-picker" data-color-key="valuePositiveColorLight">
-                                <!-- Dark mode color removed - light mode only -->
+                                <label class="form-label mb-0">כהה:</label>
+                                <input type="color" id="valuePositiveColorDark" class="form-control form-control-color color-picker" data-color-key="valuePositiveColorDark">
                   </div>
                 </div>
               </div>
@@ -694,7 +696,8 @@
                                 <input type="color" id="valueNegativeColor" class="form-control form-control-color color-picker" data-color-key="valueNegativeColor">
                                 <label class="form-label mb-0">בהיר:</label>
                                 <input type="color" id="valueNegativeColorLight" class="form-control form-control-color color-picker" data-color-key="valueNegativeColorLight">
-                                <!-- Dark mode color removed - light mode only -->
+                                <label class="form-label mb-0">כהה:</label>
+                                <input type="color" id="valueNegativeColorDark" class="form-control form-control-color color-picker" data-color-key="valueNegativeColorDark">
             </div>
               </div>
                   </div>
@@ -706,7 +709,8 @@
                                 <input type="color" id="valueNeutralColor" class="form-control form-control-color color-picker" data-color-key="valueNeutralColor">
                                 <label class="form-label mb-0">בהיר:</label>
                                 <input type="color" id="valueNeutralColorLight" class="form-control form-control-color color-picker" data-color-key="valueNeutralColorLight">
-                                <!-- Dark mode color removed - light mode only -->
+                                <label class="form-label mb-0">כהה:</label>
+                                <input type="color" id="valueNeutralColorDark" class="form-control form-control-color color-picker" data-color-key="valueNeutralColorDark">
                   </div>
                 </div>
               </div>
@@ -718,12 +722,10 @@
         <!-- UI Content Section 7 Start-->
       <div class="content-section" id="section7">
         <div class="section-header">
-            <div class="d-flex justify-content-between align-items-center">
-                <h2>📊 הגדרות גרפים</h2>
-                <button class="filter-toggle-btn" onclick="window.toggleSection('section7')" title="הצג/הסתר סקשן">
-            <span class="section-toggle-icon">▼</span>
-          </button>
-            </div>
+            <h2>📊 הגדרות גרפים</h2>
+            <button class="filter-toggle-btn" onclick="window.toggleSection('section7')" title="הצג/הסתר סקשן">
+                <span class="section-toggle-icon">▼</span>
+            </button>
         </div>
         <div class="section-body">
                 <div class="row">
@@ -892,19 +894,16 @@
         <!-- UI Content Section 8 Start-->
       <div class="content-section" id="section8">
         <div class="section-header">
-            <div class="d-flex justify-content-between align-items-center">
-                <h2>🔧 ממשק ניהול</h2>
-                <div class="d-flex gap-2 align-items-center">
-                    <button class="btn btn-sm btn-outline-primary" onclick="window.refreshAdminData()">
-                        <i class="bi bi-arrow-clockwise"></i> רענן
-          </button>
-                    <button class="filter-toggle-btn" onclick="window.toggleSection('section8')" title="הצג/הסתר סקשן">
-                        <span class="section-toggle-icon">▼</span>
-          </button>
+            <h2>🔧 ממשק ניהול</h2>
+            <div class="section-actions">
+                <button class="btn btn-sm btn-outline-primary" onclick="window.refreshAdminData()">
+                    <i class="bi bi-arrow-clockwise"></i> רענן
+                </button>
+            </div>
+            <button class="filter-toggle-btn" onclick="window.toggleSection('section8')" title="הצג/הסתר סקשן">
+                <span class="section-toggle-icon">▼</span>
+            </button>
         </div>
-        </div>
-      </div>
-    </div>
         <div class="section-body">
             <!-- חיפוש וסינון -->
             <div class="admin-search-section mb-3">
@@ -936,7 +935,11 @@
   
             <div id="adminInterfaceContainer">
                 <!-- Admin interface will be loaded here -->
-        <!-- UI Content Section 7 End--> 
+            </div>
+        </div>
+        <!-- UI Content Section 8 End-->
+    </div>
+    <!-- 🔒 LOCKED TEMPLATE ZONE 3 - End Main Content Container (DO NOT MODIFY) --> 
   
     <!-- 🔄 NEW UNIFIED INITIALIZATION SYSTEM -->
     <!-- Core Systems -->
@@ -946,19 +949,61 @@
     <script src="scripts/notification-system.js"></script>
     <script src="scripts/system-management.js"></script>
     <script src="scripts/notification-category-detector.js"></script>
-    <script src="scripts/notification-migration-system.js"></script>
     <script src="scripts/global-notification-collector.js"></script>
     <script src="scripts/tables.js"></script>
     <script src="scripts/page-utils.js"></script>
-    <script src="scripts/central-refresh-system.js"></script>
+    
     <script src="scripts/preferences.js"></script>
     
+    <!-- Real-time Notifications System -->
+    <script src="scripts/realtime-notifications-client.js"></script>
+    
     <!-- New Unified Initialization System -->
-    <script src="scripts/application-initializer.js"></script>
     <script src="scripts/page-initialization-configs.js"></script>
     <script src="scripts/unified-app-initializer.js"></script>
 
     <!-- 🔓 TEMPLATE ZONE 6 - Page-Specific Scripts (ADD NEW SCRIPTS HERE) -->
-    <!-- No manual DOMContentLoaded listener needed - handled by unified system -->
+    <!-- Fallback initialization if unified system fails -->
+    <script>
+        // Fallback initialization for preferences page
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Wait a bit for all scripts to load
+            setTimeout(async () => {
+                try {
+                    console.log('🔄 Fallback initialization for preferences page...');
+                    
+                    // Load preferences if not already loaded
+                    if (typeof window.loadAllPreferences === 'function') {
+                        await window.loadAllPreferences();
+                    }
+                    
+                    // Default colors are now loaded automatically by loadAllPreferences
+                    
+                    // Profiles are now loaded automatically by loadAllPreferences
+                    
+                    // Add profile selection event listener (UI only)
+                    const profileSelect = document.getElementById('profileSelect');
+                    if (profileSelect) {
+                        // Only log the selection change, don't perform any actions
+                        profileSelect.addEventListener('change', function() {
+                            const selectedProfile = this.value;
+                            console.log(`📋 Profile selection changed to: ${selectedProfile} (UI only, no server action)`);
+                        });
+                        console.log('✅ Added profile selection listener (UI only)');
+                    }
+                    
+                    console.log('✅ Fallback initialization completed');
+                } catch (error) {
+                    console.error('❌ Fallback initialization failed:', error);
+                }
+            }, 500);
+        });
+    </script>
+    
+    <!-- Local copyDetailedLog function for preferences page -->
+    <script>
+        // Make the local copyDetailedLog function available globally for this page only
+        window.copyDetailedLog = copyDetailedLog;
+    </script>
 </body>
 </html>

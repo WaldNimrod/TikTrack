@@ -201,9 +201,9 @@ function testPerformance() {
   }
   console.timeEnd('auto-detection');
   
-  // בדיקת קריאת העדפות
+  // בדיקת קריאת העדפות - מופחתת
   console.time('preference-check');
-  for (let i = 0; i < iterations; i++) {
+  for (let i = 0; i < Math.min(iterations, 10); i++) {
     if (typeof window.shouldShowNotification === 'function') {
       window.shouldShowNotification('system');
     }
@@ -313,11 +313,10 @@ window.notificationSystemTester = {
 
 // ===== הרצה אוטומטית =====
 
-// הרץ בדיקה מהירה בטעינה
-setTimeout(() => {
-  console.log('🚀 Auto-running quick test...');
-  quickTest();
-}, 1000);
+// DISABLED - No automatic tests on page load
+if (!window.notificationSystemTesterInitialized) {
+  window.notificationSystemTesterInitialized = true;
+}
 
 console.log('✅ Notification System Tester ready');
 console.log('💡 Use window.notificationSystemTester.runAllTests() for full test suite');

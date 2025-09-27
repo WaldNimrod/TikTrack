@@ -44,6 +44,11 @@
       "autoRefresh": false,
       "refreshInterval": 30
     },
+    "pagination": {
+      "pageSize_logs": 25,
+      "pageSize_unified-log-table": 25,
+      "pageSize_default": 25
+    },
     "charts": {
       "theme": "modern",
       "animation": true,
@@ -101,6 +106,7 @@
       "notifications_business_enabled": true,
       "notifications_performance_enabled": false,
       "notifications_ui_enabled": true,
+      "notifications_general_enabled": true,
       "console_logs_development_enabled": false,
       "console_logs_system_enabled": true,
       "console_logs_business_enabled": true,

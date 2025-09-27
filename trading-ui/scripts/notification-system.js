@@ -36,9 +36,71 @@
  * @param {Object} alertData - Alert data object
  * @returns {Promise} Promise that resolves when alert is created
  */
-function createAlert(_alertData) {
-  // Implementation for creating business alerts
-  // TODO: Implement alert creation logic
+async function createAlert(alertData) {
+  try {
+    // שמירה במטמון מאוחד
+    if (window.UnifiedCacheManager) {
+      await window.UnifiedCacheManager.save('alerts-data', alertData, {
+        syncToBackend: true,
+        dependencies: ['accounts-data']
+      });
+    }
+    
+    // עדכון היסטוריית התראות
+    await updateNotificationHistory('alert-created', alertData);
+    
+    console.log('✅ Alert created successfully');
+  } catch (error) {
+    console.error('❌ Failed to create alert:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update notification history
+ * Updates notification history in unified cache
+ *
+ * @param {string} action - Action performed
+ * @param {Object} data - Related data
+ * @returns {Promise} Promise that resolves when history is updated
+ */
+async function updateNotificationHistory(action, data) {
+  try {
+    if (window.UnifiedCacheManager) {
+      // קבלת היסטוריה קיימת
+      let history = await window.UnifiedCacheManager.get('notifications-history', {
+        fallback: () => []
+      });
+      
+      if (!Array.isArray(history)) {
+        history = [];
+      }
+      
+      // הוספת רשומה חדשה
+      const entry = {
+        action,
+        data,
+        timestamp: Date.now(),
+        id: Date.now() + Math.random()
+      };
+      
+      history.unshift(entry); // הוספה לתחילת הרשימה
+      
+      // הגבלת גודל היסטוריה
+      if (history.length > 1000) {
+        history = history.slice(0, 1000);
+      }
+      
+      // שמירה במטמון מאוחד
+      await window.UnifiedCacheManager.save('notifications-history', history, {
+        layer: 'indexedDB',
+        compress: true,
+        ttl: 86400000 // 24 שעות
+      });
+    }
+  } catch (error) {
+    console.error('❌ Failed to update notification history:', error);
+  }
 }
 
 
@@ -118,13 +180,30 @@ async function shouldShowNotification(category) {
     }
     
     const isEnabled = await window.getPreference(preferenceName);
-    console.log(`🔍 Preference ${preferenceName} value:`, isEnabled, typeof isEnabled);
+    if (window.DEBUG_MODE) {
+      console.log(`🔍 Preference ${preferenceName} value:`, isEnabled, typeof isEnabled);
+    }
+    
+    // If preference is not found (null), don't show notification
+    if (isEnabled === null) {
+      console.log(`⚠️ Preference ${preferenceName} not found - notification disabled`);
+      return false;
+    }
     
     const result = isEnabled === 'true' || isEnabled === true;
-    console.log(`🔍 Should show notification for ${category}:`, result);
+    if (window.DEBUG_MODE) {
+      console.log(`🔍 Should show notification for ${category}:`, result);
+    }
     return result;
   } catch (error) {
-    console.warn('Failed to check notification preference, showing by default:', error);
+    if (window.DEBUG_MODE) {
+      console.warn('Failed to check notification preference, showing by default:', error);
+    }
+    // For general category, map to system category; for others, show by default
+    if (category === 'general') {
+      // Map general to system category since general doesn't exist
+      return await shouldShowNotification('system');
+    }
     return true; // Default: show notification
   }
 }
@@ -191,15 +270,40 @@ function getLogEmoji(level) {
  * @param {number} duration - Optional duration in milliseconds (default: 5000)
  * @param {string} category - Category of notification (development, system, business, performance, ui)
  */
-async function showNotification(message, type = 'info', title = 'מערכת', duration = 5000, category = 'system') {
+async function showNotification(message, type = 'info', title = 'מערכת', duration = 5000, category = null) {
+  // Auto-detect category if not provided
+  if (!category && typeof window.detectNotificationCategory === 'function') {
+    try {
+      category = window.detectNotificationCategory(message, type, title, {
+        fileName: window.location.pathname,
+        functionName: 'showNotification',
+        stackTrace: ''
+      });
+      // console.log(`🔍 Auto-detected category: ${category} for type: ${type}`);
+    } catch (error) {
+      console.warn('Failed to detect category, using default:', error);
+      category = 'general';
+    }
+  } else if (!category) {
+    // Fallback to type-based category
+    switch (type) {
+      case 'success': category = 'business'; break;
+      case 'error': category = 'system'; break;
+      case 'warning': category = 'system'; break;
+      case 'info': category = 'ui'; break;
+      default: category = 'general';
+    }
+  }
+  
   // Check if notification should be shown based on category preferences
-  // Only check if category is explicitly provided (not default 'system')
   console.log(`🔔 showNotification called: "${message}", type: ${type}, category: ${category}`);
   
-  if (category && category !== 'system') {
+  if (category) {
     try {
       const shouldShow = await shouldShowNotification(category);
+      if (window.DEBUG_MODE) {
       console.log(`🔍 Category ${category} enabled:`, shouldShow);
+    }
       if (!shouldShow) {
         console.log(`❌ Notification blocked for category: ${category}`);
         return; // Don't show notification if category is disabled
@@ -212,11 +316,39 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
     console.log(`✅ Showing notification (category: ${category})`);
   }
   
+  // Get dynamic colors from color scheme system
+  const getNotificationColor = (type) => {
+    if (typeof window.getEntityColor === 'function') {
+      switch (type) {
+        case 'success': return window.getEntityColor('account') || '#28a745';
+        case 'error': return window.getEntityColor('ticker') || '#dc3545';
+        case 'warning': return window.getEntityColor('alert') || '#ffc107';
+        case 'info': return window.getEntityColor('execution') || '#17a2b8';
+        default: return '#6c757d';
+      }
+    }
+    // Fallback to default colors
+    switch (type) {
+      case 'success': return '#28a745';
+      case 'error': return '#dc3545';
+      case 'warning': return '#ffc107';
+      case 'info': return '#17a2b8';
+      default: return '#6c757d';
+    }
+  };
+
+  const notificationColor = getNotificationColor(type);
+  
+  // Debug: Log dynamic color
+  // console.log(`🎨 Dynamic notification color for ${type}:`, notificationColor);
+  // console.log(`🎨 getEntityColor function available:`, typeof window.getEntityColor);
+
   // Create notification element
   const notification = document.createElement('div');
   notification.className = `notification notification-${type}`;
+  notification.style.borderLeft = `4px solid ${notificationColor}`;
   notification.innerHTML = `
-    <div class="notification-icon">
+    <div class="notification-icon" style="color: ${notificationColor}">
       <i class="fas ${getNotificationIcon(type)}"></i>
     </div>
     <div class="notification-content">
@@ -229,12 +361,12 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
   `;
 
   // Debug: Log notification element details
-  console.log('🔍 DEBUG: Notification element created:', {
-    element: notification,
-    className: notification.className,
-    type: type,
-    innerHTML: notification.innerHTML.substring(0, 200) + '...'
-  });
+  // console.log('🔍 DEBUG: Notification element created:', {
+  //   element: notification,
+  //   className: notification.className,
+  //   type: type,
+  //   innerHTML: notification.innerHTML.substring(0, 200) + '...'
+  // });
 
   // Debug: Check computed styles
   setTimeout(() => {
@@ -243,129 +375,129 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
     const messageElement = notification.querySelector('.notification-message');
     const iconElement = notification.querySelector('.notification-icon');
     
-    console.log('🔍 DEBUG: Computed styles after creation:', {
-      notification: {
-        backgroundColor: computedStyle.backgroundColor,
-        color: computedStyle.color,
-        borderColor: computedStyle.borderColor,
-        display: computedStyle.display,
-        opacity: computedStyle.opacity
-      },
-      title: titleElement ? {
-        color: window.getComputedStyle(titleElement).color,
-        fontSize: window.getComputedStyle(titleElement).fontSize,
-        fontWeight: window.getComputedStyle(titleElement).fontWeight
-      } : 'No title element',
-      message: messageElement ? {
-        color: window.getComputedStyle(messageElement).color,
-        fontSize: window.getComputedStyle(messageElement).fontSize
-      } : 'No message element',
-      icon: iconElement ? {
-        color: window.getComputedStyle(iconElement).color,
-        fontSize: window.getComputedStyle(iconElement).fontSize
-      } : 'No icon element'
-    });
+    // console.log('🔍 DEBUG: Computed styles after creation:', {
+    //   notification: {
+    //     backgroundColor: computedStyle.backgroundColor,
+    //     color: computedStyle.color,
+    //     borderColor: computedStyle.borderColor,
+    //     display: computedStyle.display,
+    //     opacity: computedStyle.opacity
+    //   },
+    //   title: titleElement ? {
+    //     color: window.getComputedStyle(titleElement).color,
+    //     fontSize: window.getComputedStyle(titleElement).fontSize,
+    //     fontWeight: window.getComputedStyle(titleElement).fontWeight
+    //   } : 'No title element',
+    //   message: messageElement ? {
+    //     color: window.getComputedStyle(messageElement).color,
+    //     fontSize: window.getComputedStyle(messageElement).fontSize
+    //   } : 'No message element',
+    //   icon: iconElement ? {
+    //     color: window.getComputedStyle(iconElement).color,
+    //     fontSize: window.getComputedStyle(iconElement).fontSize
+    //   } : 'No icon element'
+    // });
     
-    // Debug: Check if CSS file is loaded
-    const stylesheets = Array.from(document.styleSheets);
-    const notificationCSS = stylesheets.find(sheet => {
-      try {
-        return sheet.href && sheet.href.includes('_notifications.css');
-      } catch (e) {
-        return false;
-      }
-    });
-    console.log('🔍 DEBUG: CSS file check:', {
-      totalStylesheets: stylesheets.length,
-      notificationCSSLoaded: !!notificationCSS,
-      notificationCSSUrl: notificationCSS ? notificationCSS.href : 'Not found'
-    });
+    // Debug: Check if CSS file is loaded - DISABLED FOR PERFORMANCE
+    // const stylesheets = Array.from(document.styleSheets);
+    // const notificationCSS = stylesheets.find(sheet => {
+    //   try {
+    //     return sheet.href && sheet.href.includes('_notifications.css');
+    //   } catch (e) {
+    //     return false;
+    //   }
+    // });
+    // console.log('🔍 DEBUG: CSS file check:', {
+    //   totalStylesheets: stylesheets.length,
+    //   notificationCSSLoaded: !!notificationCSS,
+    //   notificationCSSUrl: notificationCSS ? notificationCSS.href : 'Not found'
+    // });
     
-    // Debug: Check CSS rules
-    if (notificationCSS) {
-      try {
-        const rules = Array.from(notificationCSS.cssRules || notificationCSS.rules || []);
-        const notificationRules = rules.filter(rule => 
-          rule.selectorText && rule.selectorText.includes('.notification')
-        );
-        console.log('🔍 DEBUG: CSS rules check:', {
-          totalRules: rules.length,
-          notificationRules: notificationRules.length,
-          notificationSelectors: notificationRules.map(rule => rule.selectorText)
-        });
+    // Debug: Check CSS rules - DISABLED FOR PERFORMANCE
+    // if (notificationCSS) {
+    //   try {
+    //     const rules = Array.from(notificationCSS.cssRules || notificationCSS.rules || []);
+    //     const notificationRules = rules.filter(rule => 
+    //       rule.selectorText && rule.selectorText.includes('.notification')
+    //     );
+    //     console.log('🔍 DEBUG: CSS rules check:', {
+    //       totalRules: rules.length,
+    //       notificationRules: notificationRules.length,
+    //       notificationSelectors: notificationRules.map(rule => rule.selectorText)
+    //     });
         
-        // Debug: Check specific rules
-        const titleRulesDebug = rules.filter(rule => 
-          rule.selectorText && rule.selectorText.includes('.notification-title')
-        );
-        const messageRulesDebug = rules.filter(rule => 
-          rule.selectorText && rule.selectorText.includes('.notification-message')
-        );
-        console.log('🔍 DEBUG: Specific rules check:', {
-          titleRules: titleRulesDebug.length,
-          messageRules: messageRulesDebug.length,
-          titleSelectors: titleRulesDebug.map(rule => rule.selectorText),
-          messageSelectors: messageRulesDebug.map(rule => rule.selectorText)
-        });
+        // Debug: Check specific rules - DISABLED FOR PERFORMANCE
+        // const titleRulesDebug = rules.filter(rule => 
+        //   rule.selectorText && rule.selectorText.includes('.notification-title')
+        // );
+        // const messageRulesDebug = rules.filter(rule => 
+        //   rule.selectorText && rule.selectorText.includes('.notification-message')
+        // );
+        // console.log('🔍 DEBUG: Specific rules check:', {
+        //   titleRules: titleRulesDebug.length,
+        //   messageRules: messageRulesDebug.length,
+        //   titleSelectors: titleRulesDebug.map(rule => rule.selectorText),
+        //   messageSelectors: messageRulesDebug.map(rule => rule.selectorText)
+        // });
         
-        // Debug: Check if !important rules are loaded
-        const importantRules = rules.filter(rule => 
-          rule.cssText && rule.cssText.includes('!important')
-        );
-        console.log('🔍 DEBUG: Important rules check:', {
-          importantRulesCount: importantRules.length,
-          importantRules: importantRules.map(rule => rule.selectorText + ' -> ' + rule.cssText.substring(0, 100))
-        });
+        // Debug: Check if !important rules are loaded - DISABLED FOR PERFORMANCE
+        // const importantRules = rules.filter(rule => 
+        //   rule.cssText && rule.cssText.includes('!important')
+        // );
+        // console.log('🔍 DEBUG: Important rules check:', {
+        //   importantRulesCount: importantRules.length,
+        //   importantRules: importantRules.map(rule => rule.selectorText + ' -> ' + rule.cssText.substring(0, 100))
+        // });
         
-        // Debug: Check specific color rules
-        const colorRules = rules.filter(rule => 
-          rule.cssText && (rule.cssText.includes('color:') || rule.cssText.includes('color :'))
-        );
-        console.log('🔍 DEBUG: Color rules check:', {
-          colorRulesCount: colorRules.length,
-          colorRules: colorRules.map(rule => rule.selectorText + ' -> ' + rule.cssText.substring(0, 150))
-        });
+        // Debug: Check specific color rules - DISABLED FOR PERFORMANCE
+        // const colorRules = rules.filter(rule => 
+        //   rule.cssText && (rule.cssText.includes('color:') || rule.cssText.includes('color :'))
+        // );
+        // console.log('🔍 DEBUG: Color rules check:', {
+        //   colorRulesCount: colorRules.length,
+        //   colorRules: colorRules.map(rule => rule.selectorText + ' -> ' + rule.cssText.substring(0, 150))
+        // });
         
-        // Debug: Check if our specific rules are loaded
-        const ourRules = rules.filter(rule => 
-          rule.cssText && (rule.cssText.includes('#1a1a1a') || rule.cssText.includes('#666'))
-        );
-        console.log('🔍 DEBUG: Our specific rules check:', {
-          ourRulesCount: ourRules.length,
-          ourRules: ourRules.map(rule => rule.selectorText + ' -> ' + rule.cssText.substring(0, 150))
-        });
+        // Debug: Check if our specific rules are loaded - DISABLED FOR PERFORMANCE
+        // const ourRules = rules.filter(rule => 
+        //   rule.cssText && (rule.cssText.includes('#1a1a1a') || rule.cssText.includes('#666'))
+        // );
+        // console.log('🔍 DEBUG: Our specific rules check:', {
+        //   ourRulesCount: ourRules.length,
+        //   ourRules: ourRules.map(rule => rule.selectorText + ' -> ' + rule.cssText.substring(0, 150))
+        // });
         
-        // Debug: Check the actual computed colors
-        console.log('🔍 DEBUG: Actual computed colors:', {
-          titleColor: titleElement ? window.getComputedStyle(titleElement).color : 'No title',
-          messageColor: messageElement ? window.getComputedStyle(messageElement).color : 'No message',
-          iconColor: iconElement ? window.getComputedStyle(iconElement).color : 'No icon'
-        });
+        // Debug: Check the actual computed colors - DISABLED FOR PERFORMANCE
+        // console.log('🔍 DEBUG: Actual computed colors:', {
+        //   titleColor: titleElement ? window.getComputedStyle(titleElement).color : 'No title',
+        //   messageColor: messageElement ? window.getComputedStyle(messageElement).color : 'No message',
+        //   iconColor: iconElement ? window.getComputedStyle(iconElement).color : 'No icon'
+        // });
         
-        // Debug: Check specific CSS rules for our selectors
-        const titleRulesDetailed = rules.filter(rule => 
-          rule.selectorText && rule.selectorText.includes('.notification-title')
-        );
-        const messageRulesDetailed = rules.filter(rule => 
-          rule.selectorText && rule.selectorText.includes('.notification-message')
-        );
-        console.log('🔍 DEBUG: Detailed CSS rules:', {
-          titleRules: titleRulesDetailed.map(rule => rule.selectorText + ' -> ' + rule.cssText),
-          messageRules: messageRulesDetailed.map(rule => rule.selectorText + ' -> ' + rule.cssText)
-        });
+        // Debug: Check specific CSS rules for our selectors - DISABLED FOR PERFORMANCE
+        // const titleRulesDetailed = rules.filter(rule => 
+        //   rule.selectorText && rule.selectorText.includes('.notification-title')
+        // );
+        // const messageRulesDetailed = rules.filter(rule => 
+        //   rule.selectorText && rule.selectorText.includes('.notification-message')
+        // );
+        // console.log('🔍 DEBUG: Detailed CSS rules:', {
+        //   titleRules: titleRulesDetailed.map(rule => rule.selectorText + ' -> ' + rule.cssText),
+        //   messageRules: messageRulesDetailed.map(rule => rule.selectorText + ' -> ' + rule.cssText)
+        // });
         
-        // Debug: Check if Bootstrap is overriding our styles
-        const bootstrapRules = rules.filter(rule => 
-          rule.selectorText && (rule.selectorText.includes('.text-') || rule.selectorText.includes('.text-') || rule.selectorText.includes('body') || rule.selectorText.includes('*'))
-        );
-        console.log('🔍 DEBUG: Bootstrap/Global rules that might override:', {
-          bootstrapRulesCount: bootstrapRules.length,
-          bootstrapRules: bootstrapRules.slice(0, 5).map(rule => rule.selectorText + ' -> ' + rule.cssText.substring(0, 100))
-        });
-      } catch (e) {
-        console.log('🔍 DEBUG: Cannot access CSS rules:', e.message);
-      }
-    }
+        // Debug: Check if Bootstrap is overriding our styles - DISABLED FOR PERFORMANCE
+        // const bootstrapRules = rules.filter(rule => 
+        //   rule.selectorText && (rule.selectorText.includes('.text-') || rule.selectorText.includes('.text-') || rule.selectorText.includes('body') || rule.selectorText.includes('*'))
+        // );
+        // console.log('🔍 DEBUG: Bootstrap/Global rules that might override:', {
+        //   bootstrapRulesCount: bootstrapRules.length,
+        //   bootstrapRules: bootstrapRules.slice(0, 5).map(rule => rule.selectorText + ' -> ' + rule.cssText.substring(0, 100))
+        // });
+      // } catch (e) {
+      //   console.log('🔍 DEBUG: Cannot access CSS rules:', e.message);
+      // }
+    // }
   }, 100);
 
   // Add to page
@@ -375,30 +507,30 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
     container.id = 'notification-container';
     container.className = 'notification-container';
     document.body.appendChild(container);
-    console.log('🔍 DEBUG: Created notification container:', container);
+    // console.log('🔍 DEBUG: Created notification container:', container);
   }
   
   container.appendChild(notification);
-  console.log('🔍 DEBUG: Notification added to container:', {
-    container: container,
-    notification: notification,
-    containerChildren: container.children.length
-  });
+  // console.log('🔍 DEBUG: Notification added to container:', {
+  //   container: container,
+  //   notification: notification,
+  //   containerChildren: container.children.length
+  // });
 
   // Trigger animation
   setTimeout(() => {
     notification.classList.add('show');
-    console.log('🔍 DEBUG: Animation triggered, notification classes:', notification.className);
+    // console.log('🔍 DEBUG: Animation triggered, notification classes:', notification.className);
   }, 10);
 
   // Auto remove after duration
   setTimeout(() => {
     if (notification.parentElement) {
-      console.log('🔍 DEBUG: Starting notification removal, classes:', notification.className);
+      // console.log('🔍 DEBUG: Starting notification removal, classes:', notification.className);
       notification.classList.add('hide');
       setTimeout(() => {
         if (notification.parentElement) {
-          console.log('🔍 DEBUG: Removing notification from DOM');
+          // console.log('🔍 DEBUG: Removing notification from DOM');
           notification.remove();
         }
       }, 300); // Wait for animation
@@ -406,7 +538,7 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
   }, duration);
 
   // Save to global history
-  saveNotificationToGlobalHistory(type, title, message).catch(error => {
+  saveNotificationToGlobalHistory(type, title, message, category).catch(error => {
     console.warn('Failed to save notification to global history:', error);
   });
 
@@ -417,15 +549,7 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
 /**
  * Get notification icon based on type
  */
-function getNotificationIcon(type) {
-  switch (type) {
-    case 'success': return 'fa-check-circle';
-    case 'error': return 'fa-exclamation-circle';
-    case 'warning': return 'fa-exclamation-triangle';
-    case 'info': return 'fa-info-circle';
-    default: return 'fa-info-circle';
-  }
-}
+// Function already defined above
 
 // ייצוא הפונקציה הגלובלית - יועבר למטה
 
@@ -547,7 +671,7 @@ function hideNotification(notification) {
  * @param {number} duration - Display duration in milliseconds (default: 4000)
  * @param {string} category - Category of notification (default: 'system')
  */
-async function showSuccessNotification(title, message, duration = 4000, category = 'system') {
+async function showSuccessNotification(title, message, duration = 4000, category = null) {
   // Ensure title and message are provided
   const finalTitle = title || 'הצלחה';
   const finalMessage = message || 'הפעולה הושלמה בהצלחה';
@@ -565,7 +689,7 @@ async function showSuccessNotification(title, message, duration = 4000, category
  * @param {number} duration - Display duration in milliseconds (default: 6000)
  * @param {string} category - Category of notification (default: 'system')
  */
-async function showErrorNotification(title, message, duration = 6000, category = 'system') {
+async function showErrorNotification(title, message, duration = 6000, category = null) {
   // showErrorNotification calling showNotification with category
   await showNotification(message, 'error', title, duration, category);
 }
@@ -579,7 +703,7 @@ async function showErrorNotification(title, message, duration = 6000, category =
  * @param {number} duration - Display duration in milliseconds (default: 5000)
  * @param {string} category - Category of notification (default: 'system')
  */
-async function showWarningNotification(title, message, duration = 5000, category = 'system') {
+async function showWarningNotification(title, message, duration = 5000, category = null) {
   // showWarningNotification calling showNotification with category
   await showNotification(message, 'warning', title, duration, category);
 }
@@ -593,9 +717,86 @@ async function showWarningNotification(title, message, duration = 5000, category
  * @param {number} duration - Display duration in milliseconds (default: 4000)
  * @param {string} category - Category of notification (default: 'system')
  */
-async function showInfoNotification(title, message, duration = 4000, category = 'system') {
+async function showInfoNotification(title, message, duration = 4000, category = null) {
   // showInfoNotification calling showNotification with category
   await showNotification(message, 'info', title, duration, category);
+}
+
+/**
+ * Show details modal
+ * NOTIFICATION SYSTEM - Displays details in a modal dialog
+ *
+ * @param {string} title - Modal title
+ * @param {string} content - Modal content (HTML or text)
+ * @param {Object} options - Additional options
+ */
+async function showDetailsModal(title, content, options = {}) {
+  console.log('🔍 showDetailsModal called:', { title, content, options });
+  
+  // Create unique modal ID
+  const modalId = `details-modal-${Date.now()}`;
+  
+  // Create modal HTML
+  const modalHTML = `
+    <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}-label" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header text-white" style="direction: rtl; background-color: ${window.getEntityColor ? window.getEntityColor('trade') || '#007bff' : '#007bff'};">
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="סגור" style="margin-left: 0; margin-right: auto;"></button>
+            <h4 class="modal-title" id="${modalId}-label">${title}</h4>
+          </div>
+          <div class="modal-body">
+            <div class="details-content">
+              ${content}
+            </div>
+          </div>
+          <div class="modal-footer" style="justify-content: flex-end; direction: rtl;">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Add modal to page
+  document.body.insertAdjacentHTML('beforeend', modalHTML);
+  
+  // Get modal element
+  const modal = document.getElementById(modalId);
+  
+  // Ensure content is properly rendered as HTML
+  const detailsContent = modal.querySelector('.details-content');
+  if (detailsContent) {
+    detailsContent.innerHTML = content;
+  }
+  
+  // Show modal using existing system
+  if (typeof window.showModal === 'function') {
+    window.showModal(modalId, options);
+  } else if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+    const bootstrapModal = new bootstrap.Modal(modal, options);
+    bootstrapModal.show();
+  } else {
+    console.error('No modal system available');
+    return;
+  }
+  
+  // סגירה בלחיצה על הרקע
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      const bootstrapModal = bootstrap.Modal.getInstance(modal);
+      if (bootstrapModal) {
+        bootstrapModal.hide();
+      }
+    }
+  });
+
+  // Clean up modal after it's hidden
+  modal.addEventListener('hidden.bs.modal', () => {
+    modal.remove();
+  });
+  
+  console.log('✅ Details modal shown:', modalId);
 }
 
 // WARNING FUNCTIONS MOVED TO warning-system.js
@@ -629,7 +830,7 @@ function showNotificationLegacy(message, type = 'info', duration = 4000) {
  * @param {string} title - Notification title
  * @param {string} message - Notification message
  */
-async function saveNotificationToGlobalHistory(type, title, message) {
+async function saveNotificationToGlobalHistory(type, title, message, category = 'general') {
   try {
     // יצירת אובייקט התראה
     const notification = {
@@ -637,17 +838,27 @@ async function saveNotificationToGlobalHistory(type, title, message) {
       type,
       title,
       message,
+      category,
       time: new Date(),
       timestamp: Date.now(),
       page: window.location.pathname,
       url: window.location.href
     };
 
-    // שמירה ל-UnifiedIndexedDB
-    if (window.UnifiedIndexedDB && window.UnifiedIndexedDB.isInitialized) {
-      await window.UnifiedIndexedDB.saveNotificationHistory(notification, 'notification-system');
-    } else if (window.UnifiedIndexedDB && !window.UnifiedIndexedDB.isInitialized) {
-      console.warn('UnifiedIndexedDB לא מאותחל עדיין, מדלג על שמירה');
+    // שמירה למערכת המטמון המאוחדת החדשה רק אם מאותחלת
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+      try {
+        await window.UnifiedCacheManager.save('notification_history', notification, {
+          layer: 'indexedDB',
+          ttl: 7 * 24 * 60 * 60 * 1000, // 7 days
+          category: 'notification'
+        });
+      } catch (error) {
+        console.warn('שגיאה בשמירה במערכת המטמון החדשה, עובר ל-localStorage:', error.message);
+      }
+    } else {
+      // מערכת מטמון לא מאותחלת - מדלג על שמירה
+      console.log('⚠️ Cache system not initialized - skipping notification history save');
     }
 
     // Fallback ל-localStorage במקרה של בעיה
@@ -656,14 +867,14 @@ async function saveNotificationToGlobalHistory(type, title, message) {
       const savedHistory = localStorage.getItem('tiktrack_global_notifications_history');
       if (savedHistory) {
         globalHistory = JSON.parse(savedHistory);
-    }
+      }
 
-    globalHistory.unshift(notification);
-    if (globalHistory.length > 100) {
-      globalHistory = globalHistory.slice(0, 100);
-    }
+      globalHistory.unshift(notification);
+      if (globalHistory.length > 100) {
+        globalHistory = globalHistory.slice(0, 100);
+      }
 
-    localStorage.setItem('tiktrack_global_notifications_history', JSON.stringify(globalHistory));
+      localStorage.setItem('tiktrack_global_notifications_history', JSON.stringify(globalHistory));
     } catch (e) {
       console.warn('שגיאה בשמירת fallback ל-localStorage:', e);
     }
@@ -671,7 +882,7 @@ async function saveNotificationToGlobalHistory(type, title, message) {
     // עדכון סטטיסטיקות גלובליות
     await updateGlobalNotificationStats();
 
-    console.log('✅ התראה נשמרה להיסטוריה גלובלית');
+    // console.log('✅ התראה נשמרה להיסטוריה גלובלית');
   } catch (error) {
     console.warn('שגיאה בשמירת התראה להיסטוריה גלובלית:', error);
   }
@@ -687,9 +898,16 @@ async function updateGlobalNotificationStats() {
     
     // טעינת היסטוריה מ-UnifiedIndexedDB
     if (window.UnifiedIndexedDB && window.UnifiedIndexedDB.isInitialized) {
-      history = await window.UnifiedIndexedDB.getNotificationHistory();
-    } else if (window.UnifiedIndexedDB && !window.UnifiedIndexedDB.isInitialized) {
-      console.warn('UnifiedIndexedDB לא מאותחל עדיין, מדלג על טעינת היסטוריה');
+      try {
+        history = await window.UnifiedIndexedDB.getNotificationHistory();
+      } catch (error) {
+        console.warn('שגיאה בטעינה מ-IndexedDB, עובר ל-localStorage:', error.message);
+        history = [];
+      }
+    } else {
+      // מערכת מטמון לא מאותחלת - מדלג על טעינה
+      console.log('⚠️ Cache system not initialized - skipping notification history load');
+      history = [];
     }
     
     // Fallback ל-localStorage
@@ -713,9 +931,20 @@ async function updateGlobalNotificationStats() {
       lastUpdated: Date.now()
     };
 
-    // שמירה ל-UnifiedIndexedDB
-    if (window.UnifiedIndexedDB) {
-      await window.UnifiedIndexedDB.saveNotificationStats(stats, 'notification-system');
+    // שמירה למערכת המטמון המאוחדת
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+      try {
+        await window.UnifiedCacheManager.save('notification_stats', stats, {
+          layer: 'indexedDB',
+          ttl: 24 * 60 * 60 * 1000, // 24 hours
+          category: 'notification'
+        });
+      } catch (error) {
+        console.warn('שגיאה בשמירת סטטיסטיקות ב-IndexedDB:', error.message);
+      }
+    } else {
+      // מערכת מטמון לא מאותחלת - מדלג על שמירת סטטיסטיקות
+      console.log('⚠️ Cache system not initialized - skipping notification stats save');
     }
 
     // Fallback ל-localStorage
@@ -739,12 +968,13 @@ async function loadGlobalNotificationHistory() {
   try {
     // טעינה מ-UnifiedIndexedDB
     if (window.UnifiedIndexedDB && window.UnifiedIndexedDB.isInitialized) {
-      const history = await window.UnifiedIndexedDB.getNotificationHistory();
+      const history = await window.UnifiedIndexedDB.getAll('notificationHistory');
       if (history && history.length > 0) {
         return history;
       }
-    } else if (window.UnifiedIndexedDB && !window.UnifiedIndexedDB.isInitialized) {
-      console.warn('UnifiedIndexedDB לא מאותחל עדיין, מדלג על טעינת היסטוריה');
+    } else {
+      // IndexedDB לא זמין או לא מאותחל - מדלג על טעינה מ-IndexedDB
+      // console.log('UnifiedIndexedDB לא מאותחל עדיין, מדלג על טעינת היסטוריה');
     }
     
     // Fallback ל-localStorage
@@ -770,8 +1000,9 @@ async function loadGlobalNotificationStats() {
       if (stats) {
         return stats;
       }
-    } else if (window.UnifiedIndexedDB && !window.UnifiedIndexedDB.isInitialized) {
-      console.warn('UnifiedIndexedDB לא מאותחל עדיין, מדלג על טעינת סטטיסטיקות');
+    } else {
+      // IndexedDB לא זמין או לא מאותחל - מדלג על טעינה מ-IndexedDB
+      console.log('UnifiedIndexedDB לא מאותחל עדיין, מדלג על טעינת סטטיסטיקות');
     }
     
     // Fallback ל-localStorage
@@ -809,6 +1040,7 @@ window.showSuccessNotification = showSuccessNotification;
 window.showErrorNotification = showErrorNotification;
 window.showWarningNotification = showWarningNotification;
 window.showInfoNotification = showInfoNotification;
+window.showDetailsModal = showDetailsModal;
 
 // Export NOTIFICATION CATEGORIES SYSTEM functions to global scope
 window.shouldShowNotification = shouldShowNotification;
@@ -867,6 +1099,7 @@ window.NotificationSystem = {
     showError: window.showErrorNotification,
     showWarning: window.showWarningNotification,
     showInfo: window.showInfoNotification,
+    showDetails: window.showDetailsModal,
     shouldShow: window.shouldShowNotification,
     logWithCategory: window.logWithCategory,
     getCategoryIcon: window.getCategoryIcon,
@@ -878,9 +1111,9 @@ window.NotificationSystem = {
     initialize: function() {
         console.log('🚀 NotificationSystem.initialize called');
         // Initialize notification system if needed
-        if (window.notificationSystemTester) {
-            window.notificationSystemTester.runAllTests();
-        }
+        // if (window.notificationSystemTester) {
+        //     window.notificationSystemTester.runAllTests();
+        // }
         return true;
     }
 };

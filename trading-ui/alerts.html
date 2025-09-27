@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>התראות - TikTrack</title>
+</head>
+<body>
 <!--
   ========================================
   דף ההתראות - Alerts Page
@@ -86,7 +93,8 @@
     <script src="scripts/header-system.js"></script>
 
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=v41_alerts_colors"></head>
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">
+</head>
 
 <body class="alerts-page">
     <!-- Unified Header Container -->
@@ -106,7 +114,7 @@
         <div class="section-header">
           <h2>🔔 התראות - סקירה כללית</h2>
           <div class="section-actions">
-            <button class="btn btn-sm btn-outline-primary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים וההתראות">
+            <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים וההתראות">
               <i class="fas fa-copy"></i> העתק לוג מפורט
             </button>
             <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר סקשן">
@@ -496,20 +504,26 @@
     <script src="scripts/notification-system.js"></script>
     <script src="scripts/system-management.js"></script>
     <script src="scripts/notification-category-detector.js"></script>
-    <script src="scripts/notification-migration-system.js"></script>
     <script src="scripts/global-notification-collector.js"></script>
     <script src="scripts/tables.js"></script>
     <script src="scripts/page-utils.js"></script>
-    <script src="scripts/central-refresh-system.js"></script>
     <script src="scripts/alerts.js"></script>
     
+    <!-- Real-time Notifications System -->
+    <script src="scripts/realtime-notifications-client.js"></script>
+    
     <!-- New Unified Initialization System -->
-    <script src="scripts/application-initializer.js"></script>
     <script src="scripts/page-initialization-configs.js"></script>
     <script src="scripts/unified-app-initializer.js"></script>
 
     <!-- 🔓 TEMPLATE ZONE 6 - Page-Specific Scripts (ADD NEW SCRIPTS HERE) -->
     <!-- No manual DOMContentLoaded listener needed - handled by unified system -->
+    
+    <!-- Local copyDetailedLog function for alerts page -->
+    <script>
+        // Make the local copyDetailedLog function available globally for this page only
+        window.copyDetailedLog = copyDetailedLog;
+    </script>
 </body>
 
 </html>

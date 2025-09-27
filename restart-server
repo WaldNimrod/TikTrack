@@ -1,0 +1,931 @@
+#!/bin/bash
+
+# TikTrack Server Restart Command - Complete Unified Interface
+# ============================================================
+# 
+# 🎯 Purpose: Complete server restart with all original features and clear developer feedback
+# 📖 Documentation: documentation/server/RESTART_SCRIPT_GUIDE.md
+# 
+# 🆕 Version: 3.0.0 (September 27, 2025)
+# 🛠️ Features: All original features + reliable process control + clear feedback
+# 
+# This script provides a complete replacement for the complex restart system
+# with all original features: quick/complete modes, interactive mode, verbose output,
+# auto-detection, status checking, and comprehensive developer feedback.
+
+set -e  # Exit on any error
+
+# Configuration
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SERVER_SCRIPT="$SCRIPT_DIR/Backend/dev_server.py"
+LOG_FILE="$SCRIPT_DIR/Backend/server.log"
+QUICK_SCRIPT="$SCRIPT_DIR/restart_server_quick.sh"
+COMPLETE_SCRIPT="$SCRIPT_DIR/restart_server_complete.sh"
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
+
+# Timestamp function
+timestamp() {
+    date '+%Y-%m-%d %H:%M:%S'
+}
+
+# Logging functions
+log_info() {
+    echo -e "${BLUE}[$(timestamp)] INFO:${NC} $1"
+}
+
+log_success() {
+    echo -e "${GREEN}[$(timestamp)] SUCCESS:${NC} $1"
+}
+
+log_warning() {
+    echo -e "${YELLOW}[$(timestamp)] WARNING:${NC} $1"
+}
+
+log_error() {
+    echo -e "${RED}[$(timestamp)] ERROR:${NC} $1"
+}
+
+log_debug() {
+    echo -e "${PURPLE}[$(timestamp)] DEBUG:${NC} $1"
+}
+
+# Function to show help
+show_help() {
+    echo "🔄 TikTrack Server Restart - Complete Unified Command"
+    echo "====================================================="
+    echo ""
+    echo "Usage: $0 [OPTIONS] [MODE] [CACHE_MODE]"
+    echo ""
+    echo "Modes:"
+    echo "  quick       Quick restart (5-10 seconds, default)"
+    echo "  complete    Complete restart (30-60 seconds)"
+    echo "  auto        Smart mode detection"
+    echo ""
+    echo "Cache Modes:"
+    echo "  development    Cache TTL: 10 seconds (fast development)"
+    echo "  no-cache       Cache disabled (immediate updates)"
+    echo "  production     Cache TTL: 5 minutes (performance)"
+    echo "  preserve       Keep current cache state (default)"
+    echo ""
+    echo "Options:"
+    echo "  -i, --interactive    Interactive mode with menu"
+    echo "  -v, --verbose        Verbose output with detailed logs"
+    echo "  -h, --help           Show this help"
+    echo "  --status             Show current system status"
+    echo "  --info               Show mode information"
+    echo ""
+    echo "Examples:"
+    echo "  $0                                    # Quick restart + preserve cache"
+    echo "  $0 development                        # Quick restart + development cache"
+    echo "  $0 complete no-cache                  # Complete restart + no cache"
+    echo "  $0 --interactive                      # Interactive mode"
+    echo "  $0 --verbose complete production      # Verbose complete restart + production"
+    echo "  $0 --status                           # Show system status"
+    echo ""
+    echo "This command will:"
+    echo "  1. Stop any running server processes"
+    echo "  2. Set the specified cache mode"
+    echo "  3. Start the server with proper mode"
+    echo "  4. Verify the server is running"
+    echo "  5. Show comprehensive status and feedback"
+    echo ""
+}
+
+# Function to show mode information
+show_mode_info() {
+    echo "🔄 TikTrack Server Restart - Mode Information"
+    echo "============================================="
+    echo ""
+    echo "Available Restart Modes:"
+    echo "========================"
+    echo ""
+    echo "⚡ QUICK MODE (Default):"
+    echo "   - Speed: 5-10 seconds"
+    echo "   - Use: Development, testing, minor changes"
+    echo "   - Features: Fast restart, basic health checks"
+    echo "   - Cache: PRESERVES CURRENT STATE (unless specified)"
+    echo ""
+    echo "🛡️ COMPLETE MODE:"
+    echo "   - Speed: 30-60 seconds"
+    echo "   - Use: Production, troubleshooting, major issues"
+    echo "   - Features: Full system analysis, route validation"
+    echo "   - Cache: PRESERVES CURRENT STATE (unless specified)"
+    echo ""
+    echo "🤖 AUTO MODE:"
+    echo "   - Speed: Variable (smart detection)"
+    echo "   - Use: Automatic mode selection"
+    echo "   - Features: Intelligent mode choice based on system health"
+    echo "   - Cache: PRESERVES CURRENT STATE (unless specified)"
+    echo ""
+    echo "Available Cache Modes:"
+    echo "======================"
+    echo ""
+    echo "🧠 DEVELOPMENT:"
+    echo "   - TTL: 10 seconds"
+    echo "   - Use: Fast development cycles"
+    echo "   - Performance: Balanced speed and updates"
+    echo ""
+    echo "🚫 NO-CACHE:"
+    echo "   - TTL: Disabled"
+    echo "   - Use: Immediate code updates"
+    echo "   - Performance: Fastest updates, no caching"
+    echo ""
+    echo "🏭 PRODUCTION:"
+    echo "   - TTL: 5 minutes"
+    echo "   - Use: Performance optimization"
+    echo "   - Performance: Best performance, longer cache"
+    echo ""
+    echo "💾 PRESERVE (Default):"
+    echo "   - TTL: Current state maintained"
+    echo "   - Use: Preserve existing configuration"
+    echo "   - Performance: No change from current state"
+    echo ""
+}
+
+# Function to detect current cache state
+detect_current_cache_state() {
+    log_info "🔍 Detecting current cache state..."
+    
+    # Check if server is running and get cache stats
+    if curl -s "http://localhost:8080/api/cache/stats" > /dev/null 2>&1; then
+        local cache_response=$(curl -s "http://localhost:8080/api/cache/stats" 2>/dev/null)
+        if [ $? -eq 0 ] && [ -n "$cache_response" ]; then
+            # Extract cache statistics using jq if available, otherwise use grep
+            if command -v jq >/dev/null 2>&1; then
+                local total_entries=$(echo "$cache_response" | jq -r '.data.total_entries // 0')
+                local total_requests=$(echo "$cache_response" | jq -r '.data.total_requests // 0')
+                local sets=$(echo "$cache_response" | jq -r '.data.stats.sets // 0')
+                local hits=$(echo "$cache_response" | jq -r '.data.stats.hits // 0')
+                local deletes=$(echo "$cache_response" | jq -r '.data.stats.deletes // 0')
+            else
+                local total_entries=$(echo "$cache_response" | grep -o '"total_entries":[0-9]*' | cut -d: -f2 || echo "0")
+                local total_requests=$(echo "$cache_response" | grep -o '"total_requests":[0-9]*' | cut -d: -f2 || echo "0")
+                local sets=$(echo "$cache_response" | grep -o '"sets":[0-9]*' | cut -d: -f2 || echo "0")
+                local hits=$(echo "$cache_response" | grep -o '"hits":[0-9]*' | cut -d: -f2 || echo "0")
+                local deletes=$(echo "$cache_response" | grep -o '"deletes":[0-9]*' | cut -d: -f2 || echo "0")
+            fi
+            
+            # Ensure all values are numbers
+            total_entries=${total_entries:-0}
+            total_requests=${total_requests:-0}
+            sets=${sets:-0}
+            hits=${hits:-0}
+            deletes=${deletes:-0}
+            
+            log_info "Cache stats: entries=$total_entries, requests=$total_requests, sets=$sets, hits=$hits, deletes=$deletes"
+            
+            # Determine cache state based on statistics
+            if [ "$total_entries" -eq 0 ] && [ "$total_requests" -eq 0 ] && [ "$sets" -eq 0 ]; then
+                log_info "Current cache state: NO-CACHE (all stats are 0)"
+                echo "no-cache"
+                return 0
+            elif [ "$sets" -gt 0 ] && [ "$deletes" -gt 0 ]; then
+                log_info "Current cache state: DEVELOPMENT (high activity with deletes)"
+                echo "development"
+                return 0
+            elif [ "$sets" -gt 0 ] && [ "$hits" -gt 0 ]; then
+                log_info "Current cache state: PRODUCTION (activity with hits)"
+                echo "production"
+                return 0
+            elif [ "$sets" -gt 0 ]; then
+                log_info "Current cache state: DEVELOPMENT (initial activity)"
+                echo "development"
+                return 0
+            else
+                log_info "Current cache state: NO-CACHE (no activity)"
+                echo "no-cache"
+                return 0
+            fi
+        fi
+    fi
+    
+    # Fallback: check environment variables
+    if [ "$TIKTRACK_DEV_MODE" = "true" ]; then
+        if [ "$TIKTRACK_CACHE_DISABLED" = "true" ]; then
+            log_info "Current cache state: NO-CACHE (from environment)"
+            echo "no-cache"
+        else
+            log_info "Current cache state: DEVELOPMENT (from environment)"
+            echo "development"
+        fi
+    else
+        log_info "Current cache state: PRODUCTION (default)"
+        echo "production"
+    fi
+}
+
+# Function to set cache environment
+set_cache_environment() {
+    local cache_mode="$1"
+    
+    case $cache_mode in
+        development)
+            export TIKTRACK_DEV_MODE="true"
+            export TIKTRACK_CACHE_DISABLED="false"
+            log_info "Cache mode: DEVELOPMENT (10 seconds TTL)"
+            ;;
+        no-cache)
+            export TIKTRACK_DEV_MODE="true"
+            export TIKTRACK_CACHE_DISABLED="true"
+            log_info "Cache mode: NO-CACHE (disabled)"
+            ;;
+        production)
+            export TIKTRACK_DEV_MODE="false"
+            export TIKTRACK_CACHE_DISABLED="false"
+            log_info "Cache mode: PRODUCTION (5 minutes TTL)"
+            ;;
+        preserve)
+            # Detect and preserve current state
+            local current_state=$(detect_current_cache_state)
+            log_info "Preserving current cache state: $current_state"
+            # Avoid infinite recursion by calling the specific case directly
+            case $current_state in
+                development)
+                    export TIKTRACK_DEV_MODE="true"
+                    export TIKTRACK_CACHE_DISABLED="false"
+                    log_info "Cache mode preserved as: DEVELOPMENT (10 seconds TTL)"
+                    ;;
+                no-cache)
+                    export TIKTRACK_DEV_MODE="true"
+                    export TIKTRACK_CACHE_DISABLED="true"
+                    log_info "Cache mode preserved as: NO-CACHE (disabled)"
+                    ;;
+                production)
+                    export TIKTRACK_DEV_MODE="false"
+                    export TIKTRACK_CACHE_DISABLED="false"
+                    log_info "Cache mode preserved as: PRODUCTION (5 minutes TTL)"
+                    ;;
+                custom)
+                    log_info "Cache mode preserved as: CUSTOM (unknown TTL)"
+                    ;;
+            esac
+            ;;
+        *)
+            log_error "Invalid cache mode: $cache_mode"
+            log_error "Valid modes: development, no-cache, production, preserve"
+            return 1
+            ;;
+    esac
+}
+
+# Function to stop server processes (improved)
+stop_server() {
+    log_info "🛑 Stopping server processes..."
+    
+    # Find all Python processes with dev_server.py
+    local pids=$(pgrep -f "python.*dev_server.py" 2>/dev/null || true)
+    if [ -z "$pids" ]; then
+        # Try alternative patterns
+        pids=$(pgrep -f "dev_server.py" 2>/dev/null || true)
+    fi
+    
+    if [ -n "$pids" ]; then
+        log_info "Found running server processes: $pids"
+        
+        # Try graceful shutdown first
+        pkill -f "python.*dev_server.py" 2>/dev/null || true
+        sleep 3
+        
+        # Check if processes are still running
+        local remaining_pids=$(pgrep -f "python.*dev_server.py" 2>/dev/null || true)
+        if [ -n "$remaining_pids" ]; then
+            log_warning "Processes still running after graceful shutdown: $remaining_pids"
+            log_warning "Force killing remaining processes..."
+            pkill -9 -f "python.*dev_server.py" 2>/dev/null || true
+            sleep 2
+        fi
+        
+        # Final check
+        local final_pids=$(pgrep -f "python.*dev_server.py" 2>/dev/null || true)
+        if [ -n "$final_pids" ]; then
+            log_error "Failed to stop server processes: $final_pids"
+            return 1
+        else
+            log_success "All server processes stopped successfully"
+        fi
+    else
+        log_info "No server processes found"
+    fi
+    
+    # Additional cleanup - kill any processes on port 8080
+    local port_pids=$(lsof -ti:8080 2>/dev/null || true)
+    if [ -n "$port_pids" ]; then
+        log_info "Found processes on port 8080: $port_pids"
+        kill -9 $port_pids 2>/dev/null || true
+        sleep 1
+    fi
+}
+
+# Function to detect optimal restart mode
+detect_optimal_mode() {
+    log_info "🔍 Detecting optimal restart mode..."
+    
+    # Check system resources
+    local memory_usage=$(free 2>/dev/null | grep Mem | awk '{printf "%.0f", $3/$2 * 100.0}' || echo "0")
+    local disk_usage=$(df / 2>/dev/null | tail -1 | awk '{print $5}' | sed 's/%//' || echo "0")
+    
+    log_info "Memory usage: ${memory_usage}%"
+    log_info "Disk usage: ${disk_usage}%"
+    
+    # Check for recent errors in logs
+    local recent_errors=0
+    if [ -f "$LOG_FILE" ]; then
+        recent_errors=$(grep -c "ERROR\|CRITICAL" "$LOG_FILE" 2>/dev/null || echo "0")
+    fi
+    log_info "Recent errors in logs: $recent_errors"
+    
+    # Check if server is responding
+    local server_responding=false
+    if curl -s "http://localhost:8080/api/health" > /dev/null 2>&1; then
+        server_responding=true
+        log_info "Server is currently responding"
+    else
+        log_info "Server is not responding"
+    fi
+    
+    # Decision logic
+    if [ "$memory_usage" -gt 90 ] || [ "$disk_usage" -gt 90 ] || [ "$recent_errors" -gt 10 ] || [ "$server_responding" = false ]; then
+        log_info "System indicators suggest COMPLETE mode"
+        echo "complete"
+    else
+        log_info "System indicators suggest QUICK mode"
+        echo "quick"
+    fi
+}
+
+# Function to run quick restart
+run_quick_restart() {
+    local cache_mode="$1"
+    log_info "⚡ Running quick restart mode..."
+    
+    # Use the existing quick script if available
+    if [ -f "$QUICK_SCRIPT" ]; then
+        log_info "Using existing quick restart script: $QUICK_SCRIPT"
+        
+        # Pass cache environment variables to quick script
+        export TIKTRACK_DEV_MODE="$TIKTRACK_DEV_MODE"
+        export TIKTRACK_CACHE_DISABLED="$TIKTRACK_CACHE_DISABLED"
+        
+        if [ "$VERBOSE" = "true" ]; then
+            bash "$QUICK_SCRIPT"
+            local exit_code=$?
+        else
+            bash "$QUICK_SCRIPT" > /dev/null 2>&1
+            local exit_code=$?
+        fi
+        
+        if [ $exit_code -eq 0 ]; then
+            log_success "Quick restart completed successfully"
+            return 0
+        else
+            log_error "Quick restart failed with exit code: $exit_code"
+            return 1
+        fi
+    else
+        # Fallback to direct server control
+        log_info "Quick script not found, using direct server control"
+        stop_server
+        start_server_direct "$cache_mode"
+    fi
+}
+
+# Function to run complete restart
+run_complete_restart() {
+    local cache_mode="$1"
+    log_info "🛡️ Running complete restart mode..."
+    
+    # Use the existing complete script if available
+    if [ -f "$COMPLETE_SCRIPT" ]; then
+        log_info "Using existing complete restart script: $COMPLETE_SCRIPT"
+        
+        # Pass cache environment variables to complete script
+        export TIKTRACK_DEV_MODE="$TIKTRACK_DEV_MODE"
+        export TIKTRACK_CACHE_DISABLED="$TIKTRACK_CACHE_DISABLED"
+        
+        if [ "$VERBOSE" = "true" ]; then
+            bash "$COMPLETE_SCRIPT"
+            local exit_code=$?
+        else
+            bash "$COMPLETE_SCRIPT" > /dev/null 2>&1
+            local exit_code=$?
+        fi
+        
+        if [ $exit_code -eq 0 ]; then
+            log_success "Complete restart completed successfully"
+            return 0
+        else
+            log_error "Complete restart failed with exit code: $exit_code"
+            return 1
+        fi
+    else
+        # Fallback to direct server control with comprehensive checks
+        log_info "Complete script not found, using direct server control with comprehensive checks"
+        stop_server
+        perform_comprehensive_checks
+        start_server_direct "$cache_mode"
+    fi
+}
+
+# Function to perform comprehensive system checks
+perform_comprehensive_checks() {
+    log_info "🔍 Performing comprehensive system checks..."
+    
+    # Check disk space
+    local disk_usage=$(df / | tail -1 | awk '{print $5}' | sed 's/%//')
+    if [ "$disk_usage" -gt 90 ]; then
+        log_warning "Disk usage is high: ${disk_usage}%"
+    else
+        log_info "Disk usage is acceptable: ${disk_usage}%"
+    fi
+    
+    # Check memory
+    local memory_usage=$(free | grep Mem | awk '{printf "%.0f", $3/$2 * 100.0}')
+    if [ "$memory_usage" -gt 90 ]; then
+        log_warning "Memory usage is high: ${memory_usage}%"
+    else
+        log_info "Memory usage is acceptable: ${memory_usage}%"
+    fi
+    
+    # Check for database locks
+    if [ -f "$SCRIPT_DIR/Backend/db/simpleTrade_new.db" ]; then
+        log_info "Database file exists and is accessible"
+    else
+        log_warning "Database file not found or not accessible"
+    fi
+    
+    # Check Python dependencies
+    if python3 -c "import flask" 2>/dev/null; then
+        log_info "Flask dependency is available"
+    else
+        log_error "Flask dependency is missing"
+        return 1
+    fi
+    
+    log_success "Comprehensive system checks completed"
+}
+
+# Function to start server directly
+start_server_direct() {
+    local cache_mode="$1"
+    
+    log_info "🚀 Starting server directly with $cache_mode cache mode..."
+    
+    # Change to project directory
+    cd "$SCRIPT_DIR"
+    
+    # Start server in background
+    nohup python3 "$SERVER_SCRIPT" > /dev/null 2>&1 &
+    local server_pid=$!
+    
+    log_info "Server started with PID: $server_pid"
+    
+    # Wait for server to start
+    log_info "⏳ Waiting for server to initialize..."
+    sleep 3
+    
+    # Check if server is responding
+    local max_attempts=10
+    local attempt=1
+    
+    while [ $attempt -le $max_attempts ]; do
+        if curl -s "http://localhost:8080/api/health" > /dev/null 2>&1; then
+            log_success "Server is responding on http://localhost:8080"
+            return 0
+        fi
+        
+        log_info "Attempt $attempt/$max_attempts: Server not ready yet..."
+        sleep 2
+        attempt=$((attempt + 1))
+    done
+    
+    log_error "Server failed to start or respond after $max_attempts attempts"
+    return 1
+}
+
+# Function to verify cache mode
+verify_cache_mode() {
+    local expected_mode="$1"
+    
+    log_info "🔍 Verifying cache mode..."
+    
+    # Wait a bit for cache to initialize
+    sleep 2
+    
+    # Get cache stats
+    local cache_response=$(curl -s "http://localhost:8080/api/cache/stats" 2>/dev/null)
+    
+    if [ $? -eq 0 ] && [ -n "$cache_response" ]; then
+        # Extract cache statistics
+        if command -v jq >/dev/null 2>&1; then
+            local sets=$(echo "$cache_response" | jq -r '.data.stats.sets // 0')
+            local hits=$(echo "$cache_response" | jq -r '.data.stats.hits // 0')
+            local deletes=$(echo "$cache_response" | jq -r '.data.stats.deletes // 0')
+        else
+            local sets=$(echo "$cache_response" | grep -o '"sets":[0-9]*' | cut -d: -f2 || echo "0")
+            local hits=$(echo "$cache_response" | grep -o '"hits":[0-9]*' | cut -d: -f2 || echo "0")
+            local deletes=$(echo "$cache_response" | grep -o '"deletes":[0-9]*' | cut -d: -f2 || echo "0")
+        fi
+        
+        log_info "Cache stats: sets=$sets, hits=$hits, deletes=$deletes"
+        
+        # Verify cache mode based on stats
+        case $expected_mode in
+            development)
+                if [ "$sets" -gt 0 ]; then
+                    log_success "✅ Development cache mode confirmed (sets > 0)"
+                else
+                    log_warning "⚠️  Development cache mode not confirmed (sets = 0)"
+                fi
+                ;;
+            no-cache)
+                if [ "$sets" -eq 0 ] && [ "$hits" -eq 0 ]; then
+                    log_success "✅ No-cache mode confirmed (all stats = 0)"
+                else
+                    log_warning "⚠️  No-cache mode not confirmed (stats > 0)"
+                fi
+                ;;
+            production)
+                if [ "$sets" -gt 0 ]; then
+                    log_success "✅ Production cache mode confirmed (sets > 0)"
+                else
+                    log_warning "⚠️  Production cache mode not confirmed (sets = 0)"
+                fi
+                ;;
+            preserve)
+                log_success "✅ Cache state preserved (current state maintained)"
+                ;;
+        esac
+    else
+        log_warning "Could not verify cache mode (API not responding)"
+    fi
+}
+
+# Function to show server status
+show_server_status() {
+    echo ""
+    echo "📊 Server Status"
+    echo "================"
+    
+    # Check if server is running
+    local pids=$(pgrep -f "python.*dev_server.py" 2>/dev/null || true)
+    if [ -z "$pids" ]; then
+        # Try alternative patterns
+        pids=$(pgrep -f "dev_server.py" 2>/dev/null || true)
+    fi
+    if [ -z "$pids" ]; then
+        # Try checking port 8080
+        pids=$(lsof -ti:8080 2>/dev/null || true)
+    fi
+    
+    if [ -n "$pids" ]; then
+        echo "🟢 Server: RUNNING (PID: $pids)"
+    else
+        echo "🔴 Server: NOT RUNNING"
+        return 1
+    fi
+    
+    # Check API health
+    if curl -s "http://localhost:8080/api/health" > /dev/null 2>&1; then
+        echo "🟢 API: RESPONDING"
+    else
+        echo "🔴 API: NOT RESPONDING"
+    fi
+    
+    # Show cache stats
+    local cache_response=$(curl -s "http://localhost:8080/api/cache/stats" 2>/dev/null)
+    if [ $? -eq 0 ] && [ -n "$cache_response" ]; then
+        if command -v jq >/dev/null 2>&1; then
+            local sets=$(echo "$cache_response" | jq -r '.data.stats.sets // 0')
+            local hits=$(echo "$cache_response" | jq -r '.data.stats.hits // 0')
+            local deletes=$(echo "$cache_response" | jq -r '.data.stats.deletes // 0')
+        else
+            local sets=$(echo "$cache_response" | grep -o '"sets":[0-9]*' | cut -d: -f2 || echo "0")
+            local hits=$(echo "$cache_response" | grep -o '"hits":[0-9]*' | cut -d: -f2 || echo "0")
+            local deletes=$(echo "$cache_response" | grep -o '"deletes":[0-9]*' | cut -d: -f2 || echo "0")
+        fi
+        
+        echo "🧠 Cache: sets=$sets, hits=$hits, deletes=$deletes"
+    else
+        echo "🧠 Cache: UNAVAILABLE"
+    fi
+    
+    echo ""
+    echo "🌐 Server URL: http://localhost:8080"
+    echo "📋 Cache Test: http://localhost:8080/cache-test.html"
+    echo ""
+}
+
+# Function to show interactive choice
+show_interactive_choice() {
+    local cache_mode="${1:-preserve}"
+    echo ""
+    echo "🔄 TikTrack Server Restart - Interactive Mode"
+    echo "============================================="
+    echo ""
+    
+    # Show current cache state
+    local current_cache=$(detect_current_cache_state)
+    echo "🧠 Current Cache State: $current_cache"
+    echo "🎯 Selected Cache Mode: $cache_mode"
+    echo ""
+    
+    echo "Choose restart mode:"
+    echo ""
+    echo "1) ⚡ Quick Mode (5-10 seconds)"
+    echo "   - Fast restart for development"
+    echo "   - Basic health checks"
+    echo "   - Minimal logging"
+    echo ""
+    echo "2) 🛡️ Complete Mode (30-60 seconds)"
+    echo "   - Comprehensive restart"
+    echo "   - Full system analysis"
+    echo "   - Route validation"
+    echo ""
+    echo "3) 🤖 Auto Mode (Smart detection)"
+    echo "   - Automatic mode selection"
+    echo "   - Based on system health"
+    echo ""
+    echo "4) 🧠 Change Cache Mode"
+    echo "   - Switch to development (10s TTL)"
+    echo "   - Switch to no-cache (disabled)"
+    echo "   - Switch to production (5min TTL)"
+    echo ""
+    echo "5) 📊 Show System Status"
+    echo "   - Current system information"
+    echo ""
+    echo "6) ❌ Cancel"
+    echo ""
+    
+    read -p "Enter your choice (1-6): " choice
+    
+    case $choice in
+        1)
+            log_info "User selected: Quick Mode"
+            run_quick_restart "$cache_mode"
+            ;;
+        2)
+            log_info "User selected: Complete Mode"
+            run_complete_restart "$cache_mode"
+            ;;
+        3)
+            log_info "User selected: Auto Mode"
+            local optimal_mode=$(detect_optimal_mode)
+            log_info "Auto-detected mode: $optimal_mode"
+            if [ "$optimal_mode" = "complete" ]; then
+                run_complete_restart "$cache_mode"
+            else
+                run_quick_restart "$cache_mode"
+            fi
+            ;;
+        4)
+            show_cache_mode_selection
+            ;;
+        5)
+            show_server_status
+            show_interactive_choice "$cache_mode"  # Show menu again
+            ;;
+        6)
+            log_info "Restart cancelled by user"
+            exit 0
+            ;;
+        *)
+            log_error "Invalid choice: $choice"
+            show_interactive_choice "$cache_mode"  # Show menu again
+            ;;
+    esac
+}
+
+# Function to show cache mode selection
+show_cache_mode_selection() {
+    echo ""
+    echo "🧠 Cache Mode Selection"
+    echo "======================="
+    echo ""
+    echo "Choose cache mode:"
+    echo ""
+    echo "1) 🚀 Development Mode"
+    echo "   - Cache TTL: 10 seconds"
+    echo "   - Use: Fast development cycles"
+    echo ""
+    echo "2) 🚫 No-Cache Mode"
+    echo "   - Cache TTL: Disabled"
+    echo "   - Use: Immediate code updates"
+    echo ""
+    echo "3) 🏭 Production Mode"
+    echo "   - Cache TTL: 5 minutes"
+    echo "   - Use: Performance optimization"
+    echo ""
+    echo "4) 💾 Keep Current State"
+    echo "   - Cache TTL: No change"
+    echo "   - Use: Preserve existing config"
+    echo ""
+    echo "5) ↩️  Back to Main Menu"
+    echo ""
+    
+    read -p "Enter your choice (1-5): " cache_choice
+    
+    case $cache_choice in
+        1)
+            log_info "User selected: Development Cache Mode"
+            set_cache_environment "development"
+            show_interactive_choice "development"  # Show main menu again
+            ;;
+        2)
+            log_info "User selected: No-Cache Mode"
+            set_cache_environment "no-cache"
+            show_interactive_choice "no-cache"  # Show main menu again
+            ;;
+        3)
+            log_info "User selected: Production Cache Mode"
+            set_cache_environment "production"
+            show_interactive_choice "production"  # Show main menu again
+            ;;
+        4)
+            log_info "User selected: Keep Current Cache State"
+            set_cache_environment "preserve"
+            show_interactive_choice "preserve"  # Show main menu again
+            ;;
+        5)
+            show_interactive_choice "preserve"  # Show main menu again
+            ;;
+        *)
+            log_error "Invalid choice: $cache_choice"
+            show_cache_mode_selection  # Show menu again
+            ;;
+    esac
+}
+
+# Main execution
+main() {
+    local mode="quick"
+    local cache_mode="preserve"
+    local interactive=false
+    local verbose=false
+    
+    # Parse command line arguments
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            quick|--quick)
+                mode="quick"
+                shift
+                ;;
+            complete|--complete)
+                mode="complete"
+                shift
+                ;;
+            auto|--auto)
+                mode="auto"
+                shift
+                ;;
+            development|no-cache|production|preserve)
+                cache_mode="$1"
+                shift
+                ;;
+            -i|--interactive)
+                interactive=true
+                shift
+                ;;
+            -v|--verbose)
+                verbose=true
+                shift
+                ;;
+            -h|--help)
+                show_help
+                exit 0
+                ;;
+            --info)
+                show_mode_info
+                exit 0
+                ;;
+            --status)
+                show_server_status
+                exit 0
+                ;;
+            *)
+                log_error "Unknown option: $1"
+                show_help
+                exit 1
+                ;;
+        esac
+    done
+    
+    # Set global variables
+    VERBOSE="$verbose"
+    
+    # Header
+    echo "🔄 TikTrack Server Restart - Complete Unified Command"
+    echo "====================================================="
+    echo "📅 Started at: $(timestamp)"
+    echo "🎯 Mode: $mode"
+    echo "🧠 Cache: $cache_mode"
+    echo ""
+    
+    # Interactive mode
+    if [ "$interactive" = "true" ]; then
+        show_interactive_choice "$cache_mode"
+        exit 0
+    fi
+    
+    # Set cache environment based on user choice
+    log_info "Setting cache mode: $cache_mode"
+    set_cache_environment "$cache_mode"
+    
+    # Determine restart mode
+    if [ "$mode" = "auto" ]; then
+        log_info "🔍 Auto-detecting optimal restart mode..."
+        detected_mode=$(detect_optimal_mode | tail -1)
+        mode="$detected_mode"
+        log_info "Selected mode: $mode"
+    fi
+    
+    # Execute restart
+    case $mode in
+        quick)
+            run_quick_restart "$cache_mode"
+            ;;
+        complete)
+            run_complete_restart "$cache_mode"
+            ;;
+        *)
+            log_error "Invalid mode: $mode"
+            exit 1
+            ;;
+    esac
+    
+    # Final status
+    local final_exit_code=$?
+    if [ $final_exit_code -eq 0 ]; then
+        # Verify cache mode
+        verify_cache_mode "$cache_mode"
+        
+        # Show final status
+        show_server_status
+        
+        log_success "✅ Server restart completed successfully"
+        echo ""
+        echo "🎉 Restart completed!"
+        echo "🌐 Server should be available at: http://localhost:8080"
+        echo ""
+        
+        # Show cache state after restart
+        echo "🧠 Cache State After Restart:"
+        echo "=============================="
+        case $cache_mode in
+            development)
+                echo "   Mode: DEVELOPMENT (10 seconds TTL)"
+                ;;
+            no-cache)
+                echo "   Mode: NO-CACHE (disabled)"
+                ;;
+            production)
+                echo "   Mode: PRODUCTION (5 minutes TTL)"
+                ;;
+            preserve)
+                echo "   Mode: PRESERVED (current state maintained)"
+                ;;
+        esac
+        echo ""
+        
+        # Show additional help if this was a quick restart
+        if [ "$mode" = "quick" ]; then
+            echo "💡 If you experience issues, consider complete restart:"
+            echo "   $0 complete"
+            echo ""
+        fi
+    else
+        log_error "❌ Server restart failed with exit code: $final_exit_code"
+        echo ""
+        echo "💡 TROUBLESHOOTING REQUIRED:"
+        echo "============================="
+        echo ""
+        echo "Quick restart failed. Try these solutions in order:"
+        echo ""
+        echo "1️⃣  COMPLETE RESTART (Recommended):"
+        echo "   $0 complete"
+        echo ""
+        echo "2️⃣  INTERACTIVE MODE (Guided troubleshooting):"
+        echo "   $0 --interactive"
+        echo ""
+        echo "3️⃣  VERBOSE DIAGNOSTICS:"
+        echo "   $0 --verbose complete"
+        echo ""
+        echo "4️⃣  CHECK LOGS:"
+        echo "   tail -f $LOG_FILE"
+        echo ""
+        echo "The complete mode performs comprehensive system analysis"
+        echo "and automatic problem fixing that the quick mode doesn't include."
+        echo ""
+        exit $final_exit_code
+    fi
+}
+
+# Run main function
+main "$@"

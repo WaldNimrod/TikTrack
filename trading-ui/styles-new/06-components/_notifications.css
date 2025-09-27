@@ -92,6 +92,39 @@
   color: inherit !important;
 }
 
+/* סוגי התראות ספציפיים */
+.notification-success {
+  border-left: 4px solid #28a745 !important;
+}
+
+.notification-success .notification-icon {
+  color: #28a745 !important;
+}
+
+.notification-error {
+  border-left: 4px solid #dc3545 !important;
+}
+
+.notification-error .notification-icon {
+  color: #dc3545 !important;
+}
+
+.notification-warning {
+  border-left: 4px solid #ffc107 !important;
+}
+
+.notification-warning .notification-icon {
+  color: #ffc107 !important;
+}
+
+.notification-info {
+  border-left: 4px solid #17a2b8 !important;
+}
+
+.notification-info .notification-icon {
+  color: #17a2b8 !important;
+}
+
 .notification-close {
   background: none !important;
   border: none !important;

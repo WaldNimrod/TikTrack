@@ -64,7 +64,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=20250115_level3_fix">
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">
     
     <!-- CRUD Testing Dashboard Styles -->
     <link rel="stylesheet" href="styles-new/06-components/_crud-testing-dashboard.css?v=1.0.0">
@@ -239,7 +239,7 @@
                     <div class="section-header">
                         <h1>🧪 דשבורד בדיקות CRUD</h1>
                         <div class="header-actions">
-                            <button class="btn btn-sm btn-outline-primary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
                                 <i class="fas fa-copy"></i> העתק לוג מפורט
                             </button>
                             <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר סקשן">
@@ -329,7 +329,7 @@
                                             <i class="fas fa-download"></i> ייצוא תוצאות
                                         </button>
                                         <br>
-                                        <button class="btn btn-outline-primary btn-sm mb-2" onclick="copyDetailedLog()">
+                                        <button class="btn btn-sm btn-outline-secondary mb-2" onclick="copyDetailedLog()">
                                             <i class="fas fa-copy"></i> העתק לוג מפורט
                                         </button>
                                         <br>
@@ -1284,7 +1284,6 @@
     <script src="scripts/tables.js"></script>
     <script src="scripts/linked-items.js"></script>
     <script src="scripts/page-utils.js"></script>
-    <script src="scripts/central-refresh-system.js"></script>
     
     <!-- Notification System Scripts -->
     <script src="scripts/notification-system.js"></script>
@@ -1304,7 +1303,6 @@
     <script src="scripts/crud-testing-dashboard.js"></script>
     
     <!-- Unified Initialization System -->
-    <script src="scripts/application-initializer.js"></script>
     <script src="scripts/page-initialization-configs.js"></script>
     <script src="scripts/unified-app-initializer.js"></script>
     
@@ -1315,5 +1313,10 @@
             </div> <!-- main-content -->
         </div> <!-- page-body -->
     </div> <!-- background-wrapper -->
+    <!-- Local copyDetailedLog function for crud-testing-dashboard page -->
+    <script>
+        // Make the local copyDetailedLog function available globally for this page only
+        window.copyDetailedLog = copyDetailedLog;
+    </script>
 </body>
 </html>

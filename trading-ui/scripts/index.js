@@ -554,8 +554,99 @@ function generateDetailedLog() {
 }
 
 
+// Z-Index Debug Function - בדיקת מצב z-index בפועל
+function debugZIndexStatus() {
+    console.log('🔍 בדיקת מצב Z-Index במערכת ראש הדף');
+    console.log('=====================================');
+    
+    // בדיקת אלמנטים רלוונטיים
+    const elements = [
+        { selector: '#unified-header', name: 'Header Container' },
+        { selector: '.header-top', name: 'Header Top' },
+        { selector: '.tiktrack-dropdown-menu', name: 'Dropdown Menus' },
+        { selector: '.filter-toggle-section', name: 'Filter Toggle Button' },
+        { selector: '.header-filter-toggle-btn', name: 'Filter Button' },
+        { selector: '.header-filters', name: 'Header Filters' },
+        { selector: '.filter-menu', name: 'Filter Menu' }
+    ];
+    
+    elements.forEach(element => {
+        const el = document.querySelector(element.selector);
+        if (el) {
+            const computedStyle = window.getComputedStyle(el);
+            const zIndex = computedStyle.zIndex;
+            const position = computedStyle.position;
+            const display = computedStyle.display;
+            const visibility = computedStyle.visibility;
+            
+            console.log(`📍 ${element.name}:`);
+            console.log(`   Selector: ${element.selector}`);
+            console.log(`   Z-Index: ${zIndex}`);
+            console.log(`   Position: ${position}`);
+            console.log(`   Display: ${display}`);
+            console.log(`   Visibility: ${visibility}`);
+            console.log(`   Visible: ${el.offsetParent !== null}`);
+            console.log('---');
+        } else {
+            console.log(`❌ ${element.name} (${element.selector}): לא נמצא`);
+        }
+    });
+    
+    // בדיקת כל התפריטים הפתוחים
+    console.log('🎯 בדיקת תפריטים פתוחים:');
+    const openMenus = document.querySelectorAll('.tiktrack-dropdown-menu:not([style*="display: none"])');
+    console.log(`תפריטים פתוחים: ${openMenus.length}`);
+    
+    openMenus.forEach((menu, index) => {
+        const computedStyle = window.getComputedStyle(menu);
+        console.log(`תפריט ${index + 1}: z-index = ${computedStyle.zIndex}`);
+    });
+    
+    // בדיקת כפתור הפילטר
+    console.log('🔘 בדיקת כפתור פילטר:');
+    const filterBtn = document.querySelector('.header-filter-toggle-btn');
+    if (filterBtn) {
+        const computedStyle = window.getComputedStyle(filterBtn);
+        console.log(`כפתור פילטר: z-index = ${computedStyle.zIndex}`);
+        console.log(`כפתור פילטר: position = ${computedStyle.position}`);
+        console.log(`כפתור פילטר: visible = ${filterBtn.offsetParent !== null}`);
+    }
+    
+    console.log('=====================================');
+    console.log('✅ בדיקת Z-Index הושלמה');
+}
+
 // Export log functions to global scope
 // window.copyDetailedLog export removed - using global version from system-management.js
-window.generateDetailedLog = generateDetailedLog;
+// window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
+
+// Local copyDetailedLog function for index page
+async function copyDetailedLog() {
+    try {
+        const detailedLog = await generateDetailedLog();
+        if (detailedLog) {
+            await navigator.clipboard.writeText(detailedLog);
+            if (window.showSuccessNotification) {
+                window.showSuccessNotification('לוג מפורט הועתק ללוח');
+            } else {
+                alert('לוג מפורט הועתק ללוח!');
+            }
+        } else {
+            if (window.showWarningNotification) {
+                window.showWarningNotification('אין לוג להעתקה');
+            } else {
+                alert('אין לוג להעתקה');
+            }
+        }
+    } catch (err) {
+        console.error('שגיאה בהעתקה:', err);
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה בהעתקת הלוג');
+        } else {
+            alert('שגיאה בהעתקת הלוג');
+        }
+    }
+}
+window.debugZIndexStatus = debugZIndexStatus;
 
 console.log('✅ Index page ready');

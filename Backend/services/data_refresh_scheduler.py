@@ -354,6 +354,7 @@ class DataRefreshScheduler:
             # Create new quote record
             new_quote = MarketDataQuote(
                 ticker_id=ticker.id,
+                provider_id=self.yahoo_adapter.provider_id if self.yahoo_adapter else 1,  # Default to Yahoo Finance
                 price=quote_data.price,
                 currency=quote_data.currency,
                 asof_utc=quote_data.asof_utc,

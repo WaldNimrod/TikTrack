@@ -16,7 +16,7 @@ function addNote() {
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בהוספת הערה', error.message);
     } else if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה בהוספת הערה', 'error');
+      window.showErrorNotification('שגיאה בהוספת הערה');
     }
   }
 }
@@ -62,7 +62,7 @@ function uploadFile(noteId) {
         if (typeof window.showSuccessNotification === 'function') {
           window.showSuccessNotification('קובץ הועלה בהצלחה');
         } else if (typeof window.showNotification === 'function') {
-          window.showNotification('קובץ הועלה בהצלחה', 'success');
+          window.showSuccessNotification('קובץ הועלה בהצלחה');
         }
       })
       .catch(error => {
@@ -70,7 +70,7 @@ function uploadFile(noteId) {
         if (typeof window.showErrorNotification === 'function') {
           window.showErrorNotification('שגיאה בהעלאת קובץ', error.message);
         } else if (typeof window.showNotification === 'function') {
-          window.showNotification('שגיאה בהעלאת קובץ', 'error');
+          window.showErrorNotification('שגיאה בהעלאת קובץ');
         }
       });
     };
@@ -83,7 +83,7 @@ function uploadFile(noteId) {
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בהעלאת קובץ', error.message);
     } else if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה בהעלאת קובץ', 'error');
+      window.showErrorNotification('שגיאה בהעלאת קובץ');
     }
   }
 }
@@ -116,7 +116,7 @@ function downloadFile(noteId, fileName) {
     if (typeof window.showSuccessNotification === 'function') {
       window.showSuccessNotification('הורדת קובץ החלה');
     } else if (typeof window.showNotification === 'function') {
-      window.showNotification('הורדת קובץ החלה', 'success');
+      window.showSuccessNotification('הורדת קובץ החלה');
     }
     
   } catch (error) {
@@ -124,7 +124,7 @@ function downloadFile(noteId, fileName) {
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בהורדת קובץ', error.message);
     } else if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה בהורדת קובץ', 'error');
+      window.showErrorNotification('שגיאה בהורדת קובץ');
     }
   }
 }
@@ -169,7 +169,7 @@ function viewLinkedItems(noteId) {
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בהצגת פריטים מקושרים', error.message);
     } else if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה בהצגת פריטים מקושרים', 'error');
+      window.showErrorNotification('שגיאה בהצגת פריטים מקושרים');
     }
   }
 }
@@ -240,7 +240,7 @@ function deleteNote(id) {
           );
         } else {
           // Fallback למקרה שמערכת התראות לא זמינה
-          const confirmed = window.confirm('האם אתה בטוח שברצונך למחוק הערה זו?');
+          const confirmed = window.window.showConfirmationDialog('אישור', 'האם אתה בטוח שברצונך למחוק הערה זו?');
           if (confirmed) {
             confirmDeleteNote(id);
           }
@@ -2309,5 +2309,33 @@ window.uploadFile = uploadFile;
 window.removeCurrentAttachment = removeCurrentAttachment;
 window.replaceCurrentAttachment = replaceCurrentAttachment;
 // window.copyDetailedLog export removed - using global version from system-management.js
-window.generateDetailedLog = generateDetailedLog;
+// window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
+
+// Local copyDetailedLog function for notes page
+async function copyDetailedLog() {
+    try {
+        const detailedLog = await generateDetailedLog();
+        if (detailedLog) {
+            await navigator.clipboard.writeText(detailedLog);
+            if (window.showSuccessNotification) {
+                window.showSuccessNotification('לוג מפורט הועתק ללוח');
+            } else {
+                alert('לוג מפורט הועתק ללוח!');
+            }
+        } else {
+            if (window.showWarningNotification) {
+                window.showWarningNotification('אין לוג להעתקה');
+            } else {
+                alert('אין לוג להעתקה');
+            }
+        }
+    } catch (err) {
+        console.error('שגיאה בהעתקה:', err);
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה בהעתקת הלוג');
+        } else {
+            alert('שגיאה בהעתקת הלוג');
+        }
+    }
+}
 

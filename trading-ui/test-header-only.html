@@ -187,7 +187,7 @@
                                             <button type="button" class="btn btn-info" onclick="runPerformanceTests()">בדיקות ביצועים</button>
                                             <button type="button" class="btn btn-warning" onclick="runAllTests()">כל הבדיקות</button>
                                             <button type="button" class="btn btn-secondary" onclick="resetSystem()">איפוס מערכת</button>
-                                            <button type="button" class="btn btn-outline-primary" onclick="copyTestHeaderDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
                                                 <i class="fas fa-copy"></i> העתק לוג מפורט
                                             </button>
                                         </div>
@@ -576,6 +576,10 @@
     <script src="scripts/linked-items.js"></script>
     <script src="scripts/page-utils.js"></script>
     
+    <!-- Unified Initialization System -->
+    <script src="scripts/page-initialization-configs.js"></script>
+    <script src="scripts/unified-app-initializer.js"></script>
+    
     <!-- Page-specific script -->
     <script src="scripts/test-header-only.js?v=3.1.0"></script>
     
@@ -607,6 +611,11 @@
                 window.initializeDebugSystem();
             }
         });
+    </script>
+    <!-- Local copyDetailedLog function for test-header-only page -->
+    <script>
+        // Make the local copyDetailedLog function available globally for this page only
+        window.copyDetailedLog = copyDetailedLog;
     </script>
 </body>
 </html>

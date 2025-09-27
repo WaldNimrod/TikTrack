@@ -1075,9 +1075,17 @@ if (document.readyState === 'loading') {
 }
 
 // Global functions for onclick handlers - Background Tasks specific
-window.copyDetailedLog = function() {
-  detailedLogGenerator.copyDetailedLog();
-};
+// Local copyDetailedLog function for background-tasks page
+function copyDetailedLog() {
+  if (typeof detailedLogGenerator !== 'undefined' && detailedLogGenerator.copyDetailedLog) {
+    detailedLogGenerator.copyDetailedLog();
+  } else {
+    console.error('❌ detailedLogGenerator לא זמין');
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאה', 'מערכת לוג מפורט לא זמינה');
+    }
+  }
+}
 
 window.toggleAllSections = function() {
   const sections = document.querySelectorAll('.content-section, .top-section .section-body');

@@ -136,10 +136,10 @@
     <script src="scripts/error-handlers.js"></script>
 
     <!-- Filter System Script -->
-    <script src="scripts/header-system.js"></script>
+    <!-- Removed duplicate header-system.js - using versioned one below -->
 
     <!-- Header Styles -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=v38_fixed">
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">
 </head>
 
 <body class="cache-test-page">
@@ -161,11 +161,17 @@
                             <button class="btn btn-sm btn-outline-primary" onclick="refreshCacheStatus()">
                                 <i class="fas fa-sync-alt"></i> רענן סטטוס
                             </button>
-                            <button class="btn btn-sm btn-outline-success" onclick="copyDetailedLog()">
-                                <i class="fas fa-copy"></i> העתק לוג מפורט
-                            </button>
                             <button class="btn btn-sm btn-outline-secondary" onclick="toggleAllSections()">
                                 <i class="fas fa-expand-arrows-alt"></i> הצג/הסתר הכל
+                            </button>
+                            <button class="btn btn-sm btn-outline-info" onclick="copyDetailedLog()">
+                                <i class="fas fa-copy"></i> העתק לוג מפורט
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="clearAllUnifiedCache()">
+                                <i class="fas fa-trash-alt"></i> נקה הכל
+                            </button>
+                            <button class="btn btn-sm btn-outline-success" onclick="optimizeUnifiedCache()">
+                                <i class="fas fa-magic"></i> אופטימיזציה
                             </button>
                         </div>
                     </div>
@@ -209,75 +215,603 @@
                             </div>
                         </div>
                     </div>
+                    
+                        <!-- Unified Cache Status Card -->
+                    <div class="cache-status-card mt-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-layer-group"></i> מצב מערכת מטמון מאוחדת
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="status-item">
+                                            <label>Frontend Memory:</label>
+                                            <span class="badge bg-info" id="memoryStatus">טוען...</span>
+                                        </div>
+                                        <div class="status-item">
+                                            <label>localStorage:</label>
+                                            <span class="badge bg-primary" id="localStorageStatus">טוען...</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="status-item">
+                                            <label>IndexedDB:</label>
+                                            <span class="badge bg-success" id="indexedDBStatus">טוען...</span>
+                                        </div>
+                                        <div class="status-item">
+                                            <label>Backend Cache:</label>
+                                            <span class="badge bg-warning" id="backendCacheStatus">טוען...</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="status-item">
+                                            <label>סינכרון:</label>
+                                            <span class="badge" id="syncStatus">טוען...</span>
+                                        </div>
+                                        <div class="status-item">
+                                            <label>מדיניות:</label>
+                                            <span class="badge" id="policyStatus">טוען...</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="status-item">
+                                            <label>אופטימיזציה:</label>
+                                            <span class="badge" id="optimizationStatus">טוען...</span>
+                                        </div>
+                                        <div class="status-item">
+                                            <label>ביצועים:</label>
+                                            <span class="badge" id="performanceStatus">טוען...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Unified Cache Statistics Panel -->
+                        <div class="row mt-4">
+                            <div class="col-md-4">
+                                <div class="stat-card">
+                                    <div class="stat-header">
+                                        <h3 class="stat-title">שכבות מטמון</h3>
+                                    </div>
+                                    <div class="stat-content">
+                                        <div class="stat-row">
+                                            <span>Frontend Memory</span>
+                                            <span class="badge bg-info" id="memorySize">--</span>
+                                        </div>
+                                        <div class="stat-row">
+                                            <span>localStorage</span>
+                                            <span class="badge bg-primary" id="localStorageSize">--</span>
+                                        </div>
+                                        <div class="stat-row">
+                                            <span>IndexedDB</span>
+                                            <span class="badge bg-success" id="indexedDBSize">--</span>
+                                        </div>
+                                        <div class="stat-row">
+                                            <span>Backend Cache</span>
+                                            <span class="badge bg-warning" id="backendCacheSize">--</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-card">
+                                    <div class="stat-header">
+                                        <h3 class="stat-title">ביצועים</h3>
+                                    </div>
+                                    <div class="stat-content">
+                                        <div class="stat-row">
+                                            <span>זמן תגובה ממוצע</span>
+                                            <span class="badge bg-success" id="performanceAvgResponseTime">--</span>
+                                        </div>
+                                        <div class="stat-row">
+                                            <span>שיעור פגיעות</span>
+                                            <span class="badge bg-info" id="hitRate">--</span>
+                                        </div>
+                                        <div class="stat-row">
+                                            <span>כפילות נתונים</span>
+                                            <span class="badge bg-warning" id="dataDuplication">--</span>
+                                        </div>
+                                        <div class="stat-row">
+                                            <span>סינכרון</span>
+                                            <span class="badge bg-primary" id="syncRate">--</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-card">
+                                    <div class="stat-header">
+                                        <h3 class="stat-title">ניהול זיכרון</h3>
+                                    </div>
+                                    <div class="stat-content">
+                                        <div class="stat-row">
+                                            <span>זיכרון כולל</span>
+                                            <span class="badge bg-info" id="totalMemory">--</span>
+                                        </div>
+                                        <div class="stat-row">
+                                            <span>ניקוי אוטומטי</span>
+                                            <span class="badge bg-success" id="autoCleanup">--</span>
+                                        </div>
+                                        <div class="stat-row">
+                                            <span>דחיסה</span>
+                                            <span class="badge bg-primary" id="compression">--</span>
+                                        </div>
+                                        <div class="stat-row">
+                                            <span>אופטימיזציה</span>
+                                            <span class="badge bg-warning" id="optimization">--</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <!-- UI Content Section Top End -->
 
                 <!-- UI Content Section 1 Start-->
                 <div class="content-section" id="section1">
                     <div class="section-header">
-                        <h2>⚙️ ניהול מטמון</h2>
+                        <h2>⚙️ ניהול מטמון מאוחד</h2>
+                        <p class="section-description">
+                            ניהול מקיף של מערכת המטמון המאוחדת החדשה עם 4 שכבות: Memory, localStorage, IndexedDB, Backend Cache
+                        </p>
                         <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
                     <div class="section-body">
-                        <div class="button-row mb-3">
-                            <button class="btn btn-sm btn-outline-primary" onclick="clearAllCache()">
-                                <i class="fas fa-trash-alt"></i> נקה כל המטמון
-                            </button>
-                            <button class="btn btn-sm btn-outline-warning" onclick="clearExpiredCache()">
-                                <i class="fas fa-clock"></i> נקה מטמון פג תוקף
-                            </button>
-                            <button class="btn btn-sm btn-outline-info" onclick="preloadCache()">
-                                <i class="fas fa-download"></i> טען מטמון מראש
-                            </button>
-                            <button class="btn btn-sm btn-outline-success" onclick="optimizeCache()">
-                                <i class="fas fa-magic"></i> אופטמז מטמון
-                            </button>
-                        </div>
-
-                        <!-- Cache Control Panel -->
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="stat-card">
-                                    <div class="stat-header">
-                                        <h3 class="stat-title">הגדרות TTL</h3>
+                        <!-- Unified Cache Management - 4 Layers System -->
+                        <div class="cache-management-sections mb-4">
+                            <!-- Layer 1: Frontend Memory -->
+                            <div class="cache-layer-section">
+                                <h5 class="layer-section-title">
+                                    <span class="layer-badge layer-1">🧠</span>
+                                    שכבה 1 - Frontend Memory (נתונים זמניים)
+                                </h5>
+                                <div class="cache-management-grid">
+                            <div class="cache-management-card">
+                                <div class="cache-management-header">
+                                    <i class="fas fa-memory text-primary"></i>
+                                    <h6>נקה Frontend Memory</h6>
+                                </div>
+                                <div class="cache-management-description">
+                                    <p>מנקה נתונים זמניים מהזיכרון (נתוני עמוד, מצב UI)</p>
+                                    <div class="cache-layers-indicator">
+                                        <span class="layer-badge layer-1" title="Frontend Memory">🧠</span>
                                     </div>
-                                    <div class="stat-content">
-                                        <div class="stat-row">
-                                            <span>API כללי</span>
-                                            <span class="badge bg-primary" id="generalTTL">--</span>
-                                        </div>
-                                        <div class="stat-row">
-                                            <span>נתונים חיצוניים</span>
-                                            <span class="badge bg-info" id="externalTTL">--</span>
-                                        </div>
-                                        <div class="stat-row">
-                                            <span>נתונים סטטיים</span>
-                                            <span class="badge bg-success" id="staticTTL">--</span>
-                                        </div>
+                                    <button class="btn btn-sm btn-outline-primary" onclick="clearUnifiedCacheLayer('memory')">
+                                        <i class="fas fa-memory"></i> נקה Memory
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="cache-management-card">
+                                <div class="cache-management-header">
+                                    <i class="fas fa-desktop text-info"></i>
+                                    <h6>נקה נתוני עמוד</h6>
+                                </div>
+                                <div class="cache-management-description">
+                                    <p>מנקה נתונים זמניים של העמוד הנוכחי</p>
+                                    <div class="cache-layers-indicator">
+                                        <span class="layer-badge layer-1" title="Frontend Memory">🧠</span>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-info" onclick="clearPageData()">
+                                        <i class="fas fa-desktop"></i> נקה נתוני עמוד
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="cache-management-card">
+                                <div class="cache-management-header">
+                                    <i class="fas fa-sync-alt text-warning"></i>
+                                    <h6>רענון UI State</h6>
+                                </div>
+                                <div class="cache-management-description">
+                                    <p>מאלץ רענון מצב ממשק המשתמש</p>
+                                    <div class="cache-layers-indicator">
+                                        <span class="layer-badge layer-1" title="Frontend Memory">🧠</span>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-warning" onclick="refreshUIState()">
+                                        <i class="fas fa-sync-alt"></i> רענון UI
+                                    </button>
+                                </div>
+                            </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Layer 2: localStorage -->
+                            <div class="cache-layer-section">
+                                <h5 class="layer-section-title">
+                                    <span class="layer-badge layer-2">💾</span>
+                                    שכבה 2 - localStorage (נתונים פשוטים)
+                                </h5>
+                                <div class="cache-management-grid">
+                            <div class="cache-management-card">
+                                <div class="cache-management-header">
+                                    <i class="fas fa-database text-success"></i>
+                                    <h6>נקה localStorage</h6>
+                                </div>
+                                <div class="cache-management-description">
+                                    <p>מנקה נתונים פשוטים מ-localStorage</p>
+                                    <div class="cache-layers-indicator">
+                                        <span class="layer-badge layer-2" title="localStorage">💾</span>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-success" onclick="clearUnifiedCacheLayer('localStorage')">
+                                        <i class="fas fa-database"></i> נקה localStorage
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="cache-management-card">
+                                <div class="cache-management-header">
+                                    <i class="fas fa-user-cog text-info"></i>
+                                    <h6>נקה העדפות משתמש</h6>
+                                </div>
+                                <div class="cache-management-description">
+                                    <p>מנקה העדפות משתמש מ-localStorage</p>
+                                    <div class="cache-layers-indicator">
+                                        <span class="layer-badge layer-2" title="localStorage">💾</span>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-info" onclick="clearUserPreferences()">
+                                        <i class="fas fa-user-cog"></i> נקה העדפות
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="cache-management-card">
+                                <div class="cache-management-header">
+                                    <i class="fas fa-cog text-warning"></i>
+                                    <h6>נקה הגדרות מערכת</h6>
+                                </div>
+                                <div class="cache-management-description">
+                                    <p>מנקה הגדרות מערכת מ-localStorage</p>
+                                    <div class="cache-layers-indicator">
+                                        <span class="layer-badge layer-2" title="localStorage">💾</span>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-warning" onclick="clearSystemSettings()">
+                                        <i class="fas fa-cog"></i> נקה הגדרות
+                                    </button>
+                                </div>
+                            </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Layer 3: IndexedDB -->
+                            <div class="cache-layer-section">
+                                <h5 class="layer-section-title">
+                                    <span class="layer-badge layer-3">🗄️</span>
+                                    שכבה 3 - IndexedDB (נתונים מורכבים)
+                                </h5>
+                                <div class="cache-management-grid">
+                            <div class="cache-management-card">
+                                <div class="cache-management-header">
+                                    <i class="fas fa-database text-danger"></i>
+                                    <h6>נקה IndexedDB</h6>
+                                </div>
+                                <div class="cache-management-description">
+                                    <p>מנקה נתונים מורכבים מ-IndexedDB</p>
+                                    <div class="cache-layers-indicator">
+                                        <span class="layer-badge layer-3" title="IndexedDB">🗄️</span>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="clearUnifiedCacheLayer('indexedDB')">
+                                        <i class="fas fa-database"></i> נקה IndexedDB
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="cache-management-card">
+                                <div class="cache-management-header">
+                                    <i class="fas fa-table text-info"></i>
+                                    <h6>נקה נתוני טבלאות</h6>
+                                </div>
+                                <div class="cache-management-description">
+                                    <p>מנקה נתוני טבלאות מ-IndexedDB</p>
+                                    <div class="cache-layers-indicator">
+                                        <span class="layer-badge layer-3" title="IndexedDB">🗄️</span>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-info" onclick="clearTableData()">
+                                        <i class="fas fa-table"></i> נקה טבלאות
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="cache-management-card">
+                                <div class="cache-management-header">
+                                    <i class="fas fa-history text-warning"></i>
+                                    <h6>נקה היסטוריית התראות</h6>
+                                </div>
+                                <div class="cache-management-description">
+                                    <p>מנקה היסטוריית התראות מ-IndexedDB</p>
+                                    <div class="cache-layers-indicator">
+                                        <span class="layer-badge layer-3" title="IndexedDB">🗄️</span>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-warning" onclick="clearNotificationHistory()">
+                                        <i class="fas fa-history"></i> נקה היסטוריה
+                                    </button>
+                                </div>
+                            </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Layer 4: Backend Cache -->
+                            <div class="cache-layer-section">
+                                <h5 class="layer-section-title">
+                                    <span class="layer-badge layer-4">🔄</span>
+                                    שכבה 4 - Backend Cache (נתונים קריטיים)
+                                </h5>
+                                <div class="cache-management-grid">
+                            <div class="cache-management-card">
+                                <div class="cache-management-header">
+                                    <i class="fas fa-server text-danger"></i>
+                                    <h6>נקה Backend Cache</h6>
+                                </div>
+                                <div class="cache-management-description">
+                                    <p>מנקה מטמון שרת עם TTL</p>
+                                    <div class="cache-layers-indicator">
+                                        <span class="layer-badge layer-4" title="Backend Cache">🔄</span>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="clearUnifiedCacheLayer('backend')">
+                                        <i class="fas fa-server"></i> נקה Backend
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="cache-management-card">
+                                <div class="cache-management-header">
+                                    <i class="fas fa-sync-alt text-info"></i>
+                                    <h6>סנכרן עם שרת</h6>
+                                </div>
+                                <div class="cache-management-description">
+                                    <p>מסנכרן מטמון עם השרת</p>
+                                    <div class="cache-layers-indicator">
+                                        <span class="layer-badge layer-4" title="Backend Cache">🔄</span>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-info" onclick="syncWithBackend()">
+                                        <i class="fas fa-sync-alt"></i> סנכרן
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="cache-management-card">
+                                <div class="cache-management-header">
+                                    <i class="fas fa-clock text-warning"></i>
+                                    <h6>נקה מטמון פג תוקף</h6>
+                                </div>
+                                <div class="cache-management-description">
+                                    <p>מנקה רק מטמון שפג תוקפו</p>
+                                    <div class="cache-layers-indicator">
+                                        <span class="layer-badge layer-4" title="Backend Cache">🔄</span>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-warning" onclick="clearExpiredBackendCache()">
+                                        <i class="fas fa-clock"></i> נקה פג תוקף
+                                    </button>
+                                </div>
+                            </div>
+                                </div>
+                            </div>
+                            
+                            <!-- All Layers: Complete Management -->
+                            <div class="cache-layer-section">
+                                <h5 class="layer-section-title">
+                                    <span class="layer-badge layer-1">🧠</span>
+                                    <span class="layer-badge layer-2">💾</span>
+                                    <span class="layer-badge layer-3">🗄️</span>
+                                    <span class="layer-badge layer-4">🔄</span>
+                                    כל השכבות - ניהול מלא
+                                </h5>
+                                <div class="cache-management-grid">
+                            <div class="cache-management-card">
+                                <div class="cache-management-header">
+                                    <i class="fas fa-trash-alt text-danger"></i>
+                                    <h6>נקה כל המטמון</h6>
+                                </div>
+                                <div class="cache-management-description">
+                                    <p>מנקה את כל 4 שכבות המטמון במערכת</p>
+                                    <div class="cache-layers-indicator">
+                                        <span class="layer-badge layer-1" title="Frontend Memory">🧠</span>
+                                        <span class="layer-badge layer-2" title="localStorage">💾</span>
+                                        <span class="layer-badge layer-3" title="IndexedDB">🗄️</span>
+                                        <span class="layer-badge layer-4" title="Backend Cache">🔄</span>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="clearAllUnifiedCache()">
+                                        <i class="fas fa-trash-alt"></i> נקה הכל
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="cache-management-card">
+                                <div class="cache-management-header">
+                                    <i class="fas fa-magic text-success"></i>
+                                    <h6>אופטמז מטמון מאוחד</h6>
+                                </div>
+                                <div class="cache-management-description">
+                                    <p>מבצע אופטימיזציה מלאה של המערכת המאוחדת</p>
+                                    <div class="cache-layers-indicator">
+                                        <span class="layer-badge layer-1" title="Frontend Memory">🧠</span>
+                                        <span class="layer-badge layer-2" title="localStorage">💾</span>
+                                        <span class="layer-badge layer-3" title="IndexedDB">🗄️</span>
+                                        <span class="layer-badge layer-4" title="Backend Cache">🔄</span>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-success" onclick="optimizeUnifiedCache()">
+                                        <i class="fas fa-magic"></i> אופטמז מאוחד
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="cache-management-card">
+                                <div class="cache-management-header">
+                                    <i class="fas fa-sync-alt text-info"></i>
+                                    <h6>סנכרן מערכת מלא</h6>
+                                </div>
+                                <div class="cache-management-description">
+                                    <p>מסנכרן את כל השכבות עם השרת</p>
+                                    <div class="cache-layers-indicator">
+                                        <span class="layer-badge layer-1" title="Frontend Memory">🧠</span>
+                                        <span class="layer-badge layer-2" title="localStorage">💾</span>
+                                        <span class="layer-badge layer-3" title="IndexedDB">🗄️</span>
+                                        <span class="layer-badge layer-4" title="Backend Cache">🔄</span>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-info" onclick="fullSystemSync()">
+                                        <i class="fas fa-sync-alt"></i> סנכרן מלא
+                                    </button>
+                                </div>
+                            </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Cache Layers Legend -->
+                        <div class="cache-layers-legend mb-4">
+                            <h5 class="mb-3">📋 מקרא שכבות מטמון מאוחד</h5>
+                            <div class="legend-grid">
+                                <div class="legend-item">
+                                    <span class="layer-badge layer-1">🧠</span>
+                                    <div class="legend-content">
+                                        <strong>שכבה 1 - Frontend Memory</strong>
+                                        <p>TTL: עד 5 דקות | נתונים זמניים (<100KB), מצב UI, נתוני עמוד</p>
+                                    </div>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="layer-badge layer-2">💾</span>
+                                    <div class="legend-content">
+                                        <strong>שכבה 2 - localStorage</strong>
+                                        <p>TTL: 24 שעות | נתונים פשוטים (<1MB), העדפות, הגדרות</p>
+                                    </div>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="layer-badge layer-3">🗄️</span>
+                                    <div class="legend-content">
+                                        <strong>שכבה 3 - IndexedDB</strong>
+                                        <p>TTL: 7 ימים | נתונים מורכבים (>1MB), טבלאות, היסטוריה</p>
+                                    </div>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="layer-badge layer-4">🔄</span>
+                                    <div class="legend-content">
+                                        <strong>שכבה 4 - Backend Cache</strong>
+                                        <p>TTL: 30 שניות - 1 שעה | נתונים קריטיים, API, סינכרון</p>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="stat-card">
-                                    <div class="stat-header">
-                                        <h3 class="stat-title">סטטוס מטמון</h3>
+                        </div>
+                        
+                        <!-- Smart Cache Clearing Interface -->
+                        <div class="smart-cache-clearing mb-4">
+                            <h4 class="mb-3">🧠 Smart Cache Clearing</h4>
+                            <div class="smart-clearing-grid">
+                                <div class="clearing-option">
+                                    <div class="clearing-header">
+                                        <i class="fas fa-plus-circle text-success"></i>
+                                        <h6>הוספת נתונים</h6>
                                     </div>
-                                    <div class="stat-content">
-                                        <div class="stat-row">
-                                            <span>מטמון פעיל</span>
-                                            <span class="badge bg-success" id="cacheActive">--</span>
+                                    <div class="clearing-description">
+                                        <p>מנקה מטמון קשור לפני הוספת נתונים חדשים</p>
+                                        <div class="cache-layers-indicator">
+                                            <span class="layer-badge layer-2" title="מטמון שרת">🖥️</span>
                                         </div>
-                                        <div class="stat-row">
-                                            <span>מטמון אופטימלי</span>
-                                            <span class="badge bg-info" id="cacheOptimized">--</span>
-                                        </div>
-                                        <div class="stat-row">
-                                            <span>זיכרון זמין</span>
-                                            <span class="badge bg-warning" id="memoryAvailable">--</span>
-                                        </div>
+                                        <button class="btn btn-sm btn-outline-success" onclick="smartClearCache('add')">
+                                            <i class="fas fa-plus"></i> נקה עבור הוספה
+                                        </button>
                                     </div>
+                                </div>
+                                
+                                <div class="clearing-option">
+                                    <div class="clearing-header">
+                                        <i class="fas fa-edit text-warning"></i>
+                                        <h6>עריכת נתונים</h6>
+                                    </div>
+                                    <div class="clearing-description">
+                                        <p>מנקה מטמון קשור לפני עריכת נתונים קיימים</p>
+                                        <div class="cache-layers-indicator">
+                                            <span class="layer-badge layer-2" title="מטמון שרת">🖥️</span>
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-warning" onclick="smartClearCache('edit')">
+                                            <i class="fas fa-edit"></i> נקה עבור עריכה
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="clearing-option">
+                                    <div class="clearing-header">
+                                        <i class="fas fa-trash text-danger"></i>
+                                        <h6>מחיקת נתונים</h6>
+                                    </div>
+                                    <div class="clearing-description">
+                                        <p>מנקה מטמון קשור לפני מחיקת נתונים</p>
+                                        <div class="cache-layers-indicator">
+                                            <span class="layer-badge layer-2" title="מטמון שרת">🖥️</span>
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="smartClearCache('delete')">
+                                            <i class="fas fa-trash"></i> נקה עבור מחיקה
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="smart-clearing-info">
+                                <div class="info-item">
+                                    <i class="fas fa-lightbulb"></i>
+                                    <span>Smart Clearing מנקה רק מטמון רלוונטי לפעולה</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-rocket"></i>
+                                    <span>משפר ביצועים על ידי ניקוי ממוקד</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <span>מונע בעיות עקביות נתונים</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Cache Testing Buttons -->
+                        <div class="cache-testing-section mt-4">
+                            <h5 class="testing-section-title">
+                                <i class="fas fa-vial"></i> בדיקות מערכת מטמון
+                            </h5>
+                            <div class="testing-buttons-grid">
+                                <div class="testing-button-group">
+                                    <h6>בדיקות בריאות</h6>
+                                    <button class="btn btn-sm btn-outline-success" onclick="runCacheHealthCheck()">
+                                        <i class="fas fa-heartbeat"></i> בדיקת בריאות
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-info" onclick="validateCacheIntegrity()">
+                                        <i class="fas fa-check-circle"></i> בדיקת שלמות
+                                    </button>
+                                </div>
+                                
+                                <div class="testing-button-group">
+                                    <h6>בדיקות ביצועים</h6>
+                                    <button class="btn btn-sm btn-outline-warning" onclick="testCachePerformance()">
+                                        <i class="fas fa-tachometer-alt"></i> בדיקת ביצועים
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-primary" onclick="benchmarkCacheOperations()">
+                                        <i class="fas fa-stopwatch"></i> בדיקת מהירות
+                                    </button>
+                                </div>
+                                
+                                <div class="testing-button-group">
+                                    <h6>בדיקות זיכרון</h6>
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="testCacheMemoryUsage()">
+                                        <i class="fas fa-memory"></i> בדיקת זיכרון
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="stressTestCache()">
+                                        <i class="fas fa-bolt"></i> בדיקת עומס
+                                    </button>
+                                </div>
+                                
+                                <div class="testing-button-group">
+                                    <h6>בדיקות אינטגרציה</h6>
+                                    <button class="btn btn-sm btn-outline-dark" onclick="testCacheIntegration()">
+                                        <i class="fas fa-link"></i> בדיקת אינטגרציה
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-success" onclick="runUnifiedCacheTest()">
+                                        <i class="fas fa-layer-group"></i> בדיקה מקיפה
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -288,68 +822,81 @@
                 <!-- UI Content Section 2 Start-->
                 <div class="content-section" id="section2">
                     <div class="section-header">
-                        <h2>📊 ניתוח מטמון</h2>
+                        <h2>🖥️ מטמון ממשק משתמש</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
                     <div class="section-body">
-                        <div class="button-row mb-3">
-                            <select class="form-select d-inline-block w-auto" id="timeRange" onchange="updateAnalytics()">
-                                <option value="1h">שעה אחרונה</option>
-                                <option value="24h" selected>24 שעות</option>
-                                <option value="7d">7 ימים</option>
-                                <option value="30d">30 ימים</option>
-                            </select>
-                            <button class="btn btn-sm btn-outline-primary" onclick="generateAnalyticsReport()">
-                                <i class="fas fa-chart-line"></i> דוח ניתוח
-                            </button>
-                        </div>
-                        
-                        <!-- Analytics Content -->
-                        <div id="analyticsContent">
-                            <div class="text-center text-muted">
-                                <i class="fas fa-spinner fa-spin"></i>
-                                טוען נתוני ניתוח...
+                        <!-- UI Cache System (Frontend) - TTL: 24 שעות -->
+                        <div class="cache-system-card mb-4">
+                            <div class="cache-system-header">
+                                <h4><i class="fas fa-desktop"></i> UI Cache System (Frontend)</h4>
+                                <span class="badge bg-info" id="uiCacheStatus">פעיל</span>
                             </div>
-                        </div>
-
-                        <!-- Analytics Cards -->
-                        <div class="row">
-                            <div class="col-md-3">
-                                <div class="compact-stat-card">
-                                    <div class="compact-stat-number positive" id="hitCount">--</div>
-                                    <div class="compact-stat-label">פגיעות במטמון</div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="compact-stat-card">
-                                    <div class="compact-stat-number negative" id="missCount">--</div>
-                                    <div class="compact-stat-label">חטיפות מטמון</div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="compact-stat-card">
-                                    <div class="compact-stat-number" id="evictionCount">--</div>
-                                    <div class="compact-stat-label">הסרות מטמון</div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="compact-stat-card">
-                                    <div class="compact-stat-number" id="invalidationCount">--</div>
-                                    <div class="compact-stat-label">ביטולי מטמון</div>
+                            <div class="cache-system-content">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="stat-item">
+                                            <div class="stat-number" id="uiCacheSize">--</div>
+                                            <div class="stat-label">מספר הגדרות UI</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="stat-item">
+                                            <div class="stat-number" id="uiCacheTTL">--</div>
+                                            <div class="stat-label">TTL (שעות)</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="stat-item">
+                                            <div class="stat-number" id="uiCacheValid">--</div>
+                                            <div class="stat-label">תקין</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="stat-item">
+                                            <div class="stat-number" id="uiCacheAge">--</div>
+                                            <div class="stat-label">גיל (דקות)</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Performance Chart -->
-                        <div class="chart-card mt-4">
-                            <div class="chart-title">
-                                <i class="fas fa-chart-area"></i>
-                                ביצועי מטמון לאורך זמן
+                        <!-- Central Refresh System -->
+                        <div class="cache-system-card mb-4">
+                            <div class="cache-system-header">
+                                <h4><i class="fas fa-sync-alt"></i> Central Refresh System</h4>
+                                <span class="badge bg-warning" id="centralRefreshStatus">פעיל</span>
                             </div>
-                            <div class="chart-container" id="performanceChart">
-                                <canvas id="analyticsChart" width="800" height="400"></canvas>
+                            <div class="cache-system-content">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="stat-item">
+                                            <div class="stat-number" id="centralRefreshPages">--</div>
+                                            <div class="stat-label">עמודים רשומים</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="stat-item">
+                                            <div class="stat-number" id="centralRefreshHandlers">--</div>
+                                            <div class="stat-label">מטפלי רענון</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="stat-item">
+                                            <div class="stat-number" id="centralRefreshActive">--</div>
+                                            <div class="stat-label">מטפלים פעילים</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="stat-item">
+                                            <div class="stat-number" id="centralRefreshTotal">--</div>
+                                            <div class="stat-label">סך רענונים</div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -359,65 +906,113 @@
                 <!-- UI Content Section 3 Start-->
                 <div class="content-section" id="section3">
                     <div class="section-header">
-                        <h2>🗂️ רשימת ערכי מטמון</h2>
+                        <h2>🖥️ מטמון שרת - נתונים עסקיים</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
                     <div class="section-body">
-                        <div class="button-row mb-3">
-                            <div class="input-group cache-search-input">
-                                <input type="text" class="form-control" id="cacheSearch" placeholder="חיפוש במטמון..." onkeyup="searchCacheEntries()">
-                                <button class="btn btn-outline-secondary" type="button" onclick="searchCacheEntries()">
-                                    <i class="fas fa-search"></i>
-                                </button>
+                        <!-- Advanced Cache Service Status -->
+                        <div class="cache-system-card mb-4">
+                            <div class="cache-system-header">
+                                <h4><i class="fas fa-server"></i> Advanced Cache Service (Backend)</h4>
+                                <span class="badge bg-success" id="advancedCacheStatus">פעיל</span>
                             </div>
-                            <select class="form-select d-inline-block w-auto" id="cacheFilter" onchange="filterCacheEntries()">
-                                <option value="all">כל הערכים</option>
-                                <option value="expired">פג תוקף</option>
-                                <option value="active">פעיל</option>
-                                <option value="external">נתונים חיצוניים</option>
-                                <option value="internal">נתונים פנימיים</option>
-                            </select>
+                            <div class="cache-system-content">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="stat-item">
+                                            <div class="stat-number" id="backendCacheHitRate">--</div>
+                                            <div class="stat-label">שיעור פגיעות</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="stat-item">
+                                            <div class="stat-number" id="serverBackendCacheSize">--</div>
+                                            <div class="stat-label">גודל מטמון</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="stat-item">
+                                            <div class="stat-number" id="backendCacheEntries">--</div>
+                                            <div class="stat-label">מספר ערכים</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="stat-item">
+                                            <div class="stat-number" id="backendCacheMemory">--</div>
+                                            <div class="stat-label">זיכרון בשימוש</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-
-                        <!-- Cache Entries Table -->
-                        <div class="table-container">
-                            <div class="table-responsive">
-                                <table class="data-table" id="cacheTable">
-                                    <thead>
-                                        <tr>
-                                            <th class="sortable-header-btn" onclick="sortTable('cacheTable', 0)">
-                                                מפתח מטמון
-                                                <span class="sort-icon">↕</span>
-                                            </th>
-                                            <th class="sortable-header-btn" onclick="sortTable('cacheTable', 1)">
-                                                סוג נתונים
-                                                <span class="sort-icon">↕</span>
-                                            </th>
-                                            <th class="sortable-header-btn" onclick="sortTable('cacheTable', 2)">
-                                                זמן יצירה
-                                                <span class="sort-icon">↕</span>
-                                            </th>
-                                            <th class="sortable-header-btn" onclick="sortTable('cacheTable', 3)">
-                                                TTL
-                                                <span class="sort-icon">↕</span>
-                                            </th>
-                                            <th class="sortable-header-btn" onclick="sortTable('cacheTable', 4)">
-                                                גודל
-                                                <span class="sort-icon">↕</span>
-                                            </th>
-                                            <th class="sortable-header-btn" onclick="sortTable('cacheTable', 5)">
-                                                סטטוס
-                                                <span class="sort-icon">↕</span>
-                                            </th>
-                                            <th class="actions-cell">פעולות</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="cacheTableBody">
-                                        <!-- Cache entries will be populated here -->
-                                    </tbody>
-                                </table>
+                        
+                        <!-- Server Status Card -->
+                        <div class="cache-system-card mb-4">
+                            <div class="cache-system-header">
+                                <h4><i class="fas fa-server"></i> Server Status</h4>
+                                <span class="badge bg-info">Development</span>
+                            </div>
+                            <div class="cache-system-content">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="stat-item">
+                                            <div class="stat-number" id="serverCacheMode">Development</div>
+                                            <div class="stat-label">מצב מטמון</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="stat-item">
+                                            <div class="stat-number" id="serverCacheTTL">10s</div>
+                                            <div class="stat-label">TTL</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="stat-item">
+                                            <div class="stat-number" id="serverLastRestart">--</div>
+                                            <div class="stat-label">איתחול אחרון</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="stat-item">
+                                            <div class="stat-number" id="serverUptime">--</div>
+                                            <div class="stat-label">זמן פעילות</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- TTL Strategy Display -->
+                        <div class="cache-system-card">
+                            <div class="cache-system-header">
+                                <h4><i class="fas fa-clock"></i> TTL Strategy Display</h4>
+                                <span class="badge bg-info">דינמי</span>
+                            </div>
+                            <div class="cache-system-content">
+                                <div class="ttl-strategy-grid">
+                                    <div class="ttl-category">
+                                        <h5>🔥 קריטי (30 שניות)</h5>
+                                        <ul>
+                                            <li>tickers</li>
+                                            <li>trades</li>
+                                            <li>executions</li>
+                                        </ul>
+                                    </div>
+                                    <div class="ttl-category">
+                                        <h5>⚡ רגיל (5 דקות)</h5>
+                                        <ul>
+                                            <li>preferences</li>
+                                        </ul>
+                                    </div>
+                                    <div class="ttl-category">
+                                        <h5>🏗️ סטטי (שעה)</h5>
+                                        <ul>
+                                            <li>currencies</li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -427,232 +1022,44 @@
                 <!-- UI Content Section 4 Start-->
                 <div class="content-section" id="section4">
                     <div class="section-header">
-                        <h2>🗄️ ניטור UnifiedIndexedDB</h2>
+                        <h2>🗄️ מטמון IndexedDB - נתונים טכניים</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
                     <div class="section-body">
-                        <div class="button-row mb-3">
-                            <button class="btn btn-sm btn-outline-primary" onclick="window.comprehensiveSystemCheck()">
-                                <i class="fas fa-search"></i> בדיקה מקיפה
-                            </button>
-                            <button class="btn btn-sm btn-outline-success" onclick="window.testUnifiedIndexedDB()">
-                                <i class="fas fa-vial"></i> בדיקת פונקציונליות
-                            </button>
-                            <button class="btn btn-sm btn-outline-info" onclick="refreshUnifiedIndexedDBStats()">
-                                <i class="fas fa-sync-alt"></i> רענן סטטיסטיקות
-                            </button>
-                            <button class="btn btn-sm btn-outline-warning" onclick="clearUnifiedIndexedDB()">
-                                <i class="fas fa-trash-alt"></i> נקה UnifiedIndexedDB
-                            </button>
-                        </div>
-
-                        <!-- UnifiedIndexedDB Overview -->
-                        <div class="row">
-                            <div class="col-md-3">
-                                <div class="stat-card">
-                                    <div class="stat-header">
-                                        <h3 class="stat-title">File Mapping</h3>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="stat-row">
-                                            <span>סוגי קבצים</span>
-                                            <span class="badge bg-primary" id="fileMappingTypes">--</span>
-                                        </div>
-                                        <div class="stat-row">
-                                            <span>סך קבצים</span>
-                                            <span class="badge bg-info" id="fileMappingTotal">--</span>
-                                        </div>
-                                        <div class="stat-row">
-                                            <span>גודל נתונים</span>
-                                            <span class="badge bg-success" id="fileMappingSize">--</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="stat-card">
-                                    <div class="stat-header">
-                                        <h3 class="stat-title">Notifications</h3>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="stat-row">
-                                            <span>התראות היום</span>
-                                            <span class="badge bg-warning" id="notificationsToday">--</span>
-                                        </div>
-                                        <div class="stat-row">
-                                            <span>סך התראות</span>
-                                            <span class="badge bg-info" id="notificationsTotal">--</span>
-                                        </div>
-                                        <div class="stat-row">
-                                            <span>קטגוריות</span>
-                                            <span class="badge bg-success" id="notificationsCategories">--</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="stat-card">
-                                    <div class="stat-header">
-                                        <h3 class="stat-title">Header System</h3>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="stat-row">
-                                            <span>מצב פילטרים</span>
-                                            <span class="badge bg-primary" id="headerFilterState">--</span>
-                                        </div>
-                                        <div class="stat-row">
-                                            <span>מצב סקשנים</span>
-                                            <span class="badge bg-info" id="headerSectionState">--</span>
-                                        </div>
-                                        <div class="stat-row">
-                                            <span>נתוני חשבונות</span>
-                                            <span class="badge bg-success" id="headerAccountsData">--</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="stat-card">
-                                    <div class="stat-header">
-                                        <h3 class="stat-title">Linter Monitor</h3>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="stat-row">
-                                            <span>סריקות היום</span>
-                                            <span class="badge bg-warning" id="linterScansToday">--</span>
-                                        </div>
-                                        <div class="stat-row">
-                                            <span>קבצים נסרקים</span>
-                                            <span class="badge bg-info" id="linterFilesScanned">--</span>
-                                        </div>
-                                        <div class="stat-row">
-                                            <span>לוגים</span>
-                                            <span class="badge bg-success" id="linterLogEntries">--</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Object Stores Status -->
-                        <div class="mt-4">
-                            <h4>סטטוס Object Stores</h4>
-                            <div class="table-container">
-                                <div class="table-responsive">
-                                    <table class="data-table" id="objectStoresTable">
-                                        <thead>
-                                            <tr>
-                                                <th>Store Name</th>
-                                                <th>Records</th>
-                                                <th>Size</th>
-                                                <th>Last Update</th>
-                                                <th>Status</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="objectStoresTableBody">
-                                            <!-- Object stores data will be populated here -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
-                <!-- UI Content Section 4 End -->
 
                 <!-- UI Content Section 5 Start-->
                 <div class="content-section" id="section5">
                     <div class="section-header">
-                        <h2>🔗 תלויות מטמון</h2>
+                        <h2>📋 לוג מטמון</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section5')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
                     <div class="section-body">
                         <div class="button-row mb-3">
-                            <button class="btn btn-sm btn-outline-primary" onclick="refreshDependencies()">
-                                <i class="fas fa-sync-alt"></i> רענן תלויות
+                            <button class="btn btn-sm btn-outline-warning" onclick="clearLog()">
+                                <i class="fas fa-trash-alt"></i> נקה לוג
                             </button>
-                            <button class="btn btn-sm btn-outline-warning" onclick="validateDependencies()">
-                                <i class="fas fa-check-circle"></i> בדוק תקינות
-                            </button>
-                            <button class="btn btn-sm btn-outline-info" onclick="optimizeDependencies()">
-                                <i class="fas fa-project-diagram"></i> אופטמז תלויות
+                            <button class="btn btn-sm btn-outline-info" onclick="exportLog()">
+                                <i class="fas fa-download"></i> ייצא לוג
                             </button>
                         </div>
                         
-                        <!-- Dependencies Content -->
-                        <div id="dependenciesContent">
-                            <div class="text-center text-muted">
-                                <i class="fas fa-spinner fa-spin"></i>
-                                טוען נתוני תלויות...
+                        <!-- Log Display -->
+                        <div id="logDisplay" class="log-display">
+                            <h5>לוג מטמון:</h5>
+                            <div id="logContent" class="log-content">
+                                <!-- Log content will be displayed here -->
                             </div>
                         </div>
 
-                        <!-- Dependencies Overview -->
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="stat-card">
-                                    <div class="stat-header">
-                                        <h3 class="stat-title">סטטיסטיקות תלויות</h3>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="stat-row">
-                                            <span>סך תלויות</span>
-                                            <span class="badge bg-primary" id="totalDependencies">--</span>
-                                        </div>
-                                        <div class="stat-row">
-                                            <span>תלויות פעילות</span>
-                                            <span class="badge bg-success" id="activeDependencies">--</span>
-                                        </div>
-                                        <div class="stat-row">
-                                            <span>תלויות שבורות</span>
-                                            <span class="badge bg-danger" id="brokenDependencies">--</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="stat-card">
-                                    <div class="stat-header">
-                                        <h3 class="stat-title">ביטולי מטמון</h3>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="stat-row">
-                                            <span>ביטולים היום</span>
-                                            <span class="badge bg-warning" id="invalidationsToday">--</span>
-                                        </div>
-                                        <div class="stat-row">
-                                            <span>ביטולים השבוע</span>
-                                            <span class="badge bg-info" id="invalidationsWeek">--</span>
-                                        </div>
-                                        <div class="stat-row">
-                                            <span>יעילות ביטולים</span>
-                                            <span class="badge bg-success" id="invalidationEfficiency">--</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Dependencies Tree -->
-                        <div class="chart-card mt-4">
-                            <div class="chart-title">
-                                <i class="fas fa-sitemap"></i>
-                                עץ תלויות מטמון
-                            </div>
-                            <div class="chart-container" id="dependenciesTree">
-                                <div id="dependenciesVisualization">
-                                    <!-- Dependencies tree will be rendered here -->
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
-                <!-- UI Content Section 4 End -->
+                <!-- UI Content Section 5 End -->
                 <!-- CONTENT SECTIONS EDITABLE - END -->
             </div>
         </div>
@@ -676,23 +1083,35 @@
     <script src="scripts/tables.js"></script>
     <script src="scripts/global-favicon.js"></script>
     <script src="scripts/ui-utils.js"></script>
+    <script src="scripts/preferences.js"></script>
     
-    <!-- Unified IndexedDB System -->
-    <script src="scripts/unified-indexeddb-adapter.js"></script>
-    <script src="scripts/project-files-scanner.js"></script>
-    <script src="scripts/central-refresh-system.js"></script>
+    <!-- Legacy Systems (Backed up to backup-old-cache-systems/) -->
+    
+    <!-- Unified Cache System Scripts - MUST be loaded before initialization -->
+    <script src="scripts/unified-cache-manager.js?v=debug1"></script>
+    <script src="scripts/cache-sync-manager.js?v=debug1"></script>
+    <script src="scripts/cache-policy-manager.js?v=debug1"></script>
+    <script src="scripts/memory-optimizer.js?v=debug1"></script>
+    
+    <!-- Cache Test Script - MUST be loaded before initialization -->
+    <script src="scripts/cache-test.js?v=debug1"></script>
+    
+    <!-- Real-time Notifications System -->
+    <script src="scripts/realtime-notifications-client.js?v=debug1"></script>
+    
+    <!-- Unified Initialization System - MUST be loaded in correct order -->
+    <script src="scripts/page-initialization-configs.js?v=debug1"></script>
+    <script src="scripts/unified-app-initializer.js?v=debug1"></script>
     
     <!-- Page Utils -->
     <script src="scripts/page-utils.js"></script>
-    
-    <!-- Cache Test Script -->
-    <script src="scripts/cache-test.js"></script>
 
-    <!-- Initialize on page load -->
+    <!-- Cache Test initialization is now handled by Unified App Initializer -->
+    
+    <!-- Local copyDetailedLog function for cache-test page -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeCacheTest();
-        });
+        // Make the local copyDetailedLog function available globally for this page only
+        window.copyDetailedLog = copyDetailedLog;
     </script>
 </body>
 </html>

@@ -47,6 +47,8 @@
     <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=1.0.1">
+    <link rel="stylesheet" href="styles-new/06-components/_unified-log-display.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_pagination-system.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_system-management.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=1.0.0">
@@ -54,7 +56,7 @@
     <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=1.0.0">
     
     <!-- Header Styles -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=v39_system_management">
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">
     
     <!-- Dynamic Color System Scripts -->
     <script src="scripts/color-scheme-system.js"></script>
@@ -83,7 +85,7 @@
                     <div class="section-header">
                         <h2>🔧 מנהל מערכת</h2>
                         <div class="header-actions">
-                            <button class="btn btn-sm btn-outline-primary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
                                 <i class="fas fa-copy"></i> העתק לוג מפורט
                             </button>
                             <button class="btn btn-sm btn-outline-primary" onclick="refreshSystemData()" title="רענן נתוני מערכת">
@@ -167,8 +169,8 @@
                                             <button class="btn btn-info btn-sm" onclick="clearCache()">
                                                 🗑️ נקה מטמון
                                             </button>
-                                            <button class="btn btn-warning btn-sm" onclick="copyDetailedLog()">
-                                                📋 העתק לוג מפורט
+                                            <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()">
+                                                <i class="fas fa-copy"></i> העתק לוג מפורט
                                             </button>
                                         </div>
                                     </div>
@@ -425,8 +427,8 @@
                                         </select>
                                         <input type="text" id="log-search" class="form-control" placeholder="חיפוש בלוגים...">
                                         <button class="btn btn-outline-primary refresh-btn" title="רענן נתונים">🔄 רענן</button>
-                                        <button class="btn btn-outline-success" onclick="copyDetailedLog()">
-                                            📋 העתק לוג מפורט
+                                        <button class="btn btn-outline-secondary" onclick="copyDetailedLog()">
+                                            <i class="fas fa-copy"></i> העתק לוג מפורט
                                         </button>
                                     </div>
                                 </div>
@@ -515,7 +517,7 @@
                                                     </div>
                                                 </div>
                                                 <button class="btn btn-primary" onclick="runBackup()">הפעל גיבוי עכשיו</button>
-                                        <button class="btn btn-secondary copy-log-btn" onclick="copyDetailedLog()">📋 העתק לוג מפורט</button>
+                                        <button class="btn btn-outline-secondary copy-log-btn" onclick="copyDetailedLog()"><i class="fas fa-copy"></i> העתק לוג מפורט</button>
                                         <div class="backup-status mt-3">
                                             <small class="text-muted">
                                                 💡 <strong>טיפ:</strong> הגיבוי כולל את כל הנתונים, הגדרות ולוגים של המערכת
@@ -555,6 +557,52 @@
                     </div>
                 </div>
                 <!-- UI Content Section 7 End--> 
+
+                <!-- UI Content Section 8 Start - Unified Log System -->
+                <div class="content-section" id="section8">
+                    <div class="section-header entity-test-sub-header">
+                        <h2>📊 מערכת לוגים מאוחדת</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section8')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <!-- Log Type Selection -->
+                        <div class="log-type-selection mb-3">
+                            <div class="btn-group" role="group" aria-label="בחירת סוג לוג">
+                                <button type="button" class="btn btn-outline-primary" onclick="showNotificationLog()">
+                                    <i class="fas fa-bell"></i> התראות
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="showSystemLogs()">
+                                    <i class="fas fa-cog"></i> מערכת
+                                </button>
+                                <button type="button" class="btn btn-outline-danger" onclick="showErrorReports()">
+                                    <i class="fas fa-exclamation-triangle"></i> שגיאות
+                                </button>
+                                <button type="button" class="btn btn-outline-info" onclick="showLinterLog()">
+                                    <i class="fas fa-code"></i> Linter
+                                </button>
+                                <button type="button" class="btn btn-outline-success" onclick="showFileMappings()">
+                                    <i class="fas fa-folder"></i> קבצים
+                                </button>
+                                <button type="button" class="btn btn-outline-info" onclick="showExternalDataLog()">
+                                    <i class="fas fa-globe"></i> נתונים חיצוניים
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Unified Log Display Container -->
+                        <div id="unified-logs-container" style="min-height: 400px;">
+                            <div class="d-flex justify-content-center align-items-center h-100">
+                                <div class="text-center">
+                                    <i class="fas fa-mouse-pointer fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted">לחץ על אחד מהכפתורים למעלה כדי להציג לוג במערכת החדשה</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 8 End - Unified Log System -->
             </div>
         </div>
     </div>
@@ -568,19 +616,77 @@
     <script src="scripts/notification-system.js"></script>
     <script src="scripts/system-management.js"></script>
     <script src="scripts/notification-category-detector.js"></script>
-    <script src="scripts/notification-migration-system.js"></script>
     <script src="scripts/global-notification-collector.js"></script>
     <script src="scripts/tables.js"></script>
     <script src="scripts/page-utils.js"></script>
-    <script src="scripts/central-refresh-system.js"></script>
+    
+    <!-- Unified Log System -->
+    <script src="scripts/pagination-system.js"></script>
+    <script src="scripts/unified-log-manager.js"></script>
+    <script src="scripts/unified-log-display.js"></script>
+    <script src="scripts/unified-log-api.js"></script>
     
     <!-- New Unified Initialization System -->
-    <script src="scripts/application-initializer.js"></script>
     <script src="scripts/page-initialization-configs.js"></script>
     <script src="scripts/unified-app-initializer.js"></script>
 
     <!-- 🔓 TEMPLATE ZONE 6 - Page-Specific Scripts (ADD NEW SCRIPTS HERE) -->
     <!-- No manual DOMContentLoaded listener needed - handled by unified system -->
+    
+    <!-- Local copyDetailedLog function for system-management page -->
+    <script>
+        // Make the local copyDetailedLog function available globally for this page only
+        window.copyDetailedLog = copyDetailedLog;
+        
+        // Unified Log System Functions
+        window.showNotificationLog = function() {
+            window.UnifiedLogAPI.showLog('notificationHistory', 'unified-logs-container', {
+                displayConfig: 'default',
+                autoRefresh: true,
+                refreshInterval: 10000
+            });
+        };
+        
+        window.showSystemLogs = function() {
+            window.UnifiedLogAPI.showLog('systemLogs', 'unified-logs-container', {
+                displayConfig: 'default',
+                autoRefresh: true,
+                refreshInterval: 10000
+            });
+        };
+        
+        window.showErrorReports = function() {
+            window.UnifiedLogAPI.showLog('errorReports', 'unified-logs-container', {
+                displayConfig: 'default',
+                autoRefresh: true,
+                refreshInterval: 10000
+            });
+        };
+        
+        window.showLinterLog = function() {
+            window.UnifiedLogAPI.showLog('linterHistory', 'unified-logs-container', {
+                displayConfig: 'default',
+                autoRefresh: true,
+                refreshInterval: 10000
+            });
+        };
+        
+        window.showFileMappings = function() {
+            window.UnifiedLogAPI.showLog('fileMappings', 'unified-logs-container', {
+                displayConfig: 'default',
+                autoRefresh: true,
+                refreshInterval: 10000
+            });
+        };
+        
+        window.showExternalDataLog = function() {
+            window.UnifiedLogAPI.showLog('externalDataLog', 'unified-logs-container', {
+                displayConfig: 'default',
+                autoRefresh: true,
+                refreshInterval: 10000
+            });
+        };
+    </script>
 </body>
 </html>
 

@@ -40,8 +40,11 @@ class GlobalNotificationCollector {
    * Initialize the collector
    * אתחול האוסף
    */
-  init() {
+  async init() {
     console.log(`🔔 Global Notification Collector initialized for page: ${this.pageName}`);
+    
+    // Wait for UnifiedIndexedDB to be ready before starting collection
+    await this.waitForIndexedDBReady();
     
     // Start collecting notifications
     this.startCollection();
@@ -61,6 +64,28 @@ class GlobalNotificationCollector {
     });
 
     this.isInitialized = true;
+  }
+
+  /**
+   * Wait for UnifiedIndexedDB to be ready
+   * המתנה עד ש-UnifiedIndexedDB יהיה מוכן
+   */
+  async waitForIndexedDBReady() {
+    const maxWaitTime = 5000; // 5 seconds max wait
+    const checkInterval = 100; // Check every 100ms
+    let waitTime = 0;
+
+    while (waitTime < maxWaitTime) {
+      if (window.UnifiedIndexedDB && window.UnifiedIndexedDB.isInitialized) {
+        console.log('✅ UnifiedIndexedDB is ready for Global Notification Collector');
+        return;
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, checkInterval));
+      waitTime += checkInterval;
+    }
+    
+    console.warn('⚠️ UnifiedIndexedDB not ready after 5 seconds, proceeding with fallback');
   }
 
   /**
@@ -394,25 +419,31 @@ class GlobalNotificationCollector {
 
 // ===== AUTO-INITIALIZATION =====
 
+// הוסר - המערכת המאוחדת מטפלת באתחול
 // Initialize the collector when the page loads
-document.addEventListener('DOMContentLoaded', () => {
-  // Only initialize if not already initialized
-  if (!window.globalNotificationCollector) {
-    window.globalNotificationCollector = new GlobalNotificationCollector();
-    console.log('🚀 Global Notification Collector auto-initialized');
-  }
-});
+// document.addEventListener('DOMContentLoaded', async () => {
+//   // Only initialize if not already initialized
+//   if (!window.globalNotificationCollector) {
+//     window.globalNotificationCollector = new GlobalNotificationCollector();
+//     await window.globalNotificationCollector.init();
+//     console.log('🚀 Global Notification Collector auto-initialized');
+//   }
+// });
 
 // Also initialize if DOMContentLoaded already fired
-if (document.readyState === 'loading') {
-  // DOM is still loading, wait for DOMContentLoaded
-} else {
-  // DOM already loaded, initialize immediately
-  if (!window.globalNotificationCollector) {
-    window.globalNotificationCollector = new GlobalNotificationCollector();
-    console.log('🚀 Global Notification Collector auto-initialized (DOM already loaded)');
-  }
-}
+// if (document.readyState === 'loading') {
+//   // DOM is still loading, wait for DOMContentLoaded
+// } else {
+//   // DOM already loaded, initialize immediately
+//   if (!window.globalNotificationCollector) {
+//     window.globalNotificationCollector = new GlobalNotificationCollector();
+//     window.globalNotificationCollector.init().then(() => {
+//       console.log('🚀 Global Notification Collector auto-initialized (DOM already loaded)');
+//     }).catch(error => {
+//       console.error('❌ Failed to initialize Global Notification Collector:', error);
+//     });
+//   }
+// }
 
 // ===== GLOBAL FUNCTIONS =====
 
@@ -471,13 +502,41 @@ function addGlobalNotification(type, title, message, options = {}) {
  * @param {Object} filters - Filter options
  * @returns {Array} Array of notifications
  */
-function getGlobalNotifications(filters = {}) {
+async function getGlobalNotifications(filters = {}) {
   try {
     console.log('🔍 Getting global notifications with filters:', filters);
     
-    const existingHistory = JSON.parse(localStorage.getItem('tiktrack_global_notifications_history') || '[]');
+    let allNotifications = [];
     
-    let filteredNotifications = [...existingHistory];
+    // Get from localStorage (legacy)
+    const localStorageHistory = JSON.parse(localStorage.getItem('tiktrack_global_notifications_history') || '[]');
+    allNotifications = [...localStorageHistory];
+    
+    // Get from IndexedDB (new system)
+    if (window.UnifiedIndexedDB && window.UnifiedIndexedDB.isInitialized) {
+      try {
+        const indexedDBHistory = await window.UnifiedIndexedDB.getNotificationHistory();
+        console.log(`📊 Found ${indexedDBHistory.length} notifications in IndexedDB`);
+        
+        // Merge with localStorage, avoiding duplicates
+        const existingIds = new Set(allNotifications.map(n => n.id));
+        const newFromIndexedDB = indexedDBHistory.filter(n => !existingIds.has(n.id));
+        allNotifications = [...allNotifications, ...newFromIndexedDB];
+        
+        // Sort by timestamp (newest first)
+        allNotifications.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+        
+        // Keep only last 1000 notifications
+        allNotifications = allNotifications.slice(0, 1000);
+        
+      } catch (error) {
+        console.warn('Failed to get notifications from IndexedDB:', error);
+      }
+    } else {
+      console.log('IndexedDB not available, using localStorage only');
+    }
+    
+    let filteredNotifications = [...allNotifications];
     
     // Apply filters
     if (filters.type) {

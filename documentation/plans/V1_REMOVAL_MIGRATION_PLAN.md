@@ -260,7 +260,7 @@
 ### 🔧 קבצים נוספים
 **קבצים שצריכים עדכון:**
 - `README.md` - 10 מופעים
-- `GENERAL_SYSTEMS_MATRIX.md` - 1 מופע
+- `GENERAL_SYSTEMS_LIST.md` - 1 מופע
 - `JS_MAP_SPLIT_TASK_DOCUMENT.md` - 6 מופעים
 - `test_migration_health.sh` - 1 מופע
 - `backup/js-map-split-20250920/page-scripts-matrix.html.backup` - 24 מופעים

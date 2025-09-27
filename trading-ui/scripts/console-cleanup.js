@@ -14,15 +14,23 @@ function clearConsole() {
     return;
   }
 
+  console.log('🧹 מנקה console...');
+  
   // בדוק אם יש מערכת מובנית לניקוי console
   if (window.manualClearConsole) {
     window.manualClearConsole();
+    console.log('✅ ניקוי console בוצע בהצלחה');
     if (typeof window.showNotification === 'function') {
       window.showNotification('ניקוי console בוצע בהצלחה', 'success', 'ניקוי זיכרון', 2000, 'system');
+    } else {
+      console.log('🔔 הודעת הצלחה: ניקוי console בוצע בהצלחה');
     }
   } else {
+    console.log('⚠️ מערכת ניקוי console לא זמינה');
     if (typeof window.showNotification === 'function') {
       window.showNotification('מערכת ניקוי console לא זמינה', 'warning', 'ניקוי זיכרון', 3000, 'system');
+    } else {
+      console.log('🔔 הודעת אזהרה: מערכת ניקוי console לא זמינה');
     }
   }
 }

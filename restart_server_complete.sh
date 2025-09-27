@@ -833,7 +833,7 @@ check_all_routes() {
     local routes=(
         # Core API endpoints
         "GET:/api/health:Health Check"
-        "GET:/api/accounts/:Accounts API"
+        "GET:/api/trading-accounts/:Trading Accounts API"
         "GET:/api/trades/:Trades API"
         "GET:/api/tickers/:Tickers API"
         "GET:/api/trade_plans/:Trade Plans API"
@@ -948,7 +948,7 @@ check_all_routes() {
 # Performs comprehensive health checks on the running server:
 # - Tests main page accessibility (GET /)
 # - Tests API health endpoint (GET /api/health)
-# - Tests database connectivity (GET /api/accounts/)
+# - Tests database connectivity (GET /api/trading-accounts/)
 # - Runs 6 rounds of checks with 5-second intervals
 # - Calculates success rate (minimum 80% required)
 perform_health_checks() {
@@ -979,7 +979,7 @@ perform_health_checks() {
         fi
         
         # Test database connectivity through API
-        local db_status=$(curl -s -o /dev/null -w "%{http_code}" "http://$SERVER_HOST:$SERVER_PORT/api/accounts/")
+        local db_status=$(curl -s -o /dev/null -w "%{http_code}" "http://$SERVER_HOST:$SERVER_PORT/api/trading-accounts/")
         if [ "$db_status" = "200" ]; then
             log_success "Health check $health_checks: Database connectivity confirmed (HTTP $db_status)"
             successful_checks=$((successful_checks + 1))

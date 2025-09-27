@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
-
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מעקב טריידים - TikTrack</title>
+    
             <!-- ===== CSS Architecture - Unified CSS ===== -->
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -47,7 +51,7 @@
     <script src="scripts/header-system.js"></script>
 
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=v33_green_orange">
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">
 
     <!-- 🔄 NEW UNIFIED INITIALIZATION SYSTEM -->
     <!-- Core Systems -->
@@ -57,16 +61,16 @@
     <script src="scripts/notification-system.js"></script>
     <script src="scripts/system-management.js"></script>
     <script src="scripts/notification-category-detector.js"></script>
-    <script src="scripts/notification-migration-system.js"></script>
     <script src="scripts/global-notification-collector.js"></script>
     <script src="scripts/tables.js"></script>
     <script src="scripts/page-utils.js"></script>
-    <script src="scripts/central-refresh-system.js"></script>
     <script src="scripts/trades.js"></script>
     <script src="scripts/validation-utils.js"></script>
     
+    <!-- Real-time Notifications System -->
+    <script src="scripts/realtime-notifications-client.js"></script>
+    
     <!-- New Unified Initialization System -->
-    <script src="scripts/application-initializer.js"></script>
     <script src="scripts/page-initialization-configs.js"></script>
     <script src="scripts/unified-app-initializer.js"></script>
 
@@ -91,7 +95,7 @@
             מעקב טריידים
           </div>
           <div class="table-actions">
-            <button class="btn btn-sm btn-outline-primary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והטריידים">
+            <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והטריידים">
               <i class="fas fa-copy"></i> העתק לוג מפורט
             </button>
             <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר אזור מעקב טריידים">
@@ -735,6 +739,12 @@
       </div>
     </div>
   </div> <!-- End background-wrapper -->
+  
+  <!-- Local copyDetailedLog function for trades page -->
+  <script>
+      // Make the local copyDetailedLog function available globally for this page only
+      window.copyDetailedLog = copyDetailedLog;
+  </script>
 </body>
 
 </html>

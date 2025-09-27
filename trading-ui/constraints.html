@@ -47,7 +47,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=v33_green_orange">
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">
 </head>
 
 <body>
@@ -65,8 +65,8 @@
                         <h1>🔒 מוניטור אילוצים</h1>
                         <p>ניהול וניטור אילוצי בסיס הנתונים</p>
                         <div class="header-actions">
-                            <button class="btn btn-outline-primary btn-sm" onclick="copyDetailedLog()" title="העתק לוג מפורט">
-                                <i class="fas fa-copy"></i> העתק לוג
+                            <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט">
+                                <i class="fas fa-copy"></i> העתק לוג מפורט
                             </button>
                             <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
                                 <span class="section-toggle-icon">▼</span>
@@ -291,15 +291,12 @@
     <script src="scripts/notification-system.js"></script>
     <script src="scripts/system-management.js"></script>
     <script src="scripts/notification-category-detector.js"></script>
-    <script src="scripts/notification-migration-system.js"></script>
     <script src="scripts/global-notification-collector.js"></script>
     <script src="scripts/tables.js"></script>
     <script src="scripts/page-utils.js"></script>
-    <script src="scripts/central-refresh-system.js"></script>
     <script src="scripts/constraints.js"></script>
     
     <!-- New Unified Initialization System -->
-    <script src="scripts/application-initializer.js"></script>
     <script src="scripts/page-initialization-configs.js"></script>
     <script src="scripts/unified-app-initializer.js"></script>
 

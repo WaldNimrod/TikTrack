@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
-
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>תזרימי מזומנים - TikTrack</title>
+    
             <!-- ===== CSS Architecture - Unified CSS ===== -->
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -47,7 +51,8 @@
     <script src="scripts/header-system.js"></script>
     
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=v33_green_orange"></head>
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">
+</head>
 
 <body class="cash-flows-page">
     <!-- Unified Header Container -->
@@ -70,7 +75,7 @@
                         תזרימי מזומנים
                     </div>
                     <div class="table-actions">
-                        <button class="btn btn-sm btn-outline-primary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים ותזרימי המזומנים">
+                        <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים ותזרימי המזומנים">
                             <i class="fas fa-copy"></i> העתק לוג מפורט
                         </button>
                         <button class="filter-toggle-btn" onclick="toggleSection('top')"
@@ -470,20 +475,23 @@
     <script src="scripts/notification-system.js"></script>
     <script src="scripts/system-management.js"></script>
     <script src="scripts/notification-category-detector.js"></script>
-    <script src="scripts/notification-migration-system.js"></script>
     <script src="scripts/global-notification-collector.js"></script>
     <script src="scripts/tables.js"></script>
     <script src="scripts/page-utils.js"></script>
-    <script src="scripts/central-refresh-system.js"></script>
     <script src="scripts/cash_flows.js"></script>
     
     <!-- New Unified Initialization System -->
-    <script src="scripts/application-initializer.js"></script>
     <script src="scripts/page-initialization-configs.js"></script>
     <script src="scripts/unified-app-initializer.js"></script>
 
     <!-- 🔓 TEMPLATE ZONE 6 - Page-Specific Scripts (ADD NEW SCRIPTS HERE) -->
     <!-- No manual DOMContentLoaded listener needed - handled by unified system -->
+    
+    <!-- Local copyDetailedLog function for cash_flows page -->
+    <script>
+        // Make the local copyDetailedLog function available globally for this page only
+        window.copyDetailedLog = copyDetailedLog;
+    </script>
 </body>
 
 </html>

@@ -787,7 +787,7 @@ function generateDetailedLog() {
     log.push(`window.HeaderSystem: ${typeof window.HeaderSystem}`);
     log.push(`window.headerSystem: ${typeof window.headerSystem}`);
     log.push(`window.toggleSection: ${typeof window.toggleSection}`);
-    log.push(`window.copyTestHeaderDetailedLog: ${typeof window.copyTestHeaderDetailedLog}`);
+    log.push(`window.copyDetailedLog: ${typeof window.copyDetailedLog}`);
     
     // בדיקת צבעים דינמיים
     log.push('--- בדיקת צבעים דינמיים ---');
@@ -819,7 +819,7 @@ function generateDetailedLog() {
 }
 
 // הוספת הפונקציה ל-window object
-window.copyTestHeaderDetailedLog = copyTestHeaderDetailedLog;
+window.copyDetailedLog = copyDetailedLog;
 
 // פונקציה לפתיחה וסגירה של הסקשן העליון
 function toggleTopSection() {
@@ -849,7 +849,7 @@ window.toggleTopSection = toggleTopSection;
 /**
  * Copy detailed log to clipboard - Test Header Only Page
  */
-async function copyTestHeaderDetailedLog() {
+async function copyDetailedLog() {
     try {
         const log = generateDetailedLog();
         await navigator.clipboard.writeText(log);
@@ -883,6 +883,34 @@ async function copyTestHeaderDetailedLog() {
 }
 
 // Export functions
-window.copyTestHeaderDetailedLog = copyTestHeaderDetailedLog;
-window.generateDetailedLog = generateDetailedLog;
+window.copyDetailedLog = copyDetailedLog;
+// window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 window.registerTablesWithFilterSystem = registerTablesWithFilterSystem;
+
+// Local copyDetailedLog function for test-header-only page
+async function copyDetailedLog() {
+    try {
+        const detailedLog = await generateDetailedLog();
+        if (detailedLog) {
+            await navigator.clipboard.writeText(detailedLog);
+            if (window.showSuccessNotification) {
+                window.showSuccessNotification('לוג מפורט הועתק ללוח');
+            } else {
+                alert('לוג מפורט הועתק ללוח!');
+            }
+        } else {
+            if (window.showWarningNotification) {
+                window.showWarningNotification('אין לוג להעתקה');
+            } else {
+                alert('אין לוג להעתקה');
+            }
+        }
+    } catch (err) {
+        console.error('שגיאה בהעתקה:', err);
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה בהעתקת הלוג');
+        } else {
+            alert('שגיאה בהעתקת הלוג');
+        }
+    }
+}

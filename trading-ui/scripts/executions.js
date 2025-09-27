@@ -16,7 +16,7 @@ function addExecution() {
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בהוספת ביצוע', error.message);
     } else if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה בהוספת ביצוע', 'error');
+      window.showErrorNotification('שגיאה בהוספת ביצוע');
     }
   }
 }
@@ -3661,3 +3661,152 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+
+/**
+ * Generate detailed log for Executions
+ */
+function generateDetailedLog() {
+    const timestamp = new Date().toLocaleString('he-IL');
+    const log = [];
+
+    log.push('=== לוג מפורט - עסקעות ===');
+    log.push(`זמן יצירה: ${timestamp}`);
+    log.push(`עמוד: ${window.location.href}`);
+    log.push('');
+
+    // 1. מצב כללי של העמוד
+    log.push('--- מצב כללי של העמוד ---');
+    const sections = document.querySelectorAll('.content-section, .section');
+    sections.forEach((section, index) => {
+        const header = section.querySelector('.section-header, h2, h3');
+        const body = section.querySelector('.section-body, .card-body');
+        const isOpen = body && body.style.display !== 'none' && !section.classList.contains('collapsed');
+        const title = header ? header.textContent.trim() : `סקשן ${index + 1}`;
+        log.push(`  ${index + 1}. "${title}": ${isOpen ? 'פתוח' : 'סגור'}`);
+    });
+
+    // 2. סטטיסטיקות עסקעות
+    log.push('');
+    log.push('--- סטטיסטיקות עסקעות ---');
+    const executionStats = [
+        'totalExecutions', 'totalBuyExecutions', 'totalSellExecutions',
+        'totalBuyAmount', 'totalSellAmount', 'balanceAmount'
+    ];
+    
+    executionStats.forEach(statId => {
+        const element = document.getElementById(statId);
+        if (element) {
+            const value = element.textContent.trim();
+            const visible = element.offsetParent !== null ? 'נראה' : 'לא נראה';
+            log.push(`${statId}: ${value} (${visible})`);
+        }
+    });
+
+    // 3. טבלת עסקעות
+    log.push('');
+    log.push('--- טבלת עסקעות ---');
+    const table = document.querySelector('#executionsTable, .table, table');
+    if (table) {
+        const rows = table.querySelectorAll('tbody tr');
+        log.push(`מספר שורות: ${rows.length}`);
+        rows.forEach((row, index) => {
+            const cells = row.querySelectorAll('td');
+            const rowData = Array.from(cells).map(cell => cell.textContent.trim()).join(' | ');
+            log.push(`  ${index + 1}. ${rowData}`);
+        });
+    } else {
+        log.push('טבלה לא נמצאה');
+    }
+
+    // 4. כפתורים וקונטרולים
+    log.push('');
+    log.push('--- כפתורים וקונטרולים ---');
+    const buttonIds = [
+        'addExecutionBtn', 'editExecutionBtn', 'deleteExecutionBtn', 'filterBtn',
+        'exportBtn', 'refreshBtn', 'searchBtn'
+    ];
+    
+    buttonIds.forEach(btnId => {
+        const btn = document.getElementById(btnId);
+        if (btn) {
+            const visible = btn.offsetParent !== null ? 'נראה' : 'לא נראה';
+            const disabled = btn.disabled ? 'מבוטל' : 'פעיל';
+            const text = btn.textContent.trim() || btn.value || 'ללא טקסט';
+            log.push(`${btnId}: ${visible} - ${disabled} - "${text}"`);
+        }
+    });
+
+    // 5. פילטרים וחיפוש
+    log.push('');
+    log.push('--- פילטרים וחיפוש ---');
+    const searchInput = document.querySelector('input[type="search"], input[placeholder*="חיפוש"], input[placeholder*="search"]');
+    if (searchInput) {
+        const value = searchInput.value || 'ריק';
+        const visible = searchInput.offsetParent !== null ? 'נראה' : 'לא נראה';
+        log.push(`חיפוש: "${value}" (${visible})`);
+    }
+
+    const filters = document.querySelectorAll('.filter, .form-select, select');
+    filters.forEach((filter, index) => {
+        const value = filter.value || 'לא נבחר';
+        const visible = filter.offsetParent !== null ? 'נראה' : 'לא נראה';
+        log.push(`פילטר ${index + 1}: "${value}" (${visible})`);
+    });
+
+    // 6. מידע טכני
+    log.push('');
+    log.push('--- מידע טכני ---');
+    log.push(`זמן יצירת הלוג: ${timestamp}`);
+    log.push(`גרסת דפדפן: ${navigator.userAgent}`);
+    log.push(`רזולוציה מסך: ${screen.width}x${screen.height}`);
+    log.push(`גודל חלון: ${window.innerWidth}x${window.innerHeight}`);
+    
+    if (performance.timing) {
+        const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+        log.push(`זמן טעינת עמוד: ${loadTime}ms`);
+    }
+    
+    if (navigator.deviceMemory) {
+        log.push(`זיכרון זמין: ${navigator.deviceMemory}GB`);
+    }
+    
+    log.push(`שפת דפדפן: ${navigator.language}`);
+    log.push(`פלטפורמה: ${navigator.platform}`);
+
+    // 7. שגיאות והערות מהקונסולה
+    log.push('');
+    log.push('--- שגיאות והערות מהקונסולה ---');
+    log.push('⚠️ חשוב: הלוג המפורט חייב לכלול שגיאות קונסולה לאבחון בעיות');
+    log.push('📋 הוראות: פתח את Developer Tools (F12) > Console');
+    log.push('📋 העתק את כל השגיאות וההערות מהקונסולה');
+    log.push('📋 הוסף אותן ללוג המפורט לפני שליחה');
+
+    log.push('');
+    log.push('=== סוף לוג ===');
+    return log.join('\n');
+}
+
+// Local copyDetailedLog function for executions page
+async function copyDetailedLog() {
+    try {
+        const detailedLog = await generateDetailedLog();
+        if (detailedLog) {
+            await navigator.clipboard.writeText(detailedLog);
+            
+            if (typeof window.showSuccessNotification === 'function') {
+                window.showSuccessNotification('לוג מפורט הועתק ללוח', 'הלוג מכיל את כל מה שרואה המשתמש בעמוד');
+            } else if (typeof window.showNotification === 'function') {
+                window.showNotification('לוג מפורט הועתק ללוח', 'success');
+            } else {
+                alert('לוג מפורט הועתק ללוח!');
+            }
+        }
+    } catch (error) {
+        console.error('שגיאה בהעתקת הלוג המפורט:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בהעתקת הלוג', error.message);
+        } else {
+            alert('שגיאה בהעתקת הלוג: ' + error.message);
+        }
+    }
+}

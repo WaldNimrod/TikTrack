@@ -37,7 +37,7 @@
     <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=1.0.0">
 
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=v33_green_orange">
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">
 
     <!-- Page-Specific CSS - Last to override all previous styles -->
     <link rel="stylesheet" href="styles/page-scripts-matrix.css?v=1.0.0">
@@ -69,7 +69,7 @@
         <div class="section-header">
           <h2>🗺️ מטריצת סקריפטים ועמודים - מנהל קבצים</h2>
           <div class="header-actions">
-            <button class="action-btn copy-log-btn" onclick="copyDetailedLog()" title="העתק לוג מפורט של כל הממשקים">
+            <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט של כל הממשקים">
               <i class="fas fa-copy"></i> העתק לוג מפורט
             </button>
             <button class="action-btn" onclick="refreshAllData()" title="רענן את כל הנתונים">
@@ -260,15 +260,12 @@
     <script src="scripts/notification-system.js"></script>
     <script src="scripts/system-management.js"></script>
     <script src="scripts/notification-category-detector.js"></script>
-    <script src="scripts/notification-migration-system.js"></script>
     <script src="scripts/global-notification-collector.js"></script>
     <script src="scripts/tables.js"></script>
     <script src="scripts/page-utils.js"></script>
-    <script src="scripts/central-refresh-system.js"></script>
     <script src="scripts/page-scripts-matrix.js"></script>
     
     <!-- New Unified Initialization System -->
-    <script src="scripts/application-initializer.js"></script>
     <script src="scripts/page-initialization-configs.js"></script>
     <script src="scripts/unified-app-initializer.js"></script>
 
@@ -283,6 +280,11 @@
     <!-- ===== TEMPLATE ZONE 3: PAGE BODY END (LOCKED) ===== -->
     </div>
     <!-- ===== TEMPLATE ZONE 1: BACKGROUND WRAPPER END (LOCKED) ===== -->
+    <!-- Local copyDetailedLog function for page-scripts-matrix page -->
+    <script>
+        // Make the local copyDetailedLog function available globally for this page only
+        window.copyDetailedLog = copyDetailedLog;
+    </script>
 </body>
 </html>
 

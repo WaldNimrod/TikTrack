@@ -432,8 +432,8 @@ class PageScriptsMatrixSystem {
      */
     async viewFileDetails(filename) {
         console.log('📄 Viewing details for:', filename);
-        if (window.showNotification) {
-            window.showNotification(`מציג פרטים עבור ${filename}`, 'info');
+        if (window.showInfoNotification) {
+            window.showInfoNotification('מציג פרטים עבור ' + filename);
         }
         
         try {
@@ -520,8 +520,8 @@ class PageScriptsMatrixSystem {
             }
         } catch (error) {
             console.error('Error loading file details:', error);
-            if (window.showNotification) {
-                window.showNotification('שגיאה בטעינת פרטי הקובץ', 'error');
+            if (window.showErrorNotification) {
+                window.showErrorNotification('שגיאה בטעינת פרטי הקובץ');
             }
         }
     }
@@ -534,8 +534,8 @@ class PageScriptsMatrixSystem {
         link.href = `/scripts/${filename}`;
         link.download = filename;
         link.click();
-        if (window.showNotification) {
-            window.showNotification('הורדת קובץ התחילה', 'success');
+        if (window.showSuccessNotification) {
+            window.showSuccessNotification('הורדת קובץ התחילה');
         }
     }
     
@@ -546,8 +546,8 @@ class PageScriptsMatrixSystem {
         try {
             const resultsContent = document.getElementById('architectureResultsContent');
             if (!resultsContent) {
-                if (window.showNotification) {
-                    window.showNotification('לא נמצא דוח ארכיטקטורה להעתקה', 'warning');
+                if (window.showWarningNotification) {
+                    window.showWarningNotification('לא נמצא דוח ארכיטקטורה להעתקה');
                 }
                 return;
             }
@@ -582,8 +582,8 @@ class PageScriptsMatrixSystem {
             // Copy to clipboard
             await navigator.clipboard.writeText(reportText);
             
-            if (window.showNotification) {
-                window.showNotification('דוח ארכיטקטורה הועתק ללוח', 'success');
+            if (window.showSuccessNotification) {
+                window.showSuccessNotification('דוח ארכיטקטורה הועתק ללוח');
             }
             
         } catch (error) {
@@ -2768,6 +2768,34 @@ document.addEventListener('DOMContentLoaded', function() {
     // window.toggleAllSections export removed - using global version from ui-utils.js
     // window.toggleSection export removed - using global version from ui-utils.js
     // window.copyDetailedLog export removed - using global version from system-management.js
+    
+    // Local copyDetailedLog function for page-scripts-matrix page
+    async function copyDetailedLog() {
+        try {
+            const detailedLog = await this.generateDetailedLog();
+            if (detailedLog) {
+                await navigator.clipboard.writeText(detailedLog);
+                if (window.showSuccessNotification) {
+                    window.showSuccessNotification('לוג מפורט הועתק ללוח');
+                } else {
+                    alert('לוג מפורט הועתק ללוח!');
+                }
+            } else {
+                if (window.showWarningNotification) {
+                    window.showWarningNotification('אין לוג להעתקה');
+                } else {
+                    alert('אין לוג להעתקה');
+                }
+            }
+        } catch (err) {
+            console.error('שגיאה בהעתקה:', err);
+            if (window.showErrorNotification) {
+                window.showErrorNotification('שגיאה בהעתקת הלוג');
+            } else {
+                alert('שגיאה בהעתקת הלוג');
+            }
+        }
+    }
     
     console.log('✅ Page Scripts Matrix system ready');
 });

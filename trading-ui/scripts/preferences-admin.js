@@ -490,7 +490,7 @@ window.showAdminError = function(title, message) {
     if (typeof window.showError === 'function') {
         window.showError(title, message);
     } else {
-        alert(`${title}: ${message}`);
+        window.showInfoNotification(`${title}: ${message}`);
     }
 };
 

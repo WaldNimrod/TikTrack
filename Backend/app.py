@@ -136,7 +136,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Initialize Flask-SocketIO with simpler configuration
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading', logger=False, engineio_logger=False)
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading', logger=True, engineio_logger=True)
 
 # Initialize Real-time Notifications Service
 from services.realtime_notifications import RealtimeNotificationsService

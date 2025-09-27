@@ -59,7 +59,7 @@ class RealtimeNotificationsClient {
   loadSocketIO() {
     // Load Socket.IO from CDN if not available
     const script = document.createElement('script');
-    script.src = 'https://cdn.socket.io/4.7.2/socket.io.min.js';
+        script.src = 'https://cdn.socket.io/4.0.1/socket.io.min.js';
     script.onload = () => {
       // console.log('Socket.IO loaded successfully');
       // Wait a bit for the script to initialize
@@ -476,7 +476,7 @@ class RealtimeNotificationsClient {
 
   showConnectionStatus(status) {
     const statusMessages = {
-      'connected': '', // הסרת הודעת חיבור
+      'connected': '✅ מחובר לשרת',
       'disconnected': '🔌 מנותק מהשרת',
       'error': '❌ שגיאת חיבור',
       'reconnected': '🔄 התחבר מחדש',
@@ -485,7 +485,14 @@ class RealtimeNotificationsClient {
 
     const message = statusMessages[status] || 'מצב חיבור לא ידוע';
 
-    if (status === 'connected' || status === 'reconnected') {
+    // Don't show notifications for normal connection status
+    if (status === 'connected') {
+      // Just log to console, don't show notification
+      console.log('🔗 WebSocket connected successfully');
+      return;
+    }
+    
+    if (status === 'reconnected') {
       this.showSuccessNotification('חיבור WebSocket', message, 3000);
     } else if (status === 'error' || status === 'failed') {
       this.showErrorNotification('שגיאת WebSocket', message, 5000);

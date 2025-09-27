@@ -47,6 +47,12 @@
   --apple-text-secondary: #3C3C43;
   --apple-text-tertiary: #3C3C4399;
   --apple-text-quaternary: #3C3C434D;
+  
+  /* ===== צבעי טקסט סמנטיים ===== */
+  --color-text-primary: #000000;
+  --color-text-secondary: #6c757d;
+  --color-text-muted: #868e96;
+  --color-text-primary-dark: #212529;
 
   /* ===== גבולות ===== */
   --apple-border: #C6C6C8;

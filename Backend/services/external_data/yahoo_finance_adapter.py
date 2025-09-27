@@ -1063,13 +1063,14 @@ class YahooFinanceAdapter:
             
             # Use raw SQL to update quotes_last with INSERT OR REPLACE
             # This ensures we maintain the UNIQUE (ticker_id) constraint as specified
+            from sqlalchemy import text
             self.db_session.execute(
-                """
+                text("""
                 INSERT OR REPLACE INTO quotes_last 
                 (ticker_id, price, change_pct_day, change_amount_day, volume, currency, 
                  asof_utc, fetched_at, source)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
+                """),
                 (
                     ticker_id,
                     quote.price,

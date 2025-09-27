@@ -23,6 +23,9 @@ from typing import Dict, Any, Optional, List, Union, Callable
 from datetime import datetime, timedelta
 import threading
 
+# Import cache configuration
+from config.settings import CACHE_ENABLED
+
 logger = logging.getLogger(__name__)
 
 
@@ -171,6 +174,11 @@ class AdvancedCacheService:
             ttl: Time to live in seconds
             dependencies: List of dependency keys
         """
+        # Check if cache is disabled
+        if not CACHE_ENABLED:
+            logger.debug(f"Cache disabled - skipping set for key: {key}")
+            return
+        
         with self.lock:
             # Create cache entry
             entry = CacheEntry(
@@ -203,6 +211,11 @@ class AdvancedCacheService:
         Returns:
             Cached data or None if not found/expired
         """
+        # Check if cache is disabled
+        if not CACHE_ENABLED:
+            logger.debug(f"Cache disabled - returning None for key: {key}")
+            return None
+        
         with self.lock:
             if key not in self.cache:
                 return None
@@ -220,6 +233,11 @@ class AdvancedCacheService:
     
     def delete(self, key: str):
         """Delete entry from cache"""
+        # Check if cache is disabled
+        if not CACHE_ENABLED:
+            logger.debug(f"Cache disabled - skipping delete for key: {key}")
+            return
+        
         with self.lock:
             if key in self.cache:
                 entry = self.cache[key]
@@ -244,6 +262,11 @@ class AdvancedCacheService:
         Args:
             dependency: Dependency key to invalidate
         """
+        # Check if cache is disabled
+        if not CACHE_ENABLED:
+            logger.debug(f"Cache disabled - skipping invalidation for dependency: {dependency}")
+            return
+        
         with self.lock:
             if dependency in self.dependencies:
                 keys_to_invalidate = list(self.dependencies[dependency])
@@ -567,12 +590,50 @@ advanced_cache_service = AdvancedCacheService()
 # Convenience decorators for common use cases
 def cache_for(ttl: int = 300):
     """Simple caching decorator with TTL"""
-    return advanced_cache_service.cache_with_dependencies(ttl=ttl)
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            # Generate cache key based on function and arguments
+            import hashlib
+            func_name = f"{func.__module__}.{func.__name__}"
+            args_str = str(args) + str(sorted(kwargs.items()))
+            cache_key = f"{func_name}:{hashlib.md5(args_str.encode()).hexdigest()}"
+            
+            # Check cache first
+            cached_result = advanced_cache_service.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            
+            # Cache miss - execute function and cache result
+            result = func(*args, **kwargs)
+            advanced_cache_service.set(cache_key, result, ttl=ttl)
+            return result
+        return wrapper
+    return decorator
 
 
 def cache_with_deps(ttl: int = 300, dependencies: List[str] = None):
     """Caching decorator with dependencies"""
-    return advanced_cache_service.cache_with_dependencies(ttl=ttl, dependencies=dependencies)
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            # Generate cache key based on function and arguments
+            import hashlib
+            func_name = f"{func.__module__}.{func.__name__}"
+            args_str = str(args) + str(sorted(kwargs.items()))
+            cache_key = f"{func_name}:{hashlib.md5(args_str.encode()).hexdigest()}"
+            
+            # Check cache first
+            cached_result = advanced_cache_service.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            
+            # Cache miss - execute function and cache result
+            result = func(*args, **kwargs)
+            advanced_cache_service.set(cache_key, result, ttl=ttl, dependencies=dependencies)
+            return result
+        return wrapper
+    return decorator
 
 
 def invalidate_cache(dependencies: List[str]):

@@ -26,6 +26,13 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    
     <!-- Unified CSS - אחרי Bootstrap כדי לדרוס אותו -->
     <!-- CSS Files - אחרי Bootstrap כדי לדרוס אותו -->
     <!-- 🔄 MAJOR ARCHITECTURE CHANGE - September 2025: Individual <link> tags instead of @import -->
@@ -227,128 +234,7 @@
                     </div>
                 </div>
 
-                <div class="content-section" id="indexeddbManagement">
-                    <div class="section-header">
-                        <h2>🗄️ ניהול IndexedDB</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('indexeddbManagement')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
-                    </div>
-                    <div class="section-body">
-                        <div class="card mb-4">
-                            <div class="card-header bg-light">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h3 class="mb-0"><i class="fas fa-database me-2"></i> ניהול IndexedDB</h3>
-                                    <button id="refresh-indexeddb" class="btn btn-secondary btn-sm" onclick="refreshIndexedDBStats()">
-                                        <i class="fas fa-sync me-1"></i> רענן
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <!-- IndexedDB Stats -->
-                                <div class="row mb-3">
-                                    <div class="col-md-3">
-                                        <div class="card text-center">
-                                            <div class="card-body">
-                                                <i class="fas fa-weight fa-2x text-info mb-2"></i>
-                                                <h6 class="card-title">גודל נוכחי</h6>
-                                                <span id="indexeddb-size" class="badge bg-info fs-5">-</span>
-                                                <small class="text-muted d-block">MB</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="card text-center">
-                                            <div class="card-body">
-                                                <i class="fas fa-maximize fa-2x text-warning mb-2"></i>
-                                                <h6 class="card-title">גודל מקסימאלי</h6>
-                                                <span id="indexeddb-max-size" class="badge bg-warning fs-5">100</span>
-                                                <small class="text-muted d-block">MB</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="card text-center">
-                                            <div class="card-body">
-                                                <i class="fas fa-percentage fa-2x text-success mb-2"></i>
-                                                <h6 class="card-title">אחוז שימוש</h6>
-                                                <span id="indexeddb-usage" class="badge bg-success fs-5">-</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="card text-center">
-                                            <div class="card-body">
-                                                <i class="fas fa-list fa-2x text-primary mb-2"></i>
-                                                <h6 class="card-title">מספר רשומות</h6>
-                                                <span id="indexeddb-entries" class="badge bg-primary fs-5">-</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
 
-                                <!-- Control Settings -->
-                                <div class="card mb-3">
-                                    <div class="card-header">
-                                        <h5 class="mb-0"><i class="fas fa-cogs me-2"></i> הגדרות ניקוי אוטומטי</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="row g-3">
-                                            <div class="col-md-6">
-                                                <label for="maxSizeInput" class="form-label">גודל מקסימאלי (MB)</label>
-                                                <input type="number" class="form-control" id="maxSizeInput" value="100" min="10" max="500">
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label for="cleanupIntervalInput" class="form-label">מרווח ניקוי (שעות)</label>
-                                                <input type="number" class="form-control" id="cleanupIntervalInput" value="6" min="1" max="168">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Action Buttons -->
-                                <div class="d-flex gap-2 flex-wrap">
-                                    <button id="manual-cleanup" class="btn btn-warning btn-sm" onclick="manualIndexedDBCleanup()">
-                                        <i class="fas fa-broom me-1"></i> ניקוי ידני
-                                    </button>
-                                    <button id="create-backup" class="btn btn-info btn-sm" onclick="createIndexedDBBackup()">
-                                        <i class="fas fa-save me-1"></i> יצירת גיבוי
-                                    </button>
-                                    <button id="restore-backup" class="btn btn-secondary btn-sm" onclick="restoreIndexedDBBackup()">
-                                        <i class="fas fa-upload me-1"></i> שחזור מגיבוי
-                                    </button>
-                                    <button id="clear-all" class="btn btn-danger btn-sm" onclick="clearAllIndexedDB()">
-                                        <i class="fas fa-trash-alt me-1"></i> נקה הכל
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="content-section" id="consoleLog">
-                    <div class="section-header">
-                        <h2>🖥️ לוג מערכת</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('consoleLog')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
-                    </div>
-                    <div class="section-body">
-                        <div class="card">
-                            <div class="card-header bg-light">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h3 class="mb-0"><i class="fas fa-terminal me-2"></i> לוג מערכת</h3>
-                                    <button class="btn btn-secondary btn-sm" onclick="clearLog()">
-                                        <i class="fas fa-trash me-1"></i> נקה לוג
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <div id="console-output" class="console-output">מאתחל מערכת ניהול משימות רקע...</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- ===== CONTENT SECTIONS END (EDITABLE) ===== -->
             </div>
@@ -363,12 +249,15 @@
     <script src="scripts/translation-utils.js"></script>
     <script src="scripts/data-utils.js"></script>
     <script src="scripts/global-favicon.js"></script>
+    <script src="scripts/unified-cache-manager.js"></script>
+    <script src="scripts/notification-system.js"></script>
     <script src="scripts/ui-utils.js"></script>
     <script src="scripts/table-mappings.js"></script>
     <script src="scripts/date-utils.js"></script>
     <script src="scripts/tables.js"></script>
     <script src="scripts/linked-items.js"></script>
     <script src="scripts/page-utils.js"></script>
+    
     
     <!-- Unified Initialization System -->
     <script src="scripts/page-initialization-configs.js"></script>
@@ -381,6 +270,37 @@
     <script>
         // Make the local copyDetailedLog function available globally for this page only
         window.copyDetailedLog = copyDetailedLog;
+        
+        // Debug function to check if all required systems are loaded
+        window.checkSystemLoad = function() {
+            const systems = {
+                'UnifiedCacheManager': !!window.UnifiedCacheManager,
+                'UnifiedLogManager': !!window.UnifiedLogManager,
+                'UnifiedLogDisplay': !!window.UnifiedLogDisplay,
+                'UnifiedLogAPI': !!window.UnifiedLogAPI,
+                'PaginationSystem': !!window.PaginationSystem,
+                'createPagination': !!window.createPagination,
+                'Socket.IO': !!window.io,
+                'Font Awesome': !!document.querySelector('link[href*="font-awesome"]'),
+                'Bootstrap': !!window.bootstrap
+            };
+            
+            console.log('🔍 System Load Check:', systems);
+            
+            const missing = Object.entries(systems).filter(([name, loaded]) => !loaded);
+            if (missing.length > 0) {
+                console.warn('⚠️ Missing systems:', missing.map(([name]) => name));
+            } else {
+                console.log('✅ All systems loaded successfully');
+            }
+            
+            return systems;
+        };
+        
+        // Auto-check after page load
+        setTimeout(() => {
+            window.checkSystemLoad();
+        }, 2000);
     </script>
 </body>
 </html>

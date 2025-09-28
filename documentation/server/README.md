@@ -32,62 +32,54 @@ This directory contains all server-related documentation for the TikTrack system
 
 ### Server Components ✅ **ENHANCED**
 - **Main Application**: `Backend/app.py` עם שיפורי ביצועים
-- **API Routes**: `Backend/routes/` עם Rate Limiting
-- **Services**: `Backend/services/` עם Cache, Health, Metrics
+- **API Routes**: `Backend/routes/` עם Rate Limiting (23+ blueprints)
+- **Services**: `Backend/services/` עם Cache, Health, Metrics, Background Tasks
 - **Models**: `Backend/models/` עם Query Optimization
 - **Database**: `simpleTrade_new.db` עם Connection Pool ו-Indexes
 - **Utils**: `Backend/utils/` עם Performance Monitor, Error Handlers
 - **Config**: `Backend/config/` עם Logging מתקדם
 
+### **Complex Startup Process**
+The server requires significant initialization time due to:
+- **Database Initialization** - Connection pool setup, table creation
+- **Blueprint Registration** - 23+ API route blueprints
+- **Background Services** - Task scheduler, data refresh scheduler
+- **External Data Integration** - Yahoo Finance connector
+- **Real-time Notifications** - WebSocket services
+- **Performance Monitoring** - Metrics collection, health checks
+- **Cache System** - Advanced cache service initialization
+
+**Typical Startup Time**: 10-30 seconds for full initialization
+
 ## 🚀 Server Management
 
-### 🆕 **Unified Server Restart System (Recommended)**
+### 🆕 **Unified Server Restart System (Current)**
 
-TikTrack now includes a sophisticated unified restart system with multiple modes:
+TikTrack includes a unified restart system with cache mode control:
 
-#### **Smart Auto Mode (Default)**
+#### **Main Restart Script (Recommended)**
 ```bash
-./restart
+./restart                           # Quick restart + preserve cache
+./restart --cache-mode=development  # Quick restart + development cache
+./restart complete                  # Complete restart + preserve cache
+./restart --help                    # Show all options
 ```
-- **Intelligent mode detection** based on system health
-- **Automatic problem diagnosis** and mode selection
-- **Memory usage analysis** and error pattern recognition
-- **Database lock detection** and automatic cleanup
 
-#### **Quick Restart Mode**
-```bash
-./restart quick
-```
-- **Fast restart** (5-10 seconds)
-- **Development and testing** scenarios
-- **Basic health checks** and port cleanup
-- **Minimal logging** and resource usage
+**Features**:
+- **Cache mode control** (development, no-cache, production, preserve)
+- **Automatic mode detection** from server
+- **Environment variable configuration**
+- **Simple, reliable execution**
 
-#### **Complete Restart Mode**
-```bash
-./restart complete
-```
-- **Comprehensive restart** (30-60 seconds)
-- **Production and troubleshooting** scenarios
-- **Complete system analysis** and validation
-- **Route validation** (23+ endpoints)
-- **Automatic problem fixing** and recovery
+#### **Cache Modes**
+- **development**: TTL 10 seconds (fast development)
+- **no-cache**: Cache disabled (immediate updates)
+- **production**: TTL 5 minutes (performance)
+- **preserve**: Keep current cache state (default)
 
-#### **Interactive Mode**
-```bash
-./restart --interactive
-```
-- **User choice** with detailed menu
-- **Mode comparison** and recommendations
-- **System status** display
-
-#### **Additional Options**
-```bash
-./restart --help         # Show all options
-./restart --status       # Show system status
-./restart --info         # Show mode information
-./restart --verbose      # Detailed output
-```
+#### **Restart Modes**
+- **quick**: Fast restart (5-10 seconds) for development
+- **complete**: Comprehensive restart (30-60 seconds) for production
 
 ### Legacy Server Management
 
@@ -159,15 +151,25 @@ python3 Backend/server_health_check.py
 
 ## ⚠️ Common Issues
 
+### Script Hanging
+- **Problem**: Restart scripts appear to hang during startup
+- **Root Cause**: Server takes 10-30 seconds to fully initialize
+- **Solution**: Scripts now use longer timeouts, but may still need adjustment
+
 ### Port Conflicts
-- Check if port 8080 is in use
-- Use different port if needed
+- Check if port 8080 is in use: `lsof -i :8080`
 - Kill existing processes if necessary
+- Use complete restart for thorough cleanup
 
 ### Database Locks
 - SQLite database locks can occur
-- Restart server to resolve
+- Complete restart removes WAL/SHM files
 - Check for long-running transactions
+
+### Cache Mode Issues
+- Cache modes may not be fully synchronized
+- Use `--cache-mode=no-cache` for debugging
+- Check server cache status: `curl -s http://localhost:8080/api/cache/status`
 
 ### Memory Issues
 - Monitor memory usage

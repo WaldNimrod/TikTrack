@@ -613,6 +613,21 @@ class BackgroundTaskManager:
         # Maintain history size
         if len(self.task_history) > self.max_history_size:
             self.task_history.pop(0)
+        
+        # Send to frontend for IndexedDB storage
+        try:
+            if self.realtime_notifications:
+                self.realtime_notifications.emit('background_task_log', {
+                    'task_name': entry.get('task_name'),
+                    'timestamp': entry.get('started_at'),
+                    'status': entry.get('status'),
+                    'duration_ms': entry.get('duration_ms'),
+                    'result': entry.get('result'),
+                    'error': entry.get('error'),
+                    'user_id': entry.get('user_id')
+                })
+        except Exception as e:
+            logger.warning(f"Failed to send background task log to frontend: {e}")
     
     def start_scheduler(self) -> None:
         """Start the background task scheduler"""
@@ -738,6 +753,28 @@ class BackgroundTaskManager:
             }
         
         return status
+    
+    def toggle_task(self, task_name: str) -> bool:
+        """
+        Toggle task enabled/disabled status
+        
+        Args:
+            task_name (str): Name of the task to toggle
+            
+        Returns:
+            bool: New status (True if enabled, False if disabled)
+        """
+        if task_name not in self.tasks:
+            raise ValueError(f"Task {task_name} not found")
+        
+        # Toggle the status
+        old_status = self.tasks[task_name]['enabled']
+        self.tasks[task_name]['enabled'] = not old_status
+        new_status = self.tasks[task_name]['enabled']
+        
+        logger.info(f"Task {task_name} toggled from {old_status} to {new_status}")
+        logger.info(f"Current task status: {self.tasks[task_name]}")
+        return new_status
     
     def get_task_history(self, hours: int = 24) -> List[Dict[str, Any]]:
         """

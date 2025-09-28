@@ -35,7 +35,7 @@ restart_status = {
     'status': 'idle'
 }
 
-def execute_restart_async(mode: str) -> None:
+def execute_restart_async(mode: str, restart_type: str = 'quick') -> None:
     """
     Execute restart script asynchronously to prevent Flask endpoint from hanging
     """
@@ -44,10 +44,11 @@ def execute_restart_async(mode: str) -> None:
     try:
         restart_status['in_progress'] = True
         restart_status['mode'] = mode
+        restart_status['restart_type'] = restart_type
         restart_status['start_time'] = datetime.now()
         restart_status['status'] = 'executing'
         
-        logger.info(f'Starting async restart for mode: {mode}')
+        logger.info(f'Starting async restart for mode: {mode}, type: {restart_type}')
         
         # Get the project root directory
         project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -69,13 +70,24 @@ def execute_restart_async(mode: str) -> None:
         # Make restart script executable
         os.chmod(restart_script, 0o755)
         
-        # Execute restart script with the specified mode
-        logger.info(f'Executing restart script: {restart_script} --cache-mode={mode}')
+        # Build restart command based on type and mode
+        restart_args = [restart_script]
+        
+        # Add restart type if not preserve (preserve uses default quick)
+        if restart_type != 'preserve' and mode == 'preserve':
+            restart_args.append(restart_type)
+        
+        # Add cache mode if not preserve
+        if mode != 'preserve':
+            restart_args.append(f'--cache-mode={mode}')
+        
+        # Execute restart script with the specified parameters
+        logger.info(f'Executing restart script: {" ".join(restart_args)}')
         logger.info(f'Working directory: {project_root}')
         
         # Execute the restart script
         result = subprocess.run(
-            [restart_script, f'--cache-mode={mode}'],
+            restart_args,
             capture_output=True,
             text=True,
             cwd=project_root,
@@ -126,12 +138,21 @@ def change_server_mode() -> Any:
             }), 400
         
         mode = data['mode']
+        restart_type = data.get('restart_type', 'quick')  # ברירת מחדל: quick
+        
         valid_modes = ['development', 'no-cache', 'production', 'preserve']
+        valid_restart_types = ['quick', 'complete', 'auto']
         
         if mode not in valid_modes:
             return jsonify({
                 'status': 'error',
                 'message': f'Invalid mode. Must be one of: {", ".join(valid_modes)}'
+            }), 400
+            
+        if restart_type not in valid_restart_types:
+            return jsonify({
+                'status': 'error',
+                'message': f'Invalid restart_type. Must be one of: {", ".join(valid_restart_types)}'
             }), 400
         
         # Check if restart is already in progress
@@ -171,18 +192,19 @@ def change_server_mode() -> Any:
                 # Start async restart process
                 restart_thread = threading.Thread(
                     target=execute_restart_async,
-                    args=(mode,),
+                    args=(mode, restart_type),
                     daemon=True
                 )
                 restart_thread.start()
                 
-                logger.info(f'Async restart thread started for mode: {mode}')
+                logger.info(f'Async restart thread started for mode: {mode}, type: {restart_type}')
                 
                 return jsonify({
                     'status': 'success',
-                    'message': f'Server restart initiated for mode: {mode}',
+                    'message': f'Server restart initiated for mode: {mode}, type: {restart_type}',
                     'data': {
                         'mode': mode,
+                        'restart_type': restart_type,
                         'timestamp': datetime.now().isoformat(),
                         'restart_id': f'restart_{int(time.time())}',
                         'note': 'Server restart is running in background. Check /api/server/restart-status for progress.',
@@ -195,13 +217,14 @@ def change_server_mode() -> Any:
                 logger.warning(f'Restart script not found at: {restart_script}')
                 return jsonify({
                     'status': 'success',
-                    'message': f'Mode change to {mode} requested successfully',
+                    'message': f'Mode change to {mode} (type: {restart_type}) requested successfully',
                     'data': {
                         'mode': mode,
+                        'restart_type': restart_type,
                         'timestamp': datetime.now().isoformat(),
                         'restart_id': f'manual_{int(time.time())}',
                         'note': 'Restart script not found. Please restart manually.',
-                        'instructions': f'To apply the {mode} mode, please restart the server manually using: ./restart --cache-mode={mode}',
+                        'instructions': f'To apply the {mode} mode with {restart_type} restart, please restart the server manually using: ./restart {restart_type} --cache-mode={mode}',
                         'restart_script_path': restart_script,
                         'project_root': project_root
                     }
@@ -213,13 +236,14 @@ def change_server_mode() -> Any:
             # Provide manual restart instructions as fallback
             return jsonify({
                 'status': 'success',
-                'message': f'Mode change to {mode} requested successfully',
+                'message': f'Mode change to {mode} (type: {restart_type}) requested successfully',
                 'data': {
                     'mode': mode,
+                    'restart_type': restart_type,
                     'timestamp': datetime.now().isoformat(),
                     'restart_id': f'manual_{int(time.time())}',
                     'note': 'Automatic restart failed. Please restart manually.',
-                    'instructions': f'To apply the {mode} mode, please restart the server manually using: ./restart --cache-mode={mode}',
+                    'instructions': f'To apply the {mode} mode with {restart_type} restart, please restart the server manually using: ./restart {restart_type} --cache-mode={mode}',
                     'error': str(restart_error)
                 }
             })

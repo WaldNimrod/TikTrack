@@ -72,11 +72,46 @@ def setup_logging() -> logging.Logger:
     db_handler.setFormatter(log_format)
     logger.addHandler(db_handler)
     
+    # Cache operations log
+    cache_handler = logging.handlers.RotatingFileHandler(
+        log_dir / "cache.log",
+        maxBytes=10*1024*1024,  # 10MB
+        backupCount=3
+    )
+    cache_handler.setLevel(logging.INFO)
+    cache_handler.setFormatter(log_format)
+    logger.addHandler(cache_handler)
+    
     return logger
 
 def get_logger(name: str) -> logging.Logger:
     """Get logger with specific name"""
     return logging.getLogger(name)
+
+def get_cache_logger() -> logging.Logger:
+    """Get dedicated cache logger that writes to cache.log"""
+    cache_logger = logging.getLogger('cache')
+    cache_logger.setLevel(logging.INFO)
+    
+    # Only add handler if it doesn't exist
+    if not cache_logger.handlers:
+        log_dir = Path("logs")
+        log_dir.mkdir(exist_ok=True)
+        
+        log_format = logging.Formatter(
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        )
+        
+        cache_handler = logging.handlers.RotatingFileHandler(
+            log_dir / "cache.log",
+            maxBytes=10*1024*1024,  # 10MB
+            backupCount=3
+        )
+        cache_handler.setLevel(logging.INFO)
+        cache_handler.setFormatter(log_format)
+        cache_logger.addHandler(cache_handler)
+    
+    return cache_logger
 
 # Create correlation ID for each request
 def generate_correlation_id() -> str:

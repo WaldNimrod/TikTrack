@@ -217,6 +217,27 @@ const PAGE_CONFIGS = {
         ]
     },
     
+    'server-monitor': {
+        name: 'Server Monitor',
+        requiresFilters: false,
+        requiresValidation: false,
+        requiresTables: false,
+        customInitializers: [
+            async (pageConfig) => {
+                console.log('🔧 Initializing Server Monitor...');
+                
+                // Initialize server monitor if available
+                if (window.serverMonitor) {
+                    console.log('✅ Server Monitor already initialized');
+                } else {
+                    console.log('⚠️ Server Monitor not available');
+                }
+                
+                console.log('✅ Server Monitor initialization completed');
+            }
+        ]
+    },
+    
     'crud-testing-dashboard': {
         name: 'CRUD Testing',
         requiresFilters: false,
@@ -242,8 +263,30 @@ const PAGE_CONFIGS = {
             async (pageConfig) => {
                 console.log('🌐 Initializing External Data...');
                 
+                // Check if ExternalDataDashboard class is available
+                console.log('🔍 Checking ExternalDataDashboard availability:', {
+                    ExternalDataDashboard: typeof ExternalDataDashboard,
+                    windowExternalDataDashboard: typeof window.ExternalDataDashboard
+                });
+                
                 if (typeof window.loadExternalData === 'function') {
                     await window.loadExternalData();
+                }
+                
+                // Initialize External Data Dashboard
+                if (typeof ExternalDataDashboard !== 'undefined' && !window.externalDataDashboard) {
+                    try {
+                        window.externalDataDashboard = new ExternalDataDashboard();
+                        window.externalDataDashboard.init();
+                        console.log('✅ External Data Dashboard initialized');
+                    } catch (error) {
+                        console.error('❌ Failed to initialize External Data Dashboard:', error);
+                    }
+                } else {
+                    console.log('🔍 External Data Dashboard check:', {
+                        ExternalDataDashboard: typeof ExternalDataDashboard,
+                        externalDataDashboard: typeof window.externalDataDashboard
+                    });
                 }
                 
                 // Initialize Unified Log System
@@ -255,6 +298,189 @@ const PAGE_CONFIGS = {
                         console.warn('⚠️ Failed to initialize Unified Log System:', error);
                     }
                 }
+                
+                // Define global functions for button onclick handlers
+                console.log('🔧 Defining global functions for External Data Dashboard...');
+                
+                window.testProvider = function(providerId) {
+                    // console.log('🧪 Testing provider:', providerId);
+                    // Implementation for testing specific provider
+                };
+
+                window.toggleProvider = function(providerId) {
+                    // console.log('🔄 Toggling provider:', providerId);
+                    // Implementation for toggling provider status
+                };
+
+                window.refreshLogs = function() {
+                    if (window.externalDataDashboard) {
+                        window.externalDataDashboard.loadLogs();
+                    }
+                };
+
+                window.saveSettings = function() {
+                    if (window.externalDataDashboard) {
+                        window.externalDataDashboard.saveSettings();
+                    }
+                };
+
+                window.clearLogs = function() {
+                    if (window.externalDataDashboard) {
+                        window.externalDataDashboard.clearLogs();
+                    }
+                };
+
+                window.analyzeData = function() {
+                    if (window.externalDataDashboard) {
+                        window.externalDataDashboard.analyzeData();
+                    }
+                };
+
+                window.backupData = function() {
+                    if (window.externalDataDashboard) {
+                        window.externalDataDashboard.backupData();
+                    }
+                };
+
+                window.optimizeCache = function() {
+                    if (window.externalDataDashboard) {
+                        window.externalDataDashboard.optimizeCache();
+                    }
+                };
+
+                window.refreshProviders = function() {
+                    if (window.externalDataDashboard) {
+                        window.externalDataDashboard.loadProviders();
+                    }
+                };
+
+                window.testAllProviders = function() {
+                    console.log('🔔 testAllProviders called from global function');
+                    if (window.externalDataDashboard) {
+                        window.externalDataDashboard.testAllProviders();
+                    } else {
+                        console.error('❌ externalDataDashboard not available');
+                    }
+                };
+
+                window.exportData = function() {
+                    if (window.externalDataDashboard) {
+                        window.externalDataDashboard.exportData();
+                    }
+                };
+
+                window.resetSettings = function() {
+                    if (window.externalDataDashboard) {
+                        window.externalDataDashboard.resetSettings();
+                    }
+                };
+
+                window.refreshGroupHistory = function() {
+                    if (window.externalDataDashboard) {
+                        window.externalDataDashboard.loadGroupRefreshHistory();
+                    }
+                };
+
+                window.exportGroupHistory = function() {
+                    if (window.externalDataDashboard) {
+                        window.externalDataDashboard.exportGroupHistory();
+                    }
+                };
+
+                window.validateData = function() {
+                    if (window.externalDataDashboard) {
+                        window.externalDataDashboard.validateData();
+                    }
+                };
+
+                window.runUnitTests = function() {
+                    if (window.externalDataDashboard) {
+                        window.externalDataDashboard.runUnitTests();
+                    }
+                };
+
+                window.testSpecificFunction = function() {
+                    if (window.externalDataDashboard) {
+                        window.externalDataDashboard.testSpecificFunction();
+                    }
+                };
+
+                window.generateTestReport = function() {
+                    if (window.externalDataDashboard) {
+                        window.externalDataDashboard.generateTestReport();
+                    }
+                };
+
+                window.startPerformanceMonitoring = function() {
+                    if (window.externalDataDashboard) {
+                        window.externalDataDashboard.startPerformanceMonitoring();
+                    }
+                };
+
+                window.analyzeBottlenecks = function() {
+                    if (window.externalDataDashboard) {
+                        window.externalDataDashboard.analyzeBottlenecks();
+                    }
+                };
+
+                window.stopPerformanceMonitoring = function() {
+                    if (window.externalDataDashboard) {
+                        window.externalDataDashboard.stopPerformanceMonitoring();
+                    }
+                };
+
+                window.testAPIEndpoints = function() {
+                    if (window.externalDataDashboard) {
+                        window.externalDataDashboard.testAPIEndpoints();
+                    }
+                };
+
+                window.testRateLimiting = function() {
+                    if (window.externalDataDashboard) {
+                        window.externalDataDashboard.testRateLimiting();
+                    }
+                };
+
+                window.testErrorHandling = function() {
+                    if (window.externalDataDashboard) {
+                        window.externalDataDashboard.testErrorHandling();
+                    }
+                };
+
+                window.refreshPerformanceCharts = function() {
+                    if (window.externalDataDashboard) {
+                        window.externalDataDashboard.refreshPerformanceCharts();
+                    }
+                };
+
+                window.exportPerformanceData = function() {
+                    if (window.externalDataDashboard) {
+                        window.externalDataDashboard.exportPerformanceData();
+                    }
+                };
+
+                window.refreshChart = function(chartId) {
+                    if (window.externalDataDashboard) {
+                        switch(chartId) {
+                            case 'responseTimeChart':
+                                window.externalDataDashboard.refreshPerformanceCharts();
+                                break;
+                            case 'dataQualityChart':
+                                window.externalDataDashboard.refreshPerformanceCharts();
+                                break;
+                            case 'providerComparisonChart':
+                                window.externalDataDashboard.refreshPerformanceCharts();
+                                break;
+                            case 'errorAnalysisChart':
+                                window.externalDataDashboard.refreshPerformanceCharts();
+                                break;
+                            default:
+                                console.warn(`Unknown chart ID: ${chartId}`);
+                        }
+                    }
+                };
+                
+                console.log('✅ Global functions defined for External Data Dashboard');
                 
                 // Load external data log after page initialization
                 setTimeout(async () => {

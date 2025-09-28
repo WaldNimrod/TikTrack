@@ -37,7 +37,7 @@ class UnifiedLogDisplay {
         this.currentData = [];
         this.currentFilters = {};
         this.currentSort = { by: null, order: 'desc' };
-        this.currentPagination = { page: 1, itemsPerPage: 20 }; // Will be updated from preferences
+        this.currentPagination = { page: 1, itemsPerPage: 3 }; // Will be updated from preferences
         this.isLoading = false;
         this.paginationInstance = null;
         this.autoRefreshInterval = null;
@@ -408,7 +408,7 @@ class UnifiedLogDisplay {
         
         // Get current page data from pagination
         const currentPageData = this.paginationInstance ? 
-            this.paginationInstance.getCurrentPageData() : this.currentData;
+            this.paginationInstance.getCurrentPageData() : this.currentData.slice(0, this.currentPagination.itemsPerPage);
         
         // Render the current page data
         this.renderTableData(currentPageData);
@@ -422,24 +422,72 @@ class UnifiedLogDisplay {
     createDataRow(item) {
         const row = document.createElement('tr');
         
-        // Format timestamp
-        const timestamp = this.formatTimestamp(item.timestamp);
+        // Format timestamp - handle different timestamp formats
+        let timestamp;
+        if (item.timestamp) {
+            timestamp = this.formatTimestamp(item.timestamp);
+        } else if (item.started_at) {
+            timestamp = this.formatTimestamp(item.started_at);
+        } else {
+            timestamp = '-';
+        }
         
-        // Format type with icon and color
-        const typeDisplay = this.formatType(item.type || item.level);
+        // Format type with icon and color - handle different type formats
+        let typeDisplay;
+        if (item.type || item.level) {
+            typeDisplay = this.formatType(item.type || item.level);
+        } else if (item.status) {
+            typeDisplay = this.formatType(item.status);
+        } else {
+            typeDisplay = '-';
+        }
         
-        // Format title
-        const title = item.title || item.message || '-';
+        // Format title - handle different title formats
+        let title;
+        if (item.title) {
+            title = item.title;
+        } else if (item.task_name) {
+            title = item.task_name;
+        } else if (item.message) {
+            title = item.message;
+        } else {
+            title = '-';
+        }
         
-        // Format message (truncate if too long)
-        const message = item.message || item.error || '-';
+        // Format message (truncate if too long) - handle different message formats
+        let message;
+        if (item.message) {
+            message = item.message;
+        } else if (item.error) {
+            message = item.error;
+        } else if (item.result && typeof item.result === 'object') {
+            message = JSON.stringify(item.result);
+        } else if (item.result) {
+            message = item.result;
+        } else {
+            message = '-';
+        }
         const truncatedMessage = message.length > 100 ? message.substring(0, 100) + '...' : message;
 
-        // Format category with icon and color
-        const categoryDisplay = this.formatCategory(item.category);
+        // Format category with icon and color - handle different category formats
+        let categoryDisplay;
+        if (item.category) {
+            categoryDisplay = this.formatCategory(item.category);
+        } else if (item.task_name) {
+            categoryDisplay = this.formatCategory('background_task');
+        } else {
+            categoryDisplay = '-';
+        }
         
-        // Format page with icon
-        const pageDisplay = this.formatPage(item.page);
+        // Format page with icon - handle different page formats
+        let pageDisplay;
+        if (item.page) {
+            pageDisplay = this.formatPage(item.page);
+        } else if (item.task_name) {
+            pageDisplay = this.formatPage('background_tasks');
+        } else {
+            pageDisplay = '-';
+        }
 
         row.innerHTML = `
             <td class="timestamp-cell">${timestamp}</td>
@@ -578,7 +626,10 @@ class UnifiedLogDisplay {
             'error': { emoji: '❌', color: 'danger', label: 'שגיאה' },
             'warning': { emoji: '⚠️', color: 'warning', label: 'אזהרה' },
             'info': { emoji: 'ℹ️', color: 'info', label: 'מידע' },
-            'debug': { emoji: '🐛', color: 'secondary', label: 'דיבוג' }
+            'debug': { emoji: '🐛', color: 'secondary', label: 'דיבוג' },
+            'executing': { emoji: '🔄', color: 'primary', label: 'מתבצע' },
+            'completed': { emoji: '✅', color: 'success', label: 'הושלם' },
+            'failed': { emoji: '❌', color: 'danger', label: 'נכשל' }
         };
 
         const config = typeConfig[type.toLowerCase()] || { emoji: '❓', color: 'secondary', label: type };
@@ -614,6 +665,7 @@ class UnifiedLogDisplay {
             'performance': { emoji: '⚡', color: '#ffc107', label: 'ביצועים' },
             'ui': { emoji: '🎨', color: '#17a2b8', label: 'ממשק משתמש' },
             'security': { emoji: '🔒', color: '#6f42c1', label: 'אבטחה' },
+            'background_task': { emoji: '🔄', color: '#fd7e14', label: 'משימה ברקע' },
             'network': { emoji: '🌐', color: '#20c997', label: 'רשת' },
             'database': { emoji: '🗄️', color: '#fd7e14', label: 'מסד נתונים' },
             'api': { emoji: '🔌', color: '#e83e8c', label: 'API' },
@@ -912,7 +964,12 @@ ${message}`;
 
         // Show total count from allData (before pagination)
         if (totalCount) totalCount.textContent = this.allData?.length || 0;
-        if (displayedCount) displayedCount.textContent = logData.data?.length || 0;
+        
+        // Show displayed count (current page items)
+        const currentPageSize = this.paginationInstance ? 
+            Math.min(this.currentPagination.itemsPerPage, this.allData?.length || 0) : 
+            this.currentData?.length || 0;
+        if (displayedCount) displayedCount.textContent = currentPageSize;
         if (lastUpdated) lastUpdated.textContent = new Date().toLocaleString('he-IL');
     }
 

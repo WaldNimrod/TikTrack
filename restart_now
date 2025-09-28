@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# TikTrack Restart Script - Final Working Version
-# ===============================================
+# TikTrack Instant Restart - No Waiting
+# ======================================
 # 
 # 🎯 Purpose: Start server and return control immediately
 # ⚡ Features: No waiting, no health checks, instant return
-# 📖 Based on: Analysis of server startup process
+# 📖 Based on: start_dev.sh approach
 
 set -e
 
@@ -120,8 +120,8 @@ main() {
         esac
     done
     
-    echo "🔄 TikTrack Restart Script"
-    echo "=========================="
+    echo "🔄 TikTrack Instant Restart"
+    echo "==========================="
     echo "📅 Started at: $(date '+%H:%M:%S')"
     echo "🎯 Cache Mode: $cache_mode"
     echo "⚡ Approach: Instant return (no waiting)"

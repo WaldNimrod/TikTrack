@@ -733,16 +733,29 @@ async function showInfoNotification(title, message, duration = 4000, category = 
 async function showDetailsModal(title, content, options = {}) {
   console.log('🔍 showDetailsModal called:', { title, content, options });
   
+  // סגירת כל החלונות הקודמים
+  closeAllDetailsModals();
+  
   // Create unique modal ID
   const modalId = `details-modal-${Date.now()}`;
+  
+  // Extract text content for copying
+  const textContent = extractTextFromHTML(content);
   
   // Create modal HTML
   const modalHTML = `
     <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}-label" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
-          <div class="modal-header text-white" style="direction: rtl; background-color: ${window.getEntityColor ? window.getEntityColor('trade') || '#007bff' : '#007bff'};">
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="סגור" style="margin-left: 0; margin-right: auto;"></button>
+          <div class="modal-header text-white d-flex justify-content-between align-items-center" style="direction: rtl; background-color: ${window.getEntityColor ? window.getEntityColor('trade') || '#007bff' : '#007bff'};">
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-sm btn-outline-light" id="${modalId}-copy-btn" title="העתק ללוח">
+                <i class="fas fa-copy"></i> העתק
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-light" id="${modalId}-close-btn" title="סגור">
+                X
+              </button>
+            </div>
             <h4 class="modal-title" id="${modalId}-label">${title}</h4>
           </div>
           <div class="modal-body">
@@ -751,7 +764,7 @@ async function showDetailsModal(title, content, options = {}) {
             </div>
           </div>
           <div class="modal-footer" style="justify-content: flex-end; direction: rtl;">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
+            <button type="button" class="btn btn-secondary" id="${modalId}-footer-close">סגור</button>
           </div>
         </div>
       </div>
@@ -770,33 +783,153 @@ async function showDetailsModal(title, content, options = {}) {
     detailsContent.innerHTML = content;
   }
   
-  // Show modal using existing system
-  if (typeof window.showModal === 'function') {
-    window.showModal(modalId, options);
-  } else if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-    const bootstrapModal = new bootstrap.Modal(modal, options);
-    bootstrapModal.show();
-  } else {
-    console.error('No modal system available');
-    return;
-  }
+  // Show modal using simple system (no Bootstrap dependency)
+  modal.style.display = 'block';
+  modal.classList.add('show');
+  document.body.classList.add('modal-open');
+  
+  // Create backdrop
+  const backdrop = document.createElement('div');
+  backdrop.className = 'modal-backdrop fade show';
+  backdrop.id = `${modalId}-backdrop`;
+  document.body.appendChild(backdrop);
   
   // סגירה בלחיצה על הרקע
   modal.addEventListener('click', (e) => {
     if (e.target === modal) {
-      const bootstrapModal = bootstrap.Modal.getInstance(modal);
-      if (bootstrapModal) {
-        bootstrapModal.hide();
-      }
+      hideModal(modalId);
     }
   });
-
-  // Clean up modal after it's hidden
-  modal.addEventListener('hidden.bs.modal', () => {
-    modal.remove();
-  });
+  
+  // כפתור העתקה
+  const copyButton = modal.querySelector(`#${modalId}-copy-btn`);
+  if (copyButton) {
+    copyButton.addEventListener('click', () => {
+      copyToClipboard(textContent, title);
+    });
+  }
+  
+  // כפתור סגירה בכותרת
+  const headerCloseButton = modal.querySelector(`#${modalId}-close-btn`);
+  if (headerCloseButton) {
+    headerCloseButton.addEventListener('click', () => {
+      hideModal(modalId);
+    });
+  }
+  
+  // כפתור סגירה ב-footer
+  const footerCloseBtn = modal.querySelector(`#${modalId}-footer-close`);
+  if (footerCloseBtn) {
+    footerCloseBtn.addEventListener('click', () => {
+      hideModal(modalId);
+    });
+  }
   
   console.log('✅ Details modal shown:', modalId);
+}
+
+// Helper function to hide modal
+function hideModal(modalId) {
+  const modal = document.getElementById(modalId);
+  const backdrop = document.getElementById(`${modalId}-backdrop`);
+  
+  if (modal) {
+    modal.style.display = 'none';
+    modal.classList.remove('show');
+    document.body.classList.remove('modal-open');
+    modal.remove();
+  }
+  
+  if (backdrop) {
+    backdrop.remove();
+  }
+}
+
+// Helper function to close all details modals
+function closeAllDetailsModals() {
+  // Find all existing details modals
+  const existingModals = document.querySelectorAll('[id^="details-modal-"]');
+  existingModals.forEach(modal => {
+    const modalId = modal.id;
+    hideModal(modalId);
+  });
+  
+  // Remove any remaining backdrops
+  const existingBackdrops = document.querySelectorAll('[id^="details-modal-"][id$="-backdrop"]');
+  existingBackdrops.forEach(backdrop => {
+    backdrop.remove();
+  });
+}
+
+// Helper function to extract text content from HTML
+function extractTextFromHTML(htmlContent) {
+  // Create temporary div to parse HTML
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = htmlContent;
+  
+  // Extract text content
+  let textContent = tempDiv.textContent || tempDiv.innerText || '';
+  
+  // Clean up the text
+  textContent = textContent
+    .replace(/\s+/g, ' ')  // Replace multiple spaces with single space
+    .replace(/\n\s+/g, '\n')  // Clean up line breaks
+    .trim();
+  
+  return textContent;
+}
+
+// Helper function to copy text to clipboard
+function copyToClipboard(textContent, title) {
+  // Format the content with title
+  const formattedContent = `${title}\n${'='.repeat(title.length)}\n\n${textContent}`;
+  
+  try {
+    // Try modern clipboard API first
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(formattedContent).then(() => {
+        showSuccessNotification('התוכן הועתק ללוח בהצלחה', 'העתקה');
+        console.log('✅ Content copied to clipboard via Clipboard API');
+      }).catch(err => {
+        console.warn('Clipboard API failed, trying fallback:', err);
+        fallbackCopyToClipboard(formattedContent);
+      });
+    } else {
+      // Fallback for older browsers or non-secure contexts
+      fallbackCopyToClipboard(formattedContent);
+    }
+  } catch (error) {
+    console.error('❌ Error copying to clipboard:', error);
+    fallbackCopyToClipboard(formattedContent);
+  }
+}
+
+// Fallback copy function
+function fallbackCopyToClipboard(text) {
+  try {
+    // Create temporary textarea
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    textarea.setSelectionRange(0, 99999); // For mobile devices
+    
+    // Copy the text
+    const successful = document.execCommand('copy');
+    document.body.removeChild(textarea);
+    
+    if (successful) {
+      showSuccessNotification('התוכן הועתק ללוח בהצלחה', 'העתקה');
+      console.log('✅ Content copied to clipboard via fallback method');
+    } else {
+      throw new Error('execCommand failed');
+    }
+  } catch (error) {
+    console.error('❌ Fallback copy failed:', error);
+    showErrorNotification('שגיאה בהעתקה ללוח', 'שגיאה');
+  }
 }
 
 // WARNING FUNCTIONS MOVED TO warning-system.js
@@ -1117,6 +1250,66 @@ window.NotificationSystem = {
         return true;
     }
 };
+
+// פונקציה להצגת הודעה מפורטת בחלון
+window.showDetailedNotification = async function(title, message, type = 'info', duration = 8000, category = null) {
+  try {
+    // יצירת modal עם התוכן המפורט
+    const modalId = `detailed-notification-${Date.now()}`;
+    const modalHtml = `
+      <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header bg-${type === 'error' ? 'danger' : type === 'warning' ? 'warning' : type === 'success' ? 'success' : 'info'} text-white">
+              <h5 class="modal-title" id="${modalId}Label">${title}</h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div style="white-space: pre-line; font-family: monospace; font-size: 0.9em;">${message}</div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
+              <button type="button" class="btn btn-primary" onclick="copyToClipboard('${message.replace(/'/g, "\\'")}')">העתק</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // הוספת ה-modal ל-DOM
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    // הצגת ה-modal
+    const modalElement = document.getElementById(modalId);
+    const modal = new bootstrap.Modal(modalElement);
+    modal.show();
+    
+    // הסרת ה-modal אחרי סגירה
+    modalElement.addEventListener('hidden.bs.modal', () => {
+      modalElement.remove();
+    });
+    
+    // סגירה אוטומטית אחרי הזמן שצוין
+    if (duration > 0) {
+      setTimeout(() => {
+        if (modalElement && document.contains(modalElement)) {
+          modal.hide();
+        }
+      }, duration);
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('❌ Error showing detailed notification:', error);
+    // fallback להודעה רגילה
+    return await window.showNotification(message, type, title, duration, category);
+  }
+};
+
+// Export new helper functions to global scope
+window.closeAllDetailsModals = closeAllDetailsModals;
+window.extractTextFromHTML = extractTextFromHTML;
+window.copyToClipboard = copyToClipboard;
 
 // בדיקת פונקציות בסוף טעינת notification-system.js
 // notification-system.js נטען

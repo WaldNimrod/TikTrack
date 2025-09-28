@@ -346,8 +346,23 @@ class UnifiedCacheManager {
         return {
             ...this.stats,
             initialized: this.initialized,
-            layers: Object.keys(this.layers).filter(name => this.layers[name]),
-            policies: Object.keys(this.defaultPolicies)
+            layers: this.stats.layers || {
+                memory: { entries: 0, size: 0 },
+                localStorage: { entries: 0, size: 0 },
+                indexedDB: { entries: 0, size: 0 },
+                backend: { entries: 0, size: 0 }
+            },
+            performance: this.stats.performance || {
+                avgResponseTime: 0,
+                hitRate: 0
+            },
+            operations: this.stats.operations || {
+                get: 0,
+                set: 0,
+                delete: 0,
+                hits: 0,
+                misses: 0
+            }
         };
     }
 
@@ -857,43 +872,6 @@ class BackendCacheLayer {
         };
     }
 
-    /**
-     * Initialize the Unified Cache Manager
-     */
-    async initialize() {
-        if (this.initialized) {
-            console.log('✅ UnifiedCacheManager already initialized');
-            return;
-        }
-
-        try {
-            console.log('🔄 Initializing UnifiedCacheManager...');
-            
-            // Initialize IndexedDB if available
-            if (window.indexedDB) {
-                await this.initializeIndexedDB();
-            }
-            
-            // Load existing data from localStorage
-            this.loadFromLocalStorage();
-            
-            // Initialize stats
-            this.updateStats();
-            
-            this.initialized = true;
-            console.log('✅ UnifiedCacheManager initialized successfully');
-            
-        } catch (error) {
-            console.error('❌ Failed to initialize UnifiedCacheManager:', error);
-            console.error('❌ Error details:', {
-                message: error.message,
-                stack: error.stack,
-                name: error.name
-            });
-            console.log('⚠️ Continuing with basic initialization...');
-            this.initialized = true; // Set as initialized even if some parts failed
-        }
-    }
 
     /**
      * Initialize IndexedDB
@@ -966,6 +944,13 @@ class BackendCacheLayer {
                     performance: {
                         avgResponseTime: 0,
                         hitRate: 0
+                    },
+                    operations: {
+                        get: 0,
+                        set: 0,
+                        delete: 0,
+                        hits: 0,
+                        misses: 0
                     }
                 };
             }
@@ -1000,6 +985,13 @@ class BackendCacheLayer {
                     performance: {
                         avgResponseTime: 0,
                         hitRate: 0
+                    },
+                    operations: {
+                        get: 0,
+                        set: 0,
+                        delete: 0,
+                        hits: 0,
+                        misses: 0
                     }
                 };
             }
@@ -1030,6 +1022,13 @@ class BackendCacheLayer {
                     performance: {
                         avgResponseTime: 0,
                         hitRate: 0
+                    },
+                    operations: {
+                        get: 0,
+                        set: 0,
+                        delete: 0,
+                        hits: 0,
+                        misses: 0
                     }
                 };
             }
@@ -1067,6 +1066,7 @@ class BackendCacheLayer {
 
 // יצירת instance גלובלי
 window.UnifiedCacheManager = new UnifiedCacheManager();
+
 
 // הוספה למערכת האתחול המאוחדת
 if (window.UnifiedInitializationSystem) {

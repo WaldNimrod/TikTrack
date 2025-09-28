@@ -333,35 +333,35 @@ window.UnifiedLogAPI = new UnifiedLogAPI();
 /**
  * Quick function to show notification log
  */
-window.showNotificationLog = function(containerId, options = {}) {
+window.showNotificationLog = function(containerId = 'unified-logs-container', options = {}) {
     return window.UnifiedLogAPI.showLog('notificationHistory', containerId, options);
 };
 
 /**
  * Quick function to show linter log
  */
-window.showLinterLog = function(containerId, options = {}) {
+window.showLinterLog = function(containerId = 'unified-logs-container', options = {}) {
     return window.UnifiedLogAPI.showLog('linterHistory', containerId, options);
 };
 
 /**
  * Quick function to show system logs
  */
-window.showSystemLogs = function(containerId, options = {}) {
+window.showSystemLogs = function(containerId = 'unified-logs-container', options = {}) {
     return window.UnifiedLogAPI.showLog('systemLogs', containerId, options);
 };
 
 /**
  * Quick function to show error reports
  */
-window.showErrorReports = function(containerId, options = {}) {
+window.showErrorReports = function(containerId = 'unified-logs-container', options = {}) {
     return window.UnifiedLogAPI.showLog('errorReports', containerId, options);
 };
 
 /**
  * Quick function to show file mappings
  */
-window.showFileMappings = function(containerId, options = {}) {
+window.showFileMappings = function(containerId = 'unified-logs-container', options = {}) {
     return window.UnifiedLogAPI.showLog('fileMappings', containerId, options);
 };
 
@@ -370,6 +370,76 @@ window.showFileMappings = function(containerId, options = {}) {
  */
 window.showChartHistory = function(containerId, options = {}) {
     return window.UnifiedLogAPI.showLog('chartHistory', containerId, options);
+};
+
+/**
+ * Quick function to show background tasks log
+ */
+window.showBackgroundTasksLog = function(containerId = 'unified-logs-container', options = {}) {
+    return window.UnifiedLogAPI.showLog('backgroundTasksLog', containerId, options);
+};
+
+/**
+ * Quick function to show external data log
+ */
+window.showExternalDataLog = function(containerId = 'unified-logs-container', options = {}) {
+    return window.UnifiedLogAPI.showLog('externalDataLog', containerId, options);
+};
+
+/**
+ * Quick function to show server app logs
+ */
+window.showServerAppLogs = function(containerId = 'unified-logs-container', options = {}) {
+    return window.UnifiedLogAPI.showLog('serverAppLogs', containerId, options);
+};
+
+/**
+ * Quick function to show server error logs
+ */
+window.showServerErrorLogs = function(containerId = 'unified-logs-container', options = {}) {
+    return window.UnifiedLogAPI.showLog('serverErrorLogs', containerId, options);
+};
+
+/**
+ * Quick function to show server performance logs
+ */
+window.showServerPerformanceLogs = function(containerId = 'unified-logs-container', options = {}) {
+    return window.UnifiedLogAPI.showLog('serverPerformanceLogs', containerId, options);
+};
+
+/**
+ * Quick function to show server database logs
+ */
+window.showServerDatabaseLogs = function(containerId = 'unified-logs-container', options = {}) {
+    return window.UnifiedLogAPI.showLog('serverDatabaseLogs', containerId, options);
+};
+
+/**
+ * Quick function to show server cache logs
+ */
+window.showServerCacheLogs = function(containerId = 'unified-logs-container', options = {}) {
+    return window.UnifiedLogAPI.showLog('serverCacheLogs', containerId, options);
+};
+
+/**
+ * Quick function to show server background tasks logs
+ */
+window.showServerBackgroundTasksLogs = function(containerId = 'unified-logs-container', options = {}) {
+    return window.UnifiedLogAPI.showLog('serverBackgroundTasksLogs', containerId, options);
+};
+
+/**
+ * Quick function to show background tasks file log (alias)
+ */
+window.showBackgroundTasksFileLog = function(containerId = 'unified-logs-container', options = {}) {
+    return window.showServerBackgroundTasksLogs(containerId, options);
+};
+
+/**
+ * Quick function to show cache log
+ */
+window.showCacheLog = function(containerId = 'unified-logs-container', options = {}) {
+    return window.UnifiedLogAPI.showLog('cacheLog', containerId, options);
 };
 
 /**

@@ -101,21 +101,9 @@
                             <div>עדכון אחרון: <strong id="last-update-time">טוען...</strong></div>
                             <div>סטטוס: <strong id="overall-status">טוען...</strong></div>
                         </div>
-                    </div>
-                </div>
-                <!-- UI Content Section Top End -->  
-
-                <!-- UI Content Section 1 Start-->
-                <div class="content-section" id="section1">
-                    <div class="section-header">
-                        <h2>📊 סטטיסטיקות מערכת</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
-                    </div>
-                    <div class="section-body">
-                        <!-- כאן נכנס התוכן של גוף הסקשן -->
-                        <div class="row">
+                        
+                        <!-- סטטיסטיקות בכרטיסים קטנים -->
+                        <div class="row mt-3">
                             <div class="col-md-3">
                                 <div class="card text-center">
                                     <div class="card-body">
@@ -149,15 +137,54 @@
                                 </div>
                             </div>
                         </div>
+                        
+                        <!-- מידע טכני -->
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">📊 ביצועים</h6>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <small class="text-muted">זמן טעינת עמוד:</small><br>
+                                                <strong id="page-load-time">טוען...</strong>
+                                            </div>
+                                            <div class="col-6">
+                                                <small class="text-muted">זיכרון בשימוש:</small><br>
+                                                <strong id="memory-usage">טוען...</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">🔧 מידע טכני</h6>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <small class="text-muted">User Agent:</small><br>
+                                                <small id="user-agent">טוען...</small>
+                                            </div>
+                                            <div class="col-6">
+                                                <small class="text-muted">Platform:</small><br>
+                                                <small id="platform">טוען...</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <!-- UI Content Section 1 End -->   
+                <!-- UI Content Section Top End -->  
 
-                <!-- UI Content Section 2 Start-->
-                <div class="content-section" id="section2">
+
+                <!-- UI Content Section 1 Start-->
+                <div class="content-section" id="section1">
                     <div class="section-header">
                         <h2>🔗 ספקי נתונים</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
@@ -204,38 +231,202 @@
                         </div>
                     </div>
                 </div>
-                <!-- UI Content Section 2 End--> 
+                <!-- UI Content Section 1 End--> 
 
-                <!-- UI Content Section 3 Start-->
+
+                <!-- UI Content Section 2 Start - Development Tools -->
+                <div class="content-section" id="section2">
+                    <div class="section-header">
+                        <h2>🔧 כלי פיתוח מתקדמים</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card mb-3">
+                                    <div class="card-header">
+                                        <h6 class="card-title mb-0">🧪 בדיקות יחידה</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <button class="btn btn-outline-primary w-100 mb-2" onclick="runUnitTests()">
+                                            <i class="fas fa-play"></i> הרץ בדיקות
+                                        </button>
+                                        <button class="btn btn-outline-secondary w-100 mb-2" onclick="testSpecificFunction()">
+                                            <i class="fas fa-bug"></i> בדיקת פונקציה
+                                        </button>
+                                        <button class="btn btn-outline-info w-100" onclick="generateTestReport()">
+                                            <i class="fas fa-file-alt"></i> דוח בדיקות
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card mb-3">
+                                    <div class="card-header">
+                                        <h6 class="card-title mb-0">⚡ ניטור ביצועים</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <button class="btn btn-outline-success w-100 mb-2" onclick="startPerformanceMonitoring()">
+                                            <i class="fas fa-play-circle"></i> התחל ניטור
+                                        </button>
+                                        <button class="btn btn-outline-warning w-100 mb-2" onclick="analyzeBottlenecks()">
+                                            <i class="fas fa-search"></i> ניתוח צווארי בקבוק
+                                        </button>
+                                        <button class="btn btn-outline-danger w-100" onclick="stopPerformanceMonitoring()">
+                                            <i class="fas fa-stop-circle"></i> עצור ניטור
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card mb-3">
+                                    <div class="card-header">
+                                        <h6 class="card-title mb-0">📋 ניהול נתונים</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <button class="btn btn-outline-success w-100 mb-2" onclick="testAllProviders()">
+                                            <i class="fas fa-sync"></i> רענן כל הנתונים
+                                        </button>
+                                        <button class="btn btn-outline-info w-100 mb-2" onclick="exportData()">
+                                            <i class="fas fa-download"></i> ייצא נתונים
+                                        </button>
+                                        <button class="btn btn-outline-warning w-100" onclick="backupData()">
+                                            <i class="fas fa-database"></i> גיבוי נתונים
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card mb-3">
+                                    <div class="card-header">
+                                        <h6 class="card-title mb-0">🔍 בדיקת API</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <button class="btn btn-outline-primary w-100 mb-2" onclick="testAPIEndpoints()">
+                                            <i class="fas fa-network-wired"></i> בדיקת Endpoints
+                                        </button>
+                                        <button class="btn btn-outline-secondary w-100 mb-2" onclick="testRateLimiting()">
+                                            <i class="fas fa-tachometer-alt"></i> בדיקת Rate Limiting
+                                        </button>
+                                        <button class="btn btn-outline-info w-100" onclick="testErrorHandling()">
+                                            <i class="fas fa-exclamation-triangle"></i> בדיקת שגיאות
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 2 End - Development Tools -->
+
+                <!-- UI Content Section 3 Start - Performance Analytics -->
                 <div class="content-section" id="section3">
                     <div class="section-header">
-                        <h2>📋 ניהול נתונים</h2>
+                        <h2>📈 ניתוח ביצועים ומגמות</h2>
+                        <div class="section-actions">
+                            <button class="btn btn-sm btn-outline-primary" onclick="refreshPerformanceCharts()">
+                                <i class="fas fa-sync-alt"></i> רענן גרפים
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="exportPerformanceData()">
+                                <i class="fas fa-download"></i> ייצא נתונים
+                            </button>
+                        </div>
                         <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
                     <div class="section-body">
-                        <!-- כאן נכנס התוכן של גוף הסקשן -->
-                        <div class="row">
-                            <div class="col-md-4">
-                                <button class="btn btn-success w-100 mb-3" onclick="testAllProviders()">
-                                    <i class="fas fa-sync"></i> רענן כל הנתונים
-                                </button>
+                        <!-- Performance Charts Grid -->
+                        <div class="row g-4">
+                            <!-- Chart 1: Response Time Trends -->
+                            <div class="col-lg-6">
+                                <div class="card h-100">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-chart-line text-primary"></i> מגמות זמן תגובה
+                                        </h5>
+                                        <div class="chart-actions">
+                                            <button class="btn btn-sm btn-outline-primary" onclick="refreshChart('responseTimeChart')">
+                                                <i class="fas fa-sync-alt"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-container" style="position: relative; height: 300px;">
+                                            <canvas id="responseTimeChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-4">
-                                <button class="btn btn-info w-100 mb-3" onclick="exportData()">
-                                    <i class="fas fa-download"></i> ייצא נתונים
-                                </button>
+
+                            <!-- Chart 2: Data Quality Metrics -->
+                            <div class="col-lg-6">
+                                <div class="card h-100">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-chart-pie text-success"></i> מדדי איכות נתונים
+                                        </h5>
+                                        <div class="chart-actions">
+                                            <button class="btn btn-sm btn-outline-primary" onclick="refreshChart('dataQualityChart')">
+                                                <i class="fas fa-sync-alt"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-container" style="position: relative; height: 300px;">
+                                            <canvas id="dataQualityChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-4">
-                                <button class="btn btn-warning w-100 mb-3" onclick="backupData()">
-                                    <i class="fas fa-database"></i> גיבוי נתונים
-                                </button>
+
+                            <!-- Chart 3: Provider Comparison -->
+                            <div class="col-lg-6">
+                                <div class="card h-100">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-chart-bar text-warning"></i> השוואת ספקים
+                                        </h5>
+                                        <div class="chart-actions">
+                                            <button class="btn btn-sm btn-outline-primary" onclick="refreshChart('providerComparisonChart')">
+                                                <i class="fas fa-sync-alt"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-container" style="position: relative; height: 300px;">
+                                            <canvas id="providerComparisonChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Chart 4: Error Analysis -->
+                            <div class="col-lg-6">
+                                <div class="card h-100">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-chart-area text-danger"></i> ניתוח שגיאות
+                                        </h5>
+                                        <div class="chart-actions">
+                                            <button class="btn btn-sm btn-outline-primary" onclick="refreshChart('errorAnalysisChart')">
+                                                <i class="fas fa-sync-alt"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-container" style="position: relative; height: 300px;">
+                                            <canvas id="errorAnalysisChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- UI Content Section 3 End--> 
+                <!-- UI Content Section 3 End - Performance Analytics -->
 
                 <!-- UI Content Section 4 Start - External Data Log -->
                 <div class="content-section" id="section4">
@@ -264,18 +455,25 @@
     <script src="scripts/ui-utils.js"></script>
     <script src="scripts/data-utils.js"></script>
     <script src="scripts/notification-system.js"></script>
-    <script src="scripts/system-management.js"></script>
     <script src="scripts/notification-category-detector.js"></script>
+    
+    <!-- Cache System -->
+    <script src="scripts/unified-cache-manager.js"></script>
+    <script src="scripts/cache-sync-manager.js"></script>
+    <script src="scripts/cache-policy-manager.js"></script>
+    <script src="scripts/memory-optimizer.js"></script>
     <script src="scripts/global-notification-collector.js"></script>
     <script src="scripts/tables.js"></script>
     <script src="scripts/page-utils.js"></script>
-    <script src="scripts/external-data-dashboard.js"></script>
     
     <!-- Unified Log System -->
     <script src="scripts/pagination-system.js"></script>
     <script src="scripts/unified-log-manager.js"></script>
     <script src="scripts/unified-log-display.js"></script>
     <script src="scripts/unified-log-api.js"></script>
+    
+    <!-- Page-specific scripts (loaded before initialization system) -->
+    <script src="scripts/external-data-dashboard.js"></script>
     
     <!-- New Unified Initialization System -->
     <script src="scripts/page-initialization-configs.js"></script>
@@ -306,5 +504,8 @@
             }
         };
     </script>
+    
+    <!-- Chart.js for performance analytics - loaded at the end to avoid MIME type errors -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 </html>

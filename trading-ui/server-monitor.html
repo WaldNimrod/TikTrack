@@ -6,58 +6,58 @@
     <!-- Favicon will be set by global-favicon.js -->
     <title>ניטור שרת - TikTrack</title>
     
+    <!-- 
+    ===== IMPORTANT DEVELOPMENT RULES =====
+    
+    CSS RULES:
+    - Only external CSS files are used, following the system's CSS architecture
+    - NO inline styles or styles within the page are allowed in this system
+    - All styling must be defined in external stylesheets according to ITCSS methodology
+    
+    JAVASCRIPT RULES:
+    - All functions are located in external files
+    - NO functions are allowed within the page
+    - All system functions use shared global functions located in dedicated files
+    - Page-specific functions should be centralized only in the page's dedicated script file
+    
+    ======================================
+    
+    CSS Loading Order - ראו: documentation/frontend/css/CSS_ARCHITECTURE.md
+    Bootstrap חייב להיטען לפני CSS שלנו כדי ש-CSS שלנו יוכל לדרוס אותו
+    -->
+    
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- 🔄 MAJOR ARCHITECTURE CHANGE - September 2025: Individual <link> tags instead of @import -->
-    <!-- Unified CSS -->
     <!-- CSS Files - אחרי Bootstrap כדי לדרוס אותו -->
-    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/02-tools/_normalize.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/03-generic/_box-sizing.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/04-elements/_lists.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/04-elements/_tables.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/04-elements/_forms.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/04-elements/_buttons.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/05-objects/_containers.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/05-objects/_media.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/05-objects/_tables.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/06-components/_buttons.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/06-components/_forms.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/06-components/_alerts.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/06-components/_badges.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/06-components/_progress.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/06-components/_pagination-system.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/07-utilities/_spacing.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/07-utilities/_text.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/07-utilities/_colors.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/07-utilities/_display.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/07-utilities/_flexbox.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/07-utilities/_sizing.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/07-utilities/_position.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/07-utilities/_borders.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/07-utilities/_shadows.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/07-utilities/_opacity.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/07-utilities/_overflow.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/07-utilities/_float.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/07-utilities/_clearfix.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/07-utilities/_screenreaders.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/07-utilities/_print.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/08-overrides/_bootstrap-overrides.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/08-overrides/_third-party-overrides.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/09-pages/_development-tools.css?v=20250115">
-    <link rel="stylesheet" href="styles-new/09-pages/_server-monitor.css?v=20250115">
+    <!-- 🔄 MAJOR ARCHITECTURE CHANGE - September 2025: Individual <link> tags instead of @import -->
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=1.0.1">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=1.0.1">
+        <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=1.0.3">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=1.0.1">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=1.0.1">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_monitoring-enhanced.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=20250923_fixed_colors_v2">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=1.0.1">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=1.0.0">
     
-    <!-- Custom CSS for this page -->
-    <link rel="stylesheet" href="styles-new/09-pages/_server-monitor.css?v=20250115">
+    <!-- Header Styles -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">
 </head>
 <body>
     <div class="background-wrapper">
@@ -74,38 +74,93 @@
                 <!-- UI Content Section Top Start-->
                 <div class="top-section" data-section="top">
                     <div class="section-header">
+                        <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
                         <h2>🖥️ ניטור שרת</h2>
-                        <div class="header-actions">
-                            <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
-                                <i class="fas fa-copy"></i> העתק לוג מפורט
+                        
+                        <!-- כפתורים מרכזיים -->
+                        <div class="section-actions">
+                            <button class="btn btn-sm btn-outline-primary" id="monitoringAnalysisBtn" title="הצג ניתוח מפורט של מצב הניתור">
+                                📊 ניתוח ניתור
                             </button>
-                            <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
-                                <span class="section-toggle-icon">▼</span>
+                            <button class="btn btn-sm btn-outline-secondary" id="copyDetailedLogBtn" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
+                                📋 העתק לוג מפורט
                             </button>
                         </div>
+                        
+                        <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
                     </div>
                     <div class="section-body">
-                        <!-- Monitoring Status -->
-                        <div class="monitoring-status" id="monitoringStatus">
-                            <div class="status-indicator">
-                                <span class="status-text" id="statusText">מאתחל...</span>
-                                <span class="last-check" id="lastCheck">-</span>
+                        <!-- Monitoring Status - Enhanced for Development -->
+                        <div class="monitoring-status-enhanced" id="monitoringStatus">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <div class="status-indicator-large">
+                                        <div class="status-circle" id="monitoringStatusCircle">
+                                            <i class="fas fa-circle" id="monitoringIcon"></i>
+                                        </div>
+                                        <div class="status-text-large">
+                                            <h4 id="statusText">מאתחל...</h4>
+                                            <p id="monitoringDetails" class="text-muted">מתחבר לשרת...</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="monitoring-controls">
+                                        <button class="btn btn-success btn-sm" id="startMonitoringBtn">
+                                            ▶️ התחל
+                                        </button>
+                                        <button class="btn btn-warning btn-sm" id="pauseMonitoringBtn">
+                                            ⏸️ השהייה
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" id="stopMonitoringBtn">
+                                            ⏹️ עצור
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Page summary -->
-                        <div class="info-summary" id="summaryStats">
-                            <div>סטטוס שרת: <strong id="serverStatusStats">בדיקה...</strong></div>
-                            <div>בסיס נתונים: <strong id="databaseStatusStats">בדיקה...</strong></div>
-                            <div>Cache: <strong id="cacheStatusStats">בדיקה...</strong></div>
-                            <div>סטטוס כללי: <strong id="overallStatus">בדיקה...</strong></div>
+                        <!-- System Status Traffic Light - Development Focus -->
+                        <div class="system-status-traffic-light" id="summaryStats">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="traffic-light-item">
+                                        <div class="light" id="serverLight"></div>
+                                        <div class="light-label">שרת</div>
+                                        <div class="light-status" id="serverStatusStats">בדיקה...</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="traffic-light-item">
+                                        <div class="light" id="databaseLight"></div>
+                                        <div class="light-label">בסיס נתונים</div>
+                                        <div class="light-status" id="databaseStatusStats">בדיקה...</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="traffic-light-item">
+                                        <div class="light" id="cacheLight"></div>
+                                        <div class="light-label">מטמון</div>
+                                        <div class="light-status" id="cacheStatusStats">בדיקה...</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="traffic-light-item">
+                                        <div class="light" id="overallLight"></div>
+                                        <div class="light-label">כללי</div>
+                                        <div class="light-status" id="overallStatus">בדיקה...</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <!-- UI Content Section Top End -->  
 
                 <!-- UI Content Section 1 Start-->
-                <div class="content-section" id="section1">
+                <div class="content-section" id="section1" data-section="section1">
                     <div class="section-header">
                         <h2>⚡ פעולות מהירות</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
@@ -115,23 +170,44 @@
                     <div class="section-body">
                         <div class="row">
                             <div class="col-md-3">
-                                <button class="btn btn-success w-100 mb-3" onclick="restartServer()">
-                                    <i class="fas fa-power-off"></i> הפעל שרת
-                                </button>
+        <!-- בחירת מצב Cache -->
+        <div class="mb-3">
+            <label for="cacheMode" class="form-label">מצב Cache:</label>
+            <select id="cacheMode" class="form-select">
+                <option value="preserve">שמור מצב נוכחי (ברירת מחדל)</option>
+                <option value="development">פיתוח (TTL 10 שניות)</option>
+                <option value="no-cache">ללא Cache (עדכונים מיידיים)</option>
+                <option value="production">ייצור (TTL 5 דקות)</option>
+            </select>
+        </div>
+        
+        <!-- בחירת סוג איתחול -->
+        <div class="mb-3">
+            <label for="restartType" class="form-label">סוג איתחול:</label>
+            <select id="restartType" class="form-select">
+                <option value="quick">מהיר (5-10 שניות) - ברירת מחדל</option>
+                <option value="complete">מלא (30-60 שניות) - לפתרון בעיות</option>
+                <option value="auto">אוטומטי - זיהוי חכם</option>
+            </select>
+        </div>
+        
+        <button class="btn btn-success w-100 mb-3" onclick="restartServerAdvanced()">
+            🔄 הפעל שרת
+        </button>
                             </div>
                             <div class="col-md-3">
                                 <button class="btn btn-warning w-100 mb-3" onclick="stopServer()">
-                                    <i class="fas fa-stop"></i> עצור שרת
+                                    ⏹️ עצור שרת
                                 </button>
                             </div>
                             <div class="col-md-3">
                                 <button class="btn btn-info w-100 mb-3" onclick="refreshStatus()">
-                                    <i class="fas fa-sync"></i> רענן סטטוס
+                                    🔄 רענן סטטוס
                                 </button>
                             </div>
                             <div class="col-md-3">
                                 <button class="btn btn-secondary w-100 mb-3" onclick="clearLogs()">
-                                    <i class="fas fa-trash"></i> נקה לוגים
+                                    🗑️ נקה לוגים
                                 </button>
                             </div>
                         </div>
@@ -140,7 +216,7 @@
                 <!-- UI Content Section 1 End -->   
 
                 <!-- UI Content Section 2 Start-->
-                <div class="content-section" id="section2">
+                <div class="content-section" id="section2" data-section="section2">
                     <div class="section-header">
                         <h2>📊 סטטיסטיקות מערכת</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
@@ -205,11 +281,100 @@
                 </div>
                 <!-- UI Content Section 2 End--> 
 
+
                 <!-- UI Content Section 3 Start-->
-                <div class="content-section" id="section3">
+                <div class="content-section" id="section3" data-section="section3">
+                    <div class="section-header">
+                        <h2>🔌 API Status & Endpoints</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3>❤️ Server Health</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="text-center">
+                                                    <h4 id="apiHealth" class="text-success">פעיל</h4>
+                                                    <small class="text-muted">סטטוס כללי</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="text-center">
+                                                    <h4 id="apiResponseTime">-</h4>
+                                                    <small class="text-muted">זמן תגובה</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="text-center">
+                                                    <h4 id="serverPort">8080</h4>
+                                                    <small class="text-muted">פורט שרת</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="text-center">
+                                                    <h4 id="lastApiCheck">-</h4>
+                                                    <small class="text-muted">בדיקה אחרונה</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-3 text-center">
+                                            <button class="btn btn-primary" onclick="checkApiHealth()">
+                                                ❤️ בדיקת בריאות מפורטת
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h3>🔗 All API Endpoints</h3>
+                                            <small class="text-muted">מקרא: 🟢 פעיל | 🔴 שגיאה | 🟡 בדיקה | ⚫ לא נבדק | ⏱️ Rate Limited | ❓ לא נמצא</small>
+                                        </div>
+                                        <div>
+                                            <button class="btn btn-sm btn-success" onclick="scanNewEndpoints()">
+                                                🔍 סריקה חוזרת
+                                            </button>
+                                            <button class="btn btn-sm btn-primary" onclick="testAllEndpoints()">
+                                                🧪 בדוק הכל
+                                            </button>
+                                            <button class="btn btn-sm btn-secondary" onclick="refreshEndpointStatus()">
+                                                🔄 רענן
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div id="endpointsList">
+                                                    <!-- Endpoints will be populated here -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 3 End-->
+
+                <!-- UI Content Section 4 Start-->
+                <div class="content-section" id="section4" data-section="section4">
                     <div class="section-header">
                         <h2>📋 לוגים</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
@@ -219,7 +384,7 @@
                         </div>
                     </div>
                 </div>
-                <!-- UI Content Section 3 End-->
+                <!-- UI Content Section 4 End-->
                 <!-- CONTENT SECTIONS EDITABLE - END -->
             </div>
         </div>
@@ -235,11 +400,23 @@
     <script src="scripts/ui-utils.js"></script>
     <script src="scripts/data-utils.js"></script>
     <script src="scripts/notification-system.js"></script>
+    <script src="scripts/warning-system.js"></script>
     <script src="scripts/system-management.js"></script>
     <script src="scripts/notification-category-detector.js"></script>
     <script src="scripts/global-notification-collector.js"></script>
     <script src="scripts/tables.js"></script>
     <script src="scripts/page-utils.js"></script>
+    
+    <!-- Cache System - Not needed for server-monitor page -->
+    <!-- <script src="scripts/unified-cache-manager.js"></script> -->
+    <!-- <script src="scripts/cache-sync-manager.js"></script> -->
+    <!-- <script src="scripts/cache-policy-manager.js"></script> -->
+    <!-- <script src="scripts/memory-optimizer.js"></script> -->
+    
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Page Specific -->
     <script src="scripts/server-monitor.js"></script>
     
     <!-- New Unified Initialization System -->
@@ -248,138 +425,5 @@
 
     <!-- 🔓 TEMPLATE ZONE 6 - Page-Specific Scripts (ADD NEW SCRIPTS HERE) -->
     <!-- No manual DOMContentLoaded listener needed - handled by unified system -->
-
-    <script>
-        // Page-specific functionality
-        function generateDetailedLog() {
-            try {
-                const logData = {
-                    timestamp: new Date().toISOString(),
-                    page: 'server-monitor',
-                    url: window.location.href,
-                    userAgent: navigator.userAgent,
-                    viewport: {
-                        width: window.innerWidth,
-                        height: window.innerHeight
-                    },
-                    performance: {
-                        loadTime: performance.timing.loadEventEnd - performance.timing.navigationStart,
-                        domContentLoaded: performance.timing.domContentLoadedEventEnd - performance.timing.navigationStart
-                    },
-                    memory: window.performance.memory ? {
-                        used: window.performance.memory.usedJSHeapSize,
-                        total: window.performance.memory.totalJSHeapSize,
-                        limit: window.performance.memory.jsHeapSizeLimit
-                    } : null,
-                    serverStatus: {
-                        monitoringStatus: document.getElementById('monitoringStatus')?.textContent || 'לא נמצא',
-                        serverStatus: document.getElementById('serverStatus')?.textContent || 'לא נמצא',
-                        databaseStatus: document.getElementById('databaseStatus')?.textContent || 'לא נמצא',
-                        summaryStats: document.getElementById('summaryStats')?.textContent || 'לא נמצא'
-                    },
-                    sections: {
-                        section1: {
-                            title: 'פעולות מהירות',
-                            visible: !document.getElementById('section1')?.classList.contains('d-none'),
-                            content: document.getElementById('section1')?.textContent || 'לא נמצא'
-                        },
-                        section2: {
-                            title: 'סטטיסטיקות מערכת',
-                            visible: !document.getElementById('section2')?.classList.contains('d-none'),
-                            content: document.getElementById('section2')?.textContent || 'לא נמצא'
-                        },
-                        section3: {
-                            title: 'לוגים',
-                            visible: !document.getElementById('section3')?.classList.contains('d-none'),
-                            content: document.getElementById('section3')?.textContent || 'לא נמצא'
-                        }
-                    },
-                    console: {
-                        errors: [],
-                        warnings: [],
-                        logs: []
-                    }
-                };
-
-                // Capture console messages
-                const originalError = console.error;
-                const originalWarn = console.warn;
-                const originalLog = console.log;
-
-                console.error = function(...args) {
-                    logData.console.errors.push(args.join(' '));
-                    originalError.apply(console, args);
-                };
-
-                console.warn = function(...args) {
-                    logData.console.warnings.push(args.join(' '));
-                    originalWarn.apply(console, args);
-                };
-
-                console.log = function(...args) {
-                    logData.console.logs.push(args.join(' '));
-                    originalLog.apply(console, args);
-                };
-
-                return JSON.stringify(logData, null, 2);
-            } catch (error) {
-                return `Error generating log: ${error.message}`;
-            }
-        }
-
-        function copyDetailedLog() {
-            try {
-                const logContent = generateDetailedLog();
-                navigator.clipboard.writeText(logContent).then(() => {
-                    if (window.showNotification) {
-                        window.showNotification('לוג מפורט הועתק ללוח', 'success');
-                    } else {
-                        alert('לוג מפורט הועתק ללוח');
-                    }
-                }).catch(err => {
-                    console.error('Failed to copy log:', err);
-                    // Fallback: show in console
-                    console.log('Detailed Log:', logContent);
-                    if (window.showNotification) {
-                        window.showNotification('לוג מפורט הוצג בקונסול', 'info');
-                    } else {
-                        alert('לוג מפורט הוצג בקונסול');
-                    }
-                });
-            } catch (error) {
-                console.error('Error copying log:', error);
-                if (window.showNotification) {
-                    window.showNotification('שגיאה בהעתקת הלוג', 'error');
-                } else {
-                    alert('שגיאה בהעתקת הלוג');
-                }
-            }
-        }
-
-        // Export functions to global scope
-        window.copyDetailedLog = copyDetailedLog;
-        window.generateDetailedLog = generateDetailedLog;
-
-        // Page initialization
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Server Monitor page loaded');
-            
-            // Initialize monitoring
-            if (typeof initializeMonitoring === 'function') {
-                initializeMonitoring();
-            }
-            
-            // Start status refresh
-            if (typeof startStatusRefresh === 'function') {
-                startStatusRefresh();
-            }
-        });
-    </script>
-    
-    <!-- Local copyDetailedLog function for server-monitor page -->
-    <script>
-        // Make the local copyDetailedLog function available globally for this page only
-        window.copyDetailedLog = copyDetailedLog;
-    </script>
 </body>
 </html>

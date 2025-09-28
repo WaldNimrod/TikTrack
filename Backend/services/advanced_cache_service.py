@@ -25,8 +25,10 @@ import threading
 
 # Import cache configuration
 from config.settings import CACHE_ENABLED
+from config.logging import get_cache_logger
 
 logger = logging.getLogger(__name__)
+cache_logger = get_cache_logger()
 
 
 class CacheEntry:
@@ -176,7 +178,7 @@ class AdvancedCacheService:
         """
         # Check if cache is disabled
         if not CACHE_ENABLED:
-            logger.debug(f"Cache disabled - skipping set for key: {key}")
+            cache_logger.info(f"Cache disabled - skipping set for key: {key}")
             return
         
         with self.lock:
@@ -199,6 +201,8 @@ class AdvancedCacheService:
                         self.dependencies[dep] = set()
                     self.dependencies[dep].add(key)
             
+            # Log cache operation
+            cache_logger.info(f"Cache SET: {key} (TTL: {ttl}s, Dependencies: {dependencies}, Data size: {len(str(data))} chars)")
             logger.debug(f"Cache set: {key} (TTL: {ttl}s, Dependencies: {dependencies})")
     
     def get(self, key: str) -> Optional[Any]:
@@ -218,17 +222,25 @@ class AdvancedCacheService:
         
         with self.lock:
             if key not in self.cache:
+                self.stats['misses'] += 1
+                cache_logger.info(f"Cache MISS: {key}")
                 return None
             
             entry = self.cache[key]
             
             # Check if expired
             if entry.is_expired():
+                self.stats['misses'] += 1
+                cache_logger.info(f"Cache EXPIRED: {key} (Age: {time.time() - entry.created_at:.1f}s)")
                 self.delete(key)
                 return None
             
             # Record access
             entry.access()
+            self.stats['hits'] += 1
+            
+            # Log cache hit
+            cache_logger.info(f"Cache HIT: {key} (Access count: {entry.access_count})")
             return entry.data
     
     def delete(self, key: str):
@@ -253,6 +265,8 @@ class AdvancedCacheService:
                 del self.cache[key]
                 self.stats['deletes'] += 1
                 
+                # Log cache delete
+                cache_logger.info(f"Cache DELETE: {key} (Was accessed {entry.access_count} times)")
                 logger.debug(f"Cache delete: {key}")
     
     def invalidate_by_dependency(self, dependency: str):

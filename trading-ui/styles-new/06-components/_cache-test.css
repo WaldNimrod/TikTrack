@@ -294,6 +294,7 @@
 .cache-status-card .badge {
     font-size: 0.8em;
     padding: 4px 8px;
+    color: white !important;
 }
 
 /* Dependencies Matrix Styles */

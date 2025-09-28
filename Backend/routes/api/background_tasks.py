@@ -104,7 +104,7 @@ def get_background_tasks_status():
 
 @background_tasks_bp.route('/tasks', methods=['GET'])
 @monitor_performance("background_tasks_list")
-@cache_for(ttl=30)  # Cache for 30 seconds - background tasks list changes frequently
+# @cache_for(ttl=30)  # Cache disabled - tasks status needs to be real-time for testing
 def get_background_tasks():
     """
     Get list of all background tasks with detailed information
@@ -287,23 +287,26 @@ def toggle_background_task(task_name: str):
         JSON: Updated task status
     """
     try:
-        tasks = background_task_manager.get_task_status()['tasks']
-        
-        if task_name not in tasks:
+        # Check if task exists
+        if task_name not in background_task_manager.tasks:
             return jsonify({
                 'error': 'Task not found',
                 'task_name': task_name
             }), 404
         
-        current_status = tasks[task_name]['enabled']
+        current_status = background_task_manager.tasks[task_name]['enabled']
         new_status = not current_status
         
         # Toggle task status
+        logger.info(f"About to toggle task {task_name} from {current_status} to {new_status}")
         if hasattr(background_task_manager, 'toggle_task'):
+            logger.info(f"Using toggle_task method")
             background_task_manager.toggle_task(task_name)
         else:
+            logger.info(f"Using fallback method")
             # Fallback: update the task status directly
-            tasks[task_name]['enabled'] = new_status
+            background_task_manager.tasks[task_name]['enabled'] = new_status
+        logger.info(f"Task {task_name} status after toggle: {background_task_manager.tasks[task_name]['enabled']}")
         
         # Invalidate cache for background tasks
         invalidate_cache('background_tasks')

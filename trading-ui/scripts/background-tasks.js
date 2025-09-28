@@ -110,10 +110,20 @@ const utils = {
     if (!element) {return;}
 
     if (show) {
-      element.innerHTML = '<i class="fas fa-spinner fa-spin"></i> טוען...';
+      element.innerHTML = '🔄 טוען...';
       element.classList.add('loading');
+      element.disabled = true;
     } else {
       element.classList.remove('loading');
+      element.disabled = false;
+      // Restore original content based on element type
+      if (elementId.includes('start-scheduler')) {
+        element.innerHTML = '▶️ הפעל Scheduler';
+      } else if (elementId.includes('stop-scheduler')) {
+        element.innerHTML = '⏹️ עצור Scheduler';
+      } else if (elementId.includes('refresh-')) {
+        element.innerHTML = '🔄 רענן';
+      }
     }
   },
 
@@ -244,8 +254,6 @@ const uiManager = {
      * Update system status display
      */
   updateStatus(status) {
-    console.log('🔧 Updating UI status:', status);
-
     // Update scheduler status
     const schedulerStatus = document.getElementById('scheduler-status');
     if (schedulerStatus) {
@@ -255,11 +263,17 @@ const uiManager = {
 
     // Update performance metrics
     const metrics = status.performance_metrics || {};
+    
     this.updateElement('total-tasks', metrics.total_tasks || 0);
     this.updateElement('enabled-tasks', metrics.enabled_tasks || 0);
     this.updateElement('running-tasks', metrics.running_tasks || 0);
     this.updateElement('success-rate', utils.formatSuccessRate(metrics.success_rate_overall));
-    this.updateElement('total-executions', metrics.total_executions || 0);
+    
+    // Update summary stats
+    this.updateElement('schedulerStatusStats', status.scheduler_running ? 'פועל' : 'עצור');
+    this.updateElement('enabledTasksStats', metrics.enabled_tasks || 0);
+    this.updateElement('runningTasksStats', metrics.running_tasks || 0);
+    this.updateElement('overallStatus', metrics.success_rate_overall ? `${metrics.success_rate_overall}%` : '0%');
 
     // Update button states
     this.updateSchedulerButtons(status.scheduler_running);
@@ -269,7 +283,6 @@ const uiManager = {
      * Update scheduler button states
      */
   updateSchedulerButtons(isRunning) {
-    console.log('🔧 Updating scheduler buttons, isRunning:', isRunning);
     const startBtn = document.getElementById('start-scheduler');
     const stopBtn = document.getElementById('stop-scheduler');
 
@@ -278,16 +291,14 @@ const uiManager = {
         // Scheduler is running - show only stop button
         startBtn.style.setProperty('display', 'none', 'important');
         stopBtn.style.setProperty('display', 'inline-block', 'important');
-        stopBtn.innerHTML = '<i class="fas fa-stop me-1"></i> עצור Scheduler';
+        stopBtn.innerHTML = '⏹️ עצור Scheduler';
         stopBtn.disabled = false;
-        console.log('🟢 Scheduler running - showing stop button');
       } else {
         // Scheduler is stopped - show only start button
         startBtn.style.setProperty('display', 'inline-block', 'important');
         stopBtn.style.setProperty('display', 'none', 'important');
-        startBtn.innerHTML = '<i class="fas fa-play me-1"></i> הפעל Scheduler';
+        startBtn.innerHTML = '▶️ הפעל Scheduler';
         startBtn.disabled = false;
-        console.log('🔴 Scheduler stopped - showing start button');
       }
     }
   },
@@ -306,8 +317,12 @@ const uiManager = {
      * Render tasks table
      */
   renderTasks(tasks) {
-    const tbody = document.getElementById('tasks-tbody');
-    if (!tbody) {return;}
+    const tbody = document.querySelector('#tasks-table tbody');
+    if (!tbody) {
+      console.error('❌ tasks-table tbody not found');
+      return;
+    }
+    console.log('✅ Found tbody, rendering', tasks?.length || 0, 'tasks');
 
     if (!tasks || tasks.length === 0) {
       tbody.innerHTML = '<tr><td colspan="7" class="no-data">אין משימות זמינות</td></tr>';
@@ -331,15 +346,17 @@ const uiManager = {
                 <td>${utils.formatSuccessRate(task.success_rate)}</td>
                 <td>
                     <div class="action-buttons">
-                        <button class="btn btn-sm btn-success" onclick="executeTask('${task.name}')" ${!task.enabled ? 'disabled' : ''}>
-                            <i class="fas fa-play"></i> הפעל
+                        <button class="btn btn-sm btn-success" onclick="executeTask('${task.name}')" ${!task.enabled ? 'disabled' : ''} title="הפעל משימה">
+                            ▶️
                         </button>
-                        <button class="btn btn-sm btn-warning" onclick="toggleTask('${task.name}')">
-                            <i class="fas fa-toggle-${task.enabled ? 'on' : 'off'}"></i>
-                            ${task.enabled ? 'כבה' : 'הפעל'}
+                        <button class="btn btn-sm btn-warning" onclick="toggleTask('${task.name}')" title="${task.enabled ? 'כבה משימה' : 'הפעל משימה'}">
+                            ${task.enabled ? '⏸️' : '▶️'}
                         </button>
-                        <button class="btn btn-sm btn-primary" onclick="showTaskDetails('${task.name}')">
-                            <i class="fas fa-info-circle"></i> פרטים
+                        <button class="btn btn-sm btn-danger" onclick="stopTask('${task.name}')" ${!task.enabled ? 'disabled' : ''} title="עצור משימה">
+                            ⏹️
+                        </button>
+                        <button class="btn btn-sm btn-primary" onclick="showTaskDetails('${task.name}')" title="פרטי משימה">
+                            ℹ️
                         </button>
                     </div>
                 </td>
@@ -351,51 +368,14 @@ const uiManager = {
      * Render history table
      */
   renderHistory(history) {
-    const tbody = document.getElementById('history-tbody');
-    if (!tbody) {return;}
-
-    if (!history || history.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" class="no-data">אין היסטוריה זמינה</td></tr>';
-      return;
-    }
-
-    tbody.innerHTML = history.map(entry => `
-            <tr>
-                <td>${utils.formatTimestamp(entry.timestamp)}</td>
-                <td><strong>${entry.task_name}</strong></td>
-                <td>
-                    <span class="task-status ${entry.status === 'success' ? 'enabled' : 'disabled'}">
-                        ${entry.status === 'success' ? 'הצלחה' : 'שגיאה'}
-                    </span>
-                </td>
-                <td>${utils.formatDuration(entry.duration_ms || 0)}</td>
-                <td>
-                    ${entry.result ?
-    `<span class="result-summary">${JSON.stringify(entry.result).substring(0, 50)}...</span>` :
-    'אין תוצאה'
-}
-                </td>
-                <td>
-                    <button class="btn btn-sm btn-primary" 
-                            onclick="showHistoryDetails('${entry.execution_id || entry.timestamp}')">
-                        <i class="fas fa-eye"></i> צפה
-                    </button>
-                </td>
-            </tr>
-        `).join('');
+    // History UI elements not implemented yet - silently ignore
   },
 
   /**
      * Render analytics
      */
   renderAnalytics(analytics) {
-    // Update general stats
-    this.updateElement('analytics-total-executions', analytics.total_executions || 0);
-    this.updateElement('analytics-success-rate', utils.formatSuccessRate(analytics.success_rate));
-    this.updateElement('analytics-avg-duration', utils.formatDuration(analytics.average_duration_ms || 0));
-
-    // Render task performance chart
-    this.renderTaskPerformanceChart(analytics.task_performance || {});
+    // Analytics UI elements not implemented yet - silently ignore
   },
 
   /**
@@ -632,24 +612,17 @@ const eventHandlers = {
      * Start scheduler
      */
   async startScheduler() {
-    console.log('🚀 startScheduler clicked!');
     try {
       utils.showLoading('start-scheduler', true);
-      console.log('📡 Calling API to start scheduler...');
       const result = await apiService.startScheduler();
-      console.log('📡 Start scheduler API response:', result);
       utils.showNotification('Scheduler הופעל בהצלחה', 'success');
-      console.log('🔄 Refreshing status after start...');
-      // Wait a bit for server to update
       await new Promise(resolve => setTimeout(resolve, 1000));
       await eventHandlers.refreshStatus();
-      console.log('✅ startScheduler completed successfully');
     } catch (error) {
       console.error('❌ Error in startScheduler:', error);
       utils.showNotification(`שגיאה בהפעלת Scheduler: ${error.message}`, 'error');
     } finally {
       utils.showLoading('start-scheduler', false);
-      console.log('🔄 startScheduler loading cleared');
     }
   },
 
@@ -657,24 +630,18 @@ const eventHandlers = {
      * Stop scheduler
      */
   async stopScheduler() {
-    console.log('🛑 stopScheduler clicked!');
     try {
       utils.showLoading('stop-scheduler', true);
-      console.log('📡 Calling API to stop scheduler...');
       const result = await apiService.stopScheduler();
-      console.log('📡 Stop scheduler API response:', result);
       utils.showNotification('Scheduler נעצר בהצלחה', 'success');
-      console.log('🔄 Refreshing status after stop...');
-      // Wait a bit for server to update
       await new Promise(resolve => setTimeout(resolve, 1000));
       await eventHandlers.refreshStatus();
-      console.log('✅ stopScheduler completed successfully');
+      await eventHandlers.refreshTasks();
     } catch (error) {
       console.error('❌ Error in stopScheduler:', error);
       utils.showNotification(`שגיאה בעצירת Scheduler: ${error.message}`, 'error');
     } finally {
       utils.showLoading('stop-scheduler', false);
-      console.log('🔄 stopScheduler loading cleared');
     }
   },
 
@@ -682,14 +649,19 @@ const eventHandlers = {
      * Refresh system status
      */
   async refreshStatus() {
-    console.log('🔄 refreshStatus started');
     try {
-      const status = await apiService.getStatus();
-      console.log('📊 Status received:', status);
+      // Clear cache before refreshing to ensure fresh data
+      if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+        await window.UnifiedCacheManager.clear('memory');
+        console.log('🧹 Cleared memory cache before refreshing status');
+      }
+      
+      const response = await apiService.getStatus();
+      const status = response.data || response;
       uiManager.updateStatus(status);
-      console.log('✅ refreshStatus completed');
     } catch (error) {
       console.error('❌ Failed to refresh status:', error);
+      utils.showNotification('שגיאה בטעינת סטטוס המערכת', 'error');
     }
   },
 
@@ -697,18 +669,24 @@ const eventHandlers = {
      * Refresh tasks list
      */
   async refreshTasks() {
-    console.log('🔄 refreshTasks started');
     try {
       utils.showLoading('refresh-tasks', true);
-      const tasks = await apiService.getTasks();
-      console.log('📋 Tasks received:', tasks);
-      uiManager.renderTasks(tasks.tasks || []);
-      console.log('✅ refreshTasks completed');
+      
+      // Clear cache before refreshing to ensure fresh data
+      if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+        await window.UnifiedCacheManager.clear('memory');
+        console.log('🧹 Cleared memory cache before refreshing tasks');
+      }
+      
+      const response = await apiService.getTasks();
+      const tasks = response.tasks || response.data?.tasks || [];
+      console.log('📋 refreshTasks: received', tasks?.length || 0, 'tasks');
+      uiManager.renderTasks(tasks);
     } catch (error) {
       console.error('❌ Failed to refresh tasks:', error);
+      utils.showNotification('שגיאה בטעינת רשימת המשימות', 'error');
     } finally {
       utils.showLoading('refresh-tasks', false);
-      console.log('🔄 refreshTasks loading cleared');
     }
   },
 
@@ -735,19 +713,24 @@ const eventHandlers = {
      * Refresh history
      */
   async refreshHistory() {
-    console.log('🔄 refreshHistory started');
     try {
       utils.showLoading('refresh-history', true);
+      
+      // Clear cache before refreshing to ensure fresh data
+      if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+        await window.UnifiedCacheManager.clear('memory');
+        console.log('🧹 Cleared memory cache before refreshing history');
+      }
+      
       const hours = document.getElementById('history-hours')?.value || 24;
-      const history = await apiService.getHistory({ hours });
-      console.log('📜 History received:', history);
-      uiManager.renderHistory(history.history || []);
-      console.log('✅ refreshHistory completed');
+      const response = await apiService.getHistory({ hours });
+      const history = response.history || response.data?.history || [];
+      uiManager.renderHistory(history);
     } catch (error) {
       console.error('❌ Failed to refresh history:', error);
+      utils.showNotification('שגיאה בטעינת היסטוריית המשימות', 'error');
     } finally {
       utils.showLoading('refresh-history', false);
-      console.log('🔄 refreshHistory loading cleared');
     }
   },
 
@@ -775,19 +758,24 @@ const eventHandlers = {
      * Refresh analytics
      */
   async refreshAnalytics() {
-    console.log('🔄 refreshAnalytics started');
     try {
       utils.showLoading('refresh-analytics', true);
+      
+      // Clear cache before refreshing to ensure fresh data
+      if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+        await window.UnifiedCacheManager.clear('memory');
+        console.log('🧹 Cleared memory cache before refreshing analytics');
+      }
+      
       const period = document.getElementById('analytics-period')?.value || '7d';
-      const analytics = await apiService.getAnalytics({ period });
-      console.log('📊 Analytics received:', analytics);
+      const response = await apiService.getAnalytics({ period });
+      const analytics = response.data || response;
       uiManager.renderAnalytics(analytics);
-      console.log('✅ refreshAnalytics completed');
     } catch (error) {
       console.error('❌ Failed to refresh analytics:', error);
+      utils.showNotification('שגיאה בטעינת אנליטיקס המשימות', 'error');
     } finally {
       utils.showLoading('refresh-analytics', false);
-      console.log('🔄 refreshAnalytics loading cleared');
     }
   },
 
@@ -828,11 +816,11 @@ window.executeTask = async function(taskName) {
     const result = await apiService.executeTask(taskName);
     utils.showNotification(`משימה ${taskName} הופעלה בהצלחה`, 'success');
 
-    // Refresh data
-    await eventHandlers.refreshStatus();
+    // Refresh data with delay to avoid rate limiting
+    await new Promise(resolve => setTimeout(resolve, 500));
     await eventHandlers.refreshTasks();
+    await new Promise(resolve => setTimeout(resolve, 500));
     await eventHandlers.refreshHistory();
-    await eventHandlers.refreshAnalytics();
 
     return result;
   } catch (error) {
@@ -847,8 +835,8 @@ window.toggleTask = async function(taskName) {
     const newStatus = result.new_status ? 'הופעלה' : 'כובתה';
     utils.showNotification(`משימה ${taskName} ${newStatus} בהצלחה`, 'success');
 
-    // Refresh data
-    await eventHandlers.refreshStatus();
+    // Refresh data with delay to avoid rate limiting
+    await new Promise(resolve => setTimeout(resolve, 500));
     await eventHandlers.refreshTasks();
 
     return result;
@@ -858,8 +846,133 @@ window.toggleTask = async function(taskName) {
   }
 };
 
-window.showTaskDetails = function(taskName) {
-  modalManager.showTaskDetails(taskName);
+window.executeTask = async function(taskName) {
+  try {
+    utils.showNotification(`מפעיל משימה: ${taskName}`, 'info');
+    const result = await apiService.executeTask(taskName);
+    utils.showNotification(`משימה ${taskName} הופעלה בהצלחה`, 'success');
+
+    // Refresh data with delay to avoid rate limiting
+    await new Promise(resolve => setTimeout(resolve, 500));
+    await eventHandlers.refreshTasks();
+    await new Promise(resolve => setTimeout(resolve, 500));
+    await eventHandlers.refreshHistory();
+
+    return result;
+  } catch (error) {
+    utils.showNotification(`שגיאה בהפעלת משימה ${taskName}: ${error.message}`, 'error');
+    throw error;
+  }
+};
+
+window.toggleTask = async function(taskName) {
+  console.log('🔄 toggleTask called with:', taskName);
+  try {
+    const result = await apiService.toggleTask(taskName);
+    console.log('✅ toggleTask result:', result);
+    const newStatus = result.new_status ? 'הופעלה' : 'כובתה';
+    utils.showNotification(`משימה ${taskName} ${newStatus} בהצלחה`, 'success');
+
+    // Refresh data with delay to avoid rate limiting
+    await new Promise(resolve => setTimeout(resolve, 500));
+    await eventHandlers.refreshTasks();
+    await new Promise(resolve => setTimeout(resolve, 500));
+    await eventHandlers.refreshHistory();
+
+    return result;
+  } catch (error) {
+    console.error('❌ toggleTask error:', error);
+    utils.showNotification(`שגיאה בשינוי סטטוס משימה ${taskName}: ${error.message}`, 'error');
+    throw error;
+  }
+};
+
+window.stopTask = async function(taskName) {
+  console.log('🛑 stopTask called with:', taskName);
+  try {
+    utils.showNotification(`עוצר משימה: ${taskName}`, 'info');
+    
+    // First disable the task
+    const result = await apiService.toggleTask(taskName);
+    console.log('✅ stopTask result:', result);
+    
+    if (result.new_status === false) {
+      utils.showNotification(`משימה ${taskName} נעצרה בהצלחה`, 'success');
+    } else {
+      utils.showNotification(`משימה ${taskName} כבר לא פעילה`, 'warning');
+    }
+
+    // Refresh data with delay to avoid rate limiting
+    await new Promise(resolve => setTimeout(resolve, 500));
+    await eventHandlers.refreshTasks();
+    await new Promise(resolve => setTimeout(resolve, 500));
+    await eventHandlers.refreshHistory();
+
+    return result;
+  } catch (error) {
+    console.error('❌ stopTask error:', error);
+    utils.showNotification(`שגיאה בעצירת משימה ${taskName}: ${error.message}`, 'error');
+    throw error;
+  }
+};
+
+window.showTaskDetails = async function(taskName) {
+  try {
+    // Get task details from API
+    const details = await apiService.getTaskDetails(taskName);
+    
+    // Format details for display
+    const content = `
+      <div class="task-details">
+        <h5>פרטי משימה: ${taskName}</h5>
+        <div class="details-grid">
+          <div class="detail-item">
+            <strong>שם:</strong> ${details.name || taskName}
+          </div>
+          <div class="detail-item">
+            <strong>תיאור:</strong> ${details.description || 'אין תיאור'}
+          </div>
+          <div class="detail-item">
+            <strong>תזמון:</strong> ${details.schedule_interval || 'N/A'}
+          </div>
+          <div class="detail-item">
+            <strong>סטטוס:</strong> ${details.enabled ? 'פעיל' : 'לא פעיל'}
+          </div>
+          <div class="detail-item">
+            <strong>ביצוע אחרון:</strong> ${details.last_run ? utils.formatTimestamp(details.last_run) : 'לא בוצע'}
+          </div>
+          <div class="detail-item">
+            <strong>משך ביצוע:</strong> ${details.last_duration_ms ? utils.formatDuration(details.last_duration_ms) : 'N/A'}
+          </div>
+          <div class="detail-item">
+            <strong>אחוז הצלחה:</strong> ${utils.formatSuccessRate(details.success_rate)}
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Show details modal using notification system
+    window.showDetailsModal(`פרטי משימה: ${taskName}`, content);
+    
+  } catch (error) {
+    utils.showNotification(`שגיאה בטעינת פרטי המשימה: ${error.message}`, 'error');
+  }
+};
+
+window.startScheduler = function() {
+  eventHandlers.startScheduler();
+};
+
+window.stopScheduler = function() {
+  eventHandlers.stopScheduler();
+};
+
+window.refreshStatus = function() {
+  eventHandlers.refreshStatus();
+};
+
+window.refreshTasks = function() {
+  eventHandlers.refreshTasks();
 };
 
 window.showHistoryDetails = function(executionId) {
@@ -1034,10 +1147,12 @@ const detailedLogGenerator = {
 // Main initialization
 async function initializeBackgroundTasks() {
   try {
-    console.log('Initializing Background Tasks Management...');
 
     // Initialize event handlers
     eventHandlers.init();
+
+    // Initialize real-time log listener
+    initializeRealtimeLogListener();
 
     // Load initial data
     await Promise.all([
@@ -1056,10 +1171,9 @@ async function initializeBackgroundTasks() {
       copyLogBtn.addEventListener('click', () => {
         detailedLogGenerator.copyDetailedLog();
       });
-      console.log('Detailed log button initialized');
     }
 
-    console.log('Background Tasks Management initialized successfully');
+    
 
   } catch (error) {
     console.error('Failed to initialize Background Tasks Management:', error);
@@ -1138,129 +1252,10 @@ window.refreshTasks = function() {
   eventHandlers.refreshTasks();
 };
 
-window.refreshIndexedDBStats = async function() {
-  try {
-    console.log('📊 Refreshing IndexedDB stats...');
-    const data = await apiService.request('/api/indexeddb/stats');
-    
-    // Update UI with IndexedDB stats
-    const updateElement = (id, value) => {
-      const element = document.getElementById(id);
-      if (element) element.textContent = value;
-    };
-    
-    updateElement('indexeddb-size', data.total_size_mb.toFixed(1));
-    updateElement('indexeddb-max-size', data.max_size_mb);
-    updateElement('indexeddb-usage', data.usage_percentage.toFixed(1) + '%');
-    updateElement('indexeddb-entries', data.total_entries);
-    
-    // Update progress bar color based on usage
-    const usageElement = document.getElementById('indexeddb-usage');
-    const usagePercent = data.usage_percentage;
-    
-    if (usagePercent < 60) {
-      usageElement.className = 'badge bg-success fs-5';
-    } else if (usagePercent < 80) {
-      usageElement.className = 'badge bg-warning fs-5';
-    } else {
-      usageElement.className = 'badge bg-danger fs-5';
-    }
-    
-    console.log(`✅ IndexedDB stats updated: ${data.total_size_mb.toFixed(1)}MB (${data.total_entries} entries)`);
-    utils.showNotification('IndexedDB stats updated', 'success');
-  } catch (error) {
-    console.error('❌ Error updating IndexedDB stats:', error);
-    utils.showNotification(`Error updating stats: ${error.message}`, 'error');
-  }
-};
 
-window.manualIndexedDBCleanup = async function() {
-  try {
-    const maxSize = document.getElementById('maxSizeInput')?.value || '100';
-    console.log(`🧹 Starting manual IndexedDB cleanup (max size: ${maxSize}MB)...`);
-    
-    const data = await apiService.request(`/api/indexeddb/cleanup/${maxSize}`, {
-      method: 'POST'
-    });
-    
-    console.log(`✅ IndexedDB cleanup completed: removed ${data.entries_removed} entries, freed ${data.space_freed_mb}MB`);
-    utils.showNotification(
-      `Cleanup completed: removed ${data.entries_removed} entries (${data.space_freed_mb}MB freed)`,
-      'success'
-    );
-    
-    // Refresh stats after cleanup
-    setTimeout(window.refreshIndexedDBStats, 1000);
-  } catch (error) {
-    console.error('❌ Error in IndexedDB cleanup:', error);
-    utils.showNotification(`Error in cleanup: ${error.message}`, 'error');
-  }
-};
 
-window.createIndexedDBBackup = async function() {
-  try {
-    console.log('💾 Creating IndexedDB backup...');
-    const data = await apiService.request('/api/indexeddb/backup');
-    
-    console.log(`✅ Backup created: ${data.backup_file}`);
-    utils.showNotification(`Backup created: ${data.backup_file}`, 'success');
-  } catch (error) {
-    console.error('❌ Error creating backup:', error);
-    utils.showNotification(`Error creating backup: ${error.message}`, 'error');
-  }
-};
 
-window.restoreIndexedDBBackup = async function() {
-  try {
-    const backupFile = prompt('Enter backup file name:', 'indexeddb_backup_20250118.json');
-    if (!backupFile) return;
-    
-    console.log(`🔄 Restoring from backup: ${backupFile}...`);
-    
-    const data = await apiService.request('/api/indexeddb/restore', {
-      method: 'POST',
-      body: JSON.stringify({ backup_file: backupFile }),
-      headers: { 'Content-Type': 'application/json' }
-    });
-    
-    console.log(`✅ Restore completed: restored ${data.entries_restored} entries`);
-    utils.showNotification(
-      `Restore completed: restored ${data.entries_restored} entries`,
-      'success'
-    );
-    
-    // Refresh stats after restore
-    setTimeout(window.refreshIndexedDBStats, 1000);
-  } catch (error) {
-    console.error('❌ Error restoring from backup:', error);
-    utils.showNotification(`Error restoring: ${error.message}`, 'error');
-  }
-};
 
-window.clearAllIndexedDB = async function() {
-  if (!confirm('⚠️ Are you sure you want to clear all IndexedDB?\nThis action will permanently delete all data!')) {
-    return;
-  }
-  
-  try {
-    console.log('🗑️ Clearing all IndexedDB...');
-    const data = await apiService.request('/api/indexeddb/clear', {
-      method: 'POST'
-    });
-    
-    console.log(`✅ IndexedDB cleared: removed ${data.databases_cleared} databases`);
-    utils.showNotification(
-      `IndexedDB cleared: removed ${data.databases_cleared} databases`,
-      'warning'
-    );
-    
-    // Refresh stats after clear
-    setTimeout(window.refreshIndexedDBStats, 1000);
-  } catch (error) {
-    console.error('❌ Error clearing IndexedDB:', error);
-    utils.showNotification(`Error clearing: ${error.message}`, 'error');
-  }
-};
 
 window.clearLog = function() {
   const logElement = document.getElementById('console-output');
@@ -1270,20 +1265,6 @@ window.clearLog = function() {
   }
 };
 
-window.stopTask = async function(taskName) {
-  try {
-    console.log(`🛑 Stopping task: ${taskName}`);
-    await apiService.request(`/api/background-tasks/tasks/${taskName}/stop`, {
-      method: 'POST'
-    });
-    console.log(`✅ Task ${taskName} stopped successfully`);
-    utils.showNotification(`Task ${taskName} stopped successfully`, 'success');
-    setTimeout(window.refreshStatus, 2000);
-  } catch (error) {
-    console.error(`❌ Error stopping task ${taskName}:`, error);
-    utils.showNotification(`Error stopping task: ${error.message}`, 'error');
-  }
-};
 
 // Export for testing
 if (typeof module !== 'undefined' && module.exports) {
@@ -1370,3 +1351,43 @@ function generateDetailedLog() {
 
 // ייצוא לגלובל scope
 // window.copyDetailedLog export removed - using global version from system-management.js
+
+// ===== REAL-TIME LOG LISTENER =====
+
+/**
+ * Initialize real-time log listener for background tasks
+ */
+function initializeRealtimeLogListener() {
+    try {
+        // Listen for background task log events from server
+        if (window.io && window.io.socket) {
+            window.io.socket.on('background_task_log', async (logData) => {
+                try {
+                    console.log('📥 Received background task log:', logData);
+                    
+                    // Save to IndexedDB using unified cache system
+                    if (window.saveBackgroundTaskLog) {
+                        await window.saveBackgroundTaskLog(logData.task_name, {
+                            status: logData.status,
+                            duration_ms: logData.duration_ms,
+                            result: logData.result,
+                            error: logData.error,
+                            user_id: logData.user_id
+                        });
+                        
+                        // Refresh the log display
+                    }
+                } catch (error) {
+                    console.error('❌ Error processing background task log:', error);
+                }
+            });
+            
+            console.log('✅ Real-time background task log listener initialized');
+        } else {
+            console.warn('⚠️ Socket.IO not available for real-time log listening');
+        }
+    } catch (error) {
+        console.error('❌ Failed to initialize real-time log listener:', error);
+    }
+}
+

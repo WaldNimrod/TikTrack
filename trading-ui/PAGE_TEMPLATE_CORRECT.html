@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Favicon will be set by global-favicon.js -->
+    <title>[PAGE_NAME] - TikTrack</title>
+    
+    <!-- 
+    ===== CORRECT PAGE TEMPLATE =====
+    
+    This template follows the correct architecture:
+    1. Complete ITCSS implementation
+    2. All base package systems included
+    3. Correct loading order
+    4. No duplicate systems
+    5. Proper HTML structure
+    
+    ======================================
+    -->
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap CSS - Must load first -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- ITCSS Architecture - Complete Implementation -->
+    
+    <!-- 01-settings - Variables and Settings -->
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=1.0.0">
+    
+    <!-- 02-tools - Functions and Mixins -->
+    <link rel="stylesheet" href="styles-new/02-tools/_mixins.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/02-tools/_functions.css?v=1.0.0">
+    
+    <!-- 03-generic - Reset and Normalization -->
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=1.0.0">
+    
+    <!-- 04-elements - Basic HTML Elements -->
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=1.0.0">
+    
+    <!-- 05-objects - Layout Structures -->
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=1.0.0">
+    
+    <!-- 06-components - UI Components -->
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=1.0.0">
+    
+    <!-- 07-pages - Page-specific Styles -->
+    <link rel="stylesheet" href="styles-new/07-pages/_[PAGE_NAME].css?v=1.0.0">
+    
+    <!-- 08-themes - Themes -->
+    <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=1.0.0">
+    
+    <!-- 09-utilities - Utility Classes -->
+    <link rel="stylesheet" href="styles-new/09-utilities/_spacing.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/09-utilities/_text.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/09-utilities/_display.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/09-utilities/_responsive.css?v=1.0.0">
+    
+    <!-- External Libraries -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">
+</head>
+
+<body class="[PAGE_NAME]-page">
+    <!-- Header System - Created automatically by header-system.js -->
+    <div id="unified-header"></div>
+    
+    <!-- Page Content -->
+    <div class="background-wrapper">
+        <div class="page-body">
+            <!-- 
+            ===== PAGE CONTENT TEMPLATE =====
+            
+            Replace [PAGE_CONTENT] with the actual page content
+            Follow the standard page structure:
+            - top-section for main content
+            - section-header with title and actions
+            - section-body with actual content
+            
+            ======================================
+            -->
+            <div class="top-section" data-section="top">
+                <div class="section-header">
+                    <div class="table-title">
+                        <img src="images/icons/[PAGE_ICON].svg" alt="[PAGE_TITLE]" style="width: 40px; height: 40px; margin-left: 8px; vertical-align: middle;">
+                        [PAGE_TITLE]
+                    </div>
+                    <div class="table-actions">
+                        <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט">
+                            <i class="fas fa-copy"></i> העתק לוג מפורט
+                        </button>
+                        <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <!-- [PAGE_CONTENT] -->
+                    <p>Replace this with actual page content</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- ===== BASE PACKAGE SYSTEMS - CORRECT LOADING ORDER ===== -->
+    
+    <!-- Stage 1: Initialization Systems (Must be first) -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script>
+    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script>
+    
+    <!-- Stage 2: Core Base Systems -->
+    <script src="scripts/global-favicon.js?v=1.0.0"></script>
+    <script src="scripts/translation-utils.js?v=1.0.0"></script>
+    
+    <!-- Stage 3: UI Base Systems -->
+    <script src="scripts/notification-system.js?v=1.0.0"></script>
+    
+    <!-- Stage 4: Cache and Refresh Systems -->
+    <script src="scripts/cache-sync-manager.js?v=1.0.0"></script>
+    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script>
+    <script src="scripts/cache-policy-manager.js?v=1.0.0"></script>
+    <script src="scripts/memory-optimizer.js?v=1.0.0"></script>
+    
+    <!-- Stage 5: Advanced UI Systems (Always required) -->
+    <script src="scripts/ui-utils.js?v=1.0.0"></script>
+    <script src="scripts/color-scheme-system.js?v=1.0.0"></script>
+    <script src="scripts/header-system.js?v=v6.0.0"></script>
+    
+    <!-- Stage 6: Data and Utility Systems -->
+    <script src="scripts/data-utils.js?v=1.0.0"></script>
+    <script src="scripts/date-utils.js?v=1.0.0"></script>
+    <script src="scripts/button-icons.js?v=1.0.0"></script>
+    <script src="scripts/tables.js?v=1.0.0"></script>
+    <script src="scripts/table-mappings.js?v=1.0.0"></script>
+    <script src="scripts/page-utils.js?v=1.0.0"></script>
+    
+    <!-- Stage 7: Additional Systems (As needed) -->
+    <script src="scripts/preferences.js?v=1.0.0"></script>
+    <script src="scripts/notification-category-detector.js?v=1.0.0"></script>
+    <script src="scripts/global-notification-collector.js?v=1.0.0"></script>
+    <script src="scripts/system-management.js?v=1.0.0"></script>
+    
+    <!-- Stage 8: Page-specific Script -->
+    <script src="scripts/[PAGE_NAME].js?v=1.0.0"></script>
+    
+    <!-- 
+    ===== TEMPLATE INSTRUCTIONS =====
+    
+    To use this template:
+    1. Replace [PAGE_NAME] with the actual page name (e.g., 'alerts', 'trades')
+    2. Replace [PAGE_TITLE] with the Hebrew page title
+    3. Replace [PAGE_ICON] with the appropriate icon name
+    4. Replace [PAGE_CONTENT] with the actual page content
+    5. Remove or modify systems in Stage 7 based on page requirements
+    
+    This template includes:
+    ✅ Complete ITCSS architecture (all 9 layers)
+    ✅ All 10 base package systems
+    ✅ Correct loading order
+    ✅ No duplicate systems
+    ✅ Proper HTML structure
+    ✅ Consistent versioning
+    
+    ======================================
+    -->
+</body>
+</html>

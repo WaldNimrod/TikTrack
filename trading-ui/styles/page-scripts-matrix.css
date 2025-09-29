@@ -1,0 +1,70 @@
+/* Page Scripts Matrix - Page Specific Styles */
+/* This file contains styles specific to the page-scripts-matrix page */
+
+/* Override general table styles for page mapping table */
+.page-mapping-table {
+    font-size: 11px !important;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.page-mapping-table th, 
+.page-mapping-table td {
+    padding: 10px 5px !important;
+    border: 1px solid #ddd;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.page-mapping-table th:first-child,
+.page-mapping-table td:first-child {
+    position: sticky !important;
+    left: 0 !important;
+    background: #f8f9fa !important;
+    z-index: 10 !important;
+    max-width: 200px !important;
+    min-width: 120px !important;
+    text-align: right !important;
+    font-weight: bold !important;
+    word-wrap: break-word !important;
+    white-space: normal !important;
+    line-height: 1.2 !important;
+}
+
+.page-mapping-table th {
+    background: #e9ecef !important;
+    font-weight: bold;
+    min-width: 50px !important;
+    max-width: 50px !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    height: 120px;
+}
+
+.page-mapping-table .connected {
+    background-color: #d4edda !important;
+    color: #155724 !important;
+}
+
+.page-mapping-table .disconnected {
+    background-color: #f8d7da !important;
+    color: #721c24 !important;
+}
+
+.page-mapping-table-container {
+    overflow-x: auto;
+    border: 1px solid #ddd;
+}
+
+/* Ensure these styles override any general table styles */
+.page-scripts-matrix .page-mapping-table th,
+.page-scripts-matrix .page-mapping-table td {
+    padding: 10px 5px !important;
+}
+
+.page-scripts-matrix .page-mapping-table th {
+    min-width: 50px !important;
+    max-width: 50px !important;
+}

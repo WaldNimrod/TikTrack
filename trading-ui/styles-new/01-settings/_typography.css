@@ -1,0 +1,37 @@
+/**
+ * טיפוגרפיה - Typography System
+ * 
+ * קובץ זה מכיל את מערכת הטיפוגרפיה הגלובלית
+ * עם תמיכה מלאה בעברית ו-RTL
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 5, 2025
+ */
+
+:root {
+  /* ===== גופנים - Fonts ===== */
+  --font-family-primary: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
+  --font-family-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+  
+  /* ===== גדלי גופן - Font Sizes ===== */
+  --font-size-xs: 12px;    /* 0.75rem */
+  --font-size-sm: 14px;    /* 0.875rem */
+  --font-size-base: 16px;  /* 1rem */
+  --font-size-lg: 18px;    /* 1.125rem */
+  --font-size-xl: 20px;    /* 1.25rem */
+  --font-size-xxl: 24px;   /* 1.5rem */
+  --font-size-xxxl: 32px;  /* 2rem */
+  
+  /* ===== משקלי גופן - Font Weights ===== */
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  /* ===== גובה שורה - Line Heights ===== */
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.4;
+  --line-height-relaxed: 1.6;
+  --line-height-loose: 1.8;
+}

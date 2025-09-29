@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Favicon will be set by global-favicon.js -->
+    <title>ניהול גרפים - TikTrack</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS - חייב להיות קודם -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Header System Script -->
+    <script src="scripts/header-system.js"></script>
+    
+    <!-- TikTrack CSS - Unified CSS (No @import) -->
+    <!-- CSS Files - אחרי Bootstrap כדי לדרוס אותו -->
+    <!-- 🔄 MAJOR ARCHITECTURE CHANGE - September 2025: Individual <link> tags instead of @import -->
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=1.0.1">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=1.0.0">
+
+    <!-- Header Styles - נפרד מ-ITCSS -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="scripts/global-favicon.js"></script>
+</head>
+<body>
+    <!-- Header System -->
+    <div id="unified-header"></div>
+
+    <div class="main-content">
+        <div class="top-section" data-section="top">
+            <div class="section-header">
+                <h2>📊 ניהול גרפים</h2>
+                <div class="header-actions">
+                    <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
+                        <i class="fas fa-copy"></i> העתק לוג מפורט
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="refreshChartsStatus()">
+                        <i class="fas fa-sync"></i> רענן סטטוס
+                    </button>
+                    <button class="btn btn-outline-success btn-sm" onclick="exportAllCharts()">
+                        <i class="fas fa-download"></i> ייצא הכל
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- סקירה כללית -->
+        <div class="content-section" id="overviewSection">
+            <div class="section-header">
+                <h3>📈 סקירת גרפים</h3>
+                <button class="btn btn-outline-secondary btn-sm" onclick="toggleSection('overviewSection')">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+            <div class="section-content">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <i class="fas fa-chart-bar fa-2x text-primary mb-2"></i>
+                                <h5 class="card-title" id="totalCharts">0</h5>
+                                <p class="card-text">סה"כ גרפים</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <i class="fas fa-chart-line fa-2x text-success mb-2"></i>
+                                <h5 class="card-title" id="activeCharts">0</h5>
+                                <p class="card-text">גרפים פעילים</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <i class="fas fa-exclamation-triangle fa-2x text-warning mb-2"></i>
+                                <h5 class="card-title" id="errorCharts">0</h5>
+                                <p class="card-text">גרפים עם שגיאות</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <i class="fas fa-memory fa-2x text-info mb-2"></i>
+                                <h5 class="card-title" id="memoryUsage">0MB</h5>
+                                <p class="card-text">שימוש זיכרון</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ניהול גרפים -->
+        <div class="content-section" id="managementSection">
+            <div class="section-header">
+                <h3>🔧 ניהול גרפים</h3>
+                <button class="btn btn-outline-secondary btn-sm" onclick="toggleSection('managementSection')">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+            <div class="section-content">
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <button class="btn btn-primary me-2" onclick="createNewChart()">
+                            <i class="fas fa-plus"></i> צור גרף חדש
+                        </button>
+                        <button class="btn btn-secondary me-2" onclick="refreshAllCharts()">
+                            <i class="fas fa-sync"></i> רענן הכל
+                        </button>
+                        <button class="btn btn-danger" onclick="destroyAllCharts()">
+                            <i class="fas fa-trash"></i> מחק הכל
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>🧪 גרפים לדוגמה</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <button class="btn btn-primary btn-sm me-2 mb-2" onclick="createTestChart()">
+                                            <i class="fas fa-plus"></i> גרף בדיקה
+                                        </button>
+                                        <button class="btn btn-info btn-sm me-2 mb-2" onclick="createPerformanceChart()">
+                                            <i class="fas fa-chart-line"></i> גרף ביצועים
+                                        </button>
+                                        <button class="btn btn-success btn-sm me-2 mb-2" onclick="createAccountChart()">
+                                            <i class="fas fa-users"></i> גרף חשבונות
+                                        </button>
+                                        <button class="btn btn-warning btn-sm me-2 mb-2" onclick="createMixedChart()">
+                                            <i class="fas fa-layer-group"></i> גרף מעורב
+                                        </button>
+                                        <button class="btn btn-secondary btn-sm me-2 mb-2" onclick="updateTestChart()">
+                                            <i class="fas fa-sync"></i> עדכן נתונים
+                                        </button>
+                                        <button class="btn btn-outline-primary btn-sm me-2 mb-2" onclick="exportTestChart()">
+                                            <i class="fas fa-download"></i> ייצא גרף
+                                        </button>
+                                        <button class="btn btn-outline-danger btn-sm mb-2" onclick="destroyTestChart()">
+                                            <i class="fas fa-trash"></i> מחק גרף
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <canvas id="testChart" width="800" height="400" style="max-width: 100%; height: auto;"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>📋 רשימת גרפים</h5>
+                            </div>
+                            <div class="card-body" id="chartsList">
+                                <!-- Charts will be dynamically populated here -->
+                                <p class="text-muted">אין גרפים פעילים כרגע</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- הגדרות מערכת -->
+        <div class="content-section" id="settingsSection">
+            <div class="section-header">
+                <h3>⚙️ הגדרות מערכת</h3>
+                <button class="btn btn-outline-secondary btn-sm" onclick="toggleSection('settingsSection')">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+            <div class="section-content">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>🎨 הגדרות גרפים</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label" for="chartTheme">נושא גרפים:</label>
+                                    <select class="form-select" id="chartTheme" onchange="changeChartTheme(this.value)">
+                                        <option value="default">ברירת מחדל</option>
+                                        <option value="dark">כהה</option>
+                                        <option value="light">בהיר</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="autoRefresh" onchange="toggleAutoRefresh(this.checked)">
+                                    <label class="form-check-label" for="autoRefresh">רענון אוטומטי</label>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label" for="refreshInterval">מרווח רענון (שניות):</label>
+                                    <input type="number" class="form-control" id="refreshInterval" value="30" min="5" max="300">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>📤 אפשרויות ייצוא</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label" for="exportFormat">פורמט:</label>
+                                    <select class="form-select" id="exportFormat">
+                                        <option value="png">PNG</option>
+                                        <option value="jpg">JPG</option>
+                                        <option value="pdf">PDF</option>
+                                        <option value="svg">SVG</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label" for="exportQuality">איכות:</label>
+                                    <select class="form-select" id="exportQuality">
+                                        <option value="low">נמוכה</option>
+                                        <option value="medium">בינונית</option>
+                                        <option value="high" selected>גבוהה</option>
+                                        <option value="ultra">אולטרה</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+    <!-- Scripts -->
+    <!-- Error Handlers -->
+    <script src="scripts/error-handlers.js"></script>
+    
+    <!-- 🔄 NEW UNIFIED INITIALIZATION SYSTEM -->
+    <!-- Core Systems -->
+    <script src="scripts/global-favicon.js"></script>
+    <script src="scripts/ui-utils.js"></script>
+    <script src="scripts/data-utils.js"></script>
+    <script src="scripts/notification-system.js"></script>
+    <script src="scripts/system-management.js"></script>
+    <script src="scripts/notification-category-detector.js"></script>
+    <script src="scripts/global-notification-collector.js"></script>
+    <script src="scripts/tables.js"></script>
+    <script src="scripts/page-utils.js"></script>
+    <script src="scripts/chart-management.js"></script>
+    
+    <!-- Chart.js Library - Required for chart functionality -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Chart System -->
+    <script src="scripts/charts/chart-loader.js"></script>
+    <script src="scripts/charts/chart-theme.js"></script>
+    <script src="scripts/charts/chart-system.js"></script>
+    <script src="scripts/charts/adapters/performance-adapter.js"></script>
+    <script src="scripts/charts/adapters/linter-adapter.js"></script>
+    <script src="scripts/charts/adapters/trades-adapter.js"></script>
+    <script src="scripts/charts/chart-export.js"></script>
+    
+    <!-- New Unified Initialization System -->
+    <script src="scripts/page-initialization-configs.js"></script>
+    <script src="scripts/unified-app-initializer.js"></script>
+
+    <!-- 🔓 TEMPLATE ZONE 6 - Page-Specific Scripts (ADD NEW SCRIPTS HERE) -->
+    <!-- No manual DOMContentLoaded listener needed - handled by unified system -->
+</body>
+</html>
+

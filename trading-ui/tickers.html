@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Favicon will be set by global-favicon.js -->
+    <title>טיקרים - TikTrack</title>
+    
+    <!-- 
+    ===== CORRECTED TICKERS PAGE =====
+    
+    This page has been corrected to follow the proper architecture:
+    1. Complete ITCSS implementation
+    2. All base package systems included
+    3. Correct loading order
+    4. Scripts moved to body
+    
+    ======================================
+    -->
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap CSS - Must load first -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- ITCSS Architecture - Complete Implementation -->
+    
+    <!-- 01-settings - Variables and Settings -->
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=1.0.0">
+    
+    <!-- 02-tools - Functions and Mixins -->
+    <link rel="stylesheet" href="styles-new/02-tools/_mixins.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/02-tools/_functions.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/02-tools/_utilities.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/02-tools/_rtl-helpers.css?v=1.0.0">
+    
+    <!-- 03-generic - Reset and Normalization -->
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=1.0.0">
+    
+    <!-- 04-elements - Basic HTML Elements -->
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=1.0.0">
+    
+    <!-- 05-objects - Layout Structures -->
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=1.0.0">
+    
+    <!-- 06-components - UI Components -->
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=1.0.0">
+    
+    <!-- 07-pages - Page-specific Styles -->
+    <link rel="stylesheet" href="styles-new/07-pages/_tickers.css?v=1.0.0">
+    
+    <!-- 08-themes - Themes -->
+    <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=1.0.0">
+    
+    <!-- 09-utilities - Utility Classes -->
+    <link rel="stylesheet" href="styles-new/09-utilities/_spacing.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/09-utilities/_text.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/09-utilities/_display.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/09-utilities/_responsive.css?v=1.0.0">
+    
+    <!-- External Libraries -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">
+</head>
+
+<body class="tickers-page">
+    <!-- Header System - Created automatically by header-system.js -->
+    <div id="unified-header"></div>
+    
+    <!-- Page Content -->
+    <div class="background-wrapper">
+        <div class="page-body">
+            <!-- Tickers area - top-Section -->
+            <div class="top-section" data-section="top">
+                <!-- Main header -->
+                <div class="section-header">
+                    <div class="table-title">
+                        <img src="images/icons/tickers.svg" alt="טיקרים" class="table-icon">
+                        טיקרים
+                    </div>
+                    <div class="table-actions">
+                        <button class="refresh-btn" onclick="refreshYahooFinanceData()" title="רענן נתוני מחירים מ-Yahoo Finance" id="yahooRefreshBtn">
+                            <span class="action-icon">🔄</span>
+                            רענן נתונים
+                        </button>
+                        <div class="action-separator"></div>
+                        <button id="addTickerBtn" class="refresh-btn" onclick="showAddTickerModal()" title="הוסף תיקר חדש">
+                            <img src="images/icons/tickers.svg" alt="הוסף" class="action-icon">
+                            הוסף טיקר
+                        </button>
+                        <div class="action-separator"></div>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והטיקרים">
+                            <i class="fas fa-copy"></i> העתק לוג מפורט
+                        </button>
+                        <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר אזור טיקרים">
+                            <span class="filter-icon">▲</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Alert cards -->
+                <div class="section-body">
+                    <active-alerts></active-alerts>
+
+                    <!-- Data summary -->
+                    <div class="info-summary" id="summaryStats">
+                        <div>סה"כ טיקרים: <strong id="totalTickers">0</strong></div>
+                        <div>טיקרים פעילים: <strong id="activeTickers">0</strong></div>
+                        <div>מחיר ממוצע: <strong id="averagePrice">$0</strong></div>
+                        <div>שינוי יומי: <strong id="dailyChange">0%</strong></div>
+                    </div>
+                </div>
+            </div> <!-- End top-section -->
+
+            <!-- Main content -->
+            <div class="main-content">
+                <!-- Tickers management area - content-section -->
+                <div class="content-section" id="main">
+                    <!-- Tickers header -->
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/tickers.svg" alt="ניהול טיקרים" class="section-icon">
+                            ניהול טיקרים
+                        </div>
+                        <div class="table-count" id="tickersCount">טוען...</div>
+                        <div class="table-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('main')" title="הצג/הסתר אזור ניהול טיקרים">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tickers table -->
+                    <div class="section-body">
+                        <div class="table-responsive" id="tickersContainer">
+                            <table class="table" id="tickersTable" data-table-type="tickers">
+                                <thead>
+                                    <tr>
+                                        <th class="col-name">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); }"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                שם הטיקר <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-price">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); }"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                מחיר נוכחי <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-change">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); }"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                שינוי יומי <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-volume">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); }"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                נפח <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-status">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); }"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                סטטוס <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-updated">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); }"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                עודכן ב <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-actions actions-cell actions-3-btn">
+                                            פעולות
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="7" class="loading">טוען טיקרים...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom page spacing -->
+        <div style="height: 3rem;"></div>
+
+        <!-- Notification system -->
+        <div class="notification-container" id="notificationContainer"></div>
+
+        <!-- Toast container for notifications -->
+        <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1000000002;"></div>
+
+        <!-- Add Ticker Modal -->
+        <div class="modal fade" id="addTickerModal" tabindex="-1" aria-labelledby="addTickerModalLabel" aria-hidden="true"
+            data-bs-backdrop="true" data-bs-keyboard="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-colored">
+                        <h5 class="modal-title" id="addTickerModalLabel">הוספת טיקר חדש</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addTickerForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="tickerSymbol" class="form-label">סמל הטיקר</label>
+                                        <input type="text" class="form-control" id="tickerSymbol" placeholder="AAPL" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="tickerName" class="form-label">שם החברה</label>
+                                        <input type="text" class="form-control" id="tickerName" placeholder="Apple Inc." required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="tickerExchange" class="form-label">בורסה</label>
+                                        <select class="form-select" id="tickerExchange" required>
+                                            <option value="">בחר בורסה</option>
+                                            <option value="NASDAQ">NASDAQ</option>
+                                            <option value="NYSE">NYSE</option>
+                                            <option value="AMEX">AMEX</option>
+                                            <option value="TSX">TSX</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="tickerSector" class="form-label">סקטור</label>
+                                        <select class="form-select" id="tickerSector">
+                                            <option value="">בחר סקטור</option>
+                                            <option value="Technology">טכנולוגיה</option>
+                                            <option value="Healthcare">בריאות</option>
+                                            <option value="Finance">פיננסים</option>
+                                            <option value="Energy">אנרגיה</option>
+                                            <option value="Consumer">צריכה</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <label for="tickerDescription" class="form-label">תיאור הטיקר</label>
+                                        <textarea class="form-control" id="tickerDescription" rows="3" placeholder="תיאור הטיקר..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                        <button type="button" class="btn btn-success" onclick="addTicker()"
+                            style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">הוסף
+                            טיקר</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Ticker Modal -->
+        <div class="modal fade" id="editTickerModal" tabindex="-1" aria-labelledby="editTickerModalLabel" aria-hidden="true"
+            data-bs-backdrop="true" data-bs-keyboard="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-colored">
+                        <h5 class="modal-title" id="editTickerModalLabel">עריכת טיקר</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editTickerForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editTickerSymbol" class="form-label">סמל הטיקר</label>
+                                        <input type="text" class="form-control" id="editTickerSymbol" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editTickerName" class="form-label">שם החברה</label>
+                                        <input type="text" class="form-control" id="editTickerName" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editTickerExchange" class="form-label">בורסה</label>
+                                        <select class="form-select" id="editTickerExchange" required>
+                                            <option value="NASDAQ">NASDAQ</option>
+                                            <option value="NYSE">NYSE</option>
+                                            <option value="AMEX">AMEX</option>
+                                            <option value="TSX">TSX</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editTickerSector" class="form-label">סקטור</label>
+                                        <select class="form-select" id="editTickerSector">
+                                            <option value="Technology">טכנולוגיה</option>
+                                            <option value="Healthcare">בריאות</option>
+                                            <option value="Finance">פיננסים</option>
+                                            <option value="Energy">אנרגיה</option>
+                                            <option value="Consumer">צריכה</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <label for="editTickerDescription" class="form-label">תיאור הטיקר</label>
+                                        <textarea class="form-control" id="editTickerDescription" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                        <button type="button" class="btn btn-success" onclick="updateTicker()"
+                            style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">עדכן
+                            טיקר</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- ===== BASE PACKAGE SYSTEMS - CORRECT LOADING ORDER ===== -->
+    
+    <!-- Stage 1: Initialization Systems (Must be first) -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script>
+    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script>
+    
+    <!-- Stage 2: Core Base Systems -->
+    <script src="scripts/global-favicon.js?v=1.0.0"></script>
+    <script src="scripts/translation-utils.js?v=1.0.0"></script>
+    
+    <!-- Stage 3: UI Base Systems -->
+    <script src="scripts/notification-system.js?v=1.0.0"></script>
+    
+    <!-- Stage 4: Cache and Refresh Systems -->
+    <script src="scripts/cache-sync-manager.js?v=1.0.0"></script>
+    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script>
+    <script src="scripts/cache-policy-manager.js?v=1.0.0"></script>
+    <script src="scripts/memory-optimizer.js?v=1.0.0"></script>
+    
+    <!-- Stage 5: Advanced UI Systems (Always required) -->
+    <script src="scripts/ui-utils.js?v=1.0.0"></script>
+    <script src="scripts/color-scheme-system.js?v=1.0.0"></script>
+    <script src="scripts/header-system.js?v=v6.0.0"></script>
+    
+    <!-- Stage 6: Data and Utility Systems -->
+    <script src="scripts/data-utils.js?v=1.0.0"></script>
+    <script src="scripts/date-utils.js?v=1.0.0"></script>
+    <script src="scripts/button-icons.js?v=1.0.0"></script>
+    <script src="scripts/tables.js?v=1.0.0"></script>
+    <script src="scripts/table-mappings.js?v=1.0.0"></script>
+    <script src="scripts/page-utils.js?v=1.0.0"></script>
+    
+    <!-- Stage 7: Additional Systems (As needed) -->
+    <script src="scripts/preferences.js?v=1.0.0"></script>
+    <script src="scripts/notification-category-detector.js?v=1.0.0"></script>
+    <script src="scripts/global-notification-collector.js?v=1.0.0"></script>
+    <script src="scripts/system-management.js?v=1.0.0"></script>
+    <script src="scripts/realtime-notifications-client.js?v=1.0.0"></script>
+    <script src="scripts/error-handlers.js?v=1.0.0"></script>
+    
+    <!-- Stage 8: Page-specific Script -->
+    <script src="scripts/tickers.js?v=1.0.0"></script>
+    
+    <!-- Local copyDetailedLog function for tickers page -->
+    <script>
+        // Make the local copyDetailedLog function available globally for this page only
+        window.copyDetailedLog = copyDetailedLog;
+    </script>
+</body>
+</html>

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Favicon will be set by global-favicon.js -->
+    <title>ניהול משימות רקע - TikTrack</title>
+    
+    <!-- 
+    ===== IMPORTANT DEVELOPMENT RULES =====
+    
+    CSS RULES:
+    - Only external CSS files are used, following the system's CSS architecture
+    - NO inline styles or styles within the page are allowed in this system
+    - All styling must be defined in external stylesheets according to ITCSS methodology
+    
+    JAVASCRIPT RULES:
+    - All functions are located in external files
+    - NO functions are allowed within the page
+    - All system functions use shared global functions located in dedicated files
+    - Page-specific functions should be centralized only in the page's dedicated script file
+    
+    ======================================
+    -->
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    
+    <!-- Unified CSS - אחרי Bootstrap כדי לדרוס אותו -->
+    <!-- CSS Files - אחרי Bootstrap כדי לדרוס אותו -->
+    <!-- 🔄 MAJOR ARCHITECTURE CHANGE - September 2025: Individual <link> tags instead of @import -->
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_info-summary.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=1.0.1">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=1.0.0">
+    
+    <!-- Header Styles -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">
+    
+    <!-- Background Tasks Styles -->
+    <link rel="stylesheet" href="styles-new/06-components/_background-tasks.css?v=1.0.0">
+    
+    <!-- Unified Log Display Styles -->
+    <link rel="stylesheet" href="styles-new/06-components/_unified-log-display.css?v=1.0.0">
+    
+    <!-- Header System Script -->
+    <script src="scripts/header-system.js?v=v6.0.0_background_tasks"></script>
+    
+    <!-- Dynamic Color System Scripts -->
+    <script src="scripts/color-scheme-system.js"></script>
+    
+    <!-- Preferences System Scripts -->
+    <script src="scripts/preferences.js"></script>
+    
+    <!-- Color Demo Toggle Script -->
+    <script src="scripts/color-demo-toggle.js"></script>
+</head>
+
+<body>
+    <!-- ===== TEMPLATE ZONE 1: BACKGROUND WRAPPER (LOCKED) ===== -->
+    <div class="background-wrapper">
+        <!-- ===== TEMPLATE ZONE 2: HEADER SYSTEM (LOCKED - DO NOT TOUCH) ===== -->
+        <div id="unified-header"></div>
+
+        <!-- ===== TEMPLATE ZONE 3: PAGE BODY (LOCKED) ===== -->
+        <div class="page-body">
+            <!-- ===== TEMPLATE ZONE 4: MAIN CONTENT (EDITABLE) ===== -->
+            <div class="main-content">
+                <!-- ===== CONTENT SECTIONS START (EDITABLE) ===== -->
+                
+                <div class="top-section" data-section="top">
+                    <div class="section-header">
+                        <h1>🔧 ניהול משימות רקע</h1>
+                        <div class="header-actions">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
+                                <i class="fas fa-copy"></i> העתק לוג מפורט
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- Active alerts -->
+                        <active-alerts></active-alerts>
+
+                        <!-- Page summary -->
+                        <div class="info-summary" id="summaryStats">
+                            <div>Scheduler: <strong id="schedulerStatusStats">בדיקה...</strong></div>
+                            <div>משימות פעילות: <strong id="enabledTasksStats">בדיקה...</strong></div>
+                            <div>משימות רצות: <strong id="runningTasksStats">בדיקה...</strong></div>
+                            <div>סטטוס: <strong id="overallStatus">בדיקה...</strong></div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="content-section" id="systemStatus">
+                    <div class="section-header">
+                        <h2>📊 מצב המערכת</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('systemStatus')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <!-- System Status Summary -->
+                        <div class="info-summary" id="systemStatusSummary">
+                            <div class="row g-3">
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="card h-100">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-power-off fa-2x text-primary mb-2"></i>
+                                            <h6 class="card-title">סטטוס Scheduler</h6>
+                                            <span id="scheduler-status" class="status-stopped badge bg-secondary">טוען...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="card h-100">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-list fa-2x text-info mb-2"></i>
+                                            <h6 class="card-title">סה"כ משימות</h6>
+                                            <span id="total-tasks" class="badge bg-primary fs-5">-</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="card h-100">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                                            <h6 class="card-title">משימות פעילות</h6>
+                                            <span id="enabled-tasks" class="badge bg-success fs-5">-</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="card h-100">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-running fa-2x text-warning mb-2"></i>
+                                            <h6 class="card-title">משימות רצות</h6>
+                                            <span id="running-tasks" class="badge bg-warning fs-5">-</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="card h-100">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-chart-line fa-2x text-info mb-2"></i>
+                                            <h6 class="card-title">אחוז הצלחה</h6>
+                                            <span id="success-rate" class="badge bg-info fs-5">-</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                <!-- Control Buttons -->
+                <div class="control-buttons mb-3">
+                    <button id="start-scheduler" class="btn btn-success btn-sm" onclick="startScheduler()">
+                        <i class="fas fa-play me-1"></i> הפעל Scheduler
+                    </button>
+                    <button id="stop-scheduler" class="btn btn-danger btn-sm" onclick="stopScheduler()">
+                        <i class="fas fa-stop me-1"></i> עצור Scheduler
+                    </button>
+                    <button id="refresh-status" class="btn btn-primary btn-sm" onclick="refreshStatus()">
+                        <i class="fas fa-sync-alt me-1"></i> רענן
+                    </button>
+                </div>
+                    </div>
+                </div>
+
+                <div class="content-section" id="tasksList">
+                    <div class="section-header">
+                        <h2>📋 רשימת משימות</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('tasksList')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h3 class="mb-0"><i class="fas fa-tasks me-2"></i> רשימת משימות</h3>
+                                    <button id="refresh-tasks" class="btn btn-secondary btn-sm" onclick="refreshTasks()">
+                                        <i class="fas fa-sync me-1"></i> רענן
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped" id="tasks-table">
+                                        <thead>
+                                            <tr>
+                                                <th>שם המשימה</th>
+                                                <th>תיאור</th>
+                                                <th>תזמון</th>
+                                                <th>סטטוס</th>
+                                                <th>ביצועים אחרונים</th>
+                                                <th>אחוז הצלחה</th>
+                                                <th>פעולות</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr><td colspan="7" class="text-center">טוען משימות...</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Background Tasks Log Section -->
+                <div class="content-section" id="backgroundTasksLog">
+                    <div class="section-header">
+                        <h2>📋 לוג משימות ברקע</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('backgroundTasksLog')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h3 class="mb-0"><i class="fas fa-tasks me-2"></i> לוג משימות ברקע</h3>
+                                    <button id="refresh-background-tasks-log" class="btn btn-secondary btn-sm" onclick="refreshBackgroundTasksLog()">
+                                        <i class="fas fa-sync me-1"></i> רענן
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <!-- Unified Log Display Container -->
+                                <div id="unified-logs-container"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== CONTENT SECTIONS END (EDITABLE) ===== -->
+            </div>
+            <!-- ===== END MAIN CONTENT ===== -->
+        </div>
+        <!-- ===== END PAGE BODY ===== -->
+    </div>
+    <!-- ===== END BACKGROUND WRAPPER ===== -->
+
+    <!-- Core System Scripts -->
+    <script src="scripts/console-cleanup.js"></script>
+    <script src="scripts/translation-utils.js"></script>
+    <script src="scripts/data-utils.js"></script>
+    <script src="scripts/global-favicon.js"></script>
+    <script src="scripts/unified-cache-manager.js"></script>
+    <script src="scripts/notification-system.js"></script>
+    <script src="scripts/ui-utils.js"></script>
+    <script src="scripts/table-mappings.js"></script>
+    <script src="scripts/date-utils.js"></script>
+    <script src="scripts/tables.js"></script>
+    <script src="scripts/linked-items.js"></script>
+    <script src="scripts/page-utils.js"></script>
+    
+    
+    <!-- Unified Initialization System -->
+    <script src="scripts/page-initialization-configs.js"></script>
+    <script src="scripts/unified-app-initializer.js"></script>
+    
+    <!-- Unified Log System Scripts -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="scripts/pagination-system.js"></script>
+    <script src="scripts/unified-log-manager.js"></script>
+    <script src="scripts/unified-log-display.js"></script>
+    <script src="scripts/unified-log-api.js"></script>
+    
+    <!-- Page-specific scripts -->
+    <script src="scripts/background-tasks.js"></script>
+    
+    <!-- Local copyDetailedLog function for background-tasks page -->
+    <script>
+        // Make the local copyDetailedLog function available globally for this page only
+        window.copyDetailedLog = copyDetailedLog;
+        
+        // Background Tasks Log Functions
+        window.refreshBackgroundTasksLog = function() {
+            if (window.UnifiedLogAPI) {
+                window.UnifiedLogAPI.showLog('backgroundTasksFileLog', 'unified-logs-container', {
+                    displayConfig: 'default',
+                    autoRefresh: true,
+                    refreshInterval: 10000
+                });
+            } else {
+                console.warn('⚠️ UnifiedLogAPI not available');
+            }
+        };
+        
+        window.initializeBackgroundTasksLog = function() {
+            // Wait for UnifiedLogAPI to be available
+            let attempts = 0;
+            const maxAttempts = 10;
+            
+            const tryInitialize = () => {
+                if (window.UnifiedLogAPI) {
+                    console.log('🚀 Initializing background tasks log...');
+                    window.refreshBackgroundTasksLog();
+                } else if (attempts < maxAttempts) {
+                    attempts++;
+                    console.log(`⏳ Waiting for UnifiedLogAPI... (attempt ${attempts}/${maxAttempts})`);
+                    setTimeout(tryInitialize, 500);
+                } else {
+                    console.warn('⚠️ UnifiedLogAPI not available after maximum attempts');
+                }
+            };
+            
+            tryInitialize();
+        };
+        
+        // Debug function to check if all required systems are loaded
+        window.checkSystemLoad = function() {
+            const systems = {
+                'UnifiedCacheManager': !!window.UnifiedCacheManager,
+                'UnifiedLogManager': !!window.UnifiedLogManager,
+                'UnifiedLogDisplay': !!window.UnifiedLogDisplay,
+                'UnifiedLogAPI': !!window.UnifiedLogAPI,
+                'PaginationSystem': !!window.PaginationSystem,
+                'createPagination': !!window.createPagination,
+                'Socket.IO': !!window.io,
+                'Font Awesome': !!document.querySelector('link[href*="font-awesome"]'),
+                'Bootstrap': !!window.bootstrap
+            };
+            
+            console.log('🔍 System Load Check:', systems);
+            
+            const missing = Object.entries(systems).filter(([name, loaded]) => !loaded);
+            if (missing.length > 0) {
+                console.warn('⚠️ Missing systems:', missing.map(([name]) => name));
+            } else {
+                console.log('✅ All systems loaded successfully');
+            }
+            
+            return systems;
+        };
+        
+        // Auto-check after page load
+        setTimeout(() => {
+            window.checkSystemLoad();
+        }, 2000);
+    </script>
+</body>
+</html>

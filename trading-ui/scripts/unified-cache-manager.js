@@ -306,6 +306,7 @@ class UnifiedCacheManager {
                         }
                     }
                 }
+                
             } else if (this.layers[type] && this.layers[type].clear) {
                 // ניקוי שכבה ספציפית
                 const result = await this.layers[type].clear(options);
@@ -337,6 +338,7 @@ class UnifiedCacheManager {
             return false;
         }
     }
+
 
     /**
      * קבלת סטטיסטיקות מטמון

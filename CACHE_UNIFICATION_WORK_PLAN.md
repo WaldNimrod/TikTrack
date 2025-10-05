@@ -10,8 +10,8 @@
 ## 🎯 **מטרות התוכנית**
 
 ### **מטרות עיקריות:**
-- [ ] **חיבור מלא** - כל 29 העמודים ו-39 המערכות למערכת המטמון המאוחדת
-- [ ] **מיגרציה מלאה** - העברת כל הנתונים ממערכות ישנות למערכת חדשה
+- [ ] **חיבור מלא** - כל 29 העמודים ו-35+ המערכות למערכת המטמון המאוחדת
+- [ ] **מיגרציה מלאה** - העברת כל 118 קריאות localStorage למערכת חדשה
 - [ ] **מחיקה מוחלטת** - הסרת כל קוד המטמון הישן
 - [ ] **הפעלה מלאה** - הפעלת כל 4 רכיבי המערכת המאוחדת
 - [ ] **בדיקות מקיפות** - וידוא תקינות מלאה
@@ -30,12 +30,12 @@
 **תאריכים:** 27 בינואר - 2 בפברואר 2025
 
 #### **יום 1-2 (27-28 בינואר): ניתוח מפורט**
-- [ ] **סריקת כל הקבצים** לזיהוי שימוש ב-localStorage ישיר
-  - [ ] סריקת `trading-ui/scripts/` (39 קבצים)
-  - [ ] זיהוי 118 קריאות ל-localStorage ישיר
-  - [ ] מיפוי dependencies בין מערכות מטמון
-- [ ] **הערכת נפח נתונים** בכל מערכת
-- [ ] **יצירת תוכנית מיגרציה** מפורטת
+- [x] **סריקת כל הקבצים** לזיהוי שימוש ב-localStorage ישיר
+  - [x] סריקת `trading-ui/scripts/` (29 קבצים עם localStorage)
+  - [x] זיהוי 118 קריאות ל-localStorage ישיר ב-29 קבצים
+  - [x] מיפוי dependencies בין מערכות מטמון (8 dependencies)
+- [x] **הערכת נפח נתונים** בכל מערכת
+- [x] **יצירת תוכנית מיגרציה** מפורטת לפי GENERAL_SYSTEMS_LIST.md
 
 #### **יום 3-4 (29-30 בינואר): הכנת תשתית**
 - [ ] **יצירת כלי עזר למיגרציה**
@@ -65,7 +65,7 @@
 ##### **2.1 מיגרציה של מערכת UI Utils**
 **קובץ:** `trading-ui/scripts/ui-utils.js`
 - [ ] **גיבוי נתונים קיימים** מ-localStorage
-- [ ] **המרת 12 פונקציות** לשימוש ב-UnifiedCacheManager
+- [ ] **המרת 9 פונקציות** לשימוש ב-UnifiedCacheManager
   ```javascript
   // לפני:
   localStorage.setItem(storageKey, isHidden.toString());
@@ -125,11 +125,12 @@
 #### **יום 1-2 (10-11 בפברואר): עמודי פיתוח**
 
 ##### **3.1 חיבור עמודי ניהול פיתוח**
-**עמודים לעדכון:**
+**עמודים לעדכון (לפי GENERAL_SYSTEMS_LIST.md):**
 - [ ] `chart-management.html` - הוספת מערכת מטמון מאוחדת
-- [ ] `css-management.html` - הוספת מערכת מטמון מאוחדת
-- [ ] `js-map.html` - הוספת מערכת מטמון מאוחדת
+- [ ] `js-map.html` - הוספת מערכת מטמון מאוחדת  
+- [ ] `linter-realtime-monitor.html` - הוספת מערכת מטמון מאוחדת
 - [ ] `constraints.html` - הוספת מערכת מטמון מאוחדת
+- [ ] `crud-testing-dashboard.html` - הוספת מערכת מטמון מאוחדת
 
 **תבנית עדכון לכל עמוד:**
 ```html
@@ -143,14 +144,12 @@
 #### **יום 3-4 (12-13 בפברואר): עמודי ניטור**
 
 ##### **3.2 חיבור עמודי ניטור**
-**עמודים לעדכון:**
-- [ ] `server-monitor.html` - הוספת מערכת מטמון מאוחדת
-- [ ] `linter-realtime-monitor.html` - הוספת מערכת מטמון מאוחדת
-- [ ] `crud-testing-dashboard.html` - הוספת מערכת מטמון מאוחדת
+**עמודים לעדכון (לפי GENERAL_SYSTEMS_LIST.md):**
+- [x] `server-monitor.html` - כבר מחובר למערכת מטמון מאוחדת
+- [ ] `notifications-center.html` - הוספת מערכת מטמון מאוחדת
 
 ##### **3.3 חיבור עמודי עזר**
-**עמודים לעדכון:**
-- [ ] `notifications-center.html` - הוספת מערכת מטמון מאוחדת
+**עמודים לעדכון (לפי GENERAL_SYSTEMS_LIST.md):**
 - [ ] `page-scripts-matrix.html` - הוספת מערכת מטמון מאוחדת
 - [ ] `designs.html` - הוספת מערכת מטמון מאוחדת
 - [ ] `dynamic-colors-display.html` - הוספת מערכת מטמון מאוחדת
@@ -159,9 +158,10 @@
 #### **יום 5 (14 בפברואר): בדיקות חיבור**
 
 ##### **3.4 בדיקת תקינות כל העמודים**
-- [ ] **בדיקת טעינה** של כל 29 העמודים
+- [ ] **בדיקת טעינה** של כל 29 העמודים (לפי GENERAL_SYSTEMS_LIST.md)
 - [ ] **בדיקת אתחול** מערכת המטמון בכל עמוד
 - [ ] **בדיקת פונקציונליות** בסיסית
+- [ ] **בדיקת חבילת בסיס** בכל עמוד (10 מערכות חיוניות)
 
 ---
 
@@ -261,19 +261,32 @@ const paginatedData = window.MemoryOptimizer.paginate(largeDataArray);
 ```javascript
 async function migrateAllLocalStorageData() {
   const migrationMap = {
+    // מערכות UI בסיסיות (9 קריאות)
     'colorScheme': 'user-color-scheme',
+    'customColorScheme': 'user-custom-color-scheme',
     'headerFilters': 'header-filters',
+    
+    // מערכות CSS וניהול (4 קריאות)
     'css-duplicates-results': 'css-duplicates-results',
+    
+    // מערכות נתונים (2 קריאות)
     'cashFlowsSectionState': 'cash-flows-section-state',
     'executionsTopSectionCollapsed': 'executions-top-section-collapsed',
-    'serverMonitorSettings': 'server-monitor-settings',
+    
+    // מערכות התראות (17 קריאות)
     'globalNotificationHistory': 'notifications-history',
     'globalNotificationStats': 'notifications-stats',
-    'lastExternalDataRefresh': 'external-data-last-refresh',
     'tiktrack_global_notifications_history': 'notifications-history-v2',
     'tiktrack_global_notifications_stats': 'notifications-stats-v2',
+    
+    // מערכות לוגים (9 קריאות)
+    'lastExternalDataRefresh': 'external-data-last-refresh',
+    'cache_mode': 'cache-mode',
+    
+    // מערכות עזר (22 קריאות)
     'tiktrack_cache_policies': 'cache-policies-custom',
-    'tiktrack_memory_optimizer_settings': 'memory-optimizer-settings'
+    'tiktrack_memory_optimizer_settings': 'memory-optimizer-settings',
+    'serverMonitorSettings': 'server-monitor-settings'
   };
   
   for (const [oldKey, newKey] of Object.entries(migrationMap)) {
@@ -300,20 +313,36 @@ async function migrateAllLocalStorageData() {
 #### **יום 3-4 (26-27 בפברואר): מחיקת קוד ישן**
 
 ##### **5.3 מחיקת פונקציות מטמון ישנות**
-**קבצים לניקוי:**
+**קבצים לניקוי (29 קבצים עם localStorage):**
 - [ ] `trading_accounts.js` - מחיקת `getFromUnifiedCache/setToUnifiedCache`
-- [ ] `cash_flows.js` - מחיקת localStorage ישיר
-- [ ] `executions.js` - מחיקת localStorage ישיר
-- [ ] `color-scheme-system.js` - מחיקת localStorage ישיר
-- [ ] `header-system.js` - מחיקת localStorage ישיר
-- [ ] `ui-utils.js` - מחיקת localStorage ישיר
+- [ ] `tables.js` - מחיקת localStorage ישיר
+- [ ] `unified-cache-manager.js` - ניקוי קוד מיותר
 - [ ] `css-management.js` - מחיקת localStorage ישיר
-- [ ] `notification-system.js` - מחיקת localStorage ישיר
+- [ ] `color-scheme-system.js` - מחיקת localStorage ישיר
+- [ ] `cash_flows.js` - מחיקת localStorage ישיר
 - [ ] `notifications-center.js` - מחיקת localStorage ישיר
+- [ ] `notification-system.js` - מחיקת localStorage ישיר
+- [ ] `preferences.js` - מחיקת localStorage ישיר
+- [ ] `executions.js` - מחיקת localStorage ישיר
+- [ ] `header-system.js` - מחיקת localStorage ישיר
 - [ ] `system-management.js` - מחיקת localStorage ישיר
 - [ ] `server-monitor-backup-*.js` - מחיקת localStorage ישיר
 - [ ] `unified-log-manager.js` - מחיקת localStorage ישיר
-- [ ] `background-tasks.js` - מחיקת localStorage ישיר
+- [ ] `ui-utils.js` - מחיקת localStorage ישיר (9 קריאות)
+- [ ] `memory-optimizer.js` - ניקוי קוד מיותר
+- [ ] `cache-policy-manager.js` - ניקוי קוד מיותר
+- [ ] `global-notification-collector.js` - מחיקת localStorage ישיר
+- [ ] `js-map.js` - מחיקת localStorage ישיר
+- [ ] `linter-realtime-monitor.js` - מחיקת localStorage ישיר
+- [ ] `crud-testing-dashboard.js` - מחיקת localStorage ישיר
+- [ ] `console-cleanup.js` - מחיקת localStorage ישיר
+- [ ] `translation-utils.js` - מחיקת localStorage ישיר
+- [ ] `global-favicon.js` - מחיקת localStorage ישיר
+- [ ] `log-recovery.js` - מחיקת localStorage ישיר
+- [ ] `linter-export-system.js` - מחיקת localStorage ישיר
+- [ ] `page-utils.js` - מחיקת localStorage ישיר
+- [ ] `data-utils.js` - מחיקת localStorage ישיר
+- [ ] `auth.js` - מחיקת localStorage ישיר (13 קריאות)
 
 ##### **5.4 מחיקת מערכות מטמון ישנות**
 - [ ] **הסרת מערכת מטמון ישנה** (אם קיימת)
@@ -387,15 +416,15 @@ describe('Unified Cache System', () => {
 
 ### **מדדים שבועיים:**
 - **שבוע 1:** ניתוח מושלם + כלי עזר מוכנים
-- **שבוע 2:** 5 מערכות ליבה מיגרציה מושלמת
-- **שבוע 3:** 12 עמודים מחוברים למערכת
+- **שבוע 2:** 5 מערכות ליבה מיגרציה מושלמת (16 קריאות localStorage)
+- **שבוע 3:** 13 עמודים מחוברים למערכת (לפי GENERAL_SYSTEMS_LIST.md)
 - **שבוע 4:** 3 מערכות מתקדמות פעילות
-- **שבוע 5:** מיגרציה מלאה + ניקוי קוד
+- **שבוע 5:** מיגרציה מלאה + ניקוי קוד (118 קריאות localStorage)
 - **שבוע 6:** בדיקות מושלמות + פריסה
 
 ### **מדדים יומיים:**
-- [ ] **יום 1:** סריקה מושלמת של כל הקבצים
-- [ ] **יום 2:** תוכנית מיגרציה מפורטת
+- [x] **יום 1:** סריקה מושלמת של כל הקבצים (118 קריאות localStorage ב-29 קבצים)
+- [x] **יום 2:** תוכנית מיגרציה מפורטת לפי GENERAL_SYSTEMS_LIST.md
 - [ ] **יום 3:** כלי עזר למיגרציה מוכנים
 - [ ] **יום 4:** מערכת גיבוי פעילה
 - [ ] **יום 5:** בדיקות מקדימות מושלמות
@@ -495,16 +524,16 @@ class CacheMonitor {
 ## 📋 **רשימת משימות יומיות**
 
 ### **יום 1 (27 בינואר 2025):**
-- [ ] סריקת כל הקבצים ב-`trading-ui/scripts/`
-- [ ] זיהוי 118 קריאות ל-localStorage ישיר
-- [ ] מיפוי dependencies בין מערכות מטמון
-- [ ] יצירת רשימה מפורטת של מערכות למיגרציה
+- [x] סריקת כל הקבצים ב-`trading-ui/scripts/` (29 קבצים עם localStorage)
+- [x] זיהוי 118 קריאות ל-localStorage ישיר ב-29 קבצים
+- [x] מיפוי dependencies בין מערכות מטמון (8 dependencies)
+- [x] יצירת רשימה מפורטת של מערכות למיגרציה (29 עמודים לפי GENERAL_SYSTEMS_LIST.md)
 
 ### **יום 2 (28 בינואר 2025):**
-- [ ] הערכת נפח נתונים בכל מערכת
-- [ ] יצירת תוכנית מיגרציה מפורטת
-- [ ] הכנת תוכנית גיבוי ו-rollback
-- [ ] הכנת תוכנית בדיקות
+- [x] הערכת נפח נתונים בכל מערכת
+- [x] יצירת תוכנית מיגרציה מפורטת לפי GENERAL_SYSTEMS_LIST.md
+- [x] הכנת תוכנית גיבוי ו-rollback
+- [x] הכנת תוכנית בדיקות
 
 ### **יום 3 (29 בינואר 2025):**
 - [ ] יצירת `migration-helper.js`
@@ -570,8 +599,8 @@ class CacheMonitor {
 
 תוכנית זו תבצע יישום מלא של מערכת המטמון המאוחדת תוך 6 שבועות, עם:
 
-1. **חיבור מלא** של כל 29 העמודים ו-39 המערכות
-2. **מיגרציה מלאה** של כל הנתונים
+1. **חיבור מלא** של כל 29 העמודים ו-35+ המערכות (לפי GENERAL_SYSTEMS_LIST.md)
+2. **מיגרציה מלאה** של כל 118 קריאות localStorage
 3. **מחיקה מוחלטת** של מערכות מטמון ישנות
 4. **הפעלה מלאה** של כל 4 רכיבי המערכת
 5. **בדיקות מקיפות** ווידוא תקינות
@@ -584,5 +613,5 @@ class CacheMonitor {
 **המסמך מתעדכן באופן יומי בהתאם להתקדמות העבודה.**
 
 **עודכן לאחרונה:** 26 בינואר 2025  
-**גרסה:** 1.0  
-**סטטוס:** 📋 תוכנית עבודה פעילה
+**גרסה:** 1.1  
+**סטטוס:** 📋 תוכנית עבודה מעודכנת לפי GENERAL_SYSTEMS_LIST.md

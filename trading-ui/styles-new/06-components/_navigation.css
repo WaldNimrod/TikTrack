@@ -121,7 +121,7 @@
   text-decoration: underline;
 }
 
-/* לוגו - .logo-section moved to header-styles.css */
+/* .logo-section - no duplicate, only in header-styles.css */
 
 .logo-icon {
   width: 32px;

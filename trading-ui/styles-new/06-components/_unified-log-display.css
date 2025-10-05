@@ -190,46 +190,7 @@
 }
 
 
-.filter-actions .btn-icon {
-    width: 30px;
-    height: 30px;
-    min-width: 30px;
-    min-height: 30px;
-    max-width: 30px;
-    max-height: 30px;
-    padding: 0;
-    border: 1px solid var(--apple-gray-4);
-    border-radius: 6px;
-    background: var(--apple-gray-1);
-    color: var(--apple-gray-8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    line-height: 1;
-    transition: all 0.2s ease;
-    
-    i {
-        font-size: 14px;
-        line-height: 1;
-        display: block;
-        text-align: center;
-        width: auto;
-        height: auto;
-    }
-    
-    &:hover {
-        background: var(--apple-gray-2);
-        border-color: var(--apple-gray-5);
-        color: var(--apple-gray-9);
-    }
-    
-    &:focus {
-        outline: none;
-        border-color: var(--apple-blue);
-        box-shadow: 0 0 0 1px rgba(0, 122, 255, 0.3);
-    }
-}
+/* .filter-actions styles moved to header-styles.css */
 
 .log-display-controls .btn-icon {
     width: 30px;

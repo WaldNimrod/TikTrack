@@ -190,6 +190,33 @@ const PAGE_CONFIGS = {
         ]
     },
     
+    'trading_accounts': {
+        name: 'Trading Accounts',
+        requiresFilters: true,        // נדרש - פילטרים עובדים
+        requiresValidation: true,     // נדרש - ולידציה של נתונים
+        requiresTables: true,         // נדרש - טבלאות עובדות
+        customInitializers: [
+            async (pageConfig) => {
+                console.log('💼 Initializing Trading Accounts...');
+                
+                // טעינת נתוני חשבונות
+                if (typeof window.getAccounts === 'function') {
+                    await window.getAccounts();
+                }
+                
+                // הגדרת event handlers ספציפיים
+                if (typeof window.setupTradingAccountsHandlers === 'function') {
+                    window.setupTradingAccountsHandlers();
+                }
+                
+                // עדכון סטטיסטיקות
+                if (typeof window.updateTradingAccountsStatistics === 'function') {
+                    window.updateTradingAccountsStatistics();
+                }
+            }
+        ]
+    },
+    
     // Development Tools
     'system-management': {
         name: 'System Management',

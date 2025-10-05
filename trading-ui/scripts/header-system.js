@@ -1137,20 +1137,45 @@ class HeaderSystem {
           account: []
         },
         
-        // שמירת פילטרים
-        saveFilters() {
-          localStorage.setItem('headerFilters', JSON.stringify(this.currentFilters));
+        // שמירת פילטרים באמצעות Unified Cache Manager
+        async saveFilters() {
+          if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+            await window.UnifiedCacheManager.save('headerFilters', this.currentFilters, {
+              layer: 'localStorage',
+              ttl: 3600000, // 1 שעה
+              compress: true,
+              syncToBackend: false
+            });
+            console.log('💾 Header filters saved to Unified Cache');
+          } else {
+            // Fallback to localStorage if Unified Cache is not available
+            localStorage.setItem('headerFilters', JSON.stringify(this.currentFilters));
+            console.log('💾 Header filters saved to localStorage (fallback)');
+          }
         },
         
-        // טעינת פילטרים
-        loadFilters() {
-          const saved = localStorage.getItem('headerFilters');
-          if (saved) {
+        // טעינת פילטרים באמצעות Unified Cache Manager
+        async loadFilters() {
+          if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
             try {
-              this.currentFilters = { ...this.currentFilters, ...JSON.parse(saved) };
-              console.log('🔧 Loaded saved filters:', this.currentFilters);
+              const cachedFilters = await window.UnifiedCacheManager.get('headerFilters');
+              if (cachedFilters) {
+                this.currentFilters = { ...this.currentFilters, ...cachedFilters };
+                console.log('🔧 Loaded saved filters from Unified Cache:', this.currentFilters);
+              }
             } catch (e) {
-              console.log('⚠️ Error loading saved filters:', e);
+              console.log('⚠️ Error loading saved filters from Unified Cache:', e);
+            }
+          } else {
+            // Fallback to localStorage if Unified Cache is not available
+            const saved = localStorage.getItem('headerFilters');
+            if (saved) {
+              try {
+                this.currentFilters = { ...this.currentFilters, ...JSON.parse(saved) };
+                console.log('🔧 Loaded saved filters from localStorage (fallback):', this.currentFilters);
+              } catch (e) {
+                console.log('⚠️ Error loading saved filters:', e);
+              }
             }
           }
         },

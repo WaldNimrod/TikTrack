@@ -4047,8 +4047,19 @@ function saveDuplicatesToCache(resultsData) {
             version: '1.0'
         };
         
-        localStorage.setItem(cacheKey, JSON.stringify(cacheData));
-        console.log('💾 תוצאות כפילויות נשמרו ב-localStorage:', cacheData.duplicates.length, 'כפילויות');
+        if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+            await window.UnifiedCacheManager.save('css-duplicates-results', cacheData, {
+                layer: 'indexedDB',
+                ttl: 86400000, // 24 שעות
+                compress: true,
+                syncToBackend: false
+            });
+            console.log('💾 תוצאות כפילויות נשמרו במערכת מטמון מאוחדת:', cacheData.duplicates.length, 'כפילויות');
+        } else {
+            // Fallback to localStorage if Unified Cache is not available
+            localStorage.setItem(cacheKey, JSON.stringify(cacheData));
+            console.log('💾 תוצאות כפילויות נשמרו ב-localStorage (fallback):', cacheData.duplicates.length, 'כפילויות');
+        }
         
         if (typeof window.showInfoNotification === 'function') {
             window.showInfoNotification('מטמון CSS', `נשמרו ${cacheData.duplicates.length} כפילויות במטמון`);
@@ -4068,14 +4079,23 @@ function saveDuplicatesToCache(resultsData) {
 function loadDuplicatesFromCache() {
     try {
         const cacheKey = 'css-duplicates-results';
-        const cachedData = localStorage.getItem(cacheKey);
+        let cachedData = null;
+        
+        if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+            cachedData = await window.UnifiedCacheManager.get('css-duplicates-results');
+        } else {
+            // Fallback to localStorage if Unified Cache is not available
+            const localData = localStorage.getItem(cacheKey);
+            cachedData = localData ? JSON.parse(localData) : null;
+        }
         
         if (!cachedData) {
             console.log('📭 אין נתונים במטמון');
             return null;
         }
         
-        const parsedData = JSON.parse(cachedData);
+        // cachedData is already parsed from UnifiedCacheManager or localStorage
+        const parsedData = cachedData;
         
         // בדיקת גיל הנתונים (24 שעות)
         const cacheTime = new Date(parsedData.cachedAt);
@@ -4111,9 +4131,14 @@ function loadDuplicatesFromCache() {
 function clearDuplicatesCache() {
     try {
         const cacheKey = 'css-duplicates-results';
-        localStorage.removeItem(cacheKey);
-        
-        console.log('🗑️ מטמון כפילויות CSS נוקה');
+        if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+            await window.UnifiedCacheManager.remove('css-duplicates-results');
+            console.log('🗑️ מטמון כפילויות CSS נוקה ממערכת מטמון מאוחדת');
+        } else {
+            // Fallback to localStorage if Unified Cache is not available
+            localStorage.removeItem(cacheKey);
+            console.log('🗑️ מטמון כפילויות CSS נוקה מ-localStorage (fallback)');
+        }
         
         if (typeof window.showSuccessNotification === 'function') {
             window.showSuccessNotification('מטמון CSS', 'מטמון כפילויות CSS נוקה בהצלחה');
@@ -4133,8 +4158,14 @@ function clearDuplicatesCache() {
 function hasCachedDuplicates() {
     try {
         const cacheKey = 'css-duplicates-results';
-        const cachedData = localStorage.getItem(cacheKey);
-        return !!cachedData;
+        if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+            const cachedData = await window.UnifiedCacheManager.get('css-duplicates-results');
+            return !!cachedData;
+        } else {
+            // Fallback to localStorage if Unified Cache is not available
+            const cachedData = localStorage.getItem(cacheKey);
+            return !!cachedData;
+        }
     } catch (error) {
         console.error('❌ שגיאה בבדיקת מטמון:', error);
         return false;

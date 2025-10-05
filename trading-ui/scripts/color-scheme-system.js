@@ -2374,8 +2374,19 @@ function applyColorScheme(schemeName = 'light', customColors = null) {
     // Apply new scheme
     document.body.classList.add(`${schemeName}-scheme`);
     
-    // Store current scheme
-    localStorage.setItem('colorScheme', schemeName);
+    // Store current scheme using Unified Cache Manager
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+      await window.UnifiedCacheManager.save('colorScheme', schemeName, {
+        layer: 'localStorage',
+        ttl: null, // persistent
+        syncToBackend: false
+      });
+      console.log(`💾 Color scheme saved to Unified Cache: ${schemeName}`);
+    } else {
+      // Fallback to localStorage if Unified Cache is not available
+      localStorage.setItem('colorScheme', schemeName);
+      console.log(`💾 Color scheme saved to localStorage (fallback): ${schemeName}`);
+    }
     
     // Apply scheme-specific colors
     switch (schemeName) {
@@ -2435,8 +2446,17 @@ function toggleColorScheme() {
  */
 function loadColorScheme() {
   try {
-    const savedScheme = localStorage.getItem('colorScheme') || 'light';
-    console.log(`📥 Loading color scheme: ${savedScheme}`);
+    let savedScheme = 'light';
+    
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+      const cachedScheme = await window.UnifiedCacheManager.get('colorScheme');
+      savedScheme = cachedScheme || 'light';
+      console.log(`📥 Loading color scheme from Unified Cache: ${savedScheme}`);
+    } else {
+      // Fallback to localStorage if Unified Cache is not available
+      savedScheme = localStorage.getItem('colorScheme') || 'light';
+      console.log(`📥 Loading color scheme from localStorage (fallback): ${savedScheme}`);
+    }
     
     // Apply the saved scheme
     applyColorScheme(savedScheme);
@@ -2460,12 +2480,35 @@ function saveColorScheme(schemeName, customColors = null) {
   try {
     console.log(`💾 Saving color scheme: ${schemeName}`);
     
-    // Save scheme name
-    localStorage.setItem('colorScheme', schemeName);
-    
-    // Save custom colors if provided
-    if (customColors && schemeName === 'custom') {
-      localStorage.setItem('customColorScheme', JSON.stringify(customColors));
+    // Save scheme name using Unified Cache Manager
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+      await window.UnifiedCacheManager.save('colorScheme', schemeName, {
+        layer: 'localStorage',
+        ttl: null, // persistent
+        syncToBackend: false
+      });
+      console.log(`💾 Color scheme saved to Unified Cache: ${schemeName}`);
+      
+      // Save custom colors if provided
+      if (customColors && schemeName === 'custom') {
+        await window.UnifiedCacheManager.save('customColorScheme', customColors, {
+          layer: 'localStorage',
+          ttl: null, // persistent
+          compress: true,
+          syncToBackend: false
+        });
+        console.log(`💾 Custom color scheme saved to Unified Cache`);
+      }
+    } else {
+      // Fallback to localStorage if Unified Cache is not available
+      localStorage.setItem('colorScheme', schemeName);
+      console.log(`💾 Color scheme saved to localStorage (fallback): ${schemeName}`);
+      
+      // Save custom colors if provided
+      if (customColors && schemeName === 'custom') {
+        localStorage.setItem('customColorScheme', JSON.stringify(customColors));
+        console.log(`💾 Custom color scheme saved to localStorage (fallback)`);
+      }
     }
     
     // Update current preferences
@@ -2491,7 +2534,13 @@ function saveColorScheme(schemeName, customColors = null) {
  */
 function getCurrentColorScheme() {
   try {
-    return localStorage.getItem('colorScheme') || 'light';
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+      const cachedScheme = await window.UnifiedCacheManager.get('colorScheme');
+      return cachedScheme || 'light';
+    } else {
+      // Fallback to localStorage if Unified Cache is not available
+      return localStorage.getItem('colorScheme') || 'light';
+    }
   } catch (error) {
     console.error('❌ Error getting current color scheme:', error);
     return 'light';

@@ -34,24 +34,104 @@ function clearCache() {
 }
 
 /**
- * קבלת כל החשבונות מהשרת
+ * עיבוד נתוני חשבונות עם מערכת מיפוי טבלאות
+ * @param {Array} rawData - נתונים גולמיים מהשרת
+ * @returns {Array} נתונים מעובדים
+ */
+function processAccountsData(rawData) {
+  const accounts = rawData.data || rawData;
+  
+  return accounts.map(account => {
+    // שימוש במערכת מיפוי טבלאות אם זמינה
+    if (window.getColumnValue && window.tableMappings) {
+      return {
+        id: window.getColumnValue(account, 0, 'accounts') || account.id,
+        name: window.getColumnValue(account, 1, 'accounts') || account.name,
+        currency: window.getColumnValue(account, 2, 'accounts') || account.currency,
+        status: window.getColumnValue(account, 3, 'accounts') || account.status,
+        cashBalance: parseFloat(window.getColumnValue(account, 4, 'accounts')) || 0,
+        totalValue: parseFloat(window.getColumnValue(account, 5, 'accounts')) || 0,
+        totalPL: parseFloat(window.getColumnValue(account, 6, 'accounts')) || 0,
+        notes: window.getColumnValue(account, 7, 'accounts') || account.notes || ''
+      };
+    } else {
+      // fallback למיפוי ידני
+      return {
+        id: account.id,
+        name: account.name || 'Unknown',
+        currency: account.currency || 'USD',
+        status: account.status || 'unknown',
+        cashBalance: parseFloat(account.cash_balance) || 0,
+        totalValue: parseFloat(account.total_value) || 0,
+        totalPL: parseFloat(account.total_pl) || 0,
+        notes: account.notes || ''
+      };
+    }
+  });
+}
+
+/**
+ * קבלת כל החשבונות מהשרת עם אינטגרציה למערכת מטמון מאוחדת
  * @returns {Promise<Array>} מערך של חשבונות
  */
 async function getAccounts() {
   try {
-    const response = await fetch('/api/accounts/');
+    // נסה לקבל ממטמון מאוחד קודם
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+      const cachedData = await window.UnifiedCacheManager.get('trading_accounts_data', {
+        layer: 'localStorage'
+      });
+      if (cachedData && isCacheValid(cachedData)) {
+        console.log('📦 נתונים נטענו ממטמון');
+        return cachedData.data;
+      }
+    }
+
+    // אם אין במטמון, טען מהשרת
+    console.log('🌐 טוען נתונים מהשרת...');
+    const response = await fetch('/api/trading-accounts/'); // תיקון endpoint
     if (response.ok) {
       const data = await response.json();
-      const accounts = data.data || data || [];
-      return accounts;
+      
+      // עיבוד נתונים עם מערכת מיפוי טבלאות
+      const processedAccounts = processAccountsData(data);
+      
+      // שמור במטמון מאוחד עם מדיניות
+      if (window.UnifiedCacheManager) {
+        await window.UnifiedCacheManager.save('trading_accounts_data', {
+          data: processedAccounts,
+          timestamp: Date.now()
+        }, {
+          layer: 'localStorage',
+          ttl: 300000, // 5 דקות
+          compress: false
+        });
+      }
+      
+      return processedAccounts;
     } else {
-      // Failed to fetch accounts
+      console.warn('⚠️ תגובת שרת לא תקינה:', response.status);
       return [];
     }
-  } catch {
-    // Error fetching accounts
+  } catch (error) {
+    console.error('Error fetching accounts:', error);
     return [];
   }
+}
+
+/**
+ * בדיקת תקינות מטמון
+ * @param {Object} cachedData - נתוני מטמון
+ * @returns {boolean} האם המטמון תקין
+ */
+function isCacheValid(cachedData) {
+  if (!cachedData || !cachedData.timestamp) return false;
+  
+  const now = Date.now();
+  const cacheAge = now - cachedData.timestamp;
+  const maxAge = 300000; // 5 דקות
+  
+  return cacheAge < maxAge;
 }
 
 /**
@@ -74,28 +154,50 @@ async function getAccountsByStatus(status) {
 }
 
 /**
- * ביטול חשבון - גרסה פשוטה
+ * ביטול חשבון עם אינטגרציה למערכות כלליות
  * @param {number} accountId - מזהה החשבון
+ * @param {string} accountName - שם החשבון (לאופציונלי להודעות)
  * @returns {Promise<boolean>} האם הביטול הצליח
  */
-async function cancelAccount(accountId) {
-  // ביטול חשבון
+async function cancelAccount(accountId, accountName = 'החשבון') {
+  try {
+    const response = await fetch(`/api/trading-accounts/${accountId}/cancel`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
 
-  const response = await fetch(`/api/accounts/${accountId}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ status: 'cancelled' }),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error?.message || 'שגיאה בביטול החשבון');
+    if (response.ok) {
+      // הצגת הודעה באמצעות מערכת התראות
+      if (window.showSuccessNotification) {
+        window.showSuccessNotification(`חשבון "${accountName}" בוטל בהצלחה`);
+      }
+      
+      // ניקוי מטמון מקומי
+      if (window.UnifiedCacheManager) {
+        await window.UnifiedCacheManager.remove('trading_accounts_data', {
+          layer: 'localStorage'
+        });
+      }
+      
+      // סינכרון עם שרת - ביטול מטמון Backend
+      if (window.CacheSyncManager) {
+        await window.CacheSyncManager.invalidateBackend(['trading_accounts']);
+      }
+      
+      // ניקוי cache מקומי (legacy)
+      clearCache();
+      
+      return true;
+    } else {
+      throw new Error(`Failed to cancel account: ${response.status}`);
+    }
+  } catch (error) {
+    console.error('Error canceling account:', error);
+    if (window.showErrorNotification) {
+      window.showErrorNotification(`שגיאה בביטול חשבון "${accountName}"`);
+    }
+    return false;
   }
-
-  // ניקוי ה-cache
-  clearCache();
-
-  return true;
 }
 
 /**

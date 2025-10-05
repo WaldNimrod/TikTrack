@@ -889,12 +889,23 @@ window.toggleSection = function (sectionId) {
       console.log(`🎨 Icon updated to: "${newIcon}"`);
     }
 
-    // Save state with page-specific key
+    // Save state with page-specific key using Unified Cache Manager
     const isHidden = sectionBody.style.display === 'none';
     const pageName = getCurrentPageName();
     const storageKey = `${pageName}_${sectionId}_SectionHidden`;
-    localStorage.setItem(storageKey, isHidden.toString());
-    console.log(`💾 State saved to localStorage: ${storageKey} = "${isHidden}"`);
+    
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+        await window.UnifiedCacheManager.save(storageKey, isHidden, {
+            layer: 'localStorage',
+            ttl: null, // persistent
+            syncToBackend: false
+        });
+        console.log(`💾 State saved to Unified Cache: ${storageKey} = "${isHidden}"`);
+    } else {
+        // Fallback to localStorage if Unified Cache is not available
+        localStorage.setItem(storageKey, isHidden.toString());
+        console.log(`💾 State saved to localStorage (fallback): ${storageKey} = "${isHidden}"`);
+    }
     
   } else {
     console.warn(`❌ Section ${sectionId} not found`);
@@ -930,10 +941,19 @@ window.restoreAllSectionStates = function () {
     console.log(`🔧 Processing section ${index + 1}/${sections.length}: ID="${sectionId}"`);
 
     if (sectionBody && sectionId) {
-      // Check localStorage for saved state with page-specific key
+      // Check Unified Cache for saved state with page-specific key
       const storageKey = `${pageName}_${sectionId}_SectionHidden`;
-      const isHidden = localStorage.getItem(storageKey) === 'true';
-      console.log(`💾 Retrieved state for "${sectionId}" on page "${pageName}": hidden=${isHidden}`);
+      let isHidden = false;
+      
+      if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+        const cachedState = await window.UnifiedCacheManager.get(storageKey);
+        isHidden = cachedState === true;
+        console.log(`💾 Retrieved state from Unified Cache for "${sectionId}" on page "${pageName}": hidden=${isHidden}`);
+      } else {
+        // Fallback to localStorage if Unified Cache is not available
+        isHidden = localStorage.getItem(storageKey) === 'true';
+        console.log(`💾 Retrieved state from localStorage (fallback) for "${sectionId}" on page "${pageName}": hidden=${isHidden}`);
+      }
 
       if (isHidden) {
         // Restore collapsed state
@@ -973,8 +993,17 @@ window.restoreSectionStates = function () {
   const pageName = getCurrentPageName();
   console.log(`🔧 restoreSectionStates called for page: "${pageName}"`);
   
-  const topSectionHidden = localStorage.getItem(`${pageName}_top-section_collapsed`) === 'true';
-  console.log(`💾 Retrieved top section state for page "${pageName}": collapsed=${topSectionHidden}`);
+  let topSectionHidden = false;
+  
+  if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+    const cachedState = await window.UnifiedCacheManager.get(`${pageName}_top-section_collapsed`);
+    topSectionHidden = cachedState === true;
+    console.log(`💾 Retrieved top section state from Unified Cache for page "${pageName}": collapsed=${topSectionHidden}`);
+  } else {
+    // Fallback to localStorage if Unified Cache is not available
+    topSectionHidden = localStorage.getItem(`${pageName}_top-section_collapsed`) === 'true';
+    console.log(`💾 Retrieved top section state from localStorage (fallback) for page "${pageName}": collapsed=${topSectionHidden}`);
+  }
   
   const topSection = document.querySelector('.top-section .section-body, .top-section .section-content');
   const topToggleBtn = document.querySelector('.top-section button[onclick*="toggleSection"]');
@@ -1002,8 +1031,17 @@ window.restoreSectionStates = function () {
   sections.forEach((section, index) => {
     const sectionId = section.getAttribute('data-section') || section.id || `section-${index}`;
     if (sectionId) {
-      const sectionHidden = localStorage.getItem(`${pageName}_${sectionId}_SectionHidden`) === 'true';
-      console.log(`💾 Retrieved state for section "${sectionId}" on page "${pageName}": hidden=${sectionHidden}`);
+      let sectionHidden = false;
+      
+      if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+        const cachedState = await window.UnifiedCacheManager.get(`${pageName}_${sectionId}_SectionHidden`);
+        sectionHidden = cachedState === true;
+        console.log(`💾 Retrieved state from Unified Cache for section "${sectionId}" on page "${pageName}": hidden=${sectionHidden}`);
+      } else {
+        // Fallback to localStorage if Unified Cache is not available
+        sectionHidden = localStorage.getItem(`${pageName}_${sectionId}_SectionHidden`) === 'true';
+        console.log(`💾 Retrieved state from localStorage (fallback) for section "${sectionId}" on page "${pageName}": hidden=${sectionHidden}`);
+      }
       
       const sectionBody = section.querySelector('.section-body, .section-content');
       const toggleBtn = section.querySelector('button[onclick*="toggleSection"]');
@@ -1307,8 +1345,18 @@ function toggleTopSection(sectionId = 'top-section') {
   // Save state to localStorage with page-specific key
   const pageName = getCurrentPageName();
   const storageKey = `${pageName}_${sectionId}_collapsed`;
-  localStorage.setItem(storageKey, (!isCollapsed).toString());
-  console.log(`💾 Top section state saved: ${storageKey} = "${!isCollapsed}"`);
+  if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+    await window.UnifiedCacheManager.save(storageKey, !isCollapsed, {
+      layer: 'localStorage',
+      ttl: null, // persistent
+      syncToBackend: false
+    });
+    console.log(`💾 Top section state saved to Unified Cache: ${storageKey} = "${!isCollapsed}"`);
+  } else {
+    // Fallback to localStorage if Unified Cache is not available
+    localStorage.setItem(storageKey, (!isCollapsed).toString());
+    console.log(`💾 Top section state saved to localStorage (fallback): ${storageKey} = "${!isCollapsed}"`);
+  }
 }
 
 // toggleSection function removed - use toggleSection('main') instead
@@ -1344,8 +1392,16 @@ window.debugSectionStates = function() {
   
   // Check top section
   const topSectionKey = `${pageName}_top-section_collapsed`;
-  const topSectionState = localStorage.getItem(topSectionKey);
-  console.log(`📍 Top Section: ${topSectionKey} = "${topSectionState}"`);
+  let topSectionState = null;
+  
+  if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+    topSectionState = await window.UnifiedCacheManager.get(topSectionKey);
+    console.log(`📍 Top Section from Unified Cache: ${topSectionKey} = "${topSectionState}"`);
+  } else {
+    // Fallback to localStorage if Unified Cache is not available
+    topSectionState = localStorage.getItem(topSectionKey);
+    console.log(`📍 Top Section from localStorage (fallback): ${topSectionKey} = "${topSectionState}"`);
+  }
   
   // Check all content sections
   const sections = document.querySelectorAll('.content-section');
@@ -1353,8 +1409,16 @@ window.debugSectionStates = function() {
     const sectionId = section.getAttribute('data-section') || section.id;
     if (sectionId) {
       const sectionKey = `${pageName}_${sectionId}_SectionHidden`;
-      const sectionState = localStorage.getItem(sectionKey);
-      console.log(`📍 Section ${index + 1}: ${sectionKey} = "${sectionState}"`);
+      let sectionState = null;
+      
+      if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+        sectionState = await window.UnifiedCacheManager.get(sectionKey);
+        console.log(`📍 Section ${index + 1} from Unified Cache: ${sectionKey} = "${sectionState}"`);
+      } else {
+        // Fallback to localStorage if Unified Cache is not available
+        sectionState = localStorage.getItem(sectionKey);
+        console.log(`📍 Section ${index + 1} from localStorage (fallback): ${sectionKey} = "${sectionState}"`);
+      }
     }
   });
   
@@ -1426,8 +1490,18 @@ function toggleAllSections() {
       // Save state with page-specific key
       const isHidden = sectionBody.style.display === 'none';
       const storageKey = `${pageName}_${sectionId}_SectionHidden`;
-      localStorage.setItem(storageKey, isHidden.toString());
-      console.log(`💾 State saved to localStorage: ${storageKey} = "${isHidden}"`);
+      if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+        await window.UnifiedCacheManager.save(storageKey, isHidden, {
+          layer: 'localStorage',
+          ttl: null, // persistent
+          syncToBackend: false
+        });
+        console.log(`💾 State saved to Unified Cache: ${storageKey} = "${isHidden}"`);
+      } else {
+        // Fallback to localStorage if Unified Cache is not available
+        localStorage.setItem(storageKey, isHidden.toString());
+        console.log(`💾 State saved to localStorage (fallback): ${storageKey} = "${isHidden}"`);
+      }
     } else {
       console.log(`⚠️ No section body found for section "${sectionId}"`);
     }
@@ -1456,9 +1530,17 @@ function loadSectionStates() {
   sections.forEach((section, index) => {
     const sectionId = section.getAttribute('data-section') || section.id || `section-${index}`;
     const storageKey = `${pageName}_${sectionId}_SectionHidden`;
-    const isCollapsed = localStorage.getItem(storageKey) === 'true';
+    let isCollapsed = false;
     
-    console.log(`💾 Retrieved state for "${sectionId}" on page "${pageName}": hidden=${isCollapsed}`);
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+      const cachedState = await window.UnifiedCacheManager.get(storageKey);
+      isCollapsed = cachedState === true;
+      console.log(`💾 Retrieved state from Unified Cache for "${sectionId}" on page "${pageName}": hidden=${isCollapsed}`);
+    } else {
+      // Fallback to localStorage if Unified Cache is not available
+      isCollapsed = localStorage.getItem(storageKey) === 'true';
+      console.log(`💾 Retrieved state from localStorage (fallback) for "${sectionId}" on page "${pageName}": hidden=${isCollapsed}`);
+    }
     
     const sectionBody = section.querySelector('.section-body, .section-content');
     const toggleIcon = section.querySelector('.section-toggle-icon, .filter-icon');

@@ -1035,7 +1035,18 @@ if (window.location.pathname.includes('/trade_plans')) {
  */
 async function loadTradePlansData() {
   try {
-    // Use trade-plan-service to load data
+    // שימוש במערכת הכללית לטעינת נתונים
+    if (typeof window.loadTableData === 'function') {
+      const data = await window.loadTableData('trade_plans', updateTradePlansTable);
+      
+      // עדכון נתונים גלובליים
+      window.tradePlansData = data;
+      window.tradePlansLoaded = true;
+      
+      return data;
+    }
+    
+    // Fallback: Use trade-plan-service to load data
     if (typeof window.tradePlanService?.loadTradePlansData === 'function') {
       const data = await window.tradePlanService.loadTradePlansData();
 
@@ -1332,12 +1343,14 @@ function updateTradePlansTable(trade_plans) {
           </span>
         </td>
         <td class="actions-cell">
-          <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTradePlan(${design.id})" title="צפה באלמנטים מקושרים">
-            🔗
-          </button>
-          ${createEditButton(`window.openEditTradePlanModal(${design.id})`)}
-          ${createCancelButton('trade_plan', design.id, design.status, 'sm')}
-          ${createDeleteButton(`window.openDeleteTradePlanModal(${design.id})`)}
+          ${window.createLinkButton ? window.createLinkButton(`viewLinkedItemsForTradePlan(${design.id})`) : 
+            `<button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTradePlan(${design.id})" title="צפה באלמנטים מקושרים">🔗</button>`}
+          ${window.createEditButton ? window.createEditButton(`window.openEditTradePlanModal(${design.id})`) : 
+            `<button class="btn btn-sm btn-primary" onclick="window.openEditTradePlanModal(${design.id})" title="ערוך">✏️</button>`}
+          ${window.createCancelButton ? window.createCancelButton('trade_plan', design.id, design.status, 'sm') : 
+            `<button class="btn btn-sm btn-warning" onclick="window.openCancelTradePlanModal(${design.id})" title="בטל">❌</button>`}
+          ${window.createDeleteButton ? window.createDeleteButton(`window.openDeleteTradePlanModal(${design.id})`) : 
+            `<button class="btn btn-sm btn-danger" onclick="window.openDeleteTradePlanModal(${design.id})" title="מחק">🗑️</button>`}
         </td>
       </tr>
     `;

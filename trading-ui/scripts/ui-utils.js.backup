@@ -931,8 +931,7 @@ window.restoreAllSectionStates = async function () {
   const pageName = getCurrentPageName();
   console.log(`🔧 restoreAllSectionStates called for page: "${pageName}"`);
   
-  for (let index = 0; index < sections.length; index++) {
-    const section = sections[index];
+  sections.forEach((section, index) => {
     const sectionId = section.getAttribute('data-section') || section.id || `section-${index}`;
     const sectionBody = section.querySelector('.section-body, .section-content');
     const toggleBtn = section.querySelector('button[onclick*="toggleSection"]');
@@ -976,7 +975,7 @@ window.restoreAllSectionStates = async function () {
     } else {
       console.log(`⚠️ No section body or ID found for section ${index + 1}`);
     }
-  }
+  });
   
   console.log(`✅ restoreAllSectionStates completed - restored ${restoredCount}/${sections.length} sections`);
   return restoredCount;
@@ -1029,8 +1028,7 @@ window.restoreSectionStates = async function () {
   
   let restoredCount = 0;
   
-  for (let index = 0; index < sections.length; index++) {
-    const section = sections[index];
+  sections.forEach((section, index) => {
     const sectionId = section.getAttribute('data-section') || section.id || `section-${index}`;
     if (sectionId) {
       let sectionHidden = false;
@@ -1066,7 +1064,7 @@ window.restoreSectionStates = async function () {
         restoredCount++;
       }
     }
-  }
+  });
   
   console.log(`✅ restoreSectionStates completed - restored ${restoredCount}/${sections.length} sections`);
 };
@@ -1293,7 +1291,7 @@ document.addEventListener('DOMContentLoaded', () => {
  * Toggle top section visibility
  * Used for the main top section of each page
  */
-async function toggleTopSection(sectionId = 'top-section') {
+function toggleTopSection(sectionId = 'top-section') {
   const section = document.getElementById(sectionId);
   if (!section) {
     console.warn(`⚠️ Section ${sectionId} not found`);
@@ -1387,7 +1385,7 @@ function getCurrentPageName() {
  * Debug function to show all section states for current page
  * Useful for debugging section state management
  */
-window.debugSectionStates = async function() {
+window.debugSectionStates = function() {
   const pageName = getCurrentPageName();
   console.log(`🔍 Debug Section States for page: "${pageName}"`);
   console.log('=====================================');
@@ -1407,8 +1405,7 @@ window.debugSectionStates = async function() {
   
   // Check all content sections
   const sections = document.querySelectorAll('.content-section');
-  for (let index = 0; index < sections.length; index++) {
-    const section = sections[index];
+  sections.forEach((section, index) => {
     const sectionId = section.getAttribute('data-section') || section.id;
     if (sectionId) {
       const sectionKey = `${pageName}_${sectionId}_SectionHidden`;
@@ -1423,7 +1420,7 @@ window.debugSectionStates = async function() {
         console.log(`📍 Section ${index + 1} from localStorage (fallback): ${sectionKey} = "${sectionState}"`);
       }
     }
-  }
+  });
   
   console.log('=====================================');
 };
@@ -1465,8 +1462,7 @@ async function toggleAllSections() {
   const pageName = getCurrentPageName();
   
   // Toggle all sections
-  for (let index = 0; index < allSections.length; index++) {
-    const section = allSections[index];
+  allSections.forEach((section, index) => {
     const sectionId = section.getAttribute('data-section') || section.id || `section-${index}`;
     const sectionBody = section.querySelector('.section-body, .section-content');
     const toggleBtn = section.querySelector('.filter-toggle-btn, [onclick*="toggle"]');
@@ -1509,7 +1505,7 @@ async function toggleAllSections() {
     } else {
       console.log(`⚠️ No section body found for section "${sectionId}"`);
     }
-  }
+  });
   
   console.log(`✅ toggleAllSections (generic) completed - processed ${allSections.length} sections`);
   console.log(`📂 All sections ${allCollapsed ? 'expanded' : 'collapsed'}`);
@@ -1520,7 +1516,7 @@ async function toggleAllSections() {
  * Called on page load to restore previous section states
  * UPDATED: Now uses page-specific localStorage keys
  */
-async function loadSectionStates() {
+function loadSectionStates() {
   console.log(`🔧 loadSectionStates called`);
   
   const pageName = getCurrentPageName();
@@ -1531,8 +1527,7 @@ async function loadSectionStates() {
   
   let restoredCount = 0;
   
-  for (let index = 0; index < sections.length; index++) {
-    const section = sections[index];
+  sections.forEach((section, index) => {
     const sectionId = section.getAttribute('data-section') || section.id || `section-${index}`;
     const storageKey = `${pageName}_${sectionId}_SectionHidden`;
     let isCollapsed = false;
@@ -1565,7 +1560,7 @@ async function loadSectionStates() {
       console.log(`✅ Section "${sectionId}" RESTORED to EXPANDED`);
       restoredCount++;
     }
-  }
+  });
   
   console.log(`✅ loadSectionStates completed - restored ${restoredCount}/${sections.length} sections`);
 }

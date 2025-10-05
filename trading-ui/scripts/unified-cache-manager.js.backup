@@ -127,14 +127,6 @@ class UnifiedCacheManager {
     }
 
     /**
-     * בדיקה האם המערכת מאותחלת
-     * @returns {boolean} true אם המערכת מאותחלת
-     */
-    isInitialized() {
-        return this.initialized;
-    }
-
-    /**
      * שמירת נתונים במטמון עם החלטה אוטומטית על שכבה
      * @param {string} key - מפתח הנתונים
      * @param {any} data - הנתונים לשמירה

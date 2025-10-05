@@ -2850,17 +2850,7 @@ document.addEventListener('DOMContentLoaded', function () {
   } else {
     // console.warn('⚠️ restoreAllSectionStates function not available, using fallback');
     // Fallback: restore top section state manually
-    let topSectionHidden = false;
-    
-    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
-      const cachedState = await window.UnifiedCacheManager.get('executionsTopSectionCollapsed');
-      topSectionHidden = cachedState === true;
-      console.log('📥 Executions top section state loaded from Unified Cache:', topSectionHidden);
-    } else {
-      // Fallback to localStorage if Unified Cache is not available
-      topSectionHidden = localStorage.getItem('executionsTopSectionCollapsed') === 'true';
-      console.log('📥 Executions top section state loaded from localStorage (fallback):', topSectionHidden);
-    }
+    const topSectionHidden = localStorage.getItem('executionsTopSectionCollapsed') === 'true';
     const topSection = document.querySelector('.top-section .section-body');
     const topToggleBtn = document.querySelector('.top-section button[onclick*="toggleSection"]');
     const topIcon = topToggleBtn ? topToggleBtn.querySelector('.filter-icon') : null;

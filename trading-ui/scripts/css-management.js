@@ -4047,7 +4047,7 @@ async function saveDuplicatesToCache(resultsData) {
             version: '1.0'
         };
         
-        if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+        if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
             await window.UnifiedCacheManager.save('css-duplicates-results', cacheData, {
                 layer: 'indexedDB',
                 ttl: 86400000, // 24 שעות
@@ -4081,7 +4081,7 @@ async function loadDuplicatesFromCache() {
         const cacheKey = 'css-duplicates-results';
         let cachedData = null;
         
-        if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+        if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
             cachedData = await window.UnifiedCacheManager.get('css-duplicates-results');
         } else {
             // Fallback to localStorage if Unified Cache is not available
@@ -4131,7 +4131,7 @@ async function loadDuplicatesFromCache() {
 async function clearDuplicatesCache() {
     try {
         const cacheKey = 'css-duplicates-results';
-        if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+        if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
             await window.UnifiedCacheManager.remove('css-duplicates-results');
             console.log('🗑️ מטמון כפילויות CSS נוקה ממערכת מטמון מאוחדת');
         } else {
@@ -4158,7 +4158,7 @@ async function clearDuplicatesCache() {
 async function hasCachedDuplicates() {
     try {
         const cacheKey = 'css-duplicates-results';
-        if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+        if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
             const cachedData = await window.UnifiedCacheManager.get('css-duplicates-results');
             return !!cachedData;
         } else {

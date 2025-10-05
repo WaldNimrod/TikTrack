@@ -1304,8 +1304,14 @@ function updateTradePlansTable(trade_plans) {
     const typeForFilter = design.investment_type || '';
     const statusForFilter = design.status || '';
 
+    // חישוב רווח פשוט
+    const profitAmount = design.current_price && design.planned_amount ? 
+      (design.current_price - design.planned_amount) * (design.side === 'Long' ? 1 : -1) : 0;
+    const profitDisplay = formatCurrency(profitAmount);
+
     return `
       <tr>
+        <!-- 1. טיקר -->
         <td class="ticker-cell">
           <div style="display: flex; align-items: center; gap: 6px;">
             ${tickerLink}
@@ -1314,34 +1320,67 @@ function updateTradePlansTable(trade_plans) {
             </span>
           </div>
         </td>
+        
+        <!-- 2. תאריך -->
         <td data-date="${design.created_at}"><span class="date-text">${dateDisplay}</span></td>
+        
+        <!-- 3. סוג -->
         <td class="type-cell" data-type="${typeForFilter}">
           <span class="entity-trade-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
             ${typeDisplay}
           </span>
         </td>
+        
+        <!-- 4. צד -->
         <td class="side-cell" data-side="${design.side}">
           <span class="${design.side === 'Long' ? 'numeric-value-positive' : 'numeric-value-negative'}" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
             ${sideDisplay}
           </span>
         </td>
-        <td>
+        
+        <!-- 5. כמות -->
+        <td class="quantity-cell">
+          <span class="numeric-value-positive" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
+            ${formatCurrency(design.planned_amount || 0)}
+          </span>
+        </td>
+        
+        <!-- 6. מחיר -->
+        <td class="price-cell">
+          <span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
+            ${formatCurrency(design.current_price || 0)}
+          </span>
+        </td>
+        
+        <!-- 7. השקעה -->
+        <td class="investment-cell">
           <span class="numeric-value-positive" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
             ${amountDisplay}
           </span>
         </td>
-        <td class="target-cell"><span class="target-text" style="color: ${window.getTableColors ? window.getTableColors().positive : '#28a745'};">${targetDisplay}</span></td>
-        <td class="stop-cell"><span class="stop-text" style="color: ${window.getTableColors ? window.getTableColors().negative : '#dc3545'};">${stopDisplay}</span></td>
-        <td>
-          <span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
-            ${currentDisplay}
-          </span>
-        </td>
+        
+        <!-- 8. סטטוס -->
         <td class="status-cell" data-status="${statusForFilter}">
           <span class="status-${design.status}-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
             ${statusDisplay}
           </span>
         </td>
+        
+        <!-- 9. רווח -->
+        <td class="profit-cell">
+          <span class="${profitAmount >= 0 ? 'numeric-value-positive' : 'numeric-value-negative'}" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
+            ${profitDisplay}
+          </span>
+        </td>
+        
+        <!-- 10. הערות -->
+        <td class="notes-cell">
+          <span style="font-size: 0.85em; color: #666;">
+            ${design.notes || design.reasons || 'אין הערות'}
+          </span>
+        </td>
+        
+        <!-- 11. פעולות -->
         <td class="actions-cell">
           ${window.createLinkButton ? window.createLinkButton(`viewLinkedItemsForTradePlan(${design.id})`) : 
             `<button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTradePlan(${design.id})" title="צפה באלמנטים מקושרים">🔗</button>`}
@@ -1356,7 +1395,7 @@ function updateTradePlansTable(trade_plans) {
     `;
     } catch (error) {
       console.error(`❌ Error processing design ${index + 1}:`, error);
-      return `<tr><td colspan="10" class="text-center text-danger">שגיאה בעיבוד תכנון ${index + 1}</td></tr>`;
+      return `<tr><td colspan="11" class="text-center text-danger">שגיאה בעיבוד תכנון ${index + 1}</td></tr>`;
     }
   }).join('');
 
@@ -1386,63 +1425,57 @@ function updateTradePlansTable(trade_plans) {
 function updatePageSummaryStats() {
   // Using filtered data if available, otherwise all data
   const dataToUse = window.filteredTradePlansData || window.tradePlansData;
+  
+  if (!dataToUse || !Array.isArray(dataToUse)) {
+    console.log('⚠️ No data available for statistics');
+    return;
+  }
+
   const totalDesigns = dataToUse.length;
   const openDesigns = dataToUse.filter(design => design.status === 'open').length;
   const closedDesigns = dataToUse.filter(design => design.status === 'closed').length;
   const cancelledDesigns = dataToUse.filter(design => design.status === 'cancelled').length;
 
-  // Calculating sums
+  // Calculating sums using correct field names
   let totalInvestment = 0;
   let totalProfit = 0;
 
-  window.tradePlansData.forEach(design => {
+  dataToUse.forEach(design => {
     // Safeguarding against invalid data
     if (!design || typeof design !== 'object') {
-      if (typeof window.showNotification === 'function') {
-        window.showNotification('Invalid design data', 'warning');
-      }
       return;
     }
 
-    // Handling data from server (numbers) or strings
+    // Using correct field name: planned_amount instead of amount
     let amount = 0;
-    if (design.amount !== null && design.amount !== undefined) {
-      if (typeof design.amount === 'string') {
-        amount = parseFloat(design.amount.replace(/[$,]/g, '')) || 0;
+    if (design.planned_amount !== null && design.planned_amount !== undefined) {
+      if (typeof design.planned_amount === 'string') {
+        amount = parseFloat(design.planned_amount.replace(/[$,]/g, '')) || 0;
       } else {
-        amount = parseFloat(design.amount) || 0;
+        amount = parseFloat(design.planned_amount) || 0;
       }
     }
     totalInvestment += amount;
 
-    // Simple profit calculation (for example)
-    if (design.status === 'closed') {
-      let current = 0;
-      let target = 0;
+    // Simple profit calculation using correct fields
+    if (design.current_price && design.planned_amount) {
+      const currentPrice = typeof design.current_price === 'string' ? 
+        parseFloat(design.current_price.replace(/[$,]/g, '')) || 0 : 
+        parseFloat(design.current_price) || 0;
+      
+      const plannedAmount = typeof design.planned_amount === 'string' ? 
+        parseFloat(design.planned_amount.replace(/[$,]/g, '')) || 0 : 
+        parseFloat(design.planned_amount) || 0;
 
-      if (design.current !== null && design.current !== undefined) {
-        if (typeof design.current === 'string') {
-          current = parseFloat(design.current.replace(/[$,]/g, '')) || 0;
-        } else {
-          current = parseFloat(design.current) || 0;
-        }
-      }
-
-      if (design.target !== null && design.target !== undefined) {
-        if (typeof design.target === 'string') {
-          target = parseFloat(design.target.replace(/[$,]/g, '')) || 0;
-        } else {
-          target = parseFloat(design.target) || 0;
-        }
-      }
-
-      if (current > target) {
-        totalProfit += amount * 0.1; // 10% profit for example
-      }
+      // Calculate profit based on side (Long/Short)
+      const profit = (currentPrice - plannedAmount) * (design.side === 'Long' ? 1 : -1);
+      totalProfit += profit;
     }
   });
 
   const avgInvestment = totalDesigns > 0 ? totalInvestment / totalDesigns : 0;
+
+  console.log(`📊 Statistics: ${totalDesigns} designs, $${totalInvestment.toFixed(2)} total investment, $${totalProfit.toFixed(2)} total profit`);
 
   // עדכון אלמנטי הסיכום - בדיקה אם הם קיימים לפני הגישה
   const totalDesignsElement = document.getElementById('totalDesigns');
@@ -1466,9 +1499,9 @@ function updatePageSummaryStats() {
   }
 
   // עדכון מספר הרשומות בטבלה
-  const countElement = document.getElementById('designsCount');
+  const countElement = document.getElementById('trade_plansCount');
   if (countElement) {
-    countElement.textContent = `${totalDesigns} רשומות`;
+    countElement.textContent = `${totalDesigns} תכנונים`;
   }
 }
 

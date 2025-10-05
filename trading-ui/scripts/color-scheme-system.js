@@ -2364,7 +2364,7 @@ document.addEventListener('DOMContentLoaded', () => {
  * @param {string} schemeName - שם הסכמה (light, dark, custom)
  * @param {Object} customColors - צבעים מותאמים אישית (אופציונלי)
  */
-function applyColorScheme(schemeName = 'light', customColors = null) {
+async function applyColorScheme(schemeName = 'light', customColors = null) {
   try {
     console.log(`🎨 Applying color scheme: ${schemeName}`);
     
@@ -2376,17 +2376,12 @@ function applyColorScheme(schemeName = 'light', customColors = null) {
     
     // Store current scheme using Unified Cache Manager
     if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
-      try {
-        await window.UnifiedCacheManager.save('colorScheme', schemeName, {
-          layer: 'localStorage',
-          ttl: null, // persistent
-          syncToBackend: false
-        });
-        console.log(`💾 Color scheme saved to Unified Cache: ${schemeName}`);
-      } catch (error) {
-        console.warn('Failed to save color scheme to Unified Cache, using localStorage fallback:', error);
-        localStorage.setItem('colorScheme', schemeName);
-      }
+      await window.UnifiedCacheManager.save('colorScheme', schemeName, {
+        layer: 'localStorage',
+        ttl: null, // persistent
+        syncToBackend: false
+      });
+      console.log(`💾 Color scheme saved to Unified Cache: ${schemeName}`);
     } else {
       // Fallback to localStorage if Unified Cache is not available
       localStorage.setItem('colorScheme', schemeName);
@@ -2430,13 +2425,13 @@ function applyColorScheme(schemeName = 'light', customColors = null) {
  * Toggle between light and dark color schemes
  * החלפה בין סכמות צבעים בהירות וכהה
  */
-function toggleColorScheme() {
+async function toggleColorScheme() {
   try {
-    const currentScheme = getCurrentColorScheme();
+    const currentScheme = await getCurrentColorScheme();
     const newScheme = currentScheme === 'light' ? 'dark' : 'light';
     
     console.log(`🔄 Toggling color scheme from ${currentScheme} to ${newScheme}`);
-    applyColorScheme(newScheme);
+    await applyColorScheme(newScheme);
     
   } catch (error) {
     console.error('❌ Error toggling color scheme:', error);
@@ -2449,7 +2444,7 @@ function toggleColorScheme() {
  * 
  * @returns {string} שם הסכמה הנוכחית
  */
-function loadColorScheme() {
+async function loadColorScheme() {
   try {
     let savedScheme = 'light';
     
@@ -2464,7 +2459,7 @@ function loadColorScheme() {
     }
     
     // Apply the saved scheme
-    applyColorScheme(savedScheme);
+    await applyColorScheme(savedScheme);
     
     return savedScheme;
     
@@ -2481,7 +2476,7 @@ function loadColorScheme() {
  * @param {string} schemeName - שם הסכמה לשמירה
  * @param {Object} customColors - צבעים מותאמים אישית (אופציונלי)
  */
-function saveColorScheme(schemeName, customColors = null) {
+async function saveColorScheme(schemeName, customColors = null) {
   try {
     console.log(`💾 Saving color scheme: ${schemeName}`);
     
@@ -2537,7 +2532,7 @@ function saveColorScheme(schemeName, customColors = null) {
  * 
  * @returns {string} שם הסכמה הנוכחית
  */
-function getCurrentColorScheme() {
+async function getCurrentColorScheme() {
   try {
     if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
       const cachedScheme = await window.UnifiedCacheManager.get('colorScheme');

@@ -175,14 +175,54 @@
 }
 
 /* ===== עמודות ספציפיות לתכנוני מסחר ===== */
+.col-ticker { 
+  width: 12%; 
+  min-width: 100px;
+}
+
+.col-date { 
+  width: 10%; 
+  min-width: 90px;
+}
+
+.col-type { 
+  width: 8%; 
+  min-width: 70px;
+}
+
+.col-side { 
+  width: 6%; 
+  min-width: 60px;
+}
+
+.col-quantity { 
+  width: 10%; 
+  min-width: 90px;
+}
+
+.col-price { 
+  width: 10%; 
+  min-width: 90px;
+}
+
 .col-investment { 
   width: 10%; 
   min-width: 90px;
 }
 
+.col-status { 
+  width: 8%; 
+  min-width: 70px;
+}
+
 .col-profit { 
   width: 10%; 
   min-width: 90px;
+}
+
+.col-notes { 
+  width: 16%; 
+  min-width: 120px;
 }
 
 /* ===== עמודות ספציפיות להעדפות ===== */

@@ -140,7 +140,7 @@ function stopAutoClearConsole() {
 }
 
 // פונקציה לקבלת הגדרות console
-function getConsoleSettings() {
+async function getConsoleSettings() {
   const defaultSettings = {
     autoClear: false, // ברירת מחדל: לא לפעיל ניקוי אוטומטי
     clearInterval: 60, // שניות
@@ -148,13 +148,26 @@ function getConsoleSettings() {
     suppressDuration: 5, // שניות
   };
 
-  const savedSettings = localStorage.getItem('consoleSettings');
-  return savedSettings ? { ...defaultSettings, ...JSON.parse(savedSettings) } : defaultSettings;
+  let savedSettings = null;
+  if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+    savedSettings = await window.UnifiedCacheManager.get('consoleSettings');
+  } else {
+    savedSettings = localStorage.getItem('consoleSettings'); // fallback
+  }
+  return savedSettings ? { ...defaultSettings, ...(typeof savedSettings === 'string' ? JSON.parse(savedSettings) : savedSettings) } : defaultSettings;
 }
 
 // פונקציה לשמירת הגדרות console
-function saveConsoleSettings(settings) {
-  localStorage.setItem('consoleSettings', JSON.stringify(settings));
+async function saveConsoleSettings(settings) {
+  if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+    await window.UnifiedCacheManager.save('consoleSettings', settings, {
+      layer: 'localStorage',
+      ttl: null, // persistent
+      syncToBackend: false
+    });
+  } else {
+    localStorage.setItem('consoleSettings', JSON.stringify(settings)); // fallback
+  }
 }
 
 // אתחול אוטומטי - מעודכן למערכת המובנית

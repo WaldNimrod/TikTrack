@@ -374,9 +374,14 @@ class GlobalNotificationCollector {
    * Save notifications to localStorage (fallback)
    * שמירת התראות ל-localStorage (גיבוי)
    */
-  saveToLocalStorage(notifications) {
+  async saveToLocalStorage(notifications) {
     try {
-      const existingHistory = JSON.parse(localStorage.getItem('tiktrack_global_notifications_history') || '[]');
+      let existingHistory = [];
+      if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+        existingHistory = await window.UnifiedCacheManager.get('tiktrack_global_notifications_history') || [];
+      } else {
+        existingHistory = JSON.parse(localStorage.getItem('tiktrack_global_notifications_history') || '[]'); // fallback
+      }
       
       notifications.forEach(notification => {
         const globalNotification = {
@@ -396,7 +401,15 @@ class GlobalNotificationCollector {
       // Keep only last 1000 notifications
       const trimmedHistory = existingHistory.slice(0, 1000);
       
-      localStorage.setItem('tiktrack_global_notifications_history', JSON.stringify(trimmedHistory));
+      if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+        await window.UnifiedCacheManager.save('tiktrack_global_notifications_history', trimmedHistory, {
+          layer: 'localStorage',
+          ttl: 7 * 24 * 60 * 60 * 1000, // 7 days
+          syncToBackend: false
+        });
+      } else {
+        localStorage.setItem('tiktrack_global_notifications_history', JSON.stringify(trimmedHistory)); // fallback
+      }
     } catch (error) {
       console.error('❌ Error saving to localStorage:', error);
     }
@@ -456,7 +469,7 @@ class GlobalNotificationCollector {
  * @param {string} message - Notification message
  * @param {Object} options - Additional options
  */
-function addGlobalNotification(type, title, message, options = {}) {
+async function addGlobalNotification(type, title, message, options = {}) {
   try {
     console.log(`🔔 Adding global notification: ${type} - ${title}`);
     
@@ -474,12 +487,27 @@ function addGlobalNotification(type, title, message, options = {}) {
     };
     
     // Add to global history
-    const existingHistory = JSON.parse(localStorage.getItem('tiktrack_global_notifications_history') || '[]');
+    let existingHistory = [];
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+      existingHistory = await window.UnifiedCacheManager.get('tiktrack_global_notifications_history') || [];
+    } else {
+      existingHistory = JSON.parse(localStorage.getItem('tiktrack_global_notifications_history') || '[]'); // fallback
+    }
+    
     existingHistory.unshift(notification);
     
     // Keep only last 1000 notifications
     const trimmedHistory = existingHistory.slice(0, 1000);
-    localStorage.setItem('tiktrack_global_notifications_history', JSON.stringify(trimmedHistory));
+    
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+      await window.UnifiedCacheManager.save('tiktrack_global_notifications_history', trimmedHistory, {
+        layer: 'localStorage',
+        ttl: 7 * 24 * 60 * 60 * 1000, // 7 days
+        syncToBackend: false
+      });
+    } else {
+      localStorage.setItem('tiktrack_global_notifications_history', JSON.stringify(trimmedHistory)); // fallback
+    }
     
     // Show notification if system is available
     if (typeof window.showNotification === 'function') {
@@ -509,7 +537,12 @@ async function getGlobalNotifications(filters = {}) {
     let allNotifications = [];
     
     // Get from localStorage (legacy)
-    const localStorageHistory = JSON.parse(localStorage.getItem('tiktrack_global_notifications_history') || '[]');
+    let localStorageHistory = [];
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+      localStorageHistory = await window.UnifiedCacheManager.get('tiktrack_global_notifications_history') || [];
+    } else {
+      localStorageHistory = JSON.parse(localStorage.getItem('tiktrack_global_notifications_history') || '[]'); // fallback
+    }
     allNotifications = [...localStorageHistory];
     
     // Get from IndexedDB (new system)
@@ -571,19 +604,28 @@ async function getGlobalNotifications(filters = {}) {
  * 
  * @param {Object} filters - Clear options
  */
-function clearGlobalNotifications(filters = {}) {
+async function clearGlobalNotifications(filters = {}) {
   try {
     console.log('🧹 Clearing global notifications with filters:', filters);
     
     if (filters.all) {
       // Clear all notifications
-      localStorage.removeItem('tiktrack_global_notifications_history');
+      if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+        await window.UnifiedCacheManager.remove('tiktrack_global_notifications_history', { layer: 'localStorage' });
+      } else {
+        localStorage.removeItem('tiktrack_global_notifications_history'); // fallback
+      }
       console.log('✅ All global notifications cleared');
       return;
     }
     
     // Get existing notifications
-    const existingHistory = JSON.parse(localStorage.getItem('tiktrack_global_notifications_history') || '[]');
+    let existingHistory = [];
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+      existingHistory = await window.UnifiedCacheManager.get('tiktrack_global_notifications_history') || [];
+    } else {
+      existingHistory = JSON.parse(localStorage.getItem('tiktrack_global_notifications_history') || '[]'); // fallback
+    }
     
     let filteredNotifications = [...existingHistory];
     
@@ -607,7 +649,15 @@ function clearGlobalNotifications(filters = {}) {
     }
     
     // Save filtered notifications back
-    localStorage.setItem('tiktrack_global_notifications_history', JSON.stringify(filteredNotifications));
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+      await window.UnifiedCacheManager.save('tiktrack_global_notifications_history', filteredNotifications, {
+        layer: 'localStorage',
+        ttl: 7 * 24 * 60 * 60 * 1000, // 7 days
+        syncToBackend: false
+      });
+    } else {
+      localStorage.setItem('tiktrack_global_notifications_history', JSON.stringify(filteredNotifications)); // fallback
+    }
     
     const clearedCount = existingHistory.length - filteredNotifications.length;
     console.log(`✅ Cleared ${clearedCount} global notifications`);

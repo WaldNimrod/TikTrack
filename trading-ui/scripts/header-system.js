@@ -1168,10 +1168,17 @@ class HeaderSystem {
             }
           } else {
             // Fallback to localStorage if Unified Cache is not available
-            const saved = localStorage.getItem('headerFilters');
+            let saved = null;
+            if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+              saved = await window.UnifiedCacheManager.get('headerFilters');
+            } else {
+              saved = localStorage.getItem('headerFilters'); // fallback
+            }
+            
             if (saved) {
               try {
-                this.currentFilters = { ...this.currentFilters, ...JSON.parse(saved) };
+                const parsedFilters = typeof saved === 'string' ? JSON.parse(saved) : saved;
+                this.currentFilters = { ...this.currentFilters, ...parsedFilters };
                 console.log('🔧 Loaded saved filters from localStorage (fallback):', this.currentFilters);
               } catch (e) {
                 console.log('⚠️ Error loading saved filters:', e);

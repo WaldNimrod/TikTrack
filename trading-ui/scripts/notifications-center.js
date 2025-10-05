@@ -1106,9 +1106,15 @@ class NotificationsCenter {
       // Fallback ל-localStorage אם הלוג המאוחד לא זמין
       if (globalHistory.length === 0) {
         try {
-          const savedHistory = localStorage.getItem('tiktrack_global_notifications_history');
+          let savedHistory = null;
+          if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+            savedHistory = await window.UnifiedCacheManager.get('tiktrack_global_notifications_history');
+          } else {
+            savedHistory = localStorage.getItem('tiktrack_global_notifications_history'); // fallback
+          }
+          
           if (savedHistory) {
-            globalHistory = JSON.parse(savedHistory);
+            globalHistory = typeof savedHistory === 'string' ? JSON.parse(savedHistory) : savedHistory;
             console.log('📚 היסטוריה נטענה מ-localStorage (fallback):', globalHistory.length, 'התראות');
           }
         } catch (e) {
@@ -2032,9 +2038,15 @@ async function generateDetailedLog() {
     // Fallback ל-localStorage אם הלוג המאוחד לא זמין
     if (allNotifications.length === 0) {
         try {
-            const savedHistory = localStorage.getItem('tiktrack_global_notifications_history');
+            let savedHistory = null;
+            if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                savedHistory = await window.UnifiedCacheManager.get('tiktrack_global_notifications_history');
+            } else {
+                savedHistory = localStorage.getItem('tiktrack_global_notifications_history'); // fallback
+            }
+            
             if (savedHistory) {
-                allNotifications = JSON.parse(savedHistory);
+                allNotifications = typeof savedHistory === 'string' ? JSON.parse(savedHistory) : savedHistory;
                 totalCount = allNotifications.length;
                 console.log('📊 לוג מפורט - נטענו מ-localStorage:', totalCount, 'התראות');
             } else {
@@ -2084,7 +2096,14 @@ async function generateDetailedLog() {
         log.push('היסטוריית התראות לא זמינה');
         log.push('בדיקת מקורות נתונים:');
         log.push(`  UnifiedLogAPI זמין: ${window.UnifiedLogAPI ? 'כן' : 'לא'}`);
-        log.push(`  localStorage זמין: ${localStorage.getItem('tiktrack_global_notifications_history') ? 'כן' : 'לא'}`);
+        let localStorageAvailable = false;
+        if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+            const data = await window.UnifiedCacheManager.get('tiktrack_global_notifications_history');
+            localStorageAvailable = data !== null;
+        } else {
+            localStorageAvailable = localStorage.getItem('tiktrack_global_notifications_history') !== null;
+        }
+        log.push(`  localStorage זמין: ${localStorageAvailable ? 'כן' : 'לא'}`);
         log.push(`  notificationsCenter זמין: ${window.notificationsCenter ? 'כן' : 'לא'}`);
         if (window.notificationsCenter) {
             log.push(`  notificationsCenter.history: ${window.notificationsCenter.history ? window.notificationsCenter.history.length : 'לא קיים'}`);

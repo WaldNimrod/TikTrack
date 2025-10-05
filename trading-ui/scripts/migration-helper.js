@@ -214,7 +214,11 @@ class CacheMigrationHelper {
             for (let i = 0; i < localStorage.length; i++) {
                 const key = localStorage.key(i);
                 if (this.isSystemKey(key, systemName)) {
-                    backupData[key] = localStorage.getItem(key);
+                    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                        backupData[key] = await window.UnifiedCacheManager.get(key);
+                    } else {
+                        backupData[key] = localStorage.getItem(key); // fallback
+                    }
                 }
             }
             
@@ -260,7 +264,13 @@ class CacheMigrationHelper {
                 if (this.isSystemKey(oldKey, systemName)) {
                     totalItems++;
                     
-                    const data = localStorage.getItem(oldKey);
+                    let data = null;
+                    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                        data = await window.UnifiedCacheManager.get(oldKey);
+                    } else {
+                        data = localStorage.getItem(oldKey); // fallback
+                    }
+                    
                     if (data) {
                         try {
                             const parsedData = this.parseData(data);
@@ -271,7 +281,11 @@ class CacheMigrationHelper {
                                 await window.UnifiedCacheManager.save(newKey, parsedData, policy);
                                 
                                 // מחיקה מ-localStorage המקורי
-                                localStorage.removeItem(oldKey);
+                                if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                                    await window.UnifiedCacheManager.remove(oldKey, { layer: 'localStorage' });
+                                } else {
+                                    localStorage.removeItem(oldKey); // fallback
+                                }
                                 
                                 migratedItems.push({
                                     oldKey,
@@ -319,9 +333,20 @@ class CacheMigrationHelper {
         
         try {
             // בדיקה 1: אין נתונים ישנים ב-localStorage
-            const oldKeys = Object.keys(this.migrationMap).filter(key => 
-                this.isSystemKey(key, systemName) && localStorage.getItem(key)
-            );
+            const oldKeys = [];
+            for (const key of Object.keys(this.migrationMap)) {
+                if (this.isSystemKey(key, systemName)) {
+                    let value = null;
+                    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                        value = await window.UnifiedCacheManager.get(key);
+                    } else {
+                        value = localStorage.getItem(key); // fallback
+                    }
+                    if (value) {
+                        oldKeys.push(key);
+                    }
+                }
+            }
             
             validationResults.checks.push({
                 name: 'localStorage Cleanup',
@@ -392,7 +417,15 @@ class CacheMigrationHelper {
             // שחזור נתונים ל-localStorage
             for (const [key, value] of Object.entries(backupData)) {
                 if (this.isOriginalKey(key)) {
-                    localStorage.setItem(key, value);
+                    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                        await window.UnifiedCacheManager.save(key, value, {
+                            layer: 'localStorage',
+                            ttl: null, // persistent
+                            syncToBackend: false
+                        });
+                    } else {
+                        localStorage.setItem(key, value); // fallback
+                    }
                 }
             }
             

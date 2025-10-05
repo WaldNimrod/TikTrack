@@ -464,12 +464,17 @@ class JsMapSystem {
             // Clear JS-Map localStorage
             const keys = Object.keys(localStorage);
             let clearedCount = 0;
-            keys.forEach(key => {
+            
+            for (const key of keys) {
                 if (key.startsWith('jsMap') || key.startsWith('js-map')) {
-                    localStorage.removeItem(key);
+                    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                        await window.UnifiedCacheManager.remove(key, { layer: 'localStorage' });
+                    } else {
+                        localStorage.removeItem(key); // fallback
+                    }
                     clearedCount++;
                 }
-            });
+            }
             
             console.log(`✅ Cleared ${clearedCount} JS-Map cache entries`);
             
@@ -658,9 +663,14 @@ class JsMapSystem {
      * Check if localStorage key exists
      * בדיקת קיום מפתח localStorage
      */
-    checkLocalStorageKeyExists(key) {
+    async checkLocalStorageKeyExists(key) {
         try {
-            const value = localStorage.getItem(key);
+            let value = null;
+            if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                value = await window.UnifiedCacheManager.get(key);
+            } else {
+                value = localStorage.getItem(key); // fallback
+            }
             return value !== null ? 'קיים' : 'לא קיים';
         } catch (error) {
             console.warn(`Error checking localStorage key ${key}:`, error);

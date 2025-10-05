@@ -126,7 +126,15 @@ class MigrationTestingSuite {
             
             // שמירת נתונים ב-localStorage
             for (const [key, value] of Object.entries(testData)) {
-                localStorage.setItem(key, value);
+                if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                    await window.UnifiedCacheManager.save(key, value, {
+                        layer: 'localStorage',
+                        ttl: null, // persistent
+                        syncToBackend: false
+                    });
+                } else {
+                    localStorage.setItem(key, value); // fallback
+                }
             }
             
             // מיגרציה באמצעות CacheMigrationHelper
@@ -152,7 +160,14 @@ class MigrationTestingSuite {
             
             // בדיקה שהנתונים הישנים נמחקו
             for (const key of testKeys) {
-                if (localStorage.getItem(key)) {
+                let value = null;
+                if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                    value = await window.UnifiedCacheManager.get(key);
+                } else {
+                    value = localStorage.getItem(key); // fallback
+                }
+                
+                if (value) {
                     throw new Error(`נתון ישן ${key} לא נמחק`);
                 }
             }
@@ -374,7 +389,15 @@ class MigrationTestingSuite {
             
             // יצירת גיבוי
             const originalData = { test: 'original', timestamp: Date.now() };
-            localStorage.setItem('rollback-test', JSON.stringify(originalData));
+            if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                await window.UnifiedCacheManager.save('rollback-test', originalData, {
+                    layer: 'localStorage',
+                    ttl: null, // persistent
+                    syncToBackend: false
+                });
+            } else {
+                localStorage.setItem('rollback-test', JSON.stringify(originalData)); // fallback
+            }
             
             // מיגרציה
             const migrationResult = await window.CacheMigrationHelper.migrateSystem('rollback-test', {
@@ -386,8 +409,15 @@ class MigrationTestingSuite {
                 await window.CacheMigrationHelper.rollbackMigration('rollback-test', migrationResult.migrationId);
                 
                 // בדיקה שהנתונים חזרו
-                const restoredData = localStorage.getItem('rollback-test');
-                if (!restoredData || JSON.parse(restoredData).test !== 'original') {
+                let restoredData = null;
+                if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                    restoredData = await window.UnifiedCacheManager.get('rollback-test');
+                } else {
+                    restoredData = localStorage.getItem('rollback-test'); // fallback
+                }
+                
+                const parsedData = typeof restoredData === 'string' ? JSON.parse(restoredData) : restoredData;
+                if (!restoredData || parsedData.test !== 'original') {
                     throw new Error('Rollback לא שחזר את הנתונים המקוריים');
                 }
             }

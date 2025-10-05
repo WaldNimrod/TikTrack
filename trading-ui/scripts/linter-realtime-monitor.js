@@ -583,7 +583,11 @@ async function discoverProjectFiles() {
             
             // Clear localStorage to prevent fake progress from old data
             try {
-                localStorage.removeItem('linterScanningResults');
+                if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                    await window.UnifiedCacheManager.remove('linterScanningResults', { layer: 'localStorage' });
+                } else {
+                    localStorage.removeItem('linterScanningResults'); // fallback
+                }
                 console.log('🧹 Cleared old scanning results from localStorage');
             } catch (error) {
                 console.warn('Failed to clear localStorage:', error);
@@ -612,7 +616,15 @@ async function discoverProjectFiles() {
             
             // Fallback to localStorage
             try {
-                localStorage.setItem('linterScanningResults', JSON.stringify(window.scanningResults));
+                if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                    await window.UnifiedCacheManager.save('linterScanningResults', window.scanningResults, {
+                        layer: 'localStorage',
+                        ttl: 24 * 60 * 60 * 1000, // 24 hours
+                        syncToBackend: false
+                    });
+                } else {
+                    localStorage.setItem('linterScanningResults', JSON.stringify(window.scanningResults)); // fallback
+                }
                 console.log('✅ Saved updated scanning results to localStorage:', window.scanningResults);
             } catch (error) {
                 console.warn('Failed to save updated scanning results to localStorage:', error);
@@ -675,7 +687,11 @@ async function discoverProjectFilesFallback() {
     
     // Clear localStorage to prevent fake progress from old data
     try {
-        localStorage.removeItem('linterScanningResults');
+        if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+            await window.UnifiedCacheManager.remove('linterScanningResults', { layer: 'localStorage' });
+        } else {
+            localStorage.removeItem('linterScanningResults'); // fallback
+        }
         console.log('🧹 Cleared old scanning results from localStorage (fallback)');
         } catch (error) {
         console.warn('Failed to clear localStorage:', error);
@@ -701,7 +717,15 @@ async function discoverProjectFilesFallback() {
     
     // Fallback to localStorage
     try {
-        localStorage.setItem('linterScanningResults', JSON.stringify(window.scanningResults));
+        if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+            await window.UnifiedCacheManager.save('linterScanningResults', window.scanningResults, {
+                layer: 'localStorage',
+                ttl: 24 * 60 * 60 * 1000, // 24 hours
+                syncToBackend: false
+            });
+        } else {
+            localStorage.setItem('linterScanningResults', JSON.stringify(window.scanningResults)); // fallback
+        }
         console.log('✅ Saved empty scanning results to localStorage');
         } catch (error) {
         console.warn('Failed to save empty scanning results to localStorage:', error);
@@ -1128,7 +1152,15 @@ async function finishScan() {
             
             // Fallback to localStorage
             try {
-                localStorage.setItem('linterScanningResults', JSON.stringify(window.scanningResults));
+                if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                    await window.UnifiedCacheManager.save('linterScanningResults', window.scanningResults, {
+                        layer: 'localStorage',
+                        ttl: 24 * 60 * 60 * 1000, // 24 hours
+                        syncToBackend: false
+                    });
+                } else {
+                    localStorage.setItem('linterScanningResults', JSON.stringify(window.scanningResults)); // fallback
+                }
                 console.log('✅ Saved scanning results to localStorage');
             } catch (error) {
                 console.warn('Failed to save scanning results to localStorage:', error);
@@ -1553,8 +1585,13 @@ function updateFileMappingStatus() {
                 console.warn('Failed to get log entries from UnifiedIndexedDB:', error);
                 // Fallback to localStorage
                 try {
-                    const logEntries = localStorage.getItem('linterLogEntries');
-                    logCount = logEntries ? JSON.parse(logEntries).length : 0;
+                    let logEntries = null;
+                    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                        logEntries = await window.UnifiedCacheManager.get('linterLogEntries');
+                    } else {
+                        logEntries = localStorage.getItem('linterLogEntries'); // fallback
+                    }
+                    logCount = logEntries ? (typeof logEntries === 'string' ? JSON.parse(logEntries).length : logEntries.length) : 0;
                     logEntriesCountElement.textContent = logCount;
                 } catch (e) {
                     console.warn('Failed to get log entries from localStorage:', e);
@@ -1563,8 +1600,13 @@ function updateFileMappingStatus() {
         } else {
             // Fallback to localStorage
             try {
-                const logEntries = localStorage.getItem('linterLogEntries');
-                logCount = logEntries ? JSON.parse(logEntries).length : 0;
+                let logEntries = null;
+                if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                    logEntries = await window.UnifiedCacheManager.get('linterLogEntries');
+                } else {
+                    logEntries = localStorage.getItem('linterLogEntries'); // fallback
+                }
+                logCount = logEntries ? (typeof logEntries === 'string' ? JSON.parse(logEntries).length : logEntries.length) : 0;
                 logEntriesCountElement.textContent = logCount;
             } catch (error) {
                 console.warn('Failed to get log entries from localStorage:', error);

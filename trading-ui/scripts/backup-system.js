@@ -147,7 +147,11 @@ class BackupSystem {
             for (let i = 0; i < localStorage.length; i++) {
                 const key = localStorage.key(i);
                 if (key && !key.startsWith(this.backupPrefix)) {
-                    localStorageData[key] = localStorage.getItem(key);
+                    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                        localStorageData[key] = await window.UnifiedCacheManager.get(key);
+                    } else {
+                        localStorageData[key] = localStorage.getItem(key); // fallback
+                    }
                 }
             }
             
@@ -276,7 +280,15 @@ class BackupSystem {
             // שמירה ב-localStorage (אם יש מקום)
             if (dataSize < 5 * 1024 * 1024) { // פחות מ-5MB
                 const storageKey = `${this.backupPrefix}${backupId}`;
-                localStorage.setItem(storageKey, jsonData);
+                if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                    await window.UnifiedCacheManager.save(storageKey, backupData, {
+                        layer: 'localStorage',
+                        ttl: null, // persistent
+                        syncToBackend: false
+                    });
+                } else {
+                    localStorage.setItem(storageKey, jsonData); // fallback
+                }
                 console.log(`💾 גיבוי נשמר ב-localStorage: ${storageKey}`);
             } else {
                 // שמירה ב-IndexedDB (אם זמין)
@@ -358,10 +370,16 @@ class BackupSystem {
         try {
             // ניסיון טעינה מ-localStorage
             const storageKey = `${this.backupPrefix}${backupId}`;
-            const localData = localStorage.getItem(storageKey);
+            let localData = null;
+            
+            if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                localData = await window.UnifiedCacheManager.get(storageKey);
+            } else {
+                localData = localStorage.getItem(storageKey); // fallback
+            }
             
             if (localData) {
-                return JSON.parse(localData);
+                return typeof localData === 'string' ? JSON.parse(localData) : localData;
             }
             
             // ניסיון טעינה מ-IndexedDB
@@ -385,12 +403,20 @@ class BackupSystem {
      */
     async restoreLocalStorage(localStorageData) {
         try {
-            // מחיקת localStorage הנוכחי
+            // מחיקת localStorage הנוכחי (fallback)
             localStorage.clear();
             
             // שחזור נתונים
             for (const [key, value] of Object.entries(localStorageData)) {
-                localStorage.setItem(key, value);
+                if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                    await window.UnifiedCacheManager.save(key, value, {
+                        layer: 'localStorage',
+                        ttl: null, // persistent
+                        syncToBackend: false
+                    });
+                } else {
+                    localStorage.setItem(key, value); // fallback
+                }
             }
             
             console.log(`💾 שחזור localStorage: ${Object.keys(localStorageData).length} מפתחות`);
@@ -438,7 +464,13 @@ class BackupSystem {
                 const key = localStorage.key(i);
                 if (key && key.startsWith(this.backupPrefix)) {
                     try {
-                        const data = JSON.parse(localStorage.getItem(key));
+                        let data = null;
+                        if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                            data = await window.UnifiedCacheManager.get(key);
+                        } else {
+                            data = JSON.parse(localStorage.getItem(key)); // fallback
+                        }
+                        
                         if (data && data.metadata) {
                             backups.push({
                                 id: data.metadata.backupId,
@@ -500,7 +532,11 @@ class BackupSystem {
             const storageKey = `${this.backupPrefix}${backupId}`;
             
             // מחיקה מ-localStorage
-            localStorage.removeItem(storageKey);
+            if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                await window.UnifiedCacheManager.remove(storageKey, { layer: 'localStorage' });
+            } else {
+                localStorage.removeItem(storageKey); // fallback
+            }
             
             // מחיקה מ-IndexedDB
             if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {

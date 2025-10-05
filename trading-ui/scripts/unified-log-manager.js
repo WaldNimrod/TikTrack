@@ -593,10 +593,16 @@ class UnifiedLogManager {
      */
     async getNotificationHistory() {
         try {
-            const savedHistory = localStorage.getItem('tiktrack_global_notifications_history');
+            let savedHistory = null;
+            if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                savedHistory = await window.UnifiedCacheManager.get('tiktrack_global_notifications_history');
+            } else {
+                savedHistory = localStorage.getItem('tiktrack_global_notifications_history'); // fallback
+            }
+            
             if (savedHistory) {
-                const data = JSON.parse(savedHistory);
-                console.log(`📊 Loaded ${data.length} notification history records from localStorage`);
+                const data = typeof savedHistory === 'string' ? JSON.parse(savedHistory) : savedHistory;
+                console.log(`📊 Loaded ${data.length} notification history records from unified cache`);
                 return data;
             }
         } catch (error) {
@@ -610,7 +616,13 @@ class UnifiedLogManager {
      */
     async getNotificationStats() {
         try {
-            const savedStats = localStorage.getItem('tiktrack_global_notifications_stats');
+            let savedStats = null;
+            if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                savedStats = await window.UnifiedCacheManager.get('tiktrack_global_notifications_stats');
+            } else {
+                savedStats = localStorage.getItem('tiktrack_global_notifications_stats'); // fallback
+            }
+            
             if (savedStats) {
                 const data = JSON.parse(savedStats);
                 console.log(`📊 Loaded ${data.length} notification stats records from localStorage`);
@@ -1186,8 +1198,15 @@ class UnifiedLogManager {
                 const hasRecentData = externalData && Array.isArray(externalData) && externalData.length > 0;
                 
                 // Also check if we're in no-cache mode
+                let cacheMode = null;
+                if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                    cacheMode = await window.UnifiedCacheManager.get('cache_mode');
+                } else {
+                    cacheMode = localStorage.getItem('cache_mode'); // fallback
+                }
+                
                 const isNoCacheMode = window.cacheMode === 'no-cache' || 
-                                     localStorage.getItem('cache_mode') === 'no-cache' ||
+                                     cacheMode === 'no-cache' ||
                                      !hasRecentData;
                 
                 if (isNoCacheMode) {
@@ -1388,7 +1407,13 @@ class UnifiedLogManager {
             
             // Check rate limiting (minimum 30 seconds between requests)
             const now = Date.now();
-            const lastRefresh = localStorage.getItem('lastExternalDataRefresh');
+            let lastRefresh = null;
+            if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                lastRefresh = await window.UnifiedCacheManager.get('lastExternalDataRefresh');
+            } else {
+                lastRefresh = localStorage.getItem('lastExternalDataRefresh'); // fallback
+            }
+            
             if (lastRefresh && (now - parseInt(lastRefresh)) < 30000) {
                 const remainingTime = Math.ceil((30000 - (now - parseInt(lastRefresh))) / 1000);
                 if (window.showWarningNotification) {
@@ -1409,7 +1434,15 @@ class UnifiedLogManager {
             this.showRefreshLoadingIndicator();
             
             // Store refresh timestamp
-            localStorage.setItem('lastExternalDataRefresh', now.toString());
+            if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                await window.UnifiedCacheManager.save('lastExternalDataRefresh', now.toString(), {
+                    layer: 'localStorage',
+                    ttl: 60 * 60 * 1000, // 1 hour
+                    syncToBackend: false
+                });
+            } else {
+                localStorage.setItem('lastExternalDataRefresh', now.toString()); // fallback
+            }
             
             // Call the external data refresh API
             const response = await fetch('/api/external-data/refresh/all', {

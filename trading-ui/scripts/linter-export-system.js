@@ -300,7 +300,13 @@ async function createVersionSnapshot() {
                 };
                 
                 // Save to localStorage (versions are smaller, so localStorage is OK)
-                const versions = JSON.parse(localStorage.getItem('linterVersions') || '[]');
+                let versions = [];
+                if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                    versions = await window.UnifiedCacheManager.get('linterVersions') || [];
+                } else {
+                    versions = JSON.parse(localStorage.getItem('linterVersions') || '[]'); // fallback
+                }
+                
                 versions.push(snapshot);
                 
                 // Keep only last 10 versions
@@ -308,7 +314,15 @@ async function createVersionSnapshot() {
                     versions.splice(0, versions.length - 10);
                 }
                 
-                localStorage.setItem('linterVersions', JSON.stringify(versions));
+                if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                    await window.UnifiedCacheManager.save('linterVersions', versions, {
+                        layer: 'localStorage',
+                        ttl: null, // persistent
+                        syncToBackend: false
+                    });
+                } else {
+                    localStorage.setItem('linterVersions', JSON.stringify(versions)); // fallback
+                }
                 
                 // Version snapshot created successfully
                 addLogEntry('SUCCESS', `Version snapshot created: ${versionId}`, { 
@@ -337,7 +351,13 @@ async function restoreVersionSnapshot(versionId) {
     try {
         // Restoring version
         
-        const versions = JSON.parse(localStorage.getItem('linterVersions') || '[]');
+        let versions = [];
+        if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+            versions = await window.UnifiedCacheManager.get('linterVersions') || [];
+        } else {
+            versions = JSON.parse(localStorage.getItem('linterVersions') || '[]'); // fallback
+        }
+        
         const snapshot = versions.find(v => v.id === versionId);
         
         if (snapshot && typeof window.IndexedDBAdapter !== 'undefined') {
@@ -377,11 +397,16 @@ async function restoreVersionSnapshot(versionId) {
 /**
  * List available version snapshots
  */
-function listAvailableVersions() {
+async function listAvailableVersions() {
     try {
         // Available versions list...
         
-        const versions = JSON.parse(localStorage.getItem('linterVersions') || '[]');
+        let versions = [];
+        if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+            versions = await window.UnifiedCacheManager.get('linterVersions') || [];
+        } else {
+            versions = JSON.parse(localStorage.getItem('linterVersions') || '[]'); // fallback
+        }
         
         // Available versions logged
         addLogEntry('INFO', `Found ${versions.length} available versions`, { 
@@ -399,14 +424,28 @@ function listAvailableVersions() {
 /**
  * Delete a version snapshot
  */
-function deleteVersionSnapshot(versionId) {
+async function deleteVersionSnapshot(versionId) {
     try {
         // Deleting version
         
-        const versions = JSON.parse(localStorage.getItem('linterVersions') || '[]');
+        let versions = [];
+        if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+            versions = await window.UnifiedCacheManager.get('linterVersions') || [];
+        } else {
+            versions = JSON.parse(localStorage.getItem('linterVersions') || '[]'); // fallback
+        }
+        
         const filteredVersions = versions.filter(v => v.id !== versionId);
         
-        localStorage.setItem('linterVersions', JSON.stringify(filteredVersions));
+        if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+            await window.UnifiedCacheManager.save('linterVersions', filteredVersions, {
+                layer: 'localStorage',
+                ttl: null, // persistent
+                syncToBackend: false
+            });
+        } else {
+            localStorage.setItem('linterVersions', JSON.stringify(filteredVersions)); // fallback
+        }
         
         // Version deleted successfully
         addLogEntry('SUCCESS', `Version ${versionId} deleted successfully`);
@@ -425,8 +464,13 @@ function generateVersionId() {
     return `v${dateStr}_${timeStr}`;
 }
 
-function updateVersionList(newVersionId = null) {
-    const versions = JSON.parse(localStorage.getItem('linterVersions') || '[]');
+async function updateVersionList(newVersionId = null) {
+    let versions = [];
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+        versions = await window.UnifiedCacheManager.get('linterVersions') || [];
+    } else {
+        versions = JSON.parse(localStorage.getItem('linterVersions') || '[]'); // fallback
+    }
     
     if (newVersionId) {
         // Version list updated - new version added

@@ -220,7 +220,15 @@ class MigrationLogger {
                 const logsJson = JSON.stringify(logsData);
                 
                 if (logsJson.length < 5 * 1024 * 1024) { // פחות מ-5MB
-                    localStorage.setItem(storageKey, logsJson);
+                    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                        await window.UnifiedCacheManager.save(storageKey, logsData, {
+                            layer: 'localStorage',
+                            ttl: 7 * 24 * 60 * 60 * 1000, // 7 days
+                            syncToBackend: false
+                        });
+                    } else {
+                        localStorage.setItem(storageKey, logsJson); // fallback
+                    }
                     this.debug('לוגים נשמרו ב-localStorage', 'logger');
                 } else {
                     this.warning('לוגים גדולים מדי לשמירה ב-localStorage', 'logger');
@@ -253,7 +261,12 @@ class MigrationLogger {
         try {
             // טעינה מ-localStorage
             const storageKey = 'tiktrack_migration_logs';
-            const localData = localStorage.getItem(storageKey);
+            let localData = null;
+            if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                localData = await window.UnifiedCacheManager.get(storageKey);
+            } else {
+                localData = localStorage.getItem(storageKey); // fallback
+            }
             
             if (localData) {
                 const logsData = JSON.parse(localData);
@@ -497,11 +510,17 @@ class MigrationLogger {
     /**
      * טעינת הגדרות
      */
-    loadSettings() {
+    async loadSettings() {
         try {
-            const savedSettings = localStorage.getItem('tiktrack_migration_logger_settings');
+            let savedSettings = null;
+            if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                savedSettings = await window.UnifiedCacheManager.get('tiktrack_migration_logger_settings');
+            } else {
+                savedSettings = localStorage.getItem('tiktrack_migration_logger_settings'); // fallback
+            }
+            
             if (savedSettings) {
-                const parsed = JSON.parse(savedSettings);
+                const parsed = typeof savedSettings === 'string' ? JSON.parse(savedSettings) : savedSettings;
                 this.settings = { ...this.settings, ...parsed };
             }
         } catch (error) {
@@ -512,9 +531,17 @@ class MigrationLogger {
     /**
      * שמירת הגדרות
      */
-    saveSettings() {
+    async saveSettings() {
         try {
-            localStorage.setItem('tiktrack_migration_logger_settings', JSON.stringify(this.settings));
+            if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                await window.UnifiedCacheManager.save('tiktrack_migration_logger_settings', this.settings, {
+                    layer: 'localStorage',
+                    ttl: null, // persistent
+                    syncToBackend: false
+                });
+            } else {
+                localStorage.setItem('tiktrack_migration_logger_settings', JSON.stringify(this.settings)); // fallback
+            }
         } catch (error) {
             console.warn('שגיאה בשמירת הגדרות לוגר:', error);
         }

@@ -446,13 +446,24 @@ class MemoryOptimizer {
             
             for (const key of keys) {
                 if (key.startsWith(prefix)) {
-                    const value = localStorage.getItem(key);
-                    const data = JSON.parse(value);
+                    let value = null;
+                    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                        value = await window.UnifiedCacheManager.get(key);
+                    } else {
+                        value = localStorage.getItem(key); // fallback
+                    }
                     
-                    if (this.isOldData(data, options.maxAge || this.settings.maxAge)) {
-                        localStorage.removeItem(key);
-                        cleanedItems++;
-                        savedMemory += value.length;
+                    if (value) {
+                        const data = typeof value === 'string' ? JSON.parse(value) : value;
+                        
+                        if (this.isOldData(data, options.maxAge || this.settings.maxAge)) {
+                            if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                                await window.UnifiedCacheManager.remove(key, { layer: 'localStorage' });
+                            } else {
+                                localStorage.removeItem(key); // fallback
+                            }
+                            cleanedItems++;
+                            savedMemory += typeof value === 'string' ? value.length : JSON.stringify(value).length;
                     }
                 }
             }
@@ -726,7 +737,7 @@ class MemoryOptimizer {
             // הערכה גסה של שימוש בזיכרון
             let usage = 0;
             
-            // LocalStorage
+            // LocalStorage (fallback estimation)
             for (let i = 0; i < localStorage.length; i++) {
                 const key = localStorage.key(i);
                 const value = localStorage.getItem(key);
@@ -749,9 +760,15 @@ class MemoryOptimizer {
      */
     async loadSettings() {
         try {
-            const settings = localStorage.getItem('tiktrack_memory_optimizer_settings');
+            let settings = null;
+            if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                settings = await window.UnifiedCacheManager.get('tiktrack_memory_optimizer_settings');
+            } else {
+                settings = localStorage.getItem('tiktrack_memory_optimizer_settings'); // fallback
+            }
+            
             if (settings) {
-                const parsedSettings = JSON.parse(settings);
+                const parsedSettings = typeof settings === 'string' ? JSON.parse(settings) : settings;
                 this.settings = { ...this.settings, ...parsedSettings };
             }
         } catch (error) {
@@ -762,9 +779,17 @@ class MemoryOptimizer {
     /**
      * שמירת הגדרות
      */
-    saveSettings() {
+    async saveSettings() {
         try {
-            localStorage.setItem('tiktrack_memory_optimizer_settings', JSON.stringify(this.settings));
+            if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                await window.UnifiedCacheManager.save('tiktrack_memory_optimizer_settings', this.settings, {
+                    layer: 'localStorage',
+                    ttl: null, // persistent
+                    syncToBackend: false
+                });
+            } else {
+                localStorage.setItem('tiktrack_memory_optimizer_settings', JSON.stringify(this.settings)); // fallback
+            }
         } catch (error) {
             console.warn('⚠️ Failed to save settings:', error);
         }

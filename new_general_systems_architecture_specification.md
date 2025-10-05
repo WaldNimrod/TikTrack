@@ -631,6 +631,12 @@ class DynamicLoader {
 
 ## 🔧 **מדריך למפתח העתידי**
 
+### **🔗 מסמכים קשורים:**
+- **תוכנית יישום:** `new_general_systems_implementation_plan.md`
+- **ניתוח השפעות על כלי פיתוח:** `development_tools_impact_analysis.md`
+- **דוח בדיקת מיפוי:** `systems_mapping_verification_report.md`
+- **דוח ניתוח אינטגרציה:** `integration_analysis_report.md`
+
 ### **הוספת מערכת חדשה:**
 
 #### **שלב 1: זיהוי המודול המתאים**

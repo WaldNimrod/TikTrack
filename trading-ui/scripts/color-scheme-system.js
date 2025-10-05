@@ -2376,12 +2376,17 @@ function applyColorScheme(schemeName = 'light', customColors = null) {
     
     // Store current scheme using Unified Cache Manager
     if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
-      await window.UnifiedCacheManager.save('colorScheme', schemeName, {
-        layer: 'localStorage',
-        ttl: null, // persistent
-        syncToBackend: false
-      });
-      console.log(`💾 Color scheme saved to Unified Cache: ${schemeName}`);
+      try {
+        await window.UnifiedCacheManager.save('colorScheme', schemeName, {
+          layer: 'localStorage',
+          ttl: null, // persistent
+          syncToBackend: false
+        });
+        console.log(`💾 Color scheme saved to Unified Cache: ${schemeName}`);
+      } catch (error) {
+        console.warn('Failed to save color scheme to Unified Cache, using localStorage fallback:', error);
+        localStorage.setItem('colorScheme', schemeName);
+      }
     } else {
       // Fallback to localStorage if Unified Cache is not available
       localStorage.setItem('colorScheme', schemeName);

@@ -4038,7 +4038,7 @@ function generateDetailedLog() {
 /**
  * שמירת תוצאות כפילויות ב-localStorage
  */
-function saveDuplicatesToCache(resultsData) {
+async function saveDuplicatesToCache(resultsData) {
     try {
         const cacheKey = 'css-duplicates-results';
         const cacheData = {
@@ -4076,7 +4076,7 @@ function saveDuplicatesToCache(resultsData) {
 /**
  * טעינת תוצאות כפילויות מ-localStorage
  */
-function loadDuplicatesFromCache() {
+async function loadDuplicatesFromCache() {
     try {
         const cacheKey = 'css-duplicates-results';
         let cachedData = null;
@@ -4128,7 +4128,7 @@ function loadDuplicatesFromCache() {
 /**
  * ניקוי מטמון כפילויות
  */
-function clearDuplicatesCache() {
+async function clearDuplicatesCache() {
     try {
         const cacheKey = 'css-duplicates-results';
         if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
@@ -4155,7 +4155,7 @@ function clearDuplicatesCache() {
 /**
  * בדיקה אם יש נתונים במטמון
  */
-function hasCachedDuplicates() {
+async function hasCachedDuplicates() {
     try {
         const cacheKey = 'css-duplicates-results';
         if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {

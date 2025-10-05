@@ -189,7 +189,7 @@ async function ensureTradingAccountsLoaded() {
 // ========================================
 // פונקציות ניהול סקשנים
 // ========================================
-function toggleCashFlowsSection() {
+async function toggleCashFlowsSection() {
   const cashFlowsSection = document.querySelector('.cash-flows-section');
   if (!cashFlowsSection) {
     handleElementNotFound('toggleCashFlowsSection', 'סקשן תזרימי מזומנים לא נמצא');
@@ -220,11 +220,33 @@ function toggleCashFlowsSection() {
     toggleBtn.title = 'הסתר תזרימי מזומנים';
   }
 
-  localStorage.setItem('cashFlowsSectionState', isVisible ? 'closed' : 'open');
+  // Save section state using Unified Cache Manager
+  if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+    await window.UnifiedCacheManager.save('cashFlowsSectionState', isVisible ? 'closed' : 'open', {
+      layer: 'localStorage',
+      ttl: null, // persistent
+      syncToBackend: false
+    });
+    console.log('💾 Cash flows section state saved to Unified Cache');
+  } else {
+    // Fallback to localStorage if Unified Cache is not available
+    localStorage.setItem('cashFlowsSectionState', isVisible ? 'closed' : 'open');
+    console.log('💾 Cash flows section state saved to localStorage (fallback)');
+  }
 }
 
-function restoreCashFlowsSectionState() {
-  const savedState = localStorage.getItem('cashFlowsSectionState');
+async function restoreCashFlowsSectionState() {
+  let savedState = null;
+  
+  if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+    savedState = await window.UnifiedCacheManager.get('cashFlowsSectionState');
+    console.log('📥 Cash flows section state loaded from Unified Cache:', savedState);
+  } else {
+    // Fallback to localStorage if Unified Cache is not available
+    savedState = localStorage.getItem('cashFlowsSectionState');
+    console.log('📥 Cash flows section state loaded from localStorage (fallback):', savedState);
+  }
+  
   if (!savedState) {
     return;
   }

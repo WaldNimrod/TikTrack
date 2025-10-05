@@ -1459,9 +1459,17 @@ async function saveNotificationToGlobalHistory(type, title, message, category = 
     // Fallback ל-localStorage במקרה של בעיה
     try {
       let globalHistory = [];
-      const savedHistory = localStorage.getItem('tiktrack_global_notifications_history');
-      if (savedHistory) {
-        globalHistory = JSON.parse(savedHistory);
+      if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+        const cachedHistory = await window.UnifiedCacheManager.get('tiktrack_global_notifications_history');
+        if (cachedHistory) {
+          globalHistory = cachedHistory;
+        }
+      } else {
+        // Fallback to localStorage if Unified Cache is not available
+        const savedHistory = localStorage.getItem('tiktrack_global_notifications_history');
+        if (savedHistory) {
+          globalHistory = JSON.parse(savedHistory);
+        }
       }
 
       globalHistory.unshift(notification);
@@ -1469,7 +1477,19 @@ async function saveNotificationToGlobalHistory(type, title, message, category = 
         globalHistory = globalHistory.slice(0, 100);
       }
 
-      localStorage.setItem('tiktrack_global_notifications_history', JSON.stringify(globalHistory));
+      if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+        await window.UnifiedCacheManager.save('tiktrack_global_notifications_history', globalHistory, {
+          layer: 'indexedDB',
+          ttl: 86400000, // 24 שעות
+          compress: true,
+          syncToBackend: false
+        });
+        console.log('💾 Global notifications history saved to Unified Cache');
+      } else {
+        // Fallback to localStorage if Unified Cache is not available
+        localStorage.setItem('tiktrack_global_notifications_history', JSON.stringify(globalHistory));
+        console.log('💾 Global notifications history saved to localStorage (fallback)');
+      }
     } catch (e) {
       console.warn('שגיאה בשמירת fallback ל-localStorage:', e);
     }
@@ -1508,9 +1528,17 @@ async function updateGlobalNotificationStats() {
     // Fallback ל-localStorage
     if (history.length === 0) {
       try {
-        const savedHistory = localStorage.getItem('tiktrack_global_notifications_history');
-        if (savedHistory) {
-          history = JSON.parse(savedHistory);
+        if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+          const cachedHistory = await window.UnifiedCacheManager.get('tiktrack_global_notifications_history');
+          if (cachedHistory) {
+            history = cachedHistory;
+          }
+        } else {
+          // Fallback to localStorage if Unified Cache is not available
+          const savedHistory = localStorage.getItem('tiktrack_global_notifications_history');
+          if (savedHistory) {
+            history = JSON.parse(savedHistory);
+          }
         }
       } catch (e) {
         console.warn('שגיאה בטעינת היסטוריה מ-localStorage:', e);

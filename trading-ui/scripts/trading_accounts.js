@@ -37,12 +37,12 @@ class TradingAccountsController {
      */
     async initialize() {
         try {
-            // בדיקה שמערכת האתחול המאוחדת זמינה
-            if (!window.unifiedAppInit || !window.unifiedAppInit.isInitialized()) {
-                console.warn('⚠️ Unified App Initializer not ready, using fallback initialization');
-                await this.fallbackInitialize();
-                return;
-            }
+        // בדיקה שמערכת האתחול המאוחדת זמינה
+        if (!window.unifiedAppInit || typeof window.unifiedAppInit.isInitialized !== 'function') {
+            console.warn('⚠️ Unified App Initializer not ready, using fallback initialization');
+            await this.fallbackInitialize();
+    return;
+  }
 
             // שימוש במערכת אתחול מאוחדת
             console.log('🚀 Initializing Trading Accounts with Unified System...');
@@ -76,7 +76,15 @@ class TradingAccountsController {
         
         // טעינת נתוני חשבונות
         if (typeof window.getAccounts === 'function') {
-            this.data = await window.getAccounts();
+            try {
+                this.data = await window.getAccounts();
+    } catch (error) {
+                console.warn('Failed to load accounts data:', error);
+                this.data = [];
+    }
+  } else {
+            console.warn('window.getAccounts function not available');
+            this.data = [];
         }
         
         // הגדרת event handlers ספציפיים
@@ -107,22 +115,30 @@ class TradingAccountsController {
 
         try {
             // שימוש ב-account-service הקיים עם Unified Cache
-            this.data = await window.getAccounts();
+            if (typeof window.getAccounts === 'function') {
+                this.data = await window.getAccounts();
+      } else {
+                console.warn('window.getAccounts function not available, using empty data');
+                this.data = [];
+            }
             
             // עדכון UI באמצעות מערכות כלליות
             this.updateTable();
             this.updateStatistics();
-            
-        } catch (error) {
+
+  } catch (error) {
             console.error('Error loading data:', error);
+            this.data = []; // fallback to empty array
+            this.updateTable();
+            this.updateStatistics();
             this.showError('שגיאה בטעינת נתונים');
         } finally {
             this.isLoading = false;
             this.hideLoadingState();
-        }
-    }
+  }
+}
 
-    /**
+/**
      * עדכון הטבלה באמצעות מערכת מיפוי טבלאות
      */
     updateTable() {
@@ -151,12 +167,12 @@ class TradingAccountsController {
 
             console.log(`✅ טבלה עודכנה עם ${this.data.length} חשבונות מסחר`);
 
-        } catch (error) {
+  } catch (error) {
             console.error('❌ שגיאה בעדכון הטבלה:', error);
-        }
-    }
+  }
+}
 
-    /**
+/**
      * יצירת שורה בטבלה
      */
     createTableRow(tradingAccount) {
@@ -174,7 +190,7 @@ class TradingAccountsController {
             totalValueValue = window.getColumnValue(tradingAccount, 5, tableType) || tradingAccount.total_value || 0;
             plValue = window.getColumnValue(tradingAccount, 6, tableType) || tradingAccount.total_pl || 0;
             notesValue = window.getColumnValue(tradingAccount, 7, tableType) || tradingAccount.notes || '';
-        } else {
+    } else {
             // fallback למיפוי ידני
             nameValue = tradingAccount.name || '-';
             currencyValue = tradingAccount.currency || '-';
@@ -215,9 +231,9 @@ class TradingAccountsController {
         if (!this.data || !Array.isArray(this.data)) {
             console.warn('⚠️ אין נתונים לעדכון סטטיסטיקות');
             return;
-        }
+  }
 
-        try {
+  try {
             const totalAccounts = this.data.length;
             const activeAccounts = this.data.filter(account => account.status === 'open').length;
             const openAccounts = this.data.filter(account => account.status === 'open').length;
@@ -234,12 +250,12 @@ class TradingAccountsController {
 
             console.log('📊 סטטיסטיקות עודכנו:', { totalAccounts, activeAccounts, openAccounts, totalBalance });
 
-        } catch (error) {
+  } catch (error) {
             console.error('❌ שגיאה בעדכון סטטיסטיקות:', error);
-        }
-    }
+  }
+}
 
-    /**
+/**
      * עדכון אלמנט סטטיסטיקה
      */
     updateStatElement(elementId, value) {
@@ -335,10 +351,10 @@ class TradingAccountsController {
         // הודעת הצלחה
         if (window.showSuccessNotification) {
             window.showSuccessNotification('נתונים רוענו בהצלחה');
-        }
-    }
+  }
+}
 
-    /**
+/**
      * טיפול בלחיצה על פילטר
      */
     handleFilterClick(event) {
@@ -356,31 +372,31 @@ class TradingAccountsController {
         const loadingEl = document.getElementById('loadingIndicator');
         if (loadingEl) {
             loadingEl.style.display = 'block';
-        }
-    }
+  }
+}
 
-    /**
+/**
      * הסתרת מצב טעינה
      */
     hideLoadingState() {
         const loadingEl = document.getElementById('loadingIndicator');
         if (loadingEl) {
             loadingEl.style.display = 'none';
-        }
-    }
+  }
+}
 
-    /**
+/**
      * הצגת שגיאה
      */
     showError(message) {
         console.error('❌ Error:', message);
         
-        if (window.showErrorNotification) {
+            if (window.showErrorNotification) {
             window.showErrorNotification(message);
-        }
-    }
+  }
+}
 
-    /**
+/**
      * עדכון UI כללי
      */
     updateUI() {
@@ -406,15 +422,23 @@ window.updateTradingAccountsStatistics = function() {
     }
 };
 
-// אתחול אוטומטי אם DOM מוכן
+// אתחול אוטומטי אם DOM מוכן - המתן למערכות כלליות
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-        console.log('🚀 DOM Content Loaded - Starting Trading Accounts initialization');
+        console.log('🚀 DOM Content Loaded - Waiting for systems initialization...');
+        // המתן למערכות כלליות להתאתחל
+setTimeout(() => {
+            console.log('🚀 Starting Trading Accounts initialization after delay');
+            window.TradingAccountsController.initialize();
+        }, 2000);
+          });
+      } else {
+    console.log('🚀 DOM already ready - Waiting for systems initialization...');
+    // המתן למערכות כלליות להתאתחל
+    setTimeout(() => {
+        console.log('🚀 Starting Trading Accounts initialization after delay');
         window.TradingAccountsController.initialize();
-    });
-} else {
-    console.log('🚀 DOM already ready - Starting Trading Accounts initialization');
-    window.TradingAccountsController.initialize();
+}, 2000);
 }
 
 console.log('✅ trading_accounts_new.js loaded successfully');

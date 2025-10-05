@@ -931,7 +931,8 @@ window.restoreAllSectionStates = async function () {
   const pageName = getCurrentPageName();
   console.log(`🔧 restoreAllSectionStates called for page: "${pageName}"`);
   
-  sections.forEach((section, index) => {
+  for (let index = 0; index < sections.length; index++) {
+    const section = sections[index];
     const sectionId = section.getAttribute('data-section') || section.id || `section-${index}`;
     const sectionBody = section.querySelector('.section-body, .section-content');
     const toggleBtn = section.querySelector('button[onclick*="toggleSection"]');
@@ -946,9 +947,14 @@ window.restoreAllSectionStates = async function () {
       let isHidden = false;
       
       if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
-        const cachedState = await window.UnifiedCacheManager.get(storageKey);
-        isHidden = cachedState === true;
-        console.log(`💾 Retrieved state from Unified Cache for "${sectionId}" on page "${pageName}": hidden=${isHidden}`);
+        try {
+          const cachedState = await window.UnifiedCacheManager.get(storageKey);
+          isHidden = cachedState === true;
+          console.log(`💾 Retrieved state from Unified Cache for "${sectionId}" on page "${pageName}": hidden=${isHidden}`);
+        } catch (error) {
+          console.warn('Failed to get state from Unified Cache, using localStorage fallback:', error);
+          isHidden = localStorage.getItem(storageKey) === 'true';
+        }
       } else {
         // Fallback to localStorage if Unified Cache is not available
         isHidden = localStorage.getItem(storageKey) === 'true';
@@ -1527,7 +1533,8 @@ function loadSectionStates() {
   
   let restoredCount = 0;
   
-  sections.forEach((section, index) => {
+  for (let index = 0; index < sections.length; index++) {
+    const section = sections[index];
     const sectionId = section.getAttribute('data-section') || section.id || `section-${index}`;
     const storageKey = `${pageName}_${sectionId}_SectionHidden`;
     let isCollapsed = false;

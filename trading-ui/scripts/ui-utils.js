@@ -853,7 +853,7 @@ async function autoRefreshCurrentPage(operationName = 'פעולה') {
  * Generic function for toggling any section by its ID
  * @param {string} sectionId - The ID of the section to toggle
  */
-window.toggleSection = function (sectionId) {
+window.toggleSection = async function (sectionId) {
   console.log(`🔧 toggleSection called with sectionId: "${sectionId}"`);
   
   const section = document.getElementById(sectionId) || document.querySelector(`[data-section="${sectionId}"]`);
@@ -920,7 +920,7 @@ window.toggleSection = function (sectionId) {
  * Works with the unified section toggle system
  * UPDATED: Now uses page-specific localStorage keys
  */
-window.restoreAllSectionStates = function () {
+window.restoreAllSectionStates = async function () {
   console.log(`🔧 restoreAllSectionStates called`);
   
   const sections = document.querySelectorAll('.content-section, .top-section');
@@ -986,7 +986,7 @@ window.restoreAllSectionStates = function () {
  * Called on page load to restore previous section states
  * UPDATED: Now uses page-specific localStorage keys consistently
  */
-window.restoreSectionStates = function () {
+window.restoreSectionStates = async function () {
   console.log(`🔧 restoreSectionStates called`);
   
   // Restore top section state with page-specific key
@@ -1430,7 +1430,7 @@ window.debugSectionStates = function() {
  * Generic function that toggles all collapsible sections
  * UPDATED: Now uses page-specific localStorage keys
  */
-function toggleAllSections() {
+async function toggleAllSections() {
   console.log(`🔧 toggleAllSections (generic) called`);
   
   // Find all possible section types

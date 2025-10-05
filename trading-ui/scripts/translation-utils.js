@@ -262,7 +262,7 @@ function translateTestCategory(category) {
  * @param {string} language - Language code (he, en, etc.)
  * @param {Object} options - Language setting options
  */
-function setLanguage(language, options = {}) {
+async function setLanguage(language, options = {}) {
   try {
     console.log(`🌐 Setting application language to: ${language}`);
     
@@ -274,7 +274,15 @@ function setLanguage(language, options = {}) {
     }
     
     // Store language preference
-    localStorage.setItem('tiktrack_language', language);
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+      await window.UnifiedCacheManager.save('tiktrack_language', language, {
+        layer: 'localStorage',
+        ttl: null, // persistent
+        syncToBackend: false
+      });
+    } else {
+      localStorage.setItem('tiktrack_language', language); // fallback
+    }
     
     // Update document language attribute
     document.documentElement.lang = language;
@@ -338,10 +346,16 @@ function setLanguage(language, options = {}) {
  * 
  * @returns {string} Current language code
  */
-function getCurrentLanguage() {
+async function getCurrentLanguage() {
   try {
-    // First check localStorage
-    const storedLanguage = localStorage.getItem('tiktrack_language');
+    // First check unified cache
+    let storedLanguage = null;
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+      storedLanguage = await window.UnifiedCacheManager.get('tiktrack_language');
+    } else {
+      storedLanguage = localStorage.getItem('tiktrack_language'); // fallback
+    }
+    
     if (storedLanguage) {
       return storedLanguage;
     }
@@ -412,16 +426,23 @@ function updateLanguageDependentElements(language) {
  * Initialize language system
  * אתחול מערכת השפה
  */
-function initializeLanguageSystem() {
+async function initializeLanguageSystem() {
   try {
     console.log('🌐 Initializing language system...');
     
     // Get current language
-    const currentLanguage = getCurrentLanguage();
+    const currentLanguage = await getCurrentLanguage();
     
     // Set language if not already set
-    if (!localStorage.getItem('tiktrack_language')) {
-      setLanguage(currentLanguage, { showNotification: false });
+    let hasLanguage = false;
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+      hasLanguage = await window.UnifiedCacheManager.get('tiktrack_language') !== null;
+    } else {
+      hasLanguage = localStorage.getItem('tiktrack_language') !== null; // fallback
+    }
+    
+    if (!hasLanguage) {
+      await setLanguage(currentLanguage, { showNotification: false });
     }
     
     // Listen for language change events

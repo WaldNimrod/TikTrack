@@ -1,0 +1,32 @@
+
+
+/* MIME Type: text/css */
+/* TikTrack Unified CSS - Deduplicated */
+/* Generated automatically from ITCSS structure */
+/* אלמנט הראש נשמר בנפרד */
+
+.form-group label {
+display: block;
+  margin-bottom: var(--apple-spacing-xs);
+  font-weight: 500;
+  color: var(--apple-text-primary);
+  font-size: 15px;
+  text-align: right;
+  direction: rtl;
+}
+
+/* Form Select Styles */
+.form-select {
+  background: var(--apple-bg-primary, #FFFFFF);
+  border: 1px solid var(--apple-border, #C6C6C8);
+  color: var(--apple-text-primary, #000000);
+}
+
+.form-select:focus {
+  border-color: var(--apple-blue, #007AFF);
+  box-shadow: 0 0 0 0.2rem rgba(var(--apple-blue-rgb, 0, 122, 255), 0.25);
+}
+
+/* ===== Light Mode Only - No Dark Mode ===== */
+/* All form elements use light mode colors by default */
+

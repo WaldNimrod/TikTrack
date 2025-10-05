@@ -113,7 +113,7 @@ function setFavicon(iconPath = 'favicon.ico', iconType = 'image/svg+xml') {
  * 
  * @param {string} status - Application status (online, offline, error, loading, etc.)
  */
-function updateFaviconBasedOnStatus(status = 'online') {
+async function updateFaviconBasedOnStatus(status = 'online') {
     const statusIcons = {
         'online': {
             path: 'favicon.ico',
@@ -154,8 +154,16 @@ function updateFaviconBasedOnStatus(status = 'online') {
     try {
         setGlobalFavicon(iconConfig.path, iconConfig.type);
         
-        // Store current status in localStorage for persistence
-        localStorage.setItem('appStatus', status);
+        // Store current status in unified cache for persistence
+        if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+          await window.UnifiedCacheManager.save('appStatus', status, {
+            layer: 'localStorage',
+            ttl: null, // persistent
+            syncToBackend: false
+          });
+        } else {
+          localStorage.setItem('appStatus', status); // fallback
+        }
         
         console.log(`✅ Favicon updated for status: ${status}`);
     } catch (error) {
@@ -169,8 +177,12 @@ function updateFaviconBasedOnStatus(status = 'online') {
  * 
  * @returns {string} Current application status
  */
-function getCurrentAppStatus() {
-    return localStorage.getItem('appStatus') || 'online';
+async function getCurrentAppStatus() {
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+        return await window.UnifiedCacheManager.get('appStatus') || 'online';
+    } else {
+        return localStorage.getItem('appStatus') || 'online'; // fallback
+    }
 }
 
 /**

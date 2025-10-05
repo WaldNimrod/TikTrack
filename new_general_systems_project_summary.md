@@ -145,9 +145,11 @@ git checkout -b feature/new-general-systems-architecture
 **"ארכיטקטורה חדשה למערכות כלליות"** - ברור, מדויק ולא יוצר בלבול
 
 ### **הקבצים:**
-1. `new_general_systems_architecture_specification.md` - אפיון
-2. `new_general_systems_implementation_plan.md` - תוכנית יישום
+1. `new_general_systems_architecture_specification.md` - אפיון מפורט
+2. `new_general_systems_implementation_plan.md` - תוכנית יישום (8 ימים)
 3. `new_general_systems_project_summary.md` - סיכום (קובץ זה)
+4. `systems_mapping_verification_report.md` - דוח בדיקת מיפוי
+5. `integration_analysis_report.md` - דוח ניתוח אינטגרציה
 
 ### **המטרה:**
 ארגון מחדש של 95 המערכות הכלליות ל-8 מודולים מאורגנים עם ביצועים מעולים

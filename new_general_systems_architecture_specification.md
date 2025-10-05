@@ -75,32 +75,120 @@ trading-ui/scripts/
 ```javascript
 // אתחול מערכת
 window.UnifiedAppInitializer.initialize()
+/**
+ * אתחול מערכת האפליקציה המאוחדת
+ * @returns {Promise<boolean>} הצלחת האתחול
+ * @example
+ * await window.UnifiedAppInitializer.initialize();
+ */
 
 // התראות
 window.showNotification(message, type)
+/**
+ * הצגת התראה כללית
+ * @param {string} message - הודעת ההתראה
+ * @param {string} type - סוג ההתראה (success, error, warning, info)
+ * @example
+ * window.showNotification('הפעולה הושלמה בהצלחה', 'success');
+ */
+
 window.showSuccessNotification(message)
+/**
+ * הצגת התראת הצלחה
+ * @param {string} message - הודעת ההצלחה
+ * @example
+ * window.showSuccessNotification('הנתונים נשמרו בהצלחה');
+ */
+
 window.showErrorNotification(message)
+/**
+ * הצגת התראת שגיאה
+ * @param {string} message - הודעת השגיאה
+ * @example
+ * window.showErrorNotification('שגיאה בשמירת הנתונים');
+ */
 
 // מודולים
 window.showModal(modalId)
+/**
+ * הצגת מודול
+ * @param {string} modalId - מזהה המודול
+ * @example
+ * window.showModal('add-user-modal');
+ */
+
 window.closeModal(modalId)
+/**
+ * סגירת מודול
+ * @param {string} modalId - מזהה המודול
+ * @example
+ * window.closeModal('add-user-modal');
+ */
 
 // מצב סקשנים
 window.toggleSection(sectionId)
+/**
+ * החלפת מצב סקשן (פתוח/סגור)
+ * @param {string} sectionId - מזהה הסקשן
+ * @example
+ * window.toggleSection('main-section');
+ */
+
 window.restoreAllSectionStates()
+/**
+ * שחזור מצב כל הסקשנים
+ * @example
+ * window.restoreAllSectionStates();
+ */
 
 // תרגום
 window.translate(key, params)
+/**
+ * תרגום מפתח למחרוזת
+ * @param {string} key - מפתח התרגום
+ * @param {Object} params - פרמטרים להחלפה
+ * @returns {string} הטקסט המתורגם
+ * @example
+ * window.translate('welcome_message', {name: 'יוסי'});
+ */
 
 // מצב עמודים
 window.savePageState(key, data)
+/**
+ * שמירת מצב עמוד
+ * @param {string} key - מפתח המצב
+ * @param {Object} data - נתוני המצב
+ * @example
+ * window.savePageState('filters', {status: 'active', type: 'all'});
+ */
+
 window.loadPageState(key)
+/**
+ * טעינת מצב עמוד
+ * @param {string} key - מפתח המצב
+ * @returns {Object|null} נתוני המצב או null
+ * @example
+ * const filters = window.loadPageState('filters');
+ */
 
 // אישורים
 window.confirm(message) // מוחלף אוטומטית
+/**
+ * הצגת חלון אישור (מוחלף אוטומטית במערכת ההתראות)
+ * @param {string} message - הודעת האישור
+ * @returns {Promise<boolean>} תשובת המשתמש
+ * @example
+ * const confirmed = await window.confirm('האם למחוק את הפריט?');
+ */
 
 // favicon
 window.setFavicon(status)
+/**
+ * הגדרת סטטוס favicon
+ * @param {string} status - סטטוס המערכת (loading, success, error)
+ * @example
+ * window.setFavicon('loading');
+ */
 ```
 
 ### **2. ui-basic.js (25KB)**

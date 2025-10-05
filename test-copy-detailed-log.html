@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Copy Detailed Log</title>
+</head>
+<body>
+    <h1>בדיקת כפתור העתק לוג מפורט</h1>
+    
+    <button onclick="testCopyDetailedLog()">בדוק copyDetailedLog</button>
+    <button onclick="copyDetailedLog()">העתק לוג מפורט</button>
+    
+    <div id="result"></div>
+    
+    <script>
+        function testCopyDetailedLog() {
+            const result = document.getElementById('result');
+            
+            if (typeof window.copyDetailedLog === 'function') {
+                result.innerHTML = '<p style="color: green;">✅ copyDetailedLog function exists!</p>';
+                console.log('✅ copyDetailedLog function exists:', window.copyDetailedLog);
+            } else {
+                result.innerHTML = '<p style="color: red;">❌ copyDetailedLog function does not exist!</p>';
+                console.log('❌ copyDetailedLog function does not exist');
+            }
+        }
+        
+        // Test immediately on load
+        window.addEventListener('load', () => {
+            console.log('🔧 Page loaded, testing copyDetailedLog...');
+            testCopyDetailedLog();
+        });
+    </script>
+    
+    <!-- Load preferences.js -->
+    <script src="scripts/preferences.js"></script>
+</body>
+</html>
+

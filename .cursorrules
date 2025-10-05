@@ -1,0 +1,119 @@
+# TikTrack Development Rules - .cursorrules
+# ===============================================
+# קובץ חוקי פיתוח קבועים למערכת TikTrack
+# נטען אוטומטית בכל צ'אט חדש
+
+## 🌐 שפה ותקשורת (Language & Communication)
+1. Always respond in Hebrew - all code, documentation, database data, and folder names should be in English only
+5. If missing information for action or doubt about requested action - ask user and propose alternatives + reasoned recommendation
+
+## 🏗️ ארכיטקטורה וקוד (Architecture & Code)
+
+### מערכות כלליות וארכיטקטורה
+6. **General Systems Usage** - The system has 95 implemented general systems. Must read `GENERAL_SYSTEMS_LIST.md` before starting work. Before creating new page-specific functions that parallel existing general systems, explicit user approval must be obtained
+7. **Script Architecture** - Must follow the script architecture described in documentation. Includes proper division of functions between different files, relevant and generic function and variable names. Must refer to mandatory reading of script architecture documentation file
+8. **Code Organization** - Prohibition on inserting scripts into page files - use only script files according to architecture. No inline scripts in HTML files, no duplicate functions across files, use existing global systems before creating new ones
+9. **Function Management** - After writing any new function, ensure no duplicates were created and delete old functions that are no longer relevant if needed. Then ensure all calls to the old function are updated to work with the current version
+
+### מבנה קבצים וקובצים
+10. **Translation System** - The system currently operates with Hebrew interface only. Translation is performed only in the user interface and includes a general translation system
+11. **Service Files** - Use '-service.js' suffix for entity service files (not '-utils.js')
+12. **Core JavaScript Files** - Use existing core files: `ui-utils.js`, `notification-system.js`, `tables.js`, `page-utils.js`, `unified-app-initializer.js`
+13. **Unified Initialization** - Must use the unified initialization system (`unified-app-initializer.js`) with 5-stage initialization process. No individual `DOMContentLoaded` listeners allowed
+14. **File Structure & Naming** - Follow modular structure: general systems in `/scripts/`, page-specific functions in page files, service files with `-service.js` suffix. Never include version numbers in file names, function names, or table names. Use generic, descriptive names. If renaming is needed, change old file names to be clear and descriptive
+
+## 🗄️ מערכת מטמון (Cache System)
+15. **Unified Cache System** - Use the 4-layer cache system: Frontend Memory, localStorage, IndexedDB, Backend Cache. All cache operations must go through the unified cache system, not direct localStorage/IndexedDB calls. Use dependency-based cache invalidation, not pattern-based. Reference: `CACHE_ARCHITECTURE_REDESIGN_PLAN.md`, `CACHE_IMPLEMENTATION_GUIDE.md`
+
+## 🎨 עיצוב ממשק משתמש (UI Design)
+
+### הנחיות כלליות לממשק משתמש
+16. **ITCSS Architecture** - Work only according to the ITCSS architecture rules of the system. Use 23 organized files in advanced ITCSS structure for 83.4% performance improvement. Reference: `documentation/frontend/CSS_ARCHITECTURE_GUIDE.md`
+17. **CSS Loading & Hierarchy** - Bootstrap CSS must load first, then ITCSS files to override Bootstrap styles. Follow the 9-layer ITCSS structure: Settings → Tools → Generic → Elements → Objects → Components → Pages → Themes → Utilities
+18. **Code Standards** - No inline CSS, JavaScript, or HTML code in any element. Always search for existing classes to use before creating new classes. Don't use !important. If absolutely necessary, must get specific user approval before using
+
+### צבעים דינמיים והעדפות משתמש
+19. **Dynamic Color System** - Use the dynamic color system based on user preferences. Reference: `documentation/frontend/DYNAMIC_COLORS_GUIDE.md`. Work with this system as much as possible
+20. **Light Backgrounds Only** - The system currently works with light backgrounds only, no dark mode
+
+### מיקום ופריסה
+21. **RTL Hebrew Layout** - The system works right-to-left in Hebrew. Must read the RTL work guide. Reference: `documentation/RTL_HEBREW_GUIDE.md`
+22. **Logical Alignment** - Prefer alignment by start/end of line: in Hebrew right=start of line, left=end of line. Example: main menu aligned right, logo aligned left in header element
+23. **Fixed Page Template** - All pages built on fixed template of containers and sections including comments and locks. Never break this structure. Reference: `documentation/frontend/PAGE_STRUCTURE_TEMPLATE.md`
+24. **RTL Alignment Examples** - Correct alignment examples in Hebrew:
+   - Close button for module always in header at end of line (left)
+   - Headers always at start of line (right)  
+   - Action buttons for module always at end of line (left)
+   - Checkboxes - checkbox itself before the label to its right in Hebrew
+
+
+## 🗄️ בסיס נתונים (Database)
+25. **Database System** - Single fixed clock for code and data (UTC), display according to user preferences timezone. Use Backend/db/simpleTrade_new.db as database file. All database data must work according to existing system constraints with 89 custom constraints. Reference: `documentation/database/CONSTRAINTS_IMPLEMENTATION.md`
+
+## 🔧 כלי פיתוח (Development Tools)
+
+### הפעלת שרת
+50. **Server Management** - Use Cursor Tasks integration for server management only. Access via `Cmd+Shift+P` → "Tasks: Run Task". Available tasks: TT: Start Server, TT: Stop Server, TT: Restart Server. The system uses a single unified server (Backend/app.py) running on port 8080
+51. **Single Server Architecture** - The system operates with one server only: `Backend/app.py`. This is the main production/development server handling all API endpoints, caching, external data integration, and system health
+52. **Server Tasks** - Three Cursor Tasks available: (1) TT: Start Server - starts app.py, (2) TT: Stop Server - kills process on port 8080, (3) TT: Restart Server - stop + start sequence
+53. **Cache Refresh Preference** - When possible, prefer clearing cache over restarting the server. Cache can be cleared via API endpoint `/api/cache/clear` or through web dashboards
+54. **Web Dashboards** - Management dashboards available at: Server Monitor (`http://localhost:8080/server-monitor`), System Management (`http://localhost:8080/system-management`)
+
+### עבודה עם קונסול
+55. **Custom Console System** - Use the custom console cleanup system (`console-cleanup.js`) for console operations instead of direct console.* calls. The system provides controlled console clearing and message management
+
+## 🌐 מערכת נתונים חיצוניים (External Data System)
+26. **External Data Integration** - Use Yahoo Finance as first step in complete external data system with 8 REST endpoints, advanced caching, and real-time dashboard. Reference: `documentation/features/external-data/README.md`
+
+## ⚙️ מערכת העדפות (Preferences System)
+27. **Advanced Preferences** - Use the new preferences system with multiple profiles, import/export, history, and unified UI. Reference: `documentation/PREFERENCES_IMPLEMENTATION_REPORT.md`
+
+
+## 📚 חובות קריאה חובה (Mandatory Reading Requirements)
+28. **General Systems Documentation** - Must read `GENERAL_SYSTEMS_LIST.md` before starting any development work
+29. **Script Architecture Documentation** - Must read script architecture documentation before creating new functions
+30. **CSS Architecture Guide** - Must read `CSS_ARCHITECTURE_GUIDE.md` before making any CSS changes
+31. **RTL Hebrew Guide** - Must read `RTL_HEBREW_GUIDE.md` before making any layout changes
+32. **Cache Implementation Guide** - Must read cache documentation before working with caching systems
+33. **Database Constraints Documentation** - Must read constraints documentation before working with database data
+34. **Server Restart Guide** - Must read restart script documentation before server operations
+
+## 📦 ניהול גרסאות וגיבויים (Version Control & Backup Management)
+35. **GitHub Commit Strategy** - Commit only at the end of significant processes, not for every small change. Frequency: 1-3 times per week
+36. **Local Backup Frequency** - Backup locally every 3 days minimum or at the end of significant development stages
+37. **Database Backup** - Daily automatic backup at 02:00 AM, plus before migrations and major updates
+38. **Version Numbering** - Automatic versioning only on third and fourth digits (e.g., 2.1.5 → 2.1.6). Major/minor version updates (first/second digits) require explicit user approval
+39. **Backup Documentation** - Follow comprehensive backup and version control guide. Reference: `documentation/development/BACKUP_AND_VERSION_CONTROL_GUIDE.md`
+
+## 🚫 איסורים חשובים (Important Restrictions)
+40. **No Inline Code** - Absolutely no inline CSS, JavaScript, or HTML code in any element
+41. **No Duplicate Functions** - No duplicate functions across files, use existing global systems
+42. **No !important Usage** - No !important usage without explicit user approval
+43. **No Individual DOMContentLoaded** - No individual DOMContentLoaded listeners, use unified initialization system
+44. **No Direct Cache Operations** - No direct localStorage/IndexedDB calls, use unified cache system
+45. **No Pattern-Based Cache Invalidation** - Use dependency-based cache invalidation only
+46. **No Breaking Page Structure** - Never break the fixed page template structure
+47. **No Creating New Systems** - Check existing general systems before creating new page-specific functions
+48. **No Mock/Static Data Usage** - Never use mock data or static data without explicit user approval. Fallback modes or errors must display clear and detailed feedback to user and system, not mock data
+49. **Mock Data Detection** - When encountering mock data or static data replacing real data in code, must report to user immediately
+50. **Approved Static Data Documentation** - When using approved static data, add comments before and after relevant code indicating which user gave approval and on what date and time
+
+## 📖 חובת קריאה מלאה של דוקומנטציה (Mandatory Full Documentation Reading)
+51. **Complete Documentation Reading Requirement** - Before starting ANY development work, the AI assistant MUST read ALL documentation files listed in the mandatory reading requirements (rules 28-34) in their entirety. This includes:
+    - `GENERAL_SYSTEMS_LIST.md` - Complete list of 95 implemented systems
+    - `CSS_ARCHITECTURE_GUIDE.md` - Full ITCSS architecture guide
+    - `RTL_HEBREW_GUIDE.md` - Complete RTL and Hebrew layout guide
+    - `CACHE_IMPLEMENTATION_GUIDE.md` - Full cache system documentation
+    - `CONSTRAINTS_IMPLEMENTATION.md` - Complete database constraints guide
+    - `RESTART_SCRIPT_GUIDE.md` - Full server restart documentation
+    - Any other documentation referenced in the rules
+52. **Documentation Reading Verification** - The AI assistant must explicitly confirm that all required documentation has been read before proceeding with any development task
+53. **No Partial Reading** - Reading only summaries, excerpts, or partial documentation is strictly prohibited. Full, complete reading of all referenced documentation is mandatory
+54. **Documentation Updates** - If documentation is updated during development, the AI assistant must re-read the updated documentation before continuing work
+
+---
+
+**Total Rules:** 54 comprehensive development rules
+**Last Updated:** December 2024
+**Status:** Complete and ready for use
+**Coverage:** All major system components and architectural patterns

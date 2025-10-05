@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <!-- Favicon will be set by global-favicon.js -->
+    <title>חשבונות מסחר - TikTrack</title>
+    
+    <!-- 
+    ===== CORRECTED TRADING_ACCOUNTS PAGE =====
+    
+    This page has been corrected to follow the proper architecture:
+    1. Single HTML tag (removed duplicate)
+    2. Complete ITCSS implementation
+    3. All base package systems included
+    4. Correct loading order
+    5. Scripts moved to body
+    
+    ======================================
+    -->
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet" crossorigin="anonymous">
+    
+    <!-- Bootstrap CSS - Must load first -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    
+    <!-- ITCSS Architecture - Complete Implementation -->
+    
+    <!-- 01-settings - Variables and Settings -->
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=20251005_143822">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=20251005_143822">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=20251005_143822">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=20251005_143822">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=20251005_143822">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=20251005_143822">
+    
+    <!-- 02-tools - Functions and Mixins -->
+    <link rel="stylesheet" href="styles-new/02-tools/_mixins.css?v=20251005_143822">
+    <link rel="stylesheet" href="styles-new/02-tools/_functions.css?v=20251005_143822">
+    <link rel="stylesheet" href="styles-new/02-tools/_utilities.css?v=20251005_143822">
+    <link rel="stylesheet" href="styles-new/02-tools/_rtl-helpers.css?v=20251005_143822">
+    
+    <!-- 03-generic - Reset and Normalization -->
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=20251005_143822">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=20251005_143822">
+    
+    <!-- 04-elements - Basic HTML Elements -->
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=20251005_143822">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=20251005_143822">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=20251005_143822">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=20251005_143822">
+    
+    <!-- 05-objects - Structures and Layouts -->
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=20251005_143822">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=20251005_143822">
+    
+    <!-- 06-components - Components -->
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=20251005_143822">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=20251005_143822">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=20251005_143822">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=20251005_143822">
+    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=20251005_143822">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=20251005_143822">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=20251005_143822">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=20251005_143822">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=20251005_143822">
+    
+    <!-- 07-pages - Page-specific Styles -->
+    <link rel="stylesheet" href="styles-new/07-trumps/_trading_accounts.css?v=20251005_143822">
+    
+    <!-- 08-themes - Themes -->
+    <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=20251005_143822">
+    
+    <!-- 09-utilities - Utility Classes -->
+    <link rel="stylesheet" href="styles-new/09-utilities/_utilities.css?v=20251005_143822">
+    
+    <!-- External Libraries -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Header Styles - Separate from ITCSS per specification -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=20251005_143822">
+    
+</head>
+
+<body class="trading-accounts-page">
+    <!-- Header System - Created automatically by header-system.js -->
+    <div id="unified-header"></div>
+    
+    <!-- Main Page Content - לפי התבנית הסטנדרטית -->
+    <div class="main-content">
+        <!-- UI Content Section Top Start-->
+        <div class="top-section" data-section="top">
+            <div class="section-header">
+                <!-- UI section main top header comes here -->
+                <div class="table-title">
+                    <img src="images/icons/trading_accounts.svg" alt="חשבונות מסחר" class="section-icon">
+                    חשבונות מסחר
+                </div>
+                <div class="table-actions">
+                        <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והחשבונות המסחר">
+                        <i class="fas fa-copy"></i> העתק לוג מפורט
+                    </button>
+                    <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר אזור חשבונות מסחר">
+                        <span class="filter-icon">▲</span>
+                    </button>
+                </div>
+            </div>
+            <div class="section-body">
+                <!-- UI Top section body comes here -->
+                <!-- Trading Accounts Summary -->
+                <div class="info-summary" id="summaryStats">
+                    <div><strong>סה"כ חשבונות מסחר:</strong> <span id="totalAccounts">0</span></div>
+                    <div><strong>חשבונות מסחר פעילים:</strong> <span id="activeAccounts">0</span></div>
+                    <div><strong>חשבונות מסחר פתוחים:</strong> <span id="openAccounts">0</span></div>
+                    <div><strong>סה"כ יתרה:</strong> <span id="totalBalance">$0</span></div>
+                </div>
+            </div>
+        </div>
+        <!-- UI Content Section Top End -->
+
+        <!-- UI Content Section 1 Start-->
+        <div class="content-section" id="main" data-section="main">
+            <div class="section-header">
+                <!-- UI section title comes here -->
+                <div class="table-title">
+                    <img src="images/icons/trading_accounts.svg" alt="ניהול חשבונות מסחר" class="section-icon">
+                    ניהול חשבונות מסחר
+                </div>
+                <div class="table-count" id="accountsCount">טוען...</div>
+                <div class="table-actions">
+                    <button id="addAccountBtn" class="refresh-btn" onclick="showAddAccountModal()" title="הוסף חשבון מסחר חדש">
+                        <img src="images/icons/trading_accounts.svg" alt="הוסף" class="action-icon">
+                        הוסף
+                    </button>
+                    <button class="filter-toggle-btn" onclick="toggleSection('main')" title="הצג/הסתר אזור ניהול חשבונות מסחר">
+                        <span class="filter-icon">▲</span>
+                    </button>
+                </div>
+            </div>
+            <div class="section-body">
+                <!-- UI section body comes here -->
+                        <div class="table-responsive" id="accountsContainer">
+                            <table class="table" id="accountsTable" data-table-type="accounts">
+                                <thead>
+                                    <tr>
+                                        <th class="col-name">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(0, window.filteredTradingAccountsData || window.trading_accountsData, 'trading_accounts', window.updateTradingAccountsTable); }"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                שם החשבון <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-type">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, window.filteredTradingAccountsData || window.trading_accountsData, 'trading_accounts', window.updateTradingAccountsTable); }"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                סוג <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-currency">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(2, window.filteredTradingAccountsData || window.trading_accountsData, 'trading_accounts', window.updateTradingAccountsTable); }"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                מטבע <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-balance">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(3, window.filteredTradingAccountsData || window.trading_accountsData, 'trading_accounts', window.updateTradingAccountsTable); }"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                יתרה <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-status">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(4, window.filteredTradingAccountsData || window.trading_accountsData, 'trading_accounts', window.updateTradingAccountsTable); }"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                סטטוס <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-created">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(5, window.filteredTradingAccountsData || window.trading_accountsData, 'trading_accounts', window.updateTradingAccountsTable); }"
+                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                נוצר ב <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-actions actions-cell actions-3-btn">
+                                            פעולות
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="7" class="loading">טוען חשבונות מסחר...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                </div>
+            </div>
+        </div>
+        <!-- UI Content Section 1 End -->
+
+        <!-- Bottom page spacing -->
+        <div style="height: 3rem;"></div>
+
+        <!-- Notification system -->
+        <div class="notification-container" id="notificationContainer"></div>
+
+        <!-- Toast container for notifications -->
+        <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1000000002;"></div>
+
+        <!-- Add Account Modal -->
+        <div class="modal fade" id="addAccountModal" tabindex="-1" aria-labelledby="addAccountModalLabel" aria-hidden="true"
+            data-bs-backdrop="true" data-bs-keyboard="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-colored">
+                        <h5 class="modal-title" id="addAccountModalLabel">הוספת חשבון מסחר חדש</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addAccountForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="accountName" class="form-label">שם החשבון</label>
+                                        <input type="text" class="form-control" id="accountName" placeholder="שם החשבון" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="accountType" class="form-label">סוג החשבון</label>
+                                        <select class="form-select" id="accountType" required>
+                                            <option value="">בחר סוג חשבון</option>
+                                            <option value="demo">דמו</option>
+                                            <option value="live">חי</option>
+                                            <option value="paper">נייר</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="accountCurrency" class="form-label">מטבע</label>
+                                        <select class="form-select" id="accountCurrency" required>
+                                            <option value="">בחר מטבע</option>
+                                            <option value="USD">דולר אמריקאי (USD)</option>
+                                            <option value="EUR">אירו (EUR)</option>
+                                            <option value="GBP">לירה שטרלינג (GBP)</option>
+                                            <option value="ILS">שקל ישראלי (ILS)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="accountBalance" class="form-label">יתרה התחלתית</label>
+                                        <input type="number" class="form-control" id="accountBalance" step="0.01" min="0" placeholder="0.00" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <label for="accountDescription" class="form-label">תיאור החשבון</label>
+                                        <textarea class="form-control" id="accountDescription" rows="3" placeholder="תיאור החשבון..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                        <button type="button" class="btn btn-success btn-outline" onclick="addAccount()">הוסף
+                            חשבון</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Account Modal -->
+        <div class="modal fade" id="editAccountModal" tabindex="-1" aria-labelledby="editAccountModalLabel" aria-hidden="true"
+            data-bs-backdrop="true" data-bs-keyboard="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-colored">
+                        <h5 class="modal-title" id="editAccountModalLabel">עריכת חשבון מסחר</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editAccountForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editAccountName" class="form-label">שם החשבון</label>
+                                        <input type="text" class="form-control" id="editAccountName" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editAccountType" class="form-label">סוג החשבון</label>
+                                        <select class="form-select" id="editAccountType" required>
+                                            <option value="demo">דמו</option>
+                                            <option value="live">חי</option>
+                                            <option value="paper">נייר</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editAccountCurrency" class="form-label">מטבע</label>
+                                        <select class="form-select" id="editAccountCurrency" required>
+                                            <option value="USD">דולר אמריקאי (USD)</option>
+                                            <option value="EUR">אירו (EUR)</option>
+                                            <option value="GBP">לירה שטרלינג (GBP)</option>
+                                            <option value="ILS">שקל ישראלי (ILS)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editAccountBalance" class="form-label">יתרה נוכחית</label>
+                                        <input type="number" class="form-control" id="editAccountBalance" step="0.01" min="0" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <label for="editAccountDescription" class="form-label">תיאור החשבון</label>
+                                        <textarea class="form-control" id="editAccountDescription" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                        <button type="button" class="btn btn-success btn-outline" onclick="updateAccount()">עדכן
+                            חשבון</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- ===== BASE PACKAGE SYSTEMS - CORRECT LOADING ORDER ===== -->
+    
+    <!-- Stage 1: Initialization Systems (Must be first) -->
+    <script src="scripts/page-initialization-configs.js?v=20251001"></script>
+    <script src="scripts/unified-app-initializer.js?v=20251001"></script>
+    
+    <!-- Stage 2: Core Base Systems -->
+    <script src="scripts/global-favicon.js?v=20251001"></script>
+    <script src="scripts/translation-utils.js?v=20251001"></script>
+    
+    <!-- Stage 3: UI Base Systems -->
+    <script src="scripts/notification-system.js?v=20251001"></script>
+    
+    <!-- Stage 4: Cache and Refresh Systems -->
+    <script src="scripts/unified-cache-manager.js?v=20251001"></script>
+    <script src="scripts/cache-sync-manager.js?v=20251001"></script>
+    <script src="scripts/cache-policy-manager.js?v=20251001"></script>
+    <script src="scripts/memory-optimizer.js?v=20251001"></script>
+    
+    <!-- Stage 5: Advanced UI Systems (Always required) -->
+    <script src="scripts/ui-utils.js?v=20251001"></script>
+    <script src="scripts/color-scheme-system.js?v=20251001"></script>
+    <script src="scripts/header-system.js?v=v6.0.0"></script>
+    
+    <!-- Stage 6: Data and Utility Systems -->
+    <script src="scripts/data-utils.js?v=20251001"></script>
+    <script src="scripts/date-utils.js?v=20251001"></script>
+    <script src="scripts/button-icons.js?v=20251001"></script>
+    <script src="scripts/tables.js?v=20251001"></script>
+    <script src="scripts/table-mappings.js?v=20251006"></script>
+    <script src="scripts/page-utils.js?v=20251001"></script>
+    
+    <!-- Stage 7: Additional Systems (As needed) -->
+    <script src="scripts/preferences.js?v=20251001"></script>
+    <script src="scripts/notification-category-detector.js?v=20251001"></script>
+    <script src="scripts/global-notification-collector.js?v=20251001"></script>
+    <script src="scripts/system-management.js?v=20251001"></script>
+    
+    <!-- Stage 8: Modal and Warning Systems -->
+    <script src="scripts/entity-details-modal.js?v=20251001"></script>
+    <script src="scripts/warning-system.js?v=20251001"></script>
+    <script src="scripts/error-handlers.js?v=20251001"></script>
+    
+    <!-- Stage 8: Additional Core Systems -->
+    <!-- Note: modal-management.js, confirm-replacement.js, section-state-persistence.js not found - using existing systems -->
+    
+    <!-- Stage 9: Page-specific Script -->
+    <script src="scripts/trading_accounts.js?v=20251005_143822"></script>
+    
+    <!-- Local copyDetailedLog function for trading_accounts page -->
+    <script>
+        /**
+         * Copy detailed log function for trading accounts page
+         * Copies comprehensive account information to clipboard
+         */
+        function copyDetailedLog() {
+            try {
+                // Get all account data
+                const accounts = window.trading_accountsData || [];
+                const currencies = window.currenciesData || [];
+                
+                // Create detailed log content
+                let logContent = `=== דוח מפורט - חשבונות מסחר ===\n`;
+                logContent += `תאריך: ${new Date().toLocaleString('he-IL')}\n`;
+                logContent += `סה"כ חשבונות מסחר: ${accounts.length}\n\n`;
+                
+                // Add account details
+                accounts.forEach((account, index) => {
+                    logContent += `--- חשבון ${index + 1} ---\n`;
+                    logContent += `שם: ${account.name || 'לא זמין'}\n`;
+                    logContent += `סוג: ${account.type || 'לא זמין'}\n`;
+                    logContent += `מטבע: ${account.currency_symbol || account.currency_id || 'לא זמין'}\n`;
+                    logContent += `יתרה: ${account.balance || '0'}\n`;
+                    logContent += `סטטוס: ${account.status || 'לא זמין'}\n`;
+                    logContent += `נוצר: ${account.created_at || 'לא זמין'}\n`;
+                    if (account.description) {
+                        logContent += `תיאור: ${account.description}\n`;
+                    }
+                    logContent += `\n`;
+                });
+                
+                // Add currency information
+                if (currencies.length > 0) {
+                    logContent += `=== מטבעות זמינים ===\n`;
+                    currencies.forEach(currency => {
+                        logContent += `${currency.symbol}: ${currency.name} (שער: ${currency.usd_rate})\n`;
+                    });
+                }
+                
+                // Copy to clipboard
+                navigator.clipboard.writeText(logContent).then(() => {
+                    if (typeof showSuccessNotification === 'function') {
+                        showSuccessNotification('דוח מפורט הועתק ללוח', 'הדוח כולל את כל פרטי החשבונות המסחר והמטבעות');
+                    } else {
+                        alert('דוח מפורט הועתק ללוח!');
+                    }
+                }).catch(err => {
+                    console.error('שגיאה בהעתקה:', err);
+                    if (typeof showErrorNotification === 'function') {
+                        showErrorNotification('שגיאה בהעתקה', 'לא ניתן להעתיק את הדוח ללוח');
+                    } else {
+                        alert('שגיאה בהעתקה ללוח');
+                    }
+                });
+                
+            } catch (error) {
+                console.error('שגיאה ב-copyDetailedLog:', error);
+                if (typeof showErrorNotification === 'function') {
+                    showErrorNotification('שגיאה ביצירת הדוח', error.message);
+                } else {
+                    alert('שגיאה ביצירת הדוח: ' + error.message);
+                }
+            }
+        }
+        
+        // Make the local copyDetailedLog function available globally for this page only
+        window.copyDetailedLog = copyDetailedLog;
+        
+        // טעינת נתונים אחרי שהדף נטען
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📁 trading_accounts.html - DOMContentLoaded');
+            
+            setTimeout(() => {
+                console.log('⏰ טעינת נתונים אחרי 2 שניות...');
+                if (typeof window.loadTradingAccountsDataForTradingAccountsPage === 'function') {
+                    console.log('📡 קורא ל-loadTradingAccountsDataForTradingAccountsPage');
+                    window.loadTradingAccountsDataForTradingAccountsPage();
+                } else {
+                    console.error('❌ loadTradingAccountsDataForTradingAccountsPage לא נמצאה');
+                }
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

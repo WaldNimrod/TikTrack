@@ -1,0 +1,11 @@
+#!/bin/bash
+echo "Start"
+echo "Current directory: $(pwd)"
+cd Backend
+echo "Changed to Backend: $(pwd)"
+cd ..
+echo "Back to root: $(pwd)"
+echo "End"
+exit 0
+
+

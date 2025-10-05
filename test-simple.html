@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Simple</title>
+</head>
+<body>
+    <h1>בדיקה פשוטה</h1>
+    
+    <button onclick="testFunction()">בדוק פונקציה</button>
+    
+    <script>
+        function testFunction() {
+            console.log('🔧 Test function called');
+            alert('Test function called!');
+        }
+        
+        // Test copyDetailedLog
+        window.addEventListener('load', () => {
+            console.log('🔧 Page loaded');
+            console.log('🔧 copyDetailedLog type:', typeof window.copyDetailedLog);
+        });
+    </script>
+    
+    <!-- Load preferences.js -->
+    <script src="scripts/preferences.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Favicon will be set by global-favicon.js -->
+  <title>תחקיר - Tik.track</title>
+
+  
+                                                <!-- ===== CSS Architecture - Unified CSS ===== -->
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet" crossorigin="anonymous">
+    
+    <!-- Bootstrap Framework -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    
+    <!-- TikTrack CSS - Unified CSS (No @import) -->
+    <!-- CSS Files - אחרי Bootstrap כדי לדרוס אותו -->
+    <!-- 🔄 MAJOR ARCHITECTURE CHANGE - September 2025: Individual <link> tags instead of @import -->
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=1.0.1">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=20251001">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Error Handlers -->
+    <script src="scripts/error-handlers.js"></script>
+    
+    <!-- Header System Script -->
+    <script src="scripts/header-system.js"></script>
+    
+    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">
+    
+    <!-- 🔄 NEW UNIFIED INITIALIZATION SYSTEM -->
+    <!-- Core Systems -->
+    <script src="scripts/global-favicon.js"></script>
+    <script src="scripts/ui-utils.js"></script>
+    <script src="scripts/data-utils.js"></script>
+    <script src="scripts/notification-system.js"></script>
+    <script src="scripts/system-management.js"></script>
+    <script src="scripts/notification-category-detector.js"></script>
+    <script src="scripts/global-notification-collector.js"></script>
+    <script src="scripts/tables.js"></script>
+    <script src="scripts/page-utils.js"></script>
+    <script src="scripts/research.js"></script>
+    
+    <!-- New Unified Initialization System -->
+    <script src="scripts/page-initialization-configs.js"></script>
+    <script src="scripts/unified-app-initializer.js"></script>
+
+    <!-- 🔓 TEMPLATE ZONE 6 - Page-Specific Scripts (ADD NEW SCRIPTS HERE) -->
+    <!-- No manual DOMContentLoaded listener needed - handled by unified system -->
+
+        // אתחול HeaderSystem
+        if (window.headerSystem && !window.headerSystem.isInitialized) {
+          console.log('✅ אתחול HeaderSystem...');
+          window.headerSystem.init();
+        }
+
+        // אתחול דף התחקיר
+        if (typeof initializeResearchPage === 'function') {
+          initializeResearchPage();
+        }
+      });
+    </script>
+  </div> <!-- End background-wrapper -->
+
+<body class="research-page">
+  <!-- unified-header ייווצר כאן אוטומטית -->
+  <div id="unified-header"></div>
+  
+  <!-- Main Content -->
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">
+        <!-- UI Content Section Top Start-->
+        <div class="top-section" data-section="top">
+          <div class="section-header">
+            <h2>🔍 תחקיר שוק - סקירה כללית</h2>
+            <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר סקשן">
+              <span class="filter-arrow">▼</span>
+            </button>
+          </div>
+          <div class="section-body">
+            <p>בדף זה תוכל לבצע תחקיר מעמיק על השוק, לנתח מגמות ולקבל תובנות חשובות.</p>
+            <!-- כאן ניתן להוסיף סיכום נתונים או סטטיסטיקות -->
+          </div>
+        </div>
+        <!-- UI Content Section Top End -->
+        
+        <div class="content-section" id="researchMain">
+          <div class="section-header">
+            <h1 class="section-title">🔍 תחקיר שוק</h1>
+            <div class="section-actions">
+              <button class="btn btn-primary" onclick="loadResearchData()">
+                <i class="bi bi-arrow-clockwise"></i> רענן נתונים
+              </button>
+              <button class="btn btn-success" onclick="exportResearchData()">
+                <i class="bi bi-download"></i> ייצא נתונים
+              </button>
+              <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והתחקיר">
+                <i class="fas fa-copy"></i> העתק לוג מפורט
+              </button>
+            </div>
+          </div>
+          
+          <div class="section-body">
+            <!-- Research Tools -->
+            <div class="row mb-4">
+              <div class="col-md-6">
+                <div class="card">
+                  <div class="card-header">
+                    <h5>📊 כלי תחקיר</h5>
+                  </div>
+                  <div class="card-body">
+                    <div class="d-grid gap-2">
+                      <button class="btn btn-outline-primary" onclick="analyzeMarketTrends()">
+                        <i class="bi bi-graph-up"></i> ניתוח מגמות שוק
+                      </button>
+                      <button class="btn btn-outline-info" onclick="compareTickers()">
+                        <i class="bi bi-bar-chart"></i> השוואת טיקרים
+                      </button>
+                      <button class="btn btn-outline-warning" onclick="technicalAnalysis()">
+                        <i class="bi bi-cpu"></i> ניתוח טכני
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <div class="card">
+                  <div class="card-header">
+                    <h5>📈 נתונים מהירים</h5>
+                  </div>
+                  <div class="card-body">
+                    <div class="d-grid gap-2">
+                      <button class="btn btn-outline-success" onclick="getMarketOverview()">
+                        <i class="bi bi-eye"></i> סקירת שוק
+                      </button>
+                      <button class="btn btn-outline-danger" onclick="getVolatilityIndex()">
+                        <i class="bi bi-lightning"></i> מדד תנודתיות
+                      </button>
+                      <button class="btn btn-outline-secondary" onclick="getNewsFeed()">
+                        <i class="bi bi-newspaper"></i> חדשות שוק
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Research Results -->
+            <div class="card">
+              <div class="card-header">
+                <h5>📋 תוצאות תחקיר</h5>
+              </div>
+              <div class="card-body">
+                <div id="researchResults">
+                       <!-- Summary Cards -->
+                       <div class="summary-cards">
+                         <div class="summary-card">
+                           <div class="card-icon">
+                             <i class="bi bi-graph-up"></i>
+                           </div>
+                           <div class="card-content">
+                             <div class="card-title">רווח כולל</div>
+                             <div class="card-value">₪12,450</div>
+                             <div class="card-change positive">+₪1,250 (11.2%)</div>
+                           </div>
+                         </div>
+                         
+                         <div class="summary-card">
+                           <div class="card-icon">
+                             <i class="bi bi-pie-chart"></i>
+                           </div>
+                           <div class="card-content">
+                             <div class="card-title">טריידים פעילים</div>
+                             <div class="card-value">8</div>
+                             <div class="card-change neutral">0 (0%)</div>
+                           </div>
+                         </div>
+                         
+                         <div class="summary-card">
+                           <div class="card-icon">
+                             <i class="bi bi-trophy"></i>
+                           </div>
+                           <div class="card-content">
+                             <div class="card-title">אחוז הצלחה</div>
+                             <div class="card-value">73.5%</div>
+                             <div class="card-change positive">+2.1%</div>
+                           </div>
+                         </div>
+                         
+                         <div class="summary-card">
+                           <div class="card-icon">
+                             <i class="bi bi-currency-dollar"></i>
+                           </div>
+                           <div class="card-content">
+                             <div class="card-title">ערך תיק</div>
+                             <div class="card-value">₪89,200</div>
+                             <div class="card-change positive">+₪3,400 (3.9%)</div>
+                           </div>
+                         </div>
+                       </div>
+                       
+                       <!-- Summary Table -->
+                       <div class="summary-table">
+                         <table class="table table-striped">
+                           <thead>
+                             <tr>
+                               <th>סוג טרייד</th>
+                               <th>כמות</th>
+                               <th>רווח ממוצע</th>
+                               <th>אחוז הצלחה</th>
+                               <th>סטטוס</th>
+                             </tr>
+                           </thead>
+                           <tbody>
+                             <tr>
+                               <td><span class="trade-type-badge type-stock">מניות</span></td>
+                               <td>15</td>
+                               <td class="profit-positive">₪850</td>
+                               <td>80%</td>
+                               <td><span class="badge bg-success">פעיל</span></td>
+                             </tr>
+                             <tr>
+                               <td><span class="trade-type-badge type-etf">ETF</span></td>
+                               <td>8</td>
+                               <td class="profit-positive">₪420</td>
+                               <td>75%</td>
+                               <td><span class="badge bg-success">פעיל</span></td>
+                             </tr>
+                             <tr>
+                               <td><span class="trade-type-badge type-crypto">קריפטו</span></td>
+                               <td>5</td>
+                               <td class="profit-negative">-₪180</td>
+                               <td>40%</td>
+                               <td><span class="badge bg-warning">ממתין</span></td>
+                             </tr>
+                             <tr>
+                               <td><span class="trade-type-badge type-commodity">סחורות</span></td>
+                               <td>3</td>
+                               <td class="profit-positive">₪1,200</td>
+                               <td>100%</td>
+                               <td><span class="badge bg-success">פעיל</span></td>
+                             </tr>
+                           </tbody>
+                         </table>
+                       </div>
+                       
+                       <!-- Daily Changes Section -->
+                       <div class="daily-changes-section">
+                         <h6 class="section-subtitle">
+                           <i class="bi bi-calendar-day"></i>
+                           שינויים יומיים
+                         </h6>
+                         <div class="table-responsive">
+                           <table class="table table-sm daily-table">
+                             <thead>
+                               <tr>
+                                 <th>נכס</th>
+                                 <th>שינוי יומי</th>
+                                 <th>אחוז שינוי</th>
+                                 <th>נפח</th>
+                                 <th>מגמה</th>
+                               </tr>
+                             </thead>
+                             <tbody>
+                               <tr>
+                                 <td>AAPL</td>
+                                 <td class="profit-positive">+₪2.50</td>
+                                 <td class="profit-positive">+1.8%</td>
+                                 <td>1.2M</td>
+                                 <td><i class="bi bi-arrow-up text-success"></i></td>
+                               </tr>
+                               <tr>
+                                 <td>TSLA</td>
+                                 <td class="profit-negative">-₪15.20</td>
+                                 <td class="profit-negative">-2.1%</td>
+                                 <td>850K</td>
+                                 <td><i class="bi bi-arrow-down text-danger"></i></td>
+                               </tr>
+                               <tr>
+                                 <td>SPY</td>
+                                 <td class="profit-positive">+₪0.85</td>
+                                 <td class="profit-positive">+0.3%</td>
+                                 <td>2.1M</td>
+                                 <td><i class="bi bi-arrow-up text-success"></i></td>
+                               </tr>
+                               <tr>
+                                 <td>BTC</td>
+                                 <td class="profit-positive">+₪1,200</td>
+                                 <td class="profit-positive">+3.2%</td>
+                                 <td>45K</td>
+                                 <td><i class="bi bi-arrow-up text-success"></i></td>
+                               </tr>
+                             </tbody>
+                           </table>
+                         </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Local copyDetailedLog function for research page -->
+    <script>
+        // Make the local copyDetailedLog function available globally for this page only
+        window.copyDetailedLog = copyDetailedLog;
+    </script>
+</body>
+
+</html>

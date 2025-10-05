@@ -1,0 +1,33 @@
+#!/bin/bash
+set -e
+
+echo "Start"
+echo "Current directory: $(pwd)"
+
+# Set environment variables
+export TIKTRACK_DEV_MODE="true"
+export TIKTRACK_CACHE_DISABLED="false"
+echo "Environment variables set"
+
+# Change directory
+cd Backend
+echo "Changed to Backend: $(pwd)"
+
+# Start Python server
+echo "Starting Python server..."
+nohup python3 app.py > /dev/null 2>&1 &
+echo "Python server started with PID: $!"
+
+# Go back
+cd ..
+echo "Back to root: $(pwd)"
+
+# Wait a bit to see if server starts
+echo "Waiting 5 seconds for server to start..."
+sleep 5
+echo "Wait completed"
+
+echo "End"
+exit 0
+
+

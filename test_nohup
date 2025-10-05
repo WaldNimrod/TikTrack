@@ -1,0 +1,9 @@
+#!/bin/bash
+echo "Start"
+nohup sleep 5 > /dev/null 2>&1 &
+echo "Background process started"
+sleep 2
+echo "End"
+exit 0
+
+

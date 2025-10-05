@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>בדיקת החלפת confirm גלובלית</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #007bff;
+            background: #f8f9fa;
+        }
+        .success {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+        .error {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+        .warning {
+            border-left-color: #ffc107;
+            background: #fff3cd;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 בדיקת החלפת confirm גלובלית</h1>
+        <p>דף זה בודק שההחלפה הגלובלית של confirm() עובדת כראוי.</p>
+        
+        <div class="test-result" id="testResults">
+            <h3>תוצאות בדיקה:</h3>
+            <div id="results"></div>
+        </div>
+        
+        <h3>בדיקות:</h3>
+        <button class="test-button" onclick="testBasicConfirm()">בדיקת confirm בסיסי</button>
+        <button class="test-button" onclick="testConfirmWithTitle()">בדיקת confirm עם כותרת</button>
+        <button class="test-button" onclick="testConfirmInCondition()">בדיקת confirm בתנאי</button>
+        <button class="test-button" onclick="testSystemStatus()">בדיקת סטטוס מערכת</button>
+        <button class="test-button" onclick="clearResults()">ניקוי תוצאות</button>
+        
+        <h3>מידע מערכת:</h3>
+        <div id="systemInfo"></div>
+    </div>
+
+    <!-- Load required scripts -->
+    <script src="/scripts/warning-system.js"></script>
+    <script src="/scripts/notification-system.js"></script>
+    <script src="/scripts/main.js"></script>
+    
+    <script>
+        let testResults = [];
+        
+        function addResult(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            testResults.push({ message, type, timestamp });
+            updateResultsDisplay();
+        }
+        
+        function updateResultsDisplay() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = testResults.map(result => 
+                `<div class="test-result ${result.type}">
+                    <strong>[${result.timestamp}]</strong> ${result.message}
+                </div>`
+            ).join('');
+        }
+        
+        function clearResults() {
+            testResults = [];
+            updateResultsDisplay();
+        }
+        
+        function testBasicConfirm() {
+            addResult('🧪 מתחיל בדיקת confirm בסיסי...', 'info');
+            
+            try {
+                // Test basic confirm
+                const result = confirm('האם זה חלון אישור מעוצב?');
+                addResult(`✅ confirm() החזיר: ${result}`, 'success');
+                addResult('📝 הערה: confirm מחזיר false כדי למנוע ביצוע מיידי', 'warning');
+            } catch (error) {
+                addResult(`❌ שגיאה בבדיקת confirm: ${error.message}`, 'error');
+            }
+        }
+        
+        function testConfirmWithTitle() {
+            addResult('🧪 מתחיל בדיקת confirm עם כותרת...', 'info');
+            
+            try {
+                const result = confirm('האם זה חלון אישור עם כותרת מותאמת?', 'בדיקת כותרת');
+                addResult(`✅ confirm() עם כותרת החזיר: ${result}`, 'success');
+            } catch (error) {
+                addResult(`❌ שגיאה בבדיקת confirm עם כותרת: ${error.message}`, 'error');
+            }
+        }
+        
+        function testConfirmInCondition() {
+            addResult('🧪 מתחיל בדיקת confirm בתנאי...', 'info');
+            
+            try {
+                // This should show the custom dialog but not execute the code
+                if (confirm('האם לבצע פעולה זו?')) {
+                    addResult('⚠️ הקוד בוצע - זה לא אמור לקרות!', 'error');
+                } else {
+                    addResult('✅ הקוד לא בוצע - זה נכון!', 'success');
+                }
+            } catch (error) {
+                addResult(`❌ שגיאה בבדיקת confirm בתנאי: ${error.message}`, 'error');
+            }
+        }
+        
+        function testSystemStatus() {
+            addResult('🧪 בודק סטטוס מערכת...', 'info');
+            
+            // Check if functions exist
+            const checks = [
+                { name: 'window.showConfirmationDialog', exists: typeof window.showConfirmationDialog === 'function' },
+                { name: 'window._originalConfirm', exists: typeof window._originalConfirm === 'function' },
+                { name: 'window.confirm (overridden)', exists: typeof window.confirm === 'function' },
+                { name: 'window.globalConfirm', exists: typeof window.globalConfirm === 'function' }
+            ];
+            
+            checks.forEach(check => {
+                if (check.exists) {
+                    addResult(`✅ ${check.name} זמין`, 'success');
+                } else {
+                    addResult(`❌ ${check.name} לא זמין`, 'error');
+                }
+            });
+            
+            // Check if confirm is overridden
+            if (window._originalConfirm && window.confirm !== window._originalConfirm) {
+                addResult('✅ confirm() הוחלף בהצלחה', 'success');
+            } else {
+                addResult('❌ confirm() לא הוחלף', 'error');
+            }
+        }
+        
+        // Auto-run system status check on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                addResult('🚀 דף נטען - מתחיל בדיקות אוטומטיות...', 'info');
+                testSystemStatus();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

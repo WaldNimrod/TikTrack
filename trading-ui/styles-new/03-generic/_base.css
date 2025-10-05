@@ -1,0 +1,54 @@
+
+
+/* MIME Type: text/css */
+/**
+ * Base Styles - סגנונות בסיס
+ * 
+ * קובץ זה מכיל את הסגנונות הבסיסיים ביותר עבור HTML ו-body
+ * מבוסס על הסגנונות הקיימים ב-apple-theme.css
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 5, 2025
+ */
+
+/* HTML root settings */
+html {
+  direction: rtl;
+  lang: he;
+}
+
+/* Body base styles - מבוסס על apple-theme.css */
+body {
+  background-color: var(--apple-bg-secondary);
+  color: var(--apple-text-primary);
+  margin: 0;
+  padding: 0;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: var(--font-family-primary);
+  font-weight: 500; /* הוספת משקל פונט עבה יותר */
+}
+
+/* טקסט רגיל - paragraphs */
+p {
+  font-weight: 500; /* משקל פונט עבה יותר לטקסט רגיל */
+}
+
+/* טקסט בתפריט */
+.navbar, .nav {
+  font-weight: 600; /* משקל פונט עבה יותר לתפריט */
+}
+
+/* .nav-link מוגדר ב-_navigation.css לפי ITCSS */
+
+/* .navbar-nav מוגדר ב-_navigation.css לפי ITCSS */
+
+/* טקסט בסטטיסטיקות */
+.stat-row, .stat-row span {
+  font-weight: 500; /* משקל פונט עבה יותר לסטטיסטיקות */
+}
+
+/* תגיות מוגדרות ב-_unified-log-display.css לפי ITCSS */
+
+/* כפתורים מוגדרים ב-_buttons-base.css ו-_buttons-advanced.css לפי ITCSS */

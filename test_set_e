@@ -1,0 +1,9 @@
+#!/bin/bash
+set -e
+echo "Start"
+echo "This will fail"
+false
+echo "This should not print"
+exit 1
+
+

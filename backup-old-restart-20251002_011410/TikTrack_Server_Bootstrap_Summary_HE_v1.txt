@@ -1,0 +1,91 @@
+
+TikTrack – סיכום פתרון איתחול שרת ופיתוח יציב ב-macOS + Cursor
+
+גרסה: v1 • תאריך: 28-09-2025
+
+רקע קצר
+ב-Cursor הטרמינל המובנה הוא תמיד pseudo-TTY (TERM=dumb) ולכן לא ניתן “להחליף” אותו ב-Terminal.app. הפתרון הוא שינוי אופן ההרצה כך שהתהליכים ייפרדו מה-TTY, יחזירו שליטה מיד, ויעבדו זהה אצל כל המפתחים.
+
+מטרות
+• החזרת שליטה מיידית ב-Cursor
+• ללא חלונות טרמינל חיצוניים
+• Auto-Restart במקרה של קריסה/ריבוט
+• ריענון יזום בזמן פיתוח
+• פתרון אחיד לכל המפתחים
+
+עקרונות טכניים
+1) ניתוק מלא מה-TTY באמצעות setsid
+2) סגירת stdin עם </dev/null>
+3) ניתוב stdout/err ללוג קובץ (לא ל-/dev/null)
+4) שימוש ב-exec להחלפת ה-shell בתהליך השירות
+5) איחוד הפעלה/עצירה/סטטוס דרך סקריפט devctl ו-Tasks של Cursor
+
+תצורות מומלצות
+A) devctl (daemon-style): סקריפט שמריץ שירותים ברקע עם ניתוק מלא, מנהל PID/לוגים.
+B) AppleScript run_bg: מריץ פקודות ברקע ללא חלונות וללא PTY, נח לחיבור דרך Task.
+C) LaunchAgents: שירותים מערכתיים ב-macOS עם KeepAlive ו-RunAtLoad, כולל Auto-Restart.
+
+דפוס הרצה קשיח (מומלץ)
+( setsid /bin/bash -lc 'cd /PATH/TO/PROJECT && source .venv/bin/activate && exec uvicorn api:app --host 127.0.0.1 --port 8001 --reload --reload-exclude node_modules --reload-exclude .git --reload-dir api' </dev/null >> .logs/api.log 2>&1 ) &
+
+דוגמת devctl.sh (קטע מקוצר)
+start_one() {
+  name="$1"; shift; pidfile=".run/$name.pid"; logfile=".logs/$name.log"
+  [ -f "$pidfile" ] && kill -0 "$(cat "$pidfile")" 2>/dev/null && { echo "$name רץ"; return; }
+  echo "Starting $name … log: $logfile"
+  ( setsid /bin/bash -lc "$*" </dev/null >> "$logfile" 2>&1 ) &
+  echo $! > "$pidfile"; sleep 0.2
+  kill -0 "$(cat "$pidfile")" 2>/dev/null || { echo "נכשל. בדקו $logfile"; exit 1; }
+}
+
+Auto-Restart עם LaunchAgents (plist)
+~/Library/LaunchAgents/com.tiktrack.api.plist
+<key>Label</key><string>com.tiktrack.api</string>
+<key>ProgramArguments</key>
+<array>
+  <string>/bin/bash</string>
+  <string>-lc</string>
+  <string>cd /PATH/TO/TikTrack && source .venv/bin/activate && exec uvicorn api:app --host 127.0.0.1 --port 8001 --reload --reload-dir api --reload-exclude node_modules --reload-exclude .git</string>
+</array>
+<key>RunAtLoad</key><true/>
+<key>KeepAlive</key><true/>
+<key>StandardOutPath</key><string>/PATH/TO/TikTrack/.logs/api.log</string>
+<key>StandardErrorPath</key><string>/PATH/TO/TikTrack/.logs/api.log</string>
+
+איתחול/ריענון בזמן פיתוח
+# טעינה והפעלה ראשונית
+launchctl bootstrap gui/$UID ~/Library/LaunchAgents/com.tiktrack.api.plist
+launchctl kickstart -k gui/$UID/com.tiktrack.api
+
+# Restart מיידי
+launchctl kickstart -k gui/$UID/com.tiktrack.api
+
+# Graceful stop → Auto-restart
+launchctl kill SIGTERM gui/$UID/com.tiktrack.api
+
+WatchPaths (ריסט אוטומטי על שינוי קבצים)
+<key>WatchPaths</key>
+<array>
+  <string>/PATH/TO/TikTrack/api</string>
+  <string>/PATH/TO/TikTrack/services</string>
+</array>
+
+חיבור ל-Cursor (Tasks)
+{
+  "version": "2.0.0",
+  "tasks": [
+    { "label": "Dev: Start",   "type": "shell", "command": "bash scripts/devctl.sh start" },
+    { "label": "Dev: Stop",    "type": "shell", "command": "bash scripts/devctl.sh stop"  },
+    { "label": "Dev: Restart", "type": "shell", "command": "bash scripts/devctl.sh restart" },
+    { "label": "Launchd: Restart API", "type": "shell", "command": "launchctl kickstart -k gui/$UID/com.tiktrack.api" },
+    { "label": "Logs: API", "type": "shell", "command": "tail -n 200 -f /PATH/TO/TikTrack/.logs/api.log", "isBackground": true }
+  ]
+}
+
+צ'ק-ליסט אמינות
+• לנתק stdin: להשתמש ב-</dev/null>
+• להשתמש ב-setsid
+• להפנות לוגים לקובץ, לא ל-/dev/null
+• להשתמש ב-exec
+• להגביל uvicorn reload ל-api ולהחריג node_modules/.git
+• SQLite: להבטיח Writer יחיד; אם יש שכבות כתיבה – לתזמן/לתור

@@ -1,0 +1,901 @@
+
+
+/* MIME Type: text/css */
+/**
+ * טבלאות - Tables
+ * 
+ * קובץ זה מכיל את הסגנונות הבסיסיים של כל הטבלאות במערכת
+ * מבוסס על הסגנונות הקיימים ב-table.css
+ * 
+ * @version 1.1.0
+ * @lastUpdated January 2026
+ */
+
+/* ===== הגדרות רוחב עמודות ===== */
+.col-account { 
+  width: var(--col-name-width, 18%); 
+  min-width: 100px;
+}
+
+.col-type { 
+  width: var(--col-amount-width, 12%); 
+  min-width: 80px;
+}
+
+.col-amount { 
+  width: var(--col-amount-width, 12%); 
+  min-width: 100px;
+}
+
+.col-date { 
+  width: var(--col-date-width, 12%); 
+  min-width: 100px;
+}
+
+.col-description { 
+  width: var(--col-description-width, 28%); 
+  min-width: 150px;
+}
+
+.col-source { 
+  width: var(--col-source-width, 12%); 
+  min-width: 80px;
+}
+
+/* ===== עמודות ספציפיות לטריידים ===== */
+.col-ticker { 
+  width: 10%; 
+  min-width: 80px;
+}
+
+.col-price { 
+  width: 18%; 
+  min-width: 90px;
+}
+
+.col-change { 
+  width: 18%; 
+  min-width: 70px;
+}
+
+.col-status { 
+  width: 18%; 
+  min-width: 70px;
+}
+
+.col-side { 
+  width: 6%; 
+  min-width: 60px;
+}
+
+.col-plan { 
+  width: 12%; 
+  min-width: 100px;
+}
+
+.col-pnl { 
+  width: 10%; 
+  min-width: 90px;
+}
+
+.col-created { 
+  width: 10%; 
+  min-width: 100px;
+}
+
+.col-closed { 
+  width: 10%; 
+  min-width: 100px;
+}
+
+.col-notes { 
+  width: 15%; 
+  min-width: 120px;
+}
+
+/* ===== עמודות ספציפיות להתראות ===== */
+.col-condition { 
+  width: 18%; 
+  min-width: 120px;
+}
+
+.col-triggered { 
+  width: 8%; 
+  min-width: 70px;
+}
+
+.col-linked { 
+  width: 20%; 
+  min-width: 150px;
+}
+
+.col-message { 
+  width: 12%; 
+  min-width: 100px;
+}
+
+/* ===== עמודות ספציפיות לחשבונות מסחר ===== */
+.col-name { 
+  width: 25%; 
+  min-width: 150px;
+}
+
+.col-currency { 
+  width: 10%; 
+  min-width: 80px;
+}
+
+.col-balance { 
+  width: 15%; 
+  min-width: 120px;
+}
+
+/* ===== עמודות ספציפיות לטיקרים ===== */
+.col-updated { 
+  width: 18%; 
+  min-width: 100px;
+}
+
+
+/* ===== עמודות ספציפיות להערות ===== */
+.col-title { 
+  width: 20%; 
+  min-width: 150px;
+}
+
+.col-content { 
+  width: 40%; 
+  min-width: 200px;
+}
+
+/* ===== עמודות ספציפיות לעסקעות ===== */
+.col-trade { 
+  width: 10%; 
+  min-width: 80px;
+}
+
+.col-action { 
+  width: 8%; 
+  min-width: 70px;
+}
+
+.col-quantity { 
+  width: 8%; 
+  min-width: 70px;
+}
+
+.col-commission { 
+  width: 8%; 
+  min-width: 70px;
+}
+
+.col-execution-date { 
+  width: 12%; 
+  min-width: 100px;
+}
+
+/* ===== עמודות ספציפיות לתכנוני מסחר ===== */
+.col-investment { 
+  width: 10%; 
+  min-width: 90px;
+}
+
+.col-profit { 
+  width: 10%; 
+  min-width: 90px;
+}
+
+/* ===== עמודות ספציפיות להעדפות ===== */
+.col-value { 
+  width: 20%; 
+  min-width: 150px;
+}
+
+/* ===== עמודות ספציפיות לתצוגת בסיס נתונים ===== */
+.col-records { 
+  width: 15%; 
+  min-width: 120px;
+}
+
+.col-size { 
+  width: 15%; 
+  min-width: 120px;
+}
+
+/* ===== עמודות ספציפיות לנתוני טבלאות עזר ===== */
+.col-data-type { 
+  width: 15%; 
+  min-width: 120px;
+}
+
+/* ===== עמודות ספציפיות לעמוד בדיקת כותרת ===== */
+.col-symbol { 
+  width: 10%; 
+  min-width: 80px;
+}
+
+.col-has-trades { 
+  width: 10%; 
+  min-width: 80px;
+}
+
+.col-investment-type { 
+  width: 12%; 
+  min-width: 100px;
+}
+
+.col-target { 
+  width: 10%; 
+  min-width: 80px;
+}
+
+.col-stop { 
+  width: 10%; 
+  min-width: 80px;
+}
+
+.col-current { 
+  width: 10%; 
+  min-width: 80px;
+}
+
+.col-actions { 
+  width: var(--col-actions-width, 180px); 
+  min-width: var(--col-actions-width, 180px);
+  max-width: var(--col-actions-width, 180px);
+}
+
+/* הגדרות כלליות לכל הטבלאות */
+table,
+.table,
+.data-table {
+  width: 100%;
+  max-width: 100%; /* רוחב מלא של הקונטיינר */
+  table-layout: fixed; /* טבלה עם רוחב קבוע */
+  direction: rtl;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-family: var(--font-family-primary);
+}
+
+/* כותרות טבלה */
+table th,
+.table th,
+.data-table th {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0; /* מאפשר לעמודה להתכווץ */
+  max-width: none;
+  word-wrap: normal;
+  word-break: keep-all;
+  hyphens: none;
+  text-align: center;
+  direction: rtl;
+  padding: 0.625rem 0.625rem;
+  font-weight: 600;
+  color: var(--apple-text-primary);
+  font-size: 0.95rem;
+  background: var(--apple-bg-secondary);
+  border-bottom: 2px solid #f1f3f4;
+  font-family: var(--font-family-primary);
+}
+
+/* תאי טבלה */
+table td,
+.table td,
+.data-table td {
+  padding: 0.625rem 0.625rem;
+  text-align: right;
+  border-bottom: 2px solid #f1f3f4;
+  font-family: var(--font-family-primary);
+  color: var(--apple-text-primary);
+  font-size: 1rem;
+  font-weight: 500;
+  vertical-align: middle;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0; /* מאפשר לתא להתכווץ */
+}
+
+/* Hover effect לשורות */
+.data-table tbody tr {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.data-table tbody tr:hover {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* עמודת פעולות - מחלקות לפי מספר כפתורים */
+.actions-cell {
+  text-align: center;
+  vertical-align: middle;
+  height: auto;
+  min-height: 100%;
+  display: table-cell;
+  white-space: nowrap;
+  padding: 2px 5px !important;
+  overflow: visible;
+  width: 180px;
+  min-width: 180px;
+  max-width: 180px;
+}
+
+/* תאי פעולות - padding מותאם */
+.col-actions td,
+.col-actions .actions-cell {
+  padding: 2px 5px !important;
+}
+
+/* 1 כפתור */
+.actions-1-btn {
+  width: var(--actions-1-btn-width, 60px);
+  min-width: var(--actions-1-btn-width, 60px);
+  max-width: var(--actions-1-btn-width, 60px);
+}
+
+/* 2 כפתורים */
+.actions-2-btn {
+  width: var(--actions-2-btn-width, 80px);
+  min-width: var(--actions-2-btn-width, 80px);
+  max-width: var(--actions-2-btn-width, 80px);
+}
+
+/* 3 כפתורים */
+.actions-3-btn {
+  width: var(--actions-3-btn-width, 180px);
+  min-width: var(--actions-3-btn-width, 180px);
+  max-width: var(--actions-3-btn-width, 180px);
+}
+
+/* 4 כפתורים */
+.actions-4-btn {
+  width: var(--actions-4-btn-width, 160px);
+  min-width: var(--actions-4-btn-width, 160px);
+  max-width: var(--actions-4-btn-width, 160px);
+}
+
+/* 5 כפתורים */
+.actions-5-btn {
+  width: var(--actions-5-btn-width, 200px);
+  min-width: var(--actions-5-btn-width, 200px);
+  max-width: var(--actions-5-btn-width, 200px);
+}
+
+.actions-cell button {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  margin: 0 3px;
+  vertical-align: middle;
+  border-radius: 6px;
+}
+
+/* Table container */
+.table-container {
+  background: var(--apple-bg-elevated);
+  border-radius: var(--apple-radius-medium);
+  border: 1px solid var(--apple-border-light);
+  overflow: hidden;
+  box-shadow: var(--apple-shadow-light);
+}
+
+/* Table responsive */
+.table-responsive {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto; /* גלילה אופקית לגדלים קטנים */
+  -webkit-overflow-scrolling: touch;
+  display: block; /* מאפשר לטבלה להתאים לרוחב */
+}
+
+/* וידוא שהקונטיינר לא יוצר גלילה */
+.table-container {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Data table עם עיצוב מתקדם */
+.data-table {
+  background: #ffffff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+  border: 2px solid #e9ecef;
+}
+
+/* כפתורי מיון */
+.sortable-header,
+.sortable-header-btn {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-family: inherit;
+  font-weight: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0.5rem;
+  border-radius: 10px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  overflow: visible;
+  white-space: nowrap;
+}
+
+.sortable-header:hover,
+.sortable-header-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+/* איקוני מיון */
+.sortable-header .sort-icon,
+.sortable-header-btn .sort-icon {
+  font-size: 0.7rem;
+  margin-inline-start: 0.3rem;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+  display: inline;
+}
+
+.sortable-header:hover .sort-icon,
+.sortable-header-btn:hover .sort-icon {
+  opacity: 1;
+}
+
+.sortable-header.active-sort {
+  color: var(--primary-color, #007bff) !important;
+  font-weight: 600;
+}
+
+.sortable-header.active-sort .sort-icon {
+  opacity: 1;
+  color: var(--primary-color, #007bff);
+  font-weight: bold;
+}
+
+/* כותרת טבלה */
+.table-title {
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: #495057;
+  font-family: var(--font-family-primary);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin: 0;
+  position: relative;
+}
+
+.top-section .table-title {
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+/* מונה טבלה */
+.table-count {
+  background: linear-gradient(135deg, #29a6a8 0%, #1f8a8c 100%);
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: var(--font-family-primary);
+  display: inline-block;
+  box-shadow: 0 2px 8px rgba(41, 166, 168, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+/* פעולות טבלה */
+.table-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* כותרת עמודת פעולות */
+/* הגדרת actions-cell מוגדרת למעלה */
+
+/* Header לטבלה */
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* הגדרות ספציפיות לטבלאות בדף הבדיקה */
+#tickersTable,
+#tradePlansTable {
+  width: 100% !important;
+  max-width: 100% !important;
+  table-layout: fixed !important;
+  overflow: hidden !important;
+}
+
+/* הגדרות ספציפיות לטבלת הטיקרים */
+#tickersTable {
+  table-layout: fixed;
+  width: 100%;
+  max-width: 100%;
+}
+
+#tickersTable th,
+#tickersTable td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+#tickersTable th,
+#tickersTable td,
+#tradePlansTable th,
+#tradePlansTable td {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  min-width: 0 !important;
+}
+
+/* ===== רספונסיביות טבלאות ===== */
+
+/* מסכים קטנים (XS - 320-479px) */
+@media (max-width: var(--screen-xs-max, 479px)) {
+  .data-table {
+    min-width: 300px;
+  }
+  
+  /* רק עמודות חיוניות */
+  .col-date, 
+  .col-description, 
+  .col-source,
+  .col-side,
+  .col-plan,
+  .col-pnl,
+  .col-created,
+  .col-closed,
+  .col-notes,
+  .col-condition,
+  .col-triggered,
+  .col-linked,
+  .col-message,
+  .col-currency,
+  .col-balance,
+  .col-updated,
+  .col-content,
+  .col-trade,
+  .col-action,
+  .col-quantity,
+  .col-commission,
+  .col-execution-date,
+  .col-investment,
+  .col-profit,
+  .col-value,
+  .col-records,
+  .col-size,
+  .col-data-type,
+  .col-symbol,
+  .col-has-trades,
+  .col-investment-type,
+  .col-target,
+  .col-stop,
+  .col-current { 
+    display: none; 
+  }
+  
+  /* עמודות חיוניות לטיקרים - תמיד נראות */
+  .col-name { width: 40%; }
+  .col-price { width: 20%; }
+  .col-change { width: 20%; }
+  .col-updated { width: 20%; }
+  .col-status { display: none; } /* סטטוס מוסתר במסכים קטנים */
+  
+  .col-account { width: 60%; }
+  .col-type { width: 40%; }
+  .col-actions { 
+    width: 180px; 
+    min-width: 180px;
+    max-width: 180px;
+  }
+  
+  /* מחלקות כפתורים */
+  .actions-1-btn { width: var(--actions-1-btn-width, 60px); min-width: var(--actions-1-btn-width, 60px); max-width: var(--actions-1-btn-width, 60px); }
+  .actions-2-btn { width: var(--actions-2-btn-width, 80px); min-width: var(--actions-2-btn-width, 80px); max-width: var(--actions-2-btn-width, 80px); }
+  .actions-3-btn { width: var(--actions-3-btn-width, 140px); min-width: var(--actions-3-btn-width, 140px); max-width: var(--actions-3-btn-width, 140px); }
+  .actions-4-btn { width: var(--actions-4-btn-width, 160px); min-width: var(--actions-4-btn-width, 160px); max-width: var(--actions-4-btn-width, 160px); }
+  .actions-5-btn { width: var(--actions-5-btn-width, 200px); min-width: var(--actions-5-btn-width, 200px); max-width: var(--actions-5-btn-width, 200px); }
+}
+
+/* טלפונים (SM - 480-767px) */
+@media (max-width: var(--screen-sm-max, 767px)) {
+  .data-table {
+    min-width: 400px;
+    width: 800px; /* רוחב קבוע */
+    table-layout: fixed; /* פריסה קבועה */
+  }
+  
+  /* גלילה אופקית לגדלים קטנים */
+  .table-responsive {
+    overflow-x: auto;
+  }
+  
+  .table-container {
+    overflow-x: auto;
+  }
+  
+  /* כל הטבלאות */
+  .table, .data-table, table {
+    width: 800px;
+    min-width: 800px;
+    table-layout: fixed;
+  }
+  
+  /* Bootstrap override */
+  .table-responsive .table {
+    width: 800px;
+    min-width: 800px;
+    table-layout: fixed;
+  }
+  
+  /* ספציפי לטבלת cash_flows */
+  #cashFlowsTable {
+    width: 800px;
+    min-width: 800px;
+    table-layout: fixed;
+  }
+  
+  /* עמודות בסיסיות */
+  .col-date, 
+  .col-source,
+  .col-side,
+  .col-plan,
+  .col-pnl,
+  .col-created,
+  .col-closed,
+  .col-notes,
+  .col-condition,
+  .col-triggered,
+  .col-linked,
+  .col-message,
+  .col-currency,
+  .col-balance,
+  .col-updated,
+  .col-content,
+  .col-trade,
+  .col-action,
+  .col-quantity,
+  .col-commission,
+  .col-execution-date,
+  .col-investment,
+  .col-profit,
+  .col-value,
+  .col-records,
+  .col-size,
+  .col-data-type,
+  .col-symbol,
+  .col-has-trades,
+  .col-investment-type,
+  .col-target,
+  .col-stop,
+  .col-current { 
+    display: none; 
+  }
+  
+  /* עמודות חיוניות לטיקרים - תמיד נראות */
+  .col-name { width: 25%; }
+  .col-price { width: 18%; }
+  .col-change { width: 18%; }
+  .col-updated { width: 18%; }
+  .col-status { width: 12%; }
+  
+  .col-account { width: 35%; }
+  .col-type { width: 20%; }
+  .col-amount { width: 20%; }
+  .col-description { width: 25%; }
+  .col-actions { 
+    width: 180px; 
+    min-width: 180px;
+    max-width: 180px;
+  }
+  
+  /* מחלקות כפתורים */
+  .actions-1-btn { width: var(--actions-1-btn-width, 60px); min-width: var(--actions-1-btn-width, 60px); max-width: var(--actions-1-btn-width, 60px); }
+  .actions-2-btn { width: var(--actions-2-btn-width, 80px); min-width: var(--actions-2-btn-width, 80px); max-width: var(--actions-2-btn-width, 80px); }
+  .actions-3-btn { width: var(--actions-3-btn-width, 140px); min-width: var(--actions-3-btn-width, 140px); max-width: var(--actions-3-btn-width, 140px); }
+  .actions-4-btn { width: var(--actions-4-btn-width, 160px); min-width: var(--actions-4-btn-width, 160px); max-width: var(--actions-4-btn-width, 160px); }
+  .actions-5-btn { width: var(--actions-5-btn-width, 200px); min-width: var(--actions-5-btn-width, 200px); max-width: var(--actions-5-btn-width, 200px); }
+}
+
+/* טאבלטים (MD - 768-991px) */
+@media (max-width: var(--screen-md-max, 991px)) {
+  .data-table {
+    min-width: 600px;
+    width: 900px; /* רוחב קבוע */
+    table-layout: fixed; /* פריסה קבועה */
+  }
+  
+  /* גלילה אופקית לגדלים בינוניים */
+  .table-responsive {
+    overflow-x: auto;
+  }
+  
+  .table-container {
+    overflow-x: auto;
+  }
+  
+  /* כל הטבלאות */
+  .table, .data-table, table {
+    width: 900px;
+    min-width: 900px;
+    table-layout: fixed;
+  }
+  
+  /* Bootstrap override */
+  .table-responsive .table {
+    width: 900px;
+    min-width: 900px;
+    table-layout: fixed;
+  }
+  
+  /* ספציפי לטבלת cash_flows */
+  #cashFlowsTable {
+    width: 900px;
+    min-width: 900px;
+    table-layout: fixed;
+  }
+  
+  /* הסתרת עמודות משניות */
+  .col-source,
+  .col-side,
+  .col-plan,
+  .col-pnl,
+  .col-created,
+  .col-closed,
+  .col-notes,
+  .col-condition,
+  .col-triggered,
+  .col-linked,
+  .col-message,
+  .col-currency,
+  .col-balance,
+  .col-updated,
+  .col-content,
+  .col-trade,
+  .col-action,
+  .col-quantity,
+  .col-commission,
+  .col-execution-date,
+  .col-investment,
+  .col-profit,
+  .col-value,
+  .col-records,
+  .col-size,
+  .col-data-type,
+  .col-symbol,
+  .col-has-trades,
+  .col-investment-type,
+  .col-target,
+  .col-stop,
+  .col-current { 
+    display: none; 
+  }
+  
+  /* עמודות חיוניות לטיקרים - תמיד נראות */
+  .col-name { width: 25%; }
+  .col-price { width: 18%; }
+  .col-change { width: 18%; }
+  .col-updated { width: 18%; }
+  .col-status { width: 12%; }
+  
+  .col-description { width: 35%; }
+}
+
+/* מחשבים קטנים (LG - 992-1199px) */
+@media (max-width: var(--screen-lg-max, 1199px)) {
+  .data-table {
+    min-width: var(--table-min-width, 800px);
+    width: 1000px; /* רוחב קבוע */
+    table-layout: fixed; /* פריסה קבועה */
+  }
+  
+  /* גלילה אופקית לגדלים גדולים */
+  .table-responsive {
+    overflow-x: auto;
+  }
+  
+  .table-container {
+    overflow-x: auto;
+  }
+  
+  /* כל הטבלאות */
+  .table, .data-table, table {
+    width: 1000px;
+    min-width: 1000px;
+    table-layout: fixed;
+  }
+  
+  /* Bootstrap override */
+  .table-responsive .table {
+    width: 1000px;
+    min-width: 1000px;
+    table-layout: fixed;
+  }
+  
+  /* ספציפי לטבלת cash_flows */
+  #cashFlowsTable {
+    width: 1000px;
+    min-width: 1000px;
+    table-layout: fixed;
+  }
+  
+  /* כל העמודות נראות */
+  /* גלילה מינימלית */
+  
+  /* עמודות חיוניות לטיקרים - תמיד נראות */
+  .col-name { width: 25%; }
+  .col-price { width: 18%; }
+  .col-change { width: 18%; }
+  .col-updated { width: 18%; }
+  .col-status { width: 12%; }
+  
+  .col-actions { 
+    width: 180px; 
+    min-width: 180px;
+    max-width: 180px;
+  }
+  
+  /* מחלקות כפתורים */
+  .actions-1-btn { width: var(--actions-1-btn-width, 60px); min-width: var(--actions-1-btn-width, 60px); max-width: var(--actions-1-btn-width, 60px); }
+  .actions-2-btn { width: var(--actions-2-btn-width, 80px); min-width: var(--actions-2-btn-width, 80px); max-width: var(--actions-2-btn-width, 80px); }
+  .actions-3-btn { width: var(--actions-3-btn-width, 140px); min-width: var(--actions-3-btn-width, 140px); max-width: var(--actions-3-btn-width, 140px); }
+  .actions-4-btn { width: var(--actions-4-btn-width, 160px); min-width: var(--actions-4-btn-width, 160px); max-width: var(--actions-4-btn-width, 160px); }
+  .actions-5-btn { width: var(--actions-5-btn-width, 200px); min-width: var(--actions-5-btn-width, 200px); max-width: var(--actions-5-btn-width, 200px); }
+}
+
+/* מחשבים (XL+ - 1200px+) - יעד: ללא גלילה */
+@media (min-width: var(--screen-xl-min, 1200px)) {
+  .data-table {
+    min-width: 100%;
+  }
+  
+  /* כל העמודות נראות */
+  /* ללא גלילה */
+  
+  /* עמודות חיוניות לטיקרים - תמיד נראות */
+  .col-name { width: 25%; }
+  .col-price { width: 18%; }
+  .col-change { width: 18%; }
+  .col-updated { width: 18%; }
+  .col-status { width: 12%; }
+  
+  .col-actions { 
+    width: 180px; 
+    min-width: 180px;
+    max-width: 180px;
+  }
+  
+  /* מחלקות כפתורים */
+  .actions-1-btn { width: var(--actions-1-btn-width, 60px); min-width: var(--actions-1-btn-width, 60px); max-width: var(--actions-1-btn-width, 60px); }
+  .actions-2-btn { width: var(--actions-2-btn-width, 80px); min-width: var(--actions-2-btn-width, 80px); max-width: var(--actions-2-btn-width, 80px); }
+  .actions-3-btn { width: var(--actions-3-btn-width, 140px); min-width: var(--actions-3-btn-width, 140px); max-width: var(--actions-3-btn-width, 140px); }
+  .actions-4-btn { width: var(--actions-4-btn-width, 160px); min-width: var(--actions-4-btn-width, 160px); max-width: var(--actions-4-btn-width, 160px); }
+  .actions-5-btn { width: var(--actions-5-btn-width, 200px); min-width: var(--actions-5-btn-width, 200px); max-width: var(--actions-5-btn-width, 200px); }
+}

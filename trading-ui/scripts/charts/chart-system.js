@@ -27,12 +27,7 @@ class ChartSystem {
      */
     async init() {
         try {
-            // Wait for Chart.js to be loaded
-            if (window.ChartLoader) {
-                await window.ChartLoader.load();
-            } else {
-                console.warn('⚠️ ChartLoader not available');
-            }
+            // Chart.js is loaded via CDN in HTML
 
             // Wait for ChartTheme to be available
             if (!window.ChartTheme) {

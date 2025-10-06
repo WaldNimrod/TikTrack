@@ -10,6 +10,9 @@
  */
 
 /* Spacing Utilities */
+.bottom-spacing { height: 3rem; }
+.toast-high-z-index { z-index: 1000000002; }
+
 .margin-0 { margin: 0 !important; }
 .margin-1 { margin: var(--spacing-xs) !important; }
 .margin-2 { margin: var(--spacing-sm) !important; }

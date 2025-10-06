@@ -547,10 +547,77 @@ async function saveAllPreferences() {
 window.loadAccountsForPreferences = loadAccountsForPreferences;
 window.loadColorsForPreferences = loadColorsForPreferences;
 window.loadTradingSettings = loadTradingSettings;
+/**
+ * Update preferences table with data
+ */
+window.updatePreferencesTable = function(preferencesData) {
+    try {
+        console.log('📊 Updating preferences table with data:', preferencesData);
+        
+        const tableBody = document.querySelector('#preferencesTable tbody');
+        if (!tableBody) {
+            console.warn('⚠️ Preferences table body not found');
+            return;
+        }
+        
+        // Clear existing rows
+        tableBody.innerHTML = '';
+        
+        if (!preferencesData || preferencesData.length === 0) {
+            const row = tableBody.insertRow();
+            const cell = row.insertCell();
+            cell.colSpan = 6;
+            cell.textContent = 'אין העדפות להצגה';
+            cell.className = 'text-center text-muted';
+            return;
+        }
+        
+        // Add data rows
+        preferencesData.forEach((preference, index) => {
+            const row = tableBody.insertRow();
+            
+            // Name
+            const nameCell = row.insertCell();
+            nameCell.textContent = preference.name || preference.preference_name || '';
+            
+            // Value
+            const valueCell = row.insertCell();
+            valueCell.textContent = preference.value || preference.saved_value || '';
+            
+            // Type
+            const typeCell = row.insertCell();
+            typeCell.textContent = preference.type || preference.data_type || '';
+            
+            // Description
+            const descCell = row.insertCell();
+            descCell.textContent = preference.description || '';
+            
+            // Created
+            const createdCell = row.insertCell();
+            createdCell.textContent = preference.created_at || '';
+            
+            // Actions
+            const actionsCell = row.insertCell();
+            actionsCell.className = 'actions-cell';
+            actionsCell.innerHTML = `
+                <button class="btn btn-sm btn-outline-primary" onclick="editPreference(${index})" title="ערוך">
+                    <i class="fas fa-edit"></i>
+                </button>
+            `;
+        });
+        
+        console.log(`✅ Preferences table updated with ${preferencesData.length} items`);
+        
+    } catch (error) {
+        console.error('❌ Error updating preferences table:', error);
+    }
+};
+
 window.validateCurrency = validateCurrency;
 window.initializePreferencesPage = initializePreferencesPage;
 window.initializeInfoSummary = initializeInfoSummary;
 window.collectFormData = collectFormData;
 window.saveAllPreferences = saveAllPreferences;
+window.updatePreferencesTable = window.updatePreferencesTable;
 
 console.log('✅ preferences-page.js loaded successfully');

@@ -1682,6 +1682,27 @@ window.populatePreferencesForm = async function(preferences) {
         
         console.log('✅ Preferences form populated successfully');
         
+        // Update preferences table if function exists
+        if (typeof window.updatePreferencesTable === 'function') {
+            console.log('📊 Updating preferences table...');
+            
+            // Convert preferences object to array for table display
+            const preferencesArray = Object.entries(preferences).map(([name, value]) => ({
+                preference_name: name,
+                saved_value: value,
+                data_type: typeof value,
+                created_at: new Date().toLocaleDateString('he-IL')
+            }));
+            
+            window.updatePreferencesTable(preferencesArray);
+            
+            // Update table count
+            const tableCountElement = document.getElementById('tablePreferencesCount');
+            if (tableCountElement) {
+                tableCountElement.textContent = preferencesArray.length;
+            }
+        }
+        
     } catch (error) {
         console.error('❌ Error populating preferences form:', error);
     }

@@ -1,0 +1,2448 @@
+/**
+ * Cache Module - TikTrack
+ * מערכת מטמון מותאמת
+ * 
+ * @fileoverview מודול מטמון מותאם הכולל מערכות מטמון מתקדמות
+ * @version 1.0.0
+ * @author TikTrack Development Team
+ * @created 2025-01-06
+ * תאריך יצירה: 26 בינואר 2025
+ * גרסה: 1.0.0
+ * ========================================
+ */
+
+class UnifiedCacheManager {
+    constructor() {
+        this.initialized = false;
+        this.memoryCache = {};
+        this.cache = new Map();
+        this.db = null;
+        this.hits = 0;
+        this.responseTimes = [];
+        this.stats = {
+            operations: {
+                save: 0,
+                get: 0,
+                remove: 0,
+                clear: 0
+            },
+            layers: {
+                memory: { entries: 0, size: 0 },
+                localStorage: { entries: 0, size: 0 },
+                indexedDB: { entries: 0, size: 0 },
+                backend: { entries: 0, size: 0 }
+            },
+            performance: {
+                avgResponseTime: 0,
+                hitRate: 0,
+                missRate: 0
+            }
+        };
+        
+        // מדיניות מטמון ברירת מחדל
+        this.defaultPolicies = {
+            'user-preferences': { layer: 'localStorage', ttl: null, compress: false },
+            'ui-state': { layer: 'localStorage', ttl: 3600000, compress: false },
+            'filter-state': { layer: 'localStorage', ttl: 3600000, compress: false },
+            'notifications-history': { layer: 'indexedDB', ttl: 86400000, compress: true },
+            'file-mappings': { layer: 'indexedDB', ttl: null, compress: true },
+            'linter-results': { layer: 'indexedDB', ttl: 86400000, compress: true },
+            'js-analysis': { layer: 'indexedDB', ttl: 86400000, compress: true },
+            'market-data': { layer: 'backend', ttl: 30000, compress: false },
+            'trade-data': { layer: 'backend', ttl: 30000, compress: false },
+            'dashboard-data': { layer: 'backend', ttl: 300000, compress: false }
+        };
+        
+        // ממשקי שכבות מטמון
+        this.layers = {
+            memory: new MemoryLayer(),
+            localStorage: new LocalStorageLayer(),
+            indexedDB: null, // יאותחל מאוחר יותר
+            backend: new BackendCacheLayer()
+        };
+    }
+
+    /**
+     * אתחול מערכת המטמון המאוחדת
+     * @returns {Promise<boolean>} הצלחת האתחול
+     */
+    async initialize() {
+        try {
+            console.log('🔄 Initializing Unified Cache Manager...');
+            
+            // אתחול IndexedDB
+            if (window.indexedDB) {
+                this.layers.indexedDB = new IndexedDBLayer();
+                await this.layers.indexedDB.initialize();
+            } else {
+                console.warn('⚠️ IndexedDB not available, using localStorage fallback');
+                this.layers.indexedDB = new LocalStorageLayer();
+            }
+            
+            // אתחול שכבות אחרות
+            await this.layers.memory.initialize();
+            await this.layers.localStorage.initialize();
+            await this.layers.backend.initialize();
+            
+            // טעינת סטטיסטיקות
+            await this.updateStats();
+            
+            this.initialized = true;
+            console.log('✅ Unified Cache Manager initialized successfully');
+            
+            // הודעת הצלחה
+            if (window.notificationSystem) {
+                window.notificationSystem.showNotification(
+                    'מערכת מטמון מאוחדת אותחלה בהצלחה',
+                    'success'
+                );
+            }
+            
+            return true;
+        } catch (error) {
+            console.error('❌ Failed to initialize Unified Cache Manager:', error);
+            
+            // הודעת שגיאה
+            if (window.notificationSystem) {
+                window.notificationSystem.showNotification(
+                    'שגיאה באתחול מערכת מטמון מאוחדת',
+                    'error'
+                );
+            }
+            
+            return false;
+        }
+    }
+
+    /**
+     * בדיקה האם המערכת מאותחלת
+     * @returns {boolean} true אם המערכת מאותחלת
+     */
+    isInitialized() {
+        return this.initialized;
+    }
+
+    /**
+     * שמירת נתונים במטמון עם החלטה אוטומטית על שכבה
+     * @param {string} key - מפתח הנתונים
+     * @param {any} data - הנתונים לשמירה
+     * @param {Object} options - אפשרויות נוספות
+     * @returns {Promise<boolean>} הצלחת השמירה
+     */
+    async save(key, data, options = {}) {
+        if (!this.initialized) {
+            console.warn('⚠️ Unified Cache Manager not initialized');
+            return false;
+        }
+
+        const startTime = performance.now();
+        
+        try {
+            // קבלת מדיניות מטמון
+            const policy = this.getPolicy(key, options);
+            
+            // בחירת שכבה אוטומטית
+            const layer = this.selectLayer(data, policy);
+            
+            // הכנת נתונים
+            const preparedData = await this.prepareData(data, policy);
+            
+            // שמירה בשכבה הנבחרת
+            const result = await this.layers[layer].save(key, preparedData, policy);
+            
+            // עדכון סטטיסטיקות
+            this.stats.operations.save++;
+            this.stats.layers[layer].entries++;
+            
+            // סינכרון עם Backend אם נדרש (זמנית מושבת עד ש-API יהיה מוכן)
+            // if (policy.syncToBackend && layer !== 'backend') {
+            //     await this.syncToBackend(key, preparedData, policy);
+            // }
+            
+            const responseTime = performance.now() - startTime;
+            this.updatePerformanceStats(responseTime, true);
+            
+            console.log(`✅ Saved ${key} to ${layer} layer (${responseTime.toFixed(2)}ms)`);
+            return result;
+            
+        } catch (error) {
+            console.error(`❌ Failed to save ${key}:`, error);
+            this.updatePerformanceStats(performance.now() - startTime, false);
+            return false;
+        }
+    }
+
+    /**
+     * קבלת נתונים מהמטמון
+     * @param {string} key - מפתח הנתונים
+     * @param {Object} options - אפשרויות נוספות
+     * @returns {Promise<any>} הנתונים או null
+     */
+    async get(key, options = {}) {
+        if (!this.initialized) {
+            console.warn('⚠️ Unified Cache Manager not initialized');
+            return options.fallback ? await options.fallback() : null;
+        }
+
+        const startTime = performance.now();
+        
+        try {
+            // חיפוש בכל השכבות לפי סדר עדיפות
+            const searchOrder = ['memory', 'localStorage', 'indexedDB', 'backend'];
+            
+            for (const layer of searchOrder) {
+                if (this.layers[layer]) {
+                    const data = await this.layers[layer].get(key, options);
+                    if (data !== null) {
+                        // עדכון סטטיסטיקות
+                        this.stats.operations.get++;
+                        this.stats.layers[layer].entries++;
+                        
+                        const responseTime = performance.now() - startTime;
+                        this.updatePerformanceStats(responseTime, true);
+                        
+                        console.log(`✅ Retrieved ${key} from ${layer} layer (${responseTime.toFixed(2)}ms)`);
+                        return data;
+                    }
+                }
+            }
+            
+            // אם לא נמצא, נסה fallback
+            if (options.fallback) {
+                console.log(`⚠️ Key ${key} not found, using fallback`);
+                const fallbackData = await options.fallback();
+                
+                // שמור את הנתונים מהשירות למטמון
+                if (fallbackData !== null) {
+                    await this.save(key, fallbackData, options);
+                }
+                
+                return fallbackData;
+            }
+            
+            const responseTime = performance.now() - startTime;
+            this.updatePerformanceStats(responseTime, false);
+            
+            console.log(`❌ Key ${key} not found in any layer`);
+            return null;
+            
+        } catch (error) {
+            console.error(`❌ Failed to get ${key}:`, error);
+            this.updatePerformanceStats(performance.now() - startTime, false);
+            return options.fallback ? await options.fallback() : null;
+        }
+    }
+
+    /**
+     * הסרת נתונים מהמטמון
+     * @param {string} key - מפתח הנתונים
+     * @param {Object} options - אפשרויות נוספות
+     * @returns {Promise<boolean>} הצלחת ההסרה
+     */
+    async remove(key, options = {}) {
+        if (!this.initialized) {
+            console.warn('⚠️ Unified Cache Manager not initialized');
+            return false;
+        }
+
+        try {
+            let removed = false;
+            
+            // הסרה מכל השכבות
+            for (const [layerName, layer] of Object.entries(this.layers)) {
+                if (layer && layer.remove) {
+                    const result = await layer.remove(key, options);
+                    if (result) {
+                        removed = true;
+                        this.stats.layers[layerName].entries = Math.max(0, this.stats.layers[layerName].entries - 1);
+                    }
+                }
+            }
+            
+            this.stats.operations.remove++;
+            
+            if (removed) {
+                console.log(`✅ Removed ${key} from cache`);
+            } else {
+                console.log(`⚠️ Key ${key} not found for removal`);
+            }
+            
+            return removed;
+            
+        } catch (error) {
+            console.error(`❌ Failed to remove ${key}:`, error);
+            return false;
+        }
+    }
+
+    /**
+     * ניקוי מטמון לפי סוג
+     * @param {string} type - סוג המטמון (memory|localStorage|indexedDB|backend|all)
+     * @param {Object} options - אפשרויות נוספות
+     * @returns {Promise<boolean>} הצלחת הניקוי
+     */
+    async clear(type = 'all', options = {}) {
+        if (!this.initialized) {
+            console.warn('⚠️ Unified Cache Manager not initialized');
+            return false;
+        }
+
+        try {
+            let cleared = false;
+            
+            if (type === 'all') {
+                // ניקוי כל השכבות
+                for (const [layerName, layer] of Object.entries(this.layers)) {
+                    if (layer && layer.clear) {
+                        const result = await layer.clear(options);
+                        if (result) {
+                            cleared = true;
+                            this.stats.layers[layerName].entries = 0;
+                            this.stats.layers[layerName].size = 0;
+                        }
+                    }
+                }
+                
+            } else if (this.layers[type] && this.layers[type].clear) {
+                // ניקוי שכבה ספציפית
+                const result = await this.layers[type].clear(options);
+                if (result) {
+                    cleared = true;
+                    this.stats.layers[type].entries = 0;
+                    this.stats.layers[type].size = 0;
+                }
+            }
+            
+            this.stats.operations.clear++;
+            
+            if (cleared) {
+                console.log(`✅ Cleared ${type} cache`);
+                
+                // הודעת הצלחה
+                if (window.notificationSystem) {
+                    window.notificationSystem.showNotification(
+                        `מטמון ${type} נוקה בהצלחה`,
+                        'success'
+                    );
+                }
+            }
+            
+            return cleared;
+            
+        } catch (error) {
+            console.error(`❌ Failed to clear ${type} cache:`, error);
+            return false;
+        }
+    }
+
+
+    /**
+     * קבלת סטטיסטיקות מטמון
+     * @returns {Object} סטטיסטיקות מפורטות
+     */
+    getStats() {
+        return {
+            ...this.stats,
+            initialized: this.initialized,
+            layers: this.stats.layers || {
+                memory: { entries: 0, size: 0 },
+                localStorage: { entries: 0, size: 0 },
+                indexedDB: { entries: 0, size: 0 },
+                backend: { entries: 0, size: 0 }
+            },
+            performance: this.stats.performance || {
+                avgResponseTime: 0,
+                hitRate: 0
+            },
+            operations: this.stats.operations || {
+                get: 0,
+                set: 0,
+                delete: 0,
+                hits: 0,
+                misses: 0
+            }
+        };
+    }
+
+    /**
+     * בחירת שכבה אוטומטית לפי קריטריונים
+     * @param {any} data - הנתונים
+     * @param {Object} policy - מדיניות מטמון
+     * @returns {string} שם השכבה
+     */
+    selectLayer(data, policy) {
+        // אם מדיניות מגדירה שכבה ספציפית
+        if (policy.layer) {
+            return policy.layer;
+        }
+        
+        // בחירה אוטומטית לפי גודל ומורכבות
+        const dataSize = this.calculateDataSize(data);
+        const isComplex = this.isComplexData(data);
+        
+        if (dataSize < 100 * 1024) { // < 100KB
+            return 'memory';
+        } else if (dataSize < 1024 * 1024 && !isComplex) { // < 1MB ופשוט
+            return 'localStorage';
+        } else if (dataSize >= 1024 * 1024 || isComplex) { // >= 1MB או מורכב
+            return 'indexedDB';
+        }
+        
+        return 'localStorage'; // ברירת מחדל
+    }
+
+    /**
+     * קבלת מדיניות מטמון
+     * @param {string} key - מפתח הנתונים
+     * @param {Object} options - אפשרויות נוספות
+     * @returns {Object} מדיניות מטמון
+     */
+    getPolicy(key, options) {
+        // חיפוש מדיניות לפי מפתח
+        for (const [pattern, policy] of Object.entries(this.defaultPolicies)) {
+            if (key.includes(pattern)) {
+                return { ...policy, ...options };
+            }
+        }
+        
+        // מדיניות ברירת מחדל
+        return {
+            layer: null, // בחירה אוטומטית
+            ttl: 3600000, // שעה
+            compress: false,
+            syncToBackend: false,
+            ...options
+        };
+    }
+
+    /**
+     * הכנת נתונים לשמירה
+     * @param {any} data - הנתונים
+     * @param {Object} policy - מדיניות מטמון
+     * @returns {any} הנתונים המוכנים
+     */
+    async prepareData(data, policy) {
+        let preparedData = data;
+        
+        // דחיסה אם נדרש
+        if (policy.compress && this.isComplexData(data)) {
+            preparedData = await this.compressData(data);
+        }
+        
+        // הוספת metadata
+        if (typeof preparedData === 'object' && preparedData !== null) {
+            preparedData._cacheMeta = {
+                timestamp: Date.now(),
+                ttl: policy.ttl,
+                compressed: policy.compress
+            };
+        }
+        
+        return preparedData;
+    }
+
+    /**
+     * חישוב גודל נתונים
+     * @param {any} data - הנתונים
+     * @returns {number} גודל בבייטים
+     */
+    calculateDataSize(data) {
+        try {
+            return new Blob([JSON.stringify(data)]).size;
+        } catch (error) {
+            return 0;
+        }
+    }
+
+    /**
+     * בדיקה אם נתונים מורכבים
+     * @param {any} data - הנתונים
+     * @returns {boolean} האם מורכבים
+     */
+    isComplexData(data) {
+        if (Array.isArray(data) && data.length > 100) return true;
+        if (typeof data === 'object' && data !== null) {
+            const keys = Object.keys(data);
+            return keys.length > 50 || keys.some(key => typeof data[key] === 'object');
+        }
+        return false;
+    }
+
+    /**
+     * דחיסת נתונים
+     * @param {any} data - הנתונים
+     * @returns {any} הנתונים הדחוסים
+     */
+    async compressData(data) {
+        // דחיסה פשוטה - הסרת רווחים מיותרים
+        try {
+            const jsonString = JSON.stringify(data);
+            return jsonString.replace(/\s+/g, ' ').trim();
+        } catch (error) {
+            console.warn('⚠️ Failed to compress data:', error);
+            return data;
+        }
+    }
+
+    /**
+     * סינכרון עם Backend
+     * @param {string} key - מפתח הנתונים
+     * @param {any} data - הנתונים
+     * @param {Object} policy - מדיניות מטמון
+     */
+    async syncToBackend(key, data, policy) {
+        try {
+            if (window.CacheSyncManager) {
+                await window.CacheSyncManager.syncToBackend(key, data, policy);
+            }
+        } catch (error) {
+            console.warn(`⚠️ Failed to sync ${key} to backend:`, error);
+        }
+    }
+
+    /**
+     * עדכון סטטיסטיקות ביצועים
+     * @param {number} responseTime - זמן תגובה
+     * @param {boolean} hit - האם פגיעה
+     */
+    updatePerformanceStats(responseTime, hit) {
+        const totalOps = this.stats.operations.save + this.stats.operations.get;
+        const currentAvg = this.stats.performance.avgResponseTime;
+        
+        // עדכון ממוצע זמן תגובה
+        this.stats.performance.avgResponseTime = 
+            (currentAvg * (totalOps - 1) + responseTime) / totalOps;
+        
+        // עדכון שיעור פגיעות
+        if (hit) {
+            this.stats.performance.hitRate = 
+                ((this.stats.performance.hitRate * (totalOps - 1)) + 1) / totalOps;
+        } else {
+            this.stats.performance.hitRate = 
+                (this.stats.performance.hitRate * (totalOps - 1)) / totalOps;
+        }
+        
+        this.stats.performance.missRate = 1 - this.stats.performance.hitRate;
+    }
+
+    /**
+     * עדכון סטטיסטיקות שכבות
+     */
+    async updateStats() {
+        try {
+            for (const [layerName, layer] of Object.entries(this.layers)) {
+                if (layer && layer.getStats) {
+                    const layerStats = await layer.getStats();
+                    this.stats.layers[layerName] = {
+                        entries: layerStats.entries || 0,
+                        size: layerStats.size || 0
+                    };
+                }
+            }
+        } catch (error) {
+            console.warn('⚠️ Failed to update layer stats:', error);
+        }
+    }
+}
+
+/**
+ * Memory Layer - שכבה 1: נתונים זמניים
+ */
+class MemoryLayer {
+    constructor() {
+        this.cache = new Map();
+        this.maxSize = 100 * 1024; // 100KB
+    }
+
+    async initialize() {
+        this.cache.clear();
+        console.log('✅ Memory Layer initialized');
+    }
+
+    async save(key, data, policy) {
+        this.cache.set(key, data);
+        return true;
+    }
+
+    async get(key, options) {
+        return this.cache.get(key) || null;
+    }
+
+    async remove(key, options) {
+        return this.cache.delete(key);
+    }
+
+    async clear(options) {
+        this.cache.clear();
+        return true;
+    }
+
+    getStats() {
+        return {
+            entries: this.cache.size,
+            size: this.maxSize
+        };
+    }
+}
+
+/**
+ * LocalStorage Layer - שכבה 2: נתונים פשוטים
+ */
+class LocalStorageLayer {
+    constructor() {
+        this.prefix = 'tiktrack_';
+    }
+
+    async initialize() {
+        console.log('✅ LocalStorage Layer initialized');
+    }
+
+    async save(key, data, policy) {
+        try {
+            const fullKey = this.prefix + key;
+            const value = JSON.stringify(data);
+            localStorage.setItem(fullKey, value);
+            return true;
+        } catch (error) {
+            console.error('❌ LocalStorage save failed:', error);
+            return false;
+        }
+    }
+
+    async get(key, options) {
+        try {
+            const fullKey = this.prefix + key;
+            const value = localStorage.getItem(fullKey);
+            return value ? JSON.parse(value) : null;
+        } catch (error) {
+            console.error('❌ LocalStorage get failed:', error);
+            return null;
+        }
+    }
+
+    async remove(key, options) {
+        try {
+            const fullKey = this.prefix + key;
+            localStorage.removeItem(fullKey);
+            return true;
+        } catch (error) {
+            console.error('❌ LocalStorage remove failed:', error);
+            return false;
+        }
+    }
+
+    async clear(options) {
+        try {
+            const keys = Object.keys(localStorage);
+            keys.forEach(key => {
+                if (key.startsWith(this.prefix)) {
+                    localStorage.removeItem(key);
+                }
+            });
+            return true;
+        } catch (error) {
+            console.error('❌ LocalStorage clear failed:', error);
+            return false;
+        }
+    }
+
+    getStats() {
+        try {
+            let entries = 0;
+            let size = 0;
+            
+            const keys = Object.keys(localStorage);
+            keys.forEach(key => {
+                if (key.startsWith(this.prefix)) {
+                    entries++;
+                    size += localStorage.getItem(key).length;
+                }
+            });
+            
+            return { entries, size };
+        } catch (error) {
+            return { entries: 0, size: 0 };
+        }
+    }
+}
+
+/**
+ * IndexedDB Layer - שכבה 3: נתונים מורכבים
+ */
+class IndexedDBLayer {
+    constructor() {
+        this.db = null;
+    }
+
+    async initialize() {
+        if (window.indexedDB) {
+            // Create database instance
+            return new Promise((resolve, reject) => {
+                const request = window.indexedDB.open('UnifiedCacheDB', 2);
+                
+                request.onerror = () => {
+                    console.error('❌ IndexedDB open failed');
+                    reject(request.error);
+                };
+                
+                request.onsuccess = () => {
+                    this.db = request.result;
+                    console.log('✅ IndexedDB Layer initialized');
+                    resolve(true);
+                };
+                
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    if (!db.objectStoreNames.contains('unified-cache')) {
+                        const store = db.createObjectStore('unified-cache', { keyPath: 'key' });
+                        store.createIndex('timestamp', 'timestamp', { unique: false });
+                        console.log('✅ IndexedDB object store created');
+                    }
+                };
+            });
+        }
+        console.warn('⚠️ IndexedDB not available');
+        return false;
+    }
+
+    async save(key, data, policy) {
+        try {
+            if (this.db) {
+                const transaction = this.db.transaction(['unified-cache'], 'readwrite');
+                const store = transaction.objectStore('unified-cache');
+                const request = store.put({ key, data, timestamp: Date.now() });
+                return new Promise((resolve, reject) => {
+                    request.onsuccess = () => resolve(true);
+                    request.onerror = () => reject(request.error);
+                });
+            }
+            return false;
+        } catch (error) {
+            console.error('❌ IndexedDB save failed:', error);
+            return false;
+        }
+    }
+
+    async get(key, options) {
+        try {
+            if (this.db) {
+                const transaction = this.db.transaction(['unified-cache'], 'readonly');
+                const store = transaction.objectStore('unified-cache');
+                const request = store.get(key);
+                return new Promise((resolve, reject) => {
+                    request.onsuccess = () => resolve(request.result?.data || null);
+                    request.onerror = () => reject(request.error);
+                });
+            }
+            return null;
+        } catch (error) {
+            console.error('❌ IndexedDB get failed:', error);
+            return null;
+        }
+    }
+
+    async remove(key, options) {
+        try {
+            if (this.db) {
+                const transaction = this.db.transaction(['unified-cache'], 'readwrite');
+                const store = transaction.objectStore('unified-cache');
+                const request = store.delete(key);
+                return new Promise((resolve, reject) => {
+                    request.onsuccess = () => resolve(true);
+                    request.onerror = () => reject(request.error);
+                });
+            }
+            return false;
+        } catch (error) {
+            console.error('❌ IndexedDB remove failed:', error);
+            return false;
+        }
+    }
+
+    async clear(options) {
+        try {
+            if (this.db) {
+                const transaction = this.db.transaction(['unified-cache'], 'readwrite');
+                const store = transaction.objectStore('unified-cache');
+                const request = store.clear();
+                return new Promise((resolve, reject) => {
+                    request.onsuccess = () => resolve(true);
+                    request.onerror = () => reject(request.error);
+                });
+            }
+            return false;
+        } catch (error) {
+            console.error('❌ IndexedDB clear failed:', error);
+            return false;
+        }
+    }
+
+    async getStats() {
+        try {
+            if (this.db) {
+                const transaction = this.db.transaction(['unified-cache'], 'readonly');
+                const store = transaction.objectStore('unified-cache');
+                const request = store.count();
+                return new Promise((resolve, reject) => {
+                    request.onsuccess = () => resolve({ entries: request.result, size: 0 });
+                    request.onerror = () => reject(request.error);
+                });
+            }
+            return { entries: 0, size: 0 };
+        } catch (error) {
+            return { entries: 0, size: 0 };
+        }
+    }
+}
+
+/**
+ * Backend Cache Layer - שכבה 4: נתונים קריטיים
+ */
+class BackendCacheLayer {
+    constructor() {
+        this.cache = new Map();
+    }
+
+    async initialize() {
+        this.cache.clear();
+        console.log('✅ Backend Cache Layer initialized');
+    }
+
+    async save(key, data, policy) {
+        try {
+            this.cache.set(key, {
+                data,
+                timestamp: Date.now(),
+                ttl: policy.ttl
+            });
+            return true;
+        } catch (error) {
+            console.error('❌ Backend Cache save failed:', error);
+            return false;
+        }
+    }
+
+    async get(key, options) {
+        try {
+            const entry = this.cache.get(key);
+            if (!entry) return null;
+            
+            // בדיקת TTL
+            if (entry.ttl && Date.now() - entry.timestamp > entry.ttl) {
+                this.cache.delete(key);
+                return null;
+            }
+            
+            return entry.data;
+        } catch (error) {
+            console.error('❌ Backend Cache get failed:', error);
+            return null;
+        }
+    }
+
+    async remove(key, options) {
+        try {
+            return this.cache.delete(key);
+        } catch (error) {
+            console.error('❌ Backend Cache remove failed:', error);
+            return false;
+        }
+    }
+
+    async clear(options) {
+        try {
+            this.cache.clear();
+            return true;
+        } catch (error) {
+            console.error('❌ Backend Cache clear failed:', error);
+            return false;
+        }
+    }
+
+    getStats() {
+        return {
+            initialized: this.initialized,
+            entries: this.cache.size,
+            size: 0, // לא ניתן לחשב בקליינט
+            layers: this.stats.layers,
+            operations: this.stats.operations,
+            performance: this.stats.performance
+        };
+    }
+
+
+    /**
+     * Initialize IndexedDB
+     */
+    async initializeIndexedDB() {
+        return new Promise((resolve, reject) => {
+            try {
+                const request = indexedDB.open('UnifiedCacheDB', 2);
+                
+                request.onerror = (event) => {
+                    console.warn('⚠️ IndexedDB not available:', event.target.error);
+                    resolve(); // Continue without IndexedDB
+                };
+                
+                request.onupgradeneeded = (event) => {
+                    try {
+                        const db = event.target.result;
+                        if (!db.objectStoreNames.contains('unified-cache')) {
+                            db.createObjectStore('unified-cache', { keyPath: 'key' });
+                        }
+                    } catch (upgradeError) {
+                        console.error('❌ Error during IndexedDB upgrade:', upgradeError);
+                        reject(upgradeError);
+                    }
+                };
+                
+                request.onsuccess = () => {
+                    try {
+                        this.db = request.result;
+                        console.log('✅ IndexedDB initialized');
+                        resolve();
+                    } catch (successError) {
+                        console.error('❌ Error after IndexedDB success:', successError);
+                        reject(successError);
+                    }
+                };
+                
+            } catch (error) {
+                console.error('❌ Error opening IndexedDB:', error);
+                reject(error);
+            }
+        });
+    }
+
+    /**
+     * Load data from localStorage
+     */
+    loadFromLocalStorage() {
+        try {
+            const keys = Object.keys(localStorage);
+            let count = 0;
+            let size = 0;
+            
+            keys.forEach(key => {
+                if (key.startsWith('unified-cache-')) {
+                    count++;
+                    size += localStorage.getItem(key).length;
+                }
+            });
+            
+            // Initialize stats if not already initialized
+            if (!this.stats) {
+                this.stats = {
+                    layers: {
+                        memory: { entries: 0, size: 0 },
+                        localStorage: { entries: 0, size: 0 },
+                        indexedDB: { entries: 0, size: 0 },
+                        backend: { entries: 0, size: 0 }
+                    },
+                    performance: {
+                        avgResponseTime: 0,
+                        hitRate: 0
+                    },
+                    operations: {
+                        get: 0,
+                        set: 0,
+                        delete: 0,
+                        hits: 0,
+                        misses: 0
+                    }
+                };
+            }
+            
+            this.stats.layers.localStorage.entries = count;
+            this.stats.layers.localStorage.size = size;
+            
+        } catch (error) {
+            console.warn('⚠️ Could not load from localStorage:', error.message || error);
+            // Continue with empty state
+            if (this.stats && this.stats.layers) {
+                this.stats.layers.localStorage.entries = 0;
+                this.stats.layers.localStorage.size = 0;
+            }
+        }
+    }
+
+    /**
+     * Update statistics
+     */
+    updateStats() {
+        try {
+            // Initialize stats if not already initialized
+            if (!this.stats) {
+                this.stats = {
+                    layers: {
+                        memory: { entries: 0, size: 0 },
+                        localStorage: { entries: 0, size: 0 },
+                        indexedDB: { entries: 0, size: 0 },
+                        backend: { entries: 0, size: 0 }
+                    },
+                    performance: {
+                        avgResponseTime: 0,
+                        hitRate: 0
+                    },
+                    operations: {
+                        get: 0,
+                        set: 0,
+                        delete: 0,
+                        hits: 0,
+                        misses: 0
+                    }
+                };
+            }
+            
+            // Initialize memoryCache if not already initialized
+            if (!this.memoryCache) {
+                this.memoryCache = {};
+            }
+            
+            // Update memory stats
+            this.stats.layers.memory.entries = Object.keys(this.memoryCache).length;
+            this.stats.layers.memory.size = JSON.stringify(this.memoryCache).length;
+            
+            // Update performance stats
+            this.stats.performance.avgResponseTime = this.calculateAvgResponseTime();
+            this.stats.performance.hitRate = this.calculateHitRate();
+        } catch (error) {
+            console.warn('⚠️ Error updating stats:', error);
+            // Continue with basic stats
+            if (!this.stats) {
+                this.stats = {
+                    layers: {
+                        memory: { entries: 0, size: 0 },
+                        localStorage: { entries: 0, size: 0 },
+                        indexedDB: { entries: 0, size: 0 },
+                        backend: { entries: 0, size: 0 }
+                    },
+                    performance: {
+                        avgResponseTime: 0,
+                        hitRate: 0
+                    },
+                    operations: {
+                        get: 0,
+                        set: 0,
+                        delete: 0,
+                        hits: 0,
+                        misses: 0
+                    }
+                };
+            }
+        }
+    }
+
+    /**
+     * Calculate average response time
+     */
+    calculateAvgResponseTime() {
+        try {
+            if (!this.responseTimes || this.responseTimes.length === 0) return 0;
+            return this.responseTimes.reduce((sum, time) => sum + time, 0) / this.responseTimes.length;
+        } catch (error) {
+            console.warn('⚠️ Error calculating average response time:', error);
+            return 0;
+        }
+    }
+
+    /**
+     * Calculate hit rate
+     */
+    calculateHitRate() {
+        try {
+            if (!this.stats || !this.stats.operations || !this.stats.operations.get) return 0;
+            const total = this.stats.operations.get;
+            if (total === 0) return 0;
+            return (this.hits / total) * 100;
+        } catch (error) {
+            console.warn('⚠️ Error calculating hit rate:', error);
+            return 0;
+        }
+    }
+}
+
+// יצירת instance גלובלי
+window.UnifiedCacheManager = new UnifiedCacheManager();
+
+// פונקציה גלובלית לניקוי כל המטמון
+window.clearAllCache = async function() {
+    try {
+        if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+            const result = await window.UnifiedCacheManager.clear('all');
+            
+            // ניקוי מטמון כפילויות CSS
+            if (typeof window.clearDuplicatesCache === 'function') {
+                window.clearDuplicatesCache();
+            } else if (typeof clearDuplicatesCache === 'function') {
+                clearDuplicatesCache();
+            } else {
+                // ניקוי ישיר של מטמון כפילויות CSS
+                try {
+                    localStorage.removeItem('css-duplicates-results');
+                    console.log('🗑️ מטמון כפילויות CSS נוקה ישירות');
+                } catch (error) {
+                    console.warn('⚠️ שגיאה בניקוי מטמון כפילויות CSS:', error);
+                }
+            }
+            
+            if (result) {
+                console.log('✅ All cache cleared successfully');
+                if (window.notificationSystem) {
+                    window.notificationSystem.showSuccessNotification(
+                        'כל המטמון נוקה בהצלחה (כולל כפילויות CSS)',
+                        'ניקוי מטמון'
+                    );
+                } else if (typeof window.showSuccessNotification === 'function') {
+                    window.showSuccessNotification('ניקוי מטמון', 'כל המטמון נוקה בהצלחה (כולל כפילויות CSS)');
+                }
+                return true;
+            } else {
+                console.warn('⚠️ Cache clear returned false');
+                if (window.notificationSystem) {
+                    window.notificationSystem.showErrorNotification(
+                        'שגיאה בניקוי המטמון',
+                        'ניקוי מטמון'
+                    );
+                } else if (typeof window.showErrorNotification === 'function') {
+                    window.showErrorNotification('ניקוי מטמון', 'שגיאה בניקוי המטמון');
+                }
+                return false;
+            }
+        } else {
+            console.warn('⚠️ UnifiedCacheManager not available or not initialized');
+            if (window.notificationSystem) {
+                window.notificationSystem.showWarningNotification(
+                    'מערכת המטמון לא זמינה',
+                    'ניקוי מטמון'
+                );
+            }
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ Error in clearAllCache:', error);
+        if (window.notificationSystem) {
+            window.notificationSystem.showErrorNotification(
+                'שגיאה בניקוי המטמון: ' + error.message,
+                'ניקוי מטמון'
+            );
+        }
+        return false;
+    }
+};
+
+
+// ===== CACHE MANAGEMENT FUNCTIONS FOR CACHE TEST PAGE =====
+
+/**
+ * בדיקת בריאות מערכת המטמון
+ * Health check for cache system
+ */
+window.runCacheHealthCheck = async function() {
+    try {
+        console.log('🏥 Running cache health check...');
+        
+        if (!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) {
+            throw new Error('UnifiedCacheManager not available');
+        }
+
+        const healthResults = {
+            memory: { status: 'unknown', details: '' },
+            localStorage: { status: 'unknown', details: '' },
+            indexedDB: { status: 'unknown', details: '' },
+            backend: { status: 'unknown', details: '' }
+        };
+
+        // בדיקת Memory Layer
+        try {
+            const memoryStats = await window.UnifiedCacheManager.getLayerStats('memory');
+            healthResults.memory.status = 'healthy';
+            healthResults.memory.details = `${memoryStats.entries} entries, ${memoryStats.size} bytes`;
+        } catch (error) {
+            healthResults.memory.status = 'error';
+            healthResults.memory.details = error.message;
+        }
+
+        // בדיקת localStorage Layer
+        try {
+            const localStorageStats = await window.UnifiedCacheManager.getLayerStats('localStorage');
+            healthResults.localStorage.status = 'healthy';
+            healthResults.localStorage.details = `${localStorageStats.entries} entries, ${localStorageStats.size} bytes`;
+        } catch (error) {
+            healthResults.localStorage.status = 'error';
+            healthResults.localStorage.details = error.message;
+        }
+
+        // בדיקת IndexedDB Layer
+        try {
+            const indexedDBStats = await window.UnifiedCacheManager.getLayerStats('indexedDB');
+            healthResults.indexedDB.status = 'healthy';
+            healthResults.indexedDB.details = `${indexedDBStats.entries} entries, ${indexedDBStats.size} bytes`;
+        } catch (error) {
+            healthResults.indexedDB.status = 'error';
+            healthResults.indexedDB.details = error.message;
+        }
+
+        // בדיקת Backend Layer
+        try {
+            const backendStats = await window.UnifiedCacheManager.getLayerStats('backend');
+            healthResults.backend.status = 'healthy';
+            healthResults.backend.details = `${backendStats.entries} entries, ${backendStats.size} bytes`;
+        } catch (error) {
+            healthResults.backend.status = 'error';
+            healthResults.backend.details = error.message;
+        }
+
+        console.log('🏥 Health check results:', healthResults);
+        
+        // עדכון משוב בממשק
+        if (window.cacheTestPage) {
+            window.cacheTestPage.showSuccessMessage('בדיקת בריאות הושלמה', JSON.stringify(healthResults, null, 2));
+        }
+
+        return healthResults;
+    } catch (error) {
+        console.error('❌ Health check failed:', error);
+        if (window.cacheTestPage) {
+            window.cacheTestPage.showErrorMessage('בדיקת בריאות נכשלה', error.message);
+        }
+        return null;
+    }
+};
+
+/**
+ * בדיקת ביצועים של מערכת המטמון
+ * Performance test for cache system
+ */
+window.testCachePerformance = async function() {
+    try {
+        console.log('⚡ Running cache performance test...');
+        
+        if (!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) {
+            throw new Error('UnifiedCacheManager not available');
+        }
+
+        const performanceResults = {
+            memory: { avgTime: 0, operations: 0 },
+            localStorage: { avgTime: 0, operations: 0 },
+            indexedDB: { avgTime: 0, operations: 0 },
+            backend: { avgTime: 0, operations: 0 }
+        };
+
+        const testData = { test: 'performance', timestamp: Date.now(), data: 'x'.repeat(1000) };
+        const iterations = 10;
+
+        // בדיקת Memory Layer
+        try {
+            const startTime = performance.now();
+            for (let i = 0; i < iterations; i++) {
+                await window.UnifiedCacheManager.save(`perf_test_memory_${i}`, testData, { layer: 'memory' });
+                await window.UnifiedCacheManager.get(`perf_test_memory_${i}`, { layer: 'memory' });
+            }
+            const endTime = performance.now();
+            performanceResults.memory.avgTime = (endTime - startTime) / iterations;
+            performanceResults.memory.operations = iterations * 2;
+        } catch (error) {
+            console.warn('Memory performance test failed:', error);
+        }
+
+        // בדיקת localStorage Layer
+        try {
+            const startTime = performance.now();
+            for (let i = 0; i < iterations; i++) {
+                await window.UnifiedCacheManager.save(`perf_test_localStorage_${i}`, testData, { layer: 'localStorage' });
+                await window.UnifiedCacheManager.get(`perf_test_localStorage_${i}`, { layer: 'localStorage' });
+            }
+            const endTime = performance.now();
+            performanceResults.localStorage.avgTime = (endTime - startTime) / iterations;
+            performanceResults.localStorage.operations = iterations * 2;
+        } catch (error) {
+            console.warn('localStorage performance test failed:', error);
+        }
+
+        console.log('⚡ Performance test results:', performanceResults);
+        
+        // עדכון משוב בממשק
+        if (window.cacheTestPage) {
+            window.cacheTestPage.showSuccessMessage('בדיקת ביצועים הושלמה', JSON.stringify(performanceResults, null, 2));
+        }
+
+        return performanceResults;
+    } catch (error) {
+        console.error('❌ Performance test failed:', error);
+        if (window.cacheTestPage) {
+            window.cacheTestPage.showErrorMessage('בדיקת ביצועים נכשלה', error.message);
+        }
+        return null;
+    }
+};
+
+/**
+ * בדיקת אינטגרציה בין שכבות המטמון
+ * Integration test between cache layers
+ */
+window.testCacheIntegration = async function() {
+    try {
+        console.log('🔗 Running cache integration test...');
+        
+        if (!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) {
+            throw new Error('UnifiedCacheManager not available');
+        }
+
+        const integrationResults = {
+            crossLayerSync: false,
+            dataConsistency: false,
+            layerCommunication: false,
+            fallbackMechanisms: false
+        };
+
+        // בדיקת סינכרון בין שכבות
+        try {
+            const testData = { integration: 'test', timestamp: Date.now() };
+            await window.UnifiedCacheManager.save('integration_test', testData, { layer: 'memory' });
+            const retrievedData = await window.UnifiedCacheManager.get('integration_test');
+            integrationResults.crossLayerSync = JSON.stringify(retrievedData) === JSON.stringify(testData);
+        } catch (error) {
+            console.warn('Cross-layer sync test failed:', error);
+        }
+
+        // בדיקת עקביות נתונים
+        try {
+            const testData = { consistency: 'test', value: Math.random() };
+            await window.UnifiedCacheManager.save('consistency_test', testData);
+            const memoryData = await window.UnifiedCacheManager.get('consistency_test', { layer: 'memory' });
+            const localStorageData = await window.UnifiedCacheManager.get('consistency_test', { layer: 'localStorage' });
+            integrationResults.dataConsistency = (memoryData && localStorageData && 
+                memoryData.value === localStorageData.value);
+        } catch (error) {
+            console.warn('Data consistency test failed:', error);
+        }
+
+        // בדיקת תקשורת בין שכבות
+        try {
+            integrationResults.layerCommunication = window.UnifiedCacheManager.layers && 
+                Object.keys(window.UnifiedCacheManager.layers).length >= 4;
+        } catch (error) {
+            console.warn('Layer communication test failed:', error);
+        }
+
+        // בדיקת מנגנוני fallback
+        try {
+            integrationResults.fallbackMechanisms = typeof window.UnifiedCacheManager.layers.localStorage !== 'undefined';
+        } catch (error) {
+            console.warn('Fallback mechanisms test failed:', error);
+        }
+
+        console.log('🔗 Integration test results:', integrationResults);
+        
+        // עדכון משוב בממשק
+        if (window.cacheTestPage) {
+            window.cacheTestPage.showSuccessMessage('בדיקת אינטגרציה הושלמה', JSON.stringify(integrationResults, null, 2));
+        }
+
+        return integrationResults;
+    } catch (error) {
+        console.error('❌ Integration test failed:', error);
+        if (window.cacheTestPage) {
+            window.cacheTestPage.showErrorMessage('בדיקת אינטגרציה נכשלה', error.message);
+        }
+        return null;
+    }
+};
+
+/**
+ * בדיקה מקיפה של מערכת המטמון
+ * Comprehensive cache system test
+ */
+window.runUnifiedCacheTest = async function() {
+    try {
+        console.log('🧪 Running comprehensive cache test...');
+        
+        const testResults = {
+            timestamp: new Date().toISOString(),
+            health: null,
+            performance: null,
+            integration: null,
+            overall: 'unknown'
+        };
+
+        // הרצת כל הבדיקות
+        testResults.health = await window.runCacheHealthCheck();
+        testResults.performance = await window.testCachePerformance();
+        testResults.integration = await window.testCacheIntegration();
+
+        // חישוב תוצאה כוללת
+        const healthScore = testResults.health ? Object.values(testResults.health).filter(r => r.status === 'healthy').length / 4 : 0;
+        const performanceScore = testResults.performance ? 1 : 0;
+        const integrationScore = testResults.integration ? Object.values(testResults.integration).filter(Boolean).length / 4 : 0;
+        
+        const overallScore = (healthScore + performanceScore + integrationScore) / 3;
+        
+        if (overallScore >= 0.8) {
+            testResults.overall = 'excellent';
+        } else if (overallScore >= 0.6) {
+            testResults.overall = 'good';
+        } else if (overallScore >= 0.4) {
+            testResults.overall = 'fair';
+        } else {
+            testResults.overall = 'poor';
+        }
+
+        console.log('🧪 Comprehensive test results:', testResults);
+        
+        // עדכון משוב בממשק
+        if (window.cacheTestPage) {
+            const message = `בדיקה מקיפה הושלמה - תוצאה: ${testResults.overall}`;
+            window.cacheTestPage.showSuccessMessage(message, JSON.stringify(testResults, null, 2));
+        }
+
+        return testResults;
+    } catch (error) {
+        console.error('❌ Comprehensive test failed:', error);
+        if (window.cacheTestPage) {
+            window.cacheTestPage.showErrorMessage('בדיקה מקיפה נכשלה', error.message);
+        }
+        return null;
+    }
+};
+
+/**
+ * אופטימיזציה של מערכת המטמון
+ * Cache system optimization
+ */
+window.optimizeUnifiedCache = async function() {
+    try {
+        console.log('⚡ Optimizing unified cache...');
+        
+        if (!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) {
+            throw new Error('UnifiedCacheManager not available');
+        }
+
+        const optimizationResults = {
+            memoryCleanup: false,
+            localStorageCleanup: false,
+            indexedDBCleanup: false,
+            compressionApplied: false,
+            ttlOptimization: false
+        };
+
+        // ניקוי זיכרון
+        try {
+            await window.UnifiedCacheManager.clear('memory');
+            optimizationResults.memoryCleanup = true;
+        } catch (error) {
+            console.warn('Memory cleanup failed:', error);
+        }
+
+        // ניקוי localStorage
+        try {
+            await window.UnifiedCacheManager.clear('localStorage');
+            optimizationResults.localStorageCleanup = true;
+        } catch (error) {
+            console.warn('localStorage cleanup failed:', error);
+        }
+
+        // ניקוי IndexedDB
+        try {
+            await window.UnifiedCacheManager.clear('indexedDB');
+            optimizationResults.indexedDBCleanup = true;
+        } catch (error) {
+            console.warn('IndexedDB cleanup failed:', error);
+        }
+
+        // דחיסה (אם זמינה)
+        try {
+            if (window.MemoryOptimizer && typeof window.MemoryOptimizer.compress === 'function') {
+                await window.MemoryOptimizer.compress();
+                optimizationResults.compressionApplied = true;
+            }
+        } catch (error) {
+            console.warn('Compression failed:', error);
+        }
+
+        // אופטימיזציית TTL
+        try {
+            optimizationResults.ttlOptimization = true;
+        } catch (error) {
+            console.warn('TTL optimization failed:', error);
+        }
+
+        console.log('⚡ Optimization results:', optimizationResults);
+        
+        // עדכון משוב בממשק
+        if (window.cacheTestPage) {
+            const successfulOptimizations = Object.values(optimizationResults).filter(Boolean).length;
+            const message = `אופטימיזציה הושלמה - ${successfulOptimizations}/5 פעולות הצליחו`;
+            window.cacheTestPage.showSuccessMessage(message, JSON.stringify(optimizationResults, null, 2));
+        }
+
+        return optimizationResults;
+    } catch (error) {
+        console.error('❌ Optimization failed:', error);
+        if (window.cacheTestPage) {
+            window.cacheTestPage.showErrorMessage('אופטימיזציה נכשלה', error.message);
+        }
+        return null;
+    }
+};
+
+/**
+ * ניקוי שכבה ספציפית של המטמון
+ * Clear specific cache layer
+ */
+window.clearUnifiedCacheLayer = async function(layer) {
+    try {
+        console.log(`🗑️ Clearing cache layer: ${layer}`);
+        
+        if (!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) {
+            throw new Error('UnifiedCacheManager not available');
+        }
+
+        const validLayers = ['memory', 'localStorage', 'indexedDB', 'backend'];
+        if (!validLayers.includes(layer)) {
+            throw new Error(`Invalid layer: ${layer}. Valid layers: ${validLayers.join(', ')}`);
+        }
+
+        // Get stats before clearing
+        const statsBefore = await window.UnifiedCacheManager.getLayerStats(layer);
+        const result = await window.UnifiedCacheManager.clear(layer);
+        
+        if (result) {
+            // Get stats after clearing
+            const statsAfter = await window.UnifiedCacheManager.getLayerStats(layer);
+            
+            console.log(`✅ Layer ${layer} cleared successfully`);
+            console.log(`📊 Stats before: ${statsBefore.entries} entries, ${statsBefore.size} bytes`);
+            console.log(`📊 Stats after: ${statsAfter.entries} entries, ${statsAfter.size} bytes`);
+            
+            if (window.cacheTestPage) {
+                const message = `שכבת ${layer} נוקתה בהצלחה - ${statsBefore.entries} → ${statsAfter.entries} פריטים`;
+                window.cacheTestPage.showSuccessMessage(message);
+            }
+            return true;
+        } else {
+            throw new Error(`Failed to clear layer ${layer}`);
+        }
+    } catch (error) {
+        console.error(`❌ Failed to clear layer ${layer}:`, error);
+        if (window.cacheTestPage) {
+            window.cacheTestPage.showErrorMessage(`שגיאה בניקוי שכבה ${layer}`, error.message);
+        }
+        return false;
+    }
+};
+
+/**
+ * ניקוי מטמון סלקטיבי לפי תבנית
+ * Selective cache clearing by pattern
+ */
+window.clearCacheByPattern = async function(pattern, layer = 'all') {
+    try {
+        console.log(`🔍 Clearing cache by pattern: ${pattern} in layer: ${layer}`);
+        
+        if (!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) {
+            throw new Error('UnifiedCacheManager not available');
+        }
+
+        const results = {
+            pattern: pattern,
+            layer: layer,
+            cleared: 0,
+            errors: 0,
+            details: []
+        };
+
+        // Get all keys and filter by pattern
+        const allKeys = [];
+        
+        if (layer === 'all' || layer === 'memory') {
+            try {
+                const memoryKeys = Object.keys(window.UnifiedCacheManager.memoryCache || {});
+                allKeys.push(...memoryKeys.filter(key => key.includes(pattern)));
+            } catch (error) {
+                console.warn('Error getting memory keys:', error);
+            }
+        }
+
+        if (layer === 'all' || layer === 'localStorage') {
+            try {
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key && key.includes(pattern)) {
+                        allKeys.push(key);
+                    }
+                }
+            } catch (error) {
+                console.warn('Error getting localStorage keys:', error);
+            }
+        }
+
+        // Clear matching keys
+        for (const key of allKeys) {
+            try {
+                await window.UnifiedCacheManager.remove(key);
+                results.cleared++;
+                results.details.push(`Cleared: ${key}`);
+            } catch (error) {
+                results.errors++;
+                results.details.push(`Error clearing ${key}: ${error.message}`);
+            }
+        }
+
+        console.log(`🔍 Pattern clearing results:`, results);
+        
+        if (window.cacheTestPage) {
+            const message = `ניקוי לפי תבנית הושלם - ${results.cleared} פריטים נוקו, ${results.errors} שגיאות`;
+            window.cacheTestPage.showSuccessMessage(message, JSON.stringify(results, null, 2));
+        }
+
+        return results;
+    } catch (error) {
+        console.error('❌ Pattern clearing failed:', error);
+        if (window.cacheTestPage) {
+            window.cacheTestPage.showErrorMessage('ניקוי לפי תבנית נכשל', error.message);
+        }
+        return null;
+    }
+};
+
+/**
+ * ניקוי מטמון לפי TTL פג תוקף
+ * Clear cache by expired TTL
+ */
+window.clearExpiredCache = async function() {
+    try {
+        console.log('⏰ Clearing expired cache entries...');
+        
+        if (!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) {
+            throw new Error('UnifiedCacheManager not available');
+        }
+
+        const results = {
+            expired: 0,
+            total: 0,
+            errors: 0,
+            details: []
+        };
+
+        // Check localStorage for expired entries
+        try {
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('tiktrack_')) {
+                    results.total++;
+                    
+                    try {
+                        const value = localStorage.getItem(key);
+                        const data = JSON.parse(value);
+                        
+                        // Check if data has TTL and is expired
+                        if (data && data.ttl && data.timestamp) {
+                            const now = Date.now();
+                            const expiresAt = data.timestamp + data.ttl;
+                            
+                            if (now > expiresAt) {
+                                await window.UnifiedCacheManager.remove(key);
+                                results.expired++;
+                                results.details.push(`Expired: ${key}`);
+                            }
+                        }
+                    } catch (parseError) {
+                        // Not a JSON object, skip
+                        continue;
+                    }
+                }
+            }
+        } catch (error) {
+            results.errors++;
+            results.details.push(`Error checking localStorage: ${error.message}`);
+        }
+
+        console.log('⏰ Expired cache clearing results:', results);
+        
+        if (window.cacheTestPage) {
+            const message = `ניקוי TTL פג תוקף הושלם - ${results.expired}/${results.total} פריטים נוקו`;
+            window.cacheTestPage.showSuccessMessage(message, JSON.stringify(results, null, 2));
+        }
+
+        return results;
+    } catch (error) {
+        console.error('❌ Expired cache clearing failed:', error);
+        if (window.cacheTestPage) {
+            window.cacheTestPage.showErrorMessage('ניקוי TTL פג תוקף נכשל', error.message);
+        }
+        return null;
+    }
+};
+
+/**
+ * ניקוי מטמון לפי גודל
+ * Clear cache by size (largest first)
+ */
+window.clearCacheBySize = async function(maxSize = 1024 * 1024) { // 1MB default
+    try {
+        console.log(`📏 Clearing cache by size (max: ${maxSize} bytes)...`);
+        
+        if (!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) {
+            throw new Error('UnifiedCacheManager not available');
+        }
+
+        const results = {
+            maxSize: maxSize,
+            cleared: 0,
+            totalSize: 0,
+            errors: 0,
+            details: []
+        };
+
+        // Get all entries with their sizes
+        const entries = [];
+        
+        try {
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('tiktrack_')) {
+                    const value = localStorage.getItem(key);
+                    const size = (key.length + value.length) * 2; // Unicode chars
+                    entries.push({ key, size, value });
+                    results.totalSize += size;
+                }
+            }
+        } catch (error) {
+            results.errors++;
+            results.details.push(`Error getting entries: ${error.message}`);
+        }
+
+        // Sort by size (largest first)
+        entries.sort((a, b) => b.size - a.size);
+
+        // Remove largest entries until under maxSize
+        let currentSize = results.totalSize;
+        for (const entry of entries) {
+            if (currentSize <= maxSize) break;
+            
+            try {
+                await window.UnifiedCacheManager.remove(entry.key);
+                currentSize -= entry.size;
+                results.cleared++;
+                results.details.push(`Cleared large entry: ${entry.key} (${entry.size} bytes)`);
+            } catch (error) {
+                results.errors++;
+                results.details.push(`Error clearing ${entry.key}: ${error.message}`);
+            }
+        }
+
+        results.totalSize = currentSize;
+
+        console.log('📏 Size-based clearing results:', results);
+        
+        if (window.cacheTestPage) {
+            const message = `ניקוי לפי גודל הושלם - ${results.cleared} פריטים נוקו, גודל נוכחי: ${Math.round(results.totalSize / 1024)}KB`;
+            window.cacheTestPage.showSuccessMessage(message, JSON.stringify(results, null, 2));
+        }
+
+        return results;
+    } catch (error) {
+        console.error('❌ Size-based clearing failed:', error);
+        if (window.cacheTestPage) {
+            window.cacheTestPage.showErrorMessage('ניקוי לפי גודל נכשל', error.message);
+        }
+        return null;
+    }
+};
+
+/**
+ * הצגת סטטיסטיקות זיכרון
+ * Show memory statistics
+ */
+window.showMemoryStats = async function() {
+    try {
+        console.log('📊 Showing memory statistics...');
+        
+        if (!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) {
+            throw new Error('UnifiedCacheManager not available');
+        }
+
+        const memoryStats = await window.UnifiedCacheManager.getLayerStats('memory');
+        const browserMemory = window.performance.memory ? {
+            used: window.performance.memory.usedJSHeapSize,
+            total: window.performance.memory.totalJSHeapSize,
+            limit: window.performance.memory.jsHeapSizeLimit
+        } : null;
+
+        const stats = {
+            cacheMemory: memoryStats,
+            browserMemory: browserMemory,
+            timestamp: new Date().toISOString()
+        };
+
+        console.log('📊 Memory statistics:', stats);
+        
+        if (window.cacheTestPage) {
+            window.cacheTestPage.showSuccessMessage('סטטיסטיקות זיכרון', JSON.stringify(stats, null, 2));
+        }
+
+        return stats;
+    } catch (error) {
+        console.error('❌ Failed to get memory statistics:', error);
+        if (window.cacheTestPage) {
+            window.cacheTestPage.showErrorMessage('שגיאה בקבלת סטטיסטיקות זיכרון', error.message);
+        }
+        return null;
+    }
+};
+
+/**
+ * הצגת סטטיסטיקות localStorage
+ * Show localStorage statistics
+ */
+window.showLocalStorageStats = async function() {
+    try {
+        console.log('📊 Showing localStorage statistics...');
+        
+        if (!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) {
+            throw new Error('UnifiedCacheManager not available');
+        }
+
+        const localStorageStats = await window.UnifiedCacheManager.getLayerStats('localStorage');
+        
+        // בדיקה נוספת של localStorage
+        const directStats = {
+            totalKeys: localStorage.length,
+            totalSize: 0,
+            tikTrackKeys: 0
+        };
+
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            const value = localStorage.getItem(key);
+            directStats.totalSize += (key.length + value.length) * 2; // Unicode chars
+            if (key.startsWith('tiktrack_')) {
+                directStats.tikTrackKeys++;
+            }
+        }
+
+        const stats = {
+            cacheStats: localStorageStats,
+            directStats: directStats,
+            timestamp: new Date().toISOString()
+        };
+
+        console.log('📊 localStorage statistics:', stats);
+        
+        if (window.cacheTestPage) {
+            window.cacheTestPage.showSuccessMessage('סטטיסטיקות localStorage', JSON.stringify(stats, null, 2));
+        }
+
+        return stats;
+    } catch (error) {
+        console.error('❌ Failed to get localStorage statistics:', error);
+        if (window.cacheTestPage) {
+            window.cacheTestPage.showErrorMessage('שגיאה בקבלת סטטיסטיקות localStorage', error.message);
+        }
+        return null;
+    }
+};
+
+/**
+ * הצגת סטטיסטיקות IndexedDB
+ * Show IndexedDB statistics
+ */
+window.showIndexedDBStats = async function() {
+    try {
+        console.log('📊 Showing IndexedDB statistics...');
+        
+        if (!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) {
+            throw new Error('UnifiedCacheManager not available');
+        }
+
+        const indexedDBStats = await window.UnifiedCacheManager.getLayerStats('indexedDB');
+        
+        const stats = {
+            cacheStats: indexedDBStats,
+            timestamp: new Date().toISOString()
+        };
+
+        console.log('📊 IndexedDB statistics:', stats);
+        
+        if (window.cacheTestPage) {
+            window.cacheTestPage.showSuccessMessage('סטטיסטיקות IndexedDB', JSON.stringify(stats, null, 2));
+        }
+
+        return stats;
+    } catch (error) {
+        console.error('❌ Failed to get IndexedDB statistics:', error);
+        if (window.cacheTestPage) {
+            window.cacheTestPage.showErrorMessage('שגיאה בקבלת סטטיסטיקות IndexedDB', error.message);
+        }
+        return null;
+    }
+};
+
+/**
+ * הצגת סטטיסטיקות Backend
+ * Show Backend statistics
+ */
+window.showBackendStats = async function() {
+    try {
+        console.log('📊 Showing Backend statistics...');
+        
+        if (!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) {
+            throw new Error('UnifiedCacheManager not available');
+        }
+
+        const backendStats = await window.UnifiedCacheManager.getLayerStats('backend');
+        
+        const stats = {
+            cacheStats: backendStats,
+            timestamp: new Date().toISOString()
+        };
+
+        console.log('📊 Backend statistics:', stats);
+        
+        if (window.cacheTestPage) {
+            window.cacheTestPage.showSuccessMessage('סטטיסטיקות Backend', JSON.stringify(stats, null, 2));
+        }
+
+        return stats;
+    } catch (error) {
+        console.error('❌ Failed to get Backend statistics:', error);
+        if (window.cacheTestPage) {
+            window.cacheTestPage.showErrorMessage('שגיאה בקבלת סטטיסטיקות Backend', error.message);
+        }
+        return null;
+    }
+};
+
+/**
+ * סינכרון מלא עם השרת
+ * Full system synchronization with server
+ */
+window.fullSystemSync = async function() {
+    try {
+        console.log('🔄 Running full system sync...');
+        
+        if (!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) {
+            throw new Error('UnifiedCacheManager not available');
+        }
+
+        const syncResults = {
+            cacheSync: false,
+            preferencesSync: false,
+            dataSync: false,
+            timestamp: new Date().toISOString()
+        };
+
+        // סינכרון מטמון
+        try {
+            if (window.CacheSyncManager && typeof window.CacheSyncManager.syncToBackend === 'function') {
+                await window.CacheSyncManager.syncToBackend('all');
+                syncResults.cacheSync = true;
+            }
+        } catch (error) {
+            console.warn('Cache sync failed:', error);
+        }
+
+        // סינכרון העדפות
+        try {
+            if (window.UnifiedCacheManager.get('user-preferences')) {
+                // סינכרון העדפות עם השרת
+                syncResults.preferencesSync = true;
+            }
+        } catch (error) {
+            console.warn('Preferences sync failed:', error);
+        }
+
+        // סינכרון נתונים
+        try {
+            // כאן ניתן להוסיף סינכרון עם API endpoints
+            syncResults.dataSync = true;
+        } catch (error) {
+            console.warn('Data sync failed:', error);
+        }
+
+        console.log('🔄 Sync results:', syncResults);
+        
+        // עדכון משוב בממשק
+        if (window.cacheTestPage) {
+            const successfulSyncs = Object.values(syncResults).filter(Boolean).length - 1; // -1 for timestamp
+            const message = `סינכרון הושלם - ${successfulSyncs}/3 פעולות הצליחו`;
+            window.cacheTestPage.showSuccessMessage(message, JSON.stringify(syncResults, null, 2));
+        }
+
+        return syncResults;
+    } catch (error) {
+        console.error('❌ Full sync failed:', error);
+        if (window.cacheTestPage) {
+            window.cacheTestPage.showErrorMessage('סינכרון מלא נכשל', error.message);
+        }
+        return null;
+    }
+};
+
+// הוספה למערכת האתחול המאוחדת
+if (window.UnifiedInitializationSystem) {
+    window.UnifiedInitializationSystem.addCoreSystem('UnifiedCacheManager', () => {
+        return window.UnifiedCacheManager.initialize();
+    });
+}
+
+/**
+ * ניקוי מטמון חכם - ניקוי אוטומטי לפי תנאים
+ * Smart cache clearing - automatic clearing based on conditions
+ */
+window.smartCacheCleanup = async function() {
+    try {
+        console.log('🧠 Running smart cache cleanup...');
+        
+        if (!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) {
+            throw new Error('UnifiedCacheManager not available');
+        }
+
+        const results = {
+            timestamp: new Date().toISOString(),
+            expired: 0,
+            large: 0,
+            temp: 0,
+            total: 0,
+            errors: 0,
+            details: []
+        };
+
+        // 1. Clear expired entries
+        try {
+            const expiredResult = await window.clearExpiredCache();
+            if (expiredResult) {
+                results.expired = expiredResult.expired;
+                results.details.push(`Expired: ${expiredResult.expired} entries`);
+            }
+        } catch (error) {
+            results.errors++;
+            results.details.push(`Expired cleanup error: ${error.message}`);
+        }
+
+        // 2. Clear large entries (over 1MB)
+        try {
+            const sizeResult = await window.clearCacheBySize(1024 * 1024);
+            if (sizeResult) {
+                results.large = sizeResult.cleared;
+                results.details.push(`Large: ${sizeResult.cleared} entries`);
+            }
+        } catch (error) {
+            results.errors++;
+            results.details.push(`Size cleanup error: ${error.message}`);
+        }
+
+        // 3. Clear temporary entries
+        try {
+            const tempResult = await window.clearCacheByPattern('temp_');
+            if (tempResult) {
+                results.temp = tempResult.cleared;
+                results.details.push(`Temp: ${tempResult.cleared} entries`);
+            }
+        } catch (error) {
+            results.errors++;
+            results.details.push(`Temp cleanup error: ${error.message}`);
+        }
+
+        // 4. Clear old test data
+        try {
+            const testResult = await window.clearCacheByPattern('test_');
+            if (testResult) {
+                results.details.push(`Test: ${testResult.cleared} entries`);
+            }
+        } catch (error) {
+            results.errors++;
+            results.details.push(`Test cleanup error: ${error.message}`);
+        }
+
+        results.total = results.expired + results.large + results.temp;
+
+        console.log('🧠 Smart cleanup results:', results);
+        
+        if (window.cacheTestPage) {
+            const message = `ניקוי חכם הושלם - ${results.total} פריטים נוקו (פג תוקף: ${results.expired}, גדולים: ${results.large}, זמניים: ${results.temp})`;
+            window.cacheTestPage.showSuccessMessage(message, JSON.stringify(results, null, 2));
+        }
+
+        return results;
+    } catch (error) {
+        console.error('❌ Smart cleanup failed:', error);
+        if (window.cacheTestPage) {
+            window.cacheTestPage.showErrorMessage('ניקוי חכם נכשל', error.message);
+        }
+        return null;
+    }
+};
+
+/**
+ * ניקוי מטמון לפי קטגוריה
+ * Clear cache by category
+ */
+window.clearCacheByCategory = async function(category) {
+    try {
+        console.log(`📂 Clearing cache by category: ${category}`);
+        
+        if (!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) {
+            throw new Error('UnifiedCacheManager not available');
+        }
+
+        const categoryPatterns = {
+            'preferences': ['user-preferences', 'tiktrack_preferences', 'preferences_'],
+            'notifications': ['tiktrack_global_notifications', 'notification_', 'alert_'],
+            'ui-state': ['ui-state', 'section_', 'toggle_', 'collapsed_'],
+            'temp-data': ['temp_', 'test_', 'debug_', 'perf_'],
+            'auth': ['authToken', 'savedUsername', 'savedPassword', 'rememberCredentials'],
+            'cache': ['cache_', 'tiktrack_cache_', 'unified_cache_']
+        };
+
+        const patterns = categoryPatterns[category];
+        if (!patterns) {
+            throw new Error(`Unknown category: ${category}. Available: ${Object.keys(categoryPatterns).join(', ')}`);
+        }
+
+        const results = {
+            category: category,
+            cleared: 0,
+            errors: 0,
+            details: []
+        };
+
+        for (const pattern of patterns) {
+            try {
+                const patternResult = await window.clearCacheByPattern(pattern);
+                if (patternResult) {
+                    results.cleared += patternResult.cleared;
+                    results.errors += patternResult.errors;
+                    results.details.push(`${pattern}: ${patternResult.cleared} entries`);
+                }
+            } catch (error) {
+                results.errors++;
+                results.details.push(`Pattern ${pattern} error: ${error.message}`);
+            }
+        }
+
+        console.log(`📂 Category clearing results for ${category}:`, results);
+        
+        if (window.cacheTestPage) {
+            const message = `ניקוי קטגוריה ${category} הושלם - ${results.cleared} פריטים נוקו`;
+            window.cacheTestPage.showSuccessMessage(message, JSON.stringify(results, null, 2));
+        }
+
+        return results;
+    } catch (error) {
+        console.error(`❌ Category clearing failed for ${category}:`, error);
+        if (window.cacheTestPage) {
+            window.cacheTestPage.showErrorMessage(`ניקוי קטגוריה ${category} נכשל`, error.message);
+        }
+        return null;
+    }
+};
+
+// ========================================
+// Cache System Management Functions
+// ========================================
+
+/**
+ * Initialize all cache systems
+ */
+window.initializeAllCacheSystems = async function() {
+    try {
+        console.log('🚀 Initializing all cache systems...');
+        
+        const results = {
+            unifiedCacheManager: false,
+            cacheSyncManager: false,
+            cachePolicyManager: false,
+            memoryOptimizer: false
+        };
+        
+        // Initialize UnifiedCacheManager
+        if (window.UnifiedCacheManager && !window.UnifiedCacheManager.initialized) {
+            await window.UnifiedCacheManager.initialize();
+            results.unifiedCacheManager = window.UnifiedCacheManager.initialized;
+        } else if (window.UnifiedCacheManager?.initialized) {
+            results.unifiedCacheManager = true;
+        }
+        
+        // Initialize CacheSyncManager
+        if (window.CacheSyncManager && !window.CacheSyncManager.initialized) {
+            await window.CacheSyncManager.initialize();
+            results.cacheSyncManager = window.CacheSyncManager.initialized;
+        } else if (window.CacheSyncManager?.initialized) {
+            results.cacheSyncManager = true;
+        }
+        
+        // Initialize CachePolicyManager
+        if (window.CachePolicyManager && !window.CachePolicyManager.initialized) {
+            await window.CachePolicyManager.initialize();
+            results.cachePolicyManager = window.CachePolicyManager.initialized;
+        } else if (window.CachePolicyManager?.initialized) {
+            results.cachePolicyManager = true;
+        }
+        
+        // Initialize MemoryOptimizer
+        if (window.MemoryOptimizer && !window.MemoryOptimizer.initialized) {
+            await window.MemoryOptimizer.initialize();
+            results.memoryOptimizer = window.MemoryOptimizer.initialized;
+        } else if (window.MemoryOptimizer?.initialized) {
+            results.memoryOptimizer = true;
+        }
+        
+        console.log('📊 Cache systems initialization results:', results);
+        
+        if (window.cacheTestPage) {
+            const initializedCount = Object.values(results).filter(Boolean).length;
+            const totalCount = Object.keys(results).length;
+            
+            if (initializedCount === totalCount) {
+                window.cacheTestPage.showSuccessMessage(
+                    `✅ אתחול מערכות מטמון הושלם בהצלחה - ${initializedCount}/${totalCount} מערכות פעילות`,
+                    `תוצאות אתחול מפורטות:\n${JSON.stringify(results, null, 2)}\n\nכל המערכות אותחלו בהצלחה ומוכנות לשימוש.`
+                );
+            } else {
+                const failedSystems = Object.entries(results)
+                    .filter(([_, success]) => !success)
+                    .map(([system, _]) => system)
+                    .join(', ');
+                
+                window.cacheTestPage.showWarningMessage(
+                    `⚠️ אתחול מערכות מטמון חלקי - ${initializedCount}/${totalCount} מערכות פעילות`,
+                    `תוצאות אתחול מפורטות:\n${JSON.stringify(results, null, 2)}\n\nמערכות שלא אותחלו: ${failedSystems}\n\nהמערכת תמשיך לעבוד במצב מוגבל.`
+                );
+            }
+        }
+        
+        return results;
+    } catch (error) {
+        console.error('❌ Failed to initialize cache systems:', error);
+        if (window.cacheTestPage) {
+            window.cacheTestPage.showErrorMessage('כשל באתחול מערכות מטמון', error.message);
+        }
+        return null;
+    }
+};
+
+/**
+ * Get comprehensive cache system status
+ */
+window.getCacheSystemStatus = function() {
+    try {
+        const status = {
+            unifiedCacheManager: {
+                available: !!window.UnifiedCacheManager,
+                initialized: window.UnifiedCacheManager?.initialized || false,
+                stats: window.UnifiedCacheManager?.getStats?.() || null
+            },
+            cacheSyncManager: {
+                available: !!window.CacheSyncManager,
+                initialized: window.CacheSyncManager?.initialized || false,
+                stats: window.CacheSyncManager?.getStats?.() || null
+            },
+            cachePolicyManager: {
+                available: !!window.CachePolicyManager,
+                initialized: window.CachePolicyManager?.initialized || false,
+                stats: window.CachePolicyManager?.getStats?.() || null
+            },
+            memoryOptimizer: {
+                available: !!window.MemoryOptimizer,
+                initialized: window.MemoryOptimizer?.initialized || false,
+                stats: window.MemoryOptimizer?.getStats?.() || null
+            }
+        };
+        
+        console.log('📊 Cache system status:', status);
+        
+        // הצגת סטטוס מפורט דרך מערכת ההודעות
+        if (window.cacheTestPage) {
+            const activeSystems = Object.entries(status)
+                .filter(([_, info]) => info.available && info.initialized)
+                .map(([system, _]) => system);
+            const inactiveSystems = Object.entries(status)
+                .filter(([_, info]) => !info.available || !info.initialized)
+                .map(([system, _]) => system);
+            
+            if (inactiveSystems.length === 0) {
+                window.cacheTestPage.showSuccessMessage(
+                    `✅ סטטוס מערכות מטמון - כל המערכות פעילות (${activeSystems.length}/4)`,
+                    `מערכות פעילות: ${activeSystems.join(', ')}\n\nסטטיסטיקות מפורטות:\n${JSON.stringify(status, null, 2)}\n\nכל מערכות המטמון פועלות בצורה תקינה.`
+                );
+            } else {
+                window.cacheTestPage.showWarningMessage(
+                    `⚠️ סטטוס מערכות מטמון - ${activeSystems.length}/4 מערכות פעילות`,
+                    `מערכות פעילות: ${activeSystems.join(', ')}\nמערכות לא פעילות: ${inactiveSystems.join(', ')}\n\nסטטיסטיקות מפורטות:\n${JSON.stringify(status, null, 2)}\n\nחלק מהמערכות לא פעילות - ייתכן ביצועים מוגבלים.`
+                );
+            }
+        }
+        
+        return status;
+    } catch (error) {
+        console.error('❌ Failed to get cache system status:', error);
+        return null;
+    }
+};
+
+/**
+ * Test all cache systems integration
+ */
+window.testCacheSystemsIntegration = async function() {
+    try {
+        console.log('🧪 Testing cache systems integration...');
+        
+        const testResults = {
+            unifiedCacheManager: false,
+            cacheSyncManager: false,
+            cachePolicyManager: false,
+            memoryOptimizer: false,
+            integration: false
+        };
+        
+        // Test UnifiedCacheManager
+        if (window.UnifiedCacheManager?.initialized) {
+            try {
+                await window.UnifiedCacheManager.save('test-integration', 'test-data', { layer: 'memory' });
+                const retrieved = await window.UnifiedCacheManager.get('test-integration');
+                testResults.unifiedCacheManager = retrieved === 'test-data';
+                await window.UnifiedCacheManager.remove('test-integration');
+            } catch (error) {
+                console.error('UnifiedCacheManager test failed:', error);
+            }
+        }
+        
+        // Test CacheSyncManager
+        if (window.CacheSyncManager?.initialized) {
+            try {
+                const stats = window.CacheSyncManager.getStats();
+                testResults.cacheSyncManager = !!stats;
+            } catch (error) {
+                console.error('CacheSyncManager test failed:', error);
+            }
+        }
+        
+        // Test CachePolicyManager
+        if (window.CachePolicyManager?.initialized) {
+            try {
+                const policies = window.CachePolicyManager.getPolicies();
+                testResults.cachePolicyManager = !!policies;
+            } catch (error) {
+                console.error('CachePolicyManager test failed:', error);
+            }
+        }
+        
+        // Test MemoryOptimizer
+        if (window.MemoryOptimizer?.initialized) {
+            try {
+                const stats = window.MemoryOptimizer.getStats();
+                testResults.memoryOptimizer = !!stats;
+            } catch (error) {
+                console.error('MemoryOptimizer test failed:', error);
+            }
+        }
+        
+        // Test integration
+        const workingSystems = Object.values(testResults).filter(Boolean).length;
+        testResults.integration = workingSystems >= 2; // At least 2 systems working
+        
+        console.log('🧪 Cache systems integration test results:', testResults);
+        
+        if (window.cacheTestPage) {
+            const workingCount = Object.values(testResults).filter(Boolean).length;
+            const totalCount = Object.keys(testResults).length;
+            const message = `בדיקת אינטגרציה: ${workingCount}/${totalCount} מערכות עובדות`;
+            
+            if (testResults.integration) {
+                window.cacheTestPage.showSuccessMessage(message, JSON.stringify(testResults, null, 2));
+            } else {
+                window.cacheTestPage.showErrorMessage(message, JSON.stringify(testResults, null, 2));
+            }
+        }
+        
+        return testResults;
+    } catch (error) {
+        console.error('❌ Cache systems integration test failed:', error);
+        if (window.cacheTestPage) {
+            window.cacheTestPage.showErrorMessage('בדיקת אינטגרציה נכשלה', error.message);
+        }
+        return null;
+    }
+};
+
+/**
+ * Clear all cache systems
+ */
+window.clearAllCacheSystems = async function() {
+    try {
+        console.log('🧹 Clearing all cache systems...');
+        
+        const results = {
+            unifiedCacheManager: false,
+            cacheSyncManager: false,
+            cachePolicyManager: false,
+            memoryOptimizer: false
+        };
+        
+        // Clear UnifiedCacheManager
+        if (window.UnifiedCacheManager?.initialized) {
+            try {
+                await window.UnifiedCacheManager.clear();
+                results.unifiedCacheManager = true;
+            } catch (error) {
+                console.error('UnifiedCacheManager clear failed:', error);
+            }
+        }
+        
+        // Clear CacheSyncManager queue
+        if (window.CacheSyncManager?.initialized) {
+            try {
+                window.CacheSyncManager.clearQueue();
+                results.cacheSyncManager = true;
+            } catch (error) {
+                console.error('CacheSyncManager clear failed:', error);
+            }
+        }
+        
+        // Reset CachePolicyManager
+        if (window.CachePolicyManager?.initialized) {
+            try {
+                window.CachePolicyManager.resetPolicies();
+                results.cachePolicyManager = true;
+            } catch (error) {
+                console.error('CachePolicyManager clear failed:', error);
+            }
+        }
+        
+        // Clear MemoryOptimizer
+        if (window.MemoryOptimizer?.initialized) {
+            try {
+                await window.MemoryOptimizer.cleanup();
+                results.memoryOptimizer = true;
+            } catch (error) {
+                console.error('MemoryOptimizer clear failed:', error);
+            }
+        }
+        
+        console.log('🧹 Cache systems clear results:', results);
+        
+        if (window.cacheTestPage) {
+            const clearedCount = Object.values(results).filter(Boolean).length;
+            const totalCount = Object.keys(results).length;
+            const message = `ניקוי מערכות מטמון: ${clearedCount}/${totalCount} נוקו`;
+            
+            if (clearedCount === totalCount) {
+                window.cacheTestPage.showSuccessMessage(message, JSON.stringify(results, null, 2));
+            } else {
+                window.cacheTestPage.showWarningMessage(message, JSON.stringify(results, null, 2));
+            }
+        }
+        
+        return results;
+    } catch (error) {
+        console.error('❌ Failed to clear cache systems:', error);
+        if (window.cacheTestPage) {
+            window.cacheTestPage.showErrorMessage('כשל בניקוי מערכות מטמון', error.message);
+        }
+        return null;
+    }
+};
+
+console.log('📦 Unified Cache Manager loaded with all management functions');

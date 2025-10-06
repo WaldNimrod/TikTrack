@@ -27,17 +27,17 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-family: var(--font-family-primary);
-  font-weight: 500; /* הוספת משקל פונט עבה יותר */
+  font-weight: 400; /* משקל רגיל עם Heebo */
 }
 
 /* טקסט רגיל - paragraphs */
 p {
-  font-weight: 500; /* משקל פונט עבה יותר לטקסט רגיל */
+  font-weight: 400; /* משקל רגיל עם Heebo */
 }
 
 /* טקסט בתפריט */
 .navbar, .nav {
-  font-weight: 600; /* משקל פונט עבה יותר לתפריט */
+  font-weight: 500; /* משקל בינוני עם Heebo */
 }
 
 /* .nav-link מוגדר ב-_navigation.css לפי ITCSS */
@@ -46,7 +46,7 @@ p {
 
 /* טקסט בסטטיסטיקות */
 .stat-row, .stat-row span {
-  font-weight: 500; /* משקל פונט עבה יותר לסטטיסטיקות */
+  font-weight: 500; /* משקל בינוני עם Heebo לסטטיסטיקות */
 }
 
 /* תגיות מוגדרות ב-_unified-log-display.css לפי ITCSS */

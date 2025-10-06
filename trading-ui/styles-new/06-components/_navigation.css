@@ -19,6 +19,8 @@
   padding: var(--spacing-sm) var(--spacing-md);
 }
 
+/* Section Header Controls - moved to _layout.css for layout structure */
+
 .navbar-nav {
   display: flex;
   flex-direction: row-reverse;

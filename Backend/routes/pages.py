@@ -93,6 +93,11 @@ def preferences() -> Any:
     """Preferences page"""
     return send_from_directory(UI_DIR, "preferences.html")
 
+@pages_bp.route('/dynamic-loading-test')
+def dynamic_loading_test() -> Any:
+    """Dynamic loading test page"""
+    return send_from_directory(UI_DIR, "dynamic-loading-test.html")
+
 @pages_bp.route('/preferences-new')
 def preferences_new() -> Any:
     """New preferences page"""

@@ -18,8 +18,6 @@
     ======================================
     -->
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet" crossorigin="anonymous">
     
     <!-- Bootstrap CSS - Must load first -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
@@ -95,11 +93,11 @@
                 <!-- UI Content Section Top Start-->
                 <div class="top-section" data-section="top">
                     <div class="section-header">
-                        <div class="table-title">
+                        <h1>
                             <img src="images/icons/tickers.svg" alt="טיקרים" class="table-icon">
                             טיקרים
-                        </div>
-                        <div class="table-actions">
+                        </h1>
+                        <div class="header-actions">
                             <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והטיקרים">
                                 <i class="fas fa-copy"></i> העתק לוג מפורט
                             </button>
@@ -126,18 +124,18 @@
                 <div class="content-section" id="main" data-section="main">
                     <!-- Tickers header -->
                     <div class="section-header">
-                        <div class="table-title">
+                        <h2>
                             <img src="images/icons/tickers.svg" alt="ניהול טיקרים" class="section-icon">
                             ניהול טיקרים
-                        </div>
-                        <div class="table-count" id="tickersCount">טוען...</div>
-                        <div class="table-actions">
+                            <span class="table-count" id="tickersCount">טוען...</span>
+                        </h2>
+                        <div class="header-actions">
                             <button id="addTickerBtn" class="refresh-btn" onclick="showAddTickerModal()" title="הוסף תיקר חדש">
                                 <img src="images/icons/tickers.svg" alt="הוסף" class="action-icon">
                                 הוסף
                             </button>
                             <button class="filter-toggle-btn" onclick="toggleSection('main')" title="הצג/הסתר אזור ניהול טיקרים">
-                                <span class="filter-icon">▲</span>
+                                <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
                     </div>
@@ -369,7 +367,7 @@
     <!-- Bootstrap JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- ===== BASE PACKAGE SYSTEMS - CORRECT LOADING ORDER ===== -->
+    <!-- ===== DYNAMIC LOADING SYSTEM ===== -->
     
     <!-- Stage 1: Initialization Systems (Must be first) -->
     <script src="scripts/page-initialization-configs.js?v=20251001"></script>

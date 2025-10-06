@@ -19,6 +19,45 @@
   width: 100%;
 }
 
+/* Section Header Controls - כפתורי בקרה בכותרת סקשן */
+.section-header-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  margin-inline-start: auto; /* דוחף לסוף השורה - שמאל בעברית */
+}
+
+/* Header Actions - כפתורי פעולה בכותרת */
+.header-actions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  margin-inline-start: auto; /* דוחף לסוף השורה - שמאל בעברית */
+}
+
+.section-header-controls .btn {
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* Responsive Design for Section Header Controls */
+@media (max-width: 768px) {
+  .section-header-controls,
+  .header-actions {
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-inline-start: 0;
+    width: 100%;
+  }
+  
+  .section-header-controls .btn,
+  .header-actions .btn {
+    width: 100%;
+  }
+}
+
 /* Dashboard rows - for statistics sections */
 .dashboard-row {
   margin-bottom: 20px;

@@ -33,7 +33,7 @@ class CacheTestPage {
         console.log('🚀 Cache Test Page - Initializing...');
 
         // Initialize cache systems
-        this.initializeCacheSystems();
+        this.initializeCacheSystems().catch(console.error);
 
         // Load initial data
         this.loadCacheData();
@@ -59,15 +59,23 @@ class CacheTestPage {
      * Initialize cache systems
      * אתחול מערכות המטמון
      */
-    initializeCacheSystems() {
+    async initializeCacheSystems() {
         console.log('🔄 Initializing cache systems...');
         
-        // Wait for UnifiedCacheManager to be available
+        // Wait for UnifiedCacheManager to be available (new architecture)
         if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
             this.updateCacheStatus();
+        } else if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized && window.UnifiedCacheManager.isInitialized()) {
+            this.updateCacheStatus();
         } else {
-            // Retry after a short delay
-            setTimeout(() => this.initializeCacheSystems(), 500);
+            // Try to initialize all cache systems
+            if (window.initializeAllCacheSystems) {
+                await window.initializeAllCacheSystems();
+                this.updateCacheStatus();
+            } else {
+                // Retry after a short delay
+                setTimeout(() => this.initializeCacheSystems(), 500);
+            }
         }
     }
 
@@ -115,10 +123,11 @@ class CacheTestPage {
                 const stats = await window.UnifiedCacheManager.getStats();
                 
                 // Update overview cards
-                this.updateElement('cacheHitRate', stats.hitRate ? `${stats.hitRate}%` : '0%');
+                this.updateElement('cacheHitRate', stats.performance?.hitRate ? `${parseFloat(stats.performance.hitRate.toFixed(4))}%` : '0%');
                 this.updateElement('cacheSize', this.formatBytes(stats.totalSize || 0));
-                this.updateElement('avgResponseTime', `${stats.avgResponseTime || 0}ms`);
-                this.updateElement('totalRequests', stats.totalRequests || '0');
+                this.updateElement('avgResponseTime', `${parseFloat((stats.performance?.avgResponseTime || 0).toFixed(4))}ms`);
+                this.updateElement('totalRequests', stats.operations ? 
+                    (stats.operations.save + stats.operations.get + stats.operations.remove + stats.operations.clear) : '0');
 
                 // Update change indicators
                 this.updateElement('cacheHitRateChange', 'עדכני');
@@ -162,6 +171,23 @@ class CacheTestPage {
                         }
                     } catch (error) {
                         console.warn(`Could not get stats for layer ${layer}:`, error);
+                        if (sizeElement) sizeElement.textContent = '--';
+                        if (entriesElement) entriesElement.textContent = '--';
+                    }
+                } else {
+                    // Fallback - try to get stats from the stats object
+                    try {
+                        const stats = await window.UnifiedCacheManager.getStats();
+                        if (stats.layers && stats.layers[layer]) {
+                            if (sizeElement) {
+                                sizeElement.textContent = this.formatBytes(stats.layers[layer].size || 0);
+                            }
+                            if (entriesElement) {
+                                entriesElement.textContent = stats.layers[layer].entries || '0';
+                            }
+                        }
+                    } catch (fallbackError) {
+                        console.warn(`Fallback stats failed for layer ${layer}:`, fallbackError);
                         if (sizeElement) sizeElement.textContent = '--';
                         if (entriesElement) entriesElement.textContent = '--';
                     }
@@ -255,14 +281,20 @@ class CacheTestPage {
 
     /**
      * Format bytes to human readable format
-     * עיצוב bytes לפורמט קריא
+     * עיצוב bytes לפורמט קריא - עד 4 ספרות אחרי הנקודה
      */
     formatBytes(bytes) {
         if (bytes === 0) return '0 B';
         const k = 1024;
         const sizes = ['B', 'KB', 'MB', 'GB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        const value = bytes / Math.pow(k, i);
+        
+        // הגבלת ל-4 ספרות אחרי הנקודה
+        const formatted = parseFloat(value.toFixed(4));
+        
+        // הסרת ספרות אפס מיותרות בסוף
+        return formatted.toString() + ' ' + sizes[i];
     }
 
     /**
@@ -352,6 +384,96 @@ document.addEventListener('DOMContentLoaded', () => {
 // Export global functions
 window.refreshCacheData = () => window.cacheTestPage?.refreshData();
 window.initializeCacheTestPage = () => window.cacheTestPage?.init();
+
+// ===== ADDITIONAL CACHE TEST PAGE FUNCTIONS =====
+
+/**
+ * Clear log display
+ * ניקוי תצוגת הלוג
+ */
+window.clearLog = function() {
+    const logContent = document.getElementById('logContent');
+    if (logContent) {
+        logContent.innerHTML = '<div class="log-entry">לוג נוקה</div>';
+    }
+};
+
+/**
+ * Export log to file
+ * ייצוא לוג לקובץ
+ */
+window.exportLog = function() {
+    const logContent = document.getElementById('logContent');
+    if (logContent) {
+        const logText = logContent.textContent || logContent.innerText;
+        const blob = new Blob([logText], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `cache-test-log-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        if (window.cacheTestPage) {
+            window.cacheTestPage.showSuccessMessage('לוג יוצא בהצלחה');
+        }
+    }
+};
+
+/**
+ * Toggle all sections visibility
+ * הצג/הסתר כל הסקשנים
+ */
+window.toggleAllSections = function() {
+    const sections = ['section1', 'section2', 'section3'];
+    const allVisible = sections.every(sectionId => {
+        const section = document.getElementById(sectionId);
+        return section && !section.classList.contains('d-none');
+    });
+    
+    sections.forEach(sectionId => {
+        const section = document.getElementById(sectionId);
+        if (section) {
+            if (allVisible) {
+                section.classList.add('d-none');
+            } else {
+                section.classList.remove('d-none');
+            }
+        }
+    });
+    
+    // Update toggle buttons
+    const toggleButtons = document.querySelectorAll('.section-toggle-icon');
+    toggleButtons.forEach(button => {
+        button.textContent = allVisible ? '▶' : '▼';
+    });
+};
+
+/**
+ * Add log entry
+ * הוספת ערך ללוג
+ */
+function addLogEntry(message, type = 'info') {
+    const logContent = document.getElementById('logContent');
+    if (logContent) {
+        const timestamp = new Date().toLocaleTimeString('he-IL');
+        const logEntry = document.createElement('div');
+        logEntry.className = `log-entry log-${type}`;
+        logEntry.innerHTML = `<span class="log-time">[${timestamp}]</span> <span class="log-message">${message}</span>`;
+        logContent.appendChild(logEntry);
+        logContent.scrollTop = logContent.scrollHeight;
+    }
+}
+
+// Initialize log with welcome message
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        addLogEntry('מערכת בדיקת מטמון הותחלה בהצלחה', 'success');
+        addLogEntry('כל הפונקציות זמינות לשימוש', 'info');
+    }, 1000);
+});
 
 
 // Generate detailed log for cache test page
@@ -507,6 +629,82 @@ function copyDetailedLog() {
     }
 }
 
+// ========================================
+// Cache Test Page Helper Functions
+// ========================================
+
+/**
+ * Show success message
+ */
+function showSuccessMessage(message, details = null) {
+    if (window.cacheTestPage) {
+        window.cacheTestPage.showSuccessMessage(message, details);
+    } else if (window.showNotification) {
+        window.showNotification(message, 'success');
+    } else {
+        console.log('✅ SUCCESS:', message, details);
+    }
+}
+
+/**
+ * Show warning message
+ */
+function showWarningMessage(message, details = null) {
+    if (window.cacheTestPage) {
+        window.cacheTestPage.showWarningMessage(message, details);
+    } else if (window.showNotification) {
+        window.showNotification(message, 'warning');
+    } else {
+        console.warn('⚠️ WARNING:', message, details);
+    }
+}
+
+/**
+ * Show error message
+ */
+function showErrorMessage(message, details = null) {
+    if (window.cacheTestPage) {
+        window.cacheTestPage.showErrorMessage(message, details);
+    } else if (window.showNotification) {
+        window.showNotification(message, 'error');
+    } else {
+        console.error('❌ ERROR:', message, details);
+    }
+}
+
+/**
+ * Clear log
+ */
+function clearLog() {
+    if (window.cacheTestPage) {
+        window.cacheTestPage.clearLog();
+    }
+}
+
+/**
+ * Export log
+ */
+function exportLog() {
+    if (window.cacheTestPage) {
+        window.cacheTestPage.exportLog();
+    }
+}
+
+/**
+ * Toggle all sections
+ */
+function toggleAllSections() {
+    if (window.toggleAllSections) {
+        window.toggleAllSections();
+    }
+}
+
 // Export functions to global scope
 window.copyDetailedLog = copyDetailedLog;
 window.generateDetailedLog = generateDetailedLog;
+window.showSuccessMessage = showSuccessMessage;
+window.showWarningMessage = showWarningMessage;
+window.showErrorMessage = showErrorMessage;
+window.clearLog = clearLog;
+window.exportLog = exportLog;
+window.toggleAllSections = toggleAllSections;

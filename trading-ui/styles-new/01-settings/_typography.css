@@ -7,22 +7,18 @@
  * קובץ זה מכיל את מערכת הטיפוגרפיה הגלובלית
  * עם תמיכה מלאה בעברית ו-RTL
  * 
- * @version 1.0.0
- * @lastUpdated January 5, 2025
+ * @version 1.1.0
+ * @lastUpdated January 21, 2025
  */
 
-/* Preload fonts for better performance */
-@font-face {
-  font-family: 'Noto Sans Hebrew';
-  font-display: swap;
-  src: url('https://fonts.gstatic.com/s/notosanshebrew/v50/or3HQ7v33eiDljA1IufXTtVf7V6RvEEdhQlk0LlGxCyaeNKYZC0sqk3xXGiXd4utog.ttf') format('truetype');
-  font-weight: 500;
-  font-style: normal;
-}
+/* Import Google Fonts - Heebo with all weights */
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+/* Fonts are loaded via Google Fonts @import above */
 
 :root {
   /* ===== גופנים - Fonts ===== */
-  --font-family-primary: 'Noto Sans Hebrew', 'Arial Hebrew', 'David', 'Miriam', 'FrankRuehl', 'Tahoma', 'Arial', sans-serif;
+  --font-family-primary: 'Heebo', 'Noto Sans Hebrew', 'Arial Hebrew', 'David', 'Miriam', 'FrankRuehl', 'Tahoma', 'Arial', sans-serif;
   --font-family-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
   
   /* ===== גדלי גופן - Font Sizes ===== */

@@ -163,6 +163,10 @@ class UnifiedCacheManager {
             this.updatePerformanceStats(responseTime, true);
             
             console.log(`✅ Saved ${key} to ${layer} layer (${responseTime.toFixed(2)}ms)`);
+            
+            // עדכון סטטיסטיקות בזמן אמת
+            this.updateStats().catch(console.warn);
+            
             return result;
             
         } catch (error) {
@@ -202,6 +206,10 @@ class UnifiedCacheManager {
                         this.updatePerformanceStats(responseTime, true);
                         
                         console.log(`✅ Retrieved ${key} from ${layer} layer (${responseTime.toFixed(2)}ms)`);
+                        
+                        // עדכון סטטיסטיקות בזמן אמת
+                        this.updateStats().catch(console.warn);
+                        
                         return data;
                     }
                 }
@@ -222,6 +230,9 @@ class UnifiedCacheManager {
             
             const responseTime = performance.now() - startTime;
             this.updatePerformanceStats(responseTime, false);
+            
+            // עדכון סטטיסטיקות בזמן אמת
+            this.updateStats().catch(console.warn);
             
             console.log(`❌ Key ${key} not found in any layer`);
             return null;
@@ -530,6 +541,7 @@ class UnifiedCacheManager {
      */
     async updateStats() {
         try {
+            // עדכון סטטיסטיקות שכבות
             for (const [layerName, layer] of Object.entries(this.layers)) {
                 if (layer && layer.getStats) {
                     const layerStats = await layer.getStats();
@@ -538,6 +550,19 @@ class UnifiedCacheManager {
                         size: layerStats.size || 0
                     };
                 }
+            }
+            
+            // עדכון סטטיסטיקות ביצועים
+            const totalOps = this.stats.operations.save + this.stats.operations.get + this.stats.operations.remove + this.stats.operations.clear;
+            if (totalOps > 0) {
+                // חישוב ממוצע זמן תגובה
+                if (this.responseTimes.length > 0) {
+                    this.stats.performance.avgResponseTime = this.responseTimes.reduce((a, b) => a + b, 0) / this.responseTimes.length;
+                }
+                
+                // חישוב שיעור פגיעות
+                this.stats.performance.hitRate = this.hits / totalOps;
+                this.stats.performance.missRate = 1 - this.stats.performance.hitRate;
             }
         } catch (error) {
             console.warn('⚠️ Failed to update layer stats:', error);
@@ -801,10 +826,17 @@ class IndexedDBLayer {
 class BackendCacheLayer {
     constructor() {
         this.cache = new Map();
+        this.initialized = false;
+        this.stats = {
+            layers: { backend: { entries: 0, size: 0 } },
+            operations: { save: 0, get: 0, remove: 0, clear: 0 },
+            performance: { avgResponseTime: 0, hitRate: 0, missRate: 0 }
+        };
     }
 
     async initialize() {
         this.cache.clear();
+        this.initialized = true;
         console.log('✅ Backend Cache Layer initialized');
     }
 
@@ -1195,16 +1227,60 @@ window.runCacheHealthCheck = async function() {
 
         console.log('🏥 Health check results:', healthResults);
         
-        // עדכון משוב בממשק
-        if (window.cacheTestPage) {
-            window.cacheTestPage.showSuccessMessage('בדיקת בריאות הושלמה', JSON.stringify(healthResults, null, 2));
+        // בדיקת תוצאות הבריאות
+        const healthyLayers = Object.values(healthResults).filter(r => r.status === 'healthy').length;
+        const totalLayers = Object.keys(healthResults).length;
+        
+        if (healthyLayers === totalLayers) {
+            // כל השכבות בריאות - הודעה מפורטת עם מודל
+            if (typeof window.showFinalSuccessNotification === 'function') {
+                window.showFinalSuccessNotification(
+                    'בדיקת בריאות מערכת מטמון הושלמה בהצלחה!',
+                    `בדיקת הבריאות של מערכת המטמון הושלמה בהצלחה.\n\nתוצאות הבדיקה:\n• Memory Layer: ${healthResults.memory.status === 'healthy' ? '✅ בריא' : '❌ בעייתי'} - ${healthResults.memory.details}\n• localStorage Layer: ${healthResults.localStorage.status === 'healthy' ? '✅ בריא' : '❌ בעייתי'} - ${healthResults.localStorage.details}\n• IndexedDB Layer: ${healthResults.indexedDB.status === 'healthy' ? '✅ בריא' : '❌ בעייתי'} - ${healthResults.indexedDB.details}\n• Backend Layer: ${healthResults.backend.status === 'healthy' ? '✅ בריא' : '❌ בעייתי'} - ${healthResults.backend.details}\n\nזמן בדיקה: ${new Date().toLocaleTimeString('he-IL')}\nסטטוס: כל שכבות המטמון בריאות`,
+                    {
+                        operation: 'cache-health-check',
+                        duration: `${Date.now()}ms`,
+                        timestamp: new Date().toISOString(),
+                        healthResults: healthResults,
+                        healthyLayers: healthyLayers,
+                        totalLayers: totalLayers,
+                        status: 'all-layers-healthy',
+                        healthCheck: 'כל שכבות המטמון פועלות תקין',
+                        nextAction: 'המערכת מוכנה לשימוש מלא'
+                    },
+                    'system'
+                );
+            } else {
+                console.log('✅ בדיקת בריאות הושלמה בהצלחה');
+            }
+        } else {
+            // חלק מהשכבות בעייתיות - הודעת שגיאה מפורטת עם מודל
+            const unhealthyLayers = Object.entries(healthResults)
+                .filter(([_, result]) => result.status !== 'healthy')
+                .map(([layer, result]) => `${layer}: ${result.details}`)
+                .join('\n• ');
+            
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification(
+                    'בדיקת בריאות מערכת מטמון זיהתה בעיות',
+                    `בדיקת הבריאות של מערכת המטמון זיהתה בעיות.\n\nפרטי הבדיקה:\n• שכבות בריאות: ${healthyLayers}/${totalLayers}\n• Memory Layer: ${healthResults.memory.status === 'healthy' ? '✅ בריא' : '❌ בעייתי'} - ${healthResults.memory.details}\n• localStorage Layer: ${healthResults.localStorage.status === 'healthy' ? '✅ בריא' : '❌ בעייתי'} - ${healthResults.localStorage.details}\n• IndexedDB Layer: ${healthResults.indexedDB.status === 'healthy' ? '✅ בריא' : '❌ בעייתי'} - ${healthResults.indexedDB.details}\n• Backend Layer: ${healthResults.backend.status === 'healthy' ? '✅ בריא' : '❌ בעייתי'} - ${healthResults.backend.details}\n\nזמן בדיקה: ${new Date().toLocaleTimeString('he-IL')}\n\nשכבות בעייתיות:\n• ${unhealthyLayers}\n\nהוראות:\n• חלק מהתכונות לא יהיו זמינות\n• ייתכן ביצועים מוגבלים במערכת המטמון\n• מומלץ לנסות אתחול חוזר של המערכת`,
+                    20000
+                );
+            } else {
+                console.error('❌ בדיקת בריאות זיהתה בעיות');
+            }
         }
 
         return healthResults;
     } catch (error) {
         console.error('❌ Health check failed:', error);
-        if (window.cacheTestPage) {
-            window.cacheTestPage.showErrorMessage('בדיקת בריאות נכשלה', error.message);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification(
+                'בדיקת בריאות מערכת מטמון נכשלה',
+                `בדיקת הבריאות של מערכת המטמון נכשלה.\n\nפרטי השגיאה:\n• שגיאה: ${error.message}\n• זמן: ${new Date().toLocaleTimeString('he-IL')}\n• מערכת: UnifiedCacheManager\n\nהוראות:\n• בדוק שמערכת המטמון אותחלה\n• נסה אתחול חוזר של המערכת\n• בדוק את הקונסול לפרטים נוספים`
+            );
+        } else {
+            console.error('❌ בדיקת בריאות נכשלה:', error.message);
         }
         return null;
     }
@@ -1262,16 +1338,60 @@ window.testCachePerformance = async function() {
 
         console.log('⚡ Performance test results:', performanceResults);
         
-        // עדכון משוב בממשק
-        if (window.cacheTestPage) {
-            window.cacheTestPage.showSuccessMessage('בדיקת ביצועים הושלמה', JSON.stringify(performanceResults, null, 2));
+        // בדיקת תוצאות הביצועים
+        const successfulTests = Object.values(performanceResults).filter(r => r.avgTime > 0).length;
+        const totalTests = Object.keys(performanceResults).length;
+        
+        if (successfulTests === totalTests) {
+            // כל הבדיקות הצליחו - הודעה מפורטת עם מודל
+            if (typeof window.showFinalSuccessNotification === 'function') {
+                window.showFinalSuccessNotification(
+                    'בדיקת ביצועים מערכת מטמון הושלמה בהצלחה!',
+                    `בדיקת הביצועים של מערכת המטמון הושלמה בהצלחה.\n\nתוצאות הביצועים:\n• Memory Layer: ${performanceResults.memory.avgTime.toFixed(4)}ms (${performanceResults.memory.operations} פעולות)\n• localStorage Layer: ${performanceResults.localStorage.avgTime.toFixed(4)}ms (${performanceResults.localStorage.operations} פעולות)\n• IndexedDB Layer: ${performanceResults.indexedDB.avgTime.toFixed(4)}ms (${performanceResults.indexedDB.operations} פעולות)\n• Backend Layer: ${performanceResults.backend.avgTime.toFixed(4)}ms (${performanceResults.backend.operations} פעולות)\n\nזמן בדיקה: ${new Date().toLocaleTimeString('he-IL')}\nסטטוס: כל שכבות המטמון מציגות ביצועים תקינים`,
+                    {
+                        operation: 'cache-performance-test',
+                        duration: `${Date.now()}ms`,
+                        timestamp: new Date().toISOString(),
+                        performanceResults: performanceResults,
+                        successfulTests: successfulTests,
+                        totalTests: totalTests,
+                        status: 'all-layers-performing-well',
+                        healthCheck: 'כל שכבות המטמון מציגות ביצועים תקינים',
+                        nextAction: 'המערכת מוכנה לשימוש מלא'
+                    },
+                    'performance'
+                );
+            } else {
+                console.log('✅ בדיקת ביצועים הושלמה בהצלחה');
+            }
+        } else {
+            // חלק מהבדיקות נכשלו - הודעת שגיאה מפורטת עם מודל
+            const failedTests = Object.entries(performanceResults)
+                .filter(([_, result]) => result.avgTime === 0)
+                .map(([layer, _]) => layer)
+                .join(', ');
+            
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification(
+                    'בדיקת ביצועים מערכת מטמון זיהתה בעיות',
+                    `בדיקת הביצועים של מערכת המטמון זיהתה בעיות.\n\nפרטי הביצועים:\n• בדיקות מוצלחות: ${successfulTests}/${totalTests}\n• Memory Layer: ${performanceResults.memory.avgTime.toFixed(4)}ms (${performanceResults.memory.operations} פעולות)\n• localStorage Layer: ${performanceResults.localStorage.avgTime.toFixed(4)}ms (${performanceResults.localStorage.operations} פעולות)\n• IndexedDB Layer: ${performanceResults.indexedDB.avgTime.toFixed(4)}ms (${performanceResults.indexedDB.operations} פעולות)\n• Backend Layer: ${performanceResults.backend.avgTime.toFixed(4)}ms (${performanceResults.backend.operations} פעולות)\n\nזמן בדיקה: ${new Date().toLocaleTimeString('he-IL')}\n\nשכבות בעייתיות: ${failedTests}\n\nהוראות:\n• חלק מהשכבות לא פועלות תקין\n• ייתכן ביצועים מוגבלים במערכת המטמון\n• מומלץ לנסות אתחול חוזר של המערכת`,
+                    20000
+                );
+            } else {
+                console.error('❌ בדיקת ביצועים זיהתה בעיות');
+            }
         }
 
         return performanceResults;
     } catch (error) {
         console.error('❌ Performance test failed:', error);
-        if (window.cacheTestPage) {
-            window.cacheTestPage.showErrorMessage('בדיקת ביצועים נכשלה', error.message);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification(
+                'בדיקת ביצועים מערכת מטמון נכשלה',
+                `בדיקת הביצועים של מערכת המטמון נכשלה.\n\nפרטי השגיאה:\n• שגיאה: ${error.message}\n• זמן: ${new Date().toLocaleTimeString('he-IL')}\n• מערכת: UnifiedCacheManager\n\nהוראות:\n• בדוק שמערכת המטמון אותחלה\n• נסה אתחול חוזר של המערכת\n• בדוק את הקונסול לפרטים נוספים`
+            );
+        } else {
+            console.error('❌ בדיקת ביצועים נכשלה:', error.message);
         }
         return null;
     }
@@ -2145,8 +2265,11 @@ window.clearCacheByCategory = async function(category) {
 
 /**
  * Initialize all cache systems
+ * @param {boolean} isInitialLoad - האם זה אתחול ראשוני (לא להציג הודעות מפורטות)
  */
-window.initializeAllCacheSystems = async function() {
+window.initializeAllCacheSystems = async function(isInitialLoad = false) {
+    const startTime = Date.now();
+    
     try {
         console.log('🚀 Initializing all cache systems...');
         
@@ -2191,25 +2314,53 @@ window.initializeAllCacheSystems = async function() {
         
         console.log('📊 Cache systems initialization results:', results);
         
-        if (window.cacheTestPage) {
-            const initializedCount = Object.values(results).filter(Boolean).length;
-            const totalCount = Object.keys(results).length;
+        const initializedCount = Object.values(results).filter(Boolean).length;
+        const totalCount = Object.keys(results).length;
+        
+        if (initializedCount === totalCount) {
+            if (isInitialLoad) {
+                // אתחול ראשוני - הודעה רגילה בלבד
+                if (typeof window.showNotification === 'function') {
+                    window.showNotification('מערכות מטמון אותחלו בהצלחה', 'success');
+                } else {
+                    console.log('✅ אתחול מערכות מטמון הושלם בהצלחה - כל המערכות פעילות');
+                }
+            } else {
+                // אתחול ידני - הודעה מפורטת עם מודל
+                if (typeof window.showFinalSuccessNotification === 'function') {
+                    window.showFinalSuccessNotification(
+                        'אתחול מערכות מטמון הושלם בהצלחה!',
+                        `כל מערכות המטמון אותחלו בהצלחה ומוכנות לשימוש.\n\nתוצאות אתחול:\n• UnifiedCacheManager: ✅ פעיל\n• CacheSyncManager: ✅ פעיל\n• CachePolicyManager: ✅ פעיל\n• MemoryOptimizer: ✅ פעיל\n\nזמן אתחול: ${new Date().toLocaleTimeString('he-IL')}\nסטטוס: כל המערכות פעילות`,
+                        {
+                            operation: 'initialize-all-cache-systems',
+                            duration: `${Date.now() - startTime}ms`,
+                            timestamp: new Date().toISOString(),
+                            systems: results,
+                            status: 'all-systems-active',
+                            healthCheck: 'כל מערכות המטמון פעילות ומוכנות',
+                            nextAction: 'המערכת מוכנה לבדיקות ופעולות מטמון'
+                        },
+                        'system'
+                    );
+                } else {
+                    console.log('✅ אתחול מערכות מטמון הושלם בהצלחה - כל המערכות פעילות');
+                }
+            }
+        } else {
+            // אתחול חלקי - הודעת שגיאה מפורטת עם מודל
+            const failedSystems = Object.entries(results)
+                .filter(([_, success]) => !success)
+                .map(([system, _]) => system)
+                .join(', ');
             
-            if (initializedCount === totalCount) {
-                window.cacheTestPage.showSuccessMessage(
-                    `✅ אתחול מערכות מטמון הושלם בהצלחה - ${initializedCount}/${totalCount} מערכות פעילות`,
-                    `תוצאות אתחול מפורטות:\n${JSON.stringify(results, null, 2)}\n\nכל המערכות אותחלו בהצלחה ומוכנות לשימוש.`
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification(
+                    'אתחול מערכות מטמון חלקי - חלק מהמערכות לא אותחלו',
+                    `אתחול מערכות המטמון הושלם חלקית.\n\nפרטי האתחול:\n• מערכות אותחלו: ${initializedCount}/${totalCount}\n• מערכות פעילות: ${Object.entries(results).filter(([_, success]) => success).map(([system, _]) => system).join(', ')}\n• מערכות שנכשלו: ${failedSystems}\n• זמן אתחול: ${new Date().toLocaleTimeString('he-IL')}\n\nבדיקת בריאות מערכות:\n• UnifiedCacheManager: ${results.unifiedCacheManager ? '✅ פעיל' : '❌ לא פעיל'}\n• CacheSyncManager: ${results.cacheSyncManager ? '✅ פעיל' : '❌ לא פעיל'}\n• CachePolicyManager: ${results.cachePolicyManager ? '✅ פעיל' : '❌ לא פעיל'}\n• MemoryOptimizer: ${results.memoryOptimizer ? '✅ פעיל' : '❌ לא פעיל'}\n\nהוראות:\n• המערכת תמשיך לעבוד במצב מוגבל\n• חלק מהתכונות המתקדמות לא יהיו זמינות\n• ניתן לנסות אתחול חוזר של המערכות`,
+                    20000
                 );
             } else {
-                const failedSystems = Object.entries(results)
-                    .filter(([_, success]) => !success)
-                    .map(([system, _]) => system)
-                    .join(', ');
-                
-                window.cacheTestPage.showWarningMessage(
-                    `⚠️ אתחול מערכות מטמון חלקי - ${initializedCount}/${totalCount} מערכות פעילות`,
-                    `תוצאות אתחול מפורטות:\n${JSON.stringify(results, null, 2)}\n\nמערכות שלא אותחלו: ${failedSystems}\n\nהמערכת תמשיך לעבוד במצב מוגבל.`
-                );
+                console.error('⚠️ אתחול מערכות מטמון חלקי - חלק מהמערכות לא אותחלו');
             }
         }
         
@@ -2254,24 +2405,45 @@ window.getCacheSystemStatus = function() {
         console.log('📊 Cache system status:', status);
         
         // הצגת סטטוס מפורט דרך מערכת ההודעות
-        if (window.cacheTestPage) {
-            const activeSystems = Object.entries(status)
-                .filter(([_, info]) => info.available && info.initialized)
-                .map(([system, _]) => system);
-            const inactiveSystems = Object.entries(status)
-                .filter(([_, info]) => !info.available || !info.initialized)
-                .map(([system, _]) => system);
-            
-            if (inactiveSystems.length === 0) {
-                window.cacheTestPage.showSuccessMessage(
-                    `✅ סטטוס מערכות מטמון - כל המערכות פעילות (${activeSystems.length}/4)`,
-                    `מערכות פעילות: ${activeSystems.join(', ')}\n\nסטטיסטיקות מפורטות:\n${JSON.stringify(status, null, 2)}\n\nכל מערכות המטמון פועלות בצורה תקינה.`
+        const activeSystems = Object.entries(status)
+            .filter(([_, info]) => info.available && info.initialized)
+            .map(([system, _]) => system);
+        const inactiveSystems = Object.entries(status)
+            .filter(([_, info]) => !info.available || !info.initialized)
+            .map(([system, _]) => system);
+        
+        if (inactiveSystems.length === 0) {
+            // כל המערכות פעילות - הודעה מפורטת עם מודל
+            if (typeof window.showFinalSuccessNotification === 'function') {
+                window.showFinalSuccessNotification(
+                    'בדיקת סטטוס מערכות מטמון - כל המערכות פעילות!',
+                    `בדיקת סטטוס מערכות המטמון הושלמה בהצלחה.\n\nתוצאות הבדיקה:\n• UnifiedCacheManager: ✅ פעיל ומוכן\n• CacheSyncManager: ✅ פעיל ומוכן\n• CachePolicyManager: ✅ פעיל ומוכן\n• MemoryOptimizer: ✅ פעיל ומוכן\n\nזמן בדיקה: ${new Date().toLocaleTimeString('he-IL')}\nסטטוס: כל המערכות פועלות תקין`,
+                    {
+                        operation: 'cache-system-status-check',
+                        duration: `${Date.now()}ms`,
+                        timestamp: new Date().toISOString(),
+                        systems: status,
+                        activeSystems: activeSystems,
+                        inactiveSystems: inactiveSystems,
+                        status: 'all-systems-healthy',
+                        healthCheck: 'כל מערכות המטמון פועלות בצורה תקינה',
+                        nextAction: 'המערכת מוכנה לכל פעולות המטמון'
+                    },
+                    'system'
                 );
             } else {
-                window.cacheTestPage.showWarningMessage(
-                    `⚠️ סטטוס מערכות מטמון - ${activeSystems.length}/4 מערכות פעילות`,
-                    `מערכות פעילות: ${activeSystems.join(', ')}\nמערכות לא פעילות: ${inactiveSystems.join(', ')}\n\nסטטיסטיקות מפורטות:\n${JSON.stringify(status, null, 2)}\n\nחלק מהמערכות לא פעילות - ייתכן ביצועים מוגבלים.`
+                console.log('✅ סטטוס מערכות מטמון - כל המערכות פעילות');
+            }
+        } else {
+            // חלק מהמערכות לא פעילות - הודעת שגיאה מפורטת עם מודל
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification(
+                    'בדיקת סטטוס מערכות מטמון - חלק מהמערכות לא פעילות',
+                    `בדיקת סטטוס מערכות המטמון זיהתה בעיות.\n\nפרטי הבדיקה:\n• מערכות פעילות: ${activeSystems.length}/4\n• מערכות פעילות: ${activeSystems.join(', ')}\n• מערכות לא פעילות: ${inactiveSystems.join(', ')}\n• זמן בדיקה: ${new Date().toLocaleTimeString('he-IL')}\n\nבדיקת בריאות מפורטת:\n• UnifiedCacheManager: ${status.unifiedCacheManager.available && status.unifiedCacheManager.initialized ? '✅ פעיל' : '❌ לא פעיל'}\n• CacheSyncManager: ${status.cacheSyncManager.available && status.cacheSyncManager.initialized ? '✅ פעיל' : '❌ לא פעיל'}\n• CachePolicyManager: ${status.cachePolicyManager.available && status.cachePolicyManager.initialized ? '✅ פעיל' : '❌ לא פעיל'}\n• MemoryOptimizer: ${status.memoryOptimizer.available && status.memoryOptimizer.initialized ? '✅ פעיל' : '❌ לא פעיל'}\n\nהוראות:\n• חלק מהתכונות המתקדמות לא יהיו זמינות\n• ייתכן ביצועים מוגבלים במערכת המטמון\n• מומלץ לנסות אתחול חוזר של המערכות`,
+                    20000
                 );
+            } else {
+                console.error('⚠️ סטטוס מערכות מטמון - חלק מהמערכות לא פעילות');
             }
         }
         
@@ -2345,15 +2517,42 @@ window.testCacheSystemsIntegration = async function() {
         
         console.log('🧪 Cache systems integration test results:', testResults);
         
-        if (window.cacheTestPage) {
-            const workingCount = Object.values(testResults).filter(Boolean).length;
-            const totalCount = Object.keys(testResults).length;
-            const message = `בדיקת אינטגרציה: ${workingCount}/${totalCount} מערכות עובדות`;
-            
-            if (testResults.integration) {
-                window.cacheTestPage.showSuccessMessage(message, JSON.stringify(testResults, null, 2));
+        const workingCount = Object.values(testResults).filter(Boolean).length;
+        const totalCount = Object.keys(testResults).length;
+        
+        if (testResults.integration) {
+            // אינטגרציה עובדת - הודעה מפורטת עם מודל
+            if (typeof window.showFinalSuccessNotification === 'function') {
+                window.showFinalSuccessNotification(
+                    'בדיקת אינטגרציה מערכות מטמון הושלמה בהצלחה!',
+                    `בדיקת האינטגרציה בין מערכות המטמון הושלמה בהצלחה.\n\nתוצאות הבדיקה:\n• UnifiedCacheManager: ${testResults.unifiedCacheManager ? '✅ עובד' : '❌ לא עובד'}\n• CacheSyncManager: ${testResults.cacheSyncManager ? '✅ עובד' : '❌ לא עובד'}\n• CachePolicyManager: ${testResults.cachePolicyManager ? '✅ עובד' : '❌ לא עובד'}\n• MemoryOptimizer: ${testResults.memoryOptimizer ? '✅ עובד' : '❌ לא עובד'}\n• אינטגרציה כללית: ${testResults.integration ? '✅ תקינה' : '❌ לא תקינה'}\n\nזמן בדיקה: ${new Date().toLocaleTimeString('he-IL')}\nסטטוס: ${workingCount}/${totalCount} מערכות עובדות`,
+                    {
+                        operation: 'cache-systems-integration-test',
+                        duration: `${Date.now()}ms`,
+                        timestamp: new Date().toISOString(),
+                        testResults: testResults,
+                        workingSystems: workingCount,
+                        totalSystems: totalCount,
+                        integrationStatus: testResults.integration,
+                        status: 'integration-successful',
+                        healthCheck: 'כל מערכות המטמון מתחברות תקין',
+                        nextAction: 'המערכת מוכנה לשימוש מלא'
+                    },
+                    'system'
+                );
             } else {
-                window.cacheTestPage.showErrorMessage(message, JSON.stringify(testResults, null, 2));
+                console.log('✅ בדיקת אינטגרציה הושלמה בהצלחה');
+            }
+        } else {
+            // אינטגרציה לא עובדת - הודעת שגיאה מפורטת עם מודל
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification(
+                    'בדיקת אינטגרציה מערכות מטמון נכשלה - בעיות זוהו',
+                    `בדיקת האינטגרציה בין מערכות המטמון זיהתה בעיות.\n\nפרטי הבדיקה:\n• מערכות עובדות: ${workingCount}/${totalCount}\n• UnifiedCacheManager: ${testResults.unifiedCacheManager ? '✅ עובד' : '❌ לא עובד'}\n• CacheSyncManager: ${testResults.cacheSyncManager ? '✅ עובד' : '❌ לא עובד'}\n• CachePolicyManager: ${testResults.cachePolicyManager ? '✅ עובד' : '❌ לא עובד'}\n• MemoryOptimizer: ${testResults.memoryOptimizer ? '✅ עובד' : '❌ לא עובד'}\n• אינטגרציה כללית: ${testResults.integration ? '✅ תקינה' : '❌ לא תקינה'}\n\nזמן בדיקה: ${new Date().toLocaleTimeString('he-IL')}\n\nבדיקת בריאות מפורטת:\n• מערכות תקינות: ${Object.entries(testResults).filter(([_, working]) => working).map(([system, _]) => system).join(', ')}\n• מערכות בעייתיות: ${Object.entries(testResults).filter(([_, working]) => !working).map(([system, _]) => system).join(', ')}\n\nהוראות:\n• חלק מהתכונות המתקדמות לא יהיו זמינות\n• ייתכן ביצועים מוגבלים במערכת המטמון\n• מומלץ לנסות אתחול חוזר של המערכות`,
+                    20000
+                );
+            } else {
+                console.error('❌ בדיקת אינטגרציה נכשלה');
             }
         }
         
@@ -2423,15 +2622,46 @@ window.clearAllCacheSystems = async function() {
         
         console.log('🧹 Cache systems clear results:', results);
         
-        if (window.cacheTestPage) {
-            const clearedCount = Object.values(results).filter(Boolean).length;
-            const totalCount = Object.keys(results).length;
-            const message = `ניקוי מערכות מטמון: ${clearedCount}/${totalCount} נוקו`;
-            
-            if (clearedCount === totalCount) {
-                window.cacheTestPage.showSuccessMessage(message, JSON.stringify(results, null, 2));
+        const clearedCount = Object.values(results).filter(Boolean).length;
+        const totalCount = Object.keys(results).length;
+        
+        if (clearedCount === totalCount) {
+            // ניקוי מלא - הודעה מפורטת עם מודל
+            if (typeof window.showFinalSuccessNotification === 'function') {
+                window.showFinalSuccessNotification(
+                    'ניקוי מערכות מטמון הושלם בהצלחה!',
+                    `ניקוי כל מערכות המטמון הושלם בהצלחה.\n\nתוצאות הניקוי:\n• UnifiedCacheManager: ✅ נוקה\n• CacheSyncManager: ✅ נוקה\n• CachePolicyManager: ✅ נוקה\n• MemoryOptimizer: ✅ נוקה\n\nזמן ניקוי: ${new Date().toLocaleTimeString('he-IL')}\nסטטוס: כל המערכות נוקו בהצלחה`,
+                    {
+                        operation: 'clear-all-cache-systems',
+                        duration: `${Date.now()}ms`,
+                        timestamp: new Date().toISOString(),
+                        results: results,
+                        clearedSystems: clearedCount,
+                        totalSystems: totalCount,
+                        status: 'all-systems-cleared',
+                        healthCheck: 'כל מערכות המטמון נוקו ונמצאות במצב נקי',
+                        nextAction: 'המערכת מוכנה לפעולות מטמון חדשות'
+                    },
+                    'system'
+                );
             } else {
-                window.cacheTestPage.showWarningMessage(message, JSON.stringify(results, null, 2));
+                console.log('✅ ניקוי מערכות מטמון הושלם בהצלחה');
+            }
+        } else {
+            // ניקוי חלקי - הודעת שגיאה מפורטת עם מודל
+            const failedSystems = Object.entries(results)
+                .filter(([_, success]) => !success)
+                .map(([system, _]) => system)
+                .join(', ');
+            
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification(
+                    'ניקוי מערכות מטמון חלקי - חלק מהמערכות לא נוקו',
+                    `ניקוי מערכות המטמון הושלם חלקית.\n\nפרטי הניקוי:\n• מערכות שנוקו: ${clearedCount}/${totalCount}\n• מערכות שנוקו: ${Object.entries(results).filter(([_, success]) => success).map(([system, _]) => system).join(', ')}\n• מערכות שנכשלו: ${failedSystems}\n• זמן ניקוי: ${new Date().toLocaleTimeString('he-IL')}\n\nבדיקת בריאות מפורטת:\n• UnifiedCacheManager: ${results.unifiedCacheManager ? '✅ נוקה' : '❌ לא נוקה'}\n• CacheSyncManager: ${results.cacheSyncManager ? '✅ נוקה' : '❌ לא נוקה'}\n• CachePolicyManager: ${results.cachePolicyManager ? '✅ נוקה' : '❌ לא נוקה'}\n• MemoryOptimizer: ${results.memoryOptimizer ? '✅ נוקה' : '❌ לא נוקה'}\n\nהוראות:\n• חלק מהמערכות לא נוקו - ייתכן נתונים ישנים\n• מומלץ לנסות ניקוי חוזר של המערכות\n• ניתן לנסות ניקוי ידני של כל מערכת בנפרד`,
+                    20000
+                );
+            } else {
+                console.error('⚠️ ניקוי מערכות מטמון חלקי - חלק מהמערכות לא נוקו');
             }
         }
         

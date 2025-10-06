@@ -464,6 +464,7 @@ class MemoryOptimizer {
                             }
                             cleanedItems++;
                             savedMemory += typeof value === 'string' ? value.length : JSON.stringify(value).length;
+                        }
                     }
                 }
             }

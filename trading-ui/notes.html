@@ -94,11 +94,11 @@
             <div class="top-section" data-section="top">
                 <!-- Main header -->
                 <div class="section-header">
-                    <div class="table-title">
+                    <h1>
                         <img src="images/icons/home.svg" alt="הערות" class="section-icon">
                         הערות
-                    </div>
-                    <div class="table-actions">
+                    </h1>
+                    <div class="header-actions">
                         <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים וההערות">
                             <i class="fas fa-copy"></i> העתק לוג מפורט
                         </button>
@@ -128,18 +128,18 @@
                 <div class="content-section" id="main" data-section="main">
                     <!-- Notes header -->
                     <div class="section-header">
-                        <div class="table-title">
+                        <h2>
                             <img src="images/icons/home.svg" alt="ניהול הערות" class="section-icon">
                             ניהול הערות
-                        </div>
-                        <div class="table-count" id="notesCount">טוען...</div>
-                        <div class="table-actions">
+                            <span class="table-count" id="notesCount">טוען...</span>
+                        </h2>
+                        <div class="header-actions">
                             <button id="addNoteBtn" class="refresh-btn" onclick="showAddNoteModal()" title="הוסף הערה חדשה">
                                 <img src="images/icons/home.svg" alt="הוסף" class="action-icon">
                                 הוסף
                             </button>
                             <button class="filter-toggle-btn" onclick="toggleSection('main')" title="הצג/הסתר אזור ניהול הערות">
-                                <span class="filter-icon">▲</span>
+                                <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
                     </div>

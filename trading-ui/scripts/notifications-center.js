@@ -3,6 +3,7 @@
  * ===============================
  *
  * מרכז התראות מרכזי עם ניהול היסטוריה והגדרות
+ * מעודכן למערכת הכללית החדשה עם 8 מודולים מאוחדים
  *
  * Features:
  * - ניהול התראות בזמן אמת
@@ -10,24 +11,33 @@
  * - הגדרות התראות אישיות
  * - סטטיסטיקות התראות
  * - קובץ לוג להיסטוריה
+ * - אינטגרציה עם המערכת החדשה
  *
  * Dependencies:
- * - notification-system.js
+ * - modules/core-systems.js (מערכת התראות חדשה)
  * - realtime-notifications-client.js
+ * - unified-log-system
  *
  * @author TikTrack Development Team
- * @version 1.0.0
- * @lastUpdated September 4, 2025 - Fixed function calls + debug log
+ * @version 2.0.0
+ * @lastUpdated January 6, 2025 - Updated to New General Systems Architecture
  */
 
 // ===== GLOBAL FUNCTIONS (defined early for class access) =====
 
 /**
- * Initialize notifications center page
+ * Initialize notifications center page - Updated for New System
  */
 async function initializeNotificationsCenter() {
     try {
-        console.log('🚀 Initializing Notifications Center...');
+        console.log('🚀 Initializing Notifications Center (New System v2.0.0)...');
+        
+        // בדיקה שהמערכת החדשה זמינה
+        if (typeof window.showSuccessNotification !== 'function') {
+            console.error('❌ New notification system not available');
+            alert('מערכת ההתראות החדשה לא נטענה. בדוק את הטעינה של modules/core-systems.js');
+            return;
+        }
         
         // Initialize the notifications center instance
         if (!window.notificationsCenter) {
@@ -48,15 +58,25 @@ async function initializeNotificationsCenter() {
         setTimeout(async () => {
             try {
                 await loadNotificationLog();
-                console.log('✅ Notification log loaded after page initialization');
+                console.log('✅ Notification log loaded after page initialization (New System)');
             } catch (error) {
                 console.error('❌ Failed to load notification log:', error);
             }
         }, 1000); // Wait 1 second after page load
         
-        console.log('✅ Notifications Center initialized successfully');
+        console.log('✅ Notifications Center initialized successfully (New System v2.0.0)');
+        
+        // הצגת הודעת הצלחה
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('מרכז התראות אותחל בהצלחה', 'מרכז התראות אותחל בהצלחה במערכת החדשה v2.0.0', 3000, 'system');
+        }
     } catch (error) {
         console.error('❌ Failed to initialize Notifications Center:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה באתחול מרכז התראות', 'שגיאה באתחול מרכז התראות במערכת החדשה: ' + error.message, 5000, 'system');
+        } else {
+            alert('שגיאה באתחול מרכז התראות: ' + error.message);
+        }
     }
 }
 
@@ -391,7 +411,7 @@ class NotificationsCenter {
     this.setupWebSocketEvents();
 
     // טעינת היסטוריה
-    this.loadHistory().then(() => {
+    this.loadHistory().then(async () => {
       console.log('✅ היסטוריה נטענה בהצלחה');
       // עדכון סטטיסטיקות אחרי טעינת ההיסטוריה
       this.updateStats();
@@ -425,7 +445,7 @@ class NotificationsCenter {
     // הגדרות התראות הועברו למערכת ההעדפות הגלובלית
 
     // עדכון סטטיסטיקות
-    await this.updateStatsUI();
+    this.updateStatsUI();
     
     // בדיקת חיבור WebSocket אחרי טעינה
     setTimeout(() => {
@@ -557,8 +577,8 @@ class NotificationsCenter {
 
     // עדכון UI
     this.updateHistoryUI();
-    await this.updateStatsUI();
-    await this.updateOverviewStats();
+    this.updateStatsUI();
+    this.updateOverviewStats();
 
     // שמירה ללוקל סטורג' - הוסרה כי המערכת עברה ל-IndexedDB
     // this.saveToLocalStorage(); - הוסרה
@@ -1022,8 +1042,8 @@ class NotificationsCenter {
 
     // עדכון UI
     this.updateHistoryUI();
-    await this.updateStatsUI();
-    await this.updateOverviewStats();
+    this.updateStatsUI();
+    this.updateOverviewStats();
   }
 
   loadPageFilterOptions() {
@@ -1602,54 +1622,62 @@ function filterHistory() {
   }
 }
 
-// פונקציות בדיקת התראות - קריאות סטנדרטיות למערכת ההודעות
+// פונקציות בדיקת התראות - מעודכנות למערכת החדשה
 function testSuccessNotification() {
-  console.log('🧪 Testing success notification...');
+  console.log('🧪 Testing success notification (New System)...');
   
-  // קריאה סטנדרטית למערכת ההודעות כמו בכל עמוד אחר
+  // בדיקה שהמערכת החדשה זמינה
   if (typeof window.showSuccessNotification === 'function') {
-    window.showSuccessNotification('בדיקת הצלחה', 'זוהי הודעת הצלחה לבדיקה - הכל עובד תקין!', 4000);
+    window.showSuccessNotification('בדיקת הצלחה', 'זוהי הודעת הצלחה לבדיקה במערכת החדשה - הכל עובד תקין!', 4000, 'system');
   } else {
-    console.error('❌ showSuccessNotification לא זמין');
+    console.error('❌ showSuccessNotification לא זמין - המערכת החדשה לא נטענה');
+    // Fallback למקרה שהמערכת החדשה לא נטענה
+    alert('מערכת ההתראות החדשה לא נטענה. בדוק את הטעינה של modules/core-systems.js');
   }
 }
 
 function testErrorNotification() {
-  console.log('🧪 Testing error notification...');
+  console.log('🧪 Testing error notification (New System)...');
   
-  // קריאה סטנדרטית למערכת ההודעות כמו בכל עמוד אחר
+  // בדיקה שהמערכת החדשה זמינה
   if (typeof window.showErrorNotification === 'function') {
-    window.showErrorNotification('בדיקת שגיאה', 'זוהי הודעת שגיאה לבדיקה - הכל עובד תקין!', 6000);
+    window.showErrorNotification('בדיקת שגיאה', 'זוהי הודעת שגיאה לבדיקה במערכת החדשה - הכל עובד תקין!', 6000, 'system');
   } else {
-    console.error('❌ showErrorNotification לא זמין');
+    console.error('❌ showErrorNotification לא זמין - המערכת החדשה לא נטענה');
+    // Fallback למקרה שהמערכת החדשה לא נטענה
+    alert('מערכת ההתראות החדשה לא נטענה. בדוק את הטעינה של modules/core-systems.js');
   }
 }
 
 function testWarningNotification() {
-  console.log('🧪 Testing warning notification...');
+  console.log('🧪 Testing warning notification (New System)...');
   
-  // קריאה סטנדרטית למערכת ההודעות כמו בכל עמוד אחר
+  // בדיקה שהמערכת החדשה זמינה
   if (typeof window.showWarningNotification === 'function') {
-    window.showWarningNotification('בדיקת אזהרה', 'זוהי הודעת אזהרה לבדיקה - הכל עובד תקין!', 5000);
+    window.showWarningNotification('בדיקת אזהרה', 'זוהי הודעת אזהרה לבדיקה במערכת החדשה - הכל עובד תקין!', 5000, 'system');
   } else {
-    console.error('❌ showWarningNotification לא זמין');
+    console.error('❌ showWarningNotification לא זמין - המערכת החדשה לא נטענה');
+    // Fallback למקרה שהמערכת החדשה לא נטענה
+    alert('מערכת ההתראות החדשה לא נטענה. בדוק את הטעינה של modules/core-systems.js');
   }
 }
 
 function testInfoNotification() {
-  console.log('🧪 Testing info notification...');
+  console.log('🧪 Testing info notification (New System)...');
   
-  // קריאה סטנדרטית למערכת ההודעות כמו בכל עמוד אחר
+  // בדיקה שהמערכת החדשה זמינה
   if (typeof window.showInfoNotification === 'function') {
-    window.showInfoNotification('בדיקת מידע', 'זוהי הודעת מידע לבדיקה - הכל עובד תקין!', 4000);
+    window.showInfoNotification('בדיקת מידע', 'זוהי הודעת מידע לבדיקה במערכת החדשה - הכל עובד תקין!', 4000, 'system');
   } else {
-    console.error('❌ showInfoNotification לא זמין');
+    console.error('❌ showInfoNotification לא זמין - המערכת החדשה לא נטענה');
+    // Fallback למקרה שהמערכת החדשה לא נטענה
+    alert('מערכת ההתראות החדשה לא נטענה. בדוק את הטעינה של modules/core-systems.js');
   }
 }
 
-// בדיקת הודעות אישור
+// בדיקת הודעות אישור - מעודכנת למערכת החדשה
 function testConfirmationDialog() {
-  console.log('🧪 Testing confirmation dialog...');
+  console.log('🧪 Testing confirmation dialog (New System)...');
   console.log('🔍 showConfirmationDialog type:', typeof window.showConfirmationDialog);
   console.log('🔍 showConfirmationDialog function:', window.showConfirmationDialog);
   
@@ -1657,15 +1685,23 @@ function testConfirmationDialog() {
     console.log('✅ Calling showConfirmationDialog...');
     try {
       window.showConfirmationDialog(
-        'בדיקת אישור',
-        'האם אתה בטוח שברצונך לבצע את הפעולה הזו?',
+        'בדיקת אישור - מערכת חדשה',
+        'האם אתה בטוח שברצונך לבצע את הפעולה הזו במערכת החדשה?',
         () => {
           console.log('✅ User confirmed');
-          window.showSuccessNotification('אישור', 'המשתמש אישר את הפעולה', 3000, 'system');
+          if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('אישור', 'המשתמש אישר את הפעולה במערכת החדשה', 3000, 'system');
+          } else {
+            alert('המשתמש אישר את הפעולה');
+          }
         },
         () => {
           console.log('❌ User cancelled');
-          window.showInfoNotification('ביטול', 'המשתמש ביטל את הפעולה', 3000, 'system');
+          if (typeof window.showInfoNotification === 'function') {
+            window.showInfoNotification('ביטול', 'המשתמש ביטל את הפעולה במערכת החדשה', 3000, 'system');
+          } else {
+            alert('המשתמש ביטל את הפעולה');
+          }
         }
       );
       console.log('✅ showConfirmationDialog called successfully');
@@ -1673,13 +1709,14 @@ function testConfirmationDialog() {
       console.error('❌ Error calling showConfirmationDialog:', error);
     }
   } else {
-    console.error('❌ showConfirmationDialog לא זמין');
+    console.error('❌ showConfirmationDialog לא זמין - המערכת החדשה לא נטענה');
+    alert('מערכת ההתראות החדשה לא נטענה. בדוק את הטעינה של modules/core-systems.js');
   }
 }
 
-// בדיקת מודל פרטים
+// בדיקת מודל פרטים - מעודכנת למערכת החדשה
 function testDetailsModal() {
-  console.log('🧪 Testing details modal...');
+  console.log('🧪 Testing details modal (New System)...');
   console.log('🔍 showDetailsModal type:', typeof window.showDetailsModal);
   console.log('🔍 showDetailsModal function:', window.showDetailsModal);
   
@@ -1688,21 +1725,24 @@ function testDetailsModal() {
     try {
       const detailsContent = `
         <div class="details-content">
-          <h5>פרטי בדיקה</h5>
+          <h5>פרטי בדיקה - מערכת חדשה</h5>
           <p><strong>זמן:</strong> ${new Date().toLocaleString('he-IL')}</p>
           <p><strong>דף:</strong> ${window.location.pathname}</p>
           <p><strong>משתמש:</strong> בדיקה</p>
-          <p><strong>סטטוס:</strong> פעיל</p>
+          <p><strong>סטטוס:</strong> פעיל במערכת החדשה</p>
+          <p><strong>מערכת:</strong> New General Systems Architecture</p>
+          <p><strong>גרסה:</strong> 2.0.0</p>
         </div>
       `;
       
-      window.showDetailsModal('בדיקת מודל פרטים', detailsContent);
+      window.showDetailsModal('בדיקת מודל פרטים - מערכת חדשה', detailsContent);
       console.log('✅ showDetailsModal called successfully');
     } catch (error) {
       console.error('❌ Error calling showDetailsModal:', error);
     }
   } else {
-    console.error('❌ showDetailsModal לא זמין');
+    console.error('❌ showDetailsModal לא זמין - המערכת החדשה לא נטענה');
+    alert('מערכת ההתראות החדשה לא נטענה. בדוק את הטעינה של modules/core-systems.js');
   }
 }
 
@@ -1819,22 +1859,24 @@ function testSimpleErrorNotification() {
   }
 }
 
-// בדיקת הודעת הצלחה סופית
+// בדיקת הודעת הצלחה סופית - מעודכנת למערכת החדשה
 function testFinalSuccessNotification() {
-  console.log('🧪 Testing final success notification...');
+  console.log('🧪 Testing final success notification (New System)...');
   
   if (typeof window.showFinalSuccessNotification === 'function') {
     console.log('✅ Calling showFinalSuccessNotification...');
     try {
       window.showFinalSuccessNotification(
-        'תהליך הושלם בהצלחה!',
-        'הפעולה שביצעת הושלמה בהצלחה עם כל הפרטים המפורטים',
+        'תהליך הושלם בהצלחה - מערכת חדשה!',
+        'הפעולה שביצעת הושלמה בהצלחה במערכת החדשה עם כל הפרטים המפורטים',
         {
-          operation: 'test-operation',
+          operation: 'test-operation-new-system',
           result: 'success',
           itemsProcessed: 42,
           duration: '2.5 seconds',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          system: 'New General Systems Architecture',
+          version: '2.0.0'
         },
         'system'
       );
@@ -1843,7 +1885,8 @@ function testFinalSuccessNotification() {
       console.error('❌ Error calling showFinalSuccessNotification:', error);
     }
   } else {
-    console.error('❌ showFinalSuccessNotification לא זמין');
+    console.error('❌ showFinalSuccessNotification לא זמין - המערכת החדשה לא נטענה');
+    alert('מערכת ההתראות החדשה לא נטענה. בדוק את הטעינה של modules/core-systems.js');
   }
 }
 
@@ -1853,13 +1896,25 @@ async function copyDetailedLog() {
     const detailedLog = await generateDetailedLog();
     if (detailedLog) {
       await navigator.clipboard.writeText(detailedLog);
-      window.showSuccessNotification('לוג מפורט הועתק ללוח');
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('לוג מפורט הועתק ללוח', 'הלוג המפורט הועתק ללוח בהצלחה במערכת החדשה', 3000, 'system');
+      } else {
+        alert('לוג מפורט הועתק ללוח');
+      }
     } else {
-      window.showWarningNotification('אין לוג להעתקה');
+      if (typeof window.showWarningNotification === 'function') {
+        window.showWarningNotification('אין לוג להעתקה', 'לא נמצא לוג להעתקה במערכת החדשה', 3000, 'system');
+      } else {
+        alert('אין לוג להעתקה');
+      }
     }
   } catch (err) {
     console.error('שגיאה בהעתקה:', err);
-    window.showErrorNotification('שגיאה בהעתקת הלוג');
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהעתקת הלוג', 'שגיאה בהעתקת הלוג במערכת החדשה: ' + err.message, 5000, 'system');
+    } else {
+      alert('שגיאה בהעתקת הלוג: ' + err.message);
+    }
   }
 }
 
@@ -2002,9 +2057,10 @@ async function generateDetailedLog() {
     const timestamp = new Date().toLocaleString('he-IL');
     const log = [];
 
-    log.push('=== לוג מפורט - מרכז התראות TikTrack ===');
+    log.push('=== לוג מפורט - מרכז התראות TikTrack (מערכת חדשה) ===');
     log.push(`זמן יצירה: ${timestamp}`);
     log.push(`עמוד: ${window.location.href}`);
+    log.push(`מערכת: New General Systems Architecture v2.0.0`);
     log.push('');
     
     // סטטוס כללי
@@ -2114,7 +2170,8 @@ async function generateDetailedLog() {
     
     // סטטוס חיבור
     log.push('--- סטטוס מערכת ---');
-    log.push(`סטטוס מערכת: פעיל`);
+    log.push(`סטטוס מערכת: פעיל במערכת החדשה`);
+    log.push(`מערכת: New General Systems Architecture v2.0.0`);
     log.push(`מקור נתונים: ${window.UnifiedLogAPI ? 'לוג מאוחד' : 'localStorage'}`);
     log.push(`זמן עדכון: ${new Date().toLocaleString('he-IL')}`);
     
@@ -2136,7 +2193,7 @@ async function generateDetailedLog() {
             log.push(`עדכון אחרון: ${new Date(lastTime).toLocaleString('he-IL')}`);
         }
     }
-    log.push(`סטטוס: פעיל`);
+    log.push(`סטטוס: פעיל במערכת החדשה`);
 
     // היסטוריית התראות (10 האחרונות)
     log.push('--- היסטוריית התראות (10 האחרונות) ---');
@@ -2356,43 +2413,80 @@ async function exportAllLogs() {
 }
 
 /**
- * Load notification log automatically on page load
+ * Load notification log automatically on page load - Updated for New System
  */
 async function loadNotificationLog() {
     try {
-        console.log('📊 Loading notification log automatically...');
+        console.log('📊 Loading notification log automatically (New System)...');
         
-        await window.showNotificationLog('notification-log-container', {
-            displayConfig: 'default',
-            autoRefresh: true,
-            refreshInterval: 10000
-        });
-        
-        console.log('✅ Notification log loaded successfully');
+        // בדיקה שהמערכת החדשה זמינה
+        if (typeof window.showNotificationLog === 'function') {
+            await window.showNotificationLog('notification-log-container', {
+                displayConfig: 'default',
+                autoRefresh: true,
+                refreshInterval: 10000
+            });
+            console.log('✅ Notification log loaded successfully with new system');
+        } else {
+            console.warn('⚠️ showNotificationLog not available, using fallback');
+            // Fallback למקרה שהמערכת החדשה לא נטענה
+            const container = document.getElementById('notification-log-container');
+            if (container) {
+                container.innerHTML = `
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        מערכת הלוגים החדשה לא נטענה. בדוק את הטעינה של modules/core-systems.js
+                    </div>
+                `;
+            }
+        }
     } catch (error) {
         console.error('❌ Failed to load notification log:', error);
+        // Fallback במקרה של שגיאה
+        const container = document.getElementById('notification-log-container');
+        if (container) {
+            container.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle"></i>
+                    שגיאה בטעינת לוג התראות: ${error.message}
+                </div>
+            `;
+        }
     }
 }
 
 /**
- * Test the new system with sample data
+ * Test the new system with sample data - Updated for New System
  */
 async function testUnifiedLogSystem() {
     try {
-        console.log('🧪 Testing Unified Log System...');
+        console.log('🧪 Testing Unified Log System (New System)...');
+        
+        // בדיקה שהמערכת החדשה זמינה
+        if (typeof window.showSuccessNotification !== 'function') {
+            console.error('❌ New notification system not available');
+            alert('מערכת ההתראות החדשה לא נטענה. בדוק את הטעינה של modules/core-systems.js');
+            return;
+        }
         
         // Generate some test notifications
         const testNotifications = [
-            { type: 'success', title: 'בדיקה', message: 'התראה חדשה במערכת החדשה' },
-            { type: 'info', title: 'מידע', message: 'זהו לוג מידע במערכת החדשה' },
-            { type: 'warning', title: 'אזהרה', message: 'זהו לוג אזהרה במערכת החדשה' },
-            { type: 'error', title: 'שגיאה', message: 'זהו לוג שגיאה במערכת החדשה' }
+            { type: 'success', title: 'בדיקה', message: 'התראה חדשה במערכת החדשה v2.0.0' },
+            { type: 'info', title: 'מידע', message: 'זהו לוג מידע במערכת החדשה v2.0.0' },
+            { type: 'warning', title: 'אזהרה', message: 'זהו לוג אזהרה במערכת החדשה v2.0.0' },
+            { type: 'error', title: 'שגיאה', message: 'זהו לוג שגיאה במערכת החדשה v2.0.0' }
         ];
         
-        // Show test notifications
+        // Show test notifications using new system
         for (const notification of testNotifications) {
-            if (window.showNotification) {
-                window.showNotification(notification.message, notification.type, notification.title);
+            if (notification.type === 'success' && window.showSuccessNotification) {
+                window.showSuccessNotification(notification.title, notification.message, 3000, 'system');
+            } else if (notification.type === 'info' && window.showInfoNotification) {
+                window.showInfoNotification(notification.title, notification.message, 3000, 'system');
+            } else if (notification.type === 'warning' && window.showWarningNotification) {
+                window.showWarningNotification(notification.title, notification.message, 3000, 'system');
+            } else if (notification.type === 'error' && window.showErrorNotification) {
+                window.showErrorNotification(notification.title, notification.message, 3000, 'system');
             }
             // Wait a bit between notifications
             await new Promise(resolve => setTimeout(resolve, 500));
@@ -2403,14 +2497,16 @@ async function testUnifiedLogSystem() {
             await loadNotificationLog();
         }, 1000);
         
-        if (window.showNotification) {
-            window.showNotification('בדיקת המערכת החדשה הושלמה!', 'success');
+        if (window.showSuccessNotification) {
+            window.showSuccessNotification('בדיקת המערכת החדשה הושלמה!', 'בדיקת המערכת החדשה v2.0.0 הושלמה בהצלחה!', 4000, 'system');
         }
         
     } catch (error) {
         console.error('❌ Failed to test Unified Log System:', error);
-        if (window.showNotification) {
-            window.showNotification('שגיאה בבדיקת המערכת: ' + error.message, 'error');
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה בבדיקת המערכת', 'שגיאה בבדיקת המערכת החדשה: ' + error.message, 5000, 'system');
+        } else {
+            alert('שגיאה בבדיקת המערכת: ' + error.message);
         }
     }
 }
@@ -2426,25 +2522,31 @@ window.loadNotificationLog = loadNotificationLog;
 window.initializeNotificationsCenter = initializeNotificationsCenter;
 
 /**
- * Refresh notifications data - global function for button
+ * Refresh notifications data - global function for button - Updated for New System
  */
 async function refreshNotificationsData() {
     try {
         if (window.notificationsCenter) {
             await window.notificationsCenter.refreshNotifications();
-            if (window.showNotification) {
-                window.showNotification('נתוני התראות רוענו בהצלחה', 'success');
+            if (typeof window.showSuccessNotification === 'function') {
+                window.showSuccessNotification('נתוני התראות רוענו בהצלחה', 'נתוני התראות רוענו בהצלחה במערכת החדשה', 3000, 'system');
+            } else {
+                alert('נתוני התראות רוענו בהצלחה');
             }
         } else {
             console.warn('Notifications center not initialized');
-            if (window.showNotification) {
-                window.showNotification('מרכז התראות לא מאותחל', 'warning');
+            if (typeof window.showWarningNotification === 'function') {
+                window.showWarningNotification('מרכז התראות לא מאותחל', 'מרכז התראות לא מאותחל במערכת החדשה', 3000, 'system');
+            } else {
+                alert('מרכז התראות לא מאותחל');
             }
         }
     } catch (error) {
         console.error('Error refreshing notifications data:', error);
-        if (window.showNotification) {
-            window.showNotification('שגיאה ברענון נתונים: ' + error.message, 'error');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה ברענון נתונים', 'שגיאה ברענון נתונים במערכת החדשה: ' + error.message, 5000, 'system');
+        } else {
+            alert('שגיאה ברענון נתונים: ' + error.message);
         }
     }
 }

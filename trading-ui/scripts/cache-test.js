@@ -62,21 +62,46 @@ class CacheTestPage {
     async initializeCacheSystems() {
         console.log('🔄 Initializing cache systems...');
         
-        // Wait for UnifiedCacheManager to be available (new architecture)
-        if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
-            this.updateCacheStatus();
-        } else if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized && window.UnifiedCacheManager.isInitialized()) {
+        // בדיקה אם כל מערכות המטמון כבר פעילות
+        const allSystemsReady = this.checkAllCacheSystemsReady();
+        
+        if (allSystemsReady) {
+            console.log('✅ All cache systems already initialized');
             this.updateCacheStatus();
         } else {
             // Try to initialize all cache systems
             if (window.initializeAllCacheSystems) {
-                await window.initializeAllCacheSystems();
+                await window.initializeAllCacheSystems(true); // true = אתחול ראשוני
                 this.updateCacheStatus();
             } else {
                 // Retry after a short delay
                 setTimeout(() => this.initializeCacheSystems(), 500);
             }
         }
+    }
+
+    /**
+     * בדיקה אם כל מערכות המטמון פעילות
+     */
+    checkAllCacheSystemsReady() {
+        const systems = [
+            { name: 'UnifiedCacheManager', obj: window.UnifiedCacheManager },
+            { name: 'CacheSyncManager', obj: window.CacheSyncManager },
+            { name: 'CachePolicyManager', obj: window.CachePolicyManager },
+            { name: 'MemoryOptimizer', obj: window.MemoryOptimizer }
+        ];
+
+        return systems.every(system => {
+            if (!system.obj) return false;
+            
+            // בדיקה אם המערכת מאותחלת
+            if (system.obj.initialized) return true;
+            if (system.obj.isInitialized && typeof system.obj.isInitialized === 'function') {
+                return system.obj.isInitialized();
+            }
+            
+            return false;
+        });
     }
 
     /**
@@ -120,23 +145,53 @@ class CacheTestPage {
     async updateCacheOverview() {
         try {
             if (window.UnifiedCacheManager && window.UnifiedCacheManager.getStats) {
+                // עדכון סטטיסטיקות לפני קבלת הנתונים
+                if (window.UnifiedCacheManager.updateStats) {
+                    await window.UnifiedCacheManager.updateStats();
+                }
+                
                 const stats = await window.UnifiedCacheManager.getStats();
+                console.log('📊 Cache stats for overview:', stats);
+                
+                // חישוב גודל מטמון כולל
+                let totalSize = 0;
+                if (stats.layers) {
+                    for (const layer of Object.values(stats.layers)) {
+                        totalSize += layer.size || 0;
+                    }
+                }
                 
                 // Update overview cards
-                this.updateElement('cacheHitRate', stats.performance?.hitRate ? `${parseFloat(stats.performance.hitRate.toFixed(4))}%` : '0%');
-                this.updateElement('cacheSize', this.formatBytes(stats.totalSize || 0));
-                this.updateElement('avgResponseTime', `${parseFloat((stats.performance?.avgResponseTime || 0).toFixed(4))}ms`);
-                this.updateElement('totalRequests', stats.operations ? 
-                    (stats.operations.save + stats.operations.get + stats.operations.remove + stats.operations.clear) : '0');
+                const hitRate = stats.performance?.hitRate ? parseFloat(stats.performance.hitRate.toFixed(4)) : 0;
+                const avgResponseTime = stats.performance?.avgResponseTime ? parseFloat(stats.performance.avgResponseTime.toFixed(4)) : 0;
+                const totalRequests = stats.operations ? 
+                    (stats.operations.save + stats.operations.get + stats.operations.remove + stats.operations.clear) : 0;
+                
+                this.updateElement('cacheHitRate', `${hitRate}%`);
+                this.updateElement('cacheSize', this.formatBytes(totalSize));
+                this.updateElement('avgResponseTime', `${avgResponseTime}ms`);
+                this.updateElement('totalRequests', totalRequests.toString());
 
                 // Update change indicators
                 this.updateElement('cacheHitRateChange', 'עדכני');
                 this.updateElement('cacheSizeChange', 'עדכני');
                 this.updateElement('avgResponseTimeChange', 'עדכני');
                 this.updateElement('totalRequestsChange', 'עדכני');
+            } else {
+                console.warn('UnifiedCacheManager not available for stats');
+                // הצגת ערכים ברירת מחדל
+                this.updateElement('cacheHitRate', '0%');
+                this.updateElement('cacheSize', '0 B');
+                this.updateElement('avgResponseTime', '0ms');
+                this.updateElement('totalRequests', '0');
             }
         } catch (error) {
             console.error('Error updating cache overview:', error);
+            // הצגת ערכים ברירת מחדל במקרה של שגיאה
+            this.updateElement('cacheHitRate', '0%');
+            this.updateElement('cacheSize', '0 B');
+            this.updateElement('avgResponseTime', '0ms');
+            this.updateElement('totalRequests', '0');
         }
     }
 
@@ -308,6 +363,13 @@ class CacheTestPage {
                 this.loadCacheData();
             }
         }, 30000);
+        
+        // Auto-refresh overview every 5 seconds for real-time stats
+        this.statsInterval = setInterval(() => {
+            if (!this.isLoading) {
+                this.updateCacheOverview();
+            }
+        }, 5000);
     }
 
     /**
@@ -322,6 +384,19 @@ class CacheTestPage {
                     this.loadCacheData();
                 }
             });
+        }
+    }
+
+    /**
+     * Clear intervals when page is unloaded
+     * ניקוי intervals כשהדף נסגר
+     */
+    cleanup() {
+        if (this.refreshInterval) {
+            clearInterval(this.refreshInterval);
+        }
+        if (this.statsInterval) {
+            clearInterval(this.statsInterval);
         }
     }
 
@@ -708,3 +783,21 @@ window.showErrorMessage = showErrorMessage;
 window.clearLog = clearLog;
 window.exportLog = exportLog;
 window.toggleAllSections = toggleAllSections;
+
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        window.cacheTestPage = new CacheTestPage();
+        window.cacheTestPage.init();
+    });
+} else {
+    window.cacheTestPage = new CacheTestPage();
+    window.cacheTestPage.init();
+}
+
+// Cleanup when page is unloaded
+window.addEventListener('beforeunload', () => {
+    if (window.cacheTestPage) {
+        window.cacheTestPage.cleanup();
+    }
+});

@@ -80,10 +80,15 @@
         <!-- סקירה כללית -->
         <div class="content-section" id="overviewSection">
             <div class="section-header">
-                <h3>📈 סקירת גרפים</h3>
-                <button class="btn btn-outline-secondary btn-sm" onclick="toggleSection('overviewSection')">
-                    <i class="fas fa-chevron-down"></i>
-                </button>
+                <h2>📈 סקירת גרפים</h2>
+                <div class="header-actions">
+                    <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט">
+                        <i class="fas fa-copy"></i> העתק לוג מפורט
+                    </button>
+                    <button class="filter-toggle-btn" onclick="toggleSection('overviewSection')" title="הצג/הסתר סקשן">
+                        <span class="section-toggle-icon">▼</span>
+                    </button>
+                </div>
             </div>
             <div class="section-content">
                 <div class="row">
@@ -133,10 +138,12 @@
         <!-- ניהול גרפים -->
         <div class="content-section" id="managementSection">
             <div class="section-header">
-                <h3>🔧 ניהול גרפים</h3>
-                <button class="btn btn-outline-secondary btn-sm" onclick="toggleSection('managementSection')">
-                    <i class="fas fa-chevron-down"></i>
-                </button>
+                <h2>🔧 ניהול גרפים</h2>
+                <div class="header-actions">
+                    <button class="filter-toggle-btn" onclick="toggleSection('managementSection')" title="הצג/הסתר סקשן">
+                        <span class="section-toggle-icon">▼</span>
+                    </button>
+                </div>
             </div>
             <div class="section-content">
                 <div class="row mb-3">
@@ -214,10 +221,12 @@
         <!-- הגדרות מערכת -->
         <div class="content-section" id="settingsSection">
             <div class="section-header">
-                <h3>⚙️ הגדרות מערכת</h3>
-                <button class="btn btn-outline-secondary btn-sm" onclick="toggleSection('settingsSection')">
-                    <i class="fas fa-chevron-down"></i>
-                </button>
+                <h2>⚙️ הגדרות מערכת</h2>
+                <div class="header-actions">
+                    <button class="filter-toggle-btn" onclick="toggleSection('settingsSection')" title="הצג/הסתר סקשן">
+                        <span class="section-toggle-icon">▼</span>
+                    </button>
+                </div>
             </div>
             <div class="section-content">
                 <div class="row">

@@ -1924,7 +1924,7 @@ function showFinalSuccessModal(successInfo) {
   
   // Create modal HTML
   const modalHtml = `
-    <div class="modal fade" id="finalSuccessModal" tabindex="-1" aria-labelledby="finalSuccessModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
+    <div class="modal fade" id="finalSuccessModal" tabindex="-1" aria-labelledby="finalSuccessModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true" inert>
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header text-white d-flex justify-content-between align-items-center" style="direction: rtl; background-color: #28a745;">
@@ -1988,7 +1988,19 @@ function showFinalSuccessModal(successInfo) {
   document.body.insertAdjacentHTML('beforeend', modalHtml);
   
   // Show modal
-  const modal = new bootstrap.Modal(document.getElementById('finalSuccessModal'));
+  const modalElement = document.getElementById('finalSuccessModal');
+  const modal = new bootstrap.Modal(modalElement);
+  
+  // Remove inert attribute when modal is shown
+  modalElement.addEventListener('shown.bs.modal', () => {
+    modalElement.removeAttribute('inert');
+  });
+  
+  // Add inert attribute when modal is hidden
+  modalElement.addEventListener('hidden.bs.modal', () => {
+    modalElement.setAttribute('inert', '');
+  });
+  
   modal.show();
   
   // Store success info globally for copying
@@ -2022,6 +2034,9 @@ async function showCriticalErrorModal(errorInfo, detailedMessage) {
               <i class="fas fa-exclamation-triangle"></i> ${errorInfo.title}
             </h4>
             <div class="d-flex gap-2">
+              <button type="button" class="btn btn-sm btn-warning" id="${modalId}-copy-btn" title="העתק פרטי שגיאה">
+                <i class="fas fa-copy"></i> העתק
+              </button>
               <button type="button" class="btn btn-sm btn-secondary" id="${modalId}-close-btn" title="סגור">
                 <i class="fas fa-times"></i> סגור
               </button>
@@ -2057,6 +2072,9 @@ async function showCriticalErrorModal(errorInfo, detailedMessage) {
             </div>
           </div>
           <div class="modal-footer" style="justify-content: flex-end; direction: rtl;">
+            <button type="button" class="btn btn-warning" id="${modalId}-copy-details-btn">
+              <i class="fas fa-copy"></i> העתק פרטי שגיאה
+            </button>
             <button type="button" class="btn btn-secondary" id="${modalId}-footer-close">
               <i class="fas fa-times"></i> סגור
             </button>
@@ -2480,7 +2498,7 @@ async function saveNotificationToGlobalHistory(type, title, message, category = 
       }
     } else {
       // מערכת מטמון לא מאותחלת - מדלג על שמירה
-      console.log('⚠️ Cache system not initialized - skipping notification history save');
+      console.debug('⚠️ Cache system not initialized - skipping notification history save');
     }
 
     // Fallback ל-localStorage במקרה של בעיה
@@ -2528,7 +2546,7 @@ async function updateGlobalNotificationStats() {
       }
     } else {
       // מערכת מטמון לא מאותחלת - מדלג על טעינה
-      console.log('⚠️ Cache system not initialized - skipping notification history load');
+      console.debug('⚠️ Cache system not initialized - skipping notification history load');
       history = [];
     }
     
@@ -2566,7 +2584,7 @@ async function updateGlobalNotificationStats() {
       }
     } else {
       // מערכת מטמון לא מאותחלת - מדלג על שמירת סטטיסטיקות
-      console.log('⚠️ Cache system not initialized - skipping notification stats save');
+      console.debug('⚠️ Cache system not initialized - skipping notification stats save');
     }
 
     // Fallback ל-localStorage

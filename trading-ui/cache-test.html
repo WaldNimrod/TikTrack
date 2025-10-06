@@ -178,19 +178,19 @@
                 <!-- UI Content Section Top Start-->
                 <div class="top-section" data-section="top">
                     <div class="section-header">
-                        <h1 class="table-title">🧪 בדיקת מטמון</h1>
-                        <div class="d-flex gap-1">
+                        <h1>🧪 בדיקת מטמון</h1>
+                        <div class="header-actions">
                             <button class="btn btn-sm btn-outline-primary" onclick="refreshCacheData()">
                                 <i class="fas fa-sync-alt"></i> רענן סטטוס
-                            </button>
-                            <button class="btn btn-sm btn-outline-secondary" onclick="toggleAllSections()">
-                                <i class="fas fa-expand-arrows-alt"></i> הצג/הסתר הכל
                             </button>
                             <button class="btn btn-sm btn-outline-info" onclick="exportLog()">
                                 <i class="fas fa-download"></i> ייצא לוג
                             </button>
                             <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט של כל הממשקים">
                                 <i class="fas fa-copy"></i> העתק לוג מפורט
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר סקשן">
+                                <span class="filter-icon">▲</span>
                             </button>
                         </div>
                     </div>
@@ -419,9 +419,11 @@
                         <p class="section-description">
                             בדיקות, ניקוי, אופטימיזציה וסינכרון של מערכת המטמון המאוחדת
                         </p>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
                     </div>
                     <div class="section-body">
                         <!-- Cache Testing and Management Cards -->
@@ -824,9 +826,11 @@
                         <p class="section-description">
                             מידע מפורט על כל שכבות המטמון: Frontend Memory, localStorage, IndexedDB, ו-Backend Cache
                         </p>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
                     </div>
                     <div class="section-body">
                         <!-- All Cache Layers Overview -->
@@ -938,9 +942,11 @@
                 <div class="content-section" id="section3">
                     <div class="section-header">
                         <h2>📋 לוג מטמון</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
                     </div>
                     <div class="section-body">
                         <div class="button-row mb-3">

@@ -26,60 +26,68 @@
     Bootstrap חייב להיטען לפני CSS שלנו כדי ש-CSS שלנו יוכל לדרוס אותו
     -->
     
-    <!-- Bootstrap CSS -->
+    <!-- Google Fonts - Heebo (הפונט החדש של המערכת) -->
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS - חייב להיות קודם -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
     
-    <!-- FontAwesome Icons - Local -->
-    <link rel="stylesheet" href="images/fontawesome/css/all.min.css">
+    <!-- ITCSS Architecture - Complete Implementation -->
     
-    <!-- Bootstrap JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- 01-settings - Variables and Settings -->
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=20251006">
     
-    <!-- CSS Files - אחרי Bootstrap כדי לדרוס אותו -->
-    <!-- ITCSS Architecture - Individual Files (September 2025) -->
-    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=v20250924_fixed_black_text">
-    <link rel="stylesheet" href="styles-new/06-components/_unified-log-display.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_pagination-system.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=20251001">
+    <!-- 02-tools - Functions and Mixins -->
+    <link rel="stylesheet" href="styles-new/02-tools/_mixins.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/02-tools/_functions.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/02-tools/_utilities.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/02-tools/_rtl-helpers.css?v=20251006">
     
-    <!-- Header Styles -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.1">
+    <!-- 03-generic - Reset and Normalization -->
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=20251006">
     
-    <!-- Page Headers - Development pages with white background -->
-    <link rel="stylesheet" href="styles-new/06-components/_page-headers.css?v=20251001">
+    <!-- 04-elements - Basic HTML Elements -->
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=20251006">
     
-    <!-- Dynamic Color System Scripts -->
-    <script src="scripts/color-scheme-system.js"></script>
+    <!-- 05-objects - Layout Structures -->
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=20251006">
     
-    <!-- Preferences System Scripts -->
-    <script src="scripts/preferences.js"></script>
+    <!-- 06-components - UI Components -->
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/06-components/_unified-log-display.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/06-components/_pagination-system.css?v=20251006">
     
-    <!-- Color Demo Toggle Script -->
-    <script src="scripts/color-demo-toggle.js"></script>
+    <!-- 07-trumps - Page-specific Styles -->
+    <!-- הוסף כאן קובץ CSS ספציפי לעמוד (למשל: _notifications-center.css) -->
     
-    <!-- Header System Script -->
-    <script src="scripts/header-system.js"></script>
+    <!-- 08-themes - Themes -->
+    <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=20251006">
+    
+    <!-- 09-utilities - Utility Classes -->
+    <link rel="stylesheet" href="styles-new/09-utilities/_utilities.css?v=20251006">
+
+    <!-- External Libraries -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
 </head>
 
 <body>
@@ -174,60 +182,8 @@
                 <!-- UI Content Section 1 Start-->
                 <div class="content-section" id="section1">
                     <div class="section-header">
-                        <h2>🚨 מערכת הודעות שגיאה מתקדמת</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
-                    </div>
-                    <div class="section-body">
-                        <div class="alert alert-info" role="alert">
-                            <h5 class="alert-heading">
-                                <i class="fas fa-info-circle"></i> מערכת הודעות מפורטת חדשה
-                            </h5>
-                            <p><strong>עדכון חשוב:</strong> כל הודעות השגיאה והצלחה עכשיו משתמשות במערכת החדשה עם מודל מפורט ועצירה בתהליך!</p>
-                            <hr>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <h6><i class="fas fa-check-circle text-success"></i> תכונות חדשות:</h6>
-                                    <ul>
-                                        <li>עצירה בתהליך עד לסגירה</li>
-                                        <li>כפתור העתקה ללוח עם פרטים מפורטים</li>
-                                        <li>מידע מקור עמוד ופונקציה</li>
-                                        <li>Stack trace מלא</li>
-                                        <li>פרטי דפדפן ומערכת</li>
-                                    </ul>
-                                </div>
-                                <div class="col-md-6">
-                                    <h6><i class="fas fa-code text-primary"></i> דוגמאות שימוש:</h6>
-                                    <pre class="bg-light p-2 rounded"><code>// שגיאה רגילה (עכשיו עם מודל!)
-showErrorNotification('שגיאה', 'הודעה');
-
-// שגיאה פשוטה (legacy mode)
-showSimpleErrorNotification('שגיאה', 'הודעה');
-
-// הצלחה סופית (עם מודל!)
-showFinalSuccessNotification('הצלחה', 'הודעה', {
-  operation: 'save-data',
-  itemsProcessed: 42
-});
-
-// שגיאה מפורטת
-showCriticalErrorNotification('כותרת', 'הודעה', {
-  source: 'my-function',
-  function: 'processData',
-  line: '123'
-});</code></pre>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- UI Content Section 2 Start-->
-                <div class="content-section" id="section2">
-                    <div class="section-header">
                         <h2>📊 סקירה כללית</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
@@ -290,49 +246,99 @@ showCriticalErrorNotification('כותרת', 'הודעה', {
                 </div>
                 <!-- UI Content Section 2 End-->
 
+                <!-- UI Content Section 3 Start-->
+                <div class="content-section" id="section3">
+                    <div class="section-header">
+                        <h2>🚨 מערכת הודעות שגיאה מתקדמת</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <div class="alert alert-info" role="alert">
+                            <h5 class="alert-heading">
+                                <i class="fas fa-info-circle"></i> מערכת הודעות מפורטת חדשה
+                            </h5>
+                            <p><strong>עדכון חשוב:</strong> כל הודעות השגיאה והצלחה עכשיו משתמשות במערכת החדשה עם מודל מפורט ועצירה בתהליך!</p>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-check-circle text-success"></i> תכונות חדשות:</h6>
+                                    <ul>
+                                        <li>עצירה בתהליך עד לסגירה</li>
+                                        <li>כפתור העתקה ללוח עם פרטים מפורטים</li>
+                                        <li>מידע מקור עמוד ופונקציה</li>
+                                        <li>Stack trace מלא</li>
+                                        <li>פרטי דפדפן ומערכת</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-code text-primary"></i> דוגמאות שימוש:</h6>
+                                    <pre class="bg-light p-2 rounded"><code>// שגיאה רגילה (עכשיו עם מודל!)
+showErrorNotification('שגיאה', 'הודעה');
+
+// שגיאה פשוטה (legacy mode)
+showSimpleErrorNotification('שגיאה', 'הודעה');
+
+// הצלחה סופית (עם מודל!)
+showFinalSuccessNotification('הצלחה', 'הודעה', {
+  operation: 'save-data',
+  itemsProcessed: 42
+});
+
+// שגיאה מפורטת
+showCriticalErrorNotification('כותרת', 'הודעה', {
+  source: 'my-function',
+  function: 'processData',
+  line: '123'
+});</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 3 End-->
+
             </div>
         </div>
     </div>
 
-    <!-- Essential System Components -->
-    <script src="scripts/data-collector.js"></script>
-    
-    <!-- 🔄 NEW UNIFIED INITIALIZATION SYSTEM -->
-    <!-- Core Systems -->
-    <script src="scripts/global-favicon.js"></script>
-    <script src="scripts/ui-utils.js"></script>
-    <script src="scripts/data-utils.js"></script>
-    <script src="scripts/notification-system.js"></script>
-    <script src="scripts/warning-system.js"></script>
-    <script src="scripts/system-management.js"></script>
-    <script src="scripts/notification-category-detector.js"></script>
-    <script src="scripts/global-notification-collector.js"></script>
-    <script src="scripts/tables.js"></script>
-    <script src="scripts/page-utils.js"></script>
-    
-    <!-- New Unified Initialization System -->
-    <script src="scripts/page-initialization-configs.js"></script>
-    <script src="scripts/unified-app-initializer.js"></script>
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- 🔓 TEMPLATE ZONE 6 - Page-Specific Scripts (ADD NEW SCRIPTS HERE) -->
-    <!-- No manual DOMContentLoaded listener needed - handled by unified system -->
+    <!-- מערכת כללית חדשה - 8 מודולים מאוחדים -->
     
-    <!-- Pagination System -->
-    <script src="scripts/pagination-system.js"></script>
+    <!-- Stage 1: Core Systems (חובה) -->
+    <script src="scripts/modules/core-systems.js?v=20251006"></script>
     
-    <!-- Unified Log System -->
-    <script src="scripts/unified-log-manager.js"></script>
-    <script src="scripts/unified-log-display.js"></script>
-    <script src="scripts/unified-log-api.js"></script>
+    <!-- Stage 2: Dynamic Loader Configuration -->
+    <script src="scripts/modules/dynamic-loader-config.js?v=20251006"></script>
     
-    <!-- Page-specific scripts -->
-    <script src="scripts/realtime-notifications-client.js"></script>
-    <script src="scripts/notifications-center.js"></script>
+    <!-- Stage 3: Page Initialization Configurations -->
+    <script src="scripts/page-initialization-configs.js?v=20251006"></script>
     
-    <!-- Local copyDetailedLog function for notifications-center page -->
-    <script>
-        // Make the local copyDetailedLog function available globally for this page only
-        window.copyDetailedLog = copyDetailedLog;
-    </script>
+    <!-- Stage 4: Global Systems -->
+    <script src="scripts/global-favicon.js?v=20251006"></script>
+    <script src="scripts/translation-utils.js?v=20251006"></script>
+    <script src="scripts/header-system.js?v=v6.0.0"></script>
+    <script src="scripts/date-utils.js?v=20251006"></script>
+    <script src="scripts/button-icons.js?v=20251006"></script>
+    <script src="scripts/page-utils.js?v=20251006"></script>
+    <script src="scripts/preferences.js?v=20251006"></script>
+    <script src="scripts/notification-category-detector.js?v=20251006"></script>
+    <script src="scripts/global-notification-collector.js?v=20251006"></script>
+    <script src="scripts/system-management.js?v=20251006"></script>
+    <script src="scripts/entity-details-modal.js?v=20251006"></script>
+    <script src="scripts/warning-system.js?v=20251006"></script>
+    
+    <!-- Stage 5: Page-specific Script -->
+    <script src="scripts/notifications-center.js?v=20251006"></script>
+    
+    <!-- Additional Systems for Notifications Center -->
+    <script src="scripts/pagination-system.js?v=20251006"></script>
+    <script src="scripts/unified-log-manager.js?v=20251006"></script>
+    <script src="scripts/unified-log-display.js?v=20251006"></script>
+    <script src="scripts/unified-log-api.js?v=20251006"></script>
+    
 </body>
 </html>

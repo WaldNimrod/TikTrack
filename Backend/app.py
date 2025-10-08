@@ -108,6 +108,7 @@ from routes.api import (
     entity_details_bp,
     constraints_bp,
     currencies_bp,
+    database_schema_bp,
     linked_items_bp,
     note_relation_types_bp,
     file_scanner_bp,
@@ -208,6 +209,7 @@ app.register_blueprint(entity_details_bp)
 
 app.register_blueprint(constraints_bp)
 app.register_blueprint(currencies_bp)
+app.register_blueprint(database_schema_bp)
 app.register_blueprint(linked_items_bp)
 app.register_blueprint(note_relation_types_bp)
 app.register_blueprint(file_scanner_bp)

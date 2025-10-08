@@ -1057,19 +1057,22 @@ Error: Entity Details API לא נטען
 
 ---
 
-### **3. תיקון רענון טבלה (global data + timing)**
+### **3. תיקון רענון טבלה (global data + timing) + שימוש נכון ב-UnifiedCacheManager**
 
 #### **הבעיה:**
 - אחרי מחיקה/הוספה/עדכון הטבלה לא מתעדכנת
 - הנתונים ישנים נשארים ב-`window.cashFlowsData`
+- ❌ שימוש שגוי: `UnifiedCacheManager.invalidate()` (לא קיימת!)
+- ✅ שימוש נכון: `UnifiedCacheManager.remove()`
 
 #### **הפתרון:**
 ```javascript
 // בכל פעולת CRUD מוצלחת:
 if (result.status === 'success') {
-  // 1. ניקוי מטמון UnifiedCacheManager
-  if (window.UnifiedCacheManager) {
-    await window.UnifiedCacheManager.invalidate('cash_flows');
+  // 1. ניקוי מטמון UnifiedCacheManager - שימוש ב-remove (לא invalidate!)
+  if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+    await window.UnifiedCacheManager.remove('cash_flows');
+    console.log('✅ מטמון cash_flows נוקה');
   }
 
   // 2. ניקוי global data - חובה!
@@ -1090,11 +1093,17 @@ if (result.status === 'success') {
 ```
 
 **למה זה חשוב:**
-1. `UnifiedCacheManager.invalidate` - מנקה מטמון של מערכת המטמון
+1. **`UnifiedCacheManager.remove(key)`** - הפונקציה הנכונה! (לא `invalidate`)
+   - מנקה את המפתח מכל שכבות המטמון (memory, localStorage, indexedDB)
 2. `window.cashFlowsData = null` - מנקה נתונים גלובליים
 3. `setTimeout(100)` - נותן זמן למטמון להתרענן
-4. `await loadCashFlows()` - טוען נתונים חדשים
+4. `await loadCashFlows()` - טוען נתונים חדשים מהשרת
 5. הודעת הצלחה **אחרי** הטעינה (לא לפני)
+
+**שיטות ניקוי מטמון ב-UnifiedCacheManager:**
+- `remove(key)` - מחיקת מפתח ספציפי מכל השכבות ✅
+- `clear(layer)` - ניקוי שכבה שלמה (memory/localStorage/indexedDB)
+- אין `invalidate()` - זו לא פונקציה קיימת! ❌
 
 **קבצים שתוקנו:**
 - `trading-ui/scripts/cash_flows.js` - כל 3 פונקציות CRUD

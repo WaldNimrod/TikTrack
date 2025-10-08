@@ -131,26 +131,29 @@ async function loadTableData(tableType) {
 }
 
 /**
- * Fetch table data from server
+ * Fetch table data from server using physical database schema
  * @param {string} tableType - The table type to fetch
  * @returns {Promise<Array>} The fetched data
  */
 async function fetchTableData(tableType) {
   try {
-    // Map table types to correct API endpoints
-    const apiEndpoints = {
-      'accounts': '/api/trading-accounts/',
-      'trading_accounts': '/api/trading-accounts/',
-      'trades': '/api/trades/',
-      'tickers': '/api/tickers/',
-      'trade_plans': '/api/trade_plans/',
-      'executions': '/api/executions/',
-      'alerts': '/api/alerts/',
-      'notes': '/api/notes/',
-      'cash_flows': '/api/cash_flows/'
+    // Map table types to correct table names in database
+    const tableNames = {
+      'accounts': 'trading_accounts',
+      'trading_accounts': 'trading_accounts',
+      'trades': 'trades',
+      'tickers': 'tickers',
+      'trade_plans': 'trade_plans',
+      'executions': 'executions',
+      'alerts': 'alerts',
+      'notes': 'notes',
+      'cash_flows': 'cash_flows'
     };
     
-    const endpoint = apiEndpoints[tableType] || `/api/${tableType}/`;
+    const tableName = tableNames[tableType] || tableType;
+    
+    // Use the new database schema endpoint to get data with physical column order
+    const endpoint = `/api/database-schema/table/${tableName}/data`;
     console.log(`🌐 Fetching data for ${tableType} from ${endpoint}`);
     const response = await fetch(endpoint);
     if (!response.ok) {
@@ -161,7 +164,7 @@ async function fetchTableData(tableType) {
     console.log(`📥 Received response for ${tableType}:`, result);
 
     if (result.status === 'success') {
-      return result.data || [];
+      return result.data?.rows || [];
     } else {
       throw new Error(result.error?.message || `Error fetching ${tableType} data`);
     }

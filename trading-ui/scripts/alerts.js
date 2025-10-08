@@ -1470,31 +1470,22 @@ async function saveAlert() {
       }
     }
 
-  const alertData = {
-    related_type_id: parseInt(formData.get('alertRelationType')),
-    related_id: parseInt(document.getElementById('alertRelatedObjectSelect').value),
-    condition_attribute: conditionAttribute,
-    condition_operator: conditionOperator,
-    condition_number: conditionNumber,
-    message: document.getElementById('alertMessage').value || null,
-    status: 'open',
-    is_triggered: 'false',
-  };
+    // 6. בניית אובייקט נתונים
+    const alertData = {
+      related_type_id: parseInt(formData.get('alertRelationType')),
+      related_id: parseInt(document.getElementById('alertRelatedObjectSelect').value),
+      condition_attribute: conditionAttribute,
+      condition_operator: conditionOperator,
+      condition_number: conditionNumber,
+      message: document.getElementById('alertMessage').value || null,
+      status: 'open',
+      is_triggered: 'false',
+    };
 
-  // שולח התראה חדשה
-  // console.log('🔧 === SAVING ALERT ===');
-  // console.log('🔧 Alert data:', alertData);
-  // console.log('🔧 Request URL:', '/api/alerts/');
-  // console.log('🔧 Request method:', 'POST');
-  // console.log('🔧 Request body:', JSON.stringify(alertData, null, 2));
-
-  try {
     console.log('🔧 === SAVING ALERT ===');
     console.log('🔧 Alert data:', alertData);
-    console.log('🔧 Request URL:', '/api/alerts/');
-    console.log('🔧 Request method:', 'POST');
-    console.log('🔧 Request body:', JSON.stringify(alertData, null, 2));
 
+    // 7. שליחה לשרת
     const response = await fetch('/api/alerts/', {
       method: 'POST',
       headers: {
@@ -1503,41 +1494,47 @@ async function saveAlert() {
       body: JSON.stringify(alertData),
     });
 
-    console.log('🔧 Response status:', response.status);
-    console.log('🔧 Response ok:', response.ok);
-
-    if (response.ok) {
-      const newAlert = await response.json();
-      console.log('🔧 New alert created:', newAlert);
-
-      // התראה נשמרה בהצלחה
-
-      // שימוש במערכת הריענון המרכזית
-      if (window.centralRefresh) {
-        await window.centralRefresh.showSuccessAndRefresh('alerts', 'התראה נשמרה בהצלחה!');
-      } else {
-        // Fallback למערכת הישנה
-        // הצגת הודעה
-        if (window.showSuccessNotification) {
-          window.showSuccessNotification('הצלחה', 'התראה נשמרה בהצלחה!');
-        }
-
-        // רענון הנתונים
-        await loadAlertsData();
-      }
-
-      // סגירת המודל
-      closeModal('addAlertModal');
+    // 8. טיפול בתגובה
+    if (!response.ok) {
+      const errorData = await response.json();
       
-    } else {
-      const errorText = await response.text();
-      console.error('🔧 Server error response:', errorText);
-      throw new Error(`שגיאה בשמירת התראה: ${response.status} - ${errorText}`);
+      // בדיקה אם זו שגיאת ולידציה (HTTP 400)
+      if (response.status === 400) {
+        if (typeof window.showSimpleErrorNotification === 'function') {
+          window.showSimpleErrorNotification('שגיאת ולידציה', errorData.message || 'נתונים לא תקינים');
+        }
+        return;
+      }
+      
+      // שגיאת מערכת אחרת
+      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
     }
+
+    const result = await response.json();
+    console.log('🔧 New alert created:', result);
+    
+    // 9. הצגת הודעת הצלחה
+    if (typeof window.showSuccessNotification === 'function') {
+      window.showSuccessNotification('הצלחה', 'התראה נשמרה בהצלחה');
+    }
+
+    // 10. סגירת המודל
+    const modal = bootstrap.Modal.getInstance(document.getElementById('addAlertModal'));
+    if (modal) {
+      modal.hide();
+    }
+
+    // 11. רענון הטבלה
+    if (typeof window.loadAlertsData === 'function') {
+      await window.loadAlertsData();
+    }
+
   } catch (error) {
-    console.error('🔧 Error saving alert:', error);
-    if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה בשמירת התראה', 'שגיאה בשמירת התראה: ' + error.message);
+    console.error('Error saving alert:', error);
+    
+    // שגיאת JavaScript או Network - זו שגיאת מערכת אמיתית
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בשמירת התראה', error.message);
     }
   }
 }

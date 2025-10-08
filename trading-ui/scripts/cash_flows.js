@@ -4,26 +4,19 @@
  * טעינת נתוני תזרימי מזומנים מהשרת
  * פונקציה מאוחדת לטעינת נתונים עם טיפול בשגיאות מתקדם
  */
-async function loadCashFlows(forceRefresh = false) {
+async function loadCashFlows() {
   try {
-    console.log('📊 טוען נתוני תזרימי מזומנים...', forceRefresh ? '(force refresh)' : '');
+    console.log('📊 טוען נתוני תזרימי מזומנים...');
     
     // הצגת אינדיקטור טעינה
     if (typeof window.showInfoNotification === 'function') {
       window.showInfoNotification('טעינה', 'טוען נתוני תזרימי מזומנים...', 2000, 'ui');
     }
     
-    // אם force refresh, נוסיף timestamp כדי לעקוף מטמון שרת
-    const url = forceRefresh 
-      ? `http://127.0.0.1:8080/api/cash_flows/?cache=false&_t=${Date.now()}`
-      : 'http://127.0.0.1:8080/api/cash_flows/';
-    
-    const response = await fetch(url, {
+    const response = await fetch('http://127.0.0.1:8080/api/cash_flows/', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
       }
     });
 

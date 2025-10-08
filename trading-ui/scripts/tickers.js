@@ -1960,12 +1960,13 @@ window.clearTickersCache = clearTickersCache;
 
 // ===== פונקציות נתונים חיצוניים =====
 // פונקציות אלו קוראות ל-ExternalDataService (external-data-service.js)
+// המערכת עובדת עם כל ספק נתונים באמצעות הנורמלייזר
 
 /**
  * רענון נתוני מחירים חיצוניים לכל הטיקרים
- * משתמש ב-ExternalDataService שעובד עם כל הספקים
+ * משתמש ב-ExternalDataService שעובד עם כל הספקים (Yahoo, Alpha Vantage, וכו')
  */
-async function refreshYahooFinanceData() {
+async function refreshExternalData() {
   try {
     // טעינת נתונים אם צריך
     if (!window.tickersData || window.tickersData.length === 0) {
@@ -1978,7 +1979,7 @@ async function refreshYahooFinanceData() {
       throw new Error('External Data Service not available');
     }
 
-    // רענון הנתונים
+    // רענון הנתונים (הנורמלייזר מטפל בהתאמת הספק)
     const externalData = await service.refreshTickersData(window.tickersData);
     
     if (externalData) {
@@ -1995,7 +1996,7 @@ async function refreshYahooFinanceData() {
 /**
  * רענון נתוני מחירים חיצוניים ללא הודעות (לטעינה אוטומטית)
  */
-async function refreshYahooFinanceDataSilently() {
+async function refreshExternalDataSilently() {
   try {
     if (!window.tickersData || window.tickersData.length === 0) {
       return;
@@ -2017,8 +2018,12 @@ async function refreshYahooFinanceDataSilently() {
 }
 
 // ייצוא גלובלי
-window.refreshYahooFinanceData = refreshYahooFinanceData;
-window.refreshYahooFinanceDataSilently = refreshYahooFinanceDataSilently;
+window.refreshExternalData = refreshExternalData;
+window.refreshExternalDataSilently = refreshExternalDataSilently;
+
+// תאימות לאחור (deprecated - להסרה בגרסה הבאה)
+window.refreshYahooFinanceData = refreshExternalData;
+window.refreshYahooFinanceDataSilently = refreshExternalDataSilently;
 
 // פונקציות מודלים
 window.showAddTickerModal = showAddTickerModal;

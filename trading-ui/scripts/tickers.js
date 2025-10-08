@@ -85,62 +85,6 @@ function viewTickerDetails(tickerId) {
   }
 }
 
-/**
- * רענון נתוני טיקר
- * טוען מחדש את נתוני הטיקר מהשרת
- * @param {number} tickerId - מזהה הטיקר
- */
-function refreshTickerData(tickerId) {
-  try {
-
-    // הצגת אינדיקטור טעינה
-    if (typeof window.showNotification === 'function') {
-      window.showInfoNotification('מרענן נתוני טיקר...');
-    }
-    
-    // שליחה לשרת לרענון נתוני הטיקר
-    fetch('/api/tickers/' + tickerId + '/refresh', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('שגיאה ברענון נתוני טיקר');
-      }
-      return response.json();
-    })
-    .then(data => {
-
-      // רענון הטבלה
-      loadTickersData();
-      
-      // הודעת הצלחה
-      if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification('נתוני טיקר רוענו בהצלחה');
-      } else if (typeof window.showNotification === 'function') {
-        window.showSuccessNotification('נתוני טיקר רוענו בהצלחה');
-      }
-    })
-    .catch(error => {
-      console.error('שגיאה ברענון נתוני טיקר:', error);
-      if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification('שגיאה ברענון נתוני טיקר', error.message);
-      } else if (typeof window.showNotification === 'function') {
-        window.showErrorNotification('שגיאה ברענון נתוני טיקר');
-      }
-    });
-    
-  } catch (error) {
-    console.error('שגיאה ברענון נתוני טיקר:', error);
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה ברענון נתוני טיקר', error.message);
-    } else if (typeof window.showNotification === 'function') {
-      window.showErrorNotification('שגיאה ברענון נתוני טיקר');
-    }
-  }
-}
 /*
  * Tickers.js - Tickers Page Management
  * ====================================
@@ -1262,8 +1206,6 @@ async function updateAllTickerStatuses() {
   }
 }
 
-// Function removed - not used anywhere
-
 /**
  * ביצוע ביטול טיקר - גרסה מחודשת ומאופטמת
  */
@@ -1831,18 +1773,67 @@ function updateTickersTable(tickers) {
 }
 
 
-// הגדרת הפונקציות כגלובליות
+// ===== ייצוא גלובלי מאוחד =====
+// כל הפונקציות שנדרשות לשימוש חיצוני (onclick, etc.)
+
+// Active Trades Management
 window.updateActiveTradesField = updateActiveTradesField;
 window.updateTickerActiveTradesStatus = updateTickerActiveTradesStatus;
 window.updateAllActiveTradesStatuses = updateAllActiveTradesStatuses;
+
+// CRUD Operations
+window.editTicker = editTicker;
+window.viewTickerDetails = viewTickerDetails;
+window.saveTicker = saveTicker;
+window.updateTicker = updateTicker;
 window.deleteTicker = deleteTicker;
+window.confirmDeleteTicker = confirmDeleteTicker;
+
+// Cancel & Reactivate
 window.cancelTicker = cancelTicker;
 window.performCancelTicker = performCancelTicker;
+window.reactivateTicker = reactivateTicker;
 window.updateAllTickerStatuses = updateAllTickerStatuses;
-// window.toggleSection removed - using global version from ui-utils.js
+
+// Linked Items
+window.checkLinkedItemsAndCancelTicker = checkLinkedItemsAndCancelTicker;
+window.checkLinkedItemsBeforeCancelTicker = checkLinkedItemsBeforeCancelTicker;
+window.checkLinkedItemsAndDeleteTicker = checkLinkedItemsAndDeleteTicker;
+window.checkLinkedItemsBeforeDeleteTicker = checkLinkedItemsBeforeDeleteTicker;
+window.performTickerCancellation = performTickerCancellation;
+window.performTickerDeletion = performTickerDeletion;
+window.getTickerSymbol = getTickerSymbol;
+
+// Modals
+window.showAddTickerModal = showAddTickerModal;
+window.showEditTickerModal = showEditTickerModal;
+window.showDeleteTickerModal = showDeleteTickerModal;
+
+// Validation
+window.validateTickerForm = validateTickerForm;
+window.validateEditTickerForm = validateEditTickerForm;
+
+// UI & Display
+window.updateTickersTable = updateTickersTable;
+window.updateTickersSummaryStats = updateTickersSummaryStats;
 window.toggleTickersSection = toggleTickersSection;
 window.restoreTickersSectionState = restoreTickersSectionState;
+
+// Filters
+window.filterTickersByType = filterTickersByType;
+window.getTypeDisplayName = getTypeDisplayName;
+
+// Currency
+window.loadCurrenciesData = loadCurrenciesData;
+window.getCurrencySymbol = getCurrencySymbol;
+window.generateTickerCurrencyOptions = generateTickerCurrencyOptions;
+window.updateCurrencyOptions = updateCurrencyOptions;
+
+// Cache & Styles
 window.clearTickersCache = clearTickersCache;
+window.getTickerTypeStyle = getTickerTypeStyle;
+window.getTickerStatusStyle = getTickerStatusStyle;
+window.getTickerStatusLabel = getTickerStatusLabel;
 
 // ===== פונקציות נתונים חיצוניים =====
 // פונקציות אלו קוראות ל-ExternalDataService (external-data-service.js)
@@ -1903,37 +1894,13 @@ async function refreshExternalDataSilently() {
   }
 }
 
-// ייצוא גלובלי
+// External Data - כבר מוגדר בבלוק המאוחד למעלה
 window.refreshExternalData = refreshExternalData;
 window.refreshExternalDataSilently = refreshExternalDataSilently;
 
 // תאימות לאחור (deprecated - להסרה בגרסה הבאה)
 window.refreshYahooFinanceData = refreshExternalData;
 window.refreshYahooFinanceDataSilently = refreshExternalDataSilently;
-
-// פונקציות מודלים
-window.showAddTickerModal = showAddTickerModal;
-window.showEditTickerModal = showEditTickerModal;
-window.showDeleteTickerModal = showDeleteTickerModal;
-window.saveTicker = saveTicker;
-window.updateTicker = updateTicker;
-window.confirmDeleteTicker = confirmDeleteTicker;
-
-// פונקציות ולידציה סטנדרטיות
-window.validateTickerForm = validateTickerForm;
-window.validateEditTickerForm = validateEditTickerForm;
-
-// פונקציות חדשות לביטול טיקר
-window.checkLinkedItemsAndCancelTicker = checkLinkedItemsAndCancelTicker;
-window.checkLinkedItemsBeforeCancelTicker = checkLinkedItemsBeforeCancelTicker;
-window.performTickerCancellation = performTickerCancellation;
-window.getTickerSymbol = getTickerSymbol;
-
-// פונקציות חדשות למחיקת טיקר
-window.deleteTicker = deleteTicker;
-window.checkLinkedItemsAndDeleteTicker = checkLinkedItemsAndDeleteTicker;
-window.checkLinkedItemsBeforeDeleteTicker = checkLinkedItemsBeforeDeleteTicker;
-window.performTickerDeletion = performTickerDeletion;
 
 // ===== פונקציות סידור =====
 
@@ -1961,25 +1928,7 @@ function restoreSortState() {
   }
 }
 
-// הגדרת הפונקציות כגלובליות
 // window.sortTable export removed - using global version from tables.js
-window.updateTickersTable = updateTickersTable;
-window.updateTickersSummaryStats = updateTickersSummaryStats;
-window.loadCurrenciesData = loadCurrenciesData;
-window.getCurrencySymbol = getCurrencySymbol;
-window.getTickerTypeStyle = getTickerTypeStyle;
-window.getTickerStatusStyle = getTickerStatusStyle;
-window.getTickerStatusLabel = getTickerStatusLabel;
-window.generateTickerCurrencyOptions = generateTickerCurrencyOptions;
-window.updateCurrencyOptions = updateCurrencyOptions;
-
-// פונקציות ביטול טיקר - גלובליות
-window.cancelTicker = cancelTicker;
-window.checkLinkedItemsAndCancelTicker = checkLinkedItemsAndCancelTicker;
-window.performTickerCancellation = performTickerCancellation;
-window.checkLinkedItemsBeforeCancelTicker = checkLinkedItemsBeforeCancelTicker;
-window.getTickerSymbol = getTickerSymbol;
-window.reactivateTicker = reactivateTicker;
 
 /**
  * טעינת צבעים מההעדפות ויישום על הכותרות
@@ -2258,18 +2207,7 @@ function generateDetailedLog() {
 }
 
 
-window.filterTickersByType = filterTickersByType;
-window.getTypeDisplayName = getTypeDisplayName;
-// window.toggleSection removed - using global version from ui-utils.js
-window.toggleTickersSection = toggleTickersSection;
-window.showAddTickerModal = showAddTickerModal;
-window.saveTicker = saveTicker;
-window.updateTicker = updateTicker;
-window.confirmDeleteTicker = confirmDeleteTicker;
-window.editTicker = editTicker;
-window.viewTickerDetails = viewTickerDetails;
-// window.copyDetailedLog export removed - using global version from system-management.js
-// window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
+// window.copyDetailedLog - פונקציה מקומית לעמוד זה בלבד
 
 // Local copyDetailedLog function for tickers page
 async function copyDetailedLog() {

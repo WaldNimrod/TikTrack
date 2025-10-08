@@ -1,9 +1,27 @@
-# תוכנית מיגרציה - טבלת Alerts
-## Alerts Table Migration Plan - Remove Old Fields
+# תוכנית מיגרציה מקיפה - ניקוי שדות מיותרים
+## Comprehensive Migration Plan - Remove Old Redundant Fields
 
 **תאריך:** 8 באוקטובר 2025  
-**מטרה:** הסרת שדות ישנים ומיותרים מטבלת `alerts`  
-**סטטוס:** 📋 תכנון
+**מטרה:** הסרת שדות ישנים ומיותרים מטבלאות המערכת  
+**סטטוס:** 📋 תכנון - מוכן לביצוע
+
+---
+
+## 🔍 סיכום סריקת כל הטבלאות
+
+### ✅ **טבלאות נקיות (אין בעיות):**
+- ✅ **notes** - רק `related_type_id` + `related_id` (נכון!)
+- ✅ **cash_flows** - `trading_account_id` נכון (תזרים לחשבון ספציפי)
+- ✅ **executions** - `trade_id` נכון (עסקה לטרייד ספציפי)
+- ✅ **trades** - `ticker_id`, `trading_account_id`, `trade_plan_id` נכונים
+- ✅ **trade_plans** - `ticker_id`, `trading_account_id` נכונים
+
+### ❌ **טבלאות עם שדות מיותרים:**
+- ❌ **alerts** - 2 שדות מיותרים: `ticker_id`, `trading_account_id`
+
+**מסקנה:** רק טבלת `alerts` דורשת מיגרציה! 🎯
+
+---
 
 ---
 

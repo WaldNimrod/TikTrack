@@ -302,14 +302,14 @@ table,
 table th,
 .table th,
 .data-table th {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
   min-width: 0; /* מאפשר לעמודה להתכווץ */
   max-width: none;
-  word-wrap: normal;
-  word-break: keep-all;
-  hyphens: none;
+  word-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
   text-align: center;
   direction: rtl;
   padding: 0.625rem 0.625rem;
@@ -476,7 +476,9 @@ table td,
   text-align: center;
   position: relative;
   overflow: visible;
-  white-space: nowrap;
+  white-space: normal;
+  word-wrap: break-word;
+  word-break: break-word;
 }
 
 .sortable-header:hover,
@@ -577,7 +579,15 @@ table td,
   max-width: 100%;
 }
 
-#tickersTable th,
+#tickersTable th {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  word-wrap: break-word;
+  word-break: break-word;
+  min-width: 0;
+}
+
 #tickersTable td {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -586,8 +596,16 @@ table td,
 }
 
 #tickersTable th,
+#tradePlansTable th {
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  word-break: break-word !important;
+  min-width: 0 !important;
+}
+
 #tickersTable td,
-#tradePlansTable th,
 #tradePlansTable td {
   overflow: hidden !important;
   text-overflow: ellipsis !important;

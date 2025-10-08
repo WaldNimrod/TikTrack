@@ -1408,10 +1408,6 @@ function validateAlertForm() {
 
 /**
  * שמירת התראה חדשה
- * לפי STANDARD_VALIDATION_GUIDE.md
- */
-/**
- * שמירת התראה חדשה
  * לפי STANDARD_VALIDATION_GUIDE.md + לוגיקה עסקית מיוחדת
  */
 async function saveAlert() {
@@ -1466,22 +1462,17 @@ async function saveAlert() {
         if (window.showSimpleErrorNotification) {
           window.showSimpleErrorNotification('שגיאת ולידציה', 'מחיר לא יכול להיות גדול מ-1,000,000');
         }
-        hasErrors = true;
+        return;
       }
 
       // וולידציה של אחוזים (לשינוי)
       if (conditionAttribute === 'change' && (numericValue < -100 || numericValue > 100)) {
-        if (window.showValidationWarning) {
-          window.showValidationWarning('conditionNumber', 'אחוז שינוי חייב להיות בין -100% ל-100%');
+        if (window.showSimpleErrorNotification) {
+          window.showSimpleErrorNotification('שגיאת ולידציה', 'אחוז שינוי חייב להיות בין -100% ל-100%');
         }
-        hasErrors = true;
+        return;
       }
     }
-  }
-
-  if (hasErrors) {
-    return;
-  }
 
   const alertData = {
     related_type_id: parseInt(formData.get('alertRelationType')),

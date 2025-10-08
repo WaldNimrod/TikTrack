@@ -383,31 +383,48 @@ const formData = {
 
 ---
 
-### **10. ניקוי מטמון אחרי שמירה**
+### **10. ניקוי מטמון אחרי CREATE/UPDATE/DELETE**
 
 #### **הבעיה:**
-- אחרי שמירה, נתונים ישנים נשארים במטמון
-- טעינה מחדש מציגה נתונים מהמטמון (ללא הפריט החדש)
+- אחרי שמירה/עדכון/מחיקה, נתונים ישנים נשארים במטמון
+- טעינה מחדש מציגה נתונים מהמטמון (ללא השינויים)
 
 #### **הפתרון:**
 ```javascript
-// אחרי שמירה מוצלחת
+// אחרי כל פעולה CRUD מוצלחת (CREATE/UPDATE/DELETE)
 if (result.status === 'success') {
-  // 1. ניקוי מטמון
+  // 1. ניקוי מטמון - חובה!
   if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.invalidate === 'function') {
     await window.UnifiedCacheManager.invalidate('cash_flows');
     console.log('✅ מטמון cash_flows נוקה');
   }
 
-  // 2. סגירת מודל
+  // 2. סגירת מודל (אם יש)
+  const modalElement = document.getElementById('add/editCashFlowModal');
+  if (modalElement) {
+    const modal = bootstrap.Modal.getInstance(modalElement);
+    if (modal) {
+      modal.hide();
+    }
+  }
+
   // 3. הודעת הצלחה
+  if (typeof window.showSuccessNotification === 'function') {
+    window.showSuccessNotification('הצלחה', 'הפעולה הושלמה בהצלחה', 4000, 'business');
+  }
+
   // 4. טעינה מחדש
   await loadCashFlows();
 }
 ```
 
+**יישום נדרש:**
+- ✅ `saveCashFlow()` - CREATE - תוקן
+- ✅ `updateCashFlow()` - UPDATE - תוקן
+- ✅ `deleteCashFlow()` - DELETE - תוקן
+
 **קבצים שתוקנו:**
-- `trading-ui/scripts/cash_flows.js` - `saveCashFlow`
+- `trading-ui/scripts/cash_flows.js` - כל 3 פונקציות CRUD
 
 ---
 
@@ -575,11 +592,30 @@ async function deleteCashFlow(id) {
 
 **בדיקה נדרשת בכל העמודים:**
 - [ ] חיפוש פונקציות כפולות: `grep -n "^function [name]\|^async function [name]"`
-- [ ] מחיקת wrapper functions מיותרות
+- [ ] מחיקת wrapper functions שקוראות לעצמן
+- [ ] תיקון wrapper functions לקרוא לפונקציה הנכונה
 - [ ] וידוא שיש רק פונקציה אחת לכל פעולה
 
+**דוגמאות לתיקון:**
+```javascript
+// ❌ לולאה אינסופית
+function deleteCashFlow(id) {
+    window.deleteCashFlow(id); // קורא לעצמו!
+}
+
+// ✅ תיקון - קריאה לפונקציה הנכונה
+function editCashFlow(id) {
+    if (typeof showEditCashFlowModal === 'function') {
+        showEditCashFlowModal(id);
+    }
+}
+
+// ✅ או מחיקה מוחלטת אם יש פונקציה אמיתית
+// אם יש async function deleteCashFlow - פשוט תמחק את ה-wrapper
+```
+
 **קבצים שתוקנו:**
-- `trading-ui/scripts/cash_flows.js` - מחיקת פונקציה כפולה
+- `trading-ui/scripts/cash_flows.js` - תיקון 2 wrapper functions (delete, edit)
 
 ---
 
@@ -886,6 +922,81 @@ async function ensureTickersLoaded() {
 
 ---
 
+## ⚠️ תיקונים קריטיים נוספים
+
+### **תיקון תהליך עריכה (editCashFlow)**
+
+#### **בעיות שנמצאו:**
+1. ❌ wrapper function `editCashFlow` קרא לעצמו → לולאה אינסופית
+2. ❌ לא היה ניקוי מטמון אחרי עדכון
+3. ❌ `updateCashFlow` השתמש ב-`account_id` במקום `trading_account_id`
+4. ❌ לא היתה המרת תאריך ל-`YYYY-MM-DD`
+
+#### **תיקונים שבוצעו:**
+
+**1. תיקון editCashFlow wrapper:**
+```javascript
+// ❌ לפני - לולאה אינסופית
+function editCashFlow(id) {
+    if (typeof window.editCashFlow === 'function') {
+        window.editCashFlow(id); // קורא לעצמו!
+    }
+}
+
+// ✅ אחרי - קריאה נכונה
+function editCashFlow(id) {
+    if (typeof showEditCashFlowModal === 'function') {
+        showEditCashFlowModal(id);
+    }
+}
+```
+
+**2. תיקון updateCashFlow:**
+```javascript
+async function updateCashFlow() {
+  try {
+    // ✅ בדיקת קיום אלמנטים
+    const accountIdElement = document.getElementById('editCashFlowAccountId');
+    const dateElement = document.getElementById('editCashFlowDate');
+    // ... בדיקות נוספות
+
+    // ✅ המרת תאריך
+    const dateOnly = dateElement.value.split('T')[0];
+
+    const formData = {
+      trading_account_id: parseInt(accountIdElement.value), // ✅ שדה נכון
+      date: dateOnly, // ✅ פורמט נכון
+      // ...
+    };
+
+    const response = await fetch(`http://127.0.0.1:8080/api/cash_flows/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(formData),
+    });
+
+    if (result.status === 'success') {
+      // ✅ ניקוי מטמון
+      if (window.UnifiedCacheManager) {
+        await window.UnifiedCacheManager.invalidate('cash_flows');
+      }
+      
+      // ✅ הודעת הצלחה
+      window.showSuccessNotification('הצלחה', 'תזרים המזומנים נעדכן בהצלחה', 4000, 'business');
+      
+      // ✅ רענון טבלה
+      await loadCashFlows();
+    }
+  } catch (error) {
+    // טיפול בשגיאות
+  }
+}
+```
+
+**קבצים שתוקנו:**
+- `trading-ui/scripts/cash_flows.js` - `editCashFlow()` wrapper + `updateCashFlow()`
+
+---
+
 ## 🚀 מוכן ליישום סטנדרטי!
 
 **תהליך הסטנדרטיזציה יכלול:**
@@ -893,7 +1004,8 @@ async function ensureTickersLoaded() {
 - ✅ מערכת ולידציה אחידה
 - ✅ ברירות מחדל חכמות
 - ✅ הצגת נתונים מובנת (שמות במקום מזהים)
-- ✅ ניקוי מטמון נכון
+- ✅ ניקוי מטמון אחרי כל פעולת CRUD (CREATE/UPDATE/DELETE)
+- ✅ תיקון wrapper functions (מניעת לולאות אינסופיות)
 - ✅ חווית משתמש אחידה
 
 **הכל מתועד ומוכן ליישום!** 🎯

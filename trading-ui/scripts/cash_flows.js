@@ -1900,19 +1900,39 @@ async function updateCashFlow() {
   try {
     const id = parseInt(document.getElementById('editCashFlowId').value);
 
-    // איסוף נתונים מהטופס
-    const currencyIdValue = document.getElementById('editCashFlowCurrencyId').value;
-    const externalIdValue = document.getElementById('editCashFlowExternalId').value;
+    // איסוף אלמנטים
+    const accountIdElement = document.getElementById('editCashFlowAccountId');
+    const typeElement = document.getElementById('editCashFlowType');
+    const amountElement = document.getElementById('editCashFlowAmount');
+    const dateElement = document.getElementById('editCashFlowDate');
+    const currencyIdElement = document.getElementById('editCashFlowCurrencyId');
+    const sourceElement = document.getElementById('editCashFlowSource');
+    const descriptionElement = document.getElementById('editCashFlowDescription');
+    const usdRateElement = document.getElementById('editCashFlowUsdRate');
+    const externalIdElement = document.getElementById('editCashFlowExternalId');
+
+    // בדיקת קיום אלמנטים חובה
+    if (!accountIdElement || !typeElement || !amountElement || !dateElement) {
+      if (typeof window.showSimpleErrorNotification === 'function') {
+        window.showSimpleErrorNotification('שגיאה', 'שדות חובה חסרים בטופס');
+      }
+      return;
+    }
+
+    // המרת תאריך לפורמט YYYY-MM-DD
+    const dateValue = dateElement.value;
+    const dateOnly = dateValue ? dateValue.split('T')[0] : null;
+
     const formData = {
-      account_id: parseInt(document.getElementById('editCashFlowAccountId').value),
-      type: document.getElementById('editCashFlowType').value,
-      amount: parseFloat(document.getElementById('editCashFlowAmount').value),
-      currency_id: currencyIdValue ? parseInt(currencyIdValue) : null,
-      usd_rate: 1.000000,
-      date: document.getElementById('editCashFlowDate').value,
-      description: document.getElementById('editCashFlowDescription').value,
-      source: document.getElementById('editCashFlowSource').value,
-      external_id: externalIdValue || '0',
+      trading_account_id: parseInt(accountIdElement.value),
+      type: typeElement.value,
+      amount: parseFloat(amountElement.value),
+      currency_id: currencyIdElement ? parseInt(currencyIdElement.value) : 1,
+      usd_rate: usdRateElement ? parseFloat(usdRateElement.value) : 1.000000,
+      date: dateOnly,
+      description: descriptionElement ? descriptionElement.value : '',
+      source: sourceElement ? sourceElement.value : 'manual',
+      external_id: externalIdElement ? externalIdElement.value : '0',
     };
 
     // בדיקת תקינות מקיפה
@@ -1941,11 +1961,24 @@ async function updateCashFlow() {
     const result = await response.json();
     if (result.status === 'success') {
       // סגירת המודל
-      const modal = bootstrap.Modal.getInstance(document.getElementById('editCashFlowModal'));
-      modal.hide();
+      const modalElement = document.getElementById('editCashFlowModal');
+      if (modalElement) {
+        const modal = bootstrap.Modal.getInstance(modalElement);
+        if (modal) {
+          modal.hide();
+        }
+      }
+
+      // ניקוי מטמון cash_flows
+      if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.invalidate === 'function') {
+        await window.UnifiedCacheManager.invalidate('cash_flows');
+        console.log('✅ מטמון cash_flows נוקה אחרי עדכון');
+      }
 
       // הצגת הודעת הצלחה
-      window.showSuccessNotification('הצלחה', 'תזרים המזומנים נעדכן בהצלחה');
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('הצלחה', 'תזרים המזומנים נעדכן בהצלחה', 4000, 'business');
+      }
 
       // טעינה מחדש של הנתונים
       await loadCashFlows();
@@ -2017,11 +2050,12 @@ async function updateCashFlow() {
 // Toggle functions
 
 // Cash Flow CRUD functions
+// פונקציית עריכה - קוראת ל-showEditCashFlowModal
 function editCashFlow(id) {
-    if (typeof window.editCashFlow === 'function') {
-        window.editCashFlow(id);
+    if (typeof showEditCashFlowModal === 'function') {
+        showEditCashFlowModal(id);
     } else {
-        console.warn('editCashFlow function not found');
+        console.warn('showEditCashFlowModal function not found');
     }
 }
 

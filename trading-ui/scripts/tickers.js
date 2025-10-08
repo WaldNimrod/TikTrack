@@ -1958,7 +1958,65 @@ window.toggleTickersSection = toggleTickersSection;
 window.restoreTickersSectionState = restoreTickersSectionState;
 window.clearTickersCache = clearTickersCache;
 
-// פונקציות נתונים חיצוניים
+// ===== פונקציות נתונים חיצוניים =====
+// פונקציות אלו קוראות ל-ExternalDataService (external-data-service.js)
+
+/**
+ * רענון נתוני מחירים חיצוניים לכל הטיקרים
+ * משתמש ב-ExternalDataService שעובד עם כל הספקים
+ */
+async function refreshYahooFinanceData() {
+  try {
+    // טעינת נתונים אם צריך
+    if (!window.tickersData || window.tickersData.length === 0) {
+      await loadTickersData();
+    }
+
+    // שימוש ב-ExternalDataService
+    const service = window.ExternalDataService;
+    if (!service) {
+      throw new Error('External Data Service not available');
+    }
+
+    // רענון הנתונים
+    const externalData = await service.refreshTickersData(window.tickersData);
+    
+    if (externalData) {
+      // עדכון הטבלה
+      window.tickersData = service.updateTickersWithExternalData(window.tickersData, externalData);
+      updateTickersTable(window.tickersData);
+      updateTickersSummaryStats(window.tickersData);
+    }
+  } catch (error) {
+    console.error('Error refreshing external data:', error);
+  }
+}
+
+/**
+ * רענון נתוני מחירים חיצוניים ללא הודעות (לטעינה אוטומטית)
+ */
+async function refreshYahooFinanceDataSilently() {
+  try {
+    if (!window.tickersData || window.tickersData.length === 0) {
+      return;
+    }
+
+    const service = window.ExternalDataService;
+    if (!service) {
+      return;
+    }
+
+    const externalData = await service.refreshTickersDataSilently(window.tickersData);
+    
+    if (externalData) {
+      window.tickersData = service.updateTickersWithExternalData(window.tickersData, externalData);
+    }
+  } catch (error) {
+    console.warn('Silent external data refresh failed:', error.message);
+  }
+}
+
+// ייצוא גלובלי
 window.refreshYahooFinanceData = refreshYahooFinanceData;
 window.refreshYahooFinanceDataSilently = refreshYahooFinanceDataSilently;
 

@@ -1788,25 +1788,128 @@ function updateTickersSummaryStats(tickers) {
 }
 
 
+// ===== פונקציות עזר לטבלה =====
+
 /**
- * עדכון טבלת טיקרים - גרסה פשוטה
+ * פורמט מחיר טיקר
+ */
+function formatTickerPrice(ticker) {
+  const currentPrice = ticker.current_price || 'N/A';
+  const changePercent = ticker.change_percent || 0;
+  
+  const changeColor = changePercent >= 0 ? '#28a745' : '#dc3545';
+  const formattedPrice = (currentPrice !== 'N/A' && currentPrice !== null && currentPrice !== undefined) ?
+    `$${parseFloat(currentPrice).toFixed(2)}` : 'N/A';
+  
+  return { formattedPrice, changeColor };
+}
+
+/**
+ * פורמט שינוי אחוזים
+ */
+function formatTickerChange(ticker) {
+  const changePercent = ticker.change_percent || 0;
+  const changeColor = changePercent >= 0 ? '#28a745' : '#dc3545';
+  const changeSign = changePercent >= 0 ? '+' : '';
+  const changeDisplay = (changePercent !== 'N/A' && changePercent !== null && changePercent !== undefined) ?
+    `${changeSign}${changePercent.toFixed(2)}%` : 'N/A';
+  
+  return { changeDisplay, changeColor };
+}
+
+/**
+ * פורמט זמן עדכון
+ */
+function formatTickerUpdateTime(ticker) {
+  const updatedAtDisplay = ticker.yahoo_updated_at || 'N/A';
+  return (updatedAtDisplay !== 'N/A' && updatedAtDisplay !== null && updatedAtDisplay !== undefined) ?
+    new Date(updatedAtDisplay).toLocaleString('he-IL', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    }) : 'N/A';
+}
+
+/**
+ * יצירת HTML לכפתורי פעולה
+ */
+function createTickerActionsHTML(tickerId) {
+  return `
+    <button class="btn btn-sm btn-outline-info" onclick="viewLinkedItemsForTicker(${tickerId})" title="פריטים מקושרים">
+      <i class="bi bi-link-45deg"></i>
+    </button>
+    <button class="btn btn-sm btn-outline-primary" onclick="editTicker(${tickerId})" title="עריכה">
+      <i class="bi bi-pencil"></i>
+    </button>
+    <button class="btn btn-sm btn-outline-info" onclick="viewTickerDetails(${tickerId})" title="פרטים">
+      <i class="bi bi-eye"></i>
+    </button>
+    <button class="btn btn-sm btn-outline-danger" onclick="deleteTicker(${tickerId})" title="מחיקה">
+      <i class="bi bi-trash"></i>
+    </button>
+  `;
+}
+
+/**
+ * יצירת HTML לשורת טיקר
+ */
+function createTickerRowHTML(ticker) {
+  const { formattedPrice, changeColor: priceColor } = formatTickerPrice(ticker);
+  const { changeDisplay, changeColor } = formatTickerChange(ticker);
+  const formattedUpdatedAt = formatTickerUpdateTime(ticker);
+  const statusStyle = getTickerStatusStyle(ticker.status);
+  const statusLabel = getTickerStatusLabel(ticker.status);
+  
+  return `
+    <tr>
+      <td title="${ticker.name || 'N/A'}">
+        <span class="ticker-name-link" 
+              onclick="if (window.showEntityDetails) { window.showEntityDetails('ticker', ${ticker.id}); } else { console.error('פונקציה showEntityDetails לא קיימת'); }" 
+              title="לחץ לצפייה בפרטי הטיקר">
+          <strong>${ticker.name || 'N/A'}</strong>
+        </span>
+      </td>
+      <td title="${formattedPrice !== 'N/A' ? `מחיר נוכחי: ${formattedPrice}` : 'אין נתוני מחיר'}" 
+          style="color: ${priceColor}; font-weight: bold; text-align: center; direction: ltr;">
+        ${formattedPrice}
+      </td>
+      <td title="${changeDisplay !== 'N/A' ? `שינוי יומי: ${changeDisplay}` : 'אין נתוני שינוי'}" 
+          style="color: ${changeColor}; font-weight: bold; text-align: center; direction: ltr;">
+        ${changeDisplay}
+      </td>
+      <td title="${formattedUpdatedAt !== 'N/A' ? `עדכון אחרון: ${formattedUpdatedAt}` : 'אין נתוני עדכון'}" 
+          style="text-align: center; direction: ltr;">
+        ${formattedUpdatedAt}
+      </td>
+      <td title="${statusLabel}">
+        <span style="background-color: ${statusStyle.backgroundColor}; 
+                     color: ${statusStyle.color}; 
+                     padding: ${statusStyle.padding}; 
+                     border-radius: ${statusStyle.borderRadius}; 
+                     font-size: ${statusStyle.fontSize}; 
+                     font-weight: ${statusStyle.fontWeight}; 
+                     display: ${statusStyle.display}; 
+                     text-align: ${statusStyle.textAlign};">
+          ${statusLabel}
+        </span>
+      </td>
+      <td class="col-actions actions-cell actions-3-btn">
+        ${createTickerActionsHTML(ticker.id)}
+      </td>
+    </tr>
+  `;
+}
+
+/**
+ * עדכון טבלת טיקרים - גרסה מחודשת ומאופטמת
  */
 function updateTickersTable(tickers) {
-
-  if (tickers && tickers.length > 0) {
-
-
-  }
   try {
     // מציאת ה-tbody
-    let tbody = document.querySelector('table[data-table-type="tickers"] tbody');
-
-    if (!tbody) {
-      const container = document.getElementById('tickersContainer');
-      if (container) {
-        tbody = container.querySelector('tbody');
-      }
-    }
+    const tbody = document.querySelector('table[data-table-type="tickers"] tbody') ||
+                   document.getElementById('tickersContainer')?.querySelector('tbody');
 
     if (!tbody) {
       handleElementNotFound('updateTickersTable', 'אלמנט tbody לא נמצא');
@@ -1816,122 +1919,23 @@ function updateTickersTable(tickers) {
     // בדיקה אם יש נתונים
     if (!tickers || tickers.length === 0) {
       tbody.innerHTML = '<tr><td colspan="6" class="text-center">לא נמצאו טיקרים</td></tr>';
-
       return;
     }
 
-    // יצירת שורות עם עיצוב משופר
+    // יצירת שורות
+    const tableRows = tickers.map(ticker => createTickerRowHTML(ticker));
+    
+    // עדכון הטבלה
+    tbody.innerHTML = tableRows.join('');
+    tbody.offsetHeight; // כפיית reflow
 
-
-    const tableRows = tickers.map(ticker => {
-
-      // קבלת סמל מטבע
-      const currencySymbol = getCurrencySymbol(ticker.currency_id);
-
-      // קבלת עיצוב סוג טיקר
-      const typeStyle = getTickerTypeStyle(ticker.type);
-      const typeLabel = tickerTypeColors[ticker.type]?.label || ticker.type || 'N/A';
-
-      // קבלת עיצוב סטטוס
-      const statusStyle = getTickerStatusStyle(ticker.status);
-      const statusLabel = getTickerStatusLabel(ticker.status);
-
-      // נתוני מחירים מהשירות החיצוני
-      const currentPrice = ticker.current_price || 'N/A';
-      const changePercent = ticker.change_percent || 0;
-      const volume = ticker.volume || 'N/A';
-      const updatedAtDisplay = ticker.yahoo_updated_at || 'N/A';
-      
-      // פורמט תאריך עדכון
-      const formattedUpdatedAt = (updatedAtDisplay !== 'N/A' && updatedAtDisplay !== null && updatedAtDisplay !== undefined) ?
-        new Date(updatedAtDisplay).toLocaleString('he-IL', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit'
-        }) : 'N/A';
-      
-      // לוגים לדיבוג
-      if (ticker.symbol === 'AAPL') {
-        console.log(`🔍 Debug AAPL:`, {
-          current_price: ticker.current_price,
-          change_percent: ticker.change_percent,
-          volume: ticker.volume,
-          yahoo_updated_at: ticker.yahoo_updated_at
-        });
-      }
-
-      // עיצוב שינוי אחוזים
-      const changeColor = changePercent >= 0 ? '#28a745' : '#dc3545';
-      const changeSign = changePercent >= 0 ? '+' : '';
-      const changeDisplay = (changePercent !== 'N/A' && changePercent !== null && changePercent !== undefined) ?
-        `${changeSign}${changePercent.toFixed(2)}%` : 'N/A';
-      
-      // עיגול מחיר לעד 2 ספרות אחרי הנקודה
-      const formattedPrice = (currentPrice !== 'N/A' && currentPrice !== null && currentPrice !== undefined) ?
-        `$${parseFloat(currentPrice).toFixed(2)}` : 'N/A';
-
-      return `
-                <tr>
-                    <td title="${ticker.name || 'N/A'}">
-                        <span class="ticker-name-link" 
-                              onclick="if (window.showEntityDetails) { window.showEntityDetails('ticker', ${ticker.id}); } else { console.error('פונקציה showEntityDetails לא קיימת'); }" 
-                              title="לחץ לצפייה בפרטי הטיקר">
-                            <strong>${ticker.name || 'N/A'}</strong>
-                        </span>
-                    </td>
-                    <td title="${formattedPrice !== 'N/A' ? `מחיר נוכחי: ${formattedPrice}` : 'אין נתוני מחיר'}" style="color: ${changeColor}; font-weight: bold; text-align: center; direction: ltr;">${formattedPrice}</td>
-                    <td title="${changeDisplay !== 'N/A' ? `שינוי יומי: ${changeDisplay}` : 'אין נתוני שינוי'}" style="color: ${changeColor}; font-weight: bold; text-align: center; direction: ltr;">${changeDisplay}</td>
-                    <td title="${formattedUpdatedAt !== 'N/A' ? `עדכון אחרון: ${formattedUpdatedAt}` : 'אין נתוני עדכון'}" style="text-align: center; direction: ltr;">${formattedUpdatedAt}</td>
-                    <td title="${statusLabel}">
-                        <span style="background-color: ${statusStyle.backgroundColor}; 
-                                     color: ${statusStyle.color}; 
-                                     padding: ${statusStyle.padding}; 
-                                     border-radius: ${statusStyle.borderRadius}; 
-                                     font-size: ${statusStyle.fontSize}; 
-                                     font-weight: ${statusStyle.fontWeight}; 
-                                     display: ${statusStyle.display}; 
-                                     text-align: ${statusStyle.textAlign};">
-                            ${statusLabel}
-                        </span>
-                    </td>
-                    <td class="col-actions actions-cell actions-3-btn">
-                        <button class="btn btn-sm btn-outline-info" onclick="viewLinkedItemsForTicker(${ticker.id})" title="פריטים מקושרים">
-                            <i class="bi bi-link-45deg"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-primary" onclick="editTicker(${ticker.id})" title="עריכה">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-info" onclick="viewTickerDetails(${ticker.id})" title="פרטים">
-                            <i class="bi bi-eye"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="deleteTicker(${ticker.id})" title="מחיקה">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `;
-    });
-
-    // עדכון הטבלה עם כפיית רענון DOM
-    const finalHTML = tableRows.join('');
-
-
-    tbody.innerHTML = '';  // ניקוי מלא
-
-    tbody.innerHTML = finalHTML;  // הוספת התוכן החדש
-
-    // כפיית reflow של הדפדפן
-    tbody.offsetHeight;
-
-    // עדכון הספירה
+    // עדכון ספירה
     const countElement = document.querySelector('.table-count');
     if (countElement) {
       countElement.textContent = `${tickers.length} טיקרים`;
     }
 
-    // סידור ברירת מחדל לפי העמודה הראשונה (סמל) - רק אם אין סידור קיים
+    // סידור ברירת מחדל
     if (typeof window.applyDefaultSort === 'function') {
       window.applyDefaultSort('tickers', tickers, updateTickersTable);
     }

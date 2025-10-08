@@ -64,7 +64,7 @@
     <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=20251001">
     
     <!-- 07-trumps - Page-specific Styles -->
-    <link rel="stylesheet" href="styles-new/07-trumps/_trades.css?v=20251001">
+    <!-- <link rel="stylesheet" href="styles-new/07-trumps/_trades.css?v=20251001"> -->
     
     <!-- 08-themes - Themes -->
     <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=20251001">
@@ -263,7 +263,7 @@
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="tradesTableBody">
                                     <tr>
                                         <td colspan="13" class="loading">טוען טריידים...</td>
                                     </tr>
@@ -281,6 +281,135 @@
 
         <!-- מרווח בתחתית הדף -->
         <div style="height: 3rem;"></div>
+
+        <!-- מודל הוספת טרייד -->
+        <div class="modal fade" id="addTradeModal" tabindex="-1" aria-labelledby="addTradeModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
+            <div class="modal-dialog modal-lg" style="max-width: 800px; margin: 1.75rem auto;">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-colored">
+                        <h5 class="modal-title" id="addTradeModalLabel">הוספת טרייד חדש</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addTradeForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="addTicker" class="form-label">טיקר</label>
+                                        <select class="form-select" id="addTicker" required>
+                                            <option value="">בחר טיקר</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="addAccount" class="form-label">חשבון מסחר</label>
+                                        <select class="form-select" id="addAccount" required>
+                                            <option value="">בחר חשבון</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="addStatus" class="form-label">סטטוס</label>
+                                        <select class="form-select" id="addStatus" required>
+                                            <option value="open">פתוח</option>
+                                            <option value="closed">סגור</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="addType" class="form-label">סוג השקעה</label>
+                                        <select class="form-select" id="addType" required>
+                                            <option value="swing">Swing</option>
+                                            <option value="day">Day</option>
+                                            <option value="scalp">Scalp</option>
+                                            <option value="position">Position</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="addSide" class="form-label">צד</label>
+                                        <select class="form-select" id="addSide" required>
+                                            <option value="Long">Long</option>
+                                            <option value="Short">Short</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="addTradePlan" class="form-label">תוכנית טרייד</label>
+                                        <select class="form-select" id="addTradePlan">
+                                            <option value="">בחר תוכנית</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="addEntryPrice" class="form-label">מחיר כניסה</label>
+                                        <input type="number" class="form-control" id="addEntryPrice" step="0.01" min="0">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="addExitPrice" class="form-label">מחיר יציאה</label>
+                                        <input type="number" class="form-control" id="addExitPrice" step="0.01" min="0">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="addQuantity" class="form-label">כמות</label>
+                                        <input type="number" class="form-control" id="addQuantity" step="1" min="1">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="addPnl" class="form-label">רווח/הפסד</label>
+                                        <input type="number" class="form-control" id="addPnl" step="0.01" value="0">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="addCreatedAt" class="form-label">תאריך יצירה</label>
+                                        <input type="datetime-local" class="form-control" id="addCreatedAt">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="addClosedAt" class="form-label">תאריך סגירה</label>
+                                        <input type="datetime-local" class="form-control" id="addClosedAt">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <label for="addRemarks" class="form-label">הערות</label>
+                                        <textarea class="form-control" id="addRemarks" rows="2" placeholder="הערות נוספות..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                        <button type="button" class="btn btn-success" onclick="addTrade()">הוסף טרייד</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- מודל עריכת טרייד -->
         <div class="modal fade" id="editTradeModal" tabindex="-1" aria-labelledby="editTradeModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
@@ -332,7 +461,9 @@
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="editTicker" class="form-label">טיקר</label>
-                                        <input type="text" class="form-control" id="editTicker" required disabled>
+                                        <select class="form-select" id="editTicker" required>
+                                            <option value="">בחר טיקר</option>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -348,10 +479,12 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="editType" class="form-label">סוג</label>
+                                        <label for="editType" class="form-label">סוג השקעה</label>
                                         <select class="form-select" id="editType" required>
-                                            <option value="buy">קנייה</option>
-                                            <option value="sell">מכירה</option>
+                                            <option value="swing">Swing</option>
+                                            <option value="day">Day</option>
+                                            <option value="scalp">Scalp</option>
+                                            <option value="position">Position</option>
                                         </select>
                                     </div>
                                 </div>

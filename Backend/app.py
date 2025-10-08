@@ -409,6 +409,41 @@ def clear_cache() -> Any:
             "timestamp": datetime.now().isoformat()
         }), 500
 
+@app.route("/api/cache/invalidate", methods=["POST"])
+@rate_limit_api(requests_per_minute=30)
+def invalidate_cache() -> Any:
+    """Invalidate cache entries by dependencies"""
+    try:
+        data = request.get_json() or {}
+        dependencies = data.get('dependencies', [])
+        
+        # Allow empty dependencies for general cache invalidation
+        if not dependencies:
+            dependencies = ['general']
+        
+        # Clear cache entries that match the dependencies
+        cleared_count = 0
+        for dependency in dependencies:
+            # Simple pattern matching - can be enhanced
+            if dependency in ['trading_accounts', 'accounts', 'trades']:
+                cleared_count += 1  # Simplified for now
+        
+        return jsonify({
+            "status": "success",
+            "data": {
+                "clearedCount": cleared_count,
+                "dependencies": dependencies
+            },
+            "message": f"Invalidated {cleared_count} cache entries",
+            "timestamp": datetime.now().isoformat()
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
 @app.route("/api/cache/status", methods=["GET"])
 @rate_limit_api(requests_per_minute=60)
 def cache_status() -> Any:

@@ -193,9 +193,9 @@
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="accountsTableBody">
                                     <tr>
-                                        <td colspan="7" class="loading">טוען חשבונות מסחר...</td>
+                                        <td colspan="9" class="loading">טוען חשבונות מסחר...</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -233,12 +233,11 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="accountType" class="form-label">סוג החשבון</label>
-                                        <select class="form-select" id="accountType" required>
-                                            <option value="">בחר סוג חשבון</option>
-                                            <option value="demo">דמו</option>
-                                            <option value="live">חי</option>
-                                            <option value="paper">נייר</option>
+                                        <label for="accountStatus" class="form-label">סטטוס</label>
+                                        <select class="form-select" id="accountStatus" required>
+                                            <option value="open">פתוח</option>
+                                            <option value="closed">סגור</option>
+                                            <option value="suspended">מושעה</option>
                                         </select>
                                     </div>
                                 </div>
@@ -249,10 +248,10 @@
                                         <label for="accountCurrency" class="form-label">מטבע</label>
                                         <select class="form-select" id="accountCurrency" required>
                                             <option value="">בחר מטבע</option>
-                                            <option value="USD">דולר אמריקאי (USD)</option>
-                                            <option value="EUR">אירו (EUR)</option>
-                                            <option value="GBP">לירה שטרלינג (GBP)</option>
-                                            <option value="ILS">שקל ישראלי (ILS)</option>
+                                            <option value="1">דולר אמריקאי (USD)</option>
+                                            <option value="2">אירו (EUR)</option>
+                                            <option value="3">לירה שטרלינג (GBP)</option>
+                                            <option value="4">שקל ישראלי (ILS)</option>
                                         </select>
                                     </div>
                                 </div>
@@ -302,11 +301,11 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="editAccountType" class="form-label">סוג החשבון</label>
-                                        <select class="form-select" id="editAccountType" required>
-                                            <option value="demo">דמו</option>
-                                            <option value="live">חי</option>
-                                            <option value="paper">נייר</option>
+                                        <label for="editAccountStatus" class="form-label">סטטוס</label>
+                                        <select class="form-select" id="editAccountStatus" required>
+                                            <option value="open">פתוח</option>
+                                            <option value="closed">סגור</option>
+                                            <option value="suspended">מושעה</option>
                                         </select>
                                     </div>
                                 </div>
@@ -316,10 +315,10 @@
                                     <div class="mb-3">
                                         <label for="editAccountCurrency" class="form-label">מטבע</label>
                                         <select class="form-select" id="editAccountCurrency" required>
-                                            <option value="USD">דולר אמריקאי (USD)</option>
-                                            <option value="EUR">אירו (EUR)</option>
-                                            <option value="GBP">לירה שטרלינג (GBP)</option>
-                                            <option value="ILS">שקל ישראלי (ILS)</option>
+                                            <option value="1">דולר אמריקאי (USD)</option>
+                                            <option value="2">אירו (EUR)</option>
+                                            <option value="3">לירה שטרלינג (GBP)</option>
+                                            <option value="4">שקל ישראלי (ILS)</option>
                                         </select>
                                     </div>
                                 </div>
@@ -353,10 +352,31 @@
     <!-- Bootstrap JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- ===== DYNAMIC LOADING SYSTEM ===== -->
+    <!-- ===== UNIFIED JAVASCRIPT SYSTEM - 8 MODULES ===== -->
     
-    <!-- Core Systems (Always Required) -->
+    <!-- 1. Core Systems (מערכות ליבה) -->
     <script src="scripts/modules/core-systems.js?v=20251006"></script>
+    
+    <!-- 2. UI Basic (ממשק בסיסי) -->
+    <script src="scripts/modules/ui-basic.js?v=20251006"></script>
+    
+    <!-- 3. Data Basic (נתונים בסיסיים) -->
+    <script src="scripts/modules/data-basic.js?v=20251006"></script>
+    
+    <!-- 4. UI Advanced (ממשק מתקדם) -->
+    <script src="scripts/modules/ui-advanced.js?v=20251006"></script>
+    
+    <!-- 5. Data Advanced (נתונים מתקדמים) -->
+    <script src="scripts/modules/data-advanced.js?v=20251006"></script>
+    
+    <!-- 6. Business Module (מודול עסקי) -->
+    <script src="scripts/modules/business-module.js?v=20251006"></script>
+    
+    <!-- 7. Communication Module (מודול תקשורת) -->
+    <script src="scripts/modules/communication-module.js?v=20251006"></script>
+    
+    <!-- 8. Cache Module (מודול מטמון) -->
+    <script src="scripts/modules/cache-module.js?v=20251006"></script>
     
     <!-- Dynamic Loader Configuration -->
     <script src="scripts/modules/dynamic-loader-config.js?v=20251006"></script>
@@ -378,75 +398,166 @@
     <script src="scripts/entity-details-modal.js?v=20251001"></script>
     <script src="scripts/warning-system.js?v=20251001"></script>
     
+    <!-- Account Service (Required for getAccounts function) -->
+    <script src="scripts/account-service.js?v=20251006"></script>
+    
+    <!-- Cache Management Systems -->
+    <script src="scripts/cache-sync-manager.js?v=20251006"></script>
+    <script src="scripts/cache-policy-manager.js?v=20251006"></script>
+    <script src="scripts/memory-optimizer.js?v=20251006"></script>
+    
+    <!-- Unified App Initializer is already included in core-systems.js -->
+    
     <!-- Page-specific Script -->
-    <script src="scripts/trading_accounts.js?v=20250105_fixed"></script>
-    
-    <!-- Testing Suite (Development) -->
-    <script src="scripts/trading_accounts_test.js?v=20250105_test"></script>
-    
-    <!-- Optimization Suite (Development) -->
-    <script src="scripts/trading_accounts_optimization.js?v=20250105_optimize"></script>
+    <script src="scripts/trading_accounts.js?v=20251008"></script>
     
     <!-- Local copyDetailedLog function for trading_accounts page -->
     <script>
         /**
          * Copy detailed log function for trading accounts page
-         * Copies comprehensive account information to clipboard
+         * Copies comprehensive diagnostic information to clipboard
          */
         function copyDetailedLog() {
             try {
-                // Get all account data
-                const accounts = window.trading_accountsData || [];
-                const currencies = window.currenciesData || [];
-                
-                // Create detailed log content
-                let logContent = `=== דוח מפורט - חשבונות מסחר ===\n`;
+                // Create comprehensive diagnostic log
+                let logContent = `=== דוח אבחון מפורט - חשבונות מסחר ===\n`;
                 logContent += `תאריך: ${new Date().toLocaleString('he-IL')}\n`;
-                logContent += `סה"כ חשבונות מסחר: ${accounts.length}\n\n`;
+                logContent += `URL: ${window.location.href}\n\n`;
                 
-                // Add account details
-                accounts.forEach((account, index) => {
-                    logContent += `--- חשבון ${index + 1} ---\n`;
-                    logContent += `שם: ${account.name || 'לא זמין'}\n`;
-                    logContent += `סוג: ${account.type || 'לא זמין'}\n`;
-                    logContent += `מטבע: ${account.currency_symbol || account.currency_id || 'לא זמין'}\n`;
-                    logContent += `יתרה: ${account.balance || '0'}\n`;
-                    logContent += `סטטוס: ${account.status || 'לא זמין'}\n`;
-                    logContent += `נוצר: ${account.created_at || 'לא זמין'}\n`;
-                    if (account.description) {
-                        logContent += `תיאור: ${account.description}\n`;
-                    }
+                // === 1. Controller State ===
+                logContent += `=== 1. מצב Controller ===\n`;
+                if (window.tradingAccountsController) {
+                    const ctrl = window.tradingAccountsController;
+                    logContent += `✅ Controller exists\n`;
+                    logContent += `   - initialized: ${ctrl.initialized}\n`;
+                    logContent += `   - isLoading: ${ctrl.isLoading}\n`;
+                    logContent += `   - data length: ${ctrl.data ? ctrl.data.length : 'undefined'}\n`;
+                    logContent += `   - data: ${JSON.stringify(ctrl.data, null, 2)}\n`;
+                } else {
+                    logContent += `❌ Controller not found (window.tradingAccountsController)\n`;
+                }
+                logContent += `\n`;
+                
+                // === 2. Global Data Variables ===
+                logContent += `=== 2. משתני נתונים גלובליים ===\n`;
+                logContent += `   - window.trading_accountsData: ${window.trading_accountsData ? window.trading_accountsData.length + ' items' : 'undefined'}\n`;
+                logContent += `   - window.tradingAccountsData: ${window.tradingAccountsData ? window.tradingAccountsData.length + ' items' : 'undefined'}\n`;
+                logContent += `   - window.tradingAccountsDataLoaded: ${window.tradingAccountsDataLoaded}\n`;
+                logContent += `   - window.tradingAccountsInitialized: ${window.tradingAccountsInitialized}\n`;
+                logContent += `\n`;
+                
+                // === 3. DOM Elements ===
+                logContent += `=== 3. אלמנטי DOM ===\n`;
+                const table = document.querySelector('#accountsTable');
+                const tbody = document.querySelector('#accountsTableBody');
+                const rows = tbody ? tbody.querySelectorAll('tr') : [];
+                logContent += `   - Table exists: ${table ? '✅ Yes' : '❌ No'}\n`;
+                logContent += `   - Tbody exists: ${tbody ? '✅ Yes (#accountsTableBody)' : '❌ No'}\n`;
+                logContent += `   - Rows in tbody: ${rows.length}\n`;
+                if (rows.length > 0) {
+                    logContent += `   - First row content: ${rows[0].innerHTML.substring(0, 100)}...\n`;
+                }
+                logContent += `\n`;
+                
+                // === 4. Functions Available ===
+                logContent += `=== 4. פונקציות זמינות ===\n`;
+                logContent += `   - window.getAccounts: ${typeof window.getAccounts}\n`;
+                logContent += `   - window.TradingAccountsController: ${typeof window.TradingAccountsController}\n`;
+                logContent += `   - window.updateTradingAccountsStatistics: ${typeof window.updateTradingAccountsStatistics}\n`;
+                logContent += `   - window.setupTradingAccountsHandlers: ${typeof window.setupTradingAccountsHandlers}\n`;
+                logContent += `\n`;
+                
+                // === 5. Cache System ===
+                logContent += `=== 5. מערכת מטמון ===\n`;
+                logContent += `   - UnifiedCacheManager: ${window.UnifiedCacheManager ? '✅ Available' : '❌ Not found'}\n`;
+                if (window.UnifiedCacheManager) {
+                    logContent += `   - Initialized: ${window.UnifiedCacheManager.isInitialized ? window.UnifiedCacheManager.isInitialized() : 'unknown'}\n`;
+                }
+                logContent += `\n`;
+                
+                // === 6. Actual Data from getAccounts ===
+                logContent += `=== 6. נתונים מ-getAccounts() ===\n`;
+                if (typeof window.getAccounts === 'function') {
+                    window.getAccounts().then(accounts => {
+                        logContent += `   - Returned ${accounts ? accounts.length : 0} accounts\n`;
+                        if (accounts && accounts.length > 0) {
+                            logContent += `   - First account: ${JSON.stringify(accounts[0], null, 2)}\n`;
+                        }
+                        logContent += `\n`;
+                        
+                        // === 7. API Response ===
+                        logContent += `=== 7. תגובת API ===\n`;
+                        fetch('/api/trading-accounts/')
+                            .then(r => r.json())
+                            .then(apiData => {
+                                logContent += `   - API returned: ${JSON.stringify(apiData, null, 2)}\n`;
+                                logContent += `\n`;
+                                
+                                // Copy final log to clipboard
+                                navigator.clipboard.writeText(logContent).then(() => {
+                                    if (typeof window.showSuccessNotification === 'function') {
+                                        window.showSuccessNotification('דוח אבחון הועתק ללוח', 'הדוח כולל מידע מפורט על מצב העמוד');
+                                    } else {
+                                        alert('דוח אבחון הועתק ללוח!');
+                                    }
+                                }).catch(err => {
+                                    console.error('שגיאה בהעתקה:', err);
+                                    console.log(logContent); // Print to console as fallback
+                                });
+                            })
+                            .catch(apiError => {
+                                logContent += `   - API Error: ${apiError.message}\n`;
+                                logContent += `\n`;
+                                
+                                // Copy log even if API fails
+                                navigator.clipboard.writeText(logContent).then(() => {
+                                    if (typeof window.showSuccessNotification === 'function') {
+                                        window.showSuccessNotification('דוח אבחון הועתק ללוח', 'הדוח כולל מידע מפורט על מצב העמוד (שגיאת API)');
+                                    } else {
+                                        alert('דוח אבחון הועתק ללוח (עם שגיאת API)!');
+                                    }
+                                }).catch(err => {
+                                    console.error('שגיאה בהעתקה:', err);
+                                    console.log(logContent);
+                                });
+                            });
+                    }).catch(getAccountsError => {
+                        logContent += `   - getAccounts Error: ${getAccountsError.message}\n`;
+                        logContent += `\n`;
+                        
+                        // Copy log even if getAccounts fails
+                        navigator.clipboard.writeText(logContent).then(() => {
+                            if (typeof window.showSuccessNotification === 'function') {
+                                window.showSuccessNotification('דוח אבחון הועתק ללוח', 'הדוח כולל מידע מפורט על מצב העמוד (שגיאת getAccounts)');
+                            } else {
+                                alert('דוח אבחון הועתק ללוח (עם שגיאה)!');
+                            }
+                        }).catch(err => {
+                            console.error('שגיאה בהעתקה:', err);
+                            console.log(logContent);
+                        });
+                    });
+                } else {
+                    logContent += `   - ❌ getAccounts function not available\n`;
                     logContent += `\n`;
-                });
-                
-                // Add currency information
-                if (currencies.length > 0) {
-                    logContent += `=== מטבעות זמינים ===\n`;
-                    currencies.forEach(currency => {
-                        logContent += `${currency.symbol}: ${currency.name} (שער: ${currency.usd_rate})\n`;
+                    
+                    // Copy log if getAccounts not available
+                    navigator.clipboard.writeText(logContent).then(() => {
+                        if (typeof window.showSuccessNotification === 'function') {
+                            window.showSuccessNotification('דוח אבחון הועתק ללוח', 'הדוח כולל מידע מפורט על מצב העמוד');
+                        } else {
+                            alert('דוח אבחון הועתק ללוח!');
+                        }
+                    }).catch(err => {
+                        console.error('שגיאה בהעתקה:', err);
+                        console.log(logContent);
                     });
                 }
                 
-                // Copy to clipboard
-                navigator.clipboard.writeText(logContent).then(() => {
-                    if (typeof showSuccessNotification === 'function') {
-                        showSuccessNotification('דוח מפורט הועתק ללוח', 'הדוח כולל את כל פרטי החשבונות המסחר והמטבעות');
-                    } else {
-                        alert('דוח מפורט הועתק ללוח!');
-                    }
-                }).catch(err => {
-                    console.error('שגיאה בהעתקה:', err);
-                    if (typeof showErrorNotification === 'function') {
-                        showErrorNotification('שגיאה בהעתקה', 'לא ניתן להעתיק את הדוח ללוח');
-                    } else {
-                        alert('שגיאה בהעתקה ללוח');
-                    }
-                });
-                
             } catch (error) {
                 console.error('שגיאה ב-copyDetailedLog:', error);
-                if (typeof showErrorNotification === 'function') {
-                    showErrorNotification('שגיאה ביצירת הדוח', error.message);
+                if (typeof window.showErrorNotification === 'function') {
+                    window.showErrorNotification('שגיאה ביצירת הדוח', error.message);
                 } else {
                     alert('שגיאה ביצירת הדוח: ' + error.message);
                 }
@@ -456,20 +567,9 @@
         // Make the local copyDetailedLog function available globally for this page only
         window.copyDetailedLog = copyDetailedLog;
         
-        // טעינת נתונים אחרי שהדף נטען
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('📁 trading_accounts.html - DOMContentLoaded');
-            
-            setTimeout(() => {
-                console.log('⏰ טעינת נתונים אחרי 2 שניות...');
-                if (typeof window.loadTradingAccountsDataForTradingAccountsPage === 'function') {
-                    console.log('📡 קורא ל-loadTradingAccountsDataForTradingAccountsPage');
-                    window.loadTradingAccountsDataForTradingAccountsPage();
-                } else {
-                    console.error('❌ loadTradingAccountsDataForTradingAccountsPage לא נמצאה');
-                }
-            }, 2000);
-        });
+        // טעינת נתונים אחרי שהדף נטען - מעודכן למערכת מאוחדת
+        // הוסר DOMContentLoaded listener כדי למנוע כפילות עם core-systems.js
+        // הטעינה מתבצעת דרך trading_accounts.js
     </script>
 </body>
 </html>

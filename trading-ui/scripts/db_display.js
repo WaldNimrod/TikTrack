@@ -64,6 +64,9 @@ async function loadAllTables() {
     }
   }
   console.log('✅ All tables loaded');
+  
+  // Update the main display with all table statistics as cards
+  updateMainTableDisplay();
 }
 
 /**
@@ -110,14 +113,14 @@ async function loadTableData(tableType) {
     // Store data
     tableData[tableType] = data;
 
-    // Update table display
-    updateTableDisplay(data, tableType);
+    // Store the data for this table type
+    if (!window.dbTableData) {
+      window.dbTableData = {};
+    }
+    window.dbTableData[tableType] = data;
 
-    // Update table info
-    updateTableInfo(tableType, data.length);
-
-    // Update summary statistics
-    updateSummaryStats(tableType, data.length);
+    // Update the specific table display
+    updateTableDisplay(tableType, data);
 
     console.log(`✅ Data loaded for ${tableType}: ${data.length} records`);
 
@@ -134,8 +137,22 @@ async function loadTableData(tableType) {
  */
 async function fetchTableData(tableType) {
   try {
-    console.log(`🌐 Fetching data for ${tableType} from /api/${tableType}/`);
-    const response = await fetch(`/api/${tableType}/`);
+    // Map table types to correct API endpoints
+    const apiEndpoints = {
+      'accounts': '/api/trading-accounts/',
+      'trading_accounts': '/api/trading-accounts/',
+      'trades': '/api/trades/',
+      'tickers': '/api/tickers/',
+      'trade_plans': '/api/trade_plans/',
+      'executions': '/api/executions/',
+      'alerts': '/api/alerts/',
+      'notes': '/api/notes/',
+      'cash_flows': '/api/cash_flows/'
+    };
+    
+    const endpoint = apiEndpoints[tableType] || `/api/${tableType}/`;
+    console.log(`🌐 Fetching data for ${tableType} from ${endpoint}`);
+    const response = await fetch(endpoint);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -157,62 +174,325 @@ async function fetchTableData(tableType) {
 
 // ===== TABLE DISPLAY =====
 
+// ===== CARDS DISPLAY =====
+
 /**
- * Update table display with data
- * @param {Array} data - The data to display
- * @param {string} tableType - The table type
+ * Get dynamic color for entity type
+ * @param {string} entityType - The entity type
+ * @returns {string} The color value
  */
-function updateTableDisplay(data, tableType) {
-  // Find the correct container for this table type
-  let containerId = `${tableType}Container`;
+function getEntityColor(entityType) {
+  if (!entityType) {
+    return '#6c757d'; // אפור לנתונים חסרים
+  }
+
+  // Try to use the global entity color system first
+  if (window.getEntityColor && window.getEntityColor !== getEntityColor) {
+    try {
+      return window.getEntityColor(entityType);
+    } catch (error) {
+      console.warn('Error calling global getEntityColor:', error);
+    }
+  }
+
+  // Try to get color from CSS variables
+  try {
+    const colorVar = `--entity-${entityType}-color`;
+    const computedStyle = getComputedStyle(document.documentElement);
+    const color = computedStyle.getPropertyValue(colorVar).trim();
+    
+    if (color && color !== '') {
+      return color;
+    }
+  } catch (error) {
+    console.warn('Error getting CSS color for', entityType, error);
+  }
+
+  // Fallback colors based on the system documentation
+  const fallbackColors = {
+    'account': '#28a745',      // ירוק - חשבונות
+    'trade': '#007bff',        // כחול - טריידים
+    'ticker': '#dc3545',       // אדום - טיקרים
+    'trade-plan': '#0056b3',   // כחול כהה - תכנוני טרייד
+    'execution': '#17a2b8',    // כחול טורקיז - ביצועים
+    'alert': '#ff9c05',        // כתום - התראות
+    'note': '#6f42c1',         // סגול - הערות
+    'cash-flow': '#20c997'     // ירוק טורקיז - תזרים מזומנים
+  };
   
-  // Handle special cases for container IDs
-  if (tableType === 'trade_plans') {
-    containerId = 'tradePlansContainer';
-  } else if (tableType === 'cash_flows') {
-    containerId = 'cashFlowsContainer';
-  }
-  
-  const tableContainer = document.getElementById(containerId);
-
-  if (!tableContainer) {
-    console.error(`❌ Table container not found for ${tableType}: ${containerId}`);
-    return;
-  }
-
-  // Find the table within the container
-  const table = tableContainer.querySelector('table');
-  if (!table) {
-    console.error(`❌ Table not found in container ${containerId}`);
-    return;
-  }
-
-  // Find the table body
-  const tbody = table.querySelector('tbody');
-  if (!tbody) {
-    console.error(`❌ Table body not found in table ${tableType}`);
-    return;
-  }
-
-  // Get table mappings
-  const tableMapping = window.TABLE_COLUMN_MAPPINGS?.[tableType];
-  if (!tableMapping) {
-    console.error(`❌ No table mapping found for ${tableType}`);
-    return;
-  }
-
-  console.log(`🔧 Updating table display for ${tableType} with ${data.length} records`);
-
-  // Create table body HTML
-  const tbodyHTML = createTableBodyHTML(data, tableMapping, tableType);
-
-  // Update table body
-  tbody.innerHTML = tbodyHTML;
-
-  // Apply sorting functionality
-  applySortingFunctionality(tableType);
+  const normalizedType = entityType.toLowerCase().trim();
+  return fallbackColors[normalizedType] || '#6c757d';
 }
 
+/**
+ * Update the main display with all table statistics as cards
+ */
+function updateMainTableDisplay() {
+  const container = document.getElementById('dbCardsContainer');
+  if (!container) return;
+  
+  // Clear existing content
+  container.innerHTML = '';
+  
+  // Table names and their display names with our custom icons and dynamic colors
+  const tableInfo = {
+    'accounts': { 
+      name: 'חשבונות מסחר', 
+      icon: 'account-icon', 
+      entityType: 'account',
+      customIcon: 'images/icons/trading_accounts.svg'
+    },
+    'trades': { 
+      name: 'טריידים', 
+      icon: 'trade-icon', 
+      entityType: 'trade',
+      customIcon: 'images/icons/trades.svg'
+    },
+    'tickers': { 
+      name: 'טיקרים', 
+      icon: 'ticker-icon', 
+      entityType: 'ticker',
+      customIcon: 'images/icons/tickers.svg'
+    },
+    'trade_plans': { 
+      name: 'תוכניות טרייד', 
+      icon: 'trade-plan-icon', 
+      entityType: 'trade-plan',
+      customIcon: 'images/icons/trade_plans.svg'
+    },
+    'executions': { 
+      name: 'ביצועים', 
+      icon: 'execution-icon', 
+      entityType: 'execution',
+      customIcon: 'images/icons/executions.svg'
+    },
+    'alerts': { 
+      name: 'התראות', 
+      icon: 'alert-icon', 
+      entityType: 'alert',
+      customIcon: 'images/icons/alerts.svg'
+    },
+    'notes': { 
+      name: 'הערות', 
+      icon: 'note-icon', 
+      entityType: 'note',
+      customIcon: 'images/icons/notes.svg'
+    },
+    'cash_flows': { 
+      name: 'תזרימי מזומנים', 
+      icon: 'cash-flow-icon', 
+      entityType: 'cash-flow',
+      customIcon: 'images/icons/cash_flows.svg'
+    }
+  };
+  
+  // Create cards for each table
+  Object.keys(tableInfo).forEach(tableType => {
+    const data = window.dbTableData?.[tableType] || [];
+    const info = tableInfo[tableType];
+    
+    // Calculate table size (rough estimate)
+    const sizeEstimate = data.length * 100; // Rough estimate: 100 bytes per record
+    const sizeText = sizeEstimate > 1024 ? `${(sizeEstimate / 1024).toFixed(1)} KB` : `${sizeEstimate} B`;
+    
+    // Get dynamic color for this entity type
+    const entityColor = getEntityColor(info.entityType);
+    
+    // Create card element - 4 per row with icon on the right
+    const cardCol = document.createElement('div');
+    cardCol.className = 'col-lg-3 col-md-4 col-sm-6 col-12 mb-3';
+    
+    cardCol.innerHTML = `
+      <div class="card h-100 border-0 shadow-sm">
+        <div class="card-body p-3">
+          <!-- Header row with title and export button -->
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="card-title mb-0" style="font-size: 0.9rem; font-weight: 600;">${info.name}</h6>
+            <button class="btn btn-outline-secondary btn-sm" onclick="exportTableData('${tableType}')" style="font-size: 0.7rem; padding: 0.25rem 0.5rem;" title="ייצוא נתונים">
+              <i class="fas fa-download"></i>
+            </button>
+          </div>
+          
+          <!-- Content row with stats and icon -->
+          <div class="d-flex align-items-center">
+            <!-- Stats on the left -->
+            <div class="flex-grow-1">
+              <div class="row text-center">
+                <div class="col-6">
+                  <div class="border-end">
+                    <small class="text-muted d-block">רשומות</small>
+                    <strong style="color: ${entityColor}; font-size: 1rem;">${data.length}</strong>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <small class="text-muted d-block">גודל</small>
+                  <small style="color: ${entityColor}; font-size: 0.8rem;">${sizeText}</small>
+                </div>
+              </div>
+            </div>
+            <!-- Icon on the right -->
+            <div class="ms-3">
+              <div class="${info.icon} entity-icon" style="color: ${entityColor}; font-size: 2rem;">
+                <img src="${info.customIcon}" alt="${info.name}" style="width: 32px; height: 32px; filter: ${entityColor === '#28a745' ? 'hue-rotate(0deg)' : entityColor === '#007bff' ? 'hue-rotate(200deg)' : entityColor === '#dc3545' ? 'hue-rotate(300deg)' : 'hue-rotate(0deg)'};">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    container.appendChild(cardCol);
+  });
+}
+
+/**
+ * Update table display with full data
+ * @param {string} tableType - The table type
+ * @param {Array} data - The data to display
+ */
+function updateTableDisplay(tableType, data) {
+  // Convert table type to camelCase for ID matching
+  // trade_plans -> tradePlans, cash_flows -> cashFlows
+  const camelCaseType = tableType.replace(/_([a-z])/g, (match, letter) => letter.toUpperCase());
+  
+  const tableId = `${camelCaseType}Table`;
+  const headerId = `${camelCaseType}TableHeader`;
+  const bodyId = `${camelCaseType}TableBody`;
+  
+  const table = document.getElementById(tableId);
+  const header = document.getElementById(headerId);
+  const body = document.getElementById(bodyId);
+  
+  if (!table || !header || !body) {
+    console.warn(`Table elements not found for ${tableType}. Looking for IDs: ${tableId}, ${headerId}, ${bodyId}`);
+    return;
+  }
+  
+  // Clear existing content
+  header.innerHTML = '';
+  body.innerHTML = '';
+  
+  if (!data || data.length === 0) {
+    body.innerHTML = '<tr><td colspan="100%" class="text-center text-muted">אין נתונים להצגה</td></tr>';
+    return;
+  }
+  
+  // Generate headers from first record
+  const firstRecord = data[0];
+  const columns = Object.keys(firstRecord);
+  
+  // Create header row
+  columns.forEach(column => {
+    const th = document.createElement('th');
+    th.textContent = column;
+    th.style.fontSize = '0.85rem';
+    th.style.fontWeight = '600';
+    th.style.whiteSpace = 'normal';
+    th.style.wordWrap = 'break-word';
+    th.style.maxWidth = '150px';
+    th.style.verticalAlign = 'middle';
+    header.appendChild(th);
+  });
+  
+  // Create data rows
+  data.forEach(record => {
+    const row = document.createElement('tr');
+    
+    columns.forEach(column => {
+      const td = document.createElement('td');
+      const value = record[column];
+      
+      // Format the value
+      if (value === null || value === undefined) {
+        td.textContent = '-';
+        td.className = 'text-muted';
+      } else if (typeof value === 'boolean') {
+        td.textContent = value ? 'כן' : 'לא';
+        td.className = value ? 'text-success' : 'text-danger';
+      } else if (typeof value === 'number') {
+        td.textContent = value.toLocaleString();
+        td.className = 'text-end';
+      } else if (typeof value === 'string' && value.includes('T') && value.includes('Z')) {
+        // Date formatting
+        try {
+          const date = new Date(value);
+          td.textContent = date.toLocaleString('he-IL');
+          td.className = 'text-muted';
+        } catch (e) {
+          td.textContent = value;
+        }
+      } else {
+        td.textContent = value;
+      }
+      
+      td.style.fontSize = '0.85rem';
+      row.appendChild(td);
+    });
+    
+    body.appendChild(row);
+  });
+  
+  console.log(`✅ Table ${tableType} updated with ${data.length} records`);
+}
+
+// viewTableDetails function removed - not needed for small cards
+
+/**
+ * Export table data
+ * @param {string} tableType - The table type to export
+ */
+function exportTableData(tableType) {
+  const data = window.dbTableData?.[tableType] || [];
+  const tableNames = {
+    'accounts': 'חשבונות מסחר',
+    'trades': 'טריידים',
+    'tickers': 'טיקרים',
+    'trade_plans': 'תוכניות טרייד',
+    'executions': 'ביצועים',
+    'alerts': 'התראות',
+    'notes': 'הערות',
+    'cash_flows': 'תזרימי מזומנים'
+  };
+  
+  const tableName = tableNames[tableType] || tableType;
+  
+  if (data.length === 0) {
+    if (window.showNotification) {
+      window.showNotification(
+        `אין נתונים לייצוא עבור ${tableName}`,
+        'warning',
+        'system'
+      );
+    }
+    return;
+  }
+  
+  // Create CSV content
+  const headers = Object.keys(data[0] || {});
+  const csvContent = [
+    headers.join(','),
+    ...data.map(row => headers.map(header => `"${row[header] || ''}"`).join(','))
+  ].join('\n');
+  
+  // Create and download file
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  link.setAttribute('href', url);
+  link.setAttribute('download', `${tableName}_${new Date().toISOString().split('T')[0]}.csv`);
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  
+  if (window.showNotification) {
+    window.showNotification(
+      `נתוני ${tableName} יוצאו בהצלחה`,
+      'success',
+      'system'
+    );
+  }
+}
 
 /**
  * Create table body HTML from data
@@ -584,6 +864,9 @@ function deleteRecord(tableType, recordId) {
 window.initDatabaseDisplay = initDatabaseDisplay;
 window.loadTableData = loadTableData;
 window.filterTableData = filterTableData;
+window.updateMainTableDisplay = updateMainTableDisplay;
+// window.viewTableDetails removed - not needed for small cards
+window.exportTableData = exportTableData;
 // window.toggleSection removed - using global version from ui-utils.js
 // toggleSection export removed - use toggleSection('main') instead
 window.addRecord = addRecord;

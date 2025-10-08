@@ -487,7 +487,7 @@
                                                 <span class="layer-badge layer-3" title="IndexedDB">🗄️</span>
                                                 <span class="layer-badge layer-4" title="Backend">🖥️</span>
                                             </div>
-                                            <button class="btn btn-sm btn-outline-info" onclick="testCacheIntegration()">
+                                            <button class="btn btn-sm btn-outline-info" onclick="testCacheSystemsIntegration()">
                                                 <i class="fas fa-link"></i> בדוק אינטגרציה
                                             </button>
                                         </div>
@@ -747,6 +747,15 @@
                                     <button class="btn btn-sm btn-outline-danger" onclick="clearAllCacheSystems()">
                                         <i class="fas fa-trash-alt"></i> נקה הכל
                                     </button>
+                                            <button class="btn btn-sm btn-outline-warning" onclick="clearGlobalInitializationState()" title="ניקוי מצב אתחול כפול">
+                                                <i class="fas fa-sync-alt"></i> נקה מצב אתחול
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-primary" onclick="testCacheCleanupMechanisms()" title="בדיקה מקיפה של כל מנגנוני ניקוי המטמון">
+                                                <i class="fas fa-vial"></i> בדיקה מקיפה
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-info" onclick="generateCacheCleanupReport()" title="יצירת דוח מפורט על מנגנוני ניקוי המטמון">
+                                                <i class="fas fa-chart-bar"></i> דוח מפורט
+                                            </button>
                                 </div>
                             </div>
                         </div>

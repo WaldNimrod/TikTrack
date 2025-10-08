@@ -138,9 +138,11 @@
       <div class="content-section" id="section1">
         <div class="section-header">
             <h2>👤 ניהול פרופילים</h2>
-            <button class="filter-toggle-btn" onclick="window.toggleSection('section1')" title="הצג/הסתר סקשן">
-                <span class="section-toggle-icon">▼</span>
-            </button>
+            <div class="header-actions">
+                <button class="filter-toggle-btn" onclick="window.toggleSection('section1')" title="הצג/הסתר סקשן">
+                    <span class="section-toggle-icon">▼</span>
+                </button>
+            </div>
         </div>
                 <div class="section-body">
                 <div class="row">
@@ -179,10 +181,12 @@
       <div class="content-section" id="section2">
         <div class="section-header">
             <h2>🏦 הגדרות בסיסיות</h2>
-            <button class="filter-toggle-btn" onclick="window.toggleSection('section2')" title="הצג/הסתר סקשן">
-                <span class="section-toggle-icon">▼</span>
-            </button>
-                    </div>
+            <div class="header-actions">
+                <button class="filter-toggle-btn" onclick="window.toggleSection('section2')" title="הצג/הסתר סקשן">
+                    <span class="section-toggle-icon">▼</span>
+                </button>
+            </div>
+        </div>
         <div class="section-body">
                 <div class="row">
                     <div class="col-md-6">
@@ -399,10 +403,12 @@
       <div class="content-section" id="section3">
                 <div class="section-header">
             <h2>📈 הגדרות מסחר</h2>
-            <button class="filter-toggle-btn" onclick="window.toggleSection('section3')" title="הצג/הסתר סקשן">
-                <span class="section-toggle-icon">▼</span>
-            </button>
-                    </div>
+            <div class="header-actions">
+                <button class="filter-toggle-btn" onclick="window.toggleSection('section3')" title="הצג/הסתר סקשן">
+                    <span class="section-toggle-icon">▼</span>
+                </button>
+            </div>
+        </div>
         <div class="section-body">
                 <div class="row">
                     <div class="col-md-6">
@@ -450,10 +456,12 @@
       <div class="content-section" id="section4">
                 <div class="section-header">
             <h2>🔍 פילטרים ברירת מחדל</h2>
-            <button class="filter-toggle-btn" onclick="window.toggleSection('section4')" title="הצג/הסתר סקשן">
-                <span class="section-toggle-icon">▼</span>
-                        </button>
-                    </div>
+            <div class="header-actions">
+                <button class="filter-toggle-btn" onclick="window.toggleSection('section4')" title="הצג/הסתר סקשן">
+                    <span class="section-toggle-icon">▼</span>
+                </button>
+            </div>
+        </div>
         <div class="section-body">
                 <div class="row">
                     <div class="col-md-6">
@@ -519,9 +527,11 @@
       <div class="content-section" id="section5">
                 <div class="section-header">
             <h2>🎨 צבעים</h2>
-            <button class="filter-toggle-btn" onclick="window.toggleSection('section5')" title="הצג/הסתר סקשן">
-                <span class="section-toggle-icon">▼</span>
-                        </button>
+            <div class="header-actions">
+                <button class="filter-toggle-btn" onclick="window.toggleSection('section5')" title="הצג/הסתר סקשן">
+                    <span class="section-toggle-icon">▼</span>
+                </button>
+            </div>
         </div>
         <div class="section-body">
                 <!-- Basic System Colors -->
@@ -701,63 +711,17 @@
                   </div>
         <!-- UI Content Section 5 End--> 
       
-        <!-- UI Content Section 6 Start - Chart Colors -->
+      
+        <!-- UI Content Section 6 Start-->
       <div class="content-section" id="section6">
         <div class="section-header">
-            <h2>📈 צבעי גרפים</h2>
-            <button class="filter-toggle-btn" onclick="window.toggleSection('section6')" title="הצג/הסתר סקשן">
-                <span class="section-toggle-icon">▼</span>
-                        </button>
-                    </div>
-                <div class="section-body">
-                <div class="row">
-                    <div class="col-12">
-                        <h5>צבעי גרפים</h5>
-                        <small class="text-muted">צבעים לגרפים ותרשימים במערכת</small>
-                </div>
-                  </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3 d-flex align-items-center gap-2">
-                            <label class="form-label mb-0 w-25">רקע גרף:</label>
-                            <input type="color" id="chartBackgroundColor" class="form-control form-control-color color-picker" data-color-key="chartBackgroundColor">
-                  </div>
-                        <div class="mb-3 d-flex align-items-center gap-2">
-                            <label class="form-label mb-0 w-25">גבול גרף:</label>
-                            <input type="color" id="chartBorderColor" class="form-control form-control-color color-picker" data-color-key="chartBorderColor">
-                  </div>
-                        <div class="mb-3 d-flex align-items-center gap-2">
-                            <label class="form-label mb-0 w-25">רשת גרף:</label>
-                            <input type="color" id="chartGridColor" class="form-control form-control-color color-picker" data-color-key="chartGridColor">
-                </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="mb-3 d-flex align-items-center gap-2">
-                            <label class="form-label mb-0 w-25">נקודת גרף:</label>
-                            <input type="color" id="chartPointColor" class="form-control form-control-color color-picker" data-color-key="chartPointColor">
-                  </div>
-                        <div class="mb-3 d-flex align-items-center gap-2">
-                            <label class="form-label mb-0 w-25">צבע ראשי גרף:</label>
-                            <input type="color" id="chartPrimaryColor" class="form-control form-control-color color-picker" data-color-key="chartPrimaryColor">
-                  </div>
-                        <div class="mb-3 d-flex align-items-center gap-2">
-                            <label class="form-label mb-0 w-25">טקסט גרף:</label>
-                            <input type="color" id="chartTextColor" class="form-control form-control-color color-picker" data-color-key="chartTextColor">
-                </div>
-              </div>
+            <h2>📊 צבעי ערכים מספריים</h2>
+            <div class="header-actions">
+                <button class="filter-toggle-btn" onclick="window.toggleSection('section6')" title="הצג/הסתר סקשן">
+                    <span class="section-toggle-icon">▼</span>
+                </button>
             </div>
         </div>
-      </div>
-        <!-- UI Content Section 6 End - Chart Colors --> 
-      
-        <!-- UI Content Section 7 Start-->
-      <div class="content-section" id="section7">
-        <div class="section-header">
-            <h2>📊 צבעי ערכים מספריים</h2>
-            <button class="filter-toggle-btn" onclick="window.toggleSection('section7')" title="הצג/הסתר סקשן">
-                <span class="section-toggle-icon">▼</span>
-                        </button>
-                    </div>
                 <div class="section-body">
                 <div class="row">
                     <div class="col-12">
@@ -812,12 +776,14 @@
       
         <!-- UI Content Section 7 Start-->
       <div class="content-section" id="section7">
-        <div class="section-header">
+                    <div class="section-header">
             <h2>📊 הגדרות גרפים</h2>
-            <button class="filter-toggle-btn" onclick="window.toggleSection('section7')" title="הצג/הסתר סקשן">
-                <span class="section-toggle-icon">▼</span>
-                        </button>
-                    </div>
+            <div class="header-actions">
+                <button class="filter-toggle-btn" onclick="window.toggleSection('section7')" title="הצג/הסתר סקשן">
+                    <span class="section-toggle-icon">▼</span>
+                </button>
+            </div>
+        </div>
         <div class="section-body">
                 <div class="row">
                     <div class="col-12">
@@ -827,10 +793,34 @@
                     </div>
                 <div class="row">
                     <div class="col-md-6">
+                        <h6>צבעי גרפים:</h6>
                         <div class="mb-3 d-flex align-items-center gap-2">
-                            <label class="form-label mb-0 w-25">צבע ראשי לגרפים:</label>
+                            <label class="form-label mb-0 w-25">רקע גרף:</label>
+                            <input type="color" id="chartBackgroundColor" class="form-control form-control-color color-picker" data-color-key="chartBackgroundColor">
+                        </div>
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 w-25">גבול גרף:</label>
+                            <input type="color" id="chartBorderColor" class="form-control form-control-color color-picker" data-color-key="chartBorderColor">
+                        </div>
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 w-25">רשת גרף:</label>
+                            <input type="color" id="chartGridColor" class="form-control form-control-color color-picker" data-color-key="chartGridColor">
+                        </div>
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 w-25">נקודת גרף:</label>
+                            <input type="color" id="chartPointColor" class="form-control form-control-color color-picker" data-color-key="chartPointColor">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>הגדרות נוספות:</h6>
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 w-25">צבע ראשי:</label>
                             <input type="color" id="chartPrimaryColor" class="form-control form-control-color color-picker" data-color-key="chartPrimaryColor">
-                  </div>
+                        </div>
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 w-25">טקסט גרף:</label>
+                            <input type="color" id="chartTextColor" class="form-control form-control-color color-picker" data-color-key="chartTextColor">
+                        </div>
                         <div class="mb-3 d-flex align-items-center gap-2">
                             <label class="form-label mb-0 w-25">פורמט ייצוא:</label>
                             <select id="chartExportFormat" class="form-select">
@@ -839,25 +829,56 @@
                                 <option value="svg">SVG</option>
                                 <option value="pdf">PDF</option>
                             </select>
-                  </div>
-                    </div>
-                    <div class="col-md-6">
+                        </div>
                         <div class="mb-3 d-flex align-items-center gap-2">
-                            <label class="form-label mb-0 w-25">מסנן ברירת מחדל - סטטוס:</label>
+                            <label class="form-label mb-0 w-25">איכות ייצוא:</label>
+                            <select id="chartExportQuality" class="form-select">
+                                <option value="low">נמוכה</option>
+                                <option value="medium">בינונית</option>
+                                <option value="high">גבוהה</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section-divider"></div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>מסננים ברירת מחדל:</h6>
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 w-25">סטטוס:</label>
                             <select id="defaultStatusFilter" class="form-select">
                                 <option value="all">הכל</option>
                                 <option value="active">פעיל</option>
                                 <option value="inactive">לא פעיל</option>
                             </select>
-                  </div>
+                        </div>
                         <div class="mb-3 d-flex align-items-center gap-2">
-                            <label class="form-label mb-0 w-25">מסנן ברירת מחדל - סוג:</label>
+                            <label class="form-label mb-0 w-25">סוג:</label>
                             <select id="defaultTypeFilter" class="form-select">
                                 <option value="all">הכל</option>
                                 <option value="buy">קנייה</option>
                                 <option value="sell">מכירה</option>
                             </select>
-                  </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>הגדרות רענון:</h6>
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 w-25">רענון אוטומטי:</label>
+                            <input type="checkbox" id="chartAutoRefresh" class="form-check-input" checked>
+                        </div>
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 w-25">מרווח רענון (שניות):</label>
+                            <select id="chartRefreshInterval" class="form-select">
+                                <option value="30">30</option>
+                                <option value="60" selected>60</option>
+                                <option value="120">120</option>
+                                <option value="300">300</option>
+                            </select>
+                        </div>
+                    </div>
               </div>
             </div>
             
@@ -931,74 +952,19 @@
                     </div>
                     </div>
                 </div>
-
-                <div class="section-divider"></div>
-                
-                <!-- Export Settings -->
-                <div class="row">
-                    <div class="col-12">
-                        <h5>הגדרות ייצוא</h5>
-                        <small class="text-muted">הגדרות ברירת מחדל לייצוא גרפים</small>
-              </div>
-                  </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label">פורמט ברירת מחדל:</label>
-                            <select id="chartExportFormat" class="form-select control-narrow">
-                                <option value="png" selected>PNG</option>
-                                <option value="jpg">JPG</option>
-                                <option value="pdf">PDF</option>
-                                <option value="svg">SVG</option>
-                </select>
-              </div>
-                        <div class="mb-3">
-                            <label class="form-label">איכות ברירת מחדל:</label>
-                            <select id="chartExportQuality" class="form-select control-narrow">
-                                <option value="low">נמוכה</option>
-                                <option value="medium" selected>בינונית</option>
-                                <option value="high">גבוהה</option>
-                                <option value="ultra">אולטרה</option>
-                </select>
-              </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label">רזולוציה ברירת מחדל:</label>
-                            <select id="chartExportResolution" class="form-select control-narrow">
-                                <option value="1x" selected>1x (רגיל)</option>
-                                <option value="2x">2x (רזולוציה גבוהה)</option>
-                                <option value="3x">3x (רזולוציה גבוהה מאוד)</option>
-                </select>
-              </div>
-                        <div class="mb-3">
-                            <label class="form-label">כולל רקע:</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="chartExportBackground" checked>
-                                <label class="form-check-label" for="chartExportBackground">
-                                    כלול רקע בייצוא
-                                </label>
-                  </div>
-                </div>
-                    </div>
-                    </div>
-                </div>
-              </div>
-            </div>
-        <!-- UI Content Section 7 End--> 
-      
+        <!-- UI Content Section 7 End-->        
         <!-- UI Content Section 8 Start-->
       <div class="content-section" id="section8">
         <div class="section-header">
             <h2>🔧 ממשק ניהול</h2>
-            <div class="section-actions">
+            <div class="header-actions">
                 <button class="btn btn-sm btn-outline-primary" onclick="window.refreshAdminData()">
                     <i class="bi bi-arrow-clockwise"></i> רענן
                 </button>
+                <button class="filter-toggle-btn" onclick="window.toggleSection('section8')" title="הצג/הסתר סקשן">
+                    <span class="section-toggle-icon">▼</span>
+                </button>
             </div>
-            <button class="filter-toggle-btn" onclick="window.toggleSection('section8')" title="הצג/הסתר סקשן">
-                <span class="section-toggle-icon">▼</span>
-            </button>
         </div>
         <div class="section-body">
             <!-- חיפוש וסינון -->
@@ -1009,47 +975,41 @@
                         <select class="form-select" id="admin-user-select">
                             <option value="1">משתמש 1 (ברירת מחדל)</option>
                         </select>
-    </div>
+                    </div>
                     <div class="col-md-3">
                         <label class="form-label">פרופיל:</label>
                         <select class="form-select" id="admin-profile-select">
                             <option value="">כל הפרופילים</option>
                         </select>
-  </div>
+                    </div>
                     <div class="col-md-3">
                         <label class="form-label">קבוצה:</label>
                         <select class="form-select" id="admin-group-select">
                             <option value="">כל הקבוצות</option>
                         </select>
-        </div>
+                    </div>
                     <div class="col-md-3">
                         <label class="form-label">חיפוש:</label>
                         <input type="text" class="form-control" id="admin-search-input" placeholder="חפש העדפה...">
-          </div>
-    </div>
-  </div>
-  
-            <div id="adminInterfaceContainer">
-                <!-- Admin interface will be loaded here -->
+                    </div>
+                </div>
             </div>
         </div>
+    </div>
+  
         <!-- UI Content Section 8 End-->
         
         <!-- UI Content Section 9 Start - Preferences Management Table -->
         <div class="content-section" id="section9" data-section="preferences-table">
                     <div class="section-header">
-                        <div class="table-title">
-                            <img src="images/icons/preferences.svg" alt="ניהול העדפות" class="section-icon">
-                    ניהול העדפות - טבלה
-                        </div>
-                <div class="table-count" id="tablePreferencesCount">טוען...</div>
-                        <div class="table-actions">
-                            <button id="addPreferenceBtn" class="refresh-btn" onclick="showAddPreferenceModal()" title="הוסף העדפה חדשה">
-                                <img src="images/icons/preferences.svg" alt="הוסף" class="action-icon">
-                                הוסף
+                        <h2>📋 ניהול העדפות - טבלה</h2>
+                        <div class="header-actions">
+                            <span class="badge bg-secondary" id="tablePreferencesCount">טוען...</span>
+                            <button id="addPreferenceBtn" class="btn btn-sm btn-outline-primary" onclick="showAddPreferenceModal()" title="הוסף העדפה חדשה">
+                                <i class="fas fa-plus"></i> הוסף
                             </button>
-                    <button class="filter-toggle-btn" onclick="toggleSection('section9')" title="הצג/הסתר אזור ניהול העדפות">
-                                <span class="filter-icon">▲</span>
+                            <button class="filter-toggle-btn" onclick="toggleSection('section9')" title="הצג/הסתר אזור ניהול העדפות">
+                                <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
                     </div>
@@ -1106,15 +1066,9 @@
                 </div>
         <!-- UI Content Section 9 End - Preferences Management Table -->
             </div>
-    <!-- 🔒 LOCKED TEMPLATE ZONE 3 - End Main Content Container (DO NOT MODIFY) --> 
+        </div>
+    <!-- 🔒 LOCKED TEMPLATE ZONE 3 - End Main Content Container (DO NOT MODIFY) -->
   
-    <!-- 🔄 NEW UNIFIED INITIALIZATION SYSTEM -->
-    <!-- Dynamic Loader Configuration -->
-    <script src="scripts/modules/dynamic-loader-config.js?v=20251006"></script>
-    
-    <!-- Page Initialization Configs -->
-    <script src="scripts/page-initialization-configs.js?v=20251001"></script>
-    
     <!-- Additional Required Scripts -->
     <script src="scripts/global-favicon.js?v=20251001"></script>
     <script src="scripts/translation-utils.js?v=20251001"></script>
@@ -1263,8 +1217,6 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
                     <button type="button" class="btn btn-success btn-sm" onclick="updatePreference()">עדכן העדפה</button>
-                </div>
-            </div>
         </div>
     </div>
     
@@ -1306,10 +1258,35 @@
         });
     </script>
     
-    <!-- Local copyDetailedLog function for preferences page -->
-    <script>
-        // Make the local copyDetailedLog function available globally for this page only
-        window.copyDetailedLog = copyDetailedLog;
-    </script>
+    <!-- מערכת כללית חדשה - 8 מודולים מאוחדים -->
+    
+    <!-- Load the new general systems architecture -->
+    <script src="scripts/modules/core-systems.js?v=20251006"></script>
+    <script src="scripts/modules/ui-basic.js?v=20251006"></script>
+    <script src="scripts/modules/data-basic.js?v=20251006"></script>
+    <script src="scripts/modules/ui-advanced.js?v=20251006"></script>
+    <script src="scripts/modules/data-advanced.js?v=20251006"></script>
+    <script src="scripts/modules/business-module.js?v=20251006"></script>
+    <script src="scripts/modules/communication-module.js?v=20251006"></script>
+    <script src="scripts/modules/cache-module.js?v=20251006"></script>
+    
+    <!-- Page Initialization Configurations -->
+    <script src="scripts/page-initialization-configs.js?v=20251006"></script>
+    
+    <!-- Global Systems -->
+    <script src="scripts/global-favicon.js?v=20251006"></script>
+    <script src="scripts/translation-utils.js?v=20251006"></script>
+    <script src="scripts/header-system.js?v=v6.0.0"></script>
+    <script src="scripts/date-utils.js?v=20251006"></script>
+    <script src="scripts/button-icons.js?v=20251006"></script>
+    <script src="scripts/page-utils.js?v=20251006"></script>
+    <script src="scripts/preferences.js?v=20251006"></script>
+    <script src="scripts/notification-category-detector.js?v=20251006"></script>
+    <script src="scripts/global-notification-collector.js?v=20251006"></script>
+    <script src="scripts/entity-details-modal.js?v=20251006"></script>
+    <script src="scripts/warning-system.js?v=20251006"></script>
+    
+    <!-- Page-specific Script -->
+    <script src="scripts/preferences-page.js?v=20251006"></script>
 </body>
 </html>

@@ -83,10 +83,7 @@ def db_extradata() -> Any:
     """Extra data tables page"""
     return send_from_directory(UI_DIR, "db_extradata.html")
 
-@pages_bp.route('/currencies')
-def currencies() -> Any:
-    """Currencies page"""
-    return send_from_directory(UI_DIR, "currencies.html")
+# currencies route removed - only database entity, no page
 
 @pages_bp.route('/preferences')
 def preferences() -> Any:
@@ -98,10 +95,7 @@ def dynamic_loading_test() -> Any:
     """Dynamic loading test page"""
     return send_from_directory(UI_DIR, "dynamic-loading-test.html")
 
-@pages_bp.route('/preferences-new')
-def preferences_new() -> Any:
-    """New preferences page"""
-    return send_from_directory(UI_DIR, "preferences-new.html")
+# preferences-new route removed - page doesn't exist
 
 @pages_bp.route('/external-data-dashboard')
 def external_data_dashboard() -> Any:

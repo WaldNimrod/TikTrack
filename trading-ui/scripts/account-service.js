@@ -47,24 +47,32 @@ function processAccountsData(rawData) {
       return {
         id: window.getColumnValue(account, 0, 'accounts') || account.id,
         name: window.getColumnValue(account, 1, 'accounts') || account.name,
-        currency: window.getColumnValue(account, 2, 'accounts') || account.currency,
+        currency: window.getColumnValue(account, 2, 'accounts') || account.currency_id || account.currency,
+        currency_id: account.currency_id || account.currency,
+        currency_name: account.currency_name || null,
+        currency_symbol: account.currency_symbol || null,
         status: window.getColumnValue(account, 3, 'accounts') || account.status,
-        cashBalance: parseFloat(window.getColumnValue(account, 4, 'accounts')) || 0,
-        totalValue: parseFloat(window.getColumnValue(account, 5, 'accounts')) || 0,
-        totalPL: parseFloat(window.getColumnValue(account, 6, 'accounts')) || 0,
-        notes: window.getColumnValue(account, 7, 'accounts') || account.notes || ''
+        cashBalance: parseFloat(window.getColumnValue(account, 4, 'accounts')) || parseFloat(account.cash_balance) || 0,
+        totalValue: parseFloat(window.getColumnValue(account, 5, 'accounts')) || parseFloat(account.total_value) || 0,
+        totalPL: parseFloat(window.getColumnValue(account, 6, 'accounts')) || parseFloat(account.total_pl) || 0,
+        notes: window.getColumnValue(account, 7, 'accounts') || account.notes || '',
+        created_at: account.created_at || null
       };
     } else {
       // fallback למיפוי ידני
       return {
         id: account.id,
         name: account.name || 'Unknown',
-        currency: account.currency || 'USD',
+        currency: account.currency_id || account.currency || 'USD',
+        currency_id: account.currency_id || account.currency,
+        currency_name: account.currency_name || null,
+        currency_symbol: account.currency_symbol || null,
         status: account.status || 'unknown',
         cashBalance: parseFloat(account.cash_balance) || 0,
         totalValue: parseFloat(account.total_value) || 0,
         totalPL: parseFloat(account.total_pl) || 0,
-        notes: account.notes || ''
+        notes: account.notes || '',
+        created_at: account.created_at || null
       };
     }
   });
@@ -208,7 +216,7 @@ async function cancelAccount(accountId, accountName = 'החשבון') {
 async function reactivateAccount(accountId) {
   // הפעלה מחדש של חשבון
 
-  const response = await fetch(`/api/accounts/${accountId}`, {
+  const response = await fetch(`/api/trading-accounts/${accountId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ status: 'open' }),
@@ -232,7 +240,7 @@ async function reactivateAccount(accountId) {
  */
 async function getAccountById(accountId) {
   try {
-    const response = await fetch(`/api/accounts/${accountId}`);
+    const response = await fetch(`/api/trading-accounts/${accountId}`);
     if (response.ok) {
       const data = await response.json();
       return data.data || data;

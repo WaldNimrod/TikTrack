@@ -27,7 +27,7 @@ class UnifiedAppInitializer {
         this.legacySupport = true;
         
         // Dynamic Loading Support
-        this.dynamicLoadingEnabled = true;
+        this.dynamicLoadingEnabled = false; // Static loading only
         this.loadedModules = new Set();
         this.moduleDependencies = new Map();
         this.loadingPromises = new Map();
@@ -126,13 +126,13 @@ class UnifiedAppInitializer {
      */
     async loadModule(moduleName) {
         if (this.loadedModules.has(moduleName)) {
-            console.log(`✅ Module ${moduleName} already loaded`);
+            // console.log(`✅ Module ${moduleName} already loaded`);
             return true;
         }
 
         // Special check for core-systems - if UnifiedAppInitializer exists, mark as loaded
         if (moduleName === 'core-systems' && window.UnifiedAppInitializer) {
-            console.log(`✅ Module ${moduleName} already loaded (UnifiedAppInitializer exists)`);
+            // console.log(`✅ Module ${moduleName} already loaded (UnifiedAppInitializer exists)`);
             this.loadedModules.add(moduleName);
             return true;
         }
@@ -178,14 +178,14 @@ class UnifiedAppInitializer {
             // Check if script already exists
             const existingScript = document.querySelector(`script[data-module="${moduleName}"]`);
             if (existingScript) {
-                console.log(`✅ Module ${moduleName} script already exists`);
+                // console.log(`✅ Module ${moduleName} script already exists`);
                 resolve(true);
                 return;
             }
 
             // Special check for core-systems module - check if UnifiedAppInitializer already exists
             if (moduleName === 'core-systems' && window.UnifiedAppInitializer) {
-                console.log(`✅ Module ${moduleName} already loaded (UnifiedAppInitializer exists)`);
+                // console.log(`✅ Module ${moduleName} already loaded (UnifiedAppInitializer exists)`);
                 resolve(true);
                 return;
             }
@@ -199,7 +199,7 @@ class UnifiedAppInitializer {
 
             // Handle load success
             script.onload = () => {
-                console.log(`✅ Module ${moduleName} script loaded successfully`);
+                // console.log(`✅ Module ${moduleName} script loaded successfully`);
                 resolve(true);
             };
 
@@ -229,7 +229,7 @@ class UnifiedAppInitializer {
 
         // Special handling for core-systems - if already loaded, mark as loaded
         if (requiredModules.includes('core-systems') && window.UnifiedAppInitializer) {
-            console.log('✅ Core systems already loaded, marking as loaded');
+            // console.log('✅ Core systems already loaded, marking as loaded');
             this.loadedModules.add('core-systems');
         }
 
@@ -244,7 +244,7 @@ class UnifiedAppInitializer {
             }
         }
 
-        console.log('✅ All required modules loaded successfully');
+        // console.log('✅ All required modules loaded successfully');
         return true;
     }
 
@@ -263,7 +263,7 @@ class UnifiedAppInitializer {
             required.push('data-basic');
         }
 
-        if (pageConfig.requiresFilters || pageConfig.requiresCharts) {
+        if (pageConfig.requiresFilters || pageConfig.requiresCharts || pageConfig.requiresUI) {
             required.push('ui-basic');
         }
 
@@ -285,6 +285,17 @@ class UnifiedAppInitializer {
 
         if (pageConfig.requiresCache) {
             required.push('cache-module');
+        }
+
+        // TEMPORARY FIX: Always load ui-advanced and business-module for trading pages
+        // This ensures getTableColors and handleFunctionNotFound are available
+        if (pageConfig.name && ['Executions', 'Trades', 'Alerts'].includes(pageConfig.name)) {
+            if (!required.includes('ui-advanced')) {
+                required.push('ui-advanced');
+            }
+            if (!required.includes('business-module')) {
+                required.push('business-module');
+            }
         }
 
         return [...new Set(required)]; // Remove duplicates
@@ -343,7 +354,7 @@ class UnifiedAppInitializer {
      */
     async initialize() {
         if (this.initialized) {
-            console.log('✅ Application already initialized');
+            // console.log('✅ Application already initialized');
             return this.getStatus();
         }
 
@@ -466,19 +477,8 @@ class UnifiedAppInitializer {
         console.log('🚀 Stage 3: Executing initialization...');
         const stageStart = Date.now();
         
-        // Load required modules dynamically
-        if (this.dynamicLoadingEnabled) {
-            console.log('🔧 Loading required modules dynamically...');
-            const modulesLoaded = await this.loadRequiredModules(config);
-            if (!modulesLoaded) {
-                console.error('❌ Failed to load required modules');
-                return false;
-            }
-            
-            // Log loading statistics
-            const stats = this.getLoadingStats();
-            console.log('📊 Module loading statistics:', stats);
-        }
+        // Static loading - all modules already loaded
+        console.log('✅ Static loading - all modules already loaded');
         
         // Initialize IndexedDB first (blocking) to prevent race conditions
         await this.initializeCacheSystem();
@@ -506,7 +506,7 @@ class UnifiedAppInitializer {
         window.cacheSystemReady = window.UnifiedCacheManager && window.UnifiedCacheManager.initialized;
         
         if (window.cacheSystemReady) {
-            console.log('✅ Cache system verified as ready');
+            // console.log('✅ Cache system verified as ready');
         } else {
             console.log('⚠️ Cache system not ready, using fallback mode');
         }
@@ -537,21 +537,35 @@ class UnifiedAppInitializer {
             await window.loadPageState();
         }
         
-        // Execute custom finalizers
+        // Execute custom finalizers with double initialization prevention
         if (window.DEBUG_MODE) {
             console.log('🔧 Executing custom initializers:', this.customInitializers.length);
         }
         for (let i = 0; i < this.customInitializers.length; i++) {
             const initializer = this.customInitializers[i];
+            const initializerKey = `${this.pageInfo.name}_${i}`;
+            
+            // Check if this initializer was already executed
+            if (window.globalInitializationState.customInitializers.has(initializerKey)) {
+                console.log(`⚠️ Custom initializer ${i + 1} already executed, skipping...`);
+                continue;
+            }
+            
             if (window.DEBUG_MODE) {
                 console.log(`🔧 Executing custom initializer ${i + 1}/${this.customInitializers.length}:`, typeof initializer);
             }
             if (typeof initializer === 'function') {
                 try {
                     await initializer();
-                    if (window.DEBUG_MODE) {
-                        console.log(`✅ Custom initializer ${i + 1} completed successfully`);
-                    }
+                    // Mark as executed to prevent double execution
+                    window.globalInitializationState.customInitializers.set(initializerKey, {
+                        executed: true,
+                        timestamp: Date.now(),
+                        page: this.pageInfo.name
+                    });
+                    // if (window.DEBUG_MODE) {
+                    //     console.log(`✅ Custom initializer ${i + 1} completed successfully`);
+                    // }
                 } catch (error) {
                     console.error(`❌ Custom initializer ${i + 1} failed:`, error);
                 }
@@ -684,26 +698,22 @@ class UnifiedAppInitializer {
     async initializeCacheSystem() {
         console.log('🔧 Initializing Unified Cache System...');
         
-        // Initialize UnifiedCacheManager with timeout
-        if (typeof window.UnifiedCacheManager !== 'undefined') {
+        // Initialize UnifiedCacheManager with timeout - only if not already initialized
+        if (typeof window.UnifiedCacheManager !== 'undefined' && !window.UnifiedCacheManager.initialized) {
             try {
-                if (!window.UnifiedCacheManager.initialized) {
-                    console.log('🔧 Initializing UnifiedCacheManager...');
-                    
-                    // Add timeout to prevent hanging
-                    const initPromise = window.UnifiedCacheManager.initialize();
-                    const timeoutPromise = new Promise((_, reject) => 
-                        setTimeout(() => reject(new Error('UnifiedCacheManager initialization timeout')), 10000)
-                    );
-                    
-                    const initResult = await Promise.race([initPromise, timeoutPromise]);
-                    if (initResult) {
-                        console.log('✅ UnifiedCacheManager initialized successfully');
-                    } else {
-                        throw new Error('UnifiedCacheManager initialization returned false');
-                    }
+                console.log('🔧 Initializing UnifiedCacheManager...');
+                
+                // Add timeout to prevent hanging
+                const initPromise = window.UnifiedCacheManager.initialize();
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('UnifiedCacheManager initialization timeout')), 10000)
+                );
+                
+                const initResult = await Promise.race([initPromise, timeoutPromise]);
+                if (initResult) {
+                    console.log('✅ UnifiedCacheManager initialized successfully');
                 } else {
-                    console.log('✅ UnifiedCacheManager already initialized');
+                    throw new Error('UnifiedCacheManager initialization returned false');
                 }
             } catch (error) {
                 console.error('❌ UnifiedCacheManager initialization failed:', error);
@@ -711,76 +721,75 @@ class UnifiedAppInitializer {
                 // Set a flag to indicate cache system is not available
                 window.UnifiedCacheManager = null;
             }
+        } else if (window.UnifiedCacheManager?.initialized) {
+            console.log('✅ UnifiedCacheManager already initialized');
         } else {
             console.log('⚠️ UnifiedCacheManager not available, using localStorage fallback');
         }
 
-        // Initialize CacheSyncManager with timeout
-        if (typeof window.CacheSyncManager !== 'undefined') {
+        // Initialize CacheSyncManager with timeout - only if not already initialized
+        if (typeof window.CacheSyncManager !== 'undefined' && !window.CacheSyncManager.initialized) {
             try {
-                if (!window.CacheSyncManager.initialized) {
-                    console.log('🔧 Initializing CacheSyncManager...');
-                    
-                    const initPromise = window.CacheSyncManager.initialize();
-                    const timeoutPromise = new Promise((_, reject) => 
-                        setTimeout(() => reject(new Error('CacheSyncManager initialization timeout')), 5000)
-                    );
-                    
-                    await Promise.race([initPromise, timeoutPromise]);
-                    console.log('✅ CacheSyncManager initialized successfully');
-                } else {
-                    console.log('✅ CacheSyncManager already initialized');
-                }
+                console.log('🔧 Initializing CacheSyncManager...');
+                
+                const initPromise = window.CacheSyncManager.initialize();
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('CacheSyncManager initialization timeout')), 5000)
+                );
+                
+                await Promise.race([initPromise, timeoutPromise]);
+                console.log('✅ CacheSyncManager initialized successfully');
             } catch (error) {
                 console.error('❌ CacheSyncManager initialization failed:', error);
             }
+        } else if (window.CacheSyncManager?.initialized) {
+            console.log('✅ CacheSyncManager already initialized');
         } else {
             console.log('⚠️ CacheSyncManager not available');
         }
 
-        // Initialize CachePolicyManager
-        if (typeof window.CachePolicyManager !== 'undefined') {
+        // Initialize CachePolicyManager - only if not already initialized
+        if (typeof window.CachePolicyManager !== 'undefined' && !window.CachePolicyManager.initialized) {
             try {
-                if (!window.CachePolicyManager.initialized) {
-                    console.log('🔧 Initializing CachePolicyManager...');
-                    await window.CachePolicyManager.initialize();
-                    console.log('✅ CachePolicyManager initialized successfully');
-                } else {
-                    console.log('✅ CachePolicyManager already initialized');
-                }
+                console.log('🔧 Initializing CachePolicyManager...');
+                await window.CachePolicyManager.initialize();
+                console.log('✅ CachePolicyManager initialized successfully');
             } catch (error) {
                 console.error('❌ CachePolicyManager initialization failed:', error);
             }
+        } else if (window.CachePolicyManager?.initialized) {
+            console.log('✅ CachePolicyManager already initialized');
         } else {
             console.log('⚠️ CachePolicyManager not available');
         }
 
-        // Initialize MemoryOptimizer with timeout
-        if (typeof window.MemoryOptimizer !== 'undefined') {
+        // Initialize MemoryOptimizer with timeout - only if not already initialized
+        if (typeof window.MemoryOptimizer !== 'undefined' && !window.MemoryOptimizer.initialized) {
             try {
-                if (!window.MemoryOptimizer.initialized) {
-                    console.log('🔧 Initializing MemoryOptimizer...');
-                    
-                    const initPromise = window.MemoryOptimizer.initialize();
-                    const timeoutPromise = new Promise((_, reject) => 
-                        setTimeout(() => reject(new Error('MemoryOptimizer initialization timeout')), 5000)
-                    );
-                    
-                    await Promise.race([initPromise, timeoutPromise]);
-                    console.log('✅ MemoryOptimizer initialized successfully');
-                } else {
-                    console.log('✅ MemoryOptimizer already initialized');
-                }
+                console.log('🔧 Initializing MemoryOptimizer...');
+                
+                const initPromise = window.MemoryOptimizer.initialize();
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('MemoryOptimizer initialization timeout')), 5000)
+                );
+                
+                await Promise.race([initPromise, timeoutPromise]);
+                console.log('✅ MemoryOptimizer initialized successfully');
             } catch (error) {
                 console.error('❌ MemoryOptimizer initialization failed:', error);
             }
+        } else if (window.MemoryOptimizer?.initialized) {
+            console.log('✅ MemoryOptimizer already initialized');
         } else {
             console.log('⚠️ MemoryOptimizer not available');
         }
         
-        // Initialize registered core systems
-        if (window.UnifiedInitializationSystem) {
+        // Initialize registered core systems - only if not already initialized
+        if (window.UnifiedInitializationSystem && !window.coreSystemsInitialized) {
             await window.UnifiedInitializationSystem.initializeCoreSystems();
+            window.coreSystemsInitialized = true;
+        } else if (window.coreSystemsInitialized) {
+            console.log('✅ Core systems already initialized, skipping...');
         }
         
         // Final verification and reporting
@@ -901,7 +910,7 @@ class UnifiedAppInitializer {
         
         // Show success notification
         if (typeof window.showNotification === 'function') {
-            window.showNotification('✅ Application initialized successfully', 'success');
+            window.showNotification('✅ המערכת אותחלה בהצלחה', 'success');
         }
     }
 
@@ -954,7 +963,41 @@ window.getUnifiedAppStatus = function() {
     return window.unifiedAppInit.getStatus();
 };
 
+/**
+ * Clear global initialization state (for testing/debugging)
+ */
+window.clearGlobalInitializationState = function() {
+    window.globalInitializationState = {
+        unifiedAppInitialized: false,
+        unifiedAppInitializing: false,
+        pageInitializers: new Set(),
+        customInitializers: new Map()
+    };
+    console.log('🧹 Global initialization state cleared');
+};
+
+/**
+ * Get global initialization state (for debugging)
+ */
+window.getGlobalInitializationState = function() {
+    return {
+        unifiedAppInitialized: window.globalInitializationState.unifiedAppInitialized,
+        unifiedAppInitializing: window.globalInitializationState.unifiedAppInitializing,
+        pageInitializersCount: window.globalInitializationState.pageInitializers.size,
+        customInitializersCount: window.globalInitializationState.customInitializers.size,
+        customInitializers: Array.from(window.globalInitializationState.customInitializers.entries())
+    };
+};
+
 // ===== AUTO-INITIALIZATION =====
+
+// Global initialization tracking to prevent double initialization
+window.globalInitializationState = {
+    unifiedAppInitialized: false,
+    unifiedAppInitializing: false,
+    pageInitializers: new Set(),
+    customInitializers: new Map()
+};
 
 // Single DOMContentLoaded listener - replaces all others
 document.addEventListener('DOMContentLoaded', async () => {
@@ -962,16 +1005,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('🔍 Current URL:', window.location.href);
     console.log('🔍 Current pathname:', window.location.pathname);
     
+    // Prevent double initialization
+    if (window.globalInitializationState.unifiedAppInitialized || 
+        window.globalInitializationState.unifiedAppInitializing) {
+        console.log('⚠️ Unified App already initialized or initializing, skipping...');
+        return;
+    }
+    
+    window.globalInitializationState.unifiedAppInitializing = true;
+    
     try {
         // Small delay to ensure all scripts are loaded
         setTimeout(async () => {
             console.log('🚀 About to call initializeUnifiedApp...');
             await window.initializeUnifiedApp();
-            console.log('✅ initializeUnifiedApp completed');
+            window.globalInitializationState.unifiedAppInitialized = true;
+            window.globalInitializationState.unifiedAppInitializing = false;
+            console.log('✅ Unified App Initialization completed');
         }, 100);
         
     } catch (error) {
         console.error('❌ Unified App auto-initialization failed:', error);
+        window.globalInitializationState.unifiedAppInitializing = false;
     }
 });
 
@@ -1013,9 +1068,16 @@ window.UnifiedInitializationSystem = {
         console.log('🔧 Initializing registered core systems...');
         for (const [name, initFunction] of this.coreSystems) {
             try {
+                // בדיקה אם המערכת כבר מאותחלת
+                const systemKey = name.toLowerCase().replace(/\s+/g, '');
+                if (window[`${systemKey}Initialized`] || (window[name] && window[name].initialized)) {
+                    console.log(`✅ ${name} already initialized, skipping...`);
+                    continue;
+                }
+                
                 console.log(`🔧 Initializing ${name}...`);
                 await initFunction();
-                console.log(`✅ ${name} initialized successfully`);
+                // console.log(`✅ ${name} initialized successfully`);
             } catch (error) {
                 console.error(`❌ Failed to initialize ${name}:`, error);
             }
@@ -2485,18 +2547,19 @@ async function saveNotificationToGlobalHistory(type, title, message, category = 
       url: window.location.href
     };
 
-    // שמירה למערכת המטמון המאוחדת החדשה רק אם מאותחלת
-    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+    // שמירה למערכת המטמון המאוחדת החדשה רק אם מאותחלת ולא נשמרה כבר
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized && !notification._savedToCache) {
       try {
         await window.UnifiedCacheManager.save('notification_history', notification, {
           layer: 'indexedDB',
           ttl: 7 * 24 * 60 * 60 * 1000, // 7 days
           category: 'notification'
         });
+        notification._savedToCache = true; // סימון שנשמרה
       } catch (error) {
         console.warn('שגיאה בשמירה במערכת המטמון החדשה, עובר ל-localStorage:', error.message);
       }
-    } else {
+    } else if (!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) {
       // מערכת מטמון לא מאותחלת - מדלג על שמירה
       console.debug('⚠️ Cache system not initialized - skipping notification history save');
     }
@@ -2571,18 +2634,19 @@ async function updateGlobalNotificationStats() {
       lastUpdated: Date.now()
     };
 
-    // שמירה למערכת המטמון המאוחדת
-    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+    // שמירה למערכת המטמון המאוחדת - רק אם לא נשמרו כבר
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized && !stats._savedToCache) {
       try {
         await window.UnifiedCacheManager.save('notification_stats', stats, {
           layer: 'indexedDB',
           ttl: 24 * 60 * 60 * 1000, // 24 hours
           category: 'notification'
         });
+        stats._savedToCache = true; // סימון שנשמרו
       } catch (error) {
         console.warn('שגיאה בשמירת סטטיסטיקות ב-IndexedDB:', error.message);
       }
-    } else {
+    } else if (!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) {
       // מערכת מטמון לא מאותחלת - מדלג על שמירת סטטיסטיקות
       console.debug('⚠️ Cache system not initialized - skipping notification stats save');
     }

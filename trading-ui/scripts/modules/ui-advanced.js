@@ -1963,6 +1963,12 @@ function updateCSSVariablesFromPreferences(preferences) {
  */
 async function loadColorPreferences() {
   try {
+    // מניעת כפילויות
+    if (window.colorPreferencesLoaded) {
+      console.log('✅ Color preferences already loaded');
+      return;
+    }
+    
     console.log('🎨 טוען הגדרות צבע מהעדפות...');
 
     // נסה ראשית מערכת העדפות
@@ -2010,6 +2016,7 @@ async function loadColorPreferences() {
           }
           
           console.log('🎨 ✅ הגדרות צבע נטענו בהצלחה (new system)');
+          window.colorPreferencesLoaded = true;
           return true;
         }
       }
@@ -2067,6 +2074,7 @@ async function loadColorPreferences() {
       }
 
       console.log('✅ הגדרות צבע נטענו בהצלחה (fallback)');
+      window.colorPreferencesLoaded = true;
     } else {
       console.log('❌ Response not ok:', response.status);
     }
@@ -2307,52 +2315,9 @@ function getSubHeaderOpacityHex() {
 // ===== INITIALIZATION =====
 // אתחול המערכת
 
-// טעינת הגדרות צבע בטעינת הדף
-document.addEventListener('DOMContentLoaded', () => {
-  console.log('🎨 מאתחל מערכת צבעים...');
-  
-  // יצירת CSS דינמי לסטטוסים מיד
-  console.log('🎨 יוצר CSS דינמי לסטטוסים...');
-  generateAndApplyStatusCSS();
-  
-  // נסה לטעון העדפות, אבל אם זה נכשל, המשך עם ברירות מחדל
-  console.log('🎨 קורא ל-loadColorPreferences...');
-  loadColorPreferences().then(() => {
-    console.log('✅ העדפות נטענו בהצלחה');
-  }).catch(error => {
-    console.warn('⚠️ לא ניתן לטעון צבעי ישויות מההעדפות, משתמש בברירות מחדל:', error);
-  });
-  
-  // אחרי טעינת ההעדפות, עדכן את הכותרות עם הצבעים החדשים
-  const bodyClass = document.body.className;
-  if (bodyClass) {
-    // חילוץ סוג הישות מהקלאס של הגוף
-    const entityType = bodyClass.split(' ').find(cls => 
-      ['tickers-page', 'trades-page', 'accounts-page', 'alerts-page', 'cash-flows-page', 'test-header-only'].includes(cls)
-    );
-    
-    if (entityType) {
-      let type = entityType.replace('-page', '');
-      // תיקון שמות ישויות לפורמט יחיד
-      if (type === 'tickers') type = 'ticker';
-      else if (type === 'trades') type = 'trade';
-      else if (type === 'accounts') type = 'account';
-      else if (type === 'alerts') type = 'alert';
-      else if (type === 'cash-flows') type = 'cash-flow';
-      else if (type === 'notes') type = 'note';
-      else if (type === 'trade-plans') type = 'trade-plan';
-      else if (type === 'executions') type = 'execution';
-      else if (type === 'test-header-only') type = 'test';
-      
-      console.log(`🎨 מעדכן כותרות עבור ${type}...`);
-      if (window.applyEntityColorsToHeaders) {
-        setTimeout(() => {
-          window.applyEntityColorsToHeaders(type);
-        }, 100);
-      }
-    }
-  }
-});
+// טעינת הגדרות צבע בטעינת הדף - הוסר כדי למנוע כפילות עם core-systems.js
+// האתחול מתבצע דרך מערכת האתחול המאוחדת
+console.log('🎨 UI Advanced module ready - waiting for unified initialization');
 
 // ===== COLOR SCHEME MANAGEMENT FUNCTIONS =====
 // פונקציות ניהול סכמות צבעים
@@ -2806,6 +2771,8 @@ async function loadDynamicColors() {
 window.loadDynamicColors = loadDynamicColors;
 
 // Auto-load on DOM ready
-document.addEventListener('DOMContentLoaded', loadDynamicColors);
+// הוסר DOMContentLoaded listener כדי למנוע כפילות עם core-systems.js
+// loadDynamicColors נקרא דרך מערכת האתחול המאוחדת
 
 // Color Scheme System loaded successfully
+

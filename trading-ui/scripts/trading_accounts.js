@@ -32,127 +32,59 @@ class TradingAccountsController {
         this.initialized = false;
     }
 
-    /**
-     * אתחול העמוד - אינטגרציה עם מערכת אתחול מאוחדת
-     */
-    async initialize() {
-        try {
-        // בדיקה שמערכת האתחול המאוחדת זמינה
-        if (!window.unifiedAppInit || typeof window.unifiedAppInit.isInitialized !== 'function') {
-            console.warn('⚠️ Unified App Initializer not ready, using fallback initialization');
-            await this.fallbackInitialize();
-    return;
-  }
 
-            // שימוש במערכת אתחול מאוחדת
-            console.log('🚀 Initializing Trading Accounts with Unified System...');
-            
-            // שלב 3: מערכות עמוד - אתחול ספציפי
-            await this.initializePageSystems();
-            
-            // הגדרת event listeners
-            this.setupEventListeners();
-            
-            // טעינת נתונים
-            await this.loadData();
-            
-            // עדכון UI
-            this.updateUI();
-            
-            this.initialized = true;
-            console.log('✅ Trading Accounts initialized successfully');
-            
-        } catch (error) {
-            console.error('Error initializing trading accounts page:', error);
-            this.showError('שגיאה באתחול העמוד');
-        }
-    }
-
-    /**
-     * אתחול ספציפי לעמוד (שלב 3 במערכת האתחול)
-     */
-    async initializePageSystems() {
-        console.log('📊 Initializing Trading Accounts Page Systems...');
-        
-        // טעינת נתוני חשבונות
-        if (typeof window.getAccounts === 'function') {
-            try {
-                this.data = await window.getAccounts();
-    } catch (error) {
-                console.warn('Failed to load accounts data:', error);
-                this.data = [];
-    }
-  } else {
-            console.warn('window.getAccounts function not available');
-            this.data = [];
-        }
-        
-        // הגדרת event handlers ספציפיים
-        this.setupTradingAccountsHandlers();
-    }
-
-    /**
-     * אתחול fallback במקרה שמערכת מאוחדת לא זמינה
-     */
-    async fallbackInitialize() {
-        console.log('⚠️ Using fallback initialization for Trading Accounts');
-        
-        // אתחול בסיסי ללא מערכת מאוחדת
-        this.setupEventListeners();
-        await this.loadData();
-        this.updateUI();
-        this.initialized = true;
-    }
 
     /**
      * טעינת נתונים באמצעות מערכות כלליות
      */
     async loadData() {
-        if (this.isLoading) return;
+        if (this.isLoading || window.tradingAccountsDataLoaded) {
+            console.log('✅ Data already loading or loaded, skipping...');
+            return;
+        }
         
         this.isLoading = true;
         this.showLoadingState();
 
         try {
             // שימוש ב-account-service הקיים עם Unified Cache
-            if (typeof window.getAccounts === 'function') {
-                this.data = await window.getAccounts();
-      } else {
-                console.warn('window.getAccounts function not available, using empty data');
-                this.data = [];
-            }
+            console.log('📊 Loading data from getAccounts...');
+            this.data = await window.getAccounts();
+            console.log('📊 Data loaded:', this.data);
             
             // עדכון UI באמצעות מערכות כלליות
             this.updateTable();
             this.updateStatistics();
-
-  } catch (error) {
+            
+        } catch (error) {
             console.error('Error loading data:', error);
-            this.data = []; // fallback to empty array
-            this.updateTable();
-            this.updateStatistics();
             this.showError('שגיאה בטעינת נתונים');
         } finally {
             this.isLoading = false;
             this.hideLoadingState();
-  }
-}
+            window.tradingAccountsDataLoaded = true;
+        }
+    }
 
-/**
+    /**
      * עדכון הטבלה באמצעות מערכת מיפוי טבלאות
      */
     updateTable() {
         try {
-            const tbody = document.querySelector('#accountsTable tbody');
+            const tbody = document.querySelector('#accountsTableBody');
             if (!tbody) {
                 console.error('❌ לא נמצא tbody בטבלה');
                 return;
             }
 
+            console.log('📊 updateTable called - data length:', this.data ? this.data.length : 'undefined');
+            console.log('📊 updateTable data:', this.data);
+
             // ניקוי הטבלה
             tbody.innerHTML = '';
 
             if (!this.data || this.data.length === 0) {
+                console.log('📊 No data to display');
                 const row = document.createElement('tr');
                 row.innerHTML = '<td colspan="8" class="text-center">אין נתונים להצגה</td>';
                 tbody.appendChild(row);
@@ -167,58 +99,119 @@ class TradingAccountsController {
 
             console.log(`✅ טבלה עודכנה עם ${this.data.length} חשבונות מסחר`);
 
-  } catch (error) {
+        } catch (error) {
             console.error('❌ שגיאה בעדכון הטבלה:', error);
-  }
-}
+        }
+    }
 
-/**
+    /**
      * יצירת שורה בטבלה
      */
     createTableRow(tradingAccount) {
         const row = document.createElement('tr');
         
         // שימוש במערכת מיפוי טבלאות אם זמינה
-        let nameValue, currencyValue, statusValue, balanceValue, totalValueValue, plValue, notesValue;
+        let nameValue, typeValue, currencyValue, balanceValue, statusValue, createdValue;
         
         if (window.getColumnValue && window.tableMappings) {
             const tableType = 'accounts';
             nameValue = window.getColumnValue(tradingAccount, 1, tableType) || tradingAccount.name || '-';
-            currencyValue = window.getColumnValue(tradingAccount, 2, tableType) || tradingAccount.currency || '-';
+            typeValue = tradingAccount.type || 'רגיל'; // סוג החשבון
+            
+            // תצוגת מטבע: שם מלא (סמל) או סמל בלבד
+            if (tradingAccount.currency_name && tradingAccount.currency_symbol) {
+                currencyValue = `${tradingAccount.currency_name} (${tradingAccount.currency_symbol})`;
+            } else if (tradingAccount.currency_symbol) {
+                currencyValue = tradingAccount.currency_symbol;
+            } else if (tradingAccount.currency_name) {
+                currencyValue = tradingAccount.currency_name;
+            } else {
+                currencyValue = window.getColumnValue(tradingAccount, 2, tableType) || tradingAccount.currency || '-';
+            }
+            
+            balanceValue = window.getColumnValue(tradingAccount, 4, tableType) || tradingAccount.cashBalance || tradingAccount.cash_balance || 0;
             statusValue = window.getColumnValue(tradingAccount, 3, tableType) || tradingAccount.status || '-';
-            balanceValue = window.getColumnValue(tradingAccount, 4, tableType) || tradingAccount.cash_balance || 0;
-            totalValueValue = window.getColumnValue(tradingAccount, 5, tableType) || tradingAccount.total_value || 0;
-            plValue = window.getColumnValue(tradingAccount, 6, tableType) || tradingAccount.total_pl || 0;
-            notesValue = window.getColumnValue(tradingAccount, 7, tableType) || tradingAccount.notes || '';
-    } else {
+            createdValue = tradingAccount.created_at || '-';
+        } else {
             // fallback למיפוי ידני
             nameValue = tradingAccount.name || '-';
-            currencyValue = tradingAccount.currency || '-';
+            typeValue = tradingAccount.type || 'רגיל';
+            
+            // תצוגת מטבע: שם מלא (סמל) או סמל בלבד
+            if (tradingAccount.currency_name && tradingAccount.currency_symbol) {
+                currencyValue = `${tradingAccount.currency_name} (${tradingAccount.currency_symbol})`;
+            } else if (tradingAccount.currency_symbol) {
+                currencyValue = tradingAccount.currency_symbol;
+            } else if (tradingAccount.currency_name) {
+                currencyValue = tradingAccount.currency_name;
+            } else {
+                currencyValue = tradingAccount.currency || '-';
+            }
+            
+            balanceValue = tradingAccount.cashBalance || tradingAccount.cash_balance || 0;
             statusValue = tradingAccount.status || '-';
-            balanceValue = tradingAccount.cash_balance || 0;
-            totalValueValue = tradingAccount.total_value || 0;
-            plValue = tradingAccount.total_pl || 0;
-            notesValue = tradingAccount.notes || '';
+            createdValue = tradingAccount.created_at || '-';
         }
 
         // עיצוב ערכים
-        const formattedBalance = typeof balanceValue === 'number' ? balanceValue.toLocaleString() : balanceValue;
-        const formattedTotalValue = typeof totalValueValue === 'number' ? totalValueValue.toLocaleString() : totalValueValue;
-        const formattedPL = typeof plValue === 'number' ? plValue.toLocaleString() : plValue;
+        const formattedBalance = typeof balanceValue === 'number' ? `$${balanceValue.toLocaleString()}` : balanceValue;
         
-        // צבע PL
-        const plColor = typeof plValue === 'number' && plValue > 0 ? 'text-success' : 
-                       typeof plValue === 'number' && plValue < 0 ? 'text-danger' : '';
+        // עיצוב תאריך
+        let formattedDate = '-';
+        if (createdValue && createdValue !== '-') {
+            try {
+                const date = new Date(createdValue);
+                formattedDate = date.toLocaleDateString('he-IL');
+            } catch (e) {
+                formattedDate = createdValue;
+            }
+        }
+        
+        // תרגום סטטוס לעברית
+        const translatedStatus = window.translateAccountStatus ? 
+            window.translateAccountStatus(statusValue) : statusValue;
+        
+        // קבלת צבעים דינמיים מההעדפות
+        let statusColor = '#6c757d'; // ברירת מחדל
+        let statusBgColor = 'rgba(108, 117, 125, 0.1)';
+        
+        if (window.getStatusColor && window.getStatusBackgroundColor) {
+            statusColor = window.getStatusColor(statusValue, 'medium');
+            statusBgColor = window.getStatusBackgroundColor(statusValue);
+        } else {
+            // fallback לצבעים בסיסיים
+            const fallbackColors = {
+                'open': { color: '#28a745', bg: 'rgba(40, 167, 69, 0.1)' },
+                'closed': { color: '#6c757d', bg: 'rgba(108, 117, 125, 0.1)' },
+                'cancelled': { color: '#dc3545', bg: 'rgba(220, 53, 69, 0.1)' }
+            };
+            const colors = fallbackColors[statusValue] || fallbackColors['closed'];
+            statusColor = colors.color;
+            statusBgColor = colors.bg;
+        }
 
         row.innerHTML = `
-            <td>${tradingAccount.id || '-'}</td>
-            <td>${nameValue}</td>
-            <td>${currencyValue}</td>
-            <td><span class="badge bg-secondary">${statusValue}</span></td>
-            <td>${formattedBalance}</td>
-            <td>${formattedTotalValue}</td>
-            <td class="${plColor}">${formattedPL}</td>
-            <td>${notesValue}</td>
+            <td class="col-name">${nameValue}</td>
+            <td class="col-type">${typeValue}</td>
+            <td class="col-currency">${currencyValue}</td>
+            <td class="col-balance">${formattedBalance}</td>
+            <td class="col-status">
+                <span class="badge" style="background-color: ${statusBgColor}; color: ${statusColor}; border: 1px solid ${statusColor};">
+                    ${translatedStatus}
+                </span>
+            </td>
+            <td class="col-created">${formattedDate}</td>
+            <td class="col-actions actions-cell">
+                <button class="btn btn-sm btn-outline-primary" onclick="window.tradingAccountsController.showEditModal(${tradingAccount.id})" title="עריכה">
+                    <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-info" onclick="window.tradingAccountsController.showDetails(${tradingAccount.id})" title="פרטים">
+                    <i class="bi bi-eye"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" onclick="window.tradingAccountsController.deleteAccount(${tradingAccount.id})" title="מחיקה">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </td>
         `;
 
         return row;
@@ -231,9 +224,9 @@ class TradingAccountsController {
         if (!this.data || !Array.isArray(this.data)) {
             console.warn('⚠️ אין נתונים לעדכון סטטיסטיקות');
             return;
-  }
+        }
 
-  try {
+        try {
             const totalAccounts = this.data.length;
             const activeAccounts = this.data.filter(account => account.status === 'open').length;
             const openAccounts = this.data.filter(account => account.status === 'open').length;
@@ -250,12 +243,12 @@ class TradingAccountsController {
 
             console.log('📊 סטטיסטיקות עודכנו:', { totalAccounts, activeAccounts, openAccounts, totalBalance });
 
-  } catch (error) {
+        } catch (error) {
             console.error('❌ שגיאה בעדכון סטטיסטיקות:', error);
-  }
-}
+        }
+    }
 
-/**
+    /**
      * עדכון אלמנט סטטיסטיקה
      */
     updateStatElement(elementId, value) {
@@ -351,10 +344,10 @@ class TradingAccountsController {
         // הודעת הצלחה
         if (window.showSuccessNotification) {
             window.showSuccessNotification('נתונים רוענו בהצלחה');
-  }
-}
+        }
+    }
 
-/**
+    /**
      * טיפול בלחיצה על פילטר
      */
     handleFilterClick(event) {
@@ -372,31 +365,31 @@ class TradingAccountsController {
         const loadingEl = document.getElementById('loadingIndicator');
         if (loadingEl) {
             loadingEl.style.display = 'block';
-  }
-}
+        }
+    }
 
-/**
+    /**
      * הסתרת מצב טעינה
      */
     hideLoadingState() {
         const loadingEl = document.getElementById('loadingIndicator');
         if (loadingEl) {
             loadingEl.style.display = 'none';
-  }
-}
+        }
+    }
 
-/**
+    /**
      * הצגת שגיאה
      */
     showError(message) {
         console.error('❌ Error:', message);
         
-            if (window.showErrorNotification) {
+        if (window.showErrorNotification) {
             window.showErrorNotification(message);
-  }
-}
+        }
+    }
 
-/**
+    /**
      * עדכון UI כללי
      */
     updateUI() {
@@ -410,35 +403,479 @@ class TradingAccountsController {
         
         console.log('✅ UI updated successfully');
     }
+
+    /**
+     * הצגת מודל עריכה
+     * לפי STANDARD_VALIDATION_GUIDE.md
+     */
+    async showEditModal(accountId) {
+        console.log('✏️ Showing edit modal for account:', accountId);
+        const account = this.data.find(a => a.id === accountId);
+        if (!account) {
+            console.error('❌ Account not found:', accountId);
+            return;
+        }
+        
+        // ניקוי ולידציה
+        if (window.clearValidation) {
+            window.clearValidation('editAccountForm');
+        }
+        
+        // טעינת מטבעות לפני מילוי הטופס
+        await loadCurrenciesForEditAccount();
+        
+        // מילוי שדות המודל
+        const modal = document.getElementById('editAccountModal');
+        if (modal) {
+            document.getElementById('editAccountId').value = account.id;
+            document.getElementById('editAccountName').value = account.name || '';
+            document.getElementById('editAccountStatus').value = account.status || '';
+            document.getElementById('editAccountCurrency').value = account.currency_id || account.currency || '';
+            document.getElementById('editAccountBalance').value = account.cashBalance || account.cash_balance || 0;
+            document.getElementById('editAccountDescription').value = account.notes || '';
+            
+            // פתיחת המודל
+            const bsModal = new bootstrap.Modal(modal);
+            bsModal.show();
+        }
+    }
+
+    /**
+     * הצגת פרטים
+     */
+    showDetails(accountId) {
+        console.log('👁️ Showing details for account:', accountId);
+        const account = this.data.find(a => a.id === accountId);
+        if (!account) {
+            console.error('❌ Account not found:', accountId);
+            return;
+        }
+        
+        // שימוש במערכת פרטי ישות אם זמינה
+        if (typeof window.showEntityDetails === 'function') {
+            window.showEntityDetails('trading_account', account);
+        } else {
+            // fallback - הצגה בהתראה
+            const currencyDisplay = account.currency_name ? 
+                `${account.currency_name} (${account.currency_symbol || ''})` : 
+                (account.currency_symbol || account.currency || '-');
+            
+            alert(`פרטי חשבון:\nשם: ${account.name}\nסטטוס: ${account.status}\nמטבע: ${currencyDisplay}\nיתרה: $${account.cashBalance || account.cash_balance}`);
+        }
+    }
+
+    /**
+     * מחיקת חשבון
+     */
+    async deleteAccount(accountId) {
+        console.log('🗑️ Deleting account:', accountId);
+        const account = this.data.find(a => a.id === accountId);
+        if (!account) {
+            console.error('❌ Account not found:', accountId);
+            return;
+        }
+        
+        // אישור מחיקה
+        const confirmed = confirm(`האם אתה בטוח שברצונך למחוק את החשבון "${account.name}"?`);
+        if (!confirmed) {
+            return;
+        }
+        
+        try {
+            // קריאה ל-API למחיקה
+            const response = await fetch(`/api/trading-accounts/${accountId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                console.log('✅ Account deleted successfully');
+                
+                // הסרה מהמערך המקומי
+                this.data = this.data.filter(a => a.id !== accountId);
+                
+                // עדכון הטבלה
+                this.updateTable();
+                this.updateStatistics();
+                
+                // הצגת הודעת הצלחה
+                if (typeof window.showSuccessNotification === 'function') {
+                    window.showSuccessNotification('החשבון נמחק בהצלחה', `החשבון "${account.name}" נמחק מהמערכת`);
+                }
+            } else {
+                throw new Error('Failed to delete account');
+            }
+        } catch (error) {
+            console.error('❌ Error deleting account:', error);
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification('שגיאה במחיקת החשבון', error.message);
+            } else {
+                alert('שגיאה במחיקת החשבון: ' + error.message);
+            }
+        }
+    }
 }
 
-// יצירת instance גלובלי
-window.TradingAccountsController = new TradingAccountsController();
+// יצירת instance גלובלי - שני שמות לתאימות
+window.tradingAccountsController = new TradingAccountsController();
+window.TradingAccountsController = window.tradingAccountsController; // Alias for compatibility
+
+console.log('✅ Trading Accounts Controller instance created:', window.tradingAccountsController);
+
+// ===== פונקציות ולידציה סטנדרטיות =====
+
+/**
+ * ולידציה של טופס הוספת חשבון מסחר
+ * לפי STANDARD_VALIDATION_GUIDE.md
+ */
+function validateTradingAccountForm() {
+    return window.validateEntityForm('addAccountForm', [
+        { id: 'accountName', name: 'שם חשבון' },
+        { id: 'accountStatus', name: 'סטטוס' },
+        { id: 'accountCurrency', name: 'מטבע' },
+        { 
+            id: 'accountBalance', 
+            name: 'יתרה',
+            validation: (value) => {
+                const balance = parseFloat(value);
+                if (isNaN(balance)) return 'יש להזין יתרה תקינה';
+                return true;
+            }
+        }
+    ]);
+}
+
+/**
+ * ולידציה של טופס עריכת חשבון מסחר
+ * לפי STANDARD_VALIDATION_GUIDE.md
+ */
+function validateEditAccountForm() {
+    return window.validateEntityForm('editAccountForm', [
+        { id: 'editAccountName', name: 'שם חשבון' },
+        { id: 'editAccountStatus', name: 'סטטוס' },
+        { id: 'editAccountCurrency', name: 'מטבע' },
+        { 
+            id: 'editAccountBalance', 
+            name: 'יתרה',
+            validation: (value) => {
+                const balance = parseFloat(value);
+                if (isNaN(balance)) return 'יש להזין יתרה תקינה';
+                return true;
+            }
+        }
+    ]);
+}
+
+// ===== פונקציות טיפול במודלים =====
+
+/**
+ * פתיחת מודל הוספת חשבון עם ברירות מחדל
+ * לפי STANDARD_VALIDATION_GUIDE.md
+ */
+async function showAddAccountModal() {
+    // 1. ניקוי הטופס
+    const form = document.getElementById('addAccountForm');
+    if (form) {
+        form.reset();
+    }
+
+    // 2. ניקוי ולידציה
+    if (window.clearValidation) {
+        window.clearValidation('addAccountForm');
+    }
+
+    // 3. הגדרת ברירות מחדל לוגיות
+    const statusSelect = document.getElementById('accountStatus');
+    if (statusSelect) {
+        statusSelect.value = 'open'; // ברירת מחדל: פתוח
+    }
+
+    // 4. טעינת מטבעות עם ברירת מחדל מהעדפות
+    await loadCurrenciesForAccount();
+
+    // 5. יתרה התחלתית 0
+    const balanceInput = document.getElementById('accountBalance');
+    if (balanceInput) {
+        balanceInput.value = '0';
+    }
+
+    // 6. הצגת המודל
+    const modalElement = document.getElementById('addAccountModal');
+    if (modalElement) {
+        const bootstrapModal = new bootstrap.Modal(modalElement);
+        bootstrapModal.show();
+    }
+}
+
+/**
+ * טעינת מטבעות לטופס הוספה עם ברירת מחדל מהעדפות
+ */
+async function loadCurrenciesForAccount() {
+    try {
+        const response = await fetch('/api/currencies/');
+        if (response.ok) {
+            const result = await response.json();
+            const currencies = result.data || result;
+            const select = document.getElementById('accountCurrency');
+            
+            if (select) {
+                select.innerHTML = '<option value="">בחר מטבע...</option>';
+                
+                // קבלת מטבע ברירת מחדל מהעדפות
+                const defaultCurrency = await window.getPreference('default_currency');
+                
+                currencies.forEach((currency, index) => {
+                    const option = document.createElement('option');
+                    option.value = currency.id;
+                    option.textContent = `${currency.symbol} - ${currency.name}`;
+                    
+                    // הגדרת ברירת מחדל:
+                    // 1. אם יש העדפה - השתמש בה
+                    // 2. אם אין - USD (id=1) או הראשון ברשימה
+                    if (defaultCurrency && currency.id === parseInt(defaultCurrency)) {
+                        option.selected = true;
+                    } else if (!defaultCurrency && (currency.id === 1 || index === 0)) {
+                        option.selected = true;
+                    }
+                    
+                    select.appendChild(option);
+                });
+            }
+        }
+    } catch (error) {
+        console.error('Error loading currencies:', error);
+    }
+}
+
+/**
+ * טעינת מטבעות לטופס עריכה
+ */
+async function loadCurrenciesForEditAccount() {
+    try {
+        const response = await fetch('/api/currencies/');
+        if (response.ok) {
+            const result = await response.json();
+            const currencies = result.data || result;
+            const select = document.getElementById('editAccountCurrency');
+            
+            if (select) {
+                select.innerHTML = '<option value="">בחר מטבע...</option>';
+                
+                currencies.forEach(currency => {
+                    const option = document.createElement('option');
+                    option.value = currency.id;
+                    option.textContent = `${currency.symbol} - ${currency.name}`;
+                    select.appendChild(option);
+                });
+            }
+        }
+    } catch (error) {
+        console.error('Error loading currencies:', error);
+    }
+}
+
+/**
+ * שמירת חשבון מסחר חדש
+ * לפי STANDARD_VALIDATION_GUIDE.md
+ */
+async function saveTradingAccount() {
+    try {
+        // 1. איסוף נתונים מהטופס
+        const nameElement = document.getElementById('accountName');
+        const statusElement = document.getElementById('accountStatus');
+        const currencyElement = document.getElementById('accountCurrency');
+        const balanceElement = document.getElementById('accountBalance');
+        const descriptionElement = document.getElementById('accountDescription');
+        
+        // 2. בדיקת קיום אלמנטים
+        if (!nameElement || !statusElement || !currencyElement || !balanceElement) {
+            if (typeof window.showSimpleErrorNotification === 'function') {
+                window.showSimpleErrorNotification('שגיאה', 'שדות חובה חסרים בטופס');
+            }
+            return;
+        }
+        
+        // 3. ולידציה של הטופס
+        if (!validateTradingAccountForm()) {
+            return; // עצירה אם הולידציה נכשלה
+        }
+        
+        // 4. בניית אובייקט formData
+        const formData = {
+            name: nameElement.value,
+            status: statusElement.value,
+            currency_id: parseInt(currencyElement.value),
+            cash_balance: parseFloat(balanceElement.value) || 0,
+            notes: descriptionElement ? descriptionElement.value : ''
+        };
+
+        // 5. שליחה לשרת
+        const response = await fetch('/api/trading-accounts/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+
+        // 6. טיפול בתגובה
+        if (!response.ok) {
+            const errorData = await response.json();
+            
+            // בדיקה אם זו שגיאת ולידציה (HTTP 400)
+            if (response.status === 400) {
+                // שגיאת ולידציה מהשרת
+                if (typeof window.showSimpleErrorNotification === 'function') {
+                    window.showSimpleErrorNotification('שגיאת ולידציה', errorData.message || 'נתונים לא תקינים');
+                }
+                return;
+            }
+            
+            // שגיאת מערכת אחרת (500, 404, וכו')
+            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        
+        // 7. הצגת הודעת הצלחה
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('הצלחה', 'חשבון המסחר נשמר בהצלחה');
+        }
+
+        // 8. סגירת המודל
+        const modal = bootstrap.Modal.getInstance(document.getElementById('addAccountModal'));
+        if (modal) {
+            modal.hide();
+        }
+
+        // 9. רענון הטבלה
+        if (window.tradingAccountsController && window.tradingAccountsController.loadData) {
+            await window.tradingAccountsController.loadData();
+        }
+
+    } catch (error) {
+        console.error('Error saving trading account:', error);
+        
+        // שגיאת JavaScript או Network - זו שגיאת מערכת אמיתית
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בשמירת חשבון מסחר', error.message);
+        }
+    }
+}
+
+/**
+ * עדכון חשבון מסחר קיים
+ * לפי STANDARD_VALIDATION_GUIDE.md
+ */
+async function updateTradingAccount() {
+    try {
+        // 1. איסוף נתונים מהטופס
+        const idElement = document.getElementById('editAccountId');
+        const nameElement = document.getElementById('editAccountName');
+        const statusElement = document.getElementById('editAccountStatus');
+        const currencyElement = document.getElementById('editAccountCurrency');
+        const balanceElement = document.getElementById('editAccountBalance');
+        const descriptionElement = document.getElementById('editAccountDescription');
+        
+        // 2. בדיקת קיום אלמנטים
+        if (!idElement || !nameElement || !statusElement || !currencyElement || !balanceElement) {
+            if (typeof window.showSimpleErrorNotification === 'function') {
+                window.showSimpleErrorNotification('שגיאה', 'שדות חובה חסרים בטופס');
+            }
+            return;
+        }
+        
+        // 3. ולידציה של הטופס
+        if (!validateEditAccountForm()) {
+            return; // עצירה אם הולידציה נכשלה
+        }
+        
+        // 4. בניית אובייקט formData
+        const accountId = parseInt(idElement.value);
+        const formData = {
+            name: nameElement.value,
+            status: statusElement.value,
+            currency_id: parseInt(currencyElement.value),
+            cash_balance: parseFloat(balanceElement.value) || 0,
+            notes: descriptionElement ? descriptionElement.value : ''
+        };
+
+        // 5. שליחה לשרת
+        const response = await fetch(`/api/trading-accounts/${accountId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+
+        // 6. טיפול בתגובה
+        if (!response.ok) {
+            const errorData = await response.json();
+            
+            // בדיקה אם זו שגיאת ולידציה (HTTP 400)
+            if (response.status === 400) {
+                // שגיאת ולידציה מהשרת
+                if (typeof window.showSimpleErrorNotification === 'function') {
+                    window.showSimpleErrorNotification('שגיאת ולידציה', errorData.message || 'נתונים לא תקינים');
+                }
+                return;
+            }
+            
+            // שגיאת מערכת אחרת (500, 404, וכו')
+            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        
+        // 7. הצגת הודעת הצלחה
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('הצלחה', 'חשבון המסחר עודכן בהצלחה');
+        }
+
+        // 8. סגירת המודל
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editAccountModal'));
+        if (modal) {
+            modal.hide();
+        }
+
+        // 9. רענון הטבלה
+        if (window.tradingAccountsController && window.tradingAccountsController.loadData) {
+            await window.tradingAccountsController.loadData();
+        }
+
+    } catch (error) {
+        console.error('Error updating trading account:', error);
+        
+        // שגיאת JavaScript או Network - זו שגיאת מערכת אמיתית
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בעדכון חשבון מסחר', error.message);
+        }
+    }
+}
+
+// ===== ייצוא פונקציות גלובליות =====
 
 // Export functions for unified initialization
 window.updateTradingAccountsStatistics = function() {
-    if (window.TradingAccountsController) {
-        window.TradingAccountsController.updateStatistics();
+    if (window.tradingAccountsController) {
+        window.tradingAccountsController.updateStatistics();
     }
 };
 
-// אתחול אוטומטי אם DOM מוכן - המתן למערכות כלליות
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        console.log('🚀 DOM Content Loaded - Waiting for systems initialization...');
-        // המתן למערכות כלליות להתאתחל
-setTimeout(() => {
-            console.log('🚀 Starting Trading Accounts initialization after delay');
-            window.TradingAccountsController.initialize();
-        }, 2000);
-          });
-      } else {
-    console.log('🚀 DOM already ready - Waiting for systems initialization...');
-    // המתן למערכות כלליות להתאתחל
-    setTimeout(() => {
-        console.log('🚀 Starting Trading Accounts initialization after delay');
-        window.TradingAccountsController.initialize();
-}, 2000);
-}
+// Export validation functions
+window.validateTradingAccountForm = validateTradingAccountForm;
+window.validateEditAccountForm = validateEditAccountForm;
 
-console.log('✅ trading_accounts_new.js loaded successfully');
+// Export modal functions
+window.showAddAccountModal = showAddAccountModal;
+window.loadCurrenciesForAccount = loadCurrenciesForAccount;
+window.loadCurrenciesForEditAccount = loadCurrenciesForEditAccount;
+
+// Export save/update functions
+window.saveTradingAccount = saveTradingAccount;
+window.updateTradingAccount = updateTradingAccount;
+
+// אתחול אוטומטי אם DOM מוכן - הוסר כדי למנוע כפילות עם core-systems.js
+// האתחול מתבצע דרך מערכת האתחול המאוחדת
+console.log('🚀 Trading Accounts Controller ready - waiting for unified initialization');
+
+console.log('✅ trading_accounts.js loaded successfully');

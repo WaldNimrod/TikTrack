@@ -25,204 +25,68 @@
     
             <!-- ===== CSS Architecture - Unified CSS ===== -->
     
-    <!-- Bootstrap Framework -->
+    <!-- Google Fonts - Heebo (הפונט החדש של המערכת) -->
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS - חייב להיות קודם -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
     
-    <!-- TikTrack CSS - Unified CSS (No @import) -->
-    <!-- CSS Files - אחרי Bootstrap כדי לדרוס אותו -->
-    <!-- ITCSS Architecture - Individual Files (September 2025) -->
-    <!-- 🔄 MAJOR ARCHITECTURE CHANGE - September 2025: Individual <link> tags instead of @import -->
-    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=20251001">
+    <!-- ITCSS Architecture - Complete Implementation -->
     
-    <!-- Bootstrap Icons -->
+    <!-- 01-settings - Variables and Settings -->
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=20251006">
+    
+    <!-- 02-tools - Functions and Mixins -->
+    <link rel="stylesheet" href="styles-new/02-tools/_mixins.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/02-tools/_functions.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/02-tools/_utilities.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/02-tools/_rtl-helpers.css?v=20251006">
+    
+    <!-- 03-generic - Reset and Normalization -->
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=20251006">
+    
+    <!-- 04-elements - Basic HTML Elements -->
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=20251006">
+    
+    <!-- 05-objects - Layout Structures -->
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=20251006">
+    
+    <!-- 06-components - UI Components -->
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=20251006">
+    <link rel="stylesheet" href="styles-new/06-components/_crud-testing-dashboard.css?v=20251006">
+    
+    <!-- 07-trumps - Page-specific Styles -->
+    <!-- הוסף כאן קובץ CSS ספציפי לעמוד (למשל: _crud-testing-dashboard.css) -->
+    
+    <!-- 08-themes - Themes -->
+    <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=20251006">
+    
+    <!-- 09-utilities - Utility Classes -->
+    <link rel="stylesheet" href="styles-new/09-utilities/_utilities.css?v=20251006">
+
+    <!-- External Libraries -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
-    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.1">
-    <!-- Page Headers - Development pages with white background -->
-    <link rel="stylesheet" href="styles-new/06-components/_page-headers.css?v=20251001">    
-    <!-- CRUD Testing Dashboard Styles -->
-    <link rel="stylesheet" href="styles-new/06-components/_crud-testing-dashboard.css?v=20251001">
     
-    <!-- Error Handlers -->
-    <script src="scripts/error-handlers.js"></script>
-    
-    <!-- CRUD Testing Dashboard Styles - MOVED TO EXTERNAL CSS FILE -->
-    <!-- <style>
-        .page-test-card {
-            border: 1px solid #dee2e6;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            overflow: hidden;
-            background: white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .page-header {
-            padding: 15px 20px;
-            background: linear-gradient(135deg, #29a6a8 0%, #1f8a8c 100%);
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .page-header.high {
-            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
-        }
-        .page-header.critical {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-        }
-        .page-title {
-            font-size: 1.2em;
-            font-weight: 600;
-        }
-        .priority-badge {
-            background: rgba(255,255,255,0.2);
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.8em;
-            margin-left: 10px;
-        }
-        .status-indicator {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-left: 8px;
-        }
-        .status-not-tested { background: #6c757d; }
-        .status-tested { background: #ffc107; }
-        .status-complete { background: #28a745; }
-        .status-partial { background: #fd7e14; }
-        .page-body {
-            padding: 20px;
-        }
-        .test-section {
-            margin-bottom: 25px;
-        }
-        .test-section h4 {
-            color: #495057;
-            border-bottom: 2px solid #29a6a8;
-            padding-bottom: 8px;
-            margin-bottom: 15px;
-        }
-        .checklist {
-            list-style: none;
-            padding: 0;
-        }
-        .checklist li {
-            margin: 8px 0;
-            display: flex;
-            align-items: center;
-        }
-        .checklist input[type="checkbox"] {
-            margin-left: 10px;
-            accent-color: #29a6a8;
-        }
-        .button-item {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 6px;
-            padding: 8px 12px;
-            margin: 4px 0;
-        }
-        .button-item.create {
-            border-color: #28a745;
-            background: rgba(40, 167, 69, 0.05);
-        }
-        .button-item.update {
-            border-color: #17a2b8;
-            background: rgba(23, 162, 184, 0.05);
-        }
-        .button-item.delete {
-            border-color: #dc3545;
-            background: rgba(220, 53, 69, 0.05);
-        }
-        .button-item.other {
-            border-color: #6c757d;
-            background: rgba(108, 117, 125, 0.05);
-        }
-        .test-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        .buttons-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        
-        /* Summary Stats Styles */
-        .summary-stats {
-            display: flex;
-            justify-content: space-between;
-            gap: 20px;
-            padding: 20px;
-            border: 2px solid #29a6a8;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            margin: 20px 0;
-        }
-        .summary-item {
-            flex: 1;
-            text-align: center;
-            padding: 15px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .summary-number {
-            font-size: 2em;
-            font-weight: bold;
-            color: #29a6a8;
-            margin-bottom: 5px;
-        }
-        .summary-label {
-            font-size: 0.9em;
-            color: #6c757d;
-            font-weight: 500;
-        }
-        
-        /* Bootstrap Tab Fixes */
-        .tab-pane {
-            display: none;
-        }
-        .tab-pane.active {
-            display: block;
-        }
-        .tab-pane.fade {
-            opacity: 0;
-            transition: opacity 0.15s linear;
-        }
-        .tab-pane.fade.active {
-            opacity: 1;
-        }
-    </style> -->
     <script src="scripts/global-favicon.js"></script>
 </head>
 <body>
@@ -251,11 +115,11 @@
                         </div>
                     </div>
                     <div class="section-body">
-                        <p><strong>נוצר:</strong> 06/09/2025 04:05</p>
+                        <p><strong>נוצר:</strong> 06/01/2025 04:05 | <strong>עודכן:</strong> 06/01/2025 - מערכת כללית חדשה v2.0.0</p>
                         
                         <div class="summary-stats" id="summaryStats">
                             <div class="summary-item">
-                                <div class="summary-number" id="totalPages">12</div>
+                                <div class="summary-number" id="totalPages">14</div>
                                 <div class="summary-label">עמודים לבדיקה</div>
                             </div>
                             <div class="summary-item">
@@ -271,6 +135,7 @@
                                 <div class="summary-label">התקדמות</div>
                             </div>
                         </div>
+                        
                     </div>
                 </div>
                 <!-- UI Content Section Top End -->  
@@ -309,8 +174,12 @@
                                             <i class="fas fa-database"></i> בדיקות CRUD לכל הישויות
                                         </button>
                                         <br>
-                                        <button class="btn btn-warning btn-sm" onclick="checkAllConnections()">
+                                        <button class="btn btn-warning btn-sm mb-2" id="checkAllConnectionsBtn">
                                             <i class="fas fa-network-wired"></i> בדיקת חיבורים לשרת
+                                        </button>
+                                        <br>
+                                        <button class="btn btn-dark btn-sm" onclick="copyDetailedTestResults()">
+                                            <i class="fas fa-copy"></i> העתקת תוצאות מפורטות
                                         </button>
                                     </div>
                                 </div>
@@ -336,6 +205,67 @@
                                         <button class="btn btn-dark btn-sm" onclick="resetAllTests()">
                                             <i class="fas fa-undo"></i> איפוס כל הבדיקות
                                         </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- טבלת תוצאות חיה -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6><i class="fas fa-table"></i> תוצאות בדיקות בזמן אמת</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="liveResultsContainer" class="d-none">
+                                            <div class="table-responsive">
+                                                <table class="table table-sm table-striped" id="liveResultsTable">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>עמוד/API</th>
+                                                            <th>סטטוס</th>
+                                                            <th>זמן</th>
+                                                            <th>פרטים</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="liveResultsBody">
+                                                        <!-- תוצאות יופיעו כאן בזמן אמת -->
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="mt-3">
+                                                <div class="row">
+                                                    <div class="col-md-3">
+                                                        <div class="text-center">
+                                                            <div class="h4 text-primary" id="totalTests">0</div>
+                                                            <small class="text-muted">סה"כ בדיקות</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="text-center">
+                                                            <div class="h4 text-success" id="successTests">0</div>
+                                                            <small class="text-muted">הצלחות</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="text-center">
+                                                            <div class="h4 text-danger" id="failedTests">0</div>
+                                                            <small class="text-muted">כישלונות</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="text-center">
+                                                            <div class="h4 text-warning" id="pendingTests">0</div>
+                                                            <small class="text-muted">ממתינים</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="noLiveResultsMessage" class="text-muted text-center py-4">
+                                            <i class="fas fa-info-circle"></i> טבלת התוצאות תופיע כאן בזמן אמת בעת ביצוע בדיקות
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -421,6 +351,16 @@
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link" id="preferences-tab" data-bs-toggle="tab" data-bs-target="#preferences" type="button" role="tab">
                                     ⚙️ העדפות
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="notifications-center-tab" data-bs-toggle="tab" data-bs-target="#notifications-center" type="button" role="tab">
+                                    🔔 מרכז התראות
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="database-tab" data-bs-toggle="tab" data-bs-target="#database" type="button" role="tab">
+                                    🗄️ בסיס נתונים
                                 </button>
                             </li>
                         </ul>
@@ -1264,6 +1204,24 @@
                                                 </div>
                                                 <div class="button-item update">
                                                     <input type="checkbox" id="trade_plans_btn_1">
+                                                    <label for="trade_plans_btn_1"><strong>ערוך תוכנית</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item delete">
+                                                    <input type="checkbox" id="trade_plans_btn_2">
+                                                    <label for="trade_plans_btn_2"><strong>מחק תוכנית</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item other">
+                                                    <input type="checkbox" id="trade_plans_btn_3">
+                                                    <label for="trade_plans_btn_3"><strong>רענן נתונים</strong> - עובד כהלכה</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>🔧 בדיקות CRUD מפורטות</h4>
+                                            <ul class="checklist">
+                                                <li>
+                                                    <input type="checkbox" id="trade_plans_create">
                                                     <label for="trade_plans_create"><strong>Create:</strong> יצירת תוכנית חדשה עובדת (מודל נפתח, שמירה מצליחה)</label>
                                                 </li>
                                                 <li>
@@ -1273,50 +1231,470 @@
                                                 <li>
                                                     <input type="checkbox" id="trade_plans_update">
                                                     <label for="trade_plans_update"><strong>Update:</strong> עדכון תוכנית עובד (מודל נפתח, שמירה מצליחה)</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="trade_plans_delete">
+                                                    <label for="trade_plans_delete"><strong>Delete:</strong> מחיקת תוכנית עובדת (אישור, מחיקה מהטבלה)</label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>📝 הערות ובעיות</h4>
+                                            <textarea class="form-control" id="trade_plans_notes" rows="3" 
+                                                      placeholder="תעד כאן בעיות, שגיאות או הערות על העמוד..."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- סיום טאב תוכניות מסחר -->
+
+                            <!-- טאב אילוצים -->
+                            <div class="tab-pane fade" id="constraints" role="tabpanel">
+                                <div class="page-test-card" id="pageCardConstraints">
+                                    <div class="page-header high">
+                                        <div class="page-title">
+                                            ⚠️ אילוצים
+                                        </div>
+                                        <div>
+                                            <span class="priority-badge">high</span>
+                                            <span class="status-indicator status-not-tested" id="statusConstraints"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="test-actions">
+                                        <a href="/constraints" target="_blank" class="btn btn-primary">
+                                            <i class="fas fa-external-link-alt"></i> פתח עמוד
+                                        </a>
+                                        <button class="btn btn-info btn-sm" onclick="runBasicTest('constraints', '/constraints')">
+                                            <i class="fas fa-play"></i> בדיקה בסיסית
+                                        </button>
+                                        <button class="btn btn-secondary btn-sm" onclick="runCRUDTest('constraints', '/api/constraints/')">
+                                            <i class="fas fa-database"></i> בדיקת CRUD
+                                        </button>
+                                        <button class="btn btn-success" onclick="markPageComplete('constraints')">
+                                            <i class="fas fa-check"></i> סיימתי בדיקה
+                                        </button>
+                                        <button class="btn btn-warning" onclick="markPagePartial('constraints')">
+                                            <i class="fas fa-exclamation"></i> יש בעיות
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="test-section">
+                                        <h4>🔍 בדיקות בסיסיות</h4>
+                                        <ul class="checklist">
+                                            <li>
+                                                <input type="checkbox" id="constraints_load">
+                                                <label for="constraints_load">עמוד נטען ללא שגיאות</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="constraints_css">
+                                                <label for="constraints_css">עיצוב CSS נראה תקין</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="constraints_js">
+                                                <label for="constraints_js">אין שגיאות JavaScript בקונסול</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="constraints_rtl">
+                                                <label for="constraints_rtl">RTL ועברית נכונים</label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="test-section">
+                                        <h4>📝 הערות ובעיות</h4>
+                                        <textarea class="form-control" id="constraints_notes" rows="3" 
+                                                  placeholder="תעד כאן בעיות, שגיאות או הערות על העמוד..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- סיום טאב אילוצים -->
+
+                            <!-- טאב הערות -->
+                            <div class="tab-pane fade" id="notes" role="tabpanel">
+                                <div class="page-test-card" id="pageCardNotes">
+                                    <div class="page-header high">
+                                        <div class="page-title">
+                                            📝 הערות
+                                        </div>
+                                        <div>
+                                            <span class="priority-badge">high</span>
+                                            <span class="status-indicator status-not-tested" id="statusNotes"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="test-actions">
+                                        <a href="/notes" target="_blank" class="btn btn-primary">
+                                            <i class="fas fa-external-link-alt"></i> פתח עמוד
+                                        </a>
+                                        <button class="btn btn-info btn-sm" onclick="runBasicTest('notes', '/notes')">
+                                            <i class="fas fa-play"></i> בדיקה בסיסית
+                                        </button>
+                                        <button class="btn btn-secondary btn-sm" onclick="runCRUDTest('notes', '/api/notes/')">
+                                            <i class="fas fa-database"></i> בדיקת CRUD
+                                        </button>
+                                        <button class="btn btn-success" onclick="markPageComplete('notes')">
+                                            <i class="fas fa-check"></i> סיימתי בדיקה
+                                        </button>
+                                        <button class="btn btn-warning" onclick="markPagePartial('notes')">
+                                            <i class="fas fa-exclamation"></i> יש בעיות
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="test-section">
+                                        <h4>🔍 בדיקות בסיסיות</h4>
+                                        <ul class="checklist">
+                                            <li>
+                                                <input type="checkbox" id="notes_load">
+                                                <label for="notes_load">עמוד נטען ללא שגיאות</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="notes_css">
+                                                <label for="notes_css">עיצוב CSS נראה תקין</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="notes_js">
+                                                <label for="notes_js">אין שגיאות JavaScript בקונסול</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="notes_rtl">
+                                                <label for="notes_rtl">RTL ועברית נכונים</label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="test-section">
+                                        <h4>📝 הערות ובעיות</h4>
+                                        <textarea class="form-control" id="notes_notes" rows="3" 
+                                                  placeholder="תעד כאן בעיות, שגיאות או הערות על העמוד..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- סיום טאב הערות -->
+
+                            <!-- טאב מחקר -->
+                            <div class="tab-pane fade" id="research" role="tabpanel">
+                                <div class="page-test-card" id="pageCardResearch">
+                                    <div class="page-header high">
+                                        <div class="page-title">
+                                            🔬 מחקר
+                                        </div>
+                                        <div>
+                                            <span class="priority-badge">high</span>
+                                            <span class="status-indicator status-not-tested" id="statusResearch"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="test-actions">
+                                        <a href="/research" target="_blank" class="btn btn-primary">
+                                            <i class="fas fa-external-link-alt"></i> פתח עמוד
+                                        </a>
+                                        <button class="btn btn-info btn-sm" onclick="runBasicTest('research', '/research')">
+                                            <i class="fas fa-play"></i> בדיקה בסיסית
+                                        </button>
+                                        <button class="btn btn-secondary btn-sm" onclick="runCRUDTest('research', '/api/research/')">
+                                            <i class="fas fa-database"></i> בדיקת CRUD
+                                        </button>
+                                        <button class="btn btn-success" onclick="markPageComplete('research')">
+                                            <i class="fas fa-check"></i> סיימתי בדיקה
+                                        </button>
+                                        <button class="btn btn-warning" onclick="markPagePartial('research')">
+                                            <i class="fas fa-exclamation"></i> יש בעיות
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="test-section">
+                                        <h4>🔍 בדיקות בסיסיות</h4>
+                                        <ul class="checklist">
+                                            <li>
+                                                <input type="checkbox" id="research_load">
+                                                <label for="research_load">עמוד נטען ללא שגיאות</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="research_css">
+                                                <label for="research_css">עיצוב CSS נראה תקין</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="research_js">
+                                                <label for="research_js">אין שגיאות JavaScript בקונסול</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="research_rtl">
+                                                <label for="research_rtl">RTL ועברית נכונים</label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="test-section">
+                                        <h4>📝 הערות ובעיות</h4>
+                                        <textarea class="form-control" id="research_notes" rows="3" 
+                                                  placeholder="תעד כאן בעיות, שגיאות או הערות על העמוד..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- סיום טאב מחקר -->
+
+                            <!-- טאב העדפות -->
+                            <div class="tab-pane fade" id="preferences" role="tabpanel">
+                                <div class="page-test-card" id="pageCardPreferences">
+                                    <div class="page-header critical">
+                                        <div class="page-title">
+                                            ⚙️ העדפות
+                                        </div>
+                                        <div>
+                                            <span class="priority-badge">critical</span>
+                                            <span class="status-indicator status-not-tested" id="statusPreferences"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="test-actions">
+                                        <a href="/preferences" target="_blank" class="btn btn-primary">
+                                            <i class="fas fa-external-link-alt"></i> פתח עמוד
+                                        </a>
+                                        <button class="btn btn-info btn-sm" onclick="runBasicTest('preferences', '/preferences')">
+                                            <i class="fas fa-play"></i> בדיקה בסיסית
+                                        </button>
+                                        <button class="btn btn-secondary btn-sm" onclick="runCRUDTest('preferences', '/api/preferences/')">
+                                            <i class="fas fa-database"></i> בדיקת CRUD
+                                        </button>
+                                        <button class="btn btn-success" onclick="markPageComplete('preferences')">
+                                            <i class="fas fa-check"></i> סיימתי בדיקה
+                                        </button>
+                                        <button class="btn btn-warning" onclick="markPagePartial('preferences')">
+                                            <i class="fas fa-exclamation"></i> יש בעיות
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="test-section">
+                                        <h4>🔍 בדיקות בסיסיות</h4>
+                                        <ul class="checklist">
+                                            <li>
+                                                <input type="checkbox" id="preferences_load">
+                                                <label for="preferences_load">עמוד נטען ללא שגיאות</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="preferences_css">
+                                                <label for="preferences_css">עיצוב CSS נראה תקין</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="preferences_js">
+                                                <label for="preferences_js">אין שגיאות JavaScript בקונסול</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="preferences_rtl">
+                                                <label for="preferences_rtl">RTL ועברית נכונים</label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="test-section">
+                                        <h4>📝 הערות ובעיות</h4>
+                                        <textarea class="form-control" id="preferences_notes" rows="3" 
+                                                  placeholder="תעד כאן בעיות, שגיאות או הערות על העמוד..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- סיום טאב העדפות -->
+
+                            <!-- טאב מרכז התראות -->
+                            <div class="tab-pane fade" id="notifications-center" role="tabpanel">
+                                <div class="page-test-card" id="pageCardNotificationsCenter">
+                                    <div class="page-header critical">
+                                        <div class="page-title">
+                                            🔔 מרכז התראות
+                                        </div>
+                                        <div>
+                                            <span class="priority-badge">critical</span>
+                                            <span class="status-indicator status-not-tested" id="statusNotificationsCenter"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="test-actions">
+                                        <a href="/notifications-center" target="_blank" class="btn btn-primary">
+                                            <i class="fas fa-external-link-alt"></i> פתח עמוד
+                                        </a>
+                                        <button class="btn btn-info btn-sm" onclick="runBasicTest('notifications-center', '/notifications-center')">
+                                            <i class="fas fa-play"></i> בדיקה בסיסית
+                                        </button>
+                                        <button class="btn btn-secondary btn-sm" onclick="runCRUDTest('notifications-center', '/api/notifications/')">
+                                            <i class="fas fa-database"></i> בדיקת CRUD
+                                        </button>
+                                        <button class="btn btn-success" onclick="markPageComplete('notifications-center')">
+                                            <i class="fas fa-check"></i> סיימתי בדיקה
+                                        </button>
+                                        <button class="btn btn-warning" onclick="markPagePartial('notifications-center')">
+                                            <i class="fas fa-exclamation"></i> יש בעיות
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="test-section">
+                                        <h4>🔍 בדיקות בסיסיות</h4>
+                                        <ul class="checklist">
+                                            <li>
+                                                <input type="checkbox" id="notifications-center_load">
+                                                <label for="notifications-center_load">עמוד נטען ללא שגיאות</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="notifications-center_css">
+                                                <label for="notifications-center_css">עיצוב CSS נראה תקין</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="notifications-center_js">
+                                                <label for="notifications-center_js">אין שגיאות JavaScript בקונסול</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="notifications-center_rtl">
+                                                <label for="notifications-center_rtl">RTL ועברית נכונים</label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="test-section">
+                                        <h4>🎛️ כפתורים לבדיקה</h4>
+                                        <div class="buttons-list">
+                                            <div class="button-item other">
+                                                <input type="checkbox" id="notifications-center_btn_0">
+                                                <label for="notifications-center_btn_0"><strong>בדיקת התראות</strong> - עובד כהלכה</label>
+                                            </div>
+                                            <div class="button-item other">
+                                                <input type="checkbox" id="notifications-center_btn_1">
+                                                <label for="notifications-center_btn_1"><strong>העתק לוג מפורט</strong> - עובד כהלכה</label>
+                                            </div>
+                                            <div class="button-item other">
+                                                <input type="checkbox" id="notifications-center_btn_2">
+                                                <label for="notifications-center_btn_2"><strong>רענן נתונים</strong> - עובד כהלכה</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="test-section">
+                                        <h4>📝 הערות ובעיות</h4>
+                                        <textarea class="form-control" id="notifications-center_notes" rows="3" 
+                                                  placeholder="תעד כאן בעיות, שגיאות או הערות על העמוד..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- סיום טאב מרכז התראות -->
+
+                            <!-- טאב בסיס נתונים -->
+                            <div class="tab-pane fade" id="database" role="tabpanel">
+                                <div class="page-test-card" id="pageCardDatabase">
+                                    <div class="page-header critical">
+                                        <div class="page-title">
+                                            🗄️ בסיס נתונים
+                                        </div>
+                                        <div>
+                                            <span class="priority-badge">critical</span>
+                                            <span class="status-indicator status-not-tested" id="statusDatabase"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="test-actions">
+                                        <a href="/database" target="_blank" class="btn btn-primary">
+                                            <i class="fas fa-external-link-alt"></i> פתח עמוד
+                                        </a>
+                                        <button class="btn btn-info btn-sm" onclick="runBasicTest('database', '/database')">
+                                            <i class="fas fa-play"></i> בדיקה בסיסית
+                                        </button>
+                                        <button class="btn btn-secondary btn-sm" onclick="runCRUDTest('database', '/api/database/')">
+                                            <i class="fas fa-database"></i> בדיקת CRUD
+                                        </button>
+                                        <button class="btn btn-success" onclick="markPageComplete('database')">
+                                            <i class="fas fa-check"></i> סיימתי בדיקה
+                                        </button>
+                                        <button class="btn btn-warning" onclick="markPagePartial('database')">
+                                            <i class="fas fa-exclamation"></i> יש בעיות
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="test-section">
+                                        <h4>🔍 בדיקות בסיסיות</h4>
+                                        <ul class="checklist">
+                                            <li>
+                                                <input type="checkbox" id="database_load">
+                                                <label for="database_load">עמוד נטען ללא שגיאות</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="database_css">
+                                                <label for="database_css">עיצוב CSS נראה תקין</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="database_js">
+                                                <label for="database_js">אין שגיאות JavaScript בקונסול</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="database_rtl">
+                                                <label for="database_rtl">RTL ועברית נכונים</label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="test-section">
+                                        <h4>🎛️ כפתורים לבדיקה</h4>
+                                        <div class="buttons-list">
+                                            <div class="button-item other">
+                                                <input type="checkbox" id="database_btn_0">
+                                                <label for="database_btn_0"><strong>בדיקת חיבור</strong> - עובד כהלכה</label>
+                                            </div>
+                                            <div class="button-item other">
+                                                <input type="checkbox" id="database_btn_1">
+                                                <label for="database_btn_1"><strong>רענן נתונים</strong> - עובד כהלכה</label>
+                                            </div>
+                                            <div class="button-item other">
+                                                <input type="checkbox" id="database_btn_2">
+                                                <label for="database_btn_2"><strong>בדיקת טבלאות</strong> - עובד כהלכה</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="test-section">
+                                        <h4>📝 הערות ובעיות</h4>
+                                        <textarea class="form-control" id="database_notes" rows="3" 
+                                                  placeholder="תעד כאן בעיות, שגיאות או הערות על העמוד..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- סיום טאב בסיס נתונים -->
+
+                        </div>
+                        <!-- סיום תוכן הטאבים -->
     
-    <!-- Core System Scripts -->
-    <script src="scripts/console-cleanup.js"></script>
-    <script src="scripts/translation-utils.js"></script>
-    <script src="scripts/data-utils.js"></script>
-    <script src="scripts/ui-utils.js"></script>
-    <script src="scripts/table-mappings.js"></script>
-    <script src="scripts/date-utils.js"></script>
-    <script src="scripts/tables.js"></script>
-    <script src="scripts/linked-items.js"></script>
-    <script src="scripts/page-utils.js"></script>
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- מערכת כללית חדשה - 8 מודולים מאוחדים -->
     
-    <!-- Notification System Scripts -->
-    <script src="scripts/notification-system.js"></script>
-    <script src="scripts/warning-system.js"></script>
-    <script src="scripts/global-notification-collector.js"></script>
+    <!-- Stage 1: Core Systems (חובה) -->
+    <script src="scripts/modules/core-systems.js?v=20251006"></script>
     
-    <!-- Header System Script -->
-    <script src="scripts/header-system.js"></script>
+    <!-- Stage 2: Dynamic Loader Configuration -->
+    <script src="scripts/modules/dynamic-loader-config.js?v=20251006"></script>
     
-    <!-- Dynamic Color System Scripts -->
-    <script src="scripts/color-scheme-system.js"></script>
+    <!-- Stage 3: Page Initialization Configurations -->
+    <script src="scripts/page-initialization-configs.js?v=20251006"></script>
     
-    <!-- Preferences System Scripts -->
-    <script src="scripts/preferences.js"></script>
+    <!-- Stage 4: Global Systems -->
+    <script src="scripts/global-favicon.js?v=20251006"></script>
+    <script src="scripts/translation-utils.js?v=20251006"></script>
+    <script src="scripts/header-system.js?v=v6.0.0"></script>
+    <script src="scripts/date-utils.js?v=20251006"></script>
+    <script src="scripts/button-icons.js?v=20251006"></script>
+    <script src="scripts/page-utils.js?v=20251006"></script>
+    <script src="scripts/preferences.js?v=20251006"></script>
+    <script src="scripts/notification-category-detector.js?v=20251006"></script>
+    <script src="scripts/global-notification-collector.js?v=20251006"></script>
+    <script src="scripts/system-management.js?v=20251006"></script>
+    <script src="scripts/entity-details-modal.js?v=20251006"></script>
+    <script src="scripts/warning-system.js?v=20251006"></script>
     
-    <!-- Page-Specific Script -->
-    <script src="scripts/crud-testing-dashboard.js"></script>
-    
-    <!-- Unified Initialization System -->
-    <script src="scripts/page-initialization-configs.js"></script>
-    <script src="scripts/unified-app-initializer.js"></script>
-    
-    <!-- JavaScript functions moved to external file -->
+    <!-- Stage 5: Page-specific Script -->
+    <script src="scripts/crud-testing-dashboard.js?v=20251006"></script>
     
     <!-- Closing divs for main structure -->
                 </div> <!-- content-section -->
             </div> <!-- main-content -->
         </div> <!-- page-body -->
     </div> <!-- background-wrapper -->
-    <!-- Local copyDetailedLog function for crud-testing-dashboard page -->
-    <script>
-        // Make the local copyDetailedLog function available globally for this page only
-        window.copyDetailedLog = copyDetailedLog;
-    </script>
 </body>
 </html>

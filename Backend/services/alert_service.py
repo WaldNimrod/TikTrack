@@ -47,6 +47,10 @@ class AlertService:
     def create(db: Session, alert_data: Dict[str, Any]) -> Alert:
         """Create a new alert"""
         try:
+            # Check if alert_data is empty or None
+            if not alert_data or len(alert_data) == 0:
+                raise ValueError("Alert data cannot be empty")
+            
             # Set default value for is_triggered
             if 'is_triggered' not in alert_data:
                 alert_data['is_triggered'] = 'false'
@@ -367,13 +371,13 @@ class AlertService:
                         # Remove legacy field
                         del alert_data['condition']
             
-            # Set defaults for new fields if not provided
-            if 'condition_attribute' not in alert_data:
-                alert_data['condition_attribute'] = 'price'
-            if 'condition_operator' not in alert_data:
-                alert_data['condition_operator'] = 'more_than'
-            if 'condition_number' not in alert_data:
-                alert_data['condition_number'] = '0'
+            # Don't set defaults for new fields - require them to be provided
+            # if 'condition_attribute' not in alert_data:
+            #     alert_data['condition_attribute'] = 'price'
+            # if 'condition_operator' not in alert_data:
+            #     alert_data['condition_operator'] = 'more_than'
+            # if 'condition_number' not in alert_data:
+            #     alert_data['condition_number'] = '0'
             
             # Validate new condition fields
             valid_attributes = ['price', 'change', 'ma', 'volume']

@@ -88,11 +88,35 @@ const PAGE_CONFIGS = {
         ]
     },
     
+    'trade_plans': {
+        name: 'Trade Plans',
+        requiresFilters: true,
+        requiresValidation: true,
+        requiresTables: true,
+        customInitializers: [
+            async (pageConfig) => {
+                console.log('📋 Initializing Trade Plans...');
+                
+                // Load trade plans data
+                if (typeof window.loadTradePlansData === 'function') {
+                    await window.loadTradePlansData();
+                }
+                
+                // Setup trade plan-specific handlers
+                if (typeof window.setupTradePlanHandlers === 'function') {
+                    window.setupTradePlanHandlers();
+                }
+            }
+        ]
+    },
+    
     'executions': {
         name: 'Executions',
         requiresFilters: true,
         requiresValidation: false,
         requiresTables: true,
+        requiresCommunication: true,
+        requiresCharts: true,
         customInitializers: [
             async (pageConfig) => {
                 console.log('⚡ Initializing Executions...');
@@ -150,8 +174,8 @@ const PAGE_CONFIGS = {
             async (pageConfig) => {
                 console.log('💰 Initializing Cash Flows...');
                 
-                if (typeof window.loadCashFlowsData === 'function') {
-                    await window.loadCashFlowsData();
+                if (typeof window.initializeCashFlowsPage === 'function') {
+                    await window.initializeCashFlowsPage();
                 }
             }
         ]
@@ -199,19 +223,26 @@ const PAGE_CONFIGS = {
             async (pageConfig) => {
                 console.log('💼 Initializing Trading Accounts...');
                 
-                // טעינת נתוני חשבונות
-                if (typeof window.getAccounts === 'function') {
-                    await window.getAccounts();
-                }
-                
-                // הגדרת event handlers ספציפיים
-                if (typeof window.setupTradingAccountsHandlers === 'function') {
-                    window.setupTradingAccountsHandlers();
-                }
-                
-                // עדכון סטטיסטיקות
-                if (typeof window.updateTradingAccountsStatistics === 'function') {
-                    window.updateTradingAccountsStatistics();
+                // טעינת נתונים ועדכון UI פשוט
+                if (window.tradingAccountsController) {
+                    // הגדרת event listeners
+                    if (typeof window.tradingAccountsController.setupEventListeners === 'function') {
+                        window.tradingAccountsController.setupEventListeners();
+                    }
+                    
+                    // טעינת נתונים
+                    if (typeof window.tradingAccountsController.loadData === 'function') {
+                        await window.tradingAccountsController.loadData();
+                    }
+                    
+                    // עדכון UI
+                    if (typeof window.tradingAccountsController.updateUI === 'function') {
+                        window.tradingAccountsController.updateUI();
+                    }
+                    
+                    console.log('✅ Trading Accounts initialized successfully');
+                } else {
+                    console.error('❌ tradingAccountsController not found');
                 }
             }
         ]
@@ -223,6 +254,7 @@ const PAGE_CONFIGS = {
         requiresFilters: false,
         requiresValidation: false,
         requiresTables: false,
+        requiresUI: true,
         customInitializers: [
             async (pageConfig) => {
                 console.log('🔧 Initializing System Management...');
@@ -634,6 +666,22 @@ const PAGE_CONFIGS = {
         ]
     },
     
+    'db_extradata': {
+        name: 'Database Extra Data',
+        requiresFilters: false,
+        requiresValidation: false,
+        requiresTables: true,
+        customInitializers: [
+            async (pageConfig) => {
+                console.log('🗄️ Initializing Database Extra Data...');
+                
+                if (typeof window.loadExtraDataInfo === 'function') {
+                    await window.loadExtraDataInfo();
+                }
+            }
+        ]
+    },
+    
     'research': {
         name: 'Research',
         requiresFilters: true,
@@ -652,29 +700,44 @@ const PAGE_CONFIGS = {
     
     'cache-test': {
         name: 'Cache Test',
-        requiresFilters: false,
+        requiresFilters: true,
         requiresValidation: false,
         requiresTables: false,
         customInitializers: [
             async (pageConfig) => {
-                console.log('🧪 Initializing Cache Test...');
-                console.log('🔍 Page config received:', pageConfig);
-                console.log('🔍 Checking if initializeCacheTest function exists:', typeof window.initializeCacheTest);
-                console.log('🔍 Document ready state:', document.readyState);
-                console.log('🔍 DOM elements loaded:', document.body ? 'Yes' : 'No');
-                console.log('🔍 Available functions:', Object.keys(window).filter(k => k.includes('Cache')));
+                console.log('🧪 Initializing Cache Test Page via UnifiedAppInitializer...');
                 
-                if (typeof window.initializeCacheTest === 'function') {
-                    console.log('✅ Calling initializeCacheTest...');
-                    try {
-                        await window.initializeCacheTest();
-                        console.log('✅ initializeCacheTest completed successfully');
-                    } catch (error) {
-                        console.error('❌ Error in initializeCacheTest:', error);
+                // Initialize Cache Test Page if not already initialized
+                if (!window.cacheTestPage) {
+                    console.log('🚀 Creating Cache Test Page instance...');
+                    
+                    // Wait for DOM to be ready
+                    if (document.readyState === 'loading') {
+                        await new Promise(resolve => {
+                            document.addEventListener('DOMContentLoaded', resolve, { once: true });
+                        });
+                    }
+                    
+                    // Create and initialize Cache Test Page
+                    if (typeof CacheTestPage !== 'undefined') {
+                        window.cacheTestPage = new CacheTestPage();
+                        window.cacheTestPage.init();
+                        console.log('✅ Cache Test Page initialized via UnifiedAppInitializer');
+                    } else {
+                        console.error('❌ CacheTestPage class not available');
                     }
                 } else {
-                    console.error('❌ initializeCacheTest function not found!');
-                    console.error('❌ Available window functions:', Object.keys(window).filter(k => k.includes('initialize')));
+                    console.log('✅ Cache Test Page already initialized');
+                }
+                
+                // Ensure cache systems are ready
+                if (typeof window.initializeAllCacheSystems === 'function') {
+                    try {
+                        await window.initializeAllCacheSystems(true); // isInitialLoad = true
+                        console.log('✅ Cache systems initialized for Cache Test Page');
+                    } catch (error) {
+                        console.error('❌ Failed to initialize cache systems:', error);
+                    }
                 }
             }
         ]

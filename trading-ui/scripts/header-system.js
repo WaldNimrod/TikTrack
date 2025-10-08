@@ -88,9 +88,9 @@ class HeaderSystem {
     
     // בדיקה אם הפונקציות מוגדרות
     // console.log('🔧 Checking if filter functions are defined:');
-    console.log('selectStatusOption:', typeof window.selectStatusOption);
-    console.log('updateStatusFilterText:', typeof window.updateStatusFilterText);
-    console.log('applyStatusFilter:', typeof window.applyStatusFilter);
+    // console.log('selectStatusOption:', typeof window.selectStatusOption);
+    // console.log('updateStatusFilterText:', typeof window.updateStatusFilterText);
+    // console.log('applyStatusFilter:', typeof window.applyStatusFilter);
   }
 
   static getHeaderHTML() {
@@ -373,10 +373,10 @@ class HeaderSystem {
       window.updateToggleButtons();
     }, 100);
     
-    // עדכון נוסף לאחר טעינה מלאה
-    setTimeout(() => {
-      window.updateToggleButtons();
-    }, 500);
+    // עדכון נוסף לאחר טעינה מלאה - הוסר כפילות
+    // setTimeout(() => {
+    //   window.updateToggleButtons();
+    // }, 500);
     
     // הוספת event listeners לתפריט משנה של ניקוי
     setTimeout(() => {
@@ -953,7 +953,7 @@ class HeaderSystem {
 
 
   static async loadAccountsForFilter() {
-    console.log('🔧 loadAccountsForFilter - מתחיל טעינת חשבונות מסחר');
+    // console.log('🔧 loadAccountsForFilter - מתחיל טעינת חשבונות מסחר');
     
     try {
       // שימוש בפונקציה מקובץ השירותים
@@ -1006,7 +1006,7 @@ class HeaderSystem {
   }
 
   static loadSavedState() {
-    console.log('🔧 Loading saved filter state...');
+    // console.log('🔧 Loading saved filter state...');
     
     // המתן שהמערכת תהיה מוכנה
     setTimeout(() => {
@@ -1931,12 +1931,12 @@ document.addEventListener('DOMContentLoaded', function() {
     if (typeof window.HeaderSystemClass.createFilterSystem === 'function') {
       window.HeaderSystemClass.createFilterSystem();
       
-      // טעינת מצב שמור אחרי שמערכת הפילטרים נוצרה
-      setTimeout(() => {
-        if (typeof window.HeaderSystemClass.loadSavedState === 'function') {
-          window.HeaderSystemClass.loadSavedState();
-        }
-      }, 200);
+      // טעינת מצב שמור אחרי שמערכת הפילטרים נוצרה - הוסר כפילות
+      // setTimeout(() => {
+      //   if (typeof window.HeaderSystemClass.loadSavedState === 'function') {
+      //     window.HeaderSystemClass.loadSavedState();
+      //   }
+      // }, 200);
     }
     
     // בדיקה נוספת אחרי האתחול
@@ -1957,10 +1957,10 @@ window.updateToggleButtons = function() {
   const mainBtn = document.querySelector('.filter-toggle-main');
   const secondaryBtn = document.querySelector('.filter-toggle-secondary');
   
-  console.log('🔧 updateToggleButtons called');
-  console.log('headerFilters:', headerFilters);
-  console.log('mainBtn:', mainBtn);
-  console.log('secondaryBtn:', secondaryBtn);
+  // console.log('🔧 updateToggleButtons called');
+  // console.log('headerFilters:', headerFilters);
+  // console.log('mainBtn:', mainBtn);
+  // console.log('secondaryBtn:', secondaryBtn);
   
   if (!headerFilters || !mainBtn || !secondaryBtn) {
     console.log('❌ Missing elements');

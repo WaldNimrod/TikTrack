@@ -263,6 +263,96 @@ function openAddTradePlanModal() {
 /**
  * פתיחת מודל עריכת תכנון קיים
  */
+/**
+ * עריכת תכנון טרייד
+ */
+function editTradePlan(tradePlanId) {
+    openEditTradePlanModal(tradePlanId);
+}
+
+/**
+ * הצגת פרטי תכנון טרייד
+ */
+function showTradePlanDetails(tradePlanId) {
+    // חיפוש התכנון בנתונים
+    const tradePlan = window.tradePlansData ? window.tradePlansData.find(tp => tp.id === tradePlanId) : null;
+    
+    if (!tradePlan) {
+        console.error(`❌ Trade Plan with ID ${tradePlanId} not found`);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', `תכנון טרייד עם ID ${tradePlanId} לא נמצא`);
+        }
+        return;
+    }
+
+    // שימוש במערכת הצגת פרטים כללית אם זמינה
+    if (typeof window.showEntityDetails === 'function') {
+        window.showEntityDetails('trade_plan', tradePlanId, { mode: 'view' });
+    } else {
+        // הצגה פשוטה
+        const details = `פרטי תכנון טרייד:
+ID: ${tradePlan.id}
+טיקר: ${tradePlan.ticker_id}
+סוג השקעה: ${tradePlan.investment_type}
+צד: ${tradePlan.side}
+סטטוס: ${tradePlan.status}
+סכום מתוכנן: ${tradePlan.planned_amount}
+מחיר עצירה: ${tradePlan.stop_price || 'לא מוגדר'}
+מחיר יעד: ${tradePlan.target_price || 'לא מוגדר'}
+מחיר נוכחי: ${tradePlan.current_price || 'לא מוגדר'}
+נוצר: ${tradePlan.created_at ? new Date(tradePlan.created_at).toLocaleString('he-IL') : 'לא מוגדר'}`;
+        alert(details);
+    }
+}
+
+/**
+ * מחיקת תכנון טרייד
+ */
+function deleteTradePlan(tradePlanId) {
+    if (!confirm('האם אתה בטוח שברצונך למחוק תכנון טרייד זה?')) {
+        return;
+    }
+
+    if (typeof window.showLoadingNotification === 'function') {
+        window.showLoadingNotification('מוחק תכנון טרייד...');
+    }
+
+    fetch(`/api/trade_plans/${tradePlanId}`, {
+        method: 'DELETE'
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        // הסרת התכנון מהמערך המקומי
+        const index = window.tradePlansData.findIndex(tp => tp.id === tradePlanId);
+        if (index > -1) {
+            window.tradePlansData.splice(index, 1);
+        }
+
+        // עדכון הטבלה
+        updateTradePlansTable(window.tradePlansData);
+        
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('תכנון טרייד נמחק בהצלחה');
+        }
+    })
+    .catch(error => {
+        console.error('❌ Failed to delete trade plan:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה במחיקת תכנון טרייד', error.message);
+        }
+    })
+    .finally(() => {
+        if (typeof window.hideLoadingNotification === 'function') {
+            window.hideLoadingNotification();
+        }
+    });
+}
+
 async function openEditTradePlanModal(tradePlanId) {
   const tradePlan = window.tradePlansData.find(tp => tp.id === tradePlanId);
   if (!tradePlan) {
@@ -1382,14 +1472,18 @@ function updateTradePlansTable(trade_plans) {
         
         <!-- 11. פעולות -->
         <td class="actions-cell">
-          ${window.createLinkButton ? window.createLinkButton(`viewLinkedItemsForTradePlan(${design.id})`) : 
-            `<button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTradePlan(${design.id})" title="צפה באלמנטים מקושרים">🔗</button>`}
-          ${window.createEditButton ? window.createEditButton(`window.openEditTradePlanModal(${design.id})`) : 
-            `<button class="btn btn-sm btn-primary" onclick="window.openEditTradePlanModal(${design.id})" title="ערוך">✏️</button>`}
-          ${window.createCancelButton ? window.createCancelButton('trade_plan', design.id, design.status, 'sm') : 
-            `<button class="btn btn-sm btn-warning" onclick="window.openCancelTradePlanModal(${design.id})" title="בטל">❌</button>`}
-          ${window.createDeleteButton ? window.createDeleteButton(`window.openDeleteTradePlanModal(${design.id})`) : 
-            `<button class="btn btn-sm btn-danger" onclick="window.openDeleteTradePlanModal(${design.id})" title="מחק">🗑️</button>`}
+            <button class="btn btn-sm btn-outline-info" onclick="viewLinkedItemsForTradePlan(${design.id})" title="פריטים מקושרים">
+                <i class="bi bi-link-45deg"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-primary" onclick="editTradePlan(${design.id})" title="עריכה">
+                <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-info" onclick="showTradePlanDetails(${design.id})" title="פרטים">
+                <i class="bi bi-eye"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-danger" onclick="deleteTradePlan(${design.id})" title="מחיקה">
+                <i class="bi bi-trash"></i>
+            </button>
         </td>
       </tr>
     `;
@@ -2751,18 +2845,8 @@ window.loadPlanningData = function () {
   loadTradePlansData();
 };
 
-window.setupSortableHeaders = function () {
-  // הפונקציה כבר מוגדרת ב-main.js
-  if (typeof window.setupSortableHeadersGlobal === 'function') {
-    window.setupSortableHeadersGlobal('planning');
-  } else {
-    if (typeof window.showNotification === 'function') {
-      window.showNotification('setupSortableHeadersGlobal not found - using local function', 'warning');
-    }
-    // שימוש בפונקציה מקומית אם הגלובלית לא קיימת
-    setupSortableHeadersLocal();
-  }
-};
+// הפונקציה setupSortableHeaders כבר מוגדרת ב-page-utils.js
+// אין צורך להגדיר אותה שוב כאן
 
 function setupSortableHeadersLocal() {
   const headers = document.querySelectorAll('#trade_plansTable th[onclick]');

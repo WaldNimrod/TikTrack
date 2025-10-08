@@ -681,6 +681,11 @@ window.loadAllPreferences = async function() {
             // Load profiles to dropdown to ensure sync
             await window.loadProfilesToDropdown();
             
+            // Load active accounts to dropdown
+            if (window.loadActiveAccountsToDropdown) {
+                await window.loadActiveAccountsToDropdown();
+            }
+            
             // Load default colors if no color preferences exist
             if (window.loadDefaultColors) {
                 window.loadDefaultColors();
@@ -1676,7 +1681,6 @@ window.populatePreferencesForm = async function(preferences) {
             const element = document.getElementById(setting);
             if (element && preferences[setting]) {
                 element.value = preferences[setting];
-                console.log(`🎨 Loaded ${setting}: ${preferences[setting]}`);
             }
         });
         
@@ -2088,7 +2092,6 @@ window.saveAllPreferences = async function() {
         
         if (success) {
             console.log('✅ Preferences saved successfully');
-            markAsSaved();
             
             // ניקוי מטמון באמצעות המערכת המרכזית
             if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
@@ -2116,6 +2119,7 @@ window.saveAllPreferences = async function() {
                     }
                     
                     console.log('✅ Preferences refreshed from server');
+                    
                 } catch (error) {
                     console.error('❌ Error refreshing preferences:', error);
                 }
@@ -2129,6 +2133,9 @@ window.saveAllPreferences = async function() {
             } else {
                 alert('העדפות נשמרו בהצלחה!');
             }
+            
+            // סימון כנשמר אחרי הצגת ההודעה
+            markAsSaved();
             
             // עדכון כפתור השמירה
             saveButton.innerHTML = '<i class="fas fa-check"></i> נשמר בהצלחה';

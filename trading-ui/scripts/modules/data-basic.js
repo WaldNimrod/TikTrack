@@ -1511,24 +1511,7 @@ function sortTable(columnIndex, data, tableType, updateFunction) {
  * @param {Function} updateFunction - Function to call with sorted data
  * @returns {Array} Sorted data array
  */
-/**
- * Get column value for sorting
- *
- * @param {Object} item - Data item
- * @param {number} columnIndex - Column index
- * @param {string} tableType - Table type
- * @returns {*} Column value
- */
-function getColumnValue(item, columnIndex, tableType) {
-  // Use centralized table mappings system according to specification
-  if (window.tableMappings && window.tableMappings.getColumnValue) {
-    return window.tableMappings.getColumnValue(item, columnIndex, tableType);
-  }
-
-  // Fallback - should not happen if centralized system is loaded
-  console.warn(`⚠️ [tables.js] Centralized table mappings not available, falling back to basic field access for ${tableType}:${columnIndex}`);
-  return '';
-}
+// Function removed - using the main getColumnValue function above (line 382)
 
 /**
  * Get custom sort value for specific table types and columns
@@ -1643,11 +1626,11 @@ function getCustomSortValue(a, b, columnIndex, tableType, aValue, bValue) {
   return null; // No custom logic applies - use standard sorting
 }
 
-window.sortTableData = function (columnIndex, data, tableType, updateFunction) {
+window.sortTableData = async function (columnIndex, data, tableType, updateFunction) {
   // Global sortTableData called for table
 
   // Get current sort state
-  const currentSortState = window.getSortState(tableType);
+  const currentSortState = await window.getSortState(tableType);
 
   // Determine new sort direction
   let newDirection = 'asc';
@@ -1932,8 +1915,8 @@ window.updateSortIcons = updateSortIcons;
  * @param {Function} updateFunction - Function to update table
  * @returns {Array} Sorted data
  */
-window.sortAnyTable = function (tableType, columnIndex, data, updateFunction) {
-  return window.sortTableData(columnIndex, data, tableType, updateFunction);
+window.sortAnyTable = async function (tableType, columnIndex, data, updateFunction) {
+  return await window.sortTableData(columnIndex, data, tableType, updateFunction);
 };
 
 /**
@@ -1945,7 +1928,7 @@ window.sortAnyTable = function (tableType, columnIndex, data, updateFunction) {
  * @param {Function} updateFunction - Update function (optional)
  * @returns {Array} Sorted data
  */
-window.sortTable = function (tableTypeOrColumnIndex, columnIndex, dataArray, updateFunction) {
+window.sortTable = async function (tableTypeOrColumnIndex, columnIndex, dataArray, updateFunction) {
   // Handle legacy call with only column index
   if (typeof tableTypeOrColumnIndex === 'number' && arguments.length === 1) {
     // Find the current table element
@@ -2052,11 +2035,11 @@ window.sortTable = function (tableTypeOrColumnIndex, columnIndex, dataArray, upd
     }
     
     console.log(`🔍 [SORT] Sorting ${tableData.length} items by column ${tableTypeOrColumnIndex}`);
-    return window.sortTableData(tableTypeOrColumnIndex, tableData, tableType, updateFn);
+    return await window.sortTableData(tableTypeOrColumnIndex, tableData, tableType, updateFn);
   }
   
   // Handle new call with all parameters
-  return window.sortTableData(columnIndex, dataArray, tableTypeOrColumnIndex, updateFunction);
+  return await window.sortTableData(columnIndex, dataArray, tableTypeOrColumnIndex, updateFunction);
 };
 
 /**
@@ -2066,11 +2049,11 @@ window.sortTable = function (tableTypeOrColumnIndex, columnIndex, dataArray, upd
  * @param {Array} data - Data to sort
  * @param {Function} updateFunction - Function to update table
  */
-window.restoreAnyTableSort = function (tableType, data, updateFunction) {
-  const sortState = window.getSortState(tableType);
+window.restoreAnyTableSort = async function (tableType, data, updateFunction) {
+  const sortState = await window.getSortState(tableType);
   if (sortState.columnIndex >= 0) {
     // Restoring sort state for table
-    window.sortTableData(sortState.columnIndex, data, tableType, updateFunction);
+    await window.sortTableData(sortState.columnIndex, data, tableType, updateFunction);
   }
 };
 
@@ -2082,11 +2065,11 @@ window.restoreAnyTableSort = function (tableType, data, updateFunction) {
  * @param {Array} data - Data to sort
  * @param {Function} updateFunction - Function to update table
  */
-window.applyDefaultSort = function (tableType, data, updateFunction) {
-  const sortState = window.getSortState(tableType);
+window.applyDefaultSort = async function (tableType, data, updateFunction) {
+  const sortState = await window.getSortState(tableType);
   if (!sortState || sortState.columnIndex === null || sortState.columnIndex === undefined) {
     // Apply default sort by first column (index 0)
-    window.sortTableData(0, data, tableType, updateFunction);
+    await window.sortTableData(0, data, tableType, updateFunction);
   }
 };
 
@@ -2187,7 +2170,7 @@ window.loadTableData = async function(tableType, updateFunction) {
     const apiEndpoints = {
       'tickers': '/api/tickers/',
       'executions': '/api/executions/',
-      'accounts': '/api/accounts/',
+      'accounts': '/api/trading-accounts/',
       'alerts': '/api/alerts/',
       'notes': '/api/notes/',
       'trades': '/api/trades/',
@@ -2427,3 +2410,4 @@ window.loadTableState = async function(tableId) {
 console.log('✅ [tables.js] Loaded successfully!');
 console.log('✅ [tables.js] window.tableMappings available:', !!window.tableMappings);
 console.log('✅ [tables.js] window.getColumnValue available:', !!window.getColumnValue);
+

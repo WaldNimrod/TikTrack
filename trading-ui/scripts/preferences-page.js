@@ -441,7 +441,6 @@ function collectFormData() {
     
     // Collect all input elements
     const inputs = document.querySelectorAll('input, select, textarea');
-    console.log(`📋 Found ${inputs.length} input elements on page`);
     
     inputs.forEach(input => {
         if (input.id && input.id !== 'saveAllBtn' && input.id !== 'resetBtn' && !input.disabled) {
@@ -458,12 +457,9 @@ function collectFormData() {
             }
             
             formData[input.id] = value;
-            console.log(`📋 Collected: ${input.id} = ${value} (type: ${input.type})`);
         }
     });
     
-    console.log('📝 Collected form data:', formData);
-    console.log(`📋 Total fields collected: ${Object.keys(formData).length}`);
     return formData;
 }
 
@@ -552,7 +548,6 @@ window.loadTradingSettings = loadTradingSettings;
  */
 window.updatePreferencesTable = function(preferencesData) {
     try {
-        console.log('📊 Updating preferences table with data:', preferencesData);
         
         const tableBody = document.querySelector('#preferencesTable tbody');
         if (!tableBody) {
@@ -600,24 +595,170 @@ window.updatePreferencesTable = function(preferencesData) {
             const actionsCell = row.insertCell();
             actionsCell.className = 'actions-cell';
             actionsCell.innerHTML = `
-                <button class="btn btn-sm btn-outline-primary" onclick="editPreference(${index})" title="ערוך">
-                    <i class="fas fa-edit"></i>
+                <button class="btn btn-sm btn-outline-info" onclick="viewLinkedItemsForPreference(${preference.id || index})" title="פריטים מקושרים">
+                    <i class="bi bi-link-45deg"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-primary" onclick="editPreference(${index})" title="עריכה">
+                    <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-info" onclick="showPreferenceDetails(${preference.id || index})" title="פרטים">
+                    <i class="bi bi-eye"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deletePreference(${preference.id || index})" title="מחיקה">
+                    <i class="bi bi-trash"></i>
                 </button>
             `;
         });
         
-        console.log(`✅ Preferences table updated with ${preferencesData.length} items`);
         
     } catch (error) {
         console.error('❌ Error updating preferences table:', error);
     }
 };
 
+/**
+ * הצגת פרטי העדפה
+ */
+function showPreferenceDetails(preferenceId) {
+    // חיפוש ההעדפה בנתונים
+    const preference = window.preferencesData ? window.preferencesData.find(p => p.id === preferenceId) : null;
+    
+    if (!preference) {
+        console.error(`❌ Preference with ID ${preferenceId} not found`);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', `העדפה עם ID ${preferenceId} לא נמצאה`);
+        }
+        return;
+    }
+
+    // שימוש במערכת הצגת פרטים כללית אם זמינה
+    if (typeof window.showEntityDetails === 'function') {
+        window.showEntityDetails('preference', preferenceId, { mode: 'view' });
+    } else {
+        // הצגה פשוטה
+        const details = `פרטי העדפה:
+ID: ${preference.id}
+שם: ${preference.name || preference.preference_name || 'לא מוגדר'}
+ערך: ${preference.value || preference.preference_value || 'לא מוגדר'}
+סוג: ${preference.type || preference.preference_type || 'לא מוגדר'}
+תיאור: ${preference.description || 'אין תיאור'}
+נוצר: ${preference.created_at ? new Date(preference.created_at).toLocaleString('he-IL') : 'לא מוגדר'}
+עודכן: ${preference.updated_at ? new Date(preference.updated_at).toLocaleString('he-IL') : 'לא מוגדר'}`;
+        alert(details);
+    }
+}
+
+/**
+ * מחיקת העדפה
+ */
+function deletePreference(preferenceId) {
+    if (!confirm('האם אתה בטוח שברצונך למחוק העדפה זו?')) {
+        return;
+    }
+
+    if (typeof window.showLoadingNotification === 'function') {
+        window.showLoadingNotification('מוחק העדפה...');
+    }
+
+    fetch(`/api/preferences/${preferenceId}`, {
+        method: 'DELETE'
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        // הסרת ההעדפה מהמערך המקומי
+        const index = window.preferencesData.findIndex(p => p.id === preferenceId);
+        if (index > -1) {
+            window.preferencesData.splice(index, 1);
+        }
+
+        // עדכון הטבלה
+        window.updatePreferencesTable(window.preferencesData);
+        
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('העדפה נמחקה בהצלחה');
+        }
+    })
+    .catch(error => {
+        console.error('❌ Failed to delete preference:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה במחיקת העדפה', error.message);
+        }
+    })
+    .finally(() => {
+        if (typeof window.hideLoadingNotification === 'function') {
+            window.hideLoadingNotification();
+        }
+    });
+}
+
+/**
+ * הצגת פריטים מקושרים להעדפה
+ */
+function viewLinkedItemsForPreference(preferenceId) {
+    console.log('🔗 Viewing linked items for preference:', preferenceId);
+    // שימוש במערכת הצגת פריטים מקושרים אם זמינה
+    if (typeof window.showLinkedItemsModal === 'function') {
+        window.showLinkedItemsModal([], 'preference', preferenceId);
+    } else {
+        console.log('❌ showLinkedItemsModal not available');
+    }
+}
+
 window.validateCurrency = validateCurrency;
 window.initializePreferencesPage = initializePreferencesPage;
 window.initializeInfoSummary = initializeInfoSummary;
 window.collectFormData = collectFormData;
+window.showPreferenceDetails = showPreferenceDetails;
+window.deletePreference = deletePreference;
+window.viewLinkedItemsForPreference = viewLinkedItemsForPreference;
+/**
+ * Load active trading accounts into dropdown
+ */
+async function loadActiveAccountsToDropdown() {
+    try {
+        const defaultAccountSelect = document.getElementById('defaultAccountFilter');
+        if (!defaultAccountSelect) {
+            console.warn('⚠️ defaultAccountFilter select not found');
+            return;
+        }
+
+        // Clear existing options except the first one
+        const firstOption = defaultAccountSelect.querySelector('option[value="כל החשבונות"]');
+        defaultAccountSelect.innerHTML = '';
+        if (firstOption) {
+            defaultAccountSelect.appendChild(firstOption);
+        }
+
+        // Load accounts from the system
+        const response = await fetch('/api/trading-accounts');
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.data && data.data.accounts) {
+                const accounts = data.data.accounts.filter(account => 
+                    account.status === 'open' || account.status === 'active'
+                );
+                
+                accounts.forEach(account => {
+                    const option = document.createElement('option');
+                    option.value = account.name;
+                    option.textContent = account.name;
+                    defaultAccountSelect.appendChild(option);
+                });
+                
+            }
+        }
+    } catch (error) {
+        console.error('❌ Error loading active accounts:', error);
+    }
+}
+
 window.saveAllPreferences = saveAllPreferences;
 window.updatePreferencesTable = window.updatePreferencesTable;
+window.loadActiveAccountsToDropdown = loadActiveAccountsToDropdown;
 
 console.log('✅ preferences-page.js loaded successfully');

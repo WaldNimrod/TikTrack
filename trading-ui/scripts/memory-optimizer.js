@@ -92,12 +92,13 @@ class MemoryOptimizer {
             console.log('✅ Memory Optimizer initialized successfully');
             
             // הודעת הצלחה
-            if (window.notificationSystem) {
-                window.notificationSystem.showNotification(
-                    'מערכת אופטימיזציה זיכרון אותחלה בהצלחה',
-                    'success'
-                );
-            }
+            // הודעת הצלחה - תציג מאוחדת עם האפליקציה
+            // if (window.notificationSystem) {
+            //     window.notificationSystem.showNotification(
+            //         'מערכת אופטימיזציה זיכרון אותחלה בהצלחה',
+            //         'success'
+            //     );
+            // }
             
             return true;
         } catch (error) {

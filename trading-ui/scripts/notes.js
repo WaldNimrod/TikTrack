@@ -204,6 +204,37 @@ function editNote(_id) {
   showEditNoteModal(_id);
 }
 
+/**
+ * הצגת פרטי הערה
+ */
+function showNoteDetails(noteId) {
+    // חיפוש ההערה בנתונים
+    const note = window.notesData ? window.notesData.find(n => n.id === noteId) : null;
+    
+    if (!note) {
+        console.error(`❌ Note with ID ${noteId} not found`);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', `הערה עם ID ${noteId} לא נמצאה`);
+        }
+        return;
+    }
+
+    // שימוש במערכת הצגת פרטים כללית אם זמינה
+    if (typeof window.showEntityDetails === 'function') {
+        window.showEntityDetails('note', noteId, { mode: 'view' });
+    } else {
+        // הצגה פשוטה
+        const details = `פרטי הערה:
+ID: ${note.id}
+תוכן: ${note.content || 'אין תוכן'}
+קובץ מצורף: ${note.attachment || 'אין קובץ'}
+נוצר: ${note.created_at ? new Date(note.created_at).toLocaleString('he-IL') : 'לא מוגדר'}
+עודכן: ${note.updated_at ? new Date(note.updated_at).toLocaleString('he-IL') : 'לא מוגדר'}
+קשור ל: ${note.related_type_id ? `סוג ${note.related_type_id}` : 'לא מוגדר'}`;
+        alert(details);
+    }
+}
+
 function deleteNote(id) {
   // שימוש במערכת הגלובלית למחיקה
   if (typeof window.showDeleteWarning === 'function') {
@@ -565,9 +596,18 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
         <td>${attachmentDisplay}</td>
         <td data-date='${note.created_at}'>${date}</td>
         <td class='col-actions actions-cell actions-3-btn' onclick='event.stopPropagation();'>
-          ${window.createLinkButton(`window.showLinkedItemsModal && window.showLinkedItemsModal([], "note", ${note.id})`)}
-          ${window.createEditButton(`editNote("${note.id}")`)}
-          ${window.createDeleteButton(`deleteNote("${note.id}")`)}
+            <button class="btn btn-sm btn-outline-info" onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'note', ${note.id})" title="פריטים מקושרים">
+                <i class="bi bi-link-45deg"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-primary" onclick="editNote(${note.id})" title="עריכה">
+                <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-info" onclick="showNoteDetails(${note.id})" title="פרטים">
+                <i class="bi bi-eye"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-danger" onclick="deleteNote(${note.id})" title="מחיקה">
+                <i class="bi bi-trash"></i>
+            </button>
         </td>
       </tr>
     `;

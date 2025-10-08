@@ -227,3 +227,100 @@ background-color: var(--status-closed-color);
 background-color: var(--status-pending-color);
 }
 
+/* Base badge styles */
+.status-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  text-align: center;
+  min-width: 60px;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.status-badge.status-open {
+  background-color: var(--status-open-color, #28a745);
+  color: white;
+  border-color: var(--status-open-color, #28a745);
+}
+
+.status-badge.status-closed {
+  background-color: var(--status-closed-color, #6c757d);
+  color: white;
+  border-color: var(--status-closed-color, #6c757d);
+}
+
+.status-badge.status-pending {
+  background-color: var(--status-pending-color, #ffc107);
+  color: #212529;
+  border-color: var(--status-pending-color, #ffc107);
+}
+
+.status-badge.status-unknown {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  border-color: #dee2e6;
+}
+
+/* Side badges */
+.side-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  text-align: center;
+  min-width: 60px;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.side-badge.side-long {
+  background-color: var(--numeric-positive-light, #d4edda);
+  color: var(--numeric-positive-medium, #28a745);
+  border-color: var(--numeric-positive-border, #c3e6cb);
+}
+
+.side-badge.side-short {
+  background-color: var(--numeric-negative-light, #f8d7da);
+  color: var(--numeric-negative-medium, #dc3545);
+  border-color: var(--numeric-negative-border, #f5c6cb);
+}
+
+.side-badge.side-unknown {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  border-color: #dee2e6;
+}
+
+/* PnL badges */
+.pnl-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-block;
+  text-align: center;
+  min-width: 60px;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.pnl-badge.positive {
+  background-color: var(--numeric-positive-light, #d4edda);
+  color: var(--numeric-positive-medium, #28a745);
+  border-color: var(--numeric-positive-border, #c3e6cb);
+}
+
+.pnl-badge.negative {
+  background-color: var(--numeric-negative-light, #f8d7da);
+  color: var(--numeric-negative-medium, #dc3545);
+  border-color: var(--numeric-negative-border, #f5c6cb);
+}
+

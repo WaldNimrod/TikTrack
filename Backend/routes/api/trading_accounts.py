@@ -58,11 +58,13 @@ def get_trading_account(trading_account_id: int):
     return jsonify(response), status_code
 
 @trading_accounts_bp.route('/', methods=['POST'])
+@api_endpoint(cache_ttl=0, rate_limit=30)
+@handle_database_session()
 def create_trading_account():
     """Create new trading account"""
     try:
         data = request.get_json()
-        db: Session = next(get_db())
+        db: Session = g.db
         trading_account = TradingAccountService.create(db, data)
         
         # Invalidate cache when creating new trading account
@@ -94,8 +96,6 @@ def create_trading_account():
             "details": "The server encountered an unexpected error",
             "version": "1.0"
         }), 500
-    finally:
-        db.close()
 
 @trading_accounts_bp.route('/<int:trading_account_id>', methods=['PUT'])
 def update_trading_account(trading_account_id: int):

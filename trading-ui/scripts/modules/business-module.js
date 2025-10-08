@@ -365,7 +365,7 @@ function updateTradesTable(trades) {
   // בדיקה אם אנחנו בדף הנכון
   const tradesTable = document.querySelector('#tradesTable');
   if (!tradesTable) {
-    console.warn('⚠️ #tradesTable not found - not on trades page');
+    // Silent return - not on trades page, this is normal
     return;
   }
   
@@ -860,7 +860,7 @@ async function loadEditTradeModalData(trade) {
   try {
     // טעינת חשבונות, תוכניות טרייד וטיקרים
     const [accountsResponse, tradePlansResponse, tickersResponse] = await Promise.all([
-      fetch('/api/accounts/'),
+      fetch('/api/trading-accounts/'),
       fetch('/api/trade_plans/'),
       fetch('/api/tickers/'),
     ]);
@@ -1581,7 +1581,7 @@ async function loadModalData() {
   try {
 
     // טעינת חשבונות
-    const accountsResponse = await fetch('/api/accounts/');
+    const accountsResponse = await fetch('/api/trading-accounts/');
     const accounts = await accountsResponse.json();
 
     // טעינת תוכניות טרייד
@@ -1977,83 +1977,9 @@ function getCurrentPosition(_tradeId) {
 // אתחול וולידציה
 // ========================================
 
-// אתחול הדף
-document.addEventListener('DOMContentLoaded', function () {
-  // שחזור מצב הסגירה
-  if (typeof window.restoreAllSectionStates === 'function') {
-    window.restoreAllSectionStates();
-  }
-
-  // יישום צבעי ישות על כותרות
-  if (window.applyEntityColorsToHeaders) {
-    window.applyEntityColorsToHeaders('trade');
-  }
-
-  // אתחול וולידציה עם כללים מותאמים לטריידים
-  if (window.initializeValidation) {
-    // כללי וולידציה מותאמים לטופס הוספת טרייד
-    const addTradeValidationRules = {
-      ticker_id: {
-        required: true,
-        message: 'יש לבחור טיקר',
-      },
-      account_id: {
-        required: true,
-        message: 'יש לבחור חשבון',
-      },
-      investment_type: {
-        required: true,
-        enum: ['swing', 'investment', 'passive'],
-        message: 'יש לבחור סוג השקעה תקין',
-      },
-      side: {
-        required: true,
-        enum: ['Long', 'Short'],
-        message: 'יש לבחור צד תקין',
-      },
-    };
-
-    // כללי וולידציה מותאמים לטופס עריכת טרייד
-    const editTradeValidationRules = {
-      ticker_id: {
-        required: true,
-        message: 'יש לבחור טיקר',
-      },
-      account_id: {
-        required: true,
-        message: 'יש לבחור חשבון',
-      },
-      investment_type: {
-        required: true,
-        enum: ['swing', 'investment', 'passive'],
-        message: 'יש לבחור סוג השקעה תקין',
-      },
-      side: {
-        required: true,
-        enum: ['Long', 'Short'],
-        message: 'יש לבחור צד תקין',
-      },
-    };
-
-    window.initializeValidation('addTradeForm', addTradeValidationRules);
-    window.initializeValidation('editTradeForm', editTradeValidationRules);
-  }
-
-  // שחזור מצב הסקשנים - משתמש במערכת הכללית
-  if (typeof window.restoreAllSectionStates === 'function') {
-    window.restoreAllSectionStates();
-  } else {
-    if (typeof handleFunctionNotFound === 'function') {
-      handleFunctionNotFound('restoreAllSectionStates');
-    } else {
-      // console.warn('restoreAllSectionStates function not found');
-    }
-  }
-
-  // טעינת נתוני טריידים
-  loadTradesData();
-
-});
+// אתחול הדף - הוסר כדי למנוע כפילות עם core-systems.js
+// האתחול מתבצע דרך מערכת האתחול המאוחדת
+console.log('💼 Business module ready - waiting for unified initialization');
 
 // ========================================
 // ייצוא פונקציות לגלובל
@@ -2464,28 +2390,9 @@ function setupSortEventListeners() {
 }
 
 // קריאה לטעינת נתונים כשהדף נטען
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', function () {
-    // הוספת event listeners
-    setupSortEventListeners();
-    setTimeout(() => {
-      if (typeof window.loadTradesData === 'function') {
-        window.loadTradesData();
-      }
-    }, 1000);
-  });
-} else {
-  // הדף כבר נטען
-  // טעינת מצב הסידור השמור
-  loadTradesSortState();
-  // הוספת event listeners
-  setupSortEventListeners();
-  setTimeout(() => {
-    if (typeof window.loadTradesData === 'function') {
-      window.loadTradesData();
-    }
-  }, 1000);
-}
+// הוסר DOMContentLoaded listener כדי למנוע כפילות עם core-systems.js
+// האתחול מתבצע דרך מערכת האתחול המאוחדת
+console.log('💼 Business module trades ready - waiting for unified initialization');
 
 /**
  * בדיקת התאמת תוכנית טרייד לטרייד
@@ -3258,4 +3165,5 @@ async function copyDetailedLog() {
         }
     }
 }
+
 

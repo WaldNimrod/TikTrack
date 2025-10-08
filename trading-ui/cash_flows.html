@@ -233,10 +233,12 @@
                                         <label for="cashFlowType" class="form-label">סוג תזרים</label>
                                         <select class="form-select" id="cashFlowType" required>
                                             <option value="">בחר סוג תזרים</option>
-                                            <option value="deposit">הפקדה</option>
+                                            <option value="deposit" selected>הפקדה</option>
                                             <option value="withdrawal">משיכה</option>
                                             <option value="transfer">העברה</option>
                                             <option value="fee">עמלה</option>
+                                            <option value="dividend">דיבידנד</option>
+                                            <option value="interest">ריבית</option>
                                         </select>
                                     </div>
                                 </div>
@@ -251,22 +253,20 @@
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="cashFlowCurrency" class="form-label">מטבע</label>
-                                        <select class="form-select" id="cashFlowCurrency" required>
+                                        <select class="form-select" id="cashFlowCurrencyId" required>
                                             <option value="">בחר מטבע</option>
-                                            <option value="USD">דולר אמריקאי (USD)</option>
-                                            <option value="EUR">אירו (EUR)</option>
-                                            <option value="GBP">לירה שטרלינג (GBP)</option>
-                                            <option value="ILS">שקל ישראלי (ILS)</option>
+                                            <option value="1">דולר אמריקאי (USD)</option>
+                                            <option value="2">אירו (EUR)</option>
+                                            <option value="3">לירה שטרלינג (GBP)</option>
+                                            <option value="4">שקל ישראלי (ILS)</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="cashFlowAccount" class="form-label">חשבון מסחר</label>
-                                        <select class="form-select" id="cashFlowAccount" required>
+                                        <select class="form-select" id="cashFlowAccountId" required>
                                             <option value="">בחר חשבון</option>
-                                            <option value="demo">חשבון דמו</option>
-                                            <option value="live">חשבון חי</option>
                                         </select>
                                     </div>
                                 </div>
@@ -285,11 +285,30 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="cashFlowUsdRate" class="form-label">שער דולר</label>
+                                        <input type="number" class="form-control" id="cashFlowUsdRate" step="0.000001" min="0" value="1.000000" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="cashFlowSource" class="form-label">מקור</label>
+                                        <select class="form-select" id="cashFlowSource">
+                                            <option value="manual" selected>ידני</option>
+                                            <option value="file_import">יבוא קובץ</option>
+                                            <option value="direct_import">יבוא ישיר</option>
+                                            <option value="api">API</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
                         </form>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-success" onclick="addCashFlow()"
+                        <button type="button" class="btn btn-success" onclick="saveCashFlow()"
                             style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">הוסף
                             תזרים</button>
                     </div>
@@ -331,20 +350,19 @@
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="editCashFlowCurrency" class="form-label">מטבע</label>
-                                        <select class="form-select" id="editCashFlowCurrency" required>
-                                            <option value="USD">דולר אמריקאי (USD)</option>
-                                            <option value="EUR">אירו (EUR)</option>
-                                            <option value="GBP">לירה שטרלינג (GBP)</option>
-                                            <option value="ILS">שקל ישראלי (ILS)</option>
+                                        <select class="form-select" id="editCashFlowCurrencyId" required>
+                                            <option value="1">דולר אמריקאי (USD)</option>
+                                            <option value="2">אירו (EUR)</option>
+                                            <option value="3">לירה שטרלינג (GBP)</option>
+                                            <option value="4">שקל ישראלי (ILS)</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="editCashFlowAccount" class="form-label">חשבון מסחר</label>
-                                        <select class="form-select" id="editCashFlowAccount" required>
-                                            <option value="demo">חשבון דמו</option>
-                                            <option value="live">חשבון חי</option>
+                                        <select class="form-select" id="editCashFlowAccountId" required>
+                                            <option value="">בחר חשבון</option>
                                         </select>
                                     </div>
                                 </div>
@@ -360,6 +378,25 @@
                                     <div class="mb-3">
                                         <label for="editCashFlowDescription" class="form-label">תיאור</label>
                                         <input type="text" class="form-control" id="editCashFlowDescription">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editCashFlowUsdRate" class="form-label">שער דולר</label>
+                                        <input type="number" class="form-control" id="editCashFlowUsdRate" step="0.000001" min="0" value="1.000000" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editCashFlowSource" class="form-label">מקור</label>
+                                        <select class="form-select" id="editCashFlowSource">
+                                            <option value="manual">ידני</option>
+                                            <option value="file_import">יבוא קובץ</option>
+                                            <option value="direct_import">יבוא ישיר</option>
+                                            <option value="api">API</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -379,41 +416,36 @@
     <!-- Bootstrap JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- ===== DYNAMIC LOADING SYSTEM ===== -->
+    <!-- מערכת כללית חדשה - 8 מודולים מאוחדים -->
     
-    <!-- Core Systems (Always Required) -->
+    <!-- Load the new general systems architecture -->
     <script src="scripts/modules/core-systems.js?v=20251006"></script>
+    <script src="scripts/modules/ui-basic.js?v=20251006"></script>
+    <script src="scripts/modules/data-basic.js?v=20251006"></script>
+    <script src="scripts/modules/ui-advanced.js?v=20251006"></script>
+    <script src="scripts/modules/data-advanced.js?v=20251006"></script>
+    <script src="scripts/modules/business-module.js?v=20251006"></script>
+    <script src="scripts/modules/communication-module.js?v=20251006"></script>
+    <script src="scripts/modules/cache-module.js?v=20251006"></script>
     
-    <!-- Dynamic Loader Configuration -->
-    <script src="scripts/modules/dynamic-loader-config.js?v=20251006"></script>
+    <!-- Page Initialization Configurations -->
+    <script src="scripts/page-initialization-configs.js?v=20251006"></script>
     
-    <!-- Page Initialization Configs -->
-    <script src="scripts/page-initialization-configs.js?v=20251001"></script>
-    
-    <!-- Additional Required Scripts -->
-    <script src="scripts/global-favicon.js?v=20251001"></script>
-    <script src="scripts/translation-utils.js?v=20251001"></script>
+    <!-- Global Systems -->
+    <script src="scripts/global-favicon.js?v=20251006"></script>
+    <script src="scripts/translation-utils.js?v=20251006"></script>
     <script src="scripts/header-system.js?v=v6.0.0"></script>
-    <script src="scripts/date-utils.js?v=20251001"></script>
-    <script src="scripts/button-icons.js?v=20251001"></script>
-    <script src="scripts/page-utils.js?v=20251001"></script>
-    <script src="scripts/preferences.js?v=20251001"></script>
-    <script src="scripts/notification-category-detector.js?v=20251001"></script>
-    <script src="scripts/global-notification-collector.js?v=20251001"></script>
-    <script src="scripts/system-management.js?v=20251001"></script>
-    <script src="scripts/entity-details-modal.js?v=20251001"></script>
-    <script src="scripts/warning-system.js?v=20251001"></script>
-    
+    <script src="scripts/date-utils.js?v=20251006"></script>
+    <script src="scripts/button-icons.js?v=20251006"></script>
+    <script src="scripts/page-utils.js?v=20251006"></script>
+    <script src="scripts/preferences.js?v=20251006"></script>
+    <script src="scripts/notification-category-detector.js?v=20251006"></script>
+    <script src="scripts/global-notification-collector.js?v=20251006"></script>
+    <script src="scripts/entity-details-modal.js?v=20251006"></script>
+    <script src="scripts/warning-system.js?v=20251006"></script>
+
     <!-- Page-specific Script -->
-    <script src="scripts/cash_flows.js?v=20251001"></script>
+    <script src="scripts/cash_flows.js?v=20251006"></script>
     
-    <!-- Local copyDetailedLog function for cash_flows page -->
-    <script>
-        // Make the local copyDetailedLog function available globally for this page only
-        window.copyDetailedLog = copyDetailedLog;
-    </script>
-    
-    <!-- Debug script for responsive table -->
-    <script src="debug_table_final.js"></script>
 </body>
 </html>

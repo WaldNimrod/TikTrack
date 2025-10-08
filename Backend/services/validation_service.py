@@ -49,6 +49,9 @@ class ValidationService:
             
             constraints = db.execute(constraints_query, {"table_name": table_name}).fetchall()
             logger.info(f"Validating {table_name} - found {len(constraints)} constraints")
+        except Exception as e:
+            logger.warning(f"Could not fetch constraints for {table_name}: {str(e)}")
+            constraints = []
             
             logger.info(f"Starting constraint loop for {table_name}")
             for constraint in constraints:

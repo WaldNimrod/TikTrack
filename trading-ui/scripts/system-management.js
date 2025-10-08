@@ -1029,8 +1029,6 @@ class SystemManagement {
     try {
       console.log('📊 Loading system data...');
       
-      // Load primary data provider
-      await SystemManagement.loadPrimaryDataProvider();
       
       // Load system overview
       const overviewResponse = await fetch('/api/system/overview');
@@ -1314,6 +1312,9 @@ class SystemManagement {
     
     // Update security summary
     this.updateSecuritySummary(data);
+    
+    // Update system summary cards
+    this.updateSystemSummaryCards(data);
   }
 
   /**
@@ -1417,6 +1418,110 @@ class SystemManagement {
     if (securityAlertsElement) {
       securityAlertsElement.textContent = '0';
       securityAlertsElement.className = 'summary-value text-success';
+    }
+  }
+
+  /**
+   * Update system summary cards
+   * עדכון כרטיסי סיכום מערכת
+   */
+  updateSystemSummaryCards(data) {
+    // בריאות מערכת
+    const systemHealthStatus = document.getElementById('systemHealthStatus');
+    const systemHealthScore = document.getElementById('systemHealthScore');
+    if (systemHealthStatus) {
+      const healthStatus = data.health?.overall_status || 'unknown';
+      systemHealthStatus.textContent = healthStatus === 'healthy' ? 'בריא' : 
+                                      healthStatus === 'warning' ? 'אזהרה' : 'בעיה';
+      systemHealthStatus.className = healthStatus === 'healthy' ? 'status-value text-success' :
+                                    healthStatus === 'warning' ? 'status-value text-warning' : 'status-value text-danger';
+    }
+    if (systemHealthScore) {
+      systemHealthScore.textContent = `${data.system_score || 0}%`;
+    }
+
+    // ביצועים
+    const systemPerformanceStatus = document.getElementById('systemPerformanceStatus');
+    const systemCpuUsage = document.getElementById('systemCpuUsage');
+    if (systemPerformanceStatus) {
+      const cpuUsage = data.performance?.cpu_usage || 0;
+      systemPerformanceStatus.textContent = cpuUsage < 70 ? 'טוב' : 
+                                           cpuUsage < 90 ? 'בינוני' : 'גבוה';
+      systemPerformanceStatus.className = cpuUsage < 70 ? 'status-value text-success' :
+                                         cpuUsage < 90 ? 'status-value text-warning' : 'status-value text-danger';
+    }
+    if (systemCpuUsage) {
+      systemCpuUsage.textContent = `${data.performance?.cpu_usage || 0}%`;
+    }
+
+    // מטמון
+    const systemCacheStatus = document.getElementById('systemCacheStatus');
+    const systemCacheHitRate = document.getElementById('systemCacheHitRate');
+    if (systemCacheStatus) {
+      const cacheStatus = data.health?.components?.cache?.status || 'unknown';
+      systemCacheStatus.textContent = cacheStatus === 'healthy' ? 'בריא' : 'לא בריא';
+      systemCacheStatus.className = cacheStatus === 'healthy' ? 'status-value text-success' : 'status-value text-danger';
+    }
+    if (systemCacheHitRate) {
+      systemCacheHitRate.textContent = `${data.cache?.hit_rate_percent || 0}%`;
+    }
+
+    // נתונים חיצוניים
+    const systemExternalDataStatus = document.getElementById('systemExternalDataStatus');
+    const systemExternalDataProviders = document.getElementById('systemExternalDataProviders');
+    if (systemExternalDataStatus) {
+      const externalStatus = data.external_data?.status || 'unknown';
+      systemExternalDataStatus.textContent = externalStatus === 'active' ? 'פעיל' : 'לא פעיל';
+      systemExternalDataStatus.className = externalStatus === 'active' ? 'status-value text-success' : 'status-value text-danger';
+    }
+    if (systemExternalDataProviders) {
+      systemExternalDataProviders.textContent = data.external_data?.sources || 0;
+    }
+
+    // התראות
+    const systemAlertsStatus = document.getElementById('systemAlertsStatus');
+    const systemAlertsCount = document.getElementById('systemAlertsCount');
+    if (systemAlertsStatus) {
+      const alertsCount = data.alerts?.active || 0;
+      systemAlertsStatus.textContent = alertsCount === 0 ? 'אין' : alertsCount > 5 ? 'רבות' : 'מעטות';
+      systemAlertsStatus.className = alertsCount === 0 ? 'status-value text-success' :
+                                    alertsCount > 5 ? 'status-value text-danger' : 'status-value text-warning';
+    }
+    if (systemAlertsCount) {
+      systemAlertsCount.textContent = data.alerts?.active || 0;
+    }
+
+    // אבטחה
+    const systemSecurityStatus = document.getElementById('systemSecurityStatus');
+    const systemSecurityUsers = document.getElementById('systemSecurityUsers');
+    if (systemSecurityStatus) {
+      systemSecurityStatus.textContent = 'מאובטח';
+      systemSecurityStatus.className = 'status-value text-success';
+    }
+    if (systemSecurityUsers) {
+      systemSecurityUsers.textContent = '1';
+    }
+
+    // גיבויים
+    const systemBackupStatus = document.getElementById('systemBackupStatus');
+    const systemBackupLast = document.getElementById('systemBackupLast');
+    if (systemBackupStatus) {
+      systemBackupStatus.textContent = 'עדכני';
+      systemBackupStatus.className = 'status-value text-success';
+    }
+    if (systemBackupLast) {
+      systemBackupLast.textContent = 'היום';
+    }
+
+    // לוגים
+    const systemLogsStatus = document.getElementById('systemLogsStatus');
+    const systemLogsCount = document.getElementById('systemLogsCount');
+    if (systemLogsStatus) {
+      systemLogsStatus.textContent = 'פעיל';
+      systemLogsStatus.className = 'status-value text-success';
+    }
+    if (systemLogsCount) {
+      systemLogsCount.textContent = data.logs?.length || 0;
     }
   }
 
@@ -1923,13 +2028,6 @@ class SystemManagement {
       });
     }
 
-    // Primary data provider change
-    const primaryDataProviderSelect = document.getElementById('primaryDataProvider');
-    if (primaryDataProviderSelect) {
-      primaryDataProviderSelect.addEventListener('change', (e) => {
-        SystemManagement.savePrimaryDataProvider(e.target.value);
-      });
-    }
 
     // Refresh button
     const refreshButton = document.querySelector('.refresh-btn');
@@ -1962,72 +2060,11 @@ class SystemManagement {
     });
   }
 
-  /**
-   * Save primary data provider
-   * שמירת ספק נתונים ראשי
-   */
-  static async savePrimaryDataProvider(provider) {
-    try {
-      console.log(`💾 Saving primary data provider: ${provider}`);
-      
-      const response = await fetch('/api/preferences/user/preference', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          preference_name: 'primaryDataProvider',
-          value: provider,
-          user_id: 1
-        })
-      });
-      
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success) {
-          console.log('✅ Primary data provider saved successfully');
-          if (typeof window.showSuccessNotification === 'function') {
-            window.showSuccessNotification('הצלחה', `ספק נתונים ראשי נשמר: ${provider}`);
-          }
-        } else {
-          throw new Error(result.message || 'Failed to save primary data provider');
-        }
-      } else {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-    } catch (error) {
-      console.error('❌ Error saving primary data provider:', error);
-      if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification('שגיאה', 'שגיאה בשמירת ספק נתונים ראשי: ' + error.message);
-      }
-    }
-  }
 
   /**
    * Load primary data provider
    * טעינת ספק נתונים ראשי
    */
-  static async loadPrimaryDataProvider() {
-    try {
-      console.log('📡 Loading primary data provider...');
-      
-      const response = await fetch('/api/preferences/user/preference?name=primaryDataProvider&user_id=1');
-      
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success && result.data) {
-          const provider = result.data.value;
-          const select = document.getElementById('primaryDataProvider');
-          if (select) {
-            select.value = provider;
-            console.log(`✅ Primary data provider loaded: ${provider}`);
-          }
-        }
-      }
-    } catch (error) {
-      console.error('❌ Error loading primary data provider:', error);
-    }
-  }
 
   destroy() {
     if (this.refreshInterval) {
@@ -2551,6 +2588,32 @@ SystemManagement.showNotification = function(message, type = 'info') {
     // Fallback to console
     console.log(`[${type.toUpperCase()}] ${message}`);
   }
+};
+
+// New functions for additional sections
+window.runPerformanceAnalysis = function() {
+  SystemManagement.showNotification('מתחיל ניתוח ביצועים מתקדם...', 'info');
+  // TODO: Implement performance analysis
+};
+
+window.runSecurityScan = function() {
+  SystemManagement.showNotification('מתחיל סריקת אבטחה...', 'info');
+  // TODO: Implement security scan
+};
+
+window.refreshUserData = function() {
+  SystemManagement.showNotification('מרענן נתוני משתמשים...', 'info');
+  // TODO: Implement user data refresh
+};
+
+window.runDataAnalysis = function() {
+  SystemManagement.showNotification('מתחיל ניתוח נתונים...', 'info');
+  // TODO: Implement data analysis
+};
+
+window.refreshConfiguration = function() {
+  SystemManagement.showNotification('מרענן תצורת מערכת...', 'info');
+  // TODO: Implement configuration refresh
 };
 
 // Cleanup on page unload

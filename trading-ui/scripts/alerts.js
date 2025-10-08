@@ -396,7 +396,7 @@ function updateAlertsTable(alerts) {
   const loadAdditionalData = async () => {
     try {
       const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
-        fetch('/api/accounts/').then(r => r.json()).catch(() => ({ data: [] })),
+        fetch('/api/trading-accounts').then(r => r.json()).catch(() => ({ data: [] })),
         fetch('/api/trades/').then(r => r.json()).catch(() => ({ data: [] })),
         fetch('/api/trade_plans/').then(r => r.json()).catch(() => ({ data: [] })),
         fetch('/api/tickers/').then(r => r.json()).catch(() => ({ data: [] })),
@@ -677,12 +677,15 @@ function updateAlertsTable(alerts) {
           <td data-date="${alert.created_at}"><span class="date-text">${createdAt}</span></td>
           <td class="col-actions actions-cell actions-3-btn" data-entity-id="${alert.id}" data-status="${alert.status || ''}">
             ${window.createLinkButton(`viewLinkedItemsForAlert(${alert.id})`)}
-            ${window.createEditButton(`editAlert(${alert.id})`)}
-            ${alert.status === 'cancelled' || alert.status === 'canceled' ? 
-              window.createButton('REACTIVATE', `reactivateAlert(${alert.id})`) :
-              window.createButton('CANCEL', `cancelAlert(${alert.id})`)
-            }
-            ${window.createDeleteButton(`deleteAlert(${alert.id})`)}
+            <button class="btn btn-sm btn-outline-primary" onclick="editAlert(${alert.id})" title="עריכה">
+                <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-info" onclick="showAlertDetails(${alert.id})" title="פרטים">
+                <i class="bi bi-eye"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-danger" onclick="deleteAlert(${alert.id})" title="מחיקה">
+                <i class="bi bi-trash"></i>
+            </button>
           </td>
         </tr>
       `;
@@ -866,7 +869,7 @@ async function loadModalData() {
     // טעינת נתונים במקביל
     // console.log('🔧 Loading modal data...');
     const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
-      fetch('/api/accounts/').then(r => r.json()).catch(() => ({ data: [] })),
+      fetch('/api/trading-accounts').then(r => r.json()).catch(() => ({ data: [] })),
       fetch('/api/trades/').then(r => r.json()).catch(() => ({ data: [] })),
       fetch('/api/trade_plans/').then(r => r.json()).catch(() => ({ data: [] })),
       fetch('/api/tickers/').then(r => r.json()).catch(() => ({ data: [] })),
@@ -1043,7 +1046,6 @@ function populateSelect(selectId, data, field, prefix = '') {
   });
 
   // console.log('🔧 populateSelect completed for:', selectId, 'with', data.length, 'items');
-}
 }
 
 
@@ -1382,115 +1384,87 @@ function parseAlertCondition(condition) {
  * כולל בדיקת תקינות וטיפול בשגיאות
  * משתמשת במערכת ההתראות הגלובלית להודעות
  */
+/**
+ * ולידציה של טופס הוספת התראה
+ * לפי STANDARD_VALIDATION_GUIDE.md
+ */
+function validateAlertForm() {
+    return window.validateEntityForm('addAlertForm', [
+        { id: 'alertTicker', name: 'טיקר' },
+        { id: 'conditionAttribute', name: 'תנאי התראה' },
+        { id: 'conditionOperator', name: 'אופרטור' },
+        { 
+            id: 'conditionNumber', 
+            name: 'ערך',
+            validation: (value) => {
+                const num = parseFloat(value);
+                if (isNaN(num)) return 'יש להזין ערך מספרי תקין';
+                return true;
+            }
+        },
+        { id: 'alertTradingAccount', name: 'חשבון מסחר' }
+    ]);
+}
+
+/**
+ * שמירת התראה חדשה
+ * לפי STANDARD_VALIDATION_GUIDE.md
+ */
+/**
+ * שמירת התראה חדשה
+ * לפי STANDARD_VALIDATION_GUIDE.md + לוגיקה עסקית מיוחדת
+ */
 async function saveAlert() {
   console.log('🔧 saveAlert function called');
   
-  // ניקוי מטמון לפני פעולת CRUD - הוספה
-  if (window.clearCacheBeforeCRUD) {
-    window.clearCacheBeforeCRUD('alerts', 'add');
-  }
+  try {
+    // 1. ולידציה בסיסית של הטופס
+    if (!validateAlertForm()) {
+        return; // עצירה אם הולידציה נכשלה
+    }
   
-  const form = document.getElementById('addAlertForm');
-  if (!form) {
-    console.warn('⚠️ Form element not found - skipping save operation');
-    return;
-  }
-  console.log('🔧 Form found, proceeding with validation');
-
-
-  // בדיקת תקינות הטופס
-  if (!form.checkValidity()) {
-    console.log('🔧 Form validation failed');
-    form.reportValidity();
-    return;
-  }
-  console.log('🔧 Form validation passed');
-
-  // בדיקת שדות חובה
-  const formData = new FormData(form);
-  const relatedType = formData.get('alertRelationType');
-  const relatedId = document.getElementById('alertRelatedObjectSelect').value;
-
-  // console.log('🔧 Form validation:');
-  // console.log('🔧 Related type:', relatedType);
-  // console.log('🔧 Related ID:', relatedId);
-
-  // בדיקת תנאי התראה
-  const conditionAttributeElement = document.getElementById('conditionAttribute');
-  const conditionOperatorElement = document.getElementById('conditionOperator');
-  const conditionNumberElement = document.getElementById('conditionNumber');
-
-  const conditionAttribute = conditionAttributeElement.value;
-  const conditionOperator = conditionOperatorElement.value;
-  const conditionNumber = conditionNumberElement.value;
-
-  // console.log('🔧 Condition validation:');
-  // console.log('🔧 Condition attribute:', conditionAttribute);
-  // console.log('🔧 Condition operator:', conditionOperator);
-  // console.log('🔧 Condition number:', conditionNumber);
-
-  // ולידציה באמצעות מערכת הולידציה הגלובלית
-  let hasErrors = false;
-
-  // בדיקת סוג אובייקט מקושר
-  if (!relatedType) {
-    if (window.showValidationWarning) {
-      window.showValidationWarning('alertRelationType', 'יש לבחור סוג אובייקט לשיוך');
+    // 2. ניקוי מטמון לפני פעולת CRUD - הוספה
+    if (window.clearCacheBeforeCRUD) {
+      window.clearCacheBeforeCRUD('alerts', 'add');
     }
-    hasErrors = true;
-  }
 
-  // בדיקת אובייקט מקושר
-  if (!relatedId) {
-    if (window.showValidationWarning) {
-      window.showValidationWarning('alertRelatedObjectSelect', 'יש לבחור אובייקט לשיוך');
+    // 3. איסוף נתונים מהטופס
+    const form = document.getElementById('addAlertForm');
+    if (!form) {
+      console.warn('⚠️ Form element not found');
+      return;
     }
-    hasErrors = true;
-  }
 
-  // בדיקת תנאי התראה
-  if (!conditionAttribute) {
-    if (window.showValidationWarning) {
-      window.showValidationWarning('conditionAttribute', 'יש לבחור מאפיין לתנאי');
-    }
-    hasErrors = true;
-  }
+    const formData = new FormData(form);
+    const relatedType = formData.get('alertRelationType');
+    const relatedId = document.getElementById('alertRelatedObjectSelect').value;
 
-  if (!conditionOperator) {
-    if (window.showValidationWarning) {
-      window.showValidationWarning('conditionOperator', 'יש לבחור אופרטור לתנאי');
-    }
-    hasErrors = true;
-  }
+    // 4. איסוף שדות נוספים (אחרי שהולידציה הבסיסית עברה)
+    const conditionAttributeElement = document.getElementById('conditionAttribute');
+    const conditionOperatorElement = document.getElementById('conditionOperator');
+    const conditionNumberElement = document.getElementById('conditionNumber');
 
-  if (!conditionNumber) {
-    if (window.showValidationWarning) {
-      window.showValidationWarning('conditionNumber', 'יש להזין ערך לתנאי');
-    }
-    hasErrors = true;
-  }
+    const conditionAttribute = conditionAttributeElement.value;
+    const conditionOperator = conditionOperatorElement.value;
+    const conditionNumber = conditionNumberElement.value;
 
-  // וולידציה של ערך מספרי
-  if (conditionNumber) {
+    // 5. ולידציות עסקיות מיוחדות (נוסף על הולידציה הסטנדרטית)
+    
+    // בדיקה אם הסמל כבר קיים במערכת - לוגיקה עסקית מיוחדת
     const numericValue = parseFloat(conditionNumber);
-    if (isNaN(numericValue)) {
-      if (window.showValidationWarning) {
-        window.showValidationWarning('conditionNumber', 'הערך חייב להיות מספר');
-      }
-      hasErrors = true;
-    } else {
+    if (!isNaN(numericValue)) {
       // וולידציה של ערך חיובי למחיר
       if (conditionAttribute === 'price' && numericValue <= 0) {
-        if (window.showValidationWarning) {
-          window.showValidationWarning('conditionNumber', 'מחיר חייב להיות גדול מ-0');
+        if (window.showSimpleErrorNotification) {
+          window.showSimpleErrorNotification('שגיאת ולידציה', 'מחיר חייב להיות גדול מ-0');
         }
-        hasErrors = true;
+        return;
       }
 
       // וולידציה של ערך מקסימלי למחיר
       if (conditionAttribute === 'price' && numericValue > 1000000) {
-        if (window.showValidationWarning) {
-          window.showValidationWarning('conditionNumber', 'מחיר לא יכול להיות גדול מ-1,000,000');
+        if (window.showSimpleErrorNotification) {
+          window.showSimpleErrorNotification('שגיאת ולידציה', 'מחיר לא יכול להיות גדול מ-1,000,000');
         }
         hasErrors = true;
       }
@@ -2762,7 +2736,7 @@ window.loadAlertsData = loadAlertsData;
 window.updateAlertsTable = updateAlertsTable;
 window.showAddAlertModal = showAddAlertModal;
 window.editAlert = editAlert;
-window.deleteAlert = deleteAlert;
+window.deleteAlert = _deleteAlert;
 // window.copyDetailedLog export removed - using global version from system-management.js
 // window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 
@@ -2790,6 +2764,80 @@ async function copyDetailedLog() {
             window.showErrorNotification('שגיאה בהעתקת הלוג');
         } else {
             alert('שגיאה בהעתקת הלוג');
+        }
+    }
+}
+
+/**
+ * הצגת פרטי התראה
+ */
+function showAlertDetails(alertId) {
+    const alert = alertsData.find(a => a.id === alertId);
+    if (!alert) {
+        console.error(`❌ Alert with ID ${alertId} not found`);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', `התראה עם ID ${alertId} לא נמצאה`);
+        }
+        return;
+    }
+
+    // שימוש במערכת הצגת פרטים כללית אם זמינה
+    if (typeof window.showEntityDetails === 'function') {
+        window.showEntityDetails('alert', alertId, { mode: 'view' });
+    } else {
+        // הצגה פשוטה
+        const details = `פרטי התראה:
+ID: ${alert.id}
+סטטוס: ${alert.status}
+הופעל: ${alert.is_triggered}
+הודעה: ${alert.message || 'אין הודעה'}
+נוצר: ${alert.created_at ? new Date(alert.created_at).toLocaleString('he-IL') : 'לא מוגדר'}`;
+        alert(details);
+    }
+}
+
+/**
+ * מחיקת התראה
+ */
+async function deleteAlert(alertId) {
+    if (!confirm('האם אתה בטוח שברצונך למחוק התראה זו?')) {
+        return;
+    }
+
+    if (typeof window.showLoadingNotification === 'function') {
+        window.showLoadingNotification('מוחק התראה...');
+    }
+
+    try {
+        const response = await fetch(`/api/alerts/${alertId}`, {
+            method: 'DELETE'
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+        }
+
+        // הסרת ההתראה מהמערך המקומי
+        const index = alertsData.findIndex(a => a.id === alertId);
+        if (index > -1) {
+            alertsData.splice(index, 1);
+        }
+
+        // עדכון הטבלה
+        updateAlertsTable(alertsData);
+        
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('התראה נמחקה בהצלחה');
+        }
+    } catch (error) {
+        console.error('❌ Failed to delete alert:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה במחיקת התראה', error.message);
+        }
+    } finally {
+        if (typeof window.hideLoadingNotification === 'function') {
+            window.hideLoadingNotification();
         }
     }
 }

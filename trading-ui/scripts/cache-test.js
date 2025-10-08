@@ -30,6 +30,12 @@ class CacheTestPage {
             return;
         }
 
+        // Additional check to prevent double initialization
+        if (window.cacheTestPage && window.cacheTestPage !== this) {
+            console.warn('Cache Test Page already exists, skipping initialization.');
+            return;
+        }
+
         console.log('🚀 Cache Test Page - Initializing...');
 
         // Initialize cache systems
@@ -784,15 +790,22 @@ window.clearLog = clearLog;
 window.exportLog = exportLog;
 window.toggleAllSections = toggleAllSections;
 
-// Initialize when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
+// Initialize when DOM is ready - only if not already initialized by UnifiedAppInitializer
+// Skip direct initialization for cache-test page as it's handled by UnifiedAppInitializer
+if (!window.cacheTestPage && !window.location.pathname.includes('cache-test')) {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!window.cacheTestPage) {
+                window.cacheTestPage = new CacheTestPage();
+                window.cacheTestPage.init();
+            }
+        });
+    } else {
         window.cacheTestPage = new CacheTestPage();
         window.cacheTestPage.init();
-    });
-} else {
-    window.cacheTestPage = new CacheTestPage();
-    window.cacheTestPage.init();
+    }
+} else if (window.location.pathname.includes('cache-test')) {
+    console.log('🧪 Cache Test Page will be initialized by UnifiedAppInitializer');
 }
 
 // Cleanup when page is unloaded

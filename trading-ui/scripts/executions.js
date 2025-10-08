@@ -103,6 +103,38 @@ function deleteExecution(id) {
   }
 }
 
+/**
+ * הצגת פרטי עסקה
+ */
+function showExecutionDetails(executionId) {
+    // חיפוש העסקה בנתונים
+    const execution = window.executionsData ? window.executionsData.find(e => e.id === executionId) : null;
+    
+    if (!execution) {
+        console.error(`❌ Execution with ID ${executionId} not found`);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', `עסקה עם ID ${executionId} לא נמצאה`);
+        }
+        return;
+    }
+
+    // שימוש במערכת הצגת פרטים כללית אם זמינה
+    if (typeof window.showEntityDetails === 'function') {
+        window.showEntityDetails('execution', executionId, { mode: 'view' });
+    } else {
+        // הצגה פשוטה
+        const details = `פרטי עסקה:
+ID: ${execution.id}
+פעולה: ${execution.action || execution.type || 'לא מוגדר'}
+כמות: ${execution.quantity || 'לא מוגדר'}
+מחיר: $${execution.price || '0'}
+תאריך: ${execution.date || execution.execution_date || 'לא מוגדר'}
+מקור: ${execution.source || 'לא מוגדר'}
+טרייד: ${execution.trade_id || 'לא מוגדר'}`;
+        alert(details);
+    }
+}
+
 // פונקציות לפתיחה/סגירה של סקשנים - שימוש במערכת הכללית
 
 // ========================================
@@ -119,13 +151,12 @@ function resetAddExecutionForm() {
 
   // השבתת כל השדות חוץ מטיקר
   const fieldsToDisable = [
-    'addExecutionTradeId',
-    'addExecutionType',
-    'addExecutionQuantity',
-    'addExecutionPrice',
-    'addExecutionCommission',
-    'addExecutionDate',
-    'addExecutionNotes',
+    'executionTicker',
+    'executionType',
+    'executionQuantity',
+    'executionPrice',
+    'executionDate',
+    'executionAccount',
   ];
 
   fieldsToDisable.forEach(fieldId => {
@@ -156,36 +187,37 @@ async function showAddExecutionModal() {
   // הגדרת תאריך ברירת מחדל - היום
   const today = new Date();
   const todayString = today.toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
-  document.getElementById('addExecutionDate').value = todayString;
+  document.getElementById('executionDate').value = todayString;
 
-  // הגדרת עמלה ברירת מחדל לפי העדפות
+  // הגדרת חשבון ברירת מחדל לפי העדפות
   // ✨ עודכן לתמיכה במערכת העדפות!
   try {
-    let defaultCommission = 1.0; // ברירת מחדל משופרת
+    let defaultAccount = ''; // ברירת מחדל
     
     // נסה לקבל מהמערכת החדשה
     if (typeof window.getCurrentPreference === 'function') {
-      const commissionFromPrefs = await window.getCurrentPreference('defaultCommission');
-      if (commissionFromPrefs !== null && commissionFromPrefs !== undefined) {
-        defaultCommission = commissionFromPrefs;
-        console.log(`✅ Using commission from preferences: ${defaultCommission}`);
+      const accountFromPrefs = await window.getCurrentPreference('defaultTradingAccount');
+      if (accountFromPrefs !== null && accountFromPrefs !== undefined) {
+        defaultAccount = accountFromPrefs;
+        console.log(`✅ Using account from preferences: ${defaultAccount}`);
       }
     } 
     // Fallback ל-userPreferences
-    else if (window.userPreferences && window.userPreferences.defaultCommission) {
-      defaultCommission = window.userPreferences.defaultCommission;
-      console.log(`✅ Using commission from userPreferences: ${defaultCommission}`);
+    else if (window.userPreferences && window.userPreferences.defaultTradingAccount) {
+      defaultAccount = window.userPreferences.defaultTradingAccount;
+      console.log(`✅ Using account from userPreferences: ${defaultAccount}`);
     }
     
-    document.getElementById('addExecutionCommission').value = defaultCommission;
+    const accountElement = document.getElementById('executionAccount');
+    if (accountElement) {
+      accountElement.value = defaultAccount;
+    }
   } catch (error) {
-    console.warn('⚠️ Could not load default commission from preferences:', error);
-    document.getElementById('addExecutionCommission').value = 1.0;
+    console.warn('⚠️ Could not load default account from preferences:', error);
   }
 
-  // טעינת טיקרים לפי הצ'קבוקס
-  const showClosedTrades = document.getElementById('addExecutionShowClosedTrades')?.checked || false;
-  await updateTickersList('add', showClosedTrades);
+  // טעינת טיקרים (ללא צ'קבוקס - תמיד להציג טיקרים פעילים)
+  await updateTickersList('add', false);
 
   // חישוב ערכים מחושבים
   calculateAddExecutionValues();
@@ -916,13 +948,12 @@ async function saveExecution() {
 
 
   // ולידציה
-  const tradeIdValue = document.getElementById('addExecutionTradeId').value;
-  const type = document.getElementById('addExecutionType').value;
-  const quantity = document.getElementById('addExecutionQuantity').value;
-  const price = document.getElementById('addExecutionPrice').value;
-  const executionDate = document.getElementById('addExecutionDate').value;
-  const commission = document.getElementById('addExecutionCommission').value;
-  const notes = document.getElementById('addExecutionNotes').value.trim();
+  const ticker = document.getElementById('executionTicker').value;
+  const type = document.getElementById('executionType').value;
+  const quantity = document.getElementById('executionQuantity').value;
+  const price = document.getElementById('executionPrice').value;
+  const executionDate = document.getElementById('executionDate').value;
+  const account = document.getElementById('executionAccount').value;
 
   // בדיקת ולידציה מקיפה
   if (!validateCompleteExecutionForm('add')) {
@@ -1021,7 +1052,7 @@ async function saveExecution() {
               fieldName = 'addExecutionPrice';
             } else if (error.includes('Field \'date\' is out of range')) {
               fieldError = 'תאריך עסקה חייב להיות אחרי תאריך פתיחת הטרייד';
-              fieldName = 'addExecutionDate';
+              fieldName = 'executionDate';
             } else if (error.includes('Field \'trade_id\' references non-existent record')) {
               fieldError = 'טרייד לא קיים במערכת';
               fieldName = 'addExecutionTradeId';
@@ -1728,7 +1759,11 @@ async function updateExecutionsTableMain(executions) {
   }
 
   // קבלת צבעים מהמערכת הגלובלית
-  const colors = window.getTableColors();
+  const colors = window.getTableColors ? window.getTableColors() : {
+    positive: '#28a745',
+    negative: '#dc3545',
+    secondary: '#6c757d'
+  };
   const positiveColor = colors.positive;
   const negativeColor = colors.negative;
   const secondaryColor = colors.secondary;
@@ -1839,9 +1874,18 @@ async function updateExecutionsTableMain(executions) {
                 <td data-date="${execution.date || execution.execution_date}">${execution.date || execution.execution_date ? new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL') : '-'}</td>
                 <td style="text-align: left; direction: ltr;">${execution.source || '-'}</td>
                 <td class="col-actions actions-cell actions-3-btn">
-                    ${window.createLinkButton(`console.log('🔗 [LINKED ITEMS] לחיצה על כפתור מקושרים עבור עסקה:', ${execution.id}); if(window.loadLinkedItemsData) { window.loadLinkedItemsData('execution', ${execution.id}).then(data => { console.log('🔗 [LINKED ITEMS] נתונים נטענו:', data); if(data) { console.log('🔗 [LINKED ITEMS] מציג מודל עם נתונים'); window.showLinkedItemsModal(data, 'execution', ${execution.id}, 'view'); } else { console.log('❌ [LINKED ITEMS] אין נתונים להצגה'); } }); } else { console.log('❌ [LINKED ITEMS] loadLinkedItemsData לא זמין'); }`)}
-                    ${window.createEditButton(`editExecution(${execution.id})`)}
-                    ${window.createDeleteButton(`deleteExecution(${execution.id})`)}
+                    <button class="btn btn-sm btn-outline-info" onclick="console.log('🔗 [LINKED ITEMS] לחיצה על כפתור מקושרים עבור עסקה:', ${execution.id}); if(window.loadLinkedItemsData) { window.loadLinkedItemsData('execution', ${execution.id}).then(data => { console.log('🔗 [LINKED ITEMS] נתונים נטענו:', data); if(data) { console.log('🔗 [LINKED ITEMS] מציג מודל עם נתונים'); window.showLinkedItemsModal(data, 'execution', ${execution.id}, 'view'); } else { console.log('❌ [LINKED ITEMS] אין נתונים להצגה'); } }); } else { console.log('❌ [LINKED ITEMS] loadLinkedItemsData לא זמין'); }" title="פריטים מקושרים">
+                        <i class="bi bi-link-45deg"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-primary" onclick="editExecution(${execution.id})" title="עריכה">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-info" onclick="showExecutionDetails(${execution.id})" title="פרטים">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteExecution(${execution.id})" title="מחיקה">
+                        <i class="bi bi-trash"></i>
+                    </button>
                 </td>
             </tr>
         `;
@@ -2089,7 +2133,11 @@ function restoreSortState() {
   if (typeof window.restoreAnyTableSort === 'function') {
     window.restoreAnyTableSort('executions', window.executionsData || [], updateExecutionsTableMain);
   } else {
-    handleFunctionNotFound('restoreAnyTableSort');
+    if (typeof handleFunctionNotFound === 'function') {
+      handleFunctionNotFound('restoreAnyTableSort');
+    } else {
+      console.warn('⚠️ restoreAnyTableSort function not available');
+    }
   }
 }
 
@@ -2620,7 +2668,11 @@ function updateExecutionsSummary(executions) {
   const balanceElement = balanceAmountElement;
 
   // קבלת צבעים מהמערכת הגלובלית
-  const colors = window.getTableColors();
+  const colors = window.getTableColors ? window.getTableColors() : {
+    positive: '#28a745',
+    negative: '#dc3545',
+    secondary: '#6c757d'
+  };
 
   // צביעה ידנית
   balanceElement.textContent = `$${balance.toFixed(2)}`;
@@ -2656,13 +2708,13 @@ window.addNewTrade = addNewTrade;
  * חישוב ערכים מחושבים לטופס הוספה
  */
 function calculateAddExecutionValues() {
-  const quantity = parseFloat(document.getElementById('addExecutionQuantity').value) || 0;
-  const price = parseFloat(document.getElementById('addExecutionPrice').value) || 0;
-  const commission = parseFloat(document.getElementById('addExecutionCommission').value) || 0;
+  const quantity = parseFloat(document.getElementById('executionQuantity').value) || 0;
+  const price = parseFloat(document.getElementById('executionPrice').value) || 0;
 
-  const total = quantity * price + commission;
+  const total = quantity * price;
 
-  document.getElementById('addExecutionTotal').textContent = `$${total.toFixed(2)}`;
+  // אין אלמנט total במודל הנוכחי - נסיר את זה
+  // document.getElementById('addExecutionTotal').textContent = `$${total.toFixed(2)}`;
 }
 
 /**

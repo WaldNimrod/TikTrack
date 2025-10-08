@@ -773,9 +773,93 @@ window.validateTickerSymbol = validateTickerSymbol;
 window.initializeValidation = initializeValidation;
 window.clearValidation = clearValidation;
 
+// ===== פונקציות ולידציה סטנדרטיות לטפסים =====
+
+/**
+ * ולידציה סטנדרטית לטופס הוספה/עריכה
+ * @param {string} formId - מזהה הטופס
+ * @param {Array} requiredFields - מערך של אובייקטים עם fieldId ו-fieldName
+ * @returns {boolean} true אם הטופס תקין, false אחרת
+ * 
+ * דוגמה:
+ * const isValid = window.validateEntityForm('addCashFlowForm', [
+ *   { id: 'cashFlowAccountId', name: 'חשבון מסחר' },
+ *   { id: 'cashFlowType', name: 'סוג תזרים' },
+ *   { id: 'cashFlowAmount', name: 'סכום', validation: (value) => parseFloat(value) !== 0 || 'סכום לא יכול להיות 0' }
+ * ]);
+ */
+function validateEntityForm(formId, requiredFields = []) {
+  // ניקוי ולידציה קודמת
+  if (typeof window.clearValidation === 'function') {
+    window.clearValidation(formId);
+  }
+
+  let isValid = true;
+  const errors = [];
+
+  // בדיקת כל שדה חובה
+  requiredFields.forEach(fieldConfig => {
+    const field = document.getElementById(fieldConfig.id);
+    
+    if (!field) {
+      console.warn(`⚠️ שדה ${fieldConfig.id} לא נמצא בטופס`);
+      return;
+    }
+
+    const value = field.value;
+    let hasError = false;
+    let errorMessage = '';
+
+    // בדיקה אם השדה ריק
+    if (!value || value.trim() === '') {
+      hasError = true;
+      errorMessage = `יש לבחור ${fieldConfig.name}`;
+    }
+    // בדיקת ולידציה מותאמת אישית
+    else if (fieldConfig.validation) {
+      const validationResult = fieldConfig.validation(value, field);
+      if (validationResult !== true) {
+        hasError = true;
+        errorMessage = validationResult;
+      }
+    }
+
+    // סימון שדה בעייתי
+    if (hasError) {
+      if (typeof window.showFieldError === 'function') {
+        window.showFieldError(fieldConfig.id, errorMessage);
+      }
+      errors.push(fieldConfig.name);
+      isValid = false;
+    } else {
+      // סימון שדה תקין
+      if (typeof window.showFieldSuccess === 'function') {
+        window.showFieldSuccess(fieldConfig.id);
+      }
+    }
+  });
+
+  // הצגת הודעת שגיאה קצרה ומרוכזת
+  if (!isValid && errors.length > 0) {
+    const errorMsg = errors.length === 1 
+      ? `שדה חובה חסר: ${errors[0]}` 
+      : `שדות חובה חסרים: ${errors.join(', ')}`;
+    
+    // שימוש ב-showSimpleErrorNotification למניעת מודל מפורט
+    if (typeof window.showSimpleErrorNotification === 'function') {
+      window.showSimpleErrorNotification('שגיאת ולידציה', errorMsg);
+    } else if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאת ולידציה', errorMsg);
+    }
+  }
+
+  return isValid;
+}
+
 // ייצוא המודול
 window.validationUtils = {
   validateForm,
+  validateEntityForm,
   showFieldError,
   showFieldSuccess,
   clearFieldError,
@@ -797,4 +881,7 @@ window.validationUtils = {
   initializeValidation,
   clearValidation,
 };
+
+// ייצוא הפונקציה החדשה
+window.validateEntityForm = validateEntityForm;
 

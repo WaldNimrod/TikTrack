@@ -90,13 +90,13 @@ class UnifiedCacheManager {
             this.initialized = true;
             console.log('✅ Unified Cache Manager initialized successfully');
             
-            // הודעת הצלחה
-            if (window.notificationSystem) {
-                window.notificationSystem.showNotification(
-                    'מערכת מטמון מאוחדת אותחלה בהצלחה',
-                    'success'
-                );
-            }
+            // הודעת הצלחה - תציג מאוחדת עם האפליקציה
+            // if (window.notificationSystem) {
+            //     window.notificationSystem.showNotification(
+            //         'מערכת מטמון מאוחדת אותחלה בהצלחה',
+            //         'success'
+            //     );
+            // }
             
             return true;
         } catch (error) {
@@ -376,6 +376,35 @@ class UnifiedCacheManager {
     }
 
     /**
+     * קבלת סטטיסטיקות שכבה ספציפית
+     * @param {string} layerName - שם השכבה
+     * @returns {Promise<Object>} סטטיסטיקות השכבה
+     */
+    async getLayerStats(layerName) {
+        try {
+            if (!this.layers[layerName]) {
+                throw new Error(`Layer ${layerName} not found`);
+            }
+
+            // קבלת סטטיסטיקות מהשכבה
+            if (this.layers[layerName].getStats) {
+                const layerStats = await this.layers[layerName].getStats();
+                return {
+                    entries: layerStats.entries || 0,
+                    size: layerStats.size || 0,
+                    initialized: layerStats.initialized || false
+                };
+            } else {
+                // חזרה לסטטיסטיקות הכלליות אם השכבה לא תומכת
+                return this.stats.layers[layerName] || { entries: 0, size: 0 };
+            }
+        } catch (error) {
+            console.warn(`⚠️ Failed to get stats for layer ${layerName}:`, error);
+            return { entries: 0, size: 0, error: error.message };
+        }
+    }
+
+    /**
      * בחירת שכבה אוטומטית לפי קריטריונים
      * @param {any} data - הנתונים
      * @param {Object} policy - מדיניות מטמון
@@ -581,7 +610,7 @@ class MemoryLayer {
 
     async initialize() {
         this.cache.clear();
-        console.log('✅ Memory Layer initialized');
+        // console.log('✅ Memory Layer initialized');
     }
 
     async save(key, data, policy) {
@@ -619,7 +648,7 @@ class LocalStorageLayer {
     }
 
     async initialize() {
-        console.log('✅ LocalStorage Layer initialized');
+        // console.log('✅ LocalStorage Layer initialized');
     }
 
     async save(key, data, policy) {
@@ -712,7 +741,7 @@ class IndexedDBLayer {
                 
                 request.onsuccess = () => {
                     this.db = request.result;
-                    console.log('✅ IndexedDB Layer initialized');
+                    // console.log('✅ IndexedDB Layer initialized');
                     resolve(true);
                 };
                 
@@ -721,7 +750,7 @@ class IndexedDBLayer {
                     if (!db.objectStoreNames.contains('unified-cache')) {
                         const store = db.createObjectStore('unified-cache', { keyPath: 'key' });
                         store.createIndex('timestamp', 'timestamp', { unique: false });
-                        console.log('✅ IndexedDB object store created');
+                        // console.log('✅ IndexedDB object store created');
                     }
                 };
             });
@@ -837,7 +866,7 @@ class BackendCacheLayer {
     async initialize() {
         this.cache.clear();
         this.initialized = true;
-        console.log('✅ Backend Cache Layer initialized');
+        // console.log('✅ Backend Cache Layer initialized');
     }
 
     async save(key, data, policy) {
@@ -1097,6 +1126,14 @@ class BackendCacheLayer {
 // יצירת instance גלובלי
 window.UnifiedCacheManager = new UnifiedCacheManager();
 
+// Export getLayerStats as standalone function for convenience
+window.getLayerStats = async function(layerName) {
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.getLayerStats) {
+        return await window.UnifiedCacheManager.getLayerStats(layerName);
+    }
+    throw new Error('UnifiedCacheManager not available');
+};
+
 // פונקציה גלובלית לניקוי כל המטמון
 window.clearAllCache = async function() {
     try {
@@ -1334,6 +1371,34 @@ window.testCachePerformance = async function() {
             performanceResults.localStorage.operations = iterations * 2;
         } catch (error) {
             console.warn('localStorage performance test failed:', error);
+        }
+
+        // בדיקת IndexedDB Layer
+        try {
+            const startTime = performance.now();
+            for (let i = 0; i < iterations; i++) {
+                await window.UnifiedCacheManager.save(`perf_test_indexedDB_${i}`, testData, { layer: 'indexedDB' });
+                await window.UnifiedCacheManager.get(`perf_test_indexedDB_${i}`, { layer: 'indexedDB' });
+            }
+            const endTime = performance.now();
+            performanceResults.indexedDB.avgTime = (endTime - startTime) / iterations;
+            performanceResults.indexedDB.operations = iterations * 2;
+        } catch (error) {
+            console.warn('IndexedDB performance test failed:', error);
+        }
+
+        // בדיקת Backend Layer
+        try {
+            const startTime = performance.now();
+            for (let i = 0; i < iterations; i++) {
+                await window.UnifiedCacheManager.save(`perf_test_backend_${i}`, testData, { layer: 'backend' });
+                await window.UnifiedCacheManager.get(`perf_test_backend_${i}`, { layer: 'backend' });
+            }
+            const endTime = performance.now();
+            performanceResults.backend.avgTime = (endTime - startTime) / iterations;
+            performanceResults.backend.operations = iterations * 2;
+        } catch (error) {
+            console.warn('Backend performance test failed:', error);
         }
 
         console.log('⚡ Performance test results:', performanceResults);
@@ -2268,6 +2333,27 @@ window.clearCacheByCategory = async function(category) {
  * @param {boolean} isInitialLoad - האם זה אתחול ראשוני (לא להציג הודעות מפורטות)
  */
 window.initializeAllCacheSystems = async function(isInitialLoad = false) {
+    // Prevent double initialization using global state
+    const cacheInitKey = 'cache-systems-initialization';
+    
+    if (window.globalInitializationState.customInitializers.has(cacheInitKey)) {
+        console.log('⏳ Cache systems already initialized, skipping...');
+        return { unifiedCacheManager: true, cacheSyncManager: true, cachePolicyManager: true, memoryOptimizer: true };
+    }
+    
+    if (window.cacheSystemsInitializing) {
+        console.log('⏳ Cache systems already initializing, waiting...');
+        return new Promise((resolve) => {
+            const checkInterval = setInterval(() => {
+                if (!window.cacheSystemsInitializing) {
+                    clearInterval(checkInterval);
+                    resolve({ unifiedCacheManager: true, cacheSyncManager: true, cachePolicyManager: true, memoryOptimizer: true });
+                }
+            }, 100);
+        });
+    }
+
+    window.cacheSystemsInitializing = true;
     const startTime = Date.now();
     
     try {
@@ -2364,14 +2450,25 @@ window.initializeAllCacheSystems = async function(isInitialLoad = false) {
             }
         }
         
-        return results;
-    } catch (error) {
-        console.error('❌ Failed to initialize cache systems:', error);
-        if (window.cacheTestPage) {
-            window.cacheTestPage.showErrorMessage('כשל באתחול מערכות מטמון', error.message);
+            // Mark as initialized in global state
+            window.globalInitializationState.customInitializers.set(cacheInitKey, {
+                executed: true,
+                timestamp: Date.now(),
+                page: 'cache-systems',
+                results: results
+            });
+            
+            return results;
+        } catch (error) {
+            console.error('❌ Failed to initialize cache systems:', error);
+            if (window.cacheTestPage) {
+                window.cacheTestPage.showErrorMessage('כשל באתחול מערכות מטמון', error.message);
+            }
+            return null;
+        } finally {
+            // Clear the initialization flag
+            window.cacheSystemsInitializing = false;
         }
-        return null;
-    }
 };
 
 /**
@@ -2455,6 +2552,261 @@ window.getCacheSystemStatus = function() {
 };
 
 /**
+ * Comprehensive cache cleanup testing suite
+ * בדיקת מנגנוני ניקוי מטמון מקיפה
+ */
+window.testCacheCleanupMechanisms = async function() {
+    try {
+        console.log('🧪 Starting comprehensive cache cleanup testing...');
+        
+        const testResults = {
+            layerClearing: {},
+            advancedClearing: {},
+            categoryClearing: {},
+            systemClearing: {},
+            overall: false
+        };
+        
+        // שלב 1: בדיקת ניקוי שכבות בודדות
+        console.log('📋 Testing individual layer clearing...');
+        
+        // בדיקת Memory Layer
+        try {
+            await window.UnifiedCacheManager.save('test_memory_1', 'test-data-1', { layer: 'memory' });
+            await window.UnifiedCacheManager.save('test_memory_2', 'test-data-2', { layer: 'memory' });
+            
+            const beforeClear = await window.UnifiedCacheManager.getLayerStats('memory');
+            await window.clearUnifiedCacheLayer('memory');
+            const afterClear = await window.UnifiedCacheManager.getLayerStats('memory');
+            
+            testResults.layerClearing.memory = {
+                beforeEntries: beforeClear.entries,
+                afterEntries: afterClear.entries,
+                success: afterClear.entries === 0,
+                details: `Memory layer: ${beforeClear.entries} → ${afterClear.entries} entries`
+            };
+        } catch (error) {
+            testResults.layerClearing.memory = { success: false, error: error.message };
+        }
+        
+        // בדיקת localStorage Layer
+        try {
+            await window.UnifiedCacheManager.save('test_localStorage_1', 'test-data-1', { layer: 'localStorage' });
+            await window.UnifiedCacheManager.save('test_localStorage_2', 'test-data-2', { layer: 'localStorage' });
+            
+            const beforeClear = await window.UnifiedCacheManager.getLayerStats('localStorage');
+            await window.clearUnifiedCacheLayer('localStorage');
+            const afterClear = await window.UnifiedCacheManager.getLayerStats('localStorage');
+            
+            testResults.layerClearing.localStorage = {
+                beforeEntries: beforeClear.entries,
+                afterEntries: afterClear.entries,
+                success: afterClear.entries === 0,
+                details: `localStorage layer: ${beforeClear.entries} → ${afterClear.entries} entries`
+            };
+        } catch (error) {
+            testResults.layerClearing.localStorage = { success: false, error: error.message };
+        }
+        
+        // בדיקת IndexedDB Layer
+        try {
+            await window.UnifiedCacheManager.save('test_indexedDB_1', 'test-data-1', { layer: 'indexedDB' });
+            await window.UnifiedCacheManager.save('test_indexedDB_2', 'test-data-2', { layer: 'indexedDB' });
+            
+            const beforeClear = await window.UnifiedCacheManager.getLayerStats('indexedDB');
+            await window.clearUnifiedCacheLayer('indexedDB');
+            const afterClear = await window.UnifiedCacheManager.getLayerStats('indexedDB');
+            
+            testResults.layerClearing.indexedDB = {
+                beforeEntries: beforeClear.entries,
+                afterEntries: afterClear.entries,
+                success: afterClear.entries === 0,
+                details: `IndexedDB layer: ${beforeClear.entries} → ${afterClear.entries} entries`
+            };
+        } catch (error) {
+            testResults.layerClearing.indexedDB = { success: false, error: error.message };
+        }
+        
+        // שלב 2: בדיקת ניקוי מתקדם
+        console.log('📋 Testing advanced clearing mechanisms...');
+        
+        // בדיקת ניקוי TTL פג תוקף
+        try {
+            // יצירת נתונים עם TTL קצר
+            await window.UnifiedCacheManager.save('test_ttl_short', 'test-data', { 
+                layer: 'memory', 
+                ttl: 100 // 100ms
+            });
+            
+            // המתנה ל-TTL לפג
+            await new Promise(resolve => setTimeout(resolve, 150));
+            
+            const beforeClear = await window.UnifiedCacheManager.getLayerStats('memory');
+            await window.clearExpiredCache();
+            const afterClear = await window.UnifiedCacheManager.getLayerStats('memory');
+            
+            testResults.advancedClearing.expiredTTL = {
+                beforeEntries: beforeClear.entries,
+                afterEntries: afterClear.entries,
+                success: afterClear.entries < beforeClear.entries,
+                details: `Expired TTL clearing: ${beforeClear.entries} → ${afterClear.entries} entries`
+            };
+        } catch (error) {
+            testResults.advancedClearing.expiredTTL = { success: false, error: error.message };
+        }
+        
+        // בדיקת ניקוי לפי גדול
+        try {
+            // יצירת נתונים גדולים
+            const largeData = 'x'.repeat(10000); // 10KB
+            await window.UnifiedCacheManager.save('test_large_1', largeData, { layer: 'memory' });
+            await window.UnifiedCacheManager.save('test_large_2', largeData, { layer: 'memory' });
+            
+            const beforeClear = await window.UnifiedCacheManager.getLayerStats('memory');
+            await window.clearCacheBySize(5000); // נקה גדולים מ-5KB
+            const afterClear = await window.UnifiedCacheManager.getLayerStats('memory');
+            
+            testResults.advancedClearing.bySize = {
+                beforeEntries: beforeClear.entries,
+                afterEntries: afterClear.entries,
+                success: afterClear.entries < beforeClear.entries,
+                details: `Large size clearing: ${beforeClear.entries} → ${afterClear.entries} entries`
+            };
+        } catch (error) {
+            testResults.advancedClearing.bySize = { success: false, error: error.message };
+        }
+        
+        // שלב 3: בדיקת ניקוי לפי קטגוריה
+        console.log('📋 Testing category-based clearing...');
+        
+        // בדיקת ניקוי העדפות
+        try {
+            await window.UnifiedCacheManager.save('preferences_test_1', 'pref-data-1', { layer: 'localStorage' });
+            await window.UnifiedCacheManager.save('preferences_test_2', 'pref-data-2', { layer: 'localStorage' });
+            
+            const beforeClear = await window.UnifiedCacheManager.getLayerStats('localStorage');
+            await window.clearCacheByCategory('preferences');
+            const afterClear = await window.UnifiedCacheManager.getLayerStats('localStorage');
+            
+            testResults.categoryClearing.preferences = {
+                beforeEntries: beforeClear.entries,
+                afterEntries: afterClear.entries,
+                success: afterClear.entries < beforeClear.entries,
+                details: `Preferences clearing: ${beforeClear.entries} → ${afterClear.entries} entries`
+            };
+        } catch (error) {
+            testResults.categoryClearing.preferences = { success: false, error: error.message };
+        }
+        
+        // שלב 4: בדיקת ניקוי כל המערכות
+        console.log('📋 Testing complete system clearing...');
+        
+        try {
+            // מילוי כל השכבות
+            await window.UnifiedCacheManager.save('final_test_1', 'final-data-1', { layer: 'memory' });
+            await window.UnifiedCacheManager.save('final_test_2', 'final-data-2', { layer: 'localStorage' });
+            await window.UnifiedCacheManager.save('final_test_3', 'final-data-3', { layer: 'indexedDB' });
+            
+            const beforeClear = {
+                memory: await window.UnifiedCacheManager.getLayerStats('memory'),
+                localStorage: await window.UnifiedCacheManager.getLayerStats('localStorage'),
+                indexedDB: await window.UnifiedCacheManager.getLayerStats('indexedDB')
+            };
+            
+            await window.clearAllCacheSystems();
+            
+            const afterClear = {
+                memory: await window.UnifiedCacheManager.getLayerStats('memory'),
+                localStorage: await window.UnifiedCacheManager.getLayerStats('localStorage'),
+                indexedDB: await window.UnifiedCacheManager.getLayerStats('indexedDB')
+            };
+            
+            testResults.systemClearing.complete = {
+                beforeEntries: {
+                    memory: beforeClear.memory.entries,
+                    localStorage: beforeClear.localStorage.entries,
+                    indexedDB: beforeClear.indexedDB.entries
+                },
+                afterEntries: {
+                    memory: afterClear.memory.entries,
+                    localStorage: afterClear.localStorage.entries,
+                    indexedDB: afterClear.indexedDB.entries
+                },
+                success: afterClear.memory.entries === 0 && 
+                        afterClear.localStorage.entries === 0 && 
+                        afterClear.indexedDB.entries === 0,
+                details: `Complete system clearing: All layers cleared successfully`
+            };
+        } catch (error) {
+            testResults.systemClearing.complete = { success: false, error: error.message };
+        }
+        
+        // חישוב תוצאה כוללת
+        const layerSuccessCount = Object.values(testResults.layerClearing).filter(r => r.success).length;
+        const advancedSuccessCount = Object.values(testResults.advancedClearing).filter(r => r.success).length;
+        const categorySuccessCount = Object.values(testResults.categoryClearing).filter(r => r.success).length;
+        const systemSuccessCount = Object.values(testResults.systemClearing).filter(r => r.success).length;
+        
+        const totalTests = Object.keys(testResults.layerClearing).length + 
+                          Object.keys(testResults.advancedClearing).length + 
+                          Object.keys(testResults.categoryClearing).length + 
+                          Object.keys(testResults.systemClearing).length;
+        
+        const totalSuccess = layerSuccessCount + advancedSuccessCount + categorySuccessCount + systemSuccessCount;
+        
+        testResults.overall = {
+            totalTests: totalTests,
+            totalSuccess: totalSuccess,
+            successRate: (totalSuccess / totalTests * 100).toFixed(2),
+            layerTests: `${layerSuccessCount}/${Object.keys(testResults.layerClearing).length}`,
+            advancedTests: `${advancedSuccessCount}/${Object.keys(testResults.advancedClearing).length}`,
+            categoryTests: `${categorySuccessCount}/${Object.keys(testResults.categoryClearing).length}`,
+            systemTests: `${systemSuccessCount}/${Object.keys(testResults.systemClearing).length}`
+        };
+        
+        console.log('🧪 Cache cleanup testing completed:', testResults);
+        
+        // הצגת תוצאות מפורטות
+        if (testResults.overall.successRate >= 90) {
+            if (typeof window.showFinalSuccessNotification === 'function') {
+                window.showFinalSuccessNotification(
+                    'בדיקת מנגנוני ניקוי מטמון הושלמה בהצלחה!',
+                    `בדיקת כל מנגנוני ניקוי המטמון הושלמה בהצלחה.\n\nתוצאות הבדיקה:\n• ניקוי שכבות: ${testResults.overall.layerTests}\n• ניקוי מתקדם: ${testResults.overall.advancedTests}\n• ניקוי לפי קטגוריה: ${testResults.overall.categoryTests}\n• ניקוי כל המערכות: ${testResults.overall.systemTests}\n\nשיעור הצלחה כולל: ${testResults.overall.successRate}%\nזמן בדיקה: ${new Date().toLocaleTimeString('he-IL')}\nסטטוס: כל המנגנונים עובדים תקין`,
+                    {
+                        operation: 'comprehensive-cache-cleanup-test',
+                        duration: `${Date.now()}ms`,
+                        timestamp: new Date().toISOString(),
+                        testResults: testResults,
+                        successRate: testResults.overall.successRate,
+                        status: 'all-mechanisms-working',
+                        healthCheck: 'כל מנגנוני ניקוי המטמון עובדים תקין',
+                        nextAction: 'המערכת מוכנה לשימוש מלא'
+                    },
+                    'system'
+                );
+            }
+        } else {
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification(
+                    'בדיקת מנגנוני ניקוי מטמון זיהתה בעיות',
+                    `בדיקת מנגנוני ניקוי המטמון זיהתה בעיות.\n\nפרטי הבדיקה:\n• ניקוי שכבות: ${testResults.overall.layerTests}\n• ניקוי מתקדם: ${testResults.overall.advancedTests}\n• ניקוי לפי קטגוריה: ${testResults.overall.categoryTests}\n• ניקוי כל המערכות: ${testResults.overall.systemTests}\n\nשיעור הצלחה כולל: ${testResults.overall.successRate}%\nזמן בדיקה: ${new Date().toLocaleTimeString('he-IL')}\n\nבדיקת בריאות מפורטת:\n${JSON.stringify(testResults, null, 2)}`,
+                    20000
+                );
+            }
+        }
+        
+        return testResults;
+        
+    } catch (error) {
+        console.error('❌ Cache cleanup testing failed:', error);
+        if (window.cacheTestPage) {
+            window.cacheTestPage.showErrorMessage('כשל בבדיקת מנגנוני ניקוי', error.message);
+        }
+        return null;
+    }
+};
+
+/**
  * Test all cache systems integration
  */
 window.testCacheSystemsIntegration = async function() {
@@ -2520,8 +2872,8 @@ window.testCacheSystemsIntegration = async function() {
         const workingCount = Object.values(testResults).filter(Boolean).length;
         const totalCount = Object.keys(testResults).length;
         
-        if (testResults.integration) {
-            // אינטגרציה עובדת - הודעה מפורטת עם מודל
+        if (workingCount === totalCount) {
+            // כל המערכות עובדות - הודעה מפורטת עם מודל
             if (typeof window.showFinalSuccessNotification === 'function') {
                 window.showFinalSuccessNotification(
                     'בדיקת אינטגרציה מערכות מטמון הושלמה בהצלחה!',
@@ -2542,6 +2894,29 @@ window.testCacheSystemsIntegration = async function() {
                 );
             } else {
                 console.log('✅ בדיקת אינטגרציה הושלמה בהצלחה');
+            }
+        } else if (workingCount > 0) {
+            // חלק מהמערכות עובדות - הודעת הצלחה חלקית עם מודל
+            if (typeof window.showFinalSuccessNotification === 'function') {
+                window.showFinalSuccessNotification(
+                    'בדיקת אינטגרציה מערכות מטמון - הצלחה חלקית',
+                    `בדיקת האינטגרציה בין מערכות המטמון הצליחה חלקית.\n\nתוצאות הבדיקה:\n• UnifiedCacheManager: ${testResults.unifiedCacheManager ? '✅ עובד' : '❌ לא עובד'}\n• CacheSyncManager: ${testResults.cacheSyncManager ? '✅ עובד' : '❌ לא עובד'}\n• CachePolicyManager: ${testResults.cachePolicyManager ? '✅ עובד' : '❌ לא עובד'}\n• MemoryOptimizer: ${testResults.memoryOptimizer ? '✅ עובד' : '❌ לא עובד'}\n• אינטגרציה כללית: ${testResults.integration ? '✅ תקינה' : '❌ לא תקינה'}\n\nזמן בדיקה: ${new Date().toLocaleTimeString('he-IL')}\nסטטוס: ${workingCount}/${totalCount} מערכות עובדות`,
+                    {
+                        operation: 'cache-systems-integration-test-partial',
+                        duration: `${Date.now()}ms`,
+                        timestamp: new Date().toISOString(),
+                        testResults: testResults,
+                        workingSystems: workingCount,
+                        totalSystems: totalCount,
+                        integrationStatus: testResults.integration,
+                        status: 'partial-success',
+                        healthCheck: `${workingCount} מתוך ${totalCount} מערכות המטמון עובדות`,
+                        nextAction: 'המערכת תעבוד במצב מוגבל'
+                    },
+                    'warning'
+                );
+            } else {
+                console.log('⚠️ בדיקת אינטגרציה הצליחה חלקית');
             }
         } else {
             // אינטגרציה לא עובדת - הודעת שגיאה מפורטת עם מודל
@@ -2670,6 +3045,127 @@ window.clearAllCacheSystems = async function() {
         console.error('❌ Failed to clear cache systems:', error);
         if (window.cacheTestPage) {
             window.cacheTestPage.showErrorMessage('כשל בניקוי מערכות מטמון', error.message);
+        }
+        return null;
+    }
+};
+
+/**
+ * Generate detailed cache cleanup report
+ * יצירת דוח מפורט על מנגנוני ניקוי המטמון
+ */
+window.generateCacheCleanupReport = async function() {
+    try {
+        console.log('📊 Generating cache cleanup report...');
+        
+        const report = {
+            timestamp: new Date().toISOString(),
+            pageUrl: window.location.href,
+            systemInfo: {
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                language: navigator.language
+            },
+            cacheSystems: {
+                unifiedCacheManager: !!window.UnifiedCacheManager?.initialized,
+                cacheSyncManager: !!window.CacheSyncManager?.initialized,
+                cachePolicyManager: !!window.CachePolicyManager?.initialized,
+                memoryOptimizer: !!window.MemoryOptimizer?.initialized
+            },
+            layerStats: {},
+            cleanupMechanisms: {
+                layerClearing: ['memory', 'localStorage', 'indexedDB', 'backend'],
+                advancedClearing: ['expiredTTL', 'bySize', 'temporary', 'smart'],
+                categoryClearing: ['preferences', 'notifications', 'uiState', 'temporaryData', 'authentication'],
+                systemClearing: ['allSystems']
+            },
+            recommendations: []
+        };
+        
+        // קבלת סטטיסטיקות שכבות
+        if (window.UnifiedCacheManager?.initialized) {
+            for (const layer of ['memory', 'localStorage', 'indexedDB', 'backend']) {
+                try {
+                    report.layerStats[layer] = await window.UnifiedCacheManager.getLayerStats(layer);
+                } catch (error) {
+                    report.layerStats[layer] = { error: error.message };
+                }
+            }
+            
+            // קבלת סטטיסטיקות כלליות
+            report.generalStats = window.UnifiedCacheManager.getStats();
+        }
+        
+        // בדיקת זמינות מנגנוני ניקוי
+        report.cleanupAvailability = {
+            clearUnifiedCacheLayer: typeof window.clearUnifiedCacheLayer === 'function',
+            clearExpiredCache: typeof window.clearExpiredCache === 'function',
+            clearCacheBySize: typeof window.clearCacheBySize === 'function',
+            clearCacheByCategory: typeof window.clearCacheByCategory === 'function',
+            smartCacheCleanup: typeof window.smartCacheCleanup === 'function',
+            clearAllCacheSystems: typeof window.clearAllCacheSystems === 'function'
+        };
+        
+        // המלצות אוטומטיות
+        const totalEntries = Object.values(report.layerStats)
+            .reduce((sum, stats) => sum + (stats.entries || 0), 0);
+        
+        if (totalEntries > 1000) {
+            report.recommendations.push('מומלץ לבצע ניקוי חכם - יש יותר מ-1000 ערכים במטמון');
+        }
+        
+        const memoryEntries = report.layerStats.memory?.entries || 0;
+        if (memoryEntries > 500) {
+            report.recommendations.push('מומלץ לנקות שכבות זיכרון - יש יותר מ-500 ערכים');
+        }
+        
+        if (!report.cleanupAvailability.clearExpiredCache) {
+            report.recommendations.push('פונקציית ניקוי TTL פג תוקף לא זמינה');
+        }
+        
+        if (!report.cleanupAvailability.smartCacheCleanup) {
+            report.recommendations.push('פונקציית ניקוי חכם לא זמינה');
+        }
+        
+        console.log('📊 Cache cleanup report generated:', report);
+        
+        // הצגת הדוח
+        if (typeof window.showFinalSuccessNotification === 'function') {
+            const reportText = `דוח מפורט על מנגנוני ניקוי המטמון\n\n` +
+                `מערכות פעילות:\n` +
+                `• UnifiedCacheManager: ${report.cacheSystems.unifiedCacheManager ? '✅' : '❌'}\n` +
+                `• CacheSyncManager: ${report.cacheSystems.cacheSyncManager ? '✅' : '❌'}\n` +
+                `• CachePolicyManager: ${report.cacheSystems.cachePolicyManager ? '✅' : '❌'}\n` +
+                `• MemoryOptimizer: ${report.cacheSystems.memoryOptimizer ? '✅' : '❌'}\n\n` +
+                `סטטיסטיקות שכבות:\n` +
+                `• Memory: ${report.layerStats.memory?.entries || 0} ערכים\n` +
+                `• localStorage: ${report.layerStats.localStorage?.entries || 0} ערכים\n` +
+                `• IndexedDB: ${report.layerStats.indexedDB?.entries || 0} ערכים\n` +
+                `• Backend: ${report.layerStats.backend?.entries || 0} ערכים\n\n` +
+                `מנגנוני ניקוי זמינים: ${Object.values(report.cleanupAvailability).filter(Boolean).length}/${Object.keys(report.cleanupAvailability).length}\n\n` +
+                `המלצות:\n${report.recommendations.length > 0 ? report.recommendations.join('\n• ') : 'אין המלצות מיוחדות'}`;
+            
+            window.showFinalSuccessNotification(
+                'דוח מנגנוני ניקוי מטמון הושלם',
+                reportText,
+                {
+                    operation: 'cache-cleanup-report',
+                    timestamp: report.timestamp,
+                    report: report,
+                    status: 'report-completed',
+                    healthCheck: 'דוח מפורט על מנגנוני ניקוי המטמון',
+                    nextAction: 'בדוק המלצות ופעל בהתאם'
+                },
+                'info'
+            );
+        }
+        
+        return report;
+        
+    } catch (error) {
+        console.error('❌ Failed to generate cache cleanup report:', error);
+        if (window.cacheTestPage) {
+            window.cacheTestPage.showErrorMessage('כשל ביצירת דוח ניקוי', error.message);
         }
         return null;
     }

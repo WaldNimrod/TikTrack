@@ -64,7 +64,7 @@
     <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=20251001">
     
     <!-- 07-trumps - Page-specific Styles -->
-    <link rel="stylesheet" href="styles-new/07-trumps/_notes.css?v=20251001">
+    <!-- <link rel="stylesheet" href="styles-new/07-trumps/_notes.css?v=20251001"> -->
     
     <!-- 08-themes - Themes -->
     <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=20251001">
@@ -223,10 +223,24 @@
                     <div class="modal-body">
                         <form id="addNoteForm">
                             <div class="row">
-                                <div class="col-md-12">
+                                <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="noteTitle" class="form-label">כותרת ההערה</label>
-                                        <input type="text" class="form-control" id="noteTitle" placeholder="כותרת ההערה" required>
+                                        <label for="noteRelatedType" class="form-label">סוג קשר</label>
+                                        <select class="form-select" id="noteRelationType" required>
+                                            <option value="">בחר סוג קשר</option>
+                                            <option value="1">חשבון</option>
+                                            <option value="2">טרייד</option>
+                                            <option value="3">תוכנית טרייד</option>
+                                            <option value="4">טיקר</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="noteRelatedId" class="form-label">מזהה פריט</label>
+                                        <select class="form-select" id="noteRelationId" required disabled>
+                                            <option value="">בחר קודם סוג קשר</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -239,24 +253,10 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-12">
                                     <div class="mb-3">
-                                        <label for="noteStatus" class="form-label">סטטוס</label>
-                                        <select class="form-select" id="noteStatus" required>
-                                            <option value="active">פעיל</option>
-                                            <option value="archived">בארכיון</option>
-                                            <option value="draft">טיוטה</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="notePriority" class="form-label">עדיפות</label>
-                                        <select class="form-select" id="notePriority">
-                                            <option value="low">נמוכה</option>
-                                            <option value="medium">בינונית</option>
-                                            <option value="high">גבוהה</option>
-                                        </select>
+                                        <label for="noteAttachment" class="form-label">קובץ מצורף (אופציונלי)</label>
+                                        <input type="file" class="form-control" id="noteAttachment" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png">
                                     </div>
                                 </div>
                             </div>
@@ -284,10 +284,23 @@
                     <div class="modal-body">
                         <form id="editNoteForm">
                             <div class="row">
-                                <div class="col-md-12">
+                                <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="editNoteTitle" class="form-label">כותרת ההערה</label>
-                                        <input type="text" class="form-control" id="editNoteTitle" required>
+                                        <label for="editNoteRelatedType" class="form-label">סוג קשר</label>
+                                        <select class="form-select" id="editNoteRelatedType" required>
+                                            <option value="1">חשבון</option>
+                                            <option value="2">טרייד</option>
+                                            <option value="3">תוכנית טרייד</option>
+                                            <option value="4">טיקר</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editNoteRelatedId" class="form-label">מזהה פריט</label>
+                                        <select class="form-select" id="editNoteRelatedId" required>
+                                            <option value="">בחר פריט</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -300,24 +313,10 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-12">
                                     <div class="mb-3">
-                                        <label for="editNoteStatus" class="form-label">סטטוס</label>
-                                        <select class="form-select" id="editNoteStatus" required>
-                                            <option value="active">פעיל</option>
-                                            <option value="archived">בארכיון</option>
-                                            <option value="draft">טיוטה</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="editNotePriority" class="form-label">עדיפות</label>
-                                        <select class="form-select" id="editNotePriority">
-                                            <option value="low">נמוכה</option>
-                                            <option value="medium">בינונית</option>
-                                            <option value="high">גבוהה</option>
-                                        </select>
+                                        <label for="editNoteAttachment" class="form-label">קובץ מצורף (אופציונלי)</label>
+                                        <input type="file" class="form-control" id="editNoteAttachment" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png">
                                     </div>
                                 </div>
                             </div>
@@ -339,49 +338,36 @@
     
     <!-- ===== BASE PACKAGE SYSTEMS - CORRECT LOADING ORDER ===== -->
     
-    <!-- Stage 1: Initialization Systems (Must be first) -->
-    <script src="scripts/page-initialization-configs.js?v=20251001"></script>
-    <script src="scripts/unified-app-initializer.js?v=20251001"></script>
+    <!-- מערכת כללית חדשה - 8 מודולים מאוחדים -->
     
-    <!-- Stage 2: Core Base Systems -->
-    <script src="scripts/global-favicon.js?v=20251001"></script>
-    <script src="scripts/translation-utils.js?v=20251001"></script>
+    <!-- Load the new general systems architecture -->
+    <script src="scripts/modules/core-systems.js?v=20251006"></script>
+    <script src="scripts/modules/ui-basic.js?v=20251006"></script>
+    <script src="scripts/modules/data-basic.js?v=20251006"></script>
+    <script src="scripts/modules/ui-advanced.js?v=20251006"></script>
+    <script src="scripts/modules/data-advanced.js?v=20251006"></script>
+    <script src="scripts/modules/business-module.js?v=20251006"></script>
+    <script src="scripts/modules/communication-module.js?v=20251006"></script>
+    <script src="scripts/modules/cache-module.js?v=20251006"></script>
     
-    <!-- Stage 3: UI Base Systems -->
-    <script src="scripts/notification-system.js?v=20251001"></script>
+    <!-- Page Initialization Configurations -->
+    <script src="scripts/page-initialization-configs.js?v=20251006"></script>
     
-    <!-- Stage 4: Cache and Refresh Systems -->
-    <script src="scripts/cache-sync-manager.js?v=20251001"></script>
-    <script src="scripts/unified-cache-manager.js?v=20251001"></script>
-    <script src="scripts/cache-policy-manager.js?v=20251001"></script>
-    <script src="scripts/memory-optimizer.js?v=20251001"></script>
-    
-    <!-- Stage 5: Advanced UI Systems (Always required) -->
-    <script src="scripts/ui-utils.js?v=20251001"></script>
-    <script src="scripts/color-scheme-system.js?v=20251001"></script>
+    <!-- Global Systems -->
+    <script src="scripts/global-favicon.js?v=20251006"></script>
+    <script src="scripts/translation-utils.js?v=20251006"></script>
     <script src="scripts/header-system.js?v=v6.0.0"></script>
+    <script src="scripts/date-utils.js?v=20251006"></script>
+    <script src="scripts/button-icons.js?v=20251006"></script>
+    <script src="scripts/page-utils.js?v=20251006"></script>
+    <script src="scripts/preferences.js?v=20251006"></script>
+    <script src="scripts/notification-category-detector.js?v=20251006"></script>
+    <script src="scripts/global-notification-collector.js?v=20251006"></script>
+    <script src="scripts/entity-details-modal.js?v=20251006"></script>
+    <script src="scripts/warning-system.js?v=20251006"></script>
     
-    <!-- Stage 6: Data and Utility Systems -->
-    <script src="scripts/data-utils.js?v=20251001"></script>
-    <script src="scripts/date-utils.js?v=20251001"></script>
-    <script src="scripts/button-icons.js?v=20251001"></script>
-    <script src="scripts/tables.js?v=20251001"></script>
-    <script src="scripts/table-mappings.js?v=20251006"></script>
-    <script src="scripts/page-utils.js?v=20251001"></script>
-    
-    <!-- Stage 7: Additional Systems (As needed) -->
-    <script src="scripts/preferences.js?v=20251001"></script>
-    <script src="scripts/notification-category-detector.js?v=20251001"></script>
-    <script src="scripts/global-notification-collector.js?v=20251001"></script>
-    <script src="scripts/system-management.js?v=20251001"></script>
-    
-    <!-- Stage 8: Modal and Warning Systems -->
-    <script src="scripts/entity-details-modal.js?v=20251001"></script>
-    <script src="scripts/warning-system.js?v=20251001"></script>
-    <script src="scripts/error-handlers.js?v=20251001"></script>
-    
-    <!-- Stage 9: Page-specific Script -->
-    <script src="scripts/notes.js?v=20251001"></script>
+    <!-- Page-specific Script -->
+    <script src="scripts/notes.js?v=20251006"></script>
     
     <!-- Local copyDetailedLog function for notes page -->
     <script>

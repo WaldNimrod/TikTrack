@@ -281,3 +281,161 @@
 .tab-pane.fade.active {
     opacity: 1;
 }
+
+/* Summary Stats Styles */
+.summary-stats {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px;
+    border: 2px solid #29a6a8;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    margin: 20px 0;
+}
+
+.summary-item {
+    flex: 1;
+    text-align: center;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.summary-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.summary-number {
+    font-size: 2em;
+    font-weight: bold;
+    color: #29a6a8;
+    margin-bottom: 5px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.summary-label {
+    font-size: 0.9em;
+    color: #6c757d;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Responsive Design for Summary Stats */
+@media (max-width: 768px) {
+    .summary-stats {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .summary-item {
+        padding: 12px;
+    }
+    
+    .summary-number {
+        font-size: 1.5em;
+    }
+    
+    .summary-label {
+        font-size: 0.8em;
+    }
+}
+
+/* Additional CRUD Testing Dashboard Styles */
+.checklist {
+    list-style: none;
+    padding: 0;
+}
+
+.checklist li {
+    margin: 8px 0;
+    display: flex;
+    align-items: center;
+}
+
+.checklist input[type="checkbox"] {
+    margin-left: 10px;
+    accent-color: #29a6a8;
+}
+
+.button-item {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin: 4px 0;
+}
+
+.button-item.create {
+    border-color: #28a745;
+    background: rgba(40, 167, 69, 0.05);
+}
+
+.button-item.update {
+    border-color: #17a2b8;
+    background: rgba(23, 162, 184, 0.05);
+}
+
+.button-item.delete {
+    border-color: #dc3545;
+    background: rgba(220, 53, 69, 0.05);
+}
+
+.button-item.other {
+    border-color: #6c757d;
+    background: rgba(108, 117, 125, 0.05);
+}
+
+.test-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+.buttons-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* CRUD Test Details Styles */
+.crud-test-details {
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+.test-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.25rem;
+    padding: 0.125rem 0;
+}
+
+.test-label {
+    font-weight: 500;
+    color: #495057;
+    min-width: 80px;
+}
+
+.test-status {
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+
+.test-status.text-success {
+    color: #28a745 !important;
+}
+
+.test-status.text-danger {
+    color: #dc3545 !important;
+}
+
+.test-status.text-muted {
+    color: #6c757d !important;
+}

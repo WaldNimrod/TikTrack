@@ -296,18 +296,36 @@
     <!-- Error Handlers -->
     <script src="scripts/error-handlers.js"></script>
     
-    <!-- 🔄 NEW UNIFIED INITIALIZATION SYSTEM -->
-    <!-- Core Systems -->
-    <script src="scripts/global-favicon.js"></script>
-    <script src="scripts/ui-utils.js"></script>
-    <script src="scripts/data-utils.js"></script>
-    <script src="scripts/notification-system.js"></script>
-    <script src="scripts/system-management.js"></script>
-    <script src="scripts/notification-category-detector.js"></script>
-    <script src="scripts/global-notification-collector.js"></script>
-    <script src="scripts/tables.js"></script>
-    <script src="scripts/page-utils.js"></script>
-    <script src="scripts/chart-management.js"></script>
+    <!-- מערכת כללית חדשה - 8 מודולים מאוחדים -->
+    
+    <!-- Load the new general systems architecture -->
+    <script src="scripts/modules/core-systems.js?v=20251006"></script>
+    <script src="scripts/modules/ui-basic.js?v=20251006"></script>
+    <script src="scripts/modules/data-basic.js?v=20251006"></script>
+    <script src="scripts/modules/ui-advanced.js?v=20251006"></script>
+    <script src="scripts/modules/data-advanced.js?v=20251006"></script>
+    <script src="scripts/modules/business-module.js?v=20251006"></script>
+    <script src="scripts/modules/communication-module.js?v=20251006"></script>
+    <script src="scripts/modules/cache-module.js?v=20251006"></script>
+    
+    <!-- Page Initialization Configurations -->
+    <script src="scripts/page-initialization-configs.js?v=20251006"></script>
+    
+    <!-- Global Systems -->
+    <script src="scripts/global-favicon.js?v=20251006"></script>
+    <script src="scripts/translation-utils.js?v=20251006"></script>
+    <script src="scripts/header-system.js?v=v6.0.0"></script>
+    <script src="scripts/date-utils.js?v=20251006"></script>
+    <script src="scripts/button-icons.js?v=20251006"></script>
+    <script src="scripts/page-utils.js?v=20251006"></script>
+    <script src="scripts/preferences.js?v=20251006"></script>
+    <script src="scripts/notification-category-detector.js?v=20251006"></script>
+    <script src="scripts/global-notification-collector.js?v=20251006"></script>
+    <script src="scripts/entity-details-modal.js?v=20251006"></script>
+    <script src="scripts/warning-system.js?v=20251006"></script>
+    
+    <!-- Page-specific Script -->
+    <script src="scripts/chart-management.js?v=20251006"></script>
     
     <!-- Chart.js Library - Required for chart functionality -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -321,9 +339,6 @@
     <script src="scripts/charts/adapters/trades-adapter.js"></script>
     <script src="scripts/charts/chart-export.js"></script>
     
-    <!-- New Unified Initialization System -->
-    <script src="scripts/page-initialization-configs.js"></script>
-    <script src="scripts/unified-app-initializer.js"></script>
 
     <!-- 🔓 TEMPLATE ZONE 6 - Page-Specific Scripts (ADD NEW SCRIPTS HERE) -->
     <!-- No manual DOMContentLoaded listener needed - handled by unified system -->

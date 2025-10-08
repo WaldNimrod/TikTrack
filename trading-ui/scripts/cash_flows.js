@@ -617,17 +617,27 @@ async function deleteCashFlow(id) {
     const result = await response.json();
 
     if (result.status === 'success') {
+      // ניקוי מטמון cash_flows
+      if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.invalidate === 'function') {
+        await window.UnifiedCacheManager.invalidate('cash_flows');
+        console.log('✅ מטמון cash_flows נוקה אחרי מחיקה');
+      }
+
       // הצגת הודעת הצלחה
-      window.showSuccessNotification('הצלחה', 'תזרים המזומנים נמחק בהצלחה');
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('הצלחה', 'תזרים המזומנים נמחק בהצלחה', 4000, 'business');
+      }
 
       // טעינה מחדש של הנתונים
       await loadCashFlows();
     } else {
       throw new Error(result.error || 'שגיאה לא ידועה');
     }
-  } catch {
-    // console.error('❌ Delete error:', error);
-    window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת תזרים המזומנים');
+  } catch (error) {
+    console.error('❌ Delete error:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה במחיקה', error.message || 'שגיאה במחיקת תזרים המזומנים');
+    }
   }
 }
 

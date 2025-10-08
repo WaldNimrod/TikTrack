@@ -2015,13 +2015,8 @@ function editCashFlow(id) {
     }
 }
 
-function deleteCashFlow(id) {
-    if (typeof window.deleteCashFlow === 'function') {
-        window.deleteCashFlow(id);
-    } else {
-        console.warn('deleteCashFlow function not found');
-    }
-}
+// ❌ הוסר - גרם ללולאה אינסופית
+// הפונקציה האמיתית נמצאת בשורה 568
 
 /**
  * הצגת פרטי תזרים מזומנים

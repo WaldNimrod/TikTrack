@@ -518,7 +518,72 @@ console.log(`✅ מצאתי חשבון ${accountId} ב-HeaderSystem:`, account.n
 
 ---
 
-### **15. תיקון הצגת חשבון מסחר בטבלה**
+### **15. תיקון פונקציות כפולות (Infinite Loop)**
+
+#### **הבעיה:**
+- שתי פונקציות עם אותו שם: `deleteCashFlow`
+- פונקציה אחת קוראת לעצמה דרך `window.deleteCashFlow` → לולאה אינסופית
+- שגיאה: "Maximum call stack size exceeded"
+
+#### **הפתרון:**
+```javascript
+// ❌ מחיקת הפונקציה המיותרת:
+// function deleteCashFlow(id) {
+//     if (typeof window.deleteCashFlow === 'function') {
+//         window.deleteCashFlow(id);  // ← קורא לעצמו!
+//     }
+// }
+
+// ✅ שמירה רק של הפונקציה האמיתית:
+async function deleteCashFlow(id) {
+  try {
+    // מציאת התזרים
+    const cashFlow = window.cashFlowsData.find(cf => cf.id === id);
+    if (!cashFlow) {
+      window.showSimpleErrorNotification('שגיאה', 'תזרים המזומנים לא נמצא');
+      return;
+    }
+
+    // אישור מהמשתמש
+    if (!confirm('האם אתה בטוח?')) {
+      return;
+    }
+
+    // מחיקה
+    const response = await fetch(`/api/cash_flows/${id}`, {
+      method: 'DELETE'
+    });
+
+    if (response.ok) {
+      // ניקוי מטמון
+      if (window.UnifiedCacheManager) {
+        await window.UnifiedCacheManager.invalidate('cash_flows');
+      }
+
+      // הודעת הצלחה
+      window.showSuccessNotification('הצלחה', 'תזרים נמחק', 4000, 'business');
+
+      // רענון
+      await loadCashFlows();
+    }
+  } catch (error) {
+    console.error('Error deleting cash flow:', error);
+    window.showErrorNotification('שגיאה במחיקה', error.message);
+  }
+}
+```
+
+**בדיקה נדרשת בכל העמודים:**
+- [ ] חיפוש פונקציות כפולות: `grep -n "^function [name]\|^async function [name]"`
+- [ ] מחיקת wrapper functions מיותרות
+- [ ] וידוא שיש רק פונקציה אחת לכל פעולה
+
+**קבצים שתוקנו:**
+- `trading-ui/scripts/cash_flows.js` - מחיקת פונקציה כפולה
+
+---
+
+### **16. תיקון הצגת חשבון מסחר בטבלה**
 
 #### **הבעיה:**
 - עמודת חשבון מציגה מזהה (1, 2, 3) במקום שם החשבון
@@ -783,17 +848,18 @@ async function ensureTickersLoaded() {
 
 ## 🎯 סיכום
 
-**סה"כ תיקונים:** 17 קטגוריות עיקריות
+**סה"כ תיקונים:** 18 קטגוריות עיקריות
 **סה"כ קבצים שתוקנו:** 8 קבצים
 **סה"כ עמודים לתקן:** 7 עמודים נוספים
 
 ### **קטגוריות עיקריות:**
 
-#### **תיקוני תשתית (1-4):**
+#### **תיקוני תשתית (1-4, 15):**
 1. התאמת ID אלמנטים
 2. נתיבי API שגויים
 3. כפתורי שמירה
 4. Enum values
+15. פונקציות כפולות (infinite loop)
 
 #### **מערכת ולידציה (5-6):**
 5. מערכת ולידציה סטנדרטית

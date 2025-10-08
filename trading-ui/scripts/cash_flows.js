@@ -4,19 +4,26 @@
  * טעינת נתוני תזרימי מזומנים מהשרת
  * פונקציה מאוחדת לטעינת נתונים עם טיפול בשגיאות מתקדם
  */
-async function loadCashFlows() {
+async function loadCashFlows(forceRefresh = false) {
   try {
-    console.log('📊 טוען נתוני תזרימי מזומנים...');
+    console.log('📊 טוען נתוני תזרימי מזומנים...', forceRefresh ? '(force refresh)' : '');
     
     // הצגת אינדיקטור טעינה
     if (typeof window.showInfoNotification === 'function') {
       window.showInfoNotification('טעינה', 'טוען נתוני תזרימי מזומנים...', 2000, 'ui');
     }
     
-    const response = await fetch('http://127.0.0.1:8080/api/cash_flows/', {
+    // אם force refresh, נוסיף timestamp כדי לעקוף מטמון שרת
+    const url = forceRefresh 
+      ? `http://127.0.0.1:8080/api/cash_flows/?cache=false&_t=${Date.now()}`
+      : 'http://127.0.0.1:8080/api/cash_flows/';
+    
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
       }
     });
 
@@ -626,8 +633,8 @@ async function deleteCashFlow(id) {
 
     if (result.status === 'success') {
       // ניקוי מטמון cash_flows
-      if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.invalidate === 'function') {
-        await window.UnifiedCacheManager.invalidate('cash_flows');
+      if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+        await window.UnifiedCacheManager.remove('cash_flows');
         console.log('✅ מטמון cash_flows נוקה אחרי מחיקה');
       }
 
@@ -1830,18 +1837,27 @@ async function saveCashFlow() {
       }
 
       // ניקוי מטמון cash_flows
-      if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.invalidate === 'function') {
-        await window.UnifiedCacheManager.invalidate('cash_flows');
-        console.log('✅ מטמון cash_flows נוקה');
+      if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+        await window.UnifiedCacheManager.remove('cash_flows');
+        console.log('✅ מטמון cash_flows נוקה אחרי הוספה');
       }
 
-      // הצגת הודעת הצלחה
-      if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification('הצלחה', 'תזרים המזומנים נשמר בהצלחה', 4000, 'business');
+      // ניקוי global data
+      if (window.cashFlowsData) {
+        window.cashFlowsData = null;
+        console.log('✅ Global cashFlowsData נוקה');
       }
+
+      // המתנה קצרה לוידוא ניקוי מטמון
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       // טעינה מחדש של הנתונים
       await loadCashFlows();
+
+      // הצגת הודעת הצלחה אחרי הטעינה
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('הצלחה', 'תזרים המזומנים נשמר בהצלחה', 4000, 'business');
+      }
     } else {
       handleApiError('שגיאה בשמירת תזרים מזומנים', result.error);
 
@@ -1987,18 +2003,27 @@ async function updateCashFlow() {
       }
 
       // ניקוי מטמון cash_flows
-      if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.invalidate === 'function') {
-        await window.UnifiedCacheManager.invalidate('cash_flows');
+      if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+        await window.UnifiedCacheManager.remove('cash_flows');
         console.log('✅ מטמון cash_flows נוקה אחרי עדכון');
       }
 
-      // הצגת הודעת הצלחה
-      if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification('הצלחה', 'תזרים המזומנים נעדכן בהצלחה', 4000, 'business');
+      // ניקוי global data
+      if (window.cashFlowsData) {
+        window.cashFlowsData = null;
+        console.log('✅ Global cashFlowsData נוקה');
       }
+
+      // המתנה קצרה לוידוא ניקוי מטמון
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       // טעינה מחדש של הנתונים
       await loadCashFlows();
+
+      // הצגת הודעת הצלחה אחרי הטעינה
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('הצלחה', 'תזרים המזומנים נעדכן בהצלחה', 4000, 'business');
+      }
     } else {
       handleApiError('שגיאה בעדכון תזרים מזומנים', result.error);
 

@@ -507,14 +507,17 @@ class EntityDetailsService:
     
     @staticmethod
     def _get_alert_linked_items(db: Session, alert_id: int) -> List[Dict[str, Any]]:
-        """Get linked items for alert"""
+        """Get linked items for alert - using new generic system"""
         linked_items = []
         
         try:
-            # Get the ticker this alert is for
             alert = db.query(Alert).filter(Alert.id == alert_id).first()
-            if alert and alert.ticker_id:
-                ticker = db.query(Ticker).filter(Ticker.id == alert.ticker_id).first()
+            if not alert:
+                return []
+            
+            # Use the new generic relationship system
+            if alert.related_type_id == 1:  # Ticker
+                ticker = db.query(Ticker).filter(Ticker.id == alert.related_id).first()
                 if ticker:
                     linked_items.append({
                         'id': ticker.id,
@@ -523,16 +526,49 @@ class EntityDetailsService:
                         'status': ticker.status,
                         'created_at': ticker.created_at.isoformat() if ticker.created_at else None
                     })
-                
-                # Get related trades for this ticker
-                trades = db.query(Trade).filter(Trade.ticker_id == alert.ticker_id).all()
-                for trade in trades:
+                    
+                    # Get related trades for this ticker
+                    trades = db.query(Trade).filter(Trade.ticker_id == alert.related_id).all()
+                    for trade in trades:
+                        linked_items.append({
+                            'id': trade.id,
+                            'type': 'trade',
+                            'title': f"טרייד #{trade.id}",
+                            'status': trade.status,
+                            'created_at': trade.created_at.isoformat() if trade.created_at else None
+                        })
+                        
+            elif alert.related_type_id == 2:  # Trade
+                trade = db.query(Trade).filter(Trade.id == alert.related_id).first()
+                if trade:
                     linked_items.append({
                         'id': trade.id,
                         'type': 'trade',
-                        'title': f"טרייד {trade.symbol}",
+                        'title': f"טרייד #{trade.id}",
                         'status': trade.status,
                         'created_at': trade.created_at.isoformat() if trade.created_at else None
+                    })
+                    
+            elif alert.related_type_id == 3:  # Trading Account
+                account = db.query(TradingAccount).filter(TradingAccount.id == alert.related_id).first()
+                if account:
+                    linked_items.append({
+                        'id': account.id,
+                        'type': 'trading_account',
+                        'title': f"חשבון {account.name}",
+                        'status': account.status,
+                        'created_at': account.created_at.isoformat() if account.created_at else None
+                    })
+                    
+            elif alert.related_type_id == 4:  # Trade Plan
+                plan = db.query(TradePlan).filter(TradePlan.id == alert.related_id).first()
+                if plan:
+                    linked_items.append({
+                        'id': plan.id,
+                        'type': 'trade_plan',
+                        'title': f"תכנון #{plan.id}",
+                        'status': plan.status,
+                        'created_at': plan.created_at.isoformat() if plan.created_at else None
                     })
                 
         except Exception as e:

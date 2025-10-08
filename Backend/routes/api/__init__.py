@@ -9,6 +9,7 @@ from .cash_flows import cash_flows_bp
 from .constraints import constraints_bp
 from .css_management import css_management_bp
 from .currencies import currencies_bp
+from .database_schema import database_schema_bp
 from .entity_details import entity_details_bp
 from .executions import executions_bp
 from .file_scanner import file_scanner_bp
@@ -47,6 +48,7 @@ __all__ = [
     'constraints_bp',
     'css_management_bp',
     'currencies_bp',
+    'database_schema_bp',
     'entity_details_bp',
     'executions_bp',
     'file_scanner_bp',

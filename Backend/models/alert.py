@@ -7,21 +7,20 @@ import re
 class Alert(BaseModel):
     __tablename__ = "alerts"
     
-    # Fields that exist in the database
-    trading_account_id = Column(Integer, nullable=True)
-    ticker_id = Column(Integer, ForeignKey('tickers.id'), nullable=True)
+    # Core fields
     message = Column(String(500), nullable=True)
     triggered_at = Column(DateTime, nullable=True)
     status = Column(String(20), default='open', nullable=True)
     is_triggered = Column(String(20), default='false', nullable=True)  # false, new, true
+    
+    # Generic relationship system (replaces old ticker_id and trading_account_id)
     related_type_id = Column(Integer, ForeignKey('note_relation_types.id'), nullable=False, default=4)
     related_id = Column(Integer, nullable=False)
+    
+    # Alert condition
     condition_attribute = Column(String(50), nullable=False, default='price')
     condition_operator = Column(String(50), nullable=False, default='more_than')
     condition_number = Column(String(20), nullable=False, default='0')
-    
-    # Relationships
-    ticker = relationship("Ticker", back_populates="alerts")
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

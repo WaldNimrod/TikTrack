@@ -139,8 +139,6 @@ function getDemoAlertsData() {
       status: 'open',
       related_type_id: 4, // טיקר
       related_id: 1, // מזהה טיקר AAPL
-      related_object_id: 1, // מזהה הטיקר הספציפי
-      ticker_id: 1, // מזהה הטיקר
       condition: 'מחיר יותר מ 150',
       condition_attribute: 'price',
       condition_operator: 'more_than',
@@ -155,8 +153,6 @@ function getDemoAlertsData() {
       status: 'closed',
       related_type_id: 4, // טיקר
       related_id: 2, // מזהה טיקר TSLA
-      related_object_id: 2, // מזהה הטיקר הספציפי
-      ticker_id: 2, // מזהה הטיקר
       condition: 'שינוי יותר מ 5%',
       condition_attribute: 'change',
       condition_operator: 'more_than',

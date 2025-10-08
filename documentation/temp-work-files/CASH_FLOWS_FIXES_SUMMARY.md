@@ -997,6 +997,110 @@ async function updateCashFlow() {
 
 ---
 
+---
+
+## ⚠️ תיקונים נוספים - סבב 2
+
+### **1. תיקון showEditCashFlowModal (null safety)**
+
+#### **הבעיה:**
+```
+TypeError: Cannot set properties of null (setting 'value')
+    at showEditCashFlowModal (cash_flows.js:366:49)
+```
+
+השימוש ב-`querySelector` עם `#id` ללא בדיקת null גרם לשגיאות.
+
+#### **הפתרון:**
+```javascript
+// ❌ לפני
+form.querySelector('#editCashFlowId').value = cashFlow.id;
+
+// ✅ אחרי - פונקציית עזר עם null safety
+const setFieldValue = (fieldId, value) => {
+  const field = document.getElementById(fieldId);
+  if (field) {
+    field.value = value || '';
+  } else {
+    console.warn(`⚠️ שדה ${fieldId} לא נמצא במודל עריכה`);
+  }
+};
+
+setFieldValue('editCashFlowId', cashFlow.id);
+setFieldValue('editCashFlowDate', cashFlow.date);
+setFieldValue('editCashFlowAccountId', cashFlow.trading_account_id); // ✅ שדה נכון
+```
+
+**קבצים שתוקנו:**
+- `trading-ui/scripts/cash_flows.js` - `showEditCashFlowModal()`
+
+---
+
+### **2. תיקון Entity Details API (קובץ חסר)**
+
+#### **הבעיה:**
+```
+Error: Entity Details API לא נטען
+```
+
+הקובץ `entity-details-api.js` לא נטען בעמוד.
+
+#### **הפתרון:**
+```html
+<!-- הוספת הקובץ החסר -->
+<script src="scripts/entity-details-api.js?v=20251006"></script>
+<script src="scripts/entity-details-modal.js?v=20251006"></script>
+```
+
+**קבצים שתוקנו:**
+- `trading-ui/cash_flows.html` - הוספת script חסר
+
+---
+
+### **3. תיקון רענון טבלה (global data + timing)**
+
+#### **הבעיה:**
+- אחרי מחיקה/הוספה/עדכון הטבלה לא מתעדכנת
+- הנתונים ישנים נשארים ב-`window.cashFlowsData`
+
+#### **הפתרון:**
+```javascript
+// בכל פעולת CRUD מוצלחת:
+if (result.status === 'success') {
+  // 1. ניקוי מטמון UnifiedCacheManager
+  if (window.UnifiedCacheManager) {
+    await window.UnifiedCacheManager.invalidate('cash_flows');
+  }
+
+  // 2. ניקוי global data - חובה!
+  if (window.cashFlowsData) {
+    window.cashFlowsData = null;
+    console.log('✅ Global cashFlowsData נוקה');
+  }
+
+  // 3. המתנה קצרה לוידוא ניקוי מטמון
+  await new Promise(resolve => setTimeout(resolve, 100));
+
+  // 4. טעינה מחדש של הנתונים
+  await loadCashFlows();
+
+  // 5. הצגת הודעת הצלחה אחרי הטעינה
+  window.showSuccessNotification('הצלחה', 'הפעולה הושלמה בהצלחה');
+}
+```
+
+**למה זה חשוב:**
+1. `UnifiedCacheManager.invalidate` - מנקה מטמון של מערכת המטמון
+2. `window.cashFlowsData = null` - מנקה נתונים גלובליים
+3. `setTimeout(100)` - נותן זמן למטמון להתרענן
+4. `await loadCashFlows()` - טוען נתונים חדשים
+5. הודעת הצלחה **אחרי** הטעינה (לא לפני)
+
+**קבצים שתוקנו:**
+- `trading-ui/scripts/cash_flows.js` - כל 3 פונקציות CRUD
+
+---
+
 ## 🚀 מוכן ליישום סטנדרטי!
 
 **תהליך הסטנדרטיזציה יכלול:**
@@ -1004,8 +1108,11 @@ async function updateCashFlow() {
 - ✅ מערכת ולידציה אחידה
 - ✅ ברירות מחדל חכמות
 - ✅ הצגת נתונים מובנת (שמות במקום מזהים)
-- ✅ ניקוי מטמון אחרי כל פעולת CRUD (CREATE/UPDATE/DELETE)
+- ✅ ניקוי מטמון אחרי כל פעולת CRUD (UnifiedCacheManager + global data)
+- ✅ timing נכון (await + setTimeout)
 - ✅ תיקון wrapper functions (מניעת לולאות אינסופיות)
+- ✅ null safety בכל מקום
+- ✅ טעינת קבצים נדרשים (entity-details-api.js)
 - ✅ חווית משתמש אחידה
 
 **הכל מתועד ומוכן ליישום!** 🎯

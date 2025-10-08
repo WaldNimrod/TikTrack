@@ -356,23 +356,31 @@ function showEditCashFlowModal(cashFlowId) {
     return;
   }
 
-  // מילוי הטופס
-  const form = modal.querySelector('form');
-  if (form) {
-    form.reset();
-    clearEditValidationErrors();
-    
-    // מילוי השדות
-    form.querySelector('#editCashFlowId').value = cashFlow.id;
-    form.querySelector('#editCashFlowDate').value = cashFlow.date;
-    form.querySelector('#editCashFlowAmount').value = cashFlow.amount;
-    form.querySelector('#editCashFlowDescription').value = cashFlow.description || '';
-    form.querySelector('#editCashFlowAccountId').value = cashFlow.account_id;
-    form.querySelector('#editCashFlowCurrencyId').value = cashFlow.currency_id;
-    form.querySelector('#editCashFlowType').value = cashFlow.type;
-    form.querySelector('#editCashFlowSource').value = cashFlow.source || '';
-    form.querySelector('#editCashFlowExternalId').value = cashFlow.external_id || '';
+  // ניקוי ולידציה קודמת
+  if (typeof window.clearValidation === 'function') {
+    window.clearValidation('editCashFlowForm');
   }
+
+  // מילוי השדות - בדיקת קיום כל אלמנט
+  const setFieldValue = (fieldId, value) => {
+    const field = document.getElementById(fieldId);
+    if (field) {
+      field.value = value || '';
+    } else {
+      console.warn(`⚠️ שדה ${fieldId} לא נמצא במודל עריכה`);
+    }
+  };
+
+  setFieldValue('editCashFlowId', cashFlow.id);
+  setFieldValue('editCashFlowDate', cashFlow.date);
+  setFieldValue('editCashFlowAmount', cashFlow.amount);
+  setFieldValue('editCashFlowDescription', cashFlow.description);
+  setFieldValue('editCashFlowAccountId', cashFlow.trading_account_id); // ✅ שדה נכון
+  setFieldValue('editCashFlowCurrencyId', cashFlow.currency_id);
+  setFieldValue('editCashFlowType', cashFlow.type);
+  setFieldValue('editCashFlowSource', cashFlow.source);
+  setFieldValue('editCashFlowExternalId', cashFlow.external_id);
+  setFieldValue('editCashFlowUsdRate', cashFlow.usd_rate || 1.000000);
 
   // טעינת נתונים למודל
   loadAccountsForEditCashFlow();
@@ -623,13 +631,22 @@ async function deleteCashFlow(id) {
         console.log('✅ מטמון cash_flows נוקה אחרי מחיקה');
       }
 
-      // הצגת הודעת הצלחה
-      if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification('הצלחה', 'תזרים המזומנים נמחק בהצלחה', 4000, 'business');
+      // ניקוי global data
+      if (window.cashFlowsData) {
+        window.cashFlowsData = null;
+        console.log('✅ Global cashFlowsData נוקה');
       }
+
+      // המתנה קצרה לוידוא ניקוי מטמון
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       // טעינה מחדש של הנתונים
       await loadCashFlows();
+
+      // הצגת הודעת הצלחה אחרי הטעינה
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('הצלחה', 'תזרים המזומנים נמחק בהצלחה', 4000, 'business');
+      }
     } else {
       throw new Error(result.error || 'שגיאה לא ידועה');
     }

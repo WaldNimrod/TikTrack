@@ -591,4 +591,228 @@ window.dateUtils = {
   daysDifference,
   addDays,
   addMonths,
+  createDateWithTimezone,
+  translateDateRangeToDates,
 };
+
+// ===== TIMEZONE DATE CREATION =====
+/**
+ * יצירת תאריך עם timezone
+ * Create date with timezone support
+ * 
+ * @param {number} year - שנה
+ * @param {number} month - חודש (0-11)
+ * @param {number} day - יום
+ * @returns {Promise<string>} תאריך בפורמט YYYY-MM-DD
+ */
+async function createDateWithTimezone(year, month, day) {
+  // Load user preferences for timezone
+  let timezone = 'Asia/Jerusalem'; // Default timezone
+  
+  // Try to get timezone from preferences if available
+  if (typeof window.loadUserPreferences === 'function') {
+    try {
+      const preferences = await window.loadUserPreferences();
+      timezone = preferences?.timezone || 'Asia/Jerusalem';
+    } catch (error) {
+      console.warn('Could not load timezone from preferences, using default:', error);
+    }
+  }
+
+  // Creating date with timezone
+  const date = new Date(year, month, day);
+  const options = {
+    timeZone: timezone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  };
+
+  return date.toLocaleDateString('en-CA', options); // YYYY-MM-DD format
+}
+
+// ===== DATE RANGE TRANSLATION =====
+/**
+ * תרגום טווח תאריכים לתאריכים אמיתיים
+ * Translate date range text to actual start and end dates
+ * 
+ * Supports Hebrew date range labels like:
+ * - 'היום' (Today)
+ * - 'אתמול' (Yesterday)
+ * - 'שבוע אחרון' (Last week)
+ * - 'חודש אחרון' (Last month)
+ * - And many more...
+ * 
+ * @param {string|object} dateRange - טווח תאריכים (טקסט או אובייקט עם startDate ו-endDate)
+ * @returns {Promise<object>} אובייקט עם { startDate, endDate } בפורמט YYYY-MM-DD
+ */
+async function translateDateRangeToDates(dateRange) {
+  const today = new Date();
+  const todayStr = today.toISOString().split('T')[0]; // YYYY-MM-DD
+
+  let startDate = 'לא נבחר';
+  let endDate = 'לא נבחר';
+
+  if (typeof dateRange === 'string') {
+    switch (dateRange) {
+    case 'היום':
+      startDate = todayStr;
+      endDate = todayStr;
+      break;
+
+    case 'אתמול': {
+      const yesterday = new Date(today);
+      yesterday.setDate(today.getDate() - 1);
+      startDate = yesterday.toISOString().split('T')[0];
+      endDate = startDate;
+      break;
+    }
+
+    case 'שבוע אחרון': {
+      const weekAgoLast = new Date(today);
+      weekAgoLast.setDate(today.getDate() - 7);
+      startDate = weekAgoLast.toISOString().split('T')[0];
+      endDate = todayStr;
+      break;
+    }
+
+    case 'חודש אחרון': {
+      const monthAgo = new Date(today);
+      monthAgo.setMonth(today.getMonth() - 1);
+      startDate = monthAgo.toISOString().split('T')[0];
+      endDate = todayStr;
+      break;
+    }
+
+    case '3 חודשים אחרונים': {
+      const threeMonthsAgo = new Date(today);
+      threeMonthsAgo.setMonth(today.getMonth() - 3);
+      startDate = threeMonthsAgo.toISOString().split('T')[0];
+      endDate = todayStr;
+      break;
+    }
+
+    case '6 חודשים אחרונים': {
+      const sixMonthsAgo = new Date(today);
+      sixMonthsAgo.setMonth(today.getMonth() - 6);
+      startDate = sixMonthsAgo.toISOString().split('T')[0];
+      endDate = todayStr;
+      break;
+    }
+
+    case 'שנה אחרונה': {
+      const yearAgo = new Date(today);
+      yearAgo.setFullYear(today.getFullYear() - 1);
+      startDate = yearAgo.toISOString().split('T')[0];
+      endDate = todayStr;
+      break;
+    }
+
+    case 'השבוע': {
+      const startOfWeek = new Date(today);
+      const dayOfWeek = today.getDay();
+      // In Israel, the week starts on Sunday (0)
+      startOfWeek.setDate(today.getDate() - dayOfWeek);
+      startDate = startOfWeek.toISOString().split('T')[0];
+      endDate = todayStr;
+      break;
+    }
+
+    case 'שבוע': {
+      const weekAgo7 = new Date(today);
+      weekAgo7.setDate(today.getDate() - 7);
+      startDate = weekAgo7.toISOString().split('T')[0];
+      endDate = todayStr;
+      break;
+    }
+
+    case 'החודש': {
+      const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+      startDate = startOfMonth.toISOString().split('T')[0];
+      endDate = todayStr;
+      break;
+    }
+
+    case 'MTD': {
+      startDate = await createDateWithTimezone(today.getFullYear(), today.getMonth(), 1);
+      endDate = todayStr;
+      break;
+    }
+
+    case 'השנה': {
+      const startOfYear = new Date(today.getFullYear(), 0, 1);
+      startDate = startOfYear.toISOString().split('T')[0];
+      endDate = todayStr;
+      break;
+    }
+
+    case 'YTD': {
+      startDate = await createDateWithTimezone(today.getFullYear(), 0, 1);
+      endDate = todayStr;
+      break;
+    }
+
+    case '30 יום': {
+      const thirtyDaysAgo = new Date(today);
+      thirtyDaysAgo.setDate(today.getDate() - 30);
+      startDate = thirtyDaysAgo.toISOString().split('T')[0];
+      endDate = todayStr;
+      break;
+    }
+
+    case '60 יום': {
+      const sixtyDaysAgo = new Date(today);
+      sixtyDaysAgo.setDate(today.getDate() - 60);
+      startDate = sixtyDaysAgo.toISOString().split('T')[0];
+      endDate = todayStr;
+      break;
+    }
+
+    case '90 יום': {
+      const ninetyDaysAgo = new Date(today);
+      ninetyDaysAgo.setDate(today.getDate() - 90);
+      startDate = ninetyDaysAgo.toISOString().split('T')[0];
+      endDate = todayStr;
+      break;
+    }
+
+    case 'שנה': {
+      const oneYearAgo = new Date(today);
+      oneYearAgo.setFullYear(today.getFullYear() - 1);
+      startDate = oneYearAgo.toISOString().split('T')[0];
+      endDate = todayStr;
+      break;
+    }
+
+    case 'שנה קודמת':
+      startDate = await createDateWithTimezone(today.getFullYear() - 1, 0, 1);
+      endDate = await createDateWithTimezone(today.getFullYear() - 1, 11, 31);
+      break;
+
+    default:
+      // Attempting to extract dates from text
+      if (dateRange.includes(' - ')) {
+        const dates = dateRange.split(' - ');
+        startDate = dates[0] || 'לא נבחר';
+        endDate = dates[1] || 'לא נבחר';
+      } else if (dateRange.includes(' עד ')) {
+        const dates = dateRange.split(' עד ');
+        startDate = dates[0] || 'לא נבחר';
+        endDate = dates[1] || 'לא נבחר';
+      } else {
+        startDate = dateRange;
+        endDate = dateRange;
+      }
+      break;
+    }
+  } else if (dateRange && dateRange.startDate && dateRange.endDate) {
+    startDate = dateRange.startDate;
+    endDate = dateRange.endDate;
+  }
+
+  return { startDate, endDate };
+}
+
+// Export to global scope
+window.createDateWithTimezone = createDateWithTimezone;
+window.translateDateRangeToDates = translateDateRangeToDates;

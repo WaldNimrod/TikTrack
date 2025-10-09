@@ -152,18 +152,24 @@ async function addTrade() {
 
         const result = await response.json();
         
-        // 5. הצגת הודעת הצלחה
+        // 5. ניקוי מטמון trades
+        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+            await window.UnifiedCacheManager.remove('trades');
+            console.log('✅ מטמון trades נוקה אחרי הוספה');
+        }
+        
+        // 6. הצגת הודעת הצלחה
         if (typeof window.showSuccessNotification === 'function') {
-            window.showSuccessNotification('הצלחה', 'הטרייד נוסף בהצלחה');
+            window.showSuccessNotification('הצלחה', 'הטרייד נוסף בהצלחה', 3000, 'success');
         }
 
-        // 6. סגירת המודל
+        // 7. סגירת המודל
         const modal = bootstrap.Modal.getInstance(document.getElementById('addTradeModal'));
         if (modal) {
             modal.hide();
         }
 
-        // 7. רענון הטבלה
+        // 8. רענון הטבלה
         if (typeof window.loadTradesData === 'function') {
             await window.loadTradesData();
         }
@@ -795,8 +801,14 @@ class TradesController {
             const result = await response.json();
             console.log(`✅ Trade ${mode === 'add' ? 'added' : 'updated'} successfully:`, result);
             
+            // ניקוי מטמון trades
+            if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+                await window.UnifiedCacheManager.remove('trades');
+                console.log('✅ מטמון trades נוקה אחרי עדכון');
+            }
+            
             if (typeof window.showSuccessNotification === 'function') {
-                window.showSuccessNotification(`טרייד ${mode === 'add' ? 'נוסף' : 'עודכן'} בהצלחה`);
+                window.showSuccessNotification('הצלחה', `טרייד ${mode === 'add' ? 'נוסף' : 'עודכן'} בהצלחה`, 3000, 'success');
             }
             
             // סגירת המודל
@@ -833,10 +845,16 @@ class TradesController {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             
+            // ניקוי מטמון trades
+            if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+                await window.UnifiedCacheManager.remove('trades');
+                console.log('✅ מטמון trades נוקה אחרי מחיקה');
+            }
+            
             console.log(`✅ Trade ${tradeId} deleted successfully`);
             
             if (typeof window.showSuccessNotification === 'function') {
-                window.showSuccessNotification('טרייד נמחק בהצלחה');
+                window.showSuccessNotification('הצלחה', 'טרייד נמחק בהצלחה', 3000, 'success');
             }
             
             // רענון הנתונים
@@ -845,7 +863,7 @@ class TradesController {
         } catch (error) {
             console.error('❌ Error deleting trade:', error);
             if (typeof window.showErrorNotification === 'function') {
-                window.showErrorNotification('שגיאה במחיקת טרייד', error.message);
+                window.showErrorNotification('שגיאה', 'שגיאה במחיקת טרייד: ' + error.message, 5000, 'error');
             }
         }
     }

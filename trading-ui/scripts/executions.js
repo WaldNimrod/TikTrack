@@ -550,381 +550,139 @@ async function showEditExecutionModal(id) {
 /**
  * ולידציה של מזהה טרייד
  */
-function validateExecutionTradeId(input) {
-  const selectedValue = input.value.trim();
-  const errorElement = document.getElementById(input.id + 'Error');
-
-  if (!selectedValue) {
-    // סימון השדה כשגוי
-    input.classList.add('is-invalid');
-    if (errorElement) {
-      errorElement.textContent = 'בחירת טרייד או תכנון היא שדה חובה';
-      errorElement.style.display = 'block';
-    }
-    return false;
-  }
-
-  // בדיקה שהערך הוא מספר חיובי
-  const numId = parseInt(selectedValue);
-  if (isNaN(numId) || numId < 0) {
-    // סימון השדה כשגוי
-    input.classList.add('is-invalid');
-    if (errorElement) {
-      errorElement.textContent = 'מזהה טרייד חייב להיות מספר חיובי';
-      errorElement.style.display = 'block';
-    }
-    return false;
-  }
-
-  clearFieldError(input, errorElement);
-  return true;
+// ========================================
+// פונקציות ולידציה
+// ========================================
+/**
+ * ולידציה של טופס הוספת עסקה
+ * לפי STANDARD_VALIDATION_GUIDE.md
+ */
+function validateExecutionForm() {
+    return window.validateEntityForm('addExecutionForm', [
+        { id: 'addExecutionTradeId', name: 'טרייד/תכנון' },
+        { 
+            id: 'addExecutionType', 
+            name: 'סוג עסקה',
+            validation: (value) => {
+                if (!['buy', 'sale'].includes(value)) {
+                    return 'סוג עסקה לא תקין';
+                }
+                return true;
+            }
+        },
+        { 
+            id: 'addExecutionQuantity', 
+            name: 'כמות',
+            validation: (value) => {
+                const num = parseInt(value);
+                if (isNaN(num)) return 'כמות חייבת להיות מספר';
+                if (num <= 0) return 'כמות חייבת להיות חיובית';
+                if (num > 1000000) return 'כמות גבוהה מדי (מקסימום 1,000,000)';
+                return true;
+            }
+        },
+        { 
+            id: 'addExecutionPrice', 
+            name: 'מחיר',
+            validation: (value) => {
+                const num = parseFloat(value);
+                if (isNaN(num)) return 'מחיר חייב להיות מספר';
+                if (num <= 0) return 'מחיר חייב להיות חיובי';
+                if (num > 1000000) return 'מחיר גבוה מדי (מקסימום 1,000,000)';
+                return true;
+            }
+        },
+        { id: 'addExecutionDate', name: 'תאריך עסקה' },
+        { 
+            id: 'addExecutionCommission', 
+            name: 'עמלה',
+            validation: (value) => {
+                if (value && value !== '') {
+                    const num = parseFloat(value);
+                    if (isNaN(num)) return 'עמלה חייבת להיות מספר';
+                    if (num < 0) return 'עמלה לא יכולה להיות שלילית';
+                    if (num > 10000) return 'עמלה גבוהה מדי (מקסימום 10,000)';
+                }
+                return true;
+            }
+        },
+        { 
+            id: 'addExecutionNotes', 
+            name: 'הערות',
+            validation: (value) => {
+                if (value && value.length > 1000) {
+                    return 'הערות ארוכות מדי (מקסימום 1,000 תווים)';
+                }
+                return true;
+            }
+        }
+    ]);
 }
 
 /**
- * ולידציה של כמות
+ * ולידציה של טופס עריכת עסקה
+ * לפי STANDARD_VALIDATION_GUIDE.md
  */
-function validateExecutionQuantity(input) {
-  const quantity = input.value.trim();
-  const errorElement = document.getElementById(input.id + 'Error');
-
-  if (!quantity) {
-    return false;
-  }
-
-  const numQuantity = parseFloat(quantity);
-  if (isNaN(numQuantity) || numQuantity <= 0) {
-    return false;
-  }
-
-  clearFieldError(input, errorElement);
-  return true;
-}
-
-/**
- * ולידציה של מחיר
- */
-function validateExecutionPrice(input) {
-  const price = input.value.trim();
-  const errorElement = document.getElementById(input.id + 'Error');
-
-  if (!price) {
-    return false;
-  }
-
-  const numPrice = parseFloat(price);
-  if (isNaN(numPrice) || numPrice <= 0) {
-    return false;
-  }
-
-  clearFieldError(input, errorElement);
-  return true;
-}
-
-/**
- * ולידציה של עמלה (fee)
- */
-function validateExecutionCommission(input) {
-  const commission = input.value.trim();
-  const errorElement = document.getElementById(input.id + 'Error');
-
-  if (commission) {
-    const numCommission = parseFloat(commission);
-    if (isNaN(numCommission) || numCommission < 0) {
-      if (window.showValidationWarning) {
-        window.showValidationWarning(input.id, 'עמלה חייבת להיות מספר חיובי או אפס (שדה fee אופציונלי)');
-      }
-      return false;
-    }
-  }
-
-  clearFieldError(input, errorElement);
-  return true;
-}
-
-/**
- * ולידציה של מקור (source)
- */
-function validateExecutionSource(input) {
-  const source = input.value.trim();
-  const errorElement = document.getElementById(input.id + 'Error');
-
-  if (source && source.length > 100) {
-    if (window.showValidationWarning) {
-      window.showValidationWarning(input.id, 'מקור ארוך מדי (מקסימום 100 תווים)');
-    }
-    return false;
-  }
-
-  clearFieldError(input, errorElement);
-  return true;
-}
-
-/**
- * ולידציה של הערות (notes)
- */
-function validateExecutionNotes(input) {
-  const notes = input.value.trim();
-  const errorElement = document.getElementById(input.id + 'Error');
-
-  if (notes && notes.length > 500) {
-    if (window.showValidationWarning) {
-      window.showValidationWarning(input.id, 'הערות ארוכות מדי (מקסימום 500 תווים לפי VARCHAR(500))');
-    }
-    return false;
-  }
-
-  clearFieldError(input, errorElement);
-  return true;
-}
-
-/**
- * ולידציה של מזהה חיצוני (external_id)
- */
-function validateExecutionExternalId(input) {
-  const externalId = input.value.trim();
-  const errorElement = document.getElementById(input.id + 'Error');
-
-  if (externalId && externalId.length > 100) {
-    if (window.showValidationWarning) {
-      window.showValidationWarning(input.id, 'מזהה חיצוני ארוך מדי (מקסימום 100 תווים לפי VARCHAR(100))');
-    }
-    return false;
-  }
-
-  clearFieldError(input, errorElement);
-  return true;
-}
-
-/**
- * ולידציה של תאריך (date)
- */
-function validateExecutionDate(input) {
-  const date = input.value.trim();
-  const errorElement = document.getElementById(input.id + 'Error');
-
-  if (!date) {
-    if (window.showValidationWarning) {
-      window.showValidationWarning(input.id, 'תאריך עסקה הוא שדה חובה (לפי אילוץ NOT NULL)');
-    }
-    return false;
-  }
-
-  const dateObj = new Date(date);
-  if (isNaN(dateObj.getTime())) {
-    if (window.showValidationWarning) {
-      window.showValidationWarning(input.id, 'תאריך לא תקין');
-    }
-    return false;
-  }
-
-  const today = new Date();
-  const maxDate = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
-
-  if (dateObj > maxDate) {
-    if (window.showValidationWarning) {
-      window.showValidationWarning(input.id, 'תאריך לא יכול להיות יותר משנה קדימה');
-    }
-    return false;
-  }
-
-  const minDate = new Date(2000, 0, 1);
-  if (dateObj < minDate) {
-    if (window.showValidationWarning) {
-      window.showValidationWarning(input.id, 'תאריך לא יכול להיות לפני שנת 2000');
-    }
-    return false;
-  }
-
-  clearFieldError(input, errorElement);
-  return true;
-}
-
-/**
- * ולידציה של סוג עסקה (action)
- */
-function validateExecutionType(input) {
-  const type = input.value.trim();
-  const errorElement = document.getElementById(input.id + 'Error');
-
-  if (!type) {
-    return false;
-  }
-
-  // בדיקה שהערך הוא אחד מהערכים המותרים בבסיס הנתונים (ENUM: buy, sale)
-  if (type !== 'buy' && type !== 'sale') {
-    return false;
-  }
-
-  clearFieldError(input, errorElement);
-  return true;
-}
-
-/**
- * הצגת שגיאת שדה
- */
-// showFieldError() - זמינה גלובלית מ-ui-utils.js כ-showValidationWarning
-
-/**
- * ניקוי שגיאת שדה
- */
-function clearFieldError(input, errorElement) {
-  input.classList.remove('is-invalid');
-  if (errorElement) {
-    errorElement.textContent = '';
-    errorElement.style.display = 'none';
-  }
-}
-
-/**
- * ניקוי כל שגיאות הולידציה
- */
-function clearExecutionValidationErrors() {
-  const form = document.getElementById('addExecutionForm');
-  if (form) {
-    const inputs = form.querySelectorAll('.is-invalid');
-    inputs.forEach(input => {
-      input.classList.remove('is-invalid');
-      const errorElement = document.getElementById(input.id + 'Error');
-      if (errorElement) {
-        errorElement.textContent = '';
-        errorElement.style.display = 'none';
-      }
-    });
-  }
-
-  const editForm = document.getElementById('editExecutionForm');
-  if (editForm) {
-    const inputs = editForm.querySelectorAll('.is-invalid');
-    inputs.forEach(input => {
-      input.classList.remove('is-invalid');
-      const errorElement = document.getElementById(input.id + 'Error');
-      if (errorElement) {
-        errorElement.textContent = '';
-        errorElement.style.display = 'none';
-      }
-    });
-  }
-}
-
-/**
- * וולידציה מקיפה של טופס עסקה
- * @param {string} mode - 'add' או 'edit'
- * @returns {boolean} true אם הטופס תקין, false אחרת
- */
-function validateCompleteExecutionForm(mode) {
-  const prefix = mode === 'add' ? 'add' : 'edit';
-  let isValid = true;
-  const errors = [];
-
-  // וולידציה של מזהה טרייד (trade_id - שדה חובה)
-  const tradeIdField = document.getElementById(`${prefix}ExecutionTradeId`);
-  if (!validateExecutionTradeId(tradeIdField)) {
-    isValid = false;
-    errors.push('בחירת טרייד או תכנון היא שדה חובה');
-  }
-
-  // וולידציה של סוג עסקה (action - שדה חובה)
-  const typeField = document.getElementById(`${prefix}ExecutionType`);
-  if (!validateExecutionType(typeField)) {
-    isValid = false;
-    errors.push('סוג עסקה הוא שדה חובה');
-  }
-
-  // וולידציה של כמות (quantity - שדה חובה)
-  const quantityField = document.getElementById(`${prefix}ExecutionQuantity`);
-  if (!validateExecutionQuantity(quantityField)) {
-    isValid = false;
-    errors.push('כמות היא שדה חובה');
-  } else {
-    // בדיקה נוספת - כמות לא יכולה להיות גדולה מדי
-    const quantity = parseInt(quantityField.value);
-    if (quantity > 1000000) {
-      isValid = false;
-      errors.push('כמות גבוהה מדי (מקסימום 1,000,000)');
-    }
-  }
-
-  // וולידציה של מחיר (price - שדה חובה)
-  const priceField = document.getElementById(`${prefix}ExecutionPrice`);
-  if (!validateExecutionPrice(priceField)) {
-    isValid = false;
-    errors.push('מחיר הוא שדה חובה');
-  } else {
-    // בדיקה נוספת - מחיר לא יכול להיות גבוה מדי
-    const price = parseFloat(priceField.value);
-    if (price > 1000000) {
-      isValid = false;
-      errors.push('מחיר גבוה מדי (מקסימום 1,000,000)');
-    }
-  }
-
-  // וולידציה של תאריך (date - שדה חובה לפי האילוצים בבסיס הנתונים)
-  const dateField = document.getElementById(`${prefix}ExecutionDate`);
-  if (!validateExecutionDate(dateField)) {
-    isValid = false;
-    errors.push('תאריך עסקה הוא שדה חובה');
-  }
-
-  // וולידציה של עמלה (fee - אופציונלי)
-  const commissionField = document.getElementById(`${prefix}ExecutionCommission`);
-  if (commissionField && commissionField.value) {
-    if (!validateExecutionCommission(commissionField)) {
-      isValid = false;
-      errors.push('עמלה לא תקינה');
-    } else {
-      // בדיקה נוספת - עמלה לא יכולה להיות גבוהה מדי
-      const commission = parseFloat(commissionField.value);
-      if (commission > 10000) {
-        isValid = false;
-        errors.push('עמלה גבוהה מדי (מקסימום 10,000)');
-      }
-    }
-  }
-
-  // וולידציה של הערות (notes - אופציונלי)
-  const notesField = document.getElementById(`${prefix}ExecutionNotes`);
-  if (notesField && notesField.value) {
-    if (!validateExecutionNotes(notesField)) {
-      isValid = false;
-      errors.push('הערות לא תקינות');
-    }
-  }
-
-  // וולידציה של מקור (source - אופציונלי)
-  const sourceField = document.getElementById(`${prefix}ExecutionSource`);
-  if (sourceField && sourceField.value) {
-    if (!validateExecutionSource(sourceField)) {
-      isValid = false;
-      errors.push('מקור לא תקין');
-    }
-  }
-
-  // וולידציה של מזהה חיצוני (external_id - אופציונלי, VARCHAR(100))
-  const externalIdField = document.getElementById(`${prefix}ExecutionExternalId`);
-  if (externalIdField && externalIdField.value) {
-    if (!validateExecutionExternalId(externalIdField)) {
-      isValid = false;
-      errors.push('מזהה חיצוני לא תקין');
-    }
-  }
-
-  // הצגת הודעת שגיאה מפורטת אם יש שגיאות
-  if (!isValid && errors.length > 0) {
-    const errorMessage = errors.join(', ');
-    // Validation errors check
-    // window.showErrorNotification exists check
-    // window.showValidationWarning exists check
-
-    // שימוש ישיר ב-showErrorNotification עם פרטים מפורטים
-    if (window.showErrorNotification) {
-      // Calling showErrorNotification with detailed error message
-      window.showErrorNotification('שגיאות בטופס', `יש לתקן את השגיאות הבאות: ${errorMessage}`);
-    } else {
-      handleSystemError(new Error('showErrorNotification not available'), 'מערכת התראות');
-    }
-  }
-
-  return isValid;
+function validateEditExecutionForm() {
+    return window.validateEntityForm('editExecutionForm', [
+        { id: 'editExecutionTradeId', name: 'טרייד/תכנון' },
+        { 
+            id: 'editExecutionType', 
+            name: 'סוג עסקה',
+            validation: (value) => {
+                if (!['buy', 'sale'].includes(value)) {
+                    return 'סוג עסקה לא תקין';
+                }
+                return true;
+            }
+        },
+        { 
+            id: 'editExecutionQuantity', 
+            name: 'כמות',
+            validation: (value) => {
+                const num = parseInt(value);
+                if (isNaN(num)) return 'כמות חייבת להיות מספר';
+                if (num <= 0) return 'כמות חייבת להיות חיובית';
+                if (num > 1000000) return 'כמות גבוהה מדי (מקסימום 1,000,000)';
+                return true;
+            }
+        },
+        { 
+            id: 'editExecutionPrice', 
+            name: 'מחיר',
+            validation: (value) => {
+                const num = parseFloat(value);
+                if (isNaN(num)) return 'מחיר חייב להיות מספר';
+                if (num <= 0) return 'מחיר חייב להיות חיובי';
+                if (num > 1000000) return 'מחיר גבוה מדי (מקסימום 1,000,000)';
+                return true;
+            }
+        },
+        { id: 'editExecutionDate', name: 'תאריך עסקה' },
+        { 
+            id: 'editExecutionCommission', 
+            name: 'עמלה',
+            validation: (value) => {
+                if (value && value !== '') {
+                    const num = parseFloat(value);
+                    if (isNaN(num)) return 'עמלה חייבת להיות מספר';
+                    if (num < 0) return 'עמלה לא יכולה להיות שלילית';
+                    if (num > 10000) return 'עמלה גבוהה מדי (מקסימום 10,000)';
+                }
+                return true;
+            }
+        },
+        { 
+            id: 'editExecutionNotes', 
+            name: 'הערות',
+            validation: (value) => {
+                if (value && value.length > 1000) {
+                    return 'הערות ארוכות מדי (מקסימום 1,000 תווים)';
+                }
+                return true;
+            }
+        }
+    ]);
 }
 
 
@@ -935,291 +693,164 @@ function validateCompleteExecutionForm(mode) {
 /**
  * שמירת עסקה חדשה
  */
+/**
+ * שמירת עסקה חדשה
+ * לפי STANDARD_VALIDATION_GUIDE.md
+ */
 async function saveExecution() {
-
-
-  // ולידציה
-  const ticker = document.getElementById('executionTicker').value;
-  const type = document.getElementById('executionType').value;
-  const quantity = document.getElementById('executionQuantity').value;
-  const price = document.getElementById('executionPrice').value;
-  const executionDate = document.getElementById('executionDate').value;
-  const account = document.getElementById('executionAccount').value;
-
-  // בדיקת ולידציה מקיפה
-  if (!validateCompleteExecutionForm('add')) {
-    return; // הפונקציה validateCompleteExecutionForm תציג את ההודעות
-  }
-
-  // בדיקת ערך action
-  if (!type || type !== 'buy' && type !== 'sale') {
-    handleValidationError('addExecutionType', 'יש לבחור פעולה תקינה (קניה או מכירה)');
-    return;
-  }
-
-  // עיבוד ערך trade_id - עכשיו זה מספר ישיר
-  let tradeId = null;
-  if (tradeIdValue) {
-    tradeId = parseInt(tradeIdValue);
-    if (isNaN(tradeId) || tradeId < 0) {
-      handleValidationError('addExecutionTradeId', 'מזהה טרייד לא תקין');
-      return;
-    }
-  }
-
   try {
+    // 1. ולידציה
+    if (!validateExecutionForm()) {
+        return;
+    }
+
+    // 2. בניית אובייקט נתונים
     const executionData = {
-      trade_id: tradeId,
-      action: type,
-      quantity: parseInt(quantity),
-      price: parseFloat(price),
-      date: executionDate ? new Date(executionDate).toISOString() : null,
-      fee: commission ? parseFloat(commission) : null,
-      source: 'manual',
-      notes: notes || null,
+        trade_id: parseInt(document.getElementById('addExecutionTradeId').value),
+        action: document.getElementById('addExecutionType').value,
+        quantity: parseInt(document.getElementById('addExecutionQuantity').value),
+        price: parseFloat(document.getElementById('addExecutionPrice').value),
+        date: document.getElementById('addExecutionDate').value ? 
+              new Date(document.getElementById('addExecutionDate').value).toISOString() : null,
+        fee: document.getElementById('addExecutionCommission').value ? 
+             parseFloat(document.getElementById('addExecutionCommission').value) : null,
+        source: document.getElementById('addExecutionSource')?.value || 'manual',
+        notes: document.getElementById('addExecutionNotes')?.value || null,
     };
 
-
+    // 3. שליחה לשרת
     const response = await fetch('/api/executions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(executionData),
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(executionData),
     });
 
-    if (response.ok) {
-      await response.json();
-
-
-      // סגירת המודל
-      const modal = bootstrap.Modal.getInstance(document.getElementById('addExecutionModal'));
-      modal.hide();
-
-      // הצגת הודעת הצלחה
-      // Showing success notification for save
-      // window.showSuccessNotification exists check
-
-      if (typeof window.showSuccessNotification === 'function') {
-        // Calling showSuccessNotification
-        window.showSuccessNotification('הצלחה', 'עסקה חדשה נוספה בהצלחה למערכת', 4000, 'business');
-      } else {
-        handleSystemError(new Error('showSuccessNotification not available'), 'מערכת התראות');
-      }
-
-      // רענון הנתונים
-      await loadExecutionsData();
-
-    } else {
-      const result = await response.json();
-      handleSaveError(new Error(result.error), 'שמירת עסקה');
-
-      // טיפול בשגיאות וולידציה מהשרת
-
-      if (result.error && result.error.message) {
-        const serverMessage = result.error.message;
-
-        // אם זו שגיאת וולידציה, נפרק אותה להודעות ספציפיות
-        if (serverMessage.includes('validation failed')) {
-          const validationErrors = serverMessage.replace('Execution validation failed: ', '').split('; ');
-
-          // הצגת כל שגיאה בנפרד
-          validationErrors.forEach(error => {
-            let fieldError = error;
-            let fieldName = '';
-
-            // תרגום שגיאות ספציפיות
-            if (error.includes('Field \'action\' has invalid value')) {
-              fieldError = 'סוג עסקה לא תקין - יש לבחור ערך מהרשימה';
-              fieldName = 'addExecutionType';
-            } else if (error.includes('Field \'source\' has invalid value')) {
-              fieldError = 'מקור לא תקין - יש לבחור ערך מהרשימה';
-              fieldName = 'addExecutionSource';
-            } else if (error.includes('Field \'quantity\' is out of range')) {
-              fieldError = 'כמות חייבת להיות חיובית';
-              fieldName = 'addExecutionQuantity';
-            } else if (error.includes('Field \'price\' is out of range')) {
-              fieldError = 'מחיר חייב להיות חיובי';
-              fieldName = 'addExecutionPrice';
-            } else if (error.includes('Field \'date\' is out of range')) {
-              fieldError = 'תאריך עסקה חייב להיות אחרי תאריך פתיחת הטרייד';
-              fieldName = 'executionDate';
-            } else if (error.includes('Field \'trade_id\' references non-existent record')) {
-              fieldError = 'טרייד לא קיים במערכת';
-              fieldName = 'addExecutionTradeId';
+    // 4. טיפול בתגובה
+    if (!response.ok) {
+        const errorData = await response.json();
+        
+        // שגיאת ולידציה (HTTP 400)
+        if (response.status === 400) {
+            if (typeof window.showSimpleErrorNotification === 'function') {
+                window.showSimpleErrorNotification('שגיאת ולידציה', errorData.message || 'נתונים לא תקינים');
             }
-
-            // שימוש במערכת ההתראות המובנת
-            // Field validation error (add) check
-            // window.showValidationWarning exists (add) check
-
-            if (fieldName && window.showValidationWarning) {
-              // Calling showValidationWarning (add)
-              window.showValidationWarning(fieldName, fieldError);
-            } else {
-              // Using showErrorNotification as fallback (add)
-              window.showErrorNotification('שגיאת וולידציה', fieldError);
-            }
-          });
-        } else {
-          // שגיאה כללית
-          window.showErrorNotification('שגיאה בשמירה', serverMessage);
+            return;
         }
-      } else {
-        // הצגת הודעת שגיאה כללית
-        window.showErrorNotification('שגיאה בשמירה', 'שגיאה בשמירת עסקה - בדוק את הנתונים שהוזנו');
-      }
+        
+        // שגיאת מערכת אחרת
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    
+    // 5. הצגת הודעת הצלחה
+    if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('הצלחה', 'עסקה נוספה בהצלחה');
+    }
+
+    // 6. סגירת המודל
+    const modal = bootstrap.Modal.getInstance(document.getElementById('addExecutionModal'));
+    if (modal) {
+        modal.hide();
+    }
+
+
+    // ניקוי מטמון executions
+    if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+        await window.UnifiedCacheManager.remove('executions');
+        console.log('✅ מטמון executions נוקה אחרי הוספה');
+    }
+    // 7. רענון הטבלה
+    if (typeof window.loadExecutionsData === 'function') {
+        await window.loadExecutionsData();
     }
 
   } catch (error) {
-    handleSaveError(error, 'שמירת עסקה');
+    console.error('Error saving execution:', error);
+    if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification('שגיאה בשמירת עסקה', error.message);
+    }
   }
 }
 
 /**
  * עדכון עסקה קיימת
+ * לפי STANDARD_VALIDATION_GUIDE.md
  */
 async function updateExecution() {
-
-
-  const id = document.getElementById('editExecutionId').value;
-  const tradeIdValue = document.getElementById('editExecutionTradeId').value;
-  const type = document.getElementById('editExecutionType').value;
-  const quantity = document.getElementById('editExecutionQuantity').value;
-  const price = document.getElementById('editExecutionPrice').value;
-  const executionDate = document.getElementById('editExecutionDate').value;
-  const commission = document.getElementById('editExecutionCommission').value;
-  const notes = document.getElementById('editExecutionNotes').value.trim();
-
-  // בדיקת ולידציה
-  if (!validateCompleteExecutionForm('edit')) {
-    handleValidationError('editExecutionForm', 'יש לתקן את השגיאות בטופס');
-    return;
-  }
-
-  // בדיקת ערך action
-  if (!type || type !== 'buy' && type !== 'sale') {
-    handleValidationError('editExecutionType', 'יש לבחור פעולה תקינה (קניה או מכירה)');
-    return;
-  }
-
-  // עיבוד ערך trade_id - עכשיו זה מספר ישיר
-  let tradeId = null;
-  if (tradeIdValue) {
-    tradeId = parseInt(tradeIdValue);
-    if (isNaN(tradeId) || tradeId < 0) {
-      handleValidationError('editExecutionTradeId', 'מזהה טרייד לא תקין');
-      return;
-    }
-  }
-
   try {
-    const source = document.getElementById('editExecutionSource')?.value || 'manual';
+    // 1. ולידציה
+    if (!validateEditExecutionForm()) {
+        return;
+    }
 
+    // 2. בניית אובייקט נתונים
+    const id = document.getElementById('editExecutionId').value;
     const executionData = {
-      trade_id: tradeId,
-      action: type,
-      quantity: parseInt(quantity),
-      price: parseFloat(price),
-      date: executionDate ? new Date(executionDate).toISOString() : null,
-      fee: commission ? parseFloat(commission) : null,
-      source,
-      notes: notes || null,
+        trade_id: parseInt(document.getElementById('editExecutionTradeId').value),
+        action: document.getElementById('editExecutionType').value,
+        quantity: parseInt(document.getElementById('editExecutionQuantity').value),
+        price: parseFloat(document.getElementById('editExecutionPrice').value),
+        date: document.getElementById('editExecutionDate').value ? 
+              new Date(document.getElementById('editExecutionDate').value).toISOString() : null,
+        fee: document.getElementById('editExecutionCommission').value ? 
+             parseFloat(document.getElementById('editExecutionCommission').value) : null,
+        source: document.getElementById('editExecutionSource')?.value || 'manual',
+        notes: document.getElementById('editExecutionNotes')?.value || null,
     };
 
-
+    // 3. שליחה לשרת
     const response = await fetch(`/api/executions/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(executionData),
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(executionData),
     });
 
-    if (response.ok) {
-      await response.json();
-
-
-      // סגירת המודל
-      const modal = bootstrap.Modal.getInstance(document.getElementById('editExecutionModal'));
-      modal.hide();
-
-      // הצגת הודעת הצלחה
-      // Showing success notification for update
-      // window.showSuccessNotification exists check
-
-      if (typeof window.showSuccessNotification === 'function') {
-        // Calling showSuccessNotification
-        window.showSuccessNotification('הצלחה', 'עסקה עודכנה בהצלחה במערכת', 4000, 'business');
-      } else {
-        handleSystemError(new Error('showSuccessNotification not available'), 'מערכת התראות');
-      }
-
-      // רענון הנתונים
-      await loadExecutionsData();
-
-    } else {
-      const result = await response.json();
-      handleSaveError(new Error(result.error), 'עדכון עסקה');
-
-      // טיפול בשגיאות וולידציה מהשרת
-      if (result.error && result.error.message) {
-        const serverMessage = result.error.message;
-
-        // אם זו שגיאת וולידציה, נפרק אותה להודעות ספציפיות
-        if (serverMessage.includes('validation failed')) {
-          const validationErrors = serverMessage.replace('Execution validation failed: ', '').split('; ');
-
-          // הצגת כל שגיאה בנפרד
-          validationErrors.forEach(error => {
-            let fieldError = error;
-            let fieldName = '';
-
-            // תרגום שגיאות ספציפיות
-            if (error.includes('Field \'action\' has invalid value')) {
-              fieldError = 'סוג עסקה לא תקין - יש לבחור ערך מהרשימה';
-              fieldName = 'editExecutionType';
-            } else if (error.includes('Field \'source\' has invalid value')) {
-              fieldError = 'מקור לא תקין - יש לבחור ערך מהרשימה';
-              fieldName = 'editExecutionSource';
-            } else if (error.includes('Field \'quantity\' is out of range')) {
-              fieldError = 'כמות חייבת להיות חיובית';
-              fieldName = 'editExecutionQuantity';
-            } else if (error.includes('Field \'price\' is out of range')) {
-              fieldError = 'מחיר חייב להיות חיובי';
-              fieldName = 'editExecutionPrice';
-            } else if (error.includes('Field \'date\' is out of range')) {
-              fieldError = 'תאריך עסקה חייב להיות אחרי תאריך פתיחת הטרייד';
-              fieldName = 'editExecutionDate';
-            } else if (error.includes('Field \'trade_id\' references non-existent record')) {
-              fieldError = 'טרייד לא קיים במערכת';
-              fieldName = 'editExecutionTradeId';
+    // 4. טיפול בתגובה
+    if (!response.ok) {
+        const errorData = await response.json();
+        
+        // שגיאת ולידציה (HTTP 400)
+        if (response.status === 400) {
+            if (typeof window.showSimpleErrorNotification === 'function') {
+                window.showSimpleErrorNotification('שגיאת ולידציה', errorData.message || 'נתונים לא תקינים');
             }
-
-            // שימוש במערכת ההתראות המובנת
-            // Field validation error (edit) check
-            // window.showValidationWarning exists (edit) check
-
-            if (fieldName && window.showValidationWarning) {
-              // Calling showValidationWarning (edit)
-              window.showValidationWarning(fieldName, fieldError);
-            } else {
-              // Using showErrorNotification as fallback (edit)
-              window.showErrorNotification('שגיאת וולידציה', fieldError);
-            }
-          });
-        } else {
-          // שגיאה כללית
-          window.showErrorNotification('שגיאה בעדכון', serverMessage);
+            return;
         }
-      } else {
-        // הצגת הודעת שגיאה כללית
-        window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון עסקה - בדוק את הנתונים שהוזנו');
-      }
+        
+        // שגיאת מערכת אחרת
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    
+    // 5. הצגת הודעת הצלחה
+    if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('הצלחה', 'עסקה עודכנה בהצלחה');
+    }
+
+    // 6. סגירת המודל
+    const modal = bootstrap.Modal.getInstance(document.getElementById('editExecutionModal'));
+    if (modal) {
+        modal.hide();
+    }
+
+    // 7. רענון הטבלה
+
+    // ניקוי מטמון executions
+    if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+        await window.UnifiedCacheManager.remove('executions');
+        console.log('✅ מטמון executions נוקה אחרי עדכון');
+    }
+    if (typeof window.loadExecutionsData === 'function') {
+        await window.loadExecutionsData();
     }
 
   } catch (error) {
-    handleSaveError(error, 'עדכון עסקה');
+    console.error('Error updating execution:', error);
+    if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification('שגיאה בעדכון עסקה', error.message);
+    }
   }
 }
 
@@ -1247,6 +878,12 @@ async function confirmDeleteExecution(_id) {
     // DELETE response status
 
     if (response.ok) {
+
+      // ניקוי מטמון executions
+      if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+        await window.UnifiedCacheManager.remove('executions');
+        console.log('✅ מטמון executions נוקה אחרי מחיקה');
+      }
 
 
       // סגירת המודל - לא נדרש כי אין מודל
@@ -1793,22 +1430,16 @@ window.deleteExecution = deleteExecution;
 window.showAddExecutionModal = showAddExecutionModal;
 window.showEditExecutionModal = showEditExecutionModal;
 // window.showDeleteExecutionModal = showDeleteExecutionModal; // הוסר - שימוש במערכת הגלובלית
+// Export validation functions
+window.validateExecutionForm = validateExecutionForm;
+window.validateEditExecutionForm = validateEditExecutionForm;
+
+// Export save/update functions
 window.saveExecution = saveExecution;
 window.updateExecution = updateExecution;
 window.confirmDeleteExecution = confirmDeleteExecution;
 
-// פונקציות ולידציה
-window.validateExecutionTradeId = validateExecutionTradeId;
-window.validateExecutionQuantity = validateExecutionQuantity;
-window.validateExecutionPrice = validateExecutionPrice;
-window.validateExecutionCommission = validateExecutionCommission;
-window.validateExecutionType = validateExecutionType;
-window.validateExecutionSource = validateExecutionSource;
-window.validateExecutionNotes = validateExecutionNotes;
-
-
-window.validateExecutionExternalId = validateExecutionExternalId;
-window.validateExecutionDate = validateExecutionDate;
+// Old validation functions removed - now using validateExecutionForm() and validateEditExecutionForm()
 
 // פונקציות מודל פריטים מקושרים
 window.showExecutionLinkedItemsModal = showExecutionLinkedItemsModal;

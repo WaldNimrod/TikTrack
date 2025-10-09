@@ -1526,6 +1526,12 @@ async function saveAlert() {
 
     // 11. רענון הטבלה
     if (typeof window.loadAlertsData === 'function') {
+
+      // ניקוי מטמון alerts
+      if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+        await window.UnifiedCacheManager.remove('alerts');
+        console.log('✅ מטמון alerts נוקה');
+      }
       await window.loadAlertsData();
     }
 
@@ -1953,6 +1959,12 @@ async function updateAlert() {
         await window.centralRefresh.showSuccessAndRefresh('alerts', 'התראה עודכנה בהצלחה!');
       } else {
         // Fallback למערכת הישנה
+
+      // ניקוי מטמון alerts
+      if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+        await window.UnifiedCacheManager.remove('alerts');
+        console.log('✅ מטמון alerts נוקה');
+      }
         // הצגת הודעה
         if (window.showSuccessNotification) {
           window.showSuccessNotification('הצלחה', 'התראה עודכנה בהצלחה!');

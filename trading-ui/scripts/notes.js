@@ -1145,6 +1145,12 @@ async function saveNote() {
 
     const result = await response.json();
 
+      // ניקוי מטמון notes
+      if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+        await window.UnifiedCacheManager.remove('notes');
+        console.log('✅ מטמון notes נוקה אחרי שמירה');
+      }
+
     if (response.ok && result.status === 'success') {
       window.showSuccessNotification('הצלחה', 'הערה נשמרה בהצלחה!');
 
@@ -1343,6 +1349,12 @@ async function confirmDeleteNote(noteId) {
 async function deleteNoteFromServer(noteId) {
   const maxRetries = 3;
   let retryCount = 0;
+
+        // ניקוי מטמון notes
+        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+          await window.UnifiedCacheManager.remove('notes');
+          console.log('✅ מטמון notes נוקה אחרי מחיקה');
+        }
 
   while (retryCount < maxRetries) {
     try {

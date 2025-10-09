@@ -617,6 +617,11 @@ async function handleTickerSaveSuccess(symbol) {
   }
 
   const modal = bootstrap.Modal.getInstance(document.getElementById('addTickerModal'));
+  // ניקוי מטמון tickers
+  if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+    await window.UnifiedCacheManager.remove('tickers');
+    console.log('✅ מטמון tickers נוקה אחרי שמירה');
+  }
   modal?.hide();
 
   await loadTickersData();
@@ -816,6 +821,11 @@ async function performTickerUpdateToServer(id, tickerData) {
  * טיפול בהצלחת עדכון טיקר
  */
 async function handleTickerUpdateSuccess(symbol) {
+  // ניקוי מטמון tickers
+  if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+    await window.UnifiedCacheManager.remove('tickers');
+    console.log('✅ מטמון tickers נוקה אחרי עדכון');
+  }
   const modal = bootstrap.Modal.getInstance(document.getElementById('editTickerModal'));
   modal?.hide();
 

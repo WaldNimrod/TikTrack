@@ -32,22 +32,5 @@ class CashFlow(BaseModel):
                 result[c.name] = value.strftime('%Y-%m-%d') if value else None
             else:
                 result[c.name] = value
-        
-        # Add related account information
-        if hasattr(self, 'account') and self.account:
-            result['account'] = {
-                'id': self.account.id,
-                'name': self.account.name,
-                'type': self.account.type if hasattr(self.account, 'type') else None,
-                'status': self.account.status if hasattr(self.account, 'status') else None,
-                'balance': float(self.account.balance) if hasattr(self.account, 'balance') and self.account.balance is not None else None
-            }
-            result['account_name'] = self.account.name
-        
-        # Add currency information
-        if hasattr(self, 'currency') and self.currency:
-            result['currency_symbol'] = self.currency.symbol
-            result['currency_name'] = self.currency.name
-        
         return result
 

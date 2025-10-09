@@ -41,24 +41,48 @@ base_api = BaseEntityAPI('cash_flows', cash_flow_service, 'cash_flows')
 @api_endpoint(cache_ttl=60, rate_limit=60)
 @handle_database_session()
 def get_cash_flows():
-    """Get all cash flows using base API with custom data enhancement"""
+    """Get all cash flows with enhanced account and currency data"""
     db: Session = g.db
-    response, status_code = base_api.get_all(db)
     
-    # Enhance data with additional information
-    if response.get('status') == 'success' and response.get('data'):
-        enhanced_data = []
-        for cf_dict in response['data']:
-            # Add additional fields if they exist
-            if 'account' in cf_dict and cf_dict['account']:
-                cf_dict['account_name'] = cf_dict['account'].get('name', '')
-            if 'currency' in cf_dict and cf_dict['currency']:
-                cf_dict['currency_symbol'] = cf_dict['currency'].get('symbol', '')
-                cf_dict['currency_name'] = cf_dict['currency'].get('name', '')
-            enhanced_data.append(cf_dict)
-        response['data'] = enhanced_data
+    # Use TradingAccountService to get account details (avoiding duplicate code!)
+    from services.trading_account_service import TradingAccountService
     
-    return jsonify(response), status_code
+    # Get cash flows with joined relationships
+    cash_flows = db.query(CashFlow).options(
+        joinedload(CashFlow.account),
+        joinedload(CashFlow.currency)
+    ).all()
+    
+    enhanced_data = []
+    for cf in cash_flows:
+        cf_dict = cf.to_dict()
+        
+        # Get full account details using the service
+        if cf.trading_account_id:
+            account = TradingAccountService.get_by_id(db, cf.trading_account_id)
+            if account:
+                cf_dict['account'] = {
+                    'id': account.id,
+                    'name': account.name,
+                    'type': account.type if hasattr(account, 'type') else None,
+                    'status': account.status if hasattr(account, 'status') else None,
+                    'balance': float(account.cash_balance) if hasattr(account, 'cash_balance') and account.cash_balance is not None else None
+                }
+                cf_dict['account_name'] = account.name
+        
+        # Add currency details
+        if cf.currency:
+            cf_dict['currency_symbol'] = cf.currency.symbol
+            cf_dict['currency_name'] = cf.currency.name
+        
+        enhanced_data.append(cf_dict)
+    
+    return jsonify({
+        "status": "success",
+        "data": enhanced_data,
+        "message": f"Retrieved {len(enhanced_data)} cash flows",
+        "version": "1.0"
+    }), 200
 
 @cash_flows_bp.route('/<int:cash_flow_id>', methods=['GET'])
 def get_cash_flow(cash_flow_id: int):

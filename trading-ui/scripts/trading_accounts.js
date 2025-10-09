@@ -486,6 +486,12 @@ class TradingAccountsController {
             const response = await fetch(`/api/trading-accounts/${accountId}`, {
                 method: 'DELETE',
                 headers: {
+
+                // ניקוי מטמון trading_accounts
+                if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+                    await window.UnifiedCacheManager.remove('trading_accounts');
+                    console.log('✅ מטמון trading_accounts נוקה אחרי מחיקה');
+                }
                     'Content-Type': 'application/json'
                 }
             });
@@ -730,6 +736,12 @@ async function saveTradingAccount() {
                 }
                 return;
             }
+
+        // ניקוי מטמון trading_accounts
+        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+            await window.UnifiedCacheManager.remove('trading_accounts');
+            console.log('✅ מטמון trading_accounts נוקה אחרי הוספה');
+        }
             
             // שגיאת מערכת אחרת (500, 404, וכו')
             throw new Error(errorData.message || `HTTP error! status: ${response.status}`);

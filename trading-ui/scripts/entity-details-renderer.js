@@ -1017,6 +1017,38 @@ class EntityDetailsRenderer {
                 { key: 'description', label: 'תיאור', type: 'text' },
                 { key: 'created_at', label: 'תאריך יצירה', type: 'datetime' },
                 { key: 'updated_at', label: 'תאריך עדכון', type: 'datetime' }
+            ],
+            execution: [
+                { key: 'id', label: 'מזהה', type: 'number' },
+                { key: 'trade_id', label: 'טרייד', type: 'text' },
+                { key: 'ticker_symbol', label: 'טיקר', type: 'text' },
+                { key: 'side', label: 'צד', type: 'text' },
+                { key: 'quantity', label: 'כמות', type: 'number' },
+                { key: 'price', label: 'מחיר', type: 'currency' },
+                { key: 'date', label: 'תאריך', type: 'datetime' },
+                { key: 'commission', label: 'עמלה', type: 'currency' },
+                { key: 'notes', label: 'הערות', type: 'text' },
+                { key: 'created_at', label: 'תאריך יצירה', type: 'datetime' }
+            ],
+            alert: [
+                { key: 'id', label: 'מזהה', type: 'number' },
+                { key: 'title', label: 'כותרת', type: 'text' },
+                { key: 'description', label: 'תיאור', type: 'text' },
+                { key: 'type', label: 'סוג', type: 'text' },
+                { key: 'priority', label: 'עדיפות', type: 'text' },
+                { key: 'status', label: 'סטטוס', type: 'status' },
+                { key: 'target_price', label: 'מחיר יעד', type: 'currency' },
+                { key: 'trigger_price', label: 'מחיר הפעלה', type: 'currency' },
+                { key: 'related_type', label: 'ישות מקושרת', type: 'text' },
+                { key: 'created_at', label: 'תאריך יצירה', type: 'datetime' },
+                { key: 'triggered_at', label: 'תאריך הפעלה', type: 'datetime' }
+            ],
+            note: [
+                { key: 'id', label: 'מזהה', type: 'number' },
+                { key: 'content', label: 'תוכן', type: 'text' },
+                { key: 'attachment', label: 'קובץ מצורף', type: 'text' },
+                { key: 'related_type', label: 'ישות מקושרת', type: 'text' },
+                { key: 'created_at', label: 'תאריך יצירה', type: 'datetime' }
             ]
         };
         return fieldMappings[entityType] || [];
@@ -1291,7 +1323,28 @@ class EntityDetailsRenderer {
         `;
     }
     
-    renderExecution(executionData, options) { return '<div>ביצוע עסקה</div>'; }
+    renderExecution(executionData, options = {}) {
+        const entityColor = this.entityColors.execution || '#17a2b8';
+        
+        // כותרת
+        const headerTitle = 'ביצוע עסקה';
+        const headerSubtitle = `${executionData.ticker_symbol || ''} - ${executionData.side || ''} - ${this.formatCurrency(executionData.quantity || 0)}`;
+        
+        return `
+            <div class="entity-details-container execution-details">
+                ${this.renderEntityHeader(headerTitle, headerSubtitle, entityColor, 'execution', executionData.id)}
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        ${this.renderBasicInfo(executionData, 'execution', entityColor)}
+                    </div>
+                    <div class="col-md-6">
+                        ${this.renderAdditionalInfo(executionData, 'execution', entityColor)}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
     
     renderAccount(accountData, options = {}) {
         console.log(`🎨 Rendering account data:`, accountData);
@@ -1648,7 +1701,38 @@ class EntityDetailsRenderer {
         };
         return colors[status] || '#e9ecef';
     }
-    renderNote(noteData, options) { return '<div>הערה</div>'; }
+    renderNote(noteData, options = {}) {
+        const entityColor = this.entityColors.note || '#6c757d';
+        
+        // כותרת
+        const headerTitle = 'הערה';
+        const headerSubtitle = noteData.content ? noteData.content.substring(0, 50) + '...' : 'ללא תוכן';
+        
+        return `
+            <div class="entity-details-container note-details">
+                ${this.renderEntityHeader(headerTitle, headerSubtitle, entityColor, 'note', noteData.id)}
+                
+                <div class="row">
+                    <div class="col-12">
+                        ${this.renderBasicInfo(noteData, 'note', entityColor)}
+                    </div>
+                </div>
+                
+                ${noteData.attachment ? `
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${entityColor} !important;">קובץ מצורף</h6>
+                        <div class="attachment-preview p-3 border rounded">
+                            <a href="/api/notes/files/${noteData.attachment}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-file-download me-2"></i>צפה בקובץ
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+            </div>
+        `;
+    }
     renderGeneric(entityData, entityType, options) { return '<div>ישות כללית</div>'; }
 }
 

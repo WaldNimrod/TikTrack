@@ -58,6 +58,7 @@ def get_trading_account(trading_account_id: int):
     return jsonify(response), status_code
 
 @trading_accounts_bp.route('/', methods=['POST'])
+@invalidate_cache(['trading_accounts'])
 @api_endpoint(cache_ttl=0, rate_limit=30)
 @handle_database_session()
 def create_trading_account():
@@ -66,9 +67,6 @@ def create_trading_account():
         data = request.get_json()
         db: Session = g.db
         trading_account = TradingAccountService.create(db, data)
-        
-        # Invalidate cache when creating new trading account
-        invalidate_cache('trading_accounts')
         
         return jsonify({
             "status": "success",
@@ -98,6 +96,7 @@ def create_trading_account():
         }), 500
 
 @trading_accounts_bp.route('/<int:trading_account_id>', methods=['PUT'])
+@invalidate_cache(['trading_accounts'])
 def update_trading_account(trading_account_id: int):
     """Update trading account"""
     try:
@@ -105,9 +104,6 @@ def update_trading_account(trading_account_id: int):
         db: Session = next(get_db())
         trading_account = TradingAccountService.update(db, trading_account_id, data)
         if trading_account:
-            # Invalidate cache when updating trading account
-            invalidate_cache('trading_accounts')
-            invalidate_cache(f'trading_account_{trading_account_id}')
             return jsonify({
                 "status": "success",
                 "data": trading_account.to_dict(),
@@ -167,6 +163,7 @@ def get_trading_account_open_trades(trading_account_id: int):
         db.close()
 
 @trading_accounts_bp.route('/<int:trading_account_id>', methods=['DELETE'])
+@invalidate_cache(['trading_accounts'])
 def delete_trading_account(trading_account_id: int):
     """Delete trading account"""
     try:
@@ -198,9 +195,6 @@ def delete_trading_account(trading_account_id: int):
         # Try to delete (this will check for all linked items)
         success = TradingAccountService.delete(db, trading_account_id)
         if success:
-            # Invalidate cache when deleting trading account
-            invalidate_cache('trading_accounts')
-            invalidate_cache(f'trading_account_{trading_account_id}')
             return jsonify({
                 "status": "success",
                 "message": "Trading account deleted successfully",

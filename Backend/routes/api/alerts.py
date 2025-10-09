@@ -38,6 +38,7 @@ def get_alert(alert_id: int):
     return jsonify(response), status_code
 
 @alerts_bp.route('/', methods=['POST'])
+@invalidate_cache(['alerts'])
 def create_alert():
     """Create new alert"""
     try:
@@ -61,6 +62,7 @@ def create_alert():
         db.close()
 
 @alerts_bp.route('/<int:alert_id>', methods=['PUT'])
+@invalidate_cache(['alerts'])
 def update_alert(alert_id: int):
     """Update alert"""
     try:
@@ -91,6 +93,7 @@ def update_alert(alert_id: int):
         db.close()
 
 @alerts_bp.route('/<int:alert_id>', methods=['DELETE'])
+@invalidate_cache(['alerts'])
 def delete_alert(alert_id: int):
     """Delete alert"""
     try:

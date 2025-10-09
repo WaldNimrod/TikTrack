@@ -1862,8 +1862,8 @@ function initializeAddModalValidation() {
       type: 'select',
       message: 'יש לבחור סוג השקעה',
       customValidation: value => {
-        const validTypes = ['swing', 'investment', 'passive'];
-        return validTypes.includes(value) || 'סוג השקעה לא תקין';
+        const validTypes = ['swing', 'investment', 'passive'];  // Per database constraints
+        return validTypes.includes(value) || 'סוג השקעה לא תקין. ערכים תקינים: swing, investment, passive';
       }
     },
     'addTradePlanSide': {
@@ -1893,10 +1893,12 @@ function initializeAddModalValidation() {
       max: 999999999
     },
     'addTradePlanEntryConditions': {
+      required: false,  // Not mandatory
       type: 'text',
       maxLength: 500
     },
     'addTradePlanReasons': {
+      required: false,  // Not mandatory
       type: 'text',
       maxLength: 500
     }
@@ -1920,9 +1922,9 @@ function validateTradePlanForm() {
             id: 'addTradePlanInvestmentType', 
             name: 'סוג השקעה',
             validation: (value) => {
-                const validTypes = ['swing', 'investment', 'passive'];
+                const validTypes = ['swing', 'investment', 'passive'];  // Per database constraints
                 if (!validTypes.includes(value)) {
-                    return 'סוג השקעה לא תקין';
+                    return 'סוג השקעה לא תקין. ערכים תקינים: swing, investment, passive';
                 }
                 return true;
             }
@@ -1975,6 +1977,7 @@ function validateTradePlanForm() {
         { 
             id: 'addTradePlanEntryConditions', 
             name: 'תנאי כניסה',
+            required: false,  // Not mandatory per database model
             validation: (value) => {
                 if (value && value.length > 500) {
                     return 'תנאי כניסה לא יכול להיות יותר מ-500 תווים';
@@ -1985,6 +1988,7 @@ function validateTradePlanForm() {
         { 
             id: 'addTradePlanReasons', 
             name: 'סיבות',
+            required: false,  // Not mandatory per database model
             validation: (value) => {
                 if (value && value.length > 500) {
                     return 'סיבות לא יכולות להיות יותר מ-500 תווים';

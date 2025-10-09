@@ -424,15 +424,24 @@ class TradingAccountsController {
         // טעינת מטבעות לפני מילוי הטופס
         await loadCurrenciesForEditAccount();
         
-        // מילוי שדות המודל
+        // מילוי שדות המודל באמצעות DataCollectionService
         const modal = document.getElementById('editAccountModal');
         if (modal) {
-            document.getElementById('editAccountId').value = account.id;
-            document.getElementById('editAccountName').value = account.name || '';
-            document.getElementById('editAccountStatus').value = account.status || '';
-            document.getElementById('editAccountCurrency').value = account.currency_id || account.currency || '';
-            document.getElementById('editAccountBalance').value = account.cashBalance || account.cash_balance || 0;
-            document.getElementById('editAccountDescription').value = account.notes || '';
+            window.DataCollectionService.setFormData({
+                id: { id: 'editAccountId', type: 'int' },
+                name: { id: 'editAccountName', type: 'text' },
+                status: { id: 'editAccountStatus', type: 'text' },
+                currency_id: { id: 'editAccountCurrency', type: 'int' },
+                cash_balance: { id: 'editAccountBalance', type: 'number' },
+                notes: { id: 'editAccountDescription', type: 'text' }
+            }, {
+                id: account.id,
+                name: account.name || '',
+                status: account.status || '',
+                currency_id: account.currency_id || account.currency || '',
+                cash_balance: account.cashBalance || account.cash_balance || 0,
+                notes: account.notes || ''
+            });
             
             // פתיחת המודל
             const bsModal = new bootstrap.Modal(modal);
@@ -688,34 +697,19 @@ async function loadCurrenciesForEditAccount() {
  */
 async function saveTradingAccount() {
     try {
-        // 1. איסוף נתונים מהטופס
-        const nameElement = document.getElementById('accountName');
-        const statusElement = document.getElementById('accountStatus');
-        const currencyElement = document.getElementById('accountCurrency');
-        const balanceElement = document.getElementById('accountBalance');
-        const descriptionElement = document.getElementById('accountDescription');
-        
-        // 2. בדיקת קיום אלמנטים
-        if (!nameElement || !statusElement || !currencyElement || !balanceElement) {
-            if (typeof window.showSimpleErrorNotification === 'function') {
-                window.showSimpleErrorNotification('שגיאה', 'שדות חובה חסרים בטופס');
-            }
+        // 1. ולידציה של הטופס
+        if (!validateTradingAccountForm()) {
             return;
         }
         
-        // 3. ולידציה של הטופס
-        if (!validateTradingAccountForm()) {
-            return; // עצירה אם הולידציה נכשלה
-        }
-        
-        // 4. בניית אובייקט formData
-        const formData = {
-            name: nameElement.value,
-            status: statusElement.value,
-            currency_id: parseInt(currencyElement.value),
-            cash_balance: parseFloat(balanceElement.value) || 0,
-            notes: descriptionElement ? descriptionElement.value : ''
-        };
+        // 2. איסוף נתונים מהטופס באמצעות DataCollectionService
+        const formData = window.DataCollectionService.collectFormData({
+            name: { id: 'accountName', type: 'text' },
+            status: { id: 'accountStatus', type: 'text', default: 'open' },
+            currency_id: { id: 'accountCurrency', type: 'int' },
+            cash_balance: { id: 'accountBalance', type: 'number', default: 0 },
+            notes: { id: 'accountDescription', type: 'text', default: '' }
+        });
 
         // 5. שליחה לשרת
         const response = await fetch('/api/trading-accounts/', {
@@ -781,36 +775,20 @@ async function saveTradingAccount() {
  */
 async function updateTradingAccount() {
     try {
-        // 1. איסוף נתונים מהטופס
-        const idElement = document.getElementById('editAccountId');
-        const nameElement = document.getElementById('editAccountName');
-        const statusElement = document.getElementById('editAccountStatus');
-        const currencyElement = document.getElementById('editAccountCurrency');
-        const balanceElement = document.getElementById('editAccountBalance');
-        const descriptionElement = document.getElementById('editAccountDescription');
-        
-        // 2. בדיקת קיום אלמנטים
-        if (!idElement || !nameElement || !statusElement || !currencyElement || !balanceElement) {
-            if (typeof window.showSimpleErrorNotification === 'function') {
-                window.showSimpleErrorNotification('שגיאה', 'שדות חובה חסרים בטופס');
-            }
+        // 1. ולידציה של הטופס
+        if (!validateEditAccountForm()) {
             return;
         }
         
-        // 3. ולידציה של הטופס
-        if (!validateEditAccountForm()) {
-            return; // עצירה אם הולידציה נכשלה
-        }
-        
-        // 4. בניית אובייקט formData
-        const accountId = parseInt(idElement.value);
-        const formData = {
-            name: nameElement.value,
-            status: statusElement.value,
-            currency_id: parseInt(currencyElement.value),
-            cash_balance: parseFloat(balanceElement.value) || 0,
-            notes: descriptionElement ? descriptionElement.value : ''
-        };
+        // 2. איסוף נתונים מהטופס באמצעות DataCollectionService
+        const accountId = window.DataCollectionService.getValue('editAccountId', 'int');
+        const formData = window.DataCollectionService.collectFormData({
+            name: { id: 'editAccountName', type: 'text' },
+            status: { id: 'editAccountStatus', type: 'text' },
+            currency_id: { id: 'editAccountCurrency', type: 'int' },
+            cash_balance: { id: 'editAccountBalance', type: 'number', default: 0 },
+            notes: { id: 'editAccountDescription', type: 'text', default: '' }
+        });
 
         // 5. שליחה לשרת
         const response = await fetch(`/api/trading-accounts/${accountId}`, {

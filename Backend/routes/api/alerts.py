@@ -1,7 +1,12 @@
 from flask import Blueprint, jsonify, request, g
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from config.database import get_db
+from models.alert import Alert
+from models.trade import Trade
+from models.trade_plan import TradePlan
+from models.ticker import Ticker
 from services.alert_service import AlertService
+from services.trading_account_service import TradingAccountService
 from services.advanced_cache_service import cache_for, invalidate_cache
 import logging
 
@@ -21,10 +26,43 @@ base_api = BaseEntityAPI('alerts', AlertService, 'alerts')
 @api_endpoint(cache_ttl=60, rate_limit=60)
 @handle_database_session()
 def get_alerts():
-    """Get all alerts using base API"""
+    """Get all alerts with related entity names"""
     db: Session = g.db
-    response, status_code = base_api.get_all(db)
-    return jsonify(response), status_code
+    
+    alerts = db.query(Alert).all()
+    
+    enhanced_data = []
+    for alert in alerts:
+        alert_dict = alert.to_dict()
+        
+        # Resolve related entity name based on related_type_id
+        try:
+            if alert.related_type_id == 1:  # account
+                entity = TradingAccountService.get_by_id(db, alert.related_id)
+                alert_dict['related_entity_name'] = entity.name if entity else None
+            elif alert.related_type_id == 2:  # trade
+                trade = db.query(Trade).options(joinedload(Trade.ticker)).filter(Trade.id == alert.related_id).first()
+                alert_dict['related_entity_name'] = trade.ticker.symbol if trade and trade.ticker else None
+            elif alert.related_type_id == 3:  # trade_plan
+                plan = db.query(TradePlan).options(joinedload(TradePlan.ticker)).filter(TradePlan.id == alert.related_id).first()
+                alert_dict['related_entity_name'] = plan.ticker.symbol if plan and plan.ticker else None
+            elif alert.related_type_id == 4:  # ticker
+                ticker = db.query(Ticker).filter(Ticker.id == alert.related_id).first()
+                alert_dict['related_entity_name'] = ticker.symbol if ticker else None
+            else:
+                alert_dict['related_entity_name'] = None
+        except Exception as e:
+            logger.warning(f"Could not resolve related entity for alert {alert.id}: {str(e)}")
+            alert_dict['related_entity_name'] = None
+        
+        enhanced_data.append(alert_dict)
+    
+    return jsonify({
+        "status": "success",
+        "data": enhanced_data,
+        "message": f"Retrieved {len(enhanced_data)} alerts",
+        "version": "1.0"
+    }), 200
 
  
 

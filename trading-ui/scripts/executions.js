@@ -1167,34 +1167,14 @@ async function updateExecutionsTableMain(executions) {
   }
 
   tbody.innerHTML = executions.map(execution => {
-    // מציאת הטרייד המקושר
-    const trade = trades.find(t => t.id === execution.trade_id);
-    let symbol = 'לא מוגדר';
-    let tradeInfo = '';
-    let ticker = null;
-
-    if (trade) {
-      // מציאת הטיקר
-      ticker = tickers.find(t => t.id === trade.ticker_id);
-      symbol = ticker ? ticker.symbol : 'לא מוגדר';
-
-      // מידע על הטרייד: תאריך פתיחה | צד | סוג
-      const openDate = trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
-      const side = trade.side || 'לא מוגדר';
-      const type = trade.investment_type || 'לא מוגדר';
-
-      tradeInfo = `${openDate} | ${side} | ${type}`;
-    } else {
-      tradeInfo = `טרייד ${execution.trade_id}`;
-    }
+    // שימוש בנתונים שמגיעים מהשרת
+    const symbol = execution.trade_ticker_symbol || 'לא מוגדר';
+    const tradeInfo = execution.trade_display || `טרייד ${execution.trade_id}`;
 
     // שמירת הערכים המקוריים באנגלית לפילטר
     const typeForFilter = (execution.action || execution.type) === 'buy' ? 'קנייה' :
       (execution.action || execution.type) === 'sale' ? 'מכירה' :
         execution.action || execution.type;
-
-    // מציאת שם החשבון מהטרייד
-    const accountName = trade ? trade.account_name : 'לא מוגדר';
 
     return `
             <tr data-execution-id="${execution.id}">

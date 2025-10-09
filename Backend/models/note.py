@@ -39,11 +39,14 @@ class Note(BaseModel):
             result['related_type'] = 'trade'
         elif self.related_type_id == 3:
             result['related_type'] = 'trade_plan'
+        elif self.related_type_id == 4:
+            result['related_type'] = 'ticker'
         else:
             result['related_type'] = None
         
         result['related_id'] = self.related_id
         
-        # No backward compatibility needed - using only related_type_id and related_id
+        # Note: related_entity_name will be added by the API layer
+        # when it has access to the database session for lookups
         
         return result

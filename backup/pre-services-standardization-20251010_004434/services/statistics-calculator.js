@@ -268,7 +268,7 @@ class StatisticsCalculator {
             } else {
                 element.textContent = '-';
             }
-        }
+        });
     }
 }
 

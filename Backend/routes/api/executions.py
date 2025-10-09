@@ -1,7 +1,8 @@
 from flask import Blueprint, jsonify, request, g
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from config.database import get_db
 from models.execution import Execution
+from models.trade import Trade
 from services.validation_service import ValidationService
 from services.advanced_cache_service import cache_for, cache_with_deps, invalidate_cache
 import logging
@@ -34,10 +35,23 @@ base_api = BaseEntityAPI('executions', execution_service, 'executions')
 @api_endpoint(cache_ttl=30, dependencies=['executions'], rate_limit=60)
 @handle_database_session()
 def get_executions():
-    """Get all executions using base API"""
+    """Get all executions with trade relationship data"""
     db: Session = g.db
-    response, status_code = base_api.get_all(db)
-    return jsonify(response), status_code
+    
+    # Use joinedload to get trade and ticker data
+    executions = db.query(Execution).options(
+        joinedload(Execution.trade).joinedload(Trade.ticker)
+    ).all()
+    
+    # Convert to dict - the model will add trade_display automatically
+    execution_dicts = [ex.to_dict() for ex in executions]
+    
+    return jsonify({
+        "status": "success",
+        "data": execution_dicts,
+        "message": f"Retrieved {len(execution_dicts)} executions",
+        "version": "1.0"
+    }), 200
 
 @executions_bp.route('/<int:execution_id>', methods=['GET'])
 @api_endpoint(cache_ttl=30, rate_limit=60)

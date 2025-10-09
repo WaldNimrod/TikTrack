@@ -468,7 +468,7 @@ class TradesController {
         const changePercent = trade.change_percent || 'N/A';
         
         row.innerHTML = `
-            <td class="col-ticker">${trade.ticker?.symbol || 'N/A'}</td>
+            <td class="col-ticker">${trade.ticker_symbol || trade.ticker?.symbol || 'N/A'}</td>
             <td class="col-price">${currentPrice}</td>
             <td class="col-change">${changePercent}</td>
             <td class="col-status">
@@ -490,7 +490,7 @@ class TradesController {
             </td>
             <td class="col-created">${createdDate}</td>
             <td class="col-closed">${closedDate}</td>
-            <td class="col-account">${trade.trading_account?.name || 'N/A'}</td>
+            <td class="col-account">${trade.account_name || trade.trading_account?.name || 'N/A'}</td>
             <td class="col-notes">
                 ${trade.notes ? `<span title="${trade.notes}">📝</span>` : ''}
             </td>

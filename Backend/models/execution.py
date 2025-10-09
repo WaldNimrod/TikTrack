@@ -23,7 +23,7 @@ class Execution(BaseModel):
         return f"<Execution(id={self.id}, action='{self.action}', quantity={self.quantity})>"
     
     def to_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary"""
+        """Convert to dictionary with trade relationship data"""
         result: Dict[str, Any] = {}
         for c in self.__table__.columns:
             value = getattr(self, c.name)
@@ -31,4 +31,17 @@ class Execution(BaseModel):
                 result[c.name] = value.strftime('%Y-%m-%d %H:%M:%S') if value else None
             else:
                 result[c.name] = value
+        
+        # Add trade relationship data if loaded
+        if hasattr(self, 'trade') and self.trade:
+            result['trade_ticker_symbol'] = self.trade.ticker.symbol if hasattr(self.trade, 'ticker') and self.trade.ticker else None
+            result['trade_side'] = self.trade.side
+            result['trade_date'] = self.trade.created_at.strftime('%d/%m/%Y') if self.trade.created_at else None
+            
+            # Create formatted display string: "AAPL | 15/01/2025 | Long"
+            if result['trade_ticker_symbol'] and result['trade_date'] and result['trade_side']:
+                result['trade_display'] = f"{result['trade_ticker_symbol']} | {result['trade_date']} | {result['trade_side']}"
+            else:
+                result['trade_display'] = f"Trade {self.trade_id}"
+        
         return result

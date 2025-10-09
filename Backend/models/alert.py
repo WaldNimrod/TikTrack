@@ -135,4 +135,7 @@ class Alert(BaseModel):
             result['trade_id'] = None
             result['trade_plan_id'] = self.related_id
         
+        # Note: related_entity_name will be added by the API layer
+        # when it has access to the database session for lookups
+        
         return result

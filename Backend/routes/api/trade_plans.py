@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request, g
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from config.database import get_db
+from models.trade_plan import TradePlan
 from services.trade_plan_service import TradePlanService
 from services.advanced_cache_service import cache_for, invalidate_cache
 import logging
@@ -21,10 +22,38 @@ base_api = BaseEntityAPI('trade_plans', TradePlanService, 'trade_plans')
 @api_endpoint(cache_ttl=60, rate_limit=60)
 @handle_database_session()
 def get_trade_plans():
-    """Get all trade plans using base API"""
+    """Get all trade plans with ticker and account relationship data"""
     db: Session = g.db
-    response, status_code = base_api.get_all(db)
-    return jsonify(response), status_code
+    
+    # Use joinedload to get ticker and account data
+    plans = db.query(TradePlan).options(
+        joinedload(TradePlan.ticker),
+        joinedload(TradePlan.account)
+    ).all()
+    
+    enhanced_data = []
+    for plan in plans:
+        plan_dict = plan.to_dict()
+        
+        # Add ticker details if not already in to_dict
+        if hasattr(plan, 'ticker') and plan.ticker:
+            if 'ticker_symbol' not in plan_dict:
+                plan_dict['ticker_symbol'] = plan.ticker.symbol
+            if 'ticker_name' not in plan_dict:
+                plan_dict['ticker_name'] = plan.ticker.name
+        
+        # Add account details
+        if hasattr(plan, 'account') and plan.account:
+            plan_dict['account_name'] = plan.account.name
+        
+        enhanced_data.append(plan_dict)
+    
+    return jsonify({
+        "status": "success",
+        "data": enhanced_data,
+        "message": f"Retrieved {len(enhanced_data)} trade plans",
+        "version": "1.0"
+    }), 200
 
 @trade_plans_bp.route('/<int:plan_id>', methods=['GET'])
 @api_endpoint(cache_ttl=60, rate_limit=60)

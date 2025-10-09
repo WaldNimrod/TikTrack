@@ -451,127 +451,46 @@ function updateAlertsTable(alerts) {
       //   tickers: tickers.length,
       // });
 
-      // טיפול במקרים שבהם related_type_id הוא null
+      // שימוש ב-related_entity_name שמגיע מהשרת
       if (alert.related_type_id === null || alert.related_id === null) {
         relatedDisplay = 'כללי';
         relatedIcon = '🌐';
         relatedClass = 'related-general';
-
       } else {
+        // אם יש related_entity_name מהשרת - השתמש בו
+        relatedDisplay = alert.related_entity_name || `אובייקט ${alert.related_id}`;
+        
+        // קביעת אייקון וצבע לפי סוג
         switch (alert.related_type_id) {
-        case 1: { // חשבון
-          // console.log(`🔍 Looking for account with ID: ${alert.related_id}`);
-          // console.log('🔍 Available accounts:', accounts.map(a => ({ id: a.id, name: a.name || a.account_name })));
-          const account = accounts.find(a => a.id === alert.related_id);
-          if (account) {
-            const name = account.name || account.account_name || 'לא מוגדר';
-            const currency = account.currency || 'ILS';
-            relatedDisplay = `${name} (${currency})`;
-            // console.log(`✅ Found account: ${name} (${currency})`);
-          } else {
-            relatedDisplay = `חשבון ${alert.related_id}`;
-            // console.log(`❌ Account not found for ID: ${alert.related_id}`);
-          }
-          relatedIcon = '🏦';
-          relatedClass = 'related-account entity-account-badge';
-          relatedColor = window.getEntityColor ? window.getEntityColor('account') : '#28a745';
-          relatedBgColor = window.getEntityBackgroundColor ? window.getEntityBackgroundColor('account') : 'rgba(40, 167, 69, 0.1)';
-          break;
-        }
-        case 2: { // טרייד
-          // console.log(`🔍 Looking for trade with ID: ${alert.related_id}`);
-          // console.log('🔍 Available trades:', trades.map(t => ({
-          //   id: t.id, created_at: t.created_at, date: t.date,
-          //   side: t.side, investment_type: t.investment_type
-          // })));
-          const trade = trades.find(t => t.id === alert.related_id);
-          if (trade) {
-            const date = trade.created_at || trade.date;
-            const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
-            const side = trade.side || 'לא מוגדר';
-            const investmentType = trade.investment_type || 'לא מוגדר';
-            relatedDisplay = `טרייד | ${side} | ${investmentType} | ${formattedDate}`;
-            // console.log(`✅ Found trade: ${relatedDisplay}`);
-          } else {
-            relatedDisplay = `טרייד ${alert.related_id}`;
-            // console.log(`❌ Trade not found for ID: ${alert.related_id}`);
-          }
-          relatedIcon = '📈';
-          relatedClass = 'related-trade entity-trade-badge';
-          relatedColor = window.getEntityColor ? window.getEntityColor('trade') : '#007bff';
-          relatedBgColor = window.getEntityBackgroundColor ? window.getEntityBackgroundColor('trade') : 'rgba(0, 123, 255, 0.1)';
-          break;
-        }
-        case 3: { // תוכנית
-          // console.log(`🔍 Looking for trade plan with ID: ${alert.related_id}`);
-          // console.log('🔍 Available trade plans:', tradePlans.map(p => ({
-          //   id: p.id, created_at: p.created_at, date: p.date,
-          //   side: p.side, investment_type: p.investment_type
-          // })));
-          const plan = tradePlans.find(p => p.id === alert.related_id);
-          if (plan) {
-            const date = plan.created_at || plan.date;
-            const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
-            const side = plan.side || 'לא מוגדר';
-            const investmentType = plan.investment_type || 'לא מוגדר';
-            relatedDisplay = `תוכנית | ${side} | ${investmentType} | ${formattedDate}`;
-            // console.log(`✅ Found trade plan: ${relatedDisplay}`);
-          } else {
-            relatedDisplay = `תוכנית ${alert.related_id}`;
-            // console.log(`❌ Trade plan not found for ID: ${alert.related_id}`);
-          }
-          relatedIcon = '📋';
-          relatedClass = 'related-plan';
-          break;
-        }
-        case 4: { // טיקר
-          // console.log(`🔍 Looking for ticker with ID: ${alert.related_id}`);
-          // console.log('🔍 Available tickers:', tickers.map(t => ({ id: t.id, symbol: t.symbol })));
-          const ticker = tickers.find(t => t.id === alert.related_id);
-          if (ticker) {
-            relatedDisplay = ticker.symbol;
-            // console.log(`✅ Found ticker: ${ticker.symbol}`);
-          } else {
-            relatedDisplay = `טיקר ${alert.related_id}`;
-            // console.log(`❌ Ticker not found for ID: ${alert.related_id}`);
-          }
-          relatedIcon = '📊';
-          relatedClass = 'related-ticker';
-          break;
-        }
-        default:
-          relatedDisplay = `אובייקט ${alert.related_id}`;
-          relatedClass = 'related-other';
-          // console.log(`❓ Unknown related_type_id: ${alert.related_type_id}`);
+          case 1: // חשבון
+            relatedIcon = '🏦';
+            relatedClass = 'related-account entity-account-badge';
+            relatedColor = window.getEntityColor ? window.getEntityColor('account') : '#28a745';
+            relatedBgColor = window.getEntityBackgroundColor ? window.getEntityBackgroundColor('account') : 'rgba(40, 167, 69, 0.1)';
+            break;
+          case 2: // טרייד
+            relatedIcon = '📈';
+            relatedClass = 'related-trade entity-trade-badge';
+            relatedColor = window.getEntityColor ? window.getEntityColor('trade') : '#007bff';
+            relatedBgColor = window.getEntityBackgroundColor ? window.getEntityBackgroundColor('trade') : 'rgba(0, 123, 255, 0.1)';
+            break;
+          case 3: // תוכנית
+            relatedIcon = '📋';
+            relatedClass = 'related-plan';
+            break;
+          case 4: // טיקר
+            relatedIcon = '📊';
+            relatedClass = 'related-ticker';
+            break;
+          default:
+            relatedIcon = '❓';
+            relatedClass = 'related-other';
         }
       }
 
       // קביעת הסימבול לטור הראשון
-      let symbolDisplay = '';
-      if (alert.related_type_id === 1) { // חשבון - ריק
-        symbolDisplay = '-';
-      } else if (alert.related_type_id === 2) { // טרייד
-        const trade = trades.find(t => t.id === alert.related_id);
-        if (trade && trade.ticker_id) {
-          const ticker = tickers.find(tick => tick.id === trade.ticker_id);
-          symbolDisplay = ticker ? ticker.symbol : `טרייד ${alert.related_id}`;
-        } else {
-          symbolDisplay = `טרייד ${alert.related_id}`;
-        }
-      } else if (alert.related_type_id === 3) { // תוכנית
-        const plan = tradePlans.find(p => p.id === alert.related_id);
-        if (plan && plan.ticker_id) {
-          const ticker = tickers.find(tick => tick.id === plan.ticker_id);
-          symbolDisplay = ticker ? ticker.symbol : `תוכנית ${alert.related_id}`;
-        } else {
-          symbolDisplay = `תוכנית ${alert.related_id}`;
-        }
-      } else if (alert.related_type_id === 4) { // טיקר
-        const ticker = tickers.find(tick => tick.id === alert.related_id);
-        symbolDisplay = ticker ? ticker.symbol : `טיקר ${alert.related_id}`;
-      } else {
-        symbolDisplay = `אובייקט ${alert.related_id}`;
-      }
+      // אם יש related_entity_name, השתמש בו. אחרת fallback למנגנון הישן
+      let symbolDisplay = alert.related_entity_name || '-';
 
       // הוספת איקון קישור לפני האובייקט
       relatedDisplay = '🔗 ' + relatedDisplay;

@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from models.trading_account import TradingAccount
 from services.validation_service import ValidationService
 from typing import List, Optional, Dict, Any
@@ -9,13 +9,17 @@ logger = logging.getLogger(__name__)
 class TradingAccountService:
     @staticmethod
     def get_all(db: Session) -> List[TradingAccount]:
-        """Get all trading_accounts"""
-        return db.query(TradingAccount).all()
+        """Get all trading_accounts with currency relationship"""
+        return db.query(TradingAccount).options(
+            joinedload(TradingAccount.currency)
+        ).all()
     
     @staticmethod
     def get_by_id(db: Session, trading_account_id: int) -> Optional[TradingAccount]:
-        """Get trading_account by ID"""
-        return db.query(TradingAccount).filter(TradingAccount.id == trading_account_id).first()
+        """Get trading_account by ID with currency relationship"""
+        return db.query(TradingAccount).options(
+            joinedload(TradingAccount.currency)
+        ).filter(TradingAccount.id == trading_account_id).first()
     
     @staticmethod
     def get_open_trading_accounts(db: Session) -> List[TradingAccount]:

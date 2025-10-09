@@ -477,82 +477,32 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
     let relatedClass = 'related-general';
 
     if (note.related_type_id && note.related_id) {
+      // שימוש ב-related_entity_name שמגיע מהשרת
+      relatedDisplay = note.related_entity_name || `אובייקט ${note.related_id}`;
+      symbolDisplay = note.related_entity_name || '-';
+      
+      // קביעת אייקון וcss class לפי סוג
       switch (note.related_type_id) {
-      case 1: { // חשבון
-        const account = accounts.find(a => a.id === note.related_id);
-        if (account) {
-          const name = account.name || account.account_name || 'לא מוגדר';
-          relatedDisplay = `${name}`;
-        } else {
-          relatedDisplay = `חשבון ${note.related_id}`;
-        }
-        relatedIcon = '🏦';
-        relatedClass = 'related-account';
-        symbolDisplay = ''; // חשבון - ריק לחלוטין
-        break;
-      }
-      case 2: { // טרייד
-        const trade = trades.find(t => t.id === note.related_id);
-        if (trade) {
-          const tradeDate = trade.created_at || trade.date;
-          const formattedDate = tradeDate ? new Date(tradeDate).toLocaleDateString('he-IL') : 'לא מוגדר';
-          const side = trade.side || 'לא מוגדר';
-          relatedDisplay = `טרייד | ${side} | ${formattedDate}`;
-          // קביעת סימבול לטרייד
-          if (trade.ticker_id) {
-            const ticker = tickers.find(tick => tick.id === trade.ticker_id);
-            symbolDisplay = ticker ? ticker.symbol : '-';
-          } else {
-            symbolDisplay = '-';
-          }
-        } else {
-          relatedDisplay = 'טרייד | לא מוגדר | לא מוגדר';
-          symbolDisplay = '-';
-        }
-        relatedIcon = '📈';
-        relatedClass = 'related-trade';
-        break;
-      }
-      case 3: { // תוכנית
-        const plan = tradePlans.find(p => p.id === note.related_id);
-        if (plan) {
-          const planDate = plan.created_at || plan.date;
-          const formattedDate = planDate ? new Date(planDate).toLocaleDateString('he-IL') : 'לא מוגדר';
-          const side = plan.side || 'לא מוגדר';
-          relatedDisplay = `תוכנית | ${side} | ${formattedDate}`;
-          // קביעת סימבול לתוכנית
-          if (plan.ticker_id) {
-            const ticker = tickers.find(tick => tick.id === plan.ticker_id);
-            symbolDisplay = ticker ? ticker.symbol : '-';
-          } else {
-            symbolDisplay = '-';
-          }
-        } else {
-          relatedDisplay = 'תוכנית | לא מוגדר | לא מוגדר';
-          symbolDisplay = '-';
-        }
-        relatedIcon = '📋';
-        relatedClass = 'related-plan';
-        break;
-      }
-      case 4: { // טיקר
-        const ticker = tickers.find(t => t.id === note.related_id);
-        if (ticker) {
-          relatedDisplay = ticker.symbol;
-          symbolDisplay = ticker.symbol;
-        } else {
-          relatedDisplay = `טיקר ${note.related_id}`;
-          symbolDisplay = `טיקר ${note.related_id}`;
-        }
-        relatedIcon = '📊';
-        relatedClass = 'related-ticker';
-        break;
-      }
-      default:
-        symbolDisplay = `אובייקט ${note.related_id}`;
-        relatedDisplay = `אובייקט ${note.related_id}`;
-        relatedIcon = '❓';
-        relatedClass = 'related-other';
+        case 1: // חשבון
+          relatedIcon = '🏦';
+          relatedClass = 'related-account';
+          symbolDisplay = ''; // חשבון - ריק לחלוטין
+          break;
+        case 2: // טרייד
+          relatedIcon = '📈';
+          relatedClass = 'related-trade';
+          break;
+        case 3: // תוכנית
+          relatedIcon = '📋';
+          relatedClass = 'related-plan';
+          break;
+        case 4: // טיקר
+          relatedIcon = '📊';
+          relatedClass = 'related-ticker';
+          break;
+        default:
+          relatedIcon = '❓';
+          relatedClass = 'related-other';
       }
     }
 

@@ -83,7 +83,7 @@
 ## 🚀 **מערכת כללית חדשה - ארכיטקטורה מאוחדת** ✅ **חדש! ינואר 2025**
 
 ### **New General Systems Architecture** 🟢 **חבילת בסיס**
-מערכת כללית חדשה עם 8 מודולים מאוחדים לטעינה דינמית:
+מערכת כללית חדשה עם 8 מודולים מאוחדים לטעינה סטטית:
 
 #### **מודולי המערכת החדשה:**
 1. **`modules/core-systems.js`** - מערכות ליבה (אתחול, התראות, מודולים)
@@ -94,6 +94,15 @@
 6. **`modules/business-module.js`** - לוגיקה עסקית
 7. **`modules/communication-module.js`** - תקשורת ושגיאות
 8. **`modules/cache-module.js`** - מערכת מטמון מאוחדת
+
+#### **מערכות שירות כלליות** ✅ **חדש! ינואר 2025**
+6 מערכות שירות נוספות לסטנדרטיזציה מלאה:
+1. **`services/data-collection-service.js`** - איסוף נתונים מטפסים (מחליף 3,131 קריאות)
+2. **`services/field-renderer-service.js`** - רנדור 8 סוגי שדות (badges, currency, dates)
+3. **`services/select-populator-service.js`** - מילוי select boxes מ-API
+4. **`services/crud-response-handler.js`** - טיפול מרכזי בתגובות CRUD
+5. **`services/default-value-setter.js`** - הגדרת ברירות מחדל בטפסים
+6. **`services/statistics-calculator.js`** - חישובי סטטיסטיקות
 
 #### **תכונות המערכת החדשה:**
 - **טעינה דינמית** - מודולים נטענים רק כשנדרשים
@@ -106,6 +115,93 @@
 - **אפיון המערכת:** [new_general_systems_architecture_specification.md](../new_general_systems_architecture_specification.md)
 - **תוכנית יישום:** [new_general_systems_implementation_plan.md](../new_general_systems_implementation_plan.md)
 - **סיכום פרויקט:** [new_general_systems_project_summary.md](../new_general_systems_project_summary.md)
+
+---
+
+## 🔧 **מערכות שירות כלליות - פירוט מלא** ✅ **חדש! ינואר 2025**
+
+### **1. DataCollectionService** 🟢 **קריטי**
+- **קובץ:** `services/data-collection-service.js`
+- **תיאור:** איסוף נתונים מטפסים והמרות טיפוס אוטומטיות
+- **מחליף:** 3,131 קריאות ידניות ל-getElementById
+- **פונקציות עיקריות:**
+  - `collectFormData(fieldMap)` - איסוף לפי מפת שדות
+  - `collectAllFormData(formId)` - איסוף כל השדות
+  - `setFormData(fieldMap, values)` - הגדרת ערכים
+  - `setValue(fieldId, value, type)` - הגדרת ערך בודד
+  - `getValue(fieldId, type, default)` - קבלת ערך בודד
+  - `resetForm(formId, clearValidation)` - ניקוי טופס
+- **טיפוסים נתמכים:** text, int, number, date, dateOnly, bool, checkbox
+- **דוקומנטציה:** [SERVICES_ARCHITECTURE.md](SERVICES_ARCHITECTURE.md)
+
+### **2. FieldRendererService** 🟢 **גבוה**
+- **קובץ:** `services/field-renderer-service.js`
+- **תיאור:** רנדור שדות מורכבים: status, side, PnL, currency, type, action, priority
+- **מחליף:** קוד badges חוזר ב-138 מקומות
+- **פונקציות עיקריות:**
+  - `renderStatus(status, entityType)` - status badge עם תרגום וצבעים
+  - `renderSide(side)` - Long/Short badge
+  - `renderPnL(value, currency)` - positive/negative badge
+  - `renderCurrency(id, name, symbol)` - תצוגת מטבע מלאה
+  - `renderType(type)` - swing/investment/passive badge
+  - `renderAction(action)` - buy/sale badge
+  - `renderPriority(priority)` - high/medium/low badge
+  - `renderDate(date, includeTime)` - תאריך (משתמש ב-date-utils.js)
+- **תכונות:** תרגום אוטומטי, צבעים דינמיים, fallback colors
+- **דוקומנטציה:** [SERVICES_ARCHITECTURE.md](SERVICES_ARCHITECTURE.md)
+
+### **3. SelectPopulatorService** 🟢 **גבוה**
+- **קובץ:** `services/select-populator-service.js`
+- **תיאור:** מילוי select boxes מ-API עם ברירות מחדל
+- **מחליף:** קוד טעינה חוזר ב-16 מקומות
+- **פונקציות עיקריות:**
+  - `populateTickersSelect(selectId, options)` - מילוי טיקרים
+  - `populateAccountsSelect(selectId, options)` - מילוי חשבונות
+  - `populateCurrenciesSelect(selectId, options)` - מילוי מטבעות
+  - `populateTradePlansSelect(selectId, options)` - מילוי תכנונים
+  - `populateGenericSelect(selectId, endpoint, config)` - מילוי גנרי
+- **תכונות:** ברירת מחדל מהעדפות, סינון, אופציה ריקה
+- **דוקומנטציה:** [SERVICES_ARCHITECTURE.md](SERVICES_ARCHITECTURE.md)
+
+### **4. CRUDResponseHandler** 🟢 **גבוה**
+- **קובץ:** `services/crud-response-handler.js`
+- **תיאור:** טיפול מרכזי בתגובות API של פעולות CRUD
+- **מחליף:** לוגיקה זהה ב-18 פונקציות save/update/delete
+- **פונקציות עיקריות:**
+  - `handleSaveResponse(response, options)` - טיפול ב-POST
+  - `handleUpdateResponse(response, options)` - טיפול ב-PUT
+  - `handleDeleteResponse(response, options)` - טיפול ב-DELETE
+  - `handleError(error, operation)` - טיפול בשגיאות
+  - `executeCRUDOperation(url, fetchOptions, handlerOptions)` - ביצוע מלא
+- **תכונות:** הפרדת שגיאות 400/500, סגירת modal, רענון אוטומטי
+- **דוקומנטציה:** [SERVICES_ARCHITECTURE.md](SERVICES_ARCHITECTURE.md)
+
+### **5. DefaultValueSetter** 🟡 **בינוני**
+- **קובץ:** `services/default-value-setter.js`
+- **תיאור:** הגדרת ברירות מחדל בטפסים (תאריך, העדפות, לוגי)
+- **מחליף:** קוד זהה ב-16 פונקציות showAddModal
+- **פונקציות עיקריות:**
+  - `setCurrentDate(fieldId)` - תאריך היום
+  - `setCurrentDateTime(fieldId)` - תאריך + שעה
+  - `setPreferenceValue(fieldId, preferenceName)` - מהעדפות
+  - `setLogicalDefault(fieldId, defaultValue)` - ערך לוגי
+  - `setAllDefaults(config)` - הגדרה מרובה
+  - `setFormDefaults(config)` - הגדרת טופס מלא
+- **דוקומנטציה:** [SERVICES_ARCHITECTURE.md](SERVICES_ARCHITECTURE.md)
+
+### **6. StatisticsCalculator** 🟡 **בינוני**
+- **קובץ:** `services/statistics-calculator.js`
+- **תיאור:** חישובי סטטיסטיקות מנתונים (sum, avg, count, min/max)
+- **מחליף:** קוד חישובים ב-5 עמודים
+- **פונקציות עיקריות:**
+  - `calculateSum(data, field)` - סכום שדה
+  - `calculateAverage(data, field)` - ממוצע שדה
+  - `countRecords(data, filterFn)` - ספירה מותנית
+  - `getMinMax(data, field)` - מינימום ומקסימום
+  - `groupBy(data, field)` - קיבוץ לפי שדה
+  - `calculateFullStatistics(data, config)` - חישוב מלא
+  - `updateDOMElements(stats, elementMap)` - עדכון DOM
+- **דוקומנטציה:** [SERVICES_ARCHITECTURE.md](SERVICES_ARCHITECTURE.md)
 
 ---
 
@@ -462,10 +558,11 @@
 ## 📋 **סיכום**
 
 ### **סטטוס כללי:**
-- **סה"כ מערכות:** 35+ מערכות כלליות
+- **סה"כ מערכות:** 41 מערכות כלליות (35 + 6 שירותים חדשים)
 - **חבילת בסיס:** 10 מערכות חיוניות לכל עמוד
+- **מערכות שירות:** 6 מערכות סטנדרטיזציה (ינואר 2025)
 - **דוקומנטציה:** 100% מפורטת
-- **יישום:** 95/95 מערכות מיושמות במלואן
+- **יישום:** 101/101 מערכות מיושמות במלואן
 - **בדיקה:** כל המערכות נבדקו ועובדות
 
 ### **קטגוריות עיקריות:**

@@ -1,7 +1,11 @@
 from flask import Blueprint, jsonify, request, send_from_directory, g
 from config.database import get_db
 from models.note import Note
+from models.trade import Trade
+from models.trade_plan import TradePlan
+from models.ticker import Ticker
 from services.validation_service import ValidationService
+from services.trading_account_service import TradingAccountService
 from services.advanced_cache_service import cache_for, invalidate_cache
 import logging
 import os
@@ -10,7 +14,7 @@ from datetime import datetime
 from werkzeug.utils import secure_filename
 from typing import Optional, Dict, Any, List
 from werkzeug.datastructures import FileStorage
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import text
 
 # Import base classes
@@ -116,55 +120,45 @@ def cleanup_orphaned_files() -> int:
 
 @notes_bp.route('/', methods=['GET'])
 def get_notes():
-    """Get all notes"""
+    """Get all notes with related entity names"""
     try:
         logger.info("🔄 Starting get_notes function")
         db = next(get_db())
         logger.info("✅ Database connection established")
         
-        # Use direct SQL with text() from SQLAlchemy
-        try:
-            result = db.execute(text("SELECT * FROM notes ORDER BY created_at DESC"))
-            notes_data = result.fetchall()
-            logger.info(f"✅ Successfully retrieved {len(notes_data)} notes using direct SQL")
+        # Use ORM instead of direct SQL
+        notes = db.query(Note).order_by(Note.created_at.desc()).all()
+        logger.info(f"✅ Successfully retrieved {len(notes)} notes using ORM")
+        
+        enhanced_data = []
+        for note in notes:
+            note_dict = note.to_dict()
             
-            # Convert to dictionaries
-            notes_list = []
-            for row in notes_data:
-                # Set related_type according to related_type_id
-                related_type = None
-                if row[4] == 1:  # related_type_id (now at index 4)
-                    related_type = 'account'
-                elif row[4] == 2:
-                    related_type = 'trade'
-                elif row[4] == 3:
-                    related_type = 'trade_plan'
-                elif row[4] == 4:
-                    related_type = 'ticker'
-                
-                note_dict = {
-                    'id': row[0],
-                    'content': row[1],
-                    'attachment': row[2],
-                    'created_at': row[3],
-                    'related_type_id': row[4],
-                    'related_id': row[5],
-                    'related_type': related_type
-                }
-                
-                notes_list.append(note_dict)
+            # Resolve related entity name based on related_type_id
+            try:
+                if note.related_type_id == 1:  # account
+                    entity = TradingAccountService.get_by_id(db, note.related_id)
+                    note_dict['related_entity_name'] = entity.name if entity else None
+                elif note.related_type_id == 2:  # trade
+                    trade = db.query(Trade).options(joinedload(Trade.ticker)).filter(Trade.id == note.related_id).first()
+                    note_dict['related_entity_name'] = trade.ticker.symbol if trade and trade.ticker else None
+                elif note.related_type_id == 3:  # trade_plan
+                    plan = db.query(TradePlan).options(joinedload(TradePlan.ticker)).filter(TradePlan.id == note.related_id).first()
+                    note_dict['related_entity_name'] = plan.ticker.symbol if plan and plan.ticker else None
+                elif note.related_type_id == 4:  # ticker
+                    ticker = db.query(Ticker).filter(Ticker.id == note.related_id).first()
+                    note_dict['related_entity_name'] = ticker.symbol if ticker else None
+                else:
+                    note_dict['related_entity_name'] = None
+            except Exception as e:
+                logger.warning(f"Could not resolve related entity for note {note.id}: {str(e)}")
+                note_dict['related_entity_name'] = None
             
-        except Exception as sql_error:
-            logger.error(f"❌ Error with direct SQL: {str(sql_error)}")
-            return jsonify({
-                "status": "error",
-                "error": {"message": f"Database error: {str(sql_error)}"},
-                "version": "1.0"
-            }), 500
+            enhanced_data.append(note_dict)
             
         return jsonify({
             "status": "success",
-            "data": notes_list,
+            "data": enhanced_data,
             "message": "Notes retrieved successfully",
             "version": "1.0"
         })

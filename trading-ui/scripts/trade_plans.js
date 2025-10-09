@@ -373,25 +373,36 @@ async function openEditTradePlanModal(tradePlanId) {
   // טעינת רשימת הטיקרים בחלון הבחירה
   await loadTickersForEditModal();
 
-  // מילוי הטופס בנתונים קיימים
-  document.getElementById('editTradePlanId').value = tradePlan.id;
-  document.getElementById('editTradePlanTickerId').value = tradePlan.ticker_id;
-  document.getElementById('editTradePlanInvestmentType').value = tradePlan.investment_type;
-  document.getElementById('editTradePlanSide').value = tradePlan.side;
-  document.getElementById('editTradePlanStatus').value = tradePlan.status;
-  document.getElementById('editTradePlanPlannedAmount').value = tradePlan.planned_amount;
-  document.getElementById('editTradePlanShares').value = tradePlan.shares || '';
-  document.getElementById('editTradePlanStopPrice').value = tradePlan.stop_price || '';
-  document.getElementById('editTradePlanTargetPrice').value = tradePlan.target_price || '';
-  document.getElementById('editTradePlanEntryConditions').value = tradePlan.entry_conditions || '';
-  document.getElementById('editTradePlanReasons').value = tradePlan.reasons || '';
-
-  // עדכון תאריך
-  if (tradePlan.created_at) {
-    const date = new Date(tradePlan.created_at);
-    const dateStr = date.toISOString().split('T')[0];
-    document.getElementById('editTradePlanDate').value = dateStr;
-  }
+  // מילוי הטופס בנתונים קיימים באמצעות DataCollectionService
+  const dateStr = tradePlan.created_at ? new Date(tradePlan.created_at).toISOString().split('T')[0] : '';
+  
+  window.DataCollectionService.setFormData({
+    id: { id: 'editTradePlanId', type: 'int' },
+    ticker_id: { id: 'editTradePlanTickerId', type: 'int' },
+    investment_type: { id: 'editTradePlanInvestmentType', type: 'text' },
+    side: { id: 'editTradePlanSide', type: 'text' },
+    status: { id: 'editTradePlanStatus', type: 'text' },
+    planned_amount: { id: 'editTradePlanPlannedAmount', type: 'number' },
+    shares: { id: 'editTradePlanShares', type: 'number' },
+    stop_price: { id: 'editTradePlanStopPrice', type: 'number' },
+    target_price: { id: 'editTradePlanTargetPrice', type: 'number' },
+    entry_conditions: { id: 'editTradePlanEntryConditions', type: 'text' },
+    reasons: { id: 'editTradePlanReasons', type: 'text' },
+    created_at: { id: 'editTradePlanDate', type: 'text' }
+  }, {
+    id: tradePlan.id,
+    ticker_id: tradePlan.ticker_id,
+    investment_type: tradePlan.investment_type,
+    side: tradePlan.side,
+    status: tradePlan.status,
+    planned_amount: tradePlan.planned_amount,
+    shares: tradePlan.shares || '',
+    stop_price: tradePlan.stop_price || '',
+    target_price: tradePlan.target_price || '',
+    entry_conditions: tradePlan.entry_conditions || '',
+    reasons: tradePlan.reasons || '',
+    created_at: dateStr
+  });
 
   // הפעלת כל השדות
   enableEditFields();

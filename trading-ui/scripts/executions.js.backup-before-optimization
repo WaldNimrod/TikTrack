@@ -1851,8 +1851,8 @@ async function updateExecutionsTableMain(executions) {
     return `
             <tr data-execution-id="${execution.id}">
                                    <td class="ticker-cell">
-                       <div class="ticker-cell-content">
-                           <strong class="ticker-symbol-link ${execution.action === 'buy' ? 'action-buy' : 'action-sell'}" 
+                       <div style="display: flex; align-items: center; gap: 8px;">
+                           <strong style="cursor: pointer; color: ${positiveColor};" 
                              onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('ticker', ${ticker ? ticker.id : 'null'}, 'view'); } else { console.log('Entity details modal not available'); }" 
                              title="פתח פרטי סימבול">${symbol}</strong>
                            <button class="btn btn-sm btn-info" 
@@ -1865,14 +1865,14 @@ async function updateExecutionsTableMain(executions) {
                         ${(execution.action || execution.type) === 'buy' ? 'קניה' : 'מכירה'}
                     </span>
                 </td>
-                <td data-account="${accountName}" class="account-cell-link" 
+                <td data-account="${accountName}" style="cursor: pointer;" 
                   onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('account', '${accountName}', 'view'); } else { console.log('Entity details modal not available'); }" 
                   title="פתח פרטי חשבון">${accountName}</td>
                 <td>${execution.quantity}</td>
                 <td>$${execution.price}</td>
                 <td class="pl-cell">$0</td>
                 <td data-date="${execution.date || execution.execution_date}">${execution.date || execution.execution_date ? new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL') : '-'}</td>
-                <td class="source-cell">${execution.source || '-'}</td>
+                <td style="text-align: left; direction: ltr;">${execution.source || '-'}</td>
                 <td class="col-actions actions-cell actions-3-btn">
                     <button class="btn btn-sm btn-outline-info" onclick="console.log('🔗 [LINKED ITEMS] לחיצה על כפתור מקושרים עבור עסקה:', ${execution.id}); if(window.loadLinkedItemsData) { window.loadLinkedItemsData('execution', ${execution.id}).then(data => { console.log('🔗 [LINKED ITEMS] נתונים נטענו:', data); if(data) { console.log('🔗 [LINKED ITEMS] מציג מודל עם נתונים'); window.showLinkedItemsModal(data, 'execution', ${execution.id}, 'view'); } else { console.log('❌ [LINKED ITEMS] אין נתונים להצגה'); } }); } else { console.log('❌ [LINKED ITEMS] loadLinkedItemsData לא זמין'); }" title="פריטים מקושרים">
                         <i class="bi bi-link-45deg"></i>
@@ -3415,13 +3415,13 @@ function updateTickersSummaryTable(tickers = null) {
                   onclick="viewTickerDetails(${ticker.id})" 
                   title="צפה בפרטים">
                     <img src="images/icons/tickers.svg" alt="צפה" 
-                      class="action-icon action-icon-sm">
+                      class="action-icon" style="width: 14px; height: 14px;">
                 </button>
                 <button class="btn btn-sm btn-outline-success" 
                   onclick="addExecutionForTicker(${ticker.id})" 
                   title="הוסף עסקה">
                     <img src="images/icons/executions.svg" alt="הוסף" 
-                      class="action-icon action-icon-sm">
+                      class="action-icon" style="width: 14px; height: 14px;">
                 </button>
             </td>
         `;

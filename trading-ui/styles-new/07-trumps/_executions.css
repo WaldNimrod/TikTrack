@@ -46,6 +46,43 @@
     color: var(--color-danger);
 }
 
+/* Executions table cell styles */
+.executions-page .ticker-cell-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.executions-page .ticker-symbol-link {
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.executions-page .ticker-symbol-link.action-buy {
+    color: var(--color-success, #28a745);
+}
+
+.executions-page .ticker-symbol-link.action-sell {
+    color: var(--color-danger, #dc3545);
+}
+
+.executions-page .account-cell-link {
+    cursor: pointer;
+}
+
+.executions-page .account-cell-link:hover {
+    text-decoration: underline;
+}
+
+.executions-page .source-cell {
+    text-align: left;
+    direction: ltr;
+}
+
+.executions-page .action-icon-sm {
+    width: 14px;
+    height: 14px;
+}
 
 /* Responsive adjustments for executions page */
 @media (max-width: 768px) {

@@ -137,24 +137,13 @@ def get_table_data_with_schema(table_name: str):
                 "version": "1.0"
             }), 400
         
-        # First, get the schema to know the column order
-        schema_result = db.execute(text(f"PRAGMA table_info({table_name})"))
-        columns = []
-        for row in schema_result:
-            columns.append({
-                'cid': row[0],
-                'name': row[1],
-                'type': row[2]
-            })
-        
-        # Sort by physical order
-        columns.sort(key=lambda x: x['cid'])
-        column_names = [col['name'] for col in columns]
-        
-        # Get the data
+        # Get the data first (SELECT * includes generated columns)
         data_result = db.execute(text(f"SELECT * FROM {table_name}"))
         
-        # Build data rows with columns in physical order
+        # Get column names from the result (includes generated columns)
+        column_names = list(data_result.keys()) if hasattr(data_result, 'keys') else []
+        
+        # Build data rows
         data = []
         for row in data_result:
             row_dict = {}

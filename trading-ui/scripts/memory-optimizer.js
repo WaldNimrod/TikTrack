@@ -486,9 +486,9 @@ class MemoryOptimizer {
         let savedMemory = 0;
         
         try {
-            if (window.UnifiedCacheManager) {
+            if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.clear === 'function') {
                 // ניקוי נתונים ישנים ממערכת המטמון המאוחדת
-                await window.UnifiedCacheManager.cleanup();
+                await window.UnifiedCacheManager.clear('expired');
                 console.log('🧹 Unified cache cleanup completed');
             }
         } catch (error) {

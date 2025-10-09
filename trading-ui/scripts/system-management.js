@@ -30,8 +30,13 @@ class SystemManagement {
     // Load initial data
     this.loadSystemData();
 
-    // Setup auto-refresh
-    this.setupAutoRefresh();
+    // Setup auto-refresh (ONLY on system-management page)
+    if (window.location.pathname.includes('system-management')) {
+      this.setupAutoRefresh();
+      console.log('🔄 Auto-refresh enabled for system-management page');
+    } else {
+      console.log('ℹ️ Auto-refresh disabled for this page');
+    }
 
     // Setup event listeners
     SystemManagement.setupEventListeners();

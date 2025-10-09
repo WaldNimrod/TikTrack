@@ -234,7 +234,8 @@ class UnifiedCacheManager {
             // עדכון סטטיסטיקות בזמן אמת
             this.updateStats().catch(console.warn);
             
-            console.log(`❌ Key ${key} not found in any layer`);
+            // Debug level - not an error, just means key doesn't exist yet
+            console.debug(`ℹ️ Key ${key} not found in cache (first access or not yet saved)`);
             return null;
             
         } catch (error) {

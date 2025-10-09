@@ -1277,6 +1277,109 @@ alerts = relationship("Alert",
 
 ---
 
+---
+
+## ✅ בדיקת שלמות מודל עריכה
+
+### **רשימת בדיקה למודל עריכה:**
+
+#### **שדות שחייבים להיות במודל Edit:**
+
+**Cash Flows - 10 שדות:**
+- [ ] `editCashFlowId` - מזהה (hidden)
+- [ ] `editCashFlowDate` - תאריך (datetime-local) + המרת פורמט
+- [ ] `editCashFlowAmount` - סכום (number)
+- [ ] `editCashFlowDescription` - תיאור (text)
+- [ ] `editCashFlowAccountId` - חשבון (select)
+- [ ] `editCashFlowCurrencyId` - מטבע (select)
+- [ ] `editCashFlowType` - סוג (select)
+- [ ] `editCashFlowSource` - מקור (select)
+- [ ] `editCashFlowExternalId` - מזהה חיצוני (text)
+- [ ] `editCashFlowUsdRate` - שער דולר (number)
+
+#### **בדיקות נדרשות:**
+
+1. **קיום אלמנט HTML:**
+   ```javascript
+   const field = document.getElementById('editFieldName');
+   if (!field) {
+     console.warn('⚠️ שדה חסר במודל!');
+   }
+   ```
+
+2. **המרת פורמט תאריך:**
+   ```javascript
+   // אם datetime-local, המר YYYY-MM-DD → YYYY-MM-DDTHH:MM
+   if (field.type === 'datetime-local' && value && !value.includes('T')) {
+     value = `${value}T12:00`;
+   }
+   ```
+
+3. **שם שדה נכון מהשרת:**
+   ```javascript
+   // ✅ נכון
+   setFieldValue('editCashFlowAccountId', cashFlow.trading_account_id);
+   
+   // ❌ שגוי
+   setFieldValue('editCashFlowAccountId', cashFlow.account_id);
+   ```
+
+4. **ערכי ברירת מחדל:**
+   ```javascript
+   setFieldValue('editCashFlowUsdRate', cashFlow.usd_rate || 1.000000);
+   setFieldValue('editCashFlowDescription', cashFlow.description || '');
+   ```
+
+---
+
+#### **תבנית בדיקה סטנדרטית:**
+
+```javascript
+function showEditEntityModal(entityId) {
+  // 1. בדיקת קיום מודל
+  const modal = document.getElementById('editEntityModal');
+  if (!modal) return;
+
+  // 2. מציאת הישות
+  const entity = entityData.find(e => e.id === entityId);
+  if (!entity) return;
+
+  // 3. ניקוי ולידציה
+  if (window.clearValidation) {
+    window.clearValidation('editEntityForm');
+  }
+
+  // 4. פונקציית עזר להגדרת ערך
+  const setFieldValue = (fieldId, value, type = null) => {
+    const field = document.getElementById(fieldId);
+    if (field) {
+      // המרת פורמט תאריך אם נדרש
+      if (field.type === 'datetime-local' && value && !value.includes('T')) {
+        value = `${value}T12:00`;
+      }
+      field.value = value || '';
+      console.log(`✅ ${fieldId} = ${value}`);
+    } else {
+      console.warn(`⚠️ ${fieldId} חסר!`);
+    }
+  };
+
+  // 5. מילוי כל השדות
+  setFieldValue('editEntityId', entity.id);
+  setFieldValue('editEntityField1', entity.field1);
+  // ... כל השדות
+
+  // 6. טעינת נתונים לסלקטים
+  loadRelatedDataForEdit();
+
+  // 7. הצגת המודל
+  const bootstrapModal = new bootstrap.Modal(modal);
+  bootstrapModal.show();
+}
+```
+
+---
+
 ## 🚀 מוכן ליישום סטנדרטי!
 
 **תהליך הסטנדרטיזציה יכלול:**

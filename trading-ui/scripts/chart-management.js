@@ -11,8 +11,6 @@ console.log('📊 Chart Management page loaded');
 
 // Global variables
 let chartsList = [];
-let autoRefreshInterval = null;
-let isAutoRefreshEnabled = false;
 let testChart = null;
 
 // Function to toggle section visibility
@@ -268,42 +266,9 @@ function changeChartTheme(themeName) {
     window.showNotification(`נושא הגרפים שונה ל: ${themeName}`, 'success');
 }
 
-// Function to toggle auto refresh
-async function toggleAutoRefresh(enabled) {
-    isAutoRefreshEnabled = enabled;
-    
-    if (enabled) {
-        // Get refresh interval from preferences or fallback to UI
-        let interval = 60; // default 60 seconds
-        
-        try {
-            // Try to get from preferences first
-            if (window.getPreference) {
-                const refreshInterval = await window.getPreference('chartRefreshInterval');
-                if (refreshInterval) {
-                    interval = parseInt(refreshInterval);
-                }
-            }
-        } catch (error) {
-            console.log('Using fallback refresh interval from UI');
-            // Fallback to UI element
-            const uiElement = document.getElementById('refreshInterval');
-            if (uiElement) {
-                interval = parseInt(uiElement.value);
-            }
-        }
-        
-        const intervalMs = interval * 1000;
-        autoRefreshInterval = setInterval(refreshChartsStatus, intervalMs);
-        console.log(`🔄 Auto refresh enabled (${interval}s / ${intervalMs}ms)`);
-    } else {
-        if (autoRefreshInterval) {
-            clearInterval(autoRefreshInterval);
-            autoRefreshInterval = null;
-        }
-        console.log('⏹️ Auto refresh disabled');
-    }
-}
+// Auto-refresh feature removed - not needed for chart management
+// Charts are static visualizations that don't require real-time updates
+// If refresh is needed, user can manually click the refresh button
 
 // Function to export all charts
 async function exportAllCharts() {
@@ -935,25 +900,8 @@ document.addEventListener('DOMContentLoaded', function() {
         refreshChartsStatus();
     }, 1000);
     
-    // Setup auto refresh based on preferences
-    (async () => {
-        try {
-            if (window.getPreference) {
-                const autoRefreshEnabled = await window.getPreference('chartAutoRefresh');
-                if (autoRefreshEnabled === 'true' || autoRefreshEnabled === true) {
-                    await toggleAutoRefresh(true);
-                    console.log('🔄 Auto refresh enabled from preferences');
-                }
-            }
-        } catch (error) {
-            console.log('Using fallback auto refresh from UI');
-            // Fallback to UI element
-            const autoRefreshCheckbox = document.getElementById('autoRefresh');
-            if (autoRefreshCheckbox && autoRefreshCheckbox.checked) {
-                await toggleAutoRefresh(true);
-            }
-        }
-    })();
+    // Auto-refresh removed - charts are static visualizations
+    console.log('ℹ️ Auto-refresh disabled for chart management (not needed)');
 });
 
 // Export functions to global scope
@@ -966,7 +914,7 @@ window.refreshChart = refreshChart;
 window.exportChart = exportChart;
 window.destroyChart = destroyChart;
 window.changeChartTheme = changeChartTheme;
-window.toggleAutoRefresh = toggleAutoRefresh;
+// toggleAutoRefresh removed - auto-refresh feature disabled
 window.exportAllCharts = exportAllCharts;
 window.exportSelectedCharts = exportSelectedCharts;
 // window.copyDetailedLog export removed - using global version from system-management.js

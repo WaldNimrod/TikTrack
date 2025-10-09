@@ -1447,6 +1447,132 @@ function showEditEntityModal(entityId) {
 
 ---
 
+---
+
+## 🎨 תיקוני פורמט והצגה - תקני ברירת מחדל
+
+### **תקנים חדשים למודל פרטים:**
+
+#### **1. פורמט תאריכים:**
+```javascript
+// ✅ תאריך: dd/MM/yy
+formatDate(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return `${day}/${month}/${year}`;  // 08/10/25
+}
+
+// ✅ תאריך+שעה: dd/MM/yy HH:mm
+formatDateTime(datetime) {
+    if (!datetime) return '-';
+    return `${day}/${month}/${year} ${hours}:${minutes}`;  // 08/10/25 14:30
+}
+```
+
+#### **2. פורמט סכומים:**
+```javascript
+// ✅ סכום עם פסיקים כל 3 ספרות + סמל מטבע צמוד
+formatCurrency(amount, currencySymbol = '') {
+    const formatted = parseFloat(amount).toLocaleString('he-IL', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+    return currencySymbol ? `${formatted} ${currencySymbol}` : formatted;
+}
+// דוגמה: "1,500.00 USD"
+```
+
+#### **3. תרגום סוגי תזרים:**
+```javascript
+translateCashFlowType(type) {
+    const translations = {
+        'deposit': 'הפקדה',
+        'withdrawal': 'משיכה',
+        'transfer': 'העברה',
+        'fee': 'עמלה',
+        'dividend': 'דיבידנד',
+        'interest': 'ריבית',
+        'other': 'אחר'
+    };
+    return translations[type] || type;
+}
+```
+
+#### **4. ערכים ריקים:**
+```javascript
+// ✅ אם אין ערך, להציג "-" (לא "לא זמין")
+if (!value) return '-';
+```
+
+#### **5. חשבון מקושר:**
+```javascript
+renderLinkedAccount(cashFlowData, entityColor) {
+    return `
+        <div class="linked-account-card">
+            <h6>${cashFlowData.account_name}</h6>
+            <small>חשבון מסחר #${cashFlowData.trading_account_id}</small>
+            <button onclick="window.showEntityDetails('trading_account', ${id})">
+                צפה בפרטים
+            </button>
+        </div>
+    `;
+}
+```
+
+---
+
+### **יישום ב-formatFieldValue:**
+
+```javascript
+formatFieldValue(value, type, entityColor, currencySymbol = '') {
+    if (!value) return '-';  // ✅ תמיד "-" לערכים ריקים
+    
+    switch (type) {
+        case 'datetime': return this.formatDateTime(value);      // dd/MM/yy HH:mm
+        case 'date': return this.formatDate(value);              // dd/MM/yy
+        case 'currency': return this.formatCurrency(value, currencySymbol);  // 1,500.00 USD
+        case 'number': return value.toLocaleString('he-IL');     // 1,500
+        case 'text': return String(value);
+        // ...
+    }
+}
+```
+
+---
+
+### **הגדרת שדות Cash Flow (מעודכן):**
+
+```javascript
+cash_flow: [
+    { key: 'id', label: 'מזהה', type: 'number' },
+    { key: 'type', label: 'סוג תזרים', type: 'text' },  // ✅ יתורגם אוטומטית
+    { key: 'amount', label: 'סכום', type: 'currency' },  // ✅ עם סימן מטבע
+    { key: 'currency_symbol', label: 'מטבע', type: 'text' },
+    { key: 'account_name', label: 'חשבון מסחר', type: 'text' },
+    { key: 'date', label: 'תאריך', type: 'date' },  // ✅ dd/MM/yy
+    { key: 'usd_rate', label: 'שער דולר', type: 'number' },
+    { key: 'source', label: 'מקור', type: 'text' },
+    { key: 'external_id', label: 'מזהה חיצוני', type: 'text' },
+    { key: 'description', label: 'תיאור', type: 'text' },
+    { key: 'created_at', label: 'תאריך יצירה', type: 'datetime' },  // ✅ dd/MM/yy HH:mm
+    { key: 'updated_at', label: 'תאריך עדכון', type: 'datetime' }  // ✅ או "-"
+]
+```
+
+---
+
+**קבצים שתוקנו:**
+- `trading-ui/scripts/entity-details-renderer.js` - 7 שיפורים:
+  1. formatCurrency - פסיקים + סמל מטבע
+  2. formatDate - dd/MM/yy
+  3. formatDateTime - dd/MM/yy HH:mm + "-" לריק
+  4. translateCashFlowType - תרגום לעברית
+  5. formatFieldValue - תמיכה ב-currency + date
+  6. renderBasicInfo - תרגום אוטומטי + העברת currencySymbol
+  7. renderLinkedAccount - הצגת חשבון מקושר + קישור
+
+---
+
 ## 🚀 מוכן ליישום סטנדרטי!
 
 **תהליך הסטנדרטיזציה יכלול:**
@@ -1454,11 +1580,12 @@ function showEditEntityModal(entityId) {
 - ✅ מערכת ולידציה אחידה
 - ✅ ברירות מחדל חכמות
 - ✅ הצגת נתונים מובנת (שמות במקום מזהים)
-- ✅ ניקוי מטמון אחרי כל פעולת CRUD (UnifiedCacheManager + global data)
-- ✅ timing נכון (await + setTimeout)
+- ✅ פורמטים אחידים (תאריכים, סכומים, תרגומים)
+- ✅ הצגת פריטים מקושרים עם קישורים
+- ✅ ניקוי מטמון אחרי כל פעולת CRUD
 - ✅ תיקון wrapper functions (מניעת לולאות אינסופיות)
 - ✅ null safety בכל מקום
-- ✅ טעינת קבצים נדרשים (entity-details-api.js)
+- ✅ טעינת קבצים נדרשים (entity-details)
 - ✅ חווית משתמש אחידה
 
 **הכל מתועד ומוכן ליישום!** 🎯

@@ -52,8 +52,13 @@ class ExternalDataDashboard {
       // Initialize performance charts after data is loaded
       this.initializePerformanceCharts();
       
-      // Setup auto-refresh
-      this.setupAutoRefresh();
+      // Setup auto-refresh (ONLY on external-data-dashboard page)
+      if (window.location.pathname.includes('external-data-dashboard')) {
+        this.setupAutoRefresh();
+        console.log('🔄 Auto-refresh enabled for external-data-dashboard page (30s interval)');
+      } else {
+        console.log('ℹ️ Auto-refresh disabled - not on external-data-dashboard page');
+      }
       
       // Setup event listeners
       this.setupEventListeners();

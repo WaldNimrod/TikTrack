@@ -44,8 +44,13 @@ class CacheTestPage {
         // Load initial data
         this.loadCacheData();
 
-        // Setup auto-refresh
-        this.setupAutoRefresh();
+        // Setup auto-refresh (ONLY on cache-test page)
+        if (window.location.pathname.includes('cache-test')) {
+            this.setupAutoRefresh();
+            console.log('🔄 Auto-refresh enabled for cache-test page (30s interval)');
+        } else {
+            console.log('ℹ️ Auto-refresh disabled - not on cache-test page');
+        }
 
         // Setup event listeners
         this.setupEventListeners();

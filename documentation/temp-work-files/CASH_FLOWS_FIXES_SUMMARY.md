@@ -1190,6 +1190,70 @@ def create_trade():
 
 ---
 
+## 🚨 תיקון קריטי - בעיית Schema ב-Backend
+
+### **תיקון Ticker.alerts relationship (חובה!)**
+
+#### **הבעיה:**
+```
+SQLAlchemy Error: Could not determine join condition between 
+parent/child tables on relationship Ticker.alerts
+```
+
+**הסיבה:**  
+המודל `Ticker` מנסה ליצור קשר עם `Alert` בצורה ישנה שלא תואמת למבנה החדש.
+
+#### **המבנה הישן vs החדש:**
+
+**ישן (לא קיים יותר):**
+```python
+# alerts table
+ticker_id INTEGER FK → tickers.id
+```
+
+**חדש (מערכת כללית):**
+```python
+# alerts table
+related_type_id INTEGER  # 4 = ticker
+related_id INTEGER       # ID של הטיקר
+```
+
+#### **התיקון:**
+
+**קובץ:** `Backend/models/ticker.py`  
+**שורה:** 76
+
+```python
+# ❌ לפני - גורם לקריסת SQLAlchemy
+alerts = relationship("Alert", back_populates="ticker")
+
+# ✅ אחרי - קשר נכון עם primaryjoin
+alerts = relationship("Alert", 
+                     primaryjoin="and_(Ticker.id == foreign(Alert.related_id), Alert.related_type_id == 4)",
+                     foreign_keys="[Alert.related_id]",
+                     viewonly=True)
+```
+
+**הסבר:**
+- `primaryjoin` - תנאי חיבור: `Ticker.id = Alert.related_id AND related_type_id = 4`
+- `foreign(Alert.related_id)` - מציין את ה-foreign key
+- `viewonly=True` - קשר לקריאה בלבד (read-only)
+
+#### **למה זה חשוב:**
+1. **מונע קריסת SQLAlchemy** - ללא זה, כל ה-APIs עם Ticker קורסים (500 error)
+2. **עקבי עם המערכת** - אותה לוגיקה כמו `notes` relationship
+3. **מאפשר שימוש** - `ticker.alerts` עובד נכון
+
+#### **אחרי התיקון:**
+- ✅ אתחל שרת מחדש (חובה!)
+- ✅ כל ה-APIs חוזרים לעבוד
+- ✅ אפשר להמשיך עם תיקוני המטמון
+
+**קבצים שתוקנו:**
+- `Backend/models/ticker.py` - שורה 76
+
+---
+
 ## 🚀 מוכן ליישום סטנדרטי!
 
 **תהליך הסטנדרטיזציה יכלול:**

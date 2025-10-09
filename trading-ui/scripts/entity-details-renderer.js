@@ -1553,7 +1553,7 @@ class EntityDetailsRenderer {
     /**
      * Render linked trading account info
      */
-    async renderLinkedAccount(cashFlowData, cashFlowColor) {
+    renderLinkedAccount(cashFlowData, cashFlowColor) {
         if (!cashFlowData.trading_account_id) return '';
         
         // צבעים של חשבונות
@@ -1561,23 +1561,8 @@ class EntityDetailsRenderer {
         const accountColorLight = this.lightenColor(accountColorDark, 0.9); // רקע בהיר 90%
         const accountIconPath = this.getEntityIcon('trading_account');
         
-        // טעינת פרטי החשבון מהשרת (אם לא כבר קיימים)
-        let accountData = cashFlowData.account || {};
-        
-        // אם אין נתוני חשבון מלאים, ננסה לטעון
-        if (!accountData.status && !accountData.balance) {
-            try {
-                const response = await fetch(`http://127.0.0.1:8080/api/trading-accounts/${cashFlowData.trading_account_id}`);
-                if (response.ok) {
-                    const result = await response.json();
-                    if (result.status === 'success') {
-                        accountData = result.data;
-                    }
-                }
-            } catch (error) {
-                console.warn('Failed to load account details:', error);
-            }
-        }
+        // שימוש בנתוני החשבון מה-cashFlowData (צריך לבוא מהשרת)
+        const accountData = cashFlowData.account || {};
         
         const accountName = accountData.name || cashFlowData.account_name || 'חשבון לא ידוע';
         const accountType = accountData.type || '-';

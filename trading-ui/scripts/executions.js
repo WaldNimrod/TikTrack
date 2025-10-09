@@ -6,8 +6,7 @@
  */
 function addExecution() {
   try {
-    console.log('➕ מוסיף ביצוע חדש');
-    
+
     // פתיחת מודל הוספת ביצוע
     showAddExecutionModal();
     
@@ -266,23 +265,18 @@ function resetEditExecutionForm() {
  * הצגת מודל עריכת עסקה
  */
 async function showEditExecutionModal(id) {
-  console.log('🔍 [EDIT MODAL] פתיחת מודל עריכה עבור עסקה ID:', id);
-  console.log('🔍 [EDIT MODAL] נתוני עסקעות במטמון:', executionsData.length, 'עסקעות');
-  console.log('🔍 [EDIT MODAL] נתוני עסקעות במטמון:', executionsData.map(e => `${e.id}(trade:${e.trade_id})`));
+
 
   // מציאת העסקה לפי ID
   const execution = executionsData.find(e => e.id === id);
   if (!execution) {
-    console.log('❌ [EDIT MODAL] עסקה לא נמצאה במטמון:', id);
+
     handleElementNotFound('execution', 'CRITICAL');
     return;
   }
-  
-  console.log('✅ [EDIT MODAL] עסקה נמצאה:', execution);
 
   // מילוי שדה ה-ID לפני כל השאר
   document.getElementById('editExecutionId').value = execution.id;
-  console.log('✅ [EDIT MODAL] שדה ID מולא:', execution.id);
 
   // טעינת טיקרים לפי הצ'קבוקס
   const showClosedTrades = document.getElementById('editExecutionShowClosedTrades')?.checked || false;
@@ -297,21 +291,19 @@ async function showEditExecutionModal(id) {
   try {
     // בדיקה אם יש טרייד מקושר
     if (execution.trade_id) {
-      console.log('🔍 [EDIT MODAL] מחפש טרייד מקושר ID:', execution.trade_id);
+
       const tradesResponse = await fetch('/api/trades/');
       const responseData = await tradesResponse.json();
       const trades = responseData.data || responseData || [];
-      
-      console.log('🔍 [EDIT MODAL] טריידים נטענו מהשרת:', trades.length, 'טריידים');
-      console.log('🔍 [EDIT MODAL] טריידים מהשרת:', trades.map(t => `${t.id}(ticker:${t.ticker_id},status:${t.status})`));
+
 
       const trade = trades.find(t => t.id === execution.trade_id);
       if (trade) {
-        console.log('✅ [EDIT MODAL] טרייד מקושר נמצא:', trade);
+
         linkedObject = { type: 'trade', data: trade };
         tickerId = trade.ticker_id;
       } else {
-        console.log('❌ [EDIT MODAL] טרייד מקושר לא נמצא:', execution.trade_id);
+
       }
     }
 
@@ -337,19 +329,19 @@ async function showEditExecutionModal(id) {
 
     // עדכון שדה הטיקר
     if (tickerId) {
-      console.log('🔍 [EDIT MODAL] מעדכן שדה טיקר ל-ID:', tickerId);
+
       const tickerSelect = document.getElementById('editExecutionTicker');
       if (tickerSelect) {
         tickerSelect.value = tickerId;
-        console.log('✅ [EDIT MODAL] שדה טיקר עודכן ל:', tickerId);
+
         // טעינת טריידים ותכנונים לטיקר זה
         await loadActiveTradesForTicker('edit');
-        console.log('✅ [EDIT MODAL] טריידים נטענו לטיקר:', tickerId);
+
       } else {
-        console.log('❌ [EDIT MODAL] שדה טיקר לא נמצא ב-DOM');
+
       }
     } else {
-      console.log('⚠️ [EDIT MODAL] אין tickerId לעדכון');
+
     }
 
     // מילוי הטופס - שדה ID כבר מולא למעלה
@@ -363,11 +355,11 @@ async function showEditExecutionModal(id) {
 
         // פונקציה לבדיקה ומילוי
         const trySetTradeValue = () => {
-          console.log('🔍 [EDIT MODAL] מחפש ערך טרייד:', value, 'באפשרויות:', Array.from(tradeSelect.options).map(o => `${o.value}(${o.text})`));
+
           const optionExists = Array.from(tradeSelect.options).some(option => option.value === value);
           if (optionExists) {
             tradeSelect.value = value;
-            console.log('✅ [EDIT MODAL] שדה טרייד/תכנון מולא:', value);
+
             return true;
           }
           return false;
@@ -375,12 +367,11 @@ async function showEditExecutionModal(id) {
 
         // נסיון ראשון
         if (!trySetTradeValue()) {
-          console.log('⚠️ הערך לא נמצא באפשרויות:', value, 'אפשרויות:', Array.from(tradeSelect.options).map(o => o.value));
-          
+
           // נסיון נוסף אחרי זמן קצר
           setTimeout(() => {
             if (!trySetTradeValue()) {
-              console.log('❌ לא ניתן למלא שדה טרייד/תכנון:', value);
+
             }
           }, 500);
         }
@@ -393,12 +384,12 @@ async function showEditExecutionModal(id) {
       const actionSelect = document.getElementById('editExecutionType');
       if (actionSelect) {
         actionSelect.value = actionValue;
-        console.log('✅ [EDIT MODAL] שדה פעולה מולא:', actionValue);
+
       } else {
-        console.log('❌ [EDIT MODAL] שדה פעולה לא נמצא ב-DOM');
+
       }
     } else {
-      console.log('⚠️ [EDIT MODAL] אין ערך פעולה לעסקה');
+
     }
 
     // מילוי שדה הכמות
@@ -406,12 +397,12 @@ async function showEditExecutionModal(id) {
       const quantityField = document.getElementById('editExecutionQuantity');
       if (quantityField) {
         quantityField.value = execution.quantity;
-        console.log('✅ [EDIT MODAL] שדה כמות מולא:', execution.quantity);
+
       } else {
-        console.log('❌ [EDIT MODAL] שדה כמות לא נמצא ב-DOM');
+
       }
     } else {
-      console.log('⚠️ [EDIT MODAL] אין כמות לעסקה');
+
     }
 
     // מילוי שדה המחיר
@@ -419,17 +410,17 @@ async function showEditExecutionModal(id) {
       const priceField = document.getElementById('editExecutionPrice');
       if (priceField) {
         priceField.value = execution.price;
-        console.log('✅ [EDIT MODAL] שדה מחיר מולא:', execution.price);
+
       } else {
-        console.log('❌ [EDIT MODAL] שדה מחיר לא נמצא ב-DOM');
+
       }
     } else {
-      console.log('⚠️ [EDIT MODAL] אין מחיר לעסקה');
+
     }
 
     // עיבוד תאריך ביצוע - בדיקה של שדות שונים
     executionDate = execution.date || execution.execution_date || execution.created_at;
-    console.log('🔍 [EDIT MODAL] תאריך ביצוע גולמי:', executionDate);
+
     console.log('🔍 [EDIT MODAL] שדות תאריך זמינים:', {
       date: execution.date,
       execution_date: execution.execution_date,
@@ -443,19 +434,19 @@ async function showEditExecutionModal(id) {
         const dateField = document.getElementById('editExecutionDate');
         if (dateField) {
           dateField.value = localDateTime;
-          console.log('✅ [EDIT MODAL] שדה תאריך מולא:', localDateTime, 'מהתאריך:', executionDate);
+
         } else {
-          console.log('❌ [EDIT MODAL] שדה תאריך לא נמצא ב-DOM');
+
         }
       } catch (error) {
-        console.log('❌ [EDIT MODAL] שגיאה בעיבוד תאריך:', error, 'תאריך גולמי:', executionDate);
+
         const dateField = document.getElementById('editExecutionDate');
         if (dateField) {
           dateField.value = '';
         }
       }
     } else {
-      console.log('⚠️ [EDIT MODAL] אין תאריך ביצוע לעסקה');
+
       const dateField = document.getElementById('editExecutionDate');
       if (dateField) {
         dateField.value = '';
@@ -468,12 +459,12 @@ async function showEditExecutionModal(id) {
       const commissionField = document.getElementById('editExecutionCommission');
       if (commissionField) {
         commissionField.value = commissionValue;
-        console.log('✅ [EDIT MODAL] שדה עמלה מולא:', commissionValue);
+
       } else {
-        console.log('❌ [EDIT MODAL] שדה עמלה לא נמצא ב-DOM');
+
       }
     } else {
-      console.log('⚠️ [EDIT MODAL] אין עמלה לעסקה');
+
     }
 
     // מילוי שדה המקור
@@ -481,9 +472,9 @@ async function showEditExecutionModal(id) {
     const sourceField = document.getElementById('editExecutionSource');
     if (sourceField) {
       sourceField.value = sourceValue;
-      console.log('✅ [EDIT MODAL] שדה מקור מולא:', sourceValue);
+
     } else {
-      console.log('❌ [EDIT MODAL] שדה מקור לא נמצא ב-DOM');
+
     }
 
     // מילוי שדה מזהה חיצוני אם קיים
@@ -492,10 +483,10 @@ async function showEditExecutionModal(id) {
     if (externalIdField) {
       externalIdField.value = externalIdValue;
       if (externalIdValue) {
-        console.log('✅ [EDIT MODAL] שדה מזהה חיצוני מולא:', externalIdValue);
+
       }
     } else {
-      console.log('❌ [EDIT MODAL] שדה מזהה חיצוני לא נמצא ב-DOM');
+
     }
 
     // הצגת/הסתרת שדה מזהה חיצוני לפי המקור
@@ -507,12 +498,12 @@ async function showEditExecutionModal(id) {
       const notesField = document.getElementById('editExecutionNotes');
       if (notesField) {
         notesField.value = notesValue;
-        console.log('✅ [EDIT MODAL] שדה הערות מולא:', notesValue);
+
       } else {
-        console.log('❌ [EDIT MODAL] שדה הערות לא נמצא ב-DOM');
+
       }
     } else {
-      console.log('⚠️ [EDIT MODAL] אין הערות לעסקה');
+
     }
 
     // הצגת כפתור קישור לטרייד/תכנון אם יש
@@ -1355,294 +1346,14 @@ async function showExecutionLinkedItemsModal(executionId, _errorData) {
 }
 
 /**
- * טעינת פרטי הפריטים המקושרים
+ * פריטים מקושרים - Linked Items
+ * ⚠️ הקובץ משתמש במערכת הכללית linked-items.js
+ * 
+ * במקום הפונקציות המקומיות שהוסרו, השתמש ב:
+ * - window.loadLinkedItemsData('execution', executionId)
+ * - window.showLinkedItemsModal(data, 'execution', executionId, 'view')
+ * - window.viewLinkedItemsForExecution(executionId)
  */
-async function loadLinkedItemsDetails(executionId, _errorData = null) {
-
-
-  const contentDiv = document.getElementById('linkedItemsContent');
-  contentDiv.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"></div><br>טוען פרטים...</div>';
-
-  try {
-    // קריאה ל-API לקבלת פרטי הפריטים המקושרים
-    const response = await fetch(`/api/executions/${executionId}/linked-items`);
-
-    if (response.ok) {
-      const data = await response.json();
-
-      displayLinkedItems(data.data);
-    } else {
-
-      // אם אין API ספציפי, ננסה לטעון מכל ה-APIs
-      await loadLinkedItemsFromMultipleSources(executionId);
-    }
-
-  } catch (error) {
-    handleDataLoadError(error, 'פריטים מקושרים');
-    // אם יש שגיאה, ננסה לטעון מכל ה-APIs
-    await loadLinkedItemsFromMultipleSources(executionId);
-  }
-}
-
-/**
- * טעינת פריטים מקושרים ממקורות מרובים
- */
-async function loadLinkedItemsFromMultipleSources(executionId) {
-
-
-  const execution = executionsData.find(e => e.id === executionId);
-  if (!execution) {return;}
-
-  const linkedItems = {
-    trades: [],
-    trade_plans: [],
-    alerts: [],
-    notes: [],
-  };
-
-  try {
-    // טעינת טריידים
-    try {
-      const tradesResponse = await fetch('/api/trades/');
-      if (tradesResponse.ok) {
-        const linkedTradesData = await tradesResponse.json();
-        const trades = linkedTradesData.data || linkedTradesData || [];
-        linkedItems.trades = trades.filter(trade =>
-          trade.id === execution.trade_id,
-        );
-      }
-    } catch { /* // console.warn('לא ניתן לטעון טריידים:', e); */ }
-
-    // טעינת תכנונים
-    try {
-      const plansResponse = await fetch('/api/trade_plans/');
-      if (plansResponse.ok) {
-        const plansData = await plansResponse.json();
-        const plans = plansData.data || plansData || [];
-        linkedItems.trade_plans = plans.filter(plan =>
-          plan.trade_id === execution.trade_id,
-        );
-      }
-    } catch { /* // console.warn('לא ניתן לטעון תכנונים:', e); */ }
-
-    // טעינת התראות
-    try {
-      const alertsResponse = await fetch('/api/alerts/');
-      if (alertsResponse.ok) {
-        const alertsData = await alertsResponse.json();
-        const alerts = alertsData.data || alertsData || [];
-        linkedItems.alerts = alerts.filter(alert =>
-          alert.related_type_id === 5 && alert.related_id === executionId &&
-                    alert.status === 'open',
-        );
-      }
-    } catch { /* // console.warn('לא ניתן לטעון התראות:', e); */ }
-
-    // טעינת הערות
-    try {
-      const notesResponse = await fetch('/api/notes/');
-      if (notesResponse.ok) {
-        const notesData = await notesResponse.json();
-        const notes = notesData.data || notesData || [];
-        linkedItems.notes = notes.filter(note =>
-          note.related_type_id === 5 && note.related_id === executionId,
-        );
-      }
-    } catch { /* // console.warn('לא ניתן לטעון הערות:', e); */ }
-
-    displayLinkedItems(linkedItems);
-
-  } catch (error) {
-    handleDataLoadError(error, 'פריטים מקושרים');
-    document.getElementById('linkedItemsContent').innerHTML =
-            '<div class="alert alert-danger">שגיאה בטעינת פרטי הפריטים המקושרים</div>';
-  }
-}
-
-/**
- * הצגת הפריטים המקושרים
- */
-function displayLinkedItems(linkedItems) {
-  // הצגת פריטים מקושרים
-  // סוג הנתונים
-  // מפתחות
-
-  const contentDiv = document.getElementById('linkedItemsContent');
-  let html = '';
-
-  // טריידים מקושרים
-  // בדיקת טריידים מקושרים
-  // האם קיים trades
-  // אורך trades
-  if (linkedItems.trades && linkedItems.trades.length > 0) {
-    // נמצאו טריידים מקושרים, יוצר HTML
-    html += `
-            <div class="card mb-3">
-                <div class="card-header bg-warning text-dark">
-                    <h6 class="mb-0">🔄 טריידים מקושרים (${linkedItems.trades.length})</h6>
-                </div>
-                <div class="card-body">
-                    <p><strong>נמצאו ${linkedItems.trades.length} טריידים מקושרים:</strong></p>
-                    <ul>
-                        ${linkedItems.trades.map(trade => `
-                            <li>
-                                טרייד #${trade.id} - חשבון: ${trade.account_name || 'לא זמין'} - סטטוס: ${trade.status}
-                                <button class="btn btn-sm btn-outline-primary ms-2" onclick="goToTrade(${trade.id})">
-                                    עבור לטרייד
-                                </button>
-                            </li>
-                        `).join('')}
-                    </ul>
-                </div>
-            </div>
-        `;
-  }
-
-  // תכנונים מקושרים
-  // בדיקת תכנונים מקושרים
-  if (linkedItems.trade_plans && linkedItems.trade_plans.length > 0) {
-    html += `
-            <div class="card mb-3">
-                <div class="card-header bg-info text-white">
-                    <h6 class="mb-0">📋 תכנונים מקושרים (${linkedItems.trade_plans.length})</h6>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>מזהה</th>
-                                    <th>סוג השקעה</th>
-                                    <th>סטטוס</th>
-                                    <th>תאריך יצירה</th>
-                                    <th>פעולות</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${linkedItems.trade_plans.map(plan => `
-                                    <tr>
-                                        <td>${plan.id}</td>
-                                        <td>${plan.investment_type}</td>
-                                        <td><span class="badge bg-info">${plan.status}</span></td>
-                                        <td>${formatDate(plan.created_at)}</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary" 
-                                              onclick="goToPlan(${plan.id})">
-                                                עבור לתכנון
-                                            </button>
-                                        </td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        `;
-  }
-
-  // התראות פעילות
-  if (linkedItems.alerts && linkedItems.alerts.length > 0) {
-    html += `
-            <div class="card mb-3">
-                <div class="card-header bg-danger text-white">
-                    <h6 class="mb-0">🚨 התראות פעילות (${linkedItems.alerts.length})</h6>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>מזהה</th>
-                                    <th>סוג התראה</th>
-                                    <th>תנאי</th>
-                                    <th>סטטוס</th>
-                                    <th>פעולות</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${linkedItems.alerts.map(alert => `
-                                    <tr>
-                                        <td>${alert.id}</td>
-                                        <td>${alert.alert_type}</td>
-                                        <td>${alert.condition || 'לא זמין'}</td>
-                                        <td><span class="badge ${
-  window.getAlertStatusClass ?
-    window.getAlertStatusClass(alert.status, alert.is_triggered) :
-    'bg-danger'
-}">${
-  window.getAlertStatusDisplay ?
-    window.getAlertStatusDisplay(alert.status, alert.is_triggered) :
-    alert.status
-}</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary" 
-                                              onclick="goToAlert(${alert.id})">
-                                                עבור להתראה
-                                            </button>
-                                        </td>
-                                    </tr>
-                                `).join('')}
-                        </tbody>
-                    </table>
-                    </div>
-                </div>
-            </div>
-        `;
-  }
-
-  // הערות
-  if (linkedItems.notes && linkedItems.notes.length > 0) {
-    html += `
-            <div class="card mb-3">
-                <div class="card-header bg-secondary text-white">
-                    <h6 class="mb-0">📝 הערות (${linkedItems.notes.length})</h6>
-            </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>מזהה</th>
-                                    <th>תוכן</th>
-                                    <th>תאריך יצירה</th>
-                                    <th>פעולות</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${linkedItems.notes.map(note => `
-                                    <tr>
-                                        <td>${note.id}</td>
-                                        <td>${
-  note.content ?
-    note.content.substring(0, 50) + '...' :
-    'ללא תוכן'
-}</td>
-                                        <td>${formatDate(note.created_at)}</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary" 
-                                              onclick="goToNote(${note.id})">
-                                                עבור להערה
-                                            </button>
-                                        </td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-        </div>
-                </div>
-        </div>
-    `;
-  }
-
-  // HTML שנוצר
-  if (!html) {
-    html = '<div class="alert alert-success">✅ לא נמצאו פריטים מקושרים פתוחים. ' +
-      'ניתן למחוק את הטיקר בבטחה.</div>';
-  }
-
-  contentDiv.innerHTML = html;
-}
 
 /**
  * מעבר לניהול פריטים מקושרים
@@ -1853,10 +1564,10 @@ async function updateExecutionsTableMain(executions) {
                                    <td class="ticker-cell">
                        <div class="ticker-cell-content">
                            <strong class="ticker-symbol-link ${execution.action === 'buy' ? 'action-buy' : 'action-sell'}" 
-                             onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('ticker', ${ticker ? ticker.id : 'null'}, 'view'); } else { console.log('Entity details modal not available'); }" 
+                             onclick="window.showEntityDetailsModal && window.showEntityDetailsModal('ticker', ${ticker ? ticker.id : 'null'}, 'view')" 
                              title="פתח פרטי סימבול">${symbol}</strong>
                            <button class="btn btn-sm btn-info" 
-                             onclick="console.log('🔗 [LINKED ITEMS] לחיצה על כפתור מקושרים עבור טיקר:', ${ticker ? ticker.id : 'null'}); if(window.loadLinkedItemsData) { window.loadLinkedItemsData('ticker', ${ticker ? ticker.id : 'null'}).then(data => { console.log('🔗 [LINKED ITEMS] נתונים נטענו:', data); if(data) { console.log('🔗 [LINKED ITEMS] מציג מודל עם נתונים'); window.showLinkedItemsModal(data, 'ticker', ${ticker ? ticker.id : 'null'}, 'view'); } else { console.log('❌ [LINKED ITEMS] אין נתונים להצגה'); } }); } else { console.log('❌ [LINKED ITEMS] loadLinkedItemsData לא זמין'); }" 
+                             onclick="window.viewLinkedItemsForTicker && window.viewLinkedItemsForTicker(${ticker ? ticker.id : 'null'})" 
                              title="פריטים מקושרים לטיקר">🔗</button>
                        </div>
                    </td>
@@ -1866,7 +1577,7 @@ async function updateExecutionsTableMain(executions) {
                     </span>
                 </td>
                 <td data-account="${accountName}" class="account-cell-link" 
-                  onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('account', '${accountName}', 'view'); } else { console.log('Entity details modal not available'); }" 
+                  onclick="window.showEntityDetailsModal && window.showEntityDetailsModal('account', '${accountName}', 'view')" 
                   title="פתח פרטי חשבון">${accountName}</td>
                 <td>${execution.quantity}</td>
                 <td>$${execution.price}</td>
@@ -1874,7 +1585,7 @@ async function updateExecutionsTableMain(executions) {
                 <td data-date="${execution.date || execution.execution_date}">${execution.date || execution.execution_date ? new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL') : '-'}</td>
                 <td class="source-cell">${execution.source || '-'}</td>
                 <td class="col-actions actions-cell actions-3-btn">
-                    <button class="btn btn-sm btn-outline-info" onclick="console.log('🔗 [LINKED ITEMS] לחיצה על כפתור מקושרים עבור עסקה:', ${execution.id}); if(window.loadLinkedItemsData) { window.loadLinkedItemsData('execution', ${execution.id}).then(data => { console.log('🔗 [LINKED ITEMS] נתונים נטענו:', data); if(data) { console.log('🔗 [LINKED ITEMS] מציג מודל עם נתונים'); window.showLinkedItemsModal(data, 'execution', ${execution.id}, 'view'); } else { console.log('❌ [LINKED ITEMS] אין נתונים להצגה'); } }); } else { console.log('❌ [LINKED ITEMS] loadLinkedItemsData לא זמין'); }" title="פריטים מקושרים">
+                    <button class="btn btn-sm btn-outline-info" onclick="window.viewLinkedItemsForExecution && window.viewLinkedItemsForExecution(${execution.id})" title="פריטים מקושרים">
                         <i class="bi bi-link-45deg"></i>
                     </button>
                     <button class="btn btn-sm btn-outline-primary" onclick="editExecution(${execution.id})" title="עריכה">
@@ -2124,24 +1835,6 @@ window.goToNote = goToNote;
  */
 
 /**
- * שחזור מצב סידור - שימוש בפונקציה גלובלית
- * @deprecated Use window.restoreAnyTableSort from main.js instead
- */
-function restoreSortState() {
-  // Restoring sort state for executions table
-
-  if (typeof window.restoreAnyTableSort === 'function') {
-    window.restoreAnyTableSort('executions', window.executionsData || [], updateExecutionsTableMain);
-  } else {
-    if (typeof handleFunctionNotFound === 'function') {
-      handleFunctionNotFound('restoreAnyTableSort');
-    } else {
-      console.warn('⚠️ restoreAnyTableSort function not available');
-    }
-  }
-}
-
-/**
  * טעינת צבעים מההעדפות ויישום על הכותרות
  */
 async function loadColorsAndApplyToHeaders() {
@@ -2160,7 +1853,7 @@ async function loadColorsAndApplyToHeaders() {
       if (!window.UnifiedCacheManager.initialized) {
         console.warn('⚠️ UnifiedCacheManager initialization timeout, proceeding with fallback');
       } else {
-        console.log('✅ UnifiedCacheManager initialized, proceeding with preferences loading');
+
       }
     }
 
@@ -2168,17 +1861,17 @@ async function loadColorsAndApplyToHeaders() {
     if (!window.currentPreferences) {
       if (window.preferences && window.preferences.loadPreferences) {
         await window.preferences.loadPreferences();
-        console.log('✅ Loaded preferences for executions');
+
       } else if (window.loadPreferences) {
         await window.loadPreferences();
-        console.log('🔄 Loaded preferences for executions (fallback)');
+
       }
     }
 
     // טעינת צבעים מההעדפות
     if (window.loadEntityColorsFromPreferences && window.currentPreferences) {
       window.loadEntityColorsFromPreferences(window.currentPreferences);
-      console.log('✅ Loaded entity colors from preferences');
+
     }
 
     // יישום צבעי ישות על כותרות
@@ -2209,8 +1902,10 @@ document.addEventListener('DOMContentLoaded', function () {
   // הגדרת פונקציות פילטר
   setupExecutionsFilterFunctions();
 
-  // שחזור מצב סידור
-  restoreSortState();
+  // שחזור מצב סידור - שימוש בפונקציה גלובלית
+  if (typeof window.restoreAnyTableSort === 'function') {
+    window.restoreAnyTableSort('executions', window.executionsData || [], updateExecutionsTableMain);
+  }
 
   // אתחול רשימת טיקרים לפי הצ'קבוקס (ברירת מחדל: לא מסומן)
   updateTickersList('add', false);
@@ -2218,7 +1913,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // עדכון אוטומטי כל 30 שניות
   setInterval(() => {
-    console.log('🔄 Auto-refreshing executions data...');
+
     loadExecutionsData();
   }, 30000);
 });
@@ -2320,18 +2015,15 @@ function enableAllFields(mode = 'add') {
  * @param {boolean} showClosedTrades - האם להציג טריידים סגורים
  */
 async function loadActiveTradesForTicker(mode = 'add', _showClosedTrades = false) {
-  console.log('🔄 טעינת טריידים לטיקר, מצב:', mode, 'הצג טריידים סגורים:', _showClosedTrades);
 
   const tickerId = mode === 'add'
     ? document.getElementById('addExecutionTicker').value
     : document.getElementById('editExecutionTicker').value;
 
   if (!tickerId) {
-    console.log('🔄 אין טיקר נבחר');
+
     return;
   }
-  
-  console.log('🔄 טיקר נבחר:', tickerId);
 
   // בדיקת הצ'קבוקס (אם לא הועבר כפרמטר)
   let showClosedTrades = _showClosedTrades;
@@ -2362,52 +2054,45 @@ async function loadActiveTradesForTicker(mode = 'add', _showClosedTrades = false
 
       filteredTrades = [...activeTrades, ...closedTrades];
 
-      console.log('🔄 טריידים פעילים לטיקר:', activeTrades.length);
-      console.log('🔄 טריידים סגורים לטיקר:', closedTrades.length);
-      console.log('🔄 סה"כ טריידים רלוונטיים:', filteredTrades.length);
+
     } else {
       // הצג רק טריידים פעילים
       filteredTrades = trades.filter(trade =>
         trade.ticker_id === parseInt(tickerId) && (trade.status === 'active' || trade.status === 'open'),
       );
-      console.log('🔄 טריידים פעילים בלבד לטיקר:', filteredTrades.length);
+
     }
 
     // במצב עריכה, נוודא שהטרייד המקושר לעסקה נמצא ברשימה
     if (mode === 'edit') {
       const executionId = document.getElementById('editExecutionId')?.value;
-      console.log('🔍 [EDIT MODAL] מחפש עסקה לעריכה ID:', executionId);
+
       const currentExecution = executionsData.find(e => e.id === parseInt(executionId));
-      console.log('🔍 [EDIT MODAL] עסקה נמצאה:', currentExecution);
-      
+
       if (currentExecution && currentExecution.trade_id) {
-        console.log('🔍 [EDIT MODAL] מחפש טרייד מקושר ID:', currentExecution.trade_id);
+
         const specificTrade = trades.find(trade => trade.id === currentExecution.trade_id);
-        console.log('🔍 [EDIT MODAL] טרייד מקושר נמצא:', specificTrade);
-        
+
         if (specificTrade) {
           // בדיקה אם הטרייד הספציפי כבר ברשימה
           const alreadyInList = filteredTrades.some(trade => trade.id === specificTrade.id);
-          console.log('🔍 [EDIT MODAL] טרייד כבר ברשימה:', alreadyInList);
-          
+
           if (!alreadyInList) {
             // הוספת הטרייד הספציפי לרשימה
             filteredTrades.unshift(specificTrade);
-            console.log('✅ [EDIT MODAL] הוספת טרייד ספציפי לעריכה:', specificTrade.id, 'סטטוס:', specificTrade.status);
+
           } else {
-            console.log('✅ [EDIT MODAL] טרייד ספציפי כבר ברשימה:', specificTrade.id);
+
           }
         } else {
-          console.log('❌ [EDIT MODAL] טרייד מקושר לא נמצא ברשימת הטריידים:', currentExecution.trade_id);
+
         }
       } else {
-        console.log('❌ [EDIT MODAL] אין עסקה או trade_id:', currentExecution);
+
       }
     }
 
-    console.log('🔄 נמצאו טריידים:', filteredTrades.length);
-    console.log('🔄 טריידים ברשימה:', filteredTrades.map(t => `${t.id}(${t.status})`));
-    
+
     // לוג נוסף לוודא שהטרייד המקושר נוסף
     if (mode === 'edit') {
       const executionId = document.getElementById('editExecutionId')?.value;
@@ -2415,9 +2100,9 @@ async function loadActiveTradesForTicker(mode = 'add', _showClosedTrades = false
       if (currentExecution && currentExecution.trade_id) {
         const tradeInList = filteredTrades.find(t => t.id === currentExecution.trade_id);
         if (tradeInList) {
-          console.log('✅ [EDIT MODAL] טרייד מקושר נמצא ברשימה הסופית:', tradeInList.id, 'סטטוס:', tradeInList.status);
+
         } else {
-          console.log('❌ [EDIT MODAL] טרייד מקושר לא נמצא ברשימה הסופית:', currentExecution.trade_id);
+
         }
       }
     }
@@ -2478,7 +2163,6 @@ async function updateTradesOnCheckboxChange(mode = 'add') {
       ? document.getElementById('addExecutionShowClosedTrades')?.checked || false
       : document.getElementById('editExecutionShowClosedTrades')?.checked || false;
 
-    // console.log('🔄 הצג טריידים סגורים:', showClosedTrades);
 
     // קבלת הטיקר הנבחר
     const tickerSelect = mode === 'add'
@@ -2506,15 +2190,12 @@ async function updateTradesOnCheckboxChange(mode = 'add') {
  * @param {string} mode - 'add' או 'edit'
  */
 async function updateTradesOnTickerChange(mode = 'add') {
-  console.log('🔄 עדכון טריידים לפי שינוי טיקר, מצב:', mode);
 
   try {
     // בדיקת הצ'קבוקס הנוכחי
     const showClosedTrades = mode === 'add'
       ? document.getElementById('addExecutionShowClosedTrades')?.checked || false
       : document.getElementById('editExecutionShowClosedTrades')?.checked || false;
-
-    console.log('🔄 הצג טריידים סגורים:', showClosedTrades);
 
     // עדכון הטריידים לטיקר הנבחר
     await loadActiveTradesForTicker(mode, showClosedTrades);
@@ -2974,7 +2655,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // בדיקה שהפונקציות נטענו בהצלחה
-// console.log('✅ Execution functions loaded:', {
+
 //   loadTradeExecutions: typeof loadTradeExecutions,
 //   updateExecutionsTableMain: typeof updateExecutionsTableMain,
 //   updateExecutionsTableForTradeModal: typeof updateExecutionsTableForTradeModal,
@@ -3206,7 +2887,7 @@ window.loadExecutionsData = async function() {
   try {
     const tickers = await loadTickersSummaryData();
     updateTickersSummaryTable(tickers);
-    // console.log('✅ טבלת טיקרים חלקית נטענה בהצלחה');
+
   } catch (error) {
     // console.error('❌ שגיאה בטעינת טבלת טיקרים חלקית:', error);
     handleDataLoadError(error, 'טבלת טיקרים חלקית');
@@ -3289,7 +2970,7 @@ let tickersSummaryData = [];
  * טעינת נתוני טיקרים חלקיים
  */
 async function loadTickersSummaryData() {
-  // console.log('🔄 טעינת נתוני טיקרים חלקיים...');
+
 
   try {
     // טעינת טיקרים
@@ -3343,7 +3024,6 @@ async function loadTickersSummaryData() {
     tickersSummaryData = processedTickers;
     window.tickersSummaryData = processedTickers;
 
-    // console.log('✅ טעינת טיקרים חלקיים הושלמה:', processedTickers.length, 'טיקרים');
     return processedTickers;
 
   } catch (error) {
@@ -3357,7 +3037,7 @@ async function loadTickersSummaryData() {
  * עדכון טבלת טיקרים חלקית
  */
 function updateTickersSummaryTable(tickers = null) {
-  // console.log('🔄 עדכון טבלת טיקרים חלקית...');
+
 
   const tableBody = document.querySelector('#tickersTable tbody');
   if (!tableBody) {
@@ -3429,14 +3109,13 @@ function updateTickersSummaryTable(tickers = null) {
     tableBody.appendChild(row);
   });
 
-  // console.log('✅ טבלת טיקרים חלקית עודכנה:', dataToShow.length, 'שורות');
 }
 
 /**
  * רענון רשימת טיקרים
  */
 async function refreshTickersSummary() {
-  // console.log('🔄 רענון רשימת טיקרים...');
+
 
   try {
     const tickers = await loadTickersSummaryData();
@@ -3457,7 +3136,7 @@ async function refreshTickersSummary() {
  * צפייה בפרטי טיקר
  */
 function viewTickerDetails(tickerId) {
-  // console.log('🔄 צפייה בפרטי טיקר:', tickerId);
+
 
   // מציאת הטיקר
   const ticker = tickersSummaryData.find(t => t.id === tickerId);
@@ -3476,7 +3155,7 @@ function viewTickerDetails(tickerId) {
  * הוספת עסקה לטיקר
  */
 function addExecutionForTicker(tickerId) {
-  // console.log('🔄 הוספת עסקה לטיקר:', tickerId);
+
 
   // מציאת הטיקר
   const ticker = tickersSummaryData.find(t => t.id === tickerId);
@@ -3534,7 +3213,7 @@ window.toggleTickersSection = toggleTickersSection;
  * @param {boolean} showClosedTrades - האם להציג טריידים סגורים
  */
 async function updateTickersList(mode, showClosedTrades = false) {
-  // console.log('🔄 עדכון רשימת טיקרים:', { mode, showClosedTrades });
+
 
   try {
     // טעינת כל הטיקרים
@@ -3566,15 +3245,13 @@ async function updateTickersList(mode, showClosedTrades = false) {
         index === self.findIndex(t => t.id === ticker.id),
       );
 
-      // console.log('🔄 טיקרים עם טריידים פעילים:', tickersWithActiveTrades.map(t => t.symbol));
-      // console.log('🔄 טיקרים עם טריידים סגורים:', tickersWithClosedTrades.map(t => t.symbol));
-      // console.log('🔄 סה"כ טיקרים רלוונטיים:', filteredTickers.map(t => t.symbol));
+
     } else {
       // הצג רק טיקרים עם טריידים פעילים
       filteredTickers = allTickers.filter(ticker =>
         trades.some(trade => trade.ticker_id === ticker.id && (trade.status === 'active' || trade.status === 'open')),
       );
-      // console.log('🔄 טיקרים עם טריידים פעילים בלבד:', filteredTickers.map(t => t.symbol));
+
     }
 
     // עדכון שדה הטיקר
@@ -3590,8 +3267,8 @@ async function updateTickersList(mode, showClosedTrades = false) {
         option.textContent = `${ticker.symbol} - ${ticker.name}`;
         tickerSelect.appendChild(option);
       });
-      // console.log('✅ רשימת טיקרים עודכנה:', filteredTickers.length, 'טיקרים');
-      // console.log('🔄 טיקרים שנבחרו:', filteredTickers.map(t => t.symbol));
+
+
     }
 
   } catch (error) {

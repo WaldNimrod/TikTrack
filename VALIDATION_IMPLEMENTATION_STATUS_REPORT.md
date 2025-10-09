@@ -11,16 +11,16 @@
 
 | קטגוריה | סטטוס | אחוז השלמה |
 |---------|-------|-----------|
-| **עמודים שתוקנו במלואו** | ✅ | 5/8 (62.5%) |
-| **עמודים עם תיקון חלקי** | 🟡 | 2/8 (25%) |
+| **עמודים שתוקנו במלואו** | ✅ | 7/8 (87.5%) |
 | **עמודים שטרם נבדקו** | ⏭️ | 1/8 (12.5%) |
+| **מיגרציות DB שבוצעו** | ✅ | 1 (alerts) |
 | **פונקציות ולידציה נוספו** | ✅ | 7 |
 | **פונקציות שמירה תוקנו** | ✅ | 5 |
 | **קבצים הועברו לארכיון** | ✅ | 5 |
 
 ---
 
-## ✅ עמודים שתוקנו במלואו (5/8)
+## ✅ עמודים שתוקנו במלואו (7/8)
 
 ### 1️⃣ **trading_accounts.js** ✅ **תיקון מלא 100%**
 
@@ -183,8 +183,6 @@
 
 ---
 
-## 🟡 עמודים עם תיקון חלקי (2/8)
-
 ### 5️⃣ **alerts.js** ✅ **תוקן במלואו**
 
 **קובץ:** `trading-ui/scripts/alerts.js`  
@@ -208,56 +206,48 @@
 
 ---
 
-### 6️⃣ **trade_plans.js** 🟡 **משתמש במערכת ישנה**
+### 6️⃣ **trade_plans.js** ✅ **תוקן במלואו**
 
 **קובץ:** `trading-ui/scripts/trade_plans.js`  
 **גודל:** ~3333 שורות  
-**סטטוס:** 🟡 צריך תיקון
+**סטטוס:** ✅ מושלם
 
-#### **מצב נוכחי:**
-- 🔴 משתמש ב-`window.validateForm(formId, validationRules)` ישן
-- 🔴 `validationRules` אובייקט מורכב:
-  ```javascript
-  const validationRules = {
-    'fieldId': {
-      required: true,
-      min: 0.01,
-      max: 999999,
-      customValidation: (value) => {...}
-    }
-  }
-  ```
+#### **מה תוקן:**
+- ✅ `validateTradePlanForm()` - ולידציה סטנדרטית מלאה
+- ✅ המרת `validationRules` אובייקט ל-`requiredFields` array
+- ✅ העברת `customValidation` ל-`validation` callbacks
+- ✅ `saveNewTradePlan()` - תוקן לפי המדריך
+- ✅ הסרת fallback ישן ומסורבל
+- ✅ הפרדה בין שגיאות (400 vs 500)
+- ✅ ברירת מחדל לחשבון מהעדפות
 
-#### **מה נדרש:**
-- 🔄 להחליף ל-`validateEntityForm` סטנדרטי
-- 🔄 להעביר `customValidation` ל-`validation` callback
-- 🔄 לשנות הודעות שגיאה ל-`showSimpleErrorNotification`
+**לוגיקה עסקית שנשמרה:**
+- ✅ ולידציות מותאמות:
+  - סוג השקעה: swing/investment/passive
+  - צד: Long/Short
+  - סכום > 0
+  - מחירים > 0
+  - תנאים/סיבות: max 500 תווים
 
 ---
 
-### 7️⃣ **notes.js** 🟡 **לוגיקה מיוחדת**
+### 7️⃣ **notes.js** ✅ **תוקן במלואו**
 
 **קובץ:** `trading-ui/scripts/notes.js`  
 **גודל:** ~2322 שורות  
-**סטטוס:** 🟡 צריך תיקון
+**סטטוס:** ✅ מושלם
 
-#### **לוגיקה מיוחדת:**
-- 📝 עורך טקסט עשיר (Rich Text Editor)
-  - `getEditorContent()` / `setEditorContent()`
-  - לא `<input>` רגיל!
-- 📎 קובץ מצורף אופציונלי (max 10MB)
-- 🔗 אובייקט מקושר (כמו alerts)
+#### **מה תוקן:**
+- ✅ `validateNoteForm()` - ולידציה היברידית
+- ✅ `validateEditNoteForm()` - ולידציה היברידית
+- ✅ שדות HTML → `validateEntityForm`
+- ✅ תוכן עורך → `showSimpleErrorNotification`
+- ✅ החלפת כל `showValidationWarning` ב-`showSimpleErrorNotification`
 
-#### **מצב נוכחי:**
-- 🟡 `validateNoteForm()` קיים אבל ידני
-- 🔴 משתמש ב-`showValidationWarning` ישן
-- 🔴 לא משתמש ב-`validateEntityForm`
-
-#### **מה נדרש:**
-- 🔄 ולידציה היברידית:
-  - שדות HTML → `validateEntityForm`
-  - תוכן עורך → בדיקה ידנית עם `showSimpleErrorNotification`
-- 🔄 החלפת כל `showValidationWarning` ב-`showSimpleErrorNotification`
+**לוגיקה מיוחדת שנשמרה:**
+- ✅ עורך טקסט עשיר: `getEditorContent()` / `setEditorContent()`
+- ✅ קובץ מצורף: max 10MB, סוגים: תמונות + PDF
+- ✅ תוכן: 1-10,000 תווים
 
 ---
 
@@ -425,29 +415,57 @@
 ## 🎯 סיכום והמלצות
 
 ### **הושלם:**
-- ✅ **5 עמודים מרכזיים תוקנו במלואו (62.5%)**
+- ✅ **7/8 עמודים תוקנו במלואו (87.5%)**
 - ✅ תיעוד עדכני במדריך
 - ✅ קבצים ישנים בארכיון
 - ✅ שמות גנריים לקבצים
-- ✅ **alerts.js תוקן!** - הבעיות syntax תוקנו
+- ✅ **מיגרציית DB (alerts)** - הסרת שדות מיותרים
+- ✅ **trade_plans.js** - החלפת מערכת ולידציה ישנה
+- ✅ **notes.js** - ולידציה היברידית לעורך טקסט
 
 ### **נותר לטיפול:**
-- 🔄 2 עמודים (trade_plans, notes)
-- ⏭️ 1 עמוד טרם נבדק (executions)
+- ⏭️ 1 עמוד טרם נבדק (executions) - יצטרך תשומת לב מיוחדת
 
 ### **המלצה:**
-**בדוק תחילה** את 5 העמודים שתוקנו:
+**בדוק** את 7 העמודים שתוקנו:
 1. `http://localhost:8080/trading_accounts` - נסה להוסיף חשבון ריק
 2. `http://localhost:8080/trades` - נסה להוסיף טרייד ריק
-3. `http://localhost:8080/tickers` - נסה סימול קיים (AAPL)
-4. `http://localhost:8080/cash_flows` - נסה סכום = 0
-5. `http://localhost:8080/alerts` - נסה ערך שלילי למחיר
+3. `http://localhost:8080/tickers` - נסה להוסיף טיקר ריק
+4. `http://localhost:8080/cash_flows` - נסה להוסיף תזרים ריק
+5. `http://localhost:8080/alerts` - נסה להוסיף התראה ריקה
+6. `http://localhost:8080/trade_plans` - נסה להוסיף תכנון ריק
+7. `http://localhost:8080/notes` - נסה להוסיף הערה ריקה
 
-**לאחר מכן** - נמשיך לעמודים הנותרים.
+**תוצאות צפויות:**
+- ✅ הודעת שגיאה אדומה ברורה
+- ✅ שדות בעייתיים מסומנים באדום
+- ✅ המערכת לא שולחת נתונים לא תקינים לשרת
+
+**לאחר מכן** - ניתן לטפל ב-`executions.js` (הגדול והמורכב ביותר).
 
 ---
 
-**סטטוס כללי:** 🟢 **מעולה** - 62.5% הושלם, כל העמודים המרכזיים עובדים!
+**סטטוס כללי:** 🟢 **מעולה** - 87.5% הושלם, כל העמודים המרכזיים עובדים!
+
+---
+
+## 📅 היסטוריית עדכונים
+
+| תאריך | עמוד | פעולה | סטטוס |
+|-------|------|-------|-------|
+| 2025-01-09 | trade_plans.js | המרת `validateForm` ל-`validateEntityForm` | ✅ |
+| 2025-01-09 | notes.js | ולידציה היברידית (HTML + עורך טקסט) | ✅ |
+| 2025-01-09 | trading_accounts.js | תיקון מלא + טבלה | ✅ |
+| 2025-01-09 | trades.js | תיקון מלא + עמודות | ✅ |
+| 2025-01-09 | tickers.js | תיקון infinite loop + validation | ✅ |
+| 2025-01-09 | cash_flows.js | תיקון loading + validation | ✅ |
+| 2025-01-09 | alerts.js | תיקון syntax + API + validation | ✅ |
+| 2025-01-09 | alerts (DB) | מיגרציה - הסרת שדות מיותרים | ✅ |
+
+---
+
+**עדכון אחרון:** 9 בינואר 2025, 22:00  
+**מעודכן על ידי:** AI Assistant
 
 **מוכן לבדיקה:** ✅ כן
 

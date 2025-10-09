@@ -984,6 +984,8 @@ async function populateEditSelectByType(relationType, selectedId) {
 
 /**
  * וולידציה מקיפה של טופס הערה חדשה
+ * לפי STANDARD_VALIDATION_GUIDE.md + לוגיקה מיוחדת לעורך טקסט
+ * 
  * @param {string} content - תוכן ההערה
  * @param {string} relationType - סוג הקשר
  * @param {string} relatedId - מזהה האובייקט הקשור
@@ -991,60 +993,64 @@ async function populateEditSelectByType(relationType, selectedId) {
  * @returns {boolean} true אם הטופס תקין, false אחרת
  */
 function validateNoteForm(content, relationType, relatedId, attachment) {
-  let isValid = true;
+  // 1. ולידציה בסיסית של שדות HTML רגילים
+  const basicValidation = window.validateEntityForm('addNoteForm', [
+    { id: 'noteRelationType', name: 'סוג אובייקט' },
+    { id: 'noteRelatedObjectSelect', name: 'אובייקט מקושר' }
+  ]);
+  
+  if (!basicValidation) {
+    return false;
+  }
 
-  // ניקוי שגיאות קודמות
-  clearNoteValidationErrors();
-
-  // וולידציה של תוכן
+  // 2. ולידציה מיוחדת לתוכן העורך (לא שדה HTML רגיל)
   if (!content) {
-    window.showValidationWarning('contentError', 'תוכן הערה הוא שדה חובה');
-    isValid = false;
-  } else if (content.length < 1) {
-    window.showValidationWarning('contentError', 'תוכן ההערה חייב להכיל לפחות תו אחד');
-    isValid = false;
-  } else if (content.length > 10000) {
-    window.showValidationWarning('contentError', 'תוכן ההערה ארוך מדי (מקסימום 10,000 תווים)');
-    isValid = false;
-  } else {
-    // Content validation passed
+    if (window.showSimpleErrorNotification) {
+      window.showSimpleErrorNotification('שגיאת ולידציה', 'תוכן הערה הוא שדה חובה');
+    }
+    return false;
+  }
+  
+  if (content.length < 1) {
+    if (window.showSimpleErrorNotification) {
+      window.showSimpleErrorNotification('שגיאת ולידציה', 'תוכן ההערה חייב להכיל לפחות תו אחד');
+    }
+    return false;
+  }
+  
+  if (content.length > 10000) {
+    if (window.showSimpleErrorNotification) {
+      window.showSimpleErrorNotification('שגיאת ולידציה', 'תוכן ההערה ארוך מדי (מקסימום 10,000 תווים)');
+    }
+    return false;
   }
 
-  // וולידציה של סוג קשר
-  if (!relationType) {
-    window.showValidationWarning('relationTypeError', 'יש לבחור סוג אובייקט לשיוך');
-    isValid = false;
-  }
-
-  // וולידציה של אובייקט קשור
-  if (!relatedId) {
-    window.showValidationWarning('relatedObjectError', 'יש לבחור אובייקט לשיוך');
-    isValid = false;
-  } else if (isNaN(parseInt(relatedId)) || parseInt(relatedId) <= 0) {
-    window.showValidationWarning('relatedObjectError', 'מזהה אובייקט לא תקין');
-    isValid = false;
-  }
-
-  // וולידציה של קובץ מצורף (אם קיים)
+  // 3. ולידציה של קובץ מצורף (אם קיים)
   if (attachment) {
     const maxSize = 10 * 1024 * 1024; // 10MB
     if (attachment.size > maxSize) {
-      window.showValidationWarning('attachmentError', 'קובץ מצורף גדול מדי (מקסימום 10MB)');
-      isValid = false;
+      if (window.showSimpleErrorNotification) {
+        window.showSimpleErrorNotification('שגיאת ולידציה', 'קובץ מצורף גדול מדי (מקסימום 10MB)');
+      }
+      return false;
     }
 
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'application/pdf'];
     if (!allowedTypes.includes(attachment.type)) {
-      window.showValidationWarning('attachmentError', 'סוג קובץ לא נתמך. מותרים: תמונות (JPG, PNG, GIF, BMP, WebP) ו-PDF בלבד');
-      isValid = false;
+      if (window.showSimpleErrorNotification) {
+        window.showSimpleErrorNotification('שגיאת ולידציה', 'סוג קובץ לא נתמך. מותרים: תמונות ו-PDF בלבד');
+      }
+      return false;
     }
   }
 
-  return isValid;
+  return true;
 }
 
 /**
  * וולידציה מקיפה של טופס עריכת הערה
+ * לפי STANDARD_VALIDATION_GUIDE.md + לוגיקה מיוחדת לעורך טקסט
+ * 
  * @param {string} content - תוכן ההערה
  * @param {string} relationType - סוג הקשר
  * @param {string} relatedId - מזהה האובייקט הקשור
@@ -1052,54 +1058,58 @@ function validateNoteForm(content, relationType, relatedId, attachment) {
  * @returns {boolean} true אם הטופס תקין, false אחרת
  */
 function validateEditNoteForm(content, relationType, relatedId, attachment) {
-  let isValid = true;
+  // 1. ולידציה בסיסית של שדות HTML רגילים
+  const basicValidation = window.validateEntityForm('editNoteForm', [
+    { id: 'editNoteRelationType', name: 'סוג אובייקט' },
+    { id: 'editNoteRelatedObjectSelect', name: 'אובייקט מקושר' }
+  ]);
+  
+  if (!basicValidation) {
+    return false;
+  }
 
-  // ניקוי שגיאות קודמות
-  clearNoteValidationErrors();
-
-  // וולידציה של תוכן
+  // 2. ולידציה מיוחדת לתוכן העורך
   if (!content) {
-    window.showValidationWarning('editContentError', 'תוכן הערה הוא שדה חובה');
-    isValid = false;
-  } else if (content.length < 1) {
-    window.showValidationWarning('editContentError', 'תוכן ההערה חייב להכיל לפחות תו אחד');
-    isValid = false;
-  } else if (content.length > 10000) {
-    window.showValidationWarning('editContentError', 'תוכן ההערה ארוך מדי (מקסימום 10,000 תווים)');
-    isValid = false;
+    if (window.showSimpleErrorNotification) {
+      window.showSimpleErrorNotification('שגיאת ולידציה', 'תוכן הערה הוא שדה חובה');
+    }
+    return false;
+  }
+  
+  if (content.length < 1) {
+    if (window.showSimpleErrorNotification) {
+      window.showSimpleErrorNotification('שגיאת ולידציה', 'תוכן ההערה חייב להכיל לפחות תו אחד');
+    }
+    return false;
+  }
+  
+  if (content.length > 10000) {
+    if (window.showSimpleErrorNotification) {
+      window.showSimpleErrorNotification('שגיאת ולידציה', 'תוכן ההערה ארוך מדי (מקסימום 10,000 תווים)');
+    }
+    return false;
   }
 
-  // וולידציה של סוג קשר
-  if (!relationType) {
-    window.showValidationWarning('editRelationTypeError', 'יש לבחור סוג אובייקט לשיוך');
-    isValid = false;
-  }
-
-  // וולידציה של אובייקט קשור
-  if (!relatedId) {
-    window.showValidationWarning('editRelatedObjectError', 'יש לבחור אובייקט לשיוך');
-    isValid = false;
-  } else if (isNaN(parseInt(relatedId)) || parseInt(relatedId) <= 0) {
-    window.showValidationWarning('editRelatedObjectError', 'מזהה אובייקט לא תקין');
-    isValid = false;
-  }
-
-  // וולידציה של קובץ מצורף (אם קיים)
+  // 3. ולידציה של קובץ מצורף (אם קיים)
   if (attachment) {
     const maxSize = 10 * 1024 * 1024; // 10MB
     if (attachment.size > maxSize) {
-      window.showValidationWarning('editAttachmentError', 'קובץ מצורף גדול מדי (מקסימום 10MB)');
-      isValid = false;
+      if (window.showSimpleErrorNotification) {
+        window.showSimpleErrorNotification('שגיאת ולידציה', 'קובץ מצורף גדול מדי (מקסימום 10MB)');
+      }
+      return false;
     }
 
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'application/pdf'];
     if (!allowedTypes.includes(attachment.type)) {
-      window.showValidationWarning('editAttachmentError', 'סוג קובץ לא נתמך. מותרים: תמונות (JPG, PNG, GIF, BMP, WebP) ו-PDF בלבד');
-      isValid = false;
+      if (window.showSimpleErrorNotification) {
+        window.showSimpleErrorNotification('שגיאת ולידציה', 'סוג קובץ לא נתמך. מותרים: תמונות ו-PDF בלבד');
+      }
+      return false;
     }
   }
 
-  return isValid;
+  return true;
 }
 
 // פונקציות שמירה ומחיקה

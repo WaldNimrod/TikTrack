@@ -1057,56 +1057,136 @@ Error: Entity Details API לא נטען
 
 ---
 
-### **3. תיקון רענון טבלה (global data + timing) + שימוש נכון ב-UnifiedCacheManager**
+### **3. תיקון רענון טבלה - הבעיה האמיתית: מטמון שרת!**
 
-#### **הבעיה:**
-- אחרי מחיקה/הוספה/עדכון הטבלה לא מתעדכנת
-- הנתונים ישנים נשארים ב-`window.cashFlowsData`
-- ❌ שימוש שגוי: `UnifiedCacheManager.invalidate()` (לא קיימת!)
-- ✅ שימוש נכון: `UnifiedCacheManager.remove()`
+#### **🔍 אבחון הבעיה:**
 
-#### **הפתרון:**
+**הבעיה האמיתית:** המטמון הוא ב-**Backend (Server)**, לא ב-Frontend!
+
+**מה קורה בפועל:**
+1. ✅ Frontend → DELETE → Backend מוחק מ-DB
+2. ❌ Backend → לא מנקה מטמון (חסר `@invalidate_cache`)
+3. ✅ Frontend → מנקה מטמון לוקאלי
+4. ✅ Frontend → GET request
+5. ❌ Backend → מחזיר מ-**cache ישן** (TTL=60 שניות)
+6. ❌ Frontend → מציג נתונים ישנים
+
+**למה גם F5 לא עוזר?**
+- המטמון ב-RAM של שרת Python, לא בדפדפן!
+
+---
+
+#### **✅ הפתרון הנכון - Backend:**
+
+**Backend/routes/api/cash_flows.py:**
+```python
+from services.advanced_cache_service import cache_for, invalidate_cache
+
+# שורה 102 - CREATE
+@cash_flows_bp.route('/', methods=['POST'])
+@invalidate_cache(['cash_flows'])  # ✅ הוסף decorator
+def create_cash_flow():
+    ...
+
+# שורה 176 - UPDATE  
+@cash_flows_bp.route('/<int:cash_flow_id>', methods=['PUT'])
+@invalidate_cache(['cash_flows'])  # ✅ הוסף decorator
+def update_cash_flow(cash_flow_id: int):
+    ...
+
+# שורה 257 - DELETE
+@cash_flows_bp.route('/<int:cash_flow_id>', methods=['DELETE'])
+@invalidate_cache(['cash_flows'])  # ✅ הוסף decorator
+def delete_cash_flow(cash_flow_id: int):
+    ...
+```
+
+**מה ה-decorator עושה?**
+1. מריץ את הפונקציה (CREATE/UPDATE/DELETE)
+2. אחרי הצלחה, קורא ל-`advanced_cache_service.invalidate_by_dependency('cash_flows')`
+3. מוחק את כל ה-cache keys שתלויים ב-`cash_flows`
+4. הבקשת GET הבאה תטען נתונים חדשים מה-DB
+
+---
+
+#### **⚙️ Frontend - פישוט (אופציונלי):**
+
+הקוד ב-Frontend יכול להיות **הרבה יותר פשוט**:
+
 ```javascript
-// בכל פעולת CRUD מוצלחת:
 if (result.status === 'success') {
-  // 1. ניקוי מטמון UnifiedCacheManager - שימוש ב-remove (לא invalidate!)
-  if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-    await window.UnifiedCacheManager.remove('cash_flows');
-    console.log('✅ מטמון cash_flows נוקה');
+  // 1. סגירת מודל (אם יש)
+  const modalElement = document.getElementById('addCashFlowModal');
+  if (modalElement) {
+    const modal = bootstrap.Modal.getInstance(modalElement);
+    if (modal) modal.hide();
   }
 
-  // 2. ניקוי global data - חובה!
-  if (window.cashFlowsData) {
-    window.cashFlowsData = null;
-    console.log('✅ Global cashFlowsData נוקה');
-  }
-
-  // 3. המתנה קצרה לוידוא ניקוי מטמון
-  await new Promise(resolve => setTimeout(resolve, 100));
-
-  // 4. טעינה מחדש של הנתונים
+  // 2. רענון טבלה - הכל!
   await loadCashFlows();
 
-  // 5. הצגת הודעת הצלחה אחרי הטעינה
-  window.showSuccessNotification('הצלחה', 'הפעולה הושלמה בהצלחה');
+  // 3. הודעת הצלחה
+  if (typeof window.showSuccessNotification === 'function') {
+    window.showSuccessNotification('הצלחה', 'הפעולה הושלמה בהצלחה', 4000, 'business');
+  }
 }
 ```
 
-**למה זה חשוב:**
-1. **`UnifiedCacheManager.remove(key)`** - הפונקציה הנכונה! (לא `invalidate`)
-   - מנקה את המפתח מכל שכבות המטמון (memory, localStorage, indexedDB)
-2. `window.cashFlowsData = null` - מנקה נתונים גלובליים
-3. `setTimeout(100)` - נותן זמן למטמון להתרענן
-4. `await loadCashFlows()` - טוען נתונים חדשים מהשרת
-5. הודעת הצלחה **אחרי** הטעינה (לא לפני)
+**למה יותר פשוט?**
+- אין צורך ב-`UnifiedCacheManager.remove()` - השרת כבר לא מחזיק מטמון!
+- אין צורך ב-`window.cashFlowsData = null` - `loadCashFlows()` ממילא מעדכן
+- אין צורך ב-`setTimeout(100)` - אין מטמון שרת לחכות לו
 
-**שיטות ניקוי מטמון ב-UnifiedCacheManager:**
-- `remove(key)` - מחיקת מפתח ספציפי מכל השכבות ✅
-- `clear(layer)` - ניקוי שכבה שלמה (memory/localStorage/indexedDB)
-- אין `invalidate()` - זו לא פונקציה קיימת! ❌
+**אבל אפשר להשאיר** (למקרה שיש מטמון frontend):
+```javascript
+// ניקוי מטמון frontend (אופציונלי אבל מומלץ)
+if (window.UnifiedCacheManager?.remove) {
+  await window.UnifiedCacheManager.remove('cash_flows');
+}
+if (window.cashFlowsData) {
+  window.cashFlowsData = null;
+}
+```
+
+---
+
+#### **📋 רשימת בדיקה:**
+
+**Backend (חובה!):**
+- [ ] יבוא: `from services.advanced_cache_service import invalidate_cache`
+- [ ] CREATE: `@invalidate_cache(['entity_name'])`
+- [ ] UPDATE: `@invalidate_cache(['entity_name'])`
+- [ ] DELETE: `@invalidate_cache(['entity_name'])`
+- [ ] GET: `@api_endpoint(cache_ttl=60)` (כבר קיים)
+
+**Frontend (אופציונלי אבל מומלץ):**
+- [ ] ניקוי `UnifiedCacheManager`
+- [ ] ניקוי `window.entityData`
+- [ ] קריאה ל-`loadEntity()`
+
+---
+
+#### **🎯 תקן כללי לכל Entities:**
+
+**דוגמה מ-trades.py (עובד נכון!):**
+```python
+@trades_bp.route('/', methods=['POST'])
+@invalidate_cache(['trades', 'tickers', 'dashboard'])  # ✅ נכון
+def create_trade():
+    ...
+```
+
+**Dependencies מומלצים:**
+- `cash_flows` → `['cash_flows']`
+- `trades` → `['trades', 'tickers', 'dashboard']`
+- `executions` → `['executions', 'trades', 'dashboard']`
+- `tickers` → `['tickers', 'dashboard']`
+
+---
 
 **קבצים שתוקנו:**
-- `trading-ui/scripts/cash_flows.js` - כל 3 פונקציות CRUD
+- ❌ `trading-ui/scripts/cash_flows.js` - הקוד שתיקנו **לא פתר את הבעיה**!
+- ✅ `Backend/routes/api/cash_flows.py` - **כאן הפתרון האמיתי**
 
 ---
 

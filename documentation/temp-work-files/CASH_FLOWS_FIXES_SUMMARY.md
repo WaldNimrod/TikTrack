@@ -1031,6 +1031,29 @@ setFieldValue('editCashFlowDate', cashFlow.date);
 setFieldValue('editCashFlowAccountId', cashFlow.trading_account_id); // ✅ שדה נכון
 ```
 
+**שדות שמוגדרים:**
+```javascript
+setFieldValue('editCashFlowId', cashFlow.id);
+setFieldValue('editCashFlowDate', dateTimeValue);  // ✅ עם המרה
+setFieldValue('editCashFlowAmount', cashFlow.amount);
+setFieldValue('editCashFlowDescription', cashFlow.description);
+setFieldValue('editCashFlowAccountId', cashFlow.trading_account_id);
+setFieldValue('editCashFlowCurrencyId', cashFlow.currency_id);
+setFieldValue('editCashFlowType', cashFlow.type);
+setFieldValue('editCashFlowSource', cashFlow.source);
+setFieldValue('editCashFlowExternalId', cashFlow.external_id);
+setFieldValue('editCashFlowUsdRate', cashFlow.usd_rate);
+```
+
+**תיקון נוסף - המרת פורמט תאריך:**
+```javascript
+// אם התאריך הוא YYYY-MM-DD (מהשרת), המר ל-YYYY-MM-DDTHH:MM (datetime-local)
+let dateTimeValue = cashFlow.date;
+if (dateTimeValue && !dateTimeValue.includes('T')) {
+  dateTimeValue = `${dateTimeValue}T12:00`;
+}
+```
+
 **קבצים שתוקנו:**
 - `trading-ui/scripts/cash_flows.js` - `showEditCashFlowModal()`
 

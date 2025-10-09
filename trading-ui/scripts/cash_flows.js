@@ -366,13 +366,22 @@ function showEditCashFlowModal(cashFlowId) {
     const field = document.getElementById(fieldId);
     if (field) {
       field.value = value || '';
+      console.log(`✅ שדה ${fieldId} הוגדר ל: ${value}`);
     } else {
       console.warn(`⚠️ שדה ${fieldId} לא נמצא במודל עריכה`);
     }
   };
 
+  // המרת תאריך לפורמט datetime-local (YYYY-MM-DDTHH:MM)
+  let dateTimeValue = cashFlow.date;
+  if (dateTimeValue && !dateTimeValue.includes('T')) {
+    // אם התאריך הוא רק YYYY-MM-DD, נוסיף שעה ברירת מחדל
+    dateTimeValue = `${dateTimeValue}T12:00`;
+    console.log(`📅 המרת תאריך: ${cashFlow.date} → ${dateTimeValue}`);
+  }
+
   setFieldValue('editCashFlowId', cashFlow.id);
-  setFieldValue('editCashFlowDate', cashFlow.date);
+  setFieldValue('editCashFlowDate', dateTimeValue);
   setFieldValue('editCashFlowAmount', cashFlow.amount);
   setFieldValue('editCashFlowDescription', cashFlow.description);
   setFieldValue('editCashFlowAccountId', cashFlow.trading_account_id); // ✅ שדה נכון

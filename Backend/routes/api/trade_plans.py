@@ -59,10 +59,39 @@ def get_trade_plans_by_account(account_id: int):
 
 @trade_plans_bp.route('/', methods=['POST'])
 def create_trade_plan():
-    """Create new trade plan"""
+    """Create new trade plan with percentage/price conversion support"""
     try:
         data = request.get_json()
         db: Session = next(get_db())
+        
+        # Convert percentages to prices if needed (server-side calculation)
+        from models.trade_plan import TradePlan
+        
+        current_price = data.get('current_price')
+        
+        # Handle stop: if percentage provided, convert to price
+        if 'stop_percentage' in data and 'stop_price' not in data and current_price:
+            data['stop_price'] = TradePlan.calculate_price_from_percentage(
+                current_price, 
+                data['stop_percentage'], 
+                is_stop=True
+            )
+            logger.info(f"Converted stop_percentage {data['stop_percentage']}% to stop_price ${data['stop_price']}")
+        
+        # Handle target: if percentage provided, convert to price
+        if 'target_percentage' in data and 'target_price' not in data and current_price:
+            data['target_price'] = TradePlan.calculate_price_from_percentage(
+                current_price,
+                data['target_percentage'],
+                is_stop=False
+            )
+            logger.info(f"Converted target_percentage {data['target_percentage']}% to target_price ${data['target_price']}")
+        
+        # Remove percentage fields from data (they are read-only generated columns)
+        data.pop('stop_percentage', None)
+        data.pop('target_percentage', None)
+        
+        # Create plan (with prices only)
         plan = TradePlanService.create(db, data)
         return jsonify({
             "status": "success",
@@ -82,10 +111,45 @@ def create_trade_plan():
 
 @trade_plans_bp.route('/<int:plan_id>', methods=['PUT'])
 def update_trade_plan(plan_id: int):
-    """Update trade plan"""
+    """Update trade plan with percentage/price conversion support"""
     try:
         data = request.get_json()
         db: Session = next(get_db())
+        
+        # Convert percentages to prices if needed (server-side calculation)
+        from models.trade_plan import TradePlan
+        
+        current_price = data.get('current_price')
+        
+        # If current_price not in update, get it from existing plan
+        if not current_price:
+            existing_plan = TradePlanService.get_by_id(db, plan_id)
+            if existing_plan:
+                current_price = existing_plan.current_price
+        
+        # Handle stop: if percentage provided, convert to price
+        if 'stop_percentage' in data and 'stop_price' not in data and current_price:
+            data['stop_price'] = TradePlan.calculate_price_from_percentage(
+                current_price,
+                data['stop_percentage'],
+                is_stop=True
+            )
+            logger.info(f"Converted stop_percentage {data['stop_percentage']}% to stop_price ${data['stop_price']}")
+        
+        # Handle target: if percentage provided, convert to price
+        if 'target_percentage' in data and 'target_price' not in data and current_price:
+            data['target_price'] = TradePlan.calculate_price_from_percentage(
+                current_price,
+                data['target_percentage'],
+                is_stop=False
+            )
+            logger.info(f"Converted target_percentage {data['target_percentage']}% to target_price ${data['target_price']}")
+        
+        # Remove percentage fields from data (they are read-only generated columns)
+        data.pop('stop_percentage', None)
+        data.pop('target_percentage', None)
+        
+        # Update plan (with prices only)
         plan = TradePlanService.update(db, plan_id, data)
         if plan:
             return jsonify({

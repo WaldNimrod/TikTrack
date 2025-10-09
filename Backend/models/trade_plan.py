@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, event
+from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, event, Computed
 from sqlalchemy.orm import relationship
 from .base import BaseModel
 from typing import Dict, Any, Optional
@@ -26,8 +26,16 @@ class TradePlan(BaseModel):
     # Formula: ((current_price - stop_price) / current_price) * 100
     # These are READ-ONLY - calculated by database, not stored physically
     # To update: change stop_price or target_price, percentages update automatically
-    stop_percentage = Column(Float, nullable=True)  # GENERATED ALWAYS column
-    target_percentage = Column(Float, nullable=True)  # GENERATED ALWAYS column
+    stop_percentage = Column(Float, Computed(
+        "CASE WHEN current_price > 0 AND stop_price IS NOT NULL "
+        "THEN ROUND(((current_price - stop_price) / current_price) * 100, 2) "
+        "ELSE NULL END"
+    ))
+    target_percentage = Column(Float, Computed(
+        "CASE WHEN current_price > 0 AND target_price IS NOT NULL "
+        "THEN ROUND(((target_price - current_price) / current_price) * 100, 2) "
+        "ELSE NULL END"
+    ))
     
     reasons = Column(String(500), nullable=True)
     cancelled_at = Column(DateTime, nullable=True)

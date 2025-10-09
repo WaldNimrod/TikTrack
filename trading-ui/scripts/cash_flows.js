@@ -309,8 +309,7 @@ function showAddCashFlowModal() {
     clearValidationErrors();
   }
 
-  // הגדרת ברירות מחדל
-  // תאריך - היום
+  // הגדרת ברירות מחדל באמצעות DataCollectionService
   const today = new Date();
   const yyyy = today.getFullYear();
   const mm = String(today.getMonth() + 1).padStart(2, '0');
@@ -319,16 +318,8 @@ function showAddCashFlowModal() {
   const min = String(today.getMinutes()).padStart(2, '0');
   const todayStr = `${yyyy}-${mm}-${dd}T${hh}:${min}`;
   
-  const dateInput = document.getElementById('cashFlowDate');
-  if (dateInput) {
-    dateInput.value = todayStr;
-  }
-
-  // סוג תזרים - הפקדה (deposit)
-  const typeSelect = document.getElementById('cashFlowType');
-  if (typeSelect) {
-    typeSelect.value = 'deposit';
-  }
+  window.DataCollectionService.setValue('cashFlowDate', todayStr, 'text');
+  window.DataCollectionService.setValue('cashFlowType', 'deposit', 'text');
 
   // טעינת נתונים למודל
   loadAccountsForCashFlow();
@@ -1014,10 +1005,10 @@ function updatePageSummaryStats() {
     .reduce((sum, cf) => sum + parseFloat(cf.amount || 0), 0);
   const currentBalance = totalDeposits - totalWithdrawals;
 
-  document.getElementById('totalCashFlows').textContent = totalCashFlows;
-  document.getElementById('totalDeposits').textContent = formatAmount(totalDeposits);
-  document.getElementById('totalWithdrawals').textContent = formatAmount(totalWithdrawals);
-  document.getElementById('currentBalance').textContent = formatAmount(currentBalance);
+  window.DataCollectionService.setValue('totalCashFlows', totalCashFlows, 'text');
+  window.DataCollectionService.setValue('totalDeposits', formatAmount(totalDeposits), 'text');
+  window.DataCollectionService.setValue('totalWithdrawals', formatAmount(totalWithdrawals), 'text');
+  window.DataCollectionService.setValue('currentBalance', formatAmount(currentBalance), 'text');
 }
 
 // פונקציות הועברו ל-translation-utils.js:
@@ -1736,24 +1727,28 @@ async function _showEditCashFlowModal(id) {
     // טעינת רשימת החשבונות והמטבעות קודם
     await loadAccountsForEditCashFlow();
     await loadCurrenciesForEditCashFlow();
-    // מילוי הטופס אחרי שהרשימות נטענו
-    const editTypeField = document.getElementById('editCashFlowType');
-    document.getElementById('editCashFlowId').value = cashFlow.id;
-    document.getElementById('editCashFlowAccountId').value = cashFlow.account_id;
-
-    if (editTypeField) {
-      editTypeField.value = cashFlow.type;
-    } else {
-      handleElementNotFound('showEditCashFlowModal', 'לא נמצא אלמנט editCashFlowType');
-    }
-    document.getElementById('editCashFlowAmount').value = cashFlow.amount;
-    document.getElementById('editCashFlowCurrencyId').value = cashFlow.currency_id || '';
-    document.getElementById('editCashFlowDate').value = cashFlow.date;
-    document.getElementById('editCashFlowDescription').value = cashFlow.description || '';
-
-    const editSourceField = document.getElementById('editCashFlowSource');
-    editSourceField.value = cashFlow.source || 'manual';
-    document.getElementById('editCashFlowExternalId').value = cashFlow.external_id || '0';
+    // מילוי הטופס אחרי שהרשימות נטענו - באמצעות DataCollectionService
+    window.DataCollectionService.setFormData({
+      id: { id: 'editCashFlowId', type: 'int' },
+      account_id: { id: 'editCashFlowAccountId', type: 'int' },
+      type: { id: 'editCashFlowType', type: 'text' },
+      amount: { id: 'editCashFlowAmount', type: 'number' },
+      currency_id: { id: 'editCashFlowCurrencyId', type: 'int' },
+      date: { id: 'editCashFlowDate', type: 'dateOnly' },
+      description: { id: 'editCashFlowDescription', type: 'text' },
+      source: { id: 'editCashFlowSource', type: 'text' },
+      external_id: { id: 'editCashFlowExternalId', type: 'text' }
+    }, {
+      id: cashFlow.id,
+      account_id: cashFlow.account_id,
+      type: cashFlow.type,
+      amount: cashFlow.amount,
+      currency_id: cashFlow.currency_id || '',
+      date: cashFlow.date,
+      description: cashFlow.description || '',
+      source: cashFlow.source || 'manual',
+      external_id: cashFlow.external_id || '0'
+    });
 
     // אתחול שדה מזהה חיצוני
     initializeExternalIdFields();

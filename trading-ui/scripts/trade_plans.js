@@ -1916,6 +1916,7 @@ function initializeAddModalValidation() {
  * לפי STANDARD_VALIDATION_GUIDE.md
  */
 function validateTradePlanForm() {
+    // Only validate REQUIRED fields - entry_conditions and reasons are optional!
     return window.validateEntityForm('addTradePlanForm', [
         { id: 'addTradePlanTickerId', name: 'טיקר' },
         { 
@@ -1949,53 +1950,8 @@ function validateTradePlanForm() {
                 if (numValue <= 0) return 'סכום מתוכנן חייב להיות חיובי';
                 return true;
             }
-        },
-        { 
-            id: 'addTradePlanStopPrice', 
-            name: 'מחיר עצירה',
-            validation: (value) => {
-                if (value && value !== '') {
-                    const numValue = parseFloat(value);
-                    if (isNaN(numValue)) return 'מחיר עצירה חייב להיות מספר';
-                    if (numValue <= 0) return 'מחיר עצירה חייב להיות חיובי';
-                }
-                return true;
-            }
-        },
-        { 
-            id: 'addTradePlanTargetPrice', 
-            name: 'מחיר יעד',
-            validation: (value) => {
-                if (value && value !== '') {
-                    const numValue = parseFloat(value);
-                    if (isNaN(numValue)) return 'מחיר יעד חייב להיות מספר';
-                    if (numValue <= 0) return 'מחיר יעד חייב להיות חיובי';
-                }
-                return true;
-            }
-        },
-        { 
-            id: 'addTradePlanEntryConditions', 
-            name: 'תנאי כניסה',
-            required: false,  // Not mandatory per database model
-            validation: (value) => {
-                if (value && value.length > 500) {
-                    return 'תנאי כניסה לא יכול להיות יותר מ-500 תווים';
-                }
-                return true;
-            }
-        },
-        { 
-            id: 'addTradePlanReasons', 
-            name: 'סיבות',
-            required: false,  // Not mandatory per database model
-            validation: (value) => {
-                if (value && value.length > 500) {
-                    return 'סיבות לא יכולות להיות יותר מ-500 תווים';
-                }
-                return true;
-            }
         }
+        // NOTE: stop_price, target_price, entry_conditions, reasons are optional - not validated here
     ]);
 }
 

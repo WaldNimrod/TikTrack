@@ -2115,24 +2115,6 @@ window.goToNote = goToNote;
  */
 
 /**
- * שחזור מצב סידור - שימוש בפונקציה גלובלית
- * @deprecated Use window.restoreAnyTableSort from main.js instead
- */
-function restoreSortState() {
-  // Restoring sort state for executions table
-
-  if (typeof window.restoreAnyTableSort === 'function') {
-    window.restoreAnyTableSort('executions', window.executionsData || [], updateExecutionsTableMain);
-  } else {
-    if (typeof handleFunctionNotFound === 'function') {
-      handleFunctionNotFound('restoreAnyTableSort');
-    } else {
-      console.warn('⚠️ restoreAnyTableSort function not available');
-    }
-  }
-}
-
-/**
  * טעינת צבעים מההעדפות ויישום על הכותרות
  */
 async function loadColorsAndApplyToHeaders() {
@@ -2200,8 +2182,10 @@ document.addEventListener('DOMContentLoaded', function () {
   // הגדרת פונקציות פילטר
   setupExecutionsFilterFunctions();
 
-  // שחזור מצב סידור
-  restoreSortState();
+  // שחזור מצב סידור - שימוש בפונקציה גלובלית
+  if (typeof window.restoreAnyTableSort === 'function') {
+    window.restoreAnyTableSort('executions', window.executionsData || [], updateExecutionsTableMain);
+  }
 
   // אתחול רשימת טיקרים לפי הצ'קבוקס (ברירת מחדל: לא מסומן)
   updateTickersList('add', false);

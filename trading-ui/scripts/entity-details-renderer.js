@@ -336,8 +336,17 @@ class EntityDetailsRenderer {
         `;
         
         firstColumnFields.forEach(field => {
-            const value = entityData[field.key] || 'לא זמין';
-            const displayValue = this.formatFieldValue(value, field.type, entityColor);
+            const value = entityData[field.key];
+            
+            // תרגום מיוחד לסוג תזרים
+            let displayValue;
+            if (entityType === 'cash_flow' && field.key === 'type') {
+                displayValue = this.translateCashFlowType(value);
+            } else {
+                // העברת currency_symbol אם זה שדה סכום
+                const currencySymbol = (field.type === 'currency') ? (entityData.currency_symbol || '') : '';
+                displayValue = this.formatFieldValue(value, field.type, entityColor, currencySymbol);
+            }
             
             html += `
                 <div class="row mb-2">
@@ -371,8 +380,17 @@ class EntityDetailsRenderer {
         `;
         
         secondColumnFields.forEach(field => {
-            const value = entityData[field.key] || 'לא זמין';
-            const displayValue = this.formatFieldValue(value, field.type, entityColor);
+            const value = entityData[field.key];
+            
+            // תרגום מיוחד לסוג תזרים
+            let displayValue;
+            if (entityType === 'cash_flow' && field.key === 'type') {
+                displayValue = this.translateCashFlowType(value);
+            } else {
+                // העברת currency_symbol אם זה שדה סכום
+                const currencySymbol = (field.type === 'currency') ? (entityData.currency_symbol || '') : '';
+                displayValue = this.formatFieldValue(value, field.type, entityColor, currencySymbol);
+            }
             
             html += `
                 <div class="row mb-2">
@@ -972,6 +990,55 @@ class EntityDetailsRenderer {
         return `$${parseFloat(price).toFixed(2)}`;
     }
 
+    /**
+     * Format currency with symbol and thousands separator
+     */
+    formatCurrency(amount, currencySymbol = '') {
+        if (!amount && amount !== 0) return 'לא זמין';
+        
+        // המרה למספר עם פסיקים כל 3 ספרות
+        const formatted = parseFloat(amount).toLocaleString('he-IL', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+        
+        // הוספת סימן מטבע צמוד (אם יש)
+        return currencySymbol ? `${formatted} ${currencySymbol}` : formatted;
+    }
+
+    /**
+     * Format date to dd/MM/yy
+     */
+    formatDate(dateString) {
+        if (!dateString) return '-';
+        
+        try {
+            const date = new Date(dateString);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = String(date.getFullYear()).slice(-2);
+            return `${day}/${month}/${year}`;
+        } catch {
+            return dateString;
+        }
+    }
+
+    /**
+     * Translate cash flow type to Hebrew
+     */
+    translateCashFlowType(type) {
+        const translations = {
+            'deposit': 'הפקדה',
+            'withdrawal': 'משיכה',
+            'transfer': 'העברה',
+            'fee': 'עמלה',
+            'dividend': 'דיבידנד',
+            'interest': 'ריבית',
+            'other': 'אחר'
+        };
+        return translations[type] || type;
+    }
+
     formatStatus(status, entityColor = '#019193') {
         if (!status) return '<span class="badge bg-secondary">לא זמין</span>';
         
@@ -1007,8 +1074,19 @@ class EntityDetailsRenderer {
     }
 
     formatDateTime(datetime) {
-        if (!datetime) return 'לא זמין';
-        return new Date(datetime).toLocaleDateString('he-IL');
+        if (!datetime) return '-';
+        
+        try {
+            const date = new Date(datetime);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = String(date.getFullYear()).slice(-2);
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return `${day}/${month}/${year} ${hours}:${minutes}`;
+        } catch {
+            return datetime;
+        }
     }
 
     /**
@@ -1111,11 +1189,14 @@ class EntityDetailsRenderer {
         return html;
     }
 
-    formatFieldValue(value, type, entityColor = '#019193') {
-        if (value === null || value === undefined || value === '') return 'לא זמין';
+    formatFieldValue(value, type, entityColor = '#019193', currencySymbol = '') {
+        if (value === null || value === undefined || value === '') return '-';
+        
         switch (type) {
             case 'datetime': return this.formatDateTime(value);
+            case 'date': return this.formatDate(value);
             case 'price': return this.formatPrice(value);
+            case 'currency': return this.formatCurrency(value, currencySymbol);
             case 'status': return this.formatStatus(value, entityColor);
             case 'boolean': return value ? 'כן' : 'לא';
             case 'number': return typeof value === 'number' ? value.toLocaleString('he-IL') : String(value);
@@ -1407,9 +1488,12 @@ class EntityDetailsRenderer {
     renderCashFlow(cashFlowData, options = {}) {
         const entityColor = this.entityColors.cash_flow || '#28a745';
         
+        // תרגום סוג תזרים לעברית
+        const typeDisplay = this.translateCashFlowType(cashFlowData.type);
+        
         return `
             <div class="entity-details-container cash-flow-details">
-                ${this.renderEntityHeader('תזרים מזומנים', `#${cashFlowData.id}`, entityColor)}
+                ${this.renderEntityHeader('תזרים מזומנים', `${typeDisplay} - ${this.formatCurrency(cashFlowData.amount, cashFlowData.currency_symbol)}`, entityColor)}
                 
                 <div class="row">
                     <div class="col-md-6">
@@ -1420,6 +1504,8 @@ class EntityDetailsRenderer {
                     </div>
                 </div>
                 
+                ${cashFlowData.trading_account_id ? this.renderLinkedAccount(cashFlowData, entityColor) : ''}
+                
                 <div class="row mt-4">
                     <div class="col-12">
                         ${this.renderLinkedItems(cashFlowData.linked_items || [], entityColor)}
@@ -1429,6 +1515,34 @@ class EntityDetailsRenderer {
                 <div class="row mt-4">
                     <div class="col-12">
                         ${this.renderActionButtons('cash_flow', cashFlowData.id)}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Render linked trading account info
+     */
+    renderLinkedAccount(cashFlowData, entityColor) {
+        if (!cashFlowData.account_name) return '';
+        
+        return `
+            <div class="row mt-4">
+                <div class="col-12">
+                    <h6 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${entityColor} !important;">חשבון מסחר מקושר</h6>
+                    <div class="linked-account-card p-3 border rounded">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">${cashFlowData.account_name}</h6>
+                                <small class="text-muted">חשבון מסחר #${cashFlowData.trading_account_id}</small>
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-outline-primary" onclick="window.showEntityDetails('trading_account', ${cashFlowData.trading_account_id})">
+                                    <i class="fas fa-eye"></i> צפה בפרטים
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -186,7 +186,7 @@ async function showAddExecutionModal() {
   // הגדרת תאריך ברירת מחדל - היום
   const today = new Date();
   const todayString = today.toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
-  document.getElementById('executionDate').value = todayString;
+  window.DataCollectionService.setValue('executionDate', todayString, 'text');
 
   // הגדרת חשבון ברירת מחדל לפי העדפות
   // ✨ עודכן לתמיכה במערכת העדפות!
@@ -276,7 +276,7 @@ async function showEditExecutionModal(id) {
   }
 
   // מילוי שדה ה-ID לפני כל השאר
-  document.getElementById('editExecutionId').value = execution.id;
+  window.DataCollectionService.setValue('editExecutionId', execution.id, 'int');
 
   // טעינת טיקרים לפי הצ'קבוקס
   const showClosedTrades = document.getElementById('editExecutionShowClosedTrades')?.checked || false;
@@ -578,8 +578,8 @@ function validateExecutionForm() {
                 if (isNaN(num)) return 'כמות חייבת להיות מספר';
                 if (num <= 0) return 'כמות חייבת להיות חיובית';
                 if (num > 1000000) return 'כמות גבוהה מדי (מקסימום 1,000,000)';
-                return true;
-            }
+  return true;
+}
         },
         { 
             id: 'addExecutionPrice', 
@@ -603,8 +603,8 @@ function validateExecutionForm() {
                     if (num < 0) return 'עמלה לא יכולה להיות שלילית';
                     if (num > 10000) return 'עמלה גבוהה מדי (מקסימום 10,000)';
                 }
-                return true;
-            }
+  return true;
+}
         },
         { 
             id: 'addExecutionNotes', 
@@ -633,8 +633,8 @@ function validateEditExecutionForm() {
                 if (!['buy', 'sale'].includes(value)) {
                     return 'סוג עסקה לא תקין';
                 }
-                return true;
-            }
+  return true;
+}
         },
         { 
             id: 'editExecutionQuantity', 
@@ -644,8 +644,8 @@ function validateEditExecutionForm() {
                 if (isNaN(num)) return 'כמות חייבת להיות מספר';
                 if (num <= 0) return 'כמות חייבת להיות חיובית';
                 if (num > 1000000) return 'כמות גבוהה מדי (מקסימום 1,000,000)';
-                return true;
-            }
+  return true;
+}
         },
         { 
             id: 'editExecutionPrice', 
@@ -655,8 +655,8 @@ function validateEditExecutionForm() {
                 if (isNaN(num)) return 'מחיר חייב להיות מספר';
                 if (num <= 0) return 'מחיר חייב להיות חיובי';
                 if (num > 1000000) return 'מחיר גבוה מדי (מקסימום 1,000,000)';
-                return true;
-            }
+  return true;
+}
         },
         { id: 'editExecutionDate', name: 'תאריך עסקה' },
         { 
@@ -669,8 +669,8 @@ function validateEditExecutionForm() {
                     if (num < 0) return 'עמלה לא יכולה להיות שלילית';
                     if (num > 10000) return 'עמלה גבוהה מדי (מקסימום 10,000)';
                 }
-                return true;
-            }
+  return true;
+}
         },
         { 
             id: 'editExecutionNotes', 
@@ -679,8 +679,8 @@ function validateEditExecutionForm() {
                 if (value && value.length > 1000) {
                     return 'הערות ארוכות מדי (מקסימום 1,000 תווים)';
                 }
-                return true;
-            }
+  return true;
+}
         }
     ]);
 }
@@ -701,28 +701,32 @@ async function saveExecution() {
   try {
     // 1. ולידציה
     if (!validateExecutionForm()) {
-        return;
-    }
+    return;
+  }
 
-    // 2. בניית אובייקט נתונים
+    // 2. בניית אובייקט נתונים באמצעות DataCollectionService
+    const rawData = window.DataCollectionService.collectFormData({
+        trade_id: { id: 'addExecutionTradeId', type: 'int' },
+        action: { id: 'addExecutionType', type: 'text' },
+        quantity: { id: 'addExecutionQuantity', type: 'int' },
+        price: { id: 'addExecutionPrice', type: 'number' },
+        date: { id: 'addExecutionDate', type: 'text' },
+        fee: { id: 'addExecutionCommission', type: 'number', default: null },
+        source: { id: 'addExecutionSource', type: 'text', default: 'manual' },
+        notes: { id: 'addExecutionNotes', type: 'text', default: null }
+    });
+    
+    // המרת תאריך ל-ISO
     const executionData = {
-        trade_id: parseInt(document.getElementById('addExecutionTradeId').value),
-        action: document.getElementById('addExecutionType').value,
-        quantity: parseInt(document.getElementById('addExecutionQuantity').value),
-        price: parseFloat(document.getElementById('addExecutionPrice').value),
-        date: document.getElementById('addExecutionDate').value ? 
-              new Date(document.getElementById('addExecutionDate').value).toISOString() : null,
-        fee: document.getElementById('addExecutionCommission').value ? 
-             parseFloat(document.getElementById('addExecutionCommission').value) : null,
-        source: document.getElementById('addExecutionSource')?.value || 'manual',
-        notes: document.getElementById('addExecutionNotes')?.value || null,
+        ...rawData,
+        date: rawData.date ? new Date(rawData.date).toISOString() : null
     };
 
     // 3. שליחה לשרת
     const response = await fetch('/api/executions', {
-        method: 'POST',
+      method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(executionData),
+      body: JSON.stringify(executionData),
     });
 
     // 4. טיפול בתגובה
@@ -744,7 +748,7 @@ async function saveExecution() {
     const result = await response.json();
     
     // 5. הצגת הודעת הצלחה
-    if (typeof window.showSuccessNotification === 'function') {
+      if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('הצלחה', 'עסקה נוספה בהצלחה');
     }
 
@@ -781,29 +785,33 @@ async function updateExecution() {
   try {
     // 1. ולידציה
     if (!validateEditExecutionForm()) {
-        return;
-    }
+    return;
+  }
 
-    // 2. בניית אובייקט נתונים
-    const id = document.getElementById('editExecutionId').value;
+    // 2. בניית אובייקט נתונים באמצעות DataCollectionService
+    const id = window.DataCollectionService.getValue('editExecutionId', 'int');
+    const rawData = window.DataCollectionService.collectFormData({
+        trade_id: { id: 'editExecutionTradeId', type: 'int' },
+        action: { id: 'editExecutionType', type: 'text' },
+        quantity: { id: 'editExecutionQuantity', type: 'int' },
+        price: { id: 'editExecutionPrice', type: 'number' },
+        date: { id: 'editExecutionDate', type: 'text' },
+        fee: { id: 'editExecutionCommission', type: 'number', default: null },
+        source: { id: 'editExecutionSource', type: 'text', default: 'manual' },
+        notes: { id: 'editExecutionNotes', type: 'text', default: null }
+    });
+    
+    // המרת תאריך ל-ISO
     const executionData = {
-        trade_id: parseInt(document.getElementById('editExecutionTradeId').value),
-        action: document.getElementById('editExecutionType').value,
-        quantity: parseInt(document.getElementById('editExecutionQuantity').value),
-        price: parseFloat(document.getElementById('editExecutionPrice').value),
-        date: document.getElementById('editExecutionDate').value ? 
-              new Date(document.getElementById('editExecutionDate').value).toISOString() : null,
-        fee: document.getElementById('editExecutionCommission').value ? 
-             parseFloat(document.getElementById('editExecutionCommission').value) : null,
-        source: document.getElementById('editExecutionSource')?.value || 'manual',
-        notes: document.getElementById('editExecutionNotes')?.value || null,
+        ...rawData,
+        date: rawData.date ? new Date(rawData.date).toISOString() : null
     };
 
     // 3. שליחה לשרת
     const response = await fetch(`/api/executions/${id}`, {
-        method: 'PUT',
+      method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(executionData),
+      body: JSON.stringify(executionData),
     });
 
     // 4. טיפול בתגובה
@@ -825,7 +833,7 @@ async function updateExecution() {
     const result = await response.json();
     
     // 5. הצגת הודעת הצלחה
-    if (typeof window.showSuccessNotification === 'function') {
+      if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('הצלחה', 'עסקה עודכנה בהצלחה');
     }
 

@@ -3676,14 +3676,7 @@ function addNewTicker() {
 // Export functions to global scope for onclick attributes
 // window.toggleSection removed - using global version from ui-utils.js
 window.toggleExecutionsSection = toggleExecutionsSection;
-window.openExecutionDetails = openExecutionDetails;
-window.saveExecution = saveExecution;
-window.updateExecution = updateExecution;
-window.confirmDeleteExecution = confirmDeleteExecution;
-window.goToLinkedTrade = goToLinkedTrade;
-window.addNewPlan = addNewPlan;
-window.addNewTrade = addNewTrade;
-window.addNewTicker = addNewTicker;
+// ייצוא גלובלי כפול - מוסר (כבר מיוצא בשורות 2065-2087)
 
 // Modal event listeners for form reset
 document.addEventListener('DOMContentLoaded', function() {

@@ -1076,7 +1076,16 @@ Error: Entity Details API לא נטען
 ```
 
 **קבצים שתוקנו:**
-- `trading-ui/cash_flows.html` - הוספת script חסר
+- `trading-ui/cash_flows.html` - הוספת 2 scripts חסרים:
+  - `entity-details-api.js` - API לטעינת נתוני ישויות
+  - `entity-details-renderer.js` - רינדור פרטי ישויות
+
+**סדר טעינה נכון:**
+```html
+<script src="scripts/entity-details-api.js"></script>
+<script src="scripts/entity-details-renderer.js"></script>
+<script src="scripts/entity-details-modal.js"></script>
+```
 
 ---
 

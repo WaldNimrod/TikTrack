@@ -1562,14 +1562,99 @@ cash_flow: [
 ---
 
 **קבצים שתוקנו:**
-- `trading-ui/scripts/entity-details-renderer.js` - 7 שיפורים:
+- `trading-ui/scripts/entity-details-renderer.js` - 10 שיפורים:
   1. formatCurrency - פסיקים + סמל מטבע
   2. formatDate - dd/MM/yy
   3. formatDateTime - dd/MM/yy HH:mm + "-" לריק
   4. translateCashFlowType - תרגום לעברית
   5. formatFieldValue - תמיכה ב-currency + date
-  6. renderBasicInfo - תרגום אוטומטי + העברת currencySymbol
-  7. renderLinkedAccount - הצגת חשבון מקושר + קישור
+  6. renderBasicInfo/renderAdditionalInfo - תרגום אוטומטי + העברת currencySymbol
+  7. renderEntityHeader - כפתורי פעולה בכותרת (עריכה, מחיקה, סגירה)
+  8. renderHeaderActionButtons - כפתורים מיושרים לשמאל
+  9. capitalizeFirst - המרה cash_flow → CashFlow
+  10. renderLinkedAccount - כרטיס מעוצב עם צבע/איקון חשבון + 3-4 שדות מרכזיים
+
+---
+
+## 🎨 עיצוב מודל פרטים - כותרת וכפתורים
+
+### **מבנה כותרת מעודכן:**
+
+```javascript
+renderEntityHeader(entityTypeName, entityIdentifier, color, entityType, entityId) {
+    return `
+        <div class="entity-details-header mb-4 pb-3 border-bottom d-flex justify-content-between">
+            <!-- צד ימין: איקון + כותרת -->
+            <div class="d-flex align-items-center">
+                <div class="entity-icon-circle" style="background-color: ${color};">
+                    <i class="fas ${icon}"></i>
+                </div>
+                <div>
+                    <h4 style="color: ${color};">תזרים מזומנים</h4>
+                    <p class="text-muted">הפקדה - 15,000.00 USD</p>
+                </div>
+            </div>
+            
+            <!-- צד שמאל: כפתורי פעולה -->
+            <div class="d-flex gap-2">
+                <button onclick="editCashFlow(id)">עריכה</button>
+                <button onclick="deleteCashFlow(id)">מחיקה</button>
+                <button onclick="סגירה">X</button>
+            </div>
+        </div>
+    `;
+}
+```
+
+### **כפתורי פעולה:**
+
+**מיקום:** שורת הכותרת, מיושרים לשמאל (סוף השורה)
+
+**כפתורים:**
+1. 🖊️ עריכה - `btn-outline-primary`
+2. 🗑️ מחיקה - `btn-outline-danger`
+3. ✖️ סגירה - `btn-outline-secondary`
+
+**סגנון:** זהה לכפתורים בכותרות סקשנים (btn-sm, outline)
+
+---
+
+### **חשבון מקושר - עיצוב מלא:**
+
+```html
+<div class="linked-account-card" style="border-color: [צבע חשבון];">
+    <!-- איקון חשבון + שם -->
+    <div class="entity-icon-circle" style="background-color: [צבע חשבון];">
+        <i class="fas fa-university"></i>
+    </div>
+    <h6 style="color: [צבע חשבון];">חשבון טכנולוגיה</h6>
+    
+    <!-- פרטים מרכזיים -->
+    <div class="row">
+        <div class="col-md-6">
+            <small>מזהה: #2</small>
+            <small>סוג: Standard</small>
+        </div>
+        <div class="col-md-6">
+            <small>סטטוס: פתוח</small>
+            <small>יתרה: 25,000.00 USD</small>
+        </div>
+    </div>
+    
+    <!-- כפתור צפה בפרטים -->
+    <button onclick="showEntityDetails('trading_account', 2)">
+        <i class="fas fa-external-link-alt"></i>
+    </button>
+</div>
+```
+
+**צבע ואיקון:** בהתאם לחשבונות (לא לתזרים מזומנים)
+
+**שדות מוצגים:**
+- מזהה חשבון
+- סוג חשבון (אם יש)
+- סטטוס (אם יש)
+- יתרה (אם יש)
 
 ---
 

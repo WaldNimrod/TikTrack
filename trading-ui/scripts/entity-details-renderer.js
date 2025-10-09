@@ -306,20 +306,48 @@ class EntityDetailsRenderer {
     /**
      * Render entity header - רנדור כותרת ישות
      */
-    renderEntityHeader(entityTypeName, entityIdentifier, color) {
+    renderEntityHeader(entityTypeName, entityIdentifier, color, entityType = '', entityId = null) {
+        const actionButtons = entityId ? this.renderHeaderActionButtons(entityType, entityId, color) : '';
+        
         return `
-            <div class="entity-details-header mb-4">
+            <div class="entity-details-header mb-4 pb-3 border-bottom d-flex justify-content-between align-items-center" style="border-bottom-color: ${color} !important;">
                 <div class="d-flex align-items-center">
-                    <div class="entity-icon-circle me-3" style="background-color: ${color};">
-                        <i class="fas ${this.getEntityIcon(entityTypeName)} text-white"></i>
+                    <div class="entity-icon-circle me-3" style="background-color: ${color}; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas ${this.getEntityIcon(entityType || entityTypeName)} text-white fa-lg"></i>
                     </div>
                     <div>
                         <h4 class="mb-1" style="color: ${color};">${entityTypeName}</h4>
                         <p class="text-muted mb-0">${entityIdentifier}</p>
                     </div>
                 </div>
+                <div class="d-flex gap-2">
+                    ${actionButtons}
+                </div>
             </div>
         `;
+    }
+
+    /**
+     * Render header action buttons - כפתורי פעולה בכותרת
+     */
+    renderHeaderActionButtons(entityType, entityId, color) {
+        return `
+            <button class="btn btn-sm btn-outline-primary" onclick="edit${this.capitalizeFirst(entityType)}(${entityId})" title="עריכה">
+                <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-danger" onclick="delete${this.capitalizeFirst(entityType)}(${entityId})" title="מחיקה">
+                <i class="fas fa-trash"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="document.querySelector('.modal.show .btn-close')?.click()" title="סגירה">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+    }
+
+    capitalizeFirst(str) {
+        if (!str) return '';
+        // המרה: cash_flow → CashFlow
+        return str.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('');
     }
 
     /**
@@ -1491,9 +1519,13 @@ class EntityDetailsRenderer {
         // תרגום סוג תזרים לעברית
         const typeDisplay = this.translateCashFlowType(cashFlowData.type);
         
+        // כותרת: "תזרים מזומנים" בשורה ראשונה, "הפקדה - 15,000.00 USD" בשורה שנייה
+        const headerTitle = 'תזרים מזומנים';
+        const headerSubtitle = `${typeDisplay} - ${this.formatCurrency(cashFlowData.amount, cashFlowData.currency_symbol)}`;
+        
         return `
             <div class="entity-details-container cash-flow-details">
-                ${this.renderEntityHeader('תזרים מזומנים', `${typeDisplay} - ${this.formatCurrency(cashFlowData.amount, cashFlowData.currency_symbol)}`, entityColor)}
+                ${this.renderEntityHeader(headerTitle, headerSubtitle, entityColor, 'cash_flow', cashFlowData.id)}
                 
                 <div class="row">
                     <div class="col-md-6">
@@ -1505,18 +1537,6 @@ class EntityDetailsRenderer {
                 </div>
                 
                 ${cashFlowData.trading_account_id ? this.renderLinkedAccount(cashFlowData, entityColor) : ''}
-                
-                <div class="row mt-4">
-                    <div class="col-12">
-                        ${this.renderLinkedItems(cashFlowData.linked_items || [], entityColor)}
-                    </div>
-                </div>
-                
-                <div class="row mt-4">
-                    <div class="col-12">
-                        ${this.renderActionButtons('cash_flow', cashFlowData.id)}
-                    </div>
-                </div>
             </div>
         `;
     }
@@ -1524,22 +1544,40 @@ class EntityDetailsRenderer {
     /**
      * Render linked trading account info
      */
-    renderLinkedAccount(cashFlowData, entityColor) {
+    renderLinkedAccount(cashFlowData, cashFlowColor) {
         if (!cashFlowData.account_name) return '';
+        
+        // צבע ואיקון של חשבונות
+        const accountColor = this.entityColors.account || '#6f42c1';
+        const accountIcon = this.getEntityIcon('account');
         
         return `
             <div class="row mt-4">
                 <div class="col-12">
-                    <h6 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${entityColor} !important;">חשבון מסחר מקושר</h6>
-                    <div class="linked-account-card p-3 border rounded">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="mb-1">${cashFlowData.account_name}</h6>
-                                <small class="text-muted">חשבון מסחר #${cashFlowData.trading_account_id}</small>
+                    <h6 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${cashFlowColor} !important;">חשבון מסחר מקושר</h6>
+                    <div class="linked-account-card p-3 border rounded" style="border-color: ${accountColor} !important; border-width: 2px !important;">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="d-flex align-items-start flex-grow-1">
+                                <div class="entity-icon-circle me-3" style="background-color: ${accountColor}; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas ${accountIcon} text-white"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-2" style="color: ${accountColor};">${cashFlowData.account_name}</h6>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <small class="text-muted d-block">מזהה: #${cashFlowData.trading_account_id}</small>
+                                            ${cashFlowData.account_type ? `<small class="text-muted d-block">סוג: ${cashFlowData.account_type}</small>` : ''}
+                                        </div>
+                                        <div class="col-md-6">
+                                            ${cashFlowData.account_status ? `<small class="text-muted d-block">סטטוס: ${cashFlowData.account_status}</small>` : ''}
+                                            ${cashFlowData.account_balance ? `<small class="text-muted d-block">יתרה: ${this.formatCurrency(cashFlowData.account_balance, cashFlowData.currency_symbol)}</small>` : ''}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <div>
-                                <button class="btn btn-sm btn-outline-primary" onclick="window.showEntityDetails('trading_account', ${cashFlowData.trading_account_id})">
-                                    <i class="fas fa-eye"></i> צפה בפרטים
+                                <button class="btn btn-sm btn-outline-primary" onclick="window.showEntityDetails('trading_account', ${cashFlowData.trading_account_id})" title="פרטי חשבון">
+                                    <i class="fas fa-external-link-alt"></i>
                                 </button>
                             </div>
                         </div>

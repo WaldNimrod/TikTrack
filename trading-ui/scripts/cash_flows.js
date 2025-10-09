@@ -1773,45 +1773,23 @@ async function _showEditCashFlowModal(id) {
 // עדכון פונקציית saveCashFlow
 async function saveCashFlow() {
   try {
-    // איסוף נתונים מהטופס
-    const currencyIdElement = document.getElementById('cashFlowCurrencyId');
-    const accountIdElement = document.getElementById('cashFlowAccountId');
-    const typeElement = document.getElementById('cashFlowType');
-    const amountElement = document.getElementById('cashFlowAmount');
-    const dateElement = document.getElementById('cashFlowDate');
-    const descriptionElement = document.getElementById('cashFlowDescription');
-    const sourceElement = document.getElementById('cashFlowSource');
-    const usdRateElement = document.getElementById('cashFlowUsdRate');
-    const externalIdElement = document.getElementById('cashFlowExternalId');
-    
-    // בדיקת קיום אלמנטים חובה
-    if (!accountIdElement || !typeElement || !amountElement || !dateElement) {
-      if (typeof window.showSimpleErrorNotification === 'function') {
-        window.showSimpleErrorNotification('שגיאה', 'שדות חובה חסרים בטופס');
-      }
-      return;
-    }
-    
-    // המרת תאריך לפורמט YYYY-MM-DD (השרת דורש רק תאריך, לא זמן)
-    const dateValue = dateElement.value;
-    const dateOnly = dateValue ? dateValue.split('T')[0] : null;
-    
-    const formData = {
-      trading_account_id: parseInt(accountIdElement.value),
-      type: typeElement.value,
-      amount: parseFloat(amountElement.value),
-      currency_id: currencyIdElement ? parseInt(currencyIdElement.value) : 1,
-      usd_rate: usdRateElement ? parseFloat(usdRateElement.value) : 1.000000,
-      date: dateOnly,
-      description: descriptionElement ? descriptionElement.value : '',
-      source: sourceElement ? sourceElement.value : 'manual',
-      external_id: externalIdElement ? externalIdElement.value : '0',
-    };
-
     // ולידציה של הטופס
     if (!validateCashFlowForm()) {
       return;
     }
+
+    // איסוף נתונים מהטופס באמצעות DataCollectionService
+    const formData = window.DataCollectionService.collectFormData({
+      trading_account_id: { id: 'cashFlowAccountId', type: 'int' },
+      type: { id: 'cashFlowType', type: 'text' },
+      amount: { id: 'cashFlowAmount', type: 'number' },
+      currency_id: { id: 'cashFlowCurrencyId', type: 'int', default: 1 },
+      usd_rate: { id: 'cashFlowUsdRate', type: 'number', default: 1.000000 },
+      date: { id: 'cashFlowDate', type: 'dateOnly' },
+      description: { id: 'cashFlowDescription', type: 'text', default: '' },
+      source: { id: 'cashFlowSource', type: 'text', default: 'manual' },
+      external_id: { id: 'cashFlowExternalId', type: 'text', default: '0' }
+    });
 
     const response = await fetch('http://127.0.0.1:8080/api/cash_flows/', {
       method: 'POST',
@@ -1933,51 +1911,26 @@ async function saveCashFlow() {
 // עדכון פונקציית updateCashFlow
 async function updateCashFlow() {
   try {
-    const id = parseInt(document.getElementById('editCashFlowId').value);
-
-    // איסוף אלמנטים
-    const accountIdElement = document.getElementById('editCashFlowAccountId');
-    const typeElement = document.getElementById('editCashFlowType');
-    const amountElement = document.getElementById('editCashFlowAmount');
-    const dateElement = document.getElementById('editCashFlowDate');
-    const currencyIdElement = document.getElementById('editCashFlowCurrencyId');
-    const sourceElement = document.getElementById('editCashFlowSource');
-    const descriptionElement = document.getElementById('editCashFlowDescription');
-    const usdRateElement = document.getElementById('editCashFlowUsdRate');
-    const externalIdElement = document.getElementById('editCashFlowExternalId');
-
-    // בדיקת קיום אלמנטים חובה
-    if (!accountIdElement || !typeElement || !amountElement || !dateElement) {
-      if (typeof window.showSimpleErrorNotification === 'function') {
-        window.showSimpleErrorNotification('שגיאה', 'שדות חובה חסרים בטופס');
-      }
-      return;
-    }
-
-    // המרת תאריך לפורמט YYYY-MM-DD
-    const dateValue = dateElement.value;
-    const dateOnly = dateValue ? dateValue.split('T')[0] : null;
-
-    const formData = {
-      trading_account_id: parseInt(accountIdElement.value),
-      type: typeElement.value,
-      amount: parseFloat(amountElement.value),
-      currency_id: currencyIdElement ? parseInt(currencyIdElement.value) : 1,
-      usd_rate: usdRateElement ? parseFloat(usdRateElement.value) : 1.000000,
-      date: dateOnly,
-      description: descriptionElement ? descriptionElement.value : '',
-      source: sourceElement ? sourceElement.value : 'manual',
-      external_id: externalIdElement ? externalIdElement.value : '0',
-    };
-
     // בדיקת תקינות מקיפה
     if (window.validateForm) {
       if (!window.validateForm('editCashFlowForm')) {
         return;
       }
-    } else if (!validateEditCashFlowForm(formData)) {
-      return;
     }
+
+    // איסוף נתונים מהטופס באמצעות DataCollectionService
+    const id = window.DataCollectionService.getValue('editCashFlowId', 'int');
+    const formData = window.DataCollectionService.collectFormData({
+      trading_account_id: { id: 'editCashFlowAccountId', type: 'int' },
+      type: { id: 'editCashFlowType', type: 'text' },
+      amount: { id: 'editCashFlowAmount', type: 'number' },
+      currency_id: { id: 'editCashFlowCurrencyId', type: 'int', default: 1 },
+      usd_rate: { id: 'editCashFlowUsdRate', type: 'number', default: 1.000000 },
+      date: { id: 'editCashFlowDate', type: 'dateOnly' },
+      description: { id: 'editCashFlowDescription', type: 'text', default: '' },
+      source: { id: 'editCashFlowSource', type: 'text', default: 'manual' },
+      external_id: { id: 'editCashFlowExternalId', type: 'text', default: '0' }
+    });
 
     const response = await fetch(`http://127.0.0.1:8080/api/cash_flows/${id}`, {
       method: 'PUT',

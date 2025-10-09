@@ -1392,11 +1392,11 @@ async function saveAlert() {
     // 6. בניית אובייקט נתונים
     const alertData = {
       related_type_id: parseInt(formData.get('alertRelationType')),
-      related_id: parseInt(document.getElementById('alertRelatedObjectSelect').value),
+      related_id: window.DataCollectionService.getValue('alertRelatedObjectSelect', 'int'),
       condition_attribute: conditionAttribute,
       condition_operator: conditionOperator,
       condition_number: conditionNumber,
-      message: document.getElementById('alertMessage').value || null,
+      message: window.DataCollectionService.getValue('alertMessage', 'text') || null,
       status: 'open',
       is_triggered: 'false',
     };
@@ -1841,16 +1841,16 @@ async function updateAlert() {
     return;
   }
 
-  const alertId = document.getElementById('editAlertId').value;
+  const alertId = window.DataCollectionService.getValue('editAlertId', 'int');
   const alertData = {
     related_type_id: relatedTypeId,
     related_id: relatedId,
     condition_attribute: conditionAttribute,
     condition_operator: conditionOperator,
     condition_number: conditionNumber,
-    message: document.getElementById('editAlertMessage').value || null,
-    status: document.getElementById('editAlertStatus').value,
-    is_triggered: document.getElementById('editAlertIsTriggered').value,
+    message: window.DataCollectionService.getValue('editAlertMessage', 'text') || null,
+    status: window.DataCollectionService.getValue('editAlertStatus', 'text'),
+    is_triggered: window.DataCollectionService.getValue('editAlertIsTriggered', 'text'),
   };
 
   // מעדכן התראה

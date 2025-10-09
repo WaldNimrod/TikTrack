@@ -1557,37 +1557,40 @@ class EntityDetailsRenderer {
     renderLinkedAccount(cashFlowData, cashFlowColor) {
         if (!cashFlowData.account_name) return '';
         
-        // צבע ואיקון של חשבונות
-        const accountColor = this.entityColors.account || '#6f42c1';
-        const accountIcon = this.getEntityIcon('account');
+        // צבעים של חשבונות
+        const accountColorDark = this.entityColors.account || '#6f42c1';
+        const accountColorLight = this.lightenColor(accountColorDark, 0.9); // רקע בהיר
+        const accountIconPath = this.getEntityIcon('trading_account');
         
         return `
             <div class="row mt-4">
                 <div class="col-12">
                     <h6 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${cashFlowColor} !important;">חשבון מסחר מקושר</h6>
-                    <div class="linked-account-card p-3 border rounded" style="border-color: ${accountColor} !important; border-width: 2px !important;">
+                    <div class="linked-account-card p-3 border rounded" style="background-color: ${accountColorLight}; border-color: ${accountColorDark} !important; border-width: 2px !important;">
                         <div class="d-flex justify-content-between align-items-start">
                             <div class="d-flex align-items-start flex-grow-1">
-                                <div class="entity-icon-circle me-3" style="background-color: ${accountColor}; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                                    <i class="fas ${accountIcon} text-white"></i>
+                                <div class="entity-icon-circle me-3" style="background-color: ${accountColorDark}; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 8px;">
+                                    <img src="${accountIconPath}" alt="חשבון" style="width: 100%; height: 100%; object-fit: contain; filter: brightness(0) invert(1);">
                                 </div>
                                 <div class="flex-grow-1">
-                                    <h6 class="mb-2" style="color: ${accountColor};">${cashFlowData.account_name}</h6>
+                                    <h6 class="mb-2" style="color: ${accountColorDark};">${cashFlowData.account_name}</h6>
                                     <div class="row">
-                                        <div class="col-md-6">
-                                            <small class="text-muted d-block">מזהה: #${cashFlowData.trading_account_id}</small>
-                                            ${cashFlowData.account_type ? `<small class="text-muted d-block">סוג: ${cashFlowData.account_type}</small>` : ''}
+                                        <div class="col-md-4">
+                                            <small class="text-muted d-block"><strong>מזהה:</strong> #${cashFlowData.trading_account_id}</small>
+                                            ${cashFlowData.account_type ? `<small class="text-muted d-block"><strong>סוג:</strong> ${cashFlowData.account_type}</small>` : ''}
                                         </div>
-                                        <div class="col-md-6">
-                                            ${cashFlowData.account_status ? `<small class="text-muted d-block">סטטוס: ${cashFlowData.account_status}</small>` : ''}
-                                            ${cashFlowData.account_balance ? `<small class="text-muted d-block">יתרה: ${this.formatCurrency(cashFlowData.account_balance, cashFlowData.currency_symbol)}</small>` : ''}
+                                        <div class="col-md-4">
+                                            ${cashFlowData.account_status ? `<small class="text-muted d-block"><strong>סטטוס:</strong> <span class="badge badge-sm" style="background-color: ${this.getStatusBgColor(cashFlowData.account_status)};">${this.translateStatus(cashFlowData.account_status)}</span></small>` : ''}
+                                        </div>
+                                        <div class="col-md-4">
+                                            ${cashFlowData.account_balance !== null && cashFlowData.account_balance !== undefined ? `<small class="text-muted d-block"><strong>יתרה:</strong> ${this.formatCurrency(cashFlowData.account_balance, cashFlowData.currency_symbol)}</small>` : ''}
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div>
-                                <button class="btn btn-sm btn-outline-primary" onclick="window.showEntityDetails('trading_account', ${cashFlowData.trading_account_id})" title="פרטי חשבון">
-                                    <i class="fas fa-external-link-alt"></i>
+                                <button class="btn btn-sm" style="background-color: ${accountColorDark}; color: white; border: none;" onclick="window.showEntityDetails('trading_account', ${cashFlowData.trading_account_id})" title="פרטי חשבון">
+                                    <i class="fas fa-external-link-alt"></i> פרטים
                                 </button>
                             </div>
                         </div>
@@ -1595,6 +1598,44 @@ class EntityDetailsRenderer {
                 </div>
             </div>
         `;
+    }
+
+    /**
+     * Lighten color for background
+     */
+    lightenColor(color, percent) {
+        const rgb = this.hexToRgb(color);
+        if (!rgb) return color;
+        
+        const r = Math.round(rgb.r + (255 - rgb.r) * percent);
+        const g = Math.round(rgb.g + (255 - rgb.g) * percent);
+        const b = Math.round(rgb.b + (255 - rgb.b) * percent);
+        
+        return `rgb(${r}, ${g}, ${b})`;
+    }
+
+    /**
+     * Translate status to Hebrew
+     */
+    translateStatus(status) {
+        const translations = {
+            'open': 'פתוח',
+            'closed': 'סגור',
+            'cancelled': 'מבוטל'
+        };
+        return translations[status] || status;
+    }
+
+    /**
+     * Get status background color
+     */
+    getStatusBgColor(status) {
+        const colors = {
+            'open': '#d4edda',
+            'closed': '#d6d8db',
+            'cancelled': '#f8d7da'
+        };
+        return colors[status] || '#e9ecef';
     }
     renderNote(noteData, options) { return '<div>הערה</div>'; }
     renderGeneric(entityData, entityType, options) { return '<div>ישות כללית</div>'; }

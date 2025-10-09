@@ -1564,10 +1564,10 @@ async function updateExecutionsTableMain(executions) {
                                    <td class="ticker-cell">
                        <div class="ticker-cell-content">
                            <strong class="ticker-symbol-link ${execution.action === 'buy' ? 'action-buy' : 'action-sell'}" 
-                             onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('ticker', ${ticker ? ticker.id : 'null'}, 'view'); } else { console.log('Entity details modal not available'); }" 
+                             onclick="window.showEntityDetailsModal && window.showEntityDetailsModal('ticker', ${ticker ? ticker.id : 'null'}, 'view')" 
                              title="פתח פרטי סימבול">${symbol}</strong>
                            <button class="btn btn-sm btn-info" 
-                             onclick="console.log('🔗 [LINKED ITEMS] לחיצה על כפתור מקושרים עבור טיקר:', ${ticker ? ticker.id : 'null'}); if(window.loadLinkedItemsData) { window.loadLinkedItemsData('ticker', ${ticker ? ticker.id : 'null'}).then(data => { console.log('🔗 [LINKED ITEMS] נתונים נטענו:', data); if(data) { console.log('🔗 [LINKED ITEMS] מציג מודל עם נתונים'); window.showLinkedItemsModal(data, 'ticker', ${ticker ? ticker.id : 'null'}, 'view'); } else { console.log('❌ [LINKED ITEMS] אין נתונים להצגה'); } }); } else { console.log('❌ [LINKED ITEMS] loadLinkedItemsData לא זמין'); }" 
+                             onclick="window.viewLinkedItemsForTicker && window.viewLinkedItemsForTicker(${ticker ? ticker.id : 'null'})" 
                              title="פריטים מקושרים לטיקר">🔗</button>
                        </div>
                    </td>
@@ -1577,7 +1577,7 @@ async function updateExecutionsTableMain(executions) {
                     </span>
                 </td>
                 <td data-account="${accountName}" class="account-cell-link" 
-                  onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('account', '${accountName}', 'view'); } else { console.log('Entity details modal not available'); }" 
+                  onclick="window.showEntityDetailsModal && window.showEntityDetailsModal('account', '${accountName}', 'view')" 
                   title="פתח פרטי חשבון">${accountName}</td>
                 <td>${execution.quantity}</td>
                 <td>$${execution.price}</td>
@@ -1585,7 +1585,7 @@ async function updateExecutionsTableMain(executions) {
                 <td data-date="${execution.date || execution.execution_date}">${execution.date || execution.execution_date ? new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL') : '-'}</td>
                 <td class="source-cell">${execution.source || '-'}</td>
                 <td class="col-actions actions-cell actions-3-btn">
-                    <button class="btn btn-sm btn-outline-info" onclick="console.log('🔗 [LINKED ITEMS] לחיצה על כפתור מקושרים עבור עסקה:', ${execution.id}); if(window.loadLinkedItemsData) { window.loadLinkedItemsData('execution', ${execution.id}).then(data => { console.log('🔗 [LINKED ITEMS] נתונים נטענו:', data); if(data) { console.log('🔗 [LINKED ITEMS] מציג מודל עם נתונים'); window.showLinkedItemsModal(data, 'execution', ${execution.id}, 'view'); } else { console.log('❌ [LINKED ITEMS] אין נתונים להצגה'); } }); } else { console.log('❌ [LINKED ITEMS] loadLinkedItemsData לא זמין'); }" title="פריטים מקושרים">
+                    <button class="btn btn-sm btn-outline-info" onclick="window.viewLinkedItemsForExecution && window.viewLinkedItemsForExecution(${execution.id})" title="פריטים מקושרים">
                         <i class="bi bi-link-45deg"></i>
                     </button>
                     <button class="btn btn-sm btn-outline-primary" onclick="editExecution(${execution.id})" title="עריכה">

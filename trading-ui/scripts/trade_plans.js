@@ -2014,19 +2014,21 @@ async function saveNewTradePlan() {
     const defaultAccount = await window.getPreference('default_trading_account');
     const accountId = defaultAccount ? parseInt(defaultAccount) : 1;
     
-    // 3. בניית אובייקט נתונים
-    const formData = {
-      account_id: accountId,
-      ticker_id: parseInt(document.getElementById('addTradePlanTickerId').value),
-      investment_type: document.getElementById('addTradePlanInvestmentType').value,
-      side: document.getElementById('addTradePlanSide').value,
-      planned_amount: parseFloat(document.getElementById('addTradePlanPlannedAmount').value),
-      stop_price: document.getElementById('addTradePlanStopPrice').value ? parseFloat(document.getElementById('addTradePlanStopPrice').value) : null,
-      target_price: document.getElementById('addTradePlanTargetPrice').value ? parseFloat(document.getElementById('addTradePlanTargetPrice').value) : null,
-      entry_conditions: document.getElementById('addTradePlanEntryConditions').value || '',
-      reasons: document.getElementById('addTradePlanReasons').value || '',
-      status: 'open',
-    };
+    // 3. בניית אובייקט נתונים באמצעות DataCollectionService
+    const formData = window.DataCollectionService.collectFormData({
+      trading_account_id: { id: 'addTradePlanTradingAccount', type: 'int', default: accountId },
+      ticker_id: { id: 'addTradePlanTickerId', type: 'int' },
+      investment_type: { id: 'addTradePlanInvestmentType', type: 'text' },
+      side: { id: 'addTradePlanSide', type: 'text' },
+      planned_amount: { id: 'addTradePlanPlannedAmount', type: 'number' },
+      stop_price: { id: 'addTradePlanStopPrice', type: 'number', default: null },
+      target_price: { id: 'addTradePlanTargetPrice', type: 'number', default: null },
+      entry_conditions: { id: 'addTradePlanEntryConditions', type: 'text', default: null },
+      reasons: { id: 'addTradePlanReasons', type: 'text', default: null }
+    });
+    
+    // הוספת status (תמיד 'open' לתכנונים חדשים)
+    formData.status = 'open';
 
     // 4. שליחה לשרת
     const response = await fetch('/api/trade_plans/', {

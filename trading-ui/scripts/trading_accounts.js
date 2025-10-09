@@ -252,10 +252,7 @@ class TradingAccountsController {
      * עדכון אלמנט סטטיסטיקה
      */
     updateStatElement(elementId, value) {
-        const element = document.getElementById(elementId);
-        if (element) {
-            element.textContent = value;
-        }
+        window.DataCollectionService.setValue(elementId, value, 'text');
     }
 
     /**

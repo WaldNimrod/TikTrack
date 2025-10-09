@@ -1,9 +1,13 @@
 # פתרונות לבעיית כפילות נתונים: מחיר מול אחוזים
 ## Price vs Percentage Redundancy Solutions
 
+**Status**: ✅ **IMPLEMENTED - Solution 4 (Generated Columns)**  
+**Date Implemented**: October 9, 2025  
+**Tables Affected**: `trade_plans`
+
 ---
 
-## 🎯 הבעיה הנוכחית
+## 🎯 הבעיה המקורית (לפני התיקון)
 
 בטבלת `trade_plans` קיימת כפילות נתונים:
 - `stop_price` + `stop_percentage` (שניהם מייצגים את אותו הדבר)
@@ -389,4 +393,92 @@ def create_trade_plan(data):
 - כל עדכון ל-`entry_price` יעדכן אוטומטית את האחוזים
 - ה-frontend ממיר אחוז למחיר לפני שמירה
 - ה-backend מחזיר את שני הערכים (מחיר + אחוז מחושב)
+
+---
+
+## ✅ הטמעה בפועל (October 9, 2025)
+
+### מה בוצע:
+
+1. **✅ Migration Script**: `Backend/scripts/migrate_to_generated_columns.py`
+   - יצר גיבוי אוטומטי: `simpleTrade_new_backup_generated_cols_20251009_115959.db`
+   - המיר `stop_percentage` ו-`target_percentage` ל-GENERATED columns
+   - העביר 18 רשומות בהצלחה
+
+2. **✅ Model Updates**: `Backend/models/trade_plan.py`
+   - עדכן הגדרות columns (הסרת defaults מהאחוזים)
+   - הוסיף helper methods: `calculate_price_from_percentage()` ו-`calculate_percentage_from_price()`
+   - הוסיף הערות על read-only columns
+
+3. **✅ Database Structure**:
+   ```sql
+   -- New structure (trade_plans)
+   current_price FLOAT DEFAULT 0,       -- Entry price for calculations
+   stop_price FLOAT,                    -- Source of truth
+   target_price FLOAT,                  -- Source of truth
+   
+   -- Generated automatically by SQLite
+   stop_percentage FLOAT GENERATED ALWAYS AS (
+       CASE 
+           WHEN current_price > 0 AND stop_price IS NOT NULL 
+           THEN ROUND(((current_price - stop_price) / current_price) * 100, 2)
+           ELSE NULL
+       END
+   ) VIRTUAL,
+   
+   target_percentage FLOAT GENERATED ALWAYS AS (
+       CASE 
+           WHEN current_price > 0 AND target_price IS NOT NULL 
+           THEN ROUND(((target_price - current_price) / current_price) * 100, 2)
+           ELSE NULL
+       END
+   ) VIRTUAL
+   ```
+
+### תוצאות:
+
+- ✅ **אפס כפילות נתונים** - המחירים הם מקור האמת היחיד
+- ✅ **תמיד עקבי** - SQLite מחשב אוטומטית, אי אפשר להכניס ערכים לא תואמים
+- ✅ **SQL queries עובדים** - `WHERE stop_percentage > 5` ו-`ORDER BY target_percentage` עובדים מהקופסה
+- ✅ **Zero maintenance** - לא צריך לעדכן אחוזים בקוד, SQLite עושה הכל
+- ✅ **18 תוכניות טרייד** הועברו בהצלחה
+
+### שימוש בפועל:
+
+```python
+# יצירת תוכנית עם מחירים
+plan = TradePlan(
+    current_price=100.0,
+    stop_price=95.0,
+    target_price=110.0
+)
+db.add(plan)
+db.commit()
+
+# האחוזים מחושבים אוטומטית!
+print(plan.stop_percentage)    # 5.0
+print(plan.target_percentage)  # 10.0
+
+# יצירת תוכנית עם אחוזים (ממירים למחיר תחילה)
+stop = TradePlan.calculate_price_from_percentage(100, 5, is_stop=True)    # 95.0
+target = TradePlan.calculate_price_from_percentage(100, 10, is_stop=False) # 110.0
+
+plan = TradePlan(current_price=100, stop_price=stop, target_price=target)
+db.add(plan)
+db.commit()
+# האחוזים: 5.0 ו-10.0 - מחושבים אוטומטית!
+```
+
+### קבצים שעודכנו:
+- ✅ `Backend/models/trade_plan.py` - מודל מעודכן עם helper methods
+- ✅ `Backend/scripts/migrate_to_generated_columns.py` - סקריפט migration
+- ✅ `Backend/db/simpleTrade_new.db` - מבנה DB מעודכן
+- ✅ `documentation/04-FEATURES/CORE/trade_plans/README.md` - דוקומנטציה מעודכנת
+- ✅ `documentation/database/PRICE_PERCENTAGE_PATTERNS.md` - מסמך זה
+
+### הערות חשובות:
+- ⚠️ השדות `stop_percentage` ו-`target_percentage` הם **READ-ONLY**
+- ⚠️ כדי לעדכן אחוז: שנה את `stop_price` או `target_price`, האחוזים יתעדכנו אוטומטית
+- ⚠️ אם `current_price=0`, האחוזים יהיו NULL (למנוע חלוקה באפס)
+- ✅ כל SQL query עובד: `WHERE`, `ORDER BY`, `GROUP BY` על האחוזים
 

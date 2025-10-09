@@ -30,16 +30,8 @@ function showAddTradeModal() {
     // טעינת נתונים למודל
     loadModalData();
 
-    // ניקוי הטופס
-    const form = document.getElementById('addTradeForm');
-    if (form) {
-        form.reset();
-    }
-
-    // ניקוי וולידציה
-    if (window.clearValidation) {
-        window.clearValidation('addTradeForm');
-    }
+    // ניקוי הטופס באמצעות DataCollectionService
+    window.DataCollectionService.resetForm('addTradeForm', true);
 
     // הגדרת תאריך נוכחי
     const today = new Date();
@@ -50,10 +42,7 @@ function showAddTradeModal() {
     const min = String(today.getMinutes()).padStart(2, '0');
     const todayStr = `${yyyy}-${mm}-${dd}T${hh}:${min}`;
 
-    const dateInput = document.getElementById('addCreatedAt');
-    if (dateInput) {
-        dateInput.value = todayStr;
-    }
+    window.DataCollectionService.setValue('addCreatedAt', todayStr, 'text');
 
     // הצגת המודל
     const modalElement = document.getElementById('addTradeModal');
@@ -108,22 +97,22 @@ async function addTrade() {
             return; // עצירה אם הולידציה נכשלה
         }
         
-        // 2. איסוף נתונים מהטופס
-        const formData = {
-            ticker_id: parseInt(document.getElementById('addTicker').value),
-            trading_account_id: parseInt(document.getElementById('addAccount').value),
-            status: document.getElementById('addStatus').value,
-            investment_type: document.getElementById('addType').value,
-            side: document.getElementById('addSide').value,
-            trade_plan_id: document.getElementById('addTradePlan').value || null,
-            entry_price: parseFloat(document.getElementById('addEntryPrice').value) || null,
-            exit_price: parseFloat(document.getElementById('addExitPrice').value) || null,
-            quantity: parseInt(document.getElementById('addQuantity').value),
-            pnl: parseFloat(document.getElementById('addPnl').value) || 0,
-            created_at: document.getElementById('addCreatedAt').value.split('T')[0], // רק תאריך
-            closed_at: document.getElementById('addClosedAt').value ? document.getElementById('addClosedAt').value.split('T')[0] : null,
-            remarks: document.getElementById('addRemarks').value || null
-        };
+        // 2. איסוף נתונים מהטופס באמצעות DataCollectionService
+        const formData = window.DataCollectionService.collectFormData({
+            ticker_id: { id: 'addTicker', type: 'int' },
+            trading_account_id: { id: 'addAccount', type: 'int' },
+            status: { id: 'addStatus', type: 'text' },
+            investment_type: { id: 'addType', type: 'text' },
+            side: { id: 'addSide', type: 'text' },
+            trade_plan_id: { id: 'addTradePlan', type: 'int', default: null },
+            entry_price: { id: 'addEntryPrice', type: 'number', default: null },
+            exit_price: { id: 'addExitPrice', type: 'number', default: null },
+            quantity: { id: 'addQuantity', type: 'int' },
+            pnl: { id: 'addPnl', type: 'number', default: 0 },
+            created_at: { id: 'addCreatedAt', type: 'dateOnly' },
+            closed_at: { id: 'addClosedAt', type: 'dateOnly', default: null },
+            remarks: { id: 'addRemarks', type: 'text', default: null }
+        });
 
         // 3. שליחה לשרת
         const response = await fetch('/api/trades/', {
@@ -760,15 +749,15 @@ class TradesController {
         const mode = form.dataset.mode;
         const tradeId = form.dataset.tradeId;
         
-        // איסוף נתונים מהטופס
-        const formData = {
-            ticker_id: document.getElementById('editTicker')?.value,
-            status: document.getElementById('editStatus')?.value,
-            investment_type: document.getElementById('editType')?.value,
-            side: document.getElementById('editSide')?.value,
-            trade_plan_id: document.getElementById('editTradePlan')?.value || null,
-            trading_account_id: document.getElementById('editAccount')?.value
-        };
+        // איסוף נתונים מהטופס באמצעות DataCollectionService
+        const formData = window.DataCollectionService.collectFormData({
+            ticker_id: { id: 'editTicker', type: 'int' },
+            status: { id: 'editStatus', type: 'text' },
+            investment_type: { id: 'editType', type: 'text' },
+            side: { id: 'editSide', type: 'text' },
+            trade_plan_id: { id: 'editTradePlan', type: 'int', default: null },
+            trading_account_id: { id: 'editAccount', type: 'int' }
+        });
         
         try {
             let response;

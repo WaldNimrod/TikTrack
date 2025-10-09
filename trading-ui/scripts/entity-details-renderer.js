@@ -948,6 +948,20 @@ class EntityDetailsRenderer {
                 { key: 'notes', label: 'הערות', type: 'text' },
                 { key: 'created_at', label: 'תאריך יצירה', type: 'datetime' },
                 { key: 'updated_at', label: 'תאריך עדכון', type: 'datetime' }
+            ],
+            cash_flow: [
+                { key: 'id', label: 'מזהה', type: 'number' },
+                { key: 'type', label: 'סוג תזרים', type: 'text' },
+                { key: 'amount', label: 'סכום', type: 'currency' },
+                { key: 'currency_symbol', label: 'מטבע', type: 'text' },
+                { key: 'account_name', label: 'חשבון מסחר', type: 'text' },
+                { key: 'date', label: 'תאריך', type: 'date' },
+                { key: 'usd_rate', label: 'שער דולר', type: 'number' },
+                { key: 'source', label: 'מקור', type: 'text' },
+                { key: 'external_id', label: 'מזהה חיצוני', type: 'text' },
+                { key: 'description', label: 'תיאור', type: 'text' },
+                { key: 'created_at', label: 'תאריך יצירה', type: 'datetime' },
+                { key: 'updated_at', label: 'תאריך עדכון', type: 'datetime' }
             ]
         };
         return fieldMappings[entityType] || [];
@@ -1390,7 +1404,36 @@ class EntityDetailsRenderer {
             return dateString;
         }
     }
-    renderCashFlow(cashFlowData, options) { return '<div>תזרים מזומנים</div>'; }
+    renderCashFlow(cashFlowData, options = {}) {
+        const entityColor = this.entityColors.cash_flow || '#28a745';
+        
+        return `
+            <div class="entity-details-container cash-flow-details">
+                ${this.renderEntityHeader('תזרים מזומנים', `#${cashFlowData.id}`, entityColor)}
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        ${this.renderBasicInfo(cashFlowData, 'cash_flow', entityColor)}
+                    </div>
+                    <div class="col-md-6">
+                        ${this.renderAdditionalInfo(cashFlowData, 'cash_flow', entityColor)}
+                    </div>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-12">
+                        ${this.renderLinkedItems(cashFlowData.linked_items || [], entityColor)}
+                    </div>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-12">
+                        ${this.renderActionButtons('cash_flow', cashFlowData.id)}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
     renderNote(noteData, options) { return '<div>הערה</div>'; }
     renderGeneric(entityData, entityType, options) { return '<div>ישות כללית</div>'; }
 }

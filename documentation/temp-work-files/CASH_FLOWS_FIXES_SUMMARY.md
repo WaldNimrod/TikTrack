@@ -1079,6 +1079,64 @@ Error: Entity Details API לא נטען
 - `trading-ui/cash_flows.html` - הוספת 2 scripts חסרים:
   - `entity-details-api.js` - API לטעינת נתוני ישויות
   - `entity-details-renderer.js` - רינדור פרטי ישויות
+- `trading-ui/scripts/entity-details-renderer.js`:
+  - הוספת `cash_flow` ל-`getBasicFields()` עם 12 שדות
+  - מימוש מלא של `renderCashFlow()` במקום stub
+
+**הגדרת שדות Cash Flow:**
+```javascript
+cash_flow: [
+    { key: 'id', label: 'מזהה', type: 'number' },
+    { key: 'type', label: 'סוג תזרים', type: 'text' },
+    { key: 'amount', label: 'סכום', type: 'currency' },
+    { key: 'currency_symbol', label: 'מטבע', type: 'text' },
+    { key: 'account_name', label: 'חשבון מסחר', type: 'text' },
+    { key: 'date', label: 'תאריך', type: 'date' },
+    { key: 'usd_rate', label: 'שער דולר', type: 'number' },
+    { key: 'source', label: 'מקור', type: 'text' },
+    { key: 'external_id', label: 'מזהה חיצוני', type: 'text' },
+    { key: 'description', label: 'תיאור', type: 'text' },
+    { key: 'created_at', label: 'תאריך יצירה', type: 'datetime' },
+    { key: 'updated_at', label: 'תאריך עדכון', type: 'datetime' }
+]
+```
+
+**מבנה renderCashFlow:**
+```javascript
+renderCashFlow(cashFlowData, options = {}) {
+    const entityColor = this.entityColors.cash_flow || '#28a745';
+    
+    return `
+        <div class="entity-details-container cash-flow-details">
+            ${this.renderEntityHeader('תזרים מזומנים', `#${cashFlowData.id}`, entityColor)}
+            
+            <!-- מידע בסיסי בשתי עמודות -->
+            <div class="row">
+                <div class="col-md-6">
+                    ${this.renderBasicInfo(cashFlowData, 'cash_flow', entityColor)}
+                </div>
+                <div class="col-md-6">
+                    ${this.renderAdditionalInfo(cashFlowData, 'cash_flow', entityColor)}
+                </div>
+            </div>
+            
+            <!-- פריטים מקושרים -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    ${this.renderLinkedItems(cashFlowData.linked_items || [], entityColor)}
+                </div>
+            </div>
+            
+            <!-- כפתורי פעולה -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    ${this.renderActionButtons('cash_flow', cashFlowData.id)}
+                </div>
+            </div>
+        </div>
+    `;
+}
+```
 
 **סדר טעינה נכון:**
 ```html

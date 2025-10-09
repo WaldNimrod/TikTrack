@@ -16,11 +16,19 @@ class TradePlan(BaseModel):
     status = Column(String(20), default='open', nullable=False)  # NOT NULL per constraints
     planned_amount = Column(Float, default=1000, nullable=False)  # NOT NULL, default 1000 per constraints
     entry_conditions = Column(String(500), nullable=True)
-    stop_price = Column(Float, default=0.1, nullable=True)
-    target_price = Column(Float, default=2000, nullable=True)
-    stop_percentage = Column(Float, default=0.1, nullable=True)  # Percentage for stop calculation
-    target_percentage = Column(Float, default=2000, nullable=True)  # Percentage for target calculation
-    current_price = Column(Float, default=0, nullable=True)  # Current price for calculations
+    
+    # Source of truth: Prices only
+    stop_price = Column(Float, nullable=True)
+    target_price = Column(Float, nullable=True)
+    current_price = Column(Float, default=0, nullable=True)  # Entry/current price for percentage calculations
+    
+    # Generated columns: Calculated automatically by SQLite
+    # Formula: ((current_price - stop_price) / current_price) * 100
+    # These are READ-ONLY - calculated by database, not stored physically
+    # To update: change stop_price or target_price, percentages update automatically
+    stop_percentage = Column(Float, nullable=True)  # GENERATED ALWAYS column
+    target_percentage = Column(Float, nullable=True)  # GENERATED ALWAYS column
+    
     reasons = Column(String(500), nullable=True)
     cancelled_at = Column(DateTime, nullable=True)
     cancel_reason = Column(String(500), nullable=True)
@@ -84,6 +92,64 @@ class TradePlan(BaseModel):
     
     def __repr__(self) -> str:
         return f"<TradePlan(id={self.id}, type='{self.investment_type}')>"
+    
+    @staticmethod
+    def calculate_price_from_percentage(current_price: float, percentage: float, is_stop: bool = True) -> float:
+        """
+        Helper method to convert percentage to price
+        
+        Args:
+            current_price: Entry/current price
+            percentage: Percentage value (e.g., 5 for 5%)
+            is_stop: True for stop (below entry), False for target (above entry)
+            
+        Returns:
+            Calculated price
+            
+        Example:
+            >>> TradePlan.calculate_price_from_percentage(100, 5, is_stop=True)
+            95.0  # Stop at 5% below entry
+            >>> TradePlan.calculate_price_from_percentage(100, 10, is_stop=False)
+            110.0  # Target at 10% above entry
+        """
+        if current_price is None or percentage is None:
+            return None
+        
+        if is_stop:
+            # Stop is below entry price
+            return current_price * (1 - percentage / 100)
+        else:
+            # Target is above entry price
+            return current_price * (1 + percentage / 100)
+    
+    @staticmethod
+    def calculate_percentage_from_price(current_price: float, target_price: float, is_stop: bool = True) -> float:
+        """
+        Helper method to convert price to percentage
+        
+        Args:
+            current_price: Entry/current price
+            target_price: Stop or target price
+            is_stop: True for stop, False for target
+            
+        Returns:
+            Calculated percentage
+            
+        Example:
+            >>> TradePlan.calculate_percentage_from_price(100, 95, is_stop=True)
+            5.0  # 5% below entry
+            >>> TradePlan.calculate_percentage_from_price(100, 110, is_stop=False)
+            10.0  # 10% above entry
+        """
+        if current_price is None or target_price is None or current_price == 0:
+            return None
+        
+        if is_stop:
+            # Stop percentage
+            return round(((current_price - target_price) / current_price) * 100, 2)
+        else:
+            # Target percentage
+            return round(((target_price - current_price) / current_price) * 100, 2)
 
 
 # ========================================

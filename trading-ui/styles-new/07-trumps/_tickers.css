@@ -43,14 +43,7 @@
   margin-bottom: 1rem;
 }
 
-/* Tickers status badges */
-.tickers-page .status-badge {
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
+/* Tickers status badges - LEGACY (kept for compatibility) */
 .tickers-page .status-badge.active {
   background-color: var(--color-success, #28a745);
   color: white;
@@ -61,13 +54,35 @@
   color: white;
 }
 
-/* Tickers price formatting */
-.tickers-page .price-positive {
+/* Tickers filter buttons active state */
+.tickers-page .filter-active {
+  background-color: white !important;
+  color: #28a745 !important;
+  border-color: #28a745 !important;
+}
+
+/* Tickers table cells - price and change */
+.tickers-page .ticker-price,
+.tickers-page .ticker-change {
+  font-weight: bold;
+  text-align: center;
+  direction: ltr;
+}
+
+.tickers-page .ticker-update-time {
+  text-align: center;
+  direction: ltr;
+}
+
+/* Tickers price and change colors */
+.tickers-page .price-positive,
+.tickers-page .change-positive {
   color: var(--color-success, #28a745);
   font-weight: 600;
 }
 
-.tickers-page .price-negative {
+.tickers-page .price-negative,
+.tickers-page .change-negative {
   color: var(--color-danger, #dc3545);
   font-weight: 600;
 }
@@ -75,6 +90,31 @@
 .tickers-page .price-neutral {
   color: var(--color-secondary, #6c757d);
   font-weight: 600;
+}
+
+/* Tickers status badges */
+.tickers-page .status-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: inline-block;
+  text-align: center;
+}
+
+.tickers-page .status-badge.status-open {
+  background-color: #e8f5e8;
+  color: #388e3c;
+}
+
+.tickers-page .status-badge.status-closed {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.tickers-page .status-badge.status-cancelled {
+  background-color: #ffebee;
+  color: #d32f2f;
 }
 
 /* Tickers table responsive adjustments */

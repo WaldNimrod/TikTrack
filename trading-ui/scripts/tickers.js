@@ -1677,14 +1677,18 @@ function createTickerActionsHTML(tickerId) {
 }
 
 /**
- * יצירת HTML לשורת טיקר
+ * יצירת HTML לשורת טיקר - ללא inline styles
  */
 function createTickerRowHTML(ticker) {
   const { formattedPrice, changeColor: priceColor } = formatTickerPrice(ticker);
   const { changeDisplay, changeColor } = formatTickerChange(ticker);
   const formattedUpdatedAt = formatTickerUpdateTime(ticker);
-  const statusStyle = getTickerStatusStyle(ticker.status);
   const statusLabel = getTickerStatusLabel(ticker.status);
+  
+  // קביעת CSS class לפי צבע
+  const priceClass = priceColor === '#28a745' ? 'price-positive' : 'price-negative';
+  const changeClass = changeColor === '#28a745' ? 'change-positive' : 'change-negative';
+  const statusClass = `status-${ticker.status || 'open'}`;
   
   return `
     <tr>
@@ -1696,26 +1700,19 @@ function createTickerRowHTML(ticker) {
         </span>
       </td>
       <td title="${formattedPrice !== 'N/A' ? `מחיר נוכחי: ${formattedPrice}` : 'אין נתוני מחיר'}" 
-          style="color: ${priceColor}; font-weight: bold; text-align: center; direction: ltr;">
+          class="ticker-price ${priceClass}">
         ${formattedPrice}
       </td>
       <td title="${changeDisplay !== 'N/A' ? `שינוי יומי: ${changeDisplay}` : 'אין נתוני שינוי'}" 
-          style="color: ${changeColor}; font-weight: bold; text-align: center; direction: ltr;">
+          class="ticker-change ${changeClass}">
         ${changeDisplay}
       </td>
       <td title="${formattedUpdatedAt !== 'N/A' ? `עדכון אחרון: ${formattedUpdatedAt}` : 'אין נתוני עדכון'}" 
-          style="text-align: center; direction: ltr;">
+          class="ticker-update-time">
         ${formattedUpdatedAt}
       </td>
       <td title="${statusLabel}">
-        <span style="background-color: ${statusStyle.backgroundColor}; 
-                     color: ${statusStyle.color}; 
-                     padding: ${statusStyle.padding}; 
-                     border-radius: ${statusStyle.borderRadius}; 
-                     font-size: ${statusStyle.fontSize}; 
-                     font-weight: ${statusStyle.fontWeight}; 
-                     display: ${statusStyle.display}; 
-                     text-align: ${statusStyle.textAlign};">
+        <span class="status-badge ${statusClass}">
           ${statusLabel}
         </span>
       </td>
@@ -1983,8 +1980,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // אתחול נוסף כשהדף נטען לחלוטין
-window.addEventListener('load', function () {
-
+window.addEventListener('load', async function () {
   // בדיקה אם אנחנו בדף טיקרים
   const isTickersPage = window.location.pathname.includes('tickers') ||
                          document.querySelector('table[data-table-type="tickers"]') ||
@@ -1994,73 +1990,76 @@ window.addEventListener('load', function () {
     return;
   }
 
-  // טעינת נתונים עם ניסיונות חוזרים
-  let attempts = 0;
-  const maxAttempts = 10;
-
-  function tryLoadData() {
-
-    // בדיקה מפורטת יותר
-
-    const tbody = document.querySelector('table[data-table-type="tickers"] tbody') ||
-                     document.getElementById('tickersContainer')?.querySelector('tbody');
-
+  // טעינת נתונים - Promise-based (ללא polling)
+  try {
+    const tbody = await waitForElement('table[data-table-type="tickers"] tbody', 5000);
     if (tbody) {
-      // נמצא tbody, טוען נתונים
-      // קורא ל-loadTickersData
-      loadTickersData();
-    } else if (attempts < maxAttempts) {
-      attempts++;
-      setTimeout(tryLoadData, 500);
+      await loadTickersData();
     } else {
-      handleElementNotFound('tryLoadData', 'לא הצלחתי למצוא את הטבלה אחרי 10 ניסיונות');
-      // מנסה לטעון נתונים בכל מקרה
-      loadTickersData();
+      // fallback - טעינה בכל מקרה
+      console.warn('⚠️ טבלה לא נמצאה, מנסה לטעון נתונים בכל מקרה');
+      await loadTickersData();
     }
+  } catch (error) {
+    console.error('❌ שגיאה באתחול טעינת נתונים:', error);
+    // fallback - טעינה בכל מקרה
+    await loadTickersData();
   }
-
-  // קורא ל-tryLoadData
-  tryLoadData();
 });
+
+/**
+ * המתנה לאלמנט להיות זמין - Promise-based (ללא polling)
+ * @param {string} selector - CSS selector
+ * @param {number} timeout - timeout במילישניות
+ * @returns {Promise<Element>} האלמנט או null
+ */
+function waitForElement(selector, timeout = 5000) {
+  return new Promise((resolve) => {
+    // בדיקה מיידית
+    const element = document.querySelector(selector) ||
+                    document.getElementById('tickersContainer')?.querySelector('tbody');
+    if (element) {
+      resolve(element);
+      return;
+    }
+
+    // MutationObserver לצפייה בשינויים
+    const observer = new MutationObserver(() => {
+      const element = document.querySelector(selector) ||
+                      document.getElementById('tickersContainer')?.querySelector('tbody');
+      if (element) {
+        observer.disconnect();
+        resolve(element);
+      }
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+
+    // timeout
+    setTimeout(() => {
+      observer.disconnect();
+      resolve(null);
+    }, timeout);
+  });
+}
 
 // פונקציה לפילטר טיקרים לפי סוג (פילטר פשוט - סוג אחד בלבד)
 function filterTickersByType(type) {
-
-  // עדכון מצב הכפתורים - רק אחד פעיל בכל פעם
+  // עדכון מצב הכפתורים - רק אחד פעיל בכל פעם (ללא inline styles)
   const buttons = document.querySelectorAll('.ticker-type-filter [data-type]');
   buttons.forEach(btn => {
     const btnType = btn.getAttribute('data-type');
     if (btnType === type) {
       // כפתור פעיל
-      btn.classList.add('active');
-      if (btnType === 'all') {
-        // כפתור איפוס - עיצוב מיוחד
-        btn.classList.remove('btn-outline-primary');
-        btn.style.backgroundColor = 'white';
-        btn.style.color = '#28a745';
-        btn.style.borderColor = '#28a745';
-      } else {
-        // כפתורים רגילים
-        btn.classList.remove('btn-outline-primary');
-        btn.style.backgroundColor = 'white';
-        btn.style.color = '#28a745';
-        btn.style.borderColor = '#28a745';
-      }
+      btn.classList.add('active', 'filter-active');
+      btn.classList.remove('btn-outline-primary');
     } else {
       // כפתורים לא פעילים
-      btn.classList.remove('active');
-      if (btnType === 'all') {
-        // כפתור איפוס - עיצוב ברירת מחדל
-        btn.style.backgroundColor = '';
-        btn.style.color = '';
-        btn.style.borderColor = '';
-      } else {
-        // כפתורים רגילים
-        btn.classList.add('btn-outline-primary');
-        btn.style.backgroundColor = '';
-        btn.style.color = '';
-        btn.style.borderColor = '';
-      }
+      btn.classList.remove('active', 'filter-active');
+      btn.classList.add('btn-outline-primary');
     }
   });
 

@@ -322,8 +322,8 @@ class EntityDetailsRenderer {
         return `
             <div class="entity-details-header mb-4 pb-3 border-bottom d-flex justify-content-between align-items-center" style="border-bottom-color: ${color} !important;">
                 <div class="d-flex align-items-center">
-                    <div class="entity-icon-circle me-3" style="background-color: ${color}; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 10px;">
-                        <img src="${iconPath}" alt="${entityTypeName}" style="width: 100%; height: 100%; object-fit: contain; filter: brightness(0) invert(1);">
+                    <div class="entity-icon-circle me-3" style="background-color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 10px; border: 2px solid ${color};">
+                        <img src="${iconPath}" alt="${entityTypeName}" style="width: 100%; height: 100%; object-fit: contain;">
                     </div>
                     <div>
                         <h4 class="mb-1" style="color: ${color};">${entityTypeName}</h4>
@@ -1010,7 +1010,6 @@ class EntityDetailsRenderer {
                 { key: 'type', label: 'סוג תזרים', type: 'text' },
                 { key: 'amount', label: 'סכום', type: 'currency' },
                 { key: 'currency_symbol', label: 'מטבע', type: 'text' },
-                { key: 'account_name', label: 'חשבון מסחר', type: 'text' },
                 { key: 'date', label: 'תאריך', type: 'date' },
                 { key: 'usd_rate', label: 'שער דולר', type: 'number' },
                 { key: 'source', label: 'מקור', type: 'text' },
@@ -1554,13 +1553,38 @@ class EntityDetailsRenderer {
     /**
      * Render linked trading account info
      */
-    renderLinkedAccount(cashFlowData, cashFlowColor) {
-        if (!cashFlowData.account_name) return '';
+    async renderLinkedAccount(cashFlowData, cashFlowColor) {
+        if (!cashFlowData.trading_account_id) return '';
         
         // צבעים של חשבונות
         const accountColorDark = this.entityColors.account || '#6f42c1';
-        const accountColorLight = this.lightenColor(accountColorDark, 0.9); // רקע בהיר
+        const accountColorLight = this.lightenColor(accountColorDark, 0.9); // רקע בהיר 90%
         const accountIconPath = this.getEntityIcon('trading_account');
+        
+        // טעינת פרטי החשבון מהשרת (אם לא כבר קיימים)
+        let accountData = cashFlowData.account || {};
+        
+        // אם אין נתוני חשבון מלאים, ננסה לטעון
+        if (!accountData.status && !accountData.balance) {
+            try {
+                const response = await fetch(`http://127.0.0.1:8080/api/trading-accounts/${cashFlowData.trading_account_id}`);
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.status === 'success') {
+                        accountData = result.data;
+                    }
+                }
+            } catch (error) {
+                console.warn('Failed to load account details:', error);
+            }
+        }
+        
+        const accountName = accountData.name || cashFlowData.account_name || 'חשבון לא ידוע';
+        const accountType = accountData.type || '-';
+        const accountStatus = accountData.status || '-';
+        const accountBalance = accountData.balance !== null && accountData.balance !== undefined 
+            ? this.formatCurrency(accountData.balance, cashFlowData.currency_symbol) 
+            : '-';
         
         return `
             <div class="row mt-4">
@@ -1569,21 +1593,23 @@ class EntityDetailsRenderer {
                     <div class="linked-account-card p-3 border rounded" style="background-color: ${accountColorLight}; border-color: ${accountColorDark} !important; border-width: 2px !important;">
                         <div class="d-flex justify-content-between align-items-start">
                             <div class="d-flex align-items-start flex-grow-1">
-                                <div class="entity-icon-circle me-3" style="background-color: ${accountColorDark}; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 8px;">
-                                    <img src="${accountIconPath}" alt="חשבון" style="width: 100%; height: 100%; object-fit: contain; filter: brightness(0) invert(1);">
+                                <div class="entity-icon-circle me-3" style="background-color: white; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 8px; border: 2px solid ${accountColorDark};">
+                                    <img src="${accountIconPath}" alt="חשבון" style="width: 100%; height: 100%; object-fit: contain;">
                                 </div>
                                 <div class="flex-grow-1">
-                                    <h6 class="mb-2" style="color: ${accountColorDark};">${cashFlowData.account_name}</h6>
+                                    <h6 class="mb-2" style="color: ${accountColorDark};">${accountName}</h6>
                                     <div class="row">
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <small class="text-muted d-block"><strong>מזהה:</strong> #${cashFlowData.trading_account_id}</small>
-                                            ${cashFlowData.account_type ? `<small class="text-muted d-block"><strong>סוג:</strong> ${cashFlowData.account_type}</small>` : ''}
                                         </div>
-                                        <div class="col-md-4">
-                                            ${cashFlowData.account_status ? `<small class="text-muted d-block"><strong>סטטוס:</strong> <span class="badge badge-sm" style="background-color: ${this.getStatusBgColor(cashFlowData.account_status)};">${this.translateStatus(cashFlowData.account_status)}</span></small>` : ''}
+                                        <div class="col-md-3">
+                                            <small class="text-muted d-block"><strong>סוג:</strong> ${accountType}</small>
                                         </div>
-                                        <div class="col-md-4">
-                                            ${cashFlowData.account_balance !== null && cashFlowData.account_balance !== undefined ? `<small class="text-muted d-block"><strong>יתרה:</strong> ${this.formatCurrency(cashFlowData.account_balance, cashFlowData.currency_symbol)}</small>` : ''}
+                                        <div class="col-md-3">
+                                            <small class="text-muted d-block"><strong>סטטוס:</strong> ${accountStatus !== '-' ? `<span class="badge badge-sm" style="background-color: ${this.getStatusBgColor(accountStatus)};">${this.translateStatus(accountStatus)}</span>` : '-'}</small>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <small class="text-muted d-block"><strong>יתרה:</strong> ${accountBalance}</small>
                                         </div>
                                     </div>
                                 </div>

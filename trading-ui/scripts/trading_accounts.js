@@ -590,33 +590,17 @@ function validateEditAccountForm() {
  * לפי STANDARD_VALIDATION_GUIDE.md
  */
 async function showAddAccountModal() {
-    // 1. ניקוי הטופס
-    const form = document.getElementById('addAccountForm');
-    if (form) {
-        form.reset();
-    }
+    // 1. ניקוי הטופס באמצעות DataCollectionService
+    window.DataCollectionService.resetForm('addAccountForm', true);
 
-    // 2. ניקוי ולידציה
-    if (window.clearValidation) {
-        window.clearValidation('addAccountForm');
-    }
+    // 2. הגדרת ברירות מחדל לוגיות
+    window.DataCollectionService.setValue('accountStatus', 'open', 'text');
+    window.DataCollectionService.setValue('accountBalance', '0', 'text');
 
-    // 3. הגדרת ברירות מחדל לוגיות
-    const statusSelect = document.getElementById('accountStatus');
-    if (statusSelect) {
-        statusSelect.value = 'open'; // ברירת מחדל: פתוח
-    }
-
-    // 4. טעינת מטבעות עם ברירת מחדל מהעדפות
+    // 3. טעינת מטבעות עם ברירת מחדל מהעדפות
     await loadCurrenciesForAccount();
 
-    // 5. יתרה התחלתית 0
-    const balanceInput = document.getElementById('accountBalance');
-    if (balanceInput) {
-        balanceInput.value = '0';
-    }
-
-    // 6. הצגת המודל
+    // 4. הצגת המודל
     const modalElement = document.getElementById('addAccountModal');
     if (modalElement) {
         const bootstrapModal = new bootstrap.Modal(modalElement);

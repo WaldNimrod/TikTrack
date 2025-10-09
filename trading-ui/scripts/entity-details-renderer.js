@@ -285,22 +285,31 @@ class EntityDetailsRenderer {
      * Get entity icon - קבלת אייקון לסוג ישות
      * 
      * @param {string} entityType - סוג ישות
-     * @returns {string} - מחלקת אייקון FontAwesome
+     * @returns {string} - נתיב לאייקון SVG
      * @private
      */
     getEntityIcon(entityType) {
         const iconMappings = {
-            ticker: 'fa-chart-line',
-            trade: 'fa-exchange-alt',
-            trade_plan: 'fa-strategy',
-            execution: 'fa-check-circle',
-            account: 'fa-university',
-            alert: 'fa-bell',
-            cash_flow: 'fa-money-bill-wave',
-            note: 'fa-sticky-note'
+            ticker: 'images/icons/tickers.svg',
+            tickers: 'images/icons/tickers.svg',
+            trade: 'images/icons/trades.svg',
+            trades: 'images/icons/trades.svg',
+            trade_plan: 'images/icons/trade_plans.svg',
+            trade_plans: 'images/icons/trade_plans.svg',
+            execution: 'images/icons/executions.svg',
+            executions: 'images/icons/executions.svg',
+            account: 'images/icons/trading_accounts.svg',
+            trading_account: 'images/icons/trading_accounts.svg',
+            trading_accounts: 'images/icons/trading_accounts.svg',
+            alert: 'images/icons/alerts.svg',
+            alerts: 'images/icons/alerts.svg',
+            cash_flow: 'images/icons/cash_flows.svg',
+            cash_flows: 'images/icons/cash_flows.svg',
+            note: 'images/icons/notes.svg',
+            notes: 'images/icons/notes.svg'
         };
 
-        return iconMappings[entityType] || 'fa-cube';
+        return iconMappings[entityType] || 'images/icons/home.svg';
     }
 
     /**
@@ -308,12 +317,13 @@ class EntityDetailsRenderer {
      */
     renderEntityHeader(entityTypeName, entityIdentifier, color, entityType = '', entityId = null) {
         const actionButtons = entityId ? this.renderHeaderActionButtons(entityType, entityId, color) : '';
+        const iconPath = this.getEntityIcon(entityType || entityTypeName);
         
         return `
             <div class="entity-details-header mb-4 pb-3 border-bottom d-flex justify-content-between align-items-center" style="border-bottom-color: ${color} !important;">
                 <div class="d-flex align-items-center">
-                    <div class="entity-icon-circle me-3" style="background-color: ${color}; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas ${this.getEntityIcon(entityType || entityTypeName)} text-white fa-lg"></i>
+                    <div class="entity-icon-circle me-3" style="background-color: ${color}; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 10px;">
+                        <img src="${iconPath}" alt="${entityTypeName}" style="width: 100%; height: 100%; object-fit: contain; filter: brightness(0) invert(1);">
                     </div>
                     <div>
                         <h4 class="mb-1" style="color: ${color};">${entityTypeName}</h4>

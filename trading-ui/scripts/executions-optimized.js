@@ -1346,119 +1346,13 @@ async function showExecutionLinkedItemsModal(executionId, _errorData) {
 }
 
 /**
- * טעינת פרטי הפריטים המקושרים
- */
-async function loadLinkedItemsDetails(executionId, _errorData = null) {
-
-
-  const contentDiv = document.getElementById('linkedItemsContent');
-  contentDiv.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"></div><br>טוען פרטים...</div>';
-
-  try {
-    // קריאה ל-API לקבלת פרטי הפריטים המקושרים
-    const response = await fetch(`/api/executions/${executionId}/linked-items`);
-
-    if (response.ok) {
-      const data = await response.json();
-
-      displayLinkedItems(data.data);
-    } else {
-
-      // אם אין API ספציפי, ננסה לטעון מכל ה-APIs
-      await loadLinkedItemsFromMultipleSources(executionId);
-    }
-
-  } catch (error) {
-    handleDataLoadError(error, 'פריטים מקושרים');
-    // אם יש שגיאה, ננסה לטעון מכל ה-APIs
-    await loadLinkedItemsFromMultipleSources(executionId);
-  }
-}
-
-/**
- * טעינת פריטים מקושרים ממקורות מרובים
- */
-async function loadLinkedItemsFromMultipleSources(executionId) {
-
-
-  const execution = executionsData.find(e => e.id === executionId);
-  if (!execution) {return;}
-
-  const linkedItems = {
-    trades: [],
-    trade_plans: [],
-    alerts: [],
-    notes: [],
-  };
-
-  try {
-    // טעינת טריידים
-    try {
-      const tradesResponse = await fetch('/api/trades/');
-      if (tradesResponse.ok) {
-        const linkedTradesData = await tradesResponse.json();
-        const trades = linkedTradesData.data || linkedTradesData || [];
-        linkedItems.trades = trades.filter(trade =>
-          trade.id === execution.trade_id,
-        );
-      }
-    } catch { /* // console.warn('לא ניתן לטעון טריידים:', e); */ }
-
-    // טעינת תכנונים
-    try {
-      const plansResponse = await fetch('/api/trade_plans/');
-      if (plansResponse.ok) {
-        const plansData = await plansResponse.json();
-        const plans = plansData.data || plansData || [];
-        linkedItems.trade_plans = plans.filter(plan =>
-          plan.trade_id === execution.trade_id,
-        );
-      }
-    } catch { /* // console.warn('לא ניתן לטעון תכנונים:', e); */ }
-
-    // טעינת התראות
-    try {
-      const alertsResponse = await fetch('/api/alerts/');
-      if (alertsResponse.ok) {
-        const alertsData = await alertsResponse.json();
-        const alerts = alertsData.data || alertsData || [];
-        linkedItems.alerts = alerts.filter(alert =>
-          alert.related_type_id === 5 && alert.related_id === executionId &&
-                    alert.status === 'open',
-        );
-      }
-    } catch { /* // console.warn('לא ניתן לטעון התראות:', e); */ }
-
-    // טעינת הערות
-    try {
-      const notesResponse = await fetch('/api/notes/');
-      if (notesResponse.ok) {
-        const notesData = await notesResponse.json();
-        const notes = notesData.data || notesData || [];
-        linkedItems.notes = notes.filter(note =>
-          note.related_type_id === 5 && note.related_id === executionId,
-        );
-      }
-    } catch { /* // console.warn('לא ניתן לטעון הערות:', e); */ }
-
-    displayLinkedItems(linkedItems);
-
-  } catch (error) {
-    handleDataLoadError(error, 'פריטים מקושרים');
-    document.getElementById('linkedItemsContent').innerHTML =
-            '<div class="alert alert-danger">שגיאה בטעינת פרטי הפריטים המקושרים</div>';
-  }
-}
-
-/**
- * הצגת הפריטים המקושרים
+ * פריטים מקושרים - Linked Items
+ * ⚠️ הקובץ משתמש במערכת הכללית linked-items.js
  * 
- * Note: השתמש במערכת הכללית linked-items.js במקום קוד מקומי
- * המערכת הכללית כוללת:
- * - showLinkedItemsModal() - הצגת מודל מתקדם עם פריטים מקושרים
- * - viewLinkedItemsForExecution(id) - wrapper ספציפי לעמוד executions
- * - עיצוב אחיד עם badges צבעוניים
- * - 4 כפתורי פעולה לכל פריט (View, Edit, Open Page, Delete)
+ * במקום הפונקציות המקומיות שהוסרו, השתמש ב:
+ * - window.loadLinkedItemsData('execution', executionId)
+ * - window.showLinkedItemsModal(data, 'execution', executionId, 'view')
+ * - window.viewLinkedItemsForExecution(executionId)
  */
 
 /**

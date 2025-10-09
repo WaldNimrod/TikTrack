@@ -1067,7 +1067,7 @@ async function saveNote() {
   // איסוף נתונים מהטופס
   const content = getEditorContent('add');
   const relationType = document.querySelector('input[name="noteRelationType"]:checked')?.value;
-  const relatedId = document.getElementById('noteRelatedObjectSelect').value;
+  const relatedId = window.DataCollectionService.getValue('noteRelatedObjectSelect', 'int');
   const attachment = document.getElementById('noteAttachment').files[0];
 
   // ולידציה מקיפה

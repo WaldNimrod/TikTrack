@@ -466,21 +466,42 @@ class CRUDResponseHandler {
         };
 
         const errorLogString = JSON.stringify(errorLog, null, 2);
+        
+        // Store error log globally for copy button access
+        window._currentErrorLog = errorLogString;
 
-        // Retry button (only if onRetry provided)
+        // Retry button (only if onRetry provided) - using TikTrack button classes with inline style for consistency
         const retryBtn = onRetry && typeof onRetry === 'function' ? `
-            <button class="btn btn-primary mt-3 me-2" onclick="(${onRetry.toString()})()">
+            <button class="btn" style="background-color: #29a6a8; color: white; border: 1px solid #29a6a8; padding: 0.5rem 1rem; font-size: 0.875rem; margin-top: 1rem; margin-left: 0.5rem;" 
+                    onclick="(${onRetry.toString()})()">
                 <i class="fas fa-sync"></i> נסה שוב
             </button>
         ` : '';
 
-        // Copy error log button
+        // Copy error log button - same size and font, different color
         const copyBtn = `
-            <button class="btn btn-secondary mt-3" 
-                    onclick="navigator.clipboard.writeText(\`${errorLogString.replace(/`/g, '\\`')}\`).then(() => { if (typeof window.showNotification === 'function') { window.showNotification('Log הועתק ללוח', 'success'); } else { alert('Log הועתק ללוח'); } })">
+            <button class="btn" style="background-color: #6c757d; color: white; border: 1px solid #6c757d; padding: 0.5rem 1rem; font-size: 0.875rem; margin-top: 1rem; margin-left: 0.5rem;" 
+                    onclick="window.copyCurrentErrorLog()">
                 <i class="fas fa-copy"></i> העתק פרטי שגיאה
             </button>
         `;
+        
+        // Global helper function for copying error log
+        window.copyCurrentErrorLog = function() {
+            if (window._currentErrorLog) {
+                navigator.clipboard.writeText(window._currentErrorLog)
+                    .then(() => {
+                        if (typeof window.showNotification === 'function') {
+                            window.showNotification('פרטי השגיאה הועתקו ללוח', 'success');
+                        } else {
+                            alert('פרטי השגיאה הועתקו ללוח');
+                        }
+                    })
+                    .catch(() => {
+                        alert('שגיאה בהעתקה ללוח');
+                    });
+            }
+        };
 
         tbody.innerHTML = `
             <tr>

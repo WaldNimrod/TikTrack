@@ -827,6 +827,7 @@ Services אינם חובה בכל דף - רק בדפים שצריכים אותם
 - **רשימת מערכות:** [GENERAL_SYSTEMS_LIST.md](GENERAL_SYSTEMS_LIST.md)
 - **ארכיטקטורת JavaScript:** [JAVASCRIPT_ARCHITECTURE.md](../../02-ARCHITECTURE/FRONTEND/JAVASCRIPT_ARCHITECTURE.md)
 - **מדריך ולידציה:** [STANDARD_VALIDATION_GUIDE.md](../../03-DEVELOPMENT/GUIDELINES/STANDARD_VALIDATION_GUIDE.md)
+- **מערכת ולידציה:** כלולה ב-`ui-basic.js` (Core Module) - אין צורך בקובץ נפרד
 - **מדריך בדיקה:** [SERVICES_TESTING_GUIDE.md](../../SERVICES_TESTING_GUIDE.md)
 
 ---

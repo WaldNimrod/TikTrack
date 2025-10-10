@@ -203,56 +203,29 @@
 
 /* ===== SIDE BADGES - Long/Short ===== */
 
-/* סגנון בסיסי לכל side badges - קפסולה בגודל בינוני */
+/* סגנון בסיסי לכל side badges - טקסט צבעוני בלבד */
 .side-badge {
   display: inline-block;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 500;
+  padding: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
   text-align: center;
   white-space: nowrap;
-  transition: all 0.2s ease;
-  position: relative;
-  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  /* ללא רקע, ללא מסגרת - רק צבע טקסט */
 }
 
 /* Long - ירוק (positive) */
 .side-badge-positive,
 .side-badge-long {
-  background-color: color-mix(in srgb, var(--numeric-positive-color) 10%, white);
   color: var(--numeric-positive-color);
-  border: 1px solid color-mix(in srgb, var(--numeric-positive-color) 30%, white);
 }
 
 /* Short - אדום (negative) */
 .side-badge-negative,
 .side-badge-short {
-  background-color: color-mix(in srgb, var(--numeric-negative-color) 10%, white);
   color: var(--numeric-negative-color);
-  border: 1px solid color-mix(in srgb, var(--numeric-negative-color) 30%, white);
-}
-
-/* אפקט hover */
-.side-badge:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* אנימציה מבריקה */
-.side-badge::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.5s ease;
-}
-
-.side-badge:hover::before {
-  left: 100%;
 }
 
 /* ===== ACTION BADGES - Buy/Sale ===== */
@@ -311,62 +284,31 @@
 
 /* ===== NUMERIC BADGES - ערכים מספריים ===== */
 
-/* סגנון בסיסי לכל numeric badges - קפסולה בגודל בינוני */
+/* סגנון בסיסי לכל numeric badges - טקסט צבעוני בלבד */
 .numeric-badge {
   display: inline-block;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 500;
+  padding: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
   text-align: center;
   white-space: nowrap;
-  transition: all 0.2s ease;
-  position: relative;
-  overflow: hidden;
   direction: ltr;
+  /* ללא רקע, ללא מסגרת - רק צבע טקסט */
 }
 
 /* Positive - ירוק */
 .numeric-badge-positive {
-  background-color: color-mix(in srgb, var(--numeric-positive-color) 10%, white);
   color: var(--numeric-positive-color);
-  border: 1px solid color-mix(in srgb, var(--numeric-positive-color) 30%, white);
 }
 
 /* Negative - אדום */
 .numeric-badge-negative {
-  background-color: color-mix(in srgb, var(--numeric-negative-color) 10%, white);
   color: var(--numeric-negative-color);
-  border: 1px solid color-mix(in srgb, var(--numeric-negative-color) 30%, white);
 }
 
 /* Neutral/Zero - אפור */
 .numeric-badge-neutral {
-  background-color: color-mix(in srgb, var(--numeric-zero-color) 10%, white);
   color: var(--numeric-zero-color);
-  border: 1px solid color-mix(in srgb, var(--numeric-zero-color) 30%, white);
-}
-
-/* אפקט hover */
-.numeric-badge:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* אנימציה מבריקה */
-.numeric-badge::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.5s ease;
-}
-
-.numeric-badge:hover::before {
-  left: 100%;
 }
 
 .numeric-text-negative {
@@ -582,38 +524,7 @@ background-color: var(--status-pending-color);
   border-color: #dee2e6;
 }
 
-/* Side badges */
-.side-badge {
-  padding: 0.25rem 0.5rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  display: inline-block;
-  text-align: center;
-  min-width: 60px;
-  border: 1px solid transparent;
-  transition: all 0.3s ease;
-}
-
-.side-badge.side-long {
-  background-color: var(--numeric-positive-light, #d4edda);
-  color: var(--numeric-positive-medium, #28a745);
-  border-color: var(--numeric-positive-border, #c3e6cb);
-}
-
-.side-badge.side-short {
-  background-color: var(--numeric-negative-light, #f8d7da);
-  color: var(--numeric-negative-medium, #dc3545);
-  border-color: var(--numeric-negative-border, #f5c6cb);
-}
-
-.side-badge.side-unknown {
-  background-color: #f8f9fa;
-  color: #6c757d;
-  border-color: #dee2e6;
-}
+/* Side badges - הקוד עבר להגדרה מודרנית למעלה (שורות 204-229) */
 
 /* PnL badges */
 .pnl-badge {

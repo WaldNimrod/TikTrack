@@ -609,22 +609,16 @@
     <script src="scripts/entity-details-renderer.js?v=20251006"></script>
     <script src="scripts/entity-details-modal.js?v=20251001"></script>
     <script src="scripts/warning-system.js?v=20251001"></script>
-    <script src="scripts/validation-utils.js?v=20251001"></script>
+    <!-- validation-utils.js removed - already in ui-basic.js (Core Module) -->
     
-    <!-- Service Systems (New General Services) -->
+    <!-- ===== Stage 4: Services ===== -->
     <script src="scripts/services/data-collection-service.js?v=1.0.0"></script>
     <script src="scripts/services/field-renderer-service.js?v=1.0.0"></script>
     <script src="scripts/services/select-populator-service.js?v=1.0.0"></script>
     <script src="scripts/services/default-value-setter.js?v=1.0.0"></script>
-    <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script>
+    <script src="scripts/services/crud-response-handler.js?v=2.0.0"></script>
     
-    <!-- Page-specific Script -->
-    <script src="scripts/trades.js?v=20251009"></script>
-    
-    <!-- Local copyDetailedLog function for trades page -->
-    <script>
-        // Make the local copyDetailedLog function available globally for this page only
-        window.copyDetailedLog = copyDetailedLog;
-    </script>
+    <!-- ===== Stage 5: Page Script ===== -->
+    <script src="scripts/trades.js?v=20251010"></script>
 </body>
 </html>

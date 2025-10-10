@@ -251,6 +251,7 @@ class FieldRendererService {
     /**
      * רנדור תאריך (עם או בלי שעה)
      * משתמש ב-date-utils.js הקיים
+     * תמיד משתמש בפורמט קומפקטי (DD/MM/YY) לחיסכון במקום
      * 
      * @param {string|Date} date - תאריך
      * @param {boolean} includeTime - האם לכלול שעה
@@ -258,24 +259,31 @@ class FieldRendererService {
      * 
      * @example
      * const html = FieldRendererService.renderDate('2025-01-09T10:30:00', true);
+     * // Output (with time): "09/01/25, 10:30"
+     * const html2 = FieldRendererService.renderDate('2025-01-09');
+     * // Output: "09/01/25"
      */
     static renderDate(date, includeTime = false) {
         if (!date) return '-';
         
-        // שימוש במערכת date-utils.js הקיימת
+        // עם שעה - שימוש ב-formatDateTime
         if (includeTime && typeof window.formatDateTime === 'function') {
             return window.formatDateTime(date);
-        } else if (typeof window.formatDate === 'function') {
-            return window.formatDate(date);
+        } 
+        
+        // ללא שעה - תמיד פורמט קומפקטי (DD/MM/YY)
+        if (typeof window.formatCompactDate === 'function') {
+            return window.formatCompactDate(date);
         }
         
         // Fallback
         try {
             const dateObj = new Date(date);
-            if (includeTime) {
-                return dateObj.toLocaleString('he-IL');
-            }
-            return dateObj.toLocaleDateString('he-IL');
+            return dateObj.toLocaleDateString('he-IL', {
+                day: '2-digit',
+                month: '2-digit',
+                year: '2-digit'
+            });
         } catch (e) {
             return date;
         }

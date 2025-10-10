@@ -29,7 +29,7 @@
 
 .col-date { 
   width: var(--col-date-width, 12%); 
-  min-width: 100px;
+  min-width: 75px; /* הקטנה מ-100px - פורמט DD/MM/YY */
 }
 
 .col-description { 
@@ -80,12 +80,12 @@
 
 .col-created { 
   width: 10%; 
-  min-width: 100px;
+  min-width: 75px; /* הקטנה מ-100px - פורמט DD/MM/YY */
 }
 
 .col-closed { 
   width: 10%; 
-  min-width: 100px;
+  min-width: 75px; /* הקטנה מ-100px - פורמט DD/MM/YY */
 }
 
 .col-notes { 
@@ -133,7 +133,7 @@
 /* ===== עמודות ספציפיות לטיקרים ===== */
 .col-updated { 
   width: 18%; 
-  min-width: 100px;
+  min-width: 75px; /* הקטנה מ-100px - פורמט DD/MM/YY */
 }
 
 
@@ -171,7 +171,7 @@
 
 .col-execution-date { 
   width: 12%; 
-  min-width: 100px;
+  min-width: 75px; /* הקטנה מ-100px - פורמט DD/MM/YY */
 }
 
 /* ===== עמודות ספציפיות לתכנוני מסחר ===== */
@@ -182,7 +182,7 @@
 
 .col-date { 
   width: 9%; 
-  min-width: 90px;
+  min-width: 75px; /* הקטנה מ-90px - פורמט DD/MM/YY קצר יותר */
 }
 
 .col-type { 
@@ -289,9 +289,10 @@
 table,
 .table,
 .data-table {
-  width: 100%;
-  max-width: 100%; /* רוחב מלא של הקונטיינר */
-  table-layout: fixed; /* טבלה עם רוחב קבוע */
+  /* רוחב מוגדר ב-media queries לפי גודל מסך */
+  /* במסכים < 1200px: רוחב קבוע (600-1000px) */
+  /* במסכים >= 1200px: רוחב 100% עם min-width: 1000px */
+  table-layout: fixed;
   direction: rtl;
   border-collapse: separate;
   border-spacing: 0;
@@ -571,22 +572,19 @@ table tbody td button.btn-sm {
   gap: 0.5rem;
 }
 
-/* הגדרות ספציפיות לטבלאות בדף הבדיקה */
-#tickersTable,
-#tradePlansTable,
-#trade_plansTable {
-  width: 100%;
-  max-width: 100%;
-  table-layout: fixed;
-  overflow: hidden;
+/* הגדרות ספציפיות לטבלאות - רק למסכים גדולים */
+@media (min-width: 1200px) {
+  #tickersTable,
+  #tradePlansTable,
+  #trade_plansTable {
+    width: 100%;
+    max-width: 100%;
+    table-layout: fixed;
+    overflow: hidden;
+  }
 }
 
-/* הגדרות ספציפיות לטבלת הטיקרים */
-#tickersTable {
-  table-layout: fixed;
-  width: 100%;
-  max-width: 100%;
-}
+/* במסכים קטנים - הטבלה מקבלת רוחב מה-media queries */
 
 #tickersTable th {
   overflow: visible;
@@ -628,8 +626,22 @@ table tbody td button.btn-sm {
 
 /* מסכים קטנים (XS - 320-479px) */
 @media (max-width: var(--screen-xs-max, 479px)) {
-  .data-table {
-    min-width: 300px;
+  /* כל הטבלאות - specificity גבוה יותר */
+  .table-responsive .table,
+  .table-responsive .data-table,
+  .table-responsive table,
+  .section-body .table,
+  .section-body .data-table,
+  .section-body table {
+    width: 600px;
+    min-width: 600px;
+    max-width: none; /* מאפשר לטבלה להיות רחבה מהקונטיינר */
+    table-layout: fixed;
+  }
+  
+  /* גלילה אופקית */
+  .table-responsive {
+    overflow-x: auto;
   }
   
   /* רק עמודות חיוניות */
@@ -710,17 +722,16 @@ table tbody td button.btn-sm {
     overflow-x: auto;
   }
   
-  /* כל הטבלאות */
-  .table, .data-table, table {
+  /* כל הטבלאות - specificity גבוה יותר */
+  .table-responsive .table,
+  .table-responsive .data-table,
+  .table-responsive table,
+  .section-body .table,
+  .section-body .data-table,
+  .section-body table {
     width: 800px;
     min-width: 800px;
-    table-layout: fixed;
-  }
-  
-  /* Bootstrap override */
-  .table-responsive .table {
-    width: 800px;
-    min-width: 800px;
+    max-width: none; /* מאפשר לטבלה להיות רחבה מהקונטיינר */
     table-layout: fixed;
   }
   
@@ -810,17 +821,16 @@ table tbody td button.btn-sm {
     overflow-x: auto;
   }
   
-  /* כל הטבלאות */
-  .table, .data-table, table {
+  /* כל הטבלאות - specificity גבוה יותר */
+  .table-responsive .table,
+  .table-responsive .data-table,
+  .table-responsive table,
+  .section-body .table,
+  .section-body .data-table,
+  .section-body table {
     width: 900px;
     min-width: 900px;
-    table-layout: fixed;
-  }
-  
-  /* Bootstrap override */
-  .table-responsive .table {
-    width: 900px;
-    min-width: 900px;
+    max-width: none; /* מאפשר לטבלה להיות רחבה מהקונטיינר */
     table-layout: fixed;
   }
   
@@ -894,17 +904,16 @@ table tbody td button.btn-sm {
     overflow-x: auto;
   }
   
-  /* כל הטבלאות */
-  .table, .data-table, table {
+  /* כל הטבלאות - specificity גבוה יותר */
+  .table-responsive .table,
+  .table-responsive .data-table,
+  .table-responsive table,
+  .section-body .table,
+  .section-body .data-table,
+  .section-body table {
     width: 1000px;
     min-width: 1000px;
-    table-layout: fixed;
-  }
-  
-  /* Bootstrap override */
-  .table-responsive .table {
-    width: 1000px;
-    min-width: 1000px;
+    max-width: none; /* מאפשר לטבלה להיות רחבה מהקונטיינר */
     table-layout: fixed;
   }
   
@@ -941,8 +950,22 @@ table tbody td button.btn-sm {
 
 /* מחשבים (XL+ - 1200px+) - יעד: ללא גלילה */
 @media (min-width: var(--screen-xl-min, 1200px)) {
-  .data-table {
-    min-width: 100%;
+  /* כל הטבלאות - specificity גבוה יותר */
+  .table-responsive .table,
+  .table-responsive .data-table,
+  .table-responsive table,
+  .section-body .table,
+  .section-body .data-table,
+  .section-body table {
+    width: 100%;
+    min-width: 1000px;
+    max-width: none;
+    table-layout: fixed;
+  }
+  
+  /* גלילה אם הקונטיינר קטן מ-1000px */
+  .table-responsive {
+    overflow-x: auto;
   }
   
   /* כל העמודות נראות */

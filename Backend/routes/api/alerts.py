@@ -31,31 +31,37 @@ def get_alerts():
     
     alerts = db.query(Alert).all()
     
-    enhanced_data = []
-    for alert in alerts:
-        alert_dict = alert.to_dict()
-        
-        # Resolve related entity name based on related_type_id
-        try:
-            if alert.related_type_id == 1:  # account
-                entity = TradingAccountService.get_by_id(db, alert.related_id)
-                alert_dict['related_entity_name'] = entity.name if entity else None
-            elif alert.related_type_id == 2:  # trade
-                trade = db.query(Trade).options(joinedload(Trade.ticker)).filter(Trade.id == alert.related_id).first()
-                alert_dict['related_entity_name'] = trade.ticker.symbol if trade and trade.ticker else None
-            elif alert.related_type_id == 3:  # trade_plan
-                plan = db.query(TradePlan).options(joinedload(TradePlan.ticker)).filter(TradePlan.id == alert.related_id).first()
-                alert_dict['related_entity_name'] = plan.ticker.symbol if plan and plan.ticker else None
-            elif alert.related_type_id == 4:  # ticker
-                ticker = db.query(Ticker).filter(Ticker.id == alert.related_id).first()
-                alert_dict['related_entity_name'] = ticker.symbol if ticker else None
-            else:
+    try:
+        enhanced_data = []
+        for alert in alerts:
+            alert_dict = alert.to_dict()
+            
+            # Resolve related entity name based on related_type_id
+            try:
+                if alert.related_type_id == 1:  # account
+                    from models.trading_account import TradingAccount
+                    entity = db.query(TradingAccount).filter(TradingAccount.id == alert.related_id).first()
+                    alert_dict['related_entity_name'] = entity.name if entity else None
+                elif alert.related_type_id == 2:  # trade
+                    trade = db.query(Trade).options(joinedload(Trade.ticker)).filter(Trade.id == alert.related_id).first()
+                    alert_dict['related_entity_name'] = trade.ticker.symbol if trade and trade.ticker else None
+                elif alert.related_type_id == 3:  # trade_plan
+                    plan = db.query(TradePlan).options(joinedload(TradePlan.ticker)).filter(TradePlan.id == alert.related_id).first()
+                    alert_dict['related_entity_name'] = plan.ticker.symbol if plan and plan.ticker else None
+                elif alert.related_type_id == 4:  # ticker
+                    ticker = db.query(Ticker).filter(Ticker.id == alert.related_id).first()
+                    alert_dict['related_entity_name'] = ticker.symbol if ticker else None
+                else:
+                    alert_dict['related_entity_name'] = None
+            except Exception as e:
+                logger.warning(f"Could not resolve related entity for alert {alert.id}: {str(e)}")
                 alert_dict['related_entity_name'] = None
-        except Exception as e:
-            logger.warning(f"Could not resolve related entity for alert {alert.id}: {str(e)}")
-            alert_dict['related_entity_name'] = None
-        
-        enhanced_data.append(alert_dict)
+            
+            enhanced_data.append(alert_dict)
+    except Exception as e:
+        logger.error(f"Error processing alerts data: {str(e)}")
+        # Return empty list instead of crashing
+        enhanced_data = []
     
     return jsonify({
         "status": "success",

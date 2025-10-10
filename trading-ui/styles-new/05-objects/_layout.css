@@ -152,7 +152,7 @@
   margin: 0 auto;
   padding: 0;
   box-sizing: border-box;
-  overflow-x: hidden;
+  overflow-x: visible; /* שונה מ-hidden - מאפשר גלילה לטבלאות */
 }
 
 /* התאמה רספונסיבית לנקודות שבירה */
@@ -264,7 +264,8 @@
 .section-body {
   background: var(--apple-bg);
   border-radius: 8px;
-  overflow: hidden;
+  overflow-x: visible; /* שונה מ-hidden - מאפשר גלילה אופקית לטבלאות */
+  overflow-y: visible;
 }
 
 .section-body .table {

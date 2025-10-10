@@ -166,6 +166,7 @@ function formatDateOnly(dateString) {
  * Format short date for compact display
  *
  * Provides a shorter date format for space-constrained displays
+ * Format: DD/MM (without year) - for very limited space
  *
  * @param {string|Date} dateString - Date string or Date object to format
  * @returns {string} Short formatted date string or '-' for invalid dates
@@ -183,6 +184,34 @@ function formatShortDate(dateString) {
     });
   } catch {
     // console.warn('⚠️ Error formatting short date:', dateString, error);
+    return '-';
+  }
+}
+
+/**
+ * Format compact date with 2-digit year
+ *
+ * Provides a compact date format for responsive displays
+ * Format: DD/MM/YY - saves space while keeping full date information
+ * Perfect for screens 1000-1200px
+ *
+ * @param {string|Date} dateString - Date string or Date object to format
+ * @returns {string} Compact formatted date string (DD/MM/YY) or '-' for invalid dates
+ */
+function formatCompactDate(dateString) {
+  if (!dateString) {return '-';}
+
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {return '-';}
+
+    return date.toLocaleDateString('he-IL', {
+      day: '2-digit',
+      month: '2-digit',
+      year: '2-digit',  // ← שנה בשתי ספרות!
+    });
+  } catch {
+    // console.warn('⚠️ Error formatting compact date:', dateString, error);
     return '-';
   }
 }
@@ -557,6 +586,7 @@ window.formatDate = formatDate;
 window.formatDateTime = formatDateTime;
 window.formatDateOnly = formatDateOnly;
 window.formatShortDate = formatShortDate;
+window.formatCompactDate = formatCompactDate;
 window.formatLongDate = formatLongDate;
 window.formatTimeOnly = formatTimeOnly;
 window.parseDate = parseDate;
@@ -580,6 +610,7 @@ window.dateUtils = {
   formatDateTime,
   formatDateOnly,
   formatShortDate,
+  formatCompactDate,
   formatLongDate,
   formatTimeOnly,
   parseDate,

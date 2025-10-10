@@ -155,10 +155,116 @@ table tbody td button.btn-sm {
 
 ---
 
+### 6. ✅ פורמט תאריך קומפקטי - DD/MM/YY
+
+**קבצים מעודכנים:**
+- `trading-ui/scripts/date-utils.js` - פונקציה `formatCompactDate()`
+- `trading-ui/scripts/services/field-renderer-service.js` - `renderDate()` משתמש תמיד בפורמט קומפקטי
+- `trading-ui/styles-new/06-components/_tables.css` - `min-width: 75px` לעמודות תאריך
+
+#### שינויים:
+
+**לפני:** `31/12/2024` (10 תווים) → דורש min-width: 100px  
+**אחרי:** `31/12/24` (8 תווים) → דורש min-width: 75px בלבד
+
+**יתרונות:**
+- חיסכון של 25% במקום בעמודת תאריך
+- תאריכים לא נחתכים במסכים 1000px+
+- פורמט אחיד בכל האתר
+
+**עמודות מושפעות:**
+- `.col-date` - תאריך כללי
+- `.col-created` - תאריך יצירה
+- `.col-closed` - תאריך סגירה
+- `.col-execution-date` - תאריך ביצוע
+- `.col-updated` - תאריך עדכון
+
+#### בדיקות נדרשות:
+- [ ] כל התאריכים בפורמט DD/MM/YY
+- [ ] תאריכים לא חתוכים במסכים 1000px+
+- [ ] עמודות תאריך עם min-width: 75px
+
+---
+
+### 7. ✅ badges דינמיים - סטטוסים, סוגים, עדיפויות וערכים מספריים
+
+**קבצים רלוונטיים:**
+- `trading-ui/scripts/services/field-renderer-service.js` - רינדור badges
+- `trading-ui/styles-new/06-components/_badges-status.css` - עיצוב badges
+
+#### איך ה-badges עובדים:
+
+**א. FieldRendererService מייצר HTML עם classes:**
+```javascript
+// דוגמה לרינדור סטטוס
+renderStatus(value) {
+    return `<span class="badge badge-status" data-color-category="status-${value}">${translatedValue}</span>`;
+}
+```
+
+**ב. CSS משתמש ב-`color-mix()` עם צבע בודד:**
+```css
+.badge-status[data-color-category="status-open"] {
+  color: var(--status-open-color);
+  background-color: color-mix(in srgb, var(--status-open-color) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--status-open-color) 30%, transparent);
+}
+```
+
+**ג. משתני CSS מגיעים מהעדפות המשתמש:**
+```css
+--status-open-color: #28a745
+--status-closed-color: #6c757d
+--status-cancelled-color: #dc3545
+```
+
+#### סוגי badges במערכת:
+
+**1. Status Badges (סטטוסים):**
+- `open` → צבע ירוק מההעדפות
+- `closed` → צבע אפור מההעדפות
+- `cancelled` → צבע אדום מההעדפות
+
+**2. Type Badges (סוגי השקעה):**
+- `swing` → צבע כחול מההעדפות
+- `investment` → צבע ירוק מההעדפות
+- `passive` → צבע אפור מההעדפות
+
+**3. Priority Badges (עדיפויות):**
+- `high` → צבע אדום מההעדפות
+- `medium` → צבע צהוב מההעדפות
+- `low` → צבע ירוק מההעדפות
+
+**4. Side Badges (Long/Short):**
+- `long` → `valuePositiveColor` - **טקסט צבעוני בלבד (ללא רקע/מסגרת)**
+- `short` → `valueNegativeColor` - **טקסט צבעוני בלבד (ללא רקע/מסגרת)**
+- `text-transform: uppercase` + `font-weight: 600`
+- ללא padding, רקע או border
+
+**5. Action Badges (Buy/Sale):**
+- `buy` → משתמשים ב-`valuePositiveColor` - **קפסולה עם רקע**
+- `sale` → משתמשים ב-`valueNegativeColor` - **קפסולה עם רקע**
+
+**6. Numeric Values (ערכים מספריים):**
+- חיובי → `valuePositiveColor` - **טקסט צבעוני בלבד (ללא רקע/מסגרת)**
+- שלילי → `valueNegativeColor` - **טקסט צבעוני בלבד (ללא רקע/מסגרת)**
+- נייטרלי → `valueNeutralColor` - **טקסט צבעוני בלבד (ללא רקע/מסגרת)**
+- `font-weight: 600` לבולטות
+- ללא padding, רקע או border
+
+#### בדיקות נדרשות בכל עמוד:
+- [ ] כל ה-badges מוצגים בצבעים הנכונים מההעדפות
+- [ ] לא נמצאים inline styles ישנים (כמו `style="color: ...;"`)
+- [ ] badges מקבלים `data-color-category` attribute נכון
+- [ ] שינוי צבע בהעדפות משפיע מיידית על כל ה-badges
+- [ ] כל סוגי ה-badges (status/type/priority/side/action/numeric) עובדים
+
+---
+
 ## 📊 רשימת עמודים לבדיקה
 
 ### עמודים ראשיים:
-- [x] trade_plans.html - **הושלם**
+- [x] trade_plans.html - **✅ תקין לגמרי (13/13)**
 - [ ] index.html
 - [ ] trades.html
 - [ ] tickers.html
@@ -417,11 +523,27 @@ window.getStatusColor(status, 'border')  // מסגרת
 - [ ] כותרות בבולד ✅/❌
 - [ ] נתונים במשקל רגיל ✅/❌
 
+#### תאריכים:
+- [ ] פורמט תאריך: DD/MM/YY (8 תווים) ✅/❌
+- [ ] תאריכים לא חתוכים במסכים 1000px+ ✅/❌
+- [ ] כל עמודות התאריך עם min-width: 75px ✅/❌
+
+#### badges דינמיים:
+- [ ] badges סטטוס מוצגים בצבעים נכונים (קפסולה עם רקע) ✅/❌
+- [ ] badges סוג השקעה מוצגים נכון (קפסולה עם רקע) ✅/❌
+- [ ] badges עדיפות מוצגים נכון (קפסולה עם רקע) ✅/❌
+- [ ] Long/Short: **טקסט צבעוני בלבד** (ללא רקע/מסגרת, UPPERCASE) ✅/❌
+- [ ] ערכים מספריים: **טקסט צבעוני בלבד** (ללא רקע/מסגרת) ✅/❌
+- [ ] badges Buy/Sale מוצגים נכון (קפסולה עם רקע) ✅/❌
+- [ ] אין inline styles ישנים על badges ✅/❌
+- [ ] כל ה-badges עם data-color-category נכון ✅/❌
+
 #### קוד:
 - [ ] אין inline styles ✅/❌
 - [ ] כל הclasses נכונות ✅/❌
 - [ ] אין קישורים לקבצי 07-trumps ספציפיים ✅/❌
 - [ ] טעינת CSS רק מקבצים כלליים ✅/❌
+- [ ] **טבלה עם class="data-table" (לא class="table" של Bootstrap)** ✅/❌
 
 **הערות:** [הערות נוספות]
 
@@ -446,18 +568,37 @@ window.getStatusColor(status, 'border')  // מסגרת
 ### אם יש inline styles:
 → החלף `style="..."` ב-`class="section-icon"` או `class="action-icon"`
 
+### אם badges לא בצבעים הנכונים:
+→ ודא ש-FieldRendererService משמש לרינדור (לא HTML ישיר)
+→ בדוק ש-badges מקבלים `data-color-category` attribute
+→ ודא ש-`_badges-status.css` נטען
+→ ודא ש-`ui-advanced.js` טוען את משתני הצבעים מההעדפות
+
+### אם inline styles ישנים על badges:
+→ מצא קוד שמייצר `<span style="color: ...">` 
+→ החלף ברינדור דרך `FieldRendererService.renderStatus()` וכדומה
+→ הסר את ה-inline style attributes
+
+### אם טבלה לא רספונסיבית (נשארת 100% במסכים קטנים):
+→ בדוק ש-`<table>` עם `class="data-table"` (לא `class="table"`)
+→ `class="table"` זה של Bootstrap עם `width: 100%` קבוע
+→ `class="data-table"` זה שלנו עם media queries רספונסיביים
+→ החלף: `<table class="table ...">` → `<table class="data-table ...">`
+
 ---
 
 ## 📊 סיכום סטטיסטי
 
 **קבצים שעודכנו:**
-- `styles-new/06-components/_tables.css` ✅
+- `styles-new/05-objects/_layout.css` ✅ (overflow-x: visible)
+- `styles-new/06-components/_tables.css` ✅ (media queries, max-width: none)
 - `styles-new/06-components/_buttons-advanced.css` ✅
 - `styles-new/06-components/_entity-colors.css` ✅
 - `styles-new/06-components/_cards.css` ✅
-- `styles-new/06-components/_badges-status.css` ✅
-- `scripts/services/field-renderer-service.js` ✅
-- `trade_plans.html` ✅
+- `styles-new/06-components/_badges-status.css` ✅ (numeric/side ללא רקע)
+- `scripts/date-utils.js` ✅ (formatCompactDate)
+- `scripts/services/field-renderer-service.js` ✅ (renderDate קומפקטי)
+- `trade_plans.html` ✅ (class="data-table", גרסאות CSS מעודכנות)
 - `trade_plans.js` ✅
 - `executions.html` ✅
 - `trading_accounts.html` ✅
@@ -474,20 +615,91 @@ window.getStatusColor(status, 'border')  // מסגרת
 **inline styles שהוסרו:** 2
 **קבצי CSS מיותרים שנמחקו:** 5
 **סטטוסים מיותרים שהוסרו:** 3 (pending, active, completed)
-**שיפורי רספונסיביות:** כל גדלי המסכים
-**אלמנטים שעודכנו:** כפתורים, איקונים, טבלאות, סטטיסטיקות, status badges
-**אינטגרציה עם מערכת צבעים:** 3 ווריאנטים (light, medium, border)
+**שיפורי רספונסיביות:** כל גדלי המסכים (600px-1000px לפי מסך)
+**פורמט תאריך:** תמיד DD/MM/YY (8 תווים, חיסכון 25% במקום)
+**אלמנטים שעודכנו:** כפתורים, איקונים, טבלאות, סטטיסטיקות, תאריכים
+**מערכת badges דינמית (עם קפסולה):** סטטוס (3), סוגי השקעה (3), עדיפויות (3), Buy/Sale (2)
+**טקסט צבעוני בלבד (ללא קפסולה):** Long/Short, ערכים מספריים (חיובי/שלילי/נייטרלי)
+**תיקון Bootstrap conflicts:** class="table" → class="data-table" למניעת התנגשות
+**אינטגרציה עם מערכת צבעים:** צבע אחד + color-mix() לרקע וגבול (רק לbadges עם קפסולה)
 
 ---
 
 ## 🚀 צעדים הבאים
 
 1. לעבור על כל עמוד מהרשימה
-2. לבצע את 4 שלבי הבדיקה
-3. למלא דוח לכל עמוד
-4. לתקן בעיות שנמצאו
-5. לעדכן סטטוס בטבלת העמודים
-6. לאחר השלמת כל העמודים - למחוק מסמך זה
+2. **לבדוק ולתקן `class="table"` → `class="data-table"`** ⚠️ קריטי!
+3. לבצע את 7 שלבי הבדיקה (כפתורים, איקונים, גלילה, תאריכים, סטטיסטיקות, **badges**, קוד)
+4. למלא דוח לכל עמוד
+5. לתקן בעיות שנמצאו
+6. לעדכן סטטוס בטבלת העמודים
+7. לאחר השלמת כל העמודים - למחוק מסמך זה
+
+---
+
+## ℹ️ הערות כלליות
+
+### לגבי ההערות (console.log) בעת טעינת עמוד:
+
+ההודעות בקונסולה (🔧, ✅, ⚠️) הן **חלק תקין** ממערכת ה-logging:
+- מאפשרות debug ומעקב אחר טעינת המערכות
+- מסייעות לזהות בעיות מהר
+- ניתן לכבות דרך preferences → Console Logs
+
+**זה לא שגיאות - זה מערכת מעקב מקצועית!**
+
+---
+
+## 🔍 סקריפט בדיקת badges לקונסולה
+
+להעתיק ולהריץ בקונסולת הדפדפן בכל עמוד:
+
+```javascript
+// בדיקת badges בעמוד נוכחי
+(function checkBadges() {
+    console.log('%c🔍 בדיקת Badges בעמוד', 'font-size: 16px; font-weight: bold; color: #007bff;');
+    
+    const badges = {
+        status: document.querySelectorAll('.badge-status'),
+        type: document.querySelectorAll('.badge[data-color-category*="type-"]'),
+        priority: document.querySelectorAll('.badge[data-color-category*="priority-"]'),
+        numeric: document.querySelectorAll('.badge-numeric'),
+        side: document.querySelectorAll('.badge-side'),
+        action: document.querySelectorAll('.badge-action')
+    };
+    
+    let hasIssues = false;
+    
+    console.log('\n📊 סיכום badges בעמוד:');
+    Object.entries(badges).forEach(([type, elements]) => {
+        console.log(`  ${type}: ${elements.length} badges`);
+    });
+    
+    console.log('\n⚠️ בדיקת בעיות:');
+    
+    // בדיקת inline styles
+    const withInlineStyles = document.querySelectorAll('.badge[style*="color"], .badge[style*="background"]');
+    if (withInlineStyles.length > 0) {
+        console.log(`  ❌ נמצאו ${withInlineStyles.length} badges עם inline styles`);
+        withInlineStyles.forEach(b => console.log('    ', b));
+        hasIssues = true;
+    } else {
+        console.log('  ✅ אין inline styles על badges');
+    }
+    
+    // בדיקת data-color-category
+    const allBadges = document.querySelectorAll('.badge-status, .badge-numeric, .badge-side, .badge-action');
+    const withoutCategory = Array.from(allBadges).filter(b => !b.hasAttribute('data-color-category'));
+    if (withoutCategory.length > 0) {
+        console.log(`  ⚠️ ${withoutCategory.length} badges ללא data-color-category`);
+        hasIssues = true;
+    } else {
+        console.log('  ✅ כל ה-badges עם data-color-category');
+    }
+    
+    console.log(hasIssues ? '\n❌ נמצאו בעיות!' : '\n✅ הכל תקין!');
+})();
+```
 
 ---
 

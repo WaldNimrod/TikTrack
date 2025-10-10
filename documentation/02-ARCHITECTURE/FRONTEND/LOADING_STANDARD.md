@@ -69,7 +69,7 @@
 <!-- Stage 3: Common Utilities - OPTIONAL (based on page type) -->
 <script src="scripts/translation-utils.js?v=20251010"></script>
 <script src="scripts/date-utils.js?v=20251010"></script>
-<script src="scripts/validation-utils.js?v=20251010"></script>
+<!-- validation: already in ui-basic.js (Core Module) -->
 <script src="scripts/linked-items.js?v=20251010"></script>
 <script src="scripts/warning-system.js?v=20251010"></script>
 ```
@@ -78,9 +78,15 @@
 |------|-----------|------|
 | `translation-utils.js` | דפים עם טקסט בממשק | 903 שורות |
 | `date-utils.js` | דפים עם תאריכים | 818 שורות |
-| `validation-utils.js` | דפים עם טפסים | 887 שורות |
+| ~~`validation-utils.js`~~ | ❌ **REMOVED** - כלול ב-ui-basic.js | ~~887 שורות~~ |
 | `linked-items.js` | דפים עם קשרים בין ישויות | ~400 שורות |
 | `warning-system.js` | דפים עם אישורים | ~350 שורות |
+
+### ⚠️ הערה חשובה - מערכת הולידציה
+מערכת הולידציה (validation) **נכללת ב-ui-basic.js** (Stage 1 - Core Module) ונטענת אוטומטית בכל דף.
+- ✅ **אין צורך** לטעון `validation-utils.js` כקובץ נפרד (הקובץ הוסר לחלוטין)
+- ✅ הפונקציות `window.validateEntityForm()`, `window.showFieldError()` וכו' **זמינות תמיד**
+- 📖 **דוקומנטציה מלאה:** [STANDARD_VALIDATION_GUIDE.md](../../03-DEVELOPMENT/GUIDELINES/STANDARD_VALIDATION_GUIDE.md)
 
 ---
 
@@ -170,7 +176,7 @@
 <!-- Stage 3: Common Utilities (כולם) -->
 <script src="scripts/translation-utils.js?v=20251010"></script>
 <script src="scripts/date-utils.js?v=20251010"></script>
-<script src="scripts/validation-utils.js?v=20251010"></script>
+<!-- validation: already in ui-basic.js (Core Module) -->
 <script src="scripts/linked-items.js?v=20251010"></script>
 <script src="scripts/warning-system.js?v=20251010"></script>
 
@@ -220,7 +226,7 @@
 <!-- Stage 3: Common Utilities (חלקי) -->
 <script src="scripts/translation-utils.js?v=20251010"></script>
 <script src="scripts/date-utils.js?v=20251010"></script>
-<script src="scripts/validation-utils.js?v=20251010"></script>
+<!-- validation: already in ui-basic.js (Core Module) -->
 
 <!-- Stage 4: Services (רוב) -->
 <script src="scripts/services/data-collection-service.js?v=20251010"></script>

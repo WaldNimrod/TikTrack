@@ -75,9 +75,10 @@ The New General Systems Architecture is a revolutionary approach to JavaScript i
 **⭐ For complete loading standard, see:** [LOADING_STANDARD.md](LOADING_STANDARD.md)
 
 The unified system includes:
-- **8 Core Modules** (always required)
+- **8 Core Modules** (always required) - includes validation system in ui-basic.js
 - **3 Core Utilities** (always required): global-favicon.js, page-utils.js, header-system.js
-- **5 Common Utilities** (optional): translation-utils.js, date-utils.js, validation-utils.js, linked-items.js, warning-system.js
+- **4 Common Utilities** (optional): translation-utils.js, date-utils.js, linked-items.js, warning-system.js
+  - Note: ~~validation-utils.js~~ removed (Oct 2025) - validation is in ui-basic.js (Core Module)
 - **6 Services** (optional): data-collection, field-renderer, select-populator, crud-response-handler, default-value-setter, statistics-calculator
 - **1 Page Script** (always required)
 

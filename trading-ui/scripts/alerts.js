@@ -145,6 +145,16 @@ async function loadAlertsData() {
 
     if (!response.ok) {
       console.warn(`⚠️ Server error ${response.status}, using demo data`);
+      
+      // הצגת הודעת אזהרה למשתמש - REQUIRED per .cursorrules rule 48
+      if (window.showNotification) {
+        window.showNotification(
+          `⚠️ שגיאת שרת (${response.status}) - מוצגים נתוני דמו בלבד`, 
+          'warning',
+          'שגיאת טעינה'
+        );
+      }
+      
       // שימוש בנתוני דמו במקרה של שגיאת שרת
       alertsData = getDemoAlertsData();
       updateAlertsTable(alertsData);

@@ -209,10 +209,15 @@ async function showAddExecutionModal() {
   // ניקוי והשבתת השדות
   resetAddExecutionForm();
 
-  // הגדרת תאריך ברירת מחדל - היום
-  const today = new Date();
-  const todayString = today.toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
-  window.DataCollectionService.setValue('executionDate', todayString, 'text');
+  // הגדרת תאריך ברירת מחדל באמצעות DefaultValueSetter
+  if (window.DefaultValueSetter) {
+    window.DefaultValueSetter.setCurrentDateTime('executionDate');
+  } else {
+    // Fallback למקרה שהשירות לא זמין
+    const today = new Date();
+    const todayString = today.toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
+    window.DataCollectionService.setValue('executionDate', todayString, 'text');
+  }
 
   // הגדרת חשבון ברירת מחדל לפי העדפות
   // ✨ עודכן לתמיכה במערכת העדפות!
@@ -241,8 +246,16 @@ async function showAddExecutionModal() {
     console.warn('⚠️ Could not load default account from preferences:', error);
   }
 
-  // טעינת טיקרים (ללא צ'קבוקס - תמיד להציג טיקרים פעילים)
+  // טעינת טיקרים באמצעות SelectPopulatorService
+  if (window.SelectPopulatorService) {
+    await window.SelectPopulatorService.populate('addExecutionTicker', 'tickers', {
+      filter: 'active_trades_only',
+      placeholder: 'בחר טיקר...'
+    });
+  } else {
+    // Fallback למקרה שהשירות לא זמין
   await updateTickersList('add', false);
+  }
 
   // חישוב ערכים מחושבים
   calculateAddExecutionValues();
@@ -304,9 +317,17 @@ async function showEditExecutionModal(id) {
   // מילוי שדה ה-ID לפני כל השאר
   window.DataCollectionService.setValue('editExecutionId', execution.id, 'int');
 
-  // טעינת טיקרים לפי הצ'קבוקס
+  // טעינת טיקרים באמצעות SelectPopulatorService
   const showClosedTrades = document.getElementById('editExecutionShowClosedTrades')?.checked || false;
-  await updateTickersList('edit', showClosedTrades);
+  if (window.SelectPopulatorService) {
+    await window.SelectPopulatorService.populate('editExecutionTicker', 'tickers', {
+      filter: showClosedTrades ? 'all_trades' : 'active_trades_only',
+      placeholder: 'בחר טיקר...'
+    });
+  } else {
+    // Fallback למקרה שהשירות לא זמין
+    await updateTickersList('edit', showClosedTrades);
+  }
 
   // טעינת פרטי הטרייד/תכנון המקושר
   let linkedObject = null;
@@ -2941,7 +2962,13 @@ window.toggleExecutionsSection = toggleExecutionsSection;
  * Generate detailed log for Executions
  */
 function generateDetailedLog() {
-    const timestamp = new Date().toLocaleString('he-IL');
+    // יצירת timestamp באמצעות DefaultValueSetter או fallback
+    let timestamp;
+    if (window.DefaultValueSetter) {
+        timestamp = window.DefaultValueSetter.getCurrentDateTime('he-IL');
+    } else {
+        timestamp = new Date().toLocaleString('he-IL');
+    }
     const log = [];
 
     log.push('=== לוג מפורט - עסקעות ===');

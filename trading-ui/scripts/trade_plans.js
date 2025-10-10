@@ -1097,11 +1097,11 @@ if (window.location.pathname.includes('/trade_plans')) {
 
 
 /**
+ * This function loads all trade plans from the server and updates the table
+ * Uses 3-tier fallback: loadTableData → tradePlanService → direct API fetch
+ * Returns empty array on error with proper user notification (NO MOCK DATA per Rules 48-49)
  *
- * This function loads all planning from the server and updates the table
- * If server is not available, uses demo data
- *
- * @returns {Array} Array of planning
+ * @returns {Array} Array of trade plans or empty array on error
  */
 async function loadTradePlansData() {
   try {

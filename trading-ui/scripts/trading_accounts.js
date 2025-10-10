@@ -21,6 +21,29 @@
 
 console.log('📁 trading_accounts_new.js נטען - גרסה חדשה עם מערכות כלליות');
 
+// ===== Global Element Cache =====
+let addAccountModalElement = null;
+let editAccountModalElement = null;
+let addAccountModal = null;
+let editAccountModal = null;
+let loadingIndicator = null;
+let refreshBtn = null;
+let accountCurrencySelect = null;
+let editAccountCurrencySelect = null;
+
+// Initialize element references on DOM ready
+document.addEventListener('DOMContentLoaded', () => {
+    addAccountModalElement = document.getElementById('addAccountModal');
+    editAccountModalElement = document.getElementById('editAccountModal');
+    loadingIndicator = document.getElementById('loadingIndicator');
+    refreshBtn = document.getElementById('refreshBtn');
+    accountCurrencySelect = document.getElementById('accountCurrency');
+    editAccountCurrencySelect = document.getElementById('editAccountCurrency');
+    
+    if (addAccountModalElement) addAccountModal = new bootstrap.Modal(addAccountModalElement);
+    if (editAccountModalElement) editAccountModal = new bootstrap.Modal(editAccountModalElement);
+});
+
 /**
  * Trading Accounts Page Controller
  * בקר העמוד הראשי לחשבונות מסחר עם אינטגרציה מלאה למערכות כלליות
@@ -298,7 +321,6 @@ class TradingAccountsController {
      */
     setupBasicEventListeners() {
         // Refresh button
-        const refreshBtn = document.getElementById('refreshBtn');
         if (refreshBtn) {
             refreshBtn.addEventListener('click', () => this.refreshData());
         }
@@ -359,9 +381,8 @@ class TradingAccountsController {
      * הצגת מצב טעינה
      */
     showLoadingState() {
-        const loadingEl = document.getElementById('loadingIndicator');
-        if (loadingEl) {
-            loadingEl.style.display = 'block';
+        if (loadingIndicator) {
+            loadingIndicator.style.display = 'block';
         }
     }
 
@@ -369,9 +390,8 @@ class TradingAccountsController {
      * הסתרת מצב טעינה
      */
     hideLoadingState() {
-        const loadingEl = document.getElementById('loadingIndicator');
-        if (loadingEl) {
-            loadingEl.style.display = 'none';
+        if (loadingIndicator) {
+            loadingIndicator.style.display = 'none';
         }
     }
 
@@ -422,8 +442,7 @@ class TradingAccountsController {
         await loadCurrenciesForEditAccount();
         
         // מילוי שדות המודל באמצעות DataCollectionService
-        const modal = document.getElementById('editAccountModal');
-        if (modal) {
+        if (editAccountModalElement) {
             window.DataCollectionService.setFormData({
                 id: { id: 'editAccountId', type: 'int' },
                 name: { id: 'editAccountName', type: 'text' },
@@ -441,8 +460,9 @@ class TradingAccountsController {
             });
             
             // פתיחת המודל
-            const bsModal = new bootstrap.Modal(modal);
-            bsModal.show();
+            if (editAccountModal) {
+                editAccountModal.show();
+            }
         }
     }
 
@@ -598,10 +618,8 @@ async function showAddAccountModal() {
     await loadCurrenciesForAccount();
 
     // 4. הצגת המודל
-    const modalElement = document.getElementById('addAccountModal');
-    if (modalElement) {
-        const bootstrapModal = new bootstrap.Modal(modalElement);
-        bootstrapModal.show();
+    if (addAccountModal) {
+        addAccountModal.show();
     }
 }
 
@@ -614,9 +632,8 @@ async function loadCurrenciesForAccount() {
         if (response.ok) {
             const result = await response.json();
             const currencies = result.data || result;
-            const select = document.getElementById('accountCurrency');
-            
-            if (select) {
+            if (accountCurrencySelect) {
+                const select = accountCurrencySelect;
                 select.innerHTML = '<option value="">בחר מטבע...</option>';
                 
                 // קבלת מטבע ברירת מחדל מהעדפות
@@ -654,9 +671,8 @@ async function loadCurrenciesForEditAccount() {
         if (response.ok) {
             const result = await response.json();
             const currencies = result.data || result;
-            const select = document.getElementById('editAccountCurrency');
-            
-            if (select) {
+            if (editAccountCurrencySelect) {
+                const select = editAccountCurrencySelect;
                 select.innerHTML = '<option value="">בחר מטבע...</option>';
                 
                 currencies.forEach(currency => {
@@ -730,9 +746,8 @@ async function saveTradingAccount() {
         }
 
         // 8. סגירת המודל
-        const modal = bootstrap.Modal.getInstance(document.getElementById('addAccountModal'));
-        if (modal) {
-            modal.hide();
+        if (addAccountModal) {
+            addAccountModal.hide();
         }
 
         // 9. רענון הטבלה
@@ -803,9 +818,8 @@ async function updateTradingAccount() {
         }
 
         // 8. סגירת המודל
-        const modal = bootstrap.Modal.getInstance(document.getElementById('editAccountModal'));
-        if (modal) {
-            modal.hide();
+        if (editAccountModal) {
+            editAccountModal.hide();
         }
 
         // 9. רענון הטבלה

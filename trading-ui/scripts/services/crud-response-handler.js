@@ -469,14 +469,14 @@ class CRUDResponseHandler {
 
         // Retry button (only if onRetry provided)
         const retryBtn = onRetry && typeof onRetry === 'function' ? `
-            <button class="btn btn-sm btn-primary mt-2" onclick="(${onRetry.toString()})()">
+            <button class="btn btn-primary mt-3 me-2" onclick="(${onRetry.toString()})()">
                 <i class="fas fa-sync"></i> נסה שוב
             </button>
         ` : '';
 
         // Copy error log button
         const copyBtn = `
-            <button class="btn btn-sm btn-outline-secondary mt-2 ms-2" 
+            <button class="btn btn-secondary mt-3" 
                     onclick="navigator.clipboard.writeText(\`${errorLogString.replace(/`/g, '\\`')}\`).then(() => { if (typeof window.showNotification === 'function') { window.showNotification('Log הועתק ללוח', 'success'); } else { alert('Log הועתק ללוח'); } })">
                 <i class="fas fa-copy"></i> העתק פרטי שגיאה
             </button>

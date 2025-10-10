@@ -3487,6 +3487,7 @@ async function exportSystemReport() {
 
 // Support for direct initialization (if not using unified system)
 if (typeof window !== 'undefined' && !window.unifiedAppInitializer) {
-    document.addEventListener('DOMContentLoaded', initializeServerMonitor);
+    // DOMContentLoaded removed - handled by unified system via PAGE_CONFIGS
+    // initializeServerMonitor will be called from PAGE_CONFIGS in core-systems.js
     window.addEventListener('beforeunload', cleanupServerMonitor);
 }

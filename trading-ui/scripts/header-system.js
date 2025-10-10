@@ -1915,12 +1915,10 @@ window.HeaderSystem = {
 };
 
 // Initialize the header system
-document.addEventListener('DOMContentLoaded', function() {
-  // console.log('🔧 DOMContentLoaded - checking filter functions:');
-  console.log('selectStatusOption:', typeof window.selectStatusOption);
-  console.log('updateStatusFilterText:', typeof window.updateStatusFilterText);
-  console.log('applyStatusFilter:', typeof window.applyStatusFilter);
-  
+// DOMContentLoaded removed - handled by unified system in Stage 2
+// Header system initialization is now called from core-systems.js Stage 2: UI Systems
+
+window.initializeHeaderSystem = function() {
   if (typeof window.HeaderSystemClass === 'function') {
     window.headerSystem = new window.HeaderSystemClass();
     if (typeof window.headerSystem.init === 'function') {
@@ -1930,26 +1928,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // יצירת מערכת הפילטרים
     if (typeof window.HeaderSystemClass.createFilterSystem === 'function') {
       window.HeaderSystemClass.createFilterSystem();
-      
-      // טעינת מצב שמור אחרי שמערכת הפילטרים נוצרה - הוסר כפילות
-      // setTimeout(() => {
-      //   if (typeof window.HeaderSystemClass.loadSavedState === 'function') {
-      //     window.HeaderSystemClass.loadSavedState();
-      //   }
-      // }, 200);
     }
-    
-    // בדיקה נוספת אחרי האתחול
-    setTimeout(() => {
-      // console.log('🔧 After init - checking filter functions again:');
-      console.log('selectStatusOption:', typeof window.selectStatusOption);
-      console.log('updateStatusFilterText:', typeof window.updateStatusFilterText);
-      console.log('applyStatusFilter:', typeof window.applyStatusFilter);
-    }, 100);
   } else {
     console.error('❌ HeaderSystem class not found');
   }
-});
+};
 
 // Update Toggle Buttons Function - עדכון מצב הכפתורים
 window.updateToggleButtons = function() {

@@ -176,12 +176,12 @@
 
 /* ===== עמודות ספציפיות לתכנוני מסחר ===== */
 .col-ticker { 
-  width: 12%; 
+  width: 11%; 
   min-width: 100px;
 }
 
 .col-date { 
-  width: 10%; 
+  width: 9%; 
   min-width: 90px;
 }
 
@@ -196,17 +196,17 @@
 }
 
 .col-quantity { 
-  width: 10%; 
+  width: 9%; 
   min-width: 90px;
 }
 
 .col-price { 
-  width: 10%; 
+  width: 9%; 
   min-width: 90px;
 }
 
 .col-investment { 
-  width: 10%; 
+  width: 9%; 
   min-width: 90px;
 }
 
@@ -216,12 +216,12 @@
 }
 
 .col-profit { 
-  width: 10%; 
+  width: 9%; 
   min-width: 90px;
 }
 
 .col-notes { 
-  width: 16%; 
+  width: 10%; 
   min-width: 120px;
 }
 
@@ -280,9 +280,9 @@
 }
 
 .col-actions { 
-  width: var(--col-actions-width, 180px); 
-  min-width: var(--col-actions-width, 180px);
-  max-width: var(--col-actions-width, 180px);
+  width: 12%;
+  min-width: 145px;
+  max-width: 200px;
 }
 
 /* הגדרות כלליות לכל הטבלאות */
@@ -366,9 +366,7 @@ table td,
   white-space: nowrap;
   padding: 2px 5px;
   overflow: visible;
-  width: 180px;
-  min-width: 180px;
-  max-width: 180px;
+  width: auto;
 }
 
 /* תאי פעולות - padding מותאם */
@@ -412,21 +410,25 @@ table td,
   max-width: var(--actions-5-btn-width, 200px);
 }
 
-/* כפתורי פעולות בטבלאות - הגדרה מרכזית ואחידה */
+/* כפתורי פעולות בטבלאות - הגדרה מרכזית ואחידה לכל הכפתורים */
 .actions-cell button,
-.actions-cell .btn {
-  width: 32px;
-  height: 32px;
-  min-width: 32px;
-  max-width: 32px;
-  min-height: 32px;
-  max-height: 32px;
+.actions-cell .btn,
+.ticker-cell .btn,
+.ticker-cell button,
+table tbody td .btn-sm,
+table tbody td button.btn-sm {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  max-width: 28px;
+  min-height: 28px;
+  max-height: 28px;
   padding: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
-  margin: 0 3px;
+  font-size: 0.75rem;
+  margin: 0 2px;
   vertical-align: middle;
   border-radius: 8px;
 }
@@ -571,11 +573,12 @@ table td,
 
 /* הגדרות ספציפיות לטבלאות בדף הבדיקה */
 #tickersTable,
-#tradePlansTable {
-  width: 100% !important;
-  max-width: 100% !important;
-  table-layout: fixed !important;
-  overflow: hidden !important;
+#tradePlansTable,
+#trade_plansTable {
+  width: 100%;
+  max-width: 100%;
+  table-layout: fixed;
+  overflow: hidden;
 }
 
 /* הגדרות ספציפיות לטבלת הטיקרים */
@@ -602,21 +605,23 @@ table td,
 }
 
 #tickersTable th,
-#tradePlansTable th {
-  overflow: visible !important;
-  text-overflow: clip !important;
-  white-space: normal !important;
-  word-wrap: break-word !important;
-  word-break: break-word !important;
-  min-width: 0 !important;
+#tradePlansTable th,
+#trade_plansTable th {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  word-wrap: break-word;
+  word-break: break-word;
+  min-width: 0;
 }
 
 #tickersTable td,
-#tradePlansTable td {
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  white-space: nowrap !important;
-  min-width: 0 !important;
+#tradePlansTable td,
+#trade_plansTable td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 
 /* ===== רספונסיביות טבלאות ===== */
@@ -675,9 +680,9 @@ table td,
   .col-account { width: 60%; }
   .col-type { width: 40%; }
   .col-actions { 
-    width: 180px; 
-    min-width: 180px;
-    max-width: 180px;
+    width: 12%; 
+    min-width: 145px;
+    max-width: 200px;
   }
   
   /* מחלקות כפתורים */
@@ -775,9 +780,9 @@ table td,
   .col-amount { width: 20%; }
   .col-description { width: 25%; }
   .col-actions { 
-    width: 180px; 
-    min-width: 180px;
-    max-width: 180px;
+    width: 12%; 
+    min-width: 145px;
+    max-width: 200px;
   }
   
   /* מחלקות כפתורים */
@@ -921,15 +926,15 @@ table td,
   .col-status { width: 12%; }
   
   .col-actions { 
-    width: 180px; 
-    min-width: 180px;
-    max-width: 180px;
+    width: 12%; 
+    min-width: 145px;
+    max-width: 200px;
   }
   
   /* מחלקות כפתורים */
   .actions-1-btn { width: var(--actions-1-btn-width, 60px); min-width: var(--actions-1-btn-width, 60px); max-width: var(--actions-1-btn-width, 60px); }
   .actions-2-btn { width: var(--actions-2-btn-width, 80px); min-width: var(--actions-2-btn-width, 80px); max-width: var(--actions-2-btn-width, 80px); }
-  .actions-3-btn { width: var(--actions-3-btn-width, 140px); min-width: var(--actions-3-btn-width, 140px); max-width: var(--actions-3-btn-width, 140px); }
+  .actions-3-btn { width: var(--actions-3-btn-width, 145px); min-width: var(--actions-3-btn-width, 145px); max-width: var(--actions-3-btn-width, 145px); }
   .actions-4-btn { width: var(--actions-4-btn-width, 160px); min-width: var(--actions-4-btn-width, 160px); max-width: var(--actions-4-btn-width, 160px); }
   .actions-5-btn { width: var(--actions-5-btn-width, 200px); min-width: var(--actions-5-btn-width, 200px); max-width: var(--actions-5-btn-width, 200px); }
 }
@@ -951,15 +956,15 @@ table td,
   .col-status { width: 12%; }
   
   .col-actions { 
-    width: 180px; 
-    min-width: 180px;
-    max-width: 180px;
+    width: 12%; 
+    min-width: 145px;
+    max-width: 200px;
   }
   
   /* מחלקות כפתורים */
   .actions-1-btn { width: var(--actions-1-btn-width, 60px); min-width: var(--actions-1-btn-width, 60px); max-width: var(--actions-1-btn-width, 60px); }
   .actions-2-btn { width: var(--actions-2-btn-width, 80px); min-width: var(--actions-2-btn-width, 80px); max-width: var(--actions-2-btn-width, 80px); }
-  .actions-3-btn { width: var(--actions-3-btn-width, 140px); min-width: var(--actions-3-btn-width, 140px); max-width: var(--actions-3-btn-width, 140px); }
+  .actions-3-btn { width: var(--actions-3-btn-width, 145px); min-width: var(--actions-3-btn-width, 145px); max-width: var(--actions-3-btn-width, 145px); }
   .actions-4-btn { width: var(--actions-4-btn-width, 160px); min-width: var(--actions-4-btn-width, 160px); max-width: var(--actions-4-btn-width, 160px); }
   .actions-5-btn { width: var(--actions-5-btn-width, 200px); min-width: var(--actions-5-btn-width, 200px); max-width: var(--actions-5-btn-width, 200px); }
 }

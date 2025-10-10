@@ -855,54 +855,6 @@ function updateStatusDisplay() {
 }
 
 // Event listener for DOM content loaded
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('📊 Chart Management page initialized');
-    
-    // Check color system
-    if (window.getColorPreferences) {
-        console.log('✅ Color preferences system available');
-        const colors = window.getColorPreferences();
-        console.log('🎨 Current colors:', colors);
-    } else {
-        console.warn('⚠️ Color preferences system not available');
-    }
-    
-    // Check chart color palette
-    if (window.getChartColorPalette) {
-        console.log('✅ Chart color palette system available');
-        const palette = window.getChartColorPalette();
-        console.log('🎨 Chart color palette:', palette);
-        
-        // Force update chart theme system
-        if (window.ChartTheme) {
-            console.log('🔄 Forcing chart theme update...');
-            window.ChartTheme.updateDynamicColors();
-            
-            // Test individual colors
-            const colors = window.ChartTheme.getChartColors();
-            console.log('🎨 Individual chart colors:', colors);
-            
-            // Test CSS variables
-            const rootStyles = getComputedStyle(document.documentElement);
-            const primaryColor = rootStyles.getPropertyValue('--primary-color').trim();
-            const chartPrimaryColor = rootStyles.getPropertyValue('--chart-primary-color').trim();
-            console.log('🎨 CSS Variables:', { primaryColor, chartPrimaryColor });
-        }
-    } else {
-        console.warn('⚠️ Chart color palette system not available');
-    }
-    
-    // Initialize status display
-    updateStatusDisplay();
-    
-    // Refresh status after a short delay to allow Chart System to load
-    setTimeout(() => {
-        refreshChartsStatus();
-    }, 1000);
-    
-    // Auto-refresh removed - charts are static visualizations
-    console.log('ℹ️ Auto-refresh disabled for chart management (not needed)');
-});
 
 // Export functions to global scope
 // window.toggleSection export removed - using global version from ui-utils.js

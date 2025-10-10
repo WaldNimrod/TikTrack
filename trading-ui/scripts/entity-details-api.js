@@ -980,17 +980,6 @@ async function refreshEntityData(entityType, entityId) {
 /**
  * Auto-initialize when DOM is ready - אתחול אוטומטי כשה-DOM מוכן
  */
-document.addEventListener('DOMContentLoaded', () => {
-    try {
-        // אתחול מערכת API
-        new EntityDetailsAPI();
-        
-        console.info('Entity Details API system loaded and ready');
-        
-    } catch (error) {
-        console.error('Error auto-initializing EntityDetailsAPI:', error);
-    }
-});
 
 // ===== FUNCTION INDEX =====
 /*

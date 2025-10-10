@@ -420,10 +420,8 @@ window.addRecord = addRecord;
 // window.copyDetailedLog export removed - using global version from system-management.js
 
 // Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-  // console.log('➕ Database display page DOM loaded');
-  initDatabaseDisplay();
-});
+// DOMContentLoaded removed - handled by unified system via PAGE_CONFIGS in core-systems.js
+// Initialization function already exists: initDatabaseDisplay() - will be called from PAGE_CONFIGS
 
 // console.log('✅ DB Display script loaded successfully');
 

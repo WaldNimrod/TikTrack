@@ -1356,17 +1356,6 @@ function generateDetailedLog() {
  */
 
 // ===== INITIALIZATION =====
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize the constraints monitor
-    window.initializeConstraints();
-    
-    // עדכון אוטומטי כל 30 שניות
-    setInterval(() => {
-        if (window.constraintsMonitor) {
-            window.constraintsMonitor.loadData();
-        }
-    }, 30000);
-});
 
 // ייצוא לגלובל scope
 // window.copyDetailedLog export removed - using global version from system-management.js

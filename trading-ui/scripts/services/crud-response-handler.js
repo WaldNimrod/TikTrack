@@ -43,8 +43,27 @@ class CRUDResponseHandler {
                 
                 // שגיאת ולידציה (HTTP 400)
                 if (response.status === 400) {
+                    const message = errorData.message || errorData.error || 'נתונים לא תקינים';
+                    
+                    // אם יש parser מותאם לשגיאות validation ברמת שדות
+                    if (options.customValidationParser && typeof options.customValidationParser === 'function') {
+                        try {
+                            const fieldErrors = options.customValidationParser(message, errorData);
+                            if (fieldErrors && Array.isArray(fieldErrors) && fieldErrors.length > 0) {
+                                // סימון כל השדות הבעייתיים
+                                fieldErrors.forEach(({ fieldId, message: fieldMessage }) => {
+                                    if (fieldId && typeof window.showFieldError === 'function') {
+                                        window.showFieldError(fieldId, fieldMessage);
+                                    }
+                                });
+                            }
+                        } catch (parserError) {
+                            console.warn('⚠️ שגיאה ב-customValidationParser:', parserError);
+                        }
+                    }
+                    
+                    // הודעה כללית
                     if (typeof window.showSimpleErrorNotification === 'function') {
-                        const message = errorData.message || errorData.error || 'נתונים לא תקינים';
                         window.showSimpleErrorNotification('שגיאת ולידציה', message);
                     }
                     return null;
@@ -113,8 +132,27 @@ class CRUDResponseHandler {
                 
                 // שגיאת ולידציה (HTTP 400)
                 if (response.status === 400) {
+                    const message = errorData.message || errorData.error || 'נתונים לא תקינים';
+                    
+                    // אם יש parser מותאם לשגיאות validation ברמת שדות
+                    if (options.customValidationParser && typeof options.customValidationParser === 'function') {
+                        try {
+                            const fieldErrors = options.customValidationParser(message, errorData);
+                            if (fieldErrors && Array.isArray(fieldErrors) && fieldErrors.length > 0) {
+                                // סימון כל השדות הבעייתיים
+                                fieldErrors.forEach(({ fieldId, message: fieldMessage }) => {
+                                    if (fieldId && typeof window.showFieldError === 'function') {
+                                        window.showFieldError(fieldId, fieldMessage);
+                                    }
+                                });
+                            }
+                        } catch (parserError) {
+                            console.warn('⚠️ שגיאה ב-customValidationParser:', parserError);
+                        }
+                    }
+                    
+                    // הודעה כללית
                     if (typeof window.showSimpleErrorNotification === 'function') {
-                        const message = errorData.message || errorData.error || 'נתונים לא תקינים';
                         window.showSimpleErrorNotification('שגיאת ולידציה', message);
                     }
                     return null;

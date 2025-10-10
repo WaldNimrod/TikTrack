@@ -462,10 +462,6 @@ class CacheTestPage {
 }
 
 // Initialize page when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    window.cacheTestPage = new CacheTestPage();
-    window.cacheTestPage.init();
-});
 
 // Export global functions
 window.refreshCacheData = () => window.cacheTestPage?.refreshData();
@@ -554,12 +550,6 @@ function addLogEntry(message, type = 'info') {
 }
 
 // Initialize log with welcome message
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-        addLogEntry('מערכת בדיקת מטמון הותחלה בהצלחה', 'success');
-        addLogEntry('כל הפונקציות זמינות לשימוש', 'info');
-    }, 1000);
-});
 
 
 // Generate detailed log for cache test page
@@ -799,23 +789,4 @@ window.toggleAllSections = toggleAllSections;
 // Skip direct initialization for cache-test page as it's handled by UnifiedAppInitializer
 if (!window.cacheTestPage && !window.location.pathname.includes('cache-test')) {
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => {
-            if (!window.cacheTestPage) {
-                window.cacheTestPage = new CacheTestPage();
-                window.cacheTestPage.init();
-            }
-        });
-    } else {
-        window.cacheTestPage = new CacheTestPage();
-        window.cacheTestPage.init();
-    }
-} else if (window.location.pathname.includes('cache-test')) {
-    console.log('🧪 Cache Test Page will be initialized by UnifiedAppInitializer');
-}
-
-// Cleanup when page is unloaded
-window.addEventListener('beforeunload', () => {
-    if (window.cacheTestPage) {
-        window.cacheTestPage.cleanup();
-    }
-});
+        

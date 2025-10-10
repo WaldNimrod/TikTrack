@@ -171,48 +171,27 @@ async function saveConsoleSettings(settings) {
 }
 
 // אתחול אוטומטי - מעודכן למערכת המובנית
-document.addEventListener('DOMContentLoaded', function() {
-  // הוספת פונקציות ל-global scope
-  window.clearConsole = clearConsole;
-  window.suppressConsoleMessages = suppressConsoleMessages;
-  window.enableConsoleMessages = enableConsoleMessages;
-  window.autoClearConsole = autoClearConsole;
-  window.stopAutoClearConsole = stopAutoClearConsole;
-  window.getConsoleSettings = getConsoleSettings;
-  window.saveConsoleSettings = saveConsoleSettings;
+// DOMContentLoaded removed - exports and initialization done immediately
 
-  // עצור כל ניקוי אוטומטי קיים בטעינת הדף
-  stopAutoClearConsole();
+// Export functions to global scope immediately (no need to wait for DOM)
+window.clearConsole = clearConsole;
+window.suppressConsoleMessages = suppressConsoleMessages;
+window.enableConsoleMessages = enableConsoleMessages;
+window.autoClearConsole = autoClearConsole;
+window.stopAutoClearConsole = stopAutoClearConsole;
+window.getConsoleSettings = getConsoleSettings;
+window.saveConsoleSettings = saveConsoleSettings;
 
-  // וודא שהגדרות ברירת המחדל לא מפעילות ניקוי אוטומטי
-  const currentSettings = getConsoleSettings();
-  if (currentSettings.autoClear) {
-    // אם יש הגדרה לשמירת ניקוי אוטומטי, בטל אותה בטעינת הדף
-    currentSettings.autoClear = false;
-    saveConsoleSettings(currentSettings);
-    console.log('⚠️ ניקוי אוטומטי בוטל בטעינת הדף - נדרש הפעלה ידנית');
-  }
+// Stop any auto-clear on load
+stopAutoClearConsole();
 
-  // אל תפעיל ניקוי אוטומטי בטעינת הדף - רק אם המשתמש מפעיל במפורש
-  console.log('Console cleanup utility loaded - manual control only - integrated with built-in system');
+// Ensure default settings don't enable auto-clear
+const currentSettings = getConsoleSettings();
+if (currentSettings.autoClear) {
+  currentSettings.autoClear = false;
+  saveConsoleSettings(currentSettings);
+  console.log('⚠️ ניקוי אוטומטי בוטל בטעינת הדף - נדרש הפעלה ידנית');
+}
 
-  // המתן קצת לפני שחרור הדגל למניעת ניקוי console
-  setTimeout(() => {
-    isPageInitializing = false; // סיימנו את טעינת הדף
-    if (typeof window.showNotification === 'function') {
-      window.showNotification('הדגל למניעת ניקוי console שוחרר - מערכת מובנית פעילה', 'success', 'ניקוי זיכרון', 3000, 'system');
-    }
-
-    // בדוק אם יש מערכת מובנית לניקוי console
-    if (window.manualClearConsole) {
-      if (typeof window.showNotification === 'function') {
-        window.showNotification('מערכת מובנית לניקוי console זמינה', 'info', 'ניקוי זיכרון', 2000, 'system');
-      }
-    } else {
-      if (typeof window.showNotification === 'function') {
-        window.showNotification('מערכת מובנית לניקוי console לא זמינה - ניקוי ידני בלבד', 'warning', 'ניקוי זיכרון', 4000, 'system');
-      }
-    }
-  }, 5000); // הגדלתי ל-5 שניות כדי לוודא שכל הסקריפטים נטענו
-});
+console.log('Console cleanup utility loaded - manual control only');
 

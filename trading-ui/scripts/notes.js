@@ -1444,55 +1444,31 @@ window.setupNoteValidationEvents = setupNoteValidationEvents;
 window.updateRadioButtons = updateRadioButtons;
 window.populateSelect = populateSelect;
 
-// אתחול הדף
-document.addEventListener('DOMContentLoaded', function () {
-  console.log('🚀🚀🚀 notes.js - DOMContentLoaded התחיל 🚀🚀🚀');
-  
-  // בדיקת זמינות מערכות
-  console.log('🔍 בדיקת זמינות מערכות:');
-  console.log('  - showSuccessNotification:', typeof window.showSuccessNotification);
-  console.log('  - loadNotesData:', typeof window.loadNotesData);
-  console.log('  - updateNotesTable:', typeof window.updateNotesTable);
-  
-  // בדיקה שהמערכת זמינה
-  if (typeof window.showSuccessNotification !== 'function') {
-    console.warn('⚠️ showSuccessNotification לא זמינה - ממתין...');
-    // נסה שוב אחרי 2 שניות
-    setTimeout(() => {
-      console.log('🔄 ניסיון שני לטעינת נתונים...');
-      if (typeof window.showSuccessNotification === 'function') {
-        console.log('✅ showSuccessNotification זמינה עכשיו - מתחיל טעינת נתונים');
+// Second DOMContentLoaded removed - merged into initializeNotesPage
+window.initializeNotesPage = function() {
+    console.log('📝 Initializing Notes Page...');
+    
+    // אתחול modals
+    if (typeof window.initializeNotesModals === 'function') {
+        window.initializeNotesModals();
+    }
+    
+    // שחזור מצב הסגירה (המערכת המאוחדת כבר מטפלת בזה)
+    // No need - handled by unified system in finalization stage
+    
+    // טעינת נתונים
+    if (typeof window.loadNotesData === 'function') {
         loadNotesData();
-      } else {
-        console.error('❌ showSuccessNotification עדיין לא זמינה');
-      }
-    }, 2000);
-    return;
-  }
-
-  console.log('✅ כל המערכות זמינות - מתחיל אתחול');
-
-  // שחזור מצב הסגירה
-  if (typeof window.restoreAllSectionStates === 'function') {
-    console.log('🔄 שחזור מצב סגירה - מערכת גלובלית');
-    window.restoreAllSectionStates();
-  } else {
-    console.log('🔄 שחזור מצב סגירה - מערכת מקומית');
-    // restoreNotesSectionState(); // REMOVED: Using global restoreAllSectionStates() instead
-  }
-
-  // טעינת נתונים
-  console.log('📡 טעינת נתוני הערות...');
-  loadNotesData();
-
-  // הוספת ולידציה בזמן אמת
-  setupNoteValidationEvents();
-
-  // שחזור מצב סידור
-  restoreSortState();
-
-  console.log('✅ notes.js - DOMContentLoaded הושלם');
-});
+    }
+    
+    // הוספת ולידציה בזמן אמת
+    setupNoteValidationEvents();
+    
+    // שחזור מצב סידור
+    restoreSortState();
+    
+    console.log('✅ Notes page initialized successfully');
+};
 
 // פונקציה להגדרת אירועי ולידציה
 function setupNoteValidationEvents() {

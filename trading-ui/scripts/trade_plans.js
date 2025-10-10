@@ -17,7 +17,9 @@ let addTradePlanForm = null;
 let editSelectedTickerDisplay = null;
 let selectedTickerDisplay = null;
 
-document.addEventListener('DOMContentLoaded', () => {
+// DOMContentLoaded removed - handled by unified system via PAGE_CONFIGS in core-systems.js
+
+window.initializeTradePlansModals = function() {
     addTradePlanModalElement = document.getElementById('addTradePlanModal');
     editTradePlanModalElement = document.getElementById('editTradePlanModal');
     cancelTradePlanModalElement = document.getElementById('cancelTradePlanModal');
@@ -30,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (editTradePlanModalElement) editTradePlanModal = new bootstrap.Modal(editTradePlanModalElement);
     if (cancelTradePlanModalElement) cancelTradePlanModal = new bootstrap.Modal(cancelTradePlanModalElement);
     if (deleteTradePlanModalElement) deleteTradePlanModal = new bootstrap.Modal(deleteTradePlanModalElement);
-});
+};
 
 // ===== HELPER FUNCTIONS =====
 
@@ -1364,12 +1366,6 @@ function updateTradePlansTable(trade_plans) {
             </td></tr>`;
     }
 
-    // Updating record count
-    const countElement = document.querySelector('#trade_plansCount');
-    if (countElement) {
-      countElement.textContent = '0 תכנונים';
-    }
-
     // Updating statistics
     updatePageSummaryStats();
     return;
@@ -1498,12 +1494,6 @@ function updateTradePlansTable(trade_plans) {
   tbody.innerHTML = tableHTML;
   console.log(`✅ Table updated successfully`);
 
-      // Updating record count
-    const countElement = document.querySelector('#trade_plansCount');
-    if (countElement) {
-      countElement.textContent = `${trade_plans.length} תכנונים`;
-    }
-
     // Updating statistics
     updatePageSummaryStats();
     
@@ -1607,12 +1597,6 @@ function updatePageSummaryStats() {
   const totalProfitElement = document.getElementById('totalProfit');
   if (totalProfitElement) {
     totalProfitElement.textContent = formatCurrency(stats.totalProfit);
-  }
-
-  // עדכון מספר הרשומות בטבלה
-  const countElement = document.getElementById('trade_plansCount');
-  if (countElement) {
-    countElement.textContent = `${stats.totalDesigns} תכנונים`;
   }
 }
 
@@ -1900,31 +1884,31 @@ function validateTradePlanForm() {
             name: 'סוג השקעה',
             validation: (value) => {
                 const validTypes = ['swing', 'investment', 'passive'];  // Per database constraints
-        if (!validTypes.includes(value)) {
+                if (!validTypes.includes(value)) {
                     return 'סוג השקעה לא תקין. ערכים תקינים: swing, investment, passive';
-        }
-        return true;
+                }
+                return true;
             }
         },
         { 
             id: 'addTradePlanSide', 
             name: 'צד',
             validation: (value) => {
-        const validSides = ['Long', 'Short'];
-        if (!validSides.includes(value)) {
-          return 'צד לא תקין';
-        }
-        return true;
+                const validSides = ['Long', 'Short'];
+                if (!validSides.includes(value)) {
+                    return 'צד לא תקין';
+                }
+                return true;
             }
         },
         { 
             id: 'addTradePlanPlannedAmount', 
             name: 'סכום מתוכנן',
             validation: (value) => {
-          const numValue = parseFloat(value);
+                const numValue = parseFloat(value);
                 if (isNaN(numValue)) return 'סכום מתוכנן חייב להיות מספר';
                 if (numValue <= 0) return 'סכום מתוכנן חייב להיות חיובי';
-        return true;
+                return true;
             }
         }
         // NOTE: stop_price, target_price, entry_conditions, reasons are optional - not validated here
@@ -1952,7 +1936,7 @@ async function saveNewTradePlan() {
   } else {
       // אם לא נבחר, נסה לקבל מהעדפות (עם try-catch)
       try {
-        const defaultAccount = await window.getPreference('default_trading_account');
+    const defaultAccount = await window.getPreference('default_trading_account');
         if (defaultAccount) {
           accountId = parseInt(defaultAccount);
         }
@@ -1995,7 +1979,7 @@ async function saveNewTradePlan() {
         if (typeof window.showSimpleErrorNotification === 'function') {
           window.showSimpleErrorNotification('שגיאת ולידציה', errorData.message || 'נתונים לא תקינים');
         }
-          return;
+        return;
       }
       
       // שגיאת מערכת אחרת
@@ -2525,41 +2509,28 @@ function filterTradePlansLocally(data, statuses, types, dateRange, searchTerm) {
 
 // Global functions are now properly defined in main.js
 
-// Initialization
-document.addEventListener('DOMContentLoaded', function () {
-
-  // Restoring section state - using global system
-  if (typeof window.restoreAllSectionStates === 'function') {
-    window.restoreAllSectionStates();
-  } else {
-    if (typeof handleFunctionNotFound === 'function') {
-      handleFunctionNotFound('restoreAllSectionStates');
-    } else {
-      // console.warn('restoreAllSectionStates function not found');
+// Second DOMContentLoaded removed - merged into initializeTradePlansPage
+window.initializeTradePlansPage = function() {
+    console.log('📋 Initializing Trade Plans Page...');
+    
+    // אתחול modals
+    if (typeof window.initializeTradePlansModals === 'function') {
+        window.initializeTradePlansModals();
     }
-  }
-
-  // Initializing filters
-  if (typeof window.initializePageFilters === 'function') {
-    window.initializePageFilters('planning');
-  }
+    
+    // שחזור מצב סידור (המערכת המאוחדת כבר מטפלת במצב סקשנים)
+    restoreSortState();
 
   // Loading data
+    if (typeof window.loadTradePlansData === 'function') {
   loadTradePlansData();
+    }
 
-  // Updating debug panel on page load
+    // Updating debug panel after data loads
   setTimeout(() => {
     updateFilterDebugPanel();
   }, 1000);
-
-  // Loading sort state
-  if (typeof window.loadSortState === 'function') {
-    window.loadSortState('planning');
-  }
-
-  // שחזור מצב סידור
-  restoreSortState();
-});
+};
 
 // updateGridFromComponent is already defined at the beginning of the file
 
@@ -3086,15 +3057,4 @@ async function copyDetailedLog() {
     }
 }
 
-// קריאה ב-DOMContentLoaded
-document.addEventListener('DOMContentLoaded', function() {
-  if (window.location.pathname.includes('/trade_plans')) {
-    setTimeout(() => {
-      if (typeof loadTradePlansData === 'function') {
-        loadTradePlansData();
-      } else {
-        handleFunctionNotFound('loadTradePlansData', 'פונקציית טעינת נתוני תכנונים לא נמצאה ב-DOMContentLoaded');
-      }
-    }, 500);
-  }
-});
+// Third DOMContentLoaded removed - initialization handled by PAGE_CONFIGS

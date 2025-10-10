@@ -30,7 +30,10 @@ let addTradeBtn = null;
 let editTradeBtn = null;
 
 // Initialize on DOM ready
-document.addEventListener('DOMContentLoaded', () => {
+// DOMContentLoaded removed - handled by unified system via PAGE_CONFIGS in core-systems.js
+// Initialization moved to initializeTradesPage
+
+window.initializeTradesModals = function() {
     addTradeModalElement = document.getElementById('addTradeModal');
     editTradeModalElement = document.getElementById('editTradeModal');
     editTradeModalLabel = document.getElementById('editTradeModalLabel');
@@ -40,7 +43,19 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (addTradeModalElement) addTradeModal = new bootstrap.Modal(addTradeModalElement);
     if (editTradeModalElement) editTradeModal = new bootstrap.Modal(editTradeModalElement);
-});
+};
+
+window.initializeTradesPage = function() {
+    // אתחול modals
+    if (typeof window.initializeTradesModals === 'function') {
+        window.initializeTradesModals();
+    }
+    
+    // טעינת נתונים
+    if (typeof window.loadTradesData === 'function') {
+        window.loadTradesData();
+    }
+};
 
 // ========================================
 // פונקציות מודל הוספה
@@ -129,7 +144,7 @@ async function addTrade() {
             remarks: { id: 'addRemarks', type: 'text', default: null }
         });
 
-        // 3. שליחה לשרת
+        // 3. שליחה לשרת וטיפול בתגובה באמצעות CRUDResponseHandler
         const response = await fetch('/api/trades/', {
             method: 'POST',
             headers: {
@@ -138,45 +153,23 @@ async function addTrade() {
             body: JSON.stringify(formData)
         });
 
-        // 4. טיפול בתגובה
-        if (!response.ok) {
-            const errorData = await response.json();
-            
-            // בדיקה אם זו שגיאת ולידציה (HTTP 400)
-            if (response.status === 400) {
-                if (typeof window.showSimpleErrorNotification === 'function') {
-                    window.showSimpleErrorNotification('שגיאת ולידציה', errorData.message || 'נתונים לא תקינים');
+        // טיפול בתגובה
+        await window.CRUDResponseHandler.handleSaveResponse(response, {
+            modalId: 'addTradeModal',
+            successMessage: 'הטרייד נוסף בהצלחה',
+            reloadFn: async () => {
+                // ניקוי מטמון
+                if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+                    await window.UnifiedCacheManager.remove('trades');
+                    console.log('✅ מטמון trades נוקה אחרי הוספה');
                 }
-                return;
-            }
-            
-            // שגיאת מערכת אחרת
-            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-        }
-
-        const result = await response.json();
-        
-        // 5. ניקוי מטמון trades
-        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-            await window.UnifiedCacheManager.remove('trades');
-            console.log('✅ מטמון trades נוקה אחרי הוספה');
-        }
-        
-        // 6. הצגת הודעת הצלחה
-        if (typeof window.showSuccessNotification === 'function') {
-            window.showSuccessNotification('הצלחה', 'הטרייד נוסף בהצלחה', 3000, 'success');
-        }
-
-        // 7. סגירת המודל
-        // Use cached modal;
-        if (addTradeModal || editTradeModal) {
-            addTradeModal ? addTradeModal.hide() : editTradeModal.hide();
-        }
-
-        // 8. רענון הטבלה
-        if (typeof window.loadTradesData === 'function') {
-            await window.loadTradesData();
-        }
+                // רענון טבלה
+                if (typeof window.loadTradesData === 'function') {
+                    await window.loadTradesData();
+                }
+            },
+            entityName: 'טרייד'
+        });
 
     } catch (error) {
         console.error('Error adding trade:', error);
@@ -735,32 +728,25 @@ class TradesController {
                 });
             }
             
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+            // טיפול בתגובה באמצעות CRUDResponseHandler
+            const handler = mode === 'add' ? 
+                window.CRUDResponseHandler.handleSaveResponse : 
+                window.CRUDResponseHandler.handleUpdateResponse;
             
-            // הצלחה
-            const result = await response.json();
-            console.log(`✅ Trade ${mode === 'add' ? 'added' : 'updated'} successfully:`, result);
-            
-            // ניקוי מטמון trades
-            if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-                await window.UnifiedCacheManager.remove('trades');
-                console.log('✅ מטמון trades נוקה אחרי עדכון');
-            }
-            
-            if (typeof window.showSuccessNotification === 'function') {
-                window.showSuccessNotification('הצלחה', `טרייד ${mode === 'add' ? 'נוסף' : 'עודכן'} בהצלחה`, 3000, 'success');
-            }
-            
-            // סגירת המודל
-            // Use cached modal;
-            if (addTradeModal || editTradeModal) {
-                addTradeModal ? addTradeModal.hide() : editTradeModal.hide();
-            }
-            
-            // רענון הנתונים
-            await this.loadTrades();
+            await handler(response, {
+                modalId: mode === 'add' ? 'addTradeModal' : 'editTradeModal',
+                successMessage: `טרייד ${mode === 'add' ? 'נוסף' : 'עודכן'} בהצלחה`,
+                reloadFn: async () => {
+                    // ניקוי מטמון
+                    if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+                        await window.UnifiedCacheManager.remove('trades');
+                        console.log('✅ מטמון trades נוקה אחרי עדכון');
+                    }
+                    // רענון נתונים
+                    await this.loadTrades();
+                },
+                entityName: 'טרייד'
+            });
             
         } catch (error) {
             console.error('❌ Error saving trade:', error);
@@ -783,30 +769,23 @@ class TradesController {
                 method: 'DELETE'
             });
             
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            // ניקוי מטמון trades
-            if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-                await window.UnifiedCacheManager.remove('trades');
-                console.log('✅ מטמון trades נוקה אחרי מחיקה');
-            }
-            
-            console.log(`✅ Trade ${tradeId} deleted successfully`);
-            
-            if (typeof window.showSuccessNotification === 'function') {
-                window.showSuccessNotification('הצלחה', 'טרייד נמחק בהצלחה', 3000, 'success');
-            }
-            
-            // רענון הנתונים
-            await this.loadTrades();
+            // טיפול בתגובה באמצעות CRUDResponseHandler
+            await window.CRUDResponseHandler.handleDeleteResponse(response, {
+                successMessage: 'טרייד נמחק בהצלחה',
+                reloadFn: async () => {
+                    // ניקוי מטמון
+                    if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+                        await window.UnifiedCacheManager.remove('trades');
+                        console.log('✅ מטמון trades נוקה אחרי מחיקה');
+                    }
+                    // רענון נתונים
+                    await this.loadTrades();
+                },
+                entityName: 'טרייד'
+            });
             
         } catch (error) {
-            console.error('❌ Error deleting trade:', error);
-            if (typeof window.showErrorNotification === 'function') {
-                window.showErrorNotification('שגיאה', 'שגיאה במחיקת טרייד: ' + error.message, 5000, 'error');
-            }
+            window.CRUDResponseHandler.handleError(error, 'מחיקת טרייד');
         }
     }
 }

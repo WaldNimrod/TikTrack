@@ -377,10 +377,8 @@ function exportExtraTableData(tableType) {
 }
 
 // Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', function () {
-    console.log('➕ Database extra data page DOM loaded');
-    initDatabaseExtraDisplay();
-});
+// DOMContentLoaded removed - handled by unified system via PAGE_CONFIGS in core-systems.js
+// Initialization function already exists: initDatabaseExtraDisplay() - will be called from PAGE_CONFIGS
 
 // ===== MISSING FUNCTIONS FOR ONCLICK ATTRIBUTES =====
 

@@ -427,35 +427,36 @@
 }
 
 /* ===== INFO SUMMARY COMPONENT ===== */
-/* סגנונות למידע סיכום */
+/* סגנונות למידע סיכום - אלמנט צנוע ועדין */
 .info-summary {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 1.5rem auto; /* מרווח אוטומטי למרכז */
-  padding: 1.5rem;
-  background: #f8f9fa; /* אפון בהיר */
-  border-radius: 12px; /* פינות מעוגלות */
-  border: 1px solid #e9ecef;
-  width: 90%; /* 90% מהקונטיינר שלו */
-  max-width: 100%; /* לא יותר מהקונטיינר */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin: 0.75rem auto;
+  padding: 0.75rem 1rem;
+  background: white;
+  border-radius: 8px;
+  border: none;
+  width: 90%;
+  max-width: 100%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .info-summary div {
   font-size: 14px;
-  color: #6c757d; /* טקסט אפון */
+  color: #495057;
   text-align: center;
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  font-weight: 600;
 }
 
 .info-summary strong {
-  color: #495057; /* טקסט כהה יותר */
-  font-weight: 600;
+  color: #6c757d;
+  font-weight: 400;
 }
 
 /* ===== INFO SUMMARY WITH CARDS ===== */

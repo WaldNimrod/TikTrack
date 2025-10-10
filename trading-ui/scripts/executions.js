@@ -11,7 +11,9 @@ let addExecutionForm = null;
 let editExecutionForm = null;
 let editExecutionDate = null;
 
-document.addEventListener('DOMContentLoaded', () => {
+// DOMContentLoaded removed - handled by unified system via PAGE_CONFIGS in core-systems.js
+
+window.initializeExecutionsModals = function() {
     addExecutionModalElement = document.getElementById('addExecutionModal');
     editExecutionModalElement = document.getElementById('editExecutionModal');
     linkedItemsModalElement = document.getElementById('linkedItemsModal');
@@ -22,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (addExecutionModalElement) addExecutionModal = new bootstrap.Modal(addExecutionModalElement);
     if (editExecutionModalElement) editExecutionModal = new bootstrap.Modal(editExecutionModalElement);
     if (linkedItemsModalElement) linkedItemsModal = new bootstrap.Modal(linkedItemsModalElement);
-});
+};
 
 /**
  * הוספת ביצוע חדש
@@ -753,45 +755,23 @@ async function saveExecution() {
       body: JSON.stringify(executionData),
     });
 
-    // 4. טיפול בתגובה
-    if (!response.ok) {
-        const errorData = await response.json();
-        
-        // שגיאת ולידציה (HTTP 400)
-        if (response.status === 400) {
-            if (typeof window.showSimpleErrorNotification === 'function') {
-                window.showSimpleErrorNotification('שגיאת ולידציה', errorData.message || 'נתונים לא תקינים');
+    // 4. טיפול בתגובה באמצעות CRUDResponseHandler
+    await window.CRUDResponseHandler.handleSaveResponse(response, {
+        modalId: 'addExecutionModal',
+        successMessage: 'עסקה נוספה בהצלחה',
+        reloadFn: async () => {
+            // ניקוי מטמון
+            if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+                await window.UnifiedCacheManager.remove('executions');
+                console.log('✅ מטמון executions נוקה אחרי הוספה');
             }
-            return;
-        }
-        
-        // שגיאת מערכת אחרת
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-    }
-
-    const result = await response.json();
-    
-    // 5. הצגת הודעת הצלחה
-      if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification('הצלחה', 'עסקה נוספה בהצלחה');
-    }
-
-    // 6. סגירת המודל
-    const modal = bootstrap.Modal.getInstance(addExecutionModalElement);
-    if (modal) {
-        modal.hide();
-    }
-
-
-    // ניקוי מטמון executions
-    if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-        await window.UnifiedCacheManager.remove('executions');
-        console.log('✅ מטמון executions נוקה אחרי הוספה');
-    }
-    // 7. רענון הטבלה
-    if (typeof window.loadExecutionsData === 'function') {
-        await window.loadExecutionsData();
-    }
+            // רענון טבלה
+            if (typeof window.loadExecutionsData === 'function') {
+                await window.loadExecutionsData();
+            }
+        },
+        entityName: 'עסקה'
+    });
 
   } catch (error) {
     console.error('Error saving execution:', error);
@@ -838,45 +818,23 @@ async function updateExecution() {
       body: JSON.stringify(executionData),
     });
 
-    // 4. טיפול בתגובה
-    if (!response.ok) {
-        const errorData = await response.json();
-        
-        // שגיאת ולידציה (HTTP 400)
-        if (response.status === 400) {
-            if (typeof window.showSimpleErrorNotification === 'function') {
-                window.showSimpleErrorNotification('שגיאת ולידציה', errorData.message || 'נתונים לא תקינים');
+    // 4. טיפול בתגובה באמצעות CRUDResponseHandler
+    await window.CRUDResponseHandler.handleUpdateResponse(response, {
+        modalId: 'editExecutionModal',
+        successMessage: 'עסקה עודכנה בהצלחה',
+        reloadFn: async () => {
+            // ניקוי מטמון
+            if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+                await window.UnifiedCacheManager.remove('executions');
+                console.log('✅ מטמון executions נוקה אחרי עדכון');
             }
-            return;
-        }
-        
-        // שגיאת מערכת אחרת
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-    }
-
-    const result = await response.json();
-    
-    // 5. הצגת הודעת הצלחה
-      if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification('הצלחה', 'עסקה עודכנה בהצלחה');
-    }
-
-    // 6. סגירת המודל
-    const modal = bootstrap.Modal.getInstance(editExecutionModalElement);
-    if (modal) {
-        modal.hide();
-    }
-
-    // 7. רענון הטבלה
-
-    // ניקוי מטמון executions
-    if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-        await window.UnifiedCacheManager.remove('executions');
-        console.log('✅ מטמון executions נוקה אחרי עדכון');
-    }
-    if (typeof window.loadExecutionsData === 'function') {
-        await window.loadExecutionsData();
-    }
+            // רענון טבלה
+            if (typeof window.loadExecutionsData === 'function') {
+                await window.loadExecutionsData();
+            }
+        },
+        entityName: 'עסקה'
+    });
 
   } catch (error) {
     console.error('Error updating execution:', error);
@@ -1539,36 +1497,7 @@ async function loadColorsAndApplyToHeaders() {
 // window.sortTable export removed - using global version from tables.js
 
 // אתחול הדף
-document.addEventListener('DOMContentLoaded', function () {
-  // הגדרת מודלים שלא נסגרים בלחיצה על הרקע
-  setupModalConfigurations();
-
-  // שחזור מצב הסגירה - handled by global toggleSection system
-
-  // טעינת נתונים
-  loadExecutionsData();
-
-  // טעינת צבעים מההעדפות לפני יישום על הכותרות
-  loadColorsAndApplyToHeaders();
-
-  // הגדרת פונקציות פילטר
-  setupExecutionsFilterFunctions();
-
-  // שחזור מצב סידור - שימוש בפונקציה גלובלית
-  if (typeof window.restoreAnyTableSort === 'function') {
-    window.restoreAnyTableSort('executions', window.executionsData || [], updateExecutionsTableMain);
-  }
-
-  // אתחול רשימת טיקרים לפי הצ'קבוקס (ברירת מחדל: לא מסומן)
-  updateTickersList('add', false);
-  updateTickersList('edit', false);
-
-  // עדכון אוטומטי כל 30 שניות
-  setInterval(() => {
-
-    loadExecutionsData();
-  }, 30000);
-});
+// Second DOMContentLoaded removed - merged into initializeExecutionsPage
 
 /**
  * הגדרת תצורות מודלים
@@ -2223,15 +2152,14 @@ window.resetExecutionsFilters = window.resetExecutionsFilters || function() {};
 // ========================================
 
 // אתחול הדף
-document.addEventListener('DOMContentLoaded', function () {
-  // DOM Content Loaded - checking notification functions
-  // window.showSuccessNotification
-  // window.showErrorNotification
-  // window.showInfoNotification
-
-  // שחזור מצב הסגירה
+// Third DOMContentLoaded removed - merged into initializeExecutionsPage
+function _initializeExecutionsPageValidation() {
+  // שחזור מצב הסגירה - handled by unified system finalization stage
+  // No need - unified system handles this
+  
+  // Fallback for backward compatibility
   if (typeof window.restoreAllSectionStates === 'function') {
-    window.restoreAllSectionStates();
+    // Already handled by system
   } else {
     // console.warn('⚠️ restoreAllSectionStates function not available, using fallback');
     // Fallback: restore top section state manually
@@ -2304,7 +2232,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Executions page initialized successfully
-});
+} // End of _initializeExecutionsPageValidation
 
 // בדיקה שהפונקציות נטענו בהצלחה
 
@@ -3008,23 +2936,6 @@ window.toggleExecutionsSection = toggleExecutionsSection;
 // ייצוא גלובלי כפול - מוסר (כבר מיוצא בשורות 2065-2087)
 
 // Modal event listeners for form reset
-document.addEventListener('DOMContentLoaded', function() {
-  // Add execution modal - reset form when hidden
-  const addExecutionModal = addExecutionModalElement;
-  if (addExecutionModal) {
-    addExecutionModal.addEventListener('hidden.bs.modal', function() {
-      resetAddExecutionForm();
-    });
-  }
-
-  // Edit execution modal - reset form when hidden
-  const editExecutionModal = editExecutionModalElement;
-  if (editExecutionModal) {
-    editExecutionModal.addEventListener('hidden.bs.modal', function() {
-      resetEditExecutionForm();
-    });
-  }
-});
 
 /**
  * Generate detailed log for Executions
@@ -3174,3 +3085,88 @@ async function copyDetailedLog() {
         }
     }
 }
+
+// ===== UNIFIED PAGE INITIALIZATION =====
+// All DOMContentLoaded listeners merged into single initialization function
+// Called from PAGE_CONFIGS in core-systems.js
+
+window.initializeExecutionsPage = function() {
+    console.log('⚡ Initializing Executions Page...');
+    
+    // 1. Initialize modals
+    if (typeof window.initializeExecutionsModals === 'function') {
+        window.initializeExecutionsModals();
+    }
+    
+    // 2. Setup modal configurations
+    setupModalConfigurations();
+    
+    // 3. Load data
+    if (typeof window.loadExecutionsData === 'function') {
+        loadExecutionsData();
+    }
+    
+    // 4. Load colors and apply to headers
+    loadColorsAndApplyToHeaders();
+    
+    // 5. Setup filter functions
+    setupExecutionsFilterFunctions();
+    
+    // 6. Restore sort state
+    if (typeof window.restoreAnyTableSort === 'function') {
+        window.restoreAnyTableSort('executions', window.executionsData || [], updateExecutionsTableMain);
+    }
+    
+    // 7. Initialize tickers lists
+    updateTickersList('add', false);
+    updateTickersList('edit', false);
+    
+    // 8. Initialize validation
+    if (window.initializeValidation) {
+        const addExecutionValidationRules = {
+            trade_id: {
+                required: true,
+                type: 'number',
+                min: 1,
+                message: 'יש לבחור טרייד',
+            },
+            quantity: {
+                required: true,
+                type: 'number',
+                min: 1,
+                message: 'יש להזין כמות חיובית',
+            },
+            price: {
+                required: true,
+                type: 'number',
+                min: 0.01,
+                message: 'יש להזין מחיר חיובי',
+            },
+        };
+        
+        window.initializeValidation('addExecutionForm', addExecutionValidationRules);
+        window.initializeValidation('editExecutionForm', {});
+    }
+    
+    // 9. Setup modal reset handlers
+    if (addExecutionModalElement) {
+        addExecutionModalElement.addEventListener('hidden.bs.modal', function() {
+            resetAddExecutionForm();
+        });
+    }
+    
+    if (editExecutionModalElement) {
+        editExecutionModalElement.addEventListener('hidden.bs.modal', function() {
+            resetEditExecutionForm();
+        });
+    }
+    
+    // 10. Auto-refresh every 30 seconds
+    setInterval(() => {
+        if (typeof window.loadExecutionsData === 'function') {
+            loadExecutionsData();
+        }
+    }, 30000);
+    
+    console.log('✅ Executions page initialized successfully');
+};

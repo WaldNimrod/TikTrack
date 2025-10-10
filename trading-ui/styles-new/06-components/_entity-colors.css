@@ -13,20 +13,28 @@
 
 /* ===== סגנונות ישויות ===== */
 
-/* איקונים בכותרת סקשן */
-.section-icon {
+/* איקונים בכותרת סקשן - עם רקע לבן עגול */
+.section-icon,
+img.section-icon,
+img[src*="/icons/"] {
   width: 36px;
   height: 36px;
   margin-inline-end: 8px;
   vertical-align: middle;
   display: inline-block;
+  background-color: white;
+  border-radius: 50%;
+  padding: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* איקונים בכותרת טבלה */
-.table-title .section-icon {
+.table-title .section-icon,
+.table-title img[src*="/icons/"] {
   width: 24px;
   height: 24px;
   margin-inline-end: 6px;
+  padding: 0;
 }
 
 /* איקונים בכפתור הוסף */
@@ -35,10 +43,16 @@
 .btn-add .fa-plus,
 .refresh-btn .action-icon,
 .refresh-btn img,
-.refresh-btn .fa-plus {
+.refresh-btn .fa-plus,
+.action-icon,
+img.action-icon {
   width: 20px;
   height: 20px;
   font-size: 20px;
+  background-color: white;
+  border-radius: 50%;
+  padding: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 /* .btn מוגדר ב-_buttons-base.css לפי ITCSS */
@@ -50,14 +64,14 @@
 .btn-add,
 [id*="add"][id*="Btn"],
 button[id*="add"] {
-  background-color: white !important;
-  border: 2px solid var(--primary-color, #007bff) !important;
-  border-radius: 25px !important; /* פינות מעוגלות */
-  color: var(--primary-color, #007bff) !important;
-  padding: 0.5rem 1rem !important;
-  transition: all 0.2s ease !important;
+  background-color: white;
+  border: 2px solid var(--primary-color, #007bff);
+  border-radius: 25px;
+  color: var(--primary-color, #007bff);
+  padding: 0.5rem 1rem;
+  transition: all 0.2s ease;
   font-weight: 500;
-  font-size: 0.85rem !important; /* פונט קטן יותר */
+  font-size: 0.85rem;
 }
 
 #addCashFlowBtn:hover,
@@ -66,10 +80,10 @@ button[id*="add"] {
 .btn-add:hover,
 [id*="add"][id*="Btn"]:hover,
 button[id*="add"]:hover {
-  background-color: var(--primary-color, #007bff) !important;
-  color: white !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2) !important;
+  background-color: var(--primary-color, #007bff);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
 }
 
 /* טרייד - Trade */

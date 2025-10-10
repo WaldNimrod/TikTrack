@@ -2279,21 +2279,6 @@ async function copyDetailedLog() {
 }
 
 // Initialize dashboard when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-  window.systemManagement = new SystemManagement();
-  window.systemManagement.init();
-  
-  // Make functions globally available (only if not already defined by page-specific script)
-  window.refreshSystemData = SystemManagement.refreshSystemData;
-  window.runSystemCheck = SystemManagement.runSystemCheck;
-  window.clearCache = SystemManagement.clearCache;
-  window.runBackup = SystemManagement.runBackup;
-  window.restoreFromBackup = SystemManagement.restoreFromBackup;
-  window.copyCheckResultsToClipboard = SystemManagement.copyCheckResultsToClipboard;
-  window.checkDependencies = SystemManagement.checkDependencies;
-  // window.toggleAllSections export removed - using global version from ui-utils.js
-  // window.toggleSection export removed - using global version from ui-utils.js
-});
 
 // ========================================
 // Cursor Tasks Integration Functions

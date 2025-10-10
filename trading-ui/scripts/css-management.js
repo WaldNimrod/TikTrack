@@ -3919,26 +3919,6 @@ window.hasCachedDuplicates = hasCachedDuplicates;
 // window.toggleSection export removed - using global version from ui-utils.js
 
 // Initialize on page load
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('📋 CSS Management Page loaded');
-    
-    // בדיקת מערכות נדרשות
-    console.log('🔍 בודק מערכות נדרשות:');
-    console.log('  - showSuccessNotification:', typeof window.showSuccessNotification);
-    console.log('  - showErrorNotification:', typeof window.showErrorNotification);
-    console.log('  - showInfoNotification:', typeof window.showInfoNotification);
-    console.log('  - showWarningNotification:', typeof window.showWarningNotification);
-    console.log('  - getPreference:', typeof window.getPreference);
-    console.log('  - UnifiedCacheManager:', typeof window.UnifiedCacheManager);
-    console.log('  - notificationSystem:', typeof window.notificationSystem);
-    
-    initializeCssManagement();
-    
-    // עדכון אוטומטי כל 30 שניות
-    setInterval(() => {
-        refreshCssStats();
-    }, 30000);
-});
 
 // Error handling
 window.addEventListener('error', (e) => {

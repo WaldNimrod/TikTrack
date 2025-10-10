@@ -1737,100 +1737,48 @@ async function saveCashFlow() {
       body: JSON.stringify(formData),
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      handleApiError('תגובת שגיאה מהשרת', errorText);
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const result = await response.json();
-    if (result.status === 'success') {
-      // סגירת המודל
-      if (addCashFlowModal) {
-        addCashFlowModal.hide();
-      }
-
-      // ניקוי מטמון cash_flows
-      if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-        await window.UnifiedCacheManager.remove('cash_flows');
-        console.log('✅ מטמון cash_flows נוקה אחרי הוספה');
-      }
-
-      // ניקוי global data
-      if (window.cashFlowsData) {
-        window.cashFlowsData = null;
-        console.log('✅ Global cashFlowsData נוקה');
-      }
-
-      // המתנה קצרה לוידוא ניקוי מטמון
-      await new Promise(resolve => setTimeout(resolve, 100));
-
-      // טעינה מחדש של הנתונים
-      await loadCashFlows();
-
-      // הצגת הודעת הצלחה אחרי הטעינה
-      if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification('הצלחה', 'תזרים המזומנים נשמר בהצלחה', 4000, 'business');
-      }
-    } else {
-      handleApiError('שגיאה בשמירת תזרים מזומנים', result.error);
-
-      // טיפול בשגיאות וולידציה מהשרת
-      // const errorMessage = 'שגיאה בשמירת תזרים מזומנים';
-
-      if (result.error && result.error.message) {
-        const serverMessage = result.error.message;
-
-        // אם זו שגיאת וולידציה, נפרק אותה להודעות ספציפיות
-        if (serverMessage.includes('validation failed')) {
-          const validationErrors = serverMessage.replace('Cash flow validation failed: ', '').split('; ');
-
-          // הצגת כל שגיאה בנפרד
-          validationErrors.forEach(error => {
-            let fieldError = error;
-            let fieldName = '';
-
-            // תרגום שגיאות ספציפיות
-            if (error.includes('Field \'type\' has invalid value')) {
-              fieldError = 'סוג תזרים לא תקין - יש לבחור ערך מהרשימה';
-              fieldName = 'cashFlowType';
-            } else if (error.includes('Field \'source\' has invalid value')) {
-              fieldError = 'מקור לא תקין - יש לבחור ערך מהרשימה';
-              fieldName = 'cashFlowSource';
-            } else if (error.includes('Field \'amount\' is out of range')) {
-              fieldError = 'סכום חייב להיות שונה מ-0';
-              fieldName = 'cashFlowAmount';
-            } else if (error.includes('Field \'usd_rate\' is out of range')) {
-              fieldError = 'שער דולר חייב להיות חיובי';
-              fieldName = 'cashFlowUsdRate';
-            } else if (error.includes('Field \'account_id\' references non-existent record')) {
-              fieldError = 'חשבון לא קיים במערכת';
-              fieldName = 'cashFlowAccountId';
-            }
-
-            // סימון השדה הבעייתי
-            if (fieldName && typeof window.showFieldError === 'function') {
-              window.showFieldError(fieldName, fieldError);
-            }
-          });
-          
-          // הצגת התראה פשוטה לכל השגיאות
-          if (typeof window.showSimpleErrorNotification === 'function') {
-            window.showSimpleErrorNotification('שגיאת ולידציה', 'נא לתקן את השדות המסומנים');
+    // טיפול בתגובה באמצעות CRUDResponseHandler עם customValidationParser
+    await window.CRUDResponseHandler.handleSaveResponse(response, {
+      modalId: 'addCashFlowModal',
+      successMessage: 'תזרים המזומנים נשמר בהצלחה',
+      customValidationParser: (errorMessage) => {
+        if (!errorMessage.includes('validation failed')) return null;
+        
+        const validationErrors = errorMessage.replace('Cash flow validation failed: ', '').split('; ');
+        return validationErrors.map(error => {
+          if (error.includes("Field 'type' has invalid value")) {
+            return { fieldId: 'cashFlowType', message: 'סוג תזרים לא תקין - יש לבחור ערך מהרשימה' };
+          } else if (error.includes("Field 'source' has invalid value")) {
+            return { fieldId: 'cashFlowSource', message: 'מקור לא תקין - יש לבחור ערך מהרשימה' };
+          } else if (error.includes("Field 'amount' is out of range")) {
+            return { fieldId: 'cashFlowAmount', message: 'סכום חייב להיות שונה מ-0' };
+          } else if (error.includes("Field 'usd_rate' is out of range")) {
+            return { fieldId: 'cashFlowUsdRate', message: 'שער דולר חייב להיות חיובי' };
+          } else if (error.includes("Field 'account_id' references non-existent record")) {
+            return { fieldId: 'cashFlowAccountId', message: 'חשבון לא קיים במערכת' };
           }
-        } else {
-          // שגיאה כללית מהשרת
-          if (typeof window.showSimpleErrorNotification === 'function') {
-            window.showSimpleErrorNotification('שגיאה בשמירה', serverMessage);
-          }
+          return null;
+        }).filter(Boolean);
+      },
+      reloadFn: async () => {
+        // ניקוי מטמון
+        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+          await window.UnifiedCacheManager.remove('cash_flows');
+          console.log('✅ מטמון cash_flows נוקה אחרי הוספה');
         }
-      } else {
-        // הצגת הודעת שגיאה כללית
-        if (typeof window.showSimpleErrorNotification === 'function') {
-          window.showSimpleErrorNotification('שגיאה בשמירה', 'שגיאה בשמירת תזרים מזומנים - בדוק את הנתונים שהוזנו');
+        // ניקוי global data
+        if (window.cashFlowsData) {
+          window.cashFlowsData = null;
+          console.log('✅ Global cashFlowsData נוקה');
         }
-      }
-    }
+        // המתנה קצרה לוידוא ניקוי מטמון
+        await new Promise(resolve => setTimeout(resolve, 100));
+        // טעינה מחדש
+        await loadCashFlows();
+      },
+      entityName: 'תזרים מזומנים'
+    });
+
   } catch (error) {
     console.error('Error saving cash flow:', error);
     

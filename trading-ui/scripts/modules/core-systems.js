@@ -3128,14 +3128,8 @@ const PAGE_CONFIGS = {
             async (pageConfig) => {
                 console.log('📋 Initializing Trade Plans...');
                 
-                // Load trade plans data
-                if (typeof window.loadTradePlansData === 'function') {
-                    await window.loadTradePlansData();
-                }
-                
-                // Setup trade plan-specific handlers
-                if (typeof window.setupTradePlanHandlers === 'function') {
-                    window.setupTradePlanHandlers();
+                if (typeof window.initializeTradePlansPage === 'function') {
+                    window.initializeTradePlansPage();
                 }
             }
         ]
@@ -3152,8 +3146,8 @@ const PAGE_CONFIGS = {
             async (pageConfig) => {
                 console.log('⚡ Initializing Executions...');
                 
-                if (typeof window.loadExecutionsData === 'function') {
-                    await window.loadExecutionsData();
+                if (typeof window.initializeExecutionsPage === 'function') {
+                    window.initializeExecutionsPage();
                 }
             }
         ]
@@ -3168,12 +3162,8 @@ const PAGE_CONFIGS = {
             async (pageConfig) => {
                 console.log('🔔 Initializing Alerts...');
                 
-                if (typeof window.loadAlertsData === 'function') {
-                    await window.loadAlertsData();
-                }
-                
-                if (typeof window.setupAlertHandlers === 'function') {
-                    window.setupAlertHandlers();
+                if (typeof window.initializeAlertsPage === 'function') {
+                    window.initializeAlertsPage();
                 }
             }
         ]
@@ -3230,8 +3220,8 @@ const PAGE_CONFIGS = {
             async (pageConfig) => {
                 console.log('📝 Initializing Notes...');
                 
-                if (typeof window.loadNotesData === 'function') {
-                    await window.loadNotesData();
+                if (typeof window.initializeNotesPage === 'function') {
+                    window.initializeNotesPage();
                 }
             }
         ]

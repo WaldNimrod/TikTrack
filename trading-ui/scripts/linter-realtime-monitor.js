@@ -350,25 +350,6 @@ function toggleMonitoring() {
 }
 
 // DOM Content Loaded
-document.addEventListener('DOMContentLoaded', async function() {
-    console.log('🔍 Linter Realtime Monitor DOM loaded');
-    
-    try {
-        // Initialize linter system
-        await initializeLinterSystem();
-        
-        // Initialize traffic lights
-        updateTrafficLights();
-        console.log('🚦 Traffic lights initialized');
-        
-        // Initialize charts after a delay to ensure all systems are ready
-        // Charts initialization disabled for now
-        console.log('📊 Charts initialization disabled');
-        
-    } catch (error) {
-        console.error('❌ Failed to initialize Linter Realtime Monitor:', error);
-    }
-});
 
 // ========================================
 // Load Existing File Mapping

@@ -314,20 +314,20 @@ async function loadTradesData() {
     updateTableStats();
 
   } catch (error) {
-    if (typeof handleDataLoadError === 'function') {
-      handleDataLoadError(error, 'נתוני טריידים');
+    console.error('❌ Error loading trades data:', error);
+    
+    // Use CRUDResponseHandler for unified error handling
+    if (typeof window.CRUDResponseHandler !== 'undefined') {
+      window.CRUDResponseHandler.handleNetworkError(error, {
+        tableId: 'tradesTable',
+        entityName: 'טריידים',
+        columns: 11
+      });
     } else {
-      // console.error('Error loading trades data:', error);
-    }
-
-    const tbody = document.querySelector('#tradesTable tbody');
-    if (tbody) {
-      tbody.innerHTML = '<tr><td colspan="11" class="text-center text-danger">שגיאה בטעינת נתונים: ' + error.message + '</td></tr>';
-    } else {
-      if (typeof handleElementNotFound === 'function') {
-        handleElementNotFound('#tradesTable tbody', 'CRITICAL');
-      } else {
-        // console.error('#tradesTable tbody element not found');
+      // Fallback if ResponseHandler not available
+      const tbody = document.querySelector('#tradesTable tbody');
+      if (tbody) {
+        tbody.innerHTML = '<tr><td colspan="11" class="text-center text-danger">שגיאה בטעינת נתונים: ' + error.message + '</td></tr>';
       }
     }
   }
@@ -1105,13 +1105,9 @@ async function loadEditTradeModalData(trade) {
     }
 
   } catch (error) {
-    if (typeof handleDataLoadError === 'function') {
-      handleDataLoadError(error, 'נתונים למודל עריכת טרייד');
-    } else {
-      // console.error('Error loading edit modal data:', error);
-    }
+    console.error('❌ Error loading edit modal data:', error);
     if (typeof window.showNotification === 'function') {
-      window.showErrorNotification('שגיאה בטעינת נתונים', 'שגיאה בטעינת נתונים למודל העריכה');
+      window.showNotification('שגיאה בטעינת נתונים למודל העריכה', 'error');
     }
   }
 }
@@ -1670,10 +1666,9 @@ async function loadModalData() {
     }
 
   } catch (error) {
-    if (typeof handleDataLoadError === 'function') {
-      handleDataLoadError(error, 'נתונים למודל');
-    } else {
-      // console.error('Error loading modal data:', error);
+    console.error('❌ Error loading modal data:', error);
+    if (typeof window.showNotification === 'function') {
+      window.showNotification('שגיאה בטעינת נתונים למודל', 'error');
     }
   }
 }
@@ -1756,11 +1751,7 @@ async function updateTickerFromTradePlan(tradePlanId) {
             document.getElementById('addTradeDailyChange').textContent = 'לא זמין';
           }
         } catch (error) {
-          if (typeof handleDataLoadError === 'function') {
-            handleDataLoadError(error, 'נתוני טיקר');
-          } else {
-            // console.error('Error loading ticker data:', error);
-          }
+          console.error('❌ Error loading ticker data:', error);
           // ערכי ברירת מחדל
           document.getElementById('addTradeCurrentPrice').textContent = 'לא זמין';
           document.getElementById('addTradeDailyChange').textContent = 'לא זמין';
@@ -1775,11 +1766,7 @@ async function updateTickerFromTradePlan(tradePlanId) {
     // הפעלת השדות אחרי טעינת נתוני הטיקר
     enableTradeFormFields();
   } catch (error) {
-    if (typeof handleDataLoadError === 'function') {
-      handleDataLoadError(error, 'עדכון טיקר');
-    } else {
-      // console.error('Error updating ticker:', error);
-    }
+    console.error('❌ Error updating ticker:', error);
   }
 }
 
@@ -2337,11 +2324,7 @@ async function loadTradePlanDates() {
         }
       } catch (error) {
         link.textContent = 'תוכנית קיימת';
-        if (typeof handleDataLoadError === 'function') {
-          handleDataLoadError(error, `תוכנית ${planId}`);
-        } else {
-          // console.error(`Error loading plan ${planId}:`, error);
-        }
+        console.error(`❌ Error loading plan ${planId}:`, error);
       }
     }
   }
@@ -2778,11 +2761,7 @@ async function updateEditTradeTickerFromPlan(tradePlanId) {
     }
 
   } catch (error) {
-    if (typeof handleDataLoadError === 'function') {
-      handleDataLoadError(error, 'עדכון טיקר במודל העריכה');
-    } else {
-      // console.error('Error updating ticker in edit modal:', error);
-    }
+    console.error('❌ Error updating ticker in edit modal:', error);
   }
 }
 
@@ -2826,11 +2805,7 @@ async function updateEditTradePriceFromTicker(tickerId) {
       }
     }
   } catch (error) {
-    if (typeof handleDataLoadError === 'function') {
-      handleDataLoadError(error, 'עדכון מחיר במודל העריכה');
-    } else {
-      // console.error('Error updating price in edit modal:', error);
-    }
+    console.error('❌ Error updating price in edit modal:', error);
   }
 }
 

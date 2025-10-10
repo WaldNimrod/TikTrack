@@ -2092,13 +2092,14 @@ function updateExecutionsTableForTradeModal(executions) {
     executions.forEach(execution => {
       const row = document.createElement('tr');
 
-      const typeBadge = execution.type === 'buy'
-        ? '<span class="badge bg-success">קניה</span>'
-        : '<span class="badge bg-danger">מכירה</span>';
+      // שימוש ב-FieldRendererService לעיצוב אחיד
+      const typeBadge = window.FieldRendererService ? 
+        window.FieldRendererService.renderSide(execution.type === 'buy' ? 'long' : 'short') :
+        (execution.type === 'buy' ? '<span class="badge bg-success">קניה</span>' : '<span class="badge bg-danger">מכירה</span>');
 
-      const statusBadge = execution.status === 'completed'
-        ? '<span class="badge bg-success">הושלם</span>'
-        : '<span class="badge bg-warning">ממתין</span>';
+      const statusBadge = window.FieldRendererService ? 
+        window.FieldRendererService.renderStatus(execution.status, 'execution') :
+        (execution.status === 'completed' ? '<span class="badge bg-success">הושלם</span>' : '<span class="badge bg-warning">ממתין</span>');
 
       row.innerHTML = `
                 <td>${execution.date}</td>

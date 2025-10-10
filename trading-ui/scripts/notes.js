@@ -1,5 +1,34 @@
 // ===== קובץ JavaScript פשוט לדף הערות =====
 
+// ===== Global Element Cache =====
+let addNoteModal = null;
+let addNoteModalElement = null;
+let editNoteModal = null;
+let editNoteModalElement = null;
+let deleteNoteModal = null;
+let deleteNoteModalElement = null;
+let viewNoteModal = null;
+let viewNoteModalElement = null;
+let addNoteForm = null;
+let noteRelatedObjectSelect = null;
+let editNoteRelatedObjectSelect = null;
+
+// Initialize on DOM ready
+document.addEventListener('DOMContentLoaded', () => {
+    addNoteModalElement = addNoteModalElement;
+    editNoteModalElement = editNoteModalElement;
+    deleteNoteModalElement = deleteNoteModalElement;
+    viewNoteModalElement = viewNoteModalElement;
+    addNoteForm = addNoteForm;
+    noteRelatedObjectSelect = noteRelatedObjectSelect;
+    editNoteRelatedObjectSelect = editNoteRelatedObjectSelect;
+    
+    if (addNoteModalElement) addNoteModal = new bootstrap.Modal(addNoteModalElement);
+    if (editNoteModalElement) editNoteModal = new bootstrap.Modal(editNoteModalElement);
+    if (deleteNoteModalElement) deleteNoteModal = new bootstrap.Modal(deleteNoteModalElement);
+    if (viewNoteModalElement) viewNoteModal = new bootstrap.Modal(viewNoteModalElement);
+});
+
 /**
  * הוספת הערה חדשה
  * פותח מודל להוספת הערה חדשה
@@ -633,7 +662,7 @@ function updateGridFromComponent(
 // פונקציות מודלים
 function showAddNoteModal() {
   // איפוס הטופס
-  document.getElementById('addNoteForm').reset();
+  addNoteForm.reset();
 
   // ניקוי עורך הטקסט
   setEditorContent('', 'add');
@@ -661,7 +690,7 @@ function showAddNoteModal() {
   }, 200);
 
   // הצגת המודל
-  const modal = new bootstrap.Modal(document.getElementById('addNoteModal'));
+  const modal = new bootstrap.Modal(addNoteModalElement);
   modal.show();
 }
 
@@ -674,7 +703,7 @@ function showEditNoteModal(noteId) {
   loadNoteData(noteId);
 
   // הצגת המודל
-  const modal = new bootstrap.Modal(document.getElementById('editNoteModal'));
+  const modal = new bootstrap.Modal(editNoteModalElement);
   modal.show();
 }
 
@@ -920,7 +949,7 @@ async function populateEditSelectByType(relationType, selectedId) {
     // בחירת הערך הנכון
     if (selectedId) {
       setTimeout(() => {
-        const select = document.getElementById('editNoteRelatedObjectSelect');
+        const select = editNoteRelatedObjectSelect;
         if (select) {
           select.value = selectedId;
         }
@@ -1105,7 +1134,7 @@ async function saveNote() {
       window.showSuccessNotification('הצלחה', 'הערה נשמרה בהצלחה!');
 
       // סגירת המודל וטעינה מחדש
-      const modal = bootstrap.Modal.getInstance(document.getElementById('addNoteModal'));
+      const modal = bootstrap.Modal.getInstance(addNoteModalElement);
       modal.hide();
       loadNotesData();
     } else {
@@ -1165,7 +1194,7 @@ async function updateNoteFromModal() {
   const noteId = document.getElementById('editNoteId').value;
   const content = getEditorContent('edit');
   const relationType = document.querySelector('input[name="editNoteRelationType"]:checked')?.value;
-  const relatedId = document.getElementById('editNoteRelatedObjectSelect').value;
+  const relatedId = editNoteRelatedObjectSelect.value;
   const attachment = document.getElementById('editNoteAttachment').files[0];
 
   // בדיקה אם נדרשת מחיקת קובץ
@@ -1228,7 +1257,7 @@ async function updateNoteFromModal() {
       window.replaceAttachmentFlag = false;
 
       // סגירת המודל וטעינה מחדש
-      const modal = bootstrap.Modal.getInstance(document.getElementById('editNoteModal'));
+      const modal = bootstrap.Modal.getInstance(editNoteModalElement);
       modal.hide();
       loadNotesData();
     } else {
@@ -1287,7 +1316,7 @@ async function updateNoteFromModal() {
 
 async function confirmDeleteNote(noteId) {
   // סגירת המודל
-  const modal = bootstrap.Modal.getInstance(document.getElementById('deleteNoteModal'));
+  const modal = bootstrap.Modal.getInstance(deleteNoteModalElement);
   if (modal) {
     modal.hide();
   }
@@ -1383,9 +1412,9 @@ function clearNoteValidationErrors() {
 //   case 'editRelationTypeError':
 //     return document.querySelector('input[name="editNoteRelationType"]:checked')?.closest('.col-md-6');
 //   case 'relatedObjectError':
-//     return document.getElementById('noteRelatedObjectSelect');
+//     return noteRelatedObjectSelect;
 //   case 'editRelatedObjectError':
-//     return document.getElementById('editNoteRelatedObjectSelect');
+//     return editNoteRelatedObjectSelect;
 //   default:
 //     return null;
 //   }
@@ -1497,7 +1526,7 @@ function setupNoteValidationEvents() {
   }
 
   // ולידציה לבחירת אובייקט
-  const relatedObjectSelect = document.getElementById('noteRelatedObjectSelect');
+  const relatedObjectSelect = noteRelatedObjectSelect;
   if (relatedObjectSelect) {
     relatedObjectSelect.addEventListener('change', function () {
       if (this.value) {
@@ -1520,7 +1549,7 @@ function setupNoteValidationEvents() {
   }
 
   // ולידציה לבחירת אובייקט בעריכה
-  const editRelatedObjectSelect = document.getElementById('editNoteRelatedObjectSelect');
+  const editRelatedObjectSelect = editNoteRelatedObjectSelect;
   if (editRelatedObjectSelect) {
     editRelatedObjectSelect.addEventListener('change', function () {
       if (this.value) {
@@ -1925,7 +1954,7 @@ function viewNote(noteId) {
   loadNoteForViewing(noteId);
 
   // הצגת המודל
-  const modal = new bootstrap.Modal(document.getElementById('viewNoteModal'));
+  const modal = new bootstrap.Modal(viewNoteModalElement);
   modal.show();
 }
 
@@ -2000,7 +2029,7 @@ function editCurrentNote() {
   const noteId = window.currentViewingNoteId;
   if (noteId) {
     // סגירת מודל הצפייה
-    const viewModal = bootstrap.Modal.getInstance(document.getElementById('viewNoteModal'));
+    const viewModal = bootstrap.Modal.getInstance(viewNoteModalElement);
     viewModal.hide();
 
     // פתיחת מודל העריכה
@@ -2206,9 +2235,9 @@ function generateDetailedLog() {
                 activeFilter: document.querySelector('.btn.active')?.textContent || 'לא נמצא'
             },
             modals: {
-                addModal: document.getElementById('addNoteModal') ? 'זמין' : 'לא זמין',
-                editModal: document.getElementById('editNoteModal') ? 'זמין' : 'לא זמין',
-                deleteModal: document.getElementById('deleteNoteModal') ? 'זמין' : 'לא זמין'
+                addModal: addNoteModalElement ? 'זמין' : 'לא זמין',
+                editModal: editNoteModalElement ? 'זמין' : 'לא זמין',
+                deleteModal: deleteNoteModalElement ? 'זמין' : 'לא זמין'
             },
             functions: {
                 addNote: typeof window.addNote === 'function' ? 'זמין' : 'לא זמין',

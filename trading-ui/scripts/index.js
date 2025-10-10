@@ -305,7 +305,7 @@ async function refreshAllCharts() {
         ]);
         
         if (window.showNotification) {
-            window.showNotification('success', 'כל הגרפים רוענו בהצלחה');
+            window.showNotification('כל הגרפים רוענו בהצלחה', 'success');
         }
         
         console.log('✅ All charts refreshed successfully');

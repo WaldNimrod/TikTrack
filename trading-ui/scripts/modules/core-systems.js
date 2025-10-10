@@ -532,16 +532,34 @@ class UnifiedAppInitializer {
     async manualInitialization(config) {
         console.log('🔧 Manual initialization fallback...');
         
-        // Initialize Header System (Stage 2: UI Systems)
+        // Initialize Header System (Stage 2: UI Systems) - CRITICAL!
         if (typeof window.initializeHeaderSystem === 'function') {
             console.log('🎯 Initializing Header System...');
             window.initializeHeaderSystem();
+        } else {
+            console.warn('⚠️ initializeHeaderSystem not available');
         }
         
         // Initialize Notification System
-        if (typeof window.NotificationSystem !== 'undefined' && window.NotificationSystem.initialize) {
+        if (this.availableSystems.has('notification') && typeof window.NotificationSystem !== 'undefined') {
             console.log('🔔 Initializing Notification System...');
             await window.NotificationSystem.initialize();
+        }
+        
+        // Initialize page-specific systems
+        if (config.requiresFilters && this.availableSystems.has('pageFilters')) {
+            await window.initializePageFilters(config.name);
+        }
+        
+        if (config.requiresValidation && this.availableSystems.has('validation')) {
+            const forms = document.querySelectorAll('form[id]');
+            for (const form of forms) {
+                await window.initializeValidation(form.id);
+            }
+        }
+        
+        if (config.requiresTables && this.availableSystems.has('tables')) {
+            window.setupSortableHeaders();
         }
         
         console.log('✅ Manual initialization completed');
@@ -855,33 +873,7 @@ class UnifiedAppInitializer {
         }
     }
 
-    /**
-     * Manual initialization fallback
-     */
-    async manualInitialization(config) {
-        console.log('🔧 Manual initialization fallback...');
-        
-        // Initialize core systems
-        if (this.availableSystems.has('notification') && typeof window.NotificationSystem !== 'undefined') {
-            await window.NotificationSystem.initialize();
-        }
-        
-        // Initialize page-specific systems
-        if (config.requiresFilters && this.availableSystems.has('pageFilters')) {
-            await window.initializePageFilters(config.name);
-        }
-        
-        if (config.requiresValidation && this.availableSystems.has('validation')) {
-            const forms = document.querySelectorAll('form[id]');
-            for (const form of forms) {
-                await window.initializeValidation(form.id);
-            }
-        }
-        
-        if (config.requiresTables && this.availableSystems.has('tables')) {
-            window.setupSortableHeaders();
-        }
-    }
+    // REMOVED: Duplicate manualInitialization - see line 532 for the unified version
 
     /**
      * Add custom initializer

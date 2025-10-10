@@ -1623,8 +1623,10 @@ async function _showAddCashFlowModal() {
       addCashFlowModal.show();
     }
   } catch (error) {
-    handleDataLoadError(error, 'טעינת נתונים להוספה');
-    window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתונים להוספה');
+    console.error('❌ Error loading data for add modal:', error);
+    if (window.showNotification) {
+      window.showNotification('שגיאה בטעינת נתונים להוספה', 'error');
+    }
   }
 }
 
@@ -1679,8 +1681,10 @@ async function _showEditCashFlowModal(id) {
       editCashFlowModal.show();
     }
   } catch (error) {
-    handleDataLoadError(error, 'טעינת נתונים לעריכה');
-    window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתונים לעריכה');
+    console.error('❌ Error loading data for edit modal:', error);
+    if (window.showNotification) {
+      window.showNotification('שגיאה בטעינת נתונים לעריכה', 'error');
+    }
   }
 }
 

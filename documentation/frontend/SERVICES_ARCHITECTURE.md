@@ -3,8 +3,8 @@
 
 **תאריך יצירה:** 9 בינואר 2025  
 **עדכון אחרון:** 10 באוקטובר 2025  
-**גרסה:** 2.0.0 🎉  
-**סטטוס:** ✅ **5/6 מערכות הושלמו במלואן!** (83% השלמה)
+**גרסה:** 2.5.0 (ביניים)  
+**סטטוס:** 🔄 **5/6 מערכות הושלמו + CRUDResponseHandler בתהליך (44% הושלם)**
 
 ---
 
@@ -400,9 +400,38 @@ await CRUDResponseHandler.handleSaveResponse(response, {
     modalId: 'addTradeModal',              // ID של modal לסגירה
     successMessage: 'טרייד נוסף בהצלחה',  // הודעת הצלחה
     reloadFn: window.loadTradesData,       // פונקציית רענון
-    entityName: 'טרייד'                    // שם הישות (להודעות)
+    entityName: 'טרייד',                   // שם הישות (להודעות)
+    customValidationParser: (errorMessage, errorData) => [  // ⭐ חדש! parser לשגיאות ברמת שדות
+        { fieldId: 'fieldName', message: 'הודעת שגיאה' }
+    ]
 }
 ```
+
+#### ⭐ חדש! customValidationParser - Field-level Validation
+**נוסף:** 10.10.2025
+
+מאפשר פירוק שגיאות validation לשדות ספציפיים וסימון ב-UI:
+
+```javascript
+await CRUDResponseHandler.handleSaveResponse(response, {
+    customValidationParser: (errorMessage) => {
+        if (!errorMessage.includes('validation failed')) return null;
+        
+        const errors = errorMessage.split('; ');
+        return errors.map(error => {
+            if (error.includes("Field 'amount'")) {
+                return { fieldId: 'cashFlowAmount', message: 'סכום חייב להיות שונה מ-0' };
+            }
+            // ... עוד שדות
+        }).filter(Boolean);
+    }
+});
+```
+
+**יתרונות:**
+- ✅ UX משופר - המשתמש רואה איזה שדה בעייתי
+- ✅ סימון אדום של שדות בעייתיים
+- ✅ הודעות שגיאה ספציפיות ומתורגמות
 
 #### דוגמת שימוש מלאה:
 ```javascript
@@ -435,28 +464,30 @@ async function saveTrade() {
 ```
 
 #### סטטוס שילוב:
-- 🔄 **בתהליך** - התחיל 10.10.2025
-- ✅ **1/8 עמודים** שולבו (trading_accounts.js)
-- 🔄 **2/~18 פונקציות** שולבו
+- 🔄 **בתהליך מתקדם** - 10.10.2025
+- ✅ **4/8 עמודים הושלמו** + 1 עמוד חלקי
+- 🔄 **11/~25 פונקציות** שולבו (44%)
+- ⭐ **תוספת חדשה:** customValidationParser - field-level validation!
 
 #### פירוט התקדמות:
 
 | # | עמוד | פונקציות | סטטוס |
 |---|------|----------|-------|
-| 1 | trading_accounts.js | save, update | ✅ הושלם |
-| 2 | trades.js | save, update | ⏳ ממתין |
-| 3 | cash_flows.js | save, update | ⏳ ממתין |
-| 4 | trade_plans.js | save, update, delete | ⏳ ממתין |
-| 5 | executions.js | save, update, delete | ⏳ ממתין |
-| 6 | tickers.js | save, update, delete | ⏳ ממתין |
-| 7 | alerts.js | save, update, delete | ⏳ ממתין |
-| 8 | notes.js | save, update, delete | ⏳ ממתין |
-| **סה"כ** | **1/8 (12%)** | **2/~18 (11%)** | **בתהליך** |
+| 1 | trading_accounts.js | save, update (2) | ✅ 100% |
+| 2 | trades.js | add, update, delete (3) | ✅ 100% |
+| 3 | executions.js | save, update (2) | ✅ 100% |
+| 4 | alerts.js | save, update, delete (3) | ✅ 100% |
+| 5 | cash_flows.js | save + parser (1/3) | 🔄 33% |
+| 6 | trade_plans.js | צריך המרת Promise chains | ⏳ ממתין |
+| 7 | tickers.js | צריך שילוב helper functions | ⏳ ממתין |
+| 8 | notes.js | צריך בדיקה | ⏳ ממתין |
+| **סה"כ** | **4.3/8 (54%)** | **11/~25 (44%)** | **בתהליך** |
 
-#### חיסכון צפוי:
-- **שורות קוד:** ~900 שורות (כאשר יושלם)
-- **פונקציות:** 18 → 1 מערכת מרכזית
-- **אחידות:** 100% - טיפול זהה בכל התגובות
+#### חיסכון בפועל עד כה:
+- **שורות קוד:** ~250 שורות (מתוך ~900 צפוי)
+- **עמודים מושלמים:** 4/8
+- **תוספת חדשה:** customValidationParser - UX משופר!
+- **אחידות:** 50%+ מהמערכת כבר סטנדרטית
 
 ---
 

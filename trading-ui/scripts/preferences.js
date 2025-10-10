@@ -1667,10 +1667,14 @@ window.populatePreferencesForm = async function(preferences) {
             'entityTradePlanColor', 'entityTradePlanColorLight', 'entityTradePlanColorDark',
             'entityResearchColor', 'entityResearchColorLight', 'entityResearchColorDark',
             'entityPreferencesColor', 'entityPreferencesColorLight', 'entityPreferencesColorDark',
-            // צבעי ערכים
-            'valuePositiveColor', 'valuePositiveColorLight', 'valuePositiveColorDark',
-            'valueNegativeColor', 'valueNegativeColorLight', 'valueNegativeColorDark',
-            'valueNeutralColor', 'valueNeutralColorLight', 'valueNeutralColorDark',
+            // צבעי סטטוסים
+            'statusOpenColor', 'statusClosedColor', 'statusCancelledColor',
+            // צבעי סוגי השקעה
+            'typeSwingColor', 'typeInvestmentColor', 'typePassiveColor',
+            // צבעי עדיפויות
+            'priorityHighColor', 'priorityMediumColor', 'priorityLowColor',
+            // צבעי ערכים מספריים
+            'valuePositiveColor', 'valueNegativeColor', 'valueNeutralColor',
             // צבעי גרפים
             'chartPrimaryColor', 'chartBackgroundColor', 'chartTextColor',
             'chartPointColor', 'chartGridColor', 'chartBorderColor'
@@ -1936,16 +1940,25 @@ window.loadDefaultColors = function() {
             entityCashFlowColorLight: '#e6fcf5',
             entityCashFlowColorDark: '#17a085',
             
-            // צבעי ערכים מספריים (3 וריאנטים)
+            // צבעי סטטוסים (צבע אחד לכל סטטוס)
+            statusOpenColor: '#28a745',
+            statusClosedColor: '#6c757d',
+            statusCancelledColor: '#dc3545',
+            
+            // צבעי סוגי השקעה (צבע אחד לכל סוג)
+            typeSwingColor: '#007bff',
+            typeInvestmentColor: '#28a745',
+            typePassiveColor: '#6c757d',
+            
+            // צבעי עדיפויות (צבע אחד לכל עדיפות)
+            priorityHighColor: '#dc3545',
+            priorityMediumColor: '#ffc107',
+            priorityLowColor: '#28a745',
+            
+            // צבעי ערכים מספריים (צבע אחד לכל סוג)
             valuePositiveColor: '#28a745',
-            valuePositiveColorLight: '#e8f5e8',
-            valuePositiveColorDark: '#1e7e34',
             valueNegativeColor: '#dc3545',
-            valueNegativeColorLight: '#fdeaea',
-            valueNegativeColorDark: '#c82333',
             valueNeutralColor: '#6c757d',
-            valueNeutralColorLight: '#f8f9fa',
-            valueNeutralColorDark: '#495057',
             
             // צבעי גרפים
             chartPrimaryColor: '#007bff',

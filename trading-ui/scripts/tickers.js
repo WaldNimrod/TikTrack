@@ -634,22 +634,7 @@ function handleSaveErrorResponse(response, errorData, symbol) {
 /**
  * טיפול בהצלחת שמירת טיקר
  */
-async function handleTickerSaveSuccess(symbol) {
-  if (window.showSuccessNotification) {
-    window.showSuccessNotification('הצלחה', `טיקר ${symbol} נוסף בהצלחה`);
-  }
-
-        const modal = bootstrap.Modal.getInstance(addTickerModalElement);
-  // ניקוי מטמון tickers
-  if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-    await window.UnifiedCacheManager.remove('tickers');
-    console.log('✅ מטמון tickers נוקה אחרי שמירה');
-  }
-  modal?.hide();
-
-        await loadTickersData();
-        await updateActiveTradesField();
-}
+// ❌ הוסר - משתמשים ב-CRUDResponseHandler במקום
 
 /**
  * שמירת טיקר חדש - גרסה מחודשת ומאופטמת
@@ -668,15 +653,15 @@ async function saveTicker() {
     const existingTicker = (window.tickersData || []).find(t => 
       t.symbol.toUpperCase() === formData.symbol.toUpperCase()
     );
-    if (existingTicker) {
+  if (existingTicker) {
       if (window.showSimpleErrorNotification) {
         window.showSimpleErrorNotification(
           'שגיאת ולידציה',
           `הסמל ${formData.symbol} כבר קיים במערכת (טיקר: ${existingTicker.name})`
-        );
-      }
-      return;
+      );
     }
+    return;
+  }
 
     // בניית אובייקט נתונים (טיקר חדש תמיד closed)
     const tickerData = {
@@ -692,17 +677,22 @@ async function saveTicker() {
       body: JSON.stringify(tickerData)
     });
 
-    // טיפול בתגובה
-    if (!response.ok) {
-      const errorData = await response.json();
-      const handled = handleSaveErrorResponse(response, errorData, formData.symbol);
-      if (handled) return;
-      
-      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-    }
-
-    await response.json();
-    await handleTickerSaveSuccess(formData.symbol);
+    // טיפול בתגובה באמצעות CRUDResponseHandler
+    await window.CRUDResponseHandler.handleSaveResponse(response, {
+      modalId: 'addTickerModal',
+      successMessage: `טיקר ${formData.symbol} נוסף בהצלחה`,
+      reloadFn: async () => {
+        // ניקוי מטמון
+        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+          await window.UnifiedCacheManager.remove('tickers');
+          console.log('✅ מטמון tickers נוקה');
+        }
+        // רענון טבלה
+        await loadTickersData();
+        await updateActiveTradesField();
+      },
+      entityName: 'טיקר'
+    });
 
   } catch (error) {
     console.error('Error saving ticker:', error);
@@ -840,25 +830,7 @@ async function performTickerUpdateToServer(id, tickerData) {
   return response;
 }
 
-/**
- * טיפול בהצלחת עדכון טיקר
- */
-async function handleTickerUpdateSuccess(symbol) {
-  // ניקוי מטמון tickers
-  if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-    await window.UnifiedCacheManager.remove('tickers');
-    console.log('✅ מטמון tickers נוקה אחרי עדכון');
-  }
-      const modal = bootstrap.Modal.getInstance(editTickerModalElement);
-  modal?.hide();
-
-      if (window.showSuccessNotification) {
-    window.showSuccessNotification('הצלחה', `טיקר ${symbol} עודכן בהצלחה`);
-      }
-
-      await loadTickersData();
-      await updateActiveTradesField();
-}
+// ❌ handleTickerUpdateSuccess הוסר - משתמשים ב-CRUDResponseHandler במקום
 
 /**
  * עדכון טיקר קיים - גרסה מחודשת ומאופטמת
@@ -904,21 +876,22 @@ async function updateTicker() {
 
     const response = await performTickerUpdateToServer(formData.id, tickerData);
 
-    if (response.ok) {
-      await handleTickerUpdateSuccess(formData.symbol);
-    } else if (response.status === 404) {
-      console.warn(`טיקר ${formData.id} כבר לא קיים`);
-      if (window.showSuccessNotification) {
-        window.showSuccessNotification('מידע', 'הטיקר כבר לא קיים - מרענן נתונים');
-      }
-      await handleTickerUpdateSuccess(formData.symbol);
-    } else {
-      const error = await response.text();
-      handleApiError('שגיאה בעדכון טיקר', error);
-      if (window.showErrorNotification) {
-        window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון טיקר: ' + error);
-      }
-    }
+    // טיפול בתגובה באמצעות CRUDResponseHandler
+    await window.CRUDResponseHandler.handleUpdateResponse(response, {
+      modalId: 'editTickerModal',
+      successMessage: `טיקר ${formData.symbol} עודכן בהצלחה`,
+      reloadFn: async () => {
+        // ניקוי מטמון
+        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+          await window.UnifiedCacheManager.remove('tickers');
+          console.log('✅ מטמון tickers נוקה');
+        }
+        // רענון טבלה
+        await loadTickersData();
+        await updateActiveTradesField();
+      },
+      entityName: 'טיקר'
+    });
 
   } catch (error) {
     console.error('❌ שגיאה בעדכון טיקר:', error);
@@ -1472,45 +1445,29 @@ async function confirmDeleteTicker(id) {
       method: 'DELETE'
     });
 
-    // שימוש במערכת הגלובלית
-      const handled = await window.handleApiResponseWithRefresh(response, {
-        loadDataFunction: window.loadTickersData,
-        updateActiveFieldsFunction: window.updateActiveTradesField,
-        operationName: 'מחיקה',
-        itemName: tickerInfo,
+    // טיפול בתגובה באמצעות CRUDResponseHandler
+    await window.CRUDResponseHandler.handleDeleteResponse(response, {
       successMessage: `טיקר ${tickerInfo} נמחק בהצלחה`,
-      onSuccess: () => {
+      reloadFn: async () => {
+        // ניקוי מטמון
+        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+          await window.UnifiedCacheManager.remove('tickers');
+          console.log('✅ מטמון tickers נוקה');
+        }
+        // callback מיוחד
         if (window.onTickerDeleted) {
           window.onTickerDeleted(id);
         }
-      }
+        // רענון טבלה
+        await loadTickersData();
+        await updateActiveTradesField();
+      },
+      entityName: 'טיקר'
     });
-      
-      if (handled) {
-      return;
-    }
 
-    // טיפול בשגיאות
-      const errorResponse = await response.text();
-        const errorData = JSON.parse(errorResponse);
-
-    if (errorData.error?.message?.includes('linked items')) {
-            if (window.showLinkedItemsModal) {
-        const linkedResponse = await fetch(`/api/linked-items/ticker/${id}`);
-        if (linkedResponse.ok) {
-          const data = await linkedResponse.json();
-                window.showLinkedItemsModal(data, 'ticker', id);
-        }
-      } else if (window.showErrorNotification) {
-        window.showErrorNotification('שגיאה במחיקה', 'לא ניתן למחוק טיקר עם פריטים מקושרים');
-      }
-    } else if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה במחיקה', errorData.error?.message || 'שגיאה במחיקת טיקר');
-    }
-
-  } catch (error) {
+          } catch (error) {
     console.error('❌ שגיאה במחיקת טיקר:', error);
-    if (window.showErrorNotification) {
+            if (window.showErrorNotification) {
       window.showErrorNotification('שגיאה במחיקה', error.message);
     }
   }
@@ -2012,23 +1969,23 @@ window.initializeTickersPage = function() {
         window.initializeTickersModals();
     }
     
-    // שחזור מצב הסגירה
-    restoreTickersSectionState();
+  // שחזור מצב הסגירה
+  restoreTickersSectionState();
 
-    // טעינת צבעים מההעדפות לפני יישום על הכותרות
-    loadColorsAndApplyToHeaders();
+  // טעינת צבעים מההעדפות לפני יישום על הכותרות
+  loadColorsAndApplyToHeaders();
 
-    // אתחול וולידציה - שימוש בפונקציות הגלובליות
-    if (window.initializeValidation) {
-        // שימוש בוולידציה הגלובלית ללא כללים מותאמים
-        window.initializeValidation('addTickerForm', {});
-        window.initializeValidation('editTickerForm', {});
-    }
+  // אתחול וולידציה - שימוש בפונקציות הגלובליות
+  if (window.initializeValidation) {
+    // שימוש בוולידציה הגלובלית ללא כללים מותאמים
+    window.initializeValidation('addTickerForm', {});
+    window.initializeValidation('editTickerForm', {});
+  }
 
-    // שחזור מצב סידור
-    restoreSortState();
+  // שחזור מצב סידור
+  restoreSortState();
 
-    // טעינת נתוני טיקרים
+  // טעינת נתוני טיקרים
     if (typeof window.loadTickersData === 'function') {
         window.loadTickersData();
     }

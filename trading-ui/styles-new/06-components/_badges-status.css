@@ -24,41 +24,41 @@
 /* סגנון outline - סטטוס open (ירוק) */
 .status-badge[data-status-category="open"],
 .status-badge-open {
-  background-color: var(--numeric-positive-light);
-  color: var(--numeric-positive-medium);
-  border: 1px solid var(--numeric-positive-border);
+  background-color: color-mix(in srgb, var(--status-open-color) 10%, white);
+  color: var(--status-open-color);
+  border: 1px solid color-mix(in srgb, var(--status-open-color) 30%, white);
 }
 
 /* סגנון outline - סטטוס closed (אפור) */
 .status-badge[data-status-category="closed"],
 .status-badge-closed {
-  background-color: var(--numeric-zero-light);
-  color: var(--numeric-zero-medium);
-  border: 1px solid var(--numeric-zero-border);
+  background-color: color-mix(in srgb, var(--status-closed-color) 10%, white);
+  color: var(--status-closed-color);
+  border: 1px solid color-mix(in srgb, var(--status-closed-color) 30%, white);
 }
 
 /* סגנון outline - סטטוס cancelled (אדום) */
 .status-badge[data-status-category="cancelled"],
 .status-badge-cancelled {
-  background-color: var(--numeric-negative-light);
-  color: var(--numeric-negative-medium);
-  border: 1px solid var(--numeric-negative-border);
+  background-color: color-mix(in srgb, var(--status-cancelled-color) 10%, white);
+  color: var(--status-cancelled-color);
+  border: 1px solid color-mix(in srgb, var(--status-cancelled-color) 30%, white);
 }
 
 /* סגנון outline - triggered (אזהרה - צהוב) */
 .status-badge[data-status-category="warning"],
 .status-badge-triggered {
-  background-color: var(--color-warning-light);
+  background-color: color-mix(in srgb, var(--color-warning) 10%, white);
   color: var(--color-warning);
-  border: 1px solid var(--color-warning-border);
+  border: 1px solid color-mix(in srgb, var(--color-warning) 30%, white);
 }
 
 /* סגנון outline - not_triggered (מידע - כחול) */
 .status-badge[data-status-category="info"],
 .status-badge-not-triggered {
-  background-color: var(--color-info-light);
+  background-color: color-mix(in srgb, var(--color-info) 10%, white);
   color: var(--color-info);
-  border: 1px solid var(--color-info-border);
+  border: 1px solid color-mix(in srgb, var(--color-info) 30%, white);
 }
 
 /* אפקט hover עדין */
@@ -83,37 +83,290 @@
   left: 100%;
 }
 
+/* ===== TYPE BADGES - סוגי השקעה ===== */
+
+/* סגנון בסיסי לכל type badges - קפסולה בגודל בינוני */
+.type-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Swing - כחול */
+.type-badge-swing {
+  background-color: color-mix(in srgb, var(--type-swing-color) 10%, white);
+  color: var(--type-swing-color);
+  border: 1px solid color-mix(in srgb, var(--type-swing-color) 30%, white);
+}
+
+/* Investment - ירוק */
+.type-badge-investment {
+  background-color: color-mix(in srgb, var(--type-investment-color) 10%, white);
+  color: var(--type-investment-color);
+  border: 1px solid color-mix(in srgb, var(--type-investment-color) 30%, white);
+}
+
+/* Passive - אפור */
+.type-badge-passive {
+  background-color: color-mix(in srgb, var(--type-passive-color) 10%, white);
+  color: var(--type-passive-color);
+  border: 1px solid color-mix(in srgb, var(--type-passive-color) 30%, white);
+}
+
+/* אפקט hover */
+.type-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* אנימציה מבריקה */
+.type-badge::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.type-badge:hover::before {
+  left: 100%;
+}
+
+/* ===== PRIORITY BADGES - עדיפויות ===== */
+
+/* סגנון בסיסי לכל priority badges - קפסולה בגודל בינוני */
+.priority-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* High - אדום */
+.priority-badge-high {
+  background-color: color-mix(in srgb, var(--priority-high-color) 10%, white);
+  color: var(--priority-high-color);
+  border: 1px solid color-mix(in srgb, var(--priority-high-color) 30%, white);
+}
+
+/* Medium - צהוב */
+.priority-badge-medium {
+  background-color: color-mix(in srgb, var(--priority-medium-color) 10%, white);
+  color: var(--priority-medium-color);
+  border: 1px solid color-mix(in srgb, var(--priority-medium-color) 30%, white);
+}
+
+/* Low - ירוק */
+.priority-badge-low {
+  background-color: color-mix(in srgb, var(--priority-low-color) 10%, white);
+  color: var(--priority-low-color);
+  border: 1px solid color-mix(in srgb, var(--priority-low-color) 30%, white);
+}
+
+/* אפקט hover */
+.priority-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* אנימציה מבריקה - הסרת הקוד הישן והחלפה בנקי */
 .priority-badge::before {
-content: '' ;
-  position: absolute ;
-  top: 0 ;
-  left: -100% ;
-  width: 100% ;
-  height: 100% ;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent) ;
-  transition: left 0.5s ease ;
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
 }
 
 .priority-badge:hover::before {
-left: 100% ;
+  left: 100%;
 }
 
-.priority-badge.priority-high {
-background: linear-gradient(135deg, rgba(244, 67, 54, 0.2) 0%, rgba(229, 57, 53, 0.2) 100%) ;
-  color: #d32f2f ;
-  box-shadow: 0 2px 6px rgba(244, 67, 54, 0.1) ;
+/* ===== SIDE BADGES - Long/Short ===== */
+
+/* סגנון בסיסי לכל side badges - קפסולה בגודל בינוני */
+.side-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
 }
 
-.priority-badge.priority-medium {
-background: linear-gradient(135deg, rgba(255, 152, 0, 0.2) 0%, rgba(255, 143, 0, 0.2) 100%) ;
-  color: #f57c00 ;
-  box-shadow: 0 2px 6px rgba(255, 152, 0, 0.1) ;
+/* Long - ירוק (positive) */
+.side-badge-positive,
+.side-badge-long {
+  background-color: color-mix(in srgb, var(--numeric-positive-color) 10%, white);
+  color: var(--numeric-positive-color);
+  border: 1px solid color-mix(in srgb, var(--numeric-positive-color) 30%, white);
 }
 
-.priority-badge.priority-low {
-background: linear-gradient(135deg, rgba(76, 175, 80, 0.2) 0%, rgba(67, 160, 71, 0.2) 100%) ;
-  color: #388e3c ;
-  box-shadow: 0 2px 6px rgba(76, 175, 80, 0.1) ;
+/* Short - אדום (negative) */
+.side-badge-negative,
+.side-badge-short {
+  background-color: color-mix(in srgb, var(--numeric-negative-color) 10%, white);
+  color: var(--numeric-negative-color);
+  border: 1px solid color-mix(in srgb, var(--numeric-negative-color) 30%, white);
+}
+
+/* אפקט hover */
+.side-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* אנימציה מבריקה */
+.side-badge::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.side-badge:hover::before {
+  left: 100%;
+}
+
+/* ===== ACTION BADGES - Buy/Sale ===== */
+
+/* סגנון בסיסי לכל action badges - קפסולה בגודל בינוני */
+.action-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Buy - ירוק (positive) */
+.action-badge-positive,
+.action-badge-buy {
+  background-color: color-mix(in srgb, var(--numeric-positive-color) 10%, white);
+  color: var(--numeric-positive-color);
+  border: 1px solid color-mix(in srgb, var(--numeric-positive-color) 30%, white);
+}
+
+/* Sale - אדום (negative) */
+.action-badge-negative,
+.action-badge-sale {
+  background-color: color-mix(in srgb, var(--numeric-negative-color) 10%, white);
+  color: var(--numeric-negative-color);
+  border: 1px solid color-mix(in srgb, var(--numeric-negative-color) 30%, white);
+}
+
+/* אפקט hover */
+.action-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* אנימציה מבריקה */
+.action-badge::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.action-badge:hover::before {
+  left: 100%;
+}
+
+/* ===== NUMERIC BADGES - ערכים מספריים ===== */
+
+/* סגנון בסיסי לכל numeric badges - קפסולה בגודל בינוני */
+.numeric-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  direction: ltr;
+}
+
+/* Positive - ירוק */
+.numeric-badge-positive {
+  background-color: color-mix(in srgb, var(--numeric-positive-color) 10%, white);
+  color: var(--numeric-positive-color);
+  border: 1px solid color-mix(in srgb, var(--numeric-positive-color) 30%, white);
+}
+
+/* Negative - אדום */
+.numeric-badge-negative {
+  background-color: color-mix(in srgb, var(--numeric-negative-color) 10%, white);
+  color: var(--numeric-negative-color);
+  border: 1px solid color-mix(in srgb, var(--numeric-negative-color) 30%, white);
+}
+
+/* Neutral/Zero - אפור */
+.numeric-badge-neutral {
+  background-color: color-mix(in srgb, var(--numeric-zero-color) 10%, white);
+  color: var(--numeric-zero-color);
+  border: 1px solid color-mix(in srgb, var(--numeric-zero-color) 30%, white);
+}
+
+/* אפקט hover */
+.numeric-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* אנימציה מבריקה */
+.numeric-badge::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.numeric-badge:hover::before {
+  left: 100%;
 }
 
 .numeric-text-negative {

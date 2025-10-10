@@ -79,31 +79,10 @@ class FieldRendererService {
         const sideNormalized = side.toLowerCase();
         const isLong = sideNormalized === 'long';
         
-        // צבעים מההעדפות או fallback
-        let color, bgColor, borderColor;
+        // Long = positive (ירוק), Short = negative (אדום)
+        const colorClass = isLong ? 'positive' : 'negative';
         
-        if (window.getStatusColor && window.getStatusBackgroundColor) {
-            color = isLong ? 
-                window.getStatusColor('open', 'medium') : 
-                window.getStatusColor('closed', 'medium');
-            bgColor = isLong ? 
-                window.getStatusBackgroundColor('open') : 
-                window.getStatusBackgroundColor('closed');
-            borderColor = color;
-        } else {
-            // Fallback colors
-            if (isLong) {
-                color = 'var(--numeric-positive-medium, #28a745)';
-                bgColor = 'var(--numeric-positive-light, #d4edda)';
-                borderColor = 'var(--numeric-positive-border, #c3e6cb)';
-            } else {
-                color = 'var(--numeric-negative-medium, #dc3545)';
-                bgColor = 'var(--numeric-negative-light, #f8d7da)';
-                borderColor = 'var(--numeric-negative-border, #f5c6cb)';
-            }
-        }
-        
-        return `<span class="side-badge side-${sideNormalized}" style="background-color: ${bgColor}; color: ${color}; border: 1px solid ${borderColor};">
+        return `<span class="side-badge side-badge-${sideNormalized} side-badge-${colorClass}">
             ${side}
         </span>`;
     }
@@ -130,33 +109,20 @@ class FieldRendererService {
         const isPositive = numValue > 0;
         const isZero = numValue === 0;
         
-        // צבעים
-        let color, bgColor, borderColor, cssClass;
-        
+        // קביעת מחלקת CSS לפי סימן
+        let cssClass;
         if (isZero) {
-            // אפס - אפור
-            color = 'var(--numeric-neutral-medium, #6c757d)';
-            bgColor = 'var(--numeric-neutral-light, #f8f9fa)';
-            borderColor = 'var(--numeric-neutral-border, #dee2e6)';
             cssClass = 'neutral';
         } else if (isPositive) {
-            // חיובי - ירוק
-            color = 'var(--numeric-positive-medium, #28a745)';
-            bgColor = 'var(--numeric-positive-light, #d4edda)';
-            borderColor = 'var(--numeric-positive-border, #c3e6cb)';
             cssClass = 'positive';
         } else {
-            // שלילי - אדום
-            color = 'var(--numeric-negative-medium, #dc3545)';
-            bgColor = 'var(--numeric-negative-light, #f8d7da)';
-            borderColor = 'var(--numeric-negative-border, #f5c6cb)';
             cssClass = 'negative';
         }
         
         const displayValue = numValue.toFixed(2);
         const prefix = (showPrefix && isPositive) ? '+' : '';
         
-        return `<span class="numeric-badge ${cssClass}" style="background-color: ${bgColor}; color: ${color}; border: 1px solid ${borderColor};">
+        return `<span class="numeric-badge numeric-badge-${cssClass}">
             ${prefix}${displayValue}${suffix}
         </span>`;
     }
@@ -214,16 +180,6 @@ class FieldRendererService {
         
         const typeNormalized = type.toLowerCase();
         
-        // מיפוי צבעים לפי סוג
-        const colorMap = {
-            'swing': { color: '#007bff', bg: 'rgba(0, 123, 255, 0.1)', border: '#007bff' },
-            'investment': { color: '#28a745', bg: 'rgba(40, 167, 69, 0.1)', border: '#28a745' },
-            'passive': { color: '#6c757d', bg: 'rgba(108, 117, 125, 0.1)', border: '#6c757d' },
-            'default': { color: '#6c757d', bg: 'rgba(108, 117, 125, 0.1)', border: '#6c757d' }
-        };
-        
-        const colors = colorMap[typeNormalized] || colorMap.default;
-        
         // תרגום לעברית
         const typeTranslations = {
             'swing': 'סווינג',
@@ -233,7 +189,7 @@ class FieldRendererService {
         
         const displayType = typeTranslations[typeNormalized] || type;
         
-        return `<span class="type-badge type-${typeNormalized}" style="background-color: ${colors.bg}; color: ${colors.color}; border: 1px solid ${colors.border};">
+        return `<span class="type-badge type-badge-${typeNormalized}">
             ${displayType}
         </span>`;
     }
@@ -253,15 +209,13 @@ class FieldRendererService {
         const actionNormalized = action.toLowerCase();
         const isBuy = actionNormalized === 'buy';
         
-        // צבעים
-        const color = isBuy ? '#28a745' : '#dc3545';
-        const bgColor = isBuy ? 'rgba(40, 167, 69, 0.1)' : 'rgba(220, 53, 69, 0.1)';
-        const borderColor = color;
+        // Buy = positive (ירוק), Sale = negative (אדום)
+        const colorClass = isBuy ? 'positive' : 'negative';
         
         // תרגום
         const displayAction = isBuy ? 'קניה' : 'מכירה';
         
-        return `<span class="action-badge action-${actionNormalized}" style="background-color: ${bgColor}; color: ${color}; border: 1px solid ${borderColor};">
+        return `<span class="action-badge action-badge-${actionNormalized} action-badge-${colorClass}">
             ${displayAction}
         </span>`;
     }
@@ -280,16 +234,6 @@ class FieldRendererService {
         
         const priorityNormalized = priority.toLowerCase();
         
-        // מיפוי צבעים
-        const colorMap = {
-            'high': { color: '#dc3545', bg: 'rgba(220, 53, 69, 0.1)', border: '#dc3545' },
-            'medium': { color: '#ffc107', bg: 'rgba(255, 193, 7, 0.1)', border: '#ffc107' },
-            'low': { color: '#28a745', bg: 'rgba(40, 167, 69, 0.1)', border: '#28a745' },
-            'default': { color: '#6c757d', bg: 'rgba(108, 117, 125, 0.1)', border: '#6c757d' }
-        };
-        
-        const colors = colorMap[priorityNormalized] || colorMap.default;
-        
         // תרגום
         const priorityTranslations = {
             'high': 'גבוהה',
@@ -299,7 +243,7 @@ class FieldRendererService {
         
         const displayPriority = priorityTranslations[priorityNormalized] || priority;
         
-        return `<span class="priority-badge priority-${priorityNormalized}" style="background-color: ${colors.bg}; color: ${colors.color}; border: 1px solid ${colors.border};">
+        return `<span class="priority-badge priority-badge-${priorityNormalized}">
             ${displayPriority}
         </span>`;
     }
@@ -375,45 +319,6 @@ class FieldRendererService {
         return genericTranslations[status.toLowerCase()] || status;
     }
 
-    /**
-     * קבלת צבעים דינמיים לסטטוס
-     * @private
-     */
-    static _getStatusColors(status) {
-        const normalizedStatus = status.toLowerCase();
-        
-        // מיפוי סטטוסים מיוחדים לסטטוסים סטנדרטיים
-        let mappedStatus = normalizedStatus;
-        if (normalizedStatus === 'triggered') {
-            mappedStatus = 'warning'; // צבע אזהרה
-        } else if (normalizedStatus === 'not_triggered') {
-            mappedStatus = 'info'; // צבע מידע
-        } else if (normalizedStatus === 'canceled') {
-            mappedStatus = 'cancelled'; // נרמול איות
-        }
-        
-        // ניסיון לקבל מהעדפות משתמש עם הווריאנטים
-        if (window.getStatusColor && typeof window.getStatusColor === 'function') {
-            return {
-                color: window.getStatusColor(mappedStatus, 'medium'),
-                bgColor: window.getStatusColor(mappedStatus, 'light'),
-                borderColor: window.getStatusColor(mappedStatus, 'border')
-            };
-        }
-        
-        // Fallback colors עם 3 ווריאנטים
-        const fallbackColors = {
-            'open': { color: '#28a745', bg: '#d4edda', border: '#c3e6cb' },
-            'closed': { color: '#6c757d', bg: '#e2e3e5', border: '#d6d8db' },
-            'cancelled': { color: '#dc3545', bg: '#f8d7da', border: '#f5c6cb' },
-            'warning': { color: '#ffc107', bg: '#fff3cd', border: '#ffeaa7' },
-            'info': { color: '#17a2b8', bg: '#d1ecf1', border: '#bee5eb' },
-            'default': { color: '#6c757d', bg: '#e2e3e5', border: '#d6d8db' }
-        };
-        
-        const colors = fallbackColors[mappedStatus] || fallbackColors.default;
-        return { color: colors.color, bgColor: colors.bg, borderColor: colors.border };
-    }
 }
 
 // ===== EXPORT TO GLOBAL SCOPE =====

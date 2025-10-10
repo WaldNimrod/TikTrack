@@ -1185,65 +1185,42 @@ async function updateNoteFromModal() {
       });
     }
 
-    const result = await response.json();
-
-    if (response.ok && result.status === 'success') {
-      window.showSuccessNotification('הצלחה', 'הערה עודכנה בהצלחה!');
-
-      // ניקוי דגלים
-      window.removeAttachmentFlag = false;
-      window.replaceAttachmentFlag = false;
-
-      // סגירת המודל וטעינה מחדש
-      const modal = bootstrap.Modal.getInstance(editNoteModalElement);
-      modal.hide();
-      loadNotesData();
-    } else {
-
-      // טיפול בשגיאות וולידציה מהשרת
-      if (result.error && result.error.message) {
-        const serverMessage = result.error.message;
-
-        // אם זו שגיאת וולידציה, נפרק אותה להודעות ספציפיות
-        if (serverMessage.includes('validation failed')) {
-          const validationErrors = serverMessage.replace('Note validation failed: ', '').split('; ');
-
-          // הצגת כל שגיאה בנפרד
-          validationErrors.forEach(error => {
-            let fieldError = error;
-            let fieldName = '';
-
-            // תרגום שגיאות ספציפיות
-            if (error.includes('Field \'content\' is required')) {
-              fieldError = 'תוכן הערה הוא שדה חובה';
-              fieldName = 'editContentError';
-            } else if (error.includes('Field \'related_type_id\' is required')) {
-              fieldError = 'יש לבחור סוג אובייקט לשיוך';
-              fieldName = 'editRelationTypeError';
-            } else if (error.includes('Field \'related_id\' is required')) {
-              fieldError = 'יש לבחור אובייקט לשיוך';
-              fieldName = 'editRelatedObjectError';
-            } else if (error.includes('Field \'related_id\' references non-existent record')) {
-              fieldError = 'האובייקט שנבחר לא קיים במערכת';
-              fieldName = 'editRelatedObjectError';
-            }
-
-            // שימוש במערכת ההתראות המובנת
-            if (fieldName && window.showValidationWarning) {
-              window.showValidationWarning(fieldName, fieldError);
-            } else {
-              window.showErrorNotification('שגיאת וולידציה', fieldError);
-            }
-          });
-        } else {
-          // שגיאה כללית
-          window.showErrorNotification('שגיאה בעדכון', serverMessage);
+    // טיפול בתגובה באמצעות CRUDResponseHandler עם customValidationParser
+    await window.CRUDResponseHandler.handleUpdateResponse(response, {
+      modalId: 'editNoteModal',
+      successMessage: 'הערה עודכנה בהצלחה',
+      customValidationParser: (errorMessage) => {
+        if (!errorMessage.includes('validation failed')) return null;
+        
+        const validationErrors = errorMessage.replace('Note validation failed: ', '').split('; ');
+        return validationErrors.map(error => {
+          if (error.includes("Field 'content' is required")) {
+            return { fieldId: 'editContentError', message: 'תוכן הערה הוא שדה חובה' };
+          } else if (error.includes("Field 'related_type_id' is required")) {
+            return { fieldId: 'editRelationTypeError', message: 'יש לבחור סוג אובייקט לשיוך' };
+          } else if (error.includes("Field 'related_id' is required")) {
+            return { fieldId: 'editRelatedObjectError', message: 'יש לבחור אובייקט לשיוך' };
+          } else if (error.includes("Field 'related_id' references non-existent record")) {
+            return { fieldId: 'editRelatedObjectError', message: 'האובייקט שנבחר לא קיים במערכת' };
+          }
+          return null;
+        }).filter(Boolean);
+      },
+      reloadFn: async () => {
+        // ניקוי דגלים
+        window.removeAttachmentFlag = false;
+        window.replaceAttachmentFlag = false;
+        
+        // ניקוי מטמון
+        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+          await window.UnifiedCacheManager.remove('notes');
+          console.log('✅ מטמון notes נוקה אחרי עדכון');
         }
-      } else {
-        // הצגת הודעת שגיאה כללית
-        window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון הערה - בדוק את הנתונים שהוזנו');
-      }
-    }
+        // רענון טבלה
+        await loadNotesData();
+      },
+      entityName: 'הערה'
+    });
 
   } catch {
     window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון הערה - בדוק את הנתונים שהוזנו');
@@ -1264,55 +1241,30 @@ async function confirmDeleteNote(noteId) {
 }
 
 async function deleteNoteFromServer(noteId) {
-  const maxRetries = 3;
-  let retryCount = 0;
+  try {
+    const response = await fetch(`/api/notes/${noteId}`, {
+      method: 'DELETE',
+    });
 
-        // ניקוי מטמון notes
+    // טיפול בתגובה באמצעות CRUDResponseHandler
+    await window.CRUDResponseHandler.handleDeleteResponse(response, {
+      successMessage: 'הערה נמחקה בהצלחה',
+      reloadFn: async () => {
+        // ניקוי מטמון
         if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
           await window.UnifiedCacheManager.remove('notes');
           console.log('✅ מטמון notes נוקה אחרי מחיקה');
         }
+        // רענון טבלה
+        await loadNotesData();
+      },
+      entityName: 'הערה'
+    });
 
-  while (retryCount < maxRetries) {
-    try {
-      const response = await fetch(`/api/notes/${noteId}`, {
-        method: 'DELETE',
-      });
-
-      const result = await response.json();
-
-      if (response.ok && result.status === 'success') {
-        window.showSuccessNotification('הצלחה', 'הערה נמחקה בהצלחה!');
-        loadNotesData();
-        return; // יציאה מוצלחת
-      } else {
-
-        // טיפול בשגיאות מהשרת
-        if (result.error && result.error.message) {
-          const serverMessage = result.error.message;
-
-          if (serverMessage.includes('has linked items')) {
-            window.showErrorNotification('שגיאה במחיקה', 'לא ניתן למחוק הערה זו - יש פריטים מקושרים אליה');
-          } else {
-            window.showErrorNotification('שגיאה במחיקה', serverMessage);
-          }
-        } else {
-          window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת הערה - בדוק את הנתונים');
-        }
-        return; // יציאה עם שגיאה
-      }
-
-    } catch {
-      retryCount++;
-
-      if (retryCount >= maxRetries) {
-        // ניסיונות נגמרו - הצגת שגיאה
-        window.showErrorNotification('שגיאה', `שגיאה במחיקת הערה לאחר ${maxRetries} ניסיונות. בדוק את חיבור השרת.`);
-      } else {
-        // המתנה לפני ניסיון נוסף
-        const currentRetryCount = retryCount;
-        await new Promise(resolve => setTimeout(resolve, 1000 * currentRetryCount));
-      }
+  } catch (error) {
+    console.error('❌ Error deleting note:', error);
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאה במחיקה', error.message || 'שגיאה במחיקת הערה');
     }
   }
 }

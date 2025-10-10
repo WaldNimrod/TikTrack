@@ -746,11 +746,11 @@ async function loadCurrenciesFromServer() {
       }
     }
   } catch (error) {
-    handleDataLoadError(error, 'טעינת מטבעות מהשרת');
-
+    console.error('❌ Error loading currencies from server:', error);
+    
     // הצגת הודעת שגיאה
-    if (window.showInfoNotification) {
-      window.showInfoNotification('מידע על הטעינה', 'שגיאה בטעינת מטבעות מהשרת');
+    if (window.showNotification) {
+      window.showNotification('שגיאה בטעינת מטבעות מהשרת', 'error');
     }
   }
   return [];
@@ -2323,9 +2323,8 @@ window.confirmDeleteCashFlow = confirmDeleteCashFlow;
 window.generateDetailedLog = generateDetailedLog;
 window.copyDetailedLog = copyDetailedLog;
 
-// פונקציות טיפול בשגיאות מתקדמות
-window.handleApiError = handleApiError;
-window.handleDataLoadError = handleDataLoadError;
+// פונקציות טיפול בשגיאות - legacy functions removed, now using CRUDResponseHandler v2.0.0
+// handleApiError, handleDataLoadError removed - use CRUDResponseHandler instead
 window.handleElementNotFound = handleElementNotFound;
 window.handleValidationError = handleValidationError;
 window.handleNetworkError = handleNetworkError;

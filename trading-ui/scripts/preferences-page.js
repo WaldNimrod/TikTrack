@@ -73,7 +73,30 @@ window.loadColorsForPreferences = async function() {
                 
                 // Fallback to default colors
                 console.log(`⚠️ No preference found for ${id}, setting default`);
-                if (id.includes('primary')) {
+                
+                // Fallback map מפורט
+                const fallbackMap = {
+                    // סטטוסים
+                    'statusOpenColor': '#28a745',
+                    'statusClosedColor': '#6c757d',
+                    'statusCancelledColor': '#dc3545',
+                    // סוגי השקעה
+                    'typeSwingColor': '#007bff',
+                    'typeInvestmentColor': '#28a745',
+                    'typePassiveColor': '#6c757d',
+                    // עדיפויות
+                    'priorityHighColor': '#dc3545',
+                    'priorityMediumColor': '#ffc107',
+                    'priorityLowColor': '#28a745',
+                    // ערכים מספריים
+                    'valuePositiveColor': '#28a745',
+                    'valueNegativeColor': '#dc3545',
+                    'valueNeutralColor': '#6c757d'
+                };
+                
+                if (fallbackMap[id]) {
+                    picker.value = fallbackMap[id];
+                } else if (id.includes('primary')) {
                     picker.value = '#007bff';
                 } else if (id.includes('success')) {
                     picker.value = '#28a745';
@@ -81,12 +104,6 @@ window.loadColorsForPreferences = async function() {
                     picker.value = '#ffc107';
                 } else if (id.includes('danger')) {
                     picker.value = '#dc3545';
-                } else if (id.includes('positive')) {
-                    picker.value = '#28a745';
-                } else if (id.includes('negative')) {
-                    picker.value = '#dc3545';
-                } else if (id.includes('neutral')) {
-                    picker.value = '#6c757d';
                 } else if (id.includes('entity')) {
                     picker.value = '#6f42c1';
                 } else {

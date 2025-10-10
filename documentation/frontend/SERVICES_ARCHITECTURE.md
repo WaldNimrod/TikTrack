@@ -350,11 +350,11 @@ await SelectPopulatorService.populateTickersSelect('tickerSelect', {
 ### **4. CRUDResponseHandler** ⭐ גבוה (P1)
 
 **קובץ:** `trading-ui/scripts/services/crud-response-handler.js`  
-**שורות:** 260  
-**גרסה:** 1.0.0
+**שורות:** 515 (+255 lines in v2.0.0)  
+**גרסה:** 2.0.0 ⭐ **עודכן להחלה 10.10.2025**
 
 #### תיאור:
-מערכת מרכזית לטיפול בתגובות API של פעולות CRUD.
+מערכת מרכזית לטיפול בתגובות API של פעולות CRUD ושגיאות טעינת נתונים (GET).
 
 #### בעיה שנפתרה:
 ```javascript
@@ -491,6 +491,94 @@ async function saveTrade() {
 - **UX משופר:** סימון שדות בעייתיים באדום
 - **Promise chains:** כולם הומרו ל-async/await מודרני
 - **כפילויות:** הוסרו (deleteTradePlan ישן)
+
+#### 🆕 **Extended for Data Load Errors - v2.0.0 (Oct 2025)**
+
+**תיאור:**  
+CRUDResponseHandler הורחב לכלול טיפול בשגיאות GET requests (טעינת נתונים) בנוסף ל-CRUD operations.
+
+**פונקציות חדשות:**
+
+**1. handleLoadResponse(response, options)**
+- **מטרה:** טיפול בשגיאות שרת (500, 404, 403) בעת טעינת נתונים
+- **Returns:** `[]` (never throws - גישה מגנה)
+- **תכונות:**
+  - הצגת notification למשתמש
+  - רינדור הודעת שגיאה בטבלה עם Retry button
+  - Copy Error Log button
+  - Auto-detect column count
+
+**2. handleNetworkError(error, options)**
+- **מטרה:** טיפול בשגיאות רשת (fetch failed, timeout)
+- **Returns:** `[]` (never throws)
+- **תכונות:**
+  - הבחנה בין שגיאות שרת לשגיאות רשת
+  - הודעות מותאמות (wifi icon vs triangle icon)
+  - Retry + Copy Error Log
+
+**3. _renderTableError(config)** (private)
+- **מטרה:** רינדור UI של שגיאה בטבלה
+- **תכונות:**
+  - colspan דינמי (auto-detect או פרמטר)
+  - כפתור "נסה שוב" (אם onRetry סופק)
+  - כפתור "העתק פרטי שגיאה" (JSON מפורט)
+  - Font Awesome icons
+  - Bootstrap styling
+
+**Options Object:**
+```javascript
+{
+  tableId: 'alertsTable',        // Table DOM ID
+  entityName: 'התראות',          // Entity name (Hebrew)
+  columns: 8,                    // Column count (auto-detect if omitted)
+  onRetry: () => loadData()      // Retry function
+}
+```
+
+**דוגמת שימוש:**
+```javascript
+// שגיאת שרת
+if (!response.ok) {
+  return CRUDResponseHandler.handleLoadResponse(response, {
+    tableId: 'alertsTable',
+    entityName: 'התראות',
+    columns: 8,
+    onRetry: loadAlertsData
+  });
+}
+
+// שגיאת רשת
+catch (error) {
+  return CRUDResponseHandler.handleNetworkError(error, {
+    tableId: 'alertsTable',
+    entityName: 'התראות',
+    onRetry: loadAlertsData
+  });
+}
+```
+
+**אינטגרציה עם window.loadTableData:**  
+המערכת משולבת ב-`window.loadTableData()` (data-basic.js) - כל 13 עמודי המשתמש מרוויחים אוטומטית.
+
+**תכונות UI:**
+- ✅ הודעת שגיאה ברורה בטבלה עם icon
+- ✅ כפתור "נסה שוב" (Retry)
+- ✅ כפתור "העתק פרטי שגיאה" (למשתמש לשלוח למפתח)
+- ✅ colspan אוטומטי
+- ✅ הבחנה ויזואלית בין שגיאות שרת (⚠️) לשגיאות רשת (📶)
+
+**סטטיסטיקות v2.0.0:**
+- **עמודים משולבים:** 13/13 (100%)
+- **שורות קוד נמחקו:** ~500 (error handling duplicates)
+- **שורות קוד נוספו:** ~150 (service extension)
+- **נטו:** **-350 שורות** (cleanup!)
+- **אחידות טיפול בשגיאות:** 100%
+
+**עמידה ב-Rules 48-49:**
+- ✅ אין mock/demo data בשגיאות
+- ✅ משוב ברור למשתמש ב-3 רמות: Console + Notification + UI
+- ✅ הנחיות פעולה ("בדוק חיבור", "נסה שוב")
+- ✅ כפתור Copy Error Log למשתמש לשלוח למפתח
 
 ---
 

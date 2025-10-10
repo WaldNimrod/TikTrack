@@ -103,11 +103,18 @@
 | `data-collection-service.js` | P0 קריטי | איסוף נתונים מטפסים |
 | `field-renderer-service.js` | P1 גבוה | רינדור badges וערכים מספריים |
 | `select-populator-service.js` | P1 גבוה | מילוי select boxes מ-API |
-| `crud-response-handler.js` | P1 גבוה | טיפול בתגובות CRUD |
+| `crud-response-handler.js` | P1 גבוה | טיפול בתגובות CRUD + שגיאות טעינה (v2.0.0) |
 | `default-value-setter.js` | P2 בינוני | ברירות מחדל בטפסים |
 | `statistics-calculator.js` | P3 בינוני | חישובי סטטיסטיקות |
 
 **הערה חשובה:** Services אין להם dependencies ביניהם - ניתן לטעון בכל סדר!
+
+**🆕 עדכון v2.0.0 (Oct 2025):**  
+`crud-response-handler.js` הורחב לטפל גם בשגיאות טעינת נתונים (GET requests) עם Retry + Copy Error Log. משולב ב-`window.loadTableData()` - כל 13 עמודי המשתמש מרוויחים אוטומטית:
+- ✅ הודעות שגיאה ברורות בטבלה
+- ✅ כפתור "נסה שוב" 
+- ✅ כפתור "העתק פרטי שגיאה"
+- ✅ אין mock/demo data (Rules 48-49)
 
 **דוקומנטציה:** [SERVICES_ARCHITECTURE.md](../../../frontend/SERVICES_ARCHITECTURE.md)
 

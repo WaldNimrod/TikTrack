@@ -268,6 +268,71 @@ table tbody td button.btn-sm {
 
 ---
 
+### 8. ✅ Status Badges - עיצוב קפסולה אחיד
+
+**קבצים מעודכנים:**
+- `scripts/services/field-renderer-service.js`
+- `styles-new/06-components/_badges-status.css`
+
+#### שינויים במערכת הרינדור:
+```javascript
+// הסרת סטטוסים מיותרים:
+// ❌ pending - הוסר
+// ❌ active - הוסר  
+// ❌ completed - הוסר
+
+// סטטוסים שנשארו:
+// ✅ open, closed, cancelled - צבעים מהעדפות (3 ווריאנטים)
+// ⚠️ triggered - צבע אזהרה (warning)
+// ℹ️ not_triggered - צבע מידע (info)
+
+// אינטגרציה עם מערכת צבעים:
+window.getStatusColor(status, 'light')   // רקע
+window.getStatusColor(status, 'medium')  // טקסט
+window.getStatusColor(status, 'border')  // מסגרת
+```
+
+#### סגנון CSS חדש - קפסולה בינונית outline:
+```css
+.status-badge {
+  /* צורה - קפסולה */
+  border-radius: 12px;
+  
+  /* גודל - בינוני */
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  
+  /* סגנון - outline */
+  background-color: var(--badge-bg);    /* רקע בהיר */
+  color: var(--badge-color);            /* טקסט צבעוני */
+  border: 1px solid var(--badge-border); /* מסגרת צבעונית */
+  
+  /* אפקטים */
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* hover עדין */
+.status-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+```
+
+#### בדיקות נדרשות בכל עמוד:
+- [ ] Status badges מוצגים כקפסולות (border-radius: 12px)
+- [ ] גודל בינוני (padding: 4px 10px)
+- [ ] סגנון outline (רקע בהיר, טקסט צבעוני, מסגרת)
+- [ ] צבעים דינמיים מהעדפות (3 ווריאנטים)
+- [ ] triggered = צבע אזהרה (צהוב)
+- [ ] not_triggered = צבע מידע (כחול)
+- [ ] אין סטטוסים: pending, active, completed
+- [ ] אפקט hover (עלייה קלה + צל)
+- [ ] אנימציה מבריקה על hover
+
+---
+
 ## 🔍 תהליך בדיקה מומלץ לכל עמוד:
 
 ### שלב 1: בדיקה ויזואלית
@@ -390,6 +455,8 @@ table tbody td button.btn-sm {
 - `styles-new/06-components/_buttons-advanced.css` ✅
 - `styles-new/06-components/_entity-colors.css` ✅
 - `styles-new/06-components/_cards.css` ✅
+- `styles-new/06-components/_badges-status.css` ✅
+- `scripts/services/field-renderer-service.js` ✅
 - `trade_plans.html` ✅
 - `trade_plans.js` ✅
 - `executions.html` ✅
@@ -406,8 +473,10 @@ table tbody td button.btn-sm {
 **!important שהוסרו:** 59 (47 + 12 מהקבצים הספציפיים)
 **inline styles שהוסרו:** 2
 **קבצי CSS מיותרים שנמחקו:** 5
+**סטטוסים מיותרים שהוסרו:** 3 (pending, active, completed)
 **שיפורי רספונסיביות:** כל גדלי המסכים
-**אלמנטים שעודכנו:** כפתורים, איקונים, טבלאות, סטטיסטיקות
+**אלמנטים שעודכנו:** כפתורים, איקונים, טבלאות, סטטיסטיקות, status badges
+**אינטגרציה עם מערכת צבעים:** 3 ווריאנטים (light, medium, border)
 
 ---
 

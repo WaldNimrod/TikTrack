@@ -5,19 +5,82 @@
 /* Generated automatically from ITCSS structure */
 /* אלמנט הראש נשמר בנפרד */
 
+/* ===== STATUS BADGES - סגנון קפסולה אחיד ===== */
+
+/* סגנון בסיסי לכל status badges - קפסולה בגודל בינוני */
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* סגנון outline - סטטוס open (ירוק) */
+.status-badge[data-status-category="open"],
+.status-badge-open {
+  background-color: var(--numeric-positive-light);
+  color: var(--numeric-positive-medium);
+  border: 1px solid var(--numeric-positive-border);
+}
+
+/* סגנון outline - סטטוס closed (אפור) */
+.status-badge[data-status-category="closed"],
+.status-badge-closed {
+  background-color: var(--numeric-zero-light);
+  color: var(--numeric-zero-medium);
+  border: 1px solid var(--numeric-zero-border);
+}
+
+/* סגנון outline - סטטוס cancelled (אדום) */
+.status-badge[data-status-category="cancelled"],
+.status-badge-cancelled {
+  background-color: var(--numeric-negative-light);
+  color: var(--numeric-negative-medium);
+  border: 1px solid var(--numeric-negative-border);
+}
+
+/* סגנון outline - triggered (אזהרה - צהוב) */
+.status-badge[data-status-category="warning"],
+.status-badge-triggered {
+  background-color: var(--color-warning-light);
+  color: var(--color-warning);
+  border: 1px solid var(--color-warning-border);
+}
+
+/* סגנון outline - not_triggered (מידע - כחול) */
+.status-badge[data-status-category="info"],
+.status-badge-not-triggered {
+  background-color: var(--color-info-light);
+  color: var(--color-info);
+  border: 1px solid var(--color-info-border);
+}
+
+/* אפקט hover עדין */
+.status-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* אנימציה מבריקה על hover */
 .status-badge::before {
-content: '' ;
-  position: absolute ;
-  top: 0 ;
-  left: -100% ;
-  width: 100% ;
-  height: 100% ;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent) ;
-  transition: left 0.5s ease ;
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
 }
 
 .status-badge:hover::before {
-left: 100% ;
+  left: 100%;
 }
 
 .priority-badge::before {

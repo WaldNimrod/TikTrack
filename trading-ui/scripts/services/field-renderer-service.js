@@ -5,19 +5,21 @@
  * מערכת מרכזית לרנדור שדות מורכבים: badges, currency, dates
  * מחליפה קוד חוזר ב-138 מקומות במערכת
  * 
- * @version 1.0.0
+ * @version 1.1.0
  * @created January 2025
+ * @updated January 2025
  * @author TikTrack Development Team
  * 
  * תכונות:
- * - רנדור status badges (open, closed, active, pending)
+ * - רנדור status badges (open, closed, cancelled, triggered, not_triggered)
  * - רנדור side badges (Long/Short)
- * - רנדור PnL badges (positive/negative)
+ * - רנדור numeric badges (positive/negative/neutral)
  * - רנדור currency display (1 → US Dollar)
  * - רנדור type badges (swing, investment, passive)
  * - רנדור action badges (buy, sale)
  * - רנדור priority badges (high, medium, low)
  * - שימוש ב-date-utils.js לתאריכים
+ * - אינטגרציה מלאה עם מערכת צבעים דינמית (3 ווריאנטים)
  */
 
 // ===== FIELD RENDERER SERVICE =====
@@ -26,12 +28,18 @@ class FieldRendererService {
     /**
      * רנדור status badge עם צבעים דינמיים ותרגום
      * 
-     * @param {string} status - סטטוס (open, closed, active, pending, cancelled)
+     * @param {string} status - סטטוס (open, closed, cancelled, triggered, not_triggered)
      * @param {string} entityType - סוג ישות (account, trade, alert, note, etc.)
      * @returns {string} - HTML של ה-badge
      * 
+     * Supported statuses:
+     * - open, closed, cancelled: צבעים מהעדפות משתמש
+     * - triggered: צבע אזהרה (warning)
+     * - not_triggered: צבע מידע (info)
+     * 
      * @example
      * const html = FieldRendererService.renderStatus('open', 'account');
+     * const html2 = FieldRendererService.renderStatus('triggered', 'alert');
      */
     static renderStatus(status, entityType = 'default') {
         if (!status) return '<span class="badge badge-secondary">-</span>';
@@ -39,11 +47,19 @@ class FieldRendererService {
         // תרגום סטטוס לעברית
         const translatedStatus = this._translateStatus(status, entityType);
         
-        // קבלת צבעים דינמיים
-        const { color, bgColor } = this._getStatusColors(status);
+        // נרמול שם הסטטוס לclass
+        const normalizedStatus = status.toLowerCase().replace('_', '-');
         
-        // יצירת HTML
-        return `<span class="status-badge status-${status}" style="background-color: ${bgColor}; color: ${color}; border: 1px solid ${color};">
+        // מיפוי לקטגוריית צבע
+        let colorCategory = normalizedStatus;
+        if (normalizedStatus === 'triggered') {
+            colorCategory = 'warning';
+        } else if (normalizedStatus === 'not-triggered') {
+            colorCategory = 'info';
+        }
+        
+        // יצירת HTML עם data-attribute לקטגוריית הצבע
+        return `<span class="status-badge status-badge-${normalizedStatus}" data-status-category="${colorCategory}">
             ${translatedStatus}
         </span>`;
     }
@@ -346,15 +362,12 @@ class FieldRendererService {
             return translator(status);
         }
         
-        // תרגום גנרי
+        // תרגום גנרי - רק סטטוסים סטנדרטיים
         const genericTranslations = {
             'open': 'פתוח',
             'closed': 'סגור',
             'cancelled': 'מבוטל',
             'canceled': 'מבוטל',
-            'pending': 'ממתין',
-            'active': 'פעיל',
-            'completed': 'הושלם',
             'triggered': 'הופעל',
             'not_triggered': 'לא הופעל'
         };
@@ -367,31 +380,39 @@ class FieldRendererService {
      * @private
      */
     static _getStatusColors(status) {
-        // ניסיון לקבל מהעדפות משתמש
-        if (window.getStatusColor && typeof window.getStatusColor === 'function' &&
-            window.getStatusBackgroundColor && typeof window.getStatusBackgroundColor === 'function') {
+        const normalizedStatus = status.toLowerCase();
+        
+        // מיפוי סטטוסים מיוחדים לסטטוסים סטנדרטיים
+        let mappedStatus = normalizedStatus;
+        if (normalizedStatus === 'triggered') {
+            mappedStatus = 'warning'; // צבע אזהרה
+        } else if (normalizedStatus === 'not_triggered') {
+            mappedStatus = 'info'; // צבע מידע
+        } else if (normalizedStatus === 'canceled') {
+            mappedStatus = 'cancelled'; // נרמול איות
+        }
+        
+        // ניסיון לקבל מהעדפות משתמש עם הווריאנטים
+        if (window.getStatusColor && typeof window.getStatusColor === 'function') {
             return {
-                color: window.getStatusColor(status, 'medium'),
-                bgColor: window.getStatusBackgroundColor(status)
+                color: window.getStatusColor(mappedStatus, 'medium'),
+                bgColor: window.getStatusColor(mappedStatus, 'light'),
+                borderColor: window.getStatusColor(mappedStatus, 'border')
             };
         }
         
-        // Fallback colors
+        // Fallback colors עם 3 ווריאנטים
         const fallbackColors = {
-            'open': { color: '#28a745', bg: 'rgba(40, 167, 69, 0.1)' },
-            'closed': { color: '#6c757d', bg: 'rgba(108, 117, 125, 0.1)' },
-            'cancelled': { color: '#dc3545', bg: 'rgba(220, 53, 69, 0.1)' },
-            'canceled': { color: '#dc3545', bg: 'rgba(220, 53, 69, 0.1)' },
-            'pending': { color: '#ffc107', bg: 'rgba(255, 193, 7, 0.1)' },
-            'active': { color: '#007bff', bg: 'rgba(0, 123, 255, 0.1)' },
-            'completed': { color: '#28a745', bg: 'rgba(40, 167, 69, 0.1)' },
-            'triggered': { color: '#28a745', bg: 'rgba(40, 167, 69, 0.1)' },
-            'not_triggered': { color: '#6c757d', bg: 'rgba(108, 117, 125, 0.1)' },
-            'default': { color: '#6c757d', bg: 'rgba(108, 117, 125, 0.1)' }
+            'open': { color: '#28a745', bg: '#d4edda', border: '#c3e6cb' },
+            'closed': { color: '#6c757d', bg: '#e2e3e5', border: '#d6d8db' },
+            'cancelled': { color: '#dc3545', bg: '#f8d7da', border: '#f5c6cb' },
+            'warning': { color: '#ffc107', bg: '#fff3cd', border: '#ffeaa7' },
+            'info': { color: '#17a2b8', bg: '#d1ecf1', border: '#bee5eb' },
+            'default': { color: '#6c757d', bg: '#e2e3e5', border: '#d6d8db' }
         };
         
-        const colors = fallbackColors[status.toLowerCase()] || fallbackColors.default;
-        return { color: colors.color, bgColor: colors.bg };
+        const colors = fallbackColors[mappedStatus] || fallbackColors.default;
+        return { color: colors.color, bgColor: colors.bg, borderColor: colors.border };
     }
 }
 

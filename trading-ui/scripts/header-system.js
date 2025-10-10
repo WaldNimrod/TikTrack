@@ -2043,3 +2043,6 @@ window.debugZIndexStatus = function() {
 
 console.log('✅ Header System v6.0.0 loaded successfully!');
 
+// Note: Header system initialization is called from core-systems.js Stage 2: UI Systems
+// The function window.initializeHeaderSystem() is available and will be called automatically
+

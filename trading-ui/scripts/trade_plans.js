@@ -758,28 +758,21 @@ async function saveEditTradePlan() {
       body: JSON.stringify(formData),
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText);
-    }
-
-    // הצגת הודעת הצלחה
-    if (typeof window.showNotification === 'function') {
-      window.showNotification('תכנון עודכן בהצלחה!', 'success');
-    }
-
-    // סגירת המודל
-    const modal = bootstrap.Modal.getInstance(editTradePlanModalElement);
-    modal.hide();
-
-    // רענון הטבלה
-
-    // ניקוי מטמון trade_plans
-    if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-      await window.UnifiedCacheManager.remove('trade_plans');
-      console.log('✅ מטמון trade_plans נוקה');
-    }
+    // טיפול בתגובה באמצעות CRUDResponseHandler
+    await window.CRUDResponseHandler.handleUpdateResponse(response, {
+      modalId: 'editTradePlanModal',
+      successMessage: 'תכנון עודכן בהצלחה',
+      reloadFn: async () => {
+        // ניקוי מטמון
+        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+          await window.UnifiedCacheManager.remove('trade_plans');
+          console.log('✅ מטמון trade_plans נוקה');
+        }
+        // רענון טבלה
     await loadTradePlansData();
+      },
+      entityName: 'תכנון מסחר'
+    });
 
   } catch (error) {
     handleSaveError(error, 'עדכון תכנון');
@@ -1884,31 +1877,31 @@ function validateTradePlanForm() {
             name: 'סוג השקעה',
             validation: (value) => {
                 const validTypes = ['swing', 'investment', 'passive'];  // Per database constraints
-                if (!validTypes.includes(value)) {
+        if (!validTypes.includes(value)) {
                     return 'סוג השקעה לא תקין. ערכים תקינים: swing, investment, passive';
-                }
-                return true;
+        }
+        return true;
             }
         },
         { 
             id: 'addTradePlanSide', 
             name: 'צד',
             validation: (value) => {
-                const validSides = ['Long', 'Short'];
-                if (!validSides.includes(value)) {
-                    return 'צד לא תקין';
-                }
-                return true;
+        const validSides = ['Long', 'Short'];
+        if (!validSides.includes(value)) {
+          return 'צד לא תקין';
+        }
+        return true;
             }
         },
         { 
             id: 'addTradePlanPlannedAmount', 
             name: 'סכום מתוכנן',
             validation: (value) => {
-                const numValue = parseFloat(value);
+          const numValue = parseFloat(value);
                 if (isNaN(numValue)) return 'סכום מתוכנן חייב להיות מספר';
                 if (numValue <= 0) return 'סכום מתוכנן חייב להיות חיובי';
-                return true;
+        return true;
             }
         }
         // NOTE: stop_price, target_price, entry_conditions, reasons are optional - not validated here
@@ -1979,7 +1972,7 @@ async function saveNewTradePlan() {
         if (typeof window.showSimpleErrorNotification === 'function') {
           window.showSimpleErrorNotification('שגיאת ולידציה', errorData.message || 'נתונים לא תקינים');
         }
-        return;
+          return;
       }
       
       // שגיאת מערכת אחרת

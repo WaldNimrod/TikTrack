@@ -526,6 +526,28 @@ class UnifiedAppInitializer {
     }
 
     /**
+     * Manual initialization fallback
+     * Called when window.initializeApplication is not available
+     */
+    async manualInitialization(config) {
+        console.log('🔧 Manual initialization fallback...');
+        
+        // Initialize Header System (Stage 2: UI Systems)
+        if (typeof window.initializeHeaderSystem === 'function') {
+            console.log('🎯 Initializing Header System...');
+            window.initializeHeaderSystem();
+        }
+        
+        // Initialize Notification System
+        if (typeof window.NotificationSystem !== 'undefined' && window.NotificationSystem.initialize) {
+            console.log('🔔 Initializing Notification System...');
+            await window.NotificationSystem.initialize();
+        }
+        
+        console.log('✅ Manual initialization completed');
+    }
+
+    /**
      * Stage 4: Finalize initialization
      */
     async finalizeInitialization() {

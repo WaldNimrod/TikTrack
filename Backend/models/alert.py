@@ -90,11 +90,9 @@ class Alert(BaseModel):
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary with backward compatibility"""
-        # Create result dictionary manually to avoid accessing non-existent columns
+        # Create result dictionary with actual columns only
         result: Dict[str, Any] = {
             'id': self.id,
-            'trading_account_id': self.trading_account_id,
-            'ticker_id': self.ticker_id,
             'message': self.message,
             'triggered_at': self.triggered_at.strftime('%Y-%m-%d %H:%M:%S') if self.triggered_at else None,
             'status': self.status,
@@ -124,16 +122,30 @@ class Alert(BaseModel):
         # Add fields for backward compatibility
         if self.related_type_id == 1:  # account
             result['trading_account_id'] = self.related_id
+            result['ticker_id'] = None
             result['trade_id'] = None
             result['trade_plan_id'] = None
         elif self.related_type_id == 2:  # trade
             result['trading_account_id'] = None
+            result['ticker_id'] = None
             result['trade_id'] = self.related_id
             result['trade_plan_id'] = None
         elif self.related_type_id == 3:  # trade_plan
             result['trading_account_id'] = None
+            result['ticker_id'] = None
             result['trade_id'] = None
             result['trade_plan_id'] = self.related_id
+        elif self.related_type_id == 4:  # ticker
+            result['trading_account_id'] = None
+            result['ticker_id'] = self.related_id
+            result['trade_id'] = None
+            result['trade_plan_id'] = None
+        else:
+            # General or unknown type
+            result['trading_account_id'] = None
+            result['ticker_id'] = None
+            result['trade_id'] = None
+            result['trade_plan_id'] = None
         
         # Note: related_entity_name will be added by the API layer
         # when it has access to the database session for lookups

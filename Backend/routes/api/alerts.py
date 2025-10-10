@@ -31,9 +31,10 @@ def get_alerts():
     
     alerts = db.query(Alert).all()
     
-    try:
-        enhanced_data = []
-        for alert in alerts:
+    # Process alerts with error handling
+    enhanced_data = []
+    for alert in alerts:
+        try:
             alert_dict = alert.to_dict()
             
             # Resolve related entity name based on related_type_id
@@ -57,11 +58,23 @@ def get_alerts():
                 logger.warning(f"Could not resolve related entity for alert {alert.id}: {str(e)}")
                 alert_dict['related_entity_name'] = None
             
+            # Add alert even if related entity failed
             enhanced_data.append(alert_dict)
-    except Exception as e:
-        logger.error(f"Error processing alerts data: {str(e)}")
-        # Return empty list instead of crashing
-        enhanced_data = []
+            
+        except Exception as e:
+            # If even basic alert dict fails, log but continue with other alerts
+            logger.error(f"Failed to process alert {alert.id}: {str(e)}")
+            # Still try to add basic alert data
+            try:
+                enhanced_data.append({
+                    'id': alert.id,
+                    'related_type_id': alert.related_type_id,
+                    'related_id': alert.related_id,
+                    'related_entity_name': None,
+                    'error': 'Failed to process alert data'
+                })
+            except:
+                pass  # Skip this alert entirely if even this fails
     
     return jsonify({
         "status": "success",

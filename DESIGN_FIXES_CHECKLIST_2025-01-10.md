@@ -264,11 +264,11 @@ renderStatus(value) {
 ## 📊 רשימת עמודים לבדיקה
 
 ### עמודים ראשיים:
-- [x] trade_plans.html - **✅ תקין לגמרי (13/13)**
+- [x] trade_plans.html - **✅ הושלם במלואו (כפתורים, איקונים, גלילה, תאריכים, info-summary, class="data-table")**
 - [ ] index.html
 - [ ] trades.html
 - [ ] tickers.html
-- [ ] alerts.html
+- [ ] alerts.html ← בבדיקה כעת
 - [ ] trading_accounts.html
 - [ ] cash_flows.html
 - [ ] executions.html

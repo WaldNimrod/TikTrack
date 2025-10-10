@@ -49,12 +49,13 @@
 ### Phase 2: שדרוג window.loadTableData
 
 **קובץ:** `trading-ui/scripts/modules/data-basic.js`  
-**שורות שונו:** ~30
+**שורות שונו:** ~50
 
 #### שינויים:
 - ✅ הוספת פרמטר `options` (tableId, entityName, columns, onRetry)
 - ✅ החלפת `throw error` ב-`return []` (גישה מגנה)
 - ✅ אינטגרציה עם CRUDResponseHandler v2.0.0
+- ✅ **טיפול ב-0 רשומות** - הצגת הודעה ברורה בטבלה
 - ✅ עדכון JSDoc מלא
 
 #### לפני ואחרי:
@@ -80,6 +81,33 @@ catch (error) {
   });
 }
 ```
+
+#### Empty Data Handling (0 Records):
+
+**חדש! (11 אוקטובר 2025):**
+
+כשמתקבלים 0 רשומות מהשרת (לא שגיאה), המערכת מציגה הודעה ברורה בטבלה:
+
+```javascript
+// אם data.length === 0
+tbody.innerHTML = `
+  <tr class="empty-state-row">
+    <td colspan="${columns}" class="text-center py-5">
+      <div class="empty-state-content">
+        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+        <h5 class="text-muted">אין ${entityName} להצגה</h5>
+        <p class="text-muted small mb-0">לא נמצאו רשומות במערכת</p>
+      </div>
+    </td>
+  </tr>
+`;
+```
+
+**יתרונות:**
+- ✅ משוב ברור למשתמש (לא טבלה ריקה)
+- ✅ הבחנה בין "אין נתונים" ל-"שגיאה"
+- ✅ UX מצוין - אייקון + טקסט ברור
+- ✅ עובד אוטומטית בכל 13 העמודים
 
 ---
 

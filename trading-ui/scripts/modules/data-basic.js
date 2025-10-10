@@ -2232,7 +2232,30 @@ window.loadTableData = async function(tableType, updateFunction, options = {}) {
     
     console.log(`✅ Loaded ${data.length} records for ${tableType}`);
     
-    // Call update function if provided
+    // Handle empty data (0 records) - show user-friendly message in table
+    if (data.length === 0) {
+      const tableId = options.tableId || `${tableType}Table`;
+      const tbody = document.querySelector(`#${tableId} tbody`);
+      const entityName = options.entityName || tableType;
+      const columns = options.columns || 5;
+      
+      if (tbody) {
+        tbody.innerHTML = `
+          <tr class="empty-state-row">
+            <td colspan="${columns}" class="text-center py-5">
+              <div class="empty-state-content">
+                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">אין ${entityName} להצגה</h5>
+                <p class="text-muted small mb-0">לא נמצאו רשומות במערכת</p>
+              </div>
+            </td>
+          </tr>
+        `;
+        console.log(`ℹ️ Displayed empty state message for ${entityName} (0 records)`);
+      }
+    }
+    
+    // Call update function if provided (even for empty data - let page handle if needed)
     if (typeof updateFunction === 'function') {
       updateFunction(data);
     }

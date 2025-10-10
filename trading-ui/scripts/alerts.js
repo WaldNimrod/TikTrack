@@ -93,49 +93,10 @@ const demoAlerts = [
 
 
 /**
- * טעינת נתוני התראות מהשרת
- *
- * פונקציה זו מחזירה נתוני דמו להתראות
- * @returns {Array} מערך של התראות דמו
- */
-function getDemoAlertsData() {
-  return [
-    {
-      id: 1,
-      title: 'התראה על מחיר AAPL',
-      status: 'open',
-      related_type_id: 4, // טיקר
-      related_id: 1, // מזהה טיקר AAPL
-      condition: 'מחיר יותר מ 150',
-      condition_attribute: 'price',
-      condition_operator: 'more_than',
-      condition_number: 150,
-      message: 'מחיר AAPL עלה מעל 150$',
-      created_at: '2025-01-09T10:00:00Z',
-      is_triggered: false
-    },
-    {
-      id: 2,
-      title: 'התראה על שינוי TSLA',
-      status: 'closed',
-      related_type_id: 4, // טיקר
-      related_id: 2, // מזהה טיקר TSLA
-      condition: 'שינוי יותר מ 5%',
-      condition_attribute: 'change',
-      condition_operator: 'more_than',
-      condition_number: 5,
-      message: 'שינוי TSLA מעל 5%',
-      created_at: '2025-01-09T09:30:00Z',
-      is_triggered: true
-    }
-  ];
-}
-
-/**
  * פונקציה זו טוענת את כל ההתראות מהשרת ומעדכנת את הטבלה
- * אם השרת לא זמין, משתמשת בנתוני דמו
+ * אם השרת לא זמין, מציגה הודעת שגיאה ברורה (לא נתוני דמו)
  *
- * @returns {Array} מערך של התראות
+ * @returns {Array} מערך של התראות או מערך ריק במקרה של שגיאה
  */
 async function loadAlertsData() {
   console.log('📊 טעינת נתוני התראות מהשרת...');
@@ -144,25 +105,27 @@ async function loadAlertsData() {
     console.log('📊 תגובת שרת:', response.status, response.ok);
 
     if (!response.ok) {
-      console.warn(`⚠️ Server error ${response.status}, using demo data`);
+      console.error(`❌ Server error ${response.status} - cannot load alerts data`);
       
-      // הצגת הודעת אזהרה למשתמש - REQUIRED per .cursorrules rule 48
+      // הצגת הודעת שגיאה למשתמש - NO MOCK DATA per .cursorrules rule 48
       if (window.showNotification) {
         window.showNotification(
-          `⚠️ שגיאת שרת (${response.status}) - מוצגים נתוני דמו בלבד`, 
-          'warning',
+          `❌ שגיאת שרת (${response.status}) - לא ניתן לטעון נתוני התראות`, 
+          'error',
           'שגיאת טעינה'
         );
       }
       
-      // שימוש בנתוני דמו במקרה של שגיאת שרת
-      alertsData = getDemoAlertsData();
-      updateAlertsTable(alertsData);
-      
-      // רענון כפוי של הטבלה
-      setTimeout(() => {
-        updateAlertsTable(alertsData);
-      }, 100);
+      // הצגת הודעת שגיאה בטבלה (במקום נתוני דמו)
+      alertsData = [];
+      const tbody = document.querySelector('#alertsTable tbody');
+      if (tbody) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center" style="color: #e74c3c; padding: 20px;">
+          <i class="fas fa-exclamation-triangle"></i><br>
+          שגיאת שרת (${response.status})<br>
+          <small>לא ניתן לטעון נתוני התראות מהשרת</small>
+        </td></tr>`;
+      }
       
       return alertsData;
     }
@@ -196,14 +159,26 @@ async function loadAlertsData() {
     return alertsData;
 
   } catch (error) {
-    console.error('שגיאה בטעינת התראות:', error);
-    // שימוש בנתוני דמו במקרה של שגיאה
-    alertsData = getDemoAlertsData();
-    updateAlertsTable(alertsData);
+    console.error('❌ שגיאה בטעינת התראות:', error);
     
-    // הצגת הודעת שגיאה
-    if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה בטעינת התראות', 'לא ניתן לטעון התראות מהשרת. מוצגים נתוני דמו.');
+    // הצגת הודעת שגיאה למשתמש - NO MOCK DATA per .cursorrules rule 48
+    if (window.showNotification) {
+      window.showNotification(
+        `❌ שגיאת רשת - לא ניתן לטעון נתוני התראות`, 
+        'error',
+        'שגיאת חיבור'
+      );
+    }
+    
+    // הצגת הודעת שגיאה בטבלה (במקום נתוני דמו)
+    alertsData = [];
+    const tbody = document.querySelector('#alertsTable tbody');
+    if (tbody) {
+      tbody.innerHTML = `<tr><td colspan="8" class="text-center" style="color: #e74c3c; padding: 20px;">
+        <i class="fas fa-wifi"></i><br>
+        שגיאת חיבור לשרת<br>
+        <small>בדוק חיבור לאינטרנט ונסה לרענן את הדף</small>
+      </td></tr>`;
     }
     
     return alertsData;

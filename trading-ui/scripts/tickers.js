@@ -1,5 +1,30 @@
 // ===== קובץ JavaScript לדף טיקרים =====
 
+// ===== Global Element Cache =====
+let addTickerModal = null;
+let addTickerModalElement = null;
+let editTickerModal = null;
+let editTickerModalElement = null;
+let deleteTickerModal = null;
+let deleteTickerModalElement = null;
+let addTickerForm = null;
+let yahooRefreshBtn = null;
+let addTickerBtn = null;
+
+// Initialize on DOM ready
+document.addEventListener('DOMContentLoaded', () => {
+    addTickerModalElement = addTickerModalElement;
+    editTickerModalElement = editTickerModalElement;
+    deleteTickerModalElement = deleteTickerModalElement;
+    addTickerForm = addTickerForm;
+    yahooRefreshBtn = yahooRefreshBtn;
+    addTickerBtn = addTickerBtn;
+    
+    if (addTickerModalElement) addTickerModal = new bootstrap.Modal(addTickerModalElement);
+    if (editTickerModalElement) editTickerModal = new bootstrap.Modal(editTickerModalElement);
+    if (deleteTickerModalElement) deleteTickerModal = new bootstrap.Modal(deleteTickerModalElement);
+});
+
 /**
  * עריכת טיקר קיים
  * @param {number} tickerId - מזהה הטיקר
@@ -421,7 +446,7 @@ function showAddTickerModal() {
   updateCurrencyOptions();
 
   // ניקוי הטופס
-  document.getElementById('addTickerForm').reset();
+  addTickerForm.reset();
 
   // ניקוי וולידציה
   if (window.clearValidation) {
@@ -429,7 +454,7 @@ function showAddTickerModal() {
   }
 
   // הצגת המודל
-  const modal = new bootstrap.Modal(document.getElementById('addTickerModal'), {
+  const modal = new bootstrap.Modal(addTickerModalElement, {
     backdrop: true,
     keyboard: true,
   });
@@ -486,7 +511,7 @@ function showEditTickerModal(id) {
   }
 
   // הצגת המודל
-  const modal = new bootstrap.Modal(document.getElementById('editTickerModal'), {
+  const modal = new bootstrap.Modal(editTickerModalElement, {
     backdrop: true,
     keyboard: true,
   });
@@ -525,7 +550,7 @@ function showDeleteTickerModal(id) {
   } else {
     handleFunctionNotFound('showDeleteWarning', 'פונקציית הצגת אזהרת מחיקה לא נמצאה');
     // fallback - הצגת המודל הישן
-    const modal = new bootstrap.Modal(document.getElementById('deleteTickerModal'));
+    const modal = new bootstrap.Modal(deleteTickerModalElement);
     modal.show();
   }
 }
@@ -611,7 +636,7 @@ async function handleTickerSaveSuccess(symbol) {
     window.showSuccessNotification('הצלחה', `טיקר ${symbol} נוסף בהצלחה`);
   }
 
-        const modal = bootstrap.Modal.getInstance(document.getElementById('addTickerModal'));
+        const modal = bootstrap.Modal.getInstance(addTickerModalElement);
   // ניקוי מטמון tickers
   if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
     await window.UnifiedCacheManager.remove('tickers');
@@ -821,7 +846,7 @@ async function handleTickerUpdateSuccess(symbol) {
     await window.UnifiedCacheManager.remove('tickers');
     console.log('✅ מטמון tickers נוקה אחרי עדכון');
   }
-      const modal = bootstrap.Modal.getInstance(document.getElementById('editTickerModal'));
+      const modal = bootstrap.Modal.getInstance(editTickerModalElement);
   modal?.hide();
 
       if (window.showSuccessNotification) {
@@ -2156,13 +2181,13 @@ function generateDetailedLog() {
                 hasData: document.querySelectorAll('#tickersTable tbody tr').length > 0
             },
             buttons: {
-                yahooRefreshBtn: document.getElementById('yahooRefreshBtn') ? 'זמין' : 'לא זמין',
-                addTickerBtn: document.getElementById('addTickerBtn') ? 'זמין' : 'לא זמין'
+                yahooRefreshBtn: yahooRefreshBtn ? 'זמין' : 'לא זמין',
+                addTickerBtn: addTickerBtn ? 'זמין' : 'לא זמין'
             },
             modals: {
-                addModal: document.getElementById('addTickerModal') ? 'זמין' : 'לא זמין',
-                editModal: document.getElementById('editTickerModal') ? 'זמין' : 'לא זמין',
-                deleteModal: document.getElementById('deleteTickerModal') ? 'זמין' : 'לא זמין'
+                addModal: addTickerModalElement ? 'זמין' : 'לא זמין',
+                editModal: editTickerModalElement ? 'זמין' : 'לא זמין',
+                deleteModal: deleteTickerModalElement ? 'זמין' : 'לא זמין'
             },
             functions: {
                 showAddTickerModal: typeof window.showAddTickerModal === 'function' ? 'זמין' : 'לא זמין',

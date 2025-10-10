@@ -1745,11 +1745,19 @@ async function loadAddModalData() {
     });
     
     await window.SelectPopulatorService.populateAccountsSelect('addTradePlanTradingAccount', {
-      includeEmpty: true,
-      emptyText: 'בחר חשבון',
-      defaultFromPreferences: true,  // ✅ זה יטען את ברירת המחדל מהעדפות!
+      includeEmpty: false,  // ✅ לא צריך "בחר חשבון" - נבחר אוטומטית
+      defaultFromPreferences: true,  // ינסה לקבל מהעדפות
       filterFn: account => account.status === 'open'
     });
+    
+    // אם לא נבחר חשבון (ההעדפה לא קיימת), בחר את הראשון
+    setTimeout(() => {
+      const accountSelect = document.getElementById('addTradePlanTradingAccount');
+      if (accountSelect && !accountSelect.value && accountSelect.options.length > 0) {
+        accountSelect.selectedIndex = 0;  // בחר את הראשון
+        console.log('✅ נבחר חשבון ראשון כברירת מחדל:', accountSelect.options[0].text);
+      }
+    }, 100);
   } else {
     // Fallback to manual loading
     await loadTickersForAddModal();

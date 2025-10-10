@@ -31,12 +31,12 @@ let editTradeBtn = null;
 
 // Initialize on DOM ready
 document.addEventListener('DOMContentLoaded', () => {
-    addTradeModalElement = addTradeModalElement;
-    editTradeModalElement = editTradeModalElement;
-    editTradeModalLabel = editTradeModalLabel;
-    editTradeForm = editTradeForm;
-    addTradeBtn = addTradeBtn;
-    editTradeBtn = editTradeBtn;
+    addTradeModalElement = document.getElementById('addTradeModal');
+    editTradeModalElement = document.getElementById('editTradeModal');
+    editTradeModalLabel = document.getElementById('editTradeModalLabel');
+    editTradeForm = document.getElementById('editTradeForm');
+    addTradeBtn = document.getElementById('addTradeBtn');
+    editTradeBtn = document.getElementById('editTradeBtn');
     
     if (addTradeModalElement) addTradeModal = new bootstrap.Modal(addTradeModalElement);
     if (editTradeModalElement) editTradeModal = new bootstrap.Modal(editTradeModalElement);
@@ -56,16 +56,8 @@ function showAddTradeModal() {
     // ניקוי הטופס באמצעות DataCollectionService
     window.DataCollectionService.resetForm('addTradeForm', true);
 
-    // הגדרת תאריך נוכחי
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    const hh = String(today.getHours()).padStart(2, '0');
-    const min = String(today.getMinutes()).padStart(2, '0');
-    const todayStr = `${yyyy}-${mm}-${dd}T${hh}:${min}`;
-
-    window.DataCollectionService.setValue('addCreatedAt', todayStr, 'text');
+    // הגדרת ברירות מחדל באמצעות DefaultValueSetter
+    window.DefaultValueSetter.setCurrentDateTime('addCreatedAt');
 
     // הצגת המודל
     const modalElement = addTradeModalElement;
@@ -197,57 +189,28 @@ async function addTrade() {
 }
 
 /**
- * טעינת נתונים למודלים
+ * טעינת נתונים למודלים - באמצעות SelectPopulatorService
  */
 async function loadModalData() {
     try {
         // טעינת טיקרים
-        const tickersResponse = await fetch('/api/tickers/');
-        if (tickersResponse.ok) {
-            const tickers = await tickersResponse.json();
-            const tickerSelect = document.getElementById('addTicker');
-            if (tickerSelect) {
-                tickerSelect.innerHTML = '<option value="">בחר טיקר</option>';
-                tickers.forEach(ticker => {
-                    const option = document.createElement('option');
-                    option.value = ticker.id;
-                    option.textContent = ticker.symbol;
-                    tickerSelect.appendChild(option);
-                });
-            }
-        }
+        await window.SelectPopulatorService.populateTickersSelect('addTicker', {
+            includeEmpty: true,
+            emptyText: 'בחר טיקר'
+        });
 
         // טעינת חשבונות מסחר
-        const accountsResponse = await fetch('/api/trading-accounts/');
-        if (accountsResponse.ok) {
-            const accounts = await accountsResponse.json();
-            const accountSelect = document.getElementById('addAccount');
-            if (accountSelect) {
-                accountSelect.innerHTML = '<option value="">בחר חשבון</option>';
-                accounts.forEach(account => {
-                    const option = document.createElement('option');
-                    option.value = account.id;
-                    option.textContent = account.name;
-                    accountSelect.appendChild(option);
-                });
-            }
-        }
+        await window.SelectPopulatorService.populateAccountsSelect('addAccount', {
+            includeEmpty: true,
+            emptyText: 'בחר חשבון',
+            defaultFromPreferences: true
+        });
 
         // טעינת תוכניות טרייד
-        const plansResponse = await fetch('/api/trade_plans/');
-        if (plansResponse.ok) {
-            const plans = await plansResponse.json();
-            const planSelect = document.getElementById('addTradePlan');
-            if (planSelect) {
-                planSelect.innerHTML = '<option value="">בחר תוכנית</option>';
-                plans.forEach(plan => {
-                    const option = document.createElement('option');
-                    option.value = plan.id;
-                    option.textContent = plan.name || `תוכנית ${plan.id}`;
-                    planSelect.appendChild(option);
-                });
-            }
-        }
+        await window.SelectPopulatorService.populateTradePlansSelect('addTradePlan', {
+            includeEmpty: true,
+            emptyText: 'בחר תוכנית'
+        });
 
     } catch (error) {
         console.error('Error loading modal data:', error);
@@ -467,11 +430,30 @@ class TradesController {
     createTradeRow(trade) {
         const row = document.createElement('tr');
         
-        // תאריך יצירה
-        const createdDate = trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL') : 'N/A';
+        // שימוש ב-FieldRendererService לעיצוב שדות
+        const statusBadge = window.FieldRendererService ? 
+            window.FieldRendererService.renderStatus(trade.status) : 
+            `<span class="status-badge status-${trade.status?.toLowerCase() || 'unknown'}">${trade.status || 'N/A'}</span>`;
         
-        // תאריך סגירה
-        const closedDate = trade.closed_at ? new Date(trade.closed_at).toLocaleDateString('he-IL') : 'N/A';
+        const typeBadge = window.FieldRendererService ? 
+            window.FieldRendererService.renderType(trade.investment_type, 'investment_type') : 
+            (trade.investment_type || 'N/A');
+        
+        const sideBadge = window.FieldRendererService ? 
+            window.FieldRendererService.renderSide(trade.side) : 
+            `<span class="side-badge side-${trade.side?.toLowerCase() || 'unknown'}">${trade.side || 'N/A'}</span>`;
+        
+        const pnlBadge = window.FieldRendererService ? 
+            window.FieldRendererService.renderNumericValue(trade.total_pl, ' $', true) : 
+            `<span class="pnl-badge ${(trade.total_pl || 0) >= 0 ? 'positive' : 'negative'}">${trade.total_pl || 0}</span>`;
+        
+        const createdDate = window.FieldRendererService ? 
+            window.FieldRendererService.renderDate(trade.created_at) : 
+            (trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL') : 'N/A');
+        
+        const closedDate = window.FieldRendererService ? 
+            window.FieldRendererService.renderDate(trade.closed_at) : 
+            (trade.closed_at ? new Date(trade.closed_at).toLocaleDateString('he-IL') : 'N/A');
         
         // מחיר נוכחי (נדרש לשלוף מהטיקר)
         const currentPrice = trade.current_price || 'N/A';
@@ -483,23 +465,11 @@ class TradesController {
             <td class="col-ticker">${trade.ticker_symbol || trade.ticker?.symbol || 'N/A'}</td>
             <td class="col-price">${currentPrice}</td>
             <td class="col-change">${changePercent}</td>
-            <td class="col-status">
-                <span class="status-badge status-${trade.status?.toLowerCase() || 'unknown'}">
-                    ${trade.status || 'N/A'}
-                </span>
-            </td>
-            <td class="col-type">${trade.investment_type || 'N/A'}</td>
-            <td class="col-side">
-                <span class="side-badge side-${trade.side?.toLowerCase() || 'unknown'}">
-                    ${trade.side || 'N/A'}
-                </span>
-            </td>
+            <td class="col-status">${statusBadge}</td>
+            <td class="col-type">${typeBadge}</td>
+            <td class="col-side">${sideBadge}</td>
             <td class="col-plan">${trade.trade_plan?.name || 'N/A'}</td>
-            <td class="col-pnl">
-                <span class="pnl-badge ${(trade.total_pl || 0) >= 0 ? 'positive' : 'negative'}">
-                    ${trade.total_pl || 0}
-                </span>
-            </td>
+            <td class="col-pnl">${pnlBadge}</td>
             <td class="col-created">${createdDate}</td>
             <td class="col-closed">${closedDate}</td>
             <td class="col-account">${trade.account_name || trade.trading_account?.name || 'N/A'}</td>
@@ -541,86 +511,46 @@ class TradesController {
     }
 
     /**
-     * עדכון רשימות טיקרים
+     * עדכון רשימות טיקרים - באמצעות SelectPopulatorService
      */
-    updateTickerSelects(tickers) {
+    async updateTickerSelects(tickers) {
         const selects = ['editTicker'];
         
-        selects.forEach(selectId => {
-            const select = document.getElementById(selectId);
-            if (!select) return;
-            
-            // שמירת הערך הנוכחי
-            const currentValue = select.value;
-            
-            // ניקוי האופציות
-            select.innerHTML = '<option value="">בחר טיקר</option>';
-            
-            // הוספת טיקרים
-            tickers.forEach(ticker => {
-                const option = document.createElement('option');
-                option.value = ticker.id;
-                option.textContent = `${ticker.symbol} - ${ticker.name}`;
-                select.appendChild(option);
+        for (const selectId of selects) {
+            await window.SelectPopulatorService.populateTickersSelect(selectId, {
+                includeEmpty: true,
+                emptyText: 'בחר טיקר'
             });
-            
-            // שחזור הערך
-            if (currentValue) {
-                select.value = currentValue;
-            }
-        });
+        }
     }
 
     /**
-     * עדכון רשימות חשבונות
+     * עדכון רשימות חשבונות - באמצעות SelectPopulatorService
      */
-    updateAccountSelects(accounts) {
+    async updateAccountSelects(accounts) {
         const selects = ['editAccount'];
         
-        selects.forEach(selectId => {
-            const select = document.getElementById(selectId);
-            if (!select) return;
-            
-            const currentValue = select.value;
-            select.innerHTML = '<option value="">בחר חשבון</option>';
-            
-            accounts.forEach(account => {
-                const option = document.createElement('option');
-                option.value = account.id;
-                option.textContent = account.name;
-                select.appendChild(option);
+        for (const selectId of selects) {
+            await window.SelectPopulatorService.populateAccountsSelect(selectId, {
+                includeEmpty: true,
+                emptyText: 'בחר חשבון',
+                defaultFromPreferences: true
             });
-            
-            if (currentValue) {
-                select.value = currentValue;
-            }
-        });
+        }
     }
 
     /**
-     * עדכון רשימות תוכניות מסחר
+     * עדכון רשימות תוכניות מסחר - באמצעות SelectPopulatorService
      */
-    updateTradePlanSelects(tradePlans) {
+    async updateTradePlanSelects(tradePlans) {
         const selects = ['editTradePlan'];
         
-        selects.forEach(selectId => {
-            const select = document.getElementById(selectId);
-            if (!select) return;
-            
-            const currentValue = select.value;
-            select.innerHTML = '<option value="">בחר תוכנית מסחר</option>';
-            
-            tradePlans.forEach(plan => {
-                const option = document.createElement('option');
-                option.value = plan.id;
-                option.textContent = `${plan.ticker?.symbol || 'N/A'} - ${plan.investment_type}`;
-                select.appendChild(option);
+        for (const selectId of selects) {
+            await window.SelectPopulatorService.populateTradePlansSelect(selectId, {
+                includeEmpty: true,
+                emptyText: 'בחר תוכנית מסחר'
             });
-            
-            if (currentValue) {
-                select.value = currentValue;
-            }
-        });
+        }
     }
 
     /**

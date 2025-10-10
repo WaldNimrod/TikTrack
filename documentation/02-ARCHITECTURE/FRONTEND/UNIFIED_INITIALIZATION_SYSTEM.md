@@ -70,6 +70,22 @@ The New General Systems Architecture is a revolutionary approach to JavaScript i
 | `error-handlers.js` | Archived | Moved to `modules/communication-module.js` |
 | `unified-cache-manager.js` | Archived | Moved to `modules/cache-module.js` |
 
+### **📋 Loading Order & Additional Files**
+
+**⭐ For complete loading standard, see:** [LOADING_STANDARD.md](LOADING_STANDARD.md)
+
+The unified system includes:
+- **8 Core Modules** (always required)
+- **3 Core Utilities** (always required): global-favicon.js, page-utils.js, header-system.js
+- **5 Common Utilities** (optional): translation-utils.js, date-utils.js, validation-utils.js, linked-items.js, warning-system.js
+- **6 Services** (optional): data-collection, field-renderer, select-populator, crud-response-handler, default-value-setter, statistics-calculator
+- **1 Page Script** (always required)
+
+**DOMContentLoaded Policy:**
+- ❌ FORBIDDEN in page scripts, HTML files, utilities, and services
+- ✅ Allowed ONLY in core modules if absolutely necessary
+- See [LOADING_STANDARD.md](LOADING_STANDARD.md) for complete policy and examples
+
 ### **🔄 5-Stage Initialization Process**
 
 #### **Stage 1: Core Systems**
@@ -171,7 +187,7 @@ The core systems stage includes automatic IndexedDB initialization:
 <script src="scripts/modules/cache-module.js"></script>
 ```
 
-**הערה:** הטעינה הדינמית הופסקה - המערכת החדשה משתמשת בטעינה סטטית של כל 8 המודולים.
+**⭐ חשוב:** המערכת עובדת עם טעינה סטטית בלבד - כל 8 המודולים נטענים תמיד לשיפור יציבות ופשטות.
 
 ### **Status Monitoring**
 
@@ -328,13 +344,9 @@ window.unifiedAppInit.addCustomInitializer(async (pageConfig) => {
     console.log('Custom initialization for:', pageConfig.name);
     // Your custom logic here
 });
-
-// Dynamic module loading
-window.loadModule('ui-advanced', () => {
-    console.log('UI Advanced module loaded');
-    // Module-specific initialization
-});
 ```
+
+**Note:** All 8 modules are loaded statically - no need for dynamic loading.
 
 ### **Error Handling**
 
@@ -344,15 +356,9 @@ window.unifiedAppInit.addErrorHandler((error) => {
     console.error('Initialization error:', error);
     // Custom error handling
 });
-
-// Module loading error handling
-window.loadModule('ui-advanced', () => {
-    // Success callback
-}, (error) => {
-    console.error('Module loading error:', error);
-    // Error callback
-});
 ```
+
+**Note:** All modules are loaded statically, so module-specific error handling is not needed.
 
 ---
 
@@ -478,14 +484,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
 ## 📈 **Future Enhancements**
 
-### **Planned Features**
+### **Completed Features**
 
-- ✅ **Dynamic Loading:** Modules loaded only when needed (Implemented)
-- ✅ **90% Memory Saving:** Conditional loading of modules (Implemented)
+- ✅ **Static Loading:** All 8 modules loaded for maximum compatibility and simplicity
+- ✅ **90% Memory Saving:** Unified modules instead of separate files (Implemented)
 - ✅ **70% Loading Time Improvement:** Faster initial page load (Implemented)
+
+### **Future Enhancements (Planned)**
+
 - **Service Workers:** Background initialization
 - **Progressive Enhancement:** Graceful degradation
-- **A/B Testing:** Multiple initialization strategies
 - **Analytics Integration:** Detailed performance tracking
 
 ### **Contribution Guidelines**
@@ -517,10 +525,12 @@ For issues or questions about the Unified Initialization System:
 
 ## 🔗 **Related Documentation**
 
+- ⭐ [Loading Standard](LOADING_STANDARD.md) - **תקן טעינת קבצים מדויק**
 - [New General Systems Architecture Specification](../new_general_systems_architecture_specification.md)
 - [New General Systems Implementation Plan](../new_general_systems_implementation_plan.md)
 - [New General Systems Project Summary](../new_general_systems_project_summary.md)
-- [General Systems List](GENERAL_SYSTEMS_LIST.md)
+- [General Systems List](../../frontend/GENERAL_SYSTEMS_LIST.md)
 - [JavaScript Architecture](JAVASCRIPT_ARCHITECTURE.md)
-- [Cache Implementation Guide](CACHE_IMPLEMENTATION_GUIDE.md)
+- [Services Architecture](../../frontend/SERVICES_ARCHITECTURE.md)
+- [Cache Implementation Guide](../../CACHE_IMPLEMENTATION_GUIDE.md)
 

@@ -99,13 +99,13 @@ class DatabaseRecreator:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name VARCHAR(100) NOT NULL UNIQUE,
                 currency_id INTEGER NOT NULL,
-                status VARCHAR(20) DEFAULT 'active',
+                status VARCHAR(20) DEFAULT 'open',
                 cash_balance FLOAT DEFAULT 0.00,
                 total_value FLOAT DEFAULT 0.00,
                 total_pl FLOAT DEFAULT 0.00,
                 notes VARCHAR(500),
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                status_default VARCHAR(20) DEFAULT 'active',
+                status_default VARCHAR(20) DEFAULT 'open',
                 FOREIGN KEY (currency_id) REFERENCES currencies (id)
             )
         """)
@@ -543,11 +543,9 @@ class DatabaseRecreator:
             (plan_status_constraint_id, 'cancelled', 'בוטל', 1, 3),
             
             # Trading Account status
-            (account_status_constraint_id, 'active', 'פעיל', 1, 1),
-            (account_status_constraint_id, 'inactive', 'לא פעיל', 1, 2),
-            (account_status_constraint_id, 'closed', 'סגור', 1, 3),
-            (account_status_constraint_id, 'suspended', 'מושעה', 1, 4),
-            (account_status_constraint_id, 'cancelled', 'מבוטל', 1, 5),
+            (account_status_constraint_id, 'open', 'פתוח', 1, 1),
+            (account_status_constraint_id, 'closed', 'סגור', 1, 2),
+            (account_status_constraint_id, 'cancelled', 'מבוטל', 1, 3),
             
             # Ticker types
             (ticker_type_constraint_id, 'stock', 'מניה', 1, 1),

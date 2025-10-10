@@ -114,7 +114,6 @@
                 <div class="info-summary" id="summaryStats">
                     <div><strong>סה"כ חשבונות מסחר:</strong> <span id="totalAccounts">0</span></div>
                     <div><strong>חשבונות מסחר פעילים:</strong> <span id="activeAccounts">0</span></div>
-                    <div><strong>חשבונות מסחר פתוחים:</strong> <span id="openAccounts">0</span></div>
                     <div><strong>סה"כ יתרה:</strong> <span id="totalBalance">$0</span></div>
                 </div>
             </div>
@@ -128,7 +127,6 @@
                 <h2>
                     <img src="images/icons/trading_accounts.svg" alt="ניהול חשבונות מסחר" class="section-icon">
                     ניהול חשבונות מסחר
-                    <span class="table-count" id="accountsCount">טוען...</span>
                 </h2>
                 <div class="header-actions">
                     <button id="addAccountBtn" class="refresh-btn" onclick="showAddAccountModal()" title="הוסף חשבון מסחר חדש">
@@ -237,7 +235,7 @@
                                         <select class="form-select" id="accountStatus" required>
                                             <option value="open">פתוח</option>
                                             <option value="closed">סגור</option>
-                                            <option value="suspended">מושעה</option>
+                                            <option value="cancelled">מבוטל</option>
                                         </select>
                                     </div>
                                 </div>
@@ -305,7 +303,7 @@
                                         <select class="form-select" id="editAccountStatus" required>
                                             <option value="open">פתוח</option>
                                             <option value="closed">סגור</option>
-                                            <option value="suspended">מושעה</option>
+                                            <option value="cancelled">מבוטל</option>
                                         </select>
                                     </div>
                                 </div>
@@ -382,7 +380,7 @@
     <script src="scripts/modules/dynamic-loader-config.js?v=20251006"></script>
     
     <!-- Page Initialization Configs -->
-    <script src="scripts/page-initialization-configs.js?v=20251001"></script>
+    <!-- PAGE_CONFIGS integrated in core-systems.js -->
     
     <!-- Additional Required Scripts -->
     <script src="scripts/global-favicon.js?v=20251001"></script>
@@ -412,9 +410,13 @@
     
     <!-- Service Systems (New General Services - Stage B Integration) -->
     <script src="scripts/services/data-collection-service.js?v=1.0.0"></script>
+    <script src="scripts/services/field-renderer-service.js?v=1.0.0"></script>
+    <script src="scripts/services/select-populator-service.js?v=1.0.0"></script>
+    <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script>
+    <script src="scripts/services/statistics-calculator.js?v=1.0.0"></script>
     
     <!-- Page-specific Script -->
-    <script src="scripts/trading_accounts.js?v=20251009"></script>
+    <script src="scripts/trading_accounts.js?v=20251010-fix1"></script>
     
     <!-- Local copyDetailedLog function for trading_accounts page -->
     <script>

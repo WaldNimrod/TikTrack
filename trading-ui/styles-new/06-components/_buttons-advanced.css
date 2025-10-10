@@ -540,28 +540,8 @@ button.btn-secondary-custom:hover {
   box-shadow: 0 2px 4px rgba(41, 166, 168, 0.2);
 }
 
-/* כפתורי פעולות בטבלאות */
-.actions-cell .btn-sm.btn-secondary {
-  background: #ffffff;
-  color: #29a6a8;
-  border: 1px solid #29a6a8;
-  border-radius: 8px;
-  padding: 0.3rem;
-  width: 28px;
-  height: 28px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.actions-cell .btn-sm.btn-secondary:hover {
-  background: #ffffff;
-  color: #1f8a8c;
-  border-color: #1f8a8c;
-  transform: none;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
+/* כפתורי פעולות בטבלאות - מוגדרים ב-_tables.css */
+/* סגנונות ספציפיים לכפתורים בטבלאות מנוהלים בקובץ הטבלאות */
 
 /* כפתורים עם רוחב מינימלי */
 .btn-info, .btn-success, .btn-warning, .btn-danger, .btn-primary, .btn-secondary {
@@ -586,22 +566,22 @@ button, .btn, .btn-sm, .btn-lg {
 
 /* כפתורי פעולות קטנים מרובעים - ברירת מחדל */
 .btn-action {
-  width: 32px !important;
-  height: 32px !important;
-  padding: 0 !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  border-radius: 4px !important;
-  font-size: 0.875rem !important;
-  border: 1px solid #dee2e6 !important;
-  background: white !important;
-  color: #6c757d !important;
-  transition: all 0.2s ease !important;
-  min-width: 32px !important;
-  max-width: 32px !important;
-  min-height: 32px !important;
-  max-height: 32px !important;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  border: 1px solid #dee2e6;
+  background: white;
+  color: #6c757d;
+  transition: all 0.2s ease;
+  min-width: 32px;
+  max-width: 32px;
+  min-height: 32px;
+  max-height: 32px;
 }
 
 .btn-action:hover {

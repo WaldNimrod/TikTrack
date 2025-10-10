@@ -13,7 +13,10 @@ let cashFlowCurrencySelect = null;
 let editCashFlowCurrencySelect = null;
 
 // Initialize element references on DOM ready
-document.addEventListener('DOMContentLoaded', () => {
+// DOMContentLoaded removed - handled by unified system via PAGE_CONFIGS in core-systems.js
+// Modal initialization moved to initializeCashFlowsModals
+
+window.initializeCashFlowsModals = function() {
     addCashFlowModalElement = document.getElementById('addCashFlowModal');
     editCashFlowModalElement = document.getElementById('editCashFlowModal');
     addCashFlowForm = document.getElementById('addCashFlowForm');
@@ -25,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (addCashFlowModalElement) addCashFlowModal = new bootstrap.Modal(addCashFlowModalElement);
     if (editCashFlowModalElement) editCashFlowModal = new bootstrap.Modal(editCashFlowModalElement);
-});
+};
 
 /**
  * טעינת נתוני תזרימי מזומנים מהשרת
@@ -334,17 +337,9 @@ function showAddCashFlowModal() {
     clearValidationErrors();
   }
 
-  // הגדרת ברירות מחדל באמצעות DataCollectionService
-  const today = new Date();
-  const yyyy = today.getFullYear();
-  const mm = String(today.getMonth() + 1).padStart(2, '0');
-  const dd = String(today.getDate()).padStart(2, '0');
-  const hh = String(today.getHours()).padStart(2, '0');
-  const min = String(today.getMinutes()).padStart(2, '0');
-  const todayStr = `${yyyy}-${mm}-${dd}T${hh}:${min}`;
-  
-  window.DataCollectionService.setValue('cashFlowDate', todayStr, 'text');
-  window.DataCollectionService.setValue('cashFlowType', 'deposit', 'text');
+  // הגדרת ברירות מחדל באמצעות DefaultValueSetter
+  window.DefaultValueSetter.setCurrentDateTime('cashFlowDate');
+  window.DefaultValueSetter.setLogicalDefault('cashFlowType', 'deposit');
 
   // טעינת נתונים למודל
   loadAccountsForCashFlow();
@@ -789,134 +784,46 @@ async function loadCurrenciesFromServer() {
  * טעינת רשימת חשבונות למודל הוספה
  */
 async function loadAccountsForCashFlow() {
-  try {
-    const response = await fetch('http://127.0.0.1:8080/api/trading-accounts/');
-    if (response.ok) {
-      const result = await response.json();
-      if (result.status === 'success') {
-        if (cashFlowAccountSelect) {
-          const select = cashFlowAccountSelect;
-          select.innerHTML = '<option value="">בחר חשבון...</option>';
-
-          // הצגת רק חשבונות פתוחים
-          const activeAccounts = result.data.filter(account => account.status === 'open');
-          activeAccounts.forEach((account, index) => {
-            const option = document.createElement('option');
-            option.value = account.id;
-            option.textContent = account.name;
-            // הגדרת חשבון ברירת מחדל - החשבון הראשון
-            if (index === 0) {
-              option.selected = true;
-            }
-            select.appendChild(option);
-          });
-
-        } else {
-          handleElementNotFound('loadAccountsForCashFlow', 'לא נמצא אלמנט select עם ID: cashFlowAccountId');
-        }
-      } else {
-        handleApiError('שגיאה בתגובת API', result.error);
-      }
-    } else {
-      handleApiError('שגיאת HTTP', response.status);
-    }
-  } catch (error) {
-    handleDataLoadError(error, 'טעינת חשבונות');
-
-    // הצגת הודעת שגיאה
-    if (window.showInfoNotification) {
-      window.showInfoNotification('מידע על הטעינה', 'שגיאה בטעינת חשבונות');
-    }
-  }
+    await window.SelectPopulatorService.populateAccountsSelect('cashFlowAccountId', {
+        includeEmpty: true,
+        emptyText: 'בחר חשבון...',
+        filterFn: account => account.status === 'open', // רק חשבונות פתוחים
+        defaultFromPreferences: true // שימוש בחשבון ברירת מחדל מהעדפות
+    });
 }
 
 /**
  * טעינת רשימת חשבונות למודל עריכה
  */
 async function loadAccountsForEditCashFlow() {
-  try {
-    const response = await fetch('http://127.0.0.1:8080/api/trading-accounts/');
-    if (response.ok) {
-      const result = await response.json();
-      if (result.status === 'success') {
-        if (editCashFlowAccountSelect) {
-          const select = editCashFlowAccountSelect;
-          select.innerHTML = '<option value="">בחר חשבון...</option>';
-
-          // הצגת רק חשבונות פתוחים
-          result.data
-            .filter(account => account.status === 'open')
-            .forEach(account => {
-              const option = document.createElement('option');
-              option.value = account.id;
-              option.textContent = account.name;
-              select.appendChild(option);
-            });
-        }
-      }
-    }
-  } catch (error) {
-    handleDataLoadError(error, 'טעינת חשבונות');
-  }
+    await window.SelectPopulatorService.populateAccountsSelect('editCashFlowAccountId', {
+        includeEmpty: true,
+        emptyText: 'בחר חשבון...',
+        filterFn: account => account.status === 'open' // רק חשבונות פתוחים
+    });
 }
 
 /**
  * טעינת רשימת מטבעות למודל הוספה
  */
 async function loadCurrenciesForCashFlow() {
-  try {
-    // טעינת מטבעות מהשרת עם המערכת החדשה
-    const currencies = await loadCurrenciesFromServer();
-    if (cashFlowCurrencySelect) {
-      const select = cashFlowCurrencySelect;
-      select.innerHTML = '<option value="">בחר מטבע...</option>';
-
-      currencies.forEach((currency, index) => {
-        const option = document.createElement('option');
-        option.value = currency.id;
-        option.textContent = `${currency.symbol} - ${currency.name}`;
-        // הגדרת מטבע ברירת מחדל - USD (id=1) או המטבע הראשון
-        if (currency.id === 1 || index === 0) {
-          option.selected = true;
-        }
-        select.appendChild(option);
-      });
-
-    } else {
-      handleElementNotFound('loadCurrenciesForCashFlow', 'לא נמצא אלמנט select עם ID: cashFlowCurrencyId');
-    }
-  } catch (error) {
-    handleDataLoadError(error, 'טעינת מטבעות');
-
-    // הצגת הודעת שגיאה
-    if (window.showInfoNotification) {
-      window.showInfoNotification('מידע על הטעינה', 'שגיאה בטעינת מטבעות');
-    }
-  }
+    await window.SelectPopulatorService.populateCurrenciesSelect('cashFlowCurrencyId', {
+        includeEmpty: true,
+        emptyText: 'בחר מטבע...',
+        setDefault: true, // USD (id=1) או מהעדפות
+        format: 'symbol-name' // "USD - US Dollar"
+    });
 }
 
 /**
  * טעינת רשימת מטבעות למודל עריכה
  */
 async function loadCurrenciesForEditCashFlow() {
-  try {
-    // טעינת מטבעות מהשרת עם המערכת החדשה
-    const currencies = await loadCurrenciesFromServer();
-
-    if (editCashFlowCurrencySelect) {
-      const select = editCashFlowCurrencySelect;
-      select.innerHTML = '<option value="">בחר מטבע...</option>';
-
-      currencies.forEach(currency => {
-        const option = document.createElement('option');
-        option.value = currency.id;
-        option.textContent = `${currency.symbol} - ${currency.name}`;
-        select.appendChild(option);
-      });
-    }
-  } catch (error) {
-    handleDataLoadError(error, 'טעינת מטבעות');
-  }
+    await window.SelectPopulatorService.populateCurrenciesSelect('editCashFlowCurrencyId', {
+        includeEmpty: true,
+        emptyText: 'בחר מטבע...',
+        format: 'symbol-name' // "USD - US Dollar"
+    });
 }
 
 /**
@@ -955,7 +862,18 @@ async function renderCashFlowsTable() {
     const typeDisplay = getCashFlowTypeWithColor(cashFlow.type);
 
     // עיצוב סכום עם יישור נכון וצביעה
-    const amountDisplay = formatCashFlowAmount(cashFlow.amount);
+    // שימוש ב-FieldRendererService לעיצוב שדות
+    const typeBadge = window.FieldRendererService ? 
+      window.FieldRendererService.renderType(cashFlow.type, 'cash_flow_type') : 
+      `<span class="cash-flow-${cashFlow.type.toLowerCase()}">${typeDisplay}</span>`;
+
+    const amountBadge = window.FieldRendererService ? 
+      window.FieldRendererService.renderNumericValue(cashFlow.amount, ' $', true) : 
+      `<span class="${cashFlow.amount >= 0 ? 'numeric-value-positive' : 'numeric-value-negative'}" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">${formatCashFlowAmount(cashFlow.amount)}</span>`;
+
+    const dateBadge = window.FieldRendererService ? 
+      window.FieldRendererService.renderDate(cashFlow.date) : 
+      formatDate(cashFlow.date);
 
     // עיצוב שער עם 2 ספרות אחרי הנקודה
     const rateDisplay = formatUsdRate(cashFlow.usd_rate);
@@ -975,18 +893,9 @@ async function renderCashFlowsTable() {
                     </span>
                 </div>
             </td>
-            <td class="col-type type-cell">
-                <span class="cash-flow-${cashFlow.type.toLowerCase()}">
-                    ${typeDisplay}
-                </span>
-            </td>
-            <td class="col-amount" style="text-align: left; direction: ltr;">
-                <span class="${cashFlow.amount >= 0 ? 'numeric-value-positive' : 'numeric-value-negative'}" 
-                      style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
-                    ${amountDisplay}
-                </span>
-            </td>
-            <td class="col-date" style="text-align: center;">${formatDate(cashFlow.date)}</td>
+            <td class="col-type type-cell">${typeBadge}</td>
+            <td class="col-amount" style="text-align: left; direction: ltr;">${amountBadge}</td>
+            <td class="col-date" style="text-align: center;">${dateBadge}</td>
             <td class="col-description">${cashFlow.description || '-'}</td>
             <td class="col-source">${window.translateCashFlowSource ?
     window.translateCashFlowSource(cashFlow.source) :

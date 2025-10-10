@@ -13,13 +13,13 @@ let alertRelatedObjectSelect = null;
 let editAlertRelatedObjectSelect = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-    addAlertModalElement = addAlertModalElement;
-    editAlertModalElement = editAlertModalElement;
-    deleteAlertModalElement = deleteAlertModalElement;
-    addAlertForm = addAlertForm;
-    editAlertForm = editAlertForm;
-    alertRelatedObjectSelect = alertRelatedObjectSelect;
-    editAlertRelatedObjectSelect = editAlertRelatedObjectSelect;
+    addAlertModalElement = document.getElementById('addAlertModal');
+    editAlertModalElement = document.getElementById('editAlertModal');
+    deleteAlertModalElement = document.getElementById('deleteAlertModal');
+    addAlertForm = document.getElementById('addAlertForm');
+    editAlertForm = document.getElementById('editAlertForm');
+    alertRelatedObjectSelect = document.getElementById('alertRelatedObjectSelect');
+    editAlertRelatedObjectSelect = document.getElementById('editAlertRelatedObjectSelect');
     
     if (addAlertModalElement) addAlertModal = new bootstrap.Modal(addAlertModalElement);
     if (editAlertModalElement) editAlertModal = new bootstrap.Modal(editAlertModalElement);
@@ -521,22 +521,31 @@ function updateAlertsTable(alerts) {
       // הוספת איקון קישור לפני האובייקט
       relatedDisplay = '🔗 ' + relatedDisplay;
 
-      const createdAt = alert.created_at ? new Date(alert.created_at).toLocaleDateString('he-IL', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-      }) : 'לא מוגדר';
+      // שימוש ב-FieldRendererService לעיצוב שדות
+      const statusBadge = window.FieldRendererService ? 
+        window.FieldRendererService.renderStatus(alert.status) : 
+        (() => {
+          let statusDisplay;
+          switch (alert.status) {
+            case 'open': statusDisplay = 'פתוח'; break;
+            case 'closed': statusDisplay = 'סגור'; break;
+            case 'cancelled': statusDisplay = 'מבוטל'; break;
+            default: statusDisplay = alert.status;
+          }
+          return `<span class="status-badge ${statusClass}">${statusDisplay}</span>`;
+        })();
 
-      // המרת סטטוס לעברית להצגה
-      // לפי הדוקומנטציה: open=פעיל, closed=הופעל, cancelled=בוטל
-      let statusDisplay;
-      switch (alert.status) {
-      case 'open': statusDisplay = 'פתוח'; break;
-      case 'closed': statusDisplay = 'סגור'; break;
-      case 'cancelled': statusDisplay = 'מבוטל'; break;
-      default: statusDisplay = alert.status;
-      }
+      const dateBadge = window.FieldRendererService ? 
+        window.FieldRendererService.renderDate(alert.created_at) : 
+        (alert.created_at ? new Date(alert.created_at).toLocaleDateString('he-IL', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        }) : 'לא מוגדר');
 
+      const relatedTypeBadge = window.FieldRendererService ? 
+        window.FieldRendererService.renderType(alert.related_type, 'related_type') : 
+        relatedDisplay;
 
       // המרת מצב הפעלה לעברית להצגה עם צבעים דינמיים
       // לפי הדוקומנטציה: false=לא הופעל, new=הופעל לא נקרא, true=נקרא/בוטל
@@ -603,19 +612,17 @@ function updateAlertsTable(alerts) {
     }
     return alert.condition || '-';
   })()}</span></td>
-          <td class="status-cell" data-status="${alert.status || ''}">
-          <span class="status-badge ${statusClass}">${statusDisplay}</span>
-        </td>
+          <td class="status-cell" data-status="${alert.status || ''}">${statusBadge}</td>
           <td><span class="triggered-badge ${triggeredClass}">${triggeredDisplay}</span></td>
           <td class="related-cell">
             <div class="related-object-cell ${relatedClass}" 
              title="קישור לדף אובייקט - בפיתוח">
-              ${relatedDisplay}
+              ${relatedTypeBadge}
             </div>
           </td>
 
           <td><span class="message-text">${alert.message || '-'}</span></td>
-          <td data-date="${alert.created_at}"><span class="date-text">${createdAt}</span></td>
+          <td data-date="${alert.created_at}"><span class="date-text">${dateBadge}</span></td>
           <td class="col-actions actions-cell actions-3-btn" data-entity-id="${alert.id}" data-status="${alert.status || ''}">
             ${window.createLinkButton(`viewLinkedItemsForAlert(${alert.id})`)}
             <button class="btn btn-sm btn-outline-primary" onclick="editAlert(${alert.id})" title="עריכה">

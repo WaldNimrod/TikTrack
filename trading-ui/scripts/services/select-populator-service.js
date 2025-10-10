@@ -309,7 +309,7 @@ class SelectPopulatorService {
         }
         
         // הוספת כל הפריטים
-        items.forEach(item => {
+        items.forEach((item, index) => {
             const option = document.createElement('option');
             
             // קביעת value

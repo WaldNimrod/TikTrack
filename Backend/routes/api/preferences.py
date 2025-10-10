@@ -522,12 +522,12 @@ def get_preference_types() -> Any:
     """
     try:
         # קבלת סוגי העדפות מהשירות
-        # זה דורש הרחבה של השירות
+        preference_types = preferences_service.get_all_preference_types()
+        
         return jsonify({
             "success": True,
-            "data": {
-                "message": "Admin endpoint - to be implemented"
-            },
+            "data": preference_types,
+            "count": len(preference_types) if preference_types else 0,
             "timestamp": datetime.now().isoformat()
         }), 200
         

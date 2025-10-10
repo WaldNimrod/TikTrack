@@ -4,6 +4,34 @@
  * ========================================
  */
 
+// ===== Global Element Cache =====
+let addTradePlanModal = null;
+let addTradePlanModalElement = null;
+let editTradePlanModal = null;
+let editTradePlanModalElement = null;
+let cancelTradePlanModal = null;
+let cancelTradePlanModalElement = null;
+let deleteTradePlanModal = null;
+let deleteTradePlanModalElement = null;
+let addTradePlanForm = null;
+let editSelectedTickerDisplay = null;
+let selectedTickerDisplay = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+    addTradePlanModalElement = document.getElementById('addTradePlanModal');
+    editTradePlanModalElement = document.getElementById('editTradePlanModal');
+    cancelTradePlanModalElement = document.getElementById('cancelTradePlanModal');
+    deleteTradePlanModalElement = document.getElementById('deleteTradePlanModal');
+    addTradePlanForm = document.getElementById('addTradePlanForm');
+    editSelectedTickerDisplay = document.getElementById('editSelectedTickerDisplay');
+    selectedTickerDisplay = document.getElementById('selectedTickerDisplay');
+    
+    if (addTradePlanModalElement) addTradePlanModal = new bootstrap.Modal(addTradePlanModalElement);
+    if (editTradePlanModalElement) editTradePlanModal = new bootstrap.Modal(editTradePlanModalElement);
+    if (cancelTradePlanModalElement) cancelTradePlanModal = new bootstrap.Modal(cancelTradePlanModalElement);
+    if (deleteTradePlanModalElement) deleteTradePlanModal = new bootstrap.Modal(deleteTradePlanModalElement);
+});
+
 // ===== HELPER FUNCTIONS =====
 
 /**
@@ -256,16 +284,10 @@ window.tradePlansLoaded = false;
  */
 function openAddTradePlanModal() {
   // Opening add trade plan modal
-  const modal = new bootstrap.Modal(document.getElementById('addTradePlanModal'));
+  const modal = new bootstrap.Modal(addTradePlanModalElement);
 
-  // קבע ברירת מחדל של היום לשדה התאריך
-  const today = new Date();
-  const yyyy = today.getFullYear();
-  const mm = String(today.getMonth() + 1).padStart(2, '0');
-  const dd = String(today.getDate()).padStart(2, '0');
-  const todayStr = `${yyyy}-${mm}-${dd}`;
-  const dateInput = document.getElementById('addTradePlanDate');
-  if (dateInput) {dateInput.value = todayStr;}
+  // קבע ברירת מחדל של היום לשדה התאריך באמצעות DefaultValueSetter
+  window.DefaultValueSetter.setCurrentDate('addTradePlanDate');
 
   modal.show();
 }
@@ -413,7 +435,7 @@ async function openEditTradePlanModal(tradePlanId) {
   // חישוב מספר מניות
   updateEditSharesFromAmount();
 
-  const modal = new bootstrap.Modal(document.getElementById('editTradePlanModal'));
+  const modal = new bootstrap.Modal(editTradePlanModalElement);
   modal.show();
 }
 
@@ -421,36 +443,11 @@ async function openEditTradePlanModal(tradePlanId) {
  * טעינת רשימת הטיקרים בחלון העריכה
  */
 async function loadTickersForEditModal() {
-  const tickerSelect = document.getElementById('editTradePlanTickerId');
-  if (!tickerSelect) {return;}
-
-  // ניקוי הרשימה הקיימת
-  tickerSelect.innerHTML = '<option value="">בחר טיקר</option>';
-
-  try {
-    // ניסיון לקבל טיקרים מהשירות
-    let tickers = [];
-    if (typeof window.tickerService?.getTickers === 'function') {
-      tickers = await window.tickerService.getTickers();
-    } else if (window.tickersData) {
-      tickers = window.tickersData;
-    }
-
-    // סינון טיקרים - רק פתוחים או סגורים (לא מבוטלים)
-    const activeTickers = tickers.filter(ticker =>
-      ticker.status === 'open' || ticker.status === 'closed',
-    );
-
-    // הוספת הטיקרים הפעילים לרשימה
-    activeTickers.forEach(ticker => {
-      const option = document.createElement('option');
-      option.value = ticker.id;
-      option.textContent = ticker.symbol;
-      tickerSelect.appendChild(option);
+    await window.SelectPopulatorService.populateTickersSelect('editTradePlanTickerId', {
+        includeEmpty: true,
+        emptyText: 'בחר טיקר',
+        filterActive: true // רק open או closed (לא cancelled)
     });
-  } catch (error) {
-    handleDataLoadError(error, 'טיקרים למודל עריכה');
-  }
 }
 
 /**
@@ -483,7 +480,7 @@ function enableEditFields() {
  */
 async function updateEditTickerInfo() {
   const tickerId = document.getElementById('editTradePlanTickerId').value;
-  const tickerDisplay = document.getElementById('editSelectedTickerDisplay');
+  const tickerDisplay = editSelectedTickerDisplay;
   const priceDisplay = document.getElementById('editCurrentPriceDisplay');
   const changeDisplay = document.getElementById('editDailyChangeDisplay');
   const tradePlanId = document.getElementById('editTradePlanId').value;
@@ -770,7 +767,7 @@ async function saveEditTradePlan() {
     }
 
     // סגירת המודל
-    const modal = bootstrap.Modal.getInstance(document.getElementById('editTradePlanModal'));
+    const modal = bootstrap.Modal.getInstance(editTradePlanModalElement);
     modal.hide();
 
     // רענון הטבלה
@@ -977,9 +974,9 @@ function openCancelTradePlanModal(tradePlanId) {
         <strong>סכום מתוכנן:</strong> $${tradePlan.planned_amount || '0.00'}
     `;
 
-  document.getElementById('cancelTradePlanModal').setAttribute('data-trade-plan-id', tradePlanId);
+  cancelTradePlanModalElement.setAttribute('data-trade-plan-id', tradePlanId);
 
-  const modal = new bootstrap.Modal(document.getElementById('cancelTradePlanModal'));
+  const modal = new bootstrap.Modal(cancelTradePlanModalElement);
   modal.show();
 }
 
@@ -1002,9 +999,9 @@ function openDeleteTradePlanModal(tradePlanId) {
         <strong>סכום מתוכנן:</strong> $${tradePlan.planned_amount || '0.00'}
     `;
 
-  document.getElementById('deleteTradePlanModal').setAttribute('data-trade-plan-id', tradePlanId);
+  deleteTradePlanModalElement.setAttribute('data-trade-plan-id', tradePlanId);
 
-  const modal = new bootstrap.Modal(document.getElementById('deleteTradePlanModal'));
+  const modal = new bootstrap.Modal(deleteTradePlanModalElement);
   modal.show();
 }
 
@@ -1046,7 +1043,7 @@ async function cancelTradePlan(tradePlanId) {
  * אישור ביטול תכנון
  */
 async function confirmCancelTradePlan() {
-  const modal = document.getElementById('cancelTradePlanModal');
+  const modal = cancelTradePlanModalElement;
   const tradePlanId = modal.getAttribute('data-trade-plan-id');
 
 
@@ -1061,7 +1058,7 @@ async function confirmCancelTradePlan() {
  * אישור מחיקת תכנון
  */
 async function confirmDeleteTradePlan() {
-  const modal = document.getElementById('deleteTradePlanModal');
+  const modal = deleteTradePlanModalElement;
   const tradePlanId = modal.getAttribute('data-trade-plan-id');
 
   if (!tradePlanId) {
@@ -1074,7 +1071,7 @@ async function confirmDeleteTradePlan() {
     await deleteTradePlan(tradePlanId);
 
     // סגירת המודל
-    const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteTradePlanModal'));
+    const deleteModal = bootstrap.Modal.getInstance(deleteTradePlanModalElement);
     deleteModal.hide();
 
   } catch (error) {
@@ -1393,18 +1390,38 @@ function updateTradePlansTable(trade_plans) {
     const statusClass = getStatusClass(design.status);
     const typeClass = getTypeClass(design.investment_type);
 
-    // Date formatting using date-utils
-    const dateDisplay = design.created_at && window.formatDate ? 
-      window.formatDate(design.created_at) : 'לא מוגדר';
+    // שימוש ב-FieldRendererService לעיצוב שדות
+    const dateDisplay = window.FieldRendererService ? 
+      window.FieldRendererService.renderDate(design.created_at) : 
+      (design.created_at && window.formatDate ? window.formatDate(design.created_at) : 'לא מוגדר');
 
-    // Type correction - ensuring a valid value is passed
-    const typeDisplay = design.investment_type ? window.translateTradePlanType ? window.translateTradePlanType(design.investment_type) : design.investment_type : 'לא מוגדר';
-    const sideDisplay = design.side === 'Long' ? 'Long' : 'Short';
-    const amountDisplay = formatCurrency(design.planned_amount);
-    const targetDisplay = formatCurrency(design.target_price);
-    const stopDisplay = formatCurrency(design.stop_price);
-    const currentDisplay = formatCurrency(design.current || 0);
-    const statusDisplay = window.translateTradePlanStatus ? window.translateTradePlanStatus(design.status) : design.status;
+    const typeDisplay = window.FieldRendererService ? 
+      window.FieldRendererService.renderType(design.investment_type, 'investment_type') : 
+      (design.investment_type ? window.translateTradePlanType ? window.translateTradePlanType(design.investment_type) : design.investment_type : 'לא מוגדר');
+
+    const sideDisplay = window.FieldRendererService ? 
+      window.FieldRendererService.renderSide(design.side) : 
+      `<span class="${design.side === 'Long' ? 'numeric-value-positive' : 'numeric-value-negative'}" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">${design.side === 'Long' ? 'Long' : 'Short'}</span>`;
+
+    const statusDisplay = window.FieldRendererService ? 
+      window.FieldRendererService.renderStatus(design.status) : 
+      `<span class="status-${design.status}-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">${window.translateTradePlanStatus ? window.translateTradePlanStatus(design.status) : design.status}</span>`;
+
+    // חישוב רווח פשוט
+    const profitAmount = design.current_price && design.planned_amount ? 
+      (design.current_price - design.planned_amount) * (design.side === 'Long' ? 1 : -1) : 0;
+
+    const profitDisplay = window.FieldRendererService ? 
+      window.FieldRendererService.renderNumericValue(profitAmount, ' $', true) : 
+      `<span class="${profitAmount >= 0 ? 'numeric-value-positive' : 'numeric-value-negative'}" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">${formatCurrency(profitAmount)}</span>`;
+
+    const amountDisplay = window.FieldRendererService ? 
+      window.FieldRendererService.renderNumericValue(design.planned_amount, ' $', false) : 
+      formatCurrency(design.planned_amount);
+
+    const currentPriceDisplay = window.FieldRendererService ? 
+      window.FieldRendererService.renderNumericValue(design.current_price || 0, ' $', false) : 
+      formatCurrency(design.current_price || 0);
 
     // Displaying ticker symbol or name with Entity Details link
     const tickerDisplay = design.ticker_symbol || design.ticker?.symbol || design.ticker?.name || 'לא מוגדר';
@@ -1413,11 +1430,6 @@ function updateTradePlansTable(trade_plans) {
     // שמירת הערכים המקוריים באנגלית לפילטר
     const typeForFilter = design.investment_type || '';
     const statusForFilter = design.status || '';
-
-    // חישוב רווח פשוט
-    const profitAmount = design.current_price && design.planned_amount ? 
-      (design.current_price - design.planned_amount) * (design.side === 'Long' ? 1 : -1) : 0;
-    const profitDisplay = formatCurrency(profitAmount);
 
     return `
       <tr>
@@ -1435,18 +1447,10 @@ function updateTradePlansTable(trade_plans) {
         <td data-date="${design.created_at}"><span class="date-text">${dateDisplay}</span></td>
         
         <!-- 3. סוג -->
-        <td class="type-cell" data-type="${typeForFilter}">
-          <span class="entity-trade-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
-            ${typeDisplay}
-          </span>
-        </td>
+        <td class="type-cell" data-type="${typeForFilter}">${typeDisplay}</td>
         
         <!-- 4. צד -->
-        <td class="side-cell" data-side="${design.side}">
-          <span class="${design.side === 'Long' ? 'numeric-value-positive' : 'numeric-value-negative'}" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
-            ${sideDisplay}
-          </span>
-        </td>
+        <td class="side-cell" data-side="${design.side}">${sideDisplay}</td>
         
         <!-- 5. כמות -->
         <td class="quantity-cell">
@@ -1456,32 +1460,16 @@ function updateTradePlansTable(trade_plans) {
         </td>
         
         <!-- 6. מחיר -->
-        <td class="price-cell">
-          <span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
-            ${formatCurrency(design.current_price || 0)}
-          </span>
-        </td>
+        <td class="price-cell">${currentPriceDisplay}</td>
         
         <!-- 7. השקעה -->
-        <td class="investment-cell">
-          <span class="numeric-value-positive" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
-            ${amountDisplay}
-          </span>
-        </td>
+        <td class="investment-cell">${amountDisplay}</td>
         
         <!-- 8. סטטוס -->
-        <td class="status-cell" data-status="${statusForFilter}">
-          <span class="status-${design.status}-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
-            ${statusDisplay}
-          </span>
-        </td>
+        <td class="status-cell" data-status="${statusForFilter}">${statusDisplay}</td>
         
         <!-- 9. רווח -->
-        <td class="profit-cell">
-          <span class="${profitAmount >= 0 ? 'numeric-value-positive' : 'numeric-value-negative'}" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
-            ${profitDisplay}
-          </span>
-        </td>
+        <td class="profit-cell">${profitDisplay}</td>
         
         <!-- 10. הערות -->
         <td class="notes-cell">
@@ -1537,34 +1525,24 @@ function updatePageSummaryStats() {
     return;
   }
 
-  const totalDesigns = dataToUse.length;
-  const openDesigns = dataToUse.filter(design => design.status === 'open').length;
-  const closedDesigns = dataToUse.filter(design => design.status === 'closed').length;
-  const cancelledDesigns = dataToUse.filter(design => design.status === 'cancelled').length;
-
-  // Calculating sums using correct field names
-  let totalInvestment = 0;
-  let totalProfit = 0;
-
-  dataToUse.forEach(design => {
-    // Safeguarding against invalid data
-    if (!design || typeof design !== 'object') {
-      return;
-    }
-
-    // Using correct field name: planned_amount instead of amount
-    let amount = 0;
-    if (design.planned_amount !== null && design.planned_amount !== undefined) {
-      if (typeof design.planned_amount === 'string') {
-        amount = parseFloat(design.planned_amount.replace(/[$,]/g, '')) || 0;
-      } else {
-        amount = parseFloat(design.planned_amount) || 0;
+  // חישוב סטטיסטיקות באמצעות StatisticsCalculator
+  const stats = window.StatisticsCalculator ? {
+    totalDesigns: window.StatisticsCalculator.countRecords(dataToUse),
+    openDesigns: window.StatisticsCalculator.countRecords(dataToUse, design => design.status === 'open'),
+    closedDesigns: window.StatisticsCalculator.countRecords(dataToUse, design => design.status === 'closed'),
+    cancelledDesigns: window.StatisticsCalculator.countRecords(dataToUse, design => design.status === 'cancelled'),
+    totalInvestment: window.StatisticsCalculator.calculateSum(dataToUse, design => {
+      if (!design || typeof design !== 'object') return 0;
+      let amount = design.planned_amount;
+      if (typeof amount === 'string') {
+        amount = parseFloat(amount.replace(/[$,]/g, '')) || 0;
       }
-    }
-    totalInvestment += amount;
-
-    // Simple profit calculation using correct fields
-    if (design.current_price && design.planned_amount) {
+      return parseFloat(amount) || 0;
+    }),
+    totalProfit: window.StatisticsCalculator.calculateSum(dataToUse, design => {
+      if (!design || typeof design !== 'object') return 0;
+      if (!design.current_price || !design.planned_amount) return 0;
+      
       const currentPrice = typeof design.current_price === 'string' ? 
         parseFloat(design.current_price.replace(/[$,]/g, '')) || 0 : 
         parseFloat(design.current_price) || 0;
@@ -1573,25 +1551,52 @@ function updatePageSummaryStats() {
         parseFloat(design.planned_amount.replace(/[$,]/g, '')) || 0 : 
         parseFloat(design.planned_amount) || 0;
 
-      // Calculate profit based on side (Long/Short)
-      const profit = (currentPrice - plannedAmount) * (design.side === 'Long' ? 1 : -1);
-      totalProfit += profit;
-    }
-  });
+      return (currentPrice - plannedAmount) * (design.side === 'Long' ? 1 : -1);
+    })
+  } : {
+    // Fallback
+    totalDesigns: dataToUse.length,
+    openDesigns: dataToUse.filter(design => design.status === 'open').length,
+    closedDesigns: dataToUse.filter(design => design.status === 'closed').length,
+    cancelledDesigns: dataToUse.filter(design => design.status === 'cancelled').length,
+    totalInvestment: (() => {
+      let sum = 0;
+      dataToUse.forEach(design => {
+        if (!design || typeof design !== 'object') return;
+        let amount = design.planned_amount;
+        if (typeof amount === 'string') amount = parseFloat(amount.replace(/[$,]/g, '')) || 0;
+        sum += parseFloat(amount) || 0;
+      });
+      return sum;
+    })(),
+    totalProfit: (() => {
+      let sum = 0;
+      dataToUse.forEach(design => {
+        if (!design || typeof design !== 'object') return;
+        if (!design.current_price || !design.planned_amount) return;
+        const currentPrice = typeof design.current_price === 'string' ? 
+          parseFloat(design.current_price.replace(/[$,]/g, '')) || 0 : parseFloat(design.current_price) || 0;
+        const plannedAmount = typeof design.planned_amount === 'string' ? 
+          parseFloat(design.planned_amount.replace(/[$,]/g, '')) || 0 : parseFloat(design.planned_amount) || 0;
+        sum += (currentPrice - plannedAmount) * (design.side === 'Long' ? 1 : -1);
+      });
+      return sum;
+    })()
+  };
 
-  const avgInvestment = totalDesigns > 0 ? totalInvestment / totalDesigns : 0;
+  const avgInvestment = stats.totalDesigns > 0 ? stats.totalInvestment / stats.totalDesigns : 0;
 
-  console.log(`📊 Statistics: ${totalDesigns} designs, $${totalInvestment.toFixed(2)} total investment, $${totalProfit.toFixed(2)} total profit`);
+  console.log(`📊 Statistics: ${stats.totalDesigns} designs, $${stats.totalInvestment.toFixed(2)} total investment, $${stats.totalProfit.toFixed(2)} total profit`);
 
   // עדכון אלמנטי הסיכום - בדיקה אם הם קיימים לפני הגישה
   const totalDesignsElement = document.getElementById('totalDesigns');
   if (totalDesignsElement) {
-    totalDesignsElement.textContent = totalDesigns;
+    totalDesignsElement.textContent = stats.totalDesigns;
   }
 
   const totalInvestmentElement = document.getElementById('totalInvestment');
   if (totalInvestmentElement) {
-    totalInvestmentElement.textContent = formatCurrency(totalInvestment);
+    totalInvestmentElement.textContent = formatCurrency(stats.totalInvestment);
   }
 
   const avgInvestmentElement = document.getElementById('avgInvestment');
@@ -1601,13 +1606,13 @@ function updatePageSummaryStats() {
 
   const totalProfitElement = document.getElementById('totalProfit');
   if (totalProfitElement) {
-    totalProfitElement.textContent = formatCurrency(totalProfit);
+    totalProfitElement.textContent = formatCurrency(stats.totalProfit);
   }
 
   // עדכון מספר הרשומות בטבלה
   const countElement = document.getElementById('trade_plansCount');
   if (countElement) {
-    countElement.textContent = `${totalDesigns} תכנונים`;
+    countElement.textContent = `${stats.totalDesigns} תכנונים`;
   }
 }
 
@@ -1620,7 +1625,7 @@ function showAddTradePlanModal() {
   setAddModalDefaults();
   
   // Display the modal first
-  const modalElement = document.getElementById('addTradePlanModal');
+  const modalElement = addTradePlanModalElement;
   if (modalElement) {
     if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
       const modal = new bootstrap.Modal(modalElement);
@@ -1648,24 +1653,24 @@ function showAddTradePlanModal() {
  * Initialize and reset add modal form
  */
 function initializeAddModalForm() {
-  const form = document.getElementById('addTradePlanForm');
+  const form = addTradePlanForm;
   if (!form) return;
   
-  form.reset();
-  
+    form.reset();
+
   // Clear all validation states using validation system
   if (typeof window.clearValidation === 'function') {
     window.clearValidation('addTradePlanForm');
   }
   
   // Clear form fields manually
-  const allInputs = form.querySelectorAll('input, select, textarea');
-  allInputs.forEach(input => {
-    if (input.type !== 'date') {
-      input.value = '';
-      input.classList.remove('is-valid', 'is-invalid');
-    }
-  });
+    const allInputs = form.querySelectorAll('input, select, textarea');
+    allInputs.forEach(input => {
+      if (input.type !== 'date') {
+        input.value = '';
+        input.classList.remove('is-valid', 'is-invalid');
+      }
+    });
 }
 
 /**
@@ -1769,88 +1774,22 @@ async function loadAddModalData() {
  * טעינת רשימת הטיקרים בחלון ההוספה
  */
 async function loadTickersForAddModal() {
-  const tickerSelect = document.getElementById('addTradePlanTickerId');
-  if (!tickerSelect) return;
-
-  // ניקוי הרשימה הקיימת
-  tickerSelect.innerHTML = '<option value="">בחר טיקר</option>';
-
-  try {
-    // ניסיון לקבל טיקרים מהשירות
-    let tickers = [];
-    if (typeof window.tickerService?.getTickers === 'function') {
-      tickers = await window.tickerService.getTickers();
-    } else if (window.tickersData) {
-      tickers = window.tickersData;
-    } else {
-      // קריאה ישירה לAPI אם אין שירות
-      const response = await fetch('/api/tickers');
-      if (response.ok) {
-        const data = await response.json();
-        tickers = data.data || data;
-      }
-    }
-
-    // סינון טיקרים - רק פתוחים או סגורים (לא מבוטלים)
-    const activeTickers = tickers.filter(ticker =>
-      ticker.status === 'open' || ticker.status === 'closed'
-    );
-
-    // הוספת הטיקרים הפעילים לרשימה
-    activeTickers.forEach(ticker => {
-      const option = document.createElement('option');
-      option.value = ticker.id;
-      option.textContent = ticker.symbol || ticker.name;
-      tickerSelect.appendChild(option);
+    await window.SelectPopulatorService.populateTickersSelect('addTradePlanTickerId', {
+        includeEmpty: true,
+        emptyText: 'בחר טיקר',
+        filterActive: true // רק open או closed (לא cancelled)
     });
-    
-    console.log(`✅ נטענו ${activeTickers.length} טיקרים פעילים`);
-  } catch (error) {
-    console.error('❌ שגיאה בטעינת טיקרים:', error);
-  }
 }
 
 /**
  * טעינת רשימת החשבונות בחלון ההוספה
  */
 async function loadAccountsForAddModal() {
-  const accountSelect = document.getElementById('addTradePlanTradingAccount');
-  if (!accountSelect) return;
-
-  // ניקוי הרשימה הקיימת
-  accountSelect.innerHTML = '<option value="">בחר חשבון</option>';
-
-  try {
-    // ניסיון לקבל חשבונות - קריאה ישירה לAPI
-    let accounts = [];
-    const response = await fetch('/api/trading-accounts/');
-    if (response.ok) {
-      const data = await response.json();
-      accounts = data.data || data;
-      
-      // שמירה גלובלית לשימוש חוזר
-      if (!window.trading_accountsData) {
-        window.trading_accountsData = accounts;
-      }
-    }
-
-    // סינון חשבונות - רק פתוחים (לא מבוטלים)
-    const activeAccounts = accounts.filter(account =>
-      account.status === 'open'
-    );
-
-    // הוספת החשבונות הפעילים לרשימה
-    activeAccounts.forEach(account => {
-      const option = document.createElement('option');
-      option.value = account.id;
-      option.textContent = account.name;
-      accountSelect.appendChild(option);
+    await window.SelectPopulatorService.populateAccountsSelect('addTradePlanTradingAccount', {
+        includeEmpty: true,
+        emptyText: 'בחר חשבון',
+        filterActive: true // רק open (לא cancelled)
     });
-    
-    console.log(`✅ נטענו ${activeAccounts.length} חשבונות פעילים`);
-  } catch (error) {
-    console.error('❌ שגיאה בטעינת חשבונות:', error);
-  }
 }
 
 /**
@@ -1888,62 +1827,62 @@ function initializeAddModalValidation() {
     return;
   }
   
-  const validationRules = {
-    'addTradePlanTickerId': {
-      required: true,
-      type: 'select',
+    const validationRules = {
+      'addTradePlanTickerId': {
+        required: true,
+        type: 'select',
       message: 'יש לבחור טיקר'
-    },
-    'addTradePlanInvestmentType': {
-      required: true,
-      type: 'select',
-      message: 'יש לבחור סוג השקעה',
-      customValidation: value => {
+      },
+      'addTradePlanInvestmentType': {
+        required: true,
+        type: 'select',
+        message: 'יש לבחור סוג השקעה',
+        customValidation: value => {
         const validTypes = ['swing', 'investment', 'passive'];  // Per database constraints
         return validTypes.includes(value) || 'סוג השקעה לא תקין. ערכים תקינים: swing, investment, passive';
-      }
-    },
-    'addTradePlanSide': {
-      required: true,
-      type: 'select',
-      message: 'יש לבחור צד',
-      customValidation: value => {
-        const validSides = ['Long', 'Short'];
+          }
+      },
+      'addTradePlanSide': {
+        required: true,
+        type: 'select',
+        message: 'יש לבחור צד',
+        customValidation: value => {
+          const validSides = ['Long', 'Short'];
         return validSides.includes(value) || 'צד לא תקין';
-      }
-    },
-    'addTradePlanPlannedAmount': {
-      required: true,
-      type: 'number',
-      min: 0.01,
-      max: 999999999,
+          }
+      },
+      'addTradePlanPlannedAmount': {
+        required: true,
+        type: 'number',
+        min: 0.01,
+        max: 999999999,
       message: 'יש להזין סכום מתוכנן'
-    },
-    'addTradePlanStopPrice': {
-      type: 'number',
-      min: 0.01,
+      },
+      'addTradePlanStopPrice': {
+        type: 'number',
+        min: 0.01,
       max: 999999999
-    },
-    'addTradePlanTargetPrice': {
-      type: 'number',
-      min: 0.01,
+      },
+      'addTradePlanTargetPrice': {
+        type: 'number',
+        min: 0.01,
       max: 999999999
-    },
-    'addTradePlanEntryConditions': {
+      },
+      'addTradePlanEntryConditions': {
       required: false,  // Not mandatory
-      type: 'text',
+        type: 'text',
       maxLength: 500
-    },
-    'addTradePlanReasons': {
+      },
+      'addTradePlanReasons': {
       required: false,  // Not mandatory
-      type: 'text',
+        type: 'text',
       maxLength: 500
-    }
-  };
-  
-  try {
-    window.initializeValidation('addTradePlanForm', validationRules);
-  } catch (error) {
+          }
+    };
+
+    try {
+      window.initializeValidation('addTradePlanForm', validationRules);
+    } catch (error) {
     console.error('Error initializing validation:', error);
   }
 }
@@ -1961,31 +1900,31 @@ function validateTradePlanForm() {
             name: 'סוג השקעה',
             validation: (value) => {
                 const validTypes = ['swing', 'investment', 'passive'];  // Per database constraints
-                if (!validTypes.includes(value)) {
+        if (!validTypes.includes(value)) {
                     return 'סוג השקעה לא תקין. ערכים תקינים: swing, investment, passive';
-                }
-                return true;
+        }
+        return true;
             }
         },
         { 
             id: 'addTradePlanSide', 
             name: 'צד',
             validation: (value) => {
-                const validSides = ['Long', 'Short'];
-                if (!validSides.includes(value)) {
-                    return 'צד לא תקין';
-                }
-                return true;
+        const validSides = ['Long', 'Short'];
+        if (!validSides.includes(value)) {
+          return 'צד לא תקין';
+        }
+        return true;
             }
         },
         { 
             id: 'addTradePlanPlannedAmount', 
             name: 'סכום מתוכנן',
             validation: (value) => {
-                const numValue = parseFloat(value);
+          const numValue = parseFloat(value);
                 if (isNaN(numValue)) return 'סכום מתוכנן חייב להיות מספר';
                 if (numValue <= 0) return 'סכום מתוכנן חייב להיות חיובי';
-                return true;
+        return true;
             }
         }
         // NOTE: stop_price, target_price, entry_conditions, reasons are optional - not validated here
@@ -2010,7 +1949,7 @@ async function saveNewTradePlan() {
     // נסה לקבל מהשדה
     if (tradingAccountSelect && tradingAccountSelect.value) {
       accountId = parseInt(tradingAccountSelect.value);
-    } else {
+  } else {
       // אם לא נבחר, נסה לקבל מהעדפות (עם try-catch)
       try {
         const defaultAccount = await window.getPreference('default_trading_account');
@@ -2056,7 +1995,7 @@ async function saveNewTradePlan() {
         if (typeof window.showSimpleErrorNotification === 'function') {
           window.showSimpleErrorNotification('שגיאת ולידציה', errorData.message || 'נתונים לא תקינים');
         }
-        return;
+          return;
       }
       
       // שגיאת מערכת אחרת
@@ -2071,7 +2010,7 @@ async function saveNewTradePlan() {
     }
 
     // 7. סגירת המודל
-    const modal = bootstrap.Modal.getInstance(document.getElementById('addTradePlanModal'));
+    const modal = bootstrap.Modal.getInstance(addTradePlanModalElement);
     if (modal) {
       modal.hide();
     }
@@ -2767,7 +2706,7 @@ function updateTickerInfo() {
     return;
   }
   
-  const tickerDisplay = document.getElementById('selectedTickerDisplay');
+  const tickerDisplay = selectedTickerDisplay;
   const priceDisplay = document.getElementById('currentPriceDisplay');
   const changeDisplay = document.getElementById('dailyChangeDisplay');
   const stopPriceInput = document.getElementById('addTradePlanStopPrice');
@@ -2793,33 +2732,33 @@ function updateTickerInfo() {
     
     const dailyChangeValue = '+2.5%';
     if (changeDisplay) {
-      changeDisplay.textContent = dailyChangeValue;
-      
-      // צביעה לפי ערך באמצעות המערכת הגלובלית
-      const colors = window.getTableColors ? window.getTableColors() : { positive: '#28a745', negative: '#dc3545', secondary: '#6c757d' };
-      if (dailyChangeValue.startsWith('+')) {
-        changeDisplay.style.color = colors.positive;
-        changeDisplay.style.fontWeight = 'bold';
-      } else if (dailyChangeValue.startsWith('-')) {
-        changeDisplay.style.color = colors.negative;
-        changeDisplay.style.fontWeight = 'bold';
-      } else {
-        changeDisplay.style.color = colors.secondary;
+    changeDisplay.textContent = dailyChangeValue;
+
+    // צביעה לפי ערך באמצעות המערכת הגלובלית
+    const colors = window.getTableColors ? window.getTableColors() : { positive: '#28a745', negative: '#dc3545', secondary: '#6c757d' };
+    if (dailyChangeValue.startsWith('+')) {
+      changeDisplay.style.color = colors.positive;
+      changeDisplay.style.fontWeight = 'bold';
+    } else if (dailyChangeValue.startsWith('-')) {
+      changeDisplay.style.color = colors.negative;
+      changeDisplay.style.fontWeight = 'bold';
+    } else {
+      changeDisplay.style.color = colors.secondary;
       }
     }
 
     // הפעלת כל השדות
     if (investmentTypeSelect) {
-      investmentTypeSelect.disabled = false;
-      investmentTypeSelect.setAttribute('required', 'required');
+    investmentTypeSelect.disabled = false;
+    investmentTypeSelect.setAttribute('required', 'required');
     }
     if (sideSelect) {
       sideSelect.disabled = false;
-      sideSelect.setAttribute('required', 'required');
+    sideSelect.setAttribute('required', 'required');
     }
     if (amountInput) {
       amountInput.disabled = false;
-      amountInput.setAttribute('required', 'required');
+    amountInput.setAttribute('required', 'required');
     }
     if (sharesInput) sharesInput.disabled = false;
     if (stopPriceInput) stopPriceInput.disabled = false;
@@ -2840,45 +2779,45 @@ function updateTickerInfo() {
     if (tickerDisplay) tickerDisplay.textContent = 'לא נבחר';
     if (priceDisplay) priceDisplay.textContent = '-';
     if (changeDisplay) {
-      changeDisplay.textContent = '-';
-      changeDisplay.style.color = '#6c757d';
+    changeDisplay.textContent = '-';
+    changeDisplay.style.color = '#6c757d';
     }
 
     // השבתת כל השדות
     if (investmentTypeSelect) {
-      investmentTypeSelect.disabled = true;
-      investmentTypeSelect.removeAttribute('required');
-      investmentTypeSelect.value = '';
+    investmentTypeSelect.disabled = true;
+    investmentTypeSelect.removeAttribute('required');
+    investmentTypeSelect.value = '';
     }
     if (sideSelect) {
       sideSelect.disabled = true;
       sideSelect.removeAttribute('required');
-      sideSelect.value = '';
+    sideSelect.value = '';
     }
     if (amountInput) {
       amountInput.disabled = true;
       amountInput.removeAttribute('required');
-      amountInput.value = '';
+    amountInput.value = '';
     }
     if (sharesInput) {
       sharesInput.disabled = true;
-      sharesInput.value = '';
+    sharesInput.value = '';
     }
     if (stopPriceInput) {
       stopPriceInput.disabled = true;
-      stopPriceInput.value = '';
+    stopPriceInput.value = '';
     }
     if (targetPriceInput) {
       targetPriceInput.disabled = true;
-      targetPriceInput.value = '';
+    targetPriceInput.value = '';
     }
     if (entryConditionsTextarea) {
       entryConditionsTextarea.disabled = true;
-      entryConditionsTextarea.value = '';
+    entryConditionsTextarea.value = '';
     }
     if (reasonsTextarea) {
       reasonsTextarea.disabled = true;
-      reasonsTextarea.value = '';
+    reasonsTextarea.value = '';
     }
   }
 }
@@ -2921,12 +2860,12 @@ function updateSharesFromAmount() {
   if (!amountInput || !sharesInput || !priceDisplay) return;
   if (!amountInput.value || priceDisplay.textContent === '-') return;
 
-  const amount = parseFloat(amountInput.value);
-  const price = parseFloat(priceDisplay.textContent.replace('$', ''));
+      const amount = parseFloat(amountInput.value);
+      const price = parseFloat(priceDisplay.textContent.replace('$', ''));
 
   if (price > 0 && window.convertAmountToShares) {
-    const result = window.convertAmountToShares(amount, price);
-    sharesInput.value = result.shares;
+          const result = window.convertAmountToShares(amount, price);
+          sharesInput.value = result.shares;
   } else if (price > 0) {
     // Simple fallback
     sharesInput.value = Math.floor(amount / price);
@@ -2945,12 +2884,12 @@ function updateAmountFromShares() {
   if (!sharesInput || !amountInput || !priceDisplay) return;
   if (!sharesInput.value || priceDisplay.textContent === '-') return;
 
-  const shares = parseFloat(sharesInput.value);
-  const price = parseFloat(priceDisplay.textContent.replace('$', ''));
+      const shares = parseFloat(sharesInput.value);
+      const price = parseFloat(priceDisplay.textContent.replace('$', ''));
 
   if (price > 0 && window.convertSharesToAmount) {
-    const amount = window.convertSharesToAmount(shares, price);
-    amountInput.value = amount;
+          const amount = window.convertSharesToAmount(shares, price);
+          amountInput.value = amount;
   } else if (price > 0) {
     // Simple fallback
     amountInput.value = (shares * price).toFixed(2);
@@ -3070,9 +3009,9 @@ function generateDetailedLog() {
                 hasData: document.querySelectorAll('#trade_plansTable tbody tr').length > 0
             },
             modals: {
-                addModal: document.getElementById('addTradePlanModal') ? 'זמין' : 'לא זמין',
-                editModal: document.getElementById('editTradePlanModal') ? 'זמין' : 'לא זמין',
-                deleteModal: document.getElementById('deleteTradePlanModal') ? 'זמין' : 'לא זמין'
+                addModal: addTradePlanModalElement ? 'זמין' : 'לא זמין',
+                editModal: editTradePlanModalElement ? 'זמין' : 'לא זמין',
+                deleteModal: deleteTradePlanModalElement ? 'זמין' : 'לא זמין'
             },
             functions: {
                 openAddTradePlanModal: typeof window.openAddTradePlanModal === 'function' ? 'זמין' : 'לא זמין',

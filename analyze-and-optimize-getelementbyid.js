@@ -167,3 +167,5 @@ results.forEach(r => {
 console.log('\n✅ ניתוח הושלם!\n');
 console.log('💡 המלצה: השתמש בתוצאות כדי ליצור Global Element Cache בכל קובץ\n');
 
+
+

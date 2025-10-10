@@ -10,41 +10,30 @@
 console.log('📄 Loading preferences-page.js...');
 
 /**
- * Load accounts using global function
+ * Load trading accounts using SelectPopulatorService
+ * טעינת חשבונות מסחר למילוי בשדה בחירה
  */
 async function loadAccountsForPreferences() {
     try {
-        console.log('🔄 Loading accounts for preferences...');
-        // Use global function to load accounts
-        if (typeof window.loadAccountsDataFromAPI === 'function') {
-            console.log('📡 Calling loadAccountsDataFromAPI...');
-            const accounts = await window.loadAccountsDataFromAPI();
-            console.log('📊 Accounts loaded:', accounts);
-            
-            const accountSelect = document.getElementById('defaultAccountFilter');
-            if (accountSelect && accounts) {
-                // Clear existing options except the first one
-                accountSelect.innerHTML = '<option>כל החשבונות</option>';
-                
-                // Add active accounts (status = "open")
-                accounts.forEach(account => {
-                    if (account.status === 'open') {
-                        const option = document.createElement('option');
-                        option.value = account.id;
-                        option.textContent = account.name;
-                        accountSelect.appendChild(option);
-                    }
-                });
-                
-                console.log('✅ Loaded accounts for preferences:', accounts.length);
-            } else {
-                console.warn('⚠️ Account select element not found');
-            }
-        } else {
-            console.warn('⚠️ Global loadAccountsDataFromAPI function not available');
+        console.log('🔄 Loading trading accounts for preferences...');
+        
+        const accountSelect = document.getElementById('defaultAccountFilter');
+        if (!accountSelect) {
+            console.warn('⚠️ defaultAccountFilter element not found');
+            return;
         }
+        
+        // שימוש ב-SelectPopulatorService למילוי רשימת חשבונות
+        console.log('📡 Using SelectPopulatorService...');
+        await window.SelectPopulatorService.populateAccountsSelect('defaultAccountFilter', {
+            includeEmpty: true,
+            emptyText: 'בחר חשבון מסחר',
+            defaultFromPreferences: true,
+            filterFn: account => account.status === 'open'
+        });
+        console.log('✅ Trading accounts loaded for preferences via SelectPopulatorService');
     } catch (error) {
-        console.error('❌ Error loading accounts:', error);
+        console.error('❌ Error loading trading accounts:', error);
     }
 }
 
@@ -716,49 +705,10 @@ window.collectFormData = collectFormData;
 window.showPreferenceDetails = showPreferenceDetails;
 window.deletePreference = deletePreference;
 window.viewLinkedItemsForPreference = viewLinkedItemsForPreference;
-/**
- * Load active trading accounts into dropdown
- */
-async function loadActiveAccountsToDropdown() {
-    try {
-        const defaultAccountSelect = document.getElementById('defaultAccountFilter');
-        if (!defaultAccountSelect) {
-            console.warn('⚠️ defaultAccountFilter select not found');
-            return;
-        }
-
-        // Clear existing options except the first one
-        const firstOption = defaultAccountSelect.querySelector('option[value="כל החשבונות"]');
-        defaultAccountSelect.innerHTML = '';
-        if (firstOption) {
-            defaultAccountSelect.appendChild(firstOption);
-        }
-
-        // Load accounts from the system
-        const response = await fetch('/api/trading-accounts');
-        if (response.ok) {
-            const data = await response.json();
-            if (data.success && data.data && data.data.accounts) {
-                const accounts = data.data.accounts.filter(account => 
-                    account.status === 'open' || account.status === 'active'
-                );
-                
-                accounts.forEach(account => {
-                    const option = document.createElement('option');
-                    option.value = account.name;
-                    option.textContent = account.name;
-                    defaultAccountSelect.appendChild(option);
-                });
-                
-            }
-        }
-    } catch (error) {
-        console.error('❌ Error loading active accounts:', error);
-    }
-}
+// REMOVED: loadActiveAccountsToDropdown() - old function replaced by loadAccountsForPreferences()
+// which uses SelectPopulatorService and properly handles default values from preferences
 
 window.saveAllPreferences = saveAllPreferences;
 window.updatePreferencesTable = window.updatePreferencesTable;
-window.loadActiveAccountsToDropdown = loadActiveAccountsToDropdown;
 
 console.log('✅ preferences-page.js loaded successfully');

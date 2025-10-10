@@ -780,6 +780,62 @@ class PreferencesService:
         except Exception as e:
             logger.error(f"Error activating profile {profile_id} for user {user_id}: {e}")
             return False
+    
+    def get_all_preference_types(self) -> List[Dict[str, Any]]:
+        """
+        קבלת כל סוגי ההעדפות מהמערכת
+        
+        Returns:
+            רשימת כל סוגי ההעדפות עם פרטיהם
+        """
+        try:
+            conn = sqlite3.connect(self.db_path)
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            
+            cursor.execute('''
+                SELECT 
+                    pt.id,
+                    pt.group_id,
+                    pt.preference_name,
+                    pt.data_type,
+                    pt.default_value,
+                    pt.description,
+                    pt.constraints,
+                    pt.is_required,
+                    pt.is_active,
+                    pg.group_name
+                FROM preference_types pt
+                LEFT JOIN preference_groups pg ON pt.group_id = pg.id
+                WHERE pt.is_active = 1
+                ORDER BY pg.group_name, pt.preference_name
+            ''')
+            
+            results = cursor.fetchall()
+            conn.close()
+            
+            # המרה לרשימת dictionaries
+            preference_types = []
+            for row in results:
+                preference_types.append({
+                    'id': row['id'],
+                    'group_id': row['group_id'],
+                    'group_name': row['group_name'],
+                    'preference_name': row['preference_name'],
+                    'data_type': row['data_type'],
+                    'default_value': row['default_value'],
+                    'description': row['description'],
+                    'constraints': row['constraints'],
+                    'is_required': bool(row['is_required']),
+                    'is_active': bool(row['is_active'])
+                })
+            
+            logger.info(f"Retrieved {len(preference_types)} preference types")
+            return preference_types
+            
+        except Exception as e:
+            logger.error(f"Error getting all preference types: {e}")
+            raise
 
 
 # יצירת מופע גלובלי

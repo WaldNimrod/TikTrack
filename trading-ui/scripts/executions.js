@@ -12,12 +12,12 @@ let editExecutionForm = null;
 let editExecutionDate = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-    addExecutionModalElement = addExecutionModalElement;
-    editExecutionModalElement = editExecutionModalElement;
-    linkedItemsModalElement = linkedItemsModalElement;
-    addExecutionForm = addExecutionForm;
-    editExecutionForm = editExecutionForm;
-    editExecutionDate = editExecutionDate;
+    addExecutionModalElement = document.getElementById('addExecutionModal');
+    editExecutionModalElement = document.getElementById('editExecutionModal');
+    linkedItemsModalElement = document.getElementById('linkedItemsModal');
+    addExecutionForm = document.getElementById('addExecutionForm');
+    editExecutionForm = document.getElementById('editExecutionForm');
+    editExecutionDate = document.getElementById('editExecutionDate');
     
     if (addExecutionModalElement) addExecutionModal = new bootstrap.Modal(addExecutionModalElement);
     if (editExecutionModalElement) editExecutionModal = new bootstrap.Modal(editExecutionModalElement);
@@ -1203,6 +1203,19 @@ async function updateExecutionsTableMain(executions) {
     const symbol = execution.trade_ticker_symbol || 'לא מוגדר';
     const tradeInfo = execution.trade_display || `טרייד ${execution.trade_id}`;
 
+    // שימוש ב-FieldRendererService לעיצוב שדות
+    const actionBadge = window.FieldRendererService ? 
+      window.FieldRendererService.renderAction(execution.action || execution.type) : 
+      `<span class="${(execution.action || execution.type) === 'buy' ? 'profit-positive' : 'profit-negative'}">${(execution.action || execution.type) === 'buy' ? 'קניה' : 'מכירה'}</span>`;
+
+    const dateBadge = window.FieldRendererService ? 
+      window.FieldRendererService.renderDate(execution.date || execution.execution_date) : 
+      (execution.date || execution.execution_date ? new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL') : '-');
+
+    const plBadge = window.FieldRendererService ? 
+      window.FieldRendererService.renderNumericValue(0, ' $', true) : 
+      '$0';
+
     // שמירת הערכים המקוריים באנגלית לפילטר
     const typeForFilter = (execution.action || execution.type) === 'buy' ? 'קנייה' :
       (execution.action || execution.type) === 'sale' ? 'מכירה' :
@@ -1220,18 +1233,14 @@ async function updateExecutionsTableMain(executions) {
                              title="פריטים מקושרים לטיקר">🔗</button>
                        </div>
                    </td>
-                <td class="type-cell" data-type="${typeForFilter}">
-                    <span class="${(execution.action || execution.type) === 'buy' ? 'profit-positive' : 'profit-negative'}">
-                        ${(execution.action || execution.type) === 'buy' ? 'קניה' : 'מכירה'}
-                    </span>
-                </td>
+                <td class="type-cell" data-type="${typeForFilter}">${actionBadge}</td>
                 <td data-account="${accountName}" class="account-cell-link" 
                   onclick="window.showEntityDetailsModal && window.showEntityDetailsModal('account', '${accountName}', 'view')" 
                   title="פתח פרטי חשבון">${accountName}</td>
                 <td>${execution.quantity}</td>
                 <td>$${execution.price}</td>
-                <td class="pl-cell">$0</td>
-                <td data-date="${execution.date || execution.execution_date}">${execution.date || execution.execution_date ? new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL') : '-'}</td>
+                <td class="pl-cell">${plBadge}</td>
+                <td data-date="${execution.date || execution.execution_date}">${dateBadge}</td>
                 <td class="source-cell">${execution.source || '-'}</td>
                 <td class="col-actions actions-cell actions-3-btn">
                     <button class="btn btn-sm btn-outline-info" onclick="window.viewLinkedItemsForExecution && window.viewLinkedItemsForExecution(${execution.id})" title="פריטים מקושרים">

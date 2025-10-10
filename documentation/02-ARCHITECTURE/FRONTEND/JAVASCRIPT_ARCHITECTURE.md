@@ -609,102 +609,114 @@ The unified initialization system includes a comprehensive section state persist
 ### Project Structure
 ```
 trading-ui/scripts/
-├── 🏛️ Core Files
-│   ├── page-utils.js              # Page initialization and management
-│   ├── header-system.js           # Unified header system
-│   ├── notification-system.js     # Global notification system
-│   └── console-cleanup.js         # Console cleanup
+├── 🏛️ Core Modules (8) - ALWAYS LOADED
+│   └── modules/
+│       ├── core-systems.js          # Main entry point + PAGE_CONFIGS
+│       ├── ui-basic.js              # Basic UI utilities
+│       ├── data-basic.js            # Basic data operations
+│       ├── ui-advanced.js           # Advanced UI components
+│       ├── data-advanced.js         # Advanced data operations
+│       ├── business-module.js       # Business logic
+│       ├── communication-module.js  # API communication
+│       └── cache-module.js          # Unified cache system
 │
-├── 🛠️ Utility Files
-│   ├── ui-utils.js                # Shared UI functions + TABLE REFRESH SYSTEM
-│   ├── validation-utils.js        # Global validation system
-│   ├── data-utils.js              # Shared data functions
+├── 🛠️ Core Utilities (3) - ALWAYS LOADED
+│   ├── global-favicon.js          # Favicon management
+│   ├── page-utils.js              # Page utilities
+│   └── header-system.js           # Header and filter system
+│
+├── 🔧 Common Utilities (5) - OPTIONAL
+│   ├── translation-utils.js       # Translation and localization
 │   ├── date-utils.js              # Date functions
-│   ├── tables.js                  # Global table system
-│   ├── page-utils.js              # Page functions
-│   ├── linked-items.js            # Linked items system
-│   ├── translation-utils.js       # Translation functions
-│   ├── table-mappings.js          # Table column mappings
-│   ├── simple-filter.js           # Simple filter system
-│   ├── warning-system.js          # Central warning system
-│   └── crud-utils.js              # CRUD operations utilities
+│   ├── validation-utils.js        # Form validation
+│   ├── linked-items.js            # Linked items management
+│   └── warning-system.js          # Warning dialogs
+│
+├── 🎯 Services (6) - OPTIONAL
+│   └── services/
+│       ├── data-collection-service.js   # Form data collection (P0)
+│       ├── field-renderer-service.js    # Field rendering (P1)
+│       ├── select-populator-service.js  # Select population (P1)
+│       ├── crud-response-handler.js     # CRUD responses (P1)
+│       ├── default-value-setter.js      # Default values (P2)
+│       └── statistics-calculator.js     # Statistics (P3)
 │
 ├── 📄 Page Files
-│   ├── accounts.js                # Account management (currency_id migration)
 │   ├── alerts.js                  # Alert management
-│   ├── trades.js                  # Trade management (linked items)
+│   ├── trades.js                  # Trade management
 │   ├── trade_plans.js             # Trade plan management
 │   ├── tickers.js                 # Ticker management
 │   ├── notes.js                   # Note management
-│   ├── executions.js              # Execution management (modal fixes)
-│   ├── cash_flows.js              # Cash flow management (ENUM/RANGE)
-│   ├── currencies.js              # Currency management
+│   ├── executions.js              # Execution management
+│   ├── cash_flows.js              # Cash flow management
+│   ├── trading_accounts.js        # Trading account management
 │   ├── preferences.js             # Preference management
+│   ├── preferences-page.js        # Preference page logic
 │   ├── research.js                # Research management
-
 │   ├── database.js                # Database management
-│   ├── auth.js                    # User authentication
-│   ├── active-alerts-component.js # Active alerts component
-│   └── db-extradata.js            # Auxiliary tables management
+│   ├── db_display.js              # Database display
+│   ├── db-extradata.js            # Auxiliary tables
+│   └── index.js                   # Dashboard
 │
-└── 🔧 System Files
-    ├── header-system.js           # Unified header and filter system
-    ├── constraint-manager.js      # Constraint manager
-    ├── condition-translator.js    # Condition translator
-    └── button-icons.js            # Button icon system
-    │
-└── 📊 Chart System Files
-    ├── chart-management.js        # Chart management page
-    ├── chart-system.js            # Core chart system
-    ├── chart-theme.js             # Dynamic color theming
-    ├── chart-export.js            # Chart export functionality
-    ├── trades-adapter.js          # Real data adapter
-    └── chart-loader.js            # Chart loading utilities
-    │
-└── 🆕 Additional Global Systems
-    ├── js-map-utils.js           # JS-Map specific utilities
-    ├── color-scheme-system.js     # Dynamic color scheme management
-    ├── system-management.js       # System health and management
-    ├── pagination-system.js       # Global pagination system
-    ├── central-refresh-system.js  # Centralized refresh management
-    ├── unified-indexeddb-adapter.js # Unified IndexedDB system for all data storage
-    └── 🆕 UNIFIED_INDEXEDDB_SPECIFICATION.md # Unified IndexedDB System Specification
+└── 🔧 System & Development Files
+    ├── system-management.js       # System management
+    ├── server-monitor.js          # Server monitoring
+    ├── constraints.js             # Constraints management
+    ├── css-management.js          # CSS management
+    ├── chart-management.js        # Chart management
+    ├── js-map.js                  # JavaScript mapping
+    ├── linter-realtime-monitor.js # Linter monitoring
+    ├── notifications-center.js    # Notifications center
+    ├── external-data-dashboard.js # External data
+    └── crud-testing-dashboard.js  # CRUD testing
 ```
+
+**Note:** All archived files (ui-utils.js, tables.js, data-utils.js, etc.) moved to backup/  
+**See:** [LOADING_STANDARD.md](LOADING_STANDARD.md) for complete loading order
 
 ## 📥 File Loading Order
 
-### Standard Loading Order (All Pages)
+**⭐ For complete loading standard, see:** [LOADING_STANDARD.md](LOADING_STANDARD.md)
+
+### Standard Loading Order (All Pages) - NEW ARCHITECTURE
+
 ```html
-<!-- 1. Header system -->
-<script src="scripts/header-system.js"></script>
+<!-- Stage 1: Core Modules (8) - ALWAYS REQUIRED -->
+<script src="scripts/modules/core-systems.js?v=20251010"></script>
+<script src="scripts/modules/ui-basic.js?v=20251010"></script>
+<script src="scripts/modules/data-basic.js?v=20251010"></script>
+<script src="scripts/modules/ui-advanced.js?v=20251010"></script>
+<script src="scripts/modules/data-advanced.js?v=20251010"></script>
+<script src="scripts/modules/business-module.js?v=20251010"></script>
+<script src="scripts/modules/communication-module.js?v=20251010"></script>
+<script src="scripts/modules/cache-module.js?v=20251010"></script>
 
-<!-- 2. Console cleanup -->
-<script src="scripts/console-cleanup.js"></script>
+<!-- Stage 2: Core Utilities (3) - ALWAYS REQUIRED -->
+<script src="scripts/global-favicon.js?v=20251010"></script>
+<script src="scripts/page-utils.js?v=20251010"></script>
+<script src="scripts/header-system.js?v=v6.0.0"></script>
 
-<!-- 3. Basic filters -->
-<script src="scripts/simple-filter.js"></script>
+<!-- Stage 3: Common Utilities - OPTIONAL (based on page type) -->
+<script src="scripts/translation-utils.js?v=20251010"></script>
+<script src="scripts/date-utils.js?v=20251010"></script>
+<script src="scripts/validation-utils.js?v=20251010"></script>
 
-<!-- 4. Translation functions -->
-<script src="scripts/translation-utils.js"></script>
+<!-- Stage 4: Services - OPTIONAL (based on page needs) -->
+<script src="scripts/services/data-collection-service.js?v=20251010"></script>
+<script src="scripts/services/field-renderer-service.js?v=20251010"></script>
+<script src="scripts/services/select-populator-service.js?v=20251010"></script>
 
-<!-- 5. Data functions -->
-<script src="scripts/data-utils.js"></script>
+<!-- Stage 5: Page-Specific Script (1) - REQUIRED -->
+<script src="scripts/[page-name].js?v=20251010"></script>
 
-<!-- 6. UI functions -->
-<script src="scripts/ui-utils.js"></script>
-
-<!-- 7. Table mappings -->
-<script src="scripts/table-mappings.js"></script>
-
-<!-- 8. Date functions -->
-<script src="scripts/date-utils.js"></script>
-
-<!-- 9. Table system -->
-<script src="scripts/tables.js"></script>
-
-<!-- 10. Page-specific files -->
-<script src="scripts/[page-name].js"></script>
+<!-- NO MANUAL INITIALIZATION - Handled by unified system -->
 ```
+
+**Important Notes:**
+- `core-systems.js` includes PAGE_CONFIGS - no separate file needed
+- All 8 modules are loaded statically for simplicity and stability
+- Services have NO dependencies on each other - flexible load order
+- See templates by page type in [LOADING_STANDARD.md](LOADING_STANDARD.md)
 
 ## 🏛️ Core Files
 

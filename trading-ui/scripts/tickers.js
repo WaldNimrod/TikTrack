@@ -12,18 +12,21 @@ let yahooRefreshBtn = null;
 let addTickerBtn = null;
 
 // Initialize on DOM ready
-document.addEventListener('DOMContentLoaded', () => {
-    addTickerModalElement = addTickerModalElement;
-    editTickerModalElement = editTickerModalElement;
-    deleteTickerModalElement = deleteTickerModalElement;
-    addTickerForm = addTickerForm;
-    yahooRefreshBtn = yahooRefreshBtn;
-    addTickerBtn = addTickerBtn;
+// DOMContentLoaded removed - handled by unified system via PAGE_CONFIGS in core-systems.js
+// Initialization moved to initializeTickersPage
+
+window.initializeTickersModals = function() {
+    addTickerModalElement = document.getElementById('addTickerModal');
+    editTickerModalElement = document.getElementById('editTickerModal');
+    deleteTickerModalElement = document.getElementById('deleteTickerModal');
+    addTickerForm = document.getElementById('addTickerForm');
+    yahooRefreshBtn = document.getElementById('yahooRefreshBtn');
+    addTickerBtn = document.getElementById('addTickerBtn');
     
     if (addTickerModalElement) addTickerModal = new bootstrap.Modal(addTickerModalElement);
     if (editTickerModalElement) editTickerModal = new bootstrap.Modal(editTickerModalElement);
     if (deleteTickerModalElement) deleteTickerModal = new bootstrap.Modal(deleteTickerModalElement);
-});
+};
 
 /**
  * עריכת טיקר קיים
@@ -1712,13 +1715,24 @@ function createTickerActionsHTML(tickerId) {
 function createTickerRowHTML(ticker) {
   const { formattedPrice, changeColor: priceColor } = formatTickerPrice(ticker);
   const { changeDisplay, changeColor } = formatTickerChange(ticker);
-  const formattedUpdatedAt = formatTickerUpdateTime(ticker);
-  const statusLabel = getTickerStatusLabel(ticker.status);
+  
+  // שימוש ב-FieldRendererService לעיצוב שדות
+  const statusBadge = window.FieldRendererService ? 
+    window.FieldRendererService.renderStatus(ticker.status) : 
+    `<span class="status-badge status-${ticker.status || 'open'}">${getTickerStatusLabel(ticker.status)}</span>`;
+
+  const dateBadge = window.FieldRendererService ? 
+    window.FieldRendererService.renderDate(ticker.updated_at || ticker.last_updated) : 
+    formatTickerUpdateTime(ticker);
+
+  // חישוב אחוז שינוי מהמחיר
+  const changePercent = ticker.price_change_percent || ticker.change_percent || 0;
+  const changeBadge = window.FieldRendererService ? 
+    window.FieldRendererService.renderNumericValue(changePercent, '%', true) : 
+    changeDisplay;
   
   // קביעת CSS class לפי צבע
   const priceClass = priceColor === '#28a745' ? 'price-positive' : 'price-negative';
-  const changeClass = changeColor === '#28a745' ? 'change-positive' : 'change-negative';
-  const statusClass = `status-${ticker.status || 'open'}`;
 
       return `
                 <tr>
@@ -1734,17 +1748,15 @@ function createTickerRowHTML(ticker) {
         ${formattedPrice}
       </td>
       <td title="${changeDisplay !== 'N/A' ? `שינוי יומי: ${changeDisplay}` : 'אין נתוני שינוי'}" 
-          class="ticker-change ${changeClass}">
-        ${changeDisplay}
+          class="ticker-change">
+        ${changeBadge}
       </td>
-      <td title="${formattedUpdatedAt !== 'N/A' ? `עדכון אחרון: ${formattedUpdatedAt}` : 'אין נתוני עדכון'}" 
+      <td title="${dateBadge !== 'N/A' ? `עדכון אחרון: ${dateBadge}` : 'אין נתוני עדכון'}" 
           class="ticker-update-time">
-        ${formattedUpdatedAt}
+        ${dateBadge}
       </td>
-                    <td title="${statusLabel}">
-        <span class="status-badge ${statusClass}">
-                            ${statusLabel}
-                        </span>
+                    <td title="${getTickerStatusLabel(ticker.status)}">
+        ${statusBadge}
                     </td>
                     <td class="col-actions actions-cell actions-3-btn">
         ${createTickerActionsHTML(ticker.id)}
@@ -1988,26 +2000,34 @@ async function loadColorsAndApplyToHeaders() {
 }
 
 // אתחול הדף
-document.addEventListener('DOMContentLoaded', function () {
-  // שחזור מצב הסגירה
-  restoreTickersSectionState();
+// Second DOMContentLoaded removed - merged into initializeTickersPage
+window.initializeTickersPage = function() {
+    // אתחול modals
+    if (typeof window.initializeTickersModals === 'function') {
+        window.initializeTickersModals();
+    }
+    
+    // שחזור מצב הסגירה
+    restoreTickersSectionState();
 
-  // טעינת צבעים מההעדפות לפני יישום על הכותרות
-  loadColorsAndApplyToHeaders();
+    // טעינת צבעים מההעדפות לפני יישום על הכותרות
+    loadColorsAndApplyToHeaders();
 
-  // אתחול וולידציה - שימוש בפונקציות הגלובליות
-  if (window.initializeValidation) {
-    // שימוש בוולידציה הגלובלית ללא כללים מותאמים
-    window.initializeValidation('addTickerForm', {});
-    window.initializeValidation('editTickerForm', {});
-  }
+    // אתחול וולידציה - שימוש בפונקציות הגלובליות
+    if (window.initializeValidation) {
+        // שימוש בוולידציה הגלובלית ללא כללים מותאמים
+        window.initializeValidation('addTickerForm', {});
+        window.initializeValidation('editTickerForm', {});
+    }
 
-  // שחזור מצב סידור
-  restoreSortState();
+    // שחזור מצב סידור
+    restoreSortState();
 
-  // טעינת נתוני טיקרים - מוסר כדי למנוע כפילות עם window.load
-  // loadTickersData();
-});
+    // טעינת נתוני טיקרים
+    if (typeof window.loadTickersData === 'function') {
+        window.loadTickersData();
+    }
+};
 
 // אתחול נוסף כשהדף נטען לחלוטין
 window.addEventListener('load', async function () {

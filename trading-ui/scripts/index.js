@@ -402,7 +402,10 @@ async function exportAllCharts() {
 }
 
 // Event listener for DOM content loaded
-document.addEventListener('DOMContentLoaded', function() {
+// DOMContentLoaded removed - handled by unified system via PAGE_CONFIGS in core-systems.js
+// Initialization moved to window.initializeIndexPage (called from PAGE_CONFIGS)
+
+window.initializeIndexPage = function() {
     console.log('🏠 Index page initialized');
     
     // Initialize overview data
@@ -424,7 +427,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('📊 Initializing home page charts...');
         await refreshAllCharts();
     }, 1000);
-});
+};
 
 // Export functions to global scope
 window.switchTableTab = switchTableTab;

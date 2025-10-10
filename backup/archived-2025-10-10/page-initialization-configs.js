@@ -47,19 +47,15 @@ const PAGE_CONFIGS = {
             async (pageConfig) => {
                 console.log('⚙️ Initializing Preferences...');
                 
-                // Load all preferences
+                // טעינת חשבונות מסחר - חייב לבוא לפני loadAllPreferences!
+                if (typeof window.loadAccountsForPreferences === 'function') {
+                    console.log('🔄 Loading trading accounts for preferences...');
+                    await window.loadAccountsForPreferences();
+                }
+                
+                // טעינת כל ההעדפות
                 if (typeof window.loadAllPreferences === 'function') {
                     await window.loadAllPreferences();
-                }
-                
-                // Load default colors if not set
-                if (typeof window.loadDefaultColors === 'function') {
-                    window.loadDefaultColors();
-                }
-                
-                // Setup preference change handlers
-                if (typeof window.setupPreferenceHandlers === 'function') {
-                    window.setupPreferenceHandlers();
                 }
             }
         ]
@@ -149,21 +145,7 @@ const PAGE_CONFIGS = {
     },
     
     // Account Management
-    'trading_accounts': {
-        name: 'Trading Accounts',
-        requiresFilters: true,
-        requiresValidation: true,
-        requiresTables: true,
-        customInitializers: [
-            async (pageConfig) => {
-                console.log('🏦 Initializing Trading Accounts...');
-                
-                if (typeof window.loadAccountsData === 'function') {
-                    await window.loadAccountsData();
-                }
-            }
-        ]
-    },
+    // REMOVED: Duplicate 'trading_accounts' - see line 213 for the correct implementation
     
     'cash_flows': {
         name: 'Cash Flows',
@@ -293,6 +275,70 @@ const PAGE_CONFIGS = {
                 }
                 
                 console.log('✅ Server Monitor initialization completed');
+            }
+        ]
+    },
+    
+    'constraints': {
+        name: 'Constraints',
+        requiresFilters: false,
+        requiresValidation: false,
+        requiresTables: true,
+        customInitializers: [
+            async (pageConfig) => {
+                console.log('🔒 Initializing Constraints...');
+                
+                if (typeof window.initializeConstraints === 'function') {
+                    window.initializeConstraints();
+                }
+            }
+        ]
+    },
+    
+    'css-management': {
+        name: 'CSS Management',
+        requiresFilters: false,
+        requiresValidation: false,
+        requiresTables: false,
+        customInitializers: [
+            async (pageConfig) => {
+                console.log('🎨 Initializing CSS Management...');
+                
+                if (typeof window.initializeCssManagement === 'function') {
+                    window.initializeCssManagement();
+                }
+            }
+        ]
+    },
+    
+    'chart-management': {
+        name: 'Chart Management',
+        requiresFilters: false,
+        requiresValidation: false,
+        requiresTables: false,
+        customInitializers: [
+            async (pageConfig) => {
+                console.log('📊 Initializing Chart Management...');
+                
+                // Chart management initializes automatically via its own DOMContentLoaded
+                // Just log that we're aware of it
+                console.log('✅ Chart Management system ready');
+            }
+        ]
+    },
+    
+    'js-map': {
+        name: 'JavaScript Map',
+        requiresFilters: false,
+        requiresValidation: false,
+        requiresTables: false,
+        customInitializers: [
+            async (pageConfig) => {
+                console.log('🗺️ Initializing JS Map...');
+                
+                if (typeof window.initializeJsMapPage === 'function') {
+                    window.initializeJsMapPage();
+                }
             }
         ]
     },

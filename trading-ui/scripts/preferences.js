@@ -681,10 +681,9 @@ window.loadAllPreferences = async function() {
             // Load profiles to dropdown to ensure sync
             await window.loadProfilesToDropdown();
             
-            // Load active accounts to dropdown
-            if (window.loadActiveAccountsToDropdown) {
-                await window.loadActiveAccountsToDropdown();
-            }
+            // Load active accounts to dropdown - REMOVED: now handled by loadAccountsForPreferences()
+            // Reason: loadAccountsForPreferences() uses SelectPopulatorService and handles preferences correctly
+            // The old loadActiveAccountsToDropdown() was clearing the dropdown after it was already populated
             
             // Load default colors if no color preferences exist
             if (window.loadDefaultColors) {

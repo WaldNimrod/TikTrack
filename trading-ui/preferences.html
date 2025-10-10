@@ -511,12 +511,11 @@
                                    placeholder="טקסט חיפוש ברירת מחדל">
               </div>
                         <div class="mb-3">
-                            <label class="form-label">חשבון ברירת מחדל</label>
+                            <label class="form-label">חשבון מסחר ברירת מחדל</label>
                             <select id="defaultAccountFilter" class="form-select">
-                                <option value="כל החשבונות">כל החשבונות</option>
-                                <!-- חשבונות פעילים יטענו אוטומטית מהמערכת -->
-                    </select>
-                  </div>
+                                <!-- חשבונות מסחר פעילים נטענים אוטומטית על ידי SelectPopulatorService -->
+                            </select>
+                        </div>
                   </div>
                 </div>
               </div>
@@ -1069,22 +1068,7 @@
         </div>
     <!-- 🔒 LOCKED TEMPLATE ZONE 3 - End Main Content Container (DO NOT MODIFY) -->
   
-    <!-- Additional Required Scripts -->
-    <script src="scripts/global-favicon.js?v=20251001"></script>
-    <script src="scripts/translation-utils.js?v=20251001"></script>
-    <script src="scripts/header-system.js?v=v6.0.0"></script>
-    <script src="scripts/date-utils.js?v=20251001"></script>
-    <script src="scripts/button-icons.js?v=20251001"></script>
-    <script src="scripts/page-utils.js?v=20251001"></script>
-    <script src="scripts/preferences.js?v=20251001"></script>
-    <script src="scripts/notification-category-detector.js?v=20251001"></script>
-    <script src="scripts/global-notification-collector.js?v=20251001"></script>
-    <script src="scripts/system-management.js?v=20251001"></script>
-    <script src="scripts/entity-details-modal.js?v=20251001"></script>
-    <script src="scripts/warning-system.js?v=20251001"></script>
-    
-    <!-- Page-specific Script -->
-    <script src="scripts/preferences-page.js?v=20251001"></script>
+    <!-- Scripts moved to bottom of HTML (before </body>) to prevent duplicates -->
 
         <!-- Add Preference Modal -->
         <div class="modal fade" id="addPreferenceModal" tabindex="-1" aria-labelledby="addPreferenceModalLabel" aria-hidden="true"
@@ -1221,43 +1205,6 @@
     </div>
     
     <!-- 🔓 TEMPLATE ZONE 6 - Page-Specific Scripts (ADD NEW SCRIPTS HERE) -->
-    <!-- Fallback initialization if unified system fails -->
-    <script>
-        // Fallback initialization for preferences page
-        document.addEventListener('DOMContentLoaded', async function() {
-            // Wait a bit for all scripts to load
-            setTimeout(async () => {
-                try {
-                    console.log('🔄 Fallback initialization for preferences page...');
-                    
-                    // Load preferences if not already loaded
-                    if (typeof window.loadAllPreferences === 'function') {
-                        await window.loadAllPreferences();
-                    }
-                    
-                    // Default colors are now loaded automatically by loadAllPreferences
-                    
-                    // Profiles are now loaded automatically by loadAllPreferences
-                    
-                    // Add profile selection event listener (UI only)
-                    const profileSelect = document.getElementById('profileSelect');
-                    if (profileSelect) {
-                        // Only log the selection change, don't perform any actions
-                        profileSelect.addEventListener('change', function() {
-                            const selectedProfile = this.value;
-                            console.log(`📋 Profile selection changed to: ${selectedProfile} (UI only, no server action)`);
-                        });
-                        console.log('✅ Added profile selection listener (UI only)');
-                    }
-                    
-                    console.log('✅ Fallback initialization completed');
-                } catch (error) {
-                    console.error('❌ Fallback initialization failed:', error);
-                }
-            }, 500);
-        });
-    </script>
-    
     <!-- מערכת כללית חדשה - 8 מודולים מאוחדים -->
     
     <!-- Load the new general systems architecture -->
@@ -1270,8 +1217,8 @@
     <script src="scripts/modules/communication-module.js?v=20251006"></script>
     <script src="scripts/modules/cache-module.js?v=20251006"></script>
     
-    <!-- Page Initialization Configurations -->
-    <script src="scripts/page-initialization-configs.js?v=20251006"></script>
+    <!-- Page Initialization Configurations (used by other pages, preferences initializes directly) -->
+    <!-- PAGE_CONFIGS integrated in core-systems.js -->
     
     <!-- Global Systems -->
     <script src="scripts/global-favicon.js?v=20251006"></script>
@@ -1285,6 +1232,9 @@
     <script src="scripts/global-notification-collector.js?v=20251006"></script>
     <script src="scripts/entity-details-modal.js?v=20251006"></script>
     <script src="scripts/warning-system.js?v=20251006"></script>
+    
+    <!-- Service Systems -->
+    <script src="scripts/services/select-populator-service.js?v=1.0.0"></script>
     
     <!-- Page-specific Script -->
     <script src="scripts/preferences-page.js?v=20251006"></script>

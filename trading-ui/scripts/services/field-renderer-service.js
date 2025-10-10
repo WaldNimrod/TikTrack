@@ -93,42 +93,64 @@ class FieldRendererService {
     }
 
     /**
-     * רנדור PnL badge (positive/negative)
+     * רנדור ערך מספרי עם צבע לפי סימן (חיובי/שלילי/אפס)
+     * מתאים לכל ערך מספרי: יתרות, רווח/הפסד, שינויים, וכו'
      * 
-     * @param {number} value - ערך PnL
-     * @param {string} currency - סמל מטבע (אופציונלי)
+     * @param {number} value - ערך מספרי
+     * @param {string} suffix - סיומת (מטבע, אחוז, וכו') - אופציונלי
+     * @param {boolean} showPrefix - האם להציג + לערכים חיוביים
      * @returns {string} - HTML של ה-badge
      * 
      * @example
-     * const html = FieldRendererService.renderPnL(123.45, '$');
+     * const html = FieldRendererService.renderNumericValue(123.45, ' $');
+     * const html2 = FieldRendererService.renderNumericValue(-50.00, '%', true);
      */
-    static renderPnL(value, currency = '') {
+    static renderNumericValue(value, suffix = '', showPrefix = true) {
         if (value === null || value === undefined) return '<span class="badge badge-secondary">-</span>';
         
         const numValue = parseFloat(value);
         if (isNaN(numValue)) return '<span class="badge badge-secondary">-</span>';
         
-        const isPositive = numValue >= 0;
+        const isPositive = numValue > 0;
+        const isZero = numValue === 0;
         
         // צבעים
-        let color, bgColor, borderColor;
+        let color, bgColor, borderColor, cssClass;
         
-        if (isPositive) {
+        if (isZero) {
+            // אפס - אפור
+            color = 'var(--numeric-neutral-medium, #6c757d)';
+            bgColor = 'var(--numeric-neutral-light, #f8f9fa)';
+            borderColor = 'var(--numeric-neutral-border, #dee2e6)';
+            cssClass = 'neutral';
+        } else if (isPositive) {
+            // חיובי - ירוק
             color = 'var(--numeric-positive-medium, #28a745)';
             bgColor = 'var(--numeric-positive-light, #d4edda)';
             borderColor = 'var(--numeric-positive-border, #c3e6cb)';
+            cssClass = 'positive';
         } else {
+            // שלילי - אדום
             color = 'var(--numeric-negative-medium, #dc3545)';
             bgColor = 'var(--numeric-negative-light, #f8d7da)';
             borderColor = 'var(--numeric-negative-border, #f5c6cb)';
+            cssClass = 'negative';
         }
         
         const displayValue = numValue.toFixed(2);
-        const prefix = isPositive ? '+' : '';
+        const prefix = (showPrefix && isPositive) ? '+' : '';
         
-        return `<span class="pnl-badge ${isPositive ? 'positive' : 'negative'}" style="background-color: ${bgColor}; color: ${color}; border: 1px solid ${borderColor};">
-            ${prefix}${displayValue}${currency}
+        return `<span class="numeric-badge ${cssClass}" style="background-color: ${bgColor}; color: ${color}; border: 1px solid ${borderColor};">
+            ${prefix}${displayValue}${suffix}
         </span>`;
+    }
+
+    /**
+     * רנדור PnL badge (רווח/הפסד) - קיצור ל-renderNumericValue
+     * @deprecated - השתמש ב-renderNumericValue במקום
+     */
+    static renderPnL(value, currency = '') {
+        return this.renderNumericValue(value, currency, true);
     }
 
     /**
@@ -328,10 +350,10 @@ class FieldRendererService {
         const genericTranslations = {
             'open': 'פתוח',
             'closed': 'סגור',
-            'active': 'פעיל',
-            'pending': 'ממתין',
             'cancelled': 'מבוטל',
             'canceled': 'מבוטל',
+            'pending': 'ממתין',
+            'active': 'פעיל',
             'completed': 'הושלם',
             'triggered': 'הופעל',
             'not_triggered': 'לא הופעל'
@@ -358,10 +380,10 @@ class FieldRendererService {
         const fallbackColors = {
             'open': { color: '#28a745', bg: 'rgba(40, 167, 69, 0.1)' },
             'closed': { color: '#6c757d', bg: 'rgba(108, 117, 125, 0.1)' },
-            'active': { color: '#007bff', bg: 'rgba(0, 123, 255, 0.1)' },
-            'pending': { color: '#ffc107', bg: 'rgba(255, 193, 7, 0.1)' },
             'cancelled': { color: '#dc3545', bg: 'rgba(220, 53, 69, 0.1)' },
             'canceled': { color: '#dc3545', bg: 'rgba(220, 53, 69, 0.1)' },
+            'pending': { color: '#ffc107', bg: 'rgba(255, 193, 7, 0.1)' },
+            'active': { color: '#007bff', bg: 'rgba(0, 123, 255, 0.1)' },
             'completed': { color: '#28a745', bg: 'rgba(40, 167, 69, 0.1)' },
             'triggered': { color: '#28a745', bg: 'rgba(40, 167, 69, 0.1)' },
             'not_triggered': { color: '#6c757d', bg: 'rgba(108, 117, 125, 0.1)' },
@@ -380,7 +402,8 @@ window.FieldRendererService = FieldRendererService;
 // Shortcuts למתודות נפוצות
 window.renderStatus = (status, entityType) => FieldRendererService.renderStatus(status, entityType);
 window.renderSide = (side) => FieldRendererService.renderSide(side);
-window.renderPnL = (value, currency) => FieldRendererService.renderPnL(value, currency);
+window.renderNumericValue = (value, suffix, showPrefix) => FieldRendererService.renderNumericValue(value, suffix, showPrefix);
+window.renderPnL = (value, currency) => FieldRendererService.renderPnL(value, currency); // deprecated - use renderNumericValue
 window.renderCurrency = (id, name, symbol) => FieldRendererService.renderCurrency(id, name, symbol);
 window.renderType = (type) => FieldRendererService.renderType(type);
 window.renderAction = (action) => FieldRendererService.renderAction(action);

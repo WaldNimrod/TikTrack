@@ -14,20 +14,23 @@ let noteRelatedObjectSelect = null;
 let editNoteRelatedObjectSelect = null;
 
 // Initialize on DOM ready
-document.addEventListener('DOMContentLoaded', () => {
-    addNoteModalElement = addNoteModalElement;
-    editNoteModalElement = editNoteModalElement;
-    deleteNoteModalElement = deleteNoteModalElement;
-    viewNoteModalElement = viewNoteModalElement;
-    addNoteForm = addNoteForm;
-    noteRelatedObjectSelect = noteRelatedObjectSelect;
-    editNoteRelatedObjectSelect = editNoteRelatedObjectSelect;
+// DOMContentLoaded removed - handled by unified system via PAGE_CONFIGS in core-systems.js
+// Initialization moved to initializeNotesPage
+
+window.initializeNotesModals = function() {
+    addNoteModalElement = document.getElementById('addNoteModal');
+    editNoteModalElement = document.getElementById('editNoteModal');
+    deleteNoteModalElement = document.getElementById('deleteNoteModal');
+    viewNoteModalElement = document.getElementById('viewNoteModal');
+    addNoteForm = document.getElementById('addNoteForm');
+    noteRelatedObjectSelect = document.getElementById('noteRelatedObjectSelect');
+    editNoteRelatedObjectSelect = document.getElementById('editNoteRelatedObjectSelect');
     
     if (addNoteModalElement) addNoteModal = new bootstrap.Modal(addNoteModalElement);
     if (editNoteModalElement) editNoteModal = new bootstrap.Modal(editNoteModalElement);
     if (deleteNoteModalElement) deleteNoteModal = new bootstrap.Modal(deleteNoteModalElement);
     if (viewNoteModalElement) viewNoteModal = new bootstrap.Modal(viewNoteModalElement);
-});
+};
 
 /**
  * הוספת הערה חדשה
@@ -538,6 +541,15 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
     // הוספת האייקון לפני האובייקט
     relatedDisplay = relatedIcon + relatedDisplay;
 
+    // שימוש ב-FieldRendererService לעיצוב שדות
+    const relatedTypeBadge = window.FieldRendererService ? 
+      window.FieldRendererService.renderType(note.related_type, 'related_type') : 
+      `<div class='related-object-cell ${relatedClass}' style='justify-content: flex-start; text-align: right; min-width: 150px;'>${relatedDisplay}</div>`;
+
+    const dateBadge = window.FieldRendererService ? 
+      window.FieldRendererService.renderDate(note.created_at) : 
+      date;
+
     // קביעת סוג לפילטר
     let typeForFilter = 'כללי';
     if (note.related_type_id) {
@@ -565,15 +577,10 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
     return `
       <tr onclick='viewNote(${note.id})' style='cursor: pointer;'>
         <td class='ticker-cell'><span class='symbol-text'>${symbolLink}</span></td>
-        <td style='padding: 0;' data-type='${typeForFilter}'>
-          <div class='related-object-cell ${relatedClass}' 
-            style='justify-content: flex-start; text-align: right; min-width: 150px;'>
-            ${relatedDisplay}
-          </div>
-        </td>
+        <td style='padding: 0;' data-type='${typeForFilter}'>${relatedTypeBadge}</td>
         <td>${contentDisplay}</td>
         <td>${attachmentDisplay}</td>
-        <td data-date='${note.created_at}'>${date}</td>
+        <td data-date='${note.created_at}'>${dateBadge}</td>
         <td class='col-actions actions-cell actions-3-btn' onclick='event.stopPropagation();'>
             <button class="btn btn-sm btn-outline-info" onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'note', ${note.id})" title="פריטים מקושרים">
                 <i class="bi bi-link-45deg"></i>

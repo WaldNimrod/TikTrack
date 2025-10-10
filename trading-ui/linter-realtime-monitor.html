@@ -1420,7 +1420,7 @@
     <script src="scripts/modules/cache-module.js?v=20251006"></script>
     
     <!-- Page Initialization Configurations -->
-    <script src="scripts/page-initialization-configs.js?v=20251006"></script>
+    <!-- PAGE_CONFIGS integrated in core-systems.js -->
     
     <!-- Global Systems -->
     <script src="scripts/global-favicon.js?v=20251006"></script>
@@ -1590,10 +1590,7 @@
         window.copyDetailedLog = copyDetailedLog;
         window.generateDetailedLog = generateDetailedLog;
 
-        // Page initialization
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Linter Realtime Monitor page loaded');
-        });
+        // Page initialization removed - handled by unified system via page-initialization-configs.js
     </script>
 </body>
 </html>

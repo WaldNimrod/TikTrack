@@ -141,7 +141,7 @@ function executeTradePlan(planId) {
  * יוצר עותק של תוכנית מסחר קיימת
  * @param {number} planId - מזהה התוכנית
  */
-function copyTradePlan(planId) {
+async function copyTradePlan(planId) {
   try {
     console.log('📋 מעתיק תוכנית מסחר:', planId);
     
@@ -162,28 +162,34 @@ function copyTradePlan(planId) {
     };
     
     // שליחה לשרת ליצירת העותק
-    fetch('/api/trade_plans', {
+    const response = await fetch('/api/trade_plans', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(copiedPlan)
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('שגיאה בהעתקת תוכנית מסחר');
-      }
-      return response.json();
-    })
-    .then(data => {
-      console.log('✅ תוכנית מסחר הועתקה:', data);
-      loadTradePlansData();
-      notify('תוכנית מסחר הועתקה בהצלחה', 'success');
-    })
-    .catch(error => handleError('העתקת תוכנית מסחר', error));
+    });
+
+    // טיפול בתגובה באמצעות CRUDResponseHandler
+    await window.CRUDResponseHandler.handleSaveResponse(response, {
+      successMessage: 'תוכנית מסחר הועתקה בהצלחה',
+      reloadFn: async () => {
+        // ניקוי מטמון
+        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+          await window.UnifiedCacheManager.remove('trade_plans');
+          console.log('✅ מטמון trade_plans נוקה');
+        }
+        // רענון טבלה
+        await loadTradePlansData();
+      },
+      entityName: 'תכנון מסחר'
+    });
     
   } catch (error) {
-    handleError('העתקת תוכנית מסחר', error);
+    console.error('❌ Error copying trade plan:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', error.message || 'שגיאה בהעתקת תוכנית מסחר');
+    }
   }
 }
 
@@ -342,50 +348,7 @@ ID: ${tradePlan.id}
 /**
  * מחיקת תכנון טרייד
  */
-function deleteTradePlan(tradePlanId) {
-    if (!confirm('האם אתה בטוח שברצונך למחוק תכנון טרייד זה?')) {
-        return;
-    }
-
-    if (typeof window.showLoadingNotification === 'function') {
-        window.showLoadingNotification('מוחק תכנון טרייד...');
-    }
-
-    fetch(`/api/trade_plans/${tradePlanId}`, {
-        method: 'DELETE'
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        // הסרת התכנון מהמערך המקומי
-        const index = window.tradePlansData.findIndex(tp => tp.id === tradePlanId);
-        if (index > -1) {
-            window.tradePlansData.splice(index, 1);
-        }
-
-        // עדכון הטבלה
-        updateTradePlansTable(window.tradePlansData);
-        
-        if (typeof window.showSuccessNotification === 'function') {
-            window.showSuccessNotification('תכנון טרייד נמחק בהצלחה');
-        }
-    })
-    .catch(error => {
-        console.error('❌ Failed to delete trade plan:', error);
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה במחיקת תכנון טרייד', error.message);
-        }
-    })
-    .finally(() => {
-        if (typeof window.hideLoadingNotification === 'function') {
-            window.hideLoadingNotification();
-        }
-    });
-}
+// ❌ פונקציה ישנה - הוסרה - השתמש ב-deleteTradePlan החדש (שורה ~2018)
 
 async function openEditTradePlanModal(tradePlanId) {
   const tradePlan = window.tradePlansData.find(tp => tp.id === tradePlanId);
@@ -881,36 +844,24 @@ async function reactivateTradePlan(tradePlanId) {
       }),
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-
-    // עדכון סטטוס הטיקר
-    if (tradePlan.ticker_id) {
-
-      if (typeof window.updateTickerActiveTradesStatus === 'function') {
-        await window.updateTickerActiveTradesStatus(tradePlan.ticker_id);
-      } else {
-        // console.warn('⚠️ updateTickerActiveTradesStatus function not available');
-      }
-    }
-
-    // הצגת הודעת הצלחה
-    if (typeof window.showSuccessNotification === 'function') {
-
-    // ניקוי מטמון trade_plans
-    if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-      await window.UnifiedCacheManager.remove('trade_plans');
-      console.log('✅ מטמון trade_plans נוקה');
-    }
-      window.showSuccessNotification('תכנון הופעל מחדש בהצלחה!');
-    } else if (typeof window.showNotification === 'function') {
-      window.showNotification('תכנון הופעל מחדש בהצלחה!', 'success');
-    }
-
-    // רענון הטבלה
-    await loadTradePlansData();
+    // טיפול בתגובה באמצעות CRUDResponseHandler
+    await window.CRUDResponseHandler.handleUpdateResponse(response, {
+      successMessage: 'תכנון הופעל מחדש בהצלחה',
+      reloadFn: async () => {
+        // עדכון סטטוס הטיקר
+        if (tradePlan.ticker_id && typeof window.updateTickerActiveTradesStatus === 'function') {
+          await window.updateTickerActiveTradesStatus(tradePlan.ticker_id);
+        }
+        // ניקוי מטמון
+        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+          await window.UnifiedCacheManager.remove('trade_plans');
+          console.log('✅ מטמון trade_plans נוקה');
+        }
+        // רענון טבלה
+        await loadTradePlansData();
+      },
+      entityName: 'תכנון מסחר'
+    });
 
   } catch (error) {
     handleSaveError(error, 'הפעלה מחדש של תכנון');
@@ -1016,16 +967,20 @@ async function cancelTradePlan(tradePlanId) {
       })
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText);
-    }
-
-    if (typeof window.showSuccessNotification === 'function') {
-      window.showSuccessNotification('הצלחה', 'תכנון בוטל בהצלחה!');
-    }
-
+    // טיפול בתגובה באמצעות CRUDResponseHandler
+    await window.CRUDResponseHandler.handleUpdateResponse(response, {
+      successMessage: 'תכנון בוטל בהצלחה',
+      reloadFn: async () => {
+        // ניקוי מטמון
+        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+          await window.UnifiedCacheManager.remove('trade_plans');
+          console.log('✅ מטמון trade_plans נוקה');
+        }
+        // רענון טבלה
     await loadTradePlansData();
+      },
+      entityName: 'תכנון מסחר'
+    });
   } catch (error) {
     handleSaveError(error, 'ביטול תכנון');
     if (typeof window.showErrorNotification === 'function') {
@@ -1963,39 +1918,23 @@ async function saveNewTradePlan() {
       body: JSON.stringify(formData),
     });
 
-    // 5. טיפול בתגובה
-    if (!response.ok) {
-      const errorData = await response.json();
-      
-      // בדיקה אם זו שגיאת ולידציה (HTTP 400)
-      if (response.status === 400) {
-        if (typeof window.showSimpleErrorNotification === 'function') {
-          window.showSimpleErrorNotification('שגיאת ולידציה', errorData.message || 'נתונים לא תקינים');
+    // 5. טיפול בתגובה באמצעות CRUDResponseHandler
+    await window.CRUDResponseHandler.handleSaveResponse(response, {
+      modalId: 'addTradePlanModal',
+      successMessage: 'תכנון הטרייד נשמר בהצלחה',
+      reloadFn: async () => {
+        // ניקוי מטמון
+        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+          await window.UnifiedCacheManager.remove('trade_plans');
+          console.log('✅ מטמון trade_plans נוקה');
         }
-          return;
-      }
-      
-      // שגיאת מערכת אחרת
-      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-    }
-
-    const result = await response.json();
-    
-    // 6. הצגת הודעת הצלחה
-    if (typeof window.showSuccessNotification === 'function') {
-      window.showSuccessNotification('הצלחה', 'תכנון הטרייד נשמר בהצלחה');
-    }
-
-    // 7. סגירת המודל
-    const modal = bootstrap.Modal.getInstance(addTradePlanModalElement);
-    if (modal) {
-      modal.hide();
-    }
-
-    // 8. רענון הטבלה
-    if (typeof window.loadTradePlansData === 'function') {
-      await window.loadTradePlansData();
-    }
+        // רענון טבלה
+        if (typeof window.loadTradePlansData === 'function') {
+          await window.loadTradePlansData();
+        }
+      },
+      entityName: 'תכנון מסחר'
+    });
 
   } catch (error) {
     console.error('Error saving trade plan:', error);
@@ -2046,18 +1985,20 @@ async function deleteTradePlan(tradePlanId) {
       method: 'DELETE',
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText);
-    }
-
-    // הצגת הודעת הצלחה
-    if (typeof window.showNotification === 'function') {
-      window.showNotification('תכנון נמחק בהצלחה!', 'success');
-    }
-
-    // רענון הטבלה
-    await loadTradePlansData();
+    // טיפול בתגובה באמצעות CRUDResponseHandler
+    await window.CRUDResponseHandler.handleDeleteResponse(response, {
+      successMessage: 'תכנון נמחק בהצלחה',
+      reloadFn: async () => {
+        // ניקוי מטמון
+        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+          await window.UnifiedCacheManager.remove('trade_plans');
+          console.log('✅ מטמון trade_plans נוקה');
+        }
+        // רענון טבלה
+        await loadTradePlansData();
+      },
+      entityName: 'תכנון מסחר'
+    });
 
   } catch (error) {
     handleDeleteError(error, 'תכנון');

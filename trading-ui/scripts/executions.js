@@ -1,5 +1,29 @@
 // ===== קובץ JavaScript לדף עסקעות =====
 
+// ===== Global Element Cache =====
+let addExecutionModal = null;
+let addExecutionModalElement = null;
+let editExecutionModal = null;
+let editExecutionModalElement = null;
+let linkedItemsModal = null;
+let linkedItemsModalElement = null;
+let addExecutionForm = null;
+let editExecutionForm = null;
+let editExecutionDate = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+    addExecutionModalElement = addExecutionModalElement;
+    editExecutionModalElement = editExecutionModalElement;
+    linkedItemsModalElement = linkedItemsModalElement;
+    addExecutionForm = addExecutionForm;
+    editExecutionForm = editExecutionForm;
+    editExecutionDate = editExecutionDate;
+    
+    if (addExecutionModalElement) addExecutionModal = new bootstrap.Modal(addExecutionModalElement);
+    if (editExecutionModalElement) editExecutionModal = new bootstrap.Modal(editExecutionModalElement);
+    if (linkedItemsModalElement) linkedItemsModal = new bootstrap.Modal(linkedItemsModalElement);
+});
+
 /**
  * הוספת ביצוע חדש
  * פותח מודל להוספת ביצוע חדש
@@ -145,7 +169,7 @@ ID: ${execution.id}
  */
 function resetAddExecutionForm() {
   // ניקוי הטופס
-  document.getElementById('addExecutionForm').reset();
+  addExecutionForm.reset();
   clearExecutionValidationErrors();
 
   // השבתת כל השדות חוץ מטיקר
@@ -222,7 +246,7 @@ async function showAddExecutionModal() {
   calculateAddExecutionValues();
 
   // הצגת המודל
-  const modal = new bootstrap.Modal(document.getElementById('addExecutionModal'));
+  const modal = new bootstrap.Modal(addExecutionModalElement);
   modal.show();
 }
 
@@ -231,7 +255,7 @@ async function showAddExecutionModal() {
  */
 function resetEditExecutionForm() {
   // ניקוי הטופס
-  document.getElementById('editExecutionForm').reset();
+  editExecutionForm.reset();
   clearExecutionValidationErrors();
 
   // השבתת כל השדות חוץ מטיקר
@@ -431,7 +455,7 @@ async function showEditExecutionModal(id) {
         // המרה לפורמט datetime-local
         const date = new Date(executionDate);
         const localDateTime = date.toISOString().slice(0, 16);
-        const dateField = document.getElementById('editExecutionDate');
+        const dateField = editExecutionDate;
         if (dateField) {
           dateField.value = localDateTime;
 
@@ -440,14 +464,14 @@ async function showEditExecutionModal(id) {
         }
       } catch (error) {
 
-        const dateField = document.getElementById('editExecutionDate');
+        const dateField = editExecutionDate;
         if (dateField) {
           dateField.value = '';
         }
       }
     } else {
 
-      const dateField = document.getElementById('editExecutionDate');
+      const dateField = editExecutionDate;
       if (dateField) {
         dateField.value = '';
       }
@@ -536,7 +560,7 @@ async function showEditExecutionModal(id) {
   console.log('🎯 [EDIT MODAL] - תאריך:', executionDate);
 
   // הצגת המודל
-  const modal = new bootstrap.Modal(document.getElementById('editExecutionModal'));
+  const modal = new bootstrap.Modal(editExecutionModalElement);
   modal.show();
 }
 
@@ -753,7 +777,7 @@ async function saveExecution() {
     }
 
     // 6. סגירת המודל
-    const modal = bootstrap.Modal.getInstance(document.getElementById('addExecutionModal'));
+    const modal = bootstrap.Modal.getInstance(addExecutionModalElement);
     if (modal) {
         modal.hide();
     }
@@ -838,7 +862,7 @@ async function updateExecution() {
     }
 
     // 6. סגירת המודל
-    const modal = bootstrap.Modal.getInstance(document.getElementById('editExecutionModal'));
+    const modal = bootstrap.Modal.getInstance(editExecutionModalElement);
     if (modal) {
         modal.hide();
     }
@@ -1005,7 +1029,7 @@ async function showExecutionLinkedItemsModal(executionId, _errorData) {
  */
 function goToLinkedItems() {
   // סגירת המודל
-  const modal = bootstrap.Modal.getInstance(document.getElementById('linkedItemsModal'));
+  const modal = bootstrap.Modal.getInstance(linkedItemsModalElement);
   modal.hide();
 
   // מעבר לדף הניהול הרלוונטי (לפי הפריט הראשון שנמצא)
@@ -2977,7 +3001,7 @@ window.toggleExecutionsSection = toggleExecutionsSection;
 // Modal event listeners for form reset
 document.addEventListener('DOMContentLoaded', function() {
   // Add execution modal - reset form when hidden
-  const addExecutionModal = document.getElementById('addExecutionModal');
+  const addExecutionModal = addExecutionModalElement;
   if (addExecutionModal) {
     addExecutionModal.addEventListener('hidden.bs.modal', function() {
       resetAddExecutionForm();
@@ -2985,7 +3009,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // Edit execution modal - reset form when hidden
-  const editExecutionModal = document.getElementById('editExecutionModal');
+  const editExecutionModal = editExecutionModalElement;
   if (editExecutionModal) {
     editExecutionModal.addEventListener('hidden.bs.modal', function() {
       resetEditExecutionForm();

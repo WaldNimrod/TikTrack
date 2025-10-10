@@ -1733,10 +1733,28 @@ function setAddModalDefaults() {
 /**
  * טעינת נתונים למודל
  * Load data for modal (tickers, accounts, etc.)
+ * Uses SelectPopulatorService if available, otherwise fallback to manual loading
  */
 async function loadAddModalData() {
-  await loadTickersForAddModal();
-  await loadAccountsForAddModal();
+  // Use SelectPopulatorService if available
+  if (window.SelectPopulatorService) {
+    await window.SelectPopulatorService.populateTickersSelect('addTradePlanTickerId', {
+      includeEmpty: true,
+      emptyText: 'בחר טיקר',
+      filterFn: ticker => ticker.status === 'open' || ticker.status === 'closed'
+    });
+    
+    await window.SelectPopulatorService.populateAccountsSelect('addTradePlanTradingAccount', {
+      includeEmpty: true,
+      emptyText: 'בחר חשבון',
+      defaultFromPreferences: true,  // ✅ זה יטען את ברירת המחדל מהעדפות!
+      filterFn: account => account.status === 'open'
+    });
+  } else {
+    // Fallback to manual loading
+    await loadTickersForAddModal();
+    await loadAccountsForAddModal();
+  }
 }
 
 /**
@@ -1977,9 +1995,24 @@ async function saveNewTradePlan() {
         return; // עצירה אם הולידציה נכשלה
     }
   
-    // 2. קבלת ברירת מחדל לחשבון מסחר
-    const defaultAccount = await window.getPreference('default_trading_account');
-    const accountId = defaultAccount ? parseInt(defaultAccount) : 1;
+    // 2. קבלת חשבון - מהבחירה או ברירת מחדל
+    const tradingAccountSelect = document.getElementById('addTradePlanTradingAccount');
+    let accountId = 1;  // Default fallback
+    
+    // נסה לקבל מהשדה
+    if (tradingAccountSelect && tradingAccountSelect.value) {
+      accountId = parseInt(tradingAccountSelect.value);
+    } else {
+      // אם לא נבחר, נסה לקבל מהעדפות (עם try-catch)
+      try {
+        const defaultAccount = await window.getPreference('default_trading_account');
+        if (defaultAccount) {
+          accountId = parseInt(defaultAccount);
+        }
+      } catch (error) {
+        console.warn('⚠️ Could not get default_trading_account preference, using accountId=1');
+      }
+    }
     
     // 3. בניית אובייקט נתונים באמצעות DataCollectionService
     const formData = window.DataCollectionService.collectFormData({

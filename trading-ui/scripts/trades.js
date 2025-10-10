@@ -19,6 +19,29 @@
  * ========================================
  */
 
+// ===== Global Element Cache =====
+let addTradeModal = null;
+let addTradeModalElement = null;
+let editTradeModal = null;
+let editTradeModalElement = null;
+let editTradeModalLabel = null;
+let editTradeForm = null;
+let addTradeBtn = null;
+let editTradeBtn = null;
+
+// Initialize on DOM ready
+document.addEventListener('DOMContentLoaded', () => {
+    addTradeModalElement = addTradeModalElement;
+    editTradeModalElement = editTradeModalElement;
+    editTradeModalLabel = editTradeModalLabel;
+    editTradeForm = editTradeForm;
+    addTradeBtn = addTradeBtn;
+    editTradeBtn = editTradeBtn;
+    
+    if (addTradeModalElement) addTradeModal = new bootstrap.Modal(addTradeModalElement);
+    if (editTradeModalElement) editTradeModal = new bootstrap.Modal(editTradeModalElement);
+});
+
 // ========================================
 // פונקציות מודל הוספה
 // ========================================
@@ -45,11 +68,11 @@ function showAddTradeModal() {
     window.DataCollectionService.setValue('addCreatedAt', todayStr, 'text');
 
     // הצגת המודל
-    const modalElement = document.getElementById('addTradeModal');
+    const modalElement = addTradeModalElement;
     if (modalElement) {
         if (typeof bootstrap !== 'undefined') {
             const modal = new bootstrap.Modal(modalElement);
-            modal.show();
+            addTradeModal ? addTradeModal.show() : editTradeModal.show();
         } else {
             console.error('Bootstrap is not loaded');
             // נסיון חלופי להצגת המודל
@@ -153,9 +176,9 @@ async function addTrade() {
         }
 
         // 7. סגירת המודל
-        const modal = bootstrap.Modal.getInstance(document.getElementById('addTradeModal'));
-        if (modal) {
-            modal.hide();
+        // Use cached modal;
+        if (addTradeModal || editTradeModal) {
+            addTradeModal ? addTradeModal.hide() : editTradeModal.hide();
         }
 
         // 8. רענון הטבלה
@@ -607,19 +630,19 @@ class TradesController {
         console.log('🔧 Initializing Trades Event Listeners...');
         
         // כפתור הוספת טרייד
-        const addButton = document.getElementById('addTradeBtn');
+        const addButton = addTradeBtn;
         if (addButton) {
             addButton.addEventListener('click', () => this.showAddTradeModal());
         }
         
         // כפתור עריכת טרייד
-        const editButton = document.getElementById('editTradeBtn');
+        const editButton = editTradeBtn;
         if (editButton) {
             editButton.addEventListener('click', () => this.showEditTradeModal());
         }
         
         // טופס עריכת טרייד
-        const editForm = document.getElementById('editTradeForm');
+        const editForm = editTradeForm;
         if (editForm) {
             editForm.addEventListener('submit', (e) => this.handleEditTrade(e));
         }
@@ -650,21 +673,21 @@ class TradesController {
      */
     showAddTradeModal() {
         // איפוס הטופס
-        const form = document.getElementById('editTradeForm');
+        const form = editTradeForm;
         if (form) {
             form.reset();
             form.dataset.mode = 'add';
         }
         
         // עדכון כותרת
-        const modalLabel = document.getElementById('editTradeModalLabel');
+        const modalLabel = editTradeModalLabel;
         if (modalLabel) {
             modalLabel.textContent = 'הוספת טרייד חדש';
         }
         
         // הצגת המודל
-        const modal = new bootstrap.Modal(document.getElementById('editTradeModal'));
-        modal.show();
+        // Use cached modal;
+        addTradeModal ? addTradeModal.show() : editTradeModal.show();
     }
 
     /**
@@ -701,21 +724,21 @@ class TradesController {
         this.fillEditForm(trade);
         
         // עדכון כותרת
-        const modalLabel = document.getElementById('editTradeModalLabel');
+        const modalLabel = editTradeModalLabel;
         if (modalLabel) {
             modalLabel.textContent = 'עריכת טרייד';
         }
         
         // הצגת המודל
-        const modal = new bootstrap.Modal(document.getElementById('editTradeModal'));
-        modal.show();
+        // Use cached modal;
+        addTradeModal ? addTradeModal.show() : editTradeModal.show();
     }
 
     /**
      * מילוי טופס עריכה
      */
     fillEditForm(trade) {
-        const form = document.getElementById('editTradeForm');
+        const form = editTradeForm;
         if (!form) return;
         
         form.dataset.mode = 'edit';
@@ -801,9 +824,9 @@ class TradesController {
             }
             
             // סגירת המודל
-            const modal = bootstrap.Modal.getInstance(document.getElementById('editTradeModal'));
-            if (modal) {
-                modal.hide();
+            // Use cached modal;
+            if (addTradeModal || editTradeModal) {
+                addTradeModal ? addTradeModal.hide() : editTradeModal.hide();
             }
             
             // רענון הנתונים
@@ -917,14 +940,14 @@ window.editTradeRecord = function(tradeId) {
             window.tradesController.fillEditForm(trade);
             
             // עדכון כותרת
-            const modalLabel = document.getElementById('editTradeModalLabel');
+            const modalLabel = editTradeModalLabel;
             if (modalLabel) {
                 modalLabel.textContent = 'עריכת טרייד';
             }
             
             // הצגת המודל
-            const modal = new bootstrap.Modal(document.getElementById('editTradeModal'));
-            modal.show();
+            // Use cached modal;
+            addTradeModal ? addTradeModal.show() : editTradeModal.show();
         } else {
             if (typeof window.showErrorNotification === 'function') {
                 window.showErrorNotification('שגיאה', 'טרייד לא נמצא');

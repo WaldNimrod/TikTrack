@@ -5,8 +5,9 @@
  * מערכת מרכזית לטיפול בתגובות API של פעולות CRUD
  * מחליפה לוגיקה זהה ב-18 פונקציות save/update/delete
  * 
- * @version 1.0.0
+ * @version 2.0.0
  * @created January 2025
+ * @updated October 2025 - Extended for data load errors
  * @author TikTrack Development Team
  * 
  * תכונות:
@@ -15,6 +16,7 @@
  * - רענון טבלה אוטומטי
  * - הצגת הודעות הצלחה/שגיאה
  * - תמיכה ב-cache clearing
+ * - טיפול בשגיאות טעינת נתונים (GET) עם Retry + Copy Error Log
  */
 
 // ===== CRUD RESPONSE HANDLER =====
@@ -321,17 +323,192 @@ class CRUDResponseHandler {
             return null;
         }
     }
+
+    /**
+     * טיפול בשגיאות טעינת נתונים (GET) - תגובת שרת לא תקינה
+     * 
+     * @param {Response} response - תגובת fetch
+     * @param {Object} options - אופציות
+     * @param {string} options.tableId - מזהה הטבלה (e.g., 'alertsTable')
+     * @param {string} options.entityName - שם הישות בעברית (e.g., 'התראות')
+     * @param {number} [options.columns] - מספר עמודות (auto-detect if omitted)
+     * @param {Function} [options.onRetry] - פונקציית retry
+     * @returns {Array} מערך ריק (never throws)
+     * 
+     * @example
+     * return CRUDResponseHandler.handleLoadResponse(response, {
+     *   tableId: 'alertsTable',
+     *   entityName: 'התראות',
+     *   columns: 8,
+     *   onRetry: loadAlertsData
+     * });
+     */
+    static handleLoadResponse(response, options = {}) {
+        const { tableId, entityName, columns, onRetry } = options;
+
+        console.error(`❌ Server error ${response.status} loading ${entityName || 'data'}`);
+
+        // User notification
+        if (typeof window.showNotification === 'function') {
+            window.showNotification(
+                `❌ שגיאת שרת (${response.status}) - לא ניתן לטעון ${entityName || 'נתונים'}`,
+                'error',
+                'שגיאת טעינה'
+            );
+        }
+
+        // Table UI error message
+        this._renderTableError({
+            tableId,
+            columns,
+            icon: 'fa-exclamation-triangle',
+            title: `שגיאת שרת (${response.status})`,
+            message: `לא ניתן לטעון ${entityName || 'נתונים'} מהשרת`,
+            onRetry,
+            errorType: 'server'
+        });
+
+        return [];
+    }
+
+    /**
+     * טיפול בשגיאות רשת (fetch failed, timeout)
+     * 
+     * @param {Error} error - אובייקט השגיאה
+     * @param {Object} options - אופציות
+     * @param {string} options.tableId - מזהה הטבלה
+     * @param {string} options.entityName - שם הישות בעברית
+     * @param {number} [options.columns] - מספר עמודות
+     * @param {Function} [options.onRetry] - פונקציית retry
+     * @returns {Array} מערך ריק (never throws)
+     * 
+     * @example
+     * return CRUDResponseHandler.handleNetworkError(error, {
+     *   tableId: 'alertsTable',
+     *   entityName: 'התראות',
+     *   columns: 8,
+     *   onRetry: loadAlertsData
+     * });
+     */
+    static handleNetworkError(error, options = {}) {
+        const { tableId, entityName, columns, onRetry } = options;
+
+        console.error(`❌ Network error loading ${entityName || 'data'}:`, error);
+
+        // User notification
+        if (typeof window.showNotification === 'function') {
+            window.showNotification(
+                `❌ שגיאת רשת - לא ניתן לטעון ${entityName || 'נתונים'}`,
+                'error',
+                'שגיאת חיבור'
+            );
+        }
+
+        // Table UI error message
+        this._renderTableError({
+            tableId,
+            columns,
+            icon: 'fa-wifi',
+            title: 'שגיאת חיבור לשרת',
+            message: 'בדוק חיבור לאינטרנט ונסה לרענן את הדף',
+            onRetry,
+            errorType: 'network',
+            errorDetails: error.message
+        });
+
+        return [];
+    }
+
+    /**
+     * רינדור הודעת שגיאה בטבלה עם כפתורי Retry ו-Copy Error Log
+     * @private
+     * 
+     * @param {Object} config - קונפיגורציה
+     * @param {string} config.tableId - מזהה הטבלה
+     * @param {number} [config.columns] - מספר עמודות (auto-detect if omitted)
+     * @param {string} config.icon - Font Awesome icon class
+     * @param {string} config.title - כותרת השגיאה
+     * @param {string} config.message - תיאור השגיאה
+     * @param {Function} [config.onRetry] - פונקציית retry
+     * @param {string} [config.errorType] - סוג השגיאה (server/network)
+     * @param {string} [config.errorDetails] - פרטי שגיאה נוספים
+     */
+    static _renderTableError(config) {
+        const { tableId, columns, icon, title, message, onRetry, errorType, errorDetails } = config;
+
+        if (!tableId) {
+            console.warn('⚠️ _renderTableError: tableId is required');
+            return;
+        }
+
+        const tbody = document.querySelector(`#${tableId} tbody`);
+        if (!tbody) {
+            console.warn(`⚠️ _renderTableError: tbody not found for table #${tableId}`);
+            return;
+        }
+
+        // Auto-detect columns if not provided
+        const columnCount = columns || 
+                           tbody.closest('table')?.querySelectorAll('thead th').length || 
+                           20;
+
+        // Generate error log for copy
+        const errorLog = {
+            timestamp: new Date().toISOString(),
+            table: tableId,
+            errorType: errorType || 'unknown',
+            title,
+            message,
+            details: errorDetails || 'N/A',
+            userAgent: navigator.userAgent,
+            url: window.location.href,
+            viewport: `${window.innerWidth}x${window.innerHeight}`
+        };
+
+        const errorLogString = JSON.stringify(errorLog, null, 2);
+
+        // Retry button (only if onRetry provided)
+        const retryBtn = onRetry && typeof onRetry === 'function' ? `
+            <button class="btn btn-sm btn-primary mt-2" onclick="(${onRetry.toString()})()">
+                <i class="fas fa-sync"></i> נסה שוב
+            </button>
+        ` : '';
+
+        // Copy error log button
+        const copyBtn = `
+            <button class="btn btn-sm btn-outline-secondary mt-2 ms-2" 
+                    onclick="navigator.clipboard.writeText(\`${errorLogString.replace(/`/g, '\\`')}\`).then(() => { if (typeof window.showNotification === 'function') { window.showNotification('Log הועתק ללוח', 'success'); } else { alert('Log הועתק ללוח'); } })">
+                <i class="fas fa-copy"></i> העתק פרטי שגיאה
+            </button>
+        `;
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="${columnCount}" class="text-center" style="color: #e74c3c; padding: 20px;">
+                    <i class="fas ${icon} fa-2x mb-2"></i><br>
+                    <strong style="font-size: 1.1em;">${title}</strong><br>
+                    <small>${message}</small><br>
+                    ${retryBtn}
+                    ${copyBtn}
+                </td>
+            </tr>
+        `;
+    }
 }
 
 // ===== EXPORT TO GLOBAL SCOPE =====
 
 window.CRUDResponseHandler = CRUDResponseHandler;
 
-// Shortcuts למתודות נפוצות
+// Shortcuts למתודות נפוצות - CRUD Operations
 window.handleSaveResponse = (response, options) => CRUDResponseHandler.handleSaveResponse(response, options);
 window.handleUpdateResponse = (response, options) => CRUDResponseHandler.handleUpdateResponse(response, options);
 window.handleDeleteResponse = (response, options) => CRUDResponseHandler.handleDeleteResponse(response, options);
 window.executeCRUDOperation = (url, fetchOptions, handlerOptions) => CRUDResponseHandler.executeCRUDOperation(url, fetchOptions, handlerOptions);
 
-console.log('✅ CRUDResponseHandler loaded successfully');
+// Shortcuts למתודות חדשות - Data Load Errors (v2.0.0)
+window.handleLoadResponse = (response, options) => CRUDResponseHandler.handleLoadResponse(response, options);
+window.handleNetworkError = (error, options) => CRUDResponseHandler.handleNetworkError(error, options);
+
+console.log('✅ CRUDResponseHandler v2.0.0 loaded successfully (now supports data load errors)');
 

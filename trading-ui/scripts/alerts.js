@@ -1,5 +1,31 @@
 // alerts.js loaded successfully - removed debug log
 
+// ===== Global Element Cache =====
+let addAlertModal = null;
+let addAlertModalElement = null;
+let editAlertModal = null;
+let editAlertModalElement = null;
+let deleteAlertModal = null;
+let deleteAlertModalElement = null;
+let addAlertForm = null;
+let editAlertForm = null;
+let alertRelatedObjectSelect = null;
+let editAlertRelatedObjectSelect = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+    addAlertModalElement = addAlertModalElement;
+    editAlertModalElement = editAlertModalElement;
+    deleteAlertModalElement = deleteAlertModalElement;
+    addAlertForm = addAlertForm;
+    editAlertForm = editAlertForm;
+    alertRelatedObjectSelect = alertRelatedObjectSelect;
+    editAlertRelatedObjectSelect = editAlertRelatedObjectSelect;
+    
+    if (addAlertModalElement) addAlertModal = new bootstrap.Modal(addAlertModalElement);
+    if (editAlertModalElement) editAlertModal = new bootstrap.Modal(editAlertModalElement);
+    if (deleteAlertModalElement) deleteAlertModal = new bootstrap.Modal(deleteAlertModalElement);
+});
+
 /**
  * ========================================
  * דף ההתראות - Alerts Page
@@ -662,7 +688,7 @@ function showAddAlertModal() {
   loadModalData();
 
   // ניקוי הטופס
-  const form = document.getElementById('addAlertForm');
+  const form = addAlertForm;
   if (form) {
     form.reset();
   }
@@ -688,7 +714,7 @@ function showAddAlertModal() {
   }, 100);
 
   // הצגת המודל
-  const modalElement = document.getElementById('addAlertModal');
+  const modalElement = addAlertModalElement;
   if (modalElement) {
     // הגדרת z-index גבוה מאוד
     modalElement.style.zIndex = '999999';
@@ -972,7 +998,7 @@ function onRelationTypeChange(radioElement) {
   // console.log('🔧 Relation type changed:', radioElement.value);
 
   // הפעלת שדה בחירת אובייקט
-  const relatedObjectSelect = document.getElementById('alertRelatedObjectSelect');
+  const relatedObjectSelect = alertRelatedObjectSelect;
   if (relatedObjectSelect) {
     relatedObjectSelect.disabled = false;
     relatedObjectSelect.classList.remove('disabled-field');
@@ -1062,7 +1088,7 @@ function disableConditionFields() {
  * @param {number} relationTypeId - מזהה סוג השיוך
  */
 function populateRelatedObjects(relationTypeId) {
-  const selectElement = document.getElementById('alertRelatedObjectSelect');
+  const selectElement = alertRelatedObjectSelect;
   if (!selectElement) {return;}
 
   // ניקוי הרשימה
@@ -1093,7 +1119,7 @@ function populateRelatedObjects(relationTypeId) {
  * @param {number} relationTypeId - מזהה סוג השיוך
  */
 function populateEditRelatedObjects(relationTypeId) {
-  const selectElement = document.getElementById('editAlertRelatedObjectSelect');
+  const selectElement = editAlertRelatedObjectSelect;
   if (!selectElement) {return;}
 
   // ניקוי הרשימה
@@ -1340,7 +1366,7 @@ async function saveAlert() {
     }
 
     // 3. איסוף נתונים מהטופס
-    const form = document.getElementById('addAlertForm');
+    const form = addAlertForm;
     if (!form) {
       console.warn('⚠️ Form element not found');
       return;
@@ -1348,7 +1374,7 @@ async function saveAlert() {
 
     const formData = new FormData(form);
     const relatedType = formData.get('alertRelationType');
-    const relatedId = document.getElementById('alertRelatedObjectSelect').value;
+    const relatedId = alertRelatedObjectSelect.value;
 
     // 4. איסוף שדות נוספים (אחרי שהולידציה הבסיסית עברה)
     const conditionAttributeElement = document.getElementById('conditionAttribute');
@@ -1438,7 +1464,7 @@ async function saveAlert() {
     }
 
     // 10. סגירת המודל
-    const modal = bootstrap.Modal.getInstance(document.getElementById('addAlertModal'));
+    const modal = bootstrap.Modal.getInstance(addAlertModalElement);
     if (modal) {
       modal.hide();
     }
@@ -1522,7 +1548,7 @@ function editAlert(alertId) {
 
     // בחירת האובייקט המקושר
     setTimeout(() => {
-      const relatedObjectSelect = document.getElementById('editAlertRelatedObjectSelect');
+      const relatedObjectSelect = editAlertRelatedObjectSelect;
       if (relatedObjectSelect && alert.related_id) {
         relatedObjectSelect.value = alert.related_id;
         // הפעלת אירוע change להפעלת שדות נוספים
@@ -1554,7 +1580,7 @@ function editAlert(alertId) {
   }, 100);
 
   // הצגת המודל
-  const modalElement = document.getElementById('editAlertModal');
+  const modalElement = editAlertModalElement;
   if (modalElement) {
     // הגדרת z-index גבוה מאוד
     modalElement.style.zIndex = '99999';
@@ -1730,7 +1756,7 @@ async function updateAlert() {
     window.clearCacheBeforeCRUD('alerts', 'edit');
   }
   
-  const form = document.getElementById('editAlertForm');
+  const form = editAlertForm;
   if (!form) {
     // console.warn('⚠️ Form element not found - skipping update operation');
     return;
@@ -1753,7 +1779,7 @@ async function updateAlert() {
 
   // בדיקת בחירת אובייקט
   const relatedTypeId = parseInt(document.querySelector('input[name="editAlertRelationType"]:checked')?.value);
-  const relatedId = parseInt(document.getElementById('editAlertRelatedObjectSelect').value);
+  const relatedId = parseInt(editAlertRelatedObjectSelect.value);
 
   // ולידציה באמצעות מערכת הולידציה הגלובלית
   let hasErrors = false;
@@ -2596,9 +2622,9 @@ function generateDetailedLog() {
                 activeFilter: document.querySelector('.btn.active')?.textContent || 'לא נמצא'
             },
             modals: {
-                addModal: document.getElementById('addAlertModal') ? 'זמין' : 'לא זמין',
-                editModal: document.getElementById('editAlertModal') ? 'זמין' : 'לא זמין',
-                deleteModal: document.getElementById('deleteAlertModal') ? 'זמין' : 'לא זמין'
+                addModal: addAlertModalElement ? 'זמין' : 'לא זמין',
+                editModal: editAlertModalElement ? 'זמין' : 'לא זמין',
+                deleteModal: deleteAlertModalElement ? 'זמין' : 'לא זמין'
             },
             functions: {
                 showAddAlertModal: typeof window.showAddAlertModal === 'function' ? 'זמין' : 'לא זמין',

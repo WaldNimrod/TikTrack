@@ -2152,12 +2152,26 @@ window.closeModalGlobal = window.closeModal;
 /**
  * Global function for loading table data
  * Generic implementation that can be used across all pages
+ * v2.0.0 - Now uses CRUDResponseHandler for unified error handling
  *
  * @param {string} tableType - Type of table to load
  * @param {Function} updateFunction - Function to call with loaded data
- * @returns {Promise<Array>} Loaded data
+ * @param {Object} [options] - Configuration options (v2.0.0)
+ * @param {string} [options.tableId] - Table DOM ID (defaults to `${tableType}Table`)
+ * @param {string} [options.entityName] - Entity name in Hebrew (defaults to tableType)
+ * @param {number} [options.columns] - Number of columns (auto-detect if omitted)
+ * @param {Function} [options.onRetry] - Retry function for error UI
+ * @returns {Promise<Array>} Loaded data or empty array on error (NEVER THROWS)
+ * 
+ * @example
+ * const data = await loadTableData('alerts', updateAlertsTable, {
+ *   tableId: 'alertsTable',
+ *   entityName: 'התראות',
+ *   columns: 8,
+ *   onRetry: loadAlertsData
+ * });
  */
-window.loadTableData = async function(tableType, updateFunction) {
+window.loadTableData = async function(tableType, updateFunction, options = {}) {
   try {
     console.log(`📊 Loading data for table type: ${tableType}`);
     
@@ -2187,8 +2201,21 @@ window.loadTableData = async function(tableType, updateFunction) {
     
     // Fetch data from server
     const response = await fetch(`${apiEndpoint}?_t=${Date.now()}`);
+    
+    // Server error - use CRUDResponseHandler (v2.0.0)
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      // Hide loading state
+      if (typeof window.hideLoadingState === 'function') {
+        window.hideLoadingState();
+      }
+      
+      // Handle with ResponseHandler - returns [] (never throws)
+      return window.CRUDResponseHandler.handleLoadResponse(response, {
+        tableId: options.tableId || `${tableType}Table`,
+        entityName: options.entityName || tableType,
+        columns: options.columns,
+        onRetry: options.onRetry
+      });
     }
     
     const responseData = await response.json();
@@ -2216,20 +2243,21 @@ window.loadTableData = async function(tableType, updateFunction) {
     }
     
     return data;
+    
   } catch (error) {
-    console.error(`❌ Error loading table data for ${tableType}:`, error);
-    
-    // Show error notification if function exists
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה', `שגיאה בטעינת נתוני ${tableType}: ${error.message}`);
-    }
-    
-    // Hide loading state if function exists
+    // Network error - use CRUDResponseHandler (v2.0.0)
+    // Hide loading state
     if (typeof window.hideLoadingState === 'function') {
       window.hideLoadingState();
     }
     
-    throw error;
+    // Handle with ResponseHandler - returns [] (never throws)
+    return window.CRUDResponseHandler.handleNetworkError(error, {
+      tableId: options.tableId || `${tableType}Table`,
+      entityName: options.entityName || tableType,
+      columns: options.columns,
+      onRetry: options.onRetry
+    });
   }
 };
 

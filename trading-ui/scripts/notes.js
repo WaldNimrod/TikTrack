@@ -333,107 +333,67 @@ window.deleteNote = deleteNote;
 
 // פונקציה לטעינת נתונים
 async function loadNotesData() {
-  console.log('🚀🚀🚀 loadNotesData התחיל 🚀🚀🚀');
+  console.log('📊 טוען נתוני הערות...');
 
-  try {
-    // קריאה לשרת לקבלת נתוני הערות
-    console.log('📡 קריאה לשרת לקבלת נתוני הערות...');
-    const response = await fetch('/api/notes/');
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+  // שימוש במערכת המאוחדת loadTableData (v2.0.0)
+  const notes = await window.loadTableData('notes', null, {
+    tableId: 'notesTable',
+    entityName: 'הערות',
+    columns: 7,
+    onRetry: loadNotesData
+  });
 
-    const responseData = await response.json();
-    const notes = responseData.data || responseData;
-    console.log('✅ נתונים התקבלו מהשרת:', notes ? notes.length : 0, 'הערות');
-
-    // בדיקה אם הנתונים ריקים או לא תקינים
-    if (!notes || notes.length === 0) {
-      // console.warn('⚠️ לא נמצאו הערות בשרת');
-      const tbody = document.querySelector('#notesTable tbody');
-      if (tbody) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="6" class="text-center text-muted">
-              <div style="padding: 20px;">
-                <h5>📝 אין הערות</h5>
-                <p>לא נמצאו הערות במערכת</p>
-                <button class="btn btn-sm btn-primary" onclick="openNoteDetails()">הוסף הערה ראשונה</button>
-              </div>
-            </td>
-          </tr>
-        `;
-      }
-      return;
-    }
-
-    // טעינת נתונים נוספים (חשבונות, טריידים, תוכניות, טיקרים)
-
-    // פונקציה לטעינת נתונים עם טיפול בשגיאות
-    const loadDataSafely = async (url, _dataName) => {
-      try {
-        const innerResponse = await fetch(url);
-        if (!innerResponse.ok) {
-          // console.warn(`⚠️ שגיאה בטעינת ${_dataName}: ${innerResponse.status}`);
-          return [];
-        }
-        const data = await innerResponse.json();
-        if (data.status === 'error') {
-          // console.warn(`⚠️ שגיאה ב-API ${_dataName}: ${data.error?.message || 'שגיאה לא ידועה'}`);
-          return [];
-        }
-        return Array.isArray(data.data) ? data.data : [];
-      } catch {
-        // console.warn(`⚠️ שגיאה בטעינת ${_dataName}:`);
-        return [];
-      }
-    };
-
-    const [accounts, trades, tradePlans, tickers] = await Promise.all([
-      loadDataSafely('/api/trading-accounts/', 'חשבונות מסחר'),
-      loadDataSafely('/api/trades/', 'טריידים'),
-      loadDataSafely('/api/trade_plans/', 'תוכניות'),
-      loadDataSafely('/api/tickers/', 'טיקרים'),
-    ]);
-
-    // שמירת הנתונים ב-window לסינון
-    window.notesData = notes;
-    window.accountsData = accounts;
-    window.tradesData = trades;
-    window.tradePlansData = tradePlans;
-    window.tickersData = tickers;
-
-    // עדכון הטבלה עם הנתונים הנוספים
-    // עדכון הטבלה עם הערות
-    updateNotesTable(notes, accounts, trades, tradePlans, tickers);
-    // loadNotesData הושלם בהצלחה
-
-  } catch (error) {
-    handleDataLoadError(error, 'טעינת נתונים');
-
-    // הצגת הודעת שגיאה בטבלה
+  // בדיקה אם הנתונים ריקים
+  if (!notes || notes.length === 0) {
     const tbody = document.querySelector('#notesTable tbody');
     if (tbody) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="6" class="text-center text-danger">
+          <td colspan="7" class="text-center text-muted">
             <div style="padding: 20px;">
-              <h5>❌ שגיאה בטעינת נתונים</h5>
-              <p>לא ניתן לטעון נתונים מהשרת</p>
-              <p class="small text-muted">${error.message}</p>
-              <button class="btn btn-sm btn-primary" onclick="loadNotesData()">נסה שוב</button>
+              <h5>📝 אין הערות</h5>
+              <p>לא נמצאו הערות במערכת</p>
+              <button class="btn btn-sm btn-primary" onclick="openNoteDetails()">הוסף הערה ראשונה</button>
             </div>
           </td>
         </tr>
       `;
     }
-
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתונים מהשרת: ' + error.message);
-    } else {
-      handleDataLoadError(error, 'טעינת נתונים מהשרת');
-    }
+    window.notesData = [];
+    return;
   }
+
+  // טעינת נתונים נוספים (חשבונות, טריידים, תוכניות, טיקרים)
+  const loadDataSafely = async (url, _dataName) => {
+    try {
+      const innerResponse = await fetch(url);
+      if (!innerResponse.ok) return [];
+      const data = await innerResponse.json();
+      if (data.status === 'error') return [];
+      return Array.isArray(data.data) ? data.data : [];
+    } catch {
+      return [];
+    }
+  };
+
+  const [accounts, trades, tradePlans, tickers] = await Promise.all([
+    loadDataSafely('/api/trading-accounts/', 'חשבונות מסחר'),
+    loadDataSafely('/api/trades/', 'טריידים'),
+    loadDataSafely('/api/trade_plans/', 'תוכניות'),
+    loadDataSafely('/api/tickers/', 'טיקרים'),
+  ]);
+
+  // שמירת הנתונים ב-window
+  window.notesData = notes;
+  window.accountsData = accounts;
+  window.tradesData = trades;
+  window.tradePlansData = tradePlans;
+  window.tickersData = tickers;
+
+  // עדכון הטבלה
+  updateNotesTable(notes, accounts, trades, tradePlans, tickers);
+  
+  console.log(`✅ טעינת הערות הושלמה: ${notes.length} הערות`);
 }
 
 // פונקציה לעדכון הטבלה
@@ -1129,67 +1089,38 @@ async function saveNote() {
       body: JSON.stringify(requestData),
     });
 
-    const result = await response.json();
-
-      // ניקוי מטמון notes
-      if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-        await window.UnifiedCacheManager.remove('notes');
-        console.log('✅ מטמון notes נוקה אחרי שמירה');
-      }
-
-    if (response.ok && result.status === 'success') {
-      window.showSuccessNotification('הצלחה', 'הערה נשמרה בהצלחה!');
-
-      // סגירת המודל וטעינה מחדש
-      const modal = bootstrap.Modal.getInstance(addNoteModalElement);
-      modal.hide();
-      loadNotesData();
-    } else {
-
-      // טיפול בשגיאות וולידציה מהשרת
-      if (result.error && result.error.message) {
-        const serverMessage = result.error.message;
-
-        // אם זו שגיאת וולידציה, נפרק אותה להודעות ספציפיות
-        if (serverMessage.includes('validation failed')) {
-          const validationErrors = serverMessage.replace('Note validation failed: ', '').split('; ');
-
-          // הצגת כל שגיאה בנפרד
-          validationErrors.forEach(error => {
-            let fieldError = error;
-            let fieldName = '';
-
-            // תרגום שגיאות ספציפיות
-            if (error.includes('Field \'content\' is required')) {
-              fieldError = 'תוכן הערה הוא שדה חובה';
-              fieldName = 'contentError';
-            } else if (error.includes('Field \'related_type_id\' is required')) {
-              fieldError = 'יש לבחור סוג אובייקט לשיוך';
-              fieldName = 'relationTypeError';
-            } else if (error.includes('Field \'related_id\' is required')) {
-              fieldError = 'יש לבחור אובייקט לשיוך';
-              fieldName = 'relatedObjectError';
-            } else if (error.includes('Field \'related_id\' references non-existent record')) {
-              fieldError = 'האובייקט שנבחר לא קיים במערכת';
-              fieldName = 'relatedObjectError';
-            }
-
-            // שימוש במערכת ההתראות המובנת
-            if (fieldName && window.showValidationWarning) {
-              window.showValidationWarning(fieldName, fieldError);
-            } else {
-              window.showErrorNotification('שגיאת וולידציה', fieldError);
-            }
-          });
-        } else {
-          // שגיאה כללית
-          window.showErrorNotification('שגיאה בשמירה', serverMessage);
+    // טיפול בתגובה באמצעות CRUDResponseHandler עם customValidationParser
+    await window.CRUDResponseHandler.handleSaveResponse(response, {
+      modalId: 'addNoteModal',
+      successMessage: 'הערה נשמרה בהצלחה',
+      customValidationParser: (errorMessage) => {
+        if (!errorMessage.includes('validation failed')) return null;
+        
+        const validationErrors = errorMessage.replace('Note validation failed: ', '').split('; ');
+        return validationErrors.map(error => {
+          if (error.includes("Field 'content' is required")) {
+            return { fieldId: 'contentError', message: 'תוכן הערה הוא שדה חובה' };
+          } else if (error.includes("Field 'related_type_id' is required")) {
+            return { fieldId: 'relationTypeError', message: 'יש לבחור סוג אובייקט לשיוך' };
+          } else if (error.includes("Field 'related_id' is required")) {
+            return { fieldId: 'relatedObjectError', message: 'יש לבחור אובייקט לשיוך' };
+          } else if (error.includes("Field 'related_id' references non-existent record")) {
+            return { fieldId: 'relatedObjectError', message: 'האובייקט שנבחר לא קיים במערכת' };
+          }
+          return null;
+        }).filter(Boolean);
+      },
+      reloadFn: async () => {
+        // ניקוי מטמון
+        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+          await window.UnifiedCacheManager.remove('notes');
+          console.log('✅ מטמון notes נוקה אחרי שמירה');
         }
-      } else {
-        // הצגת הודעת שגיאה כללית
-        window.showErrorNotification('שגיאה בשמירה', 'שגיאה בשמירת הערה - בדוק את הנתונים שהוזנו');
-      }
-    }
+        // רענון טבלה
+        await loadNotesData();
+      },
+      entityName: 'הערה'
+    });
 
   } catch {
     window.showErrorNotification('שגיאה בשמירה', 'שגיאה בשמירת הערה - בדוק את הנתונים שהוזנו');

@@ -1105,9 +1105,14 @@ if (window.location.pathname.includes('/trade_plans')) {
  */
 async function loadTradePlansData() {
   try {
-    // שימוש במערכת הכללית לטעינת נתונים
+    // שימוש במערכת הכללית לטעינת נתונים (v2.0.0 - with error handling)
     if (typeof window.loadTableData === 'function') {
-      const data = await window.loadTableData('trade_plans', updateTradePlansTable);
+      const data = await window.loadTableData('trade_plans', updateTradePlansTable, {
+        tableId: 'tradePlansTable',
+        entityName: 'תוכניות מסחר',
+        columns: 12,
+        onRetry: loadTradePlansData
+      });
       
       // עדכון נתונים גלובליים
       window.tradePlansData = data;

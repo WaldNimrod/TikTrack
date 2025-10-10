@@ -94,95 +94,28 @@ const demoAlerts = [
 
 /**
  * פונקציה זו טוענת את כל ההתראות מהשרת ומעדכנת את הטבלה
- * אם השרת לא זמין, מציגה הודעת שגיאה ברורה (לא נתוני דמו)
+ * משתמשת במערכת המאוחדת loadTableData + CRUDResponseHandler v2.0.0
+ * מציגה הודעת שגיאה ברורה עם Retry + Copy Error Log (לא נתוני דמו)
  *
- * @returns {Array} מערך של התראות או מערך ריק במקרה של שגיאה
+ * @returns {Array} מערך של התראות או מערך ריק במקרה של שגיאה (NEVER THROWS)
  */
 async function loadAlertsData() {
   console.log('📊 טעינת נתוני התראות מהשרת...');
-  try {
-    const response = await fetch('/api/alerts/');
-    console.log('📊 תגובת שרת:', response.status, response.ok);
-
-    if (!response.ok) {
-      console.error(`❌ Server error ${response.status} - cannot load alerts data`);
-      
-      // הצגת הודעת שגיאה למשתמש - NO MOCK DATA per .cursorrules rule 48
-      if (window.showNotification) {
-        window.showNotification(
-          `❌ שגיאת שרת (${response.status}) - לא ניתן לטעון נתוני התראות`, 
-          'error',
-          'שגיאת טעינה'
-        );
-      }
-      
-      // הצגת הודעת שגיאה בטבלה (במקום נתוני דמו)
-      alertsData = [];
-      const tbody = document.querySelector('#alertsTable tbody');
-      if (tbody) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center" style="color: #e74c3c; padding: 20px;">
-          <i class="fas fa-exclamation-triangle"></i><br>
-          שגיאת שרת (${response.status})<br>
-          <small>לא ניתן לטעון נתוני התראות מהשרת</small>
-        </td></tr>`;
-      }
-      
-      return alertsData;
-    }
-
-    const data = await response.json();
-    const alerts = data.data || data;
-    console.log('📊 נתונים שהתקבלו:', alerts.length, 'התראות');
-
-    // עדכון המשתנה הגלובלי
-    alertsData = alerts.map(alert => ({
-      id: alert.id,
-      title: alert.title,
-      status: alert.status,
-      related_type_id: alert.related_type_id,
-      related_id: alert.related_id,
-      condition: alert.condition,
-      condition_attribute: alert.condition_attribute,
-      condition_operator: alert.condition_operator,
-      condition_number: alert.condition_number,
-      message: alert.message,
-      created_at: alert.created_at,
-      is_triggered: alert.is_triggered,
-    }));
-
-    console.log('📊 נתונים מעובדים:', alertsData.length, 'התראות');
-    
-    // עדכון הטבלה
-    updateAlertsTable(alertsData);
-    
-
-    return alertsData;
-
-  } catch (error) {
-    console.error('❌ שגיאה בטעינת התראות:', error);
-    
-    // הצגת הודעת שגיאה למשתמש - NO MOCK DATA per .cursorrules rule 48
-    if (window.showNotification) {
-      window.showNotification(
-        `❌ שגיאת רשת - לא ניתן לטעון נתוני התראות`, 
-        'error',
-        'שגיאת חיבור'
-      );
-    }
-    
-    // הצגת הודעת שגיאה בטבלה (במקום נתוני דמו)
-    alertsData = [];
-    const tbody = document.querySelector('#alertsTable tbody');
-    if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="8" class="text-center" style="color: #e74c3c; padding: 20px;">
-        <i class="fas fa-wifi"></i><br>
-        שגיאת חיבור לשרת<br>
-        <small>בדוק חיבור לאינטרנט ונסה לרענן את הדף</small>
-      </td></tr>`;
-    }
-    
-    return alertsData;
-  }
+  
+  // שימוש במערכת המאוחדת - טיפול אחיד בשגיאות עם Retry + Copy Error Log
+  const data = await window.loadTableData('alerts', updateAlertsTable, {
+    tableId: 'alertsTable',
+    entityName: 'התראות',
+    columns: 8,
+    onRetry: loadAlertsData
+  });
+  
+  // עדכון המשתנה הגלובלי
+  window.alertsData = data;
+  
+  console.log(`✅ טעינת התראות הושלמה: ${data.length} התראות`);
+  
+  return data;
 }
 
 /**

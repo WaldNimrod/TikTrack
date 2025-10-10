@@ -1541,9 +1541,14 @@ async function loadTickersData() {
       await loadCurrenciesData();
     }
     
-    // שימוש במערכת הכללית לטעינת נתונים
+    // שימוש במערכת הכללית לטעינת נתונים (v2.0.0 - with error handling)
     if (typeof window.loadTableData === 'function') {
-      const data = await window.loadTableData('tickers', updateTickersTable);
+      const data = await window.loadTableData('tickers', updateTickersTable, {
+        tableId: 'tickersTable',
+        entityName: 'טיקרים',
+        columns: 9,
+        onRetry: loadTickersData
+      });
       
       // שמירת הנתונים הגלובליים
       window.tickersData = data;

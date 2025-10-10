@@ -35,50 +35,37 @@ window.initializeCashFlowsModals = function() {
  * פונקציה מאוחדת לטעינת נתונים עם טיפול בשגיאות מתקדם
  */
 async function loadCashFlows() {
-  try {
-    console.log('📊 טוען נתוני תזרימי מזומנים...');
-    
-    // הצגת אינדיקטור טעינה
-    if (typeof window.showInfoNotification === 'function') {
-      window.showInfoNotification('טעינה', 'טוען נתוני תזרימי מזומנים...', 2000, 'ui');
-    }
-    
-    const response = await fetch('http://127.0.0.1:8080/api/cash_flows/', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    });
-
-      if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const result = await response.json();
-
-    if (result.status === 'success') {
-      cashFlowsData = result.data;
-      window.cashFlowsData = result.data;
-      
-      console.log('✅ נטענו תזרימי מזומנים:', result.data.length, 'פריטים');
-      
-      await renderCashFlowsTable();
-      updatePageSummaryStats();
-      
-      // יישום צבעי ישויות על כותרות
-      if (window.applyEntityColorsToHeaders) {
-        window.applyEntityColorsToHeaders('cash_flow');
-      }
-      
-      // הודעת הצלחה
-      if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification('הצלחה', 'נתוני תזרימי מזומנים נטענו בהצלחה', 3000, 'business');
-      }
-    } else {
-      handleApiError('שגיאה בטעינת תזרימי מזומנים', result.error);
-    }
-  } catch (error) {
-    handleDataLoadError(error, 'טעינת תזרימי מזומנים');
+  console.log('📊 טוען נתוני תזרימי מזומנים...');
+  
+  // הצגת אינדיקטור טעינה
+  if (typeof window.showInfoNotification === 'function') {
+    window.showInfoNotification('טעינה', 'טוען נתוני תזרימי מזומנים...', 2000, 'ui');
+  }
+  
+  // שימוש במערכת המאוחדת loadTableData (v2.0.0)
+  const data = await window.loadTableData('cash_flows', renderCashFlowsTable, {
+    tableId: 'cashFlowsTable',
+    entityName: 'תזרימי מזומנים',
+    columns: 10,
+    onRetry: loadCashFlows
+  });
+  
+  // שמירת הנתונים הגלובליים
+  window.cashFlowsData = data;
+  cashFlowsData = data;
+  
+  console.log(`✅ נטענו תזרימי מזומנים: ${data.length} פריטים`);
+  
+  updatePageSummaryStats();
+  
+  // יישום צבעי ישויות על כותרות
+  if (window.applyEntityColorsToHeaders) {
+    window.applyEntityColorsToHeaders('cash_flow');
+  }
+  
+  // הודעת הצלחה (אם יש נתונים)
+  if (data.length > 0 && typeof window.showSuccessNotification === 'function') {
+    window.showSuccessNotification('הצלחה', 'נתוני תזרימי מזומנים נטענו בהצלחה', 3000, 'business');
   }
 }
 
@@ -2176,105 +2163,9 @@ async function copyDetailedLog() {
     }
 }
 
-// ===== מערכת טיפול בשגיאות מתקדמת =====
-
-/**
- * טיפול מתקדם בשגיאות API
- */
-function handleApiError(context, error, fallbackData = null) {
-  console.error(`❌ API Error in ${context}:`, error);
-  
-  // בדיקה אם זו שגיאת ולידציה (400) או שגיאת מערכת אחרת
-  let isValidationError = false;
-  let errorMessage = `שגיאה ב-${context}`;
-  let errorDetails = '';
-  
-  if (typeof error === 'string') {
-    errorDetails = error;
-    // בדיקה אם זו שגיאת ולידציה
-    if (error.includes('validation') || error.includes('Invalid') || error.includes('required')) {
-      isValidationError = true;
-    }
-  } else if (error && error.message) {
-    errorDetails = error.message;
-    // בדיקה אם זו שגיאת ולידציה
-    if (error.message.includes('validation') || error.message.includes('Invalid') || error.message.includes('required')) {
-      isValidationError = true;
-    }
-  } else if (error && error.status) {
-    errorDetails = `HTTP ${error.status}`;
-    // HTTP 400 = Bad Request (בדר"כ שגיאת ולידציה)
-    if (error.status === 400) {
-      isValidationError = true;
-    }
-  } else {
-    errorDetails = 'שגיאה לא ידועה';
-  }
-  
-  // הצגת הודעת שגיאה למשתמש לפי הסוג
-  if (isValidationError) {
-    // שגיאת ולידציה - התראה פשוטה
-    if (typeof window.showSimpleErrorNotification === 'function') {
-      window.showSimpleErrorNotification(errorMessage, errorDetails);
-    }
-  } else {
-    // שגיאת מערכת - מודל מפורט
-  if (typeof window.showErrorNotification === 'function') {
-    window.showErrorNotification(errorMessage, errorDetails);
-    }
-  }
-  
-  // שימוש בנתוני fallback אם קיימים
-  if (fallbackData) {
-    console.log(`🔄 משתמש בנתוני fallback עבור ${context}`);
-    return fallbackData;
-  }
-  
-  return null;
-}
-
-/**
- * טיפול מתקדם בשגיאות טעינת נתונים
- */
-function handleDataLoadError(error, context, retryCount = 0) {
-  console.error(`❌ Data Load Error in ${context}:`, error);
-  
-  // הודעת שגיאה מותאמת לפי הקשר
-  let errorMessage = `שגיאה בטעינת ${context}`;
-  let errorDetails = '';
-  
-  if (error && error.message) {
-    errorDetails = error.message;
-  } else if (typeof error === 'string') {
-    errorDetails = error;
-  } else {
-    errorDetails = 'שגיאה לא ידועה';
-  }
-  
-  // הצגת הודעת שגיאה למשתמש
-  if (typeof window.showErrorNotification === 'function') {
-    window.showErrorNotification(errorMessage, errorDetails);
-  } else if (typeof window.showNotification === 'function') {
-    window.showNotification(errorMessage, 'error');
-  } else {
-    alert(`${errorMessage}: ${errorDetails}`);
-  }
-  
-  // ניסיון חוזר אוטומטי (עד 3 פעמים)
-  if (retryCount < 3) {
-    console.log(`🔄 מנסה שוב (${retryCount + 1}/3) עבור ${context}`);
-    setTimeout(() => {
-      // קריאה חוזרת לפונקציה המקורית
-      if (context.includes('תזרימי מזומנים')) {
-        loadCashFlows();
-      } else if (context.includes('מטבעות')) {
-        loadCurrenciesFromServer();
-      } else if (context.includes('חשבונות')) {
-        loadAccountsForCashFlow();
-      }
-    }, 2000 * (retryCount + 1)); // השהיה הולכת וגדלה
-  }
-}
+// ===== Error Handling =====
+// Note: Error handling now unified via CRUDResponseHandler v2.0.0
+// Legacy handleApiError and handleDataLoadError removed - no longer needed
 
 /**
  * טיפול מתקדם בשגיאות אלמנטים לא נמצאו

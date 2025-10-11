@@ -65,7 +65,7 @@
     padding: 13px 0 1rem 0;
     background: white;
     position: relative;
-    z-index: 950;
+    z-index: auto; /* auto - לא יוצר stacking context שחוסם כפתור */
     margin-top: 0;
     /* אנימציה - התכווצות לגובה 0 */
     height: auto;
@@ -784,7 +784,7 @@
 .header-content {
     position: relative;
     margin: 0 auto;
-    z-index: 960;
+    /* z-index removed - creates stacking context that blocks toggle button */
 }
 
 /* CRITICAL: Header Top Wrapper - Override from JS */

@@ -2165,15 +2165,8 @@ function showFinalSuccessModal(successInfo) {
   const modalElement = document.getElementById('finalSuccessModal');
   const modal = new bootstrap.Modal(modalElement);
   
-  // Remove inert attribute when modal is shown
-  modalElement.addEventListener('shown.bs.modal', () => {
-    modalElement.removeAttribute('inert');
-  });
-  
-  // Add inert attribute when modal is hidden
-  modalElement.addEventListener('hidden.bs.modal', () => {
-    modalElement.setAttribute('inert', '');
-  });
+  // Let Bootstrap manage aria-hidden and focus automatically
+  // No manual intervention needed - Bootstrap handles accessibility
   
   modal.show();
   

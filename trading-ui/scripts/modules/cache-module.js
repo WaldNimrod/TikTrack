@@ -2766,133 +2766,116 @@ window.testCacheCleanupMechanisms = async function() {
 };
 
 /**
- * Test all cache systems integration
+ * Test UnifiedCacheManager integration (4 layers)
+ * Simplified from multiple cache systems to single unified system
  */
 window.testCacheSystemsIntegration = async function() {
     try {
-        console.log('🧪 Testing cache systems integration...');
+        console.log('🧪 Testing UnifiedCacheManager integration (4 layers)...');
         
         const testResults = {
-            unifiedCacheManager: false,
-            cacheSyncManager: false,
-            cachePolicyManager: false,
-            memoryOptimizer: false,
-            integration: false
+            memoryLayer: false,
+            localStorageLayer: false,
+            indexedDBLayer: false,
+            backendLayer: false
         };
         
-        // Test UnifiedCacheManager
+        // Test UnifiedCacheManager with all layers
         if (window.UnifiedCacheManager?.initialized) {
             try {
-                await window.UnifiedCacheManager.save('test-integration', 'test-data', { layer: 'memory' });
-                const retrieved = await window.UnifiedCacheManager.get('test-integration');
-                testResults.unifiedCacheManager = retrieved === 'test-data';
-                await window.UnifiedCacheManager.remove('test-integration');
+                // Test Memory Layer
+                await window.UnifiedCacheManager.save('test-memory', 'test-data-memory', { layer: 'memory' });
+                const retrievedMemory = await window.UnifiedCacheManager.get('test-memory', { layer: 'memory' });
+                testResults.memoryLayer = retrievedMemory === 'test-data-memory';
+                await window.UnifiedCacheManager.remove('test-memory');
+                
+                // Test localStorage Layer
+                await window.UnifiedCacheManager.save('test-ls', 'test-data-ls', { layer: 'localStorage' });
+                const retrievedLS = await window.UnifiedCacheManager.get('test-ls', { layer: 'localStorage' });
+                testResults.localStorageLayer = retrievedLS === 'test-data-ls';
+                await window.UnifiedCacheManager.remove('test-ls');
+                
+                // Test IndexedDB Layer
+                await window.UnifiedCacheManager.save('test-idb', 'test-data-idb', { layer: 'indexedDB' });
+                const retrievedIDB = await window.UnifiedCacheManager.get('test-idb', { layer: 'indexedDB' });
+                testResults.indexedDBLayer = retrievedIDB === 'test-data-idb';
+                await window.UnifiedCacheManager.remove('test-idb');
+                
+                // Test Backend Layer (read-only, just check availability)
+                testResults.backendLayer = typeof window.UnifiedCacheManager.fetchFromBackend === 'function';
+                
             } catch (error) {
-                console.error('UnifiedCacheManager test failed:', error);
+                console.error('UnifiedCacheManager layer test failed:', error);
             }
+        } else {
+            console.error('UnifiedCacheManager not initialized');
         }
         
-        // Test CacheSyncManager
-        if (window.CacheSyncManager?.initialized) {
-            try {
-                const stats = window.CacheSyncManager.getStats();
-                testResults.cacheSyncManager = !!stats;
-            } catch (error) {
-                console.error('CacheSyncManager test failed:', error);
-            }
-        }
-        
-        // Test CachePolicyManager
-        if (window.CachePolicyManager?.initialized) {
-            try {
-                const policies = window.CachePolicyManager.getPolicies();
-                testResults.cachePolicyManager = !!policies;
-            } catch (error) {
-                console.error('CachePolicyManager test failed:', error);
-            }
-        }
-        
-        // Test MemoryOptimizer
-        if (window.MemoryOptimizer?.initialized) {
-            try {
-                const stats = window.MemoryOptimizer.getStats();
-                testResults.memoryOptimizer = !!stats;
-            } catch (error) {
-                console.error('MemoryOptimizer test failed:', error);
-            }
-        }
-        
-        // Test integration
-        const workingSystems = Object.values(testResults).filter(Boolean).length;
-        testResults.integration = workingSystems >= 2; // At least 2 systems working
-        
-        console.log('🧪 Cache systems integration test results:', testResults);
+        console.log('🧪 Cache layer integration test results:', testResults);
         
         const workingCount = Object.values(testResults).filter(Boolean).length;
         const totalCount = Object.keys(testResults).length;
         
         if (workingCount === totalCount) {
-            // כל המערכות עובדות - הודעה מפורטת עם מודל
+            // All 4 layers working - success message
             if (typeof window.showFinalSuccessNotification === 'function') {
                 window.showFinalSuccessNotification(
-                    'בדיקת אינטגרציה מערכות מטמון הושלמה בהצלחה!',
-                    `בדיקת האינטגרציה בין מערכות המטמון הושלמה בהצלחה.\n\nתוצאות הבדיקה:\n• UnifiedCacheManager: ${testResults.unifiedCacheManager ? '✅ עובד' : '❌ לא עובד'}\n• CacheSyncManager: ${testResults.cacheSyncManager ? '✅ עובד' : '❌ לא עובד'}\n• CachePolicyManager: ${testResults.cachePolicyManager ? '✅ עובד' : '❌ לא עובד'}\n• MemoryOptimizer: ${testResults.memoryOptimizer ? '✅ עובד' : '❌ לא עובד'}\n• אינטגרציה כללית: ${testResults.integration ? '✅ תקינה' : '❌ לא תקינה'}\n\nזמן בדיקה: ${new Date().toLocaleTimeString('he-IL')}\nסטטוס: ${workingCount}/${totalCount} מערכות עובדות`,
+                    'בדיקת אינטגרציה UnifiedCacheManager הושלמה בהצלחה!',
+                    `בדיקת האינטגרציה של UnifiedCacheManager הושלמה בהצלחה.\n\nתוצאות הבדיקה (4 שכבות):\n• Memory Layer: ${testResults.memoryLayer ? '✅ עובד' : '❌ לא עובד'}\n• localStorage Layer: ${testResults.localStorageLayer ? '✅ עובד' : '❌ לא עובד'}\n• IndexedDB Layer: ${testResults.indexedDBLayer ? '✅ עובד' : '❌ לא עובד'}\n• Backend Layer: ${testResults.backendLayer ? '✅ עובד' : '❌ לא עובד'}\n\nזמן בדיקה: ${new Date().toLocaleTimeString('he-IL')}\nסטטוס: ${workingCount}/${totalCount} שכבות עובדות`,
                     {
-                        operation: 'cache-systems-integration-test',
+                        operation: 'unified-cache-integration-test',
                         duration: `${Date.now()}ms`,
                         timestamp: new Date().toISOString(),
                         testResults: testResults,
-                        workingSystems: workingCount,
-                        totalSystems: totalCount,
-                        integrationStatus: testResults.integration,
-                        status: 'integration-successful',
-                        healthCheck: 'כל מערכות המטמון מתחברות תקין',
+                        workingLayers: workingCount,
+                        totalLayers: totalCount,
+                        status: 'all-layers-working',
+                        healthCheck: 'כל 4 שכבות המטמון פעילות',
                         nextAction: 'המערכת מוכנה לשימוש מלא'
                     },
                     'system'
                 );
             } else {
-                console.log('✅ בדיקת אינטגרציה הושלמה בהצלחה');
+                console.log('✅ בדיקת אינטגרציה הושלמה בהצלחה - כל 4 השכבות פעילות');
             }
         } else if (workingCount > 0) {
-            // חלק מהמערכות עובדות - הודעת הצלחה חלקית עם מודל
+            // Some layers working - partial success
             if (typeof window.showFinalSuccessNotification === 'function') {
                 window.showFinalSuccessNotification(
-                    'בדיקת אינטגרציה מערכות מטמון - הצלחה חלקית',
-                    `בדיקת האינטגרציה בין מערכות המטמון הצליחה חלקית.\n\nתוצאות הבדיקה:\n• UnifiedCacheManager: ${testResults.unifiedCacheManager ? '✅ עובד' : '❌ לא עובד'}\n• CacheSyncManager: ${testResults.cacheSyncManager ? '✅ עובד' : '❌ לא עובד'}\n• CachePolicyManager: ${testResults.cachePolicyManager ? '✅ עובד' : '❌ לא עובד'}\n• MemoryOptimizer: ${testResults.memoryOptimizer ? '✅ עובד' : '❌ לא עובד'}\n• אינטגרציה כללית: ${testResults.integration ? '✅ תקינה' : '❌ לא תקינה'}\n\nזמן בדיקה: ${new Date().toLocaleTimeString('he-IL')}\nסטטוס: ${workingCount}/${totalCount} מערכות עובדות`,
+                    'בדיקת אינטגרציה UnifiedCacheManager - הצלחה חלקית',
+                    `בדיקת האינטגרציה של UnifiedCacheManager הצליחה חלקית.\n\nתוצאות הבדיקה (4 שכבות):\n• Memory Layer: ${testResults.memoryLayer ? '✅ עובד' : '❌ לא עובד'}\n• localStorage Layer: ${testResults.localStorageLayer ? '✅ עובד' : '❌ לא עובד'}\n• IndexedDB Layer: ${testResults.indexedDBLayer ? '✅ עובד' : '❌ לא עובד'}\n• Backend Layer: ${testResults.backendLayer ? '✅ עובד' : '❌ לא עובד'}\n\nזמן בדיקה: ${new Date().toLocaleTimeString('he-IL')}\nסטטוס: ${workingCount}/${totalCount} שכבות עובדות`,
                     {
-                        operation: 'cache-systems-integration-test-partial',
+                        operation: 'unified-cache-integration-test-partial',
                         duration: `${Date.now()}ms`,
                         timestamp: new Date().toISOString(),
                         testResults: testResults,
-                        workingSystems: workingCount,
-                        totalSystems: totalCount,
-                        integrationStatus: testResults.integration,
+                        workingLayers: workingCount,
+                        totalLayers: totalCount,
                         status: 'partial-success',
-                        healthCheck: `${workingCount} מתוך ${totalCount} מערכות המטמון עובדות`,
-                        nextAction: 'המערכת תעבוד במצב מוגבל'
+                        healthCheck: `${workingCount} מתוך ${totalCount} שכבות המטמון עובדות`,
+                        nextAction: 'המערכת תעבוד במצב מוגבל - חלק מהשכבות לא פעילות'
                     },
                     'warning'
                 );
             } else {
-                console.log('⚠️ בדיקת אינטגרציה הצליחה חלקית');
+                console.log(`⚠️ בדיקת אינטגרציה חלקית - ${workingCount}/${totalCount} שכבות`);
             }
         } else {
-            // אינטגרציה לא עובדת - הודעת שגיאה מפורטת עם מודל
+            // No layers working - error
             if (typeof window.showErrorNotification === 'function') {
                 window.showErrorNotification(
-                    'בדיקת אינטגרציה מערכות מטמון נכשלה - בעיות זוהו',
-                    `בדיקת האינטגרציה בין מערכות המטמון זיהתה בעיות.\n\nפרטי הבדיקה:\n• מערכות עובדות: ${workingCount}/${totalCount}\n• UnifiedCacheManager: ${testResults.unifiedCacheManager ? '✅ עובד' : '❌ לא עובד'}\n• CacheSyncManager: ${testResults.cacheSyncManager ? '✅ עובד' : '❌ לא עובד'}\n• CachePolicyManager: ${testResults.cachePolicyManager ? '✅ עובד' : '❌ לא עובד'}\n• MemoryOptimizer: ${testResults.memoryOptimizer ? '✅ עובד' : '❌ לא עובד'}\n• אינטגרציה כללית: ${testResults.integration ? '✅ תקינה' : '❌ לא תקינה'}\n\nזמן בדיקה: ${new Date().toLocaleTimeString('he-IL')}\n\nבדיקת בריאות מפורטת:\n• מערכות תקינות: ${Object.entries(testResults).filter(([_, working]) => working).map(([system, _]) => system).join(', ')}\n• מערכות בעייתיות: ${Object.entries(testResults).filter(([_, working]) => !working).map(([system, _]) => system).join(', ')}\n\nהוראות:\n• חלק מהתכונות המתקדמות לא יהיו זמינות\n• ייתכן ביצועים מוגבלים במערכת המטמון\n• מומלץ לנסות אתחול חוזר של המערכות`,
+                    'בדיקת אינטגרציה UnifiedCacheManager נכשלה',
+                    `בדיקת האינטגרציה של UnifiedCacheManager זיהתה בעיות.\n\nתוצאות הבדיקה (4 שכבות):\n• Memory Layer: ${testResults.memoryLayer ? '✅ עובד' : '❌ לא עובד'}\n• localStorage Layer: ${testResults.localStorageLayer ? '✅ עובד' : '❌ לא עובד'}\n• IndexedDB Layer: ${testResults.indexedDBLayer ? '✅ עובד' : '❌ לא עובד'}\n• Backend Layer: ${testResults.backendLayer ? '✅ עובד' : '❌ לא עובד'}\n\nזמן בדיקה: ${new Date().toLocaleTimeString('he-IL')}\n\nשכבות פעילות: ${Object.entries(testResults).filter(([_, working]) => working).map(([layer, _]) => layer).join(', ') || 'אין'}\nשכבות בעייתיות: ${Object.entries(testResults).filter(([_, working]) => !working).map(([layer, _]) => layer).join(', ')}\n\nהוראות:\n• UnifiedCacheManager לא פעיל או חלק מהשכבות לא עובדות\n• מומלץ לרענן את העמוד או לאתחל מחדש את המערכת`,
                     20000
                 );
             } else {
-                console.error('❌ בדיקת אינטגרציה נכשלה');
+                console.error('❌ בדיקת אינטגרציה נכשלה - אף שכבה לא עובדת');
             }
         }
         
         return testResults;
     } catch (error) {
-        console.error('❌ Cache systems integration test failed:', error);
+        console.error('❌ UnifiedCacheManager integration test failed:', error);
         if (window.cacheTestPage) {
             window.cacheTestPage.showErrorMessage('בדיקת אינטגרציה נכשלה', error.message);
         }

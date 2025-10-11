@@ -70,7 +70,7 @@
     /* אנימציה - התכווצות לגובה 0 */
     height: auto;
     max-height: 500px; /* גובה אמיתי של הפילטרים */
-    overflow: hidden; /* תוכן מוסתר בזמן אנימציה */
+    overflow: visible; /* כפתור צריך לבלוט - תמיד! */
     transition: max-height 1.2s ease-in, padding 1.2s ease-in;
     /* ease-in = מתחיל לאט, נגמר מהר */
 }
@@ -81,8 +81,14 @@
     padding-top: 0 !important;
     padding-bottom: 0 !important;
     min-height: 0 !important;
-    overflow: hidden;
+    overflow: visible; /* כפתור צריך להישאר גלוי */
     pointer-events: none;
+}
+
+/* הסתרת תוכן פנימי כשסגור */
+.header-filters.filters-hidden .filters-container {
+    visibility: hidden;
+    opacity: 0;
 }
 
 #unified-header .header-top {

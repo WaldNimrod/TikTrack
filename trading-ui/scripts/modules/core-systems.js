@@ -1213,7 +1213,7 @@ async function shouldShowNotification(category) {
     console.log(`🔍 Checking preference: ${preferenceName}`);
     
     if (typeof window.getPreference !== 'function') {
-      console.warn('getPreference function not available, showing notification by default');
+      // Preferences system not loaded yet - show notifications by default (this is normal during initialization)
       return true;
     }
     
@@ -2166,8 +2166,10 @@ function showFinalSuccessModal(successInfo) {
   const modalElement = document.getElementById('finalSuccessModal');
   const modal = new bootstrap.Modal(modalElement);
   
-  // Let Bootstrap manage aria-hidden and focus automatically
-  // No manual intervention needed - Bootstrap handles accessibility
+  // Fix ARIA accessibility issue: remove aria-hidden after modal is shown
+  modalElement.addEventListener('shown.bs.modal', () => {
+    modalElement.removeAttribute('aria-hidden');
+  }, { once: true });
   
   modal.show();
   
@@ -2194,7 +2196,7 @@ async function showCriticalErrorModal(errorInfo, detailedMessage) {
   
   // Create modal HTML
   const modalHTML = `
-    <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}-label" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
+    <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}-label">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header text-white d-flex justify-content-between align-items-center" style="direction: rtl; background-color: #dc3545;">
@@ -2422,7 +2424,7 @@ async function showDetailsModal(title, content, options = {}) {
   
   // Create modal HTML
   const modalHTML = `
-    <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}-label" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
+    <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}-label">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header text-white d-flex justify-content-between align-items-center" style="direction: rtl; background-color: ${window.getEntityColor ? window.getEntityColor('trade') || '#007bff' : '#007bff'};">
@@ -3009,7 +3011,7 @@ window.showDetailedNotification = async function(title, message, type = 'info', 
     // יצירת modal עם התוכן המפורט
     const modalId = `detailed-notification-${Date.now()}`;
     const modalHtml = `
-      <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
+      <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label">
         <div class="modal-dialog modal-lg">
           <div class="modal-content">
             <div class="modal-header bg-${type === 'error' ? 'danger' : type === 'warning' ? 'warning' : type === 'success' ? 'success' : 'info'} text-white">

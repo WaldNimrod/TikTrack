@@ -15,10 +15,12 @@
     3. Correct loading order (Bootstrap first, then ITCSS)
     4. No duplicate systems
     5. Proper HTML structure
-    6. Updated cache busting strategy (?v=20251001 for internal, v6.0.0 for header)
+    6. Updated cache busting strategy (?v=20250111 for internal, v6.0.0 for header)
     7. No cache busting for external libraries (Bootstrap, Font Awesome)
+    8. No 07-trumps page-specific CSS (January 2025) - All styles in 06-components
+    9. No inline styles - All elements with classes (January 2025)
     
-    Last Updated: October 2025
+    Last Updated: January 2025
     ======================================
     -->
     
@@ -37,33 +39,33 @@
     <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=20250111">
     
     <!-- 02-tools - Functions and Mixins -->
-    <link rel="stylesheet" href="styles-new/02-tools/_mixins.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/02-tools/_functions.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/02-tools/_mixins.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/02-tools/_functions.css?v=20250111">
     
     <!-- 03-generic - Reset and Normalization -->
-    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=20250111">
     
     <!-- 04-elements - Basic HTML Elements -->
-    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=20250111">
     
     <!-- 05-objects - Layout Structures -->
-    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=20250111">
     
     <!-- 06-components - UI Components -->
-    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=20250111">
     
     <!-- 07-trumps - Global Header & Dev Tools Only -->
     <!-- ⚠️ עדכון 11/01/2025: תיקייה זו רק לכלי פיתוח וראש העמוד הגלובלי -->
@@ -71,10 +73,10 @@
     <!-- ✅ כל הסגנונות של עמודים צריכים להיות ב-06-components -->
     
     <!-- 08-themes - Themes -->
-    <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=20250111">
     
     <!-- 09-utilities - Utility Classes -->
-    <link rel="stylesheet" href="styles-new/09-utilities/_utilities.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/09-utilities/_utilities.css?v=20250111">
     
     <!-- External Libraries -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
@@ -83,7 +85,7 @@
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">
     <!-- Page Headers - Entity-specific header colors -->
-    <link rel="stylesheet" href="styles-new/06-components/_page-headers.css?v=20251001"></head>
+    <link rel="stylesheet" href="styles-new/06-components/_page-headers.css?v=20250111"></head>
 
 <body class="[PAGE_NAME]-page">
     <!-- Header System - Created automatically by header-system.js -->
@@ -132,47 +134,47 @@
     <!-- ===== BASE PACKAGE SYSTEMS - CORRECT LOADING ORDER ===== -->
     
     <!-- Stage 1: Initialization Systems (Must be first) -->
-    <script src="scripts/page-initialization-configs.js?v=20251001"></script>
-    <script src="scripts/unified-app-initializer.js?v=20251001"></script>
+    <script src="scripts/page-initialization-configs.js?v=20250111"></script>
+    <script src="scripts/unified-app-initializer.js?v=20250111"></script>
     
     <!-- Stage 2: Core Base Systems -->
-    <script src="scripts/global-favicon.js?v=20251001"></script>
-    <script src="scripts/translation-utils.js?v=20251001"></script>
+    <script src="scripts/global-favicon.js?v=20250111"></script>
+    <script src="scripts/translation-utils.js?v=20250111"></script>
     
     <!-- Stage 3: UI Base Systems -->
-    <script src="scripts/notification-system.js?v=20251001"></script>
+    <script src="scripts/notification-system.js?v=20250111"></script>
     
     <!-- Stage 4: Cache and Refresh Systems -->
-    <script src="scripts/cache-sync-manager.js?v=20251001"></script>
-    <script src="scripts/unified-cache-manager.js?v=20251001"></script>
-    <script src="scripts/cache-policy-manager.js?v=20251001"></script>
-    <script src="scripts/memory-optimizer.js?v=20251001"></script>
+    <script src="scripts/cache-sync-manager.js?v=20250111"></script>
+    <script src="scripts/unified-cache-manager.js?v=20250111"></script>
+    <script src="scripts/cache-policy-manager.js?v=20250111"></script>
+    <script src="scripts/memory-optimizer.js?v=20250111"></script>
     
     <!-- Stage 5: Advanced UI Systems (Always required) -->
-    <script src="scripts/ui-utils.js?v=20251001"></script>
-    <script src="scripts/color-scheme-system.js?v=20251001"></script>
+    <script src="scripts/ui-utils.js?v=20250111"></script>
+    <script src="scripts/color-scheme-system.js?v=20250111"></script>
     <script src="scripts/header-system.js?v=v6.0.0"></script>
     
     <!-- Stage 6: Data and Utility Systems -->
-    <script src="scripts/data-utils.js?v=20251001"></script>
-    <script src="scripts/date-utils.js?v=20251001"></script>
-    <script src="scripts/button-icons.js?v=20251001"></script>
-    <script src="scripts/tables.js?v=20251001"></script>
-    <script src="scripts/table-mappings.js?v=20251001"></script>
-    <script src="scripts/page-utils.js?v=20251001"></script>
+    <script src="scripts/data-utils.js?v=20250111"></script>
+    <script src="scripts/date-utils.js?v=20250111"></script>
+    <script src="scripts/button-icons.js?v=20250111"></script>
+    <script src="scripts/tables.js?v=20250111"></script>
+    <script src="scripts/table-mappings.js?v=20250111"></script>
+    <script src="scripts/page-utils.js?v=20250111"></script>
     
     <!-- Stage 7: Additional Systems (As needed) -->
-    <script src="scripts/preferences.js?v=20251001"></script>
-    <script src="scripts/notification-category-detector.js?v=20251001"></script>
-    <script src="scripts/global-notification-collector.js?v=20251001"></script>
-    <script src="scripts/system-management.js?v=20251001"></script>
+    <script src="scripts/preferences.js?v=20250111"></script>
+    <script src="scripts/notification-category-detector.js?v=20250111"></script>
+    <script src="scripts/global-notification-collector.js?v=20250111"></script>
+    <script src="scripts/system-management.js?v=20250111"></script>
     
     <!-- Stage 8: Modal and Warning Systems -->
-    <script src="scripts/entity-details-modal.js?v=20251001"></script>
-    <script src="scripts/warning-system.js?v=20251001"></script>
+    <script src="scripts/entity-details-modal.js?v=20250111"></script>
+    <script src="scripts/warning-system.js?v=20250111"></script>
     
     <!-- Stage 9: Page-specific Script -->
-    <script src="scripts/[PAGE_NAME].js?v=20251001"></script>
+    <script src="scripts/[PAGE_NAME].js?v=20250111"></script>
     
     <!-- 
     ===== TEMPLATE INSTRUCTIONS =====

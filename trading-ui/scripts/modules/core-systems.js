@@ -1918,6 +1918,176 @@ function createDetailedErrorMessage(errorInfo) {
  * @param {string} detailedMessage - Detailed error message for copying
  */
 /**
+ * Show Clear Cache Confirmation Modal
+ * Returns a promise that resolves to true/false based on user choice
+ * 
+ * @param {string} level - 'light'|'medium'|'full'|'nuclear'
+ * @param {Object} currentStats - Current cache statistics
+ * @returns {Promise<boolean>} User confirmation
+ */
+window.showClearCacheConfirmation = async function(level, currentStats) {
+    return new Promise((resolve) => {
+        const levelConfig = {
+            'light': {
+                emoji: '🟢',
+                name: 'Light - ניקוי קל',
+                color: '#28a745',
+                warning: 'ניקוי קל - בטוח למבחנים',
+                items: [
+                    `✅ Memory Layer: ${currentStats.memory?.entries || 0} entries`,
+                    `✅ Service Caches: ~7-9 services`,
+                    `❌ localStorage: ${currentStats.localStorage?.entries || 0} entries (ישארו)`,
+                    `❌ Orphan Keys: ~15-20 keys (ישארו)`
+                ],
+                safety: 'גבוהה',
+                reversible: 'כן'
+            },
+            'medium': {
+                emoji: '🔵',
+                name: 'Medium - ניקוי בינוני',
+                color: '#007bff',
+                warning: 'ניקוי בינוני - מומלץ לפיתוח יומיומי',
+                items: [
+                    `✅ כל Light (Memory + Services)`,
+                    `✅ localStorage tiktrack_*: ${currentStats.localStorage?.entries || 0} entries`,
+                    `✅ IndexedDB store: ${currentStats.indexedDB?.entries || 0} entries`,
+                    `✅ Backend layer: ${currentStats.backend?.entries || 0} entries`,
+                    `❌ Orphan Keys: ~15-20 keys (ישארו)`
+                ],
+                safety: 'בינונית',
+                reversible: 'חלקי'
+            },
+            'full': {
+                emoji: '🟠',
+                name: 'Full - ניקוי מלא',
+                color: '#fd7e14',
+                warning: 'ניקוי מלא - כולל orphans וauth keys!',
+                items: [
+                    `✅ כל Medium`,
+                    `✅ Orphan Keys: ~15-20 keys`,
+                    `⚠️ כולל: authToken, currentUser`,
+                    `⚠️ כולל: colorScheme, preferences`
+                ],
+                safety: 'נמוכה',
+                reversible: 'לא'
+            },
+            'nuclear': {
+                emoji: '☢️',
+                name: 'Nuclear - גרעיני',
+                color: '#dc3545',
+                warning: '⚠️⚠️⚠️ אזהרה קריטית! מוחק הכל!',
+                items: [
+                    `☢️ כל Full`,
+                    `☢️ ALL localStorage (כולל non-TikTrack!)`,
+                    `☢️ DELETE UnifiedCacheDB database`,
+                    `☢️ sessionStorage`,
+                    `⚠️ דורש: refresh + login + setup מחדש`
+                ],
+                safety: 'אפס',
+                reversible: 'לא - בלתי הפיך!'
+            }
+        };
+        
+        const config = levelConfig[level] || levelConfig['medium'];
+        const totalEntries = (currentStats.memory?.entries || 0) + 
+                            (currentStats.localStorage?.entries || 0) + 
+                            (currentStats.indexedDB?.entries || 0) + 
+                            (currentStats.backend?.entries || 0);
+        
+        // Create modal HTML
+        const modalHtml = `
+            <div class="modal fade" id="clearCacheConfirmationModal" tabindex="-1" data-bs-backdrop="static">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header text-white" style="background-color: ${config.color}; direction: rtl;">
+                            <h4 class="modal-title">
+                                ${config.emoji} ${config.name}
+                            </h4>
+                        </div>
+                        <div class="modal-body" style="direction: rtl;">
+                            <div class="alert alert-${level === 'nuclear' ? 'danger' : level === 'full' ? 'warning' : 'info'}">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <strong>${config.warning}</strong>
+                            </div>
+                            
+                            <h5>מה ינוקה:</h5>
+                            <ul style="text-align: right;">
+                                ${config.items.map(item => `<li>${item}</li>`).join('')}
+                            </ul>
+                            
+                            <div class="row mt-3">
+                                <div class="col-md-4">
+                                    <div class="stat-box text-center p-2 border rounded">
+                                        <small class="text-muted">סה"כ נוכחי:</small>
+                                        <h5 class="mb-0">${totalEntries} entries</h5>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="stat-box text-center p-2 border rounded">
+                                        <small class="text-muted">בטיחות:</small>
+                                        <h5 class="mb-0">${config.safety}</h5>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="stat-box text-center p-2 border rounded">
+                                        <small class="text-muted">הפיך:</small>
+                                        <h5 class="mb-0">${config.reversible}</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            ${level === 'full' || level === 'nuclear' ? `
+                            <div class="alert alert-danger mt-3">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <strong>שים לב:</strong>
+                                ${level === 'full' ? 'פעולה זו תמחק את authToken ו-currentUser - ידרוש login מחדש!' : 
+                                                     'פעולה זו בלתי הפיכה ותמחק גם נתונים של אתרים אחרים ב-localhost!'}
+                            </div>
+                            ` : ''}
+                        </div>
+                        <div class="modal-footer" style="direction: rtl;">
+                            <button type="button" class="btn btn-secondary" id="clearCache-cancel-btn">
+                                ביטול
+                            </button>
+                            <button type="button" class="btn btn-${level === 'nuclear' ? 'danger' : level === 'full' ? 'warning' : 'primary'}" id="clearCache-confirm-btn">
+                                ${config.emoji} ${level === 'nuclear' ? 'כן, מחק הכל' : level === 'full' ? 'אני מבין - מחק הכל' : 'אישור'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Remove existing modal if any
+        const existing = document.getElementById('clearCacheConfirmationModal');
+        if (existing) existing.remove();
+        
+        // Add modal to DOM
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        
+        const modalElement = document.getElementById('clearCacheConfirmationModal');
+        const modal = new bootstrap.Modal(modalElement);
+        
+        // Confirm button
+        document.getElementById('clearCache-confirm-btn').onclick = () => {
+            modal.hide();
+            setTimeout(() => modalElement.remove(), 300);
+            resolve(true);
+        };
+        
+        // Cancel button
+        document.getElementById('clearCache-cancel-btn').onclick = () => {
+            modal.hide();
+            setTimeout(() => modalElement.remove(), 300);
+            resolve(false);
+        };
+        
+        // Show modal
+        modal.show();
+    });
+};
+
+/**
  * Show final success modal with detailed information
  * NOTIFICATION SYSTEM - Displays modal with final success details and requires user acknowledgment
  *

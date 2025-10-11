@@ -1135,69 +1135,412 @@ window.getLayerStats = async function(layerName) {
     throw new Error('UnifiedCacheManager not available');
 };
 
-// פונקציה גלובלית לניקוי כל המטמון
-window.clearAllCache = async function() {
+// ========================================
+// Cache Clearing System - 4 Levels
+// ========================================
+
+/**
+ * Orphan Keys - localStorage keys without tiktrack_ prefix
+ * These are fallback keys that don't get cleared by UnifiedCacheManager
+ */
+const ORPHAN_KEYS = {
+    state: [
+        'cashFlowsSectionState',
+        'executionsTopSectionCollapsed'
+    ],
+    preferences: [
+        'colorScheme',
+        'customColorScheme',
+        'headerFilters',
+        'consoleSettings'
+    ],
+    auth: [
+        'authToken',
+        'currentUser'
+    ],
+    testing: [
+        'crud_test_results',
+        'linterLogs',
+        'css-duplicates-results',
+        'serverMonitorSettings'
+    ],
+    dynamic: {
+        patterns: [
+            /^sortState_/,
+            /^section-visibility-/,
+            /^top-section-collapsed-/
+        ]
+    }
+};
+
+/**
+ * Clear all Service Caches (external Maps not managed by UnifiedCacheManager)
+ * @returns {Array} List of cleared services
+ */
+function clearServiceCaches() {
+    const cleared = [];
+    
     try {
-        if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
-            const result = await window.UnifiedCacheManager.clear('all');
-            
-            // ניקוי מטמון כפילויות CSS
-            if (typeof window.clearDuplicatesCache === 'function') {
-                window.clearDuplicatesCache();
-            } else if (typeof clearDuplicatesCache === 'function') {
-                clearDuplicatesCache();
-            } else {
-                // ניקוי ישיר של מטמון כפילויות CSS
-                try {
-                    localStorage.removeItem('css-duplicates-results');
-                    console.log('🗑️ מטמון כפילויות CSS נוקה ישירות');
-                } catch (error) {
-                    console.warn('⚠️ שגיאה בניקוי מטמון כפילויות CSS:', error);
-                }
-            }
-            
-            if (result) {
-                console.log('✅ All cache cleared successfully');
-                if (window.notificationSystem) {
-                    window.notificationSystem.showSuccessNotification(
-                        'כל המטמון נוקה בהצלחה (כולל כפילויות CSS)',
-                        'ניקוי מטמון'
-                    );
-                } else if (typeof window.showSuccessNotification === 'function') {
-                    window.showSuccessNotification('ניקוי מטמון', 'כל המטמון נוקה בהצלחה (כולל כפילויות CSS)');
-                }
-                return true;
-            } else {
-                console.warn('⚠️ Cache clear returned false');
-                if (window.notificationSystem) {
-                    window.notificationSystem.showErrorNotification(
-                        'שגיאה בניקוי המטמון',
-                        'ניקוי מטמון'
-                    );
-                } else if (typeof window.showErrorNotification === 'function') {
-                    window.showErrorNotification('ניקוי מטמון', 'שגיאה בניקוי המטמון');
-                }
-                return false;
-            }
-        } else {
-            console.warn('⚠️ UnifiedCacheManager not available or not initialized');
-            if (window.notificationSystem) {
-                window.notificationSystem.showWarningNotification(
-                    'מערכת המטמון לא זמינה',
-                    'ניקוי מטמון'
-                );
-            }
-            return false;
+        // EntityDetailsAPI
+        if (window.EntityDetailsAPI?.cache?.clear) {
+            window.EntityDetailsAPI.cache.clear();
+            cleared.push('EntityDetailsAPI');
+            console.log('🗑️ Cleared EntityDetailsAPI.cache');
         }
+        
+        // ExternalDataService
+        if (window.ExternalDataService?.cache?.clear) {
+            window.ExternalDataService.cache.clear();
+            cleared.push('ExternalDataService');
+            console.log('🗑️ Cleared ExternalDataService.cache');
+        }
+        
+        // YahooFinanceService (2 Maps!)
+        if (window.YahooFinanceService?.cache?.clear) {
+            window.YahooFinanceService.cache.clear();
+            if (window.YahooFinanceService.loadingPromises?.clear) {
+                window.YahooFinanceService.loadingPromises.clear();
+            }
+            cleared.push('YahooFinanceService');
+            console.log('🗑️ Cleared YahooFinanceService.cache + loadingPromises');
+        }
+        
+        // Chart Adapters
+        if (window.TradesAdapter?.cache?.clear) {
+            window.TradesAdapter.cache.clear();
+            cleared.push('TradesAdapter');
+            console.log('🗑️ Cleared TradesAdapter.cache');
+        }
+        
+        if (window.LinterAdapter?.cache?.clear) {
+            window.LinterAdapter.cache.clear();
+            cleared.push('LinterAdapter');
+            console.log('🗑️ Cleared LinterAdapter.cache');
+        }
+        
+        if (window.PerformanceAdapter?.cache?.clear) {
+            window.PerformanceAdapter.cache.clear();
+            cleared.push('PerformanceAdapter');
+            console.log('🗑️ Cleared PerformanceAdapter.cache');
+        }
+        
+        // CSS Management (global Sets)
+        if (typeof mergedDuplicates !== 'undefined' && mergedDuplicates?.clear) {
+            mergedDuplicates.clear();
+            if (typeof removedDuplicates !== 'undefined' && removedDuplicates?.clear) {
+                removedDuplicates.clear();
+            }
+            cleared.push('CSS Management');
+            console.log('🗑️ Cleared CSS Management (mergedDuplicates + removedDuplicates)');
+        }
+        
     } catch (error) {
-        console.error('❌ Error in clearAllCache:', error);
-        if (window.notificationSystem) {
-            window.notificationSystem.showErrorNotification(
-                'שגיאה בניקוי המטמון: ' + error.message,
-                'ניקוי מטמון'
+        console.error('❌ Error clearing service caches:', error);
+    }
+    
+    return cleared;
+}
+
+/**
+ * Clear Orphan Keys - localStorage keys not managed by UnifiedCacheManager
+ * @param {boolean} includeAuth - whether to clear auth keys (default: true)
+ * @returns {Object} Detailed clearing results
+ */
+function clearOrphanKeys(includeAuth = true) {
+    const results = {
+        state: 0,
+        preferences: 0,
+        auth: 0,
+        testing: 0,
+        dynamic: 0,
+        total: 0
+    };
+    
+    try {
+        // State keys
+        ORPHAN_KEYS.state.forEach(key => {
+            if (localStorage.getItem(key) !== null) {
+                localStorage.removeItem(key);
+                results.state++;
+                console.log(`🗑️ Removed orphan (state): ${key}`);
+            }
+        });
+        
+        // Preferences keys
+        ORPHAN_KEYS.preferences.forEach(key => {
+            if (localStorage.getItem(key) !== null) {
+                localStorage.removeItem(key);
+                results.preferences++;
+                console.log(`🗑️ Removed orphan (preferences): ${key}`);
+            }
+        });
+        
+        // Auth keys (if includeAuth)
+        if (includeAuth) {
+            ORPHAN_KEYS.auth.forEach(key => {
+                if (localStorage.getItem(key) !== null) {
+                    localStorage.removeItem(key);
+                    results.auth++;
+                    console.log(`🗑️ Removed orphan (auth): ${key}`);
+                }
+            });
+        }
+        
+        // Testing keys
+        ORPHAN_KEYS.testing.forEach(key => {
+            if (localStorage.getItem(key) !== null) {
+                localStorage.removeItem(key);
+                results.testing++;
+                console.log(`🗑️ Removed orphan (testing): ${key}`);
+            }
+        });
+        
+        // Dynamic keys (patterns)
+        const allKeys = Object.keys(localStorage);
+        allKeys.forEach(key => {
+            for (const pattern of ORPHAN_KEYS.dynamic.patterns) {
+                if (pattern.test(key)) {
+                    localStorage.removeItem(key);
+                    results.dynamic++;
+                    console.log(`🗑️ Removed orphan (dynamic): ${key}`);
+                    break;
+                }
+            }
+        });
+        
+        results.total = results.state + results.preferences + results.auth + 
+                       results.testing + results.dynamic;
+        
+                } catch (error) {
+        console.error('❌ Error clearing orphan keys:', error);
+    }
+    
+    return results;
+}
+
+/**
+ * Clear all cache - 4 levels of clearing intensity
+ * @param {Object} options - Clearing options
+ * @param {string} options.level - 'light'|'medium'|'full'|'nuclear' (default: 'medium')
+ * @param {boolean} options.skipConfirmation - Skip confirmation modal (default: false)
+ * @param {boolean} options.includeAuth - Include auth keys in full/nuclear (default: true)
+ * @param {boolean} options.verbose - Detailed logging (default: true)
+ * @returns {Promise<Object>} Detailed clearing results
+ */
+window.clearAllCache = async function(options = {}) {
+    // Default options
+    const level = options.level || 'medium';
+    const skipConfirmation = options.skipConfirmation || false;
+    const includeAuth = options.includeAuth !== undefined ? options.includeAuth : true;
+    const verbose = options.verbose !== undefined ? options.verbose : true;
+    
+    const startTime = Date.now();
+    
+    try {
+        if (!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) {
+            throw new Error('UnifiedCacheManager not initialized');
+        }
+        
+        if (verbose) {
+            console.log(`🧹 Starting cache clearing - Level: ${level.toUpperCase()}`);
+        }
+        
+        // === BEFORE SNAPSHOT ===
+        const before = {
+            memory: await window.UnifiedCacheManager.getLayerStats('memory'),
+            localStorage: await window.UnifiedCacheManager.getLayerStats('localStorage'),
+            indexedDB: await window.UnifiedCacheManager.getLayerStats('indexedDB'),
+            backend: await window.UnifiedCacheManager.getLayerStats('backend')
+        };
+        
+        // === CONFIRMATION MODAL ===
+        if (!skipConfirmation) {
+            const confirmed = await window.showClearCacheConfirmation(level, before);
+            if (!confirmed) {
+                console.log('❌ Cache clearing cancelled by user');
+                return { success: false, cancelled: true };
+            }
+        }
+        
+        // === CLEARING RESULTS ===
+        const results = {
+            success: false,
+            level: level,
+            duration: 0,
+            cleared: {},
+            total: 0,
+            coverage: ''
+        };
+        
+        // ========================================
+        // LEVEL 1: LIGHT (Memory + Services only)
+        // ========================================
+        
+        if (level === 'light' || level === 'medium' || level === 'full' || level === 'nuclear') {
+            // Clear Memory Layer
+            await window.UnifiedCacheManager.layers.memory.clear();
+            results.cleared.memoryLayer = before.memory.entries;
+            if (verbose) console.log(`✅ Memory layer cleared: ${before.memory.entries} entries`);
+            
+            // Clear Service Caches
+            const services = clearServiceCaches();
+            results.cleared.serviceCaches = services.length;
+            if (verbose) console.log(`✅ Service caches cleared: ${services.join(', ')}`);
+        }
+        
+        // ========================================
+        // LEVEL 2: MEDIUM (+ UnifiedCacheManager full)
+        // ========================================
+        
+        if (level === 'medium' || level === 'full' || level === 'nuclear') {
+            // Clear localStorage Layer (tiktrack_* only)
+            await window.UnifiedCacheManager.layers.localStorage.clear();
+            results.cleared.localStorageLayer = before.localStorage.entries;
+            if (verbose) console.log(`✅ localStorage layer cleared: ${before.localStorage.entries} entries (tiktrack_*)`);
+            
+            // Clear IndexedDB Layer (unified-cache store only)
+            await window.UnifiedCacheManager.layers.indexedDB.clear();
+            results.cleared.indexedDBLayer = before.indexedDB.entries;
+            if (verbose) console.log(`✅ IndexedDB layer cleared: ${before.indexedDB.entries} entries`);
+            
+            // Clear Backend Layer
+            await window.UnifiedCacheManager.layers.backend.clear();
+            results.cleared.backendLayer = before.backend.entries;
+            if (verbose) console.log(`✅ Backend layer cleared: ${before.backend.entries} entries`);
+        }
+        
+        // ========================================
+        // LEVEL 3: FULL (+ Orphan Keys)
+        // ========================================
+        
+        if (level === 'full' || level === 'nuclear') {
+            // Clear Orphan Keys
+            const orphanResults = clearOrphanKeys(includeAuth);
+            results.cleared.orphanKeys = orphanResults;
+            if (verbose) {
+                console.log(`✅ Orphan keys cleared: ${orphanResults.total} keys`);
+                console.log(`   - State: ${orphanResults.state}`);
+                console.log(`   - Preferences: ${orphanResults.preferences}`);
+                console.log(`   - Auth: ${orphanResults.auth}`);
+                console.log(`   - Testing: ${orphanResults.testing}`);
+                console.log(`   - Dynamic: ${orphanResults.dynamic}`);
+            }
+        }
+        
+        // ========================================
+        // LEVEL 4: NUCLEAR (+ Everything else!)
+        // ========================================
+        
+        if (level === 'nuclear') {
+            // Clear ALL localStorage (no filter!)
+            const lsCountBefore = localStorage.length;
+            localStorage.clear();
+            results.cleared.allLocalStorage = lsCountBefore;
+            if (verbose) console.log(`☢️ ALL localStorage cleared: ${lsCountBefore} entries (including non-TikTrack!)`);
+            
+            // Delete entire IndexedDB database
+            try {
+                await indexedDB.deleteDatabase('UnifiedCacheDB');
+                results.cleared.indexedDBDeleted = true;
+                if (verbose) console.log('☢️ IndexedDB database DELETED: UnifiedCacheDB');
+    } catch (error) {
+                console.warn('⚠️ Failed to delete IndexedDB:', error);
+                results.cleared.indexedDBDeleted = false;
+            }
+            
+            // Clear sessionStorage (if used)
+            if (typeof sessionStorage !== 'undefined') {
+                const ssCount = sessionStorage.length;
+                sessionStorage.clear();
+                results.cleared.sessionStorage = ssCount;
+                if (verbose) console.log(`☢️ sessionStorage cleared: ${ssCount} entries`);
+            }
+        }
+        
+        // === CALCULATE TOTALS ===
+        results.duration = Date.now() - startTime;
+        
+        // Calculate total cleared items
+        let totalCleared = 0;
+        if (results.cleared.memoryLayer) totalCleared += results.cleared.memoryLayer;
+        if (results.cleared.serviceCaches) totalCleared += results.cleared.serviceCaches;
+        if (results.cleared.localStorageLayer) totalCleared += results.cleared.localStorageLayer;
+        if (results.cleared.indexedDBLayer) totalCleared += results.cleared.indexedDBLayer;
+        if (results.cleared.backendLayer) totalCleared += results.cleared.backendLayer;
+        if (results.cleared.orphanKeys) totalCleared += results.cleared.orphanKeys.total;
+        if (results.cleared.allLocalStorage) totalCleared = 'ALL';
+        
+        results.total = totalCleared;
+        
+        // Set coverage percentage
+        results.coverage = {
+            'light': '25%',
+            'medium': '60%',
+            'full': '100%',
+            'nuclear': '150%+'
+        }[level];
+        
+        results.success = true;
+        
+        // === SUCCESS NOTIFICATION ===
+        const levelEmojis = {
+            'light': '🟢',
+            'medium': '🔵',
+            'full': '🟠',
+            'nuclear': '☢️'
+        };
+        
+        const levelNames = {
+            'light': 'Light - ניקוי קל',
+            'medium': 'Medium - ניקוי בינוני',
+            'full': 'Full - ניקוי מלא',
+            'nuclear': 'Nuclear - ניקוי גרעיני'
+        };
+        
+        if (typeof window.showSuccessNotification === 'function') {
+            let message = `${levelEmojis[level]} ${levelNames[level]}\n\n`;
+            message += `סה"כ נוקה: ${results.total} items\n`;
+            message += `זמן: ${results.duration}ms\n`;
+            message += `כיסוי: ${results.coverage}\n\n`;
+            
+            if (level === 'light') {
+                message += `✅ Memory Layer\n✅ Service Caches`;
+            } else if (level === 'medium') {
+                message += `✅ Memory + Services\n✅ UnifiedCacheManager (4 שכבות)`;
+            } else if (level === 'full') {
+                message += `✅ Medium\n✅ Orphan Keys (${results.cleared.orphanKeys?.total || 0})`;
+                if (includeAuth) {
+                    message += `\n⚠️ Auth keys נמחקו - דורש login מחדש`;
+                }
+            } else if (level === 'nuclear') {
+                message += `☢️ הכל נמחק!\n⚠️ דורש refresh + login`;
+            }
+            
+            window.showSuccessNotification('ניקוי מטמון הושלם', message);
+        }
+        
+        if (verbose) {
+            console.log('✅ Cache clearing completed:', results);
+        }
+        
+        return results;
+        
+    } catch (error) {
+        console.error('❌ Cache clearing failed:', error);
+        
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification(
+                'שגיאה בניקוי מטמון',
+                `Level: ${level}\nError: ${error.message}`
             );
         }
-        return false;
+        
+        return {
+            success: false,
+            error: error.message,
+            level: level,
+            duration: Date.now() - startTime
+        };
     }
 };
 

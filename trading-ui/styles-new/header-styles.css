@@ -261,11 +261,12 @@
 }
 
 .tiktrack-nav-item:first-child .tiktrack-nav-link {
-    padding-right: 0;
+    padding-right: 0; /* הסרת padding ימני */
+    padding-left: 0; /* הסרת padding שמאלי - מצמצם רווח */
 }
 
 .tiktrack-nav-item:nth-child(2) {
-    margin-right: 0.5rem;
+    margin-right: 0; /* הסרת margin ימני - מצמצם רווח */
 }
 
 /* .logo-section styles moved to _navigation.css */
@@ -1019,8 +1020,10 @@
 }
 
 .filter-toggle:hover {
-    border-color: #667eea;
-    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+    color: #26baac; /* ירוק לוגו - כמו תפריט ראשי */
+    background: transparent; /* ללא רקע */
+    border-color: #ddd; /* שמירת גבול מקורי */
+    box-shadow: none;
 }
 
 .filter-toggle.active {

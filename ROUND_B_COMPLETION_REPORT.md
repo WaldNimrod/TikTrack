@@ -279,10 +279,12 @@
 
 ## 🆕 עדכון: סבב C התחיל (11/01/2025)
 
-### תיקוני מודלים - trade_plans.html
+### תיקוני מודלים - trade_plans.html ✅ מושלם
 ראה: **UI_IMPROVEMENTS_ROUND_B.md - Section 10**
 
-**9 תיקונים:**
+**16 תיקונים (9 עיצוב + 7 טכני):**
+
+**עיצוב:**
 1. ✅ button-icons.js נוסף
 2. ✅ כותרת מודל: רקע בהיר, טקסט כהה, h4
 3. ✅ כפתור סגירה: X עם מסגרת, משמאל
@@ -293,7 +295,18 @@
 8. ✅ ביטול: צבע אזהרה
 9. ✅ Sortable headers: ללא inline styles
 
+**טכני:**
+10. ✅ מודל עריכה: IDs תוקנו (8 שדות)
+11. ✅ תיבת מידע טיקר: 3 אלמנטים נוספו
+12. ✅ טעינת חשבונות: SelectPopulatorService
+13. ✅ setFormData: 3 שדות נוספו
+14. ✅ collectFormData: DataCollectionService
+15. ✅ שם פונקציה: updateTradePlan → saveEditTradePlan
+16. ✅ `</script>` tag תוקן (קריטי!)
+
 **קבצים:**
+- trade_plans.html: 2 מודלים מושלמים
+- trade_plans.js: v=20250111c
 - _modals.css: v=1.2.9
 - _tables.css: v=1.3.0
 
@@ -303,6 +316,6 @@
 
 **תאריך סיום סבב B:** 11 ינואר 2025  
 **משך הפרויקט:** סבב A (10-11/01) + סבב B (11/01) + סבב C (11/01 - בתהליך)  
-**גרסה נוכחית:** 3.0  
-**סטטוס:** ✅ A+B Complete | 🔄 C In Progress
+**גרסה נוכחית:** 3.1  
+**סטטוס:** A✅ B✅ | C🔄 trade_plans✅ מושלם (16 תיקונים), 10 עמודים נותרים
 

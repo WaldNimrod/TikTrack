@@ -3,8 +3,8 @@
 
 **תאריך יצירה:** 11 ינואר 2025  
 **עדכון אחרון:** 11 ינואר 2025  
-**גרסה:** 3.0  
-**סטטוס:** סבב A הושלם (19) | סבב B הושלם (15) | סבב C בתהליך (מודלים)
+**גרסה:** 3.1  
+**סטטוס:** A✅(19) | B✅(15) | C🔄(1/11 מודלים - trade_plans מושלם)
 
 ---
 
@@ -27,10 +27,10 @@
 | **תאריך התחלה** | 10 ינואר 2025 |
 | **סבב A - עיצוב בסיסי** | 19 עמודים ✅ |
 | **סבב B - עמודים נוספים** | 15 עמודים ✅ |
-| **סבב C - מודלים** | trade_plans ✅, 10 עמודים נותרים 🔄 |
+| **סבב C - מודלים** | trade_plans ✅ מושלם (16 תיקונים), 10 נותרים 🔄 |
 | **סה"כ עמודים במערכת** | 34 עמודים HTML |
 | **אחוז השלמה בסיסי** | 100% (34/34) |
-| **אחוז השלמה מודלים** | 9% (1/11) |
+| **אחוז השלמה מודלים** | 9% (1/11) - trade_plans עם 2 מודלים מושלמים |
 
 ### 🏗️ ארכיטקטורת מערכת
 
@@ -1044,7 +1044,7 @@ console.log(`Badges ללא category: ${withoutCategory.length}`);
 
 **עמוד דוגמה:** trade_plans.html
 
-### 📋 9 תיקונים שבוצעו ב-trade_plans
+### 📋 16 תיקונים שבוצעו ב-trade_plans (9 עיצוב + 7 טכני)
 
 #### 1️⃣ כפתורי פעולה לא מוצגים
 **בעיה:** כפתורי edit/delete/view לא מופיעים בטבלה  
@@ -1198,12 +1198,133 @@ class="form-label" → class="form-label entity-label"
 
 ---
 
-### 📁 קבצים ששונו:
-1. **trade_plans.html** - 2 מודלים, button-icons.js, labels, sortable headers
-2. **_modals.css** - v=1.2.9, 9 rules חדשות
-3. **_tables.css** - v=1.3.0, sortable-header
+### 🔟 תיקונים טכניים נוספים (11/01/2025)
 
-### 🎯 ליישום על 11 עמודי משתמש:
+#### 10. תיקון מודל עריכה - IDs ושדות
+**בעיה:** IDs לא תואמים, שדות חסרים  
+**פתרון HTML:** החלפת כל ה-IDs:
+```
+editTicker → editTradePlanTickerId (select במקום input)
+editType → editTradePlanInvestmentType
+editSide → editTradePlanSide
+editQuantity → editTradePlanShares
+editPrice → editTradePlanCurrentPrice
+editNotes → editTradePlanNotes
+editPlanDate → editTradePlanDate
+```
+
+**שדות שנוספו:**
+- `editTradePlanId` (hidden)
+- `editTradePlanTradingAccount` (select)
+- `editTradePlanStatus` (select)
+- `editTradePlanPlannedAmount`
+- `editTradePlanEntryConditions`
+- `editTradePlanReasons`
+- `editTradePlanStopPrice`
+- `editTradePlanTargetPrice`
+
+#### 11. תיבת מידע טיקר במודל עריכה
+**בעיה:** `editSelectedTickerDisplay`, `editCurrentPriceDisplay`, `editDailyChangeDisplay` לא קיימים  
+**פתרון:** הוספת alert-info בראש הטופס:
+```html
+<div class="alert alert-info">
+    <div class="d-flex justify-content-between">
+        <div><strong>טיקר נבחר:</strong> <span id="editSelectedTickerDisplay">-</span></div>
+        <div><strong>מחיר נוכחי:</strong> <span id="editCurrentPriceDisplay">-</span></div>
+        <div><strong>שינוי יומי:</strong> <span id="editDailyChangeDisplay">-</span></div>
+    </div>
+</div>
+```
+
+#### 12. טעינת חשבונות במודל עריכה
+**בעיה:** חשבונות לא נטענים - SelectPopulatorService לא נקרא  
+**פתרון JS:**
+```javascript
+async function loadTickersForEditModal() {
+    // טיקרים
+    await SelectPopulatorService.populateTickersSelect('editTradePlanTickerId', {
+        filterFn: (ticker) => ticker.status !== 'cancelled'
+    });
+    
+    // חשבונות ← הוסף!
+    await SelectPopulatorService.populateAccountsSelect('editTradePlanTradingAccount', {
+        filterFn: (account) => account.status === 'open'
+    });
+}
+```
+
+#### 13. setFormData מעודכן
+**בעיה:** שדות חסרים במילוי הטופס  
+**פתרון:** הוספת שדות:
+```javascript
+window.DataCollectionService.setFormData({
+    // ... שדות קיימים
+    trading_account_id: { id: 'editTradePlanTradingAccount', type: 'int' },
+    current_price: { id: 'editTradePlanCurrentPrice', type: 'number' },
+    notes: { id: 'editTradePlanNotes', type: 'text' }
+}, tradePlanValues);
+```
+
+#### 14. collectFormData בשמירה
+**בעיה:** השתמש ב-DataCollectionService במקום getElementById ידני  
+**פתרון:** החלפה מלאה ב-`saveEditTradePlan`:
+```javascript
+const formData = window.DataCollectionService.collectFormData({
+    id: { id: 'editTradePlanId', type: 'int' },
+    ticker_id: { id: 'editTradePlanTickerId', type: 'int' },
+    trading_account_id: { id: 'editTradePlanTradingAccount', type: 'int' },
+    // ... כל השדות
+});
+```
+
+#### 15. תיקון שם פונקציה
+**בעיה:** `onclick="updateTradePlan()"` אבל הפונקציה נקראת `saveEditTradePlan()`  
+**פתרון HTML:**
+```html
+onclick="saveEditTradePlan()" <!-- ← תיקון -->
+```
+
+#### 16. תיקון `</script>` tag חסר ⚠️ קריטי!
+**בעיה:** הקובץ לא נטען - חסר closing tag  
+**פתרון:**
+```html
+<!-- לפני: -->
+<script src="scripts/trade_plans.js?v=20250111c">
+
+<!-- אחרי: -->
+<script src="scripts/trade_plans.js?v=20250111c"></script>
+```
+**תוצאה:** ללא תיקון זה - הסקריפט כולו לא נטען!
+
+---
+
+### 📁 קבצים ששונו (מעודכן):
+1. **trade_plans.html:**
+   - 2 מודלים: header, footer, buttons, h5→h4
+   - button-icons.js נוסף
+   - כל ה-labels: entity-label
+   - sortable headers: ללא inline styles
+   - מודל עריכה: IDs חדשים, שדות נוספים, תיבת מידע
+   - **`</script>` tag תוקן** ⚠️
+   
+2. **trade_plans.js:**
+   - `loadTickersForEditModal()`: הוספת טעינת חשבונות
+   - `openEditTradePlanModal()`: setFormData מעודכן
+   - `saveEditTradePlan()`: שימוש ב-DataCollectionService
+   - גרסה: v=20250111c
+   
+3. **_modals.css:**
+   - v=1.2.9
+   - 9 rules לentity modals
+   - !important מתועד
+   
+4. **_tables.css:**
+   - v=1.3.0
+   - sortable-header rule
+
+---
+
+### 🎯 ליישום על 10 עמודי משתמש נוספים:
 - trades.html
 - tickers.html
 - alerts.html
@@ -1254,10 +1375,16 @@ class="form-label" → class="form-label entity-label"
 
 ## 📝 Change Log
 
+### גרסה 3.1 - 11 ינואר 2025
+- trade_plans: 16 תיקונים הושלמו (9 עיצוב + 7 טכני)
+- מודל עריכה: תוקן במלואו (IDs, שדות, טעינות)
+- תיקון קריטי: `</script>` tag חסר
+- תיעוד מלא של כל התיקונים
+
 ### גרסה 3.0 - 11 ינואר 2025
 - הושלם סבב B (15 עמודים)
 - הוסף Section 10: תיקוני מודלים (סבב C)
-- תיעוד 9 תיקונים למודלים
+- תיעוד תיקוני מודלים
 - רשימת 11 עמודים ליישום
 
 ### גרסה 2.0 - 11 ינואר 2025
@@ -1294,6 +1421,6 @@ class="form-label" → class="form-label entity-label"
 
 **תאריך עדכון אחרון:** 11 ינואר 2025  
 **מחבר:** AI Assistant + Nimrod  
-**סטטוס:** סבבים A+B הושלמו ✅ | סבב C (מודלים) בתהליך 🔄  
-**גרסה:** 3.0
+**סטטוס:** A✅ B✅ | C🔄 trade_plans מושלם (16 תיקונים) | 10 עמודים נותרים  
+**גרסה:** 3.1
 

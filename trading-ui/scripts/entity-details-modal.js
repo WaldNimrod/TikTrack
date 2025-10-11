@@ -91,10 +91,10 @@ class EntityDetailsModal {
         }
 
         // יצירת מבנה HTML למודל
+        // Note: No aria-hidden - let Bootstrap manage it to avoid accessibility warnings
         const modalHTML = `
             <div class="modal fade" id="${this.modalId}" tabindex="-1" 
-                 aria-labelledby="${this.modalId}Label" aria-hidden="true" 
-                 data-bs-backdrop="true" data-bs-keyboard="true">
+                 aria-labelledby="${this.modalId}Label">
                 <div class="modal-dialog modal-xl modal-dialog-scrollable">
                     <div class="modal-content entity-details-modal">
                         <div class="modal-header modal-header-colored">

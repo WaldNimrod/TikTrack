@@ -99,24 +99,43 @@ class CRUDTestingDashboard {
     // לא נדרש - הכפתורים עובדים דרך onclick attributes
   }
 
-  loadTestData() {
-    // טעינת נתוני בדיקות מ-localStorage
+  async loadTestData() {
+    // טעינת נתוני בדיקות מ-UnifiedCacheManager עם fallback ל-localStorage
     try {
-      const savedResults = localStorage.getItem('crud_test_results');
+      let savedResults = null;
+      
+      if (window.UnifiedCacheManager?.isInitialized()) {
+        savedResults = await window.UnifiedCacheManager.get('crud_test_results', {
+          layer: 'localStorage'
+        });
+      } else {
+        const raw = localStorage.getItem('crud_test_results'); // fallback
+        savedResults = raw ? JSON.parse(raw) : null;
+      }
+      
       if (savedResults) {
-        this.testResults = JSON.parse(savedResults);
+        this.testResults = savedResults;
       }
     } catch (error) {
       console.warn('שגיאה בטעינת נתוני בדיקות:', error);
     }
   }
 
-  saveTestData() {
-    // שמירת נתוני בדיקות ל-localStorage
+  async saveTestData() {
+    // שמירת נתוני בדיקות ל-UnifiedCacheManager עם fallback ל-localStorage
     try {
-      localStorage.setItem('crud_test_results', JSON.stringify(this.testResults));
+      if (window.UnifiedCacheManager?.isInitialized()) {
+        await window.UnifiedCacheManager.save('crud_test_results', this.testResults, {
+          layer: 'localStorage',
+          ttl: null
+        });
+      } else {
+        localStorage.setItem('crud_test_results', JSON.stringify(this.testResults)); // fallback
+      }
     } catch (error) {
       console.warn('שגיאה בשמירת נתוני בדיקות:', error);
+      // Final fallback
+      localStorage.setItem('crud_test_results', JSON.stringify(this.testResults));
     }
   }
 

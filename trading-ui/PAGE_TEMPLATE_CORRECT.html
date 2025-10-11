@@ -29,12 +29,12 @@
     <!-- ITCSS Architecture - Individual Files (September 2025) -->
     
     <!-- 01-settings - Variables and Settings -->
-    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=20250111">
     
     <!-- 02-tools - Functions and Mixins -->
     <link rel="stylesheet" href="styles-new/02-tools/_mixins.css?v=20251001">
@@ -65,8 +65,10 @@
     <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=20251001">
     <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=20251001">
     
-    <!-- 07-trumps - Page-specific Styles -->
-    <link rel="stylesheet" href="styles-new/07-trumps/_[PAGE_NAME].css?v=20251001">
+    <!-- 07-trumps - Global Header & Dev Tools Only -->
+    <!-- ⚠️ עדכון 11/01/2025: תיקייה זו רק לכלי פיתוח וראש העמוד הגלובלי -->
+    <!-- ❌ אל תוסיף קבצי CSS ספציפיים לעמודים רגילים! -->
+    <!-- ✅ כל הסגנונות של עמודים צריכים להיות ב-06-components -->
     
     <!-- 08-themes - Themes -->
     <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=20251001">
@@ -104,7 +106,7 @@
             <div class="top-section" data-section="top">
                 <div class="section-header">
                     <div class="table-title">
-                        <img src="images/icons/[PAGE_ICON].svg" alt="[PAGE_TITLE]" style="width: 40px; height: 40px; margin-left: 8px; vertical-align: middle;">
+                        <i class="section-icon fas fa-[ICON_NAME]"></i>
                         [PAGE_TITLE]
                     </div>
                     <div class="table-actions">

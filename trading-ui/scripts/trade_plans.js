@@ -1374,9 +1374,12 @@ function updateTradePlansTable(trade_plans) {
       window.FieldRendererService.renderStatus(design.status) : 
       `<span class="status-${design.status}-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">${window.translateTradePlanStatus ? window.translateTradePlanStatus(design.status) : design.status}</span>`;
 
-    // חישוב רווח פשוט
-    const profitAmount = design.current_price && design.planned_amount ? 
-      (design.current_price - design.planned_amount) * (design.side === 'Long' ? 1 : -1) : 0;
+    // מחיר מהטיקר (לא מהתכנון)
+    const tickerPrice = design.ticker?.last_price || design.ticker?.current_price || design.current_price || 0;
+    
+    // חישוב רווח פשוט - משתמש במחיר מהטיקר
+    const profitAmount = tickerPrice && design.planned_amount ? 
+      (tickerPrice - design.planned_amount) * (design.side === 'Long' ? 1 : -1) : 0;
 
     const profitDisplay = window.FieldRendererService ? 
       window.FieldRendererService.renderNumericValue(profitAmount, ' $', true) : 
@@ -1387,8 +1390,8 @@ function updateTradePlansTable(trade_plans) {
       formatCurrency(design.planned_amount);
 
     const currentPriceDisplay = window.FieldRendererService ? 
-      window.FieldRendererService.renderNumericValue(design.current_price || 0, ' $', false) : 
-      formatCurrency(design.current_price || 0);
+      window.FieldRendererService.renderNumericValue(tickerPrice, ' $', false) : 
+      formatCurrency(tickerPrice);
 
     // Displaying ticker symbol or name with Entity Details link
     const tickerDisplay = design.ticker_symbol || design.ticker?.symbol || design.ticker?.name || 'לא מוגדר';
@@ -1410,24 +1413,24 @@ function updateTradePlansTable(trade_plans) {
           </div>
         </td>
         
-        <!-- 2. תאריך -->
+        <!-- 2. מחיר -->
+        <td class="price-cell">${currentPriceDisplay}</td>
+        
+        <!-- 3. תאריך -->
         <td data-date="${design.created_at}"><span class="date-text">${dateDisplay}</span></td>
         
-        <!-- 3. סוג -->
+        <!-- 4. סוג -->
         <td class="type-cell" data-type="${typeForFilter}">${typeDisplay}</td>
         
-        <!-- 4. צד -->
+        <!-- 5. צד -->
         <td class="side-cell" data-side="${design.side}">${sideDisplay}</td>
         
-        <!-- 5. כמות -->
+        <!-- 6. כמות -->
         <td class="quantity-cell">
           <span class="numeric-value-neutral" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
             ${design.shares || '-'}
           </span>
         </td>
-        
-        <!-- 6. מחיר -->
-        <td class="price-cell">${currentPriceDisplay}</td>
         
         <!-- 7. השקעה -->
         <td class="investment-cell">${amountDisplay}</td>

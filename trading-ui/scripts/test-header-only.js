@@ -82,17 +82,30 @@ async function loadTradePlansData() {
     try {
         console.log('📋 Loading trade plans...');
         
-        const response = await fetch('/api/trade-plans/');
+        // Use the global loadTableData function if available
+        if (typeof window.loadTableData === 'function') {
+            const data = await window.loadTableData('trade_plans', renderTradePlansTable, {
+                tableId: 'tradePlansTable',
+                entityName: 'תוכניות מסחר',
+                columns: 10,
+                onRetry: loadTradePlansData
+            });
+            
+            tradePlansData = data || [];
+            console.log(`✅ Loaded ${tradePlansData.length} trade plans`);
+            return;
+        }
+        
+        // Fallback: Direct API call
+        const response = await fetch('/api/trade-plans/?_t=' + Date.now());
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        const data = await response.json();
-        tradePlansData = data.trade_plans || data || [];
+        const result = await response.json();
+        tradePlansData = result.trade_plans || result.data || result || [];
         
         console.log(`✅ Loaded ${tradePlansData.length} trade plans`);
-        
-        // Render table
         renderTradePlansTable();
         
     } catch (error) {
@@ -108,13 +121,14 @@ async function loadExecutionsData() {
     try {
         console.log('📊 Loading executions...');
         
-        const response = await fetch('/api/executions/');
+        // Direct API call (like executions.js does)
+        const response = await fetch('/api/executions/?_t=' + Date.now());
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        const data = await response.json();
-        executionsData = data.executions || data || [];
+        const result = await response.json();
+        executionsData = result.data || result.executions || result || [];
         
         console.log(`✅ Loaded ${executionsData.length} executions`);
         
@@ -132,16 +146,20 @@ async function loadExecutionsData() {
 /**
  * Render Trade Plans Table
  */
-function renderTradePlansTable() {
+function renderTradePlansTable(data) {
     const tbody = document.getElementById('tradePlansTableBody');
     if (!tbody) return;
     
-    if (tradePlansData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">אין תכנוני טריידים</td></tr>';
+    // Use provided data or global tradePlansData
+    const plansToRender = data || tradePlansData;
+    
+    if (!plansToRender || plansToRender.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted"><i class="fas fa-info-circle"></i> אין תכנוני טריידים</td></tr>';
+        updateInfoCards();
         return;
     }
     
-    tbody.innerHTML = tradePlansData.map(plan => `
+    tbody.innerHTML = plansToRender.map(plan => `
         <tr>
             <td>${plan.ticker_symbol || ''}</td>
             <td data-date="${plan.plan_date || ''}">${plan.plan_date || ''}</td>
@@ -161,22 +179,27 @@ function renderTradePlansTable() {
         </tr>
     `).join('');
     
-    console.log('✅ Trade plans table rendered');
+    console.log(`✅ Trade plans table rendered with ${plansToRender.length} rows`);
+    updateInfoCards();
 }
 
 /**
  * Render Executions Table
  */
-function renderExecutionsTable() {
+function renderExecutionsTable(data) {
     const tbody = document.getElementById('executionsTableBody');
     if (!tbody) return;
     
-    if (executionsData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">אין ביצועים</td></tr>';
+    // Use provided data or global executionsData
+    const executionsToRender = data || executionsData;
+    
+    if (!executionsToRender || executionsToRender.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted"><i class="fas fa-info-circle"></i> אין ביצועים</td></tr>';
+        updateInfoCards();
         return;
     }
     
-    tbody.innerHTML = executionsData.map(execution => `
+    tbody.innerHTML = executionsToRender.map(execution => `
         <tr>
             <td>${execution.ticker_symbol || ''}</td>
             <td>${execution.action || ''}</td>
@@ -200,7 +223,8 @@ function renderExecutionsTable() {
         </tr>
     `).join('');
     
-    console.log('✅ Executions table rendered');
+    console.log(`✅ Executions table rendered with ${executionsToRender.length} rows`);
+    updateInfoCards();
 }
 
 /**

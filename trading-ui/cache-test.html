@@ -515,8 +515,11 @@
                                                 <span class="badge bg-warning">Full</span>
                                                 <span class="badge bg-secondary">Nuclear (ידני)</span>
                                             </div>
-                                            <button class="btn btn-sm btn-outline-success" onclick="testClearingLevels()">
-                                                <i class="fas fa-list-check"></i> בדוק רמות ניקוי
+                                            <button class="btn btn-sm btn-outline-success me-1" onclick="testClearingLevels()">
+                                                <i class="fas fa-list-check"></i> בדיקה בסיסית
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-primary" onclick="runComprehensiveCacheClearingTest()">
+                                                <i class="fas fa-microscope"></i> בדיקה מקיפה
                                             </button>
                                         </div>
                                     </div>
@@ -1262,6 +1265,9 @@
 
     <!-- Stage 5: Page Script -->
     <script src="scripts/cache-test.js?v=20251010"></script>
+    
+    <!-- Comprehensive Testing Suite (Development Tool) -->
+    <script src="scripts/testing/comprehensive-cache-clearing-test.js?v=20251011"></script>
 
 </body>
 </html>

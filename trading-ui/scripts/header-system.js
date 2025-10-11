@@ -834,8 +834,15 @@ window.toggleHeaderFilters = function() {
   console.log('🔧 toggleHeaderFilters called - Header filter system only');
   const section = document.getElementById('headerFilters');
   if (section) {
-    const isVisible = section.style.display !== 'none';
-    section.style.display = isVisible ? 'none' : 'block';
+    const isVisible = !section.classList.contains('filters-hidden');
+    
+    if (isVisible) {
+      // סגירה עם אנימציה
+      section.classList.add('filters-hidden');
+    } else {
+      // פתיחה עם אנימציה
+      section.classList.remove('filters-hidden');
+    }
     
     const toggleBtn = document.getElementById('headerFilterToggleBtn');
     const arrow = toggleBtn ? toggleBtn.querySelector('.header-filter-arrow') : null;
@@ -1426,7 +1433,7 @@ window.updateToggleButtons = function() {
     return;
   }
   
-  const isOpen = headerFilters.style.display !== 'none';
+  const isOpen = !headerFilters.classList.contains('filters-hidden');
   console.log('isOpen:', isOpen);
   
   if (isOpen) {

@@ -357,14 +357,26 @@ onclick="window.clearAllCache({ level: 'medium' })"
    - Added: testClearingLevels() (175 lines)
    - **Net change:** +175 lines
 
+5. `trading-ui/scripts/testing/comprehensive-cache-clearing-test.js` - **NEW**
+   - Added: runComprehensiveCacheClearingTest() (main)
+   - Added: testLevel_Light() - samples 4 branches
+   - Added: testLevel_Medium() - samples 6 branches
+   - Added: testLevel_Full() - samples 15 orphans individually!
+   - Added: testLevel_Nuclear_Confirmed() - manual only
+   - Added: quickVerifyLevel() - fast verification
+   - Added: createRefreshMarker() - refresh detection
+   - Added: checkRefreshMarker() - refresh validation
+   - **Net change:** +420 lines
+
 ### **HTML Files (2):**
-5. `trading-ui/cache-test.html`
+6. `trading-ui/cache-test.html`
    - Added: 4 level cards section (194 lines)
    - Added: Future features section (126 lines)
-   - Added: Test card (18 lines)
-   - **Net change:** +338 lines
+   - Added: Test card with 2 buttons (20 lines)
+   - Added: comprehensive-cache-clearing-test.js script tag
+   - **Net change:** +342 lines
 
-6. `trading-ui/system-management.html`
+7. `trading-ui/system-management.html`
    - Replaced: single button with 4-button section (33 lines)
    - **Net change:** +30 lines
 
@@ -603,8 +615,10 @@ onclick="window.clearAllCache({ level: 'medium' })"
 - [ ] Verify: localStorage.length=0 ✅
 
 ### **Automated Testing:**
+
+#### **Option 1: Basic Test**
 ```javascript
-// Run in console
+// Run in console or click button in cache-test
 const results = await testClearingLevels();
 console.table(results);
 
@@ -613,6 +627,39 @@ console.table(results);
 // ✅ medium: passed
 // ✅ full: passed
 // ⚠️ nuclear: manual only
+```
+
+#### **Option 2: Comprehensive Test (מומלץ!)**
+```javascript
+// Samples from EVERY branch and category
+const results = await runComprehensiveCacheClearingTest();
+
+// Light: samples 4 branches
+// Medium: samples 6 branches  
+// Full: samples 15 orphans individually!
+
+// Expected:
+// ✅ Light: 4/4 branches validated
+// ✅ Medium: 6/6 branches validated
+// ✅ Full: 15/15 orphans cleared (5/5 categories)
+// ⚠️ Nuclear: manual only
+```
+
+#### **Option 3: Quick Verify**
+```javascript
+// Fast check - one sample per branch
+await quickVerifyLevel('light');   // 2 sec
+await quickVerifyLevel('medium');  // 2 sec
+await quickVerifyLevel('full');    // 2 sec
+```
+
+#### **Refresh Detection:**
+```javascript
+// Track if value was refreshed even if identical
+const marker = createRefreshMarker('test-key');
+// ... do something ...
+const check = checkRefreshMarker('test-key', marker);
+// { refreshed: true, reason: 'Timestamp changed' }
 ```
 
 ---

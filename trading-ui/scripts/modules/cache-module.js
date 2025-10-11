@@ -1497,7 +1497,8 @@ window.clearAllCache = async function(options = {}) {
             'nuclear': 'Nuclear - ניקוי גרעיני'
         };
         
-        if (typeof window.showSuccessNotification === 'function') {
+        // Show notification only if verbose=true (not in automated tests)
+        if (verbose && typeof window.showSuccessNotification === 'function') {
             let message = `${levelEmojis[level]} ${levelNames[level]}\n\n`;
             message += `סה"כ נוקה: ${results.total} items\n`;
             message += `זמן: ${results.duration}ms\n`;

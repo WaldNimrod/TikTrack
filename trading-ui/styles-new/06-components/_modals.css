@@ -5,9 +5,9 @@
  * קובץ זה מכיל את הסגנונות של כל המודלים במערכת
  * מבוסס על הסגנונות הקיימים ב-apple-theme.css
  * 
- * @version 1.2.7
+ * @version 1.2.9
  * @lastUpdated January 11, 2025
- * @changes Entity modals: white bg, light entity header bg, X button with border, h4 title
+ * @changes Entity modals: white bg, light header, X button (1.75rem), cancel=warning color
  * @note !important used to override Bootstrap - documented as approved (11/01/2025)
  */
 
@@ -389,9 +389,9 @@
   line-height: 1 !important;
   color: var(--entity-text, #004085) !important;
   opacity: 1 !important;
-  padding: 0.25rem 0.5rem !important;
-  width: 2rem !important;
-  height: 2rem !important;
+  padding: 0.2rem 0.4rem !important;
+  width: 1.75rem !important;
+  height: 1.75rem !important;
   font-weight: 400 !important;
   display: flex !important;
   align-items: center !important;
@@ -445,17 +445,17 @@
   border-color: var(--entity-color, #007bff);
 }
 
-/* כפתור ביטול - אחיד עם כפתור ישות */
+/* כפתור ביטול - צבע אזהרה מהעדפות */
 .modal-footer-end .btn-secondary {
-  border: 2px solid #6c757d;
+  border: 2px solid var(--warning-color, #ffc107);
   background-color: white;
-  color: #6c757d;
+  color: var(--warning-color, #ffc107);
 }
 
 .modal-footer-end .btn-secondary:hover {
-  background-color: #6c757d;
+  background-color: var(--warning-color, #ffc107);
   color: white;
-  border-color: #6c757d;
+  border-color: var(--warning-color, #ffc107);
 }
 
 /* כפתור ישות ספציפי */

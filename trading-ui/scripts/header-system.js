@@ -846,13 +846,16 @@ window.toggleHeaderFilters = function() {
       // שלב 2: סגירת הפילטר (1.2s) - מתחיל אחרי 0.3s
       setTimeout(() => {
         section.classList.add('filters-hidden');
-        window.updateToggleButtons(); // החלפת כפתורים
       }, 300);
       
-      // שלב 3: fade in של הכפתור החדש - מתחיל אחרי 1.5s (0.3 + 1.2)
+      // החלפת כפתורים אחרי סיום מלא של אנימציה (0.3 + 1.2 = 1.5s)
       setTimeout(() => {
-        const newBtn = document.querySelector('.filter-toggle-main');
-        if (newBtn) newBtn.classList.remove('fading-out');
+        window.updateToggleButtons();
+        // שלב 3: fade in של הכפתור החדש - מיד אחרי החלפה
+        setTimeout(() => {
+          const newBtn = document.querySelector('.filter-toggle-main');
+          if (newBtn) newBtn.classList.remove('fading-out');
+        }, 50); // עיכוב קטן לוודא שהכפתור הוחלף
       }, 1500);
       
     } else {
@@ -865,13 +868,16 @@ window.toggleHeaderFilters = function() {
       // שלב 2: פתיחת הפילטר (1.2s) - מתחיל אחרי 0.3s
       setTimeout(() => {
         section.classList.remove('filters-hidden');
-        window.updateToggleButtons(); // החלפת כפתורים
       }, 300);
       
-      // שלב 3: fade in של הכפתור החדש - מתחיל אחרי 1.5s
+      // החלפת כפתורים אחרי סיום מלא של אנימציה (0.3 + 1.2 = 1.5s)
       setTimeout(() => {
-        const newBtn = document.querySelector('.filter-toggle-secondary');
-        if (newBtn) newBtn.classList.remove('fading-out');
+        window.updateToggleButtons();
+        // שלב 3: fade in של הכפתור החדש - מיד אחרי החלפה
+        setTimeout(() => {
+          const newBtn = document.querySelector('.filter-toggle-secondary');
+          if (newBtn) newBtn.classList.remove('fading-out');
+        }, 50); // עיכוב קטן לוודא שהכפתור הוחלף
       }, 1500);
     }
     

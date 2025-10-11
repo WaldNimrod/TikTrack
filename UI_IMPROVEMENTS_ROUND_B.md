@@ -3,8 +3,8 @@
 
 **תאריך יצירה:** 11 ינואר 2025  
 **עדכון אחרון:** 11 ינואר 2025  
-**גרסה:** 2.0  
-**סטטוס:** סבב A הושלם (19 עמודים) | סבב B בתכנון (15 עמודים)
+**גרסה:** 3.0  
+**סטטוס:** סבב A הושלם (19) | סבב B הושלם (15) | סבב C בתהליך (מודלים)
 
 ---
 
@@ -25,10 +25,12 @@
 | מדד | ערך |
 |-----|-----|
 | **תאריך התחלה** | 10 ינואר 2025 |
-| **סבב A - עמודים שטופלו** | 19 עמודים ✅ |
-| **סבב B - עמודים לטיפול** | 15 עמודים 🔄 |
+| **סבב A - עיצוב בסיסי** | 19 עמודים ✅ |
+| **סבב B - עמודים נוספים** | 15 עמודים ✅ |
+| **סבב C - מודלים** | trade_plans ✅, 10 עמודים נותרים 🔄 |
 | **סה"כ עמודים במערכת** | 34 עמודים HTML |
-| **אחוז השלמה כולל** | 56% (19/34) |
+| **אחוז השלמה בסיסי** | 100% (34/34) |
+| **אחוז השלמה מודלים** | 9% (1/11) |
 
 ### 🏗️ ארכיטקטורת מערכת
 
@@ -1035,6 +1037,187 @@ console.log(`Badges ללא category: ${withoutCategory.length}`);
 
 ---
 
+## 🔄 Section 10: Round C - Modal Improvements (11/01/2025)
+
+### 🎯 מטרה
+שיפור עיצוב מודלים (הוספה ועריכה) לאחידות מלאה עם שפת העיצוב של המערכת.
+
+**עמוד דוגמה:** trade_plans.html
+
+### 📋 9 תיקונים שבוצעו ב-trade_plans
+
+#### 1️⃣ כפתורי פעולה לא מוצגים
+**בעיה:** כפתורי edit/delete/view לא מופיעים בטבלה  
+**סיבה:** `button-icons.js` לא נטען  
+**פתרון:**
+```html
+<script src="scripts/button-icons.js?v=20251010"></script>
+```
+**מיקום:** Stage 3, אחרי date-utils.js, לפני linked-items.js  
+**יישום:** כל עמודי המשתמש עם טבלאות
+
+#### 2️⃣ כותרת מודל - רקע וצבעים
+**HTML:**
+```html
+<div class="modal-header entity-header entity-trade-plan">
+    <h4 class="modal-title entity-title">הוספת [סוג ישות] חדש</h4>
+    <button class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+```
+
+**CSS:**
+```css
+.entity-header {
+  background-color: var(--entity-trade-plan-bg, rgba(0, 86, 179, 0.1)) !important;
+  border-bottom: 3px solid var(--entity-color, #0056b3) !important;
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.5rem;
+}
+
+.entity-header .entity-title {
+  font-weight: 700;
+  color: var(--entity-text, #004085);
+  font-size: 1.5rem;
+  flex: 1;
+}
+```
+
+#### 3️⃣ כפתור סגירה X
+**דרישות:** X גדולה, מסגרת דקה, משמאל, גודל 1.75rem
+
+**CSS:**
+```css
+.entity-header .btn-close {
+  position: static !important; /* ביטול absolute של Bootstrap */
+  inset: auto !important;
+  margin-inline-start: auto !important; /* דוחף לשמאל */
+  margin-left: auto !important;
+  background: white !important;
+  border: 1px solid var(--entity-color) !important;
+  border-radius: 6px !important;
+  width: 1.75rem !important;
+  height: 1.75rem !important;
+  font-size: 1.5rem !important;
+  color: var(--entity-text) !important;
+}
+
+.entity-header .btn-close::after {
+  content: "×";
+}
+```
+
+#### 4️⃣ רקע המודל לבן
+**HTML:**
+```html
+<div class="modal-content entity-trade-plan">
+```
+
+**CSS:**
+```css
+.modal-content.entity-trade-plan {
+  background-color: white !important;
+}
+
+.modal-content.entity-trade-plan .modal-body {
+  background-color: white !important;
+}
+
+.modal-content.entity-trade-plan .modal-footer {
+  background-color: white !important;
+}
+```
+
+#### 5️⃣ Labels בטופס
+**HTML:** replace_all
+```html
+class="form-label" → class="form-label entity-label"
+```
+
+**CSS:**
+```css
+.entity-trade-plan .entity-label {
+  color: var(--entity-color, #0056b3);
+  font-weight: 700;
+}
+```
+
+#### 6️⃣ Footer יישור
+**HTML:**
+```html
+<div class="modal-footer modal-footer-end">
+```
+
+**CSS:**
+```css
+.modal-footer-end {
+  display: flex;
+  justify-content: flex-end;
+  direction: rtl;
+  gap: 12px;
+}
+```
+
+#### 7️⃣ כפתורים אחידים
+**CSS:**
+```css
+.modal-footer-end .btn {
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  min-height: 40px;
+  border-width: 2px;
+}
+```
+
+#### 8️⃣ כפתור ביטול - צבע אזהרה
+**CSS:**
+```css
+.modal-footer-end .btn-secondary {
+  border: 2px solid var(--warning-color, #ffc107);
+  background-color: white;
+  color: var(--warning-color, #ffc107);
+}
+```
+
+#### 9️⃣ Sortable Headers
+**HTML:** הסרת inline styles (replace_all)  
+**CSS:**
+```css
+.sortable-header {
+  border: none;
+  background: none;
+  padding: 0;
+  width: 100%;
+  text-align: center;
+  color: inherit;
+  cursor: pointer;
+}
+```
+
+---
+
+### 📁 קבצים ששונו:
+1. **trade_plans.html** - 2 מודלים, button-icons.js, labels, sortable headers
+2. **_modals.css** - v=1.2.9, 9 rules חדשות
+3. **_tables.css** - v=1.3.0, sortable-header
+
+### 🎯 ליישום על 11 עמודי משתמש:
+- trades.html
+- tickers.html
+- alerts.html
+- trading_accounts.html
+- cash_flows.html
+- executions.html
+- notes.html
+- preferences.html
+- constraints.html
+- research.html
+- (trade_plans.html - ✅ הושלם)
+
+---
+
 ## 🎯 Next Steps
 
 ### צעדים מיידיים
@@ -1071,6 +1254,12 @@ console.log(`Badges ללא category: ${withoutCategory.length}`);
 
 ## 📝 Change Log
 
+### גרסה 3.0 - 11 ינואר 2025
+- הושלם סבב B (15 עמודים)
+- הוסף Section 10: תיקוני מודלים (סבב C)
+- תיעוד 9 תיקונים למודלים
+- רשימת 11 עמודים ליישום
+
 ### גרסה 2.0 - 11 ינואר 2025
 - יצירת מסמך עבודה מאסטר חדש
 - תיעוד מלא של סבב A (19 עמודים)
@@ -1105,6 +1294,6 @@ console.log(`Badges ללא category: ${withoutCategory.length}`);
 
 **תאריך עדכון אחרון:** 11 ינואר 2025  
 **מחבר:** AI Assistant + Nimrod  
-**סטטוס:** סבב A הושלם ✅ | סבב B מתוכנן 🔄  
-**גרסה:** 2.0
+**סטטוס:** סבבים A+B הושלמו ✅ | סבב C (מודלים) בתהליך 🔄  
+**גרסה:** 3.0
 

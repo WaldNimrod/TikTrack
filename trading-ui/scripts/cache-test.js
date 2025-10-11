@@ -800,7 +800,10 @@ window.toggleAllSections = toggleAllSections;
 window.testClearingLevels = async function() {
     console.log('🧪 Testing all 4 cache clearing levels...');
     
+    const startTime = Date.now();
+    
     const testResults = {
+        startTime: startTime,
         light: { tested: false, passed: false, details: {} },
         medium: { tested: false, passed: false, details: {} },
         full: { tested: false, passed: false, details: {} },
@@ -989,8 +992,9 @@ window.testClearingLevels = async function() {
         testResults.nuclear.passed = 'N/A';
         
         // === SUMMARY ===
-        const totalPassed = Object.values(testResults).filter(r => r.passed === true).length;
-        const totalTested = Object.values(testResults).filter(r => r.tested === true).length;
+        const duration = Date.now() - startTime;
+        const totalPassed = Object.values(testResults).filter(r => r && typeof r === 'object' && r.passed === true).length;
+        const totalTested = Object.values(testResults).filter(r => r && typeof r === 'object' && r.tested === true).length;
         const totalFailed = totalTested - totalPassed;
         
         console.log('\n📊 Test Summary:');
@@ -1009,24 +1013,41 @@ window.testClearingLevels = async function() {
         detailedMessage += `• Full: ${testResults.full.passed ? '✅ עבר' : '❌ נכשל'}\n`;
         detailedMessage += `• Nuclear: ⚠️ בדיקה ידנית בלבד`;
         
-        // Show results in UI - success or warning
+        // Show results in UI - Final Success Modal or Error
         if (totalPassed === totalTested) {
-            // All tests passed
-            if (typeof window.showSuccessNotification === 'function') {
-                await window.showSuccessNotification(
-                    '✅ בדיקת רמות ניקוי הושלמה בהצלחה',
-                    detailedMessage,
-                    6000,
+            // All tests passed - show Final Success Modal with details
+            if (typeof window.showFinalSuccessNotification === 'function') {
+                await window.showFinalSuccessNotification(
+                    'בדיקת רמות ניקוי הושלמה בהצלחה! ✅',
+                    `בדיקת רמות הניקוי עברה בהצלחה.\n\n${detailedMessage}\n\nזמן בדיקה: ${duration}ms`,
+                    {
+                        operation: 'cache-clearing-levels-test',
+                        duration: `${duration}ms`,
+                        timestamp: new Date().toISOString(),
+                        results: {
+                            light: testResults.light,
+                            medium: testResults.medium,
+                            full: testResults.full,
+                            nuclear: testResults.nuclear
+                        },
+                        totalTested: totalTested,
+                        totalPassed: totalPassed,
+                        totalFailed: totalFailed,
+                        successRate: '100%',
+                        status: 'all-tests-passed',
+                        healthCheck: 'כל רמות הניקוי עובדות כצפוי',
+                        nextAction: 'המערכת מוכנה לשימוש מלא'
+                    },
                     'testing'
                 );
             }
         } else {
-            // Some tests failed
+            // Some tests failed - show Error Modal
             if (typeof window.showErrorNotification === 'function') {
                 await window.showErrorNotification(
-                    '⚠️ בדיקת רמות ניקוי - יש כשלים',
-                    detailedMessage,
-                    8000,
+                    'בדיקת רמות ניקוי',
+                    `⚠️ יש כשלים בבדיקה\n\n${detailedMessage}\n\nבדוק את הקונסול לפרטים מלאים.`,
+                    10000,
                     'testing'
                 );
             }
@@ -1038,8 +1059,8 @@ window.testClearingLevels = async function() {
         console.error('❌ Testing failed:', error);
         if (typeof window.showErrorNotification === 'function') {
             await window.showErrorNotification(
-                '❌ שגיאה קריטית בבדיקת רמות',
-                `הבדיקה נכשלה בשגיאה קריטית!\n\nפרטים:\n• ${error.message}\n• ${error.stack?.split('\n')[0] || 'לא זמין'}\n\nבדוק את הקונסול לפרטים מלאים.`,
+                'בדיקת רמות ניקוי',
+                `❌ שגיאה קריטית!\n\nהבדיקה נכשלה בשגיאה:\n• ${error.message}\n• ${error.stack?.split('\n')[0] || 'לא זמין'}\n\nבדוק את הקונסול לפרטים מלאים.`,
                 10000,
                 'testing'
             );

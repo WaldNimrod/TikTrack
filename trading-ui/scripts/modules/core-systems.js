@@ -3059,7 +3059,7 @@ window.setDynamicLoading = function(enabled) {
     }
 };
 
-console.log('✅ Dynamic Loading Global Functions loaded successfully');
+console.log('✅ Core Systems module loaded successfully (Static Loading)');
 
 // ===== PAGE INITIALIZATION CONFIGURATIONS =====
 // Unified page configurations - previously in page-initialization-configs.js

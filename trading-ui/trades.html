@@ -95,7 +95,7 @@
                 <!-- כותרת מעקב טריידים -->
                 <div class="section-header entity-trade-main-header">
                     <h1>
-                        <img src="images/icons/trades.svg" alt="מעקב טריידים" style="width: 40px; height: 40px; margin-left: 8px; vertical-align: middle;">
+                        <img src="images/icons/trades.svg" alt="מעקב טריידים" class="section-icon">
                         מעקב טריידים
                     </h1>
                     <div class="header-actions">
@@ -145,21 +145,21 @@
                     <!-- כותרת הטריידים שלי -->
                     <div class="section-header entity-trade-main-header">
                         <h2>
-                            <img src="images/icons/trades.svg" alt="הטריידים שלי" style="width: 40px; height: 40px; margin-left: 8px; vertical-align: middle;">
+                            <img src="images/icons/trades.svg" alt="הטריידים שלי" class="section-icon">
                             הטריידים שלי
                             <span class="table-count" id="tradesCount">טוען...</span>
                         </h2>
                         <div class="header-actions">
                             <button id="addTradeBtn" class="refresh-btn" onclick="showAddTradeModal()" title="הוסף טרייד חדש">
-                                <img src="images/icons/trades.svg" alt="הוסף" class="action-icon" style="width: 16px; height: 16px;"> הוסף
+                                <img src="images/icons/trades.svg" alt="הוסף" class="action-icon"> הוסף
                             </button>
                             
                             <!-- כפתורי עריכה ומחיקה נסתרים (לזיהוי בבדיקות) -->
                             <button id="editTradeBtn" class="refresh-btn d-none" onclick="editTradeRecord('')" title="ערוך טרייד נבחר">
-                                <img src="images/icons/trades.svg" alt="ערוך" class="action-icon" style="width: 16px; height: 16px;"> ערוך
+                                <img src="images/icons/trades.svg" alt="ערוך" class="action-icon"> ערוך
                             </button>
                             <button id="deleteTradeBtn" class="refresh-btn d-none" onclick="deleteTradeRecord('')" title="מחק טרייד נבחר">
-                                <img src="images/icons/trades.svg" alt="מחק" class="action-icon" style="width: 16px; height: 16px;"> מחק
+                                <img src="images/icons/trades.svg" alt="מחק" class="action-icon"> מחק
                             </button>
 
                             <button class="filter-toggle-btn" onclick="toggleSection('main')" title="הצג/הסתר אזור הטריידים שלי">
@@ -171,7 +171,7 @@
                     <!-- טבלת טריידים -->
                     <div class="section-body">
                         <div class="table-responsive" id="tradesContainer">
-                            <table class="table" id="tradesTable" data-table-type="trades">
+                            <table class="data-table" id="tradesTable" data-table-type="trades">
                                 <thead>
                                     <tr>
                                         <th class="col-ticker">
@@ -532,10 +532,10 @@
                             <!-- כפתורים בצד שמאל -->
                             <div>
                                 <button type="button" class="btn btn-info me-2" onclick="addImportantNote()">
-                                    <img src="images/icons/home.svg" alt="יש לי עוד משהו חשוב" class="btn-icon" style="width: 16px; height: 16px;"> יש לי עוד משהו חשוב
+                                    <img src="images/icons/home.svg" alt="יש לי עוד משהו חשוב" class="action-icon"> יש לי עוד משהו חשוב
                                 </button>
                                 <button type="button" class="btn btn-warning" onclick="addReminder()">
-                                    <img src="images/icons/alerts.svg" alt="תזכיר לי כש..." class="btn-icon" style="width: 16px; height: 16px;"> תזכיר לי כש...
+                                    <img src="images/icons/alerts.svg" alt="תזכיר לי כש..." class="action-icon"> תזכיר לי כש...
                                 </button>
                             </div>
 
@@ -583,42 +583,38 @@
     <!-- Bootstrap JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- ===== DYNAMIC LOADING SYSTEM ===== -->
+    <!-- ===== STATIC LOADING SYSTEM - Template 1: Trading Pages ===== -->
     
-    <!-- Core Systems (Always Required) -->
-    <script src="scripts/modules/core-systems.js?v=20251006"></script>
+    <!-- Stage 1: Core Modules (8) - ALWAYS REQUIRED -->
+    <script src="scripts/modules/core-systems.js?v=20251010"></script>
+    <script src="scripts/modules/ui-basic.js?v=20251010"></script>
+    <script src="scripts/modules/data-basic.js?v=20251010"></script>
+    <script src="scripts/modules/ui-advanced.js?v=20251010"></script>
+    <script src="scripts/modules/data-advanced.js?v=20251010"></script>
+    <script src="scripts/modules/business-module.js?v=20251010"></script>
+    <script src="scripts/modules/communication-module.js?v=20251010"></script>
+    <script src="scripts/modules/cache-module.js?v=20251010"></script>
     
-    <!-- Dynamic Loader Configuration -->
-    <script src="scripts/modules/dynamic-loader-config.js?v=20251006"></script>
-    
-    <!-- Page Initialization Configs -->
-    <!-- PAGE_CONFIGS integrated in core-systems.js -->
-    
-    <!-- Additional Required Scripts -->
-    <script src="scripts/global-favicon.js?v=20251001"></script>
-    <script src="scripts/translation-utils.js?v=20251001"></script>
+    <!-- Stage 2: Core Utilities (3) - ALWAYS REQUIRED -->
+    <script src="scripts/global-favicon.js?v=20251010"></script>
+    <script src="scripts/page-utils.js?v=20251010"></script>
     <script src="scripts/header-system.js?v=v6.0.0"></script>
-    <script src="scripts/date-utils.js?v=20251001"></script>
-    <script src="scripts/button-icons.js?v=20251001"></script>
-    <script src="scripts/page-utils.js?v=20251001"></script>
-    <script src="scripts/preferences.js?v=20251001"></script>
-    <script src="scripts/notification-category-detector.js?v=20251001"></script>
-    <script src="scripts/global-notification-collector.js?v=20251001"></script>
-    <script src="scripts/system-management.js?v=20251001"></script>
-    <script src="scripts/entity-details-api.js?v=20251006"></script>
-    <script src="scripts/entity-details-renderer.js?v=20251006"></script>
-    <script src="scripts/entity-details-modal.js?v=20251001"></script>
-    <script src="scripts/warning-system.js?v=20251001"></script>
-    <!-- validation-utils.js removed - already in ui-basic.js (Core Module) -->
     
-    <!-- ===== Stage 4: Services ===== -->
+    <!-- Stage 3: Common Utilities - ALL for Trading Pages -->
+    <script src="scripts/translation-utils.js?v=20251010"></script>
+    <script src="scripts/date-utils.js?v=20251010"></script>
+    <script src="scripts/linked-items.js?v=20251010"></script>
+    <script src="scripts/warning-system.js?v=20251010"></script>
+    
+    <!-- Stage 4: Services - ALL for Trading Pages -->
     <script src="scripts/services/data-collection-service.js?v=1.0.0"></script>
     <script src="scripts/services/field-renderer-service.js?v=1.0.0"></script>
     <script src="scripts/services/select-populator-service.js?v=1.0.0"></script>
-    <script src="scripts/services/default-value-setter.js?v=1.0.0"></script>
     <script src="scripts/services/crud-response-handler.js?v=2.0.0"></script>
+    <script src="scripts/services/default-value-setter.js?v=1.0.0"></script>
+    <script src="scripts/services/statistics-calculator.js?v=1.0.0"></script>
     
-    <!-- ===== Stage 5: Page Script ===== -->
+    <!-- Stage 5: Page Script - REQUIRED -->
     <script src="scripts/trades.js?v=20251010"></script>
 </body>
 </html>

@@ -4,16 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Favicon will be set by global-favicon.js -->
-    <title>תחקיר - TikTrack</title>
+    <title>מחקר וניתוח - TikTrack</title>
     
     <!-- 
-    ===== CORRECTED RESEARCH PAGE =====
+    ===== RESEARCH PAGE - COMPLETE REBUILD =====
     
-    This page has been corrected to follow the proper architecture:
-    1. Complete ITCSS implementation
-    2. All base package systems included
-    3. Correct loading order
-    4. Scripts moved to body
+    Rebuilt: 11 October 2025
+    Version: 3.0.0
+    
+    Features:
+    - Tabbed interface (4 tabs, first implemented)
+    - KPI calculations and analytics
+    - Comparison charts and performance analysis
+    - Ticker-based performance table
+    - Full service systems integration
     
     ======================================
     -->
@@ -25,61 +29,63 @@
     <!-- ITCSS Architecture - Complete Implementation -->
     
     <!-- 01-settings - Variables and Settings -->
-    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=20251011">
     
     <!-- 02-tools - Functions and Mixins -->
-    <link rel="stylesheet" href="styles-new/02-tools/_mixins.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/02-tools/_functions.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/02-tools/_utilities.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/02-tools/_rtl-helpers.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/02-tools/_mixins.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/02-tools/_functions.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/02-tools/_utilities.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/02-tools/_rtl-helpers.css?v=20251011">
     
     <!-- 03-generic - Reset and Normalization -->
-    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=20251011">
     
     <!-- 04-elements - Basic HTML Elements -->
-    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=20251011">
     
     <!-- 05-objects - Layout Structures -->
-    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=20251011">
     
     <!-- 06-components - UI Components -->
-    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=20251011">
     
     <!-- 07-trumps - Page-specific Styles -->
-    <!-- <link rel="stylesheet" href="styles-new/07-trumps/_research.css?v=20251001"> -->
+    <!-- No page-specific styles for research -->
     
     <!-- 08-themes - Themes -->
-    <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=20251011">
     
     <!-- 09-utilities - Utility Classes -->
-    <link rel="stylesheet" href="styles-new/09-utilities/_utilities.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/09-utilities/_utilities.css?v=20251011">
     
     <!-- External Libraries -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.1">
+    
     <!-- Page Headers - Entity-specific header colors -->
-    <link rel="stylesheet" href="styles-new/06-components/_page-headers.css?v=20251001"></head>
+    <link rel="stylesheet" href="styles-new/06-components/_page-headers.css?v=20251011">
+</head>
 
 <body class="research-page">
     <!-- Header System - Created automatically by header-system.js -->
@@ -88,187 +94,270 @@
     <!-- Page Content -->
     <div class="background-wrapper">
         <div class="page-body">
-            <!-- UI Content Section Top Start-->
+            <!-- Top Section: Header with Tabs -->
             <div class="top-section" data-section="top">
                 <div class="section-header">
-                    <h1>🔍 תחקיר שוק - סקירה כללית</h1>
+                    <h1>
+                        <i class="fas fa-microscope section-icon"></i>
+                        מחקר וניתוח
+                    </h1>
                     <div class="header-actions">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט">
-                            <i class="fas fa-copy"></i> העתק לוג מפורט
+                        <button class="btn btn-sm btn-outline-secondary" onclick="refreshResearch()" title="רענן ניתוחים">
+                            <i class="fas fa-sync-alt"></i> רענן
                         </button>
                         <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר סקשן">
                             <span class="filter-icon">▲</span>
                         </button>
                     </div>
                 </div>
+
                 <div class="section-body">
-                    <p>בדף זה תוכל לבצע תחקיר מעמיק על השוק, לנתח מגמות ולקבל תובנות חשובות.</p>
-                    <!-- כאן ניתן להוסיף סיכום נתונים או סטטיסטיקות -->
-                </div>
-            </div>
-            <!-- UI Content Section Top End -->
-            
-            <div class="content-section" id="researchMain" data-section="main">
-                <div class="section-header">
-                    <h2>🔍 תחקיר שוק</h2>
-                    <div class="header-actions">
-                        <button class="btn btn-sm btn-outline-primary" onclick="loadResearchData()">
-                            <i class="bi bi-arrow-clockwise"></i> רענן נתונים
-                        </button>
-                        <button class="btn btn-sm btn-outline-success" onclick="exportResearchData()">
-                            <i class="bi bi-download"></i> ייצא נתונים
-                        </button>
-                        <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והתחקיר">
-                            <i class="fas fa-copy"></i> העתק לוג מפורט
-                        </button>
-                        <button class="filter-toggle-btn" onclick="toggleSection('researchMain')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="section-body">
-                    <!-- Research Tools -->
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5>📊 כלי תחקיר</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="d-grid gap-2">
-                                        <button class="btn btn-outline-primary" onclick="analyzeMarketTrends()">
-                                            <i class="bi bi-graph-up"></i> ניתוח מגמות שוק
-                                        </button>
-                                        <button class="btn btn-outline-info" onclick="compareTickers()">
-                                            <i class="bi bi-bar-chart"></i> השוואת טיקרים
-                                        </button>
-                                        <button class="btn btn-outline-warning" onclick="technicalAnalysis()">
-                                            <i class="bi bi-cpu"></i> ניתוח טכני
+                    <!-- Tabs Navigation -->
+                    <ul class="nav nav-tabs mb-3" id="researchTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">
+                                <i class="fas fa-chart-line"></i> סקירה כללית
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link disabled" id="performance-tab" type="button" role="tab" title="בקרוב">
+                                <i class="fas fa-chart-bar"></i> השוואת ביצועים
+                                <span class="badge bg-secondary ms-1">בקרוב</span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link disabled" id="investment-tab" type="button" role="tab" title="בקרוב">
+                                <i class="fas fa-coins"></i> ניתוח השקעות
+                                <span class="badge bg-secondary ms-1">בקרוב</span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link disabled" id="patterns-tab" type="button" role="tab" title="בקרוב">
+                                <i class="fas fa-project-diagram"></i> מחקר תבניות
+                                <span class="badge bg-secondary ms-1">בקרוב</span>
+                            </button>
+                        </li>
+                    </ul>
+
+                    <!-- Tabs Content -->
+                    <div class="tab-content" id="researchTabContent">
+                        <!-- Tab 1: Overview Dashboard (ACTIVE) -->
+                        <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                            
+                            <!-- Section 1: KPI Cards -->
+                            <div class="content-section mb-4" id="section1" data-section="section1">
+                                <div class="section-header">
+                                    <h2>
+                                        <i class="fas fa-star section-icon"></i>
+                                        סטטיסטיקות מפתח
+                                    </h2>
+                                    <div class="header-actions">
+                                        <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
+                                            <span class="section-toggle-icon">▼</span>
                                         </button>
                                     </div>
                                 </div>
+                                <div class="section-body">
+                                    <div class="row g-3">
+                                        <div class="col-lg-3 col-md-6">
+                                            <div class="card h-100 border-0 shadow-sm bg-light">
+                                                <div class="card-body text-center">
+                                                    <h6 class="card-subtitle text-muted mb-2">Total Return</h6>
+                                                    <h3 class="card-title mb-1" id="totalReturnKPI">$0.00</h3>
+                                                    <small class="text-muted">כל הזמנים</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-md-6">
+                                            <div class="card h-100 border-0 shadow-sm bg-light">
+                                                <div class="card-body text-center">
+                                                    <h6 class="card-subtitle text-muted mb-2">Win Rate</h6>
+                                                    <h3 class="card-title mb-1" id="winRateKPI">0%</h3>
+                                                    <small class="text-muted">טריידים סגורים</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-md-6">
+                                            <div class="card h-100 border-0 shadow-sm bg-light">
+                                                <div class="card-body text-center">
+                                                    <h6 class="card-subtitle text-muted mb-2">Average Trade</h6>
+                                                    <h3 class="card-title mb-1" id="avgTradeKPI">$0.00</h3>
+                                                    <small class="text-muted">ממוצע P/L</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-md-6">
+                                            <div class="card h-100 border-0 shadow-sm bg-light">
+                                                <div class="card-body text-center">
+                                                    <h6 class="card-subtitle text-muted mb-2">Sharpe Ratio</h6>
+                                                    <h3 class="card-title mb-1" id="sharpeRatioKPI">-</h3>
+                                                    <small class="text-muted">סיכון מותאם תשואה</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section 2: Comparison Charts -->
+                            <div class="content-section mb-4" id="section2" data-section="section2">
+                                <div class="section-header">
+                                    <h2>
+                                        <i class="fas fa-balance-scale section-icon"></i>
+                                        השוואת ביצועים
+                                    </h2>
+                                    <div class="header-actions">
+                                        <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
+                                            <span class="section-toggle-icon">▼</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="section-body">
+                                    <div class="row g-3">
+                                        <div class="col-lg-6">
+                                            <div class="card border-0 shadow-sm">
+                                                <div class="card-header bg-white">
+                                                    <h5 class="mb-0">תיק מול S&P 500</h5>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div style="height: 350px;">
+                                                        <canvas id="portfolioComparisonChart"></canvas>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <div class="card border-0 shadow-sm">
+                                                <div class="card-header bg-white">
+                                                    <h5 class="mb-0">תשואה לפי סוג השקעה</h5>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div style="height: 350px;">
+                                                        <canvas id="returnsByTypeChart"></canvas>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section 3: Distribution Charts -->
+                            <div class="content-section mb-4" id="section3" data-section="section3">
+                                <div class="section-header">
+                                    <h2>
+                                        <i class="fas fa-chart-pie section-icon"></i>
+                                        פילוח השקעות
+                                    </h2>
+                                    <div class="header-actions">
+                                        <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
+                                            <span class="section-toggle-icon">▼</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="section-body">
+                                    <div class="row g-3">
+                                        <div class="col-lg-4">
+                                            <div class="card border-0 shadow-sm">
+                                                <div class="card-header bg-white">
+                                                    <h6 class="mb-0">לפי סוג</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div style="height: 250px;">
+                                                        <canvas id="typeDistributionChart"></canvas>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <div class="card border-0 shadow-sm">
+                                                <div class="card-header bg-white">
+                                                    <h6 class="mb-0">לפי צד</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div style="height: 250px;">
+                                                        <canvas id="sideDistributionChart"></canvas>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <div class="card border-0 shadow-sm">
+                                                <div class="card-header bg-white">
+                                                    <h6 class="mb-0">לפי חשבון</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div style="height: 250px;">
+                                                        <canvas id="accountDistributionChart"></canvas>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section 4: Performance Table by Ticker -->
+                            <div class="content-section" id="section4" data-section="section4">
+                                <div class="section-header">
+                                    <h2>
+                                        <i class="fas fa-table section-icon"></i>
+                                        ביצועים לפי נייר
+                                    </h2>
+                                    <div class="header-actions">
+                                        <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
+                                            <span class="section-toggle-icon">▼</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="section-body">
+                                    <div class="table-responsive">
+                                        <table class="data-table table-striped table-hover">
+                                            <thead class="table-dark">
+                                                <tr>
+                                                    <th>טיקר</th>
+                                                    <th>סה"כ טריידים</th>
+                                                    <th>Win Rate</th>
+                                                    <th>Total P/L</th>
+                                                    <th>Avg P/L</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="performanceTableBody">
+                                                <tr>
+                                                    <td colspan="5" class="text-center text-muted">טוען נתונים...</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        
+                        <!-- Tab 2: Performance Comparison (DISABLED - Coming Soon) -->
+                        <div class="tab-pane fade" id="performance" role="tabpanel">
+                            <div class="alert alert-info text-center py-5">
+                                <i class="fas fa-chart-bar mb-3" style="font-size: 4rem;"></i>
+                                <h4>בקרוב...</h4>
+                                <p class="mb-0">השוואת ביצועים לאינדקסים (S&P 500, Nasdaq, Russell 2000) תתווסף בגרסאות הבאות</p>
                             </div>
                         </div>
                         
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5>📈 נתונים מהירים</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="d-grid gap-2">
-                                        <button class="btn btn-outline-success" onclick="getMarketOverview()">
-                                            <i class="bi bi-eye"></i> סקירת שוק
-                                        </button>
-                                        <button class="btn btn-outline-danger" onclick="getVolatilityIndex()">
-                                            <i class="bi bi-lightning"></i> מדד תנודתיות
-                                        </button>
-                                        <button class="btn btn-outline-secondary" onclick="getNewsFeed()">
-                                            <i class="bi bi-newspaper"></i> חדשות שוק
-                                        </button>
-                                    </div>
-                                </div>
+                        <!-- Tab 3: Investment Analysis (DISABLED - Coming Soon) -->
+                        <div class="tab-pane fade" id="investment" role="tabpanel">
+                            <div class="alert alert-info text-center py-5">
+                                <i class="fas fa-coins mb-3" style="font-size: 4rem;"></i>
+                                <h4>בקרוב...</h4>
+                                <p class="mb-0">ניתוח מתקדם של סוגי השקעות (Swing, Investment, Passive) יתווסף בגרסאות הבאות</p>
                             </div>
                         </div>
-                    </div>
-                    
-                    <!-- Research Results -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h5>📋 תוצאות תחקיר</h5>
-                        </div>
-                        <div class="card-body">
-                            <div id="researchResults">
-                                <!-- Summary Cards -->
-                                <div class="summary-cards">
-                                    <div class="summary-card">
-                                        <div class="card-icon">
-                                            <i class="bi bi-graph-up"></i>
-                                        </div>
-                                        <div class="card-content">
-                                            <div class="card-title">רווח כולל</div>
-                                            <div class="card-value">₪12,450</div>
-                                            <div class="card-change positive">+₪1,250 (11.2%)</div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="summary-card">
-                                        <div class="card-icon">
-                                            <i class="bi bi-pie-chart"></i>
-                                        </div>
-                                        <div class="card-content">
-                                            <div class="card-title">תיקון כולל</div>
-                                            <div class="card-value">₪125,000</div>
-                                            <div class="card-change positive">+₪8,500 (7.3%)</div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="summary-card">
-                                        <div class="card-icon">
-                                            <i class="bi bi-activity"></i>
-                                        </div>
-                                        <div class="card-content">
-                                            <div class="card-title">תנודתיות</div>
-                                            <div class="card-value">15.2%</div>
-                                            <div class="card-change negative">+2.1%</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Research Table -->
-                                <div class="table-responsive mt-4">
-                                    <table class="data-table table-striped" id="researchTable">
-                                        <thead>
-                                            <tr>
-                                                <th>טיקר</th>
-                                                <th>מחיר נוכחי</th>
-                                                <th>שינוי</th>
-                                                <th>נפח</th>
-                                                <th>מגמה</th>
-                                                <th>פעולות</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>AAPL</td>
-                                                <td>₪150.25</td>
-                                                <td class="text-success">+2.5%</td>
-                                                <td>45.2M</td>
-                                                <td><span class="badge bg-success">עולה</span></td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-outline-primary" onclick="analyzeTicker('AAPL')">
-                                                        <i class="bi bi-search"></i> נתח
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>GOOGL</td>
-                                                <td>₪2,850.75</td>
-                                                <td class="text-danger">-1.2%</td>
-                                                <td>12.8M</td>
-                                                <td><span class="badge bg-warning">יציב</span></td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-outline-primary" onclick="analyzeTicker('GOOGL')">
-                                                        <i class="bi bi-search"></i> נתח
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>TSLA</td>
-                                                <td>₪890.50</td>
-                                                <td class="text-success">+5.8%</td>
-                                                <td>78.5M</td>
-                                                <td><span class="badge bg-success">עולה</span></td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-outline-primary" onclick="analyzeTicker('TSLA')">
-                                                        <i class="bi bi-search"></i> נתח
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+                        
+                        <!-- Tab 4: Pattern Research (DISABLED - Coming Soon) -->
+                        <div class="tab-pane fade" id="patterns" role="tabpanel">
+                            <div class="alert alert-info text-center py-5">
+                                <i class="fas fa-project-diagram mb-3" style="font-size: 4rem;"></i>
+                                <h4>בקרוב...</h4>
+                                <p class="mb-0">מחקר תבניות ומגמות מסחר יתווסף בגרסאות הבאות</p>
                             </div>
                         </div>
                     </div>
@@ -289,38 +378,39 @@
     <!-- Bootstrap JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- ===== DYNAMIC LOADING SYSTEM ===== -->
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
-    <!-- Core Systems (Always Required) -->
-    <script src="scripts/modules/core-systems.js?v=20251006"></script>
+    <!-- ===== STATIC LOADING SYSTEM - Template 1: Dashboard Pages ===== -->
     
-    <!-- Dynamic Loader Configuration -->
-    <script src="scripts/modules/dynamic-loader-config.js?v=20251006"></script>
+    <!-- Stage 1: Core Modules (8) - ALWAYS REQUIRED -->
+    <script src="scripts/modules/core-systems.js?v=20251011"></script>
+    <script src="scripts/modules/ui-basic.js?v=20251011"></script>
+    <script src="scripts/modules/data-basic.js?v=20251011"></script>
+    <script src="scripts/modules/ui-advanced.js?v=20251011"></script>
+    <script src="scripts/modules/data-advanced.js?v=20251011"></script>
+    <script src="scripts/modules/business-module.js?v=20251011"></script>
+    <script src="scripts/modules/communication-module.js?v=20251011"></script>
+    <script src="scripts/modules/cache-module.js?v=20251011"></script>
     
-    <!-- Page Initialization Configs -->
-    <!-- PAGE_CONFIGS integrated in core-systems.js -->
+    <!-- Stage 2: Core Utilities (3) - ALWAYS REQUIRED -->
+    <script src="scripts/global-favicon.js?v=20251011"></script>
+    <script src="scripts/page-utils.js?v=20251011"></script>
+    <script src="scripts/header-system.js?v=v6.0.1"></script>
     
-    <!-- Additional Required Scripts -->
-    <script src="scripts/global-favicon.js?v=20251001"></script>
-    <script src="scripts/translation-utils.js?v=20251001"></script>
-    <script src="scripts/header-system.js?v=v6.0.0"></script>
-    <script src="scripts/date-utils.js?v=20251001"></script>
-    <script src="scripts/button-icons.js?v=20251001"></script>
-    <script src="scripts/page-utils.js?v=20251001"></script>
-    <script src="scripts/preferences.js?v=20251001"></script>
-    <script src="scripts/notification-category-detector.js?v=20251001"></script>
-    <script src="scripts/global-notification-collector.js?v=20251001"></script>
-    <script src="scripts/system-management.js?v=20251001"></script>
-    <script src="scripts/entity-details-modal.js?v=20251001"></script>
-    <script src="scripts/warning-system.js?v=20251001"></script>
+    <!-- Stage 3: Common Utilities - OPTIONAL -->
+    <script src="scripts/translation-utils.js?v=20251011"></script>
+    <script src="scripts/date-utils.js?v=20251011"></script>
     
-    <!-- Page-specific Script -->
-    <script src="scripts/research.js?v=20251001"></script>
+    <!-- Stage 4: Services - REQUIRED for Research -->
+    <script src="scripts/services/field-renderer-service.js?v=20251011"></script>
+    <script src="scripts/services/statistics-calculator.js?v=20251011"></script>
     
-    <!-- Local copyDetailedLog function for research page -->
-    <script>
-        // Make the local copyDetailedLog function available globally for this page only
-        window.copyDetailedLog = copyDetailedLog;
-    </script>
+    <!-- Stage 5: Chart System - REQUIRED for Research -->
+    <script src="scripts/charts/chart-system.js?v=20251011"></script>
+    <script src="scripts/charts/chart-theme.js?v=20251011"></script>
+    
+    <!-- Stage 6: Page Script - REQUIRED -->
+    <script src="scripts/research.js?v=20251011"></script>
 </body>
 </html>

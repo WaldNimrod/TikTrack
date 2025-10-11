@@ -7,13 +7,17 @@
     <title>דף הבית - TikTrack</title>
     
     <!-- 
-    ===== CORRECTED INDEX PAGE =====
+    ===== INDEX PAGE - COMPLETE REBUILD =====
     
-    This page has been corrected to follow the proper architecture:
-    1. Complete ITCSS implementation
-    2. All base package systems included
-    3. Correct loading order
-    4. Scripts moved to body (removed from head)
+    Rebuilt: 11 October 2025
+    Version: 3.0.0
+    
+    Features:
+    - Complete dashboard with 5 sections
+    - Service systems integration
+    - Live charts and statistics
+    - Auto-refresh functionality
+    - Full ITCSS architecture
     
     ======================================
     -->
@@ -22,53 +26,55 @@
     <!-- Bootstrap CSS - Must load first -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
     
-    <!-- ITCSS Architecture - Individual Files (September 2025) -->
+    <!-- ITCSS Architecture - Complete Implementation -->
     
     <!-- 01-settings - Variables and Settings -->
-    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=20251011">
     
     <!-- 02-tools - Functions and Mixins -->
-    <link rel="stylesheet" href="styles-new/02-tools/_mixins.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/02-tools/_functions.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/02-tools/_mixins.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/02-tools/_functions.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/02-tools/_utilities.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/02-tools/_rtl-helpers.css?v=20251011">
     
     <!-- 03-generic - Reset and Normalization -->
-    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=20251011">
     
     <!-- 04-elements - Basic HTML Elements -->
-    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=20251011">
     
     <!-- 05-objects - Layout Structures -->
-    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=20251011">
     
     <!-- 06-components - UI Components -->
-    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=20251011">
     <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=20250111">
-    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=20251011">
     
     <!-- 07-trumps - Page-specific Styles -->
     <!-- No page-specific styles for index -->
     
     <!-- 08-themes - Themes -->
-    <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=20251011">
     
     <!-- 09-utilities - Utility Classes -->
-    <link rel="stylesheet" href="styles-new/09-utilities/_utilities.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/09-utilities/_utilities.css?v=20251011">
     
     <!-- External Libraries -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
@@ -76,8 +82,10 @@
     
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.1">
+    
     <!-- Page Headers - Entity-specific header colors -->
-    <link rel="stylesheet" href="styles-new/06-components/_page-headers.css?v=20251001"></head>
+    <link rel="stylesheet" href="styles-new/06-components/_page-headers.css?v=20251011">
+</head>
 
 <body class="index-page">
     <!-- Header System - Created automatically by header-system.js -->
@@ -86,120 +94,389 @@
     <!-- Page Content -->
     <div class="background-wrapper">
         <div class="page-body">
-            <!-- Dashboard area - top-Section -->
+            <!-- Top Section: Hero Banner -->
             <div class="top-section" data-section="top">
-                <!-- Main header -->
                 <div class="section-header">
                     <h1>
-                        <img src="images/icons/home.svg" alt="דף הבית" class="section-icon">
-                        דף הבית - TikTrack
+                        <i class="fas fa-home section-icon"></i>
+                        ברוכים הבאים ל-TikTrack
                     </h1>
                     <div class="header-actions">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים מדף הבית">
-                            <i class="fas fa-copy"></i> העתק לוג מפורט
+                        <button class="btn btn-sm btn-outline-secondary" onclick="refreshDashboard()" title="רענן דשבורד">
+                            <i class="fas fa-sync-alt"></i> רענן
                         </button>
-                        <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר אזור דף הבית">
+                        <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר סקשן">
                             <span class="filter-icon">▲</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Alert cards -->
                 <div class="section-body">
-                    <active-alerts></active-alerts>
+                    <!-- Hero Section -->
+                    <div class="text-center mb-4">
+                        <h2 class="display-6 mb-2">מערכת ניהול מסחר מתקדמת</h2>
+                        <p class="lead text-muted">מעקב, ניתוח ושליטה מלאה בתיק ההשקעות שלך</p>
+                    </div>
 
-                    <!-- Dashboard summary -->
-                    <div class="info-summary" id="summaryStats">
-                        <div>סה"כ טריידים: <strong id="totalTrades">0</strong></div>
-                        <div>סה"כ התראות: <strong id="totalAlerts">0</strong></div>
-                        <div>יתרה נוכחית: <strong id="currentBalance">$0</strong></div>
-                        <div>רווח/הפסד: <strong id="totalPnL">$0</strong></div>
+                    <!-- Main Statistics Cards - 6 Cards -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-lg-2 col-md-4 col-sm-6">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-wallet text-success mb-2" style="font-size: 2rem;"></i>
+                                    <h6 class="card-subtitle text-muted mb-2">סה"כ חשבונות</h6>
+                                    <h3 class="card-title mb-0" id="totalAccountsStat">-</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-sm-6">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-chart-line text-primary mb-2" style="font-size: 2rem;"></i>
+                                    <h6 class="card-subtitle text-muted mb-2">טריידים פעילים</h6>
+                                    <h3 class="card-title mb-0" id="activeTradesStat">-</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-sm-6">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-dollar-sign mb-2" style="font-size: 2rem;" id="totalProfitIcon">💰</i>
+                                    <h6 class="card-subtitle text-muted mb-2">רווח כולל</h6>
+                                    <h3 class="card-title mb-0" id="totalProfitStat">$0</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-sm-6">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-percentage text-info mb-2" style="font-size: 2rem;"></i>
+                                    <h6 class="card-subtitle text-muted mb-2">שיעור הצלחה</h6>
+                                    <h3 class="card-title mb-0" id="winRateStat">-%</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-sm-6">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-bell text-warning mb-2" style="font-size: 2rem;"></i>
+                                    <h6 class="card-subtitle text-muted mb-2">התראות פעילות</h6>
+                                    <h3 class="card-title mb-0" id="activeAlertsStat">-</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-sm-6">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-clipboard-list text-primary mb-2" style="font-size: 2rem;"></i>
+                                    <h6 class="card-subtitle text-muted mb-2">תכנונים פעילים</h6>
+                                    <h3 class="card-title mb-0" id="activePlansStat">-</h3>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div> <!-- End top-section -->
+            </div>
 
-            <!-- Main content -->
+            <!-- Main Content -->
             <div class="main-content">
-                <!-- Dashboard management area - content-section -->
-                <div class="content-section" id="main" data-section="main">
-                    <!-- Dashboard header -->
+                <!-- Section 1: סטטיסטיקות מרכזיות -->
+                <div class="content-section" id="section1" data-section="section1">
                     <div class="section-header">
                         <h2>
-                            <img src="images/icons/home.svg" alt="לוח בקרה" class="section-icon">
-                            לוח בקרה
-                            <span class="table-count" id="dashboardCount">טוען...</span>
+                            <i class="fas fa-chart-bar section-icon"></i>
+                            סטטיסטיקות כלליות
                         </h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('main')" title="הצג/הסתר אזור לוח בקרה">
+                            <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
                     </div>
-
-                    <!-- Dashboard content -->
                     <div class="section-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5>טריידים אחרונים</h5>
-                                    </div>
+                        <div class="row g-3">
+                            <!-- Row 1 -->
+                            <div class="col-lg-3 col-md-6">
+                                <div class="card border-0 shadow-sm">
                                     <div class="card-body">
-                                        <div id="recentTrades">טוען טריידים...</div>
+                                        <h6 class="card-subtitle text-muted mb-2">סה"כ טריידים</h6>
+                                        <h4 class="card-title mb-0" id="totalTradesStat">-</h4>
+                                        <small class="text-muted">כל הזמנים</small>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5>התראות פעילות</h5>
-                                    </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="card border-0 shadow-sm">
                                     <div class="card-body">
-                                        <div id="activeAlerts">טוען התראות...</div>
+                                        <h6 class="card-subtitle text-muted mb-2">טריידים סגורים</h6>
+                                        <h4 class="card-title mb-0" id="closedTradesStat">-</h4>
+                                        <small class="text-muted">הושלמו</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <h6 class="card-subtitle text-muted mb-2">ממוצע רווח לטרייד</h6>
+                                        <h4 class="card-title mb-0" id="avgProfitStat">$0</h4>
+                                        <small class="text-muted">טריידים סגורים</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <h6 class="card-subtitle text-muted mb-2">טיקרים במעקב</h6>
+                                        <h4 class="card-title mb-0" id="totalTickersStat">-</h4>
+                                        <small class="text-muted">פעילים</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Row 2 -->
+                            <div class="col-lg-3 col-md-6">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <h6 class="card-subtitle text-muted mb-2">ביצועים השבוע</h6>
+                                        <h4 class="card-title mb-0" id="weekPerformanceStat">$0</h4>
+                                        <small class="text-muted">7 ימים אחרונים</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <h6 class="card-subtitle text-muted mb-2">ביצועים החודש</h6>
+                                        <h4 class="card-title mb-0" id="monthPerformanceStat">$0</h4>
+                                        <small class="text-muted">30 ימים אחרונים</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <h6 class="card-subtitle text-muted mb-2">תזרימי מזומנים</h6>
+                                        <h4 class="card-title mb-0" id="totalCashFlowsStat">-</h4>
+                                        <small class="text-muted">פעילים</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <h6 class="card-subtitle text-muted mb-2">הערות</h6>
+                                        <h4 class="card-title mb-0" id="totalNotesStat">-</h4>
+                                        <small class="text-muted">כל ההערות</small>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row mt-3">
-                            <div class="col-md-4">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5>סטטוס טריידים</h5>
+                    </div>
+                </div>
+
+                <!-- Section 2: גרפים וויזואליזציות -->
+                <div class="content-section" id="section2" data-section="section2">
+                    <div class="section-header">
+                        <h2>
+                            <i class="fas fa-chart-pie section-icon"></i>
+                            ניתוח ביצועים
+                        </h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="row g-3">
+                            <!-- Chart 1: Performance Over Time -->
+                            <div class="col-lg-6">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-header bg-white">
+                                        <h5 class="mb-0">ביצועים לאורך זמן</h5>
                                     </div>
                                     <div class="card-body">
-                                        <canvas id="tradesStatusChart" width="400" height="200"></canvas>
+                                        <div style="height: 300px;">
+                                            <canvas id="performanceChart"></canvas>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5>חשבונות</h5>
+                            
+                            <!-- Chart 2: Trades Status Distribution -->
+                            <div class="col-lg-6">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-header bg-white">
+                                        <h5 class="mb-0">סטטוס טריידים</h5>
                                     </div>
                                     <div class="card-body">
-                                        <canvas id="accountChart" width="400" height="200"></canvas>
+                                        <div style="height: 300px;">
+                                            <canvas id="tradesStatusChart"></canvas>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5>ביצועים</h5>
+                            
+                            <!-- Chart 3: Account Distribution -->
+                            <div class="col-lg-6">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-header bg-white">
+                                        <h5 class="mb-0">התפלגות חשבונות</h5>
                                     </div>
                                     <div class="card-body">
-                                        <canvas id="performanceChart" width="400" height="200"></canvas>
+                                        <div style="height: 300px;">
+                                            <canvas id="accountDistributionChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Chart 4: Win Rate -->
+                            <div class="col-lg-6">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-header bg-white">
+                                        <h5 class="mb-0">שיעור הצלחה</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div style="height: 300px;">
+                                            <canvas id="winRateChart"></canvas>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row mt-3">
-                            <div class="col-md-12">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5>גרף מעורב</h5>
+                    </div>
+                </div>
+
+                <!-- Section 3: טריידים אחרונים -->
+                <div class="content-section" id="section3" data-section="section3">
+                    <div class="section-header">
+                        <h2>
+                            <i class="fas fa-history section-icon"></i>
+                            טריידים אחרונים
+                        </h2>
+                        <div class="header-actions">
+                            <button class="btn btn-sm btn-outline-primary" onclick="window.location.href='trades.html'" title="עבור לעמוד טריידים">
+                                <i class="fas fa-arrow-left"></i> כל הטריידים
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-responsive">
+                            <table class="data-table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>טיקר</th>
+                                        <th>צד</th>
+                                        <th>P/L</th>
+                                        <th>סטטוס</th>
+                                        <th>תאריך פתיחה</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentTradesBody">
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">טוען נתונים...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 4: התראות פעילות -->
+                <div class="content-section" id="section4" data-section="section4">
+                    <div class="section-header">
+                        <h2>
+                            <i class="fas fa-bell section-icon"></i>
+                            התראות פעילות
+                        </h2>
+                        <div class="header-actions">
+                            <button class="btn btn-sm btn-outline-primary" onclick="window.location.href='alerts.html'" title="עבור לעמוד התראות">
+                                <i class="fas fa-arrow-left"></i> כל ההתראות
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="row g-2" id="activeAlertsContainer">
+                            <div class="col-12 text-center text-muted">
+                                טוען התראות...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 5: תכונות המערכת (Marketing) -->
+                <div class="content-section" id="section5" data-section="section5">
+                    <div class="section-header">
+                        <h2>
+                            <i class="fas fa-star section-icon"></i>
+                            תכונות המערכת
+                        </h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('section5')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="row g-3">
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-tachometer-alt text-primary mb-3" style="font-size: 2.5rem;"></i>
+                                        <h5 class="card-title">מעקב בזמן אמת</h5>
+                                        <p class="card-text text-muted">עדכונים אוטומטיים של כל הטריידים וההתראות שלך</p>
                                     </div>
-                                    <div class="card-body">
-                                        <canvas id="mixedChart" width="400" height="200"></canvas>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-chart-line text-success mb-3" style="font-size: 2.5rem;"></i>
+                                        <h5 class="card-title">ניתוח מתקדם</h5>
+                                        <p class="card-text text-muted">גרפים וסטטיסטיקות מפורטות לקבלת החלטות נבונות</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-bell text-warning mb-3" style="font-size: 2.5rem;"></i>
+                                        <h5 class="card-title">התראות חכמות</h5>
+                                        <p class="card-text text-muted">מערכת התראות מתקדמת עם תנאים מותאמים אישית</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-clipboard-check text-info mb-3" style="font-size: 2.5rem;"></i>
+                                        <h5 class="card-title">תכנוני מסחר</h5>
+                                        <p class="card-text text-muted">תכנן והגדר אסטרטגיות מסחר לפני ביצוע</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-money-bill-wave text-success mb-3" style="font-size: 2.5rem;"></i>
+                                        <h5 class="card-title">ניהול תזרים</h5>
+                                        <p class="card-text text-muted">מעקב מלא אחר הפקדות, משיכות ודיבידנדים</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-cog text-secondary mb-3" style="font-size: 2.5rem;"></i>
+                                        <h5 class="card-title">התאמה אישית</h5>
+                                        <p class="card-text text-muted">העדפות משתמש גמישות וממשק מותאם אישית</p>
                                     </div>
                                 </div>
                             </div>
@@ -222,53 +499,39 @@
     <!-- Bootstrap JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- ===== DYNAMIC LOADING SYSTEM ===== -->
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
-    <!-- Core Systems (Always Required) -->
-    <script src="scripts/modules/core-systems.js?v=20251006"></script>
+    <!-- ===== STATIC LOADING SYSTEM - Template 1: Dashboard Pages ===== -->
     
-    <!-- Dynamic Loader Configuration -->
-    <script src="scripts/modules/dynamic-loader-config.js?v=20251006"></script>
+    <!-- Stage 1: Core Modules (8) - ALWAYS REQUIRED -->
+    <script src="scripts/modules/core-systems.js?v=20251011"></script>
+    <script src="scripts/modules/ui-basic.js?v=20251011"></script>
+    <script src="scripts/modules/data-basic.js?v=20251011"></script>
+    <script src="scripts/modules/ui-advanced.js?v=20251011"></script>
+    <script src="scripts/modules/data-advanced.js?v=20251011"></script>
+    <script src="scripts/modules/business-module.js?v=20251011"></script>
+    <script src="scripts/modules/communication-module.js?v=20251011"></script>
+    <script src="scripts/modules/cache-module.js?v=20251011"></script>
     
-    <!-- Page Initialization Configs -->
-    <!-- PAGE_CONFIGS integrated in core-systems.js -->
+    <!-- Stage 2: Core Utilities (3) - ALWAYS REQUIRED -->
+    <script src="scripts/global-favicon.js?v=20251011"></script>
+    <script src="scripts/page-utils.js?v=20251011"></script>
+    <script src="scripts/header-system.js?v=v6.0.1"></script>
     
-    <!-- Additional Required Scripts -->
-    <script src="scripts/global-favicon.js?v=20251001"></script>
-    <script src="scripts/translation-utils.js?v=20251001"></script>
-    <script src="scripts/header-system.js?v=v6.0.0"></script>
-    <script src="scripts/date-utils.js?v=20251001"></script>
-    <script src="scripts/button-icons.js?v=20251001"></script>
-    <script src="scripts/page-utils.js?v=20251001"></script>
-    <script src="scripts/preferences.js?v=20251001"></script>
-    <script src="scripts/notification-category-detector.js?v=20251001"></script>
-    <script src="scripts/global-notification-collector.js?v=20251001"></script>
-    <script src="scripts/system-management.js?v=20251001"></script>
-    <script src="scripts/entity-details-modal.js?v=20251001"></script>
-    <script src="scripts/warning-system.js?v=20251001"></script>
-    <script src="scripts/color-demo-toggle.js?v=20251001"></script>
-    <script src="scripts/console-cleanup.js?v=20251001"></script>
-    <script src="scripts/data-collector.js?v=20251001"></script>
-    <script src="scripts/linked-items.js?v=20251001"></script>
-    <script src="scripts/notification-system-tester.js?v=20251001"></script>
+    <!-- Stage 3: Common Utilities - OPTIONAL -->
+    <script src="scripts/translation-utils.js?v=20251011"></script>
+    <script src="scripts/date-utils.js?v=20251011"></script>
     
-    <!-- Chart System Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="scripts/charts/chart-loader.js?v=20251001"></script>
-    <script src="scripts/charts/chart-theme.js?v=20251001"></script>
-    <script src="scripts/charts/chart-system.js?v=20251001"></script>
-    <script src="scripts/charts/chart-export.js?v=20251001"></script>
-    <script src="scripts/charts/adapters/trades-adapter.js?v=20251001"></script>
-    <script src="scripts/charts/adapters/performance-adapter.js?v=20251001"></script>
-    <script src="scripts/charts/adapters/linter-adapter.js?v=20251001"></script>
+    <!-- Stage 4: Services - REQUIRED for Dashboard -->
+    <script src="scripts/services/field-renderer-service.js?v=20251011"></script>
+    <script src="scripts/services/statistics-calculator.js?v=20251011"></script>
     
-    <!-- Stage 9: Page-specific Script -->
-    <script src="scripts/index.js?v=20251001"></script>
+    <!-- Stage 5: Chart System - REQUIRED for Dashboard -->
+    <script src="scripts/charts/chart-system.js?v=20251011"></script>
+    <script src="scripts/charts/chart-theme.js?v=20251011"></script>
     
-    <!-- Local copyDetailedLog function for index page -->
-    <script>
-        // Make the local copyDetailedLog function available globally for this page only
-        window.copyDetailedLog = copyDetailedLog;
-    </script>
+    <!-- Stage 6: Page Script - REQUIRED -->
+    <script src="scripts/index.js?v=20251011"></script>
 </body>
 </html>

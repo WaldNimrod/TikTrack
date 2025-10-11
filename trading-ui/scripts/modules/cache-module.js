@@ -2801,8 +2801,21 @@ window.testCacheSystemsIntegration = async function() {
                 testResults.indexedDBLayer = retrievedIDB === 'test-data-idb';
                 await window.UnifiedCacheManager.remove('test-idb');
                 
-                // Test Backend Layer (read-only, just check availability)
-                testResults.backendLayer = typeof window.UnifiedCacheManager.fetchFromBackend === 'function';
+                // Test Backend Layer - check if layer is initialized and functional
+                try {
+                    if (window.UnifiedCacheManager.layers?.backend?.initialized) {
+                        // Try to save and retrieve from backend layer
+                        await window.UnifiedCacheManager.layers.backend.save('test-backend', 'test-data-backend', { ttl: null });
+                        const backendData = await window.UnifiedCacheManager.layers.backend.get('test-backend');
+                        testResults.backendLayer = backendData?.data === 'test-data-backend';
+                        await window.UnifiedCacheManager.layers.backend.remove('test-backend');
+                    } else {
+                        testResults.backendLayer = false;
+                    }
+                } catch (backendError) {
+                    console.error('Backend layer test failed:', backendError);
+                    testResults.backendLayer = false;
+                }
                 
             } catch (error) {
                 console.error('UnifiedCacheManager layer test failed:', error);

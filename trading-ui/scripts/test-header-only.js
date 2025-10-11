@@ -145,6 +145,7 @@ async function loadExecutionsData() {
 
 /**
  * Render Trade Plans Table
+ * Uses same logic as trade_plans.js
  */
 function renderTradePlansTable(data) {
     const tbody = document.getElementById('tradePlansTableBody');
@@ -159,25 +160,54 @@ function renderTradePlansTable(data) {
         return;
     }
     
-    tbody.innerHTML = plansToRender.map(plan => `
-        <tr>
-            <td>${plan.ticker_symbol || ''}</td>
-            <td data-date="${plan.plan_date || ''}">${plan.plan_date || ''}</td>
-            <td data-investment-type="${plan.investment_type || ''}">${plan.investment_type || ''}</td>
-            <td>${plan.planned_side || ''}</td>
-            <td>${plan.planned_quantity || ''}</td>
-            <td>${plan.planned_price ? '$' + parseFloat(plan.planned_price).toFixed(2) : ''}</td>
-            <td>${plan.planned_investment ? '$' + parseFloat(plan.planned_investment).toFixed(2) : ''}</td>
-            <td data-status="${plan.status || ''}">
-                ${window.FieldRendererService ? 
-                    window.FieldRendererService.renderStatus(plan.status) : 
-                    `<span class="status-badge status-${plan.status}">${plan.status}</span>`
-                }
-            </td>
-            <td>${plan.expected_profit ? '$' + parseFloat(plan.expected_profit).toFixed(2) : ''}</td>
-            <td data-account="${plan.account_name || ''}">${plan.account_name || ''}</td>
-        </tr>
-    `).join('');
+    tbody.innerHTML = plansToRender.map(plan => {
+        // Get display values
+        const tickerDisplay = plan.ticker_symbol || plan.ticker?.symbol || 'לא מוגדר';
+        const dateDisplay = plan.plan_date || plan.created_at || '';
+        const typeDisplay = plan.investment_type || '';
+        const sideDisplay = plan.planned_side || plan.side || '';
+        const quantityDisplay = plan.planned_quantity || plan.shares || '';
+        const priceDisplay = plan.planned_price || plan.planned_amount || 0;
+        const investmentDisplay = plan.planned_investment || plan.planned_amount || 0;
+        const profitDisplay = plan.expected_profit || 0;
+        
+        // For filter - use original English values
+        const typeForFilter = plan.investment_type || '';
+        const statusForFilter = plan.status || '';
+        
+        // Render status badge
+        const statusBadge = window.FieldRendererService ? 
+            window.FieldRendererService.renderStatus(plan.status) : 
+            `<span class="status-badge status-${plan.status}">${plan.status}</span>`;
+        
+        // Render numeric values
+        const priceRendered = window.FieldRendererService ?
+            window.FieldRendererService.renderNumericValue(priceDisplay, ' $', false) :
+            '$' + parseFloat(priceDisplay).toFixed(2);
+            
+        const investmentRendered = window.FieldRendererService ?
+            window.FieldRendererService.renderNumericValue(investmentDisplay, ' $', false) :
+            '$' + parseFloat(investmentDisplay).toFixed(2);
+            
+        const profitRendered = window.FieldRendererService ?
+            window.FieldRendererService.renderNumericValue(profitDisplay, ' $', true) :
+            '$' + parseFloat(profitDisplay).toFixed(2);
+        
+        return `
+            <tr>
+                <td>${tickerDisplay}</td>
+                <td data-date="${dateDisplay}">${dateDisplay}</td>
+                <td class="type-cell" data-type="${typeForFilter}">${typeDisplay}</td>
+                <td>${sideDisplay}</td>
+                <td>${quantityDisplay}</td>
+                <td>${priceRendered}</td>
+                <td>${investmentRendered}</td>
+                <td class="status-cell" data-status="${statusForFilter}">${statusBadge}</td>
+                <td>${profitRendered}</td>
+                <td>${plan.account_name || 'לא מוגדר'}</td>
+            </tr>
+        `;
+    }).join('');
     
     console.log(`✅ Trade plans table rendered with ${plansToRender.length} rows`);
     updateInfoCards();

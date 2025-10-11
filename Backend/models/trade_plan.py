@@ -71,7 +71,8 @@ class TradePlan(BaseModel):
                 result['ticker'] = {
                     'id': self.ticker.id,
                     'symbol': self.ticker.symbol,
-                    'name': self.ticker.name
+                    'name': self.ticker.name,
+                    'current_price': getattr(self.ticker, 'current_price', 0)
                 }
             else:
                 logger.info(f"Trade plan {self.id}: Ticker relationship not loaded, using ticker_id")

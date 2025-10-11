@@ -39,8 +39,12 @@ window.initializeTestHeaderPage = async function() {
         // Load action buttons if available
         setTimeout(() => {
             if (typeof window.loadTableActionButtons === 'function') {
-                console.log('🔧 Loading action buttons...');
-                window.loadTableActionButtons();
+                console.log('🔧 Loading action buttons for tickersTable...');
+                window.loadTableActionButtons('tickersTable');
+                console.log('🔧 Loading action buttons for tradePlansTable...');
+                window.loadTableActionButtons('tradePlansTable');
+            } else {
+                console.log('ℹ️ loadTableActionButtons not available (normal for test page)');
             }
         }, 500);
         
@@ -55,65 +59,46 @@ window.initializeTestHeaderPage = async function() {
 
 /**
  * Register Tables with Filter System
+ * Note: The filter system works automatically on tables with data-table-type attribute
+ * We just need to verify it's available and working
  */
 function registerTablesWithFilterSystem() {
     try {
-        console.log('🔧 Registering tables with filter system...');
+        console.log('🔧 Verifying filter system...');
         
-        if (!window.filterSystem || typeof window.filterSystem.registerTable !== 'function') {
-            console.error('❌ Filter system not available for table registration');
+        if (!window.filterSystem) {
+            console.error('❌ Filter system not available');
             return;
         }
         
-        // Register tickers table
-        const tickersConfig = {
-            tableId: 'tickersTable',
-            fields: {
-                symbol: 'symbol',
-                status: 'status',
-                has_trades: 'has_trades',
-                current_price: 'current_price',
-                change_percent: 'change_percent',
-                investment_type: 'investment_type',
-                name: 'name',
-                remarks: 'remarks',
-                date: 'date'
+        console.log('✅ Filter system available:', window.filterSystem);
+        
+        // Check if tables have correct data attributes
+        const tickersTable = document.getElementById('tickersTable');
+        const tradePlansTable = document.getElementById('tradePlansTable');
+        
+        if (tickersTable) {
+            const tableType = tickersTable.getAttribute('data-table-type');
+            console.log(`🔧 Tickers table data-table-type: ${tableType || 'NOT SET'}`);
+            if (tableType) {
+                console.log('✅ Tickers table ready for filtering');
             }
-        };
-        
-        console.log('🔧 Registering tickersTable with config:', tickersConfig);
-        window.filterSystem.registerTable('tickersTable', tickersConfig);
-        console.log('✅ Tickers table registered with filter system');
-        
-        // Register trade plans table
-        const tradePlansConfig = {
-            tableId: 'tradePlansTable',
-            fields: {
-                symbol: 'ticker',
-                date: 'date',
-                investment_type: 'investment_type',
-                side: 'side',
-                amount: 'amount',
-                target: 'target',
-                stop: 'stop',
-                current: 'current',
-                status: 'status',
-                account: 'account'
-            }
-        };
-        
-        console.log('🔧 Registering tradePlansTable with config:', tradePlansConfig);
-        window.filterSystem.registerTable('tradePlansTable', tradePlansConfig);
-        console.log('✅ Trade plans table registered with filter system');
-        
-        // Apply initial filters if any
-        if (window.filterSystem.currentFilters) {
-            console.log('🔧 Applying initial filters...');
-            window.filterSystem.applyAllFilters();
         }
         
+        if (tradePlansTable) {
+            const tableType = tradePlansTable.getAttribute('data-table-type');
+            console.log(`🔧 Trade plans table data-table-type: ${tableType || 'NOT SET'}`);
+            if (tableType) {
+                console.log('✅ Trade plans table ready for filtering');
+            }
+        }
+        
+        // The filter system will automatically work on these tables
+        // when filters are changed via the header dropdowns
+        console.log('✅ Tables configured for automatic filtering');
+        
     } catch (error) {
-        console.error('❌ Error registering tables:', error);
+        console.error('❌ Error verifying filter system:', error);
     }
 }
 

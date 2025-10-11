@@ -792,4 +792,14 @@ window.toggleAllSections = toggleAllSections;
 // Skip direct initialization for cache-test page as it's handled by UnifiedAppInitializer
 if (!window.cacheTestPage && !window.location.pathname.includes('cache-test')) {
     if (document.readyState === 'loading') {
-        
+        document.addEventListener('DOMContentLoaded', () => {
+            window.cacheTestPage = new CacheTestPage();
+            window.cacheTestPage.init();
+        });
+    } else {
+        window.cacheTestPage = new CacheTestPage();
+        window.cacheTestPage.init();
+    }
+}
+
+console.log('🧪 Cache Test Page - JavaScript ready, class available:', typeof CacheTestPage);

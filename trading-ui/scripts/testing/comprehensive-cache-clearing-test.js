@@ -27,44 +27,89 @@ window.runComprehensiveCacheClearingTest = async function() {
         nuclear: null
     };
     
-    // Test each level
-    overallResults.light = await testLevel_Light();
-    await new Promise(r => setTimeout(r, 500));
-    
-    overallResults.medium = await testLevel_Medium();
-    await new Promise(r => setTimeout(r, 500));
-    
-    overallResults.full = await testLevel_Full();
-    await new Promise(r => setTimeout(r, 500));
-    
-    // Nuclear is manual only
-    overallResults.nuclear = { 
-        tested: false, 
-        note: 'Manual test only - too destructive',
-        manualInstructions: 'Run: await testLevel_Nuclear() in isolated environment'
-    };
-    
-    // Summary
-    console.log('\n' + '='.repeat(80));
-    console.log('📊 FINAL SUMMARY');
-    console.log('='.repeat(80));
-    console.table(overallResults);
-    
-    const passedCount = Object.values(overallResults).filter(r => r.passed === true).length;
-    const testedCount = Object.values(overallResults).filter(r => r.tested === true).length;
-    
-    console.log(`\n✅ Tests Passed: ${passedCount}/${testedCount}`);
-    console.log(`📊 Success Rate: ${(passedCount/testedCount*100).toFixed(1)}%`);
-    
-    // Show in UI
-    if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification(
-            'בדיקה מקיפה הושלמה',
-            `✅ עברו: ${passedCount}/${testedCount}\n\nLight: ${overallResults.light.passed ? '✅' : '❌'}\nMedium: ${overallResults.medium.passed ? '✅' : '❌'}\nFull: ${overallResults.full.passed ? '✅' : '❌'}\nNuclear: ⚠️ ידני`
-        );
+    try {
+        // Test each level
+        overallResults.light = await testLevel_Light();
+        await new Promise(r => setTimeout(r, 500));
+        
+        overallResults.medium = await testLevel_Medium();
+        await new Promise(r => setTimeout(r, 500));
+        
+        overallResults.full = await testLevel_Full();
+        await new Promise(r => setTimeout(r, 500));
+        
+        // Nuclear is manual only
+        overallResults.nuclear = { 
+            tested: false, 
+            note: 'Manual test only - too destructive',
+            manualInstructions: 'Run: await testLevel_Nuclear() in isolated environment'
+        };
+        
+        // Summary
+        console.log('\n' + '='.repeat(80));
+        console.log('📊 FINAL SUMMARY');
+        console.log('='.repeat(80));
+        console.table(overallResults);
+        
+        const passedCount = Object.values(overallResults).filter(r => r.passed === true).length;
+        const testedCount = Object.values(overallResults).filter(r => r.tested === true).length;
+        const failedCount = testedCount - passedCount;
+        
+        console.log(`\n✅ Tests Passed: ${passedCount}/${testedCount}`);
+        console.log(`📊 Success Rate: ${(passedCount/testedCount*100).toFixed(1)}%`);
+        
+        // Build detailed message
+        let detailedMessage = `סה"כ נבדקו: ${testedCount} רמות\n`;
+        detailedMessage += `✅ עברו: ${passedCount}\n`;
+        if (failedCount > 0) {
+            detailedMessage += `❌ נכשלו: ${failedCount}\n`;
+        }
+        detailedMessage += `\n📋 פירוט:\n`;
+        detailedMessage += `• Light: ${overallResults.light.passed ? '✅ עבר' : '❌ נכשל'}\n`;
+        detailedMessage += `• Medium: ${overallResults.medium.passed ? '✅ עבר' : '❌ נכשל'}\n`;
+        detailedMessage += `• Full: ${overallResults.full.passed ? '✅ עבר' : '❌ נכשל'}\n`;
+        detailedMessage += `• Nuclear: ⚠️ בדיקה ידנית בלבד`;
+        
+        // Show success or error notification based on results
+        if (passedCount === testedCount) {
+            // All tests passed
+            if (typeof window.showSuccessNotification === 'function') {
+                await window.showSuccessNotification(
+                    '✅ בדיקה מקיפה הושלמה בהצלחה',
+                    detailedMessage,
+                    6000,
+                    'testing'
+                );
+            }
+        } else {
+            // Some tests failed
+            if (typeof window.showErrorNotification === 'function') {
+                await window.showErrorNotification(
+                    '⚠️ בדיקה מקיפה - יש כשלים',
+                    detailedMessage,
+                    8000,
+                    'testing'
+                );
+            }
+        }
+        
+        return overallResults;
+        
+    } catch (error) {
+        console.error('❌ Critical error in comprehensive test:', error);
+        
+        // Show critical error notification
+        if (typeof window.showErrorNotification === 'function') {
+            await window.showErrorNotification(
+                '❌ שגיאה קריטית בבדיקה מקיפה',
+                `הבדיקה המקיפה נכשלה בשגיאה קריטית!\n\nפרטים:\n• ${error.message}\n• ${error.stack?.split('\n')[0] || 'לא זמין'}\n\nבדוק את הקונסול לפרטים מלאים.`,
+                10000,
+                'testing'
+            );
+        }
+        
+        throw error;
     }
-    
-    return overallResults;
 };
 
 /**
@@ -163,10 +208,41 @@ async function testLevel_Light() {
         
         console.log(`\n${result.passed ? '✅ LIGHT PASSED' : '❌ LIGHT FAILED'}`);
         
+        // Show notification
+        if (result.passed) {
+            if (typeof window.showSuccessNotification === 'function') {
+                await window.showSuccessNotification(
+                    '✅ Light - בדיקה עברה',
+                    `בדיקת רמה Light עברה בהצלחה!\n\n✅ Memory cleared\n✅ localStorage preserved\n✅ IndexedDB preserved\n✅ Orphans preserved`,
+                    4000,
+                    'testing'
+                );
+            }
+        } else {
+            if (typeof window.showErrorNotification === 'function') {
+                await window.showErrorNotification(
+                    '❌ Light - בדיקה נכשלה',
+                    `בדיקת רמה Light נכשלה!\n\nבדוק את הקונסול לפרטים.`,
+                    6000,
+                    'testing'
+                );
+            }
+        }
+        
     } catch (error) {
         console.error('❌ Light test error:', error);
         result.passed = false;
         result.error = error.message;
+        
+        // Show error notification
+        if (typeof window.showErrorNotification === 'function') {
+            await window.showErrorNotification(
+                '❌ Light - שגיאה קריטית',
+                `שגיאה קריטית בבדיקת Light!\n\n• ${error.message}\n\nבדוק את הקונסול לפרטים מלאים.`,
+                8000,
+                'testing'
+            );
+        }
     }
     
     return result;
@@ -275,10 +351,48 @@ async function testLevel_Medium() {
         
         console.log(`\n${result.passed ? '✅ MEDIUM PASSED - All branches validated!' : '❌ MEDIUM FAILED'}`);
         
+        // Show notification
+        if (result.passed) {
+            if (typeof window.showSuccessNotification === 'function') {
+                await window.showSuccessNotification(
+                    '✅ Medium - בדיקה עברה',
+                    `בדיקת רמה Medium עברה בהצלחה!\n\n✅ Memory cleared\n✅ localStorage cleared\n✅ IndexedDB cleared\n✅ Backend cleared\n✅ Orphans preserved`,
+                    5000,
+                    'testing'
+                );
+            }
+        } else {
+            if (typeof window.showErrorNotification === 'function') {
+                const failedBranches = [];
+                if (!result.details.memoryCleared) failedBranches.push('Memory');
+                if (!result.details.localStorageCleared) failedBranches.push('localStorage');
+                if (!result.details.indexedDBCleared) failedBranches.push('IndexedDB');
+                if (!result.details.backendCleared) failedBranches.push('Backend');
+                if (!result.details.orphansPreserved) failedBranches.push('Orphans (לא נשמרו!)');
+                
+                await window.showErrorNotification(
+                    '❌ Medium - בדיקה נכשלה',
+                    `בדיקת רמה Medium נכשלה!\n\nענפים שנכשלו:\n• ${failedBranches.join('\n• ')}\n\nבדוק את הקונסול לפרטים.`,
+                    8000,
+                    'testing'
+                );
+            }
+        }
+        
     } catch (error) {
         console.error('❌ Medium test error:', error);
         result.passed = false;
         result.error = error.message;
+        
+        // Show error notification
+        if (typeof window.showErrorNotification === 'function') {
+            await window.showErrorNotification(
+                '❌ Medium - שגיאה קריטית',
+                `שגיאה קריטית בבדיקת Medium!\n\n• ${error.message}\n\nבדוק את הקונסול לפרטים מלאים.`,
+                8000,
+                'testing'
+            );
+        }
     }
     
     return result;
@@ -420,10 +534,48 @@ async function testLevel_Full() {
         
         console.log(`\n${result.passed ? '✅ FULL PASSED - 100% orphans cleared!' : '❌ FULL FAILED'}`);
         
+        // Show notification
+        if (result.passed) {
+            if (typeof window.showSuccessNotification === 'function') {
+                await window.showSuccessNotification(
+                    '✅ Full - בדיקה עברה',
+                    `בדיקת רמה Full עברה בהצלחה!\n\n✅ ${result.details.orphansCleared} orphans cleared\n✅ ${result.details.orphansClearedPercent} כיסוי\n\n📋 קטגוריות:\n• State: ${result.details.categories.state ? '✅' : '❌'}\n• Preferences: ${result.details.categories.preferences ? '✅' : '❌'}\n• Auth: ${result.details.categories.auth ? '✅' : '❌'}\n• Testing: ${result.details.categories.testing ? '✅' : '❌'}\n• Dynamic: ${result.details.categories.dynamic ? '✅' : '❌'}`,
+                    6000,
+                    'testing'
+                );
+            }
+        } else {
+            if (typeof window.showErrorNotification === 'function') {
+                const failedCategories = [];
+                if (!result.details.categories.state) failedCategories.push('State');
+                if (!result.details.categories.preferences) failedCategories.push('Preferences');
+                if (!result.details.categories.auth) failedCategories.push('Auth');
+                if (!result.details.categories.testing) failedCategories.push('Testing');
+                if (!result.details.categories.dynamic) failedCategories.push('Dynamic');
+                
+                await window.showErrorNotification(
+                    '❌ Full - בדיקה נכשלה',
+                    `בדיקת רמה Full נכשלה!\n\n${result.details.orphansCleared} (${result.details.orphansClearedPercent})\n\nקטגוריות שנכשלו:\n• ${failedCategories.join('\n• ')}\n\nבדוק את הקונסול לפרטים.`,
+                    8000,
+                    'testing'
+                );
+            }
+        }
+        
     } catch (error) {
         console.error('❌ Full test error:', error);
         result.passed = false;
         result.error = error.message;
+        
+        // Show error notification
+        if (typeof window.showErrorNotification === 'function') {
+            await window.showErrorNotification(
+                '❌ Full - שגיאה קריטית',
+                `שגיאה קריטית בבדיקת Full!\n\n• ${error.message}\n\nבדוק את הקונסול לפרטים מלאים.`,
+                8000,
+                'testing'
+            );
+        }
     }
     
     return result;
@@ -590,6 +742,33 @@ window.quickVerifyLevel = async function(level) {
     
     const passed = JSON.stringify(results) === JSON.stringify(expected);
     console.log(`\n${passed ? '✅ PASS' : '❌ FAIL'} - ${level.toUpperCase()}`);
+    
+    // Show notification
+    if (passed) {
+        if (typeof window.showSuccessNotification === 'function') {
+            await window.showSuccessNotification(
+                `✅ Quick Verify - ${level.toUpperCase()}`,
+                `בדיקה מהירה של ${level} עברה!\n\n${Object.entries(results).map(([k, v]) => `• ${k}: ${v ? '✅ נוקה' : '✅ נשמר'}`).join('\n')}`,
+                4000,
+                'testing'
+            );
+        }
+    } else {
+        if (typeof window.showErrorNotification === 'function') {
+            const diffs = [];
+            for (const [key, value] of Object.entries(results)) {
+                if (value !== expected[key]) {
+                    diffs.push(`${key}: צפוי ${expected[key]}, קיבלנו ${value}`);
+                }
+            }
+            await window.showErrorNotification(
+                `❌ Quick Verify - ${level.toUpperCase()}`,
+                `בדיקה מהירה של ${level} נכשלה!\n\nהבדלים:\n• ${diffs.join('\n• ')}`,
+                6000,
+                'testing'
+            );
+        }
+    }
     
     return { level, results, expected, passed };
 };

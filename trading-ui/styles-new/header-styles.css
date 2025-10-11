@@ -66,20 +66,21 @@
     background: white;
     position: relative;
     z-index: 950;
-    min-height: 60px;
     margin-top: 0;
-    /* אנימציה עדינה - רק תנועה, ללא fade */
-    max-height: 1000px; /* גובה מקסימלי לאנימציה */
+    /* אנימציה - התכווצות לגובה 0 */
+    height: auto;
+    max-height: 500px; /* גובה אמיתי של הפילטרים */
     overflow: visible; /* כפתור toggle צריך לבלוט */
-    transition: max-height 0.6s ease-in, padding 0.6s ease-in;
+    transition: max-height 1.2s ease-in, padding 1.2s ease-in;
     /* ease-in = מתחיל לאט, נגמר מהר */
 }
 
 /* מצב סגור - עם אנימציה */
 .header-filters.filters-hidden {
-    max-height: 0;
-    padding-top: 0;
-    padding-bottom: 0;
+    max-height: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    min-height: 0 !important;
     overflow: hidden; /* מוסתר רק כשסגור */
     pointer-events: none; /* לא ניתן לקליק כשסגור */
 }
@@ -927,8 +928,7 @@
     display: none;
     visibility: visible;
     opacity: 1;
-    /* אנימציה - נע עם הפילטר */
-    transition: bottom 0.6s ease-in;
+    /* ללא transition - נשאר קבוע בזמן אנימציה */
 }
 
 /* Main toggle button */

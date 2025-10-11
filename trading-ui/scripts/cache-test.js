@@ -949,17 +949,45 @@ window.testClearingLevels = async function() {
         // === SUMMARY ===
         const totalPassed = Object.values(testResults).filter(r => r.passed === true).length;
         const totalTested = Object.values(testResults).filter(r => r.tested === true).length;
+        const totalFailed = totalTested - totalPassed;
         
         console.log('\n📊 Test Summary:');
         console.log(`✅ Passed: ${totalPassed}/${totalTested}`);
         console.log('Results:', testResults);
         
-        // Show results in UI
-        if (typeof window.showSuccessNotification === 'function') {
-            window.showSuccessNotification(
-                'בדיקת רמות ניקוי',
-                `בדיקות הושלמו!\n\n✅ עברו: ${totalPassed}/${totalTested}\n\nLight: ${testResults.light.passed ? '✅' : '❌'}\nMedium: ${testResults.medium.passed ? '✅' : '❌'}\nFull: ${testResults.full.passed ? '✅' : '❌'}\nNuclear: ⚠️ ידני בלבד`
-            );
+        // Build detailed message
+        let detailedMessage = `סה"כ נבדקו: ${totalTested} רמות\n`;
+        detailedMessage += `✅ עברו: ${totalPassed}\n`;
+        if (totalFailed > 0) {
+            detailedMessage += `❌ נכשלו: ${totalFailed}\n`;
+        }
+        detailedMessage += `\n📋 פירוט:\n`;
+        detailedMessage += `• Light: ${testResults.light.passed ? '✅ עבר' : '❌ נכשל'}\n`;
+        detailedMessage += `• Medium: ${testResults.medium.passed ? '✅ עבר' : '❌ נכשל'}\n`;
+        detailedMessage += `• Full: ${testResults.full.passed ? '✅ עבר' : '❌ נכשל'}\n`;
+        detailedMessage += `• Nuclear: ⚠️ בדיקה ידנית בלבד`;
+        
+        // Show results in UI - success or warning
+        if (totalPassed === totalTested) {
+            // All tests passed
+            if (typeof window.showSuccessNotification === 'function') {
+                await window.showSuccessNotification(
+                    '✅ בדיקת רמות ניקוי הושלמה בהצלחה',
+                    detailedMessage,
+                    6000,
+                    'testing'
+                );
+            }
+        } else {
+            // Some tests failed
+            if (typeof window.showErrorNotification === 'function') {
+                await window.showErrorNotification(
+                    '⚠️ בדיקת רמות ניקוי - יש כשלים',
+                    detailedMessage,
+                    8000,
+                    'testing'
+                );
+            }
         }
         
         return testResults;
@@ -967,7 +995,12 @@ window.testClearingLevels = async function() {
     } catch (error) {
         console.error('❌ Testing failed:', error);
         if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה בבדיקות', error.message);
+            await window.showErrorNotification(
+                '❌ שגיאה קריטית בבדיקת רמות',
+                `הבדיקה נכשלה בשגיאה קריטית!\n\nפרטים:\n• ${error.message}\n• ${error.stack?.split('\n')[0] || 'לא זמין'}\n\nבדוק את הקונסול לפרטים מלאים.`,
+                10000,
+                'testing'
+            );
         }
         return testResults;
     }

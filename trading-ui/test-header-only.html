@@ -33,50 +33,32 @@
     <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=20251011">
     <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=20251011">
     
-    <!-- ===== STATIC LOADING SYSTEM - Template 3: Development Pages ===== -->
-    
-    <!-- Stage 1: Core Modules (8) - ALWAYS REQUIRED -->
-    <script src="scripts/modules/core-systems.js?v=20251011"></script>
-    <script src="scripts/modules/ui-basic.js?v=20251011"></script>
-    <script src="scripts/modules/data-basic.js?v=20251011"></script>
-    <script src="scripts/modules/ui-advanced.js?v=20251011"></script>
-    <script src="scripts/modules/data-advanced.js?v=20251011"></script>
-    <script src="scripts/modules/business-module.js?v=20251011"></script>
-    <script src="scripts/modules/communication-module.js?v=20251011"></script>
-    <script src="scripts/modules/cache-module.js?v=20251011"></script>
-    
-    <!-- Stage 2: Core Utilities (3) - ALWAYS REQUIRED -->
-    <script src="scripts/global-favicon.js?v=20251011"></script>
-    <script src="scripts/page-utils.js?v=20251011"></script>
-    <script src="scripts/header-system.js?v=v6.0.1"></script>
-    
     <!-- Header Styles -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.1">
     <link rel="stylesheet" href="styles-new/06-components/_page-headers.css?v=20251011">
     
-    <!-- Stage 5: Page-Specific Script -->
-    <script src="scripts/test-header-only.js?v=4.0.0"></script>
-    
 </head>
 
 <body class="test-header-only">
-    <!-- Notification container -->
-    <div class="notification-container" id="notificationContainer"></div>
+    <!-- Header System - Created automatically by header-system.js -->
+    <div id="unified-header"></div>
     
+    <!-- Page Content -->
     <div class="background-wrapper">
-        <!-- Header System -->
-        <div id="unified-header"></div>
-
         <div class="page-body">
             <div class="main-content">
                 
-                <!-- Top Section: Header System Info -->
-                <div class="top-section" id="top-section" data-section="top">
+                <!-- ===== CONTENT SECTIONS START ===== -->
+                
+                <!-- Top Section Start -->
+                <div class="top-section" id="topSection" data-section="top">
                     <div class="section-header">
                         <h1>🔧 בדיקת מערכת ראש הדף</h1>
-                        <button class="filter-toggle-btn" onclick="window.toggleTopSection()" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="window.toggleSection('top')" title="הצג/הסתר סקשן">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
                     </div>
                     <div class="section-body">
                         <div class="row g-3">
@@ -88,7 +70,7 @@
                                     </div>
                                     <div class="card-body">
                                         <p class="mb-2"><strong>סטטוס:</strong> <span id="filterSystemStatus">טוען...</span></p>
-                                        <p class="mb-0"><strong>טבלאות רשומות:</strong> <span id="registeredTablesCount">0</span></p>
+                                        <p class="mb-0"><strong>טבלאות:</strong> <span id="registeredTablesCount">0</span></p>
                                         <hr>
                                         <small class="text-muted">שנה פילטרים בראש הדף ובדוק שהטבלאות מגיבות</small>
                                     </div>
@@ -105,7 +87,7 @@
                                         <p class="mb-2"><strong>תכנוני טריידים:</strong> <span id="tradePlansRows">0</span> שורות</p>
                                         <p class="mb-0"><strong>ביצועים:</strong> <span id="executionsRows">0</span> שורות</p>
                                         <hr>
-                                        <small class="text-muted">שורות גלויות מתוך סה"כ</small>
+                                        <small class="text-muted">שורות גלויות / סה"כ</small>
                                     </div>
                                 </div>
                             </div>
@@ -118,7 +100,7 @@
                                     </div>
                                     <div class="card-body">
                                         <p class="mb-2"><strong>זמן טעינה:</strong> <span id="loadTime">טוען...</span></p>
-                                        <p class="mb-0"><strong>Header נטען:</strong> <span id="headerLoadTime">טוען...</span></p>
+                                        <p class="mb-0"><strong>Header נטען:</strong> <span id="headerLoadTime">~150ms</span></p>
                                         <hr>
                                         <small class="text-muted">מדידת זמני אתחול</small>
                                     </div>
@@ -127,14 +109,17 @@
                         </div>
                     </div>
                 </div>
+                <!-- Top Section End -->
 
-                <!-- Section 1: Trade Plans Table -->
-                <div class="content-section" id="section1">
+                <!-- UI Content Section 1 Start -->
+                <div class="content-section" id="section1" data-section="trade-plans">
                     <div class="section-header entity-test-sub-header">
                         <h2>📋 תכנוני טריידים</h2>
-                        <button class="filter-toggle-btn" onclick="window.toggleSection('section1')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="window.toggleSection('section1')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
                     </div>
                     <div class="section-body">
                         <div class="table-responsive">
@@ -195,14 +180,17 @@
                         </div>
                     </div>
                 </div>
+                <!-- UI Content Section 1 End -->
 
-                <!-- Section 2: Executions Table -->
-                <div class="content-section" id="section2">
+                <!-- UI Content Section 2 Start -->
+                <div class="content-section" id="section2" data-section="executions">
                     <div class="section-header entity-test-sub-header">
                         <h2>📊 ביצועים</h2>
-                        <button class="filter-toggle-btn" onclick="window.toggleSection('section2')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="window.toggleSection('section2')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
                     </div>
                     <div class="section-body">
                         <div class="table-responsive">
@@ -278,10 +266,39 @@
                         </div>
                     </div>
                 </div>
+                <!-- UI Content Section 2 End -->
 
+                <!-- ===== CONTENT SECTIONS END ===== -->
+                
             </div>
+            <!-- ===== END MAIN CONTENT ===== -->
         </div>
+        <!-- ===== END PAGE BODY ===== -->
     </div>
+    <!-- ===== END BACKGROUND WRAPPER ===== -->
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- ===== STATIC LOADING SYSTEM - Template 3: Development Pages ===== -->
+    
+    <!-- Stage 1: Core Modules (8) - ALWAYS REQUIRED -->
+    <script src="scripts/modules/core-systems.js?v=20251011"></script>
+    <script src="scripts/modules/ui-basic.js?v=20251011"></script>
+    <script src="scripts/modules/data-basic.js?v=20251011"></script>
+    <script src="scripts/modules/ui-advanced.js?v=20251011"></script>
+    <script src="scripts/modules/data-advanced.js?v=20251011"></script>
+    <script src="scripts/modules/business-module.js?v=20251011"></script>
+    <script src="scripts/modules/communication-module.js?v=20251011"></script>
+    <script src="scripts/modules/cache-module.js?v=20251011"></script>
+    
+    <!-- Stage 2: Core Utilities (3) - ALWAYS REQUIRED -->
+    <script src="scripts/global-favicon.js?v=20251011"></script>
+    <script src="scripts/page-utils.js?v=20251011"></script>
+    <script src="scripts/header-system.js?v=v6.0.1"></script>
+    
+    <!-- Stage 5: Page-Specific Script -->
+    <script src="scripts/test-header-only.js?v=4.0.0"></script>
 
 </body>
 </html>

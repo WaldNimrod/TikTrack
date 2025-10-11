@@ -232,9 +232,35 @@ function showLinkedItemsModal(data, itemType, itemId, mode = 'view') {
 
   createModal(modalId, modalTitle, modalContent, mode);
 
-  // Show the modal
-  const modal = new bootstrap.Modal(document.getElementById(modalId));
-  modal.show();
+  // Show the modal using the unified helper function to avoid ARIA warnings
+  if (typeof window.createAndShowModal === 'function') {
+    // Use helper to show existing modal (already in DOM from createModal)
+    const modalElement = document.getElementById(modalId);
+    const modal = new bootstrap.Modal(modalElement);
+    
+    // Add MutationObserver for ARIA fix
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'aria-hidden') {
+          if (modalElement.getAttribute('aria-hidden') === 'true') {
+            modalElement.removeAttribute('aria-hidden');
+            modalElement.removeAttribute('inert');
+          }
+        }
+      });
+    });
+    
+    observer.observe(modalElement, { attributes: true, attributeFilter: ['aria-hidden', 'inert'] });
+    modal.show();
+    
+    modalElement.addEventListener('hidden.bs.modal', () => {
+      observer.disconnect();
+    }, { once: true });
+  } else {
+    // Fallback to regular Bootstrap
+    const modal = new bootstrap.Modal(document.getElementById(modalId));
+    modal.show();
+  }
 }
 
 /**
@@ -940,8 +966,9 @@ function createModal(id, title, content, mode = 'view') {
   }
 
   // Create new modal with mode-specific styling
+  // Note: No aria-hidden - let Bootstrap manage it to avoid accessibility warnings
   const modalHtml = `
-    <div class="modal fade" id="${id}" tabindex="-1" aria-labelledby="${id}Label" aria-hidden="true">
+    <div class="modal fade" id="${id}" tabindex="-1" aria-labelledby="${id}Label">
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
                           <div class="modal-header linkedItems_modal-header-colored modal-header-${mode}">

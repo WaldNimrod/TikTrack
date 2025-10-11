@@ -7,17 +7,25 @@
 
 ---
 
-## ✅ **כבר תוקנו (4 modals)**
+## ✅ **כבר תוקנו (6 modals)**
 
-### **1. core-systems.js:**
+### **1. core-systems.js (3 modals):**
 - ✅ `finalSuccessModal` - showFinalSuccessNotification() - שורה ~2200
 - ✅ `clearCacheConfirmationModal` - showClearCacheConfirmation() - שורה ~2105
 - ✅ `detailedNotificationModal` - showDetailedNotification() - שורה ~3060
 
-### **2. warning-system.js:**
+### **2. warning-system.js (1 modal):**
 - ✅ confirmation modal - showConfirmationDialog() - שורה ~145
 
-**תוצאה:** ✅ **cache-test.html נקי לחלוטין!**
+### **3. entity-details-modal.js (1 modal):**
+- ✅ `entityDetailsModal` - createModalStructure() - שורה ~95
+- **תיקון:** הסרת `aria-hidden="true"` מה-HTML (modal סטטי)
+
+### **4. linked-items.js (1 modal):**
+- ✅ linked items modal - createModal() - שורה ~945
+- **תיקון:** MutationObserver inline (modal דינמי)
+
+**תוצאה:** ✅ **cache-test.html + כל modals משתמשים - נקיים לחלוטין!**
 
 ---
 
@@ -99,33 +107,27 @@ grep -n "modal fade" trading-ui/scripts/constraints.js
 
 ---
 
-### **קובץ 6: entity-details-modal.js**
+### **~~קובץ 6: entity-details-modal.js~~** ✅ **תוקן!**
 **מיקום:** `trading-ui/scripts/entity-details-modal.js`  
 **עמוד:** כל העמודים (שימוש כללי)  
 **שימוש:** הצגת פרטי ישויות - **משתמש קצה**  
-**קריטיות:** 🟡 בינונית-גבוהה
+**קריטיות:** 🔴 גבוהה
 
-**Modals לתיקון:**
-```bash
-grep -n "modal fade" trading-ui/scripts/entity-details-modal.js
-```
-
-**הערכה:** ~1 modal
+**תיקון:** הסרת `aria-hidden="true"` מה-HTML (modal סטטי)  
+**תאריך:** 11 אוקטובר 2025  
+**סטטוס:** ✅ **הושלם**
 
 ---
 
-### **קובץ 7: linked-items.js**
+### **~~קובץ 7: linked-items.js~~** ✅ **תוקן!**
 **מיקום:** `trading-ui/scripts/linked-items.js`  
 **עמוד:** כל העמודים (שימוש כללי)  
 **שימוש:** פריטים מקושרים - **משתמש קצה**  
-**קריטיות:** 🟡 בינונית
+**קריטיות:** 🔴 גבוהה
 
-**Modals לתיקון:**
-```bash
-grep -n "modal fade" trading-ui/scripts/linked-items.js
-```
-
-**הערכה:** ~1 modal
+**תיקון:** MutationObserver inline (modal דינמי)  
+**תאריך:** 11 אוקטובר 2025  
+**סטטוס:** ✅ **הושלם**
 
 ---
 
@@ -146,9 +148,9 @@ grep -n "modal fade" trading-ui/scripts/entity-details-system/entity-details-sys
 
 ## 🎯 **סדר עדיפויות מומלץ**
 
-### **עדיפות 1 (קריטי - משתמש קצה):**
-1. `entity-details-modal.js` - משתמשים רואים את זה!
-2. `linked-items.js` - משתמשים רואים את זה!
+### **~~עדיפות 1 (קריטי - משתמש קצה):~~** ✅ **הושלם!**
+1. ✅ ~~`entity-details-modal.js`~~ - **תוקן!**
+2. ✅ ~~`linked-items.js`~~ - **תוקן!**
 
 ### **עדיפות 2 (חשוב - כלי פיתוח תכופים):**
 3. `server-monitor.js` - משתמשים בו הרבה

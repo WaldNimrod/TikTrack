@@ -2097,8 +2097,9 @@ function showFinalSuccessModal(successInfo) {
   console.log('🔍 showFinalSuccessModal called:', { successInfo });
   
   // Create modal HTML
+  // Note: Don't add aria-hidden or inert - let Bootstrap manage these automatically
   const modalHtml = `
-    <div class="modal fade" id="finalSuccessModal" tabindex="-1" aria-labelledby="finalSuccessModalLabel" data-bs-backdrop="true" data-bs-keyboard="true">
+    <div class="modal fade" id="finalSuccessModal" tabindex="-1" aria-labelledby="finalSuccessModalLabel">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header text-white d-flex justify-content-between align-items-center" style="direction: rtl; background-color: #28a745;">

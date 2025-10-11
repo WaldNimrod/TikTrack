@@ -928,7 +928,7 @@
     display: none;
     visibility: visible;
     opacity: 1;
-    z-index: 9999; /* גבוה מאוד - מעל הכל! */
+    z-index: 952; /* טווח Header: 950-954 */
     /* אנימציית fade בכניסה/יציאה */
     transition: opacity 0.3s ease-in-out;
 }
@@ -942,12 +942,12 @@
 /* Main toggle button */
 .filter-toggle-main {
     bottom: -10px;
-    z-index: 9999; /* גבוה מאוד - מעל הכל! */
+    z-index: 952; /* טווח Header: 950-954 */
 }
 
 /* Secondary toggle button */
 .filter-toggle-secondary {
-    z-index: 9999; /* גבוה מאוד - מעל הכל! */
+    z-index: 952; /* טווח Header: 950-954 */
 }
 
 /* Header Filter Toggle Button */
@@ -972,7 +972,7 @@
     visibility: visible !important;
     opacity: 1 !important;
     position: relative;
-    z-index: 10000; /* הכי גבוה - מעל הכל! */
+    z-index: 952; /* טווח Header: 950-954 */
 }
 
 .header-filter-toggle-btn:hover {

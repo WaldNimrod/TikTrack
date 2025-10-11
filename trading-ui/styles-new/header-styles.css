@@ -71,7 +71,7 @@
     height: auto;
     max-height: 500px; /* גובה אמיתי של הפילטרים */
     overflow: visible; /* כפתור צריך לבלוט - תמיד! */
-    transition: max-height 1.2s ease-in, padding 1.2s ease-in;
+    transition: max-height 0.5s ease-in, padding 0.5s ease-in;
     /* ease-in = מתחיל לאט, נגמר מהר */
 }
 

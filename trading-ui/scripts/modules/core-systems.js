@@ -2166,12 +2166,21 @@ function showFinalSuccessModal(successInfo) {
   const modalElement = document.getElementById('finalSuccessModal');
   const modal = new bootstrap.Modal(modalElement);
   
-  // Fix ARIA accessibility issue: remove aria-hidden after modal is shown
-  modalElement.addEventListener('shown.bs.modal', () => {
-    modalElement.removeAttribute('aria-hidden');
-  }, { once: true });
-  
   modal.show();
+  
+  // Fix ARIA accessibility issue: remove aria-hidden and manage focus
+  // Bootstrap adds aria-hidden and auto-focuses first button, causing warning
+  // We need to remove aria-hidden AFTER Bootstrap adds it but BEFORE focus check
+  setTimeout(() => {
+    modalElement.removeAttribute('aria-hidden');
+    modalElement.removeAttribute('inert');
+    // Also remove focus from any button to prevent the warning
+    if (document.activeElement && document.activeElement.closest('#finalSuccessModal')) {
+      document.activeElement.blur();
+      // Give focus to modal itself instead
+      modalElement.focus();
+    }
+  }, 10);
   
   // Store success info globally for copying
   window.currentSuccessInfo = successInfo;

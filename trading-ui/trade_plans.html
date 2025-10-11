@@ -403,25 +403,31 @@
                     </div>
                     <div class="modal-body">
                         <form id="editTradePlanForm">
+                            <input type="hidden" id="editTradePlanId">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="editTicker" class="form-label entity-label">טיקר</label>
-                                        <input type="text" class="form-control" id="editTicker" required disabled>
+                                        <label for="editTradePlanTickerId" class="form-label entity-label">טיקר</label>
+                                        <select class="form-select" id="editTradePlanTickerId" required>
+                                            <option value="">בחר טיקר</option>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="editPlanDate" class="form-label entity-label">תאריך</label>
-                                        <input type="date" class="form-control" id="editPlanDate" required>
+                                        <label for="editTradePlanTradingAccount" class="form-label entity-label">חשבון מסחר</label>
+                                        <select class="form-select" id="editTradePlanTradingAccount" required>
+                                            <option value="">בחר חשבון</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="editType" class="form-label entity-label">סוג השקעה</label>
-                                        <select class="form-select" id="editType" required>
+                                        <label for="editTradePlanInvestmentType" class="form-label entity-label">סוג השקעה</label>
+                                        <select class="form-select" id="editTradePlanInvestmentType" required>
+                                            <option value="">בחר סוג השקעה</option>
                                             <option value="swing">סווינג</option>
                                             <option value="investment">השקעה</option>
                                             <option value="passive">פאסיבי</option>
@@ -430,8 +436,8 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="editSide" class="form-label entity-label">צד</label>
-                                        <select class="form-select" id="editSide" required>
+                                        <label for="editTradePlanSide" class="form-label entity-label">צד</label>
+                                        <select class="form-select" id="editTradePlanSide" required>
                                             <option value="Long">Long</option>
                                             <option value="Short">Short</option>
                                         </select>
@@ -441,22 +447,74 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="editQuantity" class="form-label entity-label">כמות</label>
-                                        <input type="number" class="form-control" id="editQuantity" step="1" min="1" required>
+                                        <label for="editTradePlanStatus" class="form-label entity-label">סטטוס</label>
+                                        <select class="form-select" id="editTradePlanStatus" required>
+                                            <option value="open">פתוח</option>
+                                            <option value="closed">סגור</option>
+                                            <option value="cancelled">מבוטל</option>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="editPrice" class="form-label entity-label">מחיר</label>
-                                        <input type="number" class="form-control" id="editPrice" step="0.01" min="0" required>
+                                        <label for="editTradePlanPlannedAmount" class="form-label entity-label">סכום מתוכנן</label>
+                                        <input type="number" class="form-control" id="editTradePlanPlannedAmount" step="0.01" min="0" required>
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-12">
+                                <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="editNotes" class="form-label entity-label">הערות</label>
-                                        <textarea class="form-control" id="editNotes" rows="3"></textarea>
+                                        <label for="editTradePlanShares" class="form-label entity-label">כמות</label>
+                                        <input type="number" class="form-control" id="editTradePlanShares" step="1" min="1" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editTradePlanCurrentPrice" class="form-label entity-label">מחיר</label>
+                                        <input type="number" class="form-control" id="editTradePlanCurrentPrice" step="0.01" min="0" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editTradePlanEntryConditions" class="form-label entity-label">תנאי כניסה</label>
+                                        <textarea class="form-control" id="editTradePlanEntryConditions" rows="2"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editTradePlanReasons" class="form-label entity-label">סיבות</label>
+                                        <textarea class="form-control" id="editTradePlanReasons" rows="2"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editTradePlanStopPrice" class="form-label entity-label">מחיר עצירה</label>
+                                        <input type="number" class="form-control" id="editTradePlanStopPrice" step="0.01" min="0">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editTradePlanTargetPrice" class="form-label entity-label">מחיר יעד</label>
+                                        <input type="number" class="form-control" id="editTradePlanTargetPrice" step="0.01" min="0">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editTradePlanDate" class="form-label entity-label">תאריך תכנון</label>
+                                        <input type="date" class="form-control" id="editTradePlanDate" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editTradePlanNotes" class="form-label entity-label">הערות</label>
+                                        <textarea class="form-control" id="editTradePlanNotes" rows="2"></textarea>
                                     </div>
                                 </div>
                             </div>

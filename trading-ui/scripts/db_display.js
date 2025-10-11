@@ -17,9 +17,19 @@
  * - Column mappings are centralized in table-mappings.js
  * - Sorting uses global window.sortTableData() function
  *
+ * Service Systems Integration:
+ * ✅ Global Element Cache - window.getElement (4 usages)
+ * ✅ FieldRendererService - renderDate/Number/Boolean (3 types)
+ * ✅ UI Systems - showNotification, createEditButton, createDeleteButton
+ * ✅ Entity Colors - window.getEntityColor
+ * ❌ CRUDResponseHandler - Not needed (Read-only page)
+ * ❌ DataCollectionService - Not needed (No forms)
+ * ❌ SelectPopulatorService - Not needed (No dropdowns)
+ * ❌ DefaultValueSetter - Not needed (No forms)
+ *
  * File: trading-ui/scripts/db_display.js
- * Version: 1.0
- * Last Updated: September 1, 2025
+ * Version: 2.0 - Services Integration Complete
+ * Last Updated: October 11, 2025
  */
 
 // ===== GLOBAL VARIABLES =====
@@ -74,7 +84,7 @@ async function loadAllTables() {
  */
 function setupEventListeners() {
   // Table type selector
-  const tableTypeSelect = document.getElementById('tableTypeSelect');
+  const tableTypeSelect = window.getElement?.('tableTypeSelect') || document.getElementById('tableTypeSelect');
   if (tableTypeSelect) {
     tableTypeSelect.addEventListener('change', function() {
       const selectedType = this.value;
@@ -83,7 +93,7 @@ function setupEventListeners() {
   }
 
   // Search functionality
-  const searchInput = document.getElementById('searchInput');
+  const searchInput = window.getElement?.('searchInput') || document.getElementById('searchInput');
   if (searchInput) {
     searchInput.addEventListener('input', function() {
       filterTableData(this.value);
@@ -231,7 +241,7 @@ function getEntityColor(entityType) {
  * Update the main display with all table statistics as cards
  */
 function updateMainTableDisplay() {
-  const container = document.getElementById('dbCardsContainer');
+  const container = window.getElement?.('dbCardsContainer') || document.getElementById('dbCardsContainer');
   if (!container) return;
   
   // Clear existing content
@@ -362,9 +372,9 @@ function updateTableDisplay(tableType, data) {
   const headerId = `${camelCaseType}TableHeader`;
   const bodyId = `${camelCaseType}TableBody`;
   
-  const table = document.getElementById(tableId);
-  const header = document.getElementById(headerId);
-  const body = document.getElementById(bodyId);
+  const table = window.getElement?.(tableId) || document.getElementById(tableId);
+  const header = window.getElement?.(headerId) || document.getElementById(headerId);
+  const body = window.getElement?.(bodyId) || document.getElementById(bodyId);
   
   if (!table || !header || !body) {
     console.warn(`Table elements not found for ${tableType}. Looking for IDs: ${tableId}, ${headerId}, ${bodyId}`);
@@ -405,24 +415,38 @@ function updateTableDisplay(tableType, data) {
       const td = document.createElement('td');
       const value = record[column];
       
-      // Format the value
+      // Format the value using FieldRendererService when available
       if (value === null || value === undefined) {
         td.textContent = '-';
         td.className = 'text-muted';
       } else if (typeof value === 'boolean') {
-        td.textContent = value ? 'כן' : 'לא';
-        td.className = value ? 'text-success' : 'text-danger';
+        // Use FieldRendererService for boolean if available
+        if (window.FieldRendererService?.renderBoolean) {
+          td.innerHTML = window.FieldRendererService.renderBoolean(value);
+        } else {
+          td.textContent = value ? 'כן' : 'לא';
+          td.className = value ? 'text-success' : 'text-danger';
+        }
       } else if (typeof value === 'number') {
-        td.textContent = value.toLocaleString();
-        td.className = 'text-end';
+        // Use FieldRendererService for numbers if available
+        if (window.FieldRendererService?.renderNumber) {
+          td.innerHTML = window.FieldRendererService.renderNumber(value);
+        } else {
+          td.textContent = value.toLocaleString();
+          td.className = 'text-end';
+        }
       } else if (typeof value === 'string' && value.includes('T') && value.includes('Z')) {
-        // Date formatting
-        try {
-          const date = new Date(value);
-          td.textContent = date.toLocaleString('he-IL');
-          td.className = 'text-muted';
-        } catch (e) {
-          td.textContent = value;
+        // Use FieldRendererService for dates if available
+        if (window.FieldRendererService?.renderDate) {
+          td.innerHTML = window.FieldRendererService.renderDate(value);
+        } else {
+          try {
+            const date = new Date(value);
+            td.textContent = date.toLocaleString('he-IL');
+            td.className = 'text-muted';
+          } catch (e) {
+            td.textContent = value;
+          }
         }
       } else {
         td.textContent = value;

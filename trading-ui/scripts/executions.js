@@ -2175,7 +2175,7 @@ window.resetExecutionsFilters = window.resetExecutionsFilters || function() {};
 
 // אתחול הדף
 // Third DOMContentLoaded removed - merged into initializeExecutionsPage
-function _initializeExecutionsPageValidation() {
+async function _initializeExecutionsPageValidation() {
   // שחזור מצב הסגירה - handled by unified system finalization stage
   // No need - unified system handles this
   
@@ -2184,8 +2184,22 @@ function _initializeExecutionsPageValidation() {
     // Already handled by system
   } else {
     // console.warn('⚠️ restoreAllSectionStates function not available, using fallback');
-    // Fallback: restore top section state manually
-    const topSectionHidden = localStorage.getItem('executionsTopSectionCollapsed') === 'true';
+    // Fallback: restore top section state manually with UnifiedCacheManager support
+    let topSectionHidden = false;
+    
+    if (window.UnifiedCacheManager?.isInitialized()) {
+      try {
+        const savedState = await window.UnifiedCacheManager.get('executionsTopSectionCollapsed', {
+          layer: 'localStorage'
+        });
+        topSectionHidden = savedState === 'true' || savedState === true;
+      } catch (err) {
+        topSectionHidden = localStorage.getItem('executionsTopSectionCollapsed') === 'true';
+      }
+    } else {
+      topSectionHidden = localStorage.getItem('executionsTopSectionCollapsed') === 'true';
+    }
+    
     const topSection = document.querySelector('.top-section .section-body');
     const topToggleBtn = document.querySelector('.top-section button[onclick*="toggleSection"]');
     const topIcon = topToggleBtn ? topToggleBtn.querySelector('.filter-icon') : null;

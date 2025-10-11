@@ -264,11 +264,37 @@ function toggleCashFlowsSection() {
     toggleBtn.title = 'הסתר תזרימי מזומנים';
   }
 
-  localStorage.setItem('cashFlowsSectionState', isVisible ? 'closed' : 'open');
+  // Use Unified Cache Manager if available, fallback to localStorage
+  if (window.UnifiedCacheManager?.isInitialized()) {
+    window.UnifiedCacheManager.save('cashFlowsSectionState', isVisible ? 'closed' : 'open', {
+      layer: 'localStorage',
+      ttl: null
+    }).catch(err => {
+      console.warn('Failed to save to UnifiedCacheManager, using localStorage fallback:', err);
+      localStorage.setItem('cashFlowsSectionState', isVisible ? 'closed' : 'open');
+    });
+  } else {
+    localStorage.setItem('cashFlowsSectionState', isVisible ? 'closed' : 'open');
+  }
 }
 
-function restoreCashFlowsSectionState() {
-  const savedState = localStorage.getItem('cashFlowsSectionState');
+async function restoreCashFlowsSectionState() {
+  let savedState = null;
+  
+  // Use Unified Cache Manager if available, fallback to localStorage
+  if (window.UnifiedCacheManager?.isInitialized()) {
+    try {
+      savedState = await window.UnifiedCacheManager.get('cashFlowsSectionState', {
+        layer: 'localStorage'
+      });
+    } catch (err) {
+      console.warn('Failed to get from UnifiedCacheManager, using localStorage fallback:', err);
+      savedState = localStorage.getItem('cashFlowsSectionState');
+    }
+  } else {
+    savedState = localStorage.getItem('cashFlowsSectionState');
+  }
+  
   if (!savedState) {
     return;
   }

@@ -27,48 +27,48 @@
     <!-- ITCSS Architecture - Individual Files (September 2025) -->
     
     <!-- 01-settings - Variables and Settings -->
-    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=20251010">
     
     <!-- 02-tools - Functions and Mixins -->
-    <link rel="stylesheet" href="styles-new/02-tools/_mixins.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/02-tools/_functions.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/02-tools/_mixins.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/02-tools/_functions.css?v=20251010">
     
     <!-- 03-generic - Reset and Normalization -->
-    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=20251010">
     
     <!-- 04-elements - Basic HTML Elements -->
-    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=20251010">
     
     <!-- 05-objects - Layout Structures -->
-    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=20251010">
     
     <!-- 06-components - UI Components -->
-    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_page-headers.css?v=20251001">
-    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/06-components/_page-headers.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=20251010">
     
     <!-- 08-themes - Themes -->
-    <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=20251010">
     
     <!-- 09-utilities - Utility Classes -->
-    <link rel="stylesheet" href="styles-new/09-utilities/_utilities.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/09-utilities/_utilities.css?v=20251010">
     
     <!-- External Libraries -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
@@ -142,7 +142,7 @@
                     <!-- Executions table -->
                     <div class="section-body">
                         <div class="table-responsive" id="executionsContainer">
-                            <table class="table" id="executionsTable" data-table-type="executions">
+                            <table class="data-table" id="executionsTable" data-table-type="executions">
                                 <thead>
                                     <tr>
                                         <th class="col-ticker">
@@ -404,47 +404,38 @@
     <!-- Bootstrap JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- ===== DYNAMIC LOADING SYSTEM ===== -->
+    <!-- ===== STATIC LOADING SYSTEM - Template 1: Trading Pages ===== -->
     
-    <!-- Core Systems (Always Required) -->
-    <script src="scripts/modules/core-systems.js?v=20251006"></script>
+    <!-- Stage 1: Core Modules (8) - ALWAYS REQUIRED -->
+    <script src="scripts/modules/core-systems.js?v=20251010"></script>
+    <script src="scripts/modules/ui-basic.js?v=20251010"></script>
+    <script src="scripts/modules/data-basic.js?v=20251010"></script>
+    <script src="scripts/modules/ui-advanced.js?v=20251010"></script>
+    <script src="scripts/modules/data-advanced.js?v=20251010"></script>
+    <script src="scripts/modules/business-module.js?v=20251010"></script>
+    <script src="scripts/modules/communication-module.js?v=20251010"></script>
+    <script src="scripts/modules/cache-module.js?v=20251010"></script>
     
-    <!-- Dynamic Loader Configuration -->
-    <script src="scripts/modules/dynamic-loader-config.js?v=20251006"></script>
-    
-    <!-- Page Initialization Configs -->
-    <!-- PAGE_CONFIGS integrated in core-systems.js -->
-    
-    <!-- Additional Required Scripts -->
-    <script src="scripts/global-favicon.js?v=20251001"></script>
-    <script src="scripts/translation-utils.js?v=20251001"></script>
+    <!-- Stage 2: Core Utilities (3) - ALWAYS REQUIRED -->
+    <script src="scripts/global-favicon.js?v=20251010"></script>
+    <script src="scripts/page-utils.js?v=20251010"></script>
     <script src="scripts/header-system.js?v=v6.0.0"></script>
-    <script src="scripts/date-utils.js?v=20251001"></script>
-    <script src="scripts/button-icons.js?v=20251001"></script>
-    <script src="scripts/page-utils.js?v=20251001"></script>
-    <script src="scripts/preferences.js?v=20251001"></script>
-    <script src="scripts/notification-category-detector.js?v=20251001"></script>
-    <script src="scripts/global-notification-collector.js?v=20251001"></script>
-    <script src="scripts/system-management.js?v=20251001"></script>
-    <script src="scripts/entity-details-api.js?v=20251006"></script>
-    <script src="scripts/entity-details-renderer.js?v=20251006"></script>
-    <script src="scripts/entity-details-modal.js?v=20251001"></script>
-    <script src="scripts/warning-system.js?v=20251001"></script>
     
-    <!-- Service Systems (New General Services) -->
+    <!-- Stage 3: Common Utilities - ALL for Trading Pages -->
+    <script src="scripts/translation-utils.js?v=20251010"></script>
+    <script src="scripts/date-utils.js?v=20251010"></script>
+    <script src="scripts/linked-items.js?v=20251010"></script>
+    <script src="scripts/warning-system.js?v=20251010"></script>
+    
+    <!-- Stage 4: Services - ALL for Trading Pages -->
     <script src="scripts/services/data-collection-service.js?v=1.0.0"></script>
     <script src="scripts/services/field-renderer-service.js?v=1.0.0"></script>
     <script src="scripts/services/select-populator-service.js?v=1.0.0"></script>
+    <script src="scripts/services/crud-response-handler.js?v=2.0.0"></script>
     <script src="scripts/services/default-value-setter.js?v=1.0.0"></script>
-    <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script>
+    <script src="scripts/services/statistics-calculator.js?v=1.0.0"></script>
     
-    <!-- Page-specific Script -->
-    <script src="scripts/executions.js?v=20251009"></script>
-    
-    <!-- Local copyDetailedLog function for executions page -->
-    <script>
-        // Make the local copyDetailedLog function available globally for this page only
-        window.copyDetailedLog = copyDetailedLog;
-    </script>
+    <!-- Stage 5: Page Script - REQUIRED -->
+    <script src="scripts/executions.js?v=20251010"></script>
 </body>
 </html>

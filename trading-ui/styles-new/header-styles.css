@@ -785,8 +785,7 @@
 /* CRITICAL: Header Top Wrapper - Override from JS */
 .header-top {
     padding: 15px 0;
-    max-width: 1400px;
-    margin: 0 auto;
+    /* max-width removed - background should span full width like .header-filters */
 }
 
 /* CRITICAL: Header Container Flex - Override from JS */

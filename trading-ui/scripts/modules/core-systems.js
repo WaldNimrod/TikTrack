@@ -1928,7 +1928,7 @@ function showFinalSuccessModal(successInfo) {
   
   // Create modal HTML
   const modalHtml = `
-    <div class="modal fade" id="finalSuccessModal" tabindex="-1" aria-labelledby="finalSuccessModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true" inert>
+    <div class="modal fade" id="finalSuccessModal" tabindex="-1" aria-labelledby="finalSuccessModalLabel" data-bs-backdrop="true" data-bs-keyboard="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header text-white d-flex justify-content-between align-items-center" style="direction: rtl; background-color: #28a745;">

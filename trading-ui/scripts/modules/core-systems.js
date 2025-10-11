@@ -483,8 +483,8 @@ class UnifiedAppInitializer {
         // Initialize IndexedDB first (blocking) to prevent race conditions
         await this.initializeCacheSystem();
         
-        // Wait longer for cache system to be fully ready
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // Minimal delay for IndexedDB stability (reduced from 500ms for performance)
+        await new Promise(resolve => setTimeout(resolve, 50));
         
         // Verify cache system is ready
         console.log('🔍 Verifying cache system readiness...');
@@ -524,19 +524,28 @@ class UnifiedAppInitializer {
     async manualInitialization(config) {
         console.log('🔧 Manual initialization fallback...');
         
-        // Initialize Header System (Stage 2: UI Systems) - CRITICAL!
-        if (typeof window.initializeHeaderSystem === 'function') {
-            console.log('🎯 Initializing Header System...');
-            window.initializeHeaderSystem();
-        } else {
-            console.warn('⚠️ initializeHeaderSystem not available');
-        }
-        
-        // Initialize Notification System
-        if (this.availableSystems.has('notification') && typeof window.NotificationSystem !== 'undefined') {
-            console.log('🔔 Initializing Notification System...');
-            await window.NotificationSystem.initialize();
-        }
+        // Initialize Header + Notifications in parallel (both independent of cache)
+        console.log('🎯 Initializing UI Systems in parallel...');
+        await Promise.all([
+            // Header System - has localStorage fallback, doesn't need cache
+            (async () => {
+                if (typeof window.initializeHeaderSystem === 'function') {
+                    console.log('🎯 Initializing Header System...');
+                    window.initializeHeaderSystem();
+                } else {
+                    console.warn('⚠️ initializeHeaderSystem not available');
+                }
+            })(),
+            
+            // Notification System
+            (async () => {
+                if (this.availableSystems.has('notification') && typeof window.NotificationSystem !== 'undefined') {
+                    console.log('🔔 Initializing Notification System...');
+                    await window.NotificationSystem.initialize();
+                }
+            })()
+        ]);
+        console.log('✅ UI Systems initialized');
         
         // Initialize page-specific systems
         if (config.requiresFilters && this.availableSystems.has('pageFilters')) {
@@ -1779,11 +1788,18 @@ async function showSimpleErrorNotification(title, message, duration = 6000, cate
  * @returns {Object} Bootstrap modal instance
  */
 window.createAndShowModal = function(modalHtml, modalId, options = {}) {
-  // Remove existing modal if present
-  const existing = document.getElementById(modalId);
-  if (existing) {
-    existing.remove();
-  }
+  // Remove ALL existing modals with this ID (in case of duplicates)
+  // querySelectorAll catches all instances, not just the first one
+  const existingModals = document.querySelectorAll(`#${modalId}`);
+  existingModals.forEach(modal => {
+    modal.remove();
+  });
+  
+  // Also remove any orphaned backdrops
+  const backdrops = document.querySelectorAll('.modal-backdrop');
+  backdrops.forEach(backdrop => {
+    backdrop.remove();
+  });
   
   // Add modal to DOM
   document.body.insertAdjacentHTML('beforeend', modalHtml);
@@ -1795,18 +1811,32 @@ window.createAndShowModal = function(modalHtml, modalId, options = {}) {
     return null;
   }
   
-  // Fix ARIA accessibility: remove aria-hidden BEFORE Bootstrap shows modal
-  // This prevents the "Blocked aria-hidden" warning
-  modalElement.addEventListener('show.bs.modal', () => {
-    modalElement.removeAttribute('aria-hidden');
-    modalElement.removeAttribute('inert');
-  }, { once: true });
+  // Fix ARIA accessibility: Use MutationObserver to prevent aria-hidden
+  // Bootstrap keeps adding aria-hidden, we need to remove it continuously
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'attributes' && mutation.attributeName === 'aria-hidden') {
+        if (modalElement.getAttribute('aria-hidden') === 'true') {
+          modalElement.removeAttribute('aria-hidden');
+          modalElement.removeAttribute('inert');
+        }
+      }
+    });
+  });
+  
+  // Start observing before showing modal
+  observer.observe(modalElement, { attributes: true, attributeFilter: ['aria-hidden', 'inert'] });
   
   // Initialize Bootstrap modal
   const modal = new bootstrap.Modal(modalElement, options);
   
   // Show modal
   modal.show();
+  
+  // Stop observing after modal is fully shown
+  modalElement.addEventListener('shown.bs.modal', () => {
+    observer.disconnect();
+  }, { once: true });
   
   return modal;
 };
@@ -2101,14 +2131,9 @@ window.showClearCacheConfirmation = async function(level, currentStats) {
         `;
         
         // Remove existing modal if any
-        const existing = document.getElementById('clearCacheConfirmationModal');
-        if (existing) existing.remove();
-        
-        // Add modal to DOM
-        document.body.insertAdjacentHTML('beforeend', modalHtml);
-        
+        // Use the unified helper function to create and show modal without ARIA warnings
+        const modal = window.createAndShowModal(modalHtml, 'clearCacheConfirmationModal');
         const modalElement = document.getElementById('clearCacheConfirmationModal');
-        const modal = new bootstrap.Modal(modalElement);
         
         // Confirm button
         document.getElementById('clearCache-confirm-btn').onclick = () => {
@@ -3055,13 +3080,9 @@ window.showDetailedNotification = async function(title, message, type = 'info', 
       </div>
     `;
     
-    // הוספת ה-modal ל-DOM
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-    
-    // הצגת ה-modal
+    // Use the unified helper function to create and show modal without ARIA warnings
+    const modal = window.createAndShowModal(modalHtml, modalId);
     const modalElement = document.getElementById(modalId);
-    const modal = new bootstrap.Modal(modalElement);
-    modal.show();
     
     // הסרת ה-modal אחרי סגירה
     modalElement.addEventListener('hidden.bs.modal', () => {

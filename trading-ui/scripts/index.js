@@ -187,13 +187,14 @@ function updateStatistics() {
         }
     });
     
-    // Update profit icon color
+    // Update profit icon color dynamically
     const profitIcon = window.getElement?.('totalProfitIcon') || document.getElementById('totalProfitIcon');
     if (profitIcon) {
-        profitIcon.className = stats.totalProfit >= 0 ? 
-            'fas fa-dollar-sign text-success mb-2' : 
-            'fas fa-dollar-sign text-danger mb-2';
+        profitIcon.className = 'fas fa-dollar-sign mb-2';
         profitIcon.style.fontSize = '2rem';
+        profitIcon.style.color = stats.totalProfit >= 0 ? 
+            'var(--success-color)' : 
+            'var(--danger-color)';
     }
     
     console.log('✅ Statistics updated');
@@ -636,7 +637,8 @@ function updateAdditionalTradeStats(trades) {
     const todayPnLEl = window.getElement?.('todayPnL') || document.getElementById('todayPnL');
     if (todayPnLEl) {
         todayPnLEl.textContent = formatCurrency(todayPnL);
-        todayPnLEl.className = todayPnL >= 0 ? 'ms-2 text-success' : 'ms-2 text-danger';
+        todayPnLEl.className = 'ms-2';
+        todayPnLEl.style.color = todayPnL >= 0 ? 'var(--success-color)' : 'var(--danger-color)';
     }
     
     // Update last update time

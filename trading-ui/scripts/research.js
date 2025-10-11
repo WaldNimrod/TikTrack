@@ -156,12 +156,13 @@ function updateKPICards(kpis) {
         if (el) {
             el.textContent = value;
             
-            // Add color to total return
+            // Add color to total return dynamically
             if (id === 'totalReturnKPI') {
                 const numValue = parseFloat(kpis.totalReturn);
-                el.className = numValue >= 0 ? 
-                    'card-title mb-1 text-success' : 
-                    'card-title mb-1 text-danger';
+                el.className = 'card-title mb-1';
+                el.style.color = numValue >= 0 ? 
+                    'var(--success-color)' : 
+                    'var(--danger-color)';
             }
         }
     });

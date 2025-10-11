@@ -229,29 +229,49 @@ function renderExecutionsTable(data) {
         return;
     }
     
-    tbody.innerHTML = executionsToRender.map(execution => `
-        <tr>
-            <td>${execution.ticker_symbol || ''}</td>
-            <td>${execution.action || ''}</td>
-            <td data-account="${execution.account_name || ''}">${execution.account_name || ''}</td>
-            <td>${execution.quantity || ''}</td>
-            <td>${execution.price ? '$' + parseFloat(execution.price).toFixed(2) : ''}</td>
-            <td>${execution.pnl ? 
-                window.FieldRendererService ? 
-                    window.FieldRendererService.renderNumeric(execution.pnl, 2, '$') : 
-                    '$' + parseFloat(execution.pnl).toFixed(2) : 
-                ''
-            }</td>
-            <td data-date="${execution.execution_date || ''}">${execution.execution_date || ''}</td>
-            <td>${execution.source || ''}</td>
-            <td data-status="${execution.status || ''}">
-                ${window.FieldRendererService ? 
-                    window.FieldRendererService.renderStatus(execution.status) : 
-                    `<span class="status-badge status-${execution.status}">${execution.status}</span>`
-                }
-            </td>
-        </tr>
-    `).join('');
+    tbody.innerHTML = executionsToRender.map(execution => {
+        // Get display values
+        const symbol = execution.trade_ticker_symbol || execution.ticker_symbol || 'לא מוגדר';
+        const action = execution.action || execution.type || '';
+        const accountName = execution.account_name || 'לא מוגדר';
+        const quantity = execution.quantity || 0;
+        const price = execution.price || 0;
+        const pnl = execution.pnl || 0;
+        const dateValue = execution.date || execution.execution_date || '';
+        const source = execution.source || '-';
+        
+        // For filter - use translated values
+        const typeForFilter = action === 'buy' ? 'קנייה' : action === 'sale' ? 'מכירה' : action;
+        
+        // Render action badge
+        const actionBadge = window.FieldRendererService ? 
+            window.FieldRendererService.renderAction(action) : 
+            `<span class="${action === 'buy' ? 'action-buy' : 'action-sell'}">${action === 'buy' ? 'קנייה' : 'מכירה'}</span>`;
+        
+        // Render date
+        const dateBadge = window.FieldRendererService ? 
+            window.FieldRendererService.renderDate(dateValue) : 
+            (dateValue ? new Date(dateValue).toLocaleDateString('he-IL') : '-');
+        
+        // Render P&L
+        const plBadge = window.FieldRendererService ? 
+            window.FieldRendererService.renderNumericValue(pnl, ' $', true) : 
+            `$${parseFloat(pnl).toFixed(2)}`;
+        
+        return `
+            <tr data-execution-id="${execution.id}">
+                <td>${symbol}</td>
+                <td class="type-cell" data-type="${typeForFilter}">${actionBadge}</td>
+                <td data-account="${accountName}">${accountName}</td>
+                <td>${quantity}</td>
+                <td>$${parseFloat(price).toFixed(2)}</td>
+                <td>${plBadge}</td>
+                <td data-date="${dateValue}">${dateBadge}</td>
+                <td>${source}</td>
+                <td class="col-actions actions-cell">-</td>
+            </tr>
+        `;
+    }).join('');
     
     console.log(`✅ Executions table rendered with ${executionsToRender.length} rows`);
     updateInfoCards();

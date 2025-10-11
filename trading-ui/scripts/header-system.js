@@ -837,11 +837,42 @@ window.toggleHeaderFilters = function() {
     const isVisible = !section.classList.contains('filters-hidden');
     
     if (isVisible) {
-      // סגירה עם אנימציה
-      section.classList.add('filters-hidden');
+      // סגירה בשלבים: 1.fade כפתור → 2.סגירת פילטר → 3.fade כפתור חזרה
+      
+      // שלב 1: fade out של הכפתור הנוכחי (0.3s)
+      const currentBtn = document.querySelector('.filter-toggle-secondary');
+      if (currentBtn) currentBtn.classList.add('fading-out');
+      
+      // שלב 2: סגירת הפילטר (1.2s) - מתחיל אחרי 0.3s
+      setTimeout(() => {
+        section.classList.add('filters-hidden');
+        window.updateToggleButtons(); // החלפת כפתורים
+      }, 300);
+      
+      // שלב 3: fade in של הכפתור החדש - מתחיל אחרי 1.5s (0.3 + 1.2)
+      setTimeout(() => {
+        const newBtn = document.querySelector('.filter-toggle-main');
+        if (newBtn) newBtn.classList.remove('fading-out');
+      }, 1500);
+      
     } else {
-      // פתיחה עם אנימציה
-      section.classList.remove('filters-hidden');
+      // פתיחה בשלבים: 1.fade כפתור → 2.פתיחת פילטר → 3.fade כפתור חזרה
+      
+      // שלב 1: fade out של הכפתור הנוכחי (0.3s)
+      const currentBtn = document.querySelector('.filter-toggle-main');
+      if (currentBtn) currentBtn.classList.add('fading-out');
+      
+      // שלב 2: פתיחת הפילטר (1.2s) - מתחיל אחרי 0.3s
+      setTimeout(() => {
+        section.classList.remove('filters-hidden');
+        window.updateToggleButtons(); // החלפת כפתורים
+      }, 300);
+      
+      // שלב 3: fade in של הכפתור החדש - מתחיל אחרי 1.5s
+      setTimeout(() => {
+        const newBtn = document.querySelector('.filter-toggle-secondary');
+        if (newBtn) newBtn.classList.remove('fading-out');
+      }, 1500);
     }
     
     const toggleBtn = document.getElementById('headerFilterToggleBtn');
@@ -858,9 +889,6 @@ window.toggleHeaderFilters = function() {
     }
     
     console.log(`✅ Header filters ${isVisible ? 'hidden' : 'shown'}`);
-    
-    // עדכון מצב הכפתורים
-    window.updateToggleButtons();
   }
 };
 

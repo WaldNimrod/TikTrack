@@ -5,7 +5,7 @@
  * קובץ זה מכיל את הסגנונות של כל המודלים במערכת
  * מבוסס על הסגנונות הקיימים ב-apple-theme.css
  * 
- * @version 1.2.5
+ * @version 1.2.7
  * @lastUpdated January 11, 2025
  * @changes Entity modals: white bg, light entity header bg, X button with border, h4 title
  * @note !important used to override Bootstrap - documented as approved (11/01/2025)
@@ -348,7 +348,7 @@
   display: flex;
   align-items: center;
   padding: 1rem 1.5rem;
-  justify-content: space-between; /* ריווח בין כותרת לכפתור */
+  /* אין justify-content - הכפתור ידחף את עצמו עם margin-inline-start: auto */
 }
 
 /* Trade Plan Entity */
@@ -373,9 +373,15 @@
 }
 
 /* כפתור סגירה בסוף השורה (שמאל בעברית) */
-/* NOTE: !important נדרש כאן כי Bootstrap משתמש ב-!important */
+/* NOTE: !important נדרש כאן כי Bootstrap משתמש ב-position: absolute */
 .entity-header .btn-close,
 .entity-header .btn-close-end {
+  position: static !important; /* ביטול position: absolute של Bootstrap */
+  margin-inline-start: auto !important; /* דוחף לסוף השורה - שמאל */
+  margin-inline-end: 0 !important;
+  margin-left: auto !important; /* fallback */
+  margin-right: 0 !important;
+  inset: auto !important; /* ביטול left/right/top/bottom */
   background: white !important;
   border: 1px solid var(--entity-color, #0056b3) !important;
   border-radius: 6px !important;
@@ -390,8 +396,7 @@
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  margin: 0 !important;
-  flex-shrink: 0;
+  flex-shrink: 0 !important;
 }
 
 .entity-header .btn-close::after,

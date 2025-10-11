@@ -70,7 +70,7 @@
     /* אנימציה - התכווצות לגובה 0 */
     height: auto;
     max-height: 500px; /* גובה אמיתי של הפילטרים */
-    overflow: visible; /* כפתור toggle צריך לבלוט */
+    overflow: hidden; /* תוכן מוסתר בזמן אנימציה */
     transition: max-height 1.2s ease-in, padding 1.2s ease-in;
     /* ease-in = מתחיל לאט, נגמר מהר */
 }
@@ -81,8 +81,8 @@
     padding-top: 0 !important;
     padding-bottom: 0 !important;
     min-height: 0 !important;
-    overflow: hidden; /* מוסתר רק כשסגור */
-    pointer-events: none; /* לא ניתן לקליק כשסגור */
+    overflow: hidden;
+    pointer-events: none;
 }
 
 #unified-header .header-top {
@@ -928,7 +928,14 @@
     display: none;
     visibility: visible;
     opacity: 1;
-    /* ללא transition - נשאר קבוע בזמן אנימציה */
+    /* אנימציית fade בכניסה/יציאה */
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* כפתור נעלם לפני אנימציה */
+.filter-toggle-section.fading-out {
+    opacity: 0;
+    pointer-events: none;
 }
 
 /* Main toggle button */

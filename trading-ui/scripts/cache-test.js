@@ -878,7 +878,16 @@ window.testClearingLevels = async function() {
         await window.UnifiedCacheManager.save('test-medium', 'data', { layer: 'localStorage' });
         await window.UnifiedCacheManager.save('test-idb', 'data', { layer: 'indexedDB' });
         
+        // IMPORTANT: Create orphan keys for testing!
+        localStorage.setItem('test-orphan-medium', 'should-stay');
+        localStorage.setItem('colorScheme', 'test-scheme');
+        
         const beforeMedium = await captureSnapshot();
+        console.log('📊 Before Medium:', {
+            localStorage: beforeMedium.localStorage.entries,
+            indexedDB: beforeMedium.indexedDB.entries,
+            orphans: beforeMedium.orphansCount
+        });
         
         const mediumResult = await window.clearAllCache({ 
             level: 'medium', 
@@ -886,7 +895,15 @@ window.testClearingLevels = async function() {
             verbose: false 
         });
         
+        // Wait a bit for async operations to complete
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
         const afterMedium = await captureSnapshot();
+        console.log('📊 After Medium:', {
+            localStorage: afterMedium.localStorage.entries,
+            indexedDB: afterMedium.indexedDB.entries,
+            orphans: afterMedium.orphansCount
+        });
         
         testResults.medium.tested = true;
         testResults.medium.details = {
@@ -894,7 +911,7 @@ window.testClearingLevels = async function() {
             localStorageCleared: afterMedium.localStorage.entries === 0,
             indexedDBCleared: afterMedium.indexedDB.entries === 0,
             backendCleared: afterMedium.backend.entries === 0,
-            orphansUntouched: afterMedium.orphansCount > 0
+            orphansUntouched: afterMedium.orphansCount >= beforeMedium.orphansCount  // Should stay!
         };
         testResults.medium.passed = 
             testResults.medium.details.memoryCleared &&
@@ -904,17 +921,33 @@ window.testClearingLevels = async function() {
         
         console.log(`${testResults.medium.passed ? '✅' : '❌'} MEDIUM test:`, testResults.medium.details);
         
+        // Cleanup orphans we created
+        localStorage.removeItem('test-orphan-medium');
+        localStorage.removeItem('colorScheme');
+        
         // Wait before next test
         await new Promise(resolve => setTimeout(resolve, 100));
         
         // === TEST FULL ===
         console.log('\n🧪 Testing FULL level...');
         
+        // Re-populate ALL layers for testing
+        await window.UnifiedCacheManager.save('test-full-memory', 'data', { layer: 'memory' });
+        await window.UnifiedCacheManager.save('test-full-ls', 'data', { layer: 'localStorage' });
+        await window.UnifiedCacheManager.save('test-full-idb', 'data', { layer: 'indexedDB' });
+        
         // Add some orphan keys for testing
         localStorage.setItem('test-orphan-state', 'test');
         localStorage.setItem('sortState_test', 'test');
+        localStorage.setItem('colorScheme', 'test-full');
         
         const beforeFull = await captureSnapshot();
+        console.log('📊 Before Full:', {
+            memory: beforeFull.memory.entries,
+            localStorage: beforeFull.localStorage.entries,
+            indexedDB: beforeFull.indexedDB.entries,
+            orphans: beforeFull.orphansCount
+        });
         
         const fullResult = await window.clearAllCache({ 
             level: 'full', 
@@ -923,21 +956,30 @@ window.testClearingLevels = async function() {
             includeAuth: false  // Don't clear auth for safety in testing
         });
         
+        // Wait for async operations
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
         const afterFull = await captureSnapshot();
+        console.log('📊 After Full:', {
+            memory: afterFull.memory.entries,
+            localStorage: afterFull.localStorage.entries,
+            indexedDB: afterFull.indexedDB.entries,
+            orphans: afterFull.orphansCount
+        });
         
         testResults.full.tested = true;
         testResults.full.details = {
-            allLayersCleared: afterFull.memory.entries === 0 && 
-                             afterFull.localStorage.entries === 0 &&
-                             afterFull.indexedDB.entries === 0,
-            orphansReduced: afterFull.orphansCount < beforeFull.orphansCount,
-            authPreserved: localStorage.getItem('authToken') !== null || 
-                          localStorage.getItem('currentUser') !== null ||
-                          true  // We set includeAuth=false
+            memoryCleared: afterFull.memory.entries === 0,
+            localStorageCleared: afterFull.localStorage.entries === 0,
+            indexedDBCleared: afterFull.indexedDB.entries === 0,
+            orphansCleared: afterFull.orphansCount < beforeFull.orphansCount,
+            authPreserved: true  // We set includeAuth=false
         };
         testResults.full.passed = 
-            testResults.full.details.allLayersCleared &&
-            testResults.full.details.orphansReduced;
+            testResults.full.details.memoryCleared &&
+            testResults.full.details.localStorageCleared &&
+            testResults.full.details.indexedDBCleared &&
+            testResults.full.details.orphansCleared;
         
         console.log(`${testResults.full.passed ? '✅' : '❌'} FULL test:`, testResults.full.details);
         

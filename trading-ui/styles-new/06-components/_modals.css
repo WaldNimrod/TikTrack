@@ -5,8 +5,9 @@
  * קובץ זה מכיל את הסגנונות של כל המודלים במערכת
  * מבוסס על הסגנונות הקיימים ב-apple-theme.css
  * 
- * @version 1.0.0
- * @lastUpdated January 5, 2025
+ * @version 1.2.0
+ * @lastUpdated January 11, 2025
+ * @changes Entity modals with colored headers, unified button styles
  */
 
 /* מודל בסיסי - מבוסס על apple-theme.css */
@@ -354,9 +355,18 @@
 }
 
 /* כפתור סגירה בסוף השורה (שמאל בעברית) */
-.btn-close-end {
+.entity-header .btn-close-end {
   margin-inline-start: auto; /* דוחף לסוף השורה - שמאל בעברית */
   margin-inline-end: 0;
+  filter: brightness(0) invert(1); /* הופך לצבע לבן */
+  opacity: 1;
+  background-color: transparent;
+  border: none;
+}
+
+.entity-header .btn-close-end:hover {
+  opacity: 0.8;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 /* Modal footer עם יישור לסוף השורה */
@@ -364,6 +374,17 @@
   display: flex;
   justify-content: flex-end; /* סוף השורה - שמאל בעברית */
   direction: rtl;
+  gap: 12px; /* רווח בין כפתורים */
+}
+
+/* כפתורי modal - עיצוב אחיד */
+.modal-footer-end .btn {
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  min-height: 40px;
+  border-width: 2px;
 }
 
 /* כפתור ישות */
@@ -371,15 +392,26 @@
   border: 2px solid var(--entity-color, #007bff);
   background-color: white;
   color: var(--entity-color, #007bff);
-  font-weight: 600;
-  padding: 0.5rem 1.5rem;
-  border-radius: 8px;
   transition: all 0.2s ease;
 }
 
 .btn-entity:hover {
   background-color: var(--entity-color, #007bff);
   color: white;
+  border-color: var(--entity-color, #007bff);
+}
+
+/* כפתור ביטול - אחיד עם כפתור ישות */
+.modal-footer-end .btn-secondary {
+  border: 2px solid #6c757d;
+  background-color: white;
+  color: #6c757d;
+}
+
+.modal-footer-end .btn-secondary:hover {
+  background-color: #6c757d;
+  color: white;
+  border-color: #6c757d;
 }
 
 /* כפתור ישות ספציפי */

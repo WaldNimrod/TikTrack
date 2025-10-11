@@ -55,9 +55,9 @@
     
     <!-- 06-components - UI Components -->
     <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=20251010">
-    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=1.3.0">
     <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=20251010">
-    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=1.1.0">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=1.2.0">
     <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=20251010">
     <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=20251010">
     <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=20251010">
@@ -157,71 +157,70 @@
                                     <tr>
                                         <th class="col-ticker">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(0, window.filteredTradePlansData || window.tradePlansData, 'trade_plans', window.updateTradePlansTable); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(0, window.filteredTradePlansData || window.tradePlansData, 'trade_plans', window.updateTradePlansTable); }">
                                                 טיקר <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-date">
                                             <button class="btn btn-link sortable-header"
                                                 onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, window.filteredTradePlansData || window.tradePlansData, 'trade_plans', window.updateTradePlansTable); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+>
                                                 תאריך <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-type">
                                             <button class="btn btn-link sortable-header"
                                                 onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(2, window.filteredTradePlansData || window.tradePlansData, 'trade_plans', window.updateTradePlansTable); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+>
                                                 סוג <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-side">
                                             <button class="btn btn-link sortable-header"
                                                 onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(3, window.filteredTradePlansData || window.tradePlansData, 'trade_plans', window.updateTradePlansTable); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+>
                                                 צד <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-quantity">
                                             <button class="btn btn-link sortable-header"
                                                 onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(4, window.filteredTradePlansData || window.tradePlansData, 'trade_plans', window.updateTradePlansTable); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+>
                                                 כמות <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-price">
                                             <button class="btn btn-link sortable-header"
                                                 onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(5, window.filteredTradePlansData || window.tradePlansData, 'trade_plans', window.updateTradePlansTable); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+>
                                                 מחיר <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-investment">
                                             <button class="btn btn-link sortable-header"
                                                 onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(6, window.filteredTradePlansData || window.tradePlansData, 'trade_plans', window.updateTradePlansTable); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+>
                                                 השקעה <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-status">
                                             <button class="btn btn-link sortable-header"
                                                 onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(7, window.filteredTradePlansData || window.tradePlansData, 'trade_plans', window.updateTradePlansTable); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+>
                                                 סטטוס <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-profit">
                                             <button class="btn btn-link sortable-header"
                                                 onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(8, window.filteredTradePlansData || window.tradePlansData, 'trade_plans', window.updateTradePlansTable); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+>
                                                 רווח <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-notes">
                                             <button class="btn btn-link sortable-header"
                                                 onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(9, window.filteredTradePlansData || window.tradePlansData, 'trade_plans', window.updateTradePlansTable); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+>
                                                 הערות <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
@@ -255,7 +254,7 @@
         <div class="modal fade" id="addTradePlanModal" tabindex="-1" aria-labelledby="addTradePlanModalLabel" aria-hidden="true"
             data-bs-backdrop="true" data-bs-keyboard="true">
             <div class="modal-dialog modal-lg">
-                <div class="modal-content">
+                <div class="modal-content entity-trade-plan">
                     <div class="modal-header entity-header entity-trade-plan">
                         <h5 class="modal-title entity-title">הוספת תכנון חדש</h5>
                         <button type="button" class="btn-close btn-close-end" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -384,10 +383,10 @@
                         </form>
                     </div>
                     <div class="modal-footer modal-footer-end">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
                         <button type="button" class="btn btn-entity btn-entity-trade-plan" onclick="saveNewTradePlan()">
                             הוסף תכנון חדש
                         </button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
                     </div>
                 </div>
             </div>
@@ -397,7 +396,7 @@
         <div class="modal fade" id="editTradePlanModal" tabindex="-1" aria-labelledby="editTradePlanModalLabel" aria-hidden="true"
             data-bs-backdrop="true" data-bs-keyboard="true">
             <div class="modal-dialog modal-lg">
-                <div class="modal-content">
+                <div class="modal-content entity-trade-plan">
                     <div class="modal-header entity-header entity-trade-plan">
                         <h5 class="modal-title entity-title">עריכת תכנון</h5>
                         <button type="button" class="btn-close btn-close-end" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -464,10 +463,10 @@
                         </form>
                     </div>
                     <div class="modal-footer modal-footer-end">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
                         <button type="button" class="btn btn-entity btn-entity-trade-plan" onclick="updateTradePlan()">
                             עדכן תכנון
                         </button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
                     </div>
                 </div>
             </div>

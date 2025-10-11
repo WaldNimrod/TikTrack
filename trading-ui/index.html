@@ -200,23 +200,27 @@
                         <!-- Quick Actions Row -->
                         <div class="row g-2 mb-4">
                             <div class="col-lg-3 col-md-6">
-                                <button class="btn btn-outline-primary w-100" onclick="window.location.href='trades.html'">
-                                    <i class="fas fa-chart-line"></i> טריידים
+                                <button class="btn w-100" onclick="window.location.href='trades.html'" style="border: 2px solid var(--entity-trade-color); color: var(--entity-trade-color);">
+                                    <img src="images/icons/trades.svg" alt="" style="width: 20px; height: 20px; vertical-align: middle;">
+                                    <span class="ms-2">טריידים</span>
                                 </button>
                             </div>
                             <div class="col-lg-3 col-md-6">
-                                <button class="btn btn-outline-success w-100" onclick="window.location.href='trade_plans.html'">
-                                    <i class="fas fa-clipboard-list"></i> תכנוני טרייד
+                                <button class="btn w-100" onclick="window.location.href='trade_plans.html'" style="border: 2px solid var(--entity-trade-plan-color); color: var(--entity-trade-plan-color);">
+                                    <img src="images/icons/trade_plans.svg" alt="" style="width: 20px; height: 20px; vertical-align: middle;">
+                                    <span class="ms-2">תכנוני טרייד</span>
                                 </button>
                             </div>
                             <div class="col-lg-3 col-md-6">
-                                <button class="btn btn-outline-warning w-100" onclick="window.location.href='alerts.html'">
-                                    <i class="fas fa-bell"></i> התראות
+                                <button class="btn w-100" onclick="window.location.href='alerts.html'" style="border: 2px solid var(--entity-alert-color); color: var(--entity-alert-color);">
+                                    <img src="images/icons/alerts.svg" alt="" style="width: 20px; height: 20px; vertical-align: middle;">
+                                    <span class="ms-2">התראות</span>
                                 </button>
                             </div>
                             <div class="col-lg-3 col-md-6">
-                                <button class="btn btn-outline-info w-100" onclick="window.location.href='research.html'">
-                                    <i class="fas fa-microscope"></i> מחקר וניתוח
+                                <button class="btn w-100" onclick="window.location.href='research.html'" style="border: 2px solid var(--primary-color); color: var(--primary-color);">
+                                    <img src="images/icons/reserch.svg" alt="" style="width: 20px; height: 20px; vertical-align: middle;">
+                                    <span class="ms-2">מחקר וניתוח</span>
                                 </button>
                             </div>
                         </div>
@@ -561,8 +565,8 @@
                             <div class="col-lg-4 col-md-6">
                                 <div class="card h-100 border-0 shadow-sm">
                                     <div class="card-body text-center">
-                                        <i class="fas fa-tachometer-alt text-primary mb-3" style="font-size: 2.5rem;"></i>
-                                        <h5 class="card-title">מעקב בזמן אמת</h5>
+                                        <img src="images/icons/trades.svg" alt="טריידים" class="mb-3" style="width: 50px; height: 50px;">
+                                        <h5 class="card-title" style="color: var(--entity-trade-color);">מעקב בזמן אמת</h5>
                                         <p class="card-text text-muted">עדכונים אוטומטיים של כל הטריידים וההתראות שלך</p>
                                     </div>
                                 </div>
@@ -570,8 +574,8 @@
                             <div class="col-lg-4 col-md-6">
                                 <div class="card h-100 border-0 shadow-sm">
                                     <div class="card-body text-center">
-                                        <i class="fas fa-chart-line text-success mb-3" style="font-size: 2.5rem;"></i>
-                                        <h5 class="card-title">ניתוח מתקדם</h5>
+                                        <img src="images/icons/reserch.svg" alt="מחקר" class="mb-3" style="width: 50px; height: 50px;">
+                                        <h5 class="card-title" style="color: var(--primary-color);">ניתוח מתקדם</h5>
                                         <p class="card-text text-muted">גרפים וסטטיסטיקות מפורטות לקבלת החלטות נבונות</p>
                                     </div>
                                 </div>
@@ -579,8 +583,8 @@
                             <div class="col-lg-4 col-md-6">
                                 <div class="card h-100 border-0 shadow-sm">
                                     <div class="card-body text-center">
-                                        <i class="fas fa-bell text-warning mb-3" style="font-size: 2.5rem;"></i>
-                                        <h5 class="card-title">התראות חכמות</h5>
+                                        <img src="images/icons/alerts.svg" alt="התראות" class="mb-3" style="width: 50px; height: 50px;">
+                                        <h5 class="card-title" style="color: var(--entity-alert-color);">התראות חכמות</h5>
                                         <p class="card-text text-muted">מערכת התראות מתקדמת עם תנאים מותאמים אישית</p>
                                     </div>
                                 </div>
@@ -588,8 +592,8 @@
                             <div class="col-lg-4 col-md-6">
                                 <div class="card h-100 border-0 shadow-sm">
                                     <div class="card-body text-center">
-                                        <i class="fas fa-clipboard-check text-info mb-3" style="font-size: 2.5rem;"></i>
-                                        <h5 class="card-title">תכנוני מסחר</h5>
+                                        <img src="images/icons/trade_plans.svg" alt="תכנונים" class="mb-3" style="width: 50px; height: 50px;">
+                                        <h5 class="card-title" style="color: var(--entity-trade-plan-color);">תכנוני מסחר</h5>
                                         <p class="card-text text-muted">תכנן והגדר אסטרטגיות מסחר לפני ביצוע</p>
                                     </div>
                                 </div>
@@ -597,8 +601,8 @@
                             <div class="col-lg-4 col-md-6">
                                 <div class="card h-100 border-0 shadow-sm">
                                     <div class="card-body text-center">
-                                        <i class="fas fa-money-bill-wave text-success mb-3" style="font-size: 2.5rem;"></i>
-                                        <h5 class="card-title">ניהול תזרים</h5>
+                                        <img src="images/icons/cash_flows.svg" alt="תזרימים" class="mb-3" style="width: 50px; height: 50px;">
+                                        <h5 class="card-title" style="color: var(--entity-cash-flow-color);">ניהול תזרים</h5>
                                         <p class="card-text text-muted">מעקב מלא אחר הפקדות, משיכות ודיבידנדים</p>
                                     </div>
                                 </div>
@@ -606,8 +610,8 @@
                             <div class="col-lg-4 col-md-6">
                                 <div class="card h-100 border-0 shadow-sm">
                                     <div class="card-body text-center">
-                                        <i class="fas fa-cog text-secondary mb-3" style="font-size: 2.5rem;"></i>
-                                        <h5 class="card-title">התאמה אישית</h5>
+                                        <img src="images/icons/preferences.svg" alt="העדפות" class="mb-3" style="width: 50px; height: 50px;">
+                                        <h5 class="card-title" style="color: var(--primary-color);">התאמה אישית</h5>
                                         <p class="card-text text-muted">העדפות משתמש גמישות וממשק מותאם אישית</p>
                                     </div>
                                 </div>

@@ -2334,21 +2334,22 @@ window.clearCacheByCategory = async function(category) {
  * @param {boolean} isInitialLoad - האם זה אתחול ראשוני (לא להציג הודעות מפורטות)
  */
 window.initializeAllCacheSystems = async function(isInitialLoad = false) {
-    // Prevent double initialization using global state
+    // Simplified: Initialize UnifiedCacheManager only (single unified system)
+    // Advanced systems (CacheSyncManager, CachePolicyManager, MemoryOptimizer) were removed
     const cacheInitKey = 'cache-systems-initialization';
     
     if (window.globalInitializationState.customInitializers.has(cacheInitKey)) {
-        console.log('⏳ Cache systems already initialized, skipping...');
-        return { unifiedCacheManager: true, cacheSyncManager: true, cachePolicyManager: true, memoryOptimizer: true };
+        console.log('⏳ UnifiedCacheManager already initialized, skipping...');
+        return { unifiedCacheManager: true };
     }
     
     if (window.cacheSystemsInitializing) {
-        console.log('⏳ Cache systems already initializing, waiting...');
+        console.log('⏳ UnifiedCacheManager already initializing, waiting...');
         return new Promise((resolve) => {
             const checkInterval = setInterval(() => {
                 if (!window.cacheSystemsInitializing) {
                     clearInterval(checkInterval);
-                    resolve({ unifiedCacheManager: true, cacheSyncManager: true, cachePolicyManager: true, memoryOptimizer: true });
+                    resolve({ unifiedCacheManager: true });
                 }
             }, 100);
         });
@@ -2358,13 +2359,10 @@ window.initializeAllCacheSystems = async function(isInitialLoad = false) {
     const startTime = Date.now();
     
     try {
-        console.log('🚀 Initializing all cache systems...');
+        console.log('🚀 Initializing UnifiedCacheManager (single cache system)...');
         
         const results = {
-            unifiedCacheManager: false,
-            cacheSyncManager: false,
-            cachePolicyManager: false,
-            memoryOptimizer: false
+            unifiedCacheManager: false
         };
         
         // Initialize UnifiedCacheManager
@@ -2375,31 +2373,7 @@ window.initializeAllCacheSystems = async function(isInitialLoad = false) {
             results.unifiedCacheManager = true;
         }
         
-        // Initialize CacheSyncManager
-        if (window.CacheSyncManager && !window.CacheSyncManager.initialized) {
-            await window.CacheSyncManager.initialize();
-            results.cacheSyncManager = window.CacheSyncManager.initialized;
-        } else if (window.CacheSyncManager?.initialized) {
-            results.cacheSyncManager = true;
-        }
-        
-        // Initialize CachePolicyManager
-        if (window.CachePolicyManager && !window.CachePolicyManager.initialized) {
-            await window.CachePolicyManager.initialize();
-            results.cachePolicyManager = window.CachePolicyManager.initialized;
-        } else if (window.CachePolicyManager?.initialized) {
-            results.cachePolicyManager = true;
-        }
-        
-        // Initialize MemoryOptimizer
-        if (window.MemoryOptimizer && !window.MemoryOptimizer.initialized) {
-            await window.MemoryOptimizer.initialize();
-            results.memoryOptimizer = window.MemoryOptimizer.initialized;
-        } else if (window.MemoryOptimizer?.initialized) {
-            results.memoryOptimizer = true;
-        }
-        
-        console.log('📊 Cache systems initialization results:', results);
+        console.log('📊 Cache system initialization result:', results);
         
         const initializedCount = Object.values(results).filter(Boolean).length;
         const totalCount = Object.keys(results).length;
@@ -2408,46 +2382,30 @@ window.initializeAllCacheSystems = async function(isInitialLoad = false) {
             if (isInitialLoad) {
                 // אתחול ראשוני - הודעה רגילה בלבד
                 if (typeof window.showNotification === 'function') {
-                    window.showNotification('מערכות מטמון אותחלו בהצלחה', 'success');
+                    window.showNotification('UnifiedCacheManager אותחל בהצלחה', 'success');
                 } else {
-                    console.log('✅ אתחול מערכות מטמון הושלם בהצלחה - כל המערכות פעילות');
+                    console.log('✅ UnifiedCacheManager אותחל בהצלחה - 4 שכבות פעילות');
                 }
             } else {
-                // אתחול ידני - הודעה מפורטת עם מודל
-                if (typeof window.showFinalSuccessNotification === 'function') {
-                    window.showFinalSuccessNotification(
-                        'אתחול מערכות מטמון הושלם בהצלחה!',
-                        `כל מערכות המטמון אותחלו בהצלחה ומוכנות לשימוש.\n\nתוצאות אתחול:\n• UnifiedCacheManager: ✅ פעיל\n• CacheSyncManager: ✅ פעיל\n• CachePolicyManager: ✅ פעיל\n• MemoryOptimizer: ✅ פעיל\n\nזמן אתחול: ${new Date().toLocaleTimeString('he-IL')}\nסטטוס: כל המערכות פעילות`,
-                        {
-                            operation: 'initialize-all-cache-systems',
-                            duration: `${Date.now() - startTime}ms`,
-                            timestamp: new Date().toISOString(),
-                            systems: results,
-                            status: 'all-systems-active',
-                            healthCheck: 'כל מערכות המטמון פעילות ומוכנות',
-                            nextAction: 'המערכת מוכנה לבדיקות ופעולות מטמון'
-                        },
-                        'system'
+                // אתחול ידני - הודעה מפורטת
+                if (typeof window.showSuccessNotification === 'function') {
+                    window.showSuccessNotification(
+                        'אתחול מערכת מטמון',
+                        `UnifiedCacheManager אותחל בהצלחה!\n\n4 שכבות פעילות:\n• Memory Layer: ✅\n• localStorage Layer: ✅\n• IndexedDB Layer: ✅\n• Backend Layer: ✅\n\nזמן אתחול: ${Date.now() - startTime}ms`
                     );
                 } else {
-                    console.log('✅ אתחול מערכות מטמון הושלם בהצלחה - כל המערכות פעילות');
+                    console.log('✅ UnifiedCacheManager אותחל בהצלחה - 4 שכבות פעילות');
                 }
             }
         } else {
-            // אתחול חלקי - הודעת שגיאה מפורטת עם מודל
-            const failedSystems = Object.entries(results)
-                .filter(([_, success]) => !success)
-                .map(([system, _]) => system)
-                .join(', ');
-            
+            // Failed to initialize UnifiedCacheManager
             if (typeof window.showErrorNotification === 'function') {
                 window.showErrorNotification(
-                    'אתחול מערכות מטמון חלקי - חלק מהמערכות לא אותחלו',
-                    `אתחול מערכות המטמון הושלם חלקית.\n\nפרטי האתחול:\n• מערכות אותחלו: ${initializedCount}/${totalCount}\n• מערכות פעילות: ${Object.entries(results).filter(([_, success]) => success).map(([system, _]) => system).join(', ')}\n• מערכות שנכשלו: ${failedSystems}\n• זמן אתחול: ${new Date().toLocaleTimeString('he-IL')}\n\nבדיקת בריאות מערכות:\n• UnifiedCacheManager: ${results.unifiedCacheManager ? '✅ פעיל' : '❌ לא פעיל'}\n• CacheSyncManager: ${results.cacheSyncManager ? '✅ פעיל' : '❌ לא פעיל'}\n• CachePolicyManager: ${results.cachePolicyManager ? '✅ פעיל' : '❌ לא פעיל'}\n• MemoryOptimizer: ${results.memoryOptimizer ? '✅ פעיל' : '❌ לא פעיל'}\n\nהוראות:\n• המערכת תמשיך לעבוד במצב מוגבל\n• חלק מהתכונות המתקדמות לא יהיו זמינות\n• ניתן לנסות אתחול חוזר של המערכות`,
-                    20000
+                    'שגיאה באתחול מערכת המטמון',
+                    'UnifiedCacheManager לא אותחל בהצלחה. העמוד עשוי שלא לעבוד כראוי.'
                 );
             } else {
-                console.error('⚠️ אתחול מערכות מטמון חלקי - חלק מהמערכות לא אותחלו');
+                console.error('❌ UnifiedCacheManager failed to initialize');
             }
         }
         

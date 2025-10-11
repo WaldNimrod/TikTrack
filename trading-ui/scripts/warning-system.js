@@ -136,17 +136,23 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
         </div>
     `;
 
-  // הסרת מודל קיים אם יש
-  const existingModal = document.getElementById(modalId);
-  if (existingModal) {
-    existingModal.remove();
+  // Use the unified helper function if available, otherwise fallback to manual
+  let bootstrapModal;
+  let modal;
+  
+  if (typeof window.createAndShowModal === 'function') {
+    // Use the unified helper to avoid ARIA warnings
+    bootstrapModal = window.createAndShowModal(modalHTML, modalId);
+    modal = document.getElementById(modalId);
+  } else {
+    // Fallback: manual creation
+    const existingModal = document.getElementById(modalId);
+    if (existingModal) {
+      existingModal.remove();
+    }
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    modal = document.getElementById(modalId);
   }
-
-  // הוספת המודל לדף
-  document.body.insertAdjacentHTML('beforeend', modalHTML);
-
-  // קבלת המודל החדש
-  const modal = document.getElementById(modalId);
 
   // הגדרת אירועי כפתורים
   const confirmBtn = modal.querySelector('.confirm-btn');
@@ -213,8 +219,11 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
   // הצגת המודל
   // מציג את המודל עם bootstrap
   try {
-    const bootstrapModal = new bootstrap.Modal(modal);
-    bootstrapModal.show();
+    // If we already used createAndShowModal, modal is already shown
+    if (!bootstrapModal) {
+      bootstrapModal = new bootstrap.Modal(modal);
+      bootstrapModal.show();
+    }
     // המודל הוצג בהצלחה
   } catch (error) {
     // fallback ל-confirm רגיל

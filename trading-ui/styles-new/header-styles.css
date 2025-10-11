@@ -71,8 +71,8 @@
     margin-top: 0;
     /* אנימציה עדינה לפתיחה/סגירה */
     max-height: 1000px; /* גובה מקסימלי לאנימציה */
-    overflow: hidden;
-    transition: max-height 0.4s ease-in-out, opacity 0.3s ease-in-out, padding 0.3s ease-in-out;
+    overflow: visible; /* כפתור toggle צריך לבלוט */
+    transition: max-height 0.6s ease-in-out, opacity 0.5s ease-in-out, padding 0.5s ease-in-out;
     opacity: 1;
 }
 
@@ -81,6 +81,7 @@
     opacity: 0;
     padding-top: 0;
     padding-bottom: 0;
+    overflow: hidden; /* מוסתר רק כשסגור */
 }
 
 #unified-header .header-top {

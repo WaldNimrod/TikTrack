@@ -778,7 +778,6 @@
 /* CRITICAL: Header Content Container */
 .header-content {
     position: relative;
-    max-width: 1400px;
     margin: 0 auto;
     z-index: 960;
 }

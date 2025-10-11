@@ -20,7 +20,10 @@ window.runComprehensiveCacheClearingTest = async function() {
     console.log('🧪 COMPREHENSIVE CACHE CLEARING TEST SUITE');
     console.log('='.repeat(80));
     
+    const startTime = Date.now();
+    
     const overallResults = {
+        startTime: startTime,
         light: null,
         medium: null,
         full: null,
@@ -51,12 +54,14 @@ window.runComprehensiveCacheClearingTest = async function() {
         console.log('='.repeat(80));
         console.table(overallResults);
         
-        const passedCount = Object.values(overallResults).filter(r => r.passed === true).length;
-        const testedCount = Object.values(overallResults).filter(r => r.tested === true).length;
+        const duration = Date.now() - startTime;
+        const passedCount = Object.values(overallResults).filter(r => r && typeof r === 'object' && r.passed === true).length;
+        const testedCount = Object.values(overallResults).filter(r => r && typeof r === 'object' && r.tested === true).length;
         const failedCount = testedCount - passedCount;
         
         console.log(`\n✅ Tests Passed: ${passedCount}/${testedCount}`);
         console.log(`📊 Success Rate: ${(passedCount/testedCount*100).toFixed(1)}%`);
+        console.log(`⏱️ Total Duration: ${duration}ms`);
         
         // Build detailed message
         let detailedMessage = `סה"כ נבדקו: ${testedCount} רמות\n`;

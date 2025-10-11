@@ -14,6 +14,38 @@ console.log('🔧 test-header-only.js v4.0.0 loaded successfully!');
 let tradePlansData = [];
 let executionsData = [];
 
+// ===== TRANSLATION HELPERS =====
+
+/**
+ * Translate Investment Type
+ */
+function translateType(type) {
+    if (!type) return '';
+    const translations = {
+        'swing': 'סווינג',
+        'investment': 'השקעה',
+        'passive': 'פסיבי'
+    };
+    return translations[type.toLowerCase()] || type;
+}
+
+/**
+ * Translate Status
+ */
+function translateStatus(status) {
+    if (!status) return '';
+    const translations = {
+        'open': 'פתוח',
+        'closed': 'סגור',
+        'cancelled': 'מבוטל',
+        'pending': 'ממתין',
+        'active': 'פעיל'
+    };
+    const translated = translations[status.toLowerCase()] || status;
+    const cssClass = `status-${status.toLowerCase()}`;
+    return `<span class="status-badge ${cssClass}">${translated}</span>`;
+}
+
 // ===== GLOBAL INITIALIZATION FUNCTION =====
 
 /**
@@ -164,7 +196,6 @@ function renderTradePlansTable(data) {
         // Get display values
         const tickerDisplay = plan.ticker_symbol || plan.ticker?.symbol || 'לא מוגדר';
         const dateDisplay = plan.plan_date || plan.created_at || '';
-        const typeDisplay = plan.investment_type || '';
         const sideDisplay = plan.planned_side || plan.side || '';
         const quantityDisplay = plan.planned_quantity || plan.shares || '';
         const priceDisplay = plan.planned_price || plan.planned_amount || 0;
@@ -175,10 +206,15 @@ function renderTradePlansTable(data) {
         const typeForFilter = plan.investment_type || '';
         const statusForFilter = plan.status || '';
         
-        // Render status badge
+        // Render type badge with translation
+        const typeBadge = window.FieldRendererService ? 
+            window.FieldRendererService.renderType(plan.investment_type) : 
+            translateType(plan.investment_type);
+        
+        // Render status badge with translation
         const statusBadge = window.FieldRendererService ? 
             window.FieldRendererService.renderStatus(plan.status) : 
-            `<span class="status-badge status-${plan.status}">${plan.status}</span>`;
+            translateStatus(plan.status);
         
         // Render numeric values
         const priceRendered = window.FieldRendererService ?
@@ -197,7 +233,7 @@ function renderTradePlansTable(data) {
             <tr>
                 <td>${tickerDisplay}</td>
                 <td data-date="${dateDisplay}">${dateDisplay}</td>
-                <td class="type-cell" data-type="${typeForFilter}">${typeDisplay}</td>
+                <td class="type-cell" data-type="${typeForFilter}">${typeBadge}</td>
                 <td>${sideDisplay}</td>
                 <td>${quantityDisplay}</td>
                 <td>${priceRendered}</td>

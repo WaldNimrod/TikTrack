@@ -69,6 +69,18 @@
     min-height: 60px;
     display: block; /* פתוח כברירת מחדל */
     margin-top: 0;
+    /* אנימציה עדינה לפתיחה/סגירה */
+    max-height: 1000px; /* גובה מקסימלי לאנימציה */
+    overflow: hidden;
+    transition: max-height 0.4s ease-in-out, opacity 0.3s ease-in-out, padding 0.3s ease-in-out;
+    opacity: 1;
+}
+
+.header-filters[style*="display: none"] {
+    max-height: 0;
+    opacity: 0;
+    padding-top: 0;
+    padding-bottom: 0;
 }
 
 #unified-header .header-top {

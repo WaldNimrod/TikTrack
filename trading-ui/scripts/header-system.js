@@ -96,6 +96,18 @@ class HeaderSystem {
   static getHeaderHTML() {
     return `
         <div class="header-content">
+          ${this.getHeaderTopHTML()}
+          ${this.getHeaderFiltersHTML()}
+        </div>
+    `;
+  }
+
+  /**
+   * Generate Header Top HTML - Navigation and Logo
+   * Contains: Main menu, logo, main toggle button
+   */
+  static getHeaderTopHTML() {
+    return `
           <!-- אזור לוגו ותפריט -->
           <div class="header-top">
             <div class="header-container">
@@ -212,7 +224,15 @@ class HeaderSystem {
 
             </div>
           </div>
+    `;
+  }
 
+  /**
+   * Generate Header Filters HTML - All filter controls
+   * Contains: Status, Type, Account, Date, Search filters + Action buttons
+   */
+  static getHeaderFiltersHTML() {
+    return `
         <!-- אזור פילטרים -->
         <div class="header-filters" id="headerFilters" data-section="filters">
           <div class="filters-container">
@@ -355,8 +375,6 @@ class HeaderSystem {
               </button>
             </div>
           </div>
-        </div>
-        
         </div>
     `;
   }

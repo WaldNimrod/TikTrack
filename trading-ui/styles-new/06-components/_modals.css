@@ -5,9 +5,9 @@
  * קובץ זה מכיל את הסגנונות של כל המודלים במערכת
  * מבוסס על הסגנונות הקיימים ב-apple-theme.css
  * 
- * @version 1.2.0
+ * @version 1.2.1
  * @lastUpdated January 11, 2025
- * @changes Entity modals with colored headers, unified button styles
+ * @changes Entity modals with colored headers, unified buttons, dark close button
  */
 
 /* מודל בסיסי - מבוסס על apple-theme.css */
@@ -358,15 +358,16 @@
 .entity-header .btn-close-end {
   margin-inline-start: auto; /* דוחף לסוף השורה - שמאל בעברית */
   margin-inline-end: 0;
-  filter: brightness(0) invert(1); /* הופך לצבע לבן */
-  opacity: 1;
-  background-color: transparent;
+  background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23004085'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat;
   border: none;
+  width: 1em;
+  height: 1em;
+  opacity: 1;
 }
 
 .entity-header .btn-close-end:hover {
-  opacity: 0.8;
-  background-color: rgba(255, 255, 255, 0.1);
+  opacity: 0.7;
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 /* Modal footer עם יישור לסוף השורה */

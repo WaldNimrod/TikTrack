@@ -366,28 +366,34 @@ async function openEditTradePlanModal(tradePlanId) {
   window.DataCollectionService.setFormData({
     id: { id: 'editTradePlanId', type: 'int' },
     ticker_id: { id: 'editTradePlanTickerId', type: 'int' },
+    trading_account_id: { id: 'editTradePlanTradingAccount', type: 'int' },
     investment_type: { id: 'editTradePlanInvestmentType', type: 'text' },
     side: { id: 'editTradePlanSide', type: 'text' },
     status: { id: 'editTradePlanStatus', type: 'text' },
     planned_amount: { id: 'editTradePlanPlannedAmount', type: 'number' },
     shares: { id: 'editTradePlanShares', type: 'number' },
+    current_price: { id: 'editTradePlanCurrentPrice', type: 'number' },
     stop_price: { id: 'editTradePlanStopPrice', type: 'number' },
     target_price: { id: 'editTradePlanTargetPrice', type: 'number' },
     entry_conditions: { id: 'editTradePlanEntryConditions', type: 'text' },
     reasons: { id: 'editTradePlanReasons', type: 'text' },
+    notes: { id: 'editTradePlanNotes', type: 'text' },
     created_at: { id: 'editTradePlanDate', type: 'text' }
   }, {
     id: tradePlan.id,
     ticker_id: tradePlan.ticker_id,
+    trading_account_id: tradePlan.trading_account_id,
     investment_type: tradePlan.investment_type,
     side: tradePlan.side,
     status: tradePlan.status,
     planned_amount: tradePlan.planned_amount,
     shares: tradePlan.shares || '',
+    current_price: tradePlan.current_price || '',
     stop_price: tradePlan.stop_price || '',
     target_price: tradePlan.target_price || '',
     entry_conditions: tradePlan.entry_conditions || '',
     reasons: tradePlan.reasons || '',
+    notes: tradePlan.notes || '',
     created_at: dateStr
   });
 
@@ -405,13 +411,20 @@ async function openEditTradePlanModal(tradePlanId) {
 }
 
 /**
- * טעינת רשימת הטיקרים בחלון העריכה
+ * טעינת רשימת הטיקרים והחשבונות בחלון העריכה
  */
 async function loadTickersForEditModal() {
+    // טעינת טיקרים
     await window.SelectPopulatorService.populateTickersSelect('editTradePlanTickerId', {
         includeEmpty: true,
         emptyText: 'בחר טיקר',
-        filterActive: true // רק open או closed (לא cancelled)
+        filterFn: (ticker) => ticker.status !== 'cancelled' // רק פעילים
+    });
+    
+    // טעינת חשבונות
+    await window.SelectPopulatorService.populateAccountsSelect('editTradePlanTradingAccount', {
+        includeEmpty: false,
+        filterFn: (account) => account.status === 'open' // רק פעילים
     });
 }
 
@@ -664,19 +677,24 @@ function updateEditAmountFromShares() {
  */
 async function saveEditTradePlan() {
   try {
-    // איסוף נתונים מהטופס
-    const formData = {
-      id: document.getElementById('editTradePlanId').value,
-      ticker_id: document.getElementById('editTradePlanTickerId').value,
-      investment_type: document.getElementById('editTradePlanInvestmentType').value,
-      side: document.getElementById('editTradePlanSide').value,
-      status: document.getElementById('editTradePlanStatus').value,
-      planned_amount: parseFloat(document.getElementById('editTradePlanPlannedAmount').value),
-      stop_price: parseFloat(document.getElementById('editTradePlanStopPrice').value) || null,
-      target_price: parseFloat(document.getElementById('editTradePlanTargetPrice').value) || null,
-      entry_conditions: document.getElementById('editTradePlanEntryConditions').value,
-      reasons: document.getElementById('editTradePlanReasons').value,
-    };
+    // איסוף נתונים מהטופס באמצעות DataCollectionService
+    const formData = window.DataCollectionService.collectFormData({
+      id: { id: 'editTradePlanId', type: 'int' },
+      ticker_id: { id: 'editTradePlanTickerId', type: 'int' },
+      trading_account_id: { id: 'editTradePlanTradingAccount', type: 'int' },
+      investment_type: { id: 'editTradePlanInvestmentType', type: 'text' },
+      side: { id: 'editTradePlanSide', type: 'text' },
+      status: { id: 'editTradePlanStatus', type: 'text' },
+      planned_amount: { id: 'editTradePlanPlannedAmount', type: 'number' },
+      shares: { id: 'editTradePlanShares', type: 'number', default: null },
+      current_price: { id: 'editTradePlanCurrentPrice', type: 'number', default: null },
+      stop_price: { id: 'editTradePlanStopPrice', type: 'number', default: null },
+      target_price: { id: 'editTradePlanTargetPrice', type: 'number', default: null },
+      entry_conditions: { id: 'editTradePlanEntryConditions', type: 'text', default: null },
+      reasons: { id: 'editTradePlanReasons', type: 'text', default: null },
+      notes: { id: 'editTradePlanNotes', type: 'text', default: null },
+      date: { id: 'editTradePlanDate', type: 'date', default: null }
+    });
 
     // בדיקה אם הסטטוס משתנה ל-'cancelled'
     const originalTradePlan = window.tradePlansData.find(tp => tp.id === formData.id);

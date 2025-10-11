@@ -54,29 +54,30 @@
     <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=20250111">
     <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=20250111">
     
-    <!-- Button Icons System -->
-    <script src="scripts/button-icons.js"></script>
+    <!-- ===== STATIC LOADING SYSTEM - Template 3: Development Pages ===== -->
     
-    <!-- Filter System Script -->
-    <!-- New Header System Script -->
-    <script src="scripts/header-system.js?v=v6.0.0"></script>
+    <!-- Stage 1: Core Modules (8) - ALWAYS REQUIRED -->
+    <script src="scripts/modules/core-systems.js?v=20251011"></script>
+    <script src="scripts/modules/ui-basic.js?v=20251011"></script>
+    <script src="scripts/modules/data-basic.js?v=20251011"></script>
+    <script src="scripts/modules/ui-advanced.js?v=20251011"></script>
+    <script src="scripts/modules/data-advanced.js?v=20251011"></script>
+    <script src="scripts/modules/business-module.js?v=20251011"></script>
+    <script src="scripts/modules/communication-module.js?v=20251011"></script>
+    <script src="scripts/modules/cache-module.js?v=20251011"></script>
+    
+    <!-- Stage 2: Core Utilities (3) - ALWAYS REQUIRED -->
+    <script src="scripts/global-favicon.js?v=20251011"></script>
+    <script src="scripts/page-utils.js?v=20251011"></script>
+    <script src="scripts/header-system.js?v=v6.0.1"></script>
     
     <!-- New Header Styles - נטען אחרון כדי לדרוס את כל השאר -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.1">
     <!-- Page Headers - Development pages with white background -->
-    <link rel="stylesheet" href="styles-new/06-components/_page-headers.css?v=20250111">    
-    <!-- Dynamic Color System Scripts -->
-    <script src="scripts/color-scheme-system.js"></script>
+    <link rel="stylesheet" href="styles-new/06-components/_page-headers.css?v=20250111">
     
-    <!-- Preferences System Scripts -->
-    <script src="scripts/preferences.js"></script>
-    
-    <!-- Color Demo Toggle Script -->
-    <script src="scripts/color-demo-toggle.js"></script>
-    <script src="scripts/notification-system.js"></script>
-    
-    <!-- Test Header Only Script -->
-    <script src="scripts/test-header-only.js?v=3.1.0"></script>
+    <!-- Stage 5: Page-Specific Script -->
+    <script src="scripts/test-header-only.js?v=3.2.0"></script>
     
 </head>
 
@@ -567,23 +568,7 @@
     </div>
     <!-- ===== END BACKGROUND WRAPPER ===== -->
 
-    <!-- Core System Scripts -->
-    <script src="scripts/console-cleanup.js"></script>
-    <script src="scripts/translation-utils.js"></script>
-    <script src="scripts/data-utils.js"></script>
-    <script src="scripts/ui-utils.js?v=1.2.0"></script>
-    <script src="scripts/table-mappings.js"></script>
-    <script src="scripts/date-utils.js"></script>
-    <script src="scripts/tables.js"></script>
-    <script src="scripts/linked-items.js"></script>
-    <script src="scripts/page-utils.js"></script>
-    
-    <!-- Unified Initialization System -->
-    <script src="scripts/page-initialization-configs.js"></script>
-    <script src="scripts/unified-app-initializer.js"></script>
-    
-    <!-- Page-specific script -->
-    <script src="scripts/test-header-only.js?v=3.1.0"></script>
+    <!-- All core systems and utilities already loaded via modules (Stage 1-2) -->
     
     <!-- Table Responsive CSS -->
     <style>
@@ -605,19 +590,6 @@
         }
     </style>
 
-    <!-- Initialize Debug System -->
-    <script>
-        // Initialize debug system from header system
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.initializeDebugSystem) {
-                window.initializeDebugSystem();
-            }
-        });
-    </script>
-    <!-- Local copyDetailedLog function for test-header-only page -->
-    <script>
-        // Make the local copyDetailedLog function available globally for this page only
-        window.copyDetailedLog = copyDetailedLog;
-    </script>
+    <!-- Initialization handled by unified system via PAGE_CONFIGS -->
 </body>
 </html>

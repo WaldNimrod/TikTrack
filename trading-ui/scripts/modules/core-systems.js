@@ -1824,7 +1824,7 @@ window.createAndShowModal = function(modalHtml, modalId, options = {}) {
     });
   });
   
-  // Start observing before showing modal
+  // Start observing (will cover both show AND hide transitions)
   observer.observe(modalElement, { attributes: true, attributeFilter: ['aria-hidden', 'inert'] });
   
   // Initialize Bootstrap modal
@@ -1833,8 +1833,9 @@ window.createAndShowModal = function(modalHtml, modalId, options = {}) {
   // Show modal
   modal.show();
   
-  // Stop observing after modal is fully shown
-  modalElement.addEventListener('shown.bs.modal', () => {
+  // Stop observing only after modal is fully hidden (not after shown!)
+  // This ensures we catch aria-hidden during close transition too
+  modalElement.addEventListener('hidden.bs.modal', () => {
     observer.disconnect();
   }, { once: true });
   
@@ -3975,6 +3976,27 @@ const PAGE_CONFIGS = {
                         console.error('❌ Failed to initialize cache systems:', error);
                     }
                 }
+            }
+        ]
+    },
+    
+    'test-header-only': {
+        name: 'Test Header Only',
+        requiresFilters: true,
+        requiresValidation: false,
+        requiresTables: true,
+        customInitializers: [
+            async (pageConfig) => {
+                console.log('🧪 Initializing Test Header Only...');
+                
+                // Initialize test page
+                if (typeof window.initializeTestHeaderPage === 'function') {
+                    await window.initializeTestHeaderPage();
+                } else {
+                    console.warn('⚠️ initializeTestHeaderPage not available');
+                }
+                
+                console.log('✅ Test Header Only initialized');
             }
         ]
     }

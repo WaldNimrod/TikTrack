@@ -2,77 +2,56 @@
  * Test Header Only Page - JavaScript Functions
  * פונקציות JavaScript ספציפיות לעמוד בדיקת ראש הדף החדש
  * 
- * @version 6.0.0
- * @lastUpdated January 15, 2025
+ * @version 3.2.0
+ * @lastUpdated October 11, 2025
  * @author TikTrack Development Team
  */
 
-console.log('🔧 test-header-only.js v6.0.0 loaded successfully!');
+console.log('🔧 test-header-only.js v3.2.0 loaded successfully!');
 
-// ===== UTILITY FUNCTIONS =====
-
-/**
- * Log function for compatibility
- */
-function log(message) {
-    console.log(`[Test] ${message}`);
-}
-
-// ===== NEW HEADER SYSTEM TESTING FUNCTIONS =====
-
-// Global variables for testing
-let headerSystem = null;
-let testResults = {
-    unitTests: {},
-    integrationTests: {},
-    performanceTests: {},
-    systemStats: {}
-};
-
-// Initialize testing system
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('🧪 Initializing Header System Testing...');
-    initializeTestingSystem();
-});
+// ===== GLOBAL INITIALIZATION FUNCTION =====
 
 /**
- * Initialize Testing System
+ * Initialize Test Header Page
+ * Called by unified initialization system
  */
-async function initializeTestingSystem() {
+window.initializeTestHeaderPage = async function() {
+    console.log('🧪 Test Header Page initialization starting...');
+    
     try {
-        console.log('🚀 Starting Header System Testing...');
-        
-        // Wait for HeaderSystem to be available
+        // Wait for filter system to be ready
         let attempts = 0;
-        while (!window.HeaderSystem && attempts < 50) {
+        while (!window.filterSystem && attempts < 50) {
             await new Promise(resolve => setTimeout(resolve, 100));
             attempts++;
         }
         
-        if (window.HeaderSystem) {
-            headerSystem = new HeaderSystem();
-            await headerSystem.init();
-            console.log('✅ Header System initialized successfully');
-            
-            // Wait a bit for the filter system to be ready
-            setTimeout(() => {
-                console.log('🔧 Filter system should be ready now, registering tables...');
-                // Register tables with filter system
-                registerTablesWithFilterSystem();
-                
-                // Run initial tests
-                runInitialTests();
-            }, 100);
+        if (window.filterSystem) {
+            console.log('✅ Filter system ready, registering tables...');
+            registerTablesWithFilterSystem();
         } else {
-            console.error('❌ HeaderSystem not available');
-            updateAllStatuses('לא זמין', false);
+            console.error('❌ Filter system not available after waiting');
         }
         
+        // Run initial tests
+        runInitialTests();
+        
+        // Load action buttons if available
+        setTimeout(() => {
+            if (typeof window.loadTableActionButtons === 'function') {
+                console.log('🔧 Loading action buttons...');
+                window.loadTableActionButtons();
+            }
+        }, 500);
+        
+        console.log('✅ Test Header Page initialized successfully');
+        
     } catch (error) {
-        console.error('❌ Error initializing testing system:', error);
-        updateAllStatuses('שגיאה', false);
+        console.error('❌ Error initializing test header page:', error);
     }
-}
+};
+
+// ===== TABLE REGISTRATION =====
 
 /**
  * Register Tables with Filter System
@@ -81,836 +60,312 @@ function registerTablesWithFilterSystem() {
     try {
         console.log('🔧 Registering tables with filter system...');
         
-        // Wait for filter system to be available
-        if (window.filterSystem && typeof window.filterSystem.registerTable === 'function') {
-            
-            // Register tickers table
-            const tickersConfig = {
-                fields: ['symbol', 'status', 'has_trades', 'current_price', 'change_percent', 'investment_type', 'name', 'remarks', 'date'],
-                renderFunction: null
-            };
-            console.log('🔧 Registering tickersTable with config:', tickersConfig);
-            window.filterSystem.registerTable('tickersTable', tickersConfig);
-            console.log('✅ Tickers table registered with filter system');
-            
-            // Register trade plans table
-            const tradePlansConfig = {
-                fields: ['symbol', 'date', 'investment_type', 'side', 'amount', 'target', 'stop', 'current', 'status', 'account'],
-                renderFunction: null
-            };
-            console.log('🔧 Registering tradePlansTable with config:', tradePlansConfig);
-            window.filterSystem.registerTable('tradePlansTable', tradePlansConfig);
-            console.log('✅ Trade plans table registered with filter system');
-            
-            console.log('✅ All tables registered successfully');
-        } else {
-            console.warn('⚠️ Filter system not available for table registration');
+        if (!window.filterSystem || typeof window.filterSystem.registerTable !== 'function') {
+            console.error('❌ Filter system not available for table registration');
+            return;
+        }
+        
+        // Register tickers table
+        const tickersConfig = {
+            tableId: 'tickersTable',
+            fields: {
+                symbol: 'symbol',
+                status: 'status',
+                has_trades: 'has_trades',
+                current_price: 'current_price',
+                change_percent: 'change_percent',
+                investment_type: 'investment_type',
+                name: 'name',
+                remarks: 'remarks',
+                date: 'date'
+            }
+        };
+        
+        console.log('🔧 Registering tickersTable with config:', tickersConfig);
+        window.filterSystem.registerTable('tickersTable', tickersConfig);
+        console.log('✅ Tickers table registered with filter system');
+        
+        // Register trade plans table
+        const tradePlansConfig = {
+            tableId: 'tradePlansTable',
+            fields: {
+                symbol: 'ticker',
+                date: 'date',
+                investment_type: 'investment_type',
+                side: 'side',
+                amount: 'amount',
+                target: 'target',
+                stop: 'stop',
+                current: 'current',
+                status: 'status',
+                account: 'account'
+            }
+        };
+        
+        console.log('🔧 Registering tradePlansTable with config:', tradePlansConfig);
+        window.filterSystem.registerTable('tradePlansTable', tradePlansConfig);
+        console.log('✅ Trade plans table registered with filter system');
+        
+        // Apply initial filters if any
+        if (window.filterSystem.currentFilters) {
+            console.log('🔧 Applying initial filters...');
+            window.filterSystem.applyAllFilters();
         }
         
     } catch (error) {
-        console.error('❌ Error registering tables with filter system:', error);
+        console.error('❌ Error registering tables:', error);
     }
-}
-
-/**
- * Run Initial Tests
- */
-async function runInitialTests() {
-    try {
-        console.log('🧪 Running initial tests...');
-        
-        // Test components
-        await testComponents();
-        
-        // Test services
-        await testServices();
-        
-        // Test integration
-        await testIntegration();
-        
-        // Update system stats
-        updateSystemStats();
-        
-        // Update performance metrics
-        updatePerformanceMetrics();
-        
-        console.log('✅ Initial tests completed');
-        
-    } catch (error) {
-        console.error('❌ Error running initial tests:', error);
-    }
-}
-
-/**
- * Test Components
- */
-async function testComponents() {
-    try {
-        const components = [
-            'state', 'ui', 'translation', 'preferences', 
-            'menu', 'filter', 'navigation', 'header'
-        ];
-        
-        for (const componentName of components) {
-            // המערכת החדשה כוללת את כל הרכיבים
-            const status = '✅ פעיל';
-            const isSuccess = true;
-            
-            updateStatus(`${componentName}ComponentStatus`, status, isSuccess);
-            testResults.unitTests[componentName] = { status, isSuccess };
-        }
-        
-    } catch (error) {
-        console.error('❌ Error testing components:', error);
-    }
-}
-
-/**
- * Test Services
- */
-async function testServices() {
-    try {
-        const services = ['event', 'state', 'ui'];
-        
-        for (const serviceName of services) {
-            // המערכת החדשה כוללת את כל השירותים
-            const status = '✅ פעיל';
-            const isSuccess = true;
-            
-            updateStatus(`${serviceName}ServiceStatus`, status, isSuccess);
-            testResults.unitTests[serviceName] = { status, isSuccess };
-        }
-        
-    } catch (error) {
-        console.error('❌ Error testing services:', error);
-    }
-}
-
-/**
- * Test Integration
- */
-async function testIntegration() {
-    try {
-        // Test components integration
-        const componentsWorking = Object.values(testResults.unitTests)
-            .filter(test => test.isSuccess).length >= 8;
-        
-        updateStatus('componentsIntegrationStatus', 
-            componentsWorking ? '✅ עובד' : '❌ לא עובד', componentsWorking);
-        
-        // Test services integration
-        const servicesWorking = Object.values(testResults.unitTests)
-            .filter(test => test.isSuccess).length >= 3;
-        
-        updateStatus('servicesIntegrationStatus', 
-            servicesWorking ? '✅ עובד' : '❌ לא עובד', servicesWorking);
-        
-        // Test full integration
-        const fullIntegrationWorking = componentsWorking && servicesWorking;
-        updateStatus('fullIntegrationStatus', 
-            fullIntegrationWorking ? '✅ עובד' : '❌ לא עובד', fullIntegrationWorking);
-        
-        testResults.integrationTests = {
-            components: componentsWorking,
-            services: servicesWorking,
-            full: fullIntegrationWorking
-        };
-        
-    } catch (error) {
-        console.error('❌ Error testing integration:', error);
-    }
-}
-
-/**
- * Update System Stats
- */
-function updateSystemStats() {
-    try {
-        // HeaderSystem doesn't have getInfo() method, using static info instead
-        updateStatus('componentsCount', '1'); // HeaderSystem
-        updateStatus('servicesCount', '1'); // FilterSystem
-        updateStatus('utilsCount', '0'); // No separate utils
-        updateStatus('constantsCount', '0'); // No separate constants
-        updateStatus('totalLinesCount', '10,293+');
-        
-        testResults.systemStats = {
-            components: 1,
-            services: 1,
-            utils: 0,
-            constants: 0,
-            totalLines: 10293
-        };
-        
-    } catch (error) {
-        console.error('❌ Error updating system stats:', error);
-        // Fallback values
-        updateStatus('componentsCount', '8');
-        updateStatus('servicesCount', '3');
-        updateStatus('utilsCount', '3');
-        updateStatus('constantsCount', '3');
-        updateStatus('totalLinesCount', '10,293+');
-    }
-}
-
-/**
- * Update Performance Metrics
- */
-function updatePerformanceMetrics() {
-    try {
-        const loadTime = performance.now();
-        const memoryUsage = performance.memory ? 
-            Math.round(performance.memory.usedJSHeapSize / 1024 / 1024) + ' MB' : 'לא זמין';
-        
-        updateStatus('loadTime', Math.round(loadTime) + ' ms');
-        updateStatus('memoryUsage', memoryUsage);
-        updateStatus('eventsCount', '50+');
-        updateStatus('initializationStatus', headerSystem.isInitialized ? '✅ הושלם' : '❌ לא הושלם');
-        
-        testResults.performanceTests = {
-            loadTime: Math.round(loadTime),
-            memoryUsage: memoryUsage,
-            eventsCount: 50,
-            initialized: headerSystem.isInitialized
-        };
-        
-    } catch (error) {
-        console.error('❌ Error updating performance metrics:', error);
-    }
-}
-
-/**
- * Update Status Helper
- */
-function updateStatus(elementId, status, isSuccess = true) {
-    const element = document.getElementById(elementId);
-    if (element) {
-        element.textContent = status;
-        element.style.color = isSuccess ? 'green' : 'red';
-        element.style.fontWeight = 'bold';
-    }
-}
-
-/**
- * Update All Statuses
- */
-function updateAllStatuses(status, isSuccess = true) {
-    const statusElements = [
-        'stateComponentStatus', 'uiComponentStatus', 'translationComponentStatus', 
-        'preferencesComponentStatus', 'menuComponentStatus', 'filterComponentStatus',
-        'navigationComponentStatus', 'headerComponentStatus',
-        'eventServiceStatus', 'stateServiceStatus', 'uiServiceStatus',
-        'componentsIntegrationStatus', 'servicesIntegrationStatus', 'fullIntegrationStatus'
-    ];
-    
-    statusElements.forEach(elementId => {
-        updateStatus(elementId, status, isSuccess);
-    });
-}
-
-/**
- * Test Functions for Buttons
- */
-function runUnitTests() {
-    console.log('🧪 Running Unit Tests...');
-    testComponents();
-    testServices();
-}
-
-function runIntegrationTests() {
-    console.log('🔗 Running Integration Tests...');
-    testIntegration();
-}
-
-function runPerformanceTests() {
-    console.log('⚡ Running Performance Tests...');
-    updatePerformanceMetrics();
-}
-
-function runAllTests() {
-    console.log('🚀 Running All Tests...');
-    runInitialTests();
-}
-
-function resetSystem() {
-    console.log('🔄 Resetting System...');
-    if (headerSystem) {
-        // Reset system state
-        headerSystem.state.reset();
-        console.log('✅ System reset completed');
-    }
-}
-
-/**
- * פונקציית debug למצב פילטרים
- */
-// updateDebugInfo function moved to header-system.js
-
-/**
- * פונקציה לעדכון מצב פילטרים נוכחי
- */
-function updateCurrentFilterStatus() {
-    // פילטר סטטוס
-    const statusText = document.getElementById('selectedStatus');
-    const currentStatusFilter = document.getElementById('currentStatusFilter');
-    if (statusText && currentStatusFilter) {
-        currentStatusFilter.textContent = statusText.textContent;
-    }
-
-    // פילטר טיפוס
-    const typeText = document.getElementById('selectedType');
-    const currentTypeFilter = document.getElementById('currentTypeFilter');
-    if (typeText && currentTypeFilter) {
-        currentTypeFilter.textContent = typeText.textContent;
-    }
-
-    // פילטר חשבון
-    const accountText = document.getElementById('selectedAccount');
-    const currentAccountFilter = document.getElementById('currentAccountFilter');
-    if (accountText && currentAccountFilter) {
-        currentAccountFilter.textContent = accountText.textContent;
-    }
-
-    // פילטר תאריכים
-    const dateRangeText = document.getElementById('selectedDateRange');
-    const currentDateRangeFilter = document.getElementById('currentDateRangeFilter');
-    if (dateRangeText && currentDateRangeFilter) {
-        currentDateRangeFilter.textContent = dateRangeText.textContent;
-    }
-
-    // פילטר חיפוש
-    const searchInput = document.getElementById('searchFilterInput');
-    const currentSearchFilter = document.getElementById('currentSearchFilter');
-    if (searchInput && currentSearchFilter) {
-        currentSearchFilter.textContent = searchInput.value || 'אין חיפוש';
-    }
-}
-
-/**
- * פונקציה לעדכון מידע טווח תאריכים
- */
-function updateDateRangeInfo() {
-    const startElement = document.getElementById('dateRangeStart');
-    const endElement = document.getElementById('dateRangeEnd');
-    const descriptionElement = document.getElementById('dateRangeDescription');
-
-    if (startElement && endElement && descriptionElement) {
-        // כאן תוכל להוסיף לוגיקה לעדכון טווח התאריכים
-        startElement.textContent = 'לא נבחר';
-        endElement.textContent = 'לא נבחר';
-        descriptionElement.textContent = 'לא נבחר';
-    }
-}
-
-/**
- * פונקציה לעדכון סטטיסטיקות טבלאות
- */
-function updateTableStats() {
-    // סטטיסטיקות טבלת ביצועים
-    const performanceTable = document.getElementById('performanceTable');
-    if (performanceTable) {
-        const rows = performanceTable.querySelectorAll('tbody tr');
-        document.getElementById('performanceTableCount').textContent = `${rows.length} רשומות`;
-    }
-
-    // סטטיסטיקות טבלת דיבאג
-    const debugTable = document.getElementById('debugTable');
-    if (debugTable) {
-        const rows = debugTable.querySelectorAll('tbody tr');
-        document.getElementById('debugTableCount').textContent = `${rows.length} רשומות`;
-    }
-}
-
-/**
- * פונקציה לעדכון סטטיסטיקות מהירות
- */
-function updateQuickStats() {
-    // עדכון סטטיסטיקות מהירות
-    const currentTime = new Date().toLocaleTimeString();
-    const currentTimeElement = document.getElementById('currentTime');
-    if (currentTimeElement) {
-        currentTimeElement.textContent = currentTime;
-    }
-
-    // עדכון מספר טבלאות
-    const tables = document.querySelectorAll('table');
-    const tablesCountElement = document.getElementById('tablesCount');
-    if (tablesCountElement) {
-        tablesCountElement.textContent = `${tables.length} טבלאות`;
-    }
-
-    // עדכון מספר סקשנים
-    const sections = document.querySelectorAll('.content-section');
-    const sectionsCountElement = document.getElementById('sectionsCount');
-    if (sectionsCountElement) {
-        sectionsCountElement.textContent = `${sections.length} סקשנים`;
-    }
-}
-
-/**
- * פונקציה להצגת קונטיינר פעיל
- */
-function showActiveContainer() {
-    log('הצגת קונטיינר פעיל...');
-    // כאן תוכל להוסיף לוגיקה להצגת קונטיינר פעיל
 }
 
 // ===== TEST FUNCTIONS =====
 
 /**
- * פונקציות בדיקה
+ * Run Initial Tests
  */
-function testStatusFilter() {
-    log('בדיקת פילטר סטטוס...');
-    // כאן תוכל להוסיף לוגיקה לבדיקת פילטר סטטוס
-}
-
-function testTypeFilter() {
-    log('בדיקת פילטר סוג...');
-    // כאן תוכל להוסיף לוגיקה לבדיקת פילטר סוג
-}
-
-function testAccountFilter() {
-    log('בדיקת פילטר חשבון...');
-    // כאן תוכל להוסיף לוגיקה לבדיקת פילטר חשבון
-}
-
-function testDateFilter() {
-    log('בדיקת פילטר תאריך...');
-    // כאן תוכל להוסיף לוגיקה לבדיקת פילטר תאריך
-}
-
-function testSearchFilter() {
-    log('בדיקת חיפוש חופשי...');
-    // כאן תוכל להוסיף לוגיקה לבדיקת חיפוש חופשי
-}
-
-// ===== INITIALIZATION =====
-
-/**
- * טעינת כפתורי פעולות לטבלה
- */
-function loadActionButtons() {
-    console.log('🔧 loadActionButtons called - START');
-    console.log('🔧 loadTableActionButtons function available:', typeof window.loadTableActionButtons);
+function runInitialTests() {
+    console.log('🧪 Running initial tests...');
     
-    // טעינת כפתורים לכל הטבלה בבת אחת
-    if (typeof window.loadTableActionButtons === 'function') {
-        console.log('🔧 Loading action buttons for entire table...');
-        
-        // הגדרות מותאמות אישית לטבלת הטיקרים
-        const tickerConfig = {
-            showDetails: false,  // הסתרת כפתור פרטים
-            showLinked: true,
-            showEdit: true,
-            showCancel: true,
-            showDelete: true
-            // הפונקציות יוגדרו אוטומטית לפי entityType
-        };
-        
-        window.loadTableActionButtons('tickersTable', 'ticker', tickerConfig);
-        console.log('✅ Action buttons loaded for all rows');
+    // Test 1: Check if filter system is available
+    if (window.filterSystem) {
+        console.log('✅ Test 1: Filter system available');
+        updateTestStatus('filterComponentStatus', 'זמין ✅', true);
     } else {
-        console.log('❌ loadTableActionButtons function not available');
+        console.log('❌ Test 1: Filter system not available');
+        updateTestStatus('filterComponentStatus', 'לא זמין ❌', false);
     }
+    
+    // Test 2: Check if tables exist
+    const tickersTable = document.getElementById('tickersTable');
+    const tradePlansTable = document.getElementById('tradePlansTable');
+    
+    if (tickersTable && tradePlansTable) {
+        console.log('✅ Test 2: Both tables found in DOM');
+        updateTestStatus('componentsIntegrationStatus', 'טבלאות נמצאו ✅', true);
+    } else {
+        console.log('❌ Test 2: Tables not found');
+        updateTestStatus('componentsIntegrationStatus', 'טבלאות לא נמצאו ❌', false);
+    }
+    
+    // Test 3: Count table rows
+    if (tickersTable) {
+        const tickersRows = tickersTable.querySelectorAll('tbody tr').length;
+        console.log(`✅ Test 3: Tickers table has ${tickersRows} rows`);
+        updateTestStatus('componentsCount', tickersRows.toString(), true);
+    }
+    
+    if (tradePlansTable) {
+        const tradePlansRows = tradePlansTable.querySelectorAll('tbody tr').length;
+        console.log(`✅ Test 4: Trade plans table has ${tradePlansRows} rows`);
+        updateTestStatus('servicesCount', tradePlansRows.toString(), true);
+    }
+    
+    // Test 5: Performance metrics
+    if (window.performance && window.performance.now) {
+        const loadTime = Math.round(window.performance.now());
+        console.log(`✅ Test 5: Page load time: ${loadTime}ms`);
+        updateTestStatus('loadTime', `${loadTime}ms`, true);
+    }
+    
+    console.log('✅ Initial tests completed');
 }
 
 /**
- * אתחול העמוד
+ * Update Test Status Display
  */
-document.addEventListener('DOMContentLoaded', function() {
-    log('עמוד בדיקת ראש הדף נטען');
-    updateQuickStats();
-    
-    // טעינת נתונים אמיתיים מבסיס הנתונים
-    loadRealData();
-    
-    // טעינת כפתורי פעולות אחרי שהדף נטען
-    console.log('🔧 Setting timeout for loadActionButtons...');
-    setTimeout(function() {
-        console.log('🔧 Timeout triggered, calling loadActionButtons...');
-        loadActionButtons();
-    }, 100);
-});
+function updateTestStatus(elementId, text, success) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.textContent = text;
+        element.style.color = success ? 'green' : 'red';
+        element.style.fontWeight = 'bold';
+    }
+}
 
-// ===== DATA LOADING FUNCTIONS =====
+// ===== TEST CONTROL FUNCTIONS =====
 
 /**
- * טעינת נתונים אמיתיים מבסיס הנתונים
+ * Run Unit Tests
  */
-async function loadRealData() {
-    console.log('🔄 טעינת נתונים אמיתיים מבסיס הנתונים...');
+window.runUnitTests = function() {
+    console.log('🧪 Running unit tests...');
     
-    try {
-        // טעינת נתוני טיקרים
-        if (typeof window.loadTickersData === 'function') {
-            console.log('🔄 טוען נתוני טיקרים...');
-            await window.loadTickersData();
-            console.log('✅ נתוני טיקרים נטענו');
-        } else {
-            console.warn('⚠️ פונקציית loadTickersData לא זמינה');
+    // Test Header System
+    if (window.HeaderSystemClass) {
+        console.log('✅ HeaderSystemClass available');
+        updateTestStatus('headerComponentStatus', 'זמין ✅', true);
+    } else {
+        console.log('❌ HeaderSystemClass not available');
+        updateTestStatus('headerComponentStatus', 'לא זמין ❌', false);
+    }
+    
+    // Test Filter System
+    if (window.filterSystem) {
+        console.log('✅ Filter System available');
+        updateTestStatus('filterComponentStatus', 'זמין ✅', true);
+        
+        // Test filter functions
+        if (typeof window.filterSystem.applyAllFilters === 'function') {
+            console.log('✅ applyAllFilters function available');
         }
         
-        // טעינת נתוני תכנוני טריידים
-        if (typeof window.loadTradePlansData === 'function') {
-            console.log('🔄 טוען נתוני תכנוני טריידים...');
-            await window.loadTradePlansData();
-            console.log('✅ נתוני תכנוני טריידים נטענו');
-        } else {
-            console.warn('⚠️ פונקציית loadTradePlansData לא זמינה');
+        if (typeof window.filterSystem.registerTable === 'function') {
+            console.log('✅ registerTable function available');
         }
-        
-        log('נתונים אמיתיים נטענו מבסיס הנתונים');
-        
-    } catch (error) {
-        console.error('❌ שגיאה בטעינת נתונים:', error);
-        log('שגיאה בטעינת נתונים: ' + error.message);
-    }
-}
-
-// ===== TICKER TABLE FUNCTIONS =====
-
-/**
- * פונקציות לטבלת טיקרים
- */
-
-
-/**
- * פילטר טיקרים לפי סוג
- * @param {string} type - סוג הטיקר
- */
-function filterTickersByType(type) {
-    console.log('Filtering tickers by type:', type);
-    // פונקציה בסיסית - תיושם בעתיד
-}
-
-/**
- * פתיחה/סגירה של סקשן הטיקרים
- */
-function toggleTickersSection() {
-    console.log('Toggling tickers section');
-    // פונקציה בסיסית - תיושם בעתיד
-}
-
-
-
-// Toggle functions are now handled by the global system in ui-utils.js
-// No local functions needed - using window.toggleSection() and window.toggleSection()
-
-// ===== EXPORTS =====
-
-// Export functions to global scope
-window.log = log;
-window.updateStatus = updateStatus;
-window.updateCurrentFilterStatus = updateCurrentFilterStatus;
-window.updateDateRangeInfo = updateDateRangeInfo;
-window.updateTableStats = updateTableStats;
-window.updateQuickStats = updateQuickStats;
-window.showActiveContainer = showActiveContainer;
-window.testStatusFilter = testStatusFilter;
-window.testTypeFilter = testTypeFilter;
-window.testAccountFilter = testAccountFilter;
-window.testDateFilter = testDateFilter;
-window.testSearchFilter = testSearchFilter;
-
-// Export ticker functions
-window.filterTickersByType = filterTickersByType;
-window.toggleTickersSection = toggleTickersSection;
-window.loadActionButtons = loadActionButtons;
-window.loadRealData = loadRealData;
-// window.toggleSection removed - using global version from ui-utils.js
-// window.toggleSection export removed - using global version from ui-utils.js
-
-// ===== DETAILED LOG FUNCTIONS =====
-
-/**
- * Generate detailed log for header system testing
- */
-function generateDetailedLog() {
-    const timestamp = new Date().toLocaleString('he-IL');
-    const log = [];
-
-    log.push('=== לוג מפורט - בדיקת ראש הדף ===');
-    log.push(`זמן יצירה: ${timestamp}`);
-    log.push(`עמוד: ${window.location.href}`);
-    log.push('');
-
-    // סטטוס כללי
-    log.push('--- סטטוס כללי ---');
-    const unifiedHeader = document.getElementById('unified-header');
-    const isHeaderVisible = unifiedHeader && unifiedHeader.style.display !== 'none';
-    log.push(`כותרת מאוחדת: ${isHeaderVisible ? 'נראית' : 'לא נראית'}`);
-    
-    if (unifiedHeader) {
-        log.push(`תוכן כותרת: ${unifiedHeader.innerHTML.length > 0 ? 'יש תוכן' : 'ריק'}`);
-        log.push(`גובה כותרת: ${unifiedHeader.offsetHeight}px`);
-    }
-
-    // סטטוס מערכת הכותרת
-    log.push('--- סטטוס מערכת הכותרת ---');
-    log.push(`HeaderSystem זמין: ${typeof window.HeaderSystem === 'function' ? 'כן' : 'לא'}`);
-    log.push(`headerSystem instance: ${window.headerSystem ? 'קיים' : 'לא קיים'}`);
-    
-    if (window.headerSystem) {
-        log.push(`מערכת מאותחלת: ${window.headerSystem.isInitialized ? 'כן' : 'לא'}`);
     }
     
-    // מידע נוסף על HeaderSystem
-    log.push(`HeaderSystem type: ${typeof window.HeaderSystem}`);
-    log.push(`HeaderSystem constructor: ${window.HeaderSystem ? 'קיים' : 'לא קיים'}`);
-    log.push(`HeaderSystem.createHeader: ${window.HeaderSystem && typeof window.HeaderSystem.createHeader === 'function' ? 'קיים' : 'לא קיים'}`);
+    // Test UnifiedCacheManager
+    if (window.UnifiedCacheManager) {
+        console.log('✅ UnifiedCacheManager available');
+        updateTestStatus('stateServiceStatus', 'זמין ✅', true);
+    }
     
-    // בדיקת קבצי JavaScript שנטענו
-    log.push('--- קבצי JavaScript שנטענו ---');
-    const scripts = document.querySelectorAll('script[src]');
-    scripts.forEach((script, index) => {
-        if (script.src.includes('header-system')) {
-            log.push(`  ${index + 1}. ${script.src}`);
-        }
+    if (typeof window.showNotification === 'function') {
+        window.showNotification('בדיקות יחידה הושלמו', 'success', 'בדיקות', 3000, 'system');
+    }
+};
+
+/**
+ * Run Integration Tests
+ */
+window.runIntegrationTests = function() {
+    console.log('🧪 Running integration tests...');
+    
+    // Test filter integration with tables
+    if (window.filterSystem) {
+        const registeredTables = Object.keys(window.filterSystem.registeredTables || {});
+        console.log(`✅ Registered tables: ${registeredTables.join(', ')}`);
+        updateTestStatus('fullIntegrationStatus', `${registeredTables.length} טבלאות רשומות ✅`, true);
+    }
+    
+    if (typeof window.showNotification === 'function') {
+        window.showNotification('בדיקות אינטגרציה הושלמו', 'success', 'בדיקות', 3000, 'system');
+    }
+};
+
+/**
+ * Run Performance Tests
+ */
+window.runPerformanceTests = function() {
+    console.log('🧪 Running performance tests...');
+    
+    const perfData = {
+        loadTime: window.performance ? Math.round(window.performance.now()) : 'N/A',
+        memory: window.performance && window.performance.memory ? 
+               Math.round(window.performance.memory.usedJSHeapSize / 1024 / 1024) + 'MB' : 'N/A'
+    };
+    
+    console.log('📊 Performance data:', perfData);
+    
+    updateTestStatus('loadTime', `${perfData.loadTime}ms`, true);
+    updateTestStatus('memoryUsage', perfData.memory, true);
+    updateTestStatus('initializationStatus', 'הושלם ✅', true);
+    
+    if (typeof window.showNotification === 'function') {
+        window.showNotification('בדיקות ביצועים הושלמו', 'success', 'בדיקות', 3000, 'system');
+    }
+};
+
+/**
+ * Run All Tests
+ */
+window.runAllTests = function() {
+    console.log('🧪 Running all tests...');
+    
+    window.runUnitTests();
+    setTimeout(() => window.runIntegrationTests(), 500);
+    setTimeout(() => window.runPerformanceTests(), 1000);
+    
+    if (typeof window.showNotification === 'function') {
+        window.showNotification('כל הבדיקות הושלמו', 'success', 'בדיקות', 3000, 'system');
+    }
+};
+
+/**
+ * Reset System
+ */
+window.resetSystem = function() {
+    console.log('🔄 Resetting system...');
+    
+    // Clear all filters
+    if (window.filterSystem && typeof window.clearAllFilters === 'function') {
+        window.clearAllFilters();
+    }
+    
+    // Reset all test statuses
+    const statusElements = document.querySelectorAll('[id$="Status"], [id$="Count"], [id$="Time"]');
+    statusElements.forEach(el => {
+        el.textContent = 'טוען...';
+        el.style.color = '';
+        el.style.fontWeight = '';
     });
     
-    // בדיקת שגיאות בקונסול
-    log.push('--- שגיאות בקונסול ---');
-    log.push('בדיקת שגיאות JavaScript מושבתת זמנית');
-    
-    // בדיקת DOM elements
-    log.push('--- בדיקת DOM elements ---');
-    const headerElement = document.getElementById('unified-header');
-    if (headerElement) {
-        log.push(`unified-header קיים: כן`);
-        log.push(`unified-header innerHTML length: ${headerElement.innerHTML.length}`);
-        log.push(`unified-header children count: ${headerElement.children.length}`);
-        
-        // בדיקת תוכן הכותרת
-        const headerContent = headerElement.querySelector('.header-content');
-        log.push(`header-content קיים: ${headerContent ? 'כן' : 'לא'}`);
-        
-        if (headerContent) {
-            log.push(`header-content children count: ${headerContent.children.length}`);
-        }
-        
-        // בדיקת תוכן הכותרת בפירוט
-        if (headerElement.innerHTML.length > 0) {
-            log.push(`תוכן unified-header: ${headerElement.innerHTML.substring(0, 200)}...`);
-        } else {
-            log.push(`תוכן unified-header: ריק לחלוטין`);
-        }
-        
-        // בדיקת צבעי התפריט
-        log.push('--- בדיקת צבעי התפריט ---');
-        const navLinks = headerElement.querySelectorAll('.tiktrack-nav-link');
-        log.push(`מספר קישורי תפריט: ${navLinks.length}`);
-        
-        navLinks.forEach((link, index) => {
-            const computedStyle = window.getComputedStyle(link);
-            const color = computedStyle.color;
-            const backgroundColor = computedStyle.backgroundColor;
-            log.push(`  קישור ${index + 1}: color=${color}, background=${backgroundColor}`);
-        });
-    } else {
-        log.push(`unified-header קיים: לא`);
+    if (typeof window.showNotification === 'function') {
+        window.showNotification('המערכת אופסה', 'info', 'איפוס', 2000, 'system');
     }
     
-    // בדיקת אלמנטים אחרים
-    const appHeader = document.getElementById('app-header');
-    log.push(`app-header קיים: ${appHeader ? 'כן' : 'לא'}`);
-    
-    if (appHeader) {
-        log.push(`app-header innerHTML length: ${appHeader.innerHTML.length}`);
-    }
-
-    // בדיקת רכיבים
-    log.push('--- בדיקת רכיבים ---');
-    const headerNav = document.querySelector('.header-nav');
-    const headerActions = document.querySelector('.header-actions');
-    const filtersContainer = document.querySelector('.filters-container');
-    
-    log.push(`תפריט ניווט: ${headerNav ? 'קיים' : 'לא קיים'}`);
-    log.push(`כפתורי פעולה: ${headerActions ? 'קיימים' : 'לא קיימים'}`);
-    log.push(`מכולת פילטרים: ${filtersContainer ? 'קיימת' : 'לא קיימת'}`);
-
-    // בדיקת פילטרים
-    if (filtersContainer) {
-        log.push(`פילטרים נראים: ${filtersContainer.style.display !== 'none' ? 'כן' : 'לא'}`);
-        const filterGroups = filtersContainer.querySelectorAll('.filter-group');
-        log.push(`מספר קבוצות פילטרים: ${filterGroups.length}`);
-    }
-
-    // בדיקת תפריט
-    if (headerNav) {
-        const navItems = headerNav.querySelectorAll('.tiktrack-nav-item');
-        log.push(`מספר פריטי תפריט: ${navItems.length}`);
-        
-        navItems.forEach((item, index) => {
-            const link = item.querySelector('.tiktrack-nav-link');
-            const text = link ? link.textContent.trim() : 'ללא טקסט';
-            log.push(`  ${index + 1}. ${text}`);
-        });
-    }
-
-    // סטטוס בדיקות
-    log.push('--- סטטוס בדיקות ---');
-    log.push(`תוצאות בדיקות יחידה: ${Object.keys(testResults.unitTests).length} בדיקות`);
-    log.push(`תוצאות בדיקות אינטגרציה: ${Object.keys(testResults.integrationTests).length} בדיקות`);
-    log.push(`תוצאות בדיקות ביצועים: ${Object.keys(testResults.performanceTests).length} בדיקות`);
-
-    // שגיאות בקונסול
-    log.push('--- שגיאות אחרונות ---');
-    const consoleErrors = [];
-    const originalError = console.error;
-    console.error = function(...args) {
-        consoleErrors.push(args.join(' '));
-        originalError.apply(console, args);
-    };
-
-    // CSS וסגנונות
-    log.push('--- סגנונות CSS ---');
-    const headerStyles = document.querySelector('link[href*="header-styles"]');
-    log.push(`קובץ CSS כותרת: ${headerStyles ? 'נטען' : 'לא נטען'}`);
-    
-    if (headerStyles) {
-        log.push(`קובץ CSS: ${headerStyles.href}`);
-    }
-
-    // מידע על הדפדפן
-    log.push('--- מידע דפדפן ---');
-    log.push(`User Agent: ${navigator.userAgent}`);
-    log.push(`גודל מסך: ${window.innerWidth}x${window.innerHeight}`);
-    log.push(`זום: ${Math.round(window.devicePixelRatio * 100)}%`);
-    
-    // בדיקת timing
-    log.push('--- בדיקת timing ---');
-    log.push(`DOM ready: ${document.readyState}`);
-    log.push(`window loaded: ${document.readyState === 'complete' ? 'כן' : 'לא'}`);
-    
-    // בדיקת global variables
-    log.push('--- בדיקת global variables ---');
-    log.push(`window.HeaderSystem: ${typeof window.HeaderSystem}`);
-    log.push(`window.headerSystem: ${typeof window.headerSystem}`);
-    log.push(`window.toggleSection: ${typeof window.toggleSection}`);
-    log.push(`window.copyDetailedLog: ${typeof window.copyDetailedLog}`);
-    
-    // בדיקת צבעים דינמיים
-    log.push('--- בדיקת צבעים דינמיים ---');
-    log.push(`window.currentPreferences: ${typeof window.currentPreferences}`);
-    if (window.currentPreferences) {
-        log.push(`צבע ראשי: ${window.currentPreferences.primaryColor || 'לא מוגדר'}`);
-        log.push(`צבע משני: ${window.currentPreferences.secondaryColor || 'לא מוגדר'}`);
-    }
-    
-    // בדיקת CSS Variables
-    const root = document.documentElement;
-    const primaryColor = getComputedStyle(root).getPropertyValue('--primary-color');
-    const secondaryColor = getComputedStyle(root).getPropertyValue('--secondary-color');
-    log.push(`CSS --primary-color: ${primaryColor}`);
-    log.push(`CSS --secondary-color: ${secondaryColor}`);
-    
-    // בדיקת שגיאות JavaScript
-    log.push('--- בדיקת שגיאות JavaScript ---');
-    if (window.onerror) {
-        log.push(`window.onerror מוגדר: כן`);
-    } else {
-        log.push(`window.onerror מוגדר: לא`);
-    }
-
-    log.push('');
-    log.push('=== סוף הלוג ===');
-
-    return log.join('\n');
-}
-
-// הוספת הפונקציה ל-window object
-window.copyDetailedLog = copyDetailedLog;
-
-// פונקציה לפתיחה וסגירה של הסקשן העליון
-function toggleTopSection() {
-    const section = document.querySelector('.top-section');
-    if (section) {
-        const isVisible = section.style.display !== 'none';
-        section.style.display = isVisible ? 'none' : 'block';
-        
-        const toggleBtn = document.querySelector('.filter-toggle-btn');
-        const arrow = toggleBtn ? toggleBtn.querySelector('.section-toggle-icon') : null;
-        
-        if (toggleBtn && arrow) {
-            if (isVisible) {
-                arrow.textContent = '▶';
-                toggleBtn.classList.add('collapsed');
-            } else {
-                arrow.textContent = '▼';
-                toggleBtn.classList.remove('collapsed');
-            }
-        }
-    }
-}
-
-// הוספת הפונקציה ל-window object
-window.toggleTopSection = toggleTopSection;
+    // Re-run initial tests
+    setTimeout(() => runInitialTests(), 500);
+};
 
 /**
- * Copy detailed log to clipboard - Test Header Only Page
+ * Copy Detailed Log
  */
-async function copyDetailedLog() {
-    try {
-        const log = generateDetailedLog();
-        await navigator.clipboard.writeText(log);
-        
-        // Show notification if available, otherwise use console
-        if (typeof window.showNotification === 'function') {
-            window.showNotification('הלוג המפורט הועתק בהצלחה ללוח!', 'success');
-        } else {
-            console.log('✅ הלוג המפורט הועתק בהצלחה ללוח!');
+window.copyDetailedLog = function() {
+    console.log('📋 Copying detailed log...');
+    
+    const log = {
+        timestamp: new Date().toISOString(),
+        filterSystem: !!window.filterSystem,
+        headerSystem: !!window.HeaderSystemClass,
+        cacheManager: !!window.UnifiedCacheManager,
+        registeredTables: window.filterSystem ? Object.keys(window.filterSystem.registeredTables || {}) : [],
+        performance: {
+            loadTime: window.performance ? Math.round(window.performance.now()) : 'N/A',
+            memory: window.performance && window.performance.memory ? 
+                   Math.round(window.performance.memory.usedJSHeapSize / 1024 / 1024) + 'MB' : 'N/A'
         }
-        
-        console.log('=== לוג מפורט שהועתק ===');
-        console.log(log);
-        console.log('=== סוף הלוג ===');
-    } catch (error) {
-        console.error('Failed to copy log:', error);
-        
-        // Show error notification if available, otherwise use console
-        if (typeof window.showNotification === 'function') {
-            window.showNotification('שגיאה בהעתקת הלוג: ' + error.message, 'error');
-        } else {
-            console.error('❌ שגיאה בהעתקת הלוג:', error.message);
-        }
-        
-        // Fallback: show in console
-        const log = generateDetailedLog();
-        console.log('=== לוג מפורט (לא הועתק) ===');
-        console.log(log);
-        console.log('=== סוף הלוג ===');
-    }
-}
-
-// Export functions
-window.copyDetailedLog = copyDetailedLog;
-// window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
-window.registerTablesWithFilterSystem = registerTablesWithFilterSystem;
-
-// Local copyDetailedLog function for test-header-only page
-async function copyDetailedLog() {
-    try {
-        const detailedLog = await generateDetailedLog();
-        if (detailedLog) {
-            await navigator.clipboard.writeText(detailedLog);
-            if (window.showSuccessNotification) {
-                window.showSuccessNotification('לוג מפורט הועתק ללוח');
-            } else {
-                alert('לוג מפורט הועתק ללוח!');
+    };
+    
+    const logText = JSON.stringify(log, null, 2);
+    
+    // Copy to clipboard
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(logText).then(() => {
+            console.log('✅ Log copied to clipboard');
+            if (typeof window.showNotification === 'function') {
+                window.showNotification('לוג הועתק ללוח', 'success', 'העתקה', 2000, 'system');
             }
-        } else {
-            if (window.showWarningNotification) {
-                window.showWarningNotification('אין לוג להעתקה');
-            } else {
-                alert('אין לוג להעתקה');
-            }
-        }
-    } catch (err) {
-        console.error('שגיאה בהעתקה:', err);
-        if (window.showErrorNotification) {
-            window.showErrorNotification('שגיאה בהעתקת הלוג');
-        } else {
-            alert('שגיאה בהעתקת הלוג');
-        }
+        }).catch(err => {
+            console.error('❌ Failed to copy log:', err);
+        });
+    } else {
+        console.log('📋 Log text:', logText);
+        alert('לוג מפורט:\n\n' + logText);
     }
-}
+};
+
+// ===== SECTION TOGGLE FUNCTIONS =====
+
+/**
+ * Toggle Top Section
+ */
+window.toggleTopSection = function() {
+    const section = document.getElementById('top-section');
+    if (section) {
+        section.classList.toggle('collapsed');
+        console.log('🔧 Top section toggled');
+    }
+};
+
+/**
+ * Toggle Section
+ */
+window.toggleSection = function(sectionId) {
+    const section = document.getElementById(sectionId);
+    if (section) {
+        section.classList.toggle('collapsed');
+        console.log(`🔧 Section ${sectionId} toggled`);
+    }
+};
+
+console.log('✅ test-header-only.js v3.2.0 initialization complete');

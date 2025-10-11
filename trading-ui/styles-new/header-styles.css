@@ -423,29 +423,7 @@
 
 /* .filter-group styles moved to _unified-log-display.css */
 
-.filter-toggle {
-    display: flex;
-    align-items: center;
-    gap: 0.45rem;
-    padding: 0.25rem 0.9rem;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 5.4px;
-    color: #1d1d1f;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 0.9rem;
-    font-weight: 400;
-    min-width: 120px;
-    justify-content: space-between;
-}
-
-.filter-toggle:hover {
-    border-color: #ff9500;
-    color: #ff9500;
-    background: white;
-    box-shadow: none;
-}
+/* Filter toggle removed - duplicate, see final version in "Additional Styles" section below */
 
 .filter-menu {
     position: absolute;
@@ -493,57 +471,7 @@
     margin-left: auto;
 }
 
-.reset-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    min-width: 28px;
-    min-height: 28px;
-    background: white;
-    border: 1px solid #26baac;
-    border-radius: 4px;
-    color: #26baac;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 14px;
-    font-weight: normal;
-}
-
-.clear-btn {
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-    width: 28px !important;
-    height: 28px !important;
-    min-width: 28px !important;
-    min-height: 28px !important;
-    max-width: 28px !important;
-    max-height: 28px !important;
-    background: white;
-    border: 1px solid #fb5a05;
-    border-radius: 4px;
-    color: #fb5a05;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 14px;
-    font-weight: normal;
-    padding: 0 !important;
-    margin: 0;
-    flex-shrink: 0 !important;
-    box-sizing: border-box;
-}
-
-.reset-btn:hover {
-    background: #26baac;
-    color: white;
-}
-
-.clear-btn:hover {
-    background: #fb5a05;
-    color: white;
-}
+/* Reset and Clear buttons defined below in "Additional Styles from header-system.js" section */
 
 /* Search Filter */
 .search-input-wrapper {
@@ -671,32 +599,7 @@
 
 /* .filter-group duplicate styles moved to _unified-log-display.css */
 
-.filter-toggle {
-    display: flex;
-    align-items: center;
-    gap: 0.45rem;
-    padding: 0.45rem 0.9rem;
-    background: white ;
-    border: 1px solid #ddd ;
-    border-radius: 5.4px ;
-    color: #1d1d1f ;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 12.6px;
-    box-shadow: none ;
-    outline: none ;
-    width: 120px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.filter-toggle:hover {
-    border-color: #ff9500 ;
-    color: #ff9500 ;
-    background: white ;
-    box-shadow: none ;
-}
+/* Filter toggle removed - duplicate, see final version in "Additional Styles" section below */
 
 .filter-menu {
     position: absolute;
@@ -834,48 +737,7 @@
 
 /* .action-buttons מוגדר ב-_background-tasks.css לפי ITCSS */
 
-.reset-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    background: white ;
-    border: none ;
-    border-radius: 6px ;
-    color: #26baac ;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: none ;
-    outline: none ;
-    font-size: 18px ;
-    font-weight: bold ;
-}
-
-.clear-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    background: white ;
-    border: none ;
-    border-radius: 6px ;
-    color: #ff9500 ;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: none ;
-    outline: none ;
-    font-size: 18px ;
-    font-weight: bold ;
-}
-
-.reset-btn:hover, .clear-btn:hover {
-    border-color: #ff9500 ;
-    color: #ff9500 ;
-    background: white ;
-    box-shadow: none ;
-}
+/* Reset and Clear buttons removed - duplicates, see final version below */
 
 /* Level 3 Submenu - רמה 3 של התפריט (בסגנון אפל) */
 .level3-submenu {

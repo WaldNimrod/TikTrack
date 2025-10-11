@@ -7,17 +7,36 @@ The TikTrack Header System is a comprehensive navigation and filtering solution 
 
 ## File Location
 - **Main File**: `trading-ui/scripts/header-system.js` (UNIFIED SYSTEM)
-- **Version**: 6.0 (October 2024)
-- **Status**: **UNIFIED SYSTEM** - Header + Filter System Combined
+- **CSS File**: `trading-ui/styles-new/header-styles.css` (EXTERNAL CSS)
+- **Version**: 6.1 (October 2025)
+- **Status**: **REFACTORED** - Optimized architecture with external CSS
 
-## 🎉 Current Status (October 2024)
+## 🎉 Current Status (October 2025)
 
-### 1. **Unified Header System v6 - FINAL VERSION**
-- **Status**: **COMPLETED** - Final version implemented and working perfectly
+### 1. **Unified Header System v6.1 - REFACTORED VERSION** ✅ NEW!
+- **Status**: **COMPLETED** - Refactored for better performance and maintainability
+- **Date**: 11 October 2025
+- **Structure**: Modular methods with external CSS
+- **Key Improvements**:
+  - All CSS moved to external file (browser caching enabled)
+  - HTML generation split into logical methods
+  - 680 lines of redundant code removed
+  - 0 duplications between JS and CSS
+  - Better code organization and readability
+- **Main Files**: 
+  - `trading-ui/scripts/header-system.js` - Unified header system v6.1 (1,524 lines)
+  - `trading-ui/styles-new/header-styles.css` - All header styles (1,319 lines)
+- **Architecture**:
+  - `getHeaderHTML()` - Main method (calls sub-methods)
+  - `getHeaderTopHTML()` - Navigation and logo section
+  - `getHeaderFiltersHTML()` - Filters and action buttons
+- **Git Branch**: `feature/header-refactoring`
+- **Git Commits**: 3 commits (stages 1, 2-3, 4)
+
+### 2. **Previous: Unified Header System v6 - FINAL VERSION**
+- **Status**: **ARCHIVED** - Replaced by v6.1
 - **Structure**: Single unified system (Header + Filters) in one file
-- **Main File**: 
-  - `trading-ui/scripts/header-system.js` - Unified header and filter system v6.0
-- **Test Page**: `trading-ui/test-header-only.html` - Working implementation
+- **Issue**: 545 lines of CSS injected dynamically, duplications
 - **Git Backup**: Commit `4eddd45` - "Header System v6 - Final Version"
 
 ### 2. **Bootstrap 5 Integration - COMPLETED**

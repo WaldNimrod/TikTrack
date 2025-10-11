@@ -96,6 +96,18 @@ class HeaderSystem {
   static getHeaderHTML() {
     return `
         <div class="header-content">
+          ${this.getHeaderTopHTML()}
+          ${this.getHeaderFiltersHTML()}
+        </div>
+    `;
+  }
+
+  /**
+   * Generate Header Top HTML - Navigation and Logo
+   * Contains: Main menu, logo, main toggle button
+   */
+  static getHeaderTopHTML() {
+    return `
           <!-- אזור לוגו ותפריט -->
           <div class="header-top">
             <div class="header-container">
@@ -188,7 +200,7 @@ class HeaderSystem {
                       <button class="tiktrack-nav-link cache-clear-btn" 
                               onclick="window.clearAllCache()" 
                               title="ניקוי מטמון מלא">
-                        <span class="nav-text" style="color: #007bff; font-size: 1.2rem;">🧹</span>
+                        <span class="nav-text">🧹</span>
                       </button>
                     </li>
                   </ul>
@@ -212,7 +224,15 @@ class HeaderSystem {
 
             </div>
           </div>
+    `;
+  }
 
+  /**
+   * Generate Header Filters HTML - All filter controls
+   * Contains: Status, Type, Account, Date, Search filters + Action buttons
+   */
+  static getHeaderFiltersHTML() {
+    return `
         <!-- אזור פילטרים -->
         <div class="header-filters" id="headerFilters" data-section="filters">
           <div class="filters-container">
@@ -356,8 +376,6 @@ class HeaderSystem {
             </div>
           </div>
         </div>
-        
-        </div>
     `;
   }
 
@@ -365,8 +383,8 @@ class HeaderSystem {
     // הגדרת מצב הכפתורים בהתאם למצב הפילטר
     window.updateToggleButtons();
     
-    // הוספת סגנונות CSS
-    HeaderSystem.addStyles();
+    // CSS styles now loaded from external file (header-styles.css)
+    // Removed: HeaderSystem.addStyles() - no longer needed
     
     // עדכון מצב הכפתורים בטעינה הראשונית
     setTimeout(() => {
@@ -399,557 +417,15 @@ class HeaderSystem {
     }, 100);
   }
 
-  static addStyles() {
-    const style = document.createElement('style');
-    style.textContent = HeaderSystem.getHeaderStyles();
-    document.head.appendChild(style);
-  }
-
-  static getHeaderStyles() {
-    return `
-      /* Reset */
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      /* Header Styles - Basic styles only, main styles in header-styles.css */
-      .header-content {
-        position: relative;
-        max-width: 1400px;
-        margin: 0 auto;
-        z-index: 960;
-      }
-
-      .header-top {
-        padding: 15px 0;
-        max-width: 1400px;
-        margin: 0 auto;
-      }
-
-      .header-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        overflow: visible;
-      }
-
-      /* דריסת CSS חיצוני */
-      #unified-header .header-top .logo-section {
-        order: 2 !important;
-        margin-right: 0 !important;
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-      }
-
-      #unified-header .header-top .header-nav {
-        order: 1 !important;
-        margin-left: 0 !important;
-        flex: 1;
-        display: flex;
-        justify-content: flex-start;
-      }
-
-      .main-nav {
-        display: flex;
-      }
-
-      .tiktrack-nav-list {
-        display: flex;
-        list-style: none;
-        gap: 30px;
-        align-items: center;
-      }
-
-      .tiktrack-nav-item {
-        position: relative;
-      }
-
-      .tiktrack-nav-link {
-        text-decoration: none;
-        padding: 10px 15px;
-        border-radius: 5px;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .tiktrack-nav-link:hover {
-        background: rgba(255,255,255,0.1);
-        transform: translateY(-2px);
-      }
-
-      .nav-icon {
-        width: 24px;
-        height: 24px;
-      }
-
-      .nav-text {
-        font-weight: 500;
-      }
-
-      .tiktrack-dropdown-arrow {
-        font-size: 12px;
-        transition: transform 0.3s ease;
-      }
-
-      .tiktrack-nav-item.dropdown:hover .tiktrack-dropdown-arrow {
-        transform: rotate(180deg);
-      }
-
-      .tiktrack-dropdown-menu {
-        position: absolute;
-        top: 100%;
-        right: 0;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-        min-width: 200px;
-        opacity: 0;
-        visibility: hidden;
-        transform: translateY(-10px);
-        transition: all 0.3s ease;
-        z-index: 954;
-      }
-
-      .tiktrack-nav-item.dropdown:hover .tiktrack-dropdown-menu {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
-      }
-
-      .tiktrack-dropdown-item {
-        color: #333;
-        text-decoration: none;
-        padding: 12px 20px;
-        display: block;
-        border-bottom: 1px solid #f0f0f0;
-        transition: all 0.3s ease;
-      }
-
-      .tiktrack-dropdown-item:hover {
-        background: #f8f9fa;
-        color: #667eea;
-      }
-
-      .tiktrack-dropdown-item:last-child {
-        border-bottom: none;
-      }
-
-      .separator {
-        height: 1px;
-        background: #e0e0e0;
-        margin: 5px 0;
-      }
-
-
-      .logo {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .logo-image {
-        width: 40px;
-        height: 40px;
-      }
-
-      .logo-text {
-        font-size: 18px;
-        font-weight: bold;
-        color: white;
-      }
-
-      /* Filter Toggle Button */
-            .filter-toggle-section {
-                position: absolute;
-                bottom: -10px;
-                left: 50%;
-                transform: translateX(-50%);
-        display: none;
-        visibility: visible;
-        opacity: 1;
-      }
-      
-      /* כפתור ראשי - בתוך התפריט הראשי, מתחת לתפריטי המשנה */
-      .filter-toggle-main {
-        bottom: -10px;
-        z-index: 951;
-      }
-      
-      /* כפתור משני - בתוך הפילטר, מתחת לתפריטי המשנה */
-      .filter-toggle-secondary {
-        z-index: 951;
-      }
-
-      .header-filter-toggle-btn {
-        background: rgba(255,255,255,0.9);
-        border: 1px solid #fb5a05;
-        border-radius: 50%;
-        width: 20px;
-        height: 20px;
-        min-width: 20px;
-        min-height: 20px;
-        max-width: 20px;
-        max-height: 20px;
-        cursor: pointer;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
-        display: flex !important;
-        align-items: center;
-        justify-content: center;
-        padding: 0;
-        margin: 0;
-        visibility: visible !important;
-        opacity: 1 !important;
-        position: relative;
-        z-index: 952;
-      }
-
-      .header-filter-toggle-btn:hover {
-        background: white;
-        transform: scale(1.1);
-        border-color: #fb5a05;
-      }
-
-      .header-filter-arrow {
-        font-size: 10px;
-        color: #fb5a05;
-        transition: transform 0.3s ease;
-      }
-
-      .header-filter-toggle-btn.collapsed .header-filter-arrow {
-        transform: rotate(-90deg);
-      }
-
-      /* Filter Styles */
-      .header-filters {
-        background: rgba(255,255,255,0.95);
-        padding: 13px 20px 5px 20px;
-        border-top: 1px solid rgba(255,255,255,0.2);
-        display: block; /* פתוח כברירת מחדל */
-        max-width: 1400px;
-        margin: 0 auto;
-      }
-
-      .filters-container {
-        max-width: 1400px;
-        margin: 0 auto;
-        display: flex;
-        gap: 20px;
-        align-items: center;
-        flex-wrap: wrap;
-      }
-
-      .filter-group {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .filter-toggle {
-        background: white;
-        border: 2px solid #e0e0e0;
-        border-radius: 8px;
-        padding: 5px 15px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        min-width: 150px;
-        justify-content: space-between;
-      }
-
-      .filter-toggle:hover {
-        border-color: #667eea;
-        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
-      }
-
-      .filter-toggle.active {
-        border-color: #667eea;
-        background: #f8f9ff;
-      }
-
-      .selected-value {
-        color: #333;
-        font-weight: 500;
-      }
-
-      .dropdown-arrow {
-        color: #667eea;
-        font-size: 12px;
-        transition: transform 0.3s ease;
-      }
-
-      .filter-toggle.active .dropdown-arrow {
-        transform: rotate(180deg);
-      }
-
-      .filter-menu {
-        position: absolute;
-        top: 100%;
-        right: 0;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-        min-width: 150px;
-        opacity: 0;
-        visibility: hidden;
-        transform: translateY(-10px);
-        transition: all 0.3s ease;
-        z-index: 953;
-        max-height: 200px;
-        overflow-y: auto;
-      }
-
-      .filter-toggle.active .filter-menu {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
-      }
-
-      .status-filter-item,
-      .type-filter-item,
-      .account-filter-item,
-      .date-range-filter-item {
-        padding: 6px 15px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        border-bottom: 1px solid #f0f0f0;
-      }
-
-      .status-filter-item:hover,
-      .type-filter-item:hover,
-      .account-filter-item:hover,
-      .date-range-filter-item:hover {
-        background: #f8f9ff;
-        color: #667eea;
-      }
-
-      .status-filter-item:last-child,
-      .type-filter-item:last-child,
-      .account-filter-item:last-child,
-      .date-range-filter-item:last-child {
-        border-bottom: none;
-      }
-
-      .status-filter-item.selected,
-      .type-filter-item.selected,
-      .account-filter-item.selected,
-      .date-range-filter-item.selected {
-        background: rgba(102, 126, 234, 0.3);
-        color: #667eea;
-        font-weight: 600;
-      }
-
-      .option-text {
-        font-weight: 500;
-      }
-
-      .search-input-wrapper {
-        position: relative;
-        display: flex;
-        align-items: center;
-      }
-
-      .search-filter-input {
-        padding: 5px 40px 5px 15px;
-        border: 2px solid #e0e0e0;
-        border-radius: 8px;
-        font-size: 14px;
-        min-width: 200px;
-        transition: all 0.3s ease;
-      }
-
-      .search-filter-input:focus {
-        outline: none;
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-      }
-
-      .search-clear-btn {
-        position: absolute;
-        right: 8px;
-        top: 50%;
-        transform: translateY(-50%);
-        background: none;
-        border: none;
-        color: #999;
-        cursor: pointer;
-        font-size: 16px;
-        width: 16px;
-        height: 16px;
-        min-width: 16px;
-        min-height: 16px;
-        max-width: 16px;
-        max-height: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: color 0.3s ease;
-        opacity: 0;
-        visibility: hidden;
-        pointer-events: none;
-        z-index: 10;
-        padding: 0;
-        margin: 0;
-        box-sizing: border-box;
-      }
-
-      .search-input-wrapper:hover .search-clear-btn,
-      .search-filter-input:focus + .search-clear-btn {
-        opacity: 1;
-        visibility: visible;
-        pointer-events: auto;
-      }
-
-      .search-clear-btn:hover {
-        color: #667eea;
-        background: none;
-        transform: translateY(-50%);
-      }
-
-      .filter-actions {
-        display: flex;
-        gap: 10px;
-      }
-
-      .filter-action-btn {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .reset-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 28px;
-        height: 28px;
-        min-width: 28px;
-        min-height: 28px;
-        background: white;
-        border: 1px solid #26baac;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-size: 14px;
-        font-weight: normal;
-        color: #26baac;
-      }
-
-      .clear-btn {
-        display: flex !important;
-        align-items: center;
-        justify-content: center;
-        width: 28px !important;
-        height: 28px !important;
-        min-width: 28px !important;
-        min-height: 28px !important;
-        max-width: 28px !important;
-        max-height: 28px !important;
-        background: white;
-        border: 1px solid #fb5a05;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-size: 14px;
-        font-weight: normal;
-        color: #fb5a05;
-        padding: 0 !important;
-        margin: 0;
-        flex-shrink: 0 !important;
-        box-sizing: border-box;
-      }
-
-      .reset-btn:hover {
-        background: #26baac;
-        color: white;
-      }
-
-      .clear-btn:hover {
-        background: #fb5a05;
-        color: white;
-      }
-
-      .cache-btn {
-        background: #ffc107;
-        color: #212529;
-      }
-
-      .cache-btn:hover {
-        background: #e0a800;
-        transform: translateY(-2px);
-      }
-
-      /* Cache Clear Button */
-      .cache-clear-btn {
-        background: none;
-        border: none;
-        padding: 0;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        transition: all 0.3s ease;
-      }
-
-      .cache-clear-btn:hover {
-        background-color: rgba(0, 123, 255, 0.1);
-        border-radius: 4px;
-        transform: scale(1.1);
-      }
-
-      .cache-clear-btn:active {
-        transform: scale(0.95);
-      }
-
-      .btn-text {
-        font-weight: 500;
-      }
-
-      /* Responsive Design */
-      @media (max-width: 768px) {
-        .header-container {
-          flex-direction: column;
-          gap: 20px;
-        }
-
-        .tiktrack-nav-list {
-          flex-wrap: wrap;
-          gap: 15px;
-        }
-
-        .filters-container {
-          flex-direction: column;
-          align-items: stretch;
-        }
-
-        .filter-group {
-          justify-content: center;
-        }
-
-        .filter-toggle {
-          min-width: 200px;
-        }
-
-        .search-filter-input {
-          min-width: 250px;
-        }
-      }
-
-    `;
-  }
+  /* ===== CSS STYLES MOVED TO EXTERNAL FILE ===== */
+  /* All CSS styles have been moved to trading-ui/styles-new/header-styles.css */
+  /* This significantly improves:
+   * 1. Performance - Browser can cache the CSS file
+   * 2. Maintainability - CSS in dedicated file
+   * 3. Code organization - Separation of concerns
+   * 4. Loading speed - No need to parse and inject CSS dynamically
+   * Date: 11 October 2025
+   */
 
 
   static async loadAccountsForFilter() {

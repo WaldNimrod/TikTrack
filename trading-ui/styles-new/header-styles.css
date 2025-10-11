@@ -423,29 +423,7 @@
 
 /* .filter-group styles moved to _unified-log-display.css */
 
-.filter-toggle {
-    display: flex;
-    align-items: center;
-    gap: 0.45rem;
-    padding: 0.25rem 0.9rem;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 5.4px;
-    color: #1d1d1f;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 0.9rem;
-    font-weight: 400;
-    min-width: 120px;
-    justify-content: space-between;
-}
-
-.filter-toggle:hover {
-    border-color: #ff9500;
-    color: #ff9500;
-    background: white;
-    box-shadow: none;
-}
+/* Filter toggle removed - duplicate, see final version in "Additional Styles" section below */
 
 .filter-menu {
     position: absolute;
@@ -493,57 +471,7 @@
     margin-left: auto;
 }
 
-.reset-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    min-width: 28px;
-    min-height: 28px;
-    background: white;
-    border: 1px solid #26baac;
-    border-radius: 4px;
-    color: #26baac;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 14px;
-    font-weight: normal;
-}
-
-.clear-btn {
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-    width: 28px !important;
-    height: 28px !important;
-    min-width: 28px !important;
-    min-height: 28px !important;
-    max-width: 28px !important;
-    max-height: 28px !important;
-    background: white;
-    border: 1px solid #fb5a05;
-    border-radius: 4px;
-    color: #fb5a05;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 14px;
-    font-weight: normal;
-    padding: 0 !important;
-    margin: 0;
-    flex-shrink: 0 !important;
-    box-sizing: border-box;
-}
-
-.reset-btn:hover {
-    background: #26baac;
-    color: white;
-}
-
-.clear-btn:hover {
-    background: #fb5a05;
-    color: white;
-}
+/* Reset and Clear buttons defined below in "Additional Styles from header-system.js" section */
 
 /* Search Filter */
 .search-input-wrapper {
@@ -671,32 +599,7 @@
 
 /* .filter-group duplicate styles moved to _unified-log-display.css */
 
-.filter-toggle {
-    display: flex;
-    align-items: center;
-    gap: 0.45rem;
-    padding: 0.45rem 0.9rem;
-    background: white ;
-    border: 1px solid #ddd ;
-    border-radius: 5.4px ;
-    color: #1d1d1f ;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 12.6px;
-    box-shadow: none ;
-    outline: none ;
-    width: 120px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.filter-toggle:hover {
-    border-color: #ff9500 ;
-    color: #ff9500 ;
-    background: white ;
-    box-shadow: none ;
-}
+/* Filter toggle removed - duplicate, see final version in "Additional Styles" section below */
 
 .filter-menu {
     position: absolute;
@@ -834,48 +737,7 @@
 
 /* .action-buttons מוגדר ב-_background-tasks.css לפי ITCSS */
 
-.reset-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    background: white ;
-    border: none ;
-    border-radius: 6px ;
-    color: #26baac ;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: none ;
-    outline: none ;
-    font-size: 18px ;
-    font-weight: bold ;
-}
-
-.clear-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    background: white ;
-    border: none ;
-    border-radius: 6px ;
-    color: #ff9500 ;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: none ;
-    outline: none ;
-    font-size: 18px ;
-    font-weight: bold ;
-}
-
-.reset-btn:hover, .clear-btn:hover {
-    border-color: #ff9500 ;
-    color: #ff9500 ;
-    background: white ;
-    box-shadow: none ;
-}
+/* Reset and Clear buttons removed - duplicates, see final version below */
 
 /* Level 3 Submenu - רמה 3 של התפריט (בסגנון אפל) */
 .level3-submenu {
@@ -906,5 +768,552 @@
     height: 1px;
     background: #e5e5e5;
     margin: 0.5rem 0;
+}
+
+/* ===== Additional Styles from header-system.js ===== */
+/* Moved from inline JS styles to external CSS (11 Oct 2025) */
+
+/* CRITICAL: Header Content Container */
+.header-content {
+    position: relative;
+    max-width: 1400px;
+    margin: 0 auto;
+    z-index: 960;
+}
+
+/* CRITICAL: Header Top Wrapper - Override from JS */
+.header-top {
+    padding: 15px 0;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* CRITICAL: Header Container Flex - Override from JS */
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    overflow: visible;
+}
+
+/* CRITICAL RTL: Logo positioning - RIGHT side (end of line) */
+#unified-header .header-top .logo-section {
+    order: 2 !important;
+    margin-right: 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+/* CRITICAL RTL: Navigation positioning - LEFT side (start of line) */
+#unified-header .header-top .header-nav {
+    order: 1 !important;
+    margin-left: 0 !important;
+    flex: 1;
+    display: flex;
+    justify-content: flex-start;
+}
+
+/* Main Navigation */
+.main-nav {
+    display: flex;
+}
+
+/* Navigation List */
+.tiktrack-nav-list {
+    display: flex;
+    list-style: none;
+    gap: 30px;
+    align-items: center;
+}
+
+/* Navigation Item */
+.tiktrack-nav-item {
+    position: relative;
+}
+
+/* Navigation Link */
+.tiktrack-nav-link {
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tiktrack-nav-link:hover {
+    background: rgba(255,255,255,0.1);
+    transform: translateY(-2px);
+}
+
+/* Navigation Icons and Text */
+.nav-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.nav-text {
+    font-weight: 500;
+}
+
+/* Dropdown Arrow */
+.tiktrack-dropdown-arrow {
+    font-size: 12px;
+    transition: transform 0.3s ease;
+}
+
+.tiktrack-nav-item.dropdown:hover .tiktrack-dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+/* Dropdown Menu - CRITICAL positioning */
+.tiktrack-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    min-width: 200px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 954;
+}
+
+.tiktrack-nav-item.dropdown:hover .tiktrack-dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Dropdown Items */
+.tiktrack-dropdown-item {
+    color: #333;
+    text-decoration: none;
+    padding: 12px 20px;
+    display: block;
+    border-bottom: 1px solid #f0f0f0;
+    transition: all 0.3s ease;
+}
+
+.tiktrack-dropdown-item:hover {
+    background: #f8f9fa;
+    color: #667eea;
+}
+
+.tiktrack-dropdown-item:last-child {
+    border-bottom: none;
+}
+
+/* Logo Styling - CRITICAL */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo-image {
+    width: 40px;
+    height: 40px;
+}
+
+.logo-text {
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+}
+
+/* Filter Toggle Section - CRITICAL positioning */
+.filter-toggle-section {
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Main toggle button */
+.filter-toggle-main {
+    bottom: -10px;
+    z-index: 951;
+}
+
+/* Secondary toggle button */
+.filter-toggle-secondary {
+    z-index: 951;
+}
+
+/* Header Filter Toggle Button */
+.header-filter-toggle-btn {
+    background: rgba(255,255,255,0.9);
+    border: 1px solid #fb5a05;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    min-height: 20px;
+    max-width: 20px;
+    max-height: 20px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative;
+    z-index: 952;
+}
+
+.header-filter-toggle-btn:hover {
+    background: white;
+    transform: scale(1.1);
+    border-color: #fb5a05;
+}
+
+.header-filter-arrow {
+    font-size: 10px;
+    color: #fb5a05;
+    transition: transform 0.3s ease;
+}
+
+.header-filter-toggle-btn.collapsed .header-filter-arrow {
+    transform: rotate(-90deg);
+}
+
+/* Filter Dropdown - CRITICAL for positioning */
+.filter-dropdown {
+    position: relative;
+}
+
+/* Filter Group - CRITICAL */
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+}
+
+/* Filter Toggle Button */
+.filter-toggle {
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 5px 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 150px;
+    justify-content: space-between;
+}
+
+.filter-toggle:hover {
+    border-color: #667eea;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+}
+
+.filter-toggle.active {
+    border-color: #667eea;
+    background: #f8f9ff;
+}
+
+/* Selected Value Display */
+.selected-value {
+    color: #333;
+    font-weight: 500;
+}
+
+/* Dropdown Arrow in Filters */
+.dropdown-arrow {
+    color: #667eea;
+    font-size: 12px;
+    transition: transform 0.3s ease;
+}
+
+.filter-toggle.active .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+/* Filter Menu - CRITICAL positioning */
+.filter-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    min-width: 150px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 953;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.filter-toggle.active .filter-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Filter Items */
+.status-filter-item,
+.type-filter-item,
+.account-filter-item,
+.date-range-filter-item {
+    padding: 6px 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.status-filter-item:hover,
+.type-filter-item:hover,
+.account-filter-item:hover,
+.date-range-filter-item:hover {
+    background: #f8f9ff;
+    color: #667eea;
+}
+
+.status-filter-item:last-child,
+.type-filter-item:last-child,
+.account-filter-item:last-child,
+.date-range-filter-item:last-child {
+    border-bottom: none;
+}
+
+.status-filter-item.selected,
+.type-filter-item.selected,
+.account-filter-item.selected,
+.date-range-filter-item.selected {
+    background: rgba(102, 126, 234, 0.3);
+    color: #667eea;
+    font-weight: 600;
+}
+
+.option-text {
+    font-weight: 500;
+}
+
+/* Search Filter */
+.search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-filter-input {
+    padding: 5px 40px 5px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    min-width: 200px;
+    transition: all 0.3s ease;
+}
+
+.search-filter-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Search Clear Button */
+.search-clear-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    min-height: 16px;
+    max-width: 16px;
+    max-height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.3s ease;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    z-index: 10;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.search-input-wrapper:hover .search-clear-btn,
+.search-filter-input:focus + .search-clear-btn {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.search-clear-btn:hover {
+    color: #667eea;
+    background: none;
+    transform: translateY(-50%);
+}
+
+/* Filter Actions */
+.filter-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.filter-action-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Reset and Clear Buttons - from JS inline styles */
+.reset-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+    background: white;
+    border: 1px solid #26baac;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    font-weight: normal;
+    color: #26baac;
+}
+
+.clear-btn {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    min-height: 28px !important;
+    max-width: 28px !important;
+    max-height: 28px !important;
+    background: white;
+    border: 1px solid #fb5a05;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    font-weight: normal;
+    color: #fb5a05;
+    padding: 0 !important;
+    margin: 0;
+    flex-shrink: 0 !important;
+    box-sizing: border-box;
+}
+
+.reset-btn:hover {
+    background: #26baac;
+    color: white;
+}
+
+.clear-btn:hover {
+    background: #fb5a05;
+    color: white;
+}
+
+/* Cache Button Styling */
+.cache-btn {
+    background: #ffc107;
+    color: #212529;
+}
+
+.cache-btn:hover {
+    background: #e0a800;
+    transform: translateY(-2px);
+}
+
+/* Cache Clear Button */
+.cache-clear-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.cache-clear-btn:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+    border-radius: 4px;
+    transform: scale(1.1);
+}
+
+.cache-clear-btn:active {
+    transform: scale(0.95);
+}
+
+/* Cache Clear Button - Nav Text Styling */
+.cache-clear-btn .nav-text {
+    color: var(--primary-color, #007bff);
+    font-size: 1.2rem;
+}
+
+.btn-text {
+    font-weight: 500;
+}
+
+/* Responsive Design - from JS */
+@media (max-width: 768px) {
+    .header-container {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .tiktrack-nav-list {
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .filters-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-group {
+        justify-content: center;
+    }
+
+    .filter-toggle {
+        min-width: 200px;
+    }
+
+    .search-filter-input {
+        min-width: 250px;
+    }
 }
 

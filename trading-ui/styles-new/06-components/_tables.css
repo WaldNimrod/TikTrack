@@ -452,6 +452,25 @@ table tbody td button.btn-sm {
   display: block; /* מאפשר לטבלה להתאים לרוחב */
 }
 
+/* Sortable Header Buttons - 11/01/2025 */
+.sortable-header {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  text-align: center;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.sortable-header:hover {
+  text-decoration: none;
+  color: inherit;
+  opacity: 0.8;
+}
+
 /* וידוא שהקונטיינר לא יוצר גלילה */
 .table-container {
   width: 100%;

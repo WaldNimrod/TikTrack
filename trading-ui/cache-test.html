@@ -501,34 +501,224 @@
                                             </button>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-
-                            <!-- Cache Layer Management -->
-                            <div class="cache-layer-section">
-                                <h5 class="layer-section-title">
-                                    <span class="layer-badge layer-1">⚙️</span>
-                                    ניהול שכבות מטמון
-                                </h5>
-                                <div class="cache-management-grid">
+                                    
                                     <div class="cache-management-card">
                                         <div class="cache-management-header">
-                                            <i class="fas fa-trash-alt text-danger"></i>
-                                            <h6>ניקוי מלא</h6>
+                                            <i class="fas fa-list-check text-success"></i>
+                                            <h6>בדיקת רמות ניקוי</h6>
                                         </div>
                                         <div class="cache-management-description">
-                                            <p>מנקה את כל שכבות המטמון</p>
-                                            <div class="cache-layers-indicator">
-                                                <span class="layer-badge layer-1" title="Memory">🧠</span>
-                                                <span class="layer-badge layer-2" title="localStorage">💾</span>
-                                                <span class="layer-badge layer-3" title="IndexedDB">🗄️</span>
-                                                <span class="layer-badge layer-4" title="Backend">🖥️</span>
+                                            <p>בודק את 4 רמות הניקוי (Light, Medium, Full)</p>
+                                            <div class="mb-2">
+                                                <span class="badge bg-success">Light</span>
+                                                <span class="badge bg-primary">Medium</span>
+                                                <span class="badge bg-warning">Full</span>
+                                                <span class="badge bg-secondary">Nuclear (ידני)</span>
                                             </div>
-                                            <button class="btn btn-sm btn-outline-danger" onclick="clearAllCache()">
-                                                <i class="fas fa-trash-alt"></i> נקה הכל
+                                            <button class="btn btn-sm btn-outline-success" onclick="testClearingLevels()">
+                                                <i class="fas fa-list-check"></i> בדוק רמות ניקוי
                                             </button>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+
+                            <!-- Cache Clearing Levels - 4 Intensity Levels -->
+                            <div class="cache-layer-section">
+                                <h5 class="layer-section-title">
+                                    <span class="layer-badge layer-1">🎚️</span>
+                                    רמות ניקוי מטמון - מערכת מלאה (100% כיסוי)
+                                </h5>
+                                <p class="text-muted mb-3" style="text-align: right;">
+                                    4 רמות עוצמה מדורגות - מקל (Light) ועד גרעיני (Nuclear). בחר לפי צורך הפיתוח.
+                                </p>
+                                
+                                <!-- 4 Level Cards (2x2 grid) -->
+                                <div class="row g-3 mb-4">
+                                    <!-- Light Card -->
+                                    <div class="col-md-6">
+                                        <div class="cache-management-card border-success">
+                                            <div class="cache-management-header bg-success bg-opacity-10">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <h6 class="mb-0">🟢 Light - ניקוי קל</h6>
+                                                    </div>
+                                                    <span class="badge bg-success">25% כיסוי</span>
+                                                </div>
+                                            </div>
+                                            <div class="cache-management-description">
+                                                <p class="small"><strong>מתי:</strong> מבחנים מהירים, איפוס memory</p>
+                                                <ul class="small mb-2">
+                                                    <li>✅ Memory Layer</li>
+                                                    <li>✅ Service Caches (7-9)</li>
+                                                    <li>❌ localStorage (ישאר)</li>
+                                                    <li>❌ Orphan Keys (ישארו)</li>
+                                                </ul>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <small class="text-muted">בטיחות: גבוהה | הפיך: כן</small>
+                                                </div>
+                                                <button class="btn btn-sm btn-outline-success w-100 mt-2" onclick="clearAllCache({ level: 'light' })">
+                                                    🟢 נקה - Light
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Medium Card -->
+                                    <div class="col-md-6">
+                                        <div class="cache-management-card border-primary">
+                                            <div class="cache-management-header bg-primary bg-opacity-10">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <h6 class="mb-0">🔵 Medium - ניקוי בינוני</h6>
+                                                    </div>
+                                                    <div>
+                                                        <span class="badge bg-primary">60% כיסוי</span>
+                                                        <span class="badge bg-info">ברירת מחדל</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="cache-management-description">
+                                                <p class="small"><strong>מתי:</strong> פיתוח יומיומי - <strong>מומלץ!</strong></p>
+                                                <ul class="small mb-2">
+                                                    <li>✅ כל Light</li>
+                                                    <li>✅ UnifiedCacheManager (4 שכבות)</li>
+                                                    <li>❌ Orphan Keys (ישארו)</li>
+                                                </ul>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <small class="text-muted">בטיחות: בינונית | הפיך: חלקי</small>
+                                                </div>
+                                                <p class="small text-info mb-2">
+                                                    <i class="fas fa-info-circle"></i>
+                                                    כפתור 🧹 בתפריט הראשי
+                                                </p>
+                                                <button class="btn btn-sm btn-primary w-100 mt-2" onclick="clearAllCache({ level: 'medium' })">
+                                                    🔵 נקה - Medium
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Full Card -->
+                                    <div class="col-md-6">
+                                        <div class="cache-management-card border-warning">
+                                            <div class="cache-management-header bg-warning bg-opacity-10">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <h6 class="mb-0">🟠 Full - ניקוי מלא</h6>
+                                                    </div>
+                                                    <span class="badge bg-warning">100% כיסוי</span>
+                                                </div>
+                                            </div>
+                                            <div class="cache-management-description">
+                                                <p class="small"><strong>מתי:</strong> לפני commits/releases</p>
+                                                <ul class="small mb-2">
+                                                    <li>✅ כל Medium</li>
+                                                    <li>✅ Orphan Keys (~17)</li>
+                                                    <li>⚠️ כולל: authToken, currentUser</li>
+                                                </ul>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <small class="text-muted">בטיחות: נמוכה | הפיך: לא</small>
+                                                </div>
+                                                <div class="alert alert-warning p-1 small mb-2">
+                                                    ⚠️ דורש login מחדש!
+                                                </div>
+                                                <button class="btn btn-sm btn-warning w-100 mt-2" onclick="clearAllCache({ level: 'full' })">
+                                                    🟠 נקה - Full
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Nuclear Card -->
+                                    <div class="col-md-6">
+                                        <div class="cache-management-card border-danger">
+                                            <div class="cache-management-header bg-danger bg-opacity-10">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <h6 class="mb-0">☢️ Nuclear - גרעיני</h6>
+                                                    </div>
+                                                    <span class="badge bg-danger">150%+ כיסוי</span>
+                                                </div>
+                                            </div>
+                                            <div class="cache-management-description">
+                                                <p class="small"><strong>מתי:</strong> חירום בלבד! reset מוחלט</p>
+                                                <ul class="small mb-2">
+                                                    <li>☢️ כל Full</li>
+                                                    <li>☢️ ALL localStorage (ללא סינון!)</li>
+                                                    <li>☢️ DELETE IndexedDB database</li>
+                                                </ul>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <small class="text-muted">בטיחות: אפס | הפיך: לא</small>
+                                                </div>
+                                                <div class="alert alert-danger p-1 small mb-2">
+                                                    ⚠️⚠️⚠️ מוחק גם נתונים של אתרים אחרים!
+                                                </div>
+                                                <button class="btn btn-sm btn-danger w-100 mt-2" onclick="clearAllCache({ level: 'nuclear' })">
+                                                    ☢️ נקה - Nuclear
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Comparison Table -->
+                                <div class="table-responsive mb-3">
+                                    <table class="table table-sm table-bordered text-center">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>רמה</th>
+                                                <th>UnifiedCM</th>
+                                                <th>Services</th>
+                                                <th>Orphans</th>
+                                                <th>All LS</th>
+                                                <th>Delete DB</th>
+                                                <th>כיסוי</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><span class="badge bg-success">Light</span></td>
+                                                <td>Memory</td>
+                                                <td>✅</td>
+                                                <td>❌</td>
+                                                <td>❌</td>
+                                                <td>❌</td>
+                                                <td>25%</td>
+                                            </tr>
+                                            <tr class="table-primary">
+                                                <td><span class="badge bg-primary">Medium</span></td>
+                                                <td>4 שכבות</td>
+                                                <td>✅</td>
+                                                <td>❌</td>
+                                                <td>❌</td>
+                                                <td>❌</td>
+                                                <td>60%</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="badge bg-warning">Full</span></td>
+                                                <td>4 שכבות</td>
+                                                <td>✅</td>
+                                                <td>✅</td>
+                                                <td>❌</td>
+                                                <td>❌</td>
+                                                <td>100%</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="badge bg-danger">Nuclear</span></td>
+                                                <td>4 שכבות</td>
+                                                <td>✅</td>
+                                                <td>✅</td>
+                                                <td>✅</td>
+                                                <td>✅</td>
+                                                <td>150%+</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <!-- Old cache management cards - kept for single layer operations -->
+                                <div class="cache-management-grid">
                                     
                                     <div class="cache-management-card">
                                         <div class="cache-management-header">
@@ -750,6 +940,134 @@
                                         </div>
                                     </div>
                                         </div>
+                
+                <!-- Future Features Section (Phase 2 - Disabled) -->
+                <div class="cache-layer-section mt-5">
+                    <h5 class="layer-section-title">
+                        <span class="layer-badge layer-1">🔮</span>
+                        כלים עתידיים - שלב 2 (מתוכנן)
+                    </h5>
+                    
+                    <div class="alert alert-info" style="direction: rtl;">
+                        <h6><i class="fas fa-info-circle"></i> התכונות הבאות מתוכננות ליישום בשלב 2</h6>
+                        <p class="mb-2">לאחר שהמערכת הבסיסית (4 רמות) תעבור בדיקות מקיפות ותפעל 2+ שבועות ללא בעיות.</p>
+                        <a href="/documentation/03-DEVELOPMENT/TESTING/FUTURE_CACHE_FEATURES_PLAN.md" 
+                           target="_blank" 
+                           class="btn btn-sm btn-outline-info">
+                            📖 קרא תוכנית מפורטת - שלב 2
+                        </a>
+                    </div>
+                    
+                    <div class="row g-3">
+                        <!-- CacheRegistry Dashboard -->
+                        <div class="col-md-6">
+                            <div class="cache-management-card" style="opacity: 0.6;">
+                                <div class="cache-management-header bg-secondary bg-opacity-10">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h6 class="mb-0">📊 CacheRegistry Dashboard</h6>
+                                        <span class="badge bg-secondary">שלב 2</span>
+                                    </div>
+                                </div>
+                                <div class="cache-management-description">
+                                    <p class="small">רישום ו-management מרכזי של כל ה-service caches</p>
+                                    <ul class="small mb-2">
+                                        <li>Auto-registration של services</li>
+                                        <li>Dashboard אוטומטי</li>
+                                        <li>סטטיסטיקות לכל service</li>
+                                    </ul>
+                                    <small class="text-muted">זמן פיתוח: 2-3 שעות</small>
+                                    <button class="btn btn-sm btn-secondary w-100 mt-2" disabled title="תכונה עתידית - שלב 2">
+                                        <i class="fas fa-lock"></i> הצג Dashboard (מושבת)
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- clearCacheBeforeCRUD -->
+                        <div class="col-md-6">
+                            <div class="cache-management-card" style="opacity: 0.6;">
+                                <div class="cache-management-header bg-secondary bg-opacity-10">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h6 class="mb-0">🤖 clearCacheBeforeCRUD</h6>
+                                        <span class="badge bg-secondary">שלב 2</span>
+                                    </div>
+                                </div>
+                                <div class="cache-management-description">
+                                    <p class="small">ניקוי אוטומטי לפני פעולות CRUD</p>
+                                    <div class="mb-2">
+                                        <span class="badge bg-success me-1">add → light</span>
+                                        <span class="badge bg-primary me-1">edit → medium</span>
+                                        <span class="badge bg-warning">delete → full</span>
+                                    </div>
+                                    <small class="text-muted">זמן פיתוח: 1-2 שעות</small>
+                                    <button class="btn btn-sm btn-secondary w-100 mt-2" disabled title="תכונה עתידית - שלב 2">
+                                        <i class="fas fa-lock"></i> בדוק אוטומציה (מושבת)
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- clearCacheByCategory Enhanced -->
+                        <div class="col-md-6">
+                            <div class="cache-management-card" style="opacity: 0.6;">
+                                <div class="cache-management-header bg-secondary bg-opacity-10">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h6 class="mb-0">📂 clearCacheByCategory משופר</h6>
+                                        <span class="badge bg-secondary">שלב 2</span>
+                                    </div>
+                                </div>
+                                <div class="cache-management-description">
+                                    <p class="small">ניקוי ממוקד לפי קטגוריה כולל orphans</p>
+                                    <div class="btn-group btn-group-sm mb-2" role="group">
+                                        <button class="btn btn-outline-secondary" disabled>ui-state</button>
+                                        <button class="btn btn-outline-secondary" disabled>preferences</button>
+                                        <button class="btn btn-outline-secondary" disabled>auth</button>
+                                        <button class="btn btn-outline-secondary" disabled>services</button>
+                                    </div>
+                                    <br>
+                                    <small class="text-muted">זמן פיתוח: 2-3 שעות</small>
+                                    <button class="btn btn-sm btn-secondary w-100 mt-2" disabled title="תכונה עתידית - שלב 2">
+                                        <i class="fas fa-lock"></i> ניקוי לפי קטגוריה (מושבת)
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Service-by-Service Management -->
+                        <div class="col-md-6">
+                            <div class="cache-management-card" style="opacity: 0.6;">
+                                <div class="cache-management-header bg-secondary bg-opacity-10">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h6 class="mb-0">🎛️ Service-by-Service</h6>
+                                        <span class="badge bg-secondary">שלב 2</span>
+                                    </div>
+                                </div>
+                                <div class="cache-management-description">
+                                    <p class="small">ניהול וניקוי פרטני לכל service</p>
+                                    <ul class="small mb-2">
+                                        <li>רשימת כל ה-services</li>
+                                        <li>סטטיסטיקות לכל service</li>
+                                        <li>ניקוי service בודד</li>
+                                    </ul>
+                                    <small class="text-muted">זמן פיתוח: 1-2 שעות</small>
+                                    <button class="btn btn-sm btn-secondary w-100 mt-2" disabled title="תכונה עתידית - שלב 2">
+                                        <i class="fas fa-lock"></i> נהל Services (מושבת)
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-secondary mt-3" style="direction: rtl;">
+                        <p class="mb-0">
+                            <i class="fas fa-calendar"></i>
+                            <strong>יישום משוער:</strong> שלב 2 ייושם רק אם יזוהה צורך אמיתי אחרי שימוש של 2+ שבועות בשלב 1.
+                            <br>
+                            <strong>סה"כ זמן פיתוח משוער:</strong> 6-10 שעות
+                        </p>
+                    </div>
+                </div>
+                
                 <!-- UI Content Section 1 End -->
 
                 <!-- UI Content Section 2 Start-->

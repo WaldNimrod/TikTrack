@@ -22,21 +22,106 @@
 - **מיקום:** http://localhost:8080/system-management
 - **כפתורים:**
   - 🔄 רענן נתוני מערכת
-  - 🗑️ נקה מטמון (ניקוי מלא)
+  - 🎚️ **רמות ניקוי מטמון (4 כפתורים):**
+    - 🟢 Light - ניקוי קל (25% כיסוי)
+    - 🔵 Medium - ניקוי בינוני (60% כיסוי) - **ברירת מחדל**
+    - 🟠 Full - ניקוי מלא (100% כיסוי)
+    - ☢️ Nuclear - ניקוי גרעיני (150%+ כיסוי)
   - 📊 סטטוס מטמון בזמן אמת
 
 ### **2. עמוד בדיקת מטמון** (`cache-test.html`)
 - **מיקום:** http://localhost:8080/cache-test
-- **כפתורים:**
+- **בדיקות:**
   - 🧪 בדיקת אינטגרציה (4 שכבות)
   - 🏥 בדיקת בריאות
   - ⚡ בדיקת ביצועים
+  - ✅ בדיקת רמות ניקוי (חדש!)
+- **ניקוי:**
+  - 🎚️ **4 כרטיסי רמות** (Light/Medium/Full/Nuclear)
+  - טבלת השוואה מפורטת
   - 🗑️ ניקוי שכבה ספציפית
+  - 🔮 תכונות עתידיות (מושבתות)
 
-### **3. Console בדפדפן**
+### **3. כפתור 🧹 בתפריט הראשי**
+- **קורא ל:** `clearAllCache({ level: 'medium' })`
+- **כיסוי:** 60% - UnifiedCacheManager + Service Caches
+- **בטיחות:** בינונית - לא נוגע ב-Orphan Keys
+
+### **4. Console בדפדפן**
 - **Chrome DevTools:** `F12` או `Cmd+Option+I`
 - **Console Tab** - לוגים בזמן אמת
 - **Application Tab** → **Storage** - ראה localStorage/IndexedDB
+
+---
+
+## 🎚️ **מערכת רמות ניקוי (חדש!)**
+
+### **4 רמות עוצמה מדורגות:**
+
+#### **רמה 1: Light 🟢**
+```javascript
+await clearAllCache({ level: 'light' });
+```
+**מנקה:**
+- Memory Layer
+- Service Caches (7-9)
+- CSS Management Sets
+
+**לא מנקה:**
+- localStorage (tiktrack_*)
+- Orphan Keys
+
+**מתי להשתמש:** מבחנים מהירים, איפוס memory  
+**כיסוי:** 25% | **בטיחות:** גבוהה | **הפיך:** כן
+
+---
+
+#### **רמה 2: Medium 🔵 (ברירת מחדל)**
+```javascript
+await clearAllCache({ level: 'medium' });
+// או:
+await clearAllCache();  // ברירת מחדל
+```
+**מנקה:**
+- כל Light
+- UnifiedCacheManager (4 שכבות)
+
+**לא מנקה:**
+- Orphan Keys (15-20)
+
+**מתי להשתמש:** פיתוח יומיומי, כפתור 🧹 בתפריט  
+**כיסוי:** 60% | **בטיחות:** בינונית | **הפיך:** חלקי
+
+---
+
+#### **רמה 3: Full 🟠**
+```javascript
+await clearAllCache({ level: 'full' });
+```
+**מנקה:**
+- כל Medium
+- Orphan Keys (15-20)
+- authToken, currentUser
+
+**מתי להשתמש:** לפני commits/releases, reset מלא  
+**כיסוי:** 100% | **בטיחות:** נמוכה | **הפיך:** לא  
+**⚠️ דורש login מחדש!**
+
+---
+
+#### **רמה 4: Nuclear ☢️**
+```javascript
+await clearAllCache({ level: 'nuclear' });
+```
+**מנקה:**
+- כל Full
+- ALL localStorage (ללא סינון!)
+- DELETE IndexedDB database
+- sessionStorage
+
+**מתי להשתמש:** חירום בלבד! reset מוחלט  
+**כיסוי:** 150%+ | **בטיחות:** אפס | **הפיך:** לא  
+**⚠️⚠️⚠️ מוחק גם נתונים של אתרים אחרים!**
 
 ---
 
@@ -369,6 +454,91 @@ NOTES: [כל דבר חריג]
 
 ---
 
-**סטטוס:** ✅ מוכן לשימוש  
+---
+
+## 🎯 **תרחישי שימוש מומלצים (חדש!)**
+
+### **תרחיש 1: מבחן מהיר**
+```javascript
+// Light - לא נוגע ב-persistent data
+await clearAllCache({ level: 'light' });
+```
+**למה:** איפוס Memory + Services בלבד, בטוח לחלוטין
+
+---
+
+### **תרחיש 2: פיתוח יומיומי**
+```javascript
+// Medium - ברירת מחדל, כפתור בתפריט
+await clearAllCache({ level: 'medium' });
+```
+**למה:** מנקה UnifiedCacheManager + Services, לא נוגע ב-orphans (בטוח יחסית)
+
+---
+
+### **תרחיש 3: לפני commit/push**
+```javascript
+// Full - כיסוי 100%
+await clearAllCache({ level: 'full' });
+```
+**למה:** ודא שאין נתונים ישנים, כולל orphans  
+**⚠️ שים לב:** דורש login מחדש (authToken נמחק)
+
+---
+
+### **תרחיש 4: באג מסתורי**
+```javascript
+// Full - reset מלא
+await clearAllCache({ level: 'full' });
+// רענן דף
+location.reload();
+```
+**למה:** לפעמים orphan keys גורמים לבאגים מוזרים
+
+---
+
+### **תרחיש 5: לפני demo/presentation**
+```javascript
+// Nuclear - מצב "כמו חדש"
+await clearAllCache({ level: 'nuclear' });
+location.reload();
+```
+**למה:** reset מוחלט, מערכת נקייה לחלוטין  
+**⚠️⚠️⚠️ רק בחירום!**
+
+---
+
+## 📊 **טבלת החלטה מהירה**
+
+| מצב | רמה מומלצת | סיבה |
+|-----|------------|------|
+| מבחן ביצועים | Light | לא נוגע ב-persistent |
+| עבודה יומיומית | Medium | איזון טוב |
+| סיום יום עבודה | Medium | ניקיון כללי |
+| לפני commit | Full | ודא נקי 100% |
+| באג מוזר | Full | reset מלא |
+| לפני release | Full | ודא מצב נקי |
+| לפני demo | Nuclear | מצב "חדש" |
+| תקלה חמורה | Nuclear | reset מוחלט |
+
+---
+
+## 🧪 **בדיקה אוטומטית של הרמות**
+
+```javascript
+// הרץ בדיקה מקיפה של כל 3 הרמות (Light, Medium, Full)
+const results = await testClearingLevels();
+console.log('Test Results:', results);
+```
+
+**מה נבדק:**
+- ✅ Light: Memory=0, localStorage>0, orphans>0
+- ✅ Medium: All UnifiedCM=0, orphans>0
+- ✅ Full: הכל=0
+- ⚠️ Nuclear: ידני בלבד (הרסני מדי)
+
+---
+
+**סטטוס:** ✅ מוכן לשימוש - עודכן עם מערכת רמות  
 **עדכון אחרון:** 11.10.2025
 

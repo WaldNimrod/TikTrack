@@ -248,7 +248,8 @@
 }
 
 .tiktrack-nav-link:hover {
-    color: #1e9a8a; /* צבע הלוגו כהה יותר ב-hover */
+    color: #26baac; /* ירוק לוגו - אחיד */
+    background: rgba(38, 186, 172, 0.1); /* ירוק עם שקיפות - אחיד */
 }
 
 .tiktrack-nav-item.active .tiktrack-nav-link {
@@ -356,7 +357,7 @@
         .tiktrack-dropdown-item {
             display: block;
             padding: 0.5rem 1rem;
-            color: #29a6a8; /* ירוק לוגו כברירת מחדל */
+            color: #1d1d1f; /* צבע טקסט רגיל */
             text-decoration: none;
             transition: all 0.2s ease;
             font-size: 14px;
@@ -379,8 +380,8 @@
 }
 
 .tiktrack-dropdown-item:hover {
-    background: #f5f5f7;
-    color: #ff9e04; /* כתום ב-hover */
+    color: #26baac; /* ירוק לוגו - אחיד */
+    background: rgba(38, 186, 172, 0.1); /* ירוק עם שקיפות */
 }
 
         /* Submenus */
@@ -833,21 +834,7 @@
     position: relative;
 }
 
-/* Navigation Link */
-.tiktrack-nav-link {
-    text-decoration: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.tiktrack-nav-link:hover {
-    background: rgba(255,255,255,0.1);
-    transform: translateY(-2px);
-}
+/* Navigation Link - removed duplicate, see line 237 */
 
 /* Navigation Icons and Text */
 .nav-icon {
@@ -893,17 +880,18 @@
 
 /* Dropdown Items */
 .tiktrack-dropdown-item {
-    color: #333;
+    color: #1d1d1f; /* צבע טקסט רגיל - אחיד */
     text-decoration: none;
-    padding: 12px 20px;
+    padding: 0.5rem 1rem; /* אחיד עם פילטרים */
     display: block;
     border-bottom: 1px solid #f0f0f0;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease; /* אחיד */
+    font-size: 14px; /* אחיד */
 }
 
 .tiktrack-dropdown-item:hover {
-    background: #f8f9fa;
-    color: #667eea;
+    color: #26baac; /* ירוק לוגו - אחיד */
+    background: rgba(38, 186, 172, 0.1); /* ירוק עם שקיפות - אחיד */
 }
 
 .tiktrack-dropdown-item:last-child {
@@ -1020,10 +1008,11 @@
 }
 
 .filter-toggle:hover {
-    color: #26baac; /* ירוק לוגו - כמו תפריט ראשי */
-    background: transparent; /* ללא רקע */
-    border-color: #ddd; /* שמירת גבול מקורי */
-    box-shadow: none;
+    color: #26baac; /* ירוק לוגו - אחיד */
+    background: rgba(38, 186, 172, 0.1); /* ירוק עם שקיפות - אחיד */
+    border-color: #26baac; /* גבול ירוק */
+    box-shadow: none; /* ללא צל */
+    transform: none; /* ללא תזוזה */
 }
 
 .filter-toggle.active {
@@ -1077,18 +1066,20 @@
 .type-filter-item,
 .account-filter-item,
 .date-range-filter-item {
-    padding: 6px 15px;
+    padding: 0.5rem 1rem; /* אחיד עם תפריט ראשי */
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease; /* אחיד עם תפריט ראשי */
     border-bottom: 1px solid #f0f0f0;
+    font-size: 14px; /* אחיד עם תפריט ראשי */
+    color: #1d1d1f; /* צבע טקסט רגיל */
 }
 
 .status-filter-item:hover,
 .type-filter-item:hover,
 .account-filter-item:hover,
 .date-range-filter-item:hover {
-    background: #f8f9ff;
-    color: #667eea;
+    color: #26baac; /* ירוק לוגו - אחיד */
+    background: rgba(38, 186, 172, 0.1); /* ירוק עם שקיפות - אחיד */
 }
 
 .status-filter-item:last-child,

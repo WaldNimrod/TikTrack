@@ -170,9 +170,38 @@
                                             <button class="btn btn-success btn-sm" onclick="runSystemCheck()">
                                                 🔍 בדיקת מערכת
                                             </button>
-                                            <button class="btn btn-info btn-sm" onclick="window.clearAllCache()">
-                                                🗑️ נקה מטמון
-                                            </button>
+                                        </div>
+                                        
+                                        <!-- Cache Clearing Levels -->
+                                        <div class="mt-3">
+                                            <h6 class="mb-2">🎚️ רמות ניקוי מטמון:</h6>
+                                            <div class="btn-group btn-group-sm w-100" role="group">
+                                                <button class="btn btn-outline-success" 
+                                                        onclick="clearAllCache({ level: 'light' })" 
+                                                        title="Light: Memory + Services בלבד (25% כיסוי)">
+                                                    🟢 Light
+                                                </button>
+                                                <button class="btn btn-outline-primary" 
+                                                        onclick="clearAllCache({ level: 'medium' })" 
+                                                        title="Medium: UnifiedCM + Services (60% כיסוי) - ברירת מחדל">
+                                                    🔵 Medium
+                                                </button>
+                                                <button class="btn btn-outline-warning" 
+                                                        onclick="clearAllCache({ level: 'full' })" 
+                                                        title="Full: כולל Orphan Keys (100% כיסוי) - דורש login מחדש!">
+                                                    🟠 Full
+                                                </button>
+                                                <button class="btn btn-outline-danger" 
+                                                        onclick="clearAllCache({ level: 'nuclear' })" 
+                                                        title="Nuclear: מוחק הכל! (150%+ כיסוי) - חירום בלבד!">
+                                                    ☢️ Nuclear
+                                                </button>
+                                            </div>
+                                            <p class="small text-muted mb-0 mt-1" style="text-align: right;">
+                                                <i class="fas fa-info-circle"></i>
+                                                כפתור 🧹 בתפריט הראשי: Medium | 
+                                                פרטים מלאים: <a href="/cache-test" target="_blank">עמוד בדיקת מטמון</a>
+                                            </p>
                                         </div>
                                     </div>
                                 </div>

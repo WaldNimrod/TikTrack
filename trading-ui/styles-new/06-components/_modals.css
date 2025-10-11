@@ -5,9 +5,10 @@
  * קובץ זה מכיל את הסגנונות של כל המודלים במערכת
  * מבוסס על הסגנונות הקיימים ב-apple-theme.css
  * 
- * @version 1.2.3
+ * @version 1.2.4
  * @lastUpdated January 11, 2025
- * @changes Entity modals: white bg, colored border, X close button, unified footer
+ * @changes Entity modals: forced white bg, 3px colored border, X button with size, unified footer
+ * @note !important used to override Bootstrap - documented as approved
  */
 
 /* מודל בסיסי - מבוסס על apple-theme.css */
@@ -327,17 +328,34 @@
 
 /* ===== Entity Modal Styles - 11/01/2025 ===== */
 
-/* כותרת מודל עם צבע ישות */
+/* רקע לבן תמיד */
+.modal-content.entity-trade-plan {
+  background-color: white !important;
+}
+
+.modal-content.entity-trade-plan .modal-header {
+  background-color: white !important;
+}
+
+.modal-content.entity-trade-plan .modal-body {
+  background-color: white !important;
+}
+
+.modal-content.entity-trade-plan .modal-footer {
+  background-color: white !important;
+}
+
+/* כותרת מודל - לבן עם מסגרת תחתונה צבעונית */
 .entity-header {
-  background-color: var(--entity-bg, var(--entity-trade-plan-bg, rgba(0, 86, 179, 0.1)));
-  border-bottom: none;
+  background-color: white !important;
+  border-bottom: 3px solid var(--entity-color, #0056b3) !important;
   display: flex;
   align-items: center;
+  padding: 1rem 1.5rem;
 }
 
 /* Trade Plan Entity */
 .entity-trade-plan {
-  --entity-bg: var(--entity-trade-plan-bg, rgba(0, 86, 179, 0.1));
   --entity-text: var(--entity-trade-plan-text, #004085);
   --entity-color: var(--entity-trade-plan-color, #0056b3);
 }
@@ -346,6 +364,8 @@
 .entity-header .entity-title {
   font-weight: 700;
   color: var(--entity-text, #004085);
+  margin: 0;
+  flex: 1;
 }
 
 /* Labels בטופס - צבע ישות */
@@ -355,27 +375,37 @@
 }
 
 /* כפתור סגירה בסוף השורה (שמאל בעברית) */
-/* NOTE: !important נדרש כאן כי Bootstrap משתמש ב-!important על btn-close */
+/* NOTE: !important נדרש כאן כי Bootstrap משתמש ב-!important */
 .entity-header .btn-close,
 .entity-header .btn-close-end {
-  margin-inline-start: auto; /* דוחף לסוף השורה - שמאל בעברית */
-  margin-inline-end: 0;
-  background: none !important; /* דורס Bootstrap */
-  border: none;
+  margin-inline-start: auto !important; /* דוחף לסוף השורה */
+  margin-inline-end: 0 !important;
+  background: none !important;
+  border: none !important;
+  font-size: 2.5rem !important;
+  line-height: 1 !important;
+  color: var(--entity-text, #004085) !important;
+  opacity: 1 !important;
+  padding: 0.25rem 0.5rem !important;
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+  font-weight: 300 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.entity-header .btn-close::after,
+.entity-header .btn-close-end::after {
+  content: "×";
   font-size: 2.5rem;
   line-height: 1;
-  color: var(--entity-text, #004085) !important; /* דורס Bootstrap */
-  opacity: 1 !important; /* דורס Bootstrap */
-  padding: 0.25rem 0.5rem;
-  width: auto;
-  height: auto;
-  font-weight: 300;
 }
 
 .entity-header .btn-close:hover,
 .entity-header .btn-close-end:hover {
-  opacity: 0.7 !important; /* דורס Bootstrap */
-  background-color: rgba(0, 68, 133, 0.08) !important; /* דורס Bootstrap */
+  opacity: 0.7 !important;
+  background-color: rgba(0, 68, 133, 0.08) !important;
   border-radius: 4px;
 }
 

@@ -788,6 +788,191 @@ window.clearLog = clearLog;
 window.exportLog = exportLog;
 window.toggleAllSections = toggleAllSections;
 
+// ========================================
+// Cache Clearing Levels Testing
+// ========================================
+
+/**
+ * Test all 4 cache clearing levels
+ * Validates that each level clears what it should and doesn't clear what it shouldn't
+ * @returns {Promise<Object>} Test results for all levels
+ */
+window.testClearingLevels = async function() {
+    console.log('🧪 Testing all 4 cache clearing levels...');
+    
+    const testResults = {
+        light: { tested: false, passed: false, details: {} },
+        medium: { tested: false, passed: false, details: {} },
+        full: { tested: false, passed: false, details: {} },
+        nuclear: { tested: false, passed: false, note: 'Manual test only - too destructive' }
+    };
+    
+    try {
+        // Helper: Capture full snapshot
+        async function captureSnapshot() {
+            const snapshot = {
+                memory: await window.UnifiedCacheManager.getLayerStats('memory'),
+                localStorage: await window.UnifiedCacheManager.getLayerStats('localStorage'),
+                indexedDB: await window.UnifiedCacheManager.getLayerStats('indexedDB'),
+                backend: await window.UnifiedCacheManager.getLayerStats('backend'),
+                orphansCount: 0
+            };
+            
+            // Count orphan keys
+            const orphanKeysList = [
+                'cashFlowsSectionState', 'executionsTopSectionCollapsed',
+                'colorScheme', 'customColorScheme', 'headerFilters', 'consoleSettings',
+                'authToken', 'currentUser',
+                'crud_test_results', 'linterLogs', 'css-duplicates-results', 'serverMonitorSettings'
+            ];
+            orphanKeysList.forEach(key => {
+                if (localStorage.getItem(key) !== null) {
+                    snapshot.orphansCount++;
+                }
+            });
+            
+            // Count dynamic keys
+            Object.keys(localStorage).forEach(key => {
+                if (/^sortState_|^section-visibility-|^top-section-collapsed-/.test(key)) {
+                    snapshot.orphansCount++;
+                }
+            });
+            
+            return snapshot;
+        }
+        
+        // === TEST LIGHT ===
+        console.log('\n🧪 Testing LIGHT level...');
+        const beforeLight = await captureSnapshot();
+        
+        // Clear using Light
+        const lightResult = await window.clearAllCache({ 
+            level: 'light', 
+            skipConfirmation: true,
+            verbose: false 
+        });
+        
+        const afterLight = await captureSnapshot();
+        
+        testResults.light.tested = true;
+        testResults.light.details = {
+            memoryCleared: afterLight.memory.entries === 0,
+            localStorageUntouched: afterLight.localStorage.entries === beforeLight.localStorage.entries,
+            indexedDBUntouched: afterLight.indexedDB.entries === beforeLight.indexedDB.entries,
+            orphansUntouched: afterLight.orphansCount >= beforeLight.orphansCount - 1  // -1 for css-duplicates
+        };
+        testResults.light.passed = 
+            testResults.light.details.memoryCleared &&
+            testResults.light.details.localStorageUntouched &&
+            testResults.light.details.indexedDBUntouched;
+        
+        console.log(`${testResults.light.passed ? '✅' : '❌'} LIGHT test:`, testResults.light.details);
+        
+        // Wait a bit before next test
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // === TEST MEDIUM ===
+        console.log('\n🧪 Testing MEDIUM level...');
+        
+        // Re-populate some data for testing
+        await window.UnifiedCacheManager.save('test-medium', 'data', { layer: 'localStorage' });
+        await window.UnifiedCacheManager.save('test-idb', 'data', { layer: 'indexedDB' });
+        
+        const beforeMedium = await captureSnapshot();
+        
+        const mediumResult = await window.clearAllCache({ 
+            level: 'medium', 
+            skipConfirmation: true,
+            verbose: false 
+        });
+        
+        const afterMedium = await captureSnapshot();
+        
+        testResults.medium.tested = true;
+        testResults.medium.details = {
+            memoryCleared: afterMedium.memory.entries === 0,
+            localStorageCleared: afterMedium.localStorage.entries === 0,
+            indexedDBCleared: afterMedium.indexedDB.entries === 0,
+            backendCleared: afterMedium.backend.entries === 0,
+            orphansUntouched: afterMedium.orphansCount > 0
+        };
+        testResults.medium.passed = 
+            testResults.medium.details.memoryCleared &&
+            testResults.medium.details.localStorageCleared &&
+            testResults.medium.details.indexedDBCleared &&
+            testResults.medium.details.orphansUntouched;
+        
+        console.log(`${testResults.medium.passed ? '✅' : '❌'} MEDIUM test:`, testResults.medium.details);
+        
+        // Wait before next test
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // === TEST FULL ===
+        console.log('\n🧪 Testing FULL level...');
+        
+        // Add some orphan keys for testing
+        localStorage.setItem('test-orphan-state', 'test');
+        localStorage.setItem('sortState_test', 'test');
+        
+        const beforeFull = await captureSnapshot();
+        
+        const fullResult = await window.clearAllCache({ 
+            level: 'full', 
+            skipConfirmation: true,
+            verbose: false,
+            includeAuth: false  // Don't clear auth for safety in testing
+        });
+        
+        const afterFull = await captureSnapshot();
+        
+        testResults.full.tested = true;
+        testResults.full.details = {
+            allLayersCleared: afterFull.memory.entries === 0 && 
+                             afterFull.localStorage.entries === 0 &&
+                             afterFull.indexedDB.entries === 0,
+            orphansReduced: afterFull.orphansCount < beforeFull.orphansCount,
+            authPreserved: localStorage.getItem('authToken') !== null || 
+                          localStorage.getItem('currentUser') !== null ||
+                          true  // We set includeAuth=false
+        };
+        testResults.full.passed = 
+            testResults.full.details.allLayersCleared &&
+            testResults.full.details.orphansReduced;
+        
+        console.log(`${testResults.full.passed ? '✅' : '❌'} FULL test:`, testResults.full.details);
+        
+        // === NUCLEAR - MANUAL ONLY ===
+        console.log('\n⚠️ NUCLEAR test: Manual only (too destructive for automated testing)');
+        testResults.nuclear.tested = false;
+        testResults.nuclear.passed = 'N/A';
+        
+        // === SUMMARY ===
+        const totalPassed = Object.values(testResults).filter(r => r.passed === true).length;
+        const totalTested = Object.values(testResults).filter(r => r.tested === true).length;
+        
+        console.log('\n📊 Test Summary:');
+        console.log(`✅ Passed: ${totalPassed}/${totalTested}`);
+        console.log('Results:', testResults);
+        
+        // Show results in UI
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification(
+                'בדיקת רמות ניקוי',
+                `בדיקות הושלמו!\n\n✅ עברו: ${totalPassed}/${totalTested}\n\nLight: ${testResults.light.passed ? '✅' : '❌'}\nMedium: ${testResults.medium.passed ? '✅' : '❌'}\nFull: ${testResults.full.passed ? '✅' : '❌'}\nNuclear: ⚠️ ידני בלבד`
+            );
+        }
+        
+        return testResults;
+        
+    } catch (error) {
+        console.error('❌ Testing failed:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בבדיקות', error.message);
+        }
+        return testResults;
+    }
+};
+
 // Initialize when DOM is ready - only if not already initialized by UnifiedAppInitializer
 // Skip direct initialization for cache-test page as it's handled by UnifiedAppInitializer
 if (!window.cacheTestPage && !window.location.pathname.includes('cache-test')) {

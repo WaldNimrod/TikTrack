@@ -198,8 +198,8 @@ class HeaderSystem {
 
                     <li class="tiktrack-nav-item">
                       <button class="tiktrack-nav-link cache-clear-btn" 
-                              onclick="window.clearAllCache()" 
-                              title="ניקוי מטמון מלא">
+                              onclick="window.clearAllCache({ level: 'medium' })" 
+                              title="ניקוי מטמון בינוני (Medium) - UnifiedCacheManager + Service Caches">
                         <span class="nav-text">🧹</span>
                       </button>
                     </li>

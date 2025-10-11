@@ -2807,7 +2807,8 @@ window.testCacheSystemsIntegration = async function() {
                         // Try to save and retrieve from backend layer
                         await window.UnifiedCacheManager.layers.backend.save('test-backend', 'test-data-backend', { ttl: null });
                         const backendData = await window.UnifiedCacheManager.layers.backend.get('test-backend');
-                        testResults.backendLayer = backendData?.data === 'test-data-backend';
+                        // BackendCacheLayer.get() returns data directly, not wrapped in object
+                        testResults.backendLayer = backendData === 'test-data-backend';
                         await window.UnifiedCacheManager.layers.backend.remove('test-backend');
                     } else {
                         testResults.backendLayer = false;

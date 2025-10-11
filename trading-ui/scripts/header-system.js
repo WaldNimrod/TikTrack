@@ -665,8 +665,17 @@ class HeaderSystem {
         // הפעלת פילטרים על כל הטבלאות
         applyAllFilters() {
           console.log('🔧 applyAllFilters called');
-          this.applyFiltersToTable('tickersTable');
-          this.applyFiltersToTable('tradePlansTable');
+          
+          // מציאת כל הטבלאות בעמוד באופן דינמי
+          const tables = document.querySelectorAll('table.data-table[data-table-type]');
+          console.log(`🔧 Found ${tables.length} tables to filter`);
+          
+          tables.forEach(table => {
+            if (table.id) {
+              console.log(`🔧 Applying filters to table: ${table.id} (type: ${table.getAttribute('data-table-type')})`);
+              this.applyFiltersToTable(table.id);
+            }
+          });
         },
         
         // הפעלת פילטרים על טבלה ספציפית
@@ -680,13 +689,20 @@ class HeaderSystem {
           rows.forEach(row => {
             let shouldShow = true;
             
-            // פילטר סטטוס
+            // פילטר סטטוס - רק אם יש שדה רלוונטי בטבלה
             if (this.currentFilters.status.length > 0 && !this.currentFilters.status.includes('הכול')) {
               const statusCell = row.querySelector('td[data-status]');
               if (statusCell) {
+                // יש שדה סטטוס - בדוק את הפילטר
                 const rowStatus = statusCell.getAttribute('data-status');
-                shouldShow = shouldShow && this.currentFilters.status.includes(rowStatus);
+                const rowStatusText = statusCell.textContent.trim();
+                
+                // בדיקה גם לפי data attribute וגם לפי טקסט
+                const statusMatches = this.currentFilters.status.includes(rowStatus) || 
+                                    this.currentFilters.status.includes(rowStatusText);
+                shouldShow = shouldShow && statusMatches;
               }
+              // אם אין שדה סטטוס - תמיד הצג (לא מסנן)
             }
             
             // פילטר סוג - רק אם יש שדה רלוונטי בטבלה
@@ -705,31 +721,36 @@ class HeaderSystem {
               // אם אין שדה סוג - תמיד הצג (לא מסנן)
             }
             
-            // פילטר חשבון
+            // פילטר חשבון - רק אם יש שדה רלוונטי בטבלה
             if (this.currentFilters.account.length > 0 && !this.currentFilters.account.includes('הכול')) {
               const accountCell = row.querySelector('td[data-account]');
               if (accountCell) {
+                // יש שדה חשבון - בדוק את הפילטר
                 const rowAccount = accountCell.getAttribute('data-account');
                 shouldShow = shouldShow && this.currentFilters.account.includes(rowAccount);
               }
+              // אם אין שדה חשבון - תמיד הצג (לא מסנן)
             }
             
-            // פילטר תאריכים
+            // פילטר תאריכים - רק אם יש שדה רלוונטי בטבלה
             if (this.currentFilters.dateRange && this.currentFilters.dateRange !== 'כל זמן') {
               const dateCell = row.querySelector('td[data-date]');
               if (dateCell) {
+                // יש שדה תאריך - בדוק את הפילטר
                 const rowDate = dateCell.getAttribute('data-date');
                 const isInRange = this.isDateInRange(rowDate, this.currentFilters.dateRange);
                 shouldShow = shouldShow && isInRange;
               }
+              // אם אין שדה תאריך - תמיד הצג (לא מסנן)
             }
             
-            // פילטר חיפוש
+            // פילטר חיפוש - תמיד פועל על כל העמודות בטבלה
             if (this.currentFilters.search && this.currentFilters.search.trim() !== '') {
               const searchTerm = this.currentFilters.search.toLowerCase().trim();
               const cells = row.querySelectorAll('td');
               let foundMatch = false;
               
+              // עובר על כל התאים ומחפש התאמה
               cells.forEach(cell => {
                 const cellText = cell.textContent.toLowerCase().trim();
                 if (cellText.includes(searchTerm)) {

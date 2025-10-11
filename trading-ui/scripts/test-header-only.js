@@ -201,6 +201,7 @@ function renderTradePlansTable(data) {
         const priceDisplay = plan.planned_price || plan.planned_amount || 0;
         const investmentDisplay = plan.planned_investment || plan.planned_amount || 0;
         const profitDisplay = plan.expected_profit || 0;
+        const accountName = plan.account_name || 'לא מוגדר';
         
         // For filter - use original English values
         const typeForFilter = plan.investment_type || '';
@@ -233,14 +234,14 @@ function renderTradePlansTable(data) {
             <tr>
                 <td>${tickerDisplay}</td>
                 <td data-date="${dateDisplay}">${dateDisplay}</td>
-                <td class="type-cell" data-type="${typeForFilter}">${typeBadge}</td>
+                <td class="type-cell" data-investment-type="${typeForFilter}">${typeBadge}</td>
                 <td>${sideDisplay}</td>
                 <td>${quantityDisplay}</td>
                 <td>${priceRendered}</td>
                 <td>${investmentRendered}</td>
                 <td class="status-cell" data-status="${statusForFilter}">${statusBadge}</td>
                 <td>${profitRendered}</td>
-                <td>${plan.account_name || 'לא מוגדר'}</td>
+                <td data-account="${accountName}">${accountName}</td>
             </tr>
         `;
     }).join('');
@@ -276,10 +277,10 @@ function renderExecutionsTable(data) {
         const dateValue = execution.date || execution.execution_date || '';
         const source = execution.source || '-';
         
-        // For filter - use translated values
-        const typeForFilter = action === 'buy' ? 'קנייה' : action === 'sale' ? 'מכירה' : action;
+        // For filter - use original English values
+        const typeForFilter = action;  // Keep original: 'buy' or 'sale'
         
-        // Render action badge
+        // Render action badge - FieldRendererService translates to Hebrew
         const actionBadge = window.FieldRendererService ? 
             window.FieldRendererService.renderAction(action) : 
             `<span class="${action === 'buy' ? 'action-buy' : 'action-sell'}">${action === 'buy' ? 'קנייה' : 'מכירה'}</span>`;
@@ -297,7 +298,7 @@ function renderExecutionsTable(data) {
         return `
             <tr data-execution-id="${execution.id}">
                 <td>${symbol}</td>
-                <td class="type-cell" data-type="${typeForFilter}">${actionBadge}</td>
+                <td class="type-cell" data-investment-type="${typeForFilter}">${actionBadge}</td>
                 <td data-account="${accountName}">${accountName}</td>
                 <td>${quantity}</td>
                 <td>$${parseFloat(price).toFixed(2)}</td>

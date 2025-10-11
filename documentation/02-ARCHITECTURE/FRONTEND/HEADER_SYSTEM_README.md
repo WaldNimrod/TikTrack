@@ -14,8 +14,18 @@ The TikTrack Header System is a comprehensive navigation and filtering solution 
 
 ## 🎉 Current Status (October 2025)
 
-### 1. **Unified Header System v6.0.1 - ANIMATION OPTIMIZED** ✅ NEW!
-- **Status**: **COMPLETED** - Animation and visibility fully optimized
+### 1. **Unified Header System v6.0.2 - FILTER SYSTEM OPTIMIZED** ✅ NEW!
+- **Status**: **COMPLETED** - Dynamic table detection and filter improvements
+- **Date**: 12 October 2025
+- **Key Improvements**:
+  - **Dynamic Table Detection**: Automatically finds and filters all tables on page
+  - **Improved Filter Logic**: Added explicit comments for conditional filtering
+  - **Translation System**: Full FieldRendererService integration for status/type fields
+  - **Account Support**: Full account_name support in Execution model and API
+  - **Universal Application**: Filters work on any number of tables simultaneously
+
+### 2. **Unified Header System v6.0.1 - ANIMATION OPTIMIZED** ✅
+- **Status**: **COMPLETED** - Animation and visibility fully optimized  
 - **Date**: 11 October 2025
 - **Structure**: Modular methods with external CSS + optimized animation
 - **Key Improvements**:
@@ -41,7 +51,47 @@ The TikTrack Header System is a comprehensive navigation and filtering solution 
 - **Git Commits**: 13 commits total (refactoring + optimization)
 - **Documentation**: `HEADER_ANIMATION_OPTIMIZATION_REPORT.md`
 
-### 2. **Previous: Unified Header System v6 - FINAL VERSION**
+### Implementation Details (v6.0.2)
+
+#### **Dynamic Table Detection**
+```javascript
+// OLD: Static list of tables
+applyAllFilters() {
+  this.applyFiltersToTable('tickersTable');
+  this.applyFiltersToTable('tradePlansTable');
+}
+
+// NEW: Dynamic detection
+applyAllFilters() {
+  const tables = document.querySelectorAll('table.data-table[data-table-type]');
+  tables.forEach(table => {
+    if (table.id) {
+      this.applyFiltersToTable(table.id);
+    }
+  });
+}
+```
+
+#### **Improved Filter Logic**
+All filters now have explicit logic for conditional application:
+- **Status Filter**: Only applies if `data-status` attribute exists in row
+- **Type Filter**: Only applies if `data-investment-type` attribute exists in row  
+- **Account Filter**: Only applies if `data-account` attribute exists in row
+- **Date Filter**: Only applies if `data-date` attribute exists in row
+- **Search Filter**: Always applies to all columns (except Actions)
+
+#### **Translation System Integration**
+- Added `FieldRendererService` for consistent translations
+- Status values: open → פתוח, closed → סגור, cancelled → מבוטל
+- Type values: swing → סווינג, investment → השקעה, passive → פסיבי
+- Action values: buy → קנייה, sale → מכירה
+
+#### **Backend Improvements**
+- Execution model now returns `account_name` via Trade relationship
+- Executions API endpoint loads account data with `joinedload`
+- Full support for account filtering in executions table
+
+### 3. **Previous: Unified Header System v6 - FINAL VERSION**
 - **Status**: **ARCHIVED** - Replaced by v6.1
 - **Structure**: Single unified system (Header + Filters) in one file
 - **Issue**: 545 lines of CSS injected dynamically, duplications

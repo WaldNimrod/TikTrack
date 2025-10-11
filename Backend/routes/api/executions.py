@@ -38,9 +38,10 @@ def get_executions():
     """Get all executions with trade relationship data"""
     db: Session = g.db
     
-    # Use joinedload to get trade and ticker data
+    # Use joinedload to get trade, ticker, and account data
     executions = db.query(Execution).options(
-        joinedload(Execution.trade).joinedload(Trade.ticker)
+        joinedload(Execution.trade).joinedload(Trade.ticker),
+        joinedload(Execution.trade).joinedload(Trade.account)
     ).all()
     
     # Convert to dict - the model will add trade_display automatically

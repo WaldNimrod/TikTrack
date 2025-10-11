@@ -38,6 +38,12 @@ class Execution(BaseModel):
             result['trade_side'] = self.trade.side
             result['trade_date'] = self.trade.created_at.strftime('%d/%m/%Y') if self.trade.created_at else None
             
+            # Add account name from trade
+            if hasattr(self.trade, 'account') and self.trade.account:
+                result['account_name'] = self.trade.account.name
+            else:
+                result['account_name'] = None
+            
             # Create formatted display string: "AAPL | 15/01/2025 | Long"
             if result['trade_ticker_symbol'] and result['trade_date'] and result['trade_side']:
                 result['trade_display'] = f"{result['trade_ticker_symbol']} | {result['trade_date']} | {result['trade_side']}"

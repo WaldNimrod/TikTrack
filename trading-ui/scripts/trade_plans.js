@@ -1324,14 +1324,14 @@ function updateTradePlansTable(trade_plans) {
     if (hasOriginalData && hasActiveFilters) {
       // There is data but the filter didn't find results
       // Showing "no results" message due to filters
-      tbody.innerHTML = `<tr><td colspan="10" class="text-center text-info">
+      tbody.innerHTML = `<tr><td colspan="11" class="text-center text-info">
                 <i class="fas fa-search"></i> לא נמצאו תוצאות
                 <br><small>נסה לשנות את הפילטרים או מונח החיפוש</small>
             </td></tr>`;
     } else {
       // No data at all
       // Showing "no data" message
-      tbody.innerHTML = `<tr><td colspan="10" class="text-center text-muted">
+      tbody.innerHTML = `<tr><td colspan="11" class="text-center text-muted">
                 <i class="fas fa-info-circle"></i> אין תכנונים להצגה
                 <br><small>לא נמצאו תכנונים במערכת</small>
             </td></tr>`;
@@ -1421,8 +1421,8 @@ function updateTradePlansTable(trade_plans) {
         
         <!-- 5. כמות -->
         <td class="quantity-cell">
-          <span class="numeric-value-positive" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
-            ${formatCurrency(design.planned_amount || 0)}
+          <span class="numeric-value-neutral" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
+            ${design.shares || '-'}
           </span>
         </td>
         

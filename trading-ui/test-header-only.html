@@ -57,7 +57,7 @@
                         <div class="header-actions">
                             <button class="filter-toggle-btn" onclick="window.toggleSection('top')" title="הצג/הסתר סקשן">
                                 <span class="filter-icon">▲</span>
-                            </button>
+                        </button>
                         </div>
                     </div>
                     <div class="section-body">
@@ -76,7 +76,7 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <!-- Card 2: Tables Info -->
                             <div class="col-md-4">
                                 <div class="card">
@@ -88,10 +88,10 @@
                                         <p class="mb-0"><strong>ביצועים:</strong> <span id="executionsRows">0</span> שורות</p>
                                         <hr>
                                         <small class="text-muted">שורות גלויות / סה"כ</small>
-                                    </div>
                                 </div>
                             </div>
-                            
+                        </div>
+                        
                             <!-- Card 3: Performance -->
                             <div class="col-md-4">
                                 <div class="card">
@@ -117,70 +117,35 @@
                         <h2>📋 תכנוני טריידים</h2>
                         <div class="header-actions">
                             <button class="filter-toggle-btn" onclick="window.toggleSection('section1')" title="הצג/הסתר סקשן">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
                         </div>
                     </div>
                     <div class="section-body">
-                        <div class="table-responsive">
+                        <div class="table-responsive" id="tradePlansContainer">
                             <table id="tradePlansTable" class="data-table" data-table-type="trade_plans">
-                                <thead>
-                                    <tr>
-                                        <th>טיקר</th>
-                                        <th>תאריך</th>
-                                        <th>סוג</th>
-                                        <th>צד</th>
-                                        <th>סטטוס</th>
-                                        <th>חשבון</th>
+                                                <thead>
+                                                    <tr>
+                                        <th class="col-ticker">טיקר</th>
+                                        <th class="col-date">תאריך</th>
+                                        <th class="col-type">סוג</th>
+                                        <th class="col-side">צד</th>
+                                        <th class="col-quantity">כמות</th>
+                                        <th class="col-price">מחיר</th>
+                                        <th class="col-investment">השקעה</th>
+                                        <th class="col-status">סטטוס</th>
+                                        <th class="col-profit">רווח</th>
+                                        <th class="col-account">חשבון</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>AAPL</td>
-                                        <td data-date="2025-01-15">2025-01-15</td>
-                                        <td data-investment-type="investment">השקעה</td>
-                                        <td>Long</td>
-                                        <td data-status="פתוח"><span class="status-badge status-open">פתוח</span></td>
-                                        <td data-account="חשבון מעודכן">חשבון מעודכן</td>
-                                    </tr>
-                                    <tr>
-                                        <td>TSLA</td>
-                                        <td data-date="2025-01-14">2025-01-14</td>
-                                        <td data-investment-type="swing">סווינג</td>
-                                        <td>Short</td>
-                                        <td data-status="פתוח"><span class="status-badge status-open">פתוח</span></td>
-                                        <td data-account="חשבון טכנולוגיה">חשבון טכנולוגיה</td>
-                                    </tr>
-                                    <tr>
-                                        <td>GOOGL</td>
-                                        <td data-date="2025-01-13">2025-01-13</td>
-                                        <td data-investment-type="passive">פסיבי</td>
-                                        <td>Long</td>
-                                        <td data-status="סגור"><span class="status-badge status-closed">סגור</span></td>
-                                        <td data-account="חשבון ETF">חשבון ETF</td>
-                                    </tr>
-                                    <tr>
-                                        <td>MSFT</td>
-                                        <td data-date="2025-01-12">2025-01-12</td>
-                                        <td data-investment-type="investment">השקעה</td>
-                                        <td>Long</td>
-                                        <td data-status="מבוטל"><span class="status-badge status-cancelled">מבוטל</span></td>
-                                        <td data-account="חשבון חדש">חשבון חדש</td>
-                                    </tr>
-                                    <tr>
-                                        <td>NVDA</td>
-                                        <td data-date="2025-01-11">2025-01-11</td>
-                                        <td data-investment-type="passive">פסיבי</td>
-                                        <td>Long</td>
-                                        <td data-status="פתוח"><span class="status-badge status-open">פתוח</span></td>
-                                        <td data-account="חשבון בדיקה 1">חשבון בדיקה 1</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                                <tbody id="tradePlansTableBody">
+                                    <!-- Data loaded via JavaScript -->
+                                                </tbody>
+                                            </table>
+                                        </div>
                     </div>
                 </div>
-                <!-- UI Content Section 1 End -->
+                <!-- UI Content Section 1 End -->   
 
                 <!-- UI Content Section 2 Start -->
                 <div class="content-section" id="section2" data-section="executions">
@@ -188,79 +153,28 @@
                         <h2>📊 ביצועים</h2>
                         <div class="header-actions">
                             <button class="filter-toggle-btn" onclick="window.toggleSection('section2')" title="הצג/הסתר סקשן">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
                         </div>
                     </div>
                     <div class="section-body">
-                        <div class="table-responsive">
+                        <div class="table-responsive" id="executionsContainer">
                             <table id="executionsTable" class="data-table" data-table-type="executions">
                                 <thead>
                                     <tr>
-                                        <th>טיקר</th>
-                                        <th>תאריך</th>
-                                        <th>סוג</th>
-                                        <th>כמות</th>
-                                        <th>מחיר</th>
-                                        <th>סטטוס</th>
-                                        <th>חשבון</th>
+                                        <th class="col-ticker">טיקר</th>
+                                        <th class="col-action">פעולה</th>
+                                        <th class="col-account">חשבון</th>
+                                        <th class="col-quantity">כמות</th>
+                                        <th class="col-price">מחיר</th>
+                                        <th class="col-pnl">P&L</th>
+                                        <th class="col-execution-date">תאריך ביצוע</th>
+                                        <th class="col-source">מקור</th>
+                                        <th class="col-status">סטטוס</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>AAPL</td>
-                                        <td data-date="2025-01-15">2025-01-15</td>
-                                        <td data-investment-type="investment">השקעה</td>
-                                        <td>100</td>
-                                        <td>$150.50</td>
-                                        <td data-status="פתוח"><span class="status-badge status-open">פתוח</span></td>
-                                        <td data-account="חשבון מעודכן">חשבון מעודכן</td>
-                                    </tr>
-                                    <tr>
-                                        <td>MSFT</td>
-                                        <td data-date="2025-01-14">2025-01-14</td>
-                                        <td data-investment-type="investment">השקעה</td>
-                                        <td>50</td>
-                                        <td>$420.75</td>
-                                        <td data-status="פתוח"><span class="status-badge status-open">פתוח</span></td>
-                                        <td data-account="חשבון טכנולוגיה">חשבון טכנולוגיה</td>
-                                    </tr>
-                                    <tr>
-                                        <td>GOOGL</td>
-                                        <td data-date="2025-01-13">2025-01-13</td>
-                                        <td data-investment-type="investment">השקעה</td>
-                                        <td>25</td>
-                                        <td>$2,850.00</td>
-                                        <td data-status="סגור"><span class="status-badge status-closed">סגור</span></td>
-                                        <td data-account="חשבון ETF">חשבון ETF</td>
-                                    </tr>
-                                    <tr>
-                                        <td>TSLA</td>
-                                        <td data-date="2025-01-12">2025-01-12</td>
-                                        <td data-investment-type="swing">סווינג</td>
-                                        <td>200</td>
-                                        <td>$245.30</td>
-                                        <td data-status="פתוח"><span class="status-badge status-open">פתוח</span></td>
-                                        <td data-account="חשבון בדיקה 2">חשבון בדיקה 2</td>
-                                    </tr>
-                                    <tr>
-                                        <td>NVDA</td>
-                                        <td data-date="2025-01-11">2025-01-11</td>
-                                        <td data-investment-type="passive">פסיבי</td>
-                                        <td>75</td>
-                                        <td>$875.40</td>
-                                        <td data-status="מבוטל"><span class="status-badge status-cancelled">מבוטל</span></td>
-                                        <td data-account="חשבון בדיקה 3">חשבון בדיקה 3</td>
-                                    </tr>
-                                    <tr>
-                                        <td>AMZN</td>
-                                        <td data-date="2025-01-10">2025-01-10</td>
-                                        <td data-investment-type="investment">השקעה</td>
-                                        <td>30</td>
-                                        <td>$3,250.80</td>
-                                        <td data-status="סגור"><span class="status-badge status-closed">סגור</span></td>
-                                        <td data-account="חשבון חדש">חשבון חדש</td>
-                                    </tr>
+                                <tbody id="executionsTableBody">
+                                    <!-- Data loaded via JavaScript -->
                                 </tbody>
                             </table>
                         </div>
@@ -269,7 +183,7 @@
                 <!-- UI Content Section 2 End -->
 
                 <!-- ===== CONTENT SECTIONS END ===== -->
-                
+
             </div>
             <!-- ===== END MAIN CONTENT ===== -->
         </div>

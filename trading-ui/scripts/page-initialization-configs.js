@@ -16,22 +16,17 @@ const PAGE_CONFIGS = {
     // Main Pages
     'index': {
         name: 'Dashboard',
-        requiresFilters: true,
+        requiresFilters: false,
         requiresValidation: false,
-        requiresTables: true,
+        requiresTables: false,
         customInitializers: [
             // Dashboard-specific initialization
             async (pageConfig) => {
                 console.log('📊 Initializing Dashboard...');
                 
-                // Initialize charts if available
-                if (typeof window.initializeCharts === 'function') {
-                    await window.initializeCharts();
-                }
-                
-                // Load dashboard data
-                if (typeof window.loadDashboardData === 'function') {
-                    await window.loadDashboardData();
+                // Initialize dashboard (loads data and creates charts)
+                if (typeof window.initializeIndexPage === 'function') {
+                    await window.initializeIndexPage();
                 }
             }
         ]
@@ -730,15 +725,16 @@ const PAGE_CONFIGS = {
     
     'research': {
         name: 'Research',
-        requiresFilters: true,
+        requiresFilters: false,
         requiresValidation: false,
         requiresTables: false,
         customInitializers: [
             async (pageConfig) => {
                 console.log('🔬 Initializing Research...');
                 
-                if (typeof window.initializeResearchTools === 'function') {
-                    await window.initializeResearchTools();
+                // Initialize research page (loads data and creates charts)
+                if (typeof window.initializeResearchPage === 'function') {
+                    await window.initializeResearchPage();
                 }
             }
         ]

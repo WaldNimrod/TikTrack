@@ -272,14 +272,13 @@ class MigrationTestingSuite {
                 throw new Error('העדפות משתמש לא עקביות');
             }
             
-            // בדיקת סינכרון עם Backend (אם זמין)
-            if (window.CacheSyncManager) {
-                const syncStatus = await window.CacheSyncManager.getSyncStatus();
-                
-                if (syncStatus.backendConnected) {
-                    // בדיקת סינכרון
-                    await window.CacheSyncManager.syncToBackend('user-preferences', userPrefs);
-                }
+            // שמירה ב-UnifiedCacheManager (במקום CacheSyncManager שהוסר)
+            if (window.UnifiedCacheManager?.isInitialized()) {
+                await window.UnifiedCacheManager.save('user-preferences', userPrefs, {
+                    layer: 'localStorage',
+                    ttl: null
+                });
+                console.log('✅ User preferences saved to UnifiedCacheManager');
             }
             
             this.endTest(testId, 'PASSED', 'עקביות בין עמודים תקינה');

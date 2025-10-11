@@ -121,11 +121,22 @@ const response = await fetch('/api/executions', {
 
 **קובץ:** `trading-ui/scripts/services/field-renderer-service.js`  
 **שורות:** 417  
-**גרסה:** 1.1.0  
-**עדכון אחרון:** 10 באוקטובר 2025
+**גרסה:** 1.2.0  
+**עדכון אחרון:** 11 בינואר 2025
 
 #### תיאור:
 מערכת מרכזית לרנדור שדות מורכבים: status badges, ערכים מספריים עם צבע לפי סימן, currency display, תאריכים, וכו'.
+
+#### 🆕 עדכון 11/01/2025: מערכת Badges דינמית
+**מהפכה בצבעים!** כל ה-badges עכשיו מקבלים צבעים מהעדפות המשתמש.
+
+**שינויים עיקריים:**
+- ✅ הוסרה `_getStatusColors()` - לא נחוץ יותר
+- ✅ כל ה-badges משתמשים ב-`data-color-category` attributes
+- ✅ CSS לוקח צבעים מ-preferences דרך CSS variables
+- ✅ `color-mix()` מייצר אוטומטית רקע ומסגרת
+- ✅ הוסרו סטטוסים: pending, active, completed
+- ✅ תאריכים: תמיד בפורמט DD/MM/YY (חיסכון 25% במקום)
 
 #### בעיה שנפתרה:
 ```javascript
@@ -185,20 +196,26 @@ const zero = FieldRendererService.renderNumericValue(0, ' $', false);
 // תוצאה: 0.00 $ (אפור)
 ```
 
-**צבעים אוטומטיים:**
-- **חיובי (> 0):** ירוק (`#28a745`)
-- **שלילי (< 0):** אדום (`#dc3545`)
-- **אפס (= 0):** אפור (`#6c757d`)
+**צבעים דינמיים מהעדפות:** ⭐ **עדכון 11/01/2025**
+- **חיובי (> 0):** `var(--value-positive-color)` מהעדפות
+- **שלילי (< 0):** `var(--value-negative-color)` מהעדפות
+- **אפס (= 0):** `var(--value-neutral-color)` מהעדפות
 
-#### סוגי badges נתמכים:
-1. **Status** - open, closed, cancelled
-2. **Side** - Long, Short
-3. **Numeric Values** - ⭐ חיובי/שלילי/אפס (יתרות, רווח/הפסד, שינויים)
-4. **Type** - swing, investment, passive
-5. **Action** - buy, sale
-6. **Priority** - high, medium, low
+#### סוגי badges נתמכים - **עדכון 11/01/2025**:
+
+**עם קפסולה (רקע + מסגרת):**
+1. **Status** - open, closed, cancelled (מ-statusXXXColor preferences)
+2. **Type** - swing, investment, passive (מ-typeXXXColor preferences)
+3. **Priority** - high, medium, low (מ-priorityXXXColor preferences)
+4. **Action** - buy, sale (מ-valuePositive/NegativeColor)
+
+**טקסט בלבד (ללא רקע):**
+5. **Side** - Long (LONG), Short (SHORT) - uppercase, bold
+6. **Numeric Values** - חיובי/שלילי/אפס - bold
+
+**אחרים:**
 7. **Currency** - תצוגה מלאה (US Dollar (USD))
-8. **Date** - עם/בלי שעה
+8. **Date** - **תמיד DD/MM/YY** (11/01/2025) - חיסכון 25% במקום
 
 #### ⭐ סטטוסים אחידים בכל המערכת (מאילוצי DB):
 

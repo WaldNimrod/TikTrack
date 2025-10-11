@@ -200,13 +200,16 @@ trading-ui/
 - `_entity-colors.css` - צבעי ישויות
 - `_rtl-components.css` - רכיבים RTL
 
-#### 07-pages/ - סגנונות ספציפיים לעמודים
-- `_home.css` - דף בית
-- `_trades.css` - עמוד טריידים
-- `_alerts.css` - עמוד התראות
-- `_accounts.css` - עמוד חשבונות
-- `_preferences.css` - עמוד העדפות
-- `_rtl-pages.css` - עמודים RTL
+#### 07-pages/ (trumps) - **עדכון 11/01/2025: נוקה מקבצי עמודים**
+- **כלל ארכיטקטורי חדש**: תיקייה זו מיועדת **רק** לכלי פיתוח וראש העמוד הגלובלי
+- `_header.css` - ראש העמוד הגלובלי (אלמנט קבוע)
+- `_js-map-advanced.css` - כלי פיתוח JS Map
+- `_linter-monitor.css` - כלי פיתוח Linter Monitor
+- ❌ **קבצים שנמחקו** (11/01/2025):
+  - `_trades.css`, `_alerts.css`, `_tickers.css`, `_trading_accounts.css`, `_executions.css`
+  - **סיבה**: עמודים רגילים לא צריכים קבצי CSS ספציפיים
+  - **פתרון**: כל הסגנונות עברו לקבצי components כלליים (06-components)
+- ⚠️ **הערה חשובה**: אם עמוד רגיל צריך סגנון ספציפי, יש להוסיף אותו לקובץ component כללי, לא לתיקייה זו
 
 #### 08-themes/ - ערכות נושא
 - `_light.css` - ערכת נושא בהירה
@@ -806,59 +809,230 @@ async function saveColorPreference(colorKey, colorValue) {
 }
 ```
 
-#### טבלאות
+#### טבלאות - **עדכון 11/01/2025: מערכת רספונסיבית חדשה**
+
+**⚠️ שינוי קריטי**: מעבר מ-`class="table"` (Bootstrap) ל-`class="data-table"` (שלנו)
+
+**הבעיה שפתרנו:**
+- Bootstrap מגדיר `class="table"` עם `width: 100%` קבוע
+- זה מונע מה-media queries שלנו לעבוד במסכים צרים
+- גורם לטבלאות לא רספונסיביות וחיתוך תוכן
+
+**הפתרון:**
+```html
+<!-- ❌ לא נכון - Bootstrap conflicts -->
+<table class="table">
+
+<!-- ✅ נכון - responsive שלנו -->
+<table class="data-table">
+```
+
 ```css
 /* 06-components/_tables.css */
-.table {
+
+/* ===== טבלאות בסיסיות ===== */
+.data-table {
   width: 100%;
   border-collapse: collapse;
   background-color: var(--color-bg-primary);
   border-radius: var(--radius-medium);
   overflow: hidden;
   box-shadow: var(--shadow-sm);
-  
-  /* RTL לוגי */
   direction: rtl;
   text-align: start;
 }
 
-.table th,
-.table td {
+.data-table th,
+.data-table td {
   padding: var(--spacing-sm) var(--spacing-md);
   border-bottom: 1px solid var(--color-border);
-  
-  /* RTL לוגי */
   text-align: start;
 }
 
-.table th {
+.data-table th {
   background-color: var(--color-bg-secondary);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
 }
 
-.table tbody tr:hover {
+.data-table tbody tr:hover {
   background-color: var(--color-bg-secondary);
 }
 
+/* ===== רספונסיביות - Media Queries ===== */
+/* עדכון 11/01/2025: רספונסיביות מלאה */
+
+@media (max-width: 767px) {
+  .table-responsive .data-table {
+    width: 600px;
+    max-width: none; /* חשוב! מאפשר גלילה */
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  .table-responsive .data-table {
+    width: 800px;
+    max-width: none;
+  }
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+  .table-responsive .data-table {
+    width: 900px;
+    max-width: none;
+  }
+}
+
+@media (min-width: 1200px) {
+  .table-responsive .data-table {
+    width: 100%;
+    min-width: 1000px;
+  }
+}
+
+/* ===== כפתורי פעולות ===== */
+/* עדכון 11/01/2025: גודל אחיד 28×28px */
+
+.actions-cell button,
+.actions-cell .btn,
+.ticker-cell .btn,
+table tbody td .btn-sm {
+  width: 28px;
+  height: 28px;
+  margin: 0 2px;
+  padding: 0;
+  border-radius: 8px;
+}
+
+/* עמודת פעולות */
+.col-actions {
+  width: 12%;
+  min-width: 145px;
+  max-width: 200px;
+  text-align: center;
+}
+
+/* ===== עמודות מיוחדות ===== */
+
 /* עמודות מספריות */
-.table .number-cell {
+.data-table .number-cell {
   text-align: end;
   direction: ltr;
   font-family: var(--font-family-mono);
 }
 
-/* עמודות פעולות */
-.table .actions-cell {
+/* עמודות תאריך - פורמט קומפקטי */
+/* עדכון 11/01/2025: DD/MM/YY */
+.col-date,
+.col-created,
+.col-closed,
+.col-execution-date,
+.col-updated {
+  min-width: 75px; /* הוקטן מ-100px */
   text-align: center;
-  white-space: nowrap;
-}
-
-.table .actions-cell .btn {
-  margin-inline-start: var(--spacing-xs);
-  margin-inline-end: 0;
 }
 ```
+
+**תוצאה:**
+✅ 27 טבלאות תוקנו ב-19 עמודים (11/01/2025)  
+✅ גלילה אופקית עובדת במסכים צרים  
+✅ אין קונפליקטים עם Bootstrap  
+✅ media queries פועלים כראוי
+
+---
+
+#### Badges דינמיים - **עדכון 11/01/2025: מערכת צבעים מהעדפות**
+
+**מהפכה**: כל ה-badges עכשיו מקבלים צבעים מהעדפות המשתמש!
+
+**סוגי Badges:**
+
+1. **Status Badges** (קפסולה עם רקע):
+   - open, closed, cancelled
+   - צבע מ-preferences: `statusOpenColor`, `statusClosedColor`, `statusCancelledColor`
+
+2. **Type Badges** (קפסולה עם רקע):
+   - swing, investment, passive
+   - צבע מ-preferences: `typeSwingColor`, `typeInvestmentColor`, `typePassiveColor`
+
+3. **Priority Badges** (קפסולה עם רקע):
+   - high, medium, low
+   - צבע מ-preferences: `priorityHighColor`, `priorityMediumColor`, `priorityLowColor`
+
+4. **Action Badges** (קפסולה עם רקע):
+   - buy, sale
+   - צבע מ-preferences: `valuePositiveColor`, `valueNegativeColor`
+
+5. **Side Badges** (טקסט בלבד - ללא רקע):
+   - long, short
+   - צבע מ-preferences: `valuePositiveColor`, `valueNegativeColor`
+   - `text-transform: uppercase`, `font-weight: 600`
+
+6. **Numeric Badges** (טקסט בלבד - ללא רקע):
+   - חיובי, שלילי, נייטרלי
+   - צבע מ-preferences: `valuePositiveColor`, `valueNegativeColor`, `valueNeutralColor`
+   - `font-weight: 600`
+
+```css
+/* 06-components/_badges-status.css */
+
+/* ===== Status/Type/Priority/Action Badges - קפסולה ===== */
+.badge-status[data-color-category="status-open"] {
+  color: var(--status-open-color);
+  background-color: color-mix(in srgb, var(--status-open-color) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--status-open-color) 30%, transparent);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* ===== Side/Numeric Badges - טקסט בלבד ===== */
+.side-badge,
+.numeric-badge {
+  padding: 0;
+  background: none;
+  border: none;
+  font-weight: 600;
+}
+
+.side-badge {
+  text-transform: uppercase;
+}
+```
+
+**ארכיטקטורה:**
+
+```javascript
+// field-renderer-service.js
+renderStatus(value) {
+    return `<span class="badge badge-status" 
+                  data-color-category="status-${value}">
+              ${translatedValue}
+            </span>`;
+}
+```
+
+**תהליך:**
+1. FieldRendererService מייצר HTML עם `data-color-category`
+2. CSS תופס את ה-attribute ומשתמש בצבע מההעדפות
+3. `color-mix()` מייצר רקע בהיר אוטומטית (10% opacity)
+4. מסגרת בינונית (30% opacity)
+
+**יתרונות:**
+✅ צבע אחד לכל item במקום 3 וריאנטים  
+✅ `color-mix()` אוטומטי לרקע ומסגרת  
+✅ שינוי בהעדפות משפיע מיידית  
+✅ קוד נקי יותר  
+✅ אין inline styles
+
+**12 העדפות צבעים חדשות שנוספו:**
+- statusOpenColor, statusClosedColor, statusCancelledColor
+- typeSwingColor, typeInvestmentColor, typePassiveColor
+- priorityHighColor, priorityMediumColor, priorityLowColor
+- valuePositiveColor, valueNegativeColor, valueNeutralColor
+
+---
 
 #### מודלים
 ```css

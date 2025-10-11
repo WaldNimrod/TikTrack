@@ -98,7 +98,7 @@
 #### **מערכות שירות כלליות** ✅ **חדש! ינואר 2025**
 6 מערכות שירות נוספות לסטנדרטיזציה מלאה:
 1. **`services/data-collection-service.js`** - איסוף נתונים מטפסים (מחליף 3,131 קריאות)
-2. **`services/field-renderer-service.js`** - רנדור 8 סוגי שדות (badges, currency, dates)
+2. **`services/field-renderer-service.js`** - רנדור 8 סוגי שדות (badges, currency, dates) ⭐ **עדכון 11/01/2025: badges דינמיים + DD/MM/YY**
 3. **`services/select-populator-service.js`** - מילוי select boxes מ-API
 4. **`services/crud-response-handler.js`** - טיפול מרכזי בתגובות CRUD
 5. **`services/default-value-setter.js`** - הגדרת ברירות מחדל בטפסים
@@ -154,8 +154,8 @@
   - `renderType(type)` - swing/investment/passive badge
   - `renderAction(action)` - buy/sale badge
   - `renderPriority(priority)` - high/medium/low badge
-  - `renderDate(date, includeTime)` - תאריך (משתמש ב-date-utils.js)
-- **תכונות:** תרגום אוטומטי, צבעים דינמיים, fallback colors
+  - `renderDate(date, includeTime)` - תאריך **תמיד DD/MM/YY** (11/01/2025 - חיסכון 25% במקום)
+- **תכונות:** תרגום אוטומטי, צבעים דינמיים מ-preferences (12 צבעים חדשים), `data-color-category` attributes, `color-mix()` לרקע אוטומטי
 - **דוקומנטציה:** [SERVICES_ARCHITECTURE.md](SERVICES_ARCHITECTURE.md)
 
 ### **3. SelectPopulatorService** 🟢 **גבוה** ✅ **הושלם!**

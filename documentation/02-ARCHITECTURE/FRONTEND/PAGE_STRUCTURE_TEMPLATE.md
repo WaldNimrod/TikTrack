@@ -63,8 +63,10 @@
     <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=20251006">
     <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=20251006">
     
-    <!-- 07-trumps - Page-specific Styles -->
-    <!-- הוסף כאן קובץ CSS ספציפי לעמוד (למשל: _alerts.css, _trades.css) -->
+    <!-- 07-trumps - Global Header & Dev Tools Only -->
+    <!-- ⚠️ עדכון 11/01/2025: תיקייה זו רק לכלי פיתוח וראש העמוד הגלובלי -->
+    <!-- ❌ אל תוסיף קבצי CSS ספציפיים לעמודים רגילים! -->
+    <!-- ✅ כל הסגנונות של עמודים צריכים להיות ב-06-components -->
     
     <!-- 08-themes - Themes -->
     <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=20251006">
@@ -253,14 +255,15 @@
 ### יצירת עמוד חדש
 1. **העתק את המבנה הבסיסי** - כולל CSS ו-JavaScript
 2. **עדכן את הכותרת** - `<title>שם העמוד - TikTrack</title>`
-3. **הוסף CSS ספציפי** - ב-`07-trumps` (למשל: `_alerts.css`, `_trades.css`)
-4. **הוסף תוכן ל-`section-header` ו-`section-body`**
-5. **השתמש ב-`top-section`** למידע כללי על העמוד
-6. **השתמש ב-`content-section`** לתוכן ספציפי
-7. **חובה**: הוסף `header-actions` לכל כותרת סקשן
-8. **עדכן את הסקריפט** - `scripts/[PAGE_NAME].js`
-9. **הוסף route** - ב-`Backend/routes/pages.py`
-10. **הוסף לתפריט** - ב-`scripts/header-system.js`
+3. ❌ **אל תוסיף CSS ספציפי** - **עדכון 11/01/2025**: תיקיית 07-trumps רק לכלי פיתוח וראש העמוד!
+4. ✅ **השתמש ב-components כלליים** - כל הסגנונות ב-06-components (tables, cards, badges וכו')
+5. **הוסף תוכן ל-`section-header` ו-`section-body`**
+6. **השתמש ב-`top-section`** למידע כללי על העמוד
+7. **השתמש ב-`content-section`** לתוכן ספציפי
+8. **חובה**: הוסף `header-actions` לכל כותרת סקשן
+9. **עדכן את הסקריפט** - `scripts/[PAGE_NAME].js`
+10. **הוסף route** - ב-`Backend/routes/pages.py`
+11. **הוסף לתפריט** - ב-`scripts/header-system.js`
 
 ### הוספת סקשן חדש
 1. העתק את המבנה של `content-section`
@@ -375,6 +378,53 @@
 - **`.filter-toggle-btn`**: כפתור פתיחה/סגירה של סקשן
 - **`.filter-icon`**: אייקון לכפתור פתיחה/סגירה (▲/▼)
 - **`.section-toggle-icon`**: אייקון לכפתור סקשן רגיל
+
+### Classes לטבלאות - **עדכון 11/01/2025**
+- **`.data-table`**: ✅ טבלת נתונים רספונסיבית (שלנו - **השתמש בזה!**)
+- ~~**`.table`**~~: ❌ Bootstrap - **אל תשתמש!** (גורם לקונפליקטים)
+- **`.table-responsive`**: wrapper לטבלה (מ-Bootstrap - תקין)
+- **`.col-actions`**: עמודת כפתורי פעולות (12%, min: 145px)
+- **`.col-date`**, **`.col-created`**, **`.col-closed`**: עמודות תאריך (min-width: 75px)
+- **`.actions-cell`**: תא עם כפתורי פעולות
+- **`.ticker-cell`**: תא עם קישור לטיקר
+
+**דוגמה:**
+```html
+<div class="table-responsive">
+    <table class="data-table" id="myTable">
+        <thead>
+            <tr>
+                <th class="col-ticker">טיקר</th>
+                <th class="col-status">סטטוס</th>
+                <th class="col-date">תאריך</th>
+                <th class="col-actions">פעולות</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- שורות הטבלה -->
+        </tbody>
+    </table>
+</div>
+```
+
+### Classes לבadges - **עדכון 11/01/2025**
+- **`.badge-status`**: status badge (open/closed/cancelled)
+- **`.badge-type`**: type badge (swing/investment/passive)
+- **`.badge-priority`**: priority badge (high/medium/low)
+- **`.badge-action`**: action badge (buy/sale)
+- **`.badge-side`**: side badge (Long/Short) - טקסט בלבד
+- **`.numeric-badge`**: numeric value - טקסט בלבד
+- **`[data-color-category]`**: attribute לצבע דינמי מהעדפות
+
+**דוגמה:**
+```javascript
+// השתמש ב-FieldRendererService:
+const statusBadge = FieldRendererService.renderStatus('open', 'trade');
+const sideBadge = FieldRendererService.renderSide('long');
+const numericBadge = FieldRendererService.renderNumericValue(1500.50, ' $', false);
+const dateBadge = FieldRendererService.renderDate('2025-01-11', false);
+// תוצאה: 11/01/25 (פורמט קומפקטי)
+```
 
 ### Classes משניים
 - **`.row`**: שורה (Bootstrap)

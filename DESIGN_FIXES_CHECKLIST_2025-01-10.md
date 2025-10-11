@@ -610,6 +610,42 @@ window.getStatusColor(status, 'border')  // מסגרת
 
 ---
 
+## 📚 עדכוני דוקומנטציה - 11/01/2025
+
+### ✅ 5 קבצי דוקומנטציה עודכנו:
+
+1. ✅ **CSS_ARCHITECTURE_GUIDE.md**
+   - עדכון 07-trumps - הסבר על מחיקת קבצי עמודים
+   - הוספת חלק על class="data-table" vs class="table"
+   - תיעוד מלא של מערכת badges דינמית
+   - דוגמאות קוד מעודכנות
+
+2. ✅ **SERVICES_ARCHITECTURE.md**
+   - עדכון FieldRendererService ל-v1.2.0
+   - תיעוד badges דינמיים עם data-color-category
+   - תיעוד formatCompactDate (DD/MM/YY)
+   - הסרת סטטוסים: pending, active, completed
+
+3. ✅ **GENERAL_SYSTEMS_LIST.md**
+   - עדכון field-renderer-service עם badges דינמיים
+   - עדכון date-utils עם פורמט DD/MM/YY
+
+4. ✅ **PAGE_STRUCTURE_TEMPLATE.md**
+   - אזהרה: לא להוסיף CSS ל-07-trumps
+   - דוגמאות עם class="data-table"
+   - דוגמאות badges עם FieldRendererService
+   - classes חדשות לטבלאות ו-badges
+
+5. ✅ **PREFERENCES_SYSTEM.md**
+   - עדכון: 65 → 77 העדפות (+12 חדשות)
+   - תיעוד 12 צבעי badges חדשים
+   - הסבר על הסרת וריאנטים (light/dark)
+   - עיקרון color-mix() לרקע/מסגרת
+
+**תוצאה:** הדוקומנטציה מעודכנת ומשקפת את המצב האמיתי של המערכת! 📖
+
+---
+
 ## ℹ️ הערות כלליות
 
 ### לגבי ההערות (console.log) בעת טעינת עמוד:

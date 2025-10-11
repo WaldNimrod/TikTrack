@@ -839,16 +839,16 @@ window.toggleHeaderFilters = function() {
     if (isVisible) {
       // סגירה בשלבים: 1.fade כפתור → 2.סגירת פילטר → 3.fade כפתור חזרה
       
-      // שלב 1: fade out של הכפתור הנוכחי (0.2s)
+      // שלב 1: fade out של הכפתור הנוכחי (0.15s)
       const currentBtn = document.querySelector('.filter-toggle-secondary');
       if (currentBtn) currentBtn.classList.add('fading-out');
       
-      // שלב 2: סגירת הפילטר (0.5s) - מתחיל אחרי 0.2s
+      // שלב 2: סגירת הפילטר (0.3s) - מתחיל אחרי 0.15s
       setTimeout(() => {
         section.classList.add('filters-hidden');
-      }, 200);
+      }, 150);
       
-      // החלפת כפתורים אחרי סיום מלא של אנימציה (0.2 + 0.5 = 0.7s)
+      // החלפת כפתורים אחרי סיום מלא של אנימציה (0.15 + 0.3 = 0.45s)
       setTimeout(() => {
         window.updateToggleButtons();
         // שלב 3: fade in של הכפתור החדש - מיד אחרי החלפה
@@ -856,21 +856,21 @@ window.toggleHeaderFilters = function() {
           const newBtn = document.querySelector('.filter-toggle-main');
           if (newBtn) newBtn.classList.remove('fading-out');
         }, 50); // עיכוב קטן לוודא שהכפתור הוחלף
-      }, 700);
+      }, 450);
       
     } else {
       // פתיחה בשלבים: 1.fade כפתור → 2.פתיחת פילטר → 3.fade כפתור חזרה
       
-      // שלב 1: fade out של הכפתור הנוכחי (0.2s)
+      // שלב 1: fade out של הכפתור הנוכחי (0.15s)
       const currentBtn = document.querySelector('.filter-toggle-main');
       if (currentBtn) currentBtn.classList.add('fading-out');
       
-      // שלב 2: פתיחת הפילטר (0.5s) - מתחיל אחרי 0.2s
+      // שלב 2: פתיחת הפילטר (0.3s) - מתחיל אחרי 0.15s
       setTimeout(() => {
         section.classList.remove('filters-hidden');
-      }, 200);
+      }, 150);
       
-      // החלפת כפתורים אחרי סיום מלא של אנימציה (0.2 + 0.5 = 0.7s)
+      // החלפת כפתורים אחרי סיום מלא של אנימציה (0.15 + 0.3 = 0.45s)
       setTimeout(() => {
         window.updateToggleButtons();
         // שלב 3: fade in של הכפתור החדש - מיד אחרי החלפה
@@ -878,7 +878,7 @@ window.toggleHeaderFilters = function() {
           const newBtn = document.querySelector('.filter-toggle-secondary');
           if (newBtn) newBtn.classList.remove('fading-out');
         }, 50); // עיכוב קטן לוודא שהכפתור הוחלף
-      }, 700);
+      }, 450);
     }
     
     const toggleBtn = document.getElementById('headerFilterToggleBtn');

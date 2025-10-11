@@ -2164,23 +2164,20 @@ function showFinalSuccessModal(successInfo) {
   
   // Show modal
   const modalElement = document.getElementById('finalSuccessModal');
-  const modal = new bootstrap.Modal(modalElement);
+  
+  // Configure modal with focus: false to prevent auto-focus on buttons
+  const modal = new bootstrap.Modal(modalElement, {
+    focus: false  // Prevent Bootstrap from auto-focusing buttons
+  });
   
   modal.show();
   
-  // Fix ARIA accessibility issue: remove aria-hidden and manage focus
-  // Bootstrap adds aria-hidden and auto-focuses first button, causing warning
-  // We need to remove aria-hidden AFTER Bootstrap adds it but BEFORE focus check
-  setTimeout(() => {
+  // Fix ARIA accessibility: Bootstrap still adds aria-hidden, remove it
+  // Using requestAnimationFrame for better timing than setTimeout
+  requestAnimationFrame(() => {
     modalElement.removeAttribute('aria-hidden');
     modalElement.removeAttribute('inert');
-    // Also remove focus from any button to prevent the warning
-    if (document.activeElement && document.activeElement.closest('#finalSuccessModal')) {
-      document.activeElement.blur();
-      // Give focus to modal itself instead
-      modalElement.focus();
-    }
-  }, 10);
+  });
   
   // Store success info globally for copying
   window.currentSuccessInfo = successInfo;

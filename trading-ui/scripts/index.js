@@ -568,6 +568,7 @@ function updateRecentTradesTable() {
     }
     
     const trades = dashboardState.data.trades || [];
+    const accounts = dashboardState.data.accounts || [];
     
     // Get 10 most recent trades (by open_date)
     const recentTrades = trades
@@ -575,30 +576,74 @@ function updateRecentTradesTable() {
         .slice(0, 10);
     
     if (recentTrades.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">אין טריידים להצגה</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">אין טריידים להצגה</td></tr>';
         return;
     }
+    
+    // Update additional stats
+    updateAdditionalTradeStats(trades);
     
     // Render table rows using FieldRendererService
     tbody.innerHTML = recentTrades.map(trade => {
         const tickerSymbol = trade.ticker_symbol || '-';
         const side = window.FieldRendererService?.renderSide(trade.side) || trade.side;
-        const pnl = window.FieldRendererService?.renderPnL(trade.pnl) || (trade.pnl || '$0');
+        const type = window.FieldRendererService?.renderType(trade.investment_type) || trade.investment_type || '-';
+        const pnl = window.FieldRendererService?.renderPnL(trade.pnl || trade.total_pl) || '$0';
         const status = window.FieldRendererService?.renderStatus(trade.status, 'trade') || trade.status;
-        const openDate = window.FieldRendererService?.renderDate(trade.open_date, false) || trade.open_date;
+        const openDate = window.FieldRendererService?.renderDate(trade.open_date || trade.opened_at, false) || '-';
+        const accountName = trade.account_name || accounts.find(a => a.id === trade.trading_account_id)?.account_name || '-';
         
         return `
-            <tr onclick="window.location.href='trades.html?id=${trade.id}'" style="cursor: pointer;">
+            <tr onclick="window.location.href='trades.html?id=${trade.id}'" style="cursor: pointer;" title="לחץ לפרטים מלאים">
                 <td><strong>${tickerSymbol}</strong></td>
                 <td>${side}</td>
+                <td>${type}</td>
                 <td>${pnl}</td>
                 <td>${status}</td>
                 <td>${openDate}</td>
+                <td><small>${accountName}</small></td>
             </tr>
         `;
     }).join('');
     
     console.log(`✅ Recent trades table updated with ${recentTrades.length} trades`);
+}
+
+/**
+ * Update additional trade statistics
+ */
+function updateAdditionalTradeStats(trades) {
+    const openTrades = trades.filter(t => t.status === 'open');
+    
+    // Today's closed trades
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayTrades = trades.filter(t => {
+        if (!t.closed_at && !t.close_date) return false;
+        const closeDate = new Date(t.closed_at || t.close_date);
+        return closeDate >= today;
+    });
+    
+    const todayPnL = todayTrades.reduce((sum, t) => sum + parseFloat(t.pnl || t.total_pl || 0), 0);
+    
+    // Update DOM
+    const openCountEl = window.getElement?.('openTradesCount') || document.getElementById('openTradesCount');
+    if (openCountEl) openCountEl.textContent = openTrades.length;
+    
+    const todayClosedEl = window.getElement?.('todayClosedCount') || document.getElementById('todayClosedCount');
+    if (todayClosedEl) todayClosedEl.textContent = todayTrades.length;
+    
+    const todayPnLEl = window.getElement?.('todayPnL') || document.getElementById('todayPnL');
+    if (todayPnLEl) {
+        todayPnLEl.textContent = formatCurrency(todayPnL);
+        todayPnLEl.className = todayPnL >= 0 ? 'ms-2 text-success' : 'ms-2 text-danger';
+    }
+    
+    // Update last update time
+    const lastUpdateEl = window.getElement?.('lastUpdateTime') || document.getElementById('lastUpdateTime');
+    if (lastUpdateEl && dashboardState.lastUpdate) {
+        lastUpdateEl.textContent = dashboardState.lastUpdate.toLocaleTimeString('he-IL');
+    }
 }
 
 // ===== ALERTS DISPLAY =====

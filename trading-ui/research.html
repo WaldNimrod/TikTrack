@@ -152,17 +152,34 @@
                                         סטטיסטיקות מפתח
                                     </h2>
                                     <div class="header-actions">
+                                        <button class="btn btn-sm btn-outline-secondary" onclick="if(window.showInfoNotification) window.showInfoNotification('ייצוא דוח יתווסף בגרסה הבאה')" title="ייצא דוח">
+                                            <i class="fas fa-file-export"></i> ייצא דוח
+                                        </button>
                                         <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
                                             <span class="section-toggle-icon">▼</span>
                                         </button>
                                     </div>
                                 </div>
                                 <div class="section-body">
+                                    <!-- Info Box -->
+                                    <div class="alert alert-light border mb-3">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-lightbulb text-warning me-2" style="font-size: 1.5rem;"></i>
+                                            <div>
+                                                <strong>מדדי ביצועים:</strong>
+                                                <span class="text-muted">המדדים הבאים מחושבים על בסיס טריידים סגורים בלבד לקבלת תמונה מדויקת של הביצועים.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
                                     <div class="row g-3">
                                         <div class="col-lg-3 col-md-6">
                                             <div class="card h-100 border-0 shadow-sm bg-light">
                                                 <div class="card-body text-center">
-                                                    <h6 class="card-subtitle text-muted mb-2">Total Return</h6>
+                                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                                        <h6 class="card-subtitle text-muted mb-0">Total Return</h6>
+                                                        <i class="fas fa-question-circle text-muted" title="סה'כ רווח/הפסד מכל הטריידים הסגורים" style="cursor: help;"></i>
+                                                    </div>
                                                     <h3 class="card-title mb-1" id="totalReturnKPI">$0.00</h3>
                                                     <small class="text-muted">כל הזמנים</small>
                                                 </div>
@@ -171,16 +188,22 @@
                                         <div class="col-lg-3 col-md-6">
                                             <div class="card h-100 border-0 shadow-sm bg-light">
                                                 <div class="card-body text-center">
-                                                    <h6 class="card-subtitle text-muted mb-2">Win Rate</h6>
+                                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                                        <h6 class="card-subtitle text-muted mb-0">Win Rate</h6>
+                                                        <i class="fas fa-question-circle text-muted" title="אחוז הטריידים הרווחיים מתוך כל הטריידים הסגורים" style="cursor: help;"></i>
+                                                    </div>
                                                     <h3 class="card-title mb-1" id="winRateKPI">0%</h3>
-                                                    <small class="text-muted">טריידים סגורים</small>
+                                                    <small class="text-muted">טריידים רווחיים</small>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-lg-3 col-md-6">
                                             <div class="card h-100 border-0 shadow-sm bg-light">
                                                 <div class="card-body text-center">
-                                                    <h6 class="card-subtitle text-muted mb-2">Average Trade</h6>
+                                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                                        <h6 class="card-subtitle text-muted mb-0">Average Trade</h6>
+                                                        <i class="fas fa-question-circle text-muted" title="ממוצע הרווח/הפסד לכל טרייד סגור" style="cursor: help;"></i>
+                                                    </div>
                                                     <h3 class="card-title mb-1" id="avgTradeKPI">$0.00</h3>
                                                     <small class="text-muted">ממוצע P/L</small>
                                                 </div>
@@ -189,7 +212,10 @@
                                         <div class="col-lg-3 col-md-6">
                                             <div class="card h-100 border-0 shadow-sm bg-light">
                                                 <div class="card-body text-center">
-                                                    <h6 class="card-subtitle text-muted mb-2">Sharpe Ratio</h6>
+                                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                                        <h6 class="card-subtitle text-muted mb-0">Sharpe Ratio</h6>
+                                                        <i class="fas fa-question-circle text-muted" title="יחס סיכון-תשואה: תשואה ממוצעת חלקי סטיית תקן. ככל שגבוה יותר - טוב יותר" style="cursor: help;"></i>
+                                                    </div>
                                                     <h3 class="card-title mb-1" id="sharpeRatioKPI">-</h3>
                                                     <small class="text-muted">סיכון מותאם תשואה</small>
                                                 </div>
@@ -213,6 +239,13 @@
                                     </div>
                                 </div>
                                 <div class="section-body">
+                                    <!-- Description -->
+                                    <p class="text-muted mb-3">
+                                        <i class="fas fa-info-circle"></i>
+                                        גרפי ההשוואה מציגים את ביצועי התיק שלך מול אינדקסים מרכזיים ופילוח לפי סוגי השקעה.
+                                        <strong>הערה:</strong> נתוני S&P 500 הם הערכה - אינטגרציה מלאה עם נתונים חיצוניים תתווסף בגרסאות הבאות.
+                                    </p>
+                                    
                                     <div class="row g-3">
                                         <div class="col-lg-6">
                                             <div class="card border-0 shadow-sm">
@@ -305,21 +338,55 @@
                                         ביצועים לפי נייר
                                     </h2>
                                     <div class="header-actions">
+                                        <button class="btn btn-sm btn-outline-secondary" onclick="if(window.showInfoNotification) window.showInfoNotification('מיון טבלה: לחץ על כותרת עמודה למיון')" title="עזרה">
+                                            <i class="fas fa-question-circle"></i>
+                                        </button>
                                         <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
                                             <span class="section-toggle-icon">▼</span>
                                         </button>
                                     </div>
                                 </div>
                                 <div class="section-body">
+                                    <!-- Table Description -->
+                                    <div class="alert alert-light border mb-3">
+                                        <div class="row align-items-center">
+                                            <div class="col-md-8">
+                                                <strong>ניתוח מפורט לפי נייר ערך:</strong>
+                                                <span class="text-muted">טבלה זו מקבצת את כל הטריידים לפי ticker ומציגה סטטיסטיקות מפורטות. ניתן ללחוץ על כותרת עמודה למיון.</span>
+                                            </div>
+                                            <div class="col-md-4 text-end">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-sort"></i>
+                                                    ממוין לפי Total P/L (גבוה לנמוך)
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
                                     <div class="table-responsive">
                                         <table class="data-table table-striped table-hover">
                                             <thead class="table-dark">
                                                 <tr>
-                                                    <th>טיקר</th>
-                                                    <th>סה"כ טריידים</th>
-                                                    <th>Win Rate</th>
-                                                    <th>Total P/L</th>
-                                                    <th>Avg P/L</th>
+                                                    <th style="cursor: pointer;" title="לחץ למיון">
+                                                        טיקר
+                                                        <i class="fas fa-sort ms-1"></i>
+                                                    </th>
+                                                    <th style="cursor: pointer;" title="לחץ למיון">
+                                                        סה"כ טריידים
+                                                        <i class="fas fa-sort ms-1"></i>
+                                                    </th>
+                                                    <th style="cursor: pointer;" title="לחץ למיון">
+                                                        Win Rate
+                                                        <i class="fas fa-sort ms-1"></i>
+                                                    </th>
+                                                    <th style="cursor: pointer;" title="לחץ למיון">
+                                                        Total P/L
+                                                        <i class="fas fa-sort ms-1"></i>
+                                                    </th>
+                                                    <th style="cursor: pointer;" title="לחץ למיון">
+                                                        Avg P/L
+                                                        <i class="fas fa-sort ms-1"></i>
+                                                    </th>
                                                 </tr>
                                             </thead>
                                             <tbody id="performanceTableBody">
@@ -328,6 +395,42 @@
                                                 </tr>
                                             </tbody>
                                         </table>
+                                    </div>
+                                    
+                                    <!-- Table Summary -->
+                                    <div class="row g-2 mt-3">
+                                        <div class="col-md-3">
+                                            <div class="card border-0 bg-light">
+                                                <div class="card-body py-2 text-center">
+                                                    <small class="text-muted">סה"כ ניירות:</small>
+                                                    <strong class="ms-2" id="totalTickersInTable">-</strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="card border-0 bg-light">
+                                                <div class="card-body py-2 text-center">
+                                                    <small class="text-muted">הכי רווחי:</small>
+                                                    <strong class="ms-2 text-success" id="topPerformer">-</strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="card border-0 bg-light">
+                                                <div class="card-body py-2 text-center">
+                                                    <small class="text-muted">הכי הפסדי:</small>
+                                                    <strong class="ms-2 text-danger" id="worstPerformer">-</strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="card border-0 bg-light">
+                                                <div class="card-body py-2 text-center">
+                                                    <small class="text-muted">Win Rate ממוצע:</small>
+                                                    <strong class="ms-2" id="avgWinRateAll">-%</strong>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

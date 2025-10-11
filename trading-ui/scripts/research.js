@@ -697,7 +697,37 @@ function updatePerformanceTable() {
         `;
     }).join('');
     
+    // Update table summary statistics
+    updateTableSummary(performanceData);
+    
     console.log(`✅ Performance table updated with ${performanceData.length} tickers`);
+}
+
+/**
+ * Update table summary statistics
+ */
+function updateTableSummary(performanceData) {
+    if (performanceData.length === 0) return;
+    
+    // Find top and worst performers
+    const topPerformer = performanceData[0]; // Already sorted by totalPnL desc
+    const worstPerformer = performanceData[performanceData.length - 1];
+    
+    // Calculate average win rate
+    const avgWinRate = performanceData.reduce((sum, d) => sum + parseFloat(d.winRate), 0) / performanceData.length;
+    
+    // Update DOM
+    const totalTickersEl = window.getElement?.('totalTickersInTable') || document.getElementById('totalTickersInTable');
+    if (totalTickersEl) totalTickersEl.textContent = performanceData.length;
+    
+    const topPerformerEl = window.getElement?.('topPerformer') || document.getElementById('topPerformer');
+    if (topPerformerEl) topPerformerEl.textContent = `${topPerformer.ticker} (${formatCurrency(topPerformer.totalPnL)})`;
+    
+    const worstPerformerEl = window.getElement?.('worstPerformer') || document.getElementById('worstPerformer');
+    if (worstPerformerEl) worstPerformerEl.textContent = `${worstPerformer.ticker} (${formatCurrency(worstPerformer.totalPnL)})`;
+    
+    const avgWinRateEl = window.getElement?.('avgWinRateAll') || document.getElementById('avgWinRateAll');
+    if (avgWinRateEl) avgWinRateEl.textContent = `${avgWinRate.toFixed(1)}%`;
 }
 
 // ===== TAB HANDLERS =====

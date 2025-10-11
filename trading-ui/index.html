@@ -180,7 +180,7 @@
 
             <!-- Main Content -->
             <div class="main-content">
-                <!-- Section 1: סטטיסטיקות מרכזיות -->
+                <!-- Section 1: סטטיסטיקות מרכזיות וגישה מהירה -->
                 <div class="content-section" id="section1" data-section="section1">
                     <div class="section-header">
                         <h2>
@@ -188,12 +188,39 @@
                             סטטיסטיקות כלליות
                         </h2>
                         <div class="header-actions">
+                            <button class="btn btn-sm btn-outline-primary" onclick="window.location.href='db_display.html'" title="צפה בכל הנתונים">
+                                <i class="fas fa-database"></i> בסיס נתונים
+                            </button>
                             <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
                     </div>
                     <div class="section-body">
+                        <!-- Quick Actions Row -->
+                        <div class="row g-2 mb-4">
+                            <div class="col-lg-3 col-md-6">
+                                <button class="btn btn-outline-primary w-100" onclick="window.location.href='trades.html'">
+                                    <i class="fas fa-chart-line"></i> טריידים
+                                </button>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <button class="btn btn-outline-success w-100" onclick="window.location.href='trade_plans.html'">
+                                    <i class="fas fa-clipboard-list"></i> תכנוני טרייד
+                                </button>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <button class="btn btn-outline-warning w-100" onclick="window.location.href='alerts.html'">
+                                    <i class="fas fa-bell"></i> התראות
+                                </button>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <button class="btn btn-outline-info w-100" onclick="window.location.href='research.html'">
+                                    <i class="fas fa-microscope"></i> מחקר וניתוח
+                                </button>
+                            </div>
+                        </div>
+                        
                         <div class="row g-3">
                             <!-- Row 1 -->
                             <div class="col-lg-3 col-md-6">
@@ -348,7 +375,7 @@
                     </div>
                 </div>
 
-                <!-- Section 3: טריידים אחרונים -->
+                <!-- Section 3: טריידים אחרונים ופעולות מהירות -->
                 <div class="content-section" id="section3" data-section="section3">
                     <div class="section-header">
                         <h2>
@@ -365,33 +392,73 @@
                         </div>
                     </div>
                     <div class="section-body">
+                        <!-- Info Banner -->
+                        <div class="alert alert-info d-flex align-items-center mb-3">
+                            <i class="fas fa-info-circle me-2" style="font-size: 1.5rem;"></i>
+                            <div>
+                                <strong>עדכון אחרון:</strong> <span id="lastUpdateTime">טוען...</span>
+                                <span class="ms-3 text-muted">|</span>
+                                <span class="ms-3">רענון אוטומטי: כל 5 דקות</span>
+                            </div>
+                        </div>
+                        
                         <div class="table-responsive">
                             <table class="data-table table-striped table-hover">
                                 <thead class="table-dark">
                                     <tr>
                                         <th>טיקר</th>
                                         <th>צד</th>
+                                        <th>סוג</th>
                                         <th>P/L</th>
                                         <th>סטטוס</th>
                                         <th>תאריך פתיחה</th>
+                                        <th>חשבון</th>
                                     </tr>
                                 </thead>
                                 <tbody id="recentTradesBody">
                                     <tr>
-                                        <td colspan="5" class="text-center text-muted">טוען נתונים...</td>
+                                        <td colspan="7" class="text-center text-muted">טוען נתונים...</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
+                        
+                        <!-- Additional Info -->
+                        <div class="row g-2 mt-3">
+                            <div class="col-md-4">
+                                <div class="card border-start border-primary border-3">
+                                    <div class="card-body py-2">
+                                        <small class="text-muted">טריידים פתוחים כעת:</small>
+                                        <strong class="ms-2" id="openTradesCount">-</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card border-start border-success border-3">
+                                    <div class="card-body py-2">
+                                        <small class="text-muted">נסגרו היום:</small>
+                                        <strong class="ms-2" id="todayClosedCount">-</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card border-start border-warning border-3">
+                                    <div class="card-body py-2">
+                                        <small class="text-muted">רווח/הפסד היום:</small>
+                                        <strong class="ms-2" id="todayPnL">$0</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Section 4: התראות פעילות -->
+                <!-- Section 4: התראות ופעולות מהירות -->
                 <div class="content-section" id="section4" data-section="section4">
                     <div class="section-header">
                         <h2>
                             <i class="fas fa-bell section-icon"></i>
-                            התראות פעילות
+                            התראות ופעולות מהירות
                         </h2>
                         <div class="header-actions">
                             <button class="btn btn-sm btn-outline-primary" onclick="window.location.href='alerts.html'" title="עבור לעמוד התראות">
@@ -403,9 +470,74 @@
                         </div>
                     </div>
                     <div class="section-body">
-                        <div class="row g-2" id="activeAlertsContainer">
-                            <div class="col-12 text-center text-muted">
-                                טוען התראות...
+                        <div class="row">
+                            <!-- Right Column: Active Alerts -->
+                            <div class="col-lg-8">
+                                <h5 class="mb-3">
+                                    <i class="fas fa-exclamation-circle text-warning"></i>
+                                    התראות פעילות
+                                </h5>
+                                <div class="row g-2" id="activeAlertsContainer">
+                                    <div class="col-12 text-center text-muted">
+                                        טוען התראות...
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Left Column: Quick Actions -->
+                            <div class="col-lg-4">
+                                <h5 class="mb-3">
+                                    <i class="fas fa-bolt text-info"></i>
+                                    פעולות מהירות
+                                </h5>
+                                <div class="list-group">
+                                    <a href="trades.html" class="list-group-item list-group-item-action">
+                                        <i class="fas fa-plus-circle text-primary"></i>
+                                        <span class="ms-2">טרייד חדש</span>
+                                    </a>
+                                    <a href="trade_plans.html" class="list-group-item list-group-item-action">
+                                        <i class="fas fa-clipboard-list text-success"></i>
+                                        <span class="ms-2">תכנון טרייד חדש</span>
+                                    </a>
+                                    <a href="alerts.html" class="list-group-item list-group-item-action">
+                                        <i class="fas fa-bell text-warning"></i>
+                                        <span class="ms-2">התראה חדשה</span>
+                                    </a>
+                                    <a href="notes.html" class="list-group-item list-group-item-action">
+                                        <i class="fas fa-sticky-note text-info"></i>
+                                        <span class="ms-2">הערה חדשה</span>
+                                    </a>
+                                    <a href="cash_flows.html" class="list-group-item list-group-item-action">
+                                        <i class="fas fa-money-bill-wave text-success"></i>
+                                        <span class="ms-2">תזרים מזומנים</span>
+                                    </a>
+                                    <a href="preferences.html" class="list-group-item list-group-item-action">
+                                        <i class="fas fa-cog text-secondary"></i>
+                                        <span class="ms-2">העדפות</span>
+                                    </a>
+                                </div>
+                                
+                                <!-- System Status Card -->
+                                <div class="card mt-3 border-0 shadow-sm bg-light">
+                                    <div class="card-body">
+                                        <h6 class="card-title">
+                                            <i class="fas fa-server text-success"></i>
+                                            מצב המערכת
+                                        </h6>
+                                        <div class="d-flex justify-content-between align-items-center mt-2">
+                                            <small class="text-muted">שרת:</small>
+                                            <span class="badge bg-success">פעיל</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center mt-1">
+                                            <small class="text-muted">מטמון:</small>
+                                            <span class="badge bg-info">תקין</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center mt-1">
+                                            <small class="text-muted">רענון:</small>
+                                            <span class="badge bg-primary">פעיל</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -187,12 +187,12 @@ async function cancelAccount(accountId, accountName = 'החשבון') {
         });
       }
       
-      // סינכרון עם שרת - ביטול מטמון Backend
-      if (window.CacheSyncManager) {
-        await window.CacheSyncManager.invalidateBackend(['trading_accounts']);
+      // ניקוי cache מקומי דרך UnifiedCacheManager
+      if (window.UnifiedCacheManager?.isInitialized()) {
+        await window.UnifiedCacheManager.remove('trading_accounts');
       }
       
-      // ניקוי cache מקומי (legacy)
+      // ניקוי cache מקומי (legacy fallback)
       clearCache();
       
       return true;

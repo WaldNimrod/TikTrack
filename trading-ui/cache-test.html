@@ -265,24 +265,14 @@
                                             <span class="badge bg-warning" id="backendCacheStatus">טוען...</span>
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-6">
                                         <div class="status-item">
-                                            <label>סינכרון:</label>
-                                            <span class="badge bg-success" id="syncStatus">טוען...</span>
+                                            <label>מצב מערכת:</label>
+                                            <span class="badge bg-success" id="cacheSystemStatus">פעיל</span>
                                         </div>
                                         <div class="status-item">
-                                            <label>מדיניות:</label>
-                                            <span class="badge bg-warning" id="policyStatus">טוען...</span>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="status-item">
-                                            <label>אופטימיזציה:</label>
-                                            <span class="badge bg-info" id="optimizationStatus">טוען...</span>
-                                        </div>
-                                        <div class="status-item">
-                                            <label>ביצועים:</label>
-                                            <span class="badge bg-primary" id="performanceStatus">טוען...</span>
+                                            <label>ארכיטקטורה:</label>
+                                            <span class="badge bg-info">4 שכבות (Memory, LS, IDB, Backend)</span>
                                         </div>
                                     </div>
                                 </div>
@@ -676,86 +666,20 @@
                         <div class="cache-management-grid">
                             <div class="cache-management-card">
                                 <div class="cache-management-header">
-                                    <i class="fas fa-play text-success"></i>
-                                    <h6>אתחול מערכות</h6>
-                                </div>
-                                <div class="cache-management-description">
-                                    <p>אתחול כל מערכות המטמון</p>
-                                    <div class="cache-layers-indicator">
-                                        <span class="layer-badge layer-1" title="UnifiedCacheManager">🧠</span>
-                                        <span class="layer-badge layer-2" title="CacheSyncManager">🔄</span>
-                                        <span class="layer-badge layer-3" title="CachePolicyManager">📋</span>
-                                        <span class="layer-badge layer-4" title="MemoryOptimizer">⚡</span>
-                                    </div>
-                                    <button class="btn btn-sm btn-outline-success" onclick="initializeAllCacheSystems()">
-                                        <i class="fas fa-play"></i> אתחול מערכות
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <div class="cache-management-card">
-                                <div class="cache-management-header">
                                     <i class="fas fa-chart-line text-info"></i>
-                                    <h6>סטטוס מערכות</h6>
+                                    <h6>סטטיסטיקות מטמון</h6>
                                 </div>
                                 <div class="cache-management-description">
-                                    <p>בדיקת מצב כל המערכות</p>
+                                    <p>הצגת סטטיסטיקות UnifiedCacheManager</p>
                                     <div class="cache-layers-indicator">
-                                        <span class="layer-badge layer-1" title="UnifiedCacheManager">🧠</span>
-                                        <span class="layer-badge layer-2" title="CacheSyncManager">🔄</span>
-                                        <span class="layer-badge layer-3" title="CachePolicyManager">📋</span>
-                                        <span class="layer-badge layer-4" title="MemoryOptimizer">⚡</span>
+                                        <span class="layer-badge layer-1" title="Memory">🧠</span>
+                                        <span class="layer-badge layer-2" title="localStorage">💾</span>
+                                        <span class="layer-badge layer-3" title="IndexedDB">🗄️</span>
+                                        <span class="layer-badge layer-4" title="Backend">🖥️</span>
                                     </div>
-                                    <button class="btn btn-sm btn-outline-info" onclick="getCacheSystemStatus()">
-                                        <i class="fas fa-chart-line"></i> סטטוס מערכות
+                                    <button class="btn btn-sm btn-outline-info" onclick="console.log(window.UnifiedCacheManager?.getStats())">
+                                        <i class="fas fa-chart-line"></i> הצג סטטיסטיקות
                                     </button>
-                                </div>
-                            </div>
-                            
-                            <div class="cache-management-card">
-                                <div class="cache-management-header">
-                                    <i class="fas fa-vials text-warning"></i>
-                                    <h6>בדיקת אינטגרציה</h6>
-                                </div>
-                                <div class="cache-management-description">
-                                    <p>בדיקה מקיפה של אינטגרציה</p>
-                                    <div class="cache-layers-indicator">
-                                        <span class="layer-badge layer-1" title="UnifiedCacheManager">🧠</span>
-                                        <span class="layer-badge layer-2" title="CacheSyncManager">🔄</span>
-                                        <span class="layer-badge layer-3" title="CachePolicyManager">📋</span>
-                                        <span class="layer-badge layer-4" title="MemoryOptimizer">⚡</span>
-                                    </div>
-                                    <button class="btn btn-sm btn-outline-warning" onclick="testCacheSystemsIntegration()">
-                                        <i class="fas fa-vials"></i> בדיקת אינטגרציה
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <div class="cache-management-card">
-                                <div class="cache-management-header">
-                                    <i class="fas fa-trash-alt text-danger"></i>
-                                    <h6>ניקוי כל המערכות</h6>
-                                </div>
-                                <div class="cache-management-description">
-                                    <p>ניקוי מלא של כל מערכות המטמון</p>
-                                    <div class="cache-layers-indicator">
-                                        <span class="layer-badge layer-1" title="UnifiedCacheManager">🧠</span>
-                                        <span class="layer-badge layer-2" title="CacheSyncManager">🔄</span>
-                                        <span class="layer-badge layer-3" title="CachePolicyManager">📋</span>
-                                        <span class="layer-badge layer-4" title="MemoryOptimizer">⚡</span>
-                                    </div>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="clearAllCacheSystems()">
-                                        <i class="fas fa-trash-alt"></i> נקה הכל
-                                    </button>
-                                            <button class="btn btn-sm btn-outline-warning" onclick="clearGlobalInitializationState()" title="ניקוי מצב אתחול כפול">
-                                                <i class="fas fa-sync-alt"></i> נקה מצב אתחול
-                                            </button>
-                                            <button class="btn btn-sm btn-outline-primary" onclick="testCacheCleanupMechanisms()" title="בדיקה מקיפה של כל מנגנוני ניקוי המטמון">
-                                                <i class="fas fa-vial"></i> בדיקה מקיפה
-                                            </button>
-                                            <button class="btn btn-sm btn-outline-info" onclick="generateCacheCleanupReport()" title="יצירת דוח מפורט על מנגנוני ניקוי המטמון">
-                                                <i class="fas fa-chart-bar"></i> דוח מפורט
-                                            </button>
                                 </div>
                             </div>
                         </div>
@@ -995,24 +919,31 @@
     <!-- Header System Script -->
     <script src="scripts/header-system.js?v=v6.0.0"></script>
     
-    <!-- New Modular Architecture Scripts -->
-    <script src="scripts/modules/core-systems.js?v=debug1"></script>
-    <script src="scripts/modules/ui-basic.js?v=debug1"></script>
-    <script src="scripts/modules/data-basic.js?v=debug1"></script>
-    <script src="scripts/modules/cache-module.js?v=debug1"></script>
+    <!-- Stage 1: Core Modules (8) - LOADING STANDARD -->
+    <script src="scripts/modules/core-systems.js?v=20251010"></script>
+    <script src="scripts/modules/ui-basic.js?v=20251010"></script>
+    <script src="scripts/modules/data-basic.js?v=20251010"></script>
+    <script src="scripts/modules/ui-advanced.js?v=20251010"></script>
+    <script src="scripts/modules/data-advanced.js?v=20251010"></script>
+    <script src="scripts/modules/business-module.js?v=20251010"></script>
+    <script src="scripts/modules/communication-module.js?v=20251010"></script>
+    <script src="scripts/modules/cache-module.js?v=20251010"></script>
     
-    <!-- Additional Cache System Scripts -->
-    <script src="scripts/cache-sync-manager.js?v=debug1"></script>
-    <script src="scripts/cache-policy-manager.js?v=debug1"></script>
-    <script src="scripts/memory-optimizer.js?v=debug1"></script>
+    <!-- Stage 2: Core Utilities (3) -->
+    <script src="scripts/global-favicon.js?v=20251010"></script>
+    <script src="scripts/page-utils.js?v=20251010"></script>
+    <script src="scripts/header-system.js?v=v6.0.0"></script>
     
-    <!-- Cache Test Script - פונקציות ניקוי מטמון נמצאות כעת ב-cache-module.js -->
+    <!-- Advanced Cache Systems - REMOVED (Future Features) -->
+    <!-- cache-sync-manager.js, cache-policy-manager.js, memory-optimizer.js -->
+    <!-- These are not integrated in the current architecture -->
+    <!-- UnifiedCacheManager (cache-module.js) is the single unified system -->
     
     <!-- Socket.IO -->
     <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
 
-    <!-- Cache Test Page Script -->
-    <script src="scripts/cache-test.js"></script>
+    <!-- Stage 5: Page Script -->
+    <script src="scripts/cache-test.js?v=20251010"></script>
 
 </body>
 </html>

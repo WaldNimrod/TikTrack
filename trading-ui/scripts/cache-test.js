@@ -38,8 +38,8 @@ class CacheTestPage {
 
         console.log('🚀 Cache Test Page - Initializing...');
 
-        // Initialize cache systems
-        this.initializeCacheSystems().catch(console.error);
+        // Initialize UnifiedCacheManager
+        this.initializeCacheSystem().catch(console.error);
 
         // Load initial data
         this.loadCacheData();
@@ -70,49 +70,52 @@ class CacheTestPage {
      * Initialize cache systems
      * אתחול מערכות המטמון
      */
-    async initializeCacheSystems() {
-        console.log('🔄 Initializing cache systems...');
+    async initializeCacheSystem() {
+        console.log('🔄 Initializing UnifiedCacheManager...');
         
-        // בדיקה אם כל מערכות המטמון כבר פעילות
-        const allSystemsReady = this.checkAllCacheSystemsReady();
+        // בדיקה אם UnifiedCacheManager כבר פעיל
+        const isReady = this.checkCacheSystemReady();
         
-        if (allSystemsReady) {
-            console.log('✅ All cache systems already initialized');
+        if (isReady) {
+            console.log('✅ UnifiedCacheManager already initialized');
             this.updateCacheStatus();
         } else {
-            // Try to initialize all cache systems
-            if (window.initializeAllCacheSystems) {
-                await window.initializeAllCacheSystems(true); // true = אתחול ראשוני
-                this.updateCacheStatus();
-            } else {
-                // Retry after a short delay
-                setTimeout(() => this.initializeCacheSystems(), 500);
+            // Initialize UnifiedCacheManager
+            if (!window.UnifiedCacheManager) {
+                console.error('❌ UnifiedCacheManager not loaded');
+                return false;
+            }
+            
+            try {
+                if (typeof window.UnifiedCacheManager.initialize === 'function') {
+                    await window.UnifiedCacheManager.initialize();
+                    console.log('✅ UnifiedCacheManager initialized successfully');
+                    this.updateCacheStatus();
+                } else {
+                    console.warn('⚠️ UnifiedCacheManager.initialize() not available');
+                }
+            } catch (error) {
+                console.error('❌ Failed to initialize UnifiedCacheManager:', error);
             }
         }
     }
 
     /**
-     * בדיקה אם כל מערכות המטמון פעילות
+     * בדיקה אם UnifiedCacheManager פעיל
+     * (מערכת אחידה יחידה - ללא מערכות מקבילות)
      */
-    checkAllCacheSystemsReady() {
-        const systems = [
-            { name: 'UnifiedCacheManager', obj: window.UnifiedCacheManager },
-            { name: 'CacheSyncManager', obj: window.CacheSyncManager },
-            { name: 'CachePolicyManager', obj: window.CachePolicyManager },
-            { name: 'MemoryOptimizer', obj: window.MemoryOptimizer }
-        ];
-
-        return systems.every(system => {
-            if (!system.obj) return false;
-            
-            // בדיקה אם המערכת מאותחלת
-            if (system.obj.initialized) return true;
-            if (system.obj.isInitialized && typeof system.obj.isInitialized === 'function') {
-                return system.obj.isInitialized();
-            }
-            
+    checkCacheSystemReady() {
+        // Check only UnifiedCacheManager (single unified system)
+        if (!window.UnifiedCacheManager) {
+            console.warn('⚠️ UnifiedCacheManager not loaded');
             return false;
-        });
+        }
+        
+        if (typeof window.UnifiedCacheManager.isInitialized === 'function') {
+            return window.UnifiedCacheManager.isInitialized();
+        }
+        
+        return !!window.UnifiedCacheManager.initialized;
     }
 
     /**

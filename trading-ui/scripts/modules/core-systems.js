@@ -1770,6 +1770,48 @@ async function showSimpleErrorNotification(title, message, duration = 6000, cate
 }
 
 /**
+ * Helper function: Create and show Bootstrap modal without ARIA warnings
+ * MODAL SYSTEM - Creates dynamic modal and shows it properly
+ * 
+ * @param {string} modalHtml - HTML string of the modal
+ * @param {string} modalId - ID of the modal element
+ * @param {Object} options - Bootstrap modal options (optional)
+ * @returns {Object} Bootstrap modal instance
+ */
+window.createAndShowModal = function(modalHtml, modalId, options = {}) {
+  // Remove existing modal if present
+  const existing = document.getElementById(modalId);
+  if (existing) {
+    existing.remove();
+  }
+  
+  // Add modal to DOM
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+  
+  // Get modal element
+  const modalElement = document.getElementById(modalId);
+  if (!modalElement) {
+    console.error(`Modal element not found: ${modalId}`);
+    return null;
+  }
+  
+  // Fix ARIA accessibility: remove aria-hidden BEFORE Bootstrap shows modal
+  // This prevents the "Blocked aria-hidden" warning
+  modalElement.addEventListener('show.bs.modal', () => {
+    modalElement.removeAttribute('aria-hidden');
+    modalElement.removeAttribute('inert');
+  }, { once: true });
+  
+  // Initialize Bootstrap modal
+  const modal = new bootstrap.Modal(modalElement, options);
+  
+  // Show modal
+  modal.show();
+  
+  return modal;
+};
+
+/**
  * Show final success notification with detailed logging
  * NOTIFICATION SYSTEM - Displays final success for process completion that requires user acknowledgment
  *
@@ -2153,31 +2195,8 @@ function showFinalSuccessModal(successInfo) {
     </div>
   `;
   
-  // Remove existing modal if present
-  const existingModal = document.getElementById('finalSuccessModal');
-  if (existingModal) {
-    existingModal.remove();
-  }
-  
-  // Add modal to body
-  document.body.insertAdjacentHTML('beforeend', modalHtml);
-  
-  // Show modal
-  const modalElement = document.getElementById('finalSuccessModal');
-  
-  // Configure modal with focus: false to prevent auto-focus on buttons
-  const modal = new bootstrap.Modal(modalElement, {
-    focus: false  // Prevent Bootstrap from auto-focusing buttons
-  });
-  
-  modal.show();
-  
-  // Fix ARIA accessibility: Bootstrap still adds aria-hidden, remove it
-  // Using requestAnimationFrame for better timing than setTimeout
-  requestAnimationFrame(() => {
-    modalElement.removeAttribute('aria-hidden');
-    modalElement.removeAttribute('inert');
-  });
+  // Use the unified helper function to create and show modal without ARIA warnings
+  const modal = window.createAndShowModal(modalHtml, 'finalSuccessModal');
   
   // Store success info globally for copying
   window.currentSuccessInfo = successInfo;

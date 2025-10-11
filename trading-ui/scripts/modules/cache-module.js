@@ -2898,101 +2898,54 @@ window.testCacheSystemsIntegration = async function() {
 };
 
 /**
- * Clear all cache systems
+ * Clear UnifiedCacheManager (4 layers)
+ * Simplified from multiple cache systems to single unified system
  */
 window.clearAllCacheSystems = async function() {
     try {
-        console.log('🧹 Clearing all cache systems...');
+        console.log('🧹 Clearing UnifiedCacheManager (all 4 layers)...');
         
         const results = {
-            unifiedCacheManager: false,
-            cacheSyncManager: false,
-            cachePolicyManager: false,
-            memoryOptimizer: false
+            unifiedCacheManager: false
         };
         
-        // Clear UnifiedCacheManager
+        // Clear UnifiedCacheManager (all 4 layers: memory, localStorage, indexedDB, backend)
         if (window.UnifiedCacheManager?.initialized) {
             try {
                 await window.UnifiedCacheManager.clear();
                 results.unifiedCacheManager = true;
+                console.log('✅ UnifiedCacheManager cleared - all 4 layers');
             } catch (error) {
-                console.error('UnifiedCacheManager clear failed:', error);
+                console.error('❌ UnifiedCacheManager clear failed:', error);
             }
+        } else {
+            console.warn('⚠️ UnifiedCacheManager not initialized');
         }
         
-        // Clear CacheSyncManager queue
-        if (window.CacheSyncManager?.initialized) {
-            try {
-                window.CacheSyncManager.clearQueue();
-                results.cacheSyncManager = true;
-            } catch (error) {
-                console.error('CacheSyncManager clear failed:', error);
-            }
-        }
-        
-        // Reset CachePolicyManager
-        if (window.CachePolicyManager?.initialized) {
-            try {
-                window.CachePolicyManager.resetPolicies();
-                results.cachePolicyManager = true;
-            } catch (error) {
-                console.error('CachePolicyManager clear failed:', error);
-            }
-        }
-        
-        // Clear MemoryOptimizer
-        if (window.MemoryOptimizer?.initialized) {
-            try {
-                await window.MemoryOptimizer.cleanup();
-                results.memoryOptimizer = true;
-            } catch (error) {
-                console.error('MemoryOptimizer clear failed:', error);
-            }
-        }
-        
-        console.log('🧹 Cache systems clear results:', results);
+        console.log('🧹 Cache clear result:', results);
         
         const clearedCount = Object.values(results).filter(Boolean).length;
         const totalCount = Object.keys(results).length;
         
         if (clearedCount === totalCount) {
-            // ניקוי מלא - הודעה מפורטת עם מודל
-            if (typeof window.showFinalSuccessNotification === 'function') {
-                window.showFinalSuccessNotification(
-                    'ניקוי מערכות מטמון הושלם בהצלחה!',
-                    `ניקוי כל מערכות המטמון הושלם בהצלחה.\n\nתוצאות הניקוי:\n• UnifiedCacheManager: ✅ נוקה\n• CacheSyncManager: ✅ נוקה\n• CachePolicyManager: ✅ נוקה\n• MemoryOptimizer: ✅ נוקה\n\nזמן ניקוי: ${new Date().toLocaleTimeString('he-IL')}\nסטטוס: כל המערכות נוקו בהצלחה`,
-                    {
-                        operation: 'clear-all-cache-systems',
-                        duration: `${Date.now()}ms`,
-                        timestamp: new Date().toISOString(),
-                        results: results,
-                        clearedSystems: clearedCount,
-                        totalSystems: totalCount,
-                        status: 'all-systems-cleared',
-                        healthCheck: 'כל מערכות המטמון נוקו ונמצאות במצב נקי',
-                        nextAction: 'המערכת מוכנה לפעולות מטמון חדשות'
-                    },
-                    'system'
+            // Success - UnifiedCacheManager cleared (all 4 layers)
+            if (typeof window.showSuccessNotification === 'function') {
+                window.showSuccessNotification(
+                    'ניקוי מטמון',
+                    'UnifiedCacheManager נוקה בהצלחה!\n\n4 שכבות נוקו:\n• Memory Layer ✅\n• localStorage Layer ✅\n• IndexedDB Layer ✅\n• Backend Layer ✅'
                 );
             } else {
-                console.log('✅ ניקוי מערכות מטמון הושלם בהצלחה');
+                console.log('✅ UnifiedCacheManager cleared successfully - all 4 layers');
             }
         } else {
-            // ניקוי חלקי - הודעת שגיאה מפורטת עם מודל
-            const failedSystems = Object.entries(results)
-                .filter(([_, success]) => !success)
-                .map(([system, _]) => system)
-                .join(', ');
-            
+            // Failed to clear
             if (typeof window.showErrorNotification === 'function') {
                 window.showErrorNotification(
-                    'ניקוי מערכות מטמון חלקי - חלק מהמערכות לא נוקו',
-                    `ניקוי מערכות המטמון הושלם חלקית.\n\nפרטי הניקוי:\n• מערכות שנוקו: ${clearedCount}/${totalCount}\n• מערכות שנוקו: ${Object.entries(results).filter(([_, success]) => success).map(([system, _]) => system).join(', ')}\n• מערכות שנכשלו: ${failedSystems}\n• זמן ניקוי: ${new Date().toLocaleTimeString('he-IL')}\n\nבדיקת בריאות מפורטת:\n• UnifiedCacheManager: ${results.unifiedCacheManager ? '✅ נוקה' : '❌ לא נוקה'}\n• CacheSyncManager: ${results.cacheSyncManager ? '✅ נוקה' : '❌ לא נוקה'}\n• CachePolicyManager: ${results.cachePolicyManager ? '✅ נוקה' : '❌ לא נוקה'}\n• MemoryOptimizer: ${results.memoryOptimizer ? '✅ נוקה' : '❌ לא נוקה'}\n\nהוראות:\n• חלק מהמערכות לא נוקו - ייתכן נתונים ישנים\n• מומלץ לנסות ניקוי חוזר של המערכות\n• ניתן לנסות ניקוי ידני של כל מערכת בנפרד`,
-                    20000
+                    'שגיאה בניקוי מטמון',
+                    'UnifiedCacheManager לא נוקה בהצלחה. נסה שוב או רענן את העמוד.'
                 );
             } else {
-                console.error('⚠️ ניקוי מערכות מטמון חלקי - חלק מהמערכות לא נוקו');
+                console.error('❌ Failed to clear UnifiedCacheManager');
             }
         }
         

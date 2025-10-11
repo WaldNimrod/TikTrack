@@ -323,3 +323,63 @@
   border-color: #dee2e6;
   vertical-align: middle;
 }
+
+/* ===== Entity Modal Styles - 11/01/2025 ===== */
+
+/* כותרת מודל עם צבע ישות */
+.entity-header {
+  background-color: var(--entity-color, #007bff);
+  color: white;
+  border-bottom: none;
+}
+
+/* Trade Plan Entity */
+.entity-trade-plan {
+  --entity-color: var(--entity-trade-plan-color, #007bff);
+}
+
+/* כותרת המודל */
+.entity-title {
+  font-weight: 700;
+  color: white;
+}
+
+/* כפתור סגירה בסוף השורה (שמאל בעברית) */
+.btn-close-end {
+  margin-inline-start: auto;
+  margin-inline-end: 0;
+  order: 2;
+}
+
+/* Modal footer עם יישור לסוף השורה */
+.modal-footer-end {
+  justify-content: flex-start; /* בעברית RTL זה שמאל */
+  direction: rtl;
+}
+
+/* כפתור ישות */
+.btn-entity {
+  border: 2px solid var(--entity-color, #007bff);
+  background-color: white;
+  color: var(--entity-color, #007bff);
+  font-weight: 600;
+  padding: 0.5rem 1.5rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-entity:hover {
+  background-color: var(--entity-color, #007bff);
+  color: white;
+}
+
+/* כפתור ישות ספציפי */
+.btn-entity-trade-plan {
+  --entity-color: var(--entity-trade-plan-color, #007bff);
+}
+
+/* Labels בטפסים - צבע ישות ובולד */
+.entity-label {
+  font-weight: 700;
+  color: var(--entity-color, #007bff);
+}

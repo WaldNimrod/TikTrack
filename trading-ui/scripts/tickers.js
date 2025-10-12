@@ -1739,12 +1739,11 @@ function createTickerRowHTML(ticker) {
  */
 function updateTickersTable(tickers) {
   try {
-    // מציאת ה-tbody
-    const tbody = document.querySelector('table[data-table-type="tickers"] tbody') ||
-                   document.getElementById('tickersContainer')?.querySelector('tbody');
+    // מציאת ה-tbody - עקבי עם trade_plans
+    const tbody = document.querySelector('#tickersTable tbody');
 
     if (!tbody) {
-      handleElementNotFound('updateTickersTable', 'אלמנט tbody לא נמצא');
+      handleElementNotFound('updateTickersTable', 'טבלת טיקרים לא נמצאה (#tickersTable tbody)');
       return;
     }
 
@@ -2034,18 +2033,16 @@ window.addEventListener('load', async function () {
  */
 function waitForElement(selector, timeout = 5000) {
   return new Promise((resolve) => {
-    // בדיקה מיידית
-    const element = document.querySelector(selector) ||
-                    document.getElementById('tickersContainer')?.querySelector('tbody');
+    // בדיקה מיידית - עקבי עם trade_plans
+    const element = document.querySelector(selector);
     if (element) {
       resolve(element);
       return;
     }
-
+    
     // MutationObserver לצפייה בשינויים
     const observer = new MutationObserver(() => {
-      const element = document.querySelector(selector) ||
-                      document.getElementById('tickersContainer')?.querySelector('tbody');
+      const element = document.querySelector(selector);
       if (element) {
         observer.disconnect();
         resolve(element);

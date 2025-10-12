@@ -1381,13 +1381,13 @@ class PreferencesSystem {
         try {
             // Confirm with user via notification system
             const confirmed = await new Promise((resolve) => {
-                if (window.showConfirmNotification) {
-                    window.showConfirmNotification(
-                        '⚠️ איפוס לברירת מחדל',
-                        'האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל? פעולה זו תחליף את כל הערכים הנוכחיים.',
+                if (window.showConfirmationDialog) {
+                    window.showConfirmationDialog(
+                        'איפוס לברירת מחדל',
+                        'האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל?\n\nפעולה זו תחליף את כל הערכים הנוכחיים בערכי ברירת המחדל של המערכת.',
                         () => resolve(true),
                         () => resolve(false),
-                        { duration: 0 }
+                        'warning'
                     );
                 } else {
                     // Fallback to standard confirm if notification system not available

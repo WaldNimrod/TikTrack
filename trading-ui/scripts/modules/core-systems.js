@@ -497,7 +497,7 @@ class UnifiedAppInitializer {
      */
     async manualInitialization(config) {
         
-        // Initialize Header + Notifications in parallel (both independent of cache)
+        // Initialize Header + Notifications + Dynamic Colors in parallel (all independent of cache)
         await Promise.all([
             // Header System - has localStorage fallback, doesn't need cache
             (async () => {
@@ -512,6 +512,25 @@ class UnifiedAppInitializer {
             (async () => {
                 if (this.availableSystems.has('notification') && typeof window.NotificationSystem !== 'undefined') {
                     await window.NotificationSystem.initialize();
+                }
+            })(),
+            
+            // Dynamic Colors from Preferences - Critical for entity colors!
+            (async () => {
+                if (typeof window.loadColorPreferences === 'function') {
+                    try {
+                        await window.loadColorPreferences();
+                    } catch (error) {
+                        console.error('❌ Failed to load dynamic colors:', error);
+                    }
+                } else if (typeof window.loadDynamicColors === 'function') {
+                    try {
+                        await window.loadDynamicColors();
+                    } catch (error) {
+                        console.error('❌ Failed to load dynamic colors:', error);
+                    }
+                } else {
+                    console.warn('⚠️ No dynamic colors loading function available');
                 }
             })()
         ]);

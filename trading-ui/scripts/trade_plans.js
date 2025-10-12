@@ -1977,8 +1977,8 @@ function updateTradePlansTable(trade_plans) {
 
   tbody.innerHTML = tableHTML;
 
-    // Updating statistics
-    updatePageSummaryStats();
+  // Updating statistics - pass the data directly to avoid timing issues
+  updatePageSummaryStats(trade_plans);
     
     // יישום צבעי ישויות על כותרות
     if (window.applyEntityColorsToHeaders) {
@@ -1988,17 +1988,17 @@ function updateTradePlansTable(trade_plans) {
 
 /**
  * עדכון סטטיסטיקות סיכום
+ * @param {Array} data - Optional data array to use (if not provided, uses window data)
  */
-function updatePageSummaryStats() {
-  // Using filtered data if available AND not empty, otherwise all data
-  const dataToUse = (window.filteredTradePlansData && window.filteredTradePlansData.length > 0) 
-    ? window.filteredTradePlansData 
-    : window.tradePlansData;
+function updatePageSummaryStats(data = null) {
+  // Using provided data, or filtered data if available AND not empty, otherwise all data
+  const dataToUse = data || 
+    ((window.filteredTradePlansData && window.filteredTradePlansData.length > 0) 
+      ? window.filteredTradePlansData 
+      : window.tradePlansData);
   
   if (!dataToUse || !Array.isArray(dataToUse) || dataToUse.length === 0) {
-    console.warn('⚠️ No data available for statistics - tradePlansData:', window.tradePlansData?.length || 'undefined');
-    
-    // Try to set 0 values if elements exist
+    // No data available - set 0 values
     const totalDesignsElement = document.getElementById('totalDesigns');
     if (totalDesignsElement) totalDesignsElement.textContent = '0';
     const totalInvestmentElement = document.getElementById('totalInvestment');
@@ -2729,7 +2729,6 @@ function isDateValue(value) {
 function restoreSortState() {
   // Check if data is available
   if (!window.tradePlansData || window.tradePlansData.length === 0) {
-    console.log('⚠️ No trade plans data available for sort restoration');
     return;
   }
 

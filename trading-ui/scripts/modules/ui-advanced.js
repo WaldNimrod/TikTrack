@@ -55,15 +55,15 @@ const VALID_ENTITY_TYPES = [
  * Dynamic entity colors - loaded from preferences
  */
 let ENTITY_COLORS = {
-  // ברירות מחדל
-  'trade': '#007bff',
-  'trade_plan': '#0056b3',
-  'execution': '#17a2b8',
-  'account': '#1b0b75',
-  'cash_flow': '#20c997',
-  'ticker': '#019193',
-  'alert': '#ff9c05',
-  'note': '#6f42c1',
+  // ברירות מחדל - תואמות לפרופיל ברירת המחדל במסד נתונים
+  'trade': '#26baac',
+  'trade_plan': '#8e44ad',
+  'execution': '#2c3e50',
+  'account': '#5499c7',
+  'cash_flow': '#d4a574',
+  'ticker': '#229954',
+  'alert': '#e67e22',
+  'note': '#a29bfe',
   'constraint': '#6c757d',
   'design': '#495057',
   'research': '#343a40',
@@ -117,10 +117,10 @@ let STATUS_COLORS = {
  * Dynamic text colors - calculated from main colors
  */
 let ENTITY_TEXT_COLORS = {
-  // ברירות מחדל
-  'trade': '#0056b3',
-  'trade_plan': '#004085',
-  'execution': '#138496',
+  // ברירות מחדל - תואמות לפרופיל ברירת המחדל במסד נתונים
+  'trade': '#1d8b7d',
+  'trade_plan': '#6c358f',
+  'execution': '#1a2633',
   'account': '#0f0642',
   'cash_flow': '#1a9f7a',
   'ticker': '#017a7c',
@@ -193,19 +193,19 @@ const INVESTMENT_TYPE_DESCRIPTIONS = {
  */
 let INVESTMENT_TYPE_COLORS = {
   'swing': {
-    light: 'rgba(0, 123, 255, 0.1)',
-    medium: '#007bff',
-    border: 'rgba(0, 123, 255, 0.3)'
+    light: 'rgba(142, 68, 173, 0.1)',
+    medium: '#8e44ad',
+    border: 'rgba(142, 68, 173, 0.3)'
   },
   'investment': {
-    light: 'rgba(40, 167, 69, 0.1)',
-    medium: '#28a745',
-    border: 'rgba(40, 167, 69, 0.3)'
+    light: 'rgba(40, 116, 166, 0.1)',
+    medium: '#2874a6',
+    border: 'rgba(40, 116, 166, 0.3)'
   },
   'passive': {
-    light: 'rgba(111, 66, 193, 0.1)',
-    medium: '#6f42c1',
-    border: 'rgba(111, 66, 193, 0.3)'
+    light: 'rgba(22, 160, 133, 0.1)',
+    medium: '#16a085',
+    border: 'rgba(22, 160, 133, 0.3)'
   },
   'day_trading': {
     light: 'rgba(255, 193, 7, 0.1)',
@@ -216,7 +216,7 @@ let INVESTMENT_TYPE_COLORS = {
     light: 'rgba(220, 53, 69, 0.1)',
     medium: '#dc3545',
     border: 'rgba(220, 53, 69, 0.3)'
-  }
+  }  // scalping נשאר כברירת מחדל - אין בפרופיל
 };
 
 // ===== DYNAMIC COLOR LOADING =====
@@ -1374,16 +1374,16 @@ function updateEntityColorFromHex(entityType, hexValue) {
  */
 function resetEntityColors() {
   try {
-    // איפוס הצבעים לברירת המחדל
+    // איפוס הצבעים לברירת המחדל - תואמות לפרופיל ברירת המחדל במסד נתונים
     Object.assign(ENTITY_COLORS, {
-      'trade': '#007bff',
-      'trade_plan': '#0056b3',
-      'execution': '#17a2b8',
-      'account': '#28a745',
-      'cash_flow': '#20c997',
-      'ticker': '#dc3545',
-      'alert': '#ff9c05',
-      'note': '#6f42c1',
+      'trade': '#26baac',
+      'trade_plan': '#8e44ad',
+      'execution': '#2c3e50',
+      'account': '#5499c7',
+      'cash_flow': '#d4a574',
+      'ticker': '#229954',
+      'alert': '#e67e22',
+      'note': '#a29bfe',
       'constraint': '#6c757d',
       'design': '#495057',
       'research': '#343a40',
@@ -1406,11 +1406,11 @@ function resetEntityColors() {
       'preference': 'rgba(173, 181, 189, 0.1)',
     });
 
-    // איפוס צבעי טקסט
+    // איפוס צבעי טקסט - תואמות לפרופיל ברירת המחדל במסד נתונים
     Object.assign(ENTITY_TEXT_COLORS, {
-      'trade': '#0056b3',
-      'trade_plan': '#004085',
-      'execution': '#138496',
+      'trade': '#1d8b7d',
+      'trade_plan': '#6c358f',
+      'execution': '#1a2633',
       'account': '#1e7e34',
       'cash_flow': '#1a9f7a',
       'ticker': '#c82333',
@@ -1422,16 +1422,16 @@ function resetEntityColors() {
       'preference': '#6c757d',
     });
 
-    // איפוס צבעי גבול
+    // איפוס צבעי גבול - תואמות לפרופיל ברירת המחדל במסד נתונים
     Object.assign(ENTITY_BORDER_COLORS, {
-      'trade': '#007bff',
-      'trade_plan': '#0056b3',
-      'execution': '#17a2b8',
-      'account': '#28a745',
-      'cash_flow': '#20c997',
-      'ticker': '#dc3545',
-      'alert': '#ff9c05',
-      'note': '#6f42c1',
+      'trade': '#26baac',
+      'trade_plan': '#8e44ad',
+      'execution': '#2c3e50',
+      'account': '#5499c7',
+      'cash_flow': '#d4a574',
+      'ticker': '#229954',
+      'alert': '#e67e22',
+      'note': '#a29bfe',
       'constraint': '#6c757d',
       'design': '#495057',
       'research': '#343a40',
@@ -1528,13 +1528,13 @@ function getColorPreferences() {
     infoColor: '#17a2b8',           // כחול מידע - מידע נוסף
     secondaryColor: '#6c757d',      // אפור - נתונים משניים
     
-    // צבעי ישויות לגרפים (מהמערכת הקיימת)
-    entityTradeColor: '#007bff',    // כחול - טריידים
-    entityTradingAccountColor: '#28a745',  // ירוק - חשבונות
-    entityExecutionColor: '#17a2b8', // כחול מידע - ביצועים
-    entityAlertColor: '#ffc107',    // צהוב - התראות
-    entityTickerColor: '#dc3545',   // אדום - טיקרים
-    entityNoteColor: '#6f42c1',     // סגול - הערות
+    // צבעי ישויות לגרפים (תואמים לפרופיל ברירת המחדל במסד נתונים)
+    entityTradeColor: '#26baac',    // טורקיז - טריידים
+    entityTradingAccountColor: '#5499c7',  // כחול בהיר - חשבונות
+    entityExecutionColor: '#2c3e50', // כחול כהה - ביצועים
+    entityAlertColor: '#e67e22',    // כתום - התראות
+    entityTickerColor: '#229954',   // ירוק - טיקרים
+    entityNoteColor: '#a29bfe',     // סגול בהיר - הערות
     
     // צבעי גרפים מיוחדים
     chartBackgroundColor: '#ffffff', // לבן - רקע גרפים

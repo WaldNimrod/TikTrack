@@ -140,7 +140,7 @@
         <!-- UI Content Section 1 Start-->
       <div class="content-section" id="section1">
         <div class="section-header">
-            <h2>👤 ניהול פרופילים</h2>
+            <h2>👤 ניהול פרופילים <small class="text-muted mx-3">| פעיל: <span id="currentActiveProfile">טוען...</span></small></h2>
             <div class="header-actions">
                 <button class="btn btn-success btn-sm" onclick="window.saveAllPreferences()" title="שמור הכל">
                     <i class="bi bi-save"></i> שמור
@@ -151,58 +151,27 @@
             </div>
         </div>
                 <div class="section-body">
-                <!-- הצגת פרופיל פעיל -->
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <div class="alert alert-info">
-                            <strong>📌 פרופיל פעיל נוכחי:</strong> 
-                            <span id="currentActiveProfile" class="fw-bold">טוען...</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- בחירת פרופיל להחלפה -->
                 <div class="row">
+                    <!-- עמודה ימנית - בחירת פרופיל -->
                     <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label">בחר פרופיל להפעלה</label>
-                            <select id="profileSwitchSelect" class="form-select">
-                                <option value="">בחר פרופיל...</option>
-                            </select>
-                        </div>
+                        <label class="form-label">בחר פרופיל להפעלה</label>
+                        <select id="profileSwitchSelect" class="form-select mb-3">
+                            <option value="">בחר פרופיל...</option>
+                        </select>
+                        <button class="btn btn-primary w-100" onclick="window.switchToSelectedProfile()" id="switchProfileBtn">
+                            <i class="bi bi-arrow-repeat"></i> החלף לפרופיל זה
+                        </button>
                     </div>
+                    
+                    <!-- עמודה שמאלית - יצירה ומחיקה -->
                     <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label">&nbsp;</label>
-                            <button class="btn btn-primary w-100" onclick="window.switchToSelectedProfile()" id="switchProfileBtn">
-                                <i class="bi bi-arrow-repeat"></i> החלף לפרופיל זה
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- ניהול פרופילים -->
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label">שם פרופיל חדש</label>
-                            <input type="text" id="newProfileName" class="form-control" placeholder="הכנס שם פרופיל">
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label">&nbsp;</label>
-                            <button class="btn btn-success w-100" onclick="window.createNewProfile()">
+                        <label class="form-label">שם פרופיל חדש</label>
+                        <input type="text" id="newProfileName" class="form-control mb-3" placeholder="הכנס שם פרופיל">
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-success flex-fill" onclick="window.createNewProfile()">
                                 <i class="bi bi-plus-circle"></i> צור פרופיל חדש
                             </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="row">
-                    <div class="col-12">
-                        <div class="profile-buttons d-flex flex-wrap gap-2">
-                            <button class="btn btn-danger" onclick="window.deleteCurrentProfile()">
+                            <button class="btn btn-danger flex-fill" onclick="window.deleteCurrentProfile()">
                                 <i class="bi bi-trash"></i> מחק פרופיל פעיל
                             </button>
                         </div>
@@ -247,8 +216,6 @@
                                 <option value="ILS - שקל חדש">ILS - שקל חדש</option>
                     </select>
                   </div>
-                </div>
-                    <div class="col-md-6">
                         <div class="mb-3">
                             <label class="form-label">אזור זמן</label>
                             <select id="timezone" class="form-select">
@@ -262,6 +229,8 @@
                                 <option value="America/Los_Angeles">America/Los_Angeles (לוס אנג'לס)</option>
                 </select>
               </div>
+                </div>
+                    <div class="col-md-6">
                         <div class="mb-3">
                             <label class="form-label">שפה <span class="text-muted">(עתידי)</span></label>
                             <select id="language" class="form-select control-narrow" disabled>

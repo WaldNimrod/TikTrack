@@ -813,6 +813,167 @@ class PreferencesService:
             logger.error(f"❌ Error clearing PreferencesService cache: {e}")
             return 0
 
+    def create_profile(self, user_id: int, profile_name: str, description: str = '') -> int:
+        """
+        Create new profile with system default values
+        
+        Args:
+            user_id: User ID
+            profile_name: Name for the new profile
+            description: Optional description
+            
+        Returns:
+            New profile ID
+            
+        Raises:
+            ValueError: If profile name already exists for user
+        """
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            # 1. Check if profile_name already exists for user
+            cursor.execute('''
+                SELECT id FROM preference_profiles
+                WHERE user_id = ? AND profile_name = ?
+            ''', (user_id, profile_name))
+            
+            if cursor.fetchone():
+                conn.close()
+                raise ValueError(f"Profile '{profile_name}' already exists for user {user_id}")
+            
+            # 2. INSERT INTO preference_profiles
+            cursor.execute('''
+                INSERT INTO preference_profiles 
+                (user_id, profile_name, description, is_active, is_default, created_at)
+                VALUES (?, ?, ?, 0, 0, CURRENT_TIMESTAMP)
+            ''', (user_id, profile_name, description))
+            
+            new_profile_id = cursor.lastrowid
+            logger.info(f"✅ Created profile '{profile_name}' (ID: {new_profile_id}) for user {user_id}")
+            
+            # 3. Get all preference_types with default_value
+            cursor.execute('''
+                SELECT id, default_value
+                FROM preference_types
+                WHERE is_active = 1 AND default_value IS NOT NULL
+            ''')
+            
+            preference_types = cursor.fetchall()
+            
+            # 4. INSERT INTO user_preferences for each preference with default value
+            for pref_id, default_value in preference_types:
+                cursor.execute('''
+                    INSERT INTO user_preferences 
+                    (user_id, profile_id, preference_id, saved_value, created_at, updated_at)
+                    VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                ''', (user_id, new_profile_id, pref_id, default_value))
+            
+            conn.commit()
+            conn.close()
+            
+            logger.info(f"✅ Added {len(preference_types)} default preferences to profile {new_profile_id}")
+            
+            # 5. Clear cache
+            self.clear_cache()
+            
+            # 6. Return new profile id
+            return new_profile_id
+            
+        except Exception as e:
+            logger.error(f"Error creating profile '{profile_name}' for user {user_id}: {e}")
+            raise
+
+    def delete_profile(self, user_id: int, profile_id: int) -> bool:
+        """
+        Delete profile and all its preferences
+        
+        Args:
+            user_id: User ID
+            profile_id: Profile ID to delete
+            
+        Returns:
+            True on success
+            
+        Raises:
+            ValueError: If profile is the only one for user or doesn't exist
+        """
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            # 1. Check profile exists and belongs to user
+            cursor.execute('''
+                SELECT profile_name, is_active, is_default
+                FROM preference_profiles
+                WHERE user_id = ? AND id = ?
+            ''', (user_id, profile_id))
+            
+            profile = cursor.fetchone()
+            if not profile:
+                conn.close()
+                raise ValueError(f"Profile {profile_id} not found for user {user_id}")
+            
+            profile_name, is_active, is_default = profile
+            
+            # 2. Check not the only profile (count >= 2)
+            cursor.execute('''
+                SELECT COUNT(*) FROM preference_profiles
+                WHERE user_id = ?
+            ''', (user_id,))
+            
+            profile_count = cursor.fetchone()[0]
+            if profile_count <= 1:
+                conn.close()
+                raise ValueError("Cannot delete the only profile for user")
+            
+            # 3. If is_active=1, switch to default profile first
+            if is_active:
+                logger.info(f"Profile {profile_id} is active, switching to default profile first")
+                
+                # Find default profile or fallback to first profile
+                cursor.execute('''
+                    SELECT id FROM preference_profiles
+                    WHERE user_id = ? AND id != ?
+                    ORDER BY is_default DESC, id ASC
+                    LIMIT 1
+                ''', (user_id, profile_id))
+                
+                new_active_profile = cursor.fetchone()
+                if new_active_profile:
+                    self.activate_profile(user_id, new_active_profile[0])
+                    logger.info(f"✅ Switched to profile {new_active_profile[0]}")
+            
+            # 4. DELETE FROM user_preferences WHERE profile_id=?
+            cursor.execute('''
+                DELETE FROM user_preferences
+                WHERE user_id = ? AND profile_id = ?
+            ''', (user_id, profile_id))
+            
+            deleted_prefs = cursor.rowcount
+            logger.info(f"✅ Deleted {deleted_prefs} preferences from profile {profile_id}")
+            
+            # 5. DELETE FROM preference_profiles WHERE id=?
+            cursor.execute('''
+                DELETE FROM preference_profiles
+                WHERE user_id = ? AND id = ?
+            ''', (user_id, profile_id))
+            
+            conn.commit()
+            conn.close()
+            
+            logger.info(f"✅ Deleted profile '{profile_name}' (ID: {profile_id}) for user {user_id}")
+            
+            # 6. Clear cache
+            self.clear_cache()
+            
+            # 7. Return True
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error deleting profile {profile_id} for user {user_id}: {e}")
+            raise
+
 
 # יצירת מופע גלובלי
 preferences_service = PreferencesService()

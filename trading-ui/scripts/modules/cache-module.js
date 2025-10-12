@@ -69,20 +69,19 @@ class UnifiedCacheManager {
     async initialize() {
         try {
             
-            // ⚠️ TEMPORARY FIX: IndexedDB disabled due to timeout issues
-            // TODO: Investigate why indexedDB.open() hangs and re-enable when fixed
-            const USE_INDEXED_DB = false;  // ← Set to true when IndexedDB works
-            
             // אתחול IndexedDB
-            if (window.indexedDB && USE_INDEXED_DB) {
+            if (window.indexedDB) {
                 this.layers.indexedDB = new IndexedDBLayer();
-                await this.layers.indexedDB.initialize();
-            } else {
-                if (!USE_INDEXED_DB) {
-                    console.warn('⚠️ IndexedDB disabled (temporary) - using localStorage');
-                } else {
-                    console.warn('⚠️ IndexedDB not available, using localStorage fallback');
+                const idbResult = await this.layers.indexedDB.initialize();
+                
+                // If IndexedDB failed, use localStorage as fallback
+                if (!idbResult) {
+                    console.warn('⚠️ IndexedDB initialization failed - using localStorage fallback');
+                    this.layers.indexedDB = new LocalStorageLayer();
+                    await this.layers.indexedDB.initialize();
                 }
+            } else {
+                console.warn('⚠️ IndexedDB not available, using localStorage fallback');
                 this.layers.indexedDB = new LocalStorageLayer();
             }
             
@@ -729,22 +728,65 @@ class LocalStorageLayer {
 class IndexedDBLayer {
     constructor() {
         this.db = null;
+        this.isInitializing = false;
     }
 
     async initialize() {
         if (window.indexedDB) {
+            // Prevent concurrent initialization attempts
+            if (this.isInitializing) {
+                console.warn('⚠️ IndexedDB already initializing - waiting...');
+                return new Promise(resolve => {
+                    const checkInterval = setInterval(() => {
+                        if (!this.isInitializing) {
+                            clearInterval(checkInterval);
+                            resolve(this.db !== null);
+                        }
+                    }, 100);
+                    // Timeout after 3 seconds
+                    setTimeout(() => {
+                        clearInterval(checkInterval);
+                        console.error('❌ Wait for initialization timeout');
+                        resolve(false);
+                    }, 3000);
+                });
+            }
+            
+            this.isInitializing = true;
+            
+            // Close any existing connection first
+            if (this.db) {
+                try {
+                    this.db.close();
+                    console.log('🔄 Closed previous IndexedDB connection');
+                } catch (e) {
+                    console.warn('⚠️ Error closing previous connection:', e);
+                }
+                this.db = null;
+            }
+            
             // Create database instance with timeout
+            console.log('🔄 Opening IndexedDB: UnifiedCacheDB v2...');
+            
             return new Promise((resolve, reject) => {
                 const timeout = setTimeout(() => {
-                    console.warn('⚠️ IndexedDB open timeout after 2 seconds - using localStorage fallback');
+                    this.isInitializing = false;  // ✅ Reset flag
+                    console.error('❌ IndexedDB open TIMEOUT after 1 second');
+                    console.error('→ This usually means:');
+                    console.error('   1. Another tab/window has the DB open');
+                    console.error('   2. DB was just deleted and browser needs time');
+                    console.error('   3. Browser IndexedDB is corrupted');
+                    console.warn('⚠️ Falling back to localStorage');
                     // Don't reject - just resolve with false to use fallback
                     resolve(false);
-                }, 2000);  // Reduced from 5 to 2 seconds
+                }, 1000);  // 1 second - faster feedback
                 
                 const request = window.indexedDB.open('UnifiedCacheDB', 2);
+                console.log('📡 IndexedDB.open() request sent...');
                 
                 request.onerror = () => {
                     clearTimeout(timeout);
+                    this.isInitializing = false;  // ✅ Reset flag
                     console.error('❌ IndexedDB open failed:', request.error);
                     // Don't reject - resolve with false to continue with fallback
                     resolve(false);
@@ -752,15 +794,21 @@ class IndexedDBLayer {
                 
                 request.onsuccess = () => {
                     clearTimeout(timeout);
+                    this.isInitializing = false;  // ✅ Reset flag
                     this.db = request.result;
                     console.log('✅ IndexedDB Layer initialized successfully');
+                    console.log(`   DB version: ${this.db.version}, stores: ${Array.from(this.db.objectStoreNames).join(', ')}`);
                     resolve(true);
                 };
                 
-                request.onblocked = () => {
+                request.onblocked = (event) => {
                     clearTimeout(timeout);
-                    console.warn('🔒 IndexedDB open BLOCKED - another connection is open');
-                    console.warn('→ Close other TikTrack tabs/windows or wait for them to close');
+                    this.isInitializing = false;  // ✅ Reset flag
+                    console.error('🔒 IndexedDB open BLOCKED!');
+                    console.error('→ Another connection to this DB is open');
+                    console.error('→ Close ALL other TikTrack tabs/windows');
+                    console.error('→ Or wait for blocking connection to close');
+                    console.warn('⚠️ Using localStorage fallback instead');
                     // Resolve with false to use fallback
                     resolve(false);
                 };
@@ -1500,9 +1548,46 @@ window.clearAllCache = async function(options = {}) {
             results.cleared.allLocalStorage = lsCountBefore;
             if (verbose) console.log(`☢️ ALL localStorage cleared: ${lsCountBefore} entries (including non-TikTrack!)`);
             
-            // Delete entire IndexedDB database
+            // Delete entire IndexedDB database - PROPERLY with Promise wrapper!
             try {
-                await indexedDB.deleteDatabase('UnifiedCacheDB');
+                // CRITICAL: Close any open connections FIRST!
+                if (window.UnifiedCacheManager?.layers?.indexedDB?.db) {
+                    try {
+                        window.UnifiedCacheManager.layers.indexedDB.db.close();
+                        if (verbose) console.log('☢️ Closed existing IndexedDB connection');
+                    } catch (e) {
+                        console.warn('⚠️ Error closing IndexedDB connection:', e);
+                    }
+                }
+                
+                // CRITICAL: Delay to ensure DB is fully deleted and connections closed
+                // Without this, next open() may hang!
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Wrap deleteDatabase in a Promise (it returns IDBRequest, not Promise!)
+                await new Promise((resolve, reject) => {
+                    const deleteRequest = indexedDB.deleteDatabase('UnifiedCacheDB');
+                    
+                    deleteRequest.onsuccess = () => {
+                        if (verbose) console.log('☢️ IndexedDB database DELETED successfully: UnifiedCacheDB');
+                        resolve();
+                    };
+                    
+                    deleteRequest.onerror = (event) => {
+                        console.error('❌ Failed to delete IndexedDB:', event.target.error);
+                        reject(event.target.error);
+                    };
+                    
+                    deleteRequest.onblocked = () => {
+                        console.warn('🔒 Delete BLOCKED - closing open connections...');
+                        // Wait a bit then resolve anyway
+                        setTimeout(() => {
+                            console.warn('⚠️ Proceeding despite block - may cause issues');
+                            resolve();
+                        }, 1000);
+                    };
+                });
+                
                 results.cleared.indexedDBDeleted = true;
                 
                 // ✅ CRITICAL: Reset initialized flag so it will re-initialize on refresh!
@@ -1510,8 +1595,7 @@ window.clearAllCache = async function(options = {}) {
                     window.UnifiedCacheManager.initialized = false;
                     if (verbose) console.log('☢️ UnifiedCacheManager.initialized reset to false');
                 }
-                if (verbose) console.log('☢️ IndexedDB database DELETED: UnifiedCacheDB');
-    } catch (error) {
+            } catch (error) {
                 console.warn('⚠️ Failed to delete IndexedDB:', error);
                 results.cleared.indexedDBDeleted = false;
             }

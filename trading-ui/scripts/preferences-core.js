@@ -918,28 +918,34 @@ class ProfileManager {
     }
     
     // ========================================================================
-    // FUTURE METHODS (Ready but not exposed in UI yet)
+    // PROFILE MANAGEMENT METHODS
     // ========================================================================
     
     /**
-     * Create new profile
-     * @future - UI support coming later
+     * Create new profile with system defaults
      */
-    async createProfile(profileName, description = '', copyFromActive = true) {
+    async createProfile(profileName, description = '') {
         try {
+            // 1. Validate profileName not empty
+            if (!profileName || !profileName.trim()) {
+                throw new Error('שם פרופיל לא יכול להיות ריק');
+            }
+            
             console.log(`➕ Creating profile: ${profileName}...`);
             
+            // 2. POST /api/preferences/profiles
             const response = await this.api.post('/profiles', {
                 user_id: this.preferencesManager.userId,
                 profile_name: profileName,
-                description: description,
-                copy_from_active: copyFromActive
+                description: description
             });
             
-            // Reload profiles
+            // 3. Reload profiles
             await this.loadProfiles();
             
             console.log('✅ Profile created successfully');
+            
+            // 4. Return response with new profile_id
             return response;
             
         } catch (error) {
@@ -950,28 +956,38 @@ class ProfileManager {
     
     /**
      * Delete profile
-     * @future - UI support coming later
      */
     async deleteProfile(profileId) {
         try {
+            // 1. Validate profileId provided
+            if (!profileId) {
+                throw new Error('מזהה פרופיל חסר');
+            }
+            
             console.log(`🗑️ Deleting profile ${profileId}...`);
             
-            // Prevent deleting the only profile
+            // 2. Check this.profiles.length > 1
             if (this.profiles.length <= 1) {
-                throw new Error('לא ניתן למחוק את הפרופיל האחרון');
+                throw new Error('לא ניתן למחוק את הפרופיל האחרון במערכת');
             }
             
-            // Prevent deleting active profile
-            if (this.activeProfile?.id === profileId) {
-                throw new Error('לא ניתן למחוק את הפרופיל הפעיל');
+            // 3. DELETE /api/preferences/profiles/{profileId}?user_id={userId}
+            const response = await fetch(
+                `/api/preferences/profiles/${profileId}?user_id=${this.preferencesManager.userId}`, 
+                { method: 'DELETE' }
+            );
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Failed to delete profile');
             }
             
-            await this.api.post(`/profiles/${profileId}/delete`);
-            
-            // Reload profiles
+            // 4. Reload profiles
             await this.loadProfiles();
             
             console.log('✅ Profile deleted successfully');
+            
+            // 5. Return true
             return true;
             
         } catch (error) {
@@ -1749,13 +1765,135 @@ window.switchToSelectedProfile = async () => {
 };
 
 window.createNewProfile = async () => {
-    // TODO: Implement profile creation
-    alert('יצירת פרופיל חדש - בפיתוח');
+    try {
+        const nameInput = document.getElementById('newProfileName');
+        const profileName = nameInput?.value?.trim();
+        
+        if (!profileName) {
+            window.showWarningNotification(
+                'שם פרופיל חסר',
+                'אנא הכנס שם לפרופיל החדש'
+            );
+            return;
+        }
+        
+        // Show loading
+        window.PreferencesSystem.ui.showLoading('create-profile');
+        
+        // Create profile
+        await window.PreferencesSystem.profiles.createProfile(
+            profileName,
+            `פרופיל ${profileName}`
+        );
+        
+        // Clear input
+        nameInput.value = '';
+        
+        // Hide loading
+        window.PreferencesSystem.ui.hideLoading('create-profile');
+        
+        // Success notification
+        window.showSuccessNotification(
+            'פרופיל נוצר והופעל בהצלחה',
+            `הפרופיל "${profileName}" נוצר עם ברירות מחדל והפך לפעיל. הדף ירענן בעוד רגע...`
+        );
+        
+        // Reload page to show the new active profile
+        setTimeout(() => {
+            window.location.reload();
+        }, 2000);
+        
+    } catch (error) {
+        window.PreferencesSystem.ui.hideLoading('create-profile');
+        
+        // Extract error message
+        const errorMsg = error.message || error.error || String(error);
+        
+        // Check for specific error types
+        if (errorMsg.includes('already exists')) {
+            window.showWarningNotification(
+                'שם פרופיל קיים',
+                `פרופיל בשם "${profileName}" כבר קיים במערכת. אנא בחר שם אחר.`
+            );
+        } else {
+            window.showErrorNotification(
+                'שגיאה ביצירת פרופיל',
+                errorMsg
+            );
+        }
+    }
 };
 
 window.deleteCurrentProfile = async () => {
-    // TODO: Implement profile deletion
-    alert('מחיקת פרופיל - בפיתוח');
+    try {
+        const activeProfile = window.PreferencesSystem.profiles.getActiveProfile();
+        
+        if (!activeProfile) {
+            window.showWarningNotification('שגיאה', 'לא נמצא פרופיל פעיל');
+            return;
+        }
+        
+        // Check not the only profile
+        const profiles = window.PreferencesSystem.profiles.profiles;
+        if (profiles.length <= 1) {
+            window.showWarningNotification(
+                'לא ניתן למחוק',
+                'לא ניתן למחוק את הפרופיל האחרון במערכת'
+            );
+            return;
+        }
+        
+        // Confirmation dialog
+        const confirmed = await new Promise((resolve) => {
+            window.showConfirmationDialog(
+                'מחיקת פרופיל',
+                `האם אתה בטוח שברצונך למחוק את הפרופיל "${activeProfile.name}"?\n\n` +
+                `פעולה זו תמחק את כל ההעדפות של הפרופיל ותעבור אוטומטית לפרופיל ברירת המחדל.\n\n` +
+                `⚠️ פעולה זו אינה הפיכה!`,
+                () => resolve(true),
+                () => resolve(false),
+                'danger'
+            );
+        });
+        
+        if (!confirmed) {
+            return;
+        }
+        
+        // Show loading
+        window.PreferencesSystem.ui.showLoading('delete-profile');
+        
+        // Delete profile (backend will auto-switch if active)
+        await window.PreferencesSystem.profiles.deleteProfile(activeProfile.id);
+        
+        // Reload profiles
+        await window.PreferencesSystem.profiles.loadProfiles();
+        
+        // Hide loading
+        window.PreferencesSystem.ui.hideLoading('delete-profile');
+        
+        // Success notification
+        window.showSuccessNotification(
+            'פרופיל נמחק בהצלחה',
+            `הפרופיל "${activeProfile.name}" נמחק מהמערכת`
+        );
+        
+        // Reload page to show new active profile
+        setTimeout(() => {
+            window.location.reload();
+        }, 2000);
+        
+    } catch (error) {
+        window.PreferencesSystem.ui.hideLoading('delete-profile');
+        
+        // Extract error message
+        const errorMsg = error.message || error.error || String(error);
+        
+        window.showErrorNotification(
+            'שגיאה במחיקת פרופיל',
+            errorMsg
+        );
+    }
 };
 
 // toggleSection and toggleAllSections are already defined in ui-basic.js

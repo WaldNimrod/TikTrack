@@ -93,6 +93,24 @@ class UnifiedCacheManager {
             // טעינת סטטיסטיקות
             await this.updateStats();
             
+            // NEW: Initialize WebSocket Bridge for real-time cache invalidation
+            if (window.WebSocketBridge) {
+                console.log('🔌 Initializing WebSocket Bridge...');
+                try {
+                    const wsInitialized = await window.WebSocketBridge.initialize();
+                    if (wsInitialized) {
+                        console.log('✅ WebSocket Bridge connected successfully');
+                    } else {
+                        console.warn('⚠️ WebSocket Bridge failed to connect (will work offline)');
+                    }
+                } catch (wsError) {
+                    console.warn('⚠️ WebSocket Bridge initialization error (non-critical):', wsError);
+                    // Don't fail UnifiedCacheManager if WebSocket fails - it's optional
+                }
+            } else {
+                console.log('ℹ️ WebSocket Bridge not loaded (offline mode)');
+            }
+            
             this.initialized = true;
             
             // הודעת הצלחה - תציג מאוחדת עם האפליקציה
@@ -1688,30 +1706,89 @@ window.clearAllCache = async function(options = {}) {
             }
         }
         
-        // === FORCE BROWSER CACHE CLEAR ===
-        // כל רמת ניקוי צריכה לאלץ את הדפדפן לטעון קבצים מחדש!
+        // === CACHE BUSTING STRATEGY (January 2025) ===
+        // With cache busting (?v=hash) on all JS/CSS files:
+        // - Light/Medium/Full: Just refresh data (browser auto-loads new files via ?v=hash)
+        // - Nuclear: Full page reload (needed for complete reset)
         if (results.success && !options.skipReload) {
-            let reloadDelay = 1500;
-            let reloadMessage = '🔄 טוען גרסאות עדכניות...';
             
             if (level === 'nuclear') {
-                reloadDelay = 2000;
-                reloadMessage = '🔄 מרענן עמוד בעוד 2 שניות...';
+                // Nuclear level: Full page reload needed
+                const reloadMessage = '🔄 מרענן עמוד בעוד 2 שניות...';
+                
+                if (typeof window.showNotification === 'function') {
+                    window.showNotification(reloadMessage, 'warning', 'system');
+                }
+                
+                setTimeout(() => {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('_refresh', Date.now());
+                    console.log(`☢️ Nuclear clear: Performing full page reload`);
+                    window.location.replace(url.toString());
+                }, 2000);
+                
+            } else {
+                // Light/Medium/Full: Just refresh page data (no reload needed!)
+                console.log(`🔄 ${level} clear: Refreshing page data without reload...`);
+                
+                setTimeout(async () => {
+                    try {
+                        // Get current page name
+                        const currentPage = window.location.pathname.split('/').pop().replace('.html', '');
+                        
+                        // Map of pages to their load functions
+                        const loadFunctions = {
+                            'index': window.loadDashboardData,
+                            'trading_accounts': window.loadAccountsTable,
+                            'trades': window.loadTradesData,
+                            'trade_plans': window.loadTradePlansData,
+                            'executions': window.loadExecutionsData,
+                            'cash_flows': window.loadCashFlowsData,
+                            'alerts': window.loadAlertsData,
+                            'tickers': window.loadTickersData,
+                            'notes': window.loadNotesData,
+                            'research': window.loadResearchData,
+                            'cache-test': window.cacheTestPage?.loadCacheData
+                        };
+                        
+                        const loadFn = loadFunctions[currentPage];
+                        
+                        if (loadFn && typeof loadFn === 'function') {
+                            console.log(`   Calling load function for: ${currentPage}`);
+                            await loadFn();
+                            console.log(`✅ Page data refreshed without reload!`);
+                            
+                            if (typeof window.showNotification === 'function') {
+                                window.showNotification(
+                                    'המטמון נוקה והנתונים עודכנו',
+                                    'success',
+                                    'cache'
+                                );
+                            }
+                        } else {
+                            console.log(`ℹ️ Page ${currentPage} has no load function (may not need refresh)`);
+                            
+                            if (typeof window.showNotification === 'function') {
+                                window.showNotification(
+                                    'המטמון נוקה בהצלחה',
+                                    'success',
+                                    'cache'
+                                );
+                            }
+                        }
+                    } catch (error) {
+                        console.error('❌ Error refreshing page data:', error);
+                        
+                        if (typeof window.showNotification === 'function') {
+                            window.showNotification(
+                                'המטמון נוקה. נדרש רענון ידני (F5) במקרה של בעיה',
+                                'warning',
+                                'cache'
+                            );
+                        }
+                    }
+                }, 500);  // Short delay to show completion notification
             }
-            
-            if (typeof window.showNotification === 'function') {
-                window.showNotification(reloadMessage, level === 'nuclear' ? 'warning' : 'info', 'system');
-            }
-            
-            setTimeout(() => {
-                // Hard reload with cache bypass
-                // NOTE: location.reload(true) is DEPRECATED in modern browsers!
-                // Use URL parameter cache busting + location.replace() instead
-                const url = new URL(window.location.href);
-                url.searchParams.set('_refresh', Date.now());
-                console.log(`🔄 Performing hard reload with cache busting: ${url.toString()}`);
-                window.location.replace(url.toString());
-            }, reloadDelay);
             
             return results;
         }

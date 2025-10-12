@@ -489,6 +489,109 @@ def activate_profile() -> Any:
             'timestamp': datetime.now().isoformat()
         }), 500
 
+@preferences_bp.route('/profiles', methods=['POST'])
+def create_profile() -> Any:
+    """
+    Create new profile
+    יצירת פרופיל חדש
+    """
+    try:
+        data = request.get_json()
+        user_id = data.get('user_id')
+        profile_name = data.get('profile_name')
+        description = data.get('description', '')
+        
+        # Validate required fields
+        if not user_id:
+            return jsonify({
+                'success': False,
+                'error': 'user_id is required',
+                'timestamp': datetime.now().isoformat()
+            }), 400
+        
+        if not profile_name:
+            return jsonify({
+                'success': False,
+                'error': 'profile_name is required',
+                'timestamp': datetime.now().isoformat()
+            }), 400
+        
+        # Create profile
+        new_profile_id = preferences_service.create_profile(user_id, profile_name, description)
+        
+        return jsonify({
+            'success': True,
+            'data': {
+                'profile_id': new_profile_id,
+                'profile_name': profile_name,
+                'description': description
+            },
+            'timestamp': datetime.now().isoformat()
+        }), 201
+        
+    except ValueError as e:
+        logger.warning(f"Validation error creating profile: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'timestamp': datetime.now().isoformat()
+        }), 400
+    except Exception as e:
+        logger.error(f"Error creating profile: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'timestamp': datetime.now().isoformat()
+        }), 500
+
+@preferences_bp.route('/profiles/<int:profile_id>', methods=['DELETE'])
+def delete_profile(profile_id: int) -> Any:
+    """
+    Delete profile
+    מחיקת פרופיל
+    """
+    try:
+        user_id = request.args.get('user_id', type=int)
+        
+        # Validate user_id provided
+        if not user_id:
+            return jsonify({
+                'success': False,
+                'error': 'user_id is required',
+                'timestamp': datetime.now().isoformat()
+            }), 400
+        
+        # Delete profile
+        success = preferences_service.delete_profile(user_id, profile_id)
+        
+        if success:
+            return jsonify({
+                'success': True,
+                'message': 'Profile deleted successfully',
+                'timestamp': datetime.now().isoformat()
+            }), 200
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Failed to delete profile',
+                'timestamp': datetime.now().isoformat()
+            }), 500
+        
+    except ValueError as e:
+        logger.warning(f"Validation error deleting profile: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'timestamp': datetime.now().isoformat()
+        }), 400
+    except Exception as e:
+        logger.error(f"Error deleting profile {profile_id}: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'timestamp': datetime.now().isoformat()
+        }), 500
+
 @preferences_bp.route('/clear-cache', methods=['POST'])
 def clear_cache():
     """

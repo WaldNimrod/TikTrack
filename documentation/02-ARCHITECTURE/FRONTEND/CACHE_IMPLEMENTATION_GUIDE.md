@@ -721,9 +721,37 @@ clearAllCache(level)
 
 ---
 
-**עודכן לאחרונה:** 12 ינואר 2025  
-**גרסה:** 2.1 - Auto-Reload System  
-**סטטוס:** ✅ מערכת המטמון משופרת עם reload אוטומטי
+**עודכן לאחרונה:** 13 ינואר 2025  
+**גרסה:** 2.2 - Cache Busting Implementation  
+**סטטוס:** ✅ מערכת המטמון עם Cache Busting ו-Smart Reload
+
+---
+
+## 🆕 עדכון 13 ינואר 2025 - Cache Busting (אופציה A)
+
+### **מה חדש:**
+- ✅ **Cache Busting System** - כל JS/CSS עם `?v=hash`
+- ✅ **Build Script** - `build-tools/cache-buster.sh`
+- ✅ **Smart Reload** - רק Nuclear עושה reload, Light/Medium/Full רק refresh data
+- ✅ **Cursor Task** - "TT: Build & Bust Cache"
+
+### **הבעיה שנפתרה:**
+**"תיקונים ושינויים שלא רואים"** - 80% נפתר!
+
+### **איך זה עובד:**
+```html
+<!-- לפני: -->
+<script src="cache-module.js"></script>
+<!-- דפדפן: יש לי גרסה! לא אוריד מחדש -->
+
+<!-- אחרי: -->
+<script src="cache-module.js?v=1e88302_20251013"></script>
+<!-- commit חדש → hash חדש → דפדפן: זה קובץ חדש! אוריד -->
+```
+
+### **דוקומנטציה:**
+- [OPTION_A_IMPLEMENTATION_SUMMARY.md](../../05-REPORTS/COMPLETION/OPTION_A_IMPLEMENTATION_SUMMARY.md)
+- [OPTION_A_CACHE_BUSTING_TESTING_GUIDE.md](../../03-DEVELOPMENT/TESTING/OPTION_A_CACHE_BUSTING_TESTING_GUIDE.md)
 
 
 

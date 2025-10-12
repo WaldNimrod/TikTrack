@@ -869,15 +869,32 @@ class PreferencesService:
                     VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
                 ''', (user_id, new_profile_id, pref_id, default_value))
             
+            logger.info(f"✅ Added {len(preference_types)} default preferences to profile {new_profile_id}")
+            
+            # 5. Activate the new profile (set as active)
+            cursor.execute('''
+                UPDATE preference_profiles 
+                SET is_active = 0 
+                WHERE user_id = ?
+            ''', (user_id,))
+            
+            cursor.execute('''
+                UPDATE preference_profiles 
+                SET is_active = 1, last_used_at = CURRENT_TIMESTAMP,
+                    usage_count = 1
+                WHERE id = ?
+            ''', (new_profile_id,))
+            
+            logger.info(f"✅ Activated new profile {new_profile_id}")
+            
+            # Commit all changes in single transaction
             conn.commit()
             conn.close()
             
-            logger.info(f"✅ Added {len(preference_types)} default preferences to profile {new_profile_id}")
-            
-            # 5. Clear cache
+            # 6. Clear cache
             self.clear_cache()
             
-            # 6. Return new profile id
+            # 7. Return new profile id
             return new_profile_id
             
         except Exception as e:

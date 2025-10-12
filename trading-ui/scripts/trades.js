@@ -474,13 +474,17 @@ class TradesController {
                            Math.floor(trade.trade_plan.planned_amount / trade.current_price) : 0);
             
             // הצגה: תאריך + כמות עם קישור למערכת האלמנטים המקושרים
+            const sharesDisplay = window.FieldRendererService ? 
+                window.FieldRendererService.renderShares(shares) : 
+                (shares ? `#${shares}` : '-');
+            
             planDisplay = `<span class="badge-capsule-small" style="cursor: pointer;" 
                 onclick="viewLinkedItemsForTradePlan(${planId})" 
                 title="לחץ לצפייה בפרטים מלאים של התכנון">
                 <span class="d-flex align-items-center gap-2">
                     <span class="numeric-ltr">${dateShort}</span>
                     <span class="separator-pipe">|</span>
-                    <span class="numeric-ltr">${shares || '0'}</span>
+                    ${sharesDisplay}
                 </span>
             </span>`;
         } else if (trade.trade_plan_id) {
@@ -1100,4 +1104,4 @@ window.loadTradesData = loadTradesData;
 //     }
 // });
 
-console.log('✅ trades.js v=20251012i loaded successfully - trade_plan shows date + shares');
+console.log('✅ trades.js v=20251012j loaded successfully - shares with # prefix everywhere');

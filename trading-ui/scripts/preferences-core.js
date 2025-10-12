@@ -838,52 +838,27 @@ class ProfileManager {
             await this.api.activateProfile(this.preferencesManager.userId, profileId);
             console.log('✅ Profile activated in database');
             
-            // Step 2: Clear ALL caches - backend + frontend
-            await this.preferencesManager._clearCache();
-            console.log('✅ Frontend cache cleared');
-            
-            // Step 3: Clear backend cache via API
-            try {
-                await fetch('/api/cache/clear', { method: 'POST' });
-                console.log('✅ Backend cache cleared');
-            } catch (e) {
-                console.warn('⚠️ Could not clear backend cache:', e);
-            }
-            
-            // Step 4: Reload preferences with force refresh
-            await this.preferencesManager.load(this.preferencesManager.userId, profileId, true);
-            console.log('✅ Preferences loaded with force refresh');
-            
-            // Step 5: Reload profiles list to update active status
-            await this.loadProfiles();
-            console.log('✅ Profiles list reloaded');
-            
             this.uiManager.hideLoading('profile-switch');
             this.uiManager.showSuccess('פרופיל הוחלף בהצלחה!', 'מנקה cache ומרענן...');
             
-            // Step 6: Clear browser cache and hard reload
-            console.log('🔄 Clearing all browser cache and reloading...');
+            // Use the UNIFIED cache clearing system - it handles EVERYTHING!
+            // This will:
+            // - Clear Memory, localStorage, IndexedDB, Backend layers
+            // - Clear Service Caches (EntityDetailsAPI, ExternalDataService, etc.)
+            // - Clear Orphan Keys (colorScheme, customColorScheme, etc.)
+            // - Clear backend cache via /api/cache/clear
+            // - Reload page data from server
+            // - Perform hard reload with cache bypass: location.reload(true)
+            console.log('🧹 Using unified cache clearing system...');
+            
             setTimeout(async () => {
-                // Clear localStorage
-                localStorage.clear();
-                console.log('✅ localStorage cleared');
-                
-                // Clear IndexedDB
-                try {
-                    await indexedDB.deleteDatabase('TikTrackCache');
-                    console.log('✅ IndexedDB cleared');
-                } catch (e) {
-                    console.warn('⚠️ Could not clear IndexedDB:', e);
-                }
-                
-                // Force hard reload with cache busting
-                const url = new URL(window.location.href);
-                url.searchParams.delete('_refresh');  // Remove old param if exists
-                url.searchParams.set('_refresh', Date.now());
-                
-                console.log('🔄 Hard reload with fresh cache...');
-                window.location.replace(url.toString());
-            }, 1000);  // 1 second delay to show success message
+                await window.clearAllCache({
+                    level: 'full',             // 100% coverage - for profile switch
+                    skipConfirmation: true,    // No modal - we already confirmed switch
+                    verbose: true              // Detailed logging
+                });
+                // Note: clearAllCache will automatically reload the page!
+            }, 500);
             
             return true;
             
@@ -1349,25 +1324,35 @@ class PreferencesSystem {
             await this.manager.save(formData);
             console.log('✅ Preferences saved to database');
             
-            // Clear frontend cache to ensure fresh data on next load
-            await this.manager._clearCache();
-            console.log('✅ Frontend cache cleared after save');
-            
-            // Reload fresh data from API with the SAME profile ID that was saved
-            const activeProfile = this.profiles.getActiveProfile();
-            await this.manager.load(null, activeProfile?.id, true); // Force refresh
-            
-            // Apply loaded data back to form
-            this._applyToForm(this.manager.currentPreferences);
-            
-            // Update colors
-            await this.colors.loadColors();
-            
-            // Update counters
-            await this.ui.updateCounters(this.manager.currentPreferences);
-            
             this.ui.hideLoading('save');
-            this.ui.showSuccess('העדפות נשמרו בהצלחה!', 'כל השינויים נשמרו במערכת');
+            this.ui.showSuccess('העדפות נשמרו בהצלחה!', 'מרענן מטמון...');
+            
+            // Use light cache clearing for saves - no need for full reload
+            // This clears Memory + Service Caches only (25% coverage)
+            // Enough to ensure fresh data without full page reload
+            setTimeout(async () => {
+                await window.clearAllCache({
+                    level: 'light',            // Light - just memory + services
+                    skipConfirmation: true,    // No modal
+                    verbose: false,            // No notification
+                    skipReload: true           // Don't reload page!
+                });
+                
+                // Reload fresh data from API after cache clear
+                const activeProfile = this.profiles.getActiveProfile();
+                await this.manager.load(null, activeProfile?.id, true); // Force refresh
+                
+                // Apply loaded data back to form
+                this._applyToForm(this.manager.currentPreferences);
+                
+                // Update colors
+                await this.colors.loadColors();
+                
+                // Update counters
+                await this.ui.updateCounters(this.manager.currentPreferences);
+                
+                console.log('✅ Preferences refreshed after save');
+            }, 100);
             
             return true;
             
@@ -1444,28 +1429,26 @@ class PreferencesSystem {
             await this.manager.save(defaults);
             console.log('✅ Default values saved to database');
             
-            // Clear ALL caches - frontend + backend (same as switchProfile)
-            await this.manager._clearCache();
-            console.log('✅ Frontend cache cleared');
-            
-            // Clear backend cache via API
-            try {
-                await fetch('/api/cache/clear', { method: 'POST' });
-                console.log('✅ Backend cache cleared');
-            } catch (e) {
-                console.warn('⚠️ Could not clear backend cache:', e);
-            }
-            
             this.ui.hideLoading('reset');
             this.ui.showSuccess('העדפות אופסו לברירות מחדל!', 'מנקה cache ומרענן...');
             
-            // Hard reload page immediately with cache busting (same as switchProfile)
-            setTimeout(() => {
-                const url = new URL(window.location.href);
-                url.searchParams.set('_refresh', Date.now());
-                console.log('🔄 Performing hard reload with cache busting...');
-                window.location.replace(url.toString());
-            }, 1500);
+            // Use the UNIFIED cache clearing system - it handles EVERYTHING!
+            // This will:
+            // - Clear Memory, localStorage, IndexedDB, Backend layers
+            // - Clear Service Caches (EntityDetailsAPI, ExternalDataService, etc.)
+            // - Clear backend cache via /api/cache/clear
+            // - Reload page data from server
+            // - Perform hard reload with cache bypass: location.reload(true)
+            console.log('🧹 Using unified cache clearing system...');
+            
+            setTimeout(async () => {
+                await window.clearAllCache({
+                    level: 'medium',           // 60% coverage - good for preferences
+                    skipConfirmation: true,    // No modal - we already confirmed reset
+                    verbose: true              // Detailed logging
+                });
+                // Note: clearAllCache will automatically reload the page!
+            }, 500);
             
             return true;
             

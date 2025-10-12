@@ -151,7 +151,7 @@ function showExecutionDetails(executionId) {
         const details = `פרטי עסקה:
 ID: ${execution.id}
 פעולה: ${execution.action || execution.type || 'לא מוגדר'}
-כמות: ${execution.quantity || 'לא מוגדר'}
+כמות: ${execution.quantity ? '#' + execution.quantity : 'לא מוגדר'}
 מחיר: $${execution.price || '0'}
 תאריך: ${execution.date || execution.execution_date || 'לא מוגדר'}
 מקור: ${execution.source || 'לא מוגדר'}
@@ -1212,7 +1212,7 @@ async function updateExecutionsTableMain(executions) {
                 <td data-account="${accountName}" class="account-cell-link" 
                   onclick="window.showEntityDetailsModal && window.showEntityDetailsModal('account', '${accountName}', 'view')" 
                   title="פתח פרטי חשבון">${accountName}</td>
-                <td>${execution.quantity}</td>
+                <td>${window.FieldRendererService ? window.FieldRendererService.renderShares(execution.quantity) : (execution.quantity ? '#' + execution.quantity : '-')}</td>
                 <td>$${execution.price}</td>
                 <td class="pl-cell">${plBadge}</td>
                 <td data-date="${execution.date || execution.execution_date}">${dateBadge}</td>
@@ -2100,7 +2100,7 @@ function updateExecutionsTableForTradeModal(executions) {
       row.innerHTML = `
                 <td>${execution.date}</td>
                 <td>${typeBadge}</td>
-                <td>${execution.quantity}</td>
+                <td>${window.FieldRendererService ? window.FieldRendererService.renderShares(execution.quantity) : (execution.quantity ? '#' + execution.quantity : '-')}</td>
                 <td>$${execution.price.toFixed(2)}</td>
                 <td>$${execution.commission.toFixed(2)}</td>
                 <td>$${execution.total.toFixed(2)}</td>

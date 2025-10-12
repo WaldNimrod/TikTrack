@@ -5,9 +5,9 @@
  * מערכת מרכזית לרנדור שדות מורכבים: badges, currency, dates
  * מחליפה קוד חוזר ב-138 מקומות במערכת
  * 
- * @version 1.1.0
+ * @version 1.2.0
  * @created January 2025
- * @updated January 2025
+ * @updated October 12, 2025 - Added renderShares() for # prefix
  * @author TikTrack Development Team
  * 
  * תכונות:
@@ -246,6 +246,28 @@ class FieldRendererService {
         return `<span class="priority-badge priority-badge-${priorityNormalized}">
             ${displayPriority}
         </span>`;
+    }
+
+    /**
+     * רנדור כמות מניות (תמיד עם סימן #)
+     * 
+     * @param {number} shares - כמות מניות
+     * @param {string} cssClass - מחלקת CSS נוספת (אופציונלי)
+     * @returns {string} - HTML עם # לפני המספר
+     * 
+     * @example
+     * const html = FieldRendererService.renderShares(150);
+     * // Output: "#150"
+     * const html2 = FieldRendererService.renderShares(0);
+     * // Output: "-"
+     */
+    static renderShares(shares, cssClass = 'numeric-ltr') {
+        if (!shares || shares === 0) return '-';
+        
+        const sharesNum = parseInt(shares);
+        if (isNaN(sharesNum)) return '-';
+        
+        return `<span class="${cssClass}">#${sharesNum}</span>`;
     }
 
     /**

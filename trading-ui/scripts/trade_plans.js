@@ -1935,7 +1935,7 @@ function updateTradePlansTable(trade_plans) {
         <!-- 6. כמות -->
         <td class="quantity-cell">
           <span class="numeric-value-neutral ${design.amount_input_mode === 'shares' ? 'user-saved-value' : 'calculated-value'}">
-            ${calculatedShares || '-'}
+            ${window.FieldRendererService ? window.FieldRendererService.renderShares(calculatedShares, 'numeric-value-neutral') : (calculatedShares ? '#' + calculatedShares : '-')}
           </span>
         </td>
         

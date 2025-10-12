@@ -728,16 +728,18 @@ class IndexedDBLayer {
             // Create database instance with timeout
             return new Promise((resolve, reject) => {
                 const timeout = setTimeout(() => {
-                    console.error('❌ IndexedDB open timeout after 5 seconds');
-                    reject(new Error('IndexedDB open timeout'));
-                }, 5000);
+                    console.warn('⚠️ IndexedDB open timeout after 2 seconds - using localStorage fallback');
+                    // Don't reject - just resolve with false to use fallback
+                    resolve(false);
+                }, 2000);  // Reduced from 5 to 2 seconds
                 
                 const request = window.indexedDB.open('UnifiedCacheDB', 2);
                 
                 request.onerror = () => {
                     clearTimeout(timeout);
                     console.error('❌ IndexedDB open failed:', request.error);
-                    reject(request.error);
+                    // Don't reject - resolve with false to continue with fallback
+                    resolve(false);
                 };
                 
                 request.onsuccess = () => {
@@ -745,6 +747,14 @@ class IndexedDBLayer {
                     this.db = request.result;
                     console.log('✅ IndexedDB Layer initialized successfully');
                     resolve(true);
+                };
+                
+                request.onblocked = () => {
+                    clearTimeout(timeout);
+                    console.warn('🔒 IndexedDB open BLOCKED - another connection is open');
+                    console.warn('→ Close other TikTrack tabs/windows or wait for them to close');
+                    // Resolve with false to use fallback
+                    resolve(false);
                 };
                 
                 request.onupgradeneeded = (event) => {

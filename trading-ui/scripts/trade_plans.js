@@ -3374,23 +3374,7 @@ if (window.location.pathname.includes('/trade_plans')) {
     handleFunctionNotFound('updateGridFromComponent', 'פונקציית עדכון רשת לא נמצאה');
   }
 
-  // טעינת נתונים בטעינת הדף
-  setTimeout(() => {
-    if (typeof window.loadTradePlansData === 'function') {
-      window.loadTradePlansData();
-    } else {
-      handleFunctionNotFound('loadTradePlansData', 'פונקציית טעינת נתוני תכנונים לא נמצאה');
-    }
-  }, 500);
-}
-
-// קריאה ישירה לפונקציה - למקרה שהקוד למעלה לא רץ
-if (typeof loadTradePlansData === 'function') {
-  setTimeout(() => {
-    loadTradePlansData();
-  }, 1000);
-} else {
-  handleFunctionNotFound('loadTradePlansData', 'פונקציית טעינת נתוני תכנונים לא נמצאה בסוף הקובץ');
+  // טעינת נתונים מטופלת על ידי המערכת המאוחדת - אין צורך בקוד fallback
 }
 
 // Detailed Log Functions for Trade Plans Page

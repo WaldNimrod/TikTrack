@@ -2196,8 +2196,6 @@ function updateEntityColors(preferences) {
  */
 function applyEntityColorsToHeaders(entityType, excludeWarningModals = true) {
   try {
-    console.log(`🎨 מיישם צבעי ישות ${entityType} על כותרות...`);
-    
     const color = getEntityColor(entityType);
     if (!color) {
       console.warn(`⚠️ לא נמצא צבע לישות: ${entityType}`);
@@ -2223,7 +2221,6 @@ function applyEntityColorsToHeaders(entityType, excludeWarningModals = true) {
       });
       
       header.classList.add(`entity-${entityType}-main-header`);
-      console.log(`✅ כותרת ראשית קיבלה צבע ${entityType}`);
     });
 
     // כותרות משניות - תחת content-section
@@ -2245,12 +2242,9 @@ function applyEntityColorsToHeaders(entityType, excludeWarningModals = true) {
       });
       
       header.classList.add(`entity-${entityType}-sub-header`);
-      console.log(`✅ כותרת משנית קיבלה צבע ${entityType}`);
     });
 
     // כותרות מודלים מנוהלות על ידי ההגדרות הכלליות ב-styles.css
-
-    console.log(`✅ צבעי ישות ${entityType} יושמו על כל הכותרות`);
     
   } catch (error) {
     console.error(`❌ שגיאה ביישום צבעי ישות ${entityType}:`, error);

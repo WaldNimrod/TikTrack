@@ -2173,8 +2173,6 @@ window.closeModalGlobal = window.closeModal;
  */
 window.loadTableData = async function(tableType, updateFunction, options = {}) {
   try {
-    console.log(`📊 Loading data for table type: ${tableType}`);
-    
     // Show loading state if function exists
     if (typeof window.showLoadingState === 'function') {
       window.showLoadingState();
@@ -2229,8 +2227,6 @@ window.loadTableData = async function(tableType, updateFunction, options = {}) {
     } else {
       data = [];
     }
-    
-    console.log(`✅ Loaded ${data.length} records for ${tableType}`);
     
     // Handle empty data (0 records) - show user-friendly message in table
     if (data.length === 0) {

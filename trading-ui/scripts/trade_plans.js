@@ -1177,9 +1177,9 @@ async function saveEditTradePlan() {
       successMessage: 'תכנון עודכן בהצלחה',
       reloadFn: async () => {
         // ניקוי מטמון
-        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-          await window.UnifiedCacheManager.remove('trade_plans');
-        }
+    if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+      await window.UnifiedCacheManager.remove('trade_plans');
+    }
         // רענון טבלה
     await loadTradePlansData();
       },
@@ -1297,16 +1297,16 @@ async function reactivateTradePlan(tradePlanId) {
     await window.CRUDResponseHandler.handleUpdateResponse(response, {
       successMessage: 'תכנון הופעל מחדש בהצלחה',
       reloadFn: async () => {
-        // עדכון סטטוס הטיקר
+    // עדכון סטטוס הטיקר
         if (tradePlan.ticker_id && typeof window.updateTickerActiveTradesStatus === 'function') {
-          await window.updateTickerActiveTradesStatus(tradePlan.ticker_id);
+        await window.updateTickerActiveTradesStatus(tradePlan.ticker_id);
         }
         // ניקוי מטמון
-        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-          await window.UnifiedCacheManager.remove('trade_plans');
+    if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+      await window.UnifiedCacheManager.remove('trade_plans');
         }
         // רענון טבלה
-        await loadTradePlansData();
+    await loadTradePlansData();
       },
       entityName: 'תכנון מסחר'
     });
@@ -1977,8 +1977,8 @@ function updateTradePlansTable(trade_plans) {
 
   tbody.innerHTML = tableHTML;
 
-  // Updating statistics
-  updatePageSummaryStats();
+    // Updating statistics
+    updatePageSummaryStats();
     
     // יישום צבעי ישויות על כותרות
     if (window.applyEntityColorsToHeaders) {
@@ -1990,10 +1990,12 @@ function updateTradePlansTable(trade_plans) {
  * עדכון סטטיסטיקות סיכום
  */
 function updatePageSummaryStats() {
-  // Using filtered data if available, otherwise all data
-  const dataToUse = window.filteredTradePlansData || window.tradePlansData;
+  // Using filtered data if available AND not empty, otherwise all data
+  const dataToUse = (window.filteredTradePlansData && window.filteredTradePlansData.length > 0) 
+    ? window.filteredTradePlansData 
+    : window.tradePlansData;
   
-  if (!dataToUse || !Array.isArray(dataToUse)) {
+  if (!dataToUse || !Array.isArray(dataToUse) || dataToUse.length === 0) {
     console.warn('⚠️ No data available for statistics - tradePlansData:', window.tradePlansData?.length || 'undefined');
     
     // Try to set 0 values if elements exist
@@ -2009,16 +2011,6 @@ function updatePageSummaryStats() {
     return;
   }
 
-  // DEBUG: Temporary logging
-  console.warn('🔍 DEBUG updatePageSummaryStats:', {
-    dataLength: dataToUse.length,
-    StatisticsCalculator: !!window.StatisticsCalculator,
-    elements: {
-      totalDesigns: !!document.getElementById('totalDesigns'),
-      totalInvestment: !!document.getElementById('totalInvestment')
-    }
-  });
-  
   // חישוב סטטיסטיקות באמצעות StatisticsCalculator
   const stats = window.StatisticsCalculator ? {
     totalDesigns: window.StatisticsCalculator.countRecords(dataToUse),
@@ -2080,19 +2072,10 @@ function updatePageSummaryStats() {
 
   const avgInvestment = stats.totalDesigns > 0 ? stats.totalInvestment / stats.totalDesigns : 0;
 
-  // DEBUG: Log calculated stats
-  console.warn('🔍 DEBUG calculated stats:', {
-    totalDesigns: stats.totalDesigns,
-    totalInvestment: stats.totalInvestment,
-    avgInvestment: avgInvestment
-  });
-
   // עדכון אלמנטי הסיכום - בדיקה אם הם קיימים לפני הגישה
   const totalDesignsElement = document.getElementById('totalDesigns');
-  console.warn('🔍 DEBUG totalDesignsElement:', totalDesignsElement, 'setting to:', stats.totalDesigns);
   if (totalDesignsElement) {
     totalDesignsElement.textContent = stats.totalDesigns;
-    console.warn('🔍 DEBUG after set, textContent:', totalDesignsElement.textContent);
   }
 
   const totalInvestmentElement = document.getElementById('totalInvestment');
@@ -2444,7 +2427,7 @@ async function saveNewTradePlan() {
   } else {
       // אם לא נבחר, נסה לקבל מהעדפות (עם try-catch)
       try {
-    const defaultAccount = await window.getPreference('default_trading_account');
+        const defaultAccount = await window.getPreference('default_trading_account');
         if (defaultAccount) {
           accountId = parseInt(defaultAccount);
         }
@@ -2493,9 +2476,9 @@ async function saveNewTradePlan() {
           await window.UnifiedCacheManager.remove('trade_plans');
         }
         // רענון טבלה
-        if (typeof window.loadTradePlansData === 'function') {
-          await window.loadTradePlansData();
-        }
+    if (typeof window.loadTradePlansData === 'function') {
+      await window.loadTradePlansData();
+    }
       },
       entityName: 'תכנון מסחר'
     });
@@ -2558,7 +2541,7 @@ async function deleteTradePlan(tradePlanId) {
           await window.UnifiedCacheManager.remove('trade_plans');
         }
         // רענון טבלה
-        await loadTradePlansData();
+    await loadTradePlansData();
       },
       entityName: 'תכנון מסחר'
     });

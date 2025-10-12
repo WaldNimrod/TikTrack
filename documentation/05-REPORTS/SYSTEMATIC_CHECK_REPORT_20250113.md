@@ -314,3 +314,156 @@ const tbody = document.querySelector('#tickersTable tbody');
 **Total Session:** 22 commits, ~3 hours  
 **Last Updated:** 13 January 2025, 01:20
 
+
+---
+
+## 🔴 Bug #5: Critical Cache System - Nuclear Clear Breaks Re-initialization
+
+**תאריך:** 13 ינואר 2025 - 01:39  
+**חומרה:** 🔴 CRITICAL  
+**השפעה:** כל המערכת אחרי ניקוי גרעיני
+
+### Symptoms:
+```
+שגיאה באתחול מערכת המטמון
+UnifiedCacheManager לא אותחל בהצלחה
+העמוד עשוי שלא לעבוד כראוי
+```
+
+**Where:** ANY page after nuclear cache clear  
+**When:** After page refresh following nuclear clear
+
+---
+
+### Root Cause Analysis:
+
+#### The Broken Flow:
+```javascript
+// 1. Before nuclear clear
+UnifiedCacheManager.initialized = true  ✅
+
+// 2. User clicks "Nuclear Clear"
+indexedDB.deleteDatabase('UnifiedCacheDB')  ☢️
+// → DB deleted ✅
+
+// 3. But initialized flag NOT reset!
+UnifiedCacheManager.initialized = true  ← Still true! ❌
+
+// 4. Page refreshes, initializeAllCacheSystems runs:
+if (!UnifiedCacheManager.initialized) {  ← FALSE (it's true)
+    await initialize();  ← NEVER CALLED! ❌
+} else {
+    results.unifiedCacheManager = true;  ← Assumes it's OK! ❌
+}
+
+// 5. Result:
+initialized = true  ✅
+BUT
+indexedDB.db = null  ❌ (was deleted!)
+
+// → Cache system broken! 💥
+```
+
+---
+
+### The Fix - 2 Layers of Protection:
+
+#### Fix #1: Reset flag after nuclear delete (Lines 1482-1486)
+```javascript
+if (level === 'nuclear') {
+    await indexedDB.deleteDatabase('UnifiedCacheDB');
+    
+    // ✅ NEW: Reset initialized flag!
+    if (window.UnifiedCacheManager) {
+        window.UnifiedCacheManager.initialized = false;
+        console.log('☢️ UnifiedCacheManager.initialized reset to false');
+    }
+}
+```
+
+**Effect:** Forces re-initialization on next page load
+
+---
+
+#### Fix #2: Health check before trusting initialized=true (Lines 2784-2800)
+```javascript
+if (!window.UnifiedCacheManager.initialized) {
+    await window.UnifiedCacheManager.initialize();
+} else {
+    // ✅ NEW: Don't trust the flag - verify DB exists!
+    try {
+        if (window.UnifiedCacheManager.layers?.indexedDB?.db) {
+            results.unifiedCacheManager = true;  // ✅ DB exists
+        } else {
+            // ❌ DB missing (nuclear cleared it)
+            console.warn('⚠️ UnifiedCacheManager marked as initialized but DB missing - re-initializing...');
+            window.UnifiedCacheManager.initialized = false;
+            await window.UnifiedCacheManager.initialize();
+            results.unifiedCacheManager = window.UnifiedCacheManager.initialized;
+        }
+    } catch (error) {
+        console.error('❌ Health check failed:', error);
+        results.unifiedCacheManager = false;
+    }
+}
+```
+
+**Effect:** Even if flag says "initialized", check if DB actually exists!
+
+---
+
+### Testing the Fix:
+
+#### Before Fix:
+```
+1. Nuclear clear from cache-test
+2. Navigate to cash_flows
+3. ❌ Error: "UnifiedCacheManager לא אותחל"
+4. ❌ Cache system broken
+5. ❌ Data doesn't save/load
+```
+
+#### After Fix:
+```
+1. Nuclear clear from cache-test
+2. initialized flag = false ✅
+3. Navigate to cash_flows
+4. ✅ Health check detects missing DB
+5. ✅ Re-initialization triggered
+6. ✅ Cache system works perfectly
+```
+
+---
+
+### Files Changed:
+
+**JavaScript:**
+- trading-ui/scripts/modules/cache-module.js (v=20250113fix)
+
+**HTML (11 files):**
+- All 8 user pages
+- cache-test.html
+- system-management.html
+- server-monitor.html
+
+---
+
+### Impact Assessment:
+
+**Before:** Nuclear clear → **system broken** until server restart  
+**After:** Nuclear clear → **automatic recovery** on next page load
+
+**Severity:** CRITICAL  
+**Frequency:** Every nuclear clear  
+**Users Affected:** 100% (after nuclear)  
+**Fix Complexity:** Medium  
+**Fix Quality:** Excellent (2 layers of protection)
+
+---
+
+**Commit:** 710afc5  
+**Status:** ✅ Fixed and tested  
+**Version:** cache-module.js v=20250113fix
+
+---
+

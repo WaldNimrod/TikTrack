@@ -408,6 +408,9 @@ function convertSharesToAmount(shares, price) {
   return parseFloat(amount.toFixed(2));
 }
 
+// Cache for user preferences to avoid repeated calls
+const _userPreferencesCache = {};
+
 /**
  * Get user preference
  * ✨ עודכן לתמיכה במערכת העדפות!
@@ -417,13 +420,16 @@ function convertSharesToAmount(shares, price) {
  */
 async function getUserPreference(key, defaultValue = null) {
   try {
-    console.log(`🔍 data-utils getUserPreference(${key})`);
+    // Check cache first
+    if (_userPreferencesCache.hasOwnProperty(key)) {
+      return _userPreferencesCache[key];
+    }
     
     // נסה מהמערכת הגלובלית החדשה
     if (typeof window.getCurrentPreference === 'function') {
       const value = await window.getCurrentPreference(key);
       if (value !== null && value !== undefined) {
-        console.log(`✅ Got preference ${key}: ${value}`);
+        _userPreferencesCache[key] = value;
         return value;
       }
     }
@@ -440,11 +446,21 @@ async function getUserPreference(key, defaultValue = null) {
       preferences = JSON.parse(localStorage.getItem('tikTrack_preferences') || '{}');
     }
     const localValue = preferences[key] !== undefined ? preferences[key] : defaultValue;
-    console.log(`🔄 Using localStorage preference ${key}: ${localValue}`);
+    _userPreferencesCache[key] = localValue;
     return localValue;
   } catch (error) {
     console.warn('⚠️ Error reading user preference:', error);
     return defaultValue;
+  }
+}
+
+/**
+ * Clear user preferences cache
+ * קריאה לפונקציה זו כאשר העדפות משתנות
+ */
+function clearUserPreferencesCache() {
+  for (let key in _userPreferencesCache) {
+    delete _userPreferencesCache[key];
   }
 }
 
@@ -459,6 +475,7 @@ window.calculateDefaultPrices = calculateDefaultPrices;
 window.convertAmountToShares = convertAmountToShares;
 window.convertSharesToAmount = convertSharesToAmount;
 window.getUserPreference = getUserPreference;
+window.clearUserPreferencesCache = clearUserPreferencesCache;
 window.loadDataFromAPI = loadDataFromAPI;
 window.validateDataStructure = validateDataStructure;
 window.filterDataBySearch = filterDataBySearch;

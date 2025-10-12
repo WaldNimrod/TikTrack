@@ -184,7 +184,6 @@ async function copyTradePlan(planId) {
         // ניקוי מטמון
         if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
           await window.UnifiedCacheManager.remove('trade_plans');
-          console.log('✅ מטמון trade_plans נוקה');
         }
         // רענון טבלה
         await loadTradePlansData();
@@ -1180,7 +1179,6 @@ async function saveEditTradePlan() {
         // ניקוי מטמון
         if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
           await window.UnifiedCacheManager.remove('trade_plans');
-          console.log('✅ מטמון trade_plans נוקה');
         }
         // רענון טבלה
     await loadTradePlansData();
@@ -1306,7 +1304,6 @@ async function reactivateTradePlan(tradePlanId) {
         // ניקוי מטמון
         if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
           await window.UnifiedCacheManager.remove('trade_plans');
-          console.log('✅ מטמון trade_plans נוקה');
         }
         // רענון טבלה
         await loadTradePlansData();
@@ -1425,7 +1422,6 @@ async function cancelTradePlan(tradePlanId) {
         // ניקוי מטמון
         if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
           await window.UnifiedCacheManager.remove('trade_plans');
-          console.log('✅ מטמון trade_plans נוקה');
         }
         // רענון טבלה
     await loadTradePlansData();
@@ -1563,7 +1559,17 @@ if (window.location.pathname.includes('/trade_plans')) {
  *
  * @returns {Array} Array of trade plans or empty array on error
  */
+// Flag to prevent duplicate loading
+let _isLoadingTradePlans = false;
+
 async function loadTradePlansData() {
+  // Prevent duplicate loading
+  if (_isLoadingTradePlans) {
+    return window.tradePlansData || [];
+  }
+  
+  _isLoadingTradePlans = true;
+  
   try {
     // שימוש במערכת הכללית לטעינת נתונים (v2.0.0 - with error handling)
     if (typeof window.loadTableData === 'function') {
@@ -1577,6 +1583,7 @@ async function loadTradePlansData() {
       // עדכון נתונים גלובליים
       window.tradePlansData = data;
       window.tradePlansLoaded = true;
+      _isLoadingTradePlans = false;
       
       return data;
     }
@@ -1588,6 +1595,7 @@ async function loadTradePlansData() {
       // Update global data
       window.tradePlansData = data;
       window.tradePlansLoaded = true;
+      _isLoadingTradePlans = false;
 
       // Update the table
       updateTradePlansTable(data);
@@ -1595,7 +1603,6 @@ async function loadTradePlansData() {
       return data;
     } else {
       // Fallback: load data directly from API
-      console.log('🔄 Loading trade plans data directly from API...');
       const response = await fetch('/api/trade_plans/');
       
       if (!response.ok) {
@@ -1608,15 +1615,15 @@ async function loadTradePlansData() {
       // Update global data
       window.tradePlansData = data;
       window.tradePlansLoaded = true;
+      _isLoadingTradePlans = false;
       
       // Update the table
-      console.log(`🔄 Updating table with ${data.length} trade plans...`);
       updateTradePlansTable(data);
       
-      console.log(`✅ Loaded ${data.length} trade plans`);
       return data;
     }
   } catch (error) {
+    _isLoadingTradePlans = false;
     handleDataLoadError(error, 'נתוני תכנונים');
     return [];
   }
@@ -1705,23 +1712,14 @@ function filterTradePlansData(filters) {
  * @param {Array} trade_plans - מערך של תכנונים לעדכון
  */
 function updateTradePlansTable(trade_plans) {
-  // === UPDATE TRADE PLANS TABLE FUNCTION CALLED ===
-  console.log(`🔄 updateTradePlansTable called with ${trade_plans ? trade_plans.length : 0} trade plans`);
-
   const tbody = document.querySelector('#trade_plansTable tbody');
-  console.log(`🔍 Looking for tbody:`, tbody);
-  // Looking for table body
 
   if (!tbody) {
     handleElementNotFound('#trade_plansTable tbody', 'CRITICAL');
     return;
   }
 
-  // Checking if there is data to display
-  console.log(`🔍 Checking data: trade_plans =`, trade_plans, `length =`, trade_plans?.length);
-  console.log(`🔍 Condition check: !trade_plans =`, !trade_plans, `trade_plans.length === 0 =`, trade_plans?.length === 0);
   if (!trade_plans || trade_plans.length === 0) {
-    console.log(`❌ No data to display - entering error condition`);
     // No trade plans to display
 
     // Checking if it's because of filters or if there are no data at all
@@ -1784,7 +1782,6 @@ function updateTradePlansTable(trade_plans) {
     return;
   }
 
-  console.log(`✅ Data exists, proceeding to build table HTML`);
   const tableHTML = trade_plans.map((design, index) => {
     try {
       // Safeguarding against invalid data
@@ -1978,13 +1975,10 @@ function updateTradePlansTable(trade_plans) {
     }
   }).join('');
 
-  console.log(`🔄 Table HTML built successfully, length: ${tableHTML.length}`);
-  console.log(`🔄 Setting tbody.innerHTML with ${trade_plans.length} rows`);
   tbody.innerHTML = tableHTML;
-  console.log(`✅ Table updated successfully`);
 
-    // Updating statistics
-    updatePageSummaryStats();
+  // Updating statistics
+  updatePageSummaryStats();
     
     // יישום צבעי ישויות על כותרות
     if (window.applyEntityColorsToHeaders) {
@@ -2065,8 +2059,6 @@ function updatePageSummaryStats() {
 
   const avgInvestment = stats.totalDesigns > 0 ? stats.totalInvestment / stats.totalDesigns : 0;
 
-  console.log(`📊 Statistics: ${stats.totalDesigns} designs, $${stats.totalInvestment.toFixed(2)} total investment, $${stats.totalProfit.toFixed(2)} total profit`);
-
   // עדכון אלמנטי הסיכום - בדיקה אם הם קיימים לפני הגישה
   const totalDesignsElement = document.getElementById('totalDesigns');
   if (totalDesignsElement) {
@@ -2111,7 +2103,6 @@ function showAddTradePlanModal() {
   
   // Load data asynchronously (after modal is visible) - don't await!
   loadAddModalData().then(() => {
-    console.log('✅ נתונים נטענו בהצלחה');
     // Initialize validation after data is loaded
     initializeAddModalValidation();
     // Add event listeners for ticker and account selection
@@ -2277,7 +2268,6 @@ function setupAddModalFieldActivation() {
     return;
   }
   
-  console.log('✅ Setting up ticker change listener');
   
   // Add event listener for ticker selection
   // Remove old listener if exists to prevent duplicates
@@ -2285,7 +2275,6 @@ function setupAddModalFieldActivation() {
   tickerSelect.onchange = null;
   
   tickerSelect.addEventListener('change', () => {
-    console.log('🔄 Ticker changed, calling updateAddTickerInfo');
     updateAddTickerInfo();
   });
 }
@@ -2472,7 +2461,6 @@ async function saveNewTradePlan() {
         // ניקוי מטמון
         if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
           await window.UnifiedCacheManager.remove('trade_plans');
-          console.log('✅ מטמון trade_plans נוקה');
         }
         // רענון טבלה
         if (typeof window.loadTradePlansData === 'function') {
@@ -2538,7 +2526,6 @@ async function deleteTradePlan(tradePlanId) {
         // ניקוי מטמון
         if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
           await window.UnifiedCacheManager.remove('trade_plans');
-          console.log('✅ מטמון trade_plans נוקה');
         }
         // רענון טבלה
         await loadTradePlansData();
@@ -2795,11 +2782,9 @@ function getTypeClass(type) {
  */
 async function loadUserPreferences() {
   try {
-    console.log('📋 Loading user preferences for trade_plans...');
     
     // נסה ראשית מערכת  גלובלית
     if (typeof window.getCurrentPreference === 'function') {
-      console.log('✅ Using global preferences system');
       return {
         timezone: await window.getCurrentPreference('timezone') || 'Asia/Jerusalem',
         primaryCurrency: await window.getCurrentPreference('primaryCurrency') || 'USD',
@@ -2814,7 +2799,6 @@ async function loadUserPreferences() {
       if (newResponse.ok) {
         const newData = await newResponse.json();
         if (newData.success && newData.data.preferences) {
-          console.log('✅ Using new API preferences');
           const prefs = newData.data.preferences;
           return {
             timezone: prefs.general?.timezone || 'Asia/Jerusalem',
@@ -2825,7 +2809,6 @@ async function loadUserPreferences() {
         }
       }
     } catch (newError) {
-      console.log('🔄 New API not available, trying fallback...');
     }
     
     // Fallback ל-API
@@ -2833,18 +2816,15 @@ async function loadUserPreferences() {
       const response = await fetch('/api/preferences/user');
       if (response.ok) {
         const preferences = await response.json();
-        console.log('✅ Using API preferences');
         return preferences;
       }
     } catch (migrationError) {
-      console.log('🔄 API not available, trying local config...');
     }
     
     // Fallback אחרון - קובץ JSON מקומי (legacy)
     const response = await fetch('/api/preferences/user');
     if (response.ok) {
       const preferences = await response.json();
-      console.log('🔄 Using local JSON preferences (legacy)');
       return preferences.user || preferences.defaults;
     }
     
@@ -2853,7 +2833,6 @@ async function loadUserPreferences() {
   }
   
   // ברירת מחדל
-  console.log('🔄 Using default preferences');
   return {
     timezone: 'Asia/Jerusalem',
     primaryCurrency: 'USD',
@@ -2991,7 +2970,6 @@ function filterTradePlansLocally(data, statuses, types, dateRange, searchTerm) {
 
 // Second DOMContentLoaded removed - merged into initializeTradePlansPage
 window.initializeTradePlansPage = function() {
-    console.log('📋 Initializing Trade Plans Page...');
     
     // אתחול modals
     if (typeof window.initializeTradePlansModals === 'function') {

@@ -1572,19 +1572,26 @@ window.clearAllCache = async function(options = {}) {
             }
         }
         
-        // === AUTO PAGE REFRESH (Nuclear only) ===
-        if (results.success && level === 'nuclear' && !options.skipReload) {
+        // === FORCE BROWSER CACHE CLEAR ===
+        // כל רמת ניקוי צריכה לאלץ את הדפדפן לטעון קבצים מחדש!
+        if (results.success && !options.skipReload) {
+            let reloadDelay = 1500;
+            let reloadMessage = '🔄 טוען גרסאות עדכניות...';
+            
+            if (level === 'nuclear') {
+                reloadDelay = 2000;
+                reloadMessage = '🔄 מרענן עמוד בעוד 2 שניות...';
+            }
+            
             if (typeof window.showNotification === 'function') {
-                window.showNotification('🔄 מרענן עמוד בעוד 2 שניות...', 'warning', 'system');
+                window.showNotification(reloadMessage, level === 'nuclear' ? 'warning' : 'info', 'system');
             }
             
             setTimeout(() => {
-                // Hard reload with cache busting
-                const url = new URL(window.location.href);
-                url.searchParams.delete('_refresh');
-                url.searchParams.set('_refresh', Date.now());
-                window.location.replace(url.toString());
-            }, 2000);  // 2 seconds to show notification
+                // Hard reload with cache bypass
+                // שימוש ב-location.reload(true) כדי לאלץ טעינה מהשרת
+                window.location.reload(true);
+            }, reloadDelay);
             
             return results;
         }

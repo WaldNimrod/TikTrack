@@ -657,16 +657,19 @@ if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
 
 ### **התנהגות אחרי ניקוי מטמון:**
 
-#### **כל הרמות (Light, Medium, Full):**
+#### **כל הרמות (Light, Medium, Full, Nuclear):**
 1. ✅ **Auto-reload page data** - טעינה אוטומטית של נתונים מהשרת
 2. ✅ **Update tables** - עדכון טבלאות עם נתונים חדשים
-3. ✅ **Show completion notification** - הודעת סיום מפורטת
-4. ✅ **Log result** - תיעוד בconsole (אם verbose=true)
+3. ✅ **Update statistics** - עדכון סטטיסטיקות העמוד
+4. ✅ **Hard page reload** - רענון מלא של העמוד (1.5 שניות)
+5. ✅ **Force cache bypass** - `location.reload(true)` מאלץ טעינה מהשרת
+6. ✅ **Show completion notification** - הודעת סיום מפורטת
 
-#### **רמה Nuclear בלבד:**
-5. ✅ **Show 2-second countdown** - ספירה לאחור לפני refresh
-6. ✅ **Auto-refresh entire page** - רענון מלא של העמוד
-7. ✅ **Force cache bypass** - cache busting עם URL parameter
+#### **רמה Nuclear - התנהגות מיוחדת:**
+- ⏱️ **2 שניות המתנה** (במקום 1.5) - זמן ארוך יותר להצגת אזהרה
+
+**⚠️ שינוי חשוב (12 ינואר 2025):**
+לאחר גילוי שניקוי מטמון לא מנקה את cache הדפדפן של קבצי JS, **כל הרמות** עכשיו מבצעות hard reload של העמוד. זה מבטיח שהדפדפן טוען תמיד את הגרסאות העדכניות ביותר של כל קבצי JS/CSS.
 
 ### **Error Handling:**
 - **אם reload נכשל** → הצגת אזהרה + המשך תהליך

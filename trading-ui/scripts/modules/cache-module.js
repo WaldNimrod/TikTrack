@@ -69,12 +69,20 @@ class UnifiedCacheManager {
     async initialize() {
         try {
             
+            // ⚠️ TEMPORARY FIX: IndexedDB disabled due to timeout issues
+            // TODO: Investigate why indexedDB.open() hangs and re-enable when fixed
+            const USE_INDEXED_DB = false;  // ← Set to true when IndexedDB works
+            
             // אתחול IndexedDB
-            if (window.indexedDB) {
+            if (window.indexedDB && USE_INDEXED_DB) {
                 this.layers.indexedDB = new IndexedDBLayer();
                 await this.layers.indexedDB.initialize();
             } else {
-                console.warn('⚠️ IndexedDB not available, using localStorage fallback');
+                if (!USE_INDEXED_DB) {
+                    console.warn('⚠️ IndexedDB disabled (temporary) - using localStorage');
+                } else {
+                    console.warn('⚠️ IndexedDB not available, using localStorage fallback');
+                }
                 this.layers.indexedDB = new LocalStorageLayer();
             }
             

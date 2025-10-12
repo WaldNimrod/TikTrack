@@ -253,5 +253,4 @@ window.setLogicalDefault = (fieldId, defaultValue) => DefaultValueSetter.setLogi
 window.setAllDefaults = (config) => DefaultValueSetter.setAllDefaults(config);
 window.setFormDefaults = (config) => DefaultValueSetter.setFormDefaults(config);
 
-console.log('✅ DefaultValueSetter loaded successfully');
 

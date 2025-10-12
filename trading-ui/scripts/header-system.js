@@ -1445,7 +1445,6 @@ window.updateToggleButtons = function() {
   }
   
   const isOpen = !headerFilters.classList.contains('filters-hidden');
-  console.log('isOpen:', isOpen);
   
   if (isOpen) {
     // פילטר פתוח - הצג כפתור משני (בתוך הפילטר)

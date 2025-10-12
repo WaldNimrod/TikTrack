@@ -347,5 +347,4 @@ window.populateCurrenciesSelect = (selectId, options) => SelectPopulatorService.
 window.populateTradePlansSelect = (selectId, options) => SelectPopulatorService.populateTradePlansSelect(selectId, options);
 window.populateGenericSelect = (selectId, endpoint, config) => SelectPopulatorService.populateGenericSelect(selectId, endpoint, config);
 
-console.log('✅ SelectPopulatorService loaded successfully');
 

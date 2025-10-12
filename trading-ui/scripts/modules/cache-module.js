@@ -1339,6 +1339,12 @@ async function reloadPageData() {
         
         if (typeof reloadFn === 'function') {
             await reloadFn();
+            
+            // Update page statistics if function exists
+            if (typeof window.updatePageSummaryStats === 'function') {
+                window.updatePageSummaryStats();
+            }
+            
             return { success: true, pageName, reloaded: true };
         }
         

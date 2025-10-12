@@ -372,5 +372,4 @@ window.collectAllFormData = (formId) => DataCollectionService.collectAllFormData
 window.setFormData = (fieldMap, values) => DataCollectionService.setFormData(fieldMap, values);
 window.resetForm = (formId, clearValidation) => DataCollectionService.resetForm(formId, clearValidation);
 
-console.log('✅ DataCollectionService loaded successfully');
 

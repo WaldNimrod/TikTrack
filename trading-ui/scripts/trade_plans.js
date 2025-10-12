@@ -1807,11 +1807,11 @@ function updateTradePlansTable(trade_plans) {
 
     const sideDisplay = window.FieldRendererService ? 
       window.FieldRendererService.renderSide(design.side) : 
-      `<span class="${design.side === 'Long' ? 'numeric-value-positive' : 'numeric-value-negative'}" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">${design.side === 'Long' ? 'Long' : 'Short'}</span>`;
+      `<span class="${design.side === 'Long' ? 'numeric-value-positive' : 'numeric-value-negative'} badge-capsule-small">${design.side === 'Long' ? 'Long' : 'Short'}</span>`;
 
     const statusDisplay = window.FieldRendererService ? 
       window.FieldRendererService.renderStatus(design.status) : 
-      `<span class="status-${design.status}-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">${window.translateTradePlanStatus ? window.translateTradePlanStatus(design.status) : design.status}</span>`;
+      `<span class="status-${design.status}-badge badge-capsule-small">${window.translateTradePlanStatus ? window.translateTradePlanStatus(design.status) : design.status}</span>`;
 
     // מחיר מהטיקר (לא מהתכנון)
     const tickerPrice = design.ticker?.last_price || design.ticker?.current_price || design.current_price || 0;
@@ -1873,16 +1873,16 @@ function updateTradePlansTable(trade_plans) {
         // חישוב יחס (Ratio)
         const ratio = potentialLoss > 0 ? (potentialProfit / potentialLoss) : 0;
         
-        // פורמט הצגה
+        // פורמט הצגה - ללא inline styles
         if (!isValid) {
           // מצב לא תקין - הכל בצבע אזהרה
           validationTooltip = warningMessage;
           riskRewardDisplay = `
-            <span style="color: var(--warning-color, #ffc107); font-size: 0.85em; direction: ltr; display: inline-block;">${formatCurrency(potentialProfit)}</span>
-            <span style="color: #ccc; margin: 0 2px;">|</span>
-            <span style="color: var(--warning-color, #ffc107); font-size: 0.85em; direction: ltr; display: inline-block;">${formatCurrency(Math.abs(potentialLoss))}</span>
-            <span style="color: #ccc; margin: 0 2px;">|</span>
-            <span style="color: var(--warning-color, #ffc107); font-size: 0.9em; direction: ltr; display: inline-block;">1:${Math.round(ratio)}</span>
+            <span class="risk-reward-warning numeric-ltr">${formatCurrency(potentialProfit)}</span>
+            <span class="separator-pipe">|</span>
+            <span class="risk-reward-warning numeric-ltr">${formatCurrency(Math.abs(potentialLoss))}</span>
+            <span class="separator-pipe">|</span>
+            <span class="risk-reward-warning numeric-ltr-large">1:${Math.round(ratio)}</span>
           `;
         } else {
           // מצב תקין - צבעים רגילים
@@ -1892,11 +1892,11 @@ function updateTradePlansTable(trade_plans) {
           const profitSign = potentialProfit >= 0 ? '+' : '';
           
           riskRewardDisplay = `
-            <span class="${profitClass}" style="font-size: 0.85em; direction: ltr; display: inline-block;">${profitSign}${formatCurrency(potentialProfit)}</span>
-            <span style="color: #ccc; margin: 0 2px;">|</span>
-            <span class="${lossClass}" style="font-size: 0.85em; direction: ltr; display: inline-block;">-${formatCurrency(Math.abs(potentialLoss))}</span>
-            <span style="color: #ccc; margin: 0 2px;">|</span>
-            <span class="${ratioClass}" style="font-size: 0.9em; direction: ltr; display: inline-block;">1:${Math.round(ratio)}</span>
+            <span class="${profitClass} numeric-ltr">${profitSign}${formatCurrency(potentialProfit)}</span>
+            <span class="separator-pipe">|</span>
+            <span class="${lossClass} numeric-ltr">-${formatCurrency(Math.abs(potentialLoss))}</span>
+            <span class="separator-pipe">|</span>
+            <span class="${ratioClass} numeric-ltr-large">1:${Math.round(ratio)}</span>
           `;
         }
       }
@@ -1920,9 +1920,9 @@ function updateTradePlansTable(trade_plans) {
       <tr>
         <!-- 1. טיקר -->
         <td class="ticker-cell">
-          <div style="display: flex; align-items: center; gap: 6px;">
+          <div class="d-flex align-items-center gap-2">
             ${tickerLink}
-            <span class="entity-trade-plan-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
+            <span class="entity-trade-plan-badge badge-capsule-small">
               ${tickerDisplay}
             </span>
           </div>
@@ -1942,7 +1942,7 @@ function updateTradePlansTable(trade_plans) {
         
         <!-- 6. כמות -->
         <td class="quantity-cell">
-          <span class="numeric-value-neutral ${design.amount_input_mode === 'shares' ? 'user-saved-value' : 'calculated-value'}" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em;">
+          <span class="numeric-value-neutral ${design.amount_input_mode === 'shares' ? 'user-saved-value' : 'calculated-value'}">
             ${calculatedShares || '-'}
           </span>
         </td>

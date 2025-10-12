@@ -344,5 +344,4 @@ window.renderAction = (action) => FieldRendererService.renderAction(action);
 window.renderPriority = (priority) => FieldRendererService.renderPriority(priority);
 window.renderDate = (date, includeTime) => FieldRendererService.renderDate(date, includeTime);
 
-console.log('✅ FieldRendererService loaded successfully');
 

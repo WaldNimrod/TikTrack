@@ -147,7 +147,6 @@ class UnifiedAppInitializer {
             return false;
         }
 
-
         const loadingPromise = this._loadModuleScript(moduleName, config);
         this.loadingPromises.set(moduleName, loadingPromise);
 
@@ -406,18 +405,14 @@ class UnifiedAppInitializer {
         this.analyzePageRequirements();
         
         this.performanceMetrics.stageTimes.detect = Date.now() - stageStart;
-        console.log('✅ Stage 1 Complete:', {
-            page: this.pageInfo.name,
-            systems: this.availableSystems.size,
-            requirements: this.pageInfo.requirements
-        });
+        
     }
 
     /**
      * Stage 2: Prepare optimal configuration
      */
     prepareConfiguration() {
-        console.log('⚙️ Stage 2: Preparing configuration...');
+        
         const stageStart = Date.now();
         
         // Load page-specific configuration from page-initialization-configs.js
@@ -429,7 +424,7 @@ class UnifiedAppInitializer {
         if (typeof window.pageInitializationConfigs !== 'undefined' && 
             window.pageInitializationConfigs[this.pageInfo.name]) {
             pageConfig = window.pageInitializationConfigs[this.pageInfo.name];
-            console.log(`📋 Loaded page config for ${this.pageInfo.name}:`, pageConfig);
+            
         } else {
             console.log(`⚠️ No page config found for ${this.pageInfo.name}`);
         }
@@ -490,7 +485,7 @@ class UnifiedAppInitializer {
         if (typeof window.initializeApplication === 'function') {
             await window.initializeApplication(config);
         } else {
-            console.log('⚠️ Application initializer not found, using manual initialization');
+            
             // Fallback to manual initialization
             await this.manualInitialization(config);
         }
@@ -598,8 +593,7 @@ class UnifiedAppInitializer {
         const path = window.location.pathname;
         const filename = path.split('/').pop() || 'index';
         const pageName = filename.replace('.html', '');
-        
-        
+
         const pageInfo = {
             name: pageName,
             path: path,
@@ -752,17 +746,14 @@ class UnifiedAppInitializer {
      * Report cache system status
      */
     reportCacheSystemStatus() {
-        console.log('================================');
-        
+
         if (window.UnifiedCacheManager) {
             const status = window.UnifiedCacheManager.initialized ? '✅ Ready' : '⚠️ Not Initialized';
-            console.log(`UnifiedCacheManager: ${status}`);
+            
         } else {
-            console.log('UnifiedCacheManager: ❌ Not Available');
+            
         }
-        
-        console.log('================================');
-        
+
         // Cache system is ready if UnifiedCacheManager is initialized
         window.cacheSystemReady = window.UnifiedCacheManager?.initialized || false;
         
@@ -989,7 +980,6 @@ window.UnifiedInitializationSystem = {
     }
 };
 
-
 // ===== NOTIFICATION SYSTEM ======
 /**
  * Notification System - TikTrack
@@ -1102,7 +1092,6 @@ async function updateNotificationHistory(action, data) {
   }
 }
 
-
 /**
  * Update an alert
  * ALERTS SYSTEM - Updates existing business alert
@@ -1139,7 +1128,6 @@ function markAlertAsRead(_alertId) {
   // Implementation for marking alerts as triggered
   // TODO: Implement alert read logic
 }
-
 
 // ===== NOTIFICATION SYSTEM FUNCTIONS =====
 // These functions handle system messages for user feedback
@@ -1551,7 +1539,6 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
 // ===== LINKED ITEMS SYSTEM FUNCTIONS =====
 // These functions handle linked items display and management
 
-
 /**
  * Load linked items data from server
  * LINKED ITEMS SYSTEM - Fetches linked items data for any entity type
@@ -1624,7 +1611,6 @@ function createNotificationContainer() {
   return container;
 }
 
-
 /**
  * Hide notification with animation
  * NOTIFICATION SYSTEM - Hides system notification with smooth animation
@@ -1666,7 +1652,6 @@ async function showSuccessNotification(title, message, duration = 4000, category
   // showSuccessNotification calling showNotification with category
   await showNotification(finalMessage, 'success', finalTitle, duration, category);
 }
-
 
 /**
  * Show error notification
@@ -2596,8 +2581,6 @@ function fallbackCopyToClipboard(text) {
 // showValidationWarning, showConfirmationDialog, and showDeleteWarning
 // are now located in scripts/warning-system.js
 
-
-
 // ===== LEGACY SUPPORT =====
 // These functions provide backward compatibility
 
@@ -2887,7 +2870,6 @@ window.updateAlert = updateAlert;
 window.markAlertAsTriggered = markAlertAsTriggered;
 window.markAlertAsRead = markAlertAsRead;
 
-
 // Export NOTIFICATION SYSTEM functions to global scope
 window.showNotification = showNotification;
 window.showSuccessNotification = showSuccessNotification;
@@ -2926,7 +2908,6 @@ window.notificationSystem = {
   updateAlert,
   markAlertAsTriggered,
   markAlertAsRead,
-
 
   // NOTIFICATION SYSTEM functions
   showNotification,
@@ -3128,7 +3109,6 @@ window.setDynamicLoading = function(enabled) {
         console.error('❌ UnifiedAppInitializer not available');
     }
 };
-
 
 // ===== PAGE INITIALIZATION CONFIGURATIONS =====
 // Unified page configurations - previously in page-initialization-configs.js
@@ -3680,8 +3660,7 @@ const PAGE_CONFIGS = {
                         }
                     }
                 };
-                
-                
+
                 // Load external data log after page initialization
                 setTimeout(async () => {
                     try {

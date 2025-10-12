@@ -284,5 +284,4 @@ window.getMinMax = (data, field) => StatisticsCalculator.getMinMax(data, field);
 window.groupByField = (data, field) => StatisticsCalculator.groupBy(data, field);
 window.calculateFullStatistics = (data, config) => StatisticsCalculator.calculateFullStatistics(data, config);
 
-console.log('✅ StatisticsCalculator loaded successfully');
 

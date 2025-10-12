@@ -7,9 +7,9 @@
  * קובץ זה מכיל את הסגנונות הבסיסיים של כל הטבלאות במערכת
  * מבוסס על הסגנונות הקיימים ב-table.css
  * 
- * @version 1.3.2
- * @lastUpdated January 12, 2025
- * @changes Added !important to visual feedback classes to override inline styles
+ * @version 1.3.3
+ * @lastUpdated October 12, 2025
+ * @changes Added numeric-ltr, separator-pipe, risk-reward-warning classes
  */
 
 /* ===== הגדרות רוחב עמודות ===== */
@@ -1029,4 +1029,41 @@ table tbody td button.btn-sm {
 .data-table .calculated-value,
 .table .calculated-value {
   /* רגיל - ללא סימון מיוחד */
+}
+
+/* ===== Numeric Display Utilities ===== */
+
+/**
+ * Numeric LTR Display - for numbers, prices, percentages
+ * מספרים בכיוון LTR (שמאל לימין) כדי שהסימנים יהיו נכון
+ */
+.numeric-ltr {
+  direction: ltr !important;
+  display: inline-block;
+  font-size: 0.85em;
+}
+
+.numeric-ltr-large {
+  direction: ltr !important;
+  display: inline-block;
+  font-size: 0.9em;
+}
+
+/**
+ * Separator Pipe - מפריד דק בין ערכים
+ */
+.separator-pipe {
+  color: #dee2e6;
+  margin: 0 2px;
+  font-weight: 300;
+}
+
+/**
+ * Warning display - for invalid Risk/Reward
+ */
+.risk-reward-warning {
+  color: var(--warning-color, #ffc107);
+  font-size: 0.85em;
+  direction: ltr;
+  display: inline-block;
 }

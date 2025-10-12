@@ -531,5 +531,4 @@ window.executeCRUDOperation = (url, fetchOptions, handlerOptions) => CRUDRespons
 window.handleLoadResponse = (response, options) => CRUDResponseHandler.handleLoadResponse(response, options);
 window.handleNetworkError = (error, options) => CRUDResponseHandler.handleNetworkError(error, options);
 
-console.log('✅ CRUDResponseHandler v2.0.0 loaded successfully (now supports data load errors)');
 

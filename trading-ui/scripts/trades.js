@@ -453,9 +453,23 @@ class TradesController {
         
         const tickerSymbol = trade.ticker_symbol || trade.ticker?.symbol || '-';
         const accountName = trade.account_name || trade.trading_account?.name || '-';
-        const planName = trade.trade_plan?.name || '-';
         
-        // כפתורי פעולות - button-icons.js יוסיף את האייקונים
+        // תצוגת תוכנית - trade_plan אין לו name, מציגים badge או ID
+        let planDisplay = '-';
+        if (trade.trade_plan && trade.trade_plan.id) {
+            // יצירת badge לתוכנית עם קישור
+            const planId = trade.trade_plan.id;
+            const planType = trade.trade_plan.investment_type || '';
+            const planSide = trade.trade_plan.side || '';
+            planDisplay = `<span class="badge-capsule-small" style="cursor: pointer;" onclick="viewLinkedItemsForTradePlan(${planId})" title="לחץ לצפייה בפרטים">
+                תכנון #${planId}
+            </span>`;
+        } else if (trade.trade_plan_id) {
+            // יש ID אבל אין נתונים - הצגה בסיסית
+            planDisplay = `<span class="text-muted">#${trade.trade_plan_id}</span>`;
+        }
+        
+        // כפתורי פעולות - משתמש בפונקציות מ-button-icons.js (כמו trade_plans)
         return `
             <tr>
                 <td class="col-ticker">${tickerSymbol}</td>
@@ -464,15 +478,15 @@ class TradesController {
                 <td class="col-status">${statusDisplay}</td>
                 <td class="col-type">${typeDisplay}</td>
                 <td class="col-side">${sideDisplay}</td>
-                <td class="col-plan">${planName}</td>
+                <td class="col-plan">${planDisplay}</td>
                 <td class="col-pnl">${pnlDisplay}</td>
                 <td class="col-created">${createdDate}</td>
                 <td class="col-closed">${closedDate}</td>
                 <td class="col-account">${accountName}</td>
                 <td class="col-actions actions-cell">
-                    <button class="action-btn edit-btn" onclick="editTrade(${trade.id})" title="ערוך" data-entity-type="trade" data-entity-id="${trade.id}"></button>
-                    <button class="action-btn view-btn" onclick="viewTrade(${trade.id})" title="צפה" data-entity-type="trade" data-entity-id="${trade.id}"></button>
-                    <button class="action-btn delete-btn" onclick="deleteTrade(${trade.id})" title="מחק" data-entity-type="trade" data-entity-id="${trade.id}"></button>
+                    ${window.createEditButton ? window.createEditButton(`editTrade(${trade.id})`) : ''}
+                    ${window.createButton ? window.createButton('VIEW', `viewTrade(${trade.id})`) : ''}
+                    ${window.createDeleteButton ? window.createDeleteButton(`deleteTrade(${trade.id})`) : ''}
                 </td>
             </tr>
         `;
@@ -865,13 +879,6 @@ window.updateTradesTable = function(trades) {
     if (window.tradesController) {
         window.tradesController.data = trades || window.tradesController.data;
         window.tradesController.updateTradesTable();
-        
-        // הפעלת button-icons לאחר עדכון הטבלה
-        if (typeof window.initializeButtonIcons === 'function') {
-            setTimeout(() => {
-                window.initializeButtonIcons();
-            }, 100);
-        }
     }
 };
 
@@ -914,13 +921,6 @@ async function loadTradesData() {
             window.tradesData = data;
             _isLoadingTrades = false;
             
-            // הפעלת button-icons לאחר עדכון הטבלה
-            if (typeof window.initializeButtonIcons === 'function') {
-                setTimeout(() => {
-                    window.initializeButtonIcons();
-                }, 100);
-            }
-            
             return data;
         } else {
             console.error('❌ window.loadTableData לא זמינה');
@@ -937,13 +937,6 @@ async function loadTradesData() {
             window.tradesData = data;
             updateTradesTable(data);
             _isLoadingTrades = false;
-            
-            // הפעלת button-icons לאחר עדכון הטבלה
-            if (typeof window.initializeButtonIcons === 'function') {
-                setTimeout(() => {
-                    window.initializeButtonIcons();
-                }, 100);
-            }
             
             return data;
         }
@@ -990,4 +983,4 @@ window.loadTradesData = loadTradesData;
 //     }
 // });
 
-console.log('✅ trades.js v=20251012d loaded successfully - fixed duplicate declarations');
+console.log('✅ trades.js v=20251012f loaded successfully - fixed action buttons & trade_plan display');

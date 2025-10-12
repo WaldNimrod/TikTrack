@@ -72,6 +72,20 @@ class Trade(BaseModel):
                 result["ticker_current_price"] = 0
                 logger.info(f"Trade {self.id}: Using fallback ticker symbol: {result['ticker_symbol']}")
             
+            # Add trade_plan relationship if loaded
+            if hasattr(self, 'trade_plan') and self.trade_plan:
+                result["trade_plan"] = {
+                    "id": self.trade_plan.id,
+                    "ticker_id": self.trade_plan.ticker_id,
+                    "investment_type": self.trade_plan.investment_type,
+                    "side": self.trade_plan.side,
+                    "status": self.trade_plan.status
+                }
+                logger.info(f"Trade {self.id}: Using loaded trade_plan: {self.trade_plan.id}")
+            else:
+                result["trade_plan"] = None
+                logger.info(f"Trade {self.id}: No trade_plan loaded")
+            
             # Add any additional fields that might be needed
             for field in ['cancelled_at', 'cancel_reason']:
                 if hasattr(self, field):

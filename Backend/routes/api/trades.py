@@ -31,10 +31,11 @@ def get_trades():
     status = request.args.get('status')
     
     try:
-        # Use joinedload to eagerly load ticker and account relationships
+        # Use joinedload to eagerly load ticker, account, and trade_plan relationships
         query = db.query(Trade).options(
             joinedload(Trade.ticker),
-            joinedload(Trade.account)
+            joinedload(Trade.account),
+            joinedload(Trade.trade_plan)
         )
         
         # Apply filters if provided

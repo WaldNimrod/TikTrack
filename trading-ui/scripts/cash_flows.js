@@ -1104,22 +1104,34 @@ function startAutoRefresh() {
  */
 async function loadUserPreferences() {
   try {
+    // שימוש במערכת העדפות הכללית (data-advanced.js)
+    if (typeof window.getUserPreference === 'function') {
+      const preferences = {
+        paginationSize: await window.getUserPreference('pagination_size_cash_flows', 50),
+        autoRefreshInterval: await window.getUserPreference('auto_refresh_interval', 30000),
+        defaultCurrency: await window.getUserPreference('default_currency', 'USD'),
+        showCurrencyConversion: await window.getUserPreference('show_currency_conversion', false),
+        dateFormat: await window.getUserPreference('date_format', 'DD/MM/YYYY'),
+        numberFormat: await window.getUserPreference('number_format', 'en-US'),
+        displayMode: await window.getUserPreference('cash_flows_display_mode', 'table')
+      };
+      
+      // שמירת העדפות בגלובל scope
+      window.cashFlowsPreferences = preferences;
+      
+      return preferences;
+    }
     
-    // טעינת העדפות רלוונטיות לתזרימי מזומנים
-    const preferences = await window.getPreferencesByNames([
-      'pagination_size_cash_flows',
-      'auto_refresh_interval',
-      'default_currency',
-      'show_currency_conversion',
-      'date_format',
-      'number_format',
-      'cash_flows_display_mode'
-    ]);
-    
-    // שמירת העדפות בגלובל scope
-    window.cashFlowsPreferences = preferences;
-    
-    return preferences;
+    // Fallback - ברירות מחדל בלבד
+    return {
+      paginationSize: 50,
+      autoRefreshInterval: 30000,
+      defaultCurrency: 'USD',
+      showCurrencyConversion: false,
+      dateFormat: 'DD/MM/YYYY',
+      numberFormat: 'en-US',
+      displayMode: 'table'
+    };
   } catch (error) {
     console.warn('⚠️ שגיאה בטעינת העדפות, משתמש בברירות מחדל:', error);
     return null;

@@ -1379,8 +1379,24 @@ class PreferencesSystem {
      */
     async resetToDefaults() {
         try {
-            // Confirm with user
-            if (!confirm('האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל?')) {
+            // Confirm with user via notification system
+            const confirmed = await new Promise((resolve) => {
+                if (window.showConfirmNotification) {
+                    window.showConfirmNotification(
+                        '⚠️ איפוס לברירת מחדל',
+                        'האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל? פעולה זו תחליף את כל הערכים הנוכחיים.',
+                        () => resolve(true),
+                        () => resolve(false),
+                        { duration: 0 }
+                    );
+                } else {
+                    // Fallback to standard confirm if notification system not available
+                    resolve(confirm('האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל?'));
+                }
+            });
+            
+            if (!confirmed) {
+                console.log('❌ Reset cancelled by user');
                 return false;
             }
             
@@ -1394,35 +1410,55 @@ class PreferencesSystem {
             }
             
             const data = await response.json();
-            const preferenceTypes = data.data?.preference_types || [];
+            console.log('📊 Received preference types:', data);
+            
+            // Fix: data.data is the array, not data.data.preference_types
+            const preferenceTypes = data.data || [];
+            
+            if (!preferenceTypes || preferenceTypes.length === 0) {
+                throw new Error('No preference types returned from API');
+            }
+            
+            console.log(`✅ Found ${preferenceTypes.length} preference types`);
             
             // Build defaults object
             const defaults = {};
             preferenceTypes.forEach(pref => {
-                if (pref.default_value !== null) {
+                if (pref.default_value !== null && pref.default_value !== undefined) {
                     defaults[pref.preference_name] = pref.default_value;
                 }
             });
             
+            console.log(`📝 Prepared ${Object.keys(defaults).length} default values`);
+            
+            if (Object.keys(defaults).length === 0) {
+                throw new Error('No default values found');
+            }
+            
             // Save defaults
             await this.manager.save(defaults);
             
-            // Reload
-            await this.manager.load();
+            // Reload with correct profile ID
+            const activeProfile = this.profiles.getActiveProfile();
+            await this.manager.load(null, activeProfile?.id, true);
+            this._applyToForm(this.manager.currentPreferences);
             await this.colors.loadColors();
             await this.ui.updateCounters(this.manager.currentPreferences);
             
             this.ui.hideLoading('reset');
             this.ui.showSuccess('העדפות אופסו לברירות מחדל!', 'הדף ירענן בעוד רגע...');
             
-            // Reload page after short delay
+            // Hard reload page after short delay
             setTimeout(() => {
-                window.location.reload();
+                const url = new URL(window.location.href);
+                url.searchParams.set('_refresh', Date.now());
+                window.location.replace(url.toString());
             }, 2000);
             
             return true;
             
         } catch (error) {
+            console.error('❌ Error resetting to defaults:', error);
             this.ui.hideLoading('reset');
             this.ui.showError('שגיאה באיפוס העדפות', error.message);
             return false;

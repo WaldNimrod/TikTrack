@@ -839,9 +839,9 @@ async function loadCurrenciesForEditCashFlow() {
  * רינדור טבלת תזרימי מזומנים
  */
 async function renderCashFlowsTable() {
-  const tbody = document.querySelector('#cashFlowsContainer table tbody');
+  const tbody = document.querySelector('#cashFlowsTable tbody');
   if (!tbody) {
-    console.error('❌ טבלת תזרימי מזומנים לא נמצאה');
+    console.error('❌ טבלת תזרימי מזומנים לא נמצאה (#cashFlowsTable tbody)');
     return;
   }
 

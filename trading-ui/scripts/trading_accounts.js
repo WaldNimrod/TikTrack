@@ -19,7 +19,6 @@
  * ========================================
  */
 
-console.log('📁 trading_accounts_new.js נטען - גרסה חדשה עם מערכות כלליות');
 
 // ===== Global Element Cache =====
 let addAccountModalElement = null;
@@ -321,11 +320,9 @@ class TradingAccountsController {
      * הגדרת event handlers ספציפיים לחשבונות מסחר
      */
     setupTradingAccountsHandlers() {
-        console.log('💼 Setting up Trading Accounts specific handlers...');
         
         // Export handlers to global scope for unified initialization
         window.setupTradingAccountsHandlers = () => {
-            console.log('💼 Trading Accounts handlers setup complete');
         };
     }
 
@@ -393,7 +390,6 @@ class TradingAccountsController {
      * עדכון UI כללי
      */
     updateUI() {
-        console.log('🎨 Updating UI...');
         
         // עדכון טבלה
         this.updateTable();
@@ -408,7 +404,6 @@ class TradingAccountsController {
      * לפי STANDARD_VALIDATION_GUIDE.md
      */
     async showEditModal(accountId) {
-        console.log('✏️ Showing edit modal for account:', accountId);
         const account = this.data.find(a => a.id === accountId);
         if (!account) {
             console.error('❌ Account not found:', accountId);
@@ -452,7 +447,6 @@ class TradingAccountsController {
      * הצגת פרטים
      */
     showDetails(accountId) {
-        console.log('👁️ Showing details for account:', accountId);
         const account = this.data.find(a => a.id === accountId);
         if (!account) {
             console.error('❌ Account not found:', accountId);
@@ -476,7 +470,6 @@ class TradingAccountsController {
      * מחיקת חשבון
      */
     async deleteAccount(accountId) {
-        console.log('🗑️ Deleting account:', accountId);
         const account = this.data.find(a => a.id === accountId);
         if (!account) {
             console.error('❌ Account not found:', accountId);

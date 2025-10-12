@@ -73,7 +73,6 @@ async function loadCashFlows() {
  */
 function calculateBalance() {
   try {
-    console.log('🧮 מחשב יתרה...');
     
     if (!window.cashFlowsData || window.cashFlowsData.length === 0) {
       if (typeof window.showWarningNotification === 'function') {
@@ -207,7 +206,6 @@ async function ensureTradingAccountsLoaded() {
   
   // אין חשבונות - HeaderSystem כנראה טען אבל עדיין לא זמין
   // פתרון זמני: נשתמש בנתונים מהשרת ישירות
-  console.log('⚠️ חשבונות לא נטענו - טוען מהשרת...');
   
   try {
     const response = await fetch('/api/trading-accounts/');
@@ -392,7 +390,6 @@ function showEditCashFlowModal(cashFlowId) {
   if (dateTimeValue && !dateTimeValue.includes('T')) {
     // אם התאריך הוא רק YYYY-MM-DD, נוסיף שעה ברירת מחדל
     dateTimeValue = `${dateTimeValue}T12:00`;
-    console.log(`📅 המרת תאריך: ${cashFlow.date} → ${dateTimeValue}`);
   }
 
   setFieldValue('editCashFlowId', cashFlow.id);
@@ -831,7 +828,6 @@ async function renderCashFlowsTable() {
   tbody.innerHTML = '';
 
   if (!cashFlowsData || cashFlowsData.length === 0) {
-    console.log('ℹ️ אין תזרימי מזומנים להצגה');
     tbody.innerHTML = '<tr><td colspan="7" class="text-center">לא נמצאו תזרימי מזומנים</td></tr>';
     return;
   }
@@ -841,7 +837,6 @@ async function renderCashFlowsTable() {
   await ensureTradingAccountsLoaded();
 
   cashFlowsData.forEach((cashFlow, index) => {
-    console.log(`  ${index + 1}. תזרים ID ${cashFlow.id}: ${cashFlow.type} - ${cashFlow.amount}`);
     const row = document.createElement('tr');
     // קבלת שם החשבון מ-trading_account_id
     const accountName = getAccountNameById(cashFlow.trading_account_id) || `חשבון ${cashFlow.trading_account_id}`;
@@ -1116,7 +1111,6 @@ async function loadUserPreferences() {
  */
 async function applyDynamicColors() {
   try {
-    console.log('🎨 מחיל מערכת צבעים דינמית...');
     
     // טעינת צבעי ישויות מהמערכת הגלובלית
     if (typeof window.loadEntityColors === 'function') {
@@ -1183,7 +1177,6 @@ function applyUserPreferences(preferences) {
   try {
     if (!preferences) return;
     
-    console.log('🎨 מחיל העדפות משתמש על העמוד...');
     
     // החלת העדפת גודל עמוד (רק תצוגה, לא שמירה)
     const paginationSize = preferences.pagination_size_cash_flows || 25;

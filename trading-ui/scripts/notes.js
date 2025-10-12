@@ -38,7 +38,6 @@ window.initializeNotesModals = function() {
  */
 function addNote() {
   try {
-    console.log('➕ מוסיף הערה חדשה');
     
     // פתיחת מודל הוספת הערה
     showAddNoteModal();
@@ -60,7 +59,6 @@ function addNote() {
  */
 function uploadFile(noteId) {
   try {
-    console.log('📤 מעלה קובץ להערה:', noteId);
     
     // יצירת input file
     const fileInput = document.createElement('input');
@@ -127,7 +125,6 @@ function uploadFile(noteId) {
  */
 function downloadFile(noteId, fileName) {
   try {
-    console.log('📥 מוריד קובץ:', noteId, fileName);
     
     // יצירת קישור להורדה
     const downloadUrl = `/api/notes/${noteId}/download/${encodeURIComponent(fileName)}`;
@@ -167,7 +164,6 @@ function downloadFile(noteId, fileName) {
  */
 function viewLinkedItems(noteId) {
   try {
-    console.log('🔗 מציג פריטים מקושרים להערה:', noteId);
     
     // חיפוש ההערה בנתונים
     const note = window.notesData.find(n => n.id === noteId);
@@ -1328,7 +1324,6 @@ window.populateSelect = populateSelect;
 
 // Second DOMContentLoaded removed - merged into initializeNotesPage
 window.initializeNotesPage = function() {
-    console.log('📝 Initializing Notes Page...');
     
     // אתחול modals
     if (typeof window.initializeNotesModals === 'function') {
@@ -1991,51 +1986,6 @@ function replaceCurrentAttachment() {
 // The global toggleSection function from ui-utils.js is used instead
 
 // toggleSection function removed - use toggleSection('main') instead
-
-// Note CRUD functions
-function openNoteDetails() {
-    if (typeof window.openNoteDetails === 'function') {
-        window.openNoteDetails();
-    } else {
-        console.warn('openNoteDetails function not found');
-    }
-}
-
-function editNote(id) {
-    if (typeof window.editNote === 'function') {
-        window.editNote(id);
-    } else {
-        console.warn('editNote function not found');
-    }
-}
-
-function deleteNote(id) {
-    if (typeof window.deleteNote === 'function') {
-        window.deleteNote(id);
-    } else {
-        console.warn('deleteNote function not found');
-    }
-}
-
-// Filter functions
-function filterNotesByRelatedObjectType(type) {
-    if (typeof window.filterNotesByRelatedObjectType === 'function') {
-        window.filterNotesByRelatedObjectType(type);
-    } else {
-        console.warn('filterNotesByRelatedObjectType function not found');
-    }
-}
-
-// Text formatting functions
-function formatText(format) {
-    if (typeof window.formatText === 'function') {
-        window.formatText(format);
-    } else {
-        console.warn('formatText function not found');
-    }
-}
-
-// Data loading functions - removed duplicate loadNotesData function that was causing infinite loop
 
 // ===== GLOBAL EXPORTS =====
 // Export functions to global scope for onclick attributes

@@ -316,7 +316,6 @@ function updateAlertsTable(alerts) {
 
     const tableHTML = alerts.map(alert => {
       // לוג לבדיקת מבנה הנתונים
-      // console.log('🔍 Alert data structure:', alert);
       
       // קבלת צבעי סטטוס דינמיים
       const statusClass = getStatusClass(alert.status);
@@ -330,14 +329,12 @@ function updateAlertsTable(alerts) {
       let relatedColor = '';
       let relatedBgColor = '';
 
-      // console.log('🔍 Alert details:', {
       //   id: alert.id,
       //   related_type_id: alert.related_type_id,
       //   related_id: alert.related_id,
       //   status: alert.status,
       // });
 
-      // console.log('📊 Related data counts:', {
       //   accounts: accounts.length,
       //   trades: trades.length,
       //   tradePlans: tradePlans.length,
@@ -681,7 +678,6 @@ async function loadModalData() {
   try {
 
     // טעינת נתונים במקביל
-    // console.log('🔧 Loading modal data...');
     const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
       fetch('/api/trading-accounts').then(r => r.json()).catch(() => ({ data: [] })),
       fetch('/api/trades/').then(r => r.json()).catch(() => ({ data: [] })),
@@ -699,11 +695,6 @@ async function loadModalData() {
     const tickers = Array.isArray(tickersResponse?.data) ? tickersResponse.data :
       Array.isArray(tickersResponse) ? tickersResponse : [];
 
-    // console.log('🔧 Modal data loaded:');
-    // console.log('🔧 Accounts:', accounts.length);
-    // console.log('🔧 Trades:', trades.length);
-    // console.log('🔧 Trade Plans:', tradePlans.length);
-    // console.log('🔧 Tickers:', tickers.length);
 
     // נטענו נתונים נוספים
 
@@ -717,7 +708,6 @@ async function loadModalData() {
     updateRadioButtons(accounts, trades, tradePlans, tickers);
 
     // הגדרת נתונים ראשוניים (ברירת מחדל לטיקר)
-    // console.log('🔧 Setting initial data for tickers...');
     populateSelect('alertRelatedObjectSelect', tickers, 'symbol', '');
     populateSelect('editAlertRelatedObjectSelect', tickers, 'symbol', '');
   } catch (error) {
@@ -802,7 +792,6 @@ function updateRadioButtons(accounts, trades, tradePlans, tickers) {
  * מילוי select עם נתונים
  */
 function populateSelect(selectId, data, field, prefix = '') {
-  // console.log('🔧 populateSelect called:', { selectId, dataLength: data?.length, field, prefix });
 
   const select = document.getElementById(selectId);
   if (!select) {
@@ -813,7 +802,6 @@ function populateSelect(selectId, data, field, prefix = '') {
   select.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
 
   if (!data || data.length === 0) {
-    // console.log('🔧 No data available for:', selectId);
     const option = document.createElement('option');
     option.value = '';
     option.textContent = 'אין רשומות זמינות';
@@ -859,7 +847,6 @@ function populateSelect(selectId, data, field, prefix = '') {
     select.appendChild(option);
   });
 
-  // console.log('🔧 populateSelect completed for:', selectId, 'with', data.length, 'items');
 }
 
 
@@ -868,7 +855,6 @@ function populateSelect(selectId, data, field, prefix = '') {
  * @param {HTMLInputElement} radioElement - אלמנט הרדיו שנבחר
  */
 function onRelationTypeChange(radioElement) {
-  // console.log('🔧 Relation type changed:', radioElement.value);
 
   // הפעלת שדה בחירת אובייקט
   const relatedObjectSelect = alertRelatedObjectSelect;
@@ -886,7 +872,6 @@ function onRelationTypeChange(radioElement) {
  * @param {HTMLSelectElement} selectElement - אלמנט הבחירה
  */
 function onRelatedObjectChange(selectElement) {
-  // console.log('🔧 Related object changed:', selectElement.value);
 
   if (selectElement.value) {
     // הפעלת שדות התנאי ישירות
@@ -1023,7 +1008,6 @@ function populateEditRelatedObjects(relationTypeId) {
  * @param {HTMLInputElement} radioElement - אלמנט הרדיו שנבחר
  */
 function onEditRelationTypeChange(radioElement) {
-  // console.log('🔧 Edit relation type changed:', radioElement.value);
 
   // מילוי רשימת האובייקטים לפי הסוג שנבחר
   populateEditRelatedObjects(parseInt(radioElement.value));
@@ -1034,7 +1018,6 @@ function onEditRelationTypeChange(radioElement) {
  * @param {HTMLSelectElement} selectElement - אלמנט הבחירה
  */
 function onEditRelatedObjectChange(selectElement) {
-  // console.log('🔧 Edit related object changed:', selectElement.value);
 
   if (selectElement.value) {
     // הפעלת שדות התנאי ישירות
@@ -1113,9 +1096,6 @@ function disableEditConditionFields() {
  * @returns {boolean} true אם נתמך, false אם לא
  */
 function checkAlertVariable(selectElement) {
-  // console.log('🔍 === CHECK ALERT VARIABLE ===');
-  // console.log('🔍 Element:', selectElement);
-  // console.log('🔍 Selected value:', selectElement.value);
 
   // כרגע מאפשרים את כל התכונות
   const selectedValue = selectElement.value;
@@ -1125,7 +1105,6 @@ function checkAlertVariable(selectElement) {
     return false;
   }
 
-  // console.log('✅ Variable accepted:', selectedValue);
   return true;
 }
 
@@ -1139,9 +1118,6 @@ function checkAlertVariable(selectElement) {
  * @returns {boolean} true אם נתמך, false אם לא
  */
 function checkAlertOperator(selectElement) {
-  // console.log('🔍 === CHECK ALERT OPERATOR ===');
-  // console.log('🔍 Element:', selectElement);
-  // console.log('🔍 Selected value:', selectElement.value);
 
   // כרגע מאפשרים את כל האופרטורים
   const selectedValue = selectElement.value;
@@ -1151,7 +1127,6 @@ function checkAlertOperator(selectElement) {
     return false;
   }
 
-  // console.log('✅ Operator accepted:', selectedValue);
   return true;
 }
 
@@ -1727,7 +1702,6 @@ async function updateAlert() {
   };
 
   // מעדכן התראה
-  // console.log('🔍 בדיקת נתונים לפני שליחה:');
   // console.log('- related_type_id:', relatedTypeId, '(valid:', !isNaN(relatedTypeId), ')');
   // console.log('- related_id:', relatedId, '(valid:', !isNaN(relatedId), ')');
   // console.log('- status:', alertData.status);
@@ -1801,7 +1775,6 @@ async function _deleteAlert(alertId) {
  * אישור מחיקת התראה
  */
 async function confirmDeleteAlert(alertId) {
-  // console.log('🔄 confirmDeleteAlert נקראה עבור ID:', alertId);
 
   try {
     const response = await fetch(`/api/alerts/${alertId}`, {
@@ -2141,7 +2114,6 @@ async function deleteAlert(alertId) {
 // Called from PAGE_CONFIGS in core-systems.js
 
 window.initializeAlertsPage = function() {
-    console.log('🔔 Initializing Alerts Page...');
     
     // 1. Initialize modals
     if (typeof window.initializeAlertsModals === 'function') {

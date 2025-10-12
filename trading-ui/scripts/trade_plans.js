@@ -84,7 +84,6 @@ function notify(message, type = 'info', title = '') {
   } else if (window.showNotification) {
     window.showNotification(message, type, notificationTitle);
   } else {
-    console.log(`[${type}] ${notificationTitle}: ${message}`);
   }
 }
 
@@ -97,7 +96,6 @@ function notify(message, type = 'info', title = '') {
  */
 function executeTradePlan(planId) {
   try {
-    console.log('⚡ מבצע תוכנית מסחר:', planId);
     
     // חיפוש התוכנית בנתונים
     const plan = window.tradePlansData.find(p => p.id === planId);
@@ -131,7 +129,6 @@ function executeTradePlan(planId) {
         return response.json();
       })
       .then(data => {
-        console.log('✅ תוכנית מסחר בוצעה:', data);
         loadTradePlansData();
         notify('תוכנית מסחר בוצעה בהצלחה', 'success');
       })
@@ -150,7 +147,6 @@ function executeTradePlan(planId) {
  */
 async function copyTradePlan(planId) {
   try {
-    console.log('📋 מעתיק תוכנית מסחר:', planId);
     
     // חיפוש התוכנית בנתונים
     const plan = window.tradePlansData.find(p => p.id === planId);
@@ -931,7 +927,6 @@ function updateStopPercentageFromPrice() {
   const sideSelect = document.getElementById('addTradePlanSide');
 
   if (!priceInput || !percentInput || !currentPriceDisplay) {
-    console.log('⚠️ updateStopPercentageFromPrice - חסרים אלמנטים');
     return;
   }
 
@@ -940,14 +935,11 @@ function updateStopPercentageFromPrice() {
   const currentPrice = parseFloat(priceText.replace('$', '').trim()) || 0;
   const side = sideSelect?.value || 'Long';
 
-  console.log('🔍 updateStopPercentageFromPrice:', { stopPrice, currentPrice, side, priceText });
 
   if (stopPrice > 0 && currentPrice > 0 && window.calculatePercentageFromPrice) {
     const percentage = window.calculatePercentageFromPrice(currentPrice, stopPrice, side);
-    console.log('✅ חושב אחוז עצירה:', percentage);
     percentInput.value = Math.abs(percentage).toFixed(2);
   } else {
-    console.log('⚠️ לא ניתן לחשב - חסר נתונים או פונקציה');
   }
 }
 
@@ -2237,7 +2229,6 @@ async function loadAddModalData() {
       const accountSelect = document.getElementById('addTradePlanTradingAccount');
       if (accountSelect && !accountSelect.value && accountSelect.options.length > 0) {
         accountSelect.selectedIndex = 0;  // בחר את הראשון
-        console.log('✅ נבחר חשבון ראשון כברירת מחדל:', accountSelect.options[0].text);
       }
     }, 100);
   } else {
@@ -2507,20 +2498,6 @@ function getFieldIdFromServerField(serverField) {
   };
   return fieldMapping[serverField] || null;
 }
-
-/**
- * עריכת תכנון
- */
-function editTradePlan(designId) {
-  // קריאה לפונקציה הגלובלית לפתיחת מודל עריכה
-  if (typeof window.openEditTradePlanModal === 'function') {
-    window.openEditTradePlanModal(designId);
-  } else {
-    handleFunctionNotFound('openEditTradePlanModal');
-    showErrorNotification('Error opening edit modal', 'Edit modal function not found');
-  }
-}
-
 
 /**
  * מחיקת תכנון

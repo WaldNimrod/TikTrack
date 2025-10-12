@@ -892,16 +892,7 @@ window.filteredTradesData = null;
  */
 let _isLoadingTrades = false;
 
-
-// Flag to prevent duplicate loading
-let _isLoadingTrades = false;
 async function loadTradesData() {
-  // Prevent duplicate loading
-  if (_isLoadingTrades) {
-    return window.tradesData || [];
-  }
-  _isLoadingTrades = true;
-
     // מניעת טעינה כפולה
     if (_isLoadingTrades) {
         return window.tradesData || [];
@@ -921,7 +912,6 @@ async function loadTradesData() {
             
             // עדכון נתונים גלובליים
             window.tradesData = data;
-      _isLoadingTrades = false;
             _isLoadingTrades = false;
             
             // הפעלת button-icons לאחר עדכון הטבלה
@@ -945,7 +935,6 @@ async function loadTradesData() {
             const data = result.data || result;
             
             window.tradesData = data;
-      _isLoadingTrades = false;
             updateTradesTable(data);
             _isLoadingTrades = false;
             
@@ -1001,3 +990,4 @@ window.loadTradesData = loadTradesData;
 //     }
 // });
 
+console.log('✅ trades.js v=20251012d loaded successfully - fixed duplicate declarations');

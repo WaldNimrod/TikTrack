@@ -536,6 +536,8 @@
                     </div>
                 </div>
               </div>
+        </div>
+        </div>
         <!-- UI Content Section 5 End -->
       
         <!-- UI Content Section 6 Start-->
@@ -553,106 +555,96 @@
         </div>
         <div class="section-body">
                 <!-- Basic System Colors -->
-                <div class="row">
+                <div class="row mb-3">
                     <div class="col-12">
                         <h5>צבעי מערכת בסיסיים</h5>
-                        <small class="text-muted">צבעי הממשק הכלליים</small>
-              </div>
                     </div>
+                </div>
                 <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3 d-flex align-items-center gap-2">
-                            <label class="form-label mb-0 w-25">צבע ראשי:</label>
-                            <input type="color" id="primaryColor" class="form-control form-control-color color-picker" data-color-key="primaryColor">
-                  </div>
-                        <div class="mb-3 d-flex align-items-center gap-2">
-                            <label class="form-label mb-0 w-25">צבע משני:</label>
-                            <input type="color" id="secondaryColor" class="form-control form-control-color color-picker" data-color-key="secondaryColor">
-                  </div>
-                        <div class="mb-3 d-flex align-items-center gap-2">
-                            <label class="form-label mb-0 w-25">הצלחה:</label>
-                            <input type="color" id="successColor" class="form-control form-control-color color-picker" data-color-key="successColor">
-                </div>
+                    <div class="col-md-2">
+                        <label class="form-label">צבע ראשי</label>
+                        <input type="color" id="primaryColor" class="form-control form-control-color color-picker w-100" data-color-key="primaryColor">
                     </div>
-                    <div class="col-md-6">
-                        <div class="mb-3 d-flex align-items-center gap-2">
-                            <label class="form-label mb-0 w-25">אזהרה:</label>
-                            <input type="color" id="warningColor" class="form-control form-control-color color-picker" data-color-key="warningColor">
-                  </div>
-                        <div class="mb-3 d-flex align-items-center gap-2">
-                            <label class="form-label mb-0 w-25">סכנה:</label>
-                            <input type="color" id="dangerColor" class="form-control form-control-color color-picker" data-color-key="dangerColor">
-                  </div>
-                        <div class="mb-3 d-flex align-items-center gap-2">
-                            <label class="form-label mb-0 w-25">מידע:</label>
-                            <input type="color" id="infoColor" class="form-control form-control-color color-picker" data-color-key="infoColor">
-                </div>
+                    <div class="col-md-2">
+                        <label class="form-label">צבע משני</label>
+                        <input type="color" id="secondaryColor" class="form-control form-control-color color-picker w-100" data-color-key="secondaryColor">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">הצלחה</label>
+                        <input type="color" id="successColor" class="form-control form-control-color color-picker w-100" data-color-key="successColor">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">אזהרה</label>
+                        <input type="color" id="warningColor" class="form-control form-control-color color-picker w-100" data-color-key="warningColor">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">סכנה</label>
+                        <input type="color" id="dangerColor" class="form-control form-control-color color-picker w-100" data-color-key="dangerColor">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">מידע</label>
+                        <input type="color" id="infoColor" class="form-control form-control-color color-picker w-100" data-color-key="infoColor">
                     </div>
                 </div>
 
                 <div class="section-divider"></div>
                 
                 <!-- צבעי מצבים -->
-                <div class="row">
+                <div class="row mb-3">
                     <div class="col-12">
                         <h5>צבעי מצבים</h5>
-              </div>
-                  </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <!-- סטטוסים -->
-                        <div class="mb-3">
-                            <label class="form-label">צבעי סטטוסים:</label>
-                            <div class="d-flex gap-2 align-items-center">
-                                <label class="form-label mb-0">פתוח:</label>
-                                <input type="color" id="statusOpenColor" class="form-control form-control-color color-picker" data-color-key="statusOpenColor">
-                                <label class="form-label mb-0">סגור:</label>
-                                <input type="color" id="statusClosedColor" class="form-control form-control-color color-picker" data-color-key="statusClosedColor">
-                                <label class="form-label mb-0">מבוטל:</label>
-                                <input type="color" id="statusCancelledColor" class="form-control form-control-color color-picker" data-color-key="statusCancelledColor">
-                            </div>
-                        </div>
-                        
-                        <!-- סוגי השקעה -->
-                        <div class="mb-3">
-                            <label class="form-label">סוגי השקעה:</label>
-                            <div class="d-flex gap-2 align-items-center">
-                                <label class="form-label mb-0">סווינג:</label>
-                                <input type="color" id="typeSwingColor" class="form-control form-control-color color-picker" data-color-key="typeSwingColor">
-                                <label class="form-label mb-0">השקעה:</label>
-                                <input type="color" id="typeInvestmentColor" class="form-control form-control-color color-picker" data-color-key="typeInvestmentColor">
-                                <label class="form-label mb-0">פסיבי:</label>
-                                <input type="color" id="typePassiveColor" class="form-control form-control-color color-picker" data-color-key="typePassiveColor">
-                            </div>
-                        </div>
                     </div>
-                    
-                    <div class="col-md-6">
-                        <!-- עדיפויות -->
-                        <div class="mb-3">
-                            <label class="form-label">עדיפויות:</label>
-                            <div class="d-flex gap-2 align-items-center">
-                                <label class="form-label mb-0">גבוהה:</label>
-                                <input type="color" id="priorityHighColor" class="form-control form-control-color color-picker" data-color-key="priorityHighColor">
-                                <label class="form-label mb-0">בינונית:</label>
-                                <input type="color" id="priorityMediumColor" class="form-control form-control-color color-picker" data-color-key="priorityMediumColor">
-                                <label class="form-label mb-0">נמוכה:</label>
-                                <input type="color" id="priorityLowColor" class="form-control form-control-color color-picker" data-color-key="priorityLowColor">
-                            </div>
-                        </div>
-                        
-                        <!-- ערכים מספריים -->
-                        <div class="mb-3">
-                            <label class="form-label">ערכים מספריים:</label>
-                            <div class="d-flex gap-2 align-items-center">
-                                <label class="form-label mb-0">חיובי:</label>
-                                <input type="color" id="valuePositiveColor" class="form-control form-control-color color-picker" data-color-key="valuePositiveColor">
-                                <label class="form-label mb-0">שלילי:</label>
-                                <input type="color" id="valueNegativeColor" class="form-control form-control-color color-picker" data-color-key="valueNegativeColor">
-                                <label class="form-label mb-0">נייטרלי:</label>
-                                <input type="color" id="valueNeutralColor" class="form-control form-control-color color-picker" data-color-key="valueNeutralColor">
-                            </div>
-                        </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2">
+                        <label class="form-label">פתוח</label>
+                        <input type="color" id="statusOpenColor" class="form-control form-control-color color-picker w-100" data-color-key="statusOpenColor">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">סגור</label>
+                        <input type="color" id="statusClosedColor" class="form-control form-control-color color-picker w-100" data-color-key="statusClosedColor">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">מבוטל</label>
+                        <input type="color" id="statusCancelledColor" class="form-control form-control-color color-picker w-100" data-color-key="statusCancelledColor">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">סווינג</label>
+                        <input type="color" id="typeSwingColor" class="form-control form-control-color color-picker w-100" data-color-key="typeSwingColor">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">השקעה</label>
+                        <input type="color" id="typeInvestmentColor" class="form-control form-control-color color-picker w-100" data-color-key="typeInvestmentColor">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">פסיבי</label>
+                        <input type="color" id="typePassiveColor" class="form-control form-control-color color-picker w-100" data-color-key="typePassiveColor">
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-2">
+                        <label class="form-label">עדיפות גבוהה</label>
+                        <input type="color" id="priorityHighColor" class="form-control form-control-color color-picker w-100" data-color-key="priorityHighColor">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">עדיפות בינונית</label>
+                        <input type="color" id="priorityMediumColor" class="form-control form-control-color color-picker w-100" data-color-key="priorityMediumColor">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">עדיפות נמוכה</label>
+                        <input type="color" id="priorityLowColor" class="form-control form-control-color color-picker w-100" data-color-key="priorityLowColor">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">ערך חיובי</label>
+                        <input type="color" id="valuePositiveColor" class="form-control form-control-color color-picker w-100" data-color-key="valuePositiveColor">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">ערך שלילי</label>
+                        <input type="color" id="valueNegativeColor" class="form-control form-control-color color-picker w-100" data-color-key="valueNegativeColor">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">ערך נייטרלי</label>
+                        <input type="color" id="valueNeutralColor" class="form-control form-control-color color-picker w-100" data-color-key="valueNeutralColor">
                     </div>
                 </div>
             </div>

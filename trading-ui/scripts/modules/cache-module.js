@@ -725,27 +725,35 @@ class IndexedDBLayer {
 
     async initialize() {
         if (window.indexedDB) {
-            // Create database instance
+            // Create database instance with timeout
             return new Promise((resolve, reject) => {
+                const timeout = setTimeout(() => {
+                    console.error('❌ IndexedDB open timeout after 5 seconds');
+                    reject(new Error('IndexedDB open timeout'));
+                }, 5000);
+                
                 const request = window.indexedDB.open('UnifiedCacheDB', 2);
                 
                 request.onerror = () => {
-                    console.error('❌ IndexedDB open failed');
+                    clearTimeout(timeout);
+                    console.error('❌ IndexedDB open failed:', request.error);
                     reject(request.error);
                 };
                 
                 request.onsuccess = () => {
+                    clearTimeout(timeout);
                     this.db = request.result;
-                    // console.log('✅ IndexedDB Layer initialized');
+                    console.log('✅ IndexedDB Layer initialized successfully');
                     resolve(true);
                 };
                 
                 request.onupgradeneeded = (event) => {
+                    console.log('🔄 IndexedDB upgrade needed - creating object store...');
                     const db = event.target.result;
                     if (!db.objectStoreNames.contains('unified-cache')) {
                         const store = db.createObjectStore('unified-cache', { keyPath: 'key' });
                         store.createIndex('timestamp', 'timestamp', { unique: false });
-                        // console.log('✅ IndexedDB object store created');
+                        console.log('✅ IndexedDB object store created');
                     }
                 };
             });
@@ -2775,29 +2783,11 @@ window.initializeAllCacheSystems = async function(isInitialLoad = false) {
         };
         
         // Initialize UnifiedCacheManager
-        // Always try to initialize if not already done, or if explicitly requested
-        if (window.UnifiedCacheManager) {
-            if (!window.UnifiedCacheManager.initialized) {
-                await window.UnifiedCacheManager.initialize();
-                results.unifiedCacheManager = window.UnifiedCacheManager.initialized;
-            } else {
-                // Already initialized - verify it's actually working
-                try {
-                    // Quick health check - can we access the DB?
-                    if (window.UnifiedCacheManager.layers?.indexedDB?.db) {
-                        results.unifiedCacheManager = true;
-                    } else {
-                        // DB was deleted (nuclear clear) - re-initialize!
-                        console.warn('⚠️ UnifiedCacheManager marked as initialized but DB missing - re-initializing...');
-                        window.UnifiedCacheManager.initialized = false;
-                        await window.UnifiedCacheManager.initialize();
-                        results.unifiedCacheManager = window.UnifiedCacheManager.initialized;
-                    }
-                } catch (error) {
-                    console.error('❌ UnifiedCacheManager health check failed:', error);
-                    results.unifiedCacheManager = false;
-                }
-            }
+        if (window.UnifiedCacheManager && !window.UnifiedCacheManager.initialized) {
+            await window.UnifiedCacheManager.initialize();
+            results.unifiedCacheManager = window.UnifiedCacheManager.initialized;
+        } else if (window.UnifiedCacheManager?.initialized) {
+            results.unifiedCacheManager = true;
         }
         
         

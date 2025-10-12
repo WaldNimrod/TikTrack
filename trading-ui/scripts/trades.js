@@ -454,15 +454,34 @@ class TradesController {
         const tickerSymbol = trade.ticker_symbol || trade.ticker?.symbol || '-';
         const accountName = trade.account_name || trade.trading_account?.name || '-';
         
-        // תצוגת תוכנית - trade_plan אין לו name, מציגים badge או ID
+        // תצוגת תוכנית - תאריך מקוצר + כמות מניות
         let planDisplay = '-';
         if (trade.trade_plan && trade.trade_plan.id) {
-            // יצירת badge לתוכנית עם קישור
             const planId = trade.trade_plan.id;
-            const planType = trade.trade_plan.investment_type || '';
-            const planSide = trade.trade_plan.side || '';
-            planDisplay = `<span class="badge-capsule-small" style="cursor: pointer;" onclick="viewLinkedItemsForTradePlan(${planId})" title="לחץ לצפייה בפרטים">
-                תכנון #${planId}
+            
+            // תאריך מקוצר - יום/חודש
+            let dateShort = '';
+            if (trade.trade_plan.created_at) {
+                const date = new Date(trade.trade_plan.created_at);
+                const day = date.getDate();
+                const month = date.getMonth() + 1;
+                dateShort = `${day}/${month}`;
+            }
+            
+            // כמות מניות
+            const shares = trade.trade_plan.shares || 
+                          (trade.trade_plan.planned_amount && trade.current_price ? 
+                           Math.floor(trade.trade_plan.planned_amount / trade.current_price) : 0);
+            
+            // הצגה: תאריך + כמות עם קישור למערכת האלמנטים המקושרים
+            planDisplay = `<span class="badge-capsule-small" style="cursor: pointer;" 
+                onclick="viewLinkedItemsForTradePlan(${planId})" 
+                title="לחץ לצפייה בפרטים מלאים של התכנון">
+                <span class="d-flex align-items-center gap-2">
+                    <span class="numeric-ltr">${dateShort}</span>
+                    <span class="separator-pipe">|</span>
+                    <span class="numeric-ltr">${shares || '0'}</span>
+                </span>
             </span>`;
         } else if (trade.trade_plan_id) {
             // יש ID אבל אין נתונים - הצגה בסיסית
@@ -484,8 +503,10 @@ class TradesController {
                 <td class="col-closed">${closedDate}</td>
                 <td class="col-account">${accountName}</td>
                 <td class="col-actions actions-cell">
+                    ${window.createLinkButton ? window.createLinkButton(`viewLinkedItemsForTrade(${trade.id})`) : ''}
                     ${window.createEditButton ? window.createEditButton(`editTrade(${trade.id})`) : ''}
                     ${window.createButton ? window.createButton('VIEW', `viewTrade(${trade.id})`) : ''}
+                    ${window.createCancelButton ? window.createCancelButton('trade', trade.id, trade.status) : ''}
                     ${window.createDeleteButton ? window.createDeleteButton(`deleteTrade(${trade.id})`) : ''}
                 </td>
             </tr>
@@ -874,6 +895,102 @@ window.validateTradeForm = validateTradeForm;
 // Export save function
 window.addTrade = addTrade;
 
+// ========================================
+// פונקציות ביטול והפעלה מחדש
+// ========================================
+
+/**
+ * ביטול טרייד
+ */
+window.cancelTradeRecord = async function(tradeId) {
+    try {
+        // אישור מהמשתמש
+        const confirmed = confirm('האם אתה בטוח שברצונך לבטל את הטרייד?');
+        if (!confirmed) return;
+        
+        // שליחת בקשת עדכון לשרת
+        const response = await fetch(`/api/trades/${tradeId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                status: 'cancelled',
+                cancel_reason: 'בוטל על ידי המשתמש',
+                cancelled_at: new Date().toISOString()
+            })
+        });
+        
+        // טיפול בתגובה
+        await window.CRUDResponseHandler.handleUpdateResponse(response, {
+            successMessage: 'הטרייד בוטל בהצלחה',
+            reloadFn: async () => {
+                // ניקוי מטמון
+                if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+                    await window.UnifiedCacheManager.remove('trades');
+                }
+                // רענון טבלה
+                if (typeof window.loadTradesData === 'function') {
+                    await window.loadTradesData();
+                }
+            },
+            entityName: 'טרייד'
+        });
+        
+    } catch (error) {
+        console.error('Error cancelling trade:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה בביטול הטרייד');
+        }
+    }
+};
+
+/**
+ * הפעלה מחדש של טרייד מבוטל
+ */
+window.reactivateTrade = async function(tradeId) {
+    try {
+        // אישור מהמשתמש
+        const confirmed = confirm('האם אתה בטוח שברצונך להפעיל מחדש את הטרייד?');
+        if (!confirmed) return;
+        
+        // שליחת בקשת עדכון לשרת
+        const response = await fetch(`/api/trades/${tradeId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                status: 'open',
+                cancel_reason: null,
+                cancelled_at: null
+            })
+        });
+        
+        // טיפול בתגובה
+        await window.CRUDResponseHandler.handleUpdateResponse(response, {
+            successMessage: 'הטרייד הופעל מחדש בהצלחה',
+            reloadFn: async () => {
+                // ניקוי מטמון
+                if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+                    await window.UnifiedCacheManager.remove('trades');
+                }
+                // רענון טבלה
+                if (typeof window.loadTradesData === 'function') {
+                    await window.loadTradesData();
+                }
+            },
+            entityName: 'טרייד'
+        });
+        
+    } catch (error) {
+        console.error('Error reactivating trade:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה בהפעלה מחדש של הטרייד');
+        }
+    }
+};
+
 // Export table update function (for sorting and data loading)
 window.updateTradesTable = function(trades) {
     if (window.tradesController) {
@@ -983,4 +1100,4 @@ window.loadTradesData = loadTradesData;
 //     }
 // });
 
-console.log('✅ trades.js v=20251012f loaded successfully - fixed action buttons & trade_plan display');
+console.log('✅ trades.js v=20251012i loaded successfully - trade_plan shows date + shares');

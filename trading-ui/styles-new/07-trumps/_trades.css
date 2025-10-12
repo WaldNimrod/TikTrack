@@ -4,8 +4,8 @@
  * 
  * קובץ זה מכיל רוחבי עמודות ספציפיים לעמוד הטריידים
  * 
- * @version 1.1.0
- * @lastUpdated October 12, 2025 - Removed notes column (12 columns now)
+ * @version 1.2.0
+ * @lastUpdated October 12, 2025 - Added cancel button (5 action buttons)
  * @page trades.html
  * @note This is an exception to the "no 07-trumps for regular pages" rule
  *       Trades page has 12 columns requiring custom width definitions
@@ -79,11 +79,11 @@
     min-width: 90px;
 }
 
-/* עמודת פעולות */
+/* עמודת פעולות - 5 כפתורים: Link, Edit, View, Cancel, Delete */
 .data-table.trades-table .col-actions,
 .data-table[data-table-type="trades"] .col-actions {
-    width: 12%;
-    min-width: 145px;
+    width: 15%;
+    min-width: 190px;
 }
 
 /* ===== Responsive Behavior ===== */
@@ -120,7 +120,7 @@ Total columns: 12 (הוסרה עמודת הערות)
 - created: 8%
 - closed: 8%
 - account: 9%
-- actions: 12%
-Total: ~95% (allows for minor browser variations)
+- actions: 15% (5 כפתורים: Link, Edit, View, Cancel, Delete)
+Total: ~98%
 */
 

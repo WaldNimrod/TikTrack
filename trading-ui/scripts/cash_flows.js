@@ -62,7 +62,8 @@ async function loadCashFlows() {
     window.cashFlowsData = data;
     cashFlowsData = data;
     
-    updatePageSummaryStats();
+    // עדכון סטטיסטיקות - מעביר את הנתונים כפרמטר!
+    updatePageSummaryStats(data);
     
     // יישום צבעי ישויות על כותרות
     if (window.applyEntityColorsToHeaders) {
@@ -837,8 +838,9 @@ async function loadCurrenciesForEditCashFlow() {
 
 /**
  * רינדור טבלת תזרימי מזומנים
+ * @param {Array} cashFlows - מערך תזרימי המזומנים להצגה (אם לא מסופק, משתמש ב-window.cashFlowsData)
  */
-async function renderCashFlowsTable() {
+async function renderCashFlowsTable(cashFlows = null) {
   const tbody = document.querySelector('#cashFlowsTable tbody');
   if (!tbody) {
     console.error('❌ טבלת תזרימי מזומנים לא נמצאה (#cashFlowsTable tbody)');
@@ -847,7 +849,10 @@ async function renderCashFlowsTable() {
 
   tbody.innerHTML = '';
 
-  if (!cashFlowsData || cashFlowsData.length === 0) {
+  // Use parameter if provided, otherwise fallback to global
+  const dataToRender = cashFlows || window.cashFlowsData || [];
+
+  if (!dataToRender || dataToRender.length === 0) {
     tbody.innerHTML = '<tr><td colspan="7" class="text-center">לא נמצאו תזרימי מזומנים</td></tr>';
     return;
   }
@@ -856,7 +861,7 @@ async function renderCashFlowsTable() {
   // וידוא שנתוני חשבונות מסחר נטענו
   await ensureTradingAccountsLoaded();
 
-  cashFlowsData.forEach((cashFlow, index) => {
+  dataToRender.forEach((cashFlow, index) => {
     const row = document.createElement('tr');
     // קבלת שם החשבון מ-trading_account_id
     const accountName = getAccountNameById(cashFlow.trading_account_id) || `חשבון ${cashFlow.trading_account_id}`;
@@ -934,16 +939,15 @@ async function renderCashFlowsTable() {
 /**
  * עדכון סטטיסטיקות סיכום
  */
-function updatePageSummaryStats() {
-  if (!cashFlowsData) {
-    cashFlowsData = [];
-  }
+function updatePageSummaryStats(cashFlows = null) {
+  // Use parameter if provided, otherwise fallback to global
+  const data = cashFlows || window.cashFlowsData || [];
 
-  const totalCashFlows = cashFlowsData.length;
-  const totalDeposits = cashFlowsData
+  const totalCashFlows = data.length;
+  const totalDeposits = data
     .filter(cf => cf.type === 'deposit')
     .reduce((sum, cf) => sum + parseFloat(cf.amount || 0), 0);
-  const totalWithdrawals = cashFlowsData
+  const totalWithdrawals = data
     .filter(cf => cf.type === 'withdrawal')
     .reduce((sum, cf) => sum + parseFloat(cf.amount || 0), 0);
   const currentBalance = totalDeposits - totalWithdrawals;
@@ -1061,11 +1065,11 @@ function updateCashFlowsTable(cashFlows) {
   window.cashFlowsData = cashFlows;
   cashFlowsData = cashFlows;
 
-  // רינדור הטבלה
-  renderCashFlowsTable();
+  // רינדור הטבלה - מעביר את הנתונים כפרמטר!
+  renderCashFlowsTable(cashFlows);
 
-  // עדכון סטטיסטיקות
-  updatePageSummaryStats();
+  // עדכון סטטיסטיקות - מעביר את הנתונים כפרמטר!
+  updatePageSummaryStats(cashFlows);
 }
 
 // הגדרת הפונקציה כגלובלית
@@ -1085,12 +1089,8 @@ function startAutoRefresh() {
   // עדכון נתונים כל 30 שניות
   setInterval(async () => {
     try {
+      // loadCashFlows כבר קורא ל-updatePageSummaryStats בתוכו
       await loadCashFlows();
-      
-      // עדכון סטטיסטיקות
-      if (typeof updatePageSummaryStats === 'function') {
-        updatePageSummaryStats();
-      }
       
     } catch (error) {
       console.error('❌ שגיאה בעדכון אוטומטי:', error);

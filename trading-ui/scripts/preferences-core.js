@@ -1347,10 +1347,15 @@ class PreferencesSystem {
             
             // Save
             await this.manager.save(formData);
+            console.log('✅ Preferences saved to database');
+            
+            // Clear frontend cache to ensure fresh data on next load
+            await this.manager._clearCache();
+            console.log('✅ Frontend cache cleared after save');
             
             // Reload fresh data from API with the SAME profile ID that was saved
             const activeProfile = this.profiles.getActiveProfile();
-            await this.manager.load(null, activeProfile?.id);
+            await this.manager.load(null, activeProfile?.id, true); // Force refresh
             
             // Apply loaded data back to form
             this._applyToForm(this.manager.currentPreferences);
@@ -1437,23 +1442,30 @@ class PreferencesSystem {
             
             // Save defaults
             await this.manager.save(defaults);
+            console.log('✅ Default values saved to database');
             
-            // Reload with correct profile ID
-            const activeProfile = this.profiles.getActiveProfile();
-            await this.manager.load(null, activeProfile?.id, true);
-            this._applyToForm(this.manager.currentPreferences);
-            await this.colors.loadColors();
-            await this.ui.updateCounters(this.manager.currentPreferences);
+            // Clear ALL caches - frontend + backend (same as switchProfile)
+            await this.manager._clearCache();
+            console.log('✅ Frontend cache cleared');
+            
+            // Clear backend cache via API
+            try {
+                await fetch('/api/cache/clear', { method: 'POST' });
+                console.log('✅ Backend cache cleared');
+            } catch (e) {
+                console.warn('⚠️ Could not clear backend cache:', e);
+            }
             
             this.ui.hideLoading('reset');
-            this.ui.showSuccess('העדפות אופסו לברירות מחדל!', 'הדף ירענן בעוד רגע...');
+            this.ui.showSuccess('העדפות אופסו לברירות מחדל!', 'מנקה cache ומרענן...');
             
-            // Hard reload page after short delay
+            // Hard reload page immediately with cache busting (same as switchProfile)
             setTimeout(() => {
                 const url = new URL(window.location.href);
                 url.searchParams.set('_refresh', Date.now());
+                console.log('🔄 Performing hard reload with cache busting...');
                 window.location.replace(url.toString());
-            }, 2000);
+            }, 1500);
             
             return true;
             

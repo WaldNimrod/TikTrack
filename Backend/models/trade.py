@@ -79,7 +79,10 @@ class Trade(BaseModel):
                     "ticker_id": self.trade_plan.ticker_id,
                     "investment_type": self.trade_plan.investment_type,
                     "side": self.trade_plan.side,
-                    "status": self.trade_plan.status
+                    "status": self.trade_plan.status,
+                    "created_at": self.trade_plan.created_at.strftime('%Y-%m-%d %H:%M:%S') if self.trade_plan.created_at else None,
+                    "planned_amount": getattr(self.trade_plan, 'planned_amount', None),
+                    "shares": getattr(self.trade_plan, 'shares', None)
                 }
                 logger.info(f"Trade {self.id}: Using loaded trade_plan: {self.trade_plan.id}")
             else:

@@ -1328,7 +1328,7 @@ class EntityDetailsRenderer {
         
         // כותרת
         const headerTitle = 'ביצוע עסקה';
-        const headerSubtitle = `${executionData.ticker_symbol || ''} - ${executionData.side || ''} - ${this.formatCurrency(executionData.quantity || 0)}`;
+        const headerSubtitle = `${executionData.ticker_symbol || ''} - ${executionData.side || ''} - #${executionData.quantity || 0}`;
         
         return `
             <div class="entity-details-container execution-details">

@@ -848,7 +848,7 @@ class ProfileManager {
             // - Clear Orphan Keys (colorScheme, customColorScheme, etc.)
             // - Clear backend cache via /api/cache/clear
             // - Reload page data from server
-            // - Perform hard reload with cache bypass: location.reload(true)
+            // - Perform hard reload with cache bypass: location.replace(url + ?_refresh=timestamp)
             console.log('🧹 Using unified cache clearing system...');
             
             setTimeout(async () => {
@@ -1438,7 +1438,7 @@ class PreferencesSystem {
             // - Clear Service Caches (EntityDetailsAPI, ExternalDataService, etc.)
             // - Clear backend cache via /api/cache/clear
             // - Reload page data from server
-            // - Perform hard reload with cache bypass: location.reload(true)
+            // - Perform hard reload with cache bypass: location.replace(url + ?_refresh=timestamp)
             console.log('🧹 Using unified cache clearing system...');
             
             setTimeout(async () => {

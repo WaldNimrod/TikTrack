@@ -1202,7 +1202,7 @@ function createTradePlanDetails(item) {
 function createExecutionDetails(item) {
   let details = '';
   if (item.symbol) {details += `<div><strong>סמל:</strong> ${item.symbol}</div>`;}
-  if (item.quantity) {details += `<div><strong>כמות:</strong> ${item.quantity}</div>`;}
+  if (item.quantity) {details += `<div><strong>כמות:</strong> #${item.quantity}</div>`;}
   if (item.price) {details += `<div><strong>מחיר:</strong> ${item.price}</div>`;}
   return details;
 }
@@ -1316,7 +1316,7 @@ function createCSVFromLinkedItems(data, itemType, itemId) {
       createdDate,
       item.symbol || '',
       item.currency || '',
-      item.amount || item.quantity || '',
+      item.quantity ? '#' + item.quantity : (item.amount || ''),
       item.price || '',
       item.target_price || '',
       item.stop_loss || '',

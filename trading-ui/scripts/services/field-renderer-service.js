@@ -18,6 +18,7 @@
  * - רנדור type badges (swing, investment, passive)
  * - רנדור action badges (buy, sale)
  * - רנדור priority badges (high, medium, low)
+ * - רנדור shares/quantity (תמיד עם # prefix)
  * - שימוש ב-date-utils.js לתאריכים
  * - אינטגרציה מלאה עם מערכת צבעים דינמית (3 ווריאנטים)
  */

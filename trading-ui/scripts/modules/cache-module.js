@@ -1478,6 +1478,12 @@ window.clearAllCache = async function(options = {}) {
             try {
                 await indexedDB.deleteDatabase('UnifiedCacheDB');
                 results.cleared.indexedDBDeleted = true;
+                
+                // ✅ CRITICAL: Reset initialized flag so it will re-initialize on refresh!
+                if (window.UnifiedCacheManager) {
+                    window.UnifiedCacheManager.initialized = false;
+                    if (verbose) console.log('☢️ UnifiedCacheManager.initialized reset to false');
+                }
                 if (verbose) console.log('☢️ IndexedDB database DELETED: UnifiedCacheDB');
     } catch (error) {
                 console.warn('⚠️ Failed to delete IndexedDB:', error);
@@ -1589,8 +1595,12 @@ window.clearAllCache = async function(options = {}) {
             
             setTimeout(() => {
                 // Hard reload with cache bypass
-                // שימוש ב-location.reload(true) כדי לאלץ טעינה מהשרת
-                window.location.reload(true);
+                // NOTE: location.reload(true) is DEPRECATED in modern browsers!
+                // Use URL parameter cache busting + location.replace() instead
+                const url = new URL(window.location.href);
+                url.searchParams.set('_refresh', Date.now());
+                console.log(`🔄 Performing hard reload with cache busting: ${url.toString()}`);
+                window.location.replace(url.toString());
             }, reloadDelay);
             
             return results;
@@ -2765,11 +2775,29 @@ window.initializeAllCacheSystems = async function(isInitialLoad = false) {
         };
         
         // Initialize UnifiedCacheManager
-        if (window.UnifiedCacheManager && !window.UnifiedCacheManager.initialized) {
-            await window.UnifiedCacheManager.initialize();
-            results.unifiedCacheManager = window.UnifiedCacheManager.initialized;
-        } else if (window.UnifiedCacheManager?.initialized) {
-            results.unifiedCacheManager = true;
+        // Always try to initialize if not already done, or if explicitly requested
+        if (window.UnifiedCacheManager) {
+            if (!window.UnifiedCacheManager.initialized) {
+                await window.UnifiedCacheManager.initialize();
+                results.unifiedCacheManager = window.UnifiedCacheManager.initialized;
+            } else {
+                // Already initialized - verify it's actually working
+                try {
+                    // Quick health check - can we access the DB?
+                    if (window.UnifiedCacheManager.layers?.indexedDB?.db) {
+                        results.unifiedCacheManager = true;
+                    } else {
+                        // DB was deleted (nuclear clear) - re-initialize!
+                        console.warn('⚠️ UnifiedCacheManager marked as initialized but DB missing - re-initializing...');
+                        window.UnifiedCacheManager.initialized = false;
+                        await window.UnifiedCacheManager.initialize();
+                        results.unifiedCacheManager = window.UnifiedCacheManager.initialized;
+                    }
+                } catch (error) {
+                    console.error('❌ UnifiedCacheManager health check failed:', error);
+                    results.unifiedCacheManager = false;
+                }
+            }
         }
         
         

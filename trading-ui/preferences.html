@@ -537,7 +537,6 @@
                 </div>
               </div>
         </div>
-        </div>
         <!-- UI Content Section 5 End -->
       
         <!-- UI Content Section 6 Start-->
@@ -609,12 +608,12 @@
                 </div>
                 <div class="row">
                     <div class="col-md-2">
-                        <h6 class="text-muted mb-2">סטטוסים</h6>
+                        <h6 class="text-muted mb-2 fw-bold">סטטוסים</h6>
                     </div>
                     <div class="col-md-2"></div>
                     <div class="col-md-2"></div>
                     <div class="col-md-2">
-                        <h6 class="text-muted mb-2">סוגי השקעה</h6>
+                        <h6 class="text-muted mb-2 fw-bold">סוגי השקעה</h6>
                     </div>
                     <div class="col-md-2"></div>
                     <div class="col-md-2"></div>
@@ -659,12 +658,12 @@
                 </div>
                 <div class="row mt-4">
                     <div class="col-md-2">
-                        <h6 class="text-muted mb-2">עדיפויות</h6>
+                        <h6 class="text-muted mb-2 fw-bold">עדיפויות</h6>
                     </div>
                     <div class="col-md-2"></div>
                     <div class="col-md-2"></div>
                     <div class="col-md-2">
-                        <h6 class="text-muted mb-2">ערכים מספריים</h6>
+                        <h6 class="text-muted mb-2 fw-bold">ערכים מספריים</h6>
                     </div>
                     <div class="col-md-2"></div>
                     <div class="col-md-2"></div>
@@ -876,130 +875,128 @@
             </div>
         </div>
         <div class="section-body">
-                <div class="row">
+                <!-- צבעי גרפים -->
+                <div class="row mb-3">
                     <div class="col-12">
                         <h5>צבעי גרפים</h5>
-                        <small class="text-muted">צבעים מיוחדים למערכת הגרפים</small>
-                </div>
                     </div>
+                </div>
                 <div class="row">
-                    <div class="col-md-6">
-                        <h6>צבעי גרפים:</h6>
-                        <div class="mb-3 d-flex align-items-center gap-2">
-                            <label class="form-label mb-0 w-25">רקע גרף:</label>
+                    <div class="col-md-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="form-label mb-0">רקע:</label>
                             <input type="color" id="chartBackgroundColor" class="form-control form-control-color color-picker" data-color-key="chartBackgroundColor">
                         </div>
-                        <div class="mb-3 d-flex align-items-center gap-2">
-                            <label class="form-label mb-0 w-25">גבול גרף:</label>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="form-label mb-0">גבול:</label>
                             <input type="color" id="chartBorderColor" class="form-control form-control-color color-picker" data-color-key="chartBorderColor">
                         </div>
-                        <div class="mb-3 d-flex align-items-center gap-2">
-                            <label class="form-label mb-0 w-25">רשת גרף:</label>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="form-label mb-0">רשת:</label>
                             <input type="color" id="chartGridColor" class="form-control form-control-color color-picker" data-color-key="chartGridColor">
                         </div>
-                        <div class="mb-3 d-flex align-items-center gap-2">
-                            <label class="form-label mb-0 w-25">נקודת גרף:</label>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="form-label mb-0">נקודות:</label>
                             <input type="color" id="chartPointColor" class="form-control form-control-color color-picker" data-color-key="chartPointColor">
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <h6>הגדרות נוספות:</h6>
-                        <div class="mb-3 d-flex align-items-center gap-2">
-                            <label class="form-label mb-0 w-25">צבע ראשי:</label>
+                    <div class="col-md-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="form-label mb-0">ראשי:</label>
                             <input type="color" id="chartPrimaryColor" class="form-control form-control-color color-picker" data-color-key="chartPrimaryColor">
                         </div>
-                        <div class="mb-3 d-flex align-items-center gap-2">
-                            <label class="form-label mb-0 w-25">טקסט גרף:</label>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="form-label mb-0">טקסט:</label>
                             <input type="color" id="chartTextColor" class="form-control form-control-color color-picker" data-color-key="chartTextColor">
                         </div>
-                        <div class="mb-3 d-flex align-items-center gap-2">
-                            <label class="form-label mb-0 w-25">פורמט ייצוא:</label>
-                            <select id="chartExportFormat" class="form-select">
-                                <option value="png">PNG</option>
-                                <option value="jpg">JPG</option>
-                                <option value="svg">SVG</option>
-                                <option value="pdf">PDF</option>
-                            </select>
-                        </div>
-                        <div class="mb-3 d-flex align-items-center gap-2">
-                            <label class="form-label mb-0 w-25">איכות ייצוא:</label>
-                            <select id="chartExportQuality" class="form-select">
-                                <option value="low">נמוכה</option>
-                                <option value="medium">בינונית</option>
-                                <option value="high">גבוהה</option>
-                            </select>
                     </div>
-              </div>
-            </div>
-            
+                </div>
+                
                 <div class="section-divider"></div>
                 
-                <!-- Chart Settings -->
-                <div class="row">
+                <!-- הגדרות גרפים -->
+                <div class="row mb-3">
                     <div class="col-12">
                         <h5>הגדרות גרפים</h5>
-                        <small class="text-muted">הגדרות כלליות למערכת הגרפים</small>
-              </div>
-                  </div>
+                    </div>
+                </div>
                 <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label">ריענון אוטומטי:</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="chartAutoRefresh" checked>
-                                <label class="form-check-label" for="chartAutoRefresh">
-                                    הפעל ריענון אוטומטי של גרפים
-                                </label>
-                  </div>
-                </div>
-                        <div class="mb-3">
-                            <label class="form-label">מרווח ריענון (שניות):</label>
-                            <select id="chartRefreshInterval" class="form-select control-narrow">
-                                <option value="30">30 שניות</option>
-                                <option value="60" selected>1 דקה</option>
-                                <option value="300">5 דקות</option>
-                                <option value="600">10 דקות</option>
-                                <option value="1800">30 דקות</option>
-                </select>
-              </div>
-                        <div class="mb-3">
-                            <label class="form-label">איכות גרפים:</label>
-                            <select id="chartQuality" class="form-select control-narrow">
-                                <option value="low">נמוכה (מהיר)</option>
-                                <option value="medium" selected>בינונית</option>
-                                <option value="high">גבוהה (איטי)</option>
-                </select>
-              </div>
+                    <div class="col-md-3">
+                        <label class="form-label">מרווח ריענון</label>
+                        <select id="chartRefreshInterval" class="form-select">
+                            <option value="30">30 שניות</option>
+                            <option value="60" selected>1 דקה</option>
+                            <option value="300">5 דקות</option>
+                            <option value="600">10 דקות</option>
+                            <option value="1800">30 דקות</option>
+                        </select>
                     </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label">אנימציות גרפים:</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="chartAnimations" checked>
-                                <label class="form-check-label" for="chartAnimations">
-                                    הפעל אנימציות בגרפים
-                                </label>
-                  </div>
-                </div>
-                        <div class="mb-3">
-                            <label class="form-label">מצב אינטראקטיבי:</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="chartInteractive" checked>
-                                <label class="form-check-label" for="chartInteractive">
-                                    הפעל מצב אינטראקטיבי
-                                </label>
-                  </div>
-                </div>
-                        <div class="mb-3">
-                            <label class="form-label">הצג כלי עזר:</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="chartShowTooltips" checked>
-                                <label class="form-check-label" for="chartShowTooltips">
-                                    הצג כלי עזר (tooltips)
-                                </label>
-                  </div>
-                </div>
+                    <div class="col-md-3">
+                        <label class="form-label">איכות גרפים</label>
+                        <select id="chartQuality" class="form-select">
+                            <option value="low">נמוכה</option>
+                            <option value="medium" selected>בינונית</option>
+                            <option value="high">גבוהה</option>
+                        </select>
                     </div>
+                    <div class="col-md-3">
+                        <label class="form-label">פורמט ייצוא</label>
+                        <select id="chartExportFormat" class="form-select">
+                            <option value="png">PNG</option>
+                            <option value="jpg">JPG</option>
+                            <option value="svg">SVG</option>
+                            <option value="pdf">PDF</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">איכות ייצוא</label>
+                        <select id="chartExportQuality" class="form-select">
+                            <option value="low">נמוכה</option>
+                            <option value="medium">בינונית</option>
+                            <option value="high">גבוהה</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="chartAutoRefresh" checked>
+                            <label class="form-check-label" for="chartAutoRefresh">
+                                ריענון אוטומטי
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="chartAnimations" checked>
+                            <label class="form-check-label" for="chartAnimations">
+                                אנימציות
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="chartInteractive" checked>
+                            <label class="form-check-label" for="chartInteractive">
+                                מצב אינטראקטיבי
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="chartShowTooltips" checked>
+                            <label class="form-check-label" for="chartShowTooltips">
+                                כלי עזר (tooltips)
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -821,6 +821,8 @@ class UnifiedAppInitializer {
      * Log success
      */
     logSuccess() {
+        console.log(`🎉 Unified App Initialization Success - ${this.pageInfo.name} (${this.performanceMetrics.totalTime}ms)`);
+        
         // Show success notification
         if (typeof window.showNotification === 'function') {
             window.showNotification('✅ המערכת אותחלה בהצלחה', 'success');

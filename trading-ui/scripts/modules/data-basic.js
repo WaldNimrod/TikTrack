@@ -2214,6 +2214,8 @@ window.loadTableData = async function(tableType, updateFunction, options = {}) {
       data = [];
     }
     
+    console.log(`📊 Loaded ${data.length} records for ${tableType}`);
+    
     // Handle empty data (0 records) - show user-friendly message in table
     if (data.length === 0) {
       const tableId = options.tableId || `${tableType}Table`;

@@ -69,13 +69,13 @@
     <!-- 🔒 LOCKED TEMPLATE ZONE 2 - Main Content Container (DO NOT MODIFY) -->
             <div class="main-content">
         <!-- UI Content Section Top Start-->
-        <div class="top-section" data-section="top">
-            <div class="section-header">
-                <h2><i class="bi bi-gear-fill"></i> העדפות</h2>
-                <div class="header-actions">
+            <div class="top-section" data-section="top">
+                <div class="section-header">
+            <h2><i class="bi bi-gear-fill"></i> העדפות</h2>
+            <div class="header-actions">
                     <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט">
-                        <i class="fas fa-copy"></i> העתק לוג מפורט
-                    </button>
+                            <i class="fas fa-copy"></i> העתק לוג מפורט
+                        </button>
                     <button class="btn btn-success btn-sm" onclick="window.saveAllPreferences()" id="saveAllBtn">
                         <i class="bi bi-save"></i> שמור הכל
                     </button>
@@ -87,9 +87,9 @@
                     </button>
                     <button class="filter-toggle-btn" onclick="toggleAllSections()" id="toggleAllBtn" title="הצג/הסתר כל הסקשנים">
                         <span class="filter-icon">▼</span>
-                    </button>
+                        </button>
                 </div>
-            </div>
+      </div>
             <div class="section-body" id="infoSummary">
                 <div class="card">
                     <div class="card-body">
@@ -129,11 +129,11 @@
                                     <small class="text-muted">גרסת מערכת</small>
                                     <div id="systemVersion" class="fw-bold">3.0</div>
       </div>
+      </div>
         </div>
         </div>
-                    </div>
-                </div>
-            </div>
+        </div>
+        </div>
         </div>
         <!-- UI Content Section Top End -->  
       
@@ -157,15 +157,15 @@
                         <label class="form-label">בחר פרופיל להפעלה</label>
                         <select id="profileSwitchSelect" class="form-select mb-3">
                             <option value="">בחר פרופיל...</option>
-                        </select>
+                    </select>
                         <button class="btn btn-primary w-100" onclick="window.switchToSelectedProfile()" id="switchProfileBtn">
                             <i class="bi bi-arrow-repeat"></i> החלף לפרופיל זה
                         </button>
-                    </div>
+                  </div>
                     
                     <!-- עמודה שמאלית - יצירה ומחיקה -->
                     <div class="col-md-6">
-                        <label class="form-label">שם פרופיל חדש</label>
+                            <label class="form-label">שם פרופיל חדש</label>
                         <input type="text" id="newProfileName" class="form-control mb-3" placeholder="הכנס שם פרופיל">
                         <div class="d-flex gap-2">
                             <button class="btn btn-success flex-fill" onclick="window.createNewProfile()">
@@ -174,11 +174,11 @@
                             <button class="btn btn-danger flex-fill" onclick="window.deleteCurrentProfile()">
                                 <i class="bi bi-trash"></i> מחק פרופיל פעיל
                             </button>
-                        </div>
-                    </div>
+                  </div>
                 </div>
               </div>
             </div>
+          </div>
         <!-- UI Content Section 1 End -->   
       
         <!-- UI Content Section 2 Start-->
@@ -229,6 +229,15 @@
                                 <option value="America/Los_Angeles">America/Los_Angeles (לוס אנג'לס)</option>
                 </select>
               </div>
+                        <div class="mb-3">
+                            <label class="form-label">גודל עמוד בטבלה <span class="text-muted">(עתידי)</span></label>
+                            <select id="tablePageSize" class="form-select control-narrow" disabled>
+                                <option value="10">10</option>
+                                <option value="25" selected>25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+              </div>
                 </div>
                     <div class="col-md-6">
                         <div class="mb-3">
@@ -265,19 +274,10 @@
                                 </label>
               </div>
             </div>
-                        <div class="mb-3">
-                            <label class="form-label">גודל עמוד בטבלה <span class="text-muted">(עתידי)</span>:</label>
-                            <select id="tablePageSize" class="form-select control-narrow" disabled>
-                                <option value="10">10</option>
-                                <option value="25" selected>25</option>
-                                <option value="50">50</option>
-                                <option value="100">100</option>
-                            </select>
               </div>
-                </div>
                     </div>
-        </div>
-        </div>
+                  </div>
+                    </div>
         <!-- UI Content Section 2 End --> 
       
         <!-- UI Content Section 2b Start-->
@@ -291,49 +291,11 @@
                 <button class="filter-toggle-btn" onclick="toggleSection('section2b')" title="הצג/הסתר סקשן">
                     <span class="section-toggle-icon">▼</span>
                 </button>
-            </div>
-        </div>
-        <div class="section-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label">הגדרות התראות:</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="enableNotifications" checked>
-                                <label class="form-check-label" for="enableNotifications">
-                                    הפעל התראות
-                                </label>
-                    </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="notificationPopup" checked>
-                                <label class="form-check-label" for="notificationPopup">
-                                    חלון קופץ התראות
-                                </label>
                   </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="notificationSound" checked>
-                                <label class="form-check-label" for="notificationSound">
-                                    צליל התראות
-                                </label>
-                    </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="notifyOnTradeExecuted" checked>
-                                <label class="form-check-label" for="notifyOnTradeExecuted">
-                                    התראה על ביצוע עסקה
-                                </label>
-                  </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="notifyOnStopLoss" checked>
-                                <label class="form-check-label" for="notifyOnStopLoss">
-                                    התראה על stop loss
-                                </label>
                 </div>
-                
-                <!-- הגדרות קטגוריות התראות -->
-                <div class="notification-categories-section">
-                    <h6 class="text-muted mb-3">קטגוריות התראות:</h6>
-                    
+        <div class="section-body">
                     <div class="row">
+                    <!-- עמודה ימנית - קטגוריות -->
                         <div class="col-md-6">
                             <h6 class="text-primary mb-2">התראות מערכת:</h6>
                             <div class="form-check">
@@ -372,10 +334,54 @@
                                     התראות ממשק משתמש
                                 </label>
                             </div>
+                        
+                        <div class="section-divider my-3"></div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">משך התראה (שניות)</label>
+                            <input type="number" id="notificationDuration" class="form-control" min="1" max="60" value="5">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">היסטוריית התראות מקסימלית</label>
+                            <input type="number" id="notificationMaxHistory" class="form-control" min="10" max="1000" value="100">
+                        </div>
                         </div>
                         
+                    <!-- עמודה שמאלית - הגדרות -->
                         <div class="col-md-6">
-                            <h6 class="text-success mb-2">לוגים לקונסול:</h6>
+                        <h6 class="mb-2">הגדרות התראות:</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="enableNotifications" checked>
+                            <label class="form-check-label" for="enableNotifications">
+                                הפעל התראות
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="notificationPopup" checked>
+                            <label class="form-check-label" for="notificationPopup">
+                                חלון קופץ התראות
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="notificationSound" checked>
+                            <label class="form-check-label" for="notificationSound">
+                                צליל התראות
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="notifyOnTradeExecuted" checked>
+                            <label class="form-check-label" for="notifyOnTradeExecuted">
+                                התראה על ביצוע עסקה
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="notifyOnStopLoss" checked>
+                            <label class="form-check-label" for="notifyOnStopLoss">
+                                התראה על stop loss
+                            </label>
+                        </div>
+                        
+                        <h6 class="text-success mb-2 mt-3">לוגים לקונסול:</h6>
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="console_logs_development_enabled">
                                 <label class="form-check-label" for="console_logs_development_enabled">
@@ -407,25 +413,9 @@
                                 </label>
                             </div>
                         </div>
-                        
-                        <!-- הגדרות נוספות -->
-                        
-                        <div class="mb-3">
-                            <label class="form-label">משך התראה (שניות):</label>
-                            <input type="number" id="notificationDuration" class="form-control" min="1" max="60" value="5">
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">היסטוריית התראות מקסימלית:</label>
-                            <input type="number" id="notificationMaxHistory" class="form-control" min="10" max="1000" value="100">
                         </div>
                     </div>
-                </div>
-        </div>
-        </div>
-        </div>
-        </div>
-        </div>
+                  </div>
         <!-- UI Content Section 2b End --> 
       
         <!-- UI Content Section 3 Start-->
@@ -481,7 +471,7 @@
             </div>
                   </div>
                 </div>
-            </div>
+                  </div>
         <!-- UI Content Section 3 End --> 
       
         <!-- UI Content Section 4 Start-->
@@ -551,15 +541,15 @@
                                 <!-- חשבונות מסחר פעילים נטענים אוטומטית על ידי SelectPopulatorService -->
                             </select>
                         </div>
+                  </div>
                 </div>
+              </div>
             </div>
-        </div>
-        </div>
         <!-- UI Content Section 4 End -->
       
         <!-- UI Content Section 5 Start-->
       <div class="content-section" id="section5">
-        <div class="section-header">
+                <div class="section-header">
             <h2>🎨 צבעים</h2>
             <div class="header-actions">
                 <button class="btn btn-success btn-sm" onclick="window.saveAllPreferences()" title="שמור הכל">
@@ -824,9 +814,9 @@
               </div>
                   </div>
                     </div>
+                  </div>
                     </div>
-                </div>
-            </div>
+                  </div>
         <!-- UI Content Section 5b End --> 
       
         <!-- UI Content Section 7 Start-->
@@ -895,10 +885,10 @@
                                 <option value="medium">בינונית</option>
                                 <option value="high">גבוהה</option>
                             </select>
-                        </div>
                     </div>
-                </div>
-                
+              </div>
+            </div>
+            
                 <div class="section-divider"></div>
                 
                 <!-- Chart Settings -->
@@ -967,12 +957,12 @@
                   </div>
                 </div>
                     </div>
-                  </div>
+                    </div>
+                </div>
+            </div>
+        <!-- UI Content Section 7 End -->
             </div>
         </div>
-        <!-- UI Content Section 7 End -->
-        </div>
-    </div>
     <!-- 🔒 LOCKED TEMPLATE ZONE 3 - End Main Content Container (DO NOT MODIFY) -->
   
     <!-- Scripts moved to bottom of HTML (before </body>) to prevent duplicates -->

@@ -175,74 +175,74 @@
                                 <thead>
                                     <tr>
                                         <th class="col-ticker">
-                                            <button class="sortable-header"
-                                                data-sort-column="0">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(0, window.filteredTradesData || window.tradesData, 'trades', window.updateTradesTable); }">
                                                 טיקר <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-price">
-                                            <button class="sortable-header"
-                                                data-sort-column="1">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, window.filteredTradesData || window.tradesData, 'trades', window.updateTradesTable); }">
                                                 מחיר נוכחי <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-change">
-                                            <button class="sortable-header"
-                                                data-sort-column="2">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(2, window.filteredTradesData || window.tradesData, 'trades', window.updateTradesTable); }">
                                                 שינוי % <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-status">
-                                            <button class="sortable-header"
-                                                data-sort-column="3">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(3, window.filteredTradesData || window.tradesData, 'trades', window.updateTradesTable); }">
                                                 סטטוס <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-type">
-                                            <button class="sortable-header"
-                                                data-sort-column="4">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(4, window.filteredTradesData || window.tradesData, 'trades', window.updateTradesTable); }">
                                                 סוג <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-side">
-                                            <button class="sortable-header"
-                                                data-sort-column="5">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(5, window.filteredTradesData || window.tradesData, 'trades', window.updateTradesTable); }">
                                                 צד <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-plan">
-                                            <button class="sortable-header"
-                                                data-sort-column="6">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(6, window.filteredTradesData || window.tradesData, 'trades', window.updateTradesTable); }">
                                                 תוכנית <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-pnl">
-                                            <button class="sortable-header"
-                                                data-sort-column="7">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(7, window.filteredTradesData || window.tradesData, 'trades', window.updateTradesTable); }">
                                                 רווח/הפסד <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-created">
-                                            <button class="sortable-header"
-                                                data-sort-column="8">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(8, window.filteredTradesData || window.tradesData, 'trades', window.updateTradesTable); }">
                                                 נוצר ב <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-closed">
-                                            <button class="sortable-header"
-                                                data-sort-column="9">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(9, window.filteredTradesData || window.tradesData, 'trades', window.updateTradesTable); }">
                                                 נסגר ב <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-account">
-                                            <button class="sortable-header"
-                                                data-sort-column="10">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(10, window.filteredTradesData || window.tradesData, 'trades', window.updateTradesTable); }">
                                                 חשבון <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-notes">
-                                            <button class="sortable-header"
-                                                data-sort-column="11">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(11, window.filteredTradesData || window.tradesData, 'trades', window.updateTradesTable); }">
                                                 הערות <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
@@ -599,6 +599,6 @@
     <script src="scripts/services/statistics-calculator.js?v=1.0.0"></script>
     
     <!-- Stage 5: Page Script - REQUIRED -->
-    <script src="scripts/trades.js?v=20251012"></script>
+    <script src="scripts/trades.js?v=20251012b"></script>
 </body>
 </html>

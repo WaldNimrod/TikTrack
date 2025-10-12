@@ -467,10 +467,8 @@ class UnifiedAppInitializer {
         await new Promise(resolve => setTimeout(resolve, 50));
         
         // Verify cache system is ready
-        console.log('UnifiedCacheManager available:', !!window.UnifiedCacheManager);
-        
         if (window.UnifiedCacheManager) {
-            console.log('UnifiedCacheManager initialized:', window.UnifiedCacheManager.initialized);
+            // Cache system is available and ready
         }
         
         // Set global flag for other systems
@@ -804,14 +802,6 @@ class UnifiedAppInitializer {
      * Log success
      */
     logSuccess() {
-        console.log('🎉 Unified App Initialization Success!', {
-            page: this.pageInfo.name,
-            type: this.pageInfo.type,
-            systems: this.availableSystems.size,
-            totalTime: `${this.performanceMetrics.totalTime}ms`,
-            stages: this.performanceMetrics.stageTimes
-        });
-        
         // Show success notification
         if (typeof window.showNotification === 'function') {
             window.showNotification('✅ המערכת אותחלה בהצלחה', 'success');

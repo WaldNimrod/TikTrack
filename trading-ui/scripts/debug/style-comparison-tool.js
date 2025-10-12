@@ -135,9 +135,10 @@ function analyzePageStyles() {
     // ===== 6. בדיקת רוחבי עמודות =====
     console.log('%c📏 רוחבי עמודות בטבלה:', 'color: #fc5a06; font-weight: bold; font-size: 14px;');
     const table = document.querySelector('.data-table');
+    let headers = null;
     
     if (table) {
-        const headers = table.querySelectorAll('thead th');
+        headers = table.querySelectorAll('thead th');
         console.log(`   סה"כ עמודות: ${headers.length}`);
         console.log('   רוחבים:');
         
@@ -148,6 +149,8 @@ function analyzePageStyles() {
             const minWidth = computedStyle.minWidth;
             console.log(`     ${i+1}. ${className.padEnd(20)} → width: ${width.padEnd(10)} | min-width: ${minWidth}`);
         });
+    } else {
+        console.log('   ❌ לא נמצאה טבלה');
     }
     console.log('');
     

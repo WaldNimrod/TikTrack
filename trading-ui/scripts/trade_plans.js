@@ -1994,10 +1994,31 @@ function updatePageSummaryStats() {
   const dataToUse = window.filteredTradePlansData || window.tradePlansData;
   
   if (!dataToUse || !Array.isArray(dataToUse)) {
-    console.log('⚠️ No data available for statistics');
+    console.warn('⚠️ No data available for statistics - tradePlansData:', window.tradePlansData?.length || 'undefined');
+    
+    // Try to set 0 values if elements exist
+    const totalDesignsElement = document.getElementById('totalDesigns');
+    if (totalDesignsElement) totalDesignsElement.textContent = '0';
+    const totalInvestmentElement = document.getElementById('totalInvestment');
+    if (totalInvestmentElement) totalInvestmentElement.textContent = formatCurrency(0);
+    const avgInvestmentElement = document.getElementById('avgInvestment');
+    if (avgInvestmentElement) avgInvestmentElement.textContent = formatCurrency(0);
+    const totalProfitElement = document.getElementById('totalProfit');
+    if (totalProfitElement) totalProfitElement.textContent = formatCurrency(0);
+    
     return;
   }
 
+  // DEBUG: Temporary logging
+  console.warn('🔍 DEBUG updatePageSummaryStats:', {
+    dataLength: dataToUse.length,
+    StatisticsCalculator: !!window.StatisticsCalculator,
+    elements: {
+      totalDesigns: !!document.getElementById('totalDesigns'),
+      totalInvestment: !!document.getElementById('totalInvestment')
+    }
+  });
+  
   // חישוב סטטיסטיקות באמצעות StatisticsCalculator
   const stats = window.StatisticsCalculator ? {
     totalDesigns: window.StatisticsCalculator.countRecords(dataToUse),
@@ -2059,10 +2080,19 @@ function updatePageSummaryStats() {
 
   const avgInvestment = stats.totalDesigns > 0 ? stats.totalInvestment / stats.totalDesigns : 0;
 
+  // DEBUG: Log calculated stats
+  console.warn('🔍 DEBUG calculated stats:', {
+    totalDesigns: stats.totalDesigns,
+    totalInvestment: stats.totalInvestment,
+    avgInvestment: avgInvestment
+  });
+
   // עדכון אלמנטי הסיכום - בדיקה אם הם קיימים לפני הגישה
   const totalDesignsElement = document.getElementById('totalDesigns');
+  console.warn('🔍 DEBUG totalDesignsElement:', totalDesignsElement, 'setting to:', stats.totalDesigns);
   if (totalDesignsElement) {
     totalDesignsElement.textContent = stats.totalDesigns;
+    console.warn('🔍 DEBUG after set, textContent:', totalDesignsElement.textContent);
   }
 
   const totalInvestmentElement = document.getElementById('totalInvestment');

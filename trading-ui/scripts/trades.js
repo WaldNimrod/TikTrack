@@ -327,6 +327,11 @@ class TradesController {
             
             const responseData = await response.json();
             this.data = responseData.data || responseData || [];
+            
+            // עדכון גלובלי למיון
+            window.tradesData = this.data;
+            window.filteredTradesData = null;
+            
             console.log(`✅ Loaded ${this.data.length} trades`);
             
             // עדכון טבלה
@@ -409,32 +414,38 @@ class TradesController {
         const tableBody = document.getElementById('tradesTableBody');
         if (!tableBody) return;
         
-        tableBody.innerHTML = '';
+        if (!this.data || this.data.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="13" class="text-center text-muted">אין טריידים להצגה</td></tr>';
+            return;
+        }
         
-        this.data.forEach(trade => {
-            const row = this.createTradeRow(trade);
-            tableBody.appendChild(row);
-        });
+        const tableHTML = this.data.map((trade, index) => {
+            return this.createTradeRowHTML(trade);
+        }).join('');
+        
+        tableBody.innerHTML = tableHTML;
     }
 
     /**
-     * יצירת שורת טרייד
+     * יצירת HTML לשורת טרייד
      */
-    createTradeRow(trade) {
-        const row = document.createElement('tr');
+    createTradeRowHTML(trade) {
+        // שימוש ב-FieldRendererService לעיצוב שדות
+        const statusDisplay = window.FieldRendererService ? 
+            window.FieldRendererService.renderStatus(trade.status) : 
+            `<span class="status-badge-${trade.status?.toLowerCase()}">${trade.status || '-'}</span>`;
         
-        // שימוש ב-FieldRendererService לעיצוב שדות - בלי fallback
-        const statusBadge = window.FieldRendererService ? 
-            window.FieldRendererService.renderStatus(trade.status) : '-';
+        const typeDisplay = window.FieldRendererService ? 
+            window.FieldRendererService.renderType(trade.investment_type) : 
+            (trade.investment_type || '-');
         
-        const typeBadge = window.FieldRendererService ? 
-            window.FieldRendererService.renderType(trade.investment_type) : '-';
+        const sideDisplay = window.FieldRendererService ? 
+            window.FieldRendererService.renderSide(trade.side) : 
+            `<span class="side-badge">${trade.side || '-'}</span>`;
         
-        const sideBadge = window.FieldRendererService ? 
-            window.FieldRendererService.renderSide(trade.side) : '-';
-        
-        const pnlBadge = window.FieldRendererService ? 
-            window.FieldRendererService.renderNumericValue(trade.total_pl || 0, '$', true) : '-';
+        const pnlDisplay = window.FieldRendererService ? 
+            window.FieldRendererService.renderNumericValue(trade.total_pl || 0, '$', true) : 
+            `$${(trade.total_pl || 0).toFixed(2)}`;
         
         const createdDate = window.FieldRendererService ? 
             window.FieldRendererService.renderDate(trade.created_at) : 
@@ -445,44 +456,41 @@ class TradesController {
             (trade.closed_at ? new Date(trade.closed_at).toLocaleDateString('he-IL') : '-');
         
         // מחיר נוכחי מהטיקר (מגיע מה-API עם market data)
-        const currentPrice = (trade.current_price && trade.current_price > 0) ? 
+        const currentPriceDisplay = (trade.current_price && trade.current_price > 0) ? 
             `$${Number(trade.current_price).toFixed(2)}` : 
-            '<span class="text-danger">לא זמין</span>';
+            '<span class="text-danger fw-bold">לא זמין</span>';
         
         // שינוי % מהטיקר (מגיע מה-API עם market data)
-        const changePercent = (trade.daily_change !== null && trade.daily_change !== undefined) ? 
-            window.FieldRendererService.renderNumericValue(trade.daily_change, '%') : 
+        const changePct = (trade.daily_change !== null && trade.daily_change !== undefined) ? 
+            window.FieldRendererService.renderNumericValue(trade.daily_change, '%', true) : 
             '<span class="text-muted">-</span>';
         
-        row.innerHTML = `
-            <td class="col-ticker">${trade.ticker_symbol || trade.ticker?.symbol || 'N/A'}</td>
-            <td class="col-price">${currentPrice}</td>
-            <td class="col-change">${changePercent}</td>
-            <td class="col-status">${statusBadge}</td>
-            <td class="col-type">${typeBadge}</td>
-            <td class="col-side">${sideBadge}</td>
-            <td class="col-plan">${trade.trade_plan?.name || 'N/A'}</td>
-            <td class="col-pnl">${pnlBadge}</td>
-            <td class="col-created">${createdDate}</td>
-            <td class="col-closed">${closedDate}</td>
-            <td class="col-account">${trade.account_name || trade.trading_account?.name || 'N/A'}</td>
-            <td class="col-notes">
-                ${trade.notes ? `<span title="${trade.notes}">📝</span>` : ''}
-            </td>
-            <td class="col-actions actions-cell">
-                <button class="btn btn-sm btn-outline-primary" onclick="editTrade(${trade.id})" title="ערוך">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-info" onclick="viewTrade(${trade.id})" title="צפה">
-                    <i class="fas fa-eye"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-danger" onclick="deleteTrade(${trade.id})" title="מחק">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
-        `;
+        const tickerSymbol = trade.ticker_symbol || trade.ticker?.symbol || '-';
+        const accountName = trade.account_name || trade.trading_account?.name || '-';
+        const planName = trade.trade_plan?.name || '-';
         
-        return row;
+        // כפתורי פעולות - button-icons.js יוסיף את האייקונים
+        return `
+            <tr>
+                <td class="col-ticker">${tickerSymbol}</td>
+                <td class="col-price">${currentPriceDisplay}</td>
+                <td class="col-change">${changePct}</td>
+                <td class="col-status">${statusDisplay}</td>
+                <td class="col-type">${typeDisplay}</td>
+                <td class="col-side">${sideDisplay}</td>
+                <td class="col-plan">${planName}</td>
+                <td class="col-pnl">${pnlDisplay}</td>
+                <td class="col-created">${createdDate}</td>
+                <td class="col-closed">${closedDate}</td>
+                <td class="col-account">${accountName}</td>
+                <td class="col-notes">${trade.notes ? `<span title="${trade.notes}">📝</span>` : ''}</td>
+                <td class="col-actions actions-cell">
+                    <button class="action-btn edit-btn" onclick="editTrade(${trade.id})" title="ערוך" data-entity-type="trade" data-entity-id="${trade.id}"></button>
+                    <button class="action-btn view-btn" onclick="viewTrade(${trade.id})" title="צפה" data-entity-type="trade" data-entity-id="${trade.id}"></button>
+                    <button class="action-btn delete-btn" onclick="deleteTrade(${trade.id})" title="מחק" data-entity-type="trade" data-entity-id="${trade.id}"></button>
+                </td>
+            </tr>
+        `;
     }
 
     /**
@@ -875,6 +883,18 @@ window.validateTradeForm = validateTradeForm;
 // Export save function
 window.addTrade = addTrade;
 
+// Export table update function (for sorting)
+window.updateTradesTable = function(trades) {
+    if (window.tradesController) {
+        window.tradesController.data = trades || window.tradesController.data;
+        window.tradesController.updateTradesTable();
+    }
+};
+
+// Export data arrays for sorting
+window.tradesData = [];
+window.filteredTradesData = null;
+
 // אתחול אוטומטי - הוסר למערכת מאוחדת
 // document.addEventListener('DOMContentLoaded', function() {
 //     if (window.tradesController && !window.tradesController.initialized) {
@@ -882,4 +902,4 @@ window.addTrade = addTrade;
 //     }
 // });
 
-console.log('✅ trades.js v=20251012 loaded successfully - deep fix complete');
+console.log('✅ trades.js v=20251012b loaded successfully - matched to trade_plans structure');

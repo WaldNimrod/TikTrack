@@ -34,36 +34,56 @@ window.initializeCashFlowsModals = function() {
  * טעינת נתוני תזרימי מזומנים מהשרת
  * פונקציה מאוחדת לטעינת נתונים עם טיפול בשגיאות מתקדם
  */
+// Flag to prevent duplicate loading
+let _isLoadingCashFlows = false;
+
 async function loadCashFlows() {
-  
-  // הצגת אינדיקטור טעינה
-  if (typeof window.showInfoNotification === 'function') {
-    window.showInfoNotification('טעינה', 'טוען נתוני תזרימי מזומנים...', 2000, 'ui');
+  // Prevent duplicate loading
+  if (_isLoadingCashFlows) {
+    return window.cashFlowsData || [];
   }
+  _isLoadingCashFlows = true;
   
-  // שימוש במערכת המאוחדת loadTableData (v2.0.0)
-  const data = await window.loadTableData('cash_flows', renderCashFlowsTable, {
-    tableId: 'cashFlowsTable',
-    entityName: 'תזרימי מזומנים',
-    columns: 10,
-    onRetry: loadCashFlows
-  });
-  
-  // שמירת הנתונים הגלובליים
-  window.cashFlowsData = data;
-  cashFlowsData = data;
-  
-  
-  updatePageSummaryStats();
-  
-  // יישום צבעי ישויות על כותרות
-  if (window.applyEntityColorsToHeaders) {
-    window.applyEntityColorsToHeaders('cash_flow');
-  }
-  
-  // הודעת הצלחה (אם יש נתונים)
-  if (data.length > 0 && typeof window.showSuccessNotification === 'function') {
-    window.showSuccessNotification('הצלחה', 'נתוני תזרימי מזומנים נטענו בהצלחה', 3000, 'business');
+  try {
+    // הצגת אינדיקטור טעינה
+    if (typeof window.showInfoNotification === 'function') {
+      window.showInfoNotification('טעינה', 'טוען נתוני תזרימי מזומנים...', 2000, 'ui');
+    }
+    
+    // שימוש במערכת המאוחדת loadTableData (v2.0.0)
+    const data = await window.loadTableData('cash_flows', renderCashFlowsTable, {
+      tableId: 'cashFlowsTable',
+      entityName: 'תזרימי מזומנים',
+      columns: 10,
+      onRetry: loadCashFlows
+    });
+    
+    // שמירת הנתונים הגלובליים
+    window.cashFlowsData = data;
+    cashFlowsData = data;
+    
+    updatePageSummaryStats();
+    
+    // יישום צבעי ישויות על כותרות
+    if (window.applyEntityColorsToHeaders) {
+      window.applyEntityColorsToHeaders('cash_flow');
+    }
+    
+    // הודעת הצלחה (אם יש נתונים)
+    if (data.length > 0 && typeof window.showSuccessNotification === 'function') {
+      window.showSuccessNotification('הצלחה', 'נתוני תזרימי מזומנים נטענו בהצלחה', 3000, 'business');
+    }
+    
+    _isLoadingCashFlows = false;
+    return data;
+    
+  } catch (error) {
+    console.error('❌ שגיאה בטעינת תזרימי מזומנים:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'לא ניתן לטעון נתוני תזרימי מזומנים');
+    }
+    _isLoadingCashFlows = false;
+    return [];
   }
 }
 

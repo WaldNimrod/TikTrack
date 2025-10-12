@@ -1524,6 +1524,19 @@ window.clearAllCache = async function(options = {}) {
             console.log('✅ Cache clearing completed:', results);
         }
         
+        // Auto page reload after successful cache clear
+        if (results.success && !options.skipReload) {
+            console.log('🔄 Auto-reloading page after cache clear...');
+            setTimeout(() => {
+                // Hard reload with cache busting
+                const url = new URL(window.location.href);
+                url.searchParams.delete('_refresh');
+                url.searchParams.set('_refresh', Date.now());
+                console.log('⚡ Hard reload initiated');
+                window.location.replace(url.toString());
+            }, 1500);  // 1.5 seconds to show notification
+        }
+        
         return results;
         
     } catch (error) {

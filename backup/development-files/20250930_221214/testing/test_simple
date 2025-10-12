@@ -1,5 +1,0 @@
-#!/bin/bash
-echo "Start"
-sleep 2
-echo "End"
-exit 0

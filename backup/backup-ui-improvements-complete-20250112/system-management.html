@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Favicon will be set by global-favicon.js -->
+    <title>מנהל מערכת - TikTrack</title>
+    
+    <!-- 
+    ===== IMPORTANT DEVELOPMENT RULES =====
+    
+    CSS RULES:
+    - Only external CSS files are used, following the system's CSS architecture
+    - NO inline styles or styles within the page are allowed in this system
+    - All styling must be defined in external stylesheets according to ITCSS methodology
+    
+    JAVASCRIPT RULES:
+    - All functions are located in external files
+    - NO functions are allowed within the page
+    - All system functions use shared global functions located in dedicated files
+    - Page-specific functions should be centralized only in the page's dedicated script file
+    
+    ======================================
+    -->
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS Files - אחרי Bootstrap כדי לדרוס אותו -->
+    <!-- ITCSS Architecture - Individual Files (September 2025) -->
+    <!-- 🔄 MAJOR ARCHITECTURE CHANGE - September 2025: Individual <link> tags instead of @import -->
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/06-components/_unified-log-display.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/06-components/_pagination-system.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/06-components/_system-management.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=20250111">
+    
+    <!-- Page Headers - Development pages with white background -->
+    <link rel="stylesheet" href="styles-new/06-components/_page-headers.css?v=20250111">
+    
+    <!-- Dynamic Color System Scripts -->
+    
+</head>
+
+<body>
+    <div class="background-wrapper">
+        <!-- Header System -->
+        <div id="unified-header"></div>
+
+        <!-- Page body -->
+        <div class="page-body">
+            <!-- Main content limited in width -->
+            <div class="main-content">
+                <!-- UI Content Section Top Start-->
+                <div class="top-section" data-section="top">
+                    <div class="section-header">
+                        <h2>🔧 מנהל מערכת</h2>
+                        <div class="header-actions">
+                            <button class="btn btn-sm btn-outline-success" id="quickRestartSystemBtn" title="איתחול מהיר של השרת">
+                                <i class="fas fa-redo"></i> איתחול מהיר
+                            </button>
+                            <button class="btn btn-sm btn-outline-warning" id="changeModeSystemBtn" title="שינוי מצב מטמון">
+                                <i class="fas fa-cogs"></i> מצב מטמון
+                            </button>
+                            <button class="btn btn-sm btn-outline-info" id="openServerMonitorBtn" title="פתח דשבורד ניטור שרת">
+                                <i class="fas fa-desktop"></i> ניטור שרת
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
+                                <i class="fas fa-copy"></i> העתק לוג מפורט
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary" onclick="refreshSystemData()" title="רענן נתוני מערכת">
+                                <i class="fas fa-sync-alt"></i> רענן
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- בריאות מערכת - Info Summary -->
+                        <div class="info-summary" id="healthSummary">
+                            <div class="summary-item">
+                                <span class="summary-label">🏥 בריאות מערכת:</span>
+                                <span class="summary-value" id="overallHealthStatus">טוען...</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">📊 ציון כללי:</span>
+                                <span class="summary-value" id="systemScore">טוען...</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">⏱️ זמן תגובה:</span>
+                                <span class="summary-value" id="responseTime">טוען...</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">🔄 זמן פעילות:</span>
+                                <span class="summary-value" id="uptime">טוען...</span>
+                            </div>
+                        </div>
+                        
+                        <!-- תוכן בשתי עמודות -->
+                        <div class="row">
+                            <!-- עמודה שמאלית - סטטוס מהיר -->
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3>📊 סטטוס מהיר</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="status-grid">
+                                            <div class="status-item">
+                                                <span class="status-label">שרת:</span>
+                                                <span class="status-value active" id="serverHealthStats">פעיל</span>
+                                            </div>
+                                            <div class="status-item">
+                                                <span class="status-label">בסיס נתונים:</span>
+                                                <span class="status-value active" id="databaseHealthStats">מחובר</span>
+                                            </div>
+                                            <div class="status-item">
+                                                <span class="status-label">מטמון:</span>
+                                                <span class="status-value active" id="cacheHealthStats">בריא</span>
+                                            </div>
+                                            <div class="status-item">
+                                                <span class="status-label">רשת:</span>
+                                                <span class="status-value active" id="networkHealthStats">יציב</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- עמודה ימנית - התראות ופעולות מהירות -->
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3>🚨 התראות פעילות</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- קומפוננט התראות פעילות -->
+                                        <active-alerts></active-alerts>
+                                        
+                                        <!-- כפתורי פעולה מהירה -->
+                                        <div class="quick-actions">
+                                            <button class="btn btn-primary btn-sm" onclick="refreshSystemData()">
+                                                🔄 רענן נתונים
+                                            </button>
+                                            <button class="btn btn-success btn-sm" onclick="runSystemCheck()">
+                                                🔍 בדיקת מערכת
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Cache Clearing Levels -->
+                                        <div class="mt-3">
+                                            <h6 class="mb-2">🎚️ רמות ניקוי מטמון:</h6>
+                                            <div class="btn-group btn-group-sm w-100" role="group">
+                                                <button class="btn btn-outline-success" 
+                                                        onclick="clearAllCache({ level: 'light' })" 
+                                                        title="Light: Memory + Services בלבד (25% כיסוי)">
+                                                    🟢 Light
+                                                </button>
+                                                <button class="btn btn-outline-primary" 
+                                                        onclick="clearAllCache({ level: 'medium' })" 
+                                                        title="Medium: UnifiedCM + Services (60% כיסוי) - ברירת מחדל">
+                                                    🔵 Medium
+                                                </button>
+                                                <button class="btn btn-outline-warning" 
+                                                        onclick="clearAllCache({ level: 'full' })" 
+                                                        title="Full: כולל Orphan Keys (100% כיסוי) - דורש login מחדש!">
+                                                    🟠 Full
+                                                </button>
+                                                <button class="btn btn-outline-danger" 
+                                                        onclick="clearAllCache({ level: 'nuclear' })" 
+                                                        title="Nuclear: מוחק הכל! (150%+ כיסוי) - חירום בלבד!">
+                                                    ☢️ Nuclear
+                                                </button>
+                                            </div>
+                                            <p class="small text-muted mb-0 mt-1" style="text-align: right;">
+                                                <i class="fas fa-info-circle"></i>
+                                                כפתור 🧹 בתפריט הראשי: Medium | 
+                                                פרטים מלאים: <a href="/cache-test" target="_blank">עמוד בדיקת מטמון</a>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- ביצועי מערכת - Info Summary נוף -->
+                        <h4 class="section-subtitle">📈 ביצועי מערכת</h4>
+                        <div class="info-summary performance-overview" id="performanceSummary">
+                            <div class="summary-item">
+                                <span class="summary-label">💻 מעבד:</span>
+                                <span class="summary-value" id="cpuUsage">טוען...</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">🧠 זיכרון:</span>
+                                <span class="summary-value" id="memoryUsage">טוען...</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">💾 אחסון:</span>
+                                <span class="summary-value" id="diskUsage">טוען...</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">🌐 רשת:</span>
+                                <span class="summary-value" id="networkStatus">טוען...</span>
+                            </div>
+                        </div>
+                        
+                        <!-- קיצורי מקלדת - Keyboard Shortcuts -->
+                        <h4 class="section-subtitle mt-4">⌨️ קיצורי מקלדת</h4>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header bg-success bg-opacity-10">
+                                        <h6 class="mb-0"><i class="fas fa-server"></i> ניהול שרת</h6>
+                                    </div>
+                                    <div class="card-body p-2">
+                                        <div class="shortcuts-list">
+                                            <div class="shortcut-item">
+                                                <kbd>Cmd+Shift+R</kbd>
+                                                <span>איתחול שרת</span>
+                                            </div>
+                                            <div class="shortcut-item">
+                                                <kbd>Cmd+Shift+B</kbd>
+                                                <span>הפעלת שרת</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header bg-warning bg-opacity-10">
+                                        <h6 class="mb-0"><i class="fas fa-trash-alt"></i> מטמון</h6>
+                                    </div>
+                                    <div class="card-body p-2">
+                                        <div class="shortcuts-list">
+                                            <div class="shortcut-item">
+                                                <kbd>Cmd+Shift+K</kbd>
+                                                <span>ניקוי מהיר</span>
+                                            </div>
+                                            <div class="shortcut-item">
+                                                <kbd>Cmd+Shift+Alt+K</kbd>
+                                                <span>ניקוי מלא</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header bg-info bg-opacity-10">
+                                        <h6 class="mb-0"><i class="fas fa-heartbeat"></i> לוגים ובריאות</h6>
+                                    </div>
+                                    <div class="card-body p-2">
+                                        <div class="shortcuts-list">
+                                            <div class="shortcut-item">
+                                                <kbd>Cmd+Shift+H</kbd>
+                                                <span>בדיקת בריאות</span>
+                                            </div>
+                                            <div class="shortcut-item">
+                                                <kbd>Cmd+Shift+L</kbd>
+                                                <span>לוגי שרת</span>
+                                            </div>
+                                            <div class="shortcut-item">
+                                                <kbd>Cmd+Shift+E</kbd>
+                                                <span>לוגי שגיאות</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section Top End -->  
+
+                <!-- UI Content Section System Summary Start-->
+                <div class="content-section" id="systemSummarySection">
+                    <div class="section-header">
+                        <h2>📊 סיכום מערכות</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('systemSummarySection')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <!-- System Cards Grid -->
+                        <div class="row g-4">
+                            <!-- בריאות מערכת -->
+                            <div class="col-md-3">
+                                <div class="card system-summary-card">
+                                    <div class="card-header bg-success bg-opacity-10">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-heartbeat text-success"></i> בריאות מערכת
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="system-status">
+                                            <span class="status-value" id="systemHealthStatus">טוען...</span>
+                                        </div>
+                                        <div class="system-details">
+                                            <small class="text-muted">ציון: <span id="systemHealthScore">טוען...</span></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- ביצועים -->
+                            <div class="col-md-3">
+                                <div class="card system-summary-card">
+                                    <div class="card-header bg-info bg-opacity-10">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-tachometer-alt text-info"></i> ביצועים
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="system-status">
+                                            <span class="status-value" id="systemPerformanceStatus">טוען...</span>
+                                        </div>
+                                        <div class="system-details">
+                                            <small class="text-muted">CPU: <span id="systemCpuUsage">טוען...</span></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- מטמון -->
+                            <div class="col-md-3">
+                                <div class="card system-summary-card">
+                                    <div class="card-header bg-warning bg-opacity-10">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-memory text-warning"></i> מטמון
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="system-status">
+                                            <span class="status-value" id="systemCacheStatus">טוען...</span>
+                                        </div>
+                                        <div class="system-details">
+                                            <small class="text-muted">פגיעות: <span id="systemCacheHitRate">טוען...</span></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- נתונים חיצוניים -->
+                            <div class="col-md-3">
+                                <div class="card system-summary-card">
+                                    <div class="card-header bg-primary bg-opacity-10">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-globe text-primary"></i> נתונים חיצוניים
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="system-status">
+                                            <span class="status-value" id="systemExternalDataStatus">טוען...</span>
+                                        </div>
+                                        <div class="system-details">
+                                            <small class="text-muted">ספקים: <span id="systemExternalDataProviders">טוען...</span></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- התראות -->
+                            <div class="col-md-3">
+                                <div class="card system-summary-card">
+                                    <div class="card-header bg-danger bg-opacity-10">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-exclamation-triangle text-danger"></i> התראות
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="system-status">
+                                            <span class="status-value" id="systemAlertsStatus">טוען...</span>
+                                        </div>
+                                        <div class="system-details">
+                                            <small class="text-muted">פעילות: <span id="systemAlertsCount">טוען...</span></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- אבטחה -->
+                            <div class="col-md-3">
+                                <div class="card system-summary-card">
+                                    <div class="card-header bg-dark bg-opacity-10">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-shield-alt text-dark"></i> אבטחה
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="system-status">
+                                            <span class="status-value" id="systemSecurityStatus">טוען...</span>
+                                        </div>
+                                        <div class="system-details">
+                                            <small class="text-muted">משתמשים: <span id="systemSecurityUsers">טוען...</span></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- גיבויים -->
+                            <div class="col-md-3">
+                                <div class="card system-summary-card">
+                                    <div class="card-header bg-secondary bg-opacity-10">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-save text-secondary"></i> גיבויים
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="system-status">
+                                            <span class="status-value" id="systemBackupStatus">טוען...</span>
+                                        </div>
+                                        <div class="system-details">
+                                            <small class="text-muted">אחרון: <span id="systemBackupLast">טוען...</span></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- לוגים -->
+                            <div class="col-md-3">
+                                <div class="card system-summary-card">
+                                    <div class="card-header bg-light bg-opacity-10">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-file-alt text-muted"></i> לוגים
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="system-status">
+                                            <span class="status-value" id="systemLogsStatus">טוען...</span>
+                                        </div>
+                                        <div class="system-details">
+                                            <small class="text-muted">רשומות: <span id="systemLogsCount">טוען...</span></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section System Summary End-->
+
+                <!-- UI Content Section Cursor Tasks Start-->
+                <div class="content-section" id="cursorTasksSystemSection">
+                    <div class="section-header">
+                        <h2>🎮 Cursor Tasks Integration</h2>
+                        <div class="section-actions">
+                            <button class="btn btn-sm btn-outline-primary" id="openAllDashboardsSystemBtn" title="פתח כל הדשבורדים">
+                                <i class="fas fa-external-link-alt"></i> כל הדשבורדים
+                            </button>
+                        </div>
+                        <button class="filter-toggle-btn" onclick="toggleSection('cursorTasksSystemSection')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <!-- Cursor Tasks Integration -->
+                        <div class="row g-4">
+                            <div class="col-md-4">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-rocket text-success"></i> פעולות מהירות
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="d-grid gap-2">
+                                            <button class="btn btn-success" id="quickStartSystemBtn">
+                                                <i class="fas fa-play"></i> התחלה מהירה
+                                            </button>
+                                            <button class="btn btn-danger" id="quickStopSystemBtn">
+                                                <i class="fas fa-stop"></i> עצירה מהירה
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-database text-warning"></i> מצבי מטמון
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="d-grid gap-2">
+                                            <button class="btn btn-outline-primary" id="devModeSystemBtn">
+                                                <i class="fas fa-code"></i> Development
+                                            </button>
+                                            <button class="btn btn-outline-danger" id="noCacheSystemBtn">
+                                                <i class="fas fa-ban"></i> No Cache
+                                            </button>
+                                            <button class="btn btn-outline-success" id="productionModeSystemBtn">
+                                                <i class="fas fa-industry"></i> Production
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-tools text-info"></i> כלי פיתוח
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="d-grid gap-2">
+                                            <button class="btn btn-outline-info" id="openServerMonitorSystemBtn">
+                                                <i class="fas fa-desktop"></i> ניטור שרת
+                                            </button>
+                                            <button class="btn btn-outline-secondary" id="openExternalDataBtn">
+                                                <i class="fas fa-chart-line"></i> נתונים חיצוניים
+                                            </button>
+                                            <button class="btn btn-outline-dark" id="openCrudTestingBtn">
+                                                <i class="fas fa-vial"></i> בדיקות CRUD
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Current Status Display -->
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-info-circle text-info"></i> סטטוס נוכחי
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-2">
+                                                <strong>שרת:</strong>
+                                                <span id="systemServerStatus" class="badge bg-success">טוען...</span>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <strong>מצב מטמון:</strong>
+                                                <span id="systemCacheMode" class="badge bg-primary">טוען...</span>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <strong>פורט:</strong>
+                                                <span class="badge bg-info">8080</span>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <strong>זמן פעילות:</strong>
+                                                <span id="systemUptime">טוען...</span>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <strong>זיכרון:</strong>
+                                                <span id="systemMemory">טוען...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section Cursor Tasks End-->
+
+                <!-- UI Content Section 1 Start-->
+                <div class="content-section" id="section1">
+                    <div class="section-header">
+                        <h2>📊 סקירה כללית</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <div class="info-summary">
+                            <div>סטטוס מערכת: <strong>פעיל</strong></div>
+                            <div>זמן פעילות: <strong>99.9%</strong></div>
+                            <div>זיכרון זמין: <strong>2.1GB</strong></div>
+                            <div>עדכון אחרון: <strong>לפני 2 דקות</strong></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 1 End -->  
+
+                <!-- UI Content Section Performance Analysis Start-->
+                <div class="content-section" id="performanceAnalysisSection">
+                    <div class="section-header">
+                        <h2>📈 ניתוח ביצועים מתקדם</h2>
+                        <div class="header-actions">
+                            <button class="btn btn-sm btn-outline-primary" onclick="runPerformanceAnalysis()" title="הפעל ניתוח ביצועים">
+                                <i class="fas fa-chart-line"></i> ניתוח ביצועים
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleSection('performanceAnalysisSection')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- Performance Metrics Grid -->
+                        <div class="row g-4">
+                            <!-- CPU Usage -->
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-microchip text-info"></i> שימוש מעבד
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="performance-metric">
+                                            <div class="metric-value" id="cpuUsageMetric">טוען...</div>
+                                            <div class="metric-trend" id="cpuUsageTrend">טוען...</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Memory Usage -->
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-memory text-warning"></i> שימוש זיכרון
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="performance-metric">
+                                            <div class="metric-value" id="memoryUsageMetric">טוען...</div>
+                                            <div class="metric-trend" id="memoryUsageTrend">טוען...</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Disk Usage -->
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-hdd text-secondary"></i> שימוש דיסק
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="performance-metric">
+                                            <div class="metric-value" id="diskUsageMetric">טוען...</div>
+                                            <div class="metric-trend" id="diskUsageTrend">טוען...</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Response Time -->
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-clock text-success"></i> זמן תגובה
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="performance-metric">
+                                            <div class="metric-value" id="responseTimeMetric">טוען...</div>
+                                            <div class="metric-trend" id="responseTimeTrend">טוען...</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Error Rate -->
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-exclamation-triangle text-danger"></i> שיעור שגיאות
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="performance-metric">
+                                            <div class="metric-value" id="errorRateMetric">טוען...</div>
+                                            <div class="metric-trend" id="errorRateTrend">טוען...</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Throughput -->
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-tachometer-alt text-primary"></i> תפוקה
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="performance-metric">
+                                            <div class="metric-value" id="throughputMetric">טוען...</div>
+                                            <div class="metric-trend" id="throughputTrend">טוען...</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Performance Alerts -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-bell text-warning"></i> התראות ביצועים
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="performanceAlertsList">
+                                            <div class="alert alert-info">
+                                                <i class="fas fa-info-circle"></i> אין התראות ביצועים פעילות
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section Performance Analysis End-->
+
+                <!-- UI Content Section Security Monitoring Start-->
+                <div class="content-section" id="securityMonitoringSection">
+                    <div class="section-header">
+                        <h2>🛡️ ניטור אבטחה מתקדם</h2>
+                        <div class="header-actions">
+                            <button class="btn btn-sm btn-outline-primary" onclick="runSecurityScan()" title="הפעל סריקת אבטחה">
+                                <i class="fas fa-shield-alt"></i> סריקת אבטחה
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleSection('securityMonitoringSection')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- Security Metrics Grid -->
+                        <div class="row g-4">
+                            <!-- Threat Detection -->
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-search text-danger"></i> זיהוי איומים
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="security-metric">
+                                            <div class="metric-value" id="threatDetectionMetric">טוען...</div>
+                                            <div class="metric-details">סריקה אחרונה: <span id="lastThreatScan">טוען...</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Access Control -->
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-user-shield text-warning"></i> בקרת גישה
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="security-metric">
+                                            <div class="metric-value" id="accessControlMetric">טוען...</div>
+                                            <div class="metric-details">משתמשים פעילים: <span id="activeUsersCount">טוען...</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Encryption Status -->
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-lock text-success"></i> הצפנה
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="security-metric">
+                                            <div class="metric-value" id="encryptionStatusMetric">טוען...</div>
+                                            <div class="metric-details">רמת הצפנה: <span id="encryptionLevel">טוען...</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Security Logs -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-file-alt text-info"></i> לוגי אבטחה
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="securityLogsList">
+                                            <div class="alert alert-info">
+                                                <i class="fas fa-info-circle"></i> אין לוגי אבטחה פעילים
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section Security Monitoring End-->
+
+                <!-- UI Content Section User Management Start-->
+                <div class="content-section" id="userManagementSection">
+                    <div class="section-header">
+                        <h2>👤 ניהול משתמשים</h2>
+                        <div class="header-actions">
+                            <button class="btn btn-sm btn-outline-primary" onclick="refreshUserData()" title="רענן נתוני משתמשים">
+                                <i class="fas fa-sync-alt"></i> רענן
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleSection('userManagementSection')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- User Statistics -->
+                        <div class="row g-4">
+                            <!-- Active Users -->
+                            <div class="col-md-3">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-users text-success"></i> משתמשים פעילים
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="user-metric">
+                                            <div class="metric-value" id="activeUsersMetric">טוען...</div>
+                                            <div class="metric-details">מחוברים עכשיו</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Total Users -->
+                            <div class="col-md-3">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-user-friends text-info"></i> סה"כ משתמשים
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="user-metric">
+                                            <div class="metric-value" id="totalUsersMetric">טוען...</div>
+                                            <div class="metric-details">רשומים במערכת</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- User Activity -->
+                            <div class="col-md-3">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-chart-line text-warning"></i> פעילות משתמשים
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="user-metric">
+                                            <div class="metric-value" id="userActivityMetric">טוען...</div>
+                                            <div class="metric-details">פעילות היום</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- User Permissions -->
+                            <div class="col-md-3">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-key text-primary"></i> הרשאות
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="user-metric">
+                                            <div class="metric-value" id="userPermissionsMetric">טוען...</div>
+                                            <div class="metric-details">רמות הרשאה</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- User Activity Log -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-history text-secondary"></i> לוג פעילות משתמשים
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="userActivityLog">
+                                            <div class="alert alert-info">
+                                                <i class="fas fa-info-circle"></i> אין פעילות משתמשים אחרונה
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section User Management End-->
+
+                <!-- UI Content Section Data Analysis Start-->
+                <div class="content-section" id="dataAnalysisSection">
+                    <div class="section-header">
+                        <h2>📊 ניתוח נתונים</h2>
+                        <div class="header-actions">
+                            <button class="btn btn-sm btn-outline-primary" onclick="runDataAnalysis()" title="הפעל ניתוח נתונים">
+                                <i class="fas fa-chart-bar"></i> ניתוח נתונים
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleSection('dataAnalysisSection')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- Data Statistics -->
+                        <div class="row g-4">
+                            <!-- Data Volume -->
+                            <div class="col-md-3">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-database text-primary"></i> נפח נתונים
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="data-metric">
+                                            <div class="metric-value" id="dataVolumeMetric">טוען...</div>
+                                            <div class="metric-details">גודל בסיס נתונים</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Data Growth -->
+                            <div class="col-md-3">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-chart-line text-success"></i> צמיחת נתונים
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="data-metric">
+                                            <div class="metric-value" id="dataGrowthMetric">טוען...</div>
+                                            <div class="metric-details">צמיחה יומית</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Data Quality -->
+                            <div class="col-md-3">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-check-circle text-info"></i> איכות נתונים
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="data-metric">
+                                            <div class="metric-value" id="dataQualityMetric">טוען...</div>
+                                            <div class="metric-details">אחוז דיוק</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Data Processing -->
+                            <div class="col-md-3">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-cogs text-warning"></i> עיבוד נתונים
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="data-metric">
+                                            <div class="metric-value" id="dataProcessingMetric">טוען...</div>
+                                            <div class="metric-details">מהירות עיבוד</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Data Reports -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-file-alt text-secondary"></i> דוחות נתונים
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="dataReportsList">
+                                            <div class="alert alert-info">
+                                                <i class="fas fa-info-circle"></i> אין דוחות נתונים זמינים
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section Data Analysis End-->
+
+                <!-- UI Content Section Configuration Management Start-->
+                <div class="content-section" id="configurationManagementSection">
+                    <div class="section-header">
+                        <h2>⚙️ ניהול תצורה</h2>
+                        <div class="header-actions">
+                            <button class="btn btn-sm btn-outline-primary" onclick="refreshConfiguration()" title="רענן תצורת מערכת">
+                                <i class="fas fa-sync-alt"></i> רענן תצורה
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleSection('configurationManagementSection')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- Configuration Status -->
+                        <div class="row g-4">
+                            <!-- System Configuration -->
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-cog text-primary"></i> תצורת מערכת
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="config-metric">
+                                            <div class="metric-value" id="systemConfigStatus">טוען...</div>
+                                            <div class="metric-details">סטטוס תצורה</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Environment Settings -->
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-server text-info"></i> הגדרות סביבה
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="config-metric">
+                                            <div class="metric-value" id="environmentSettings">טוען...</div>
+                                            <div class="metric-details">סביבת עבודה</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Dependencies -->
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-link text-warning"></i> תלויות
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="config-metric">
+                                            <div class="metric-value" id="dependenciesStatus">טוען...</div>
+                                            <div class="metric-details">סטטוס תלויות</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Configuration Details -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-list text-secondary"></i> פרטי תצורה
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="configurationDetails">
+                                            <div class="alert alert-info">
+                                                <i class="fas fa-info-circle"></i> אין פרטי תצורה זמינים
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section Configuration Management End-->
+
+                <!-- UI Content Section 2 Start-->
+                <div class="content-section" id="section2">
+                    <div class="section-header">
+                        <h2>🌐 נתונים חיצוניים</h2>
+                        <div class="header-actions">
+                            <a href="external-data-dashboard.html" class="btn btn-sm btn-outline-primary" title="עמוד ניהול נתונים חיצוניים">
+                                <i class="fas fa-external-link-alt"></i> ניהול מתקדם
+                            </a>
+                            <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- External Data Summary -->
+                        <div class="info-summary external-data-overview" id="externalDataSummary">
+                            <div class="summary-item">
+                                <span class="summary-label">🌐 ספקים פעילים:</span>
+                                <span class="summary-value" id="activeProvidersCount">טוען...</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">📊 נתונים מעודכנים:</span>
+                                <span class="summary-value" id="lastDataUpdate">טוען...</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">✅ דיוק נתונים:</span>
+                                <span class="summary-value" id="dataAccuracy">טוען...</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">💾 מטמון:</span>
+                                <span class="summary-value" id="cacheStatus">טוען...</span>
+                            </div>
+                        </div>
+                        
+                        <!-- External Data Details -->
+                        <div class="external-data-details">
+                            <h4>ספקי נתונים</h4>
+                            <div class="provider-list" id="providerList">
+                                <!-- Providers will be loaded dynamically -->
+                            </div>
+                            
+                            <div class="mt-3">
+                                <small class="text-muted">
+                                    💡 לניהול מתקדם של נתונים חיצוניים, השתמש בעמוד 
+                                    <a href="external-data-dashboard.html" class="text-primary">ניהול נתונים חיצוניים</a>
+                                </small>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <!-- UI Content Section 3 End--> 
+
+                <!-- UI Content Section 4 Start-->
+                <div class="content-section" id="section3">
+                    <div class="section-header entity-test-sub-header">
+                        <h2>🚨 התראות מערכת</h2>
+                        <div class="header-actions">
+                            <a href="notifications-center.html" class="btn btn-sm btn-outline-primary" title="מרכז התראות מתקדם">
+                                <i class="fas fa-external-link-alt"></i> מרכז התראות
+                            </a>
+                            <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- Alerts Summary -->
+                        <div class="info-summary alerts-overview" id="alertsSummary">
+                            <div class="summary-item">
+                                <span class="summary-label">❌ שגיאות:</span>
+                                <span class="summary-value" id="errorCount">0</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">⚠️ אזהרות:</span>
+                                <span class="summary-value" id="warningCount">0</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">ℹ️ מידע:</span>
+                                <span class="summary-value" id="infoCount">0</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">✅ סך הכל:</span>
+                                <span class="summary-value" id="totalAlerts">0</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Active Alerts -->
+                        <div class="active-alerts-container">
+                            <h4>התראות פעילות</h4>
+                            <div class="alerts-list" id="alerts-list">
+                                <!-- התראות יטענו אוטומטית מהמערכת הגלובלית -->
+                                <active-alerts></active-alerts>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <small class="text-muted">
+                                    💡 לניהול מתקדם של התראות, השתמש בעמוד 
+                                    <a href="notifications-center.html" class="text-primary">מרכז התראות</a>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 4 End--> 
+
+                <!-- UI Content Section 5 Start-->
+                <div class="content-section" id="section4">
+                    <div class="section-header entity-test-sub-header">
+                        <h2>🔒 אבטחה</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <!-- אבטחה - Info Summary -->
+                        <div class="info-summary security-overview" id="securitySummary">
+                            <div class="summary-item">
+                                <span class="summary-label">🛡️ סטטוס אבטחה:</span>
+                                <span class="summary-value" id="securityStatus">טוען...</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">🔐 הצפנה:</span>
+                                <span class="summary-value" id="encryptionStatus">טוען...</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">👤 משתמשים פעילים:</span>
+                                <span class="summary-value" id="activeUsers">טוען...</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">🚨 התראות אבטחה:</span>
+                                <span class="summary-value" id="securityAlerts">טוען...</span>
+                            </div>
+                        </div>
+                        
+                        <!-- תוכן בשתי עמודות -->
+                        <div class="row">
+                            <!-- עמודה שמאלית - ניטור איומים -->
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3>🛡️ ניטור איומים</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="status-card">
+                                            <div class="card-header">
+                                                <h3>ניטור איומים</h3>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="security-status safe">מערכת מאובטחת</div>
+                                                <div class="security-details">סריקה אחרונה: לפני 5 דקות</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- עמודה ימנית - בקרת גישה -->
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3>👤 בקרת גישה</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="status-card">
+                                            <div class="card-header">
+                                                <h3>בקרת גישה</h3>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="security-status safe">פעיל</div>
+                                                <div class="security-details">משתמשים מחוברים: 1</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 5 End--> 
+
+
+                <!-- UI Content Section 7 Start-->
+                <div class="content-section" id="section6">
+                    <div class="section-header entity-test-sub-header">
+                        <h2>💾 גיבויים ושחזור</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section6')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <!-- תוכן בשתי עמודות -->
+                        <div class="row">
+                            <!-- עמודה שמאלית - גיבויים אוטומטיים -->
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3>🔄 גיבויים אוטומטיים</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="status-card">
+                                            <div class="card-header">
+                                                <h3>גיבויים אוטומטיים</h3>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="backup-info">
+                                                    <div class="backup-schedule">
+                                                        <strong>📅 לוח זמנים:</strong> גיבוי יומי בשעה 02:00
+                                                    </div>
+                                                    <div class="backup-location">
+                                                        <strong>📁 מיקום:</strong> /backups/system_backup_YYYY-MM-DD.sql
+                                                    </div>
+                                                    <div class="backup-size">
+                                                        <strong>📊 גודל:</strong> <span id="lastBackupSize">טוען...</span>
+                                                    </div>
+                                                    <div class="backup-last">
+                                                        <strong>🕐 אחרון:</strong> <span id="lastBackupDate">טוען...</span>
+                                                    </div>
+                                                    <div class="backup-status">
+                                                        <strong>✅ סטטוס:</strong> <span id="backupStatus">בודק...</span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="backup-contents">
+                                                    <strong>📋 מה כולל הגיבוי:</strong>
+                                                    <ul class="backup-list">
+                                                        <li>🗄️ בסיס נתונים מלא (SQLite)</li>
+                                                        <li>📊 כל הטבלאות והנתונים</li>
+                                                        <li>⚙️ הגדרות מערכת</li>
+                                                        <li>🔧 קונפיגורציות</li>
+                                                        <li>📝 לוגים מערכת</li>
+                                                        <li>🎨 קבצי CSS ו-JS</li>
+                                                    </ul>
+                                                    <div class="backup-info mt-2">
+                                                        <small class="text-muted">
+                                                            🔒 הגיבוי מוצפן ומאובטח - ניתן לשחזר בכל עת
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                                <button class="btn btn-primary" onclick="runBackup()">הפעל גיבוי עכשיו</button>
+                                        <div class="backup-status mt-3">
+                                            <small class="text-muted">
+                                                💡 <strong>טיפ:</strong> הגיבוי כולל את כל הנתונים, הגדרות ולוגים של המערכת
+                                            </small>
+                                        </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- עמודה ימנית - שחזור מערכת -->
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3>🔄 שחזור מערכת</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="status-card">
+                                            <div class="card-header">
+                                                <h3>שחזור מערכת</h3>
+                                            </div>
+                                            <div class="card-body">
+                                                <p>שחזור מגיבוי אחרון</p>
+                                                <button class="btn btn-warning" onclick="restoreFromBackup()">שחזר מערכת</button>
+                                                <div class="restore-warning mt-3">
+                                                    <small class="text-warning">
+                                                        ⚠️ <strong>אזהרה:</strong> שחזור ימחק את כל הנתונים הנוכחיים
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 7 End--> 
+
+                <!-- UI Content Section 8 Start - Unified Log System -->
+                <div class="content-section" id="section8">
+                    <div class="section-header entity-test-sub-header">
+                        <h2>📊 מערכת לוגים מאוחדת</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section8')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <!-- Log Type Selection -->
+                        <div class="log-type-selection mb-3">
+                            <div class="btn-group" role="group" aria-label="בחירת סוג לוג">
+                                <button type="button" class="btn btn-outline-primary" onclick="showNotificationLog()">
+                                    <i class="fas fa-bell"></i> התראות
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="showSystemLogs()">
+                                    <i class="fas fa-cog"></i> מערכת
+                                </button>
+                                <button type="button" class="btn btn-outline-danger" onclick="showErrorReports()">
+                                    <i class="fas fa-exclamation-triangle"></i> שגיאות
+                                </button>
+                                <button type="button" class="btn btn-outline-info" onclick="showLinterLog()">
+                                    <i class="fas fa-code"></i> Linter
+                                </button>
+                                <button type="button" class="btn btn-outline-success" onclick="showFileMappings()">
+                                    <i class="fas fa-folder"></i> קבצים
+                                </button>
+                                <button type="button" class="btn btn-outline-info" onclick="showExternalDataLog()">
+                                    <i class="fas fa-globe"></i> נתונים חיצוניים
+                                </button>
+                                <button type="button" class="btn btn-outline-warning" onclick="showServerAppLogs()">
+                                    <i class="fas fa-server"></i> לוג שרת - אפליקציה
+                                </button>
+                                <button type="button" class="btn btn-outline-danger" onclick="showServerErrorLogs()">
+                                    <i class="fas fa-exclamation-triangle"></i> לוג שרת - שגיאות
+                                </button>
+                                <button type="button" class="btn btn-outline-warning" onclick="showServerPerformanceLogs()">
+                                    <i class="fas fa-tachometer-alt"></i> לוג שרת - ביצועים
+                                </button>
+                                <button type="button" class="btn btn-outline-info" onclick="showServerDatabaseLogs()">
+                                    <i class="fas fa-database"></i> לוג שרת - בסיס נתונים
+                                </button>
+                                <button type="button" class="btn btn-outline-success" onclick="showBackgroundTasksFileLog()">
+                                    <i class="fas fa-tasks"></i> לוג שרת - משימות ברקע
+                                </button>
+                                <button type="button" class="btn btn-outline-success" onclick="showCacheLog()">
+                                    <i class="fas fa-memory"></i> לוג מטמון
+                                </button>
+                            </div>
+                            
+                            <!-- Test All Log Types Button -->
+                            <div class="mt-3">
+                                <button type="button" class="btn btn-primary" onclick="testAllLogTypes()">
+                                    <i class="fas fa-vial"></i> בדוק את כל סוגי הלוגים
+                                </button>
+                                <small class="text-muted ms-2">
+                                    <i class="fas fa-info-circle"></i>
+                                    בדיקה מקיפה של כל סוגי הנתונים במערכת
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Unified Log Display Container -->
+                        <div id="unified-logs-container" class="unified-logs-container">
+                            <div class="d-flex justify-content-center align-items-center h-100">
+                                <div class="text-center">
+                                    <i class="fas fa-mouse-pointer fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted">לחץ על אחד מהכפתורים למעלה כדי להציג לוג במערכת החדשה</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 8 End - Unified Log System -->
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- מערכת כללית חדשה - 8 מודולים מאוחדים -->
+    
+    <!-- Load the new general systems architecture -->
+    <script src="scripts/modules/core-systems.js?v=20251006"></script>
+    <script src="scripts/modules/ui-basic.js?v=20251006"></script>
+    <script src="scripts/modules/data-basic.js?v=20251006"></script>
+    <script src="scripts/modules/ui-advanced.js?v=20251006"></script>
+    <script src="scripts/modules/data-advanced.js?v=20251006"></script>
+    <script src="scripts/modules/business-module.js?v=20251006"></script>
+    <script src="scripts/modules/communication-module.js?v=20251006"></script>
+    <script src="scripts/modules/cache-module.js?v=20251006"></script>
+    
+    <!-- Page Initialization Configurations -->
+    <!-- PAGE_CONFIGS integrated in core-systems.js -->
+    
+    <!-- Global Systems -->
+    <script src="scripts/global-favicon.js?v=20251006"></script>
+    <script src="scripts/translation-utils.js?v=20251006"></script>
+    <script src="scripts/header-system.js?v=v6.0.0"></script>
+    <script src="scripts/date-utils.js?v=20251006"></script>
+    <script src="scripts/button-icons.js?v=20251006"></script>
+    <script src="scripts/page-utils.js?v=20251006"></script>
+    <script src="scripts/preferences.js?v=20251006"></script>
+    <script src="scripts/notification-category-detector.js?v=20251006"></script>
+    <script src="scripts/global-notification-collector.js?v=20251006"></script>
+    <script src="scripts/entity-details-modal.js?v=20251006"></script>
+    <script src="scripts/warning-system.js?v=20251006"></script>
+    
+    <!-- Page-specific Script -->
+    <script src="scripts/system-management.js?v=20251006"></script>
+    
+    <!-- Unified Log System -->
+    <script src="scripts/pagination-system.js"></script>
+    <script src="scripts/unified-log-manager.js"></script>
+    <script src="scripts/unified-log-display.js"></script>
+    <script src="scripts/unified-log-api.js"></script>
+
+    <!-- 🔓 TEMPLATE ZONE 6 - Page-Specific Scripts (ADD NEW SCRIPTS HERE) -->
+    <!-- No manual DOMContentLoaded listener needed - handled by unified system -->
+</body>
+</html>
+

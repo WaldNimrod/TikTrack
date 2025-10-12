@@ -69,25 +69,27 @@
     <!-- 🔒 LOCKED TEMPLATE ZONE 2 - Main Content Container (DO NOT MODIFY) -->
             <div class="main-content">
         <!-- UI Content Section Top Start-->
-            <div class="top-section" data-section="top">
-                <div class="section-header">
-            <h2><i class="bi bi-gear-fill"></i> העדפות</h2>
-            <div class="header-actions">
+        <div class="top-section" data-section="top">
+            <div class="section-header">
+                <h2><i class="bi bi-gear-fill"></i> העדפות</h2>
+                <div class="header-actions">
                     <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט">
-                            <i class="fas fa-copy"></i> העתק לוג מפורט
-                        </button>
+                        <i class="fas fa-copy"></i> העתק לוג מפורט
+                    </button>
                     <button class="btn btn-success btn-sm" onclick="window.saveAllPreferences()" id="saveAllBtn">
                         <i class="bi bi-save"></i> שמור הכל
                     </button>
                     <button class="btn btn-warning btn-sm" onclick="window.resetToDefaults()" id="resetBtn">
                         <i class="bi bi-arrow-clockwise"></i> איפוס
                     </button>
-                    <button class="filter-toggle-btn" onclick="window.toggleAllSections()" id="toggleAllBtn" title="הצג/הסתר סקשן">
-                            <span class="filter-icon">▲</span>
-                        </button>
-                    </div>
+                    <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר סקשן עליון">
+                        <span class="section-toggle-icon">▼</span>
+                    </button>
+                    <button class="filter-toggle-btn" onclick="toggleAllSections()" id="toggleAllBtn" title="הצג/הסתר כל הסקשנים">
+                        <span class="filter-icon">▼</span>
+                    </button>
                 </div>
-      </div>
+            </div>
             <div class="section-body" id="infoSummary">
                 <div class="card">
                     <div class="card-body">
@@ -129,8 +131,9 @@
       </div>
         </div>
         </div>
-        </div>
-        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <!-- UI Content Section Top End -->  
       
@@ -139,42 +142,75 @@
         <div class="section-header">
             <h2>👤 ניהול פרופילים</h2>
             <div class="header-actions">
-                <button class="filter-toggle-btn" onclick="window.toggleSection('section1')" title="הצג/הסתר סקשן">
+                <button class="btn btn-success btn-sm" onclick="window.saveAllPreferences()" title="שמור הכל">
+                    <i class="bi bi-save"></i> שמור
+                </button>
+                <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
                     <span class="section-toggle-icon">▼</span>
                 </button>
             </div>
         </div>
                 <div class="section-body">
+                <!-- הצגת פרופיל פעיל -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <strong>📌 פרופיל פעיל נוכחי:</strong> 
+                            <span id="currentActiveProfile" class="fw-bold">טוען...</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- בחירת פרופיל להחלפה -->
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label class="form-label">פרופיל נוכחי</label>
-                            <select id="profileSelect" class="form-select">
-                                <option>ברירת מחדל</option>
-                    </select>
-                  </div>
-                  </div>
+                            <label class="form-label">בחר פרופיל להפעלה</label>
+                            <select id="profileSwitchSelect" class="form-select">
+                                <option value="">בחר פרופיל...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">&nbsp;</label>
+                            <button class="btn btn-primary w-100" onclick="window.switchToSelectedProfile()" id="switchProfileBtn">
+                                <i class="bi bi-arrow-repeat"></i> החלף לפרופיל זה
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ניהול פרופילים -->
+                <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label class="form-label">שם פרופיל חדש</label>
                             <input type="text" id="newProfileName" class="form-control" placeholder="הכנס שם פרופיל">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">&nbsp;</label>
+                            <button class="btn btn-success w-100" onclick="window.createNewProfile()">
+                                <i class="bi bi-plus-circle"></i> צור פרופיל חדש
+                            </button>
+                        </div>
+                    </div>
                 </div>
-              </div>
-            </div>
+                
                 <div class="row">
-                  <div class="col-12">
+                    <div class="col-12">
                         <div class="profile-buttons d-flex flex-wrap gap-2">
-                            <button class="btn btn-primary" onclick="window.saveAsActiveProfile()">
-                                <i class="bi bi-save"></i> שמור כפרופיל פעיל
+                            <button class="btn btn-danger" onclick="window.deleteCurrentProfile()">
+                                <i class="bi bi-trash"></i> מחק פרופיל פעיל
                             </button>
-                            <button class="btn btn-danger" onclick="window.deleteProfile()">
-                                <i class="bi bi-trash"></i> מחק
-                            </button>
-                  </div>
+                        </div>
+                    </div>
                 </div>
               </div>
             </div>
-          </div>
+        </div>
         <!-- UI Content Section 1 End -->   
       
         <!-- UI Content Section 2 Start-->
@@ -182,7 +218,10 @@
         <div class="section-header">
             <h2>🏦 הגדרות בסיסיות</h2>
             <div class="header-actions">
-                <button class="filter-toggle-btn" onclick="window.toggleSection('section2')" title="הצג/הסתר סקשן">
+                <button class="btn btn-success btn-sm" onclick="window.saveAllPreferences()" title="שמור הכל">
+                    <i class="bi bi-save"></i> שמור
+                </button>
+                <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
                     <span class="section-toggle-icon">▼</span>
                 </button>
             </div>
@@ -393,10 +432,10 @@
                     </div>
                 </div>
                     </div>
-                  </div>
-                    </div>
-                  </div>
                 </div>
+        </div>
+        </div>
+        </div>
         <!-- UI Content Section 2 End--> 
       
         <!-- UI Content Section 3 Start-->
@@ -404,7 +443,10 @@
                 <div class="section-header">
             <h2>📈 הגדרות מסחר</h2>
             <div class="header-actions">
-                <button class="filter-toggle-btn" onclick="window.toggleSection('section3')" title="הצג/הסתר סקשן">
+                <button class="btn btn-success btn-sm" onclick="window.saveAllPreferences()" title="שמור הכל">
+                    <i class="bi bi-save"></i> שמור
+                </button>
+                <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
                     <span class="section-toggle-icon">▼</span>
                 </button>
             </div>
@@ -449,7 +491,7 @@
             </div>
                   </div>
                 </div>
-                  </div>
+            </div>
         <!-- UI Content Section 3 End--> 
       
         <!-- UI Content Section 4 Start-->
@@ -457,7 +499,10 @@
                 <div class="section-header">
             <h2>🔍 פילטרים ברירת מחדל</h2>
             <div class="header-actions">
-                <button class="filter-toggle-btn" onclick="window.toggleSection('section4')" title="הצג/הסתר סקשן">
+                <button class="btn btn-success btn-sm" onclick="window.saveAllPreferences()" title="שמור הכל">
+                    <i class="bi bi-save"></i> שמור
+                </button>
+                <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
                     <span class="section-toggle-icon">▼</span>
                 </button>
             </div>
@@ -516,18 +561,21 @@
                                 <!-- חשבונות מסחר פעילים נטענים אוטומטית על ידי SelectPopulatorService -->
                             </select>
                         </div>
-                  </div>
                 </div>
-              </div>
             </div>
-        <!-- UI Content Section 4 End--> 
+        </div>
+        </div>
+        <!-- UI Content Section 4 End-->
       
         <!-- UI Content Section 5 Start-->
       <div class="content-section" id="section5">
-                <div class="section-header">
+        <div class="section-header">
             <h2>🎨 צבעים</h2>
             <div class="header-actions">
-                <button class="filter-toggle-btn" onclick="window.toggleSection('section5')" title="הצג/הסתר סקשן">
+                <button class="btn btn-success btn-sm" onclick="window.saveAllPreferences()" title="שמור הכל">
+                    <i class="bi bi-save"></i> שמור
+                </button>
+                <button class="filter-toggle-btn" onclick="toggleSection('section5')" title="הצג/הסתר סקשן">
                     <span class="section-toggle-icon">▼</span>
                 </button>
             </div>
@@ -705,9 +753,9 @@
               </div>
                   </div>
                     </div>
-                  </div>
                     </div>
-                  </div>
+                </div>
+            </div>
         <!-- UI Content Section 5 End--> 
       
       
@@ -716,7 +764,10 @@
         <div class="section-header">
             <h2>📊 צבעי מצבים</h2>
             <div class="header-actions">
-                <button class="filter-toggle-btn" onclick="window.toggleSection('section6')" title="הצג/הסתר סקשן">
+                <button class="btn btn-success btn-sm" onclick="window.saveAllPreferences()" title="שמור הכל">
+                    <i class="bi bi-save"></i> שמור
+                </button>
+                <button class="filter-toggle-btn" onclick="toggleSection('section6')" title="הצג/הסתר סקשן">
                     <span class="section-toggle-icon">▼</span>
                 </button>
             </div>
@@ -782,7 +833,7 @@
                         </div>
                     </div>
                 </div>
-          </div>
+            </div>
         </div>
         <!-- UI Content Section 6 End--> 
       
@@ -791,7 +842,10 @@
                     <div class="section-header">
             <h2>📊 הגדרות גרפים</h2>
             <div class="header-actions">
-                <button class="filter-toggle-btn" onclick="window.toggleSection('section7')" title="הצג/הסתר סקשן">
+                <button class="btn btn-success btn-sm" onclick="window.saveAllPreferences()" title="שמור הכל">
+                    <i class="bi bi-save"></i> שמור
+                </button>
+                <button class="filter-toggle-btn" onclick="toggleSection('section7')" title="הצג/הסתר סקשן">
                     <span class="section-toggle-icon">▼</span>
                 </button>
             </div>
@@ -962,260 +1016,16 @@
                   </div>
                 </div>
                     </div>
-                    </div>
-                </div>
-        <!-- UI Content Section 7 End-->        
-        <!-- UI Content Section 8 Start-->
-      <div class="content-section" id="section8">
-        <div class="section-header">
-            <h2>🔧 ממשק ניהול</h2>
-            <div class="header-actions">
-                <button class="btn btn-sm btn-outline-primary" onclick="window.refreshAdminData()">
-                    <i class="bi bi-arrow-clockwise"></i> רענן
-                </button>
-                <button class="filter-toggle-btn" onclick="window.toggleSection('section8')" title="הצג/הסתר סקשן">
-                    <span class="section-toggle-icon">▼</span>
-                </button>
+                  </div>
             </div>
         </div>
-        <div class="section-body">
-            <!-- חיפוש וסינון -->
-            <div class="admin-search-section mb-3">
-                <div class="row g-3">
-                    <div class="col-md-3">
-                        <label class="form-label">משתמש:</label>
-                        <select class="form-select" id="admin-user-select">
-                            <option value="1">משתמש 1 (ברירת מחדל)</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">פרופיל:</label>
-                        <select class="form-select" id="admin-profile-select">
-                            <option value="">כל הפרופילים</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">קבוצה:</label>
-                        <select class="form-select" id="admin-group-select">
-                            <option value="">כל הקבוצות</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">חיפוש:</label>
-                        <input type="text" class="form-control" id="admin-search-input" placeholder="חפש העדפה...">
-                    </div>
-                </div>
-            </div>
+        <!-- UI Content Section 7 End-->
         </div>
     </div>
-  
-        <!-- UI Content Section 8 End-->
-        
-        <!-- UI Content Section 9 Start - Preferences Management Table -->
-        <div class="content-section" id="section9" data-section="preferences-table">
-                    <div class="section-header">
-                        <h2>📋 ניהול העדפות - טבלה</h2>
-                        <div class="header-actions">
-                            <span class="badge bg-secondary" id="tablePreferencesCount">טוען...</span>
-                            <button id="addPreferenceBtn" class="btn btn-sm btn-outline-primary" onclick="showAddPreferenceModal()" title="הוסף העדפה חדשה">
-                                <i class="fas fa-plus"></i> הוסף
-                            </button>
-                            <button class="filter-toggle-btn" onclick="toggleSection('section9')" title="הצג/הסתר אזור ניהול העדפות">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Preferences table -->
-                    <div class="section-body">
-                        <div class="table-responsive" id="preferencesContainer">
-                            <table class="data-table" id="preferencesTable" data-table-type="preferences">
-                                <thead>
-                                    <tr>
-                                        <th class="col-name">
-                                            <button class="btn btn-link sortable-header"
-                                        onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(0, window.preferencesData || [], 'preferences', window.updatePreferencesTable); }">
-                                                שם העדפה <span class="sort-icon">↕</span>
-                                            </button>
-                                        </th>
-                                        <th class="col-value">
-                                            <button class="btn btn-link sortable-header"
-                                        onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, window.preferencesData || [], 'preferences', window.updatePreferencesTable); }">
-                                                ערך <span class="sort-icon">↕</span>
-                                            </button>
-                                        </th>
-                                        <th class="col-type">
-                                            <button class="btn btn-link sortable-header"
-                                        onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(2, window.preferencesData || [], 'preferences', window.updatePreferencesTable); }">
-                                                סוג <span class="sort-icon">↕</span>
-                                            </button>
-                                        </th>
-                                        <th class="col-description">
-                                            <button class="btn btn-link sortable-header"
-                                        onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(3, window.preferencesData || [], 'preferences', window.updatePreferencesTable); }">
-                                                תיאור <span class="sort-icon">↕</span>
-                                            </button>
-                                        </th>
-                                        <th class="col-created">
-                                            <button class="btn btn-link sortable-header"
-                                        onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(4, window.preferencesData || [], 'preferences', window.updatePreferencesTable); }">
-                                                נוצר ב <span class="sort-icon">↕</span>
-                                            </button>
-                                        </th>
-                                        <th class="col-actions actions-cell actions-3-btn">
-                                            פעולות
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td colspan="6" class="loading">טוען העדפות...</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-        <!-- UI Content Section 9 End - Preferences Management Table -->
-            </div>
-        </div>
     <!-- 🔒 LOCKED TEMPLATE ZONE 3 - End Main Content Container (DO NOT MODIFY) -->
   
     <!-- Scripts moved to bottom of HTML (before </body>) to prevent duplicates -->
 
-        <!-- Add Preference Modal -->
-        <div class="modal fade" id="addPreferenceModal" tabindex="-1" aria-labelledby="addPreferenceModalLabel" aria-hidden="true"
-            data-bs-backdrop="true" data-bs-keyboard="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header modal-header-colored">
-                        <h5 class="modal-title" id="addPreferenceModalLabel">הוספת העדפה חדשה</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="addPreferenceForm">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="preferenceName" class="form-label">שם ההעדפה</label>
-                                        <input type="text" class="form-control" id="preferenceName" placeholder="שם ההעדפה" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="preferenceValue" class="form-label">ערך</label>
-                                        <input type="text" class="form-control" id="preferenceValue" placeholder="ערך ההעדפה" required>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="preferenceType" class="form-label">סוג העדפה</label>
-                                        <select class="form-select" id="preferenceType" required>
-                                            <option value="">בחר סוג</option>
-                                            <option value="boolean">בוליאני (כן/לא)</option>
-                                            <option value="string">מחרוזת</option>
-                                            <option value="number">מספר</option>
-                                            <option value="color">צבע</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="preferenceCategory" class="form-label">קטגוריה</label>
-                                        <select class="form-select" id="preferenceCategory">
-                                            <option value="">בחר קטגוריה</option>
-                                            <option value="ui">ממשק משתמש</option>
-                                            <option value="trading">מסחר</option>
-                                            <option value="notifications">התראות</option>
-                                            <option value="display">תצוגה</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="mb-3">
-                                        <label for="preferenceDescription" class="form-label">תיאור ההעדפה</label>
-                                    <textarea class="form-control" id="preferenceDescription" rows="3" placeholder="תיאור ההעדפה"></textarea>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                    <button type="button" class="btn btn-success btn-sm" onclick="addPreference()">הוסף העדפה</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Edit Preference Modal -->
-        <div class="modal fade" id="editPreferenceModal" tabindex="-1" aria-labelledby="editPreferenceModalLabel" aria-hidden="true"
-            data-bs-backdrop="true" data-bs-keyboard="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header modal-header-colored">
-                        <h5 class="modal-title" id="editPreferenceModalLabel">עריכת העדפה</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="editPreferenceForm">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="editPreferenceName" class="form-label">שם ההעדפה</label>
-                                        <input type="text" class="form-control" id="editPreferenceName" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="editPreferenceValue" class="form-label">ערך</label>
-                                        <input type="text" class="form-control" id="editPreferenceValue" required>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="editPreferenceType" class="form-label">סוג העדפה</label>
-                                        <select class="form-select" id="editPreferenceType" required>
-                                            <option value="boolean">בוליאני (כן/לא)</option>
-                                            <option value="string">מחרוזת</option>
-                                            <option value="number">מספר</option>
-                                            <option value="color">צבע</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="editPreferenceCategory" class="form-label">קטגוריה</label>
-                                        <select class="form-select" id="editPreferenceCategory">
-                                            <option value="ui">ממשק משתמש</option>
-                                            <option value="trading">מסחר</option>
-                                            <option value="notifications">התראות</option>
-                                            <option value="display">תצוגה</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="mb-3">
-                                        <label for="editPreferenceDescription" class="form-label">תיאור ההעדפה</label>
-                                        <textarea class="form-control" id="editPreferenceDescription" rows="3"></textarea>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                    <button type="button" class="btn btn-success btn-sm" onclick="updatePreference()">עדכן העדפה</button>
-        </div>
-    </div>
     
     <!-- 🔓 TEMPLATE ZONE 6 - Page-Specific Scripts -->
     
@@ -1244,6 +1054,6 @@
     <script src="scripts/services/select-populator-service.js?v=1.0.0"></script>
     
     <!-- Stage 5: Page Script - REQUIRED -->
-    <script src="scripts/preferences-page.js?v=20251010"></script>
+    <script src="scripts/preferences-core.js?v=2.0.0"></script>
 </body>
 </html>

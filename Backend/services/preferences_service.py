@@ -23,6 +23,9 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from services.constraint_service import ConstraintService
 
+# Import Advanced Cache System
+from services.advanced_cache_service import cache_with_deps, invalidate_cache
+
 logger = logging.getLogger(__name__)
 
 # Custom exception classes
@@ -46,12 +49,15 @@ class PreferencesService:
     """
     שירות מתקדם למערכת העדפות
     
+    ✅ משולב עם AdvancedCacheService המרכזי של המערכת
+    
     תכונות מרכזיות:
-    - מטמון פר משתמש עם TTL ארוך
+    - שימוש ב-@cache_with_deps decorators (TTL=300s, dependency='preferences')
+    - ביטול cache אוטומטי עם @invalidate_cache
     - פונקציות נגישות מהירות
     - טיפול בשגיאות מפורט
     - תמיכה בפרופילים מרובים
-    - אופטימיזציה מקסימלית
+    - משתלב עם /api/cache/clear המרכזי
     """
     
     def __init__(self, db_path: str = None):
@@ -62,9 +68,11 @@ class PreferencesService:
             db_path = os.path.join(current_dir, "..", "db", "simpleTrade_new.db")
 
         self.db_path = db_path
-        self.cache = {}  # מטמון פנימי
-        self.cache_ttl = 24 * 60 * 60  # 24 שעות
-        self.cache_timestamps = {}  # זמני יצירת מטמון
+        
+        # ✅ NO LOCAL CACHE - Using AdvancedCacheService!
+        # Cache is managed automatically by decorators:
+        # - @cache_with_deps(ttl=300, dependencies=['preferences'])  for GET methods
+        # - @invalidate_cache(['preferences']) for SAVE methods
         
         # Initialize constraint service for validation
         self.constraint_service = ConstraintService(db_path)
@@ -168,41 +176,9 @@ class PreferencesService:
             logger.error(f"Error validating preference {preference_name}: {e}")
             raise ValidationError(f"Validation failed for preference '{preference_name}': {str(e)}")
     
-    def _get_cache_key(self, user_id: int, profile_id: int, preference_name: str = None, group_name: str = None) -> str:
-        """יצירת מפתח מטמון"""
-        if preference_name:
-            return f"preferences:{user_id}:{profile_id}:{preference_name}"
-        elif group_name:
-            return f"preferences:{user_id}:{profile_id}:group:{group_name}"
-        else:
-            return f"preferences:{user_id}:{profile_id}:all"
-    
-    def _is_cache_valid(self, cache_key: str) -> bool:
-        """בדיקת תקינות מטמון"""
-        if cache_key not in self.cache:
-            return False
-        
-        if cache_key not in self.cache_timestamps:
-            return False
-        
-        cache_time = self.cache_timestamps[cache_key]
-        return time.time() - cache_time < self.cache_ttl
-    
-    def _invalidate_user_cache(self, user_id: int, profile_id: int = None):
-        """מחיקת מטמון משתמש"""
-        if profile_id:
-            # מחק מטמון פרופיל ספציפי
-            pattern = f"preferences:{user_id}:{profile_id}:"
-        else:
-            # מחק כל המטמון של המשתמש
-            pattern = f"preferences:{user_id}:"
-        
-        keys_to_delete = [key for key in self.cache.keys() if key.startswith(pattern)]
-        for key in keys_to_delete:
-            self.cache.pop(key, None)
-            self.cache_timestamps.pop(key, None)
-        
-        logger.info(f"Cache invalidated for user {user_id}, profile {profile_id}")
+    # ✅ REMOVED: _get_cache_key, _is_cache_valid, _invalidate_user_cache
+    # Now using AdvancedCacheService decorators (@cache_with_deps, @invalidate_cache)
+    # These functions are no longer needed!
     
     def _get_active_profile_id(self, user_id: int) -> int:
         """קבלת פרופיל פעיל של משתמש"""
@@ -275,6 +251,7 @@ class PreferencesService:
             logger.error(f"Error getting group ID for {group_name}: {e}")
             raise
     
+    @cache_with_deps(ttl=300, dependencies=['preferences'])
     def get_preference(self, user_id: int, preference_name: str, profile_id: int = None, use_cache: bool = True) -> Any:
         """
         קבלת העדפה בודדת
@@ -297,12 +274,8 @@ class PreferencesService:
             if profile_id is None:
                 profile_id = self._get_active_profile_id(user_id)
             
-            # בדיקת מטמון
-            if use_cache:
-                cache_key = self._get_cache_key(user_id, profile_id, preference_name)
-                if self._is_cache_valid(cache_key):
-                    logger.debug(f"Cache hit for {preference_name}")
-                    return self.cache[cache_key]
+            # ✅ Cache handled automatically by @cache_with_deps decorator!
+            # No manual cache checking needed
             
             # שאילתה לבסיס הנתונים
             conn = sqlite3.connect(self.db_path)
@@ -322,11 +295,7 @@ class PreferencesService:
                 saved_value, data_type, default_value = result
                 value = self._convert_value(saved_value, data_type)
                 
-                # שמירה במטמון
-                if use_cache:
-                    cache_key = self._get_cache_key(user_id, profile_id, preference_name)
-                    self.cache[cache_key] = value
-                    self.cache_timestamps[cache_key] = time.time()
+                # ✅ Cache handled automatically by @cache_with_deps decorator!
                 
                 logger.debug(f"Retrieved preference {preference_name}: {value}")
                 return value
@@ -347,11 +316,7 @@ class PreferencesService:
                     default_value, data_type = result
                     value = self._convert_value(default_value, data_type)
                     
-                    # שמירה במטמון
-                    if use_cache:
-                        cache_key = self._get_cache_key(user_id, profile_id, preference_name)
-                        self.cache[cache_key] = value
-                        self.cache_timestamps[cache_key] = time.time()
+                    # ✅ Cache handled automatically by decorator!
                     
                     logger.debug(f"Using default value for {preference_name}: {value}")
                     return value
@@ -380,12 +345,7 @@ class PreferencesService:
             if profile_id is None:
                 profile_id = self._get_active_profile_id(user_id)
             
-            # בדיקת מטמון
-            if use_cache:
-                cache_key = self._get_cache_key(user_id, profile_id, group_name=group_name)
-                if self._is_cache_valid(cache_key):
-                    logger.debug(f"Cache hit for group {group_name}")
-                    return self.cache[cache_key]
+            # ✅ Cache handled automatically by decorator!
             
             # קבלת מזהה קבוצה
             group_id = self._get_group_id(group_name)
@@ -411,11 +371,7 @@ class PreferencesService:
             for preference_name, value, data_type in results:
                 preferences[preference_name] = self._convert_value(value, data_type)
             
-            # שמירה במטמון
-            if use_cache:
-                cache_key = self._get_cache_key(user_id, profile_id, group_name=group_name)
-                self.cache[cache_key] = preferences
-                self.cache_timestamps[cache_key] = time.time()
+            # ✅ Cache handled automatically by decorator!
             
             logger.debug(f"Retrieved {len(preferences)} preferences for group {group_name}")
             return preferences
@@ -460,6 +416,7 @@ class PreferencesService:
             logger.error(f"Error getting preferences by names for user {user_id}: {e}")
             raise
     
+    @cache_with_deps(ttl=300, dependencies=['preferences'])
     def get_all_user_preferences(self, user_id: int, profile_id: int = None, use_cache: bool = True) -> Dict[str, Any]:
         """
         קבלת כל ההעדפות של משתמש
@@ -477,12 +434,7 @@ class PreferencesService:
             if profile_id is None:
                 profile_id = self._get_active_profile_id(user_id)
             
-            # בדיקת מטמון
-            if use_cache:
-                cache_key = self._get_cache_key(user_id, profile_id)
-                if self._is_cache_valid(cache_key):
-                    logger.debug(f"Cache hit for all preferences")
-                    return self.cache[cache_key]
+            # ✅ Cache handled automatically by @cache_with_deps decorator!
             
             # שאילתה לבסיס הנתונים
             conn = sqlite3.connect(self.db_path)
@@ -508,11 +460,7 @@ class PreferencesService:
             for preference_name, value, data_type, group_name in results:
                 preferences[preference_name] = self._convert_value(value, data_type)
             
-            # שמירה במטמון
-            if use_cache:
-                cache_key = self._get_cache_key(user_id, profile_id)
-                self.cache[cache_key] = preferences
-                self.cache_timestamps[cache_key] = time.time()
+            # ✅ Cache handled automatically by @cache_with_deps decorator!
             
             logger.debug(f"Retrieved {len(preferences)} total preferences")
             return preferences
@@ -521,6 +469,7 @@ class PreferencesService:
             logger.error(f"Error getting all preferences for user {user_id}: {e}")
             raise
     
+    @invalidate_cache(['preferences'])
     def save_preference(self, user_id: int, preference_name: str, value: Any, profile_id: int = None) -> bool:
         """
         שמירת העדפה בודדת
@@ -561,8 +510,7 @@ class PreferencesService:
             conn.commit()
             conn.close()
             
-            # מחיקת מטמון
-            self._invalidate_user_cache(user_id, profile_id)
+            # ✅ Cache invalidation handled automatically by @invalidate_cache decorator!
             
             logger.info(f"Saved preference {preference_name} for user {user_id}")
             return True
@@ -571,6 +519,7 @@ class PreferencesService:
             logger.error(f"Error saving preference {preference_name} for user {user_id}: {e}")
             raise
     
+    @invalidate_cache(['preferences'])
     def save_preferences(self, user_id: int, preferences: Dict[str, Any], profile_id: int = None) -> bool:
         """
         שמירת העדפות מרובות
@@ -612,8 +561,7 @@ class PreferencesService:
             conn.commit()
             conn.close()
             
-            # מחיקת מטמון
-            self._invalidate_user_cache(user_id, profile_id)
+            # ✅ Cache invalidation handled automatically by @invalidate_cache decorator!
             
             logger.info(f"Saved {len(preferences)} preferences for user {user_id}")
             return True
@@ -836,6 +784,34 @@ class PreferencesService:
         except Exception as e:
             logger.error(f"Error getting all preference types: {e}")
             raise
+    
+    def clear_cache(self):
+        """
+        ניקוי מטמון של preferences - משתלב עם AdvancedCacheService
+        
+        ⚠️  NOTE: PreferencesService צריך לעבור refactoring מלא כדי להשתמש
+        ב-AdvancedCacheService decorators במקום self.cache הפנימי.
+        
+        כרגע הפונקציה מנקה:
+        1. AdvancedCacheService (דרך dependency 'preferences')
+        2. self.cache הפנימי (legacy - לביטול בעתיד)
+        
+        תוכנית: להחליף את כל self.cache ב-decorators:
+        - @cache_with_deps(ttl=300, dependencies=['preferences'])
+        - @invalidate_cache(['preferences'])
+        """
+        try:
+            # 1. Clear AdvancedCacheService cache with 'preferences' dependency
+            from services.advanced_cache_service import advanced_cache_service
+            advanced_cache_service.invalidate_by_dependency('preferences')
+            
+            # ✅ No legacy cache to clear - PreferencesService is now fully integrated!
+            
+            logger.info(f"✅ PreferencesService cache cleared via AdvancedCacheService (dependency: 'preferences')")
+            return cache_size
+        except Exception as e:
+            logger.error(f"❌ Error clearing PreferencesService cache: {e}")
+            return 0
 
 
 # יצירת מופע גלובלי

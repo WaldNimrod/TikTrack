@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Favicon will be set by global-favicon.js -->
+    <title>דף הבית - TikTrack</title>
+    
+    <!-- 
+    ===== INDEX PAGE - COMPLETE REBUILD =====
+    
+    Rebuilt: 11 October 2025
+    Version: 3.0.0
+    
+    Features:
+    - Complete dashboard with 5 sections
+    - Service systems integration
+    - Live charts and statistics
+    - Auto-refresh functionality
+    - Full ITCSS architecture
+    
+    ======================================
+    -->
+    
+    
+    <!-- Bootstrap CSS - Must load first -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    
+    <!-- ITCSS Architecture - Complete Implementation -->
+    
+    <!-- 01-settings - Variables and Settings -->
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=20251011">
+    
+    <!-- 02-tools - Functions and Mixins -->
+    <link rel="stylesheet" href="styles-new/02-tools/_mixins.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/02-tools/_functions.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/02-tools/_utilities.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/02-tools/_rtl-helpers.css?v=20251011">
+    
+    <!-- 03-generic - Reset and Normalization -->
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=20251011">
+    
+    <!-- 04-elements - Basic HTML Elements -->
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=20251011">
+    
+    <!-- 05-objects - Layout Structures -->
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=20251011">
+    
+    <!-- 06-components - UI Components -->
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=20251011">
+    
+    <!-- 07-trumps - Page-specific Styles -->
+    <!-- No page-specific styles for index -->
+    
+    <!-- 08-themes - Themes -->
+    <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=20251011">
+    
+    <!-- 09-utilities - Utility Classes -->
+    <link rel="stylesheet" href="styles-new/09-utilities/_utilities.css?v=20251011">
+    
+    <!-- External Libraries -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.1">
+    
+    <!-- Page Headers - Entity-specific header colors -->
+    <link rel="stylesheet" href="styles-new/06-components/_page-headers.css?v=20251011">
+</head>
+
+<body class="index-page">
+    <!-- Header System - Created automatically by header-system.js -->
+    <div id="unified-header"></div>
+    
+    <!-- Page Content -->
+    <div class="background-wrapper">
+        <div class="page-body">
+            <!-- Top Section: Hero Banner -->
+            <div class="top-section" data-section="top">
+                <div class="section-header">
+                    <h1>
+                        <img src="images/icons/home.svg" alt="דף הבית" class="section-icon">
+                        ברוכים הבאים ל-TikTrack
+                    </h1>
+                    <div class="header-actions">
+                        <button class="btn btn-sm btn-outline-secondary" onclick="refreshDashboard()" title="רענן דשבורד">
+                            <i class="fas fa-sync-alt"></i> רענן
+                        </button>
+                        <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר סקשן">
+                            <span class="filter-icon">▲</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="section-body">
+                    <!-- Hero Section -->
+                    <div class="text-center mb-4">
+                        <h2 class="display-6 mb-2">מערכת ניהול מסחר מתקדמת</h2>
+                        <p class="lead text-muted">מעקב, ניתוח ושליטה מלאה בתיק ההשקעות שלך</p>
+                    </div>
+
+                    <!-- Main Statistics Cards - 6 Cards -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-lg-2 col-md-4 col-sm-6">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body text-center">
+                                    <img src="images/icons/trading_accounts.svg" alt="חשבונות" class="mb-2" style="width: 40px; height: 40px; filter: hue-rotate(100deg);">
+                                    <h6 class="card-subtitle text-muted mb-2">סה"כ חשבונות</h6>
+                                    <h3 class="card-title mb-0" style="color: var(--entity-account-color);" id="totalAccountsStat">-</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-sm-6">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body text-center">
+                                    <img src="images/icons/trades.svg" alt="טריידים" class="mb-2" style="width: 40px; height: 40px;">
+                                    <h6 class="card-subtitle text-muted mb-2">טריידים פעילים</h6>
+                                    <h3 class="card-title mb-0" style="color: var(--entity-trade-color);" id="activeTradesStat">-</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-sm-6">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-dollar-sign mb-2" style="font-size: 2rem; color: var(--primary-color);" id="totalProfitIcon"></i>
+                                    <h6 class="card-subtitle text-muted mb-2">רווח כולל</h6>
+                                    <h3 class="card-title mb-0" id="totalProfitStat">$0</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-sm-6">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-percentage mb-2" style="font-size: 2rem; color: var(--primary-color);"></i>
+                                    <h6 class="card-subtitle text-muted mb-2">שיעור הצלחה</h6>
+                                    <h3 class="card-title mb-0" style="color: var(--primary-color);" id="winRateStat">-%</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-sm-6">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body text-center">
+                                    <img src="images/icons/alerts.svg" alt="התראות" class="mb-2" style="width: 40px; height: 40px;">
+                                    <h6 class="card-subtitle text-muted mb-2">התראות פעילות</h6>
+                                    <h3 class="card-title mb-0" style="color: var(--entity-alert-color);" id="activeAlertsStat">-</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-sm-6">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body text-center">
+                                    <img src="images/icons/trade_plans.svg" alt="תכנונים" class="mb-2" style="width: 40px; height: 40px;">
+                                    <h6 class="card-subtitle text-muted mb-2">תכנונים פעילים</h6>
+                                    <h3 class="card-title mb-0" style="color: var(--entity-trade-plan-color);" id="activePlansStat">-</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Section 1: סטטיסטיקות מרכזיות וגישה מהירה -->
+                <div class="content-section" id="section1" data-section="section1">
+                    <div class="section-header">
+                        <h2>
+                            <i class="fas fa-chart-bar section-icon" style="color: var(--primary-color);"></i>
+                            סטטיסטיקות כלליות
+                        </h2>
+                        <div class="header-actions">
+                            <button class="btn btn-sm btn-outline-primary" onclick="window.location.href='db_display.html'" title="צפה בכל הנתונים">
+                                <i class="fas fa-database"></i> בסיס נתונים
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- Quick Actions Row -->
+                        <div class="row g-2 mb-4">
+                            <div class="col-lg-3 col-md-6">
+                                <button class="btn w-100" onclick="window.location.href='trades.html'" style="border: 2px solid var(--entity-trade-color); color: var(--entity-trade-color);">
+                                    <img src="images/icons/trades.svg" alt="" style="width: 20px; height: 20px; vertical-align: middle;">
+                                    <span class="ms-2">טריידים</span>
+                                </button>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <button class="btn w-100" onclick="window.location.href='trade_plans.html'" style="border: 2px solid var(--entity-trade-plan-color); color: var(--entity-trade-plan-color);">
+                                    <img src="images/icons/trade_plans.svg" alt="" style="width: 20px; height: 20px; vertical-align: middle;">
+                                    <span class="ms-2">תכנוני טרייד</span>
+                                </button>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <button class="btn w-100" onclick="window.location.href='alerts.html'" style="border: 2px solid var(--entity-alert-color); color: var(--entity-alert-color);">
+                                    <img src="images/icons/alerts.svg" alt="" style="width: 20px; height: 20px; vertical-align: middle;">
+                                    <span class="ms-2">התראות</span>
+                                </button>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <button class="btn w-100" onclick="window.location.href='research.html'" style="border: 2px solid var(--primary-color); color: var(--primary-color);">
+                                    <img src="images/icons/reserch.svg" alt="" style="width: 20px; height: 20px; vertical-align: middle;">
+                                    <span class="ms-2">מחקר וניתוח</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="row g-3">
+                            <!-- Row 1 -->
+                            <div class="col-lg-3 col-md-6">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <h6 class="card-subtitle text-muted mb-2">סה"כ טריידים</h6>
+                                        <h4 class="card-title mb-0" id="totalTradesStat">-</h4>
+                                        <small class="text-muted">כל הזמנים</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <h6 class="card-subtitle text-muted mb-2">טריידים סגורים</h6>
+                                        <h4 class="card-title mb-0" id="closedTradesStat">-</h4>
+                                        <small class="text-muted">הושלמו</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <h6 class="card-subtitle text-muted mb-2">ממוצע רווח לטרייד</h6>
+                                        <h4 class="card-title mb-0" id="avgProfitStat">$0</h4>
+                                        <small class="text-muted">טריידים סגורים</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <h6 class="card-subtitle text-muted mb-2">טיקרים במעקב</h6>
+                                        <h4 class="card-title mb-0" id="totalTickersStat">-</h4>
+                                        <small class="text-muted">פעילים</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Row 2 -->
+                            <div class="col-lg-3 col-md-6">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <h6 class="card-subtitle text-muted mb-2">ביצועים השבוע</h6>
+                                        <h4 class="card-title mb-0" id="weekPerformanceStat">$0</h4>
+                                        <small class="text-muted">7 ימים אחרונים</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <h6 class="card-subtitle text-muted mb-2">ביצועים החודש</h6>
+                                        <h4 class="card-title mb-0" id="monthPerformanceStat">$0</h4>
+                                        <small class="text-muted">30 ימים אחרונים</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <h6 class="card-subtitle text-muted mb-2">תזרימי מזומנים</h6>
+                                        <h4 class="card-title mb-0" id="totalCashFlowsStat">-</h4>
+                                        <small class="text-muted">פעילים</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <h6 class="card-subtitle text-muted mb-2">הערות</h6>
+                                        <h4 class="card-title mb-0" id="totalNotesStat">-</h4>
+                                        <small class="text-muted">כל ההערות</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: גרפים וויזואליזציות -->
+                <div class="content-section" id="section2" data-section="section2">
+                    <div class="section-header">
+                        <h2>
+                            <i class="fas fa-chart-pie section-icon" style="color: var(--primary-color);"></i>
+                            ניתוח ביצועים
+                        </h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="row g-3">
+                            <!-- Chart 1: Performance Over Time -->
+                            <div class="col-lg-6">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-header bg-white">
+                                        <h5 class="mb-0">ביצועים לאורך זמן</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div style="height: 300px;">
+                                            <canvas id="performanceChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Chart 2: Trades Status Distribution -->
+                            <div class="col-lg-6">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-header bg-white">
+                                        <h5 class="mb-0">סטטוס טריידים</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div style="height: 300px;">
+                                            <canvas id="tradesStatusChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Chart 3: Account Distribution -->
+                            <div class="col-lg-6">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-header bg-white">
+                                        <h5 class="mb-0">התפלגות חשבונות</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div style="height: 300px;">
+                                            <canvas id="accountDistributionChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Chart 4: Win Rate -->
+                            <div class="col-lg-6">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-header bg-white">
+                                        <h5 class="mb-0">שיעור הצלחה</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div style="height: 300px;">
+                                            <canvas id="winRateChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: טריידים אחרונים ופעולות מהירות -->
+                <div class="content-section" id="section3" data-section="section3">
+                    <div class="section-header">
+                        <h2>
+                            <img src="images/icons/trades.svg" alt="טריידים" class="section-icon">
+                            טריידים אחרונים
+                        </h2>
+                        <div class="header-actions">
+                            <button class="btn btn-sm btn-outline-primary" onclick="window.location.href='trades.html'" title="עבור לעמוד טריידים">
+                                <i class="fas fa-arrow-left"></i> כל הטריידים
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- Info Banner -->
+                        <div class="alert alert-info d-flex align-items-center mb-3">
+                            <i class="fas fa-info-circle me-2" style="font-size: 1.5rem;"></i>
+                            <div>
+                                <strong>עדכון אחרון:</strong> <span id="lastUpdateTime">טוען...</span>
+                                <span class="ms-3 text-muted">|</span>
+                                <span class="ms-3">רענון אוטומטי: כל 5 דקות</span>
+                            </div>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="data-table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>טיקר</th>
+                                        <th>צד</th>
+                                        <th>סוג</th>
+                                        <th>P/L</th>
+                                        <th>סטטוס</th>
+                                        <th>תאריך פתיחה</th>
+                                        <th>חשבון</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentTradesBody">
+                                    <tr>
+                                        <td colspan="7" class="text-center text-muted">טוען נתונים...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Additional Info -->
+                        <div class="row g-2 mt-3">
+                            <div class="col-md-4">
+                                <div class="card border-start border-primary border-3">
+                                    <div class="card-body py-2">
+                                        <small class="text-muted">טריידים פתוחים כעת:</small>
+                                        <strong class="ms-2" id="openTradesCount">-</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card border-start border-success border-3">
+                                    <div class="card-body py-2">
+                                        <small class="text-muted">נסגרו היום:</small>
+                                        <strong class="ms-2" id="todayClosedCount">-</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card border-start border-warning border-3">
+                                    <div class="card-body py-2">
+                                        <small class="text-muted">רווח/הפסד היום:</small>
+                                        <strong class="ms-2" id="todayPnL">$0</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 4: התראות ופעולות מהירות -->
+                <div class="content-section" id="section4" data-section="section4">
+                    <div class="section-header">
+                        <h2>
+                            <img src="images/icons/alerts.svg" alt="התראות" class="section-icon">
+                            התראות ופעולות מהירות
+                        </h2>
+                        <div class="header-actions">
+                            <button class="btn btn-sm btn-outline-primary" onclick="window.location.href='alerts.html'" title="עבור לעמוד התראות">
+                                <i class="fas fa-arrow-left"></i> כל ההתראות
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="row">
+                            <!-- Right Column: Active Alerts -->
+                            <div class="col-lg-8">
+                                <h5 class="mb-3">
+                                    <i class="fas fa-exclamation-circle text-warning"></i>
+                                    התראות פעילות
+                                </h5>
+                                <div class="row g-2" id="activeAlertsContainer">
+                                    <div class="col-12 text-center text-muted">
+                                        טוען התראות...
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Left Column: Quick Actions -->
+                            <div class="col-lg-4">
+                                <h5 class="mb-3">
+                                    <i class="fas fa-bolt text-info"></i>
+                                    פעולות מהירות
+                                </h5>
+                                <div class="list-group">
+                                    <a href="trades.html" class="list-group-item list-group-item-action">
+                                        <img src="images/icons/trades.svg" alt="" style="width: 20px; height: 20px; vertical-align: middle;">
+                                        <span class="ms-2">טרייד חדש</span>
+                                    </a>
+                                    <a href="trade_plans.html" class="list-group-item list-group-item-action">
+                                        <img src="images/icons/trade_plans.svg" alt="" style="width: 20px; height: 20px; vertical-align: middle;">
+                                        <span class="ms-2">תכנון טרייד חדש</span>
+                                    </a>
+                                    <a href="alerts.html" class="list-group-item list-group-item-action">
+                                        <img src="images/icons/alerts.svg" alt="" style="width: 20px; height: 20px; vertical-align: middle;">
+                                        <span class="ms-2">התראה חדשה</span>
+                                    </a>
+                                    <a href="notes.html" class="list-group-item list-group-item-action">
+                                        <img src="images/icons/notes.svg" alt="" style="width: 20px; height: 20px; vertical-align: middle;">
+                                        <span class="ms-2">הערה חדשה</span>
+                                    </a>
+                                    <a href="cash_flows.html" class="list-group-item list-group-item-action">
+                                        <img src="images/icons/cash_flows.svg" alt="" style="width: 20px; height: 20px; vertical-align: middle;">
+                                        <span class="ms-2">תזרים מזומנים</span>
+                                    </a>
+                                    <a href="preferences.html" class="list-group-item list-group-item-action">
+                                        <img src="images/icons/preferences.svg" alt="" style="width: 20px; height: 20px; vertical-align: middle;">
+                                        <span class="ms-2">העדפות</span>
+                                    </a>
+                                </div>
+                                
+                                <!-- System Status Card -->
+                                <div class="card mt-3 border-0 shadow-sm bg-light">
+                                    <div class="card-body">
+                                        <h6 class="card-title">
+                                            <i class="fas fa-server text-success"></i>
+                                            מצב המערכת
+                                        </h6>
+                                        <div class="d-flex justify-content-between align-items-center mt-2">
+                                            <small class="text-muted">שרת:</small>
+                                            <span class="badge bg-success">פעיל</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center mt-1">
+                                            <small class="text-muted">מטמון:</small>
+                                            <span class="badge bg-info">תקין</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center mt-1">
+                                            <small class="text-muted">רענון:</small>
+                                            <span class="badge bg-primary">פעיל</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 5: תכונות המערכת (Marketing) -->
+                <div class="content-section" id="section5" data-section="section5">
+                    <div class="section-header">
+                        <h2>
+                            <i class="fas fa-star section-icon"></i>
+                            תכונות המערכת
+                        </h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('section5')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="row g-3">
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body text-center">
+                                        <img src="images/icons/trades.svg" alt="טריידים" class="mb-3" style="width: 50px; height: 50px;">
+                                        <h5 class="card-title" style="color: var(--entity-trade-color);">מעקב בזמן אמת</h5>
+                                        <p class="card-text text-muted">עדכונים אוטומטיים של כל הטריידים וההתראות שלך</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body text-center">
+                                        <img src="images/icons/reserch.svg" alt="מחקר" class="mb-3" style="width: 50px; height: 50px;">
+                                        <h5 class="card-title" style="color: var(--primary-color);">ניתוח מתקדם</h5>
+                                        <p class="card-text text-muted">גרפים וסטטיסטיקות מפורטות לקבלת החלטות נבונות</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body text-center">
+                                        <img src="images/icons/alerts.svg" alt="התראות" class="mb-3" style="width: 50px; height: 50px;">
+                                        <h5 class="card-title" style="color: var(--entity-alert-color);">התראות חכמות</h5>
+                                        <p class="card-text text-muted">מערכת התראות מתקדמת עם תנאים מותאמים אישית</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body text-center">
+                                        <img src="images/icons/trade_plans.svg" alt="תכנונים" class="mb-3" style="width: 50px; height: 50px;">
+                                        <h5 class="card-title" style="color: var(--entity-trade-plan-color);">תכנוני מסחר</h5>
+                                        <p class="card-text text-muted">תכנן והגדר אסטרטגיות מסחר לפני ביצוע</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body text-center">
+                                        <img src="images/icons/cash_flows.svg" alt="תזרימים" class="mb-3" style="width: 50px; height: 50px;">
+                                        <h5 class="card-title" style="color: var(--entity-cash-flow-color);">ניהול תזרים</h5>
+                                        <p class="card-text text-muted">מעקב מלא אחר הפקדות, משיכות ודיבידנדים</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body text-center">
+                                        <img src="images/icons/preferences.svg" alt="העדפות" class="mb-3" style="width: 50px; height: 50px;">
+                                        <h5 class="card-title" style="color: var(--primary-color);">התאמה אישית</h5>
+                                        <p class="card-text text-muted">העדפות משתמש גמישות וממשק מותאם אישית</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom page spacing -->
+        <div style="height: 3rem;"></div>
+
+        <!-- Notification system -->
+        <div class="notification-container" id="notificationContainer"></div>
+
+        <!-- Toast container for notifications -->
+        <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1000000002;"></div>
+    </div>
+    
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- ===== STATIC LOADING SYSTEM - Template 1: Dashboard Pages ===== -->
+    
+    <!-- Stage 1: Core Modules (8) - ALWAYS REQUIRED -->
+    <script src="scripts/modules/core-systems.js?v=20251011"></script>
+    <script src="scripts/modules/ui-basic.js?v=20251011"></script>
+    <script src="scripts/modules/data-basic.js?v=20251011"></script>
+    <script src="scripts/modules/ui-advanced.js?v=20251011"></script>
+    <script src="scripts/modules/data-advanced.js?v=20251011"></script>
+    <script src="scripts/modules/business-module.js?v=20251011"></script>
+    <script src="scripts/modules/communication-module.js?v=20251011"></script>
+    <script src="scripts/modules/cache-module.js?v=20251011"></script>
+    
+    <!-- Stage 2: Core Utilities (3) - ALWAYS REQUIRED -->
+    <script src="scripts/global-favicon.js?v=20251011"></script>
+    <script src="scripts/page-utils.js?v=20251011"></script>
+    <script src="scripts/header-system.js?v=v6.0.1"></script>
+    
+    <!-- Stage 3: Common Utilities - OPTIONAL -->
+    <script src="scripts/translation-utils.js?v=20251011"></script>
+    <script src="scripts/date-utils.js?v=20251011"></script>
+    
+    <!-- Stage 4: Services - REQUIRED for Dashboard -->
+    <script src="scripts/services/field-renderer-service.js?v=20251011"></script>
+    <script src="scripts/services/statistics-calculator.js?v=20251011"></script>
+    
+    <!-- Stage 5: Chart System - REQUIRED for Dashboard -->
+    <script src="scripts/charts/chart-system.js?v=20251011"></script>
+    <script src="scripts/charts/chart-theme.js?v=20251011"></script>
+    
+    <!-- Stage 6: Page Script - REQUIRED -->
+    <script src="scripts/index.js?v=20251011"></script>
+</body>
+</html>

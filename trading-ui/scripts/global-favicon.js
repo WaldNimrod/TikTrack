@@ -35,7 +35,6 @@ function setGlobalFavicon(iconPath = 'favicon.ico', iconType = 'image/svg+xml') 
         document.head.appendChild(faviconLink);
         document.head.appendChild(shortcutLink);
         
-        console.log('✅ Global favicon set successfully:', iconPath);
     } catch (error) {
         console.warn('⚠️ Failed to set global favicon:', error);
     }
@@ -165,7 +164,6 @@ async function updateFaviconBasedOnStatus(status = 'online') {
           localStorage.setItem('appStatus', status); // fallback
         }
         
-        console.log(`✅ Favicon updated for status: ${status}`);
     } catch (error) {
         console.warn(`⚠️ Failed to update favicon for status ${status}:`, error);
     }
@@ -203,5 +201,4 @@ window.updateFaviconBasedOnStatus = updateFaviconBasedOnStatus;
 window.getCurrentAppStatus = getCurrentAppStatus;
 window.restoreFaviconFromStatus = restoreFaviconFromStatus;
 
-console.log('🔧 Global Favicon Manager loaded successfully');
 

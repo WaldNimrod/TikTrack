@@ -854,7 +854,6 @@ async function autoRefreshCurrentPage(operationName = 'פעולה') {
  * @param {string} sectionId - The ID of the section to toggle
  */
 window.toggleSection = async function (sectionId) {
-  console.log(`🔧 toggleSection called with sectionId: "${sectionId}"`);
   
   const section = document.getElementById(sectionId) || document.querySelector(`[data-section="${sectionId}"]`);
   console.log(`🔍 Section found:`, section ? 'YES' : 'NO', section ? `(ID: ${section.id || 'no-id'}, data-section: ${section.getAttribute('data-section') || 'no-data-section'})` : '');
@@ -870,7 +869,6 @@ window.toggleSection = async function (sectionId) {
   
   if (sectionBody) {
     const isCollapsed = sectionBody.classList.contains('collapsed') || sectionBody.style.display === 'none';
-    console.log(`🔍 Current state - isCollapsed: ${isCollapsed}, display: "${sectionBody.style.display}"`);
 
     if (isCollapsed) {
       sectionBody.classList.remove('collapsed');
@@ -886,7 +884,6 @@ window.toggleSection = async function (sectionId) {
     if (icon) {
       const newIcon = sectionBody.style.display === 'none' ? '▼' : '▲';
       icon.textContent = newIcon;
-      console.log(`🎨 Icon updated to: "${newIcon}"`);
     }
 
     // Save state with page-specific key using Unified Cache Manager
@@ -925,11 +922,9 @@ window.restoreAllSectionStates = async function () {
   
   // מניעת כפילויות
   if (window.sectionStatesRestored && window.sectionStatesRestored[pageName]) {
-    console.log(`✅ Section states already restored for page: "${pageName}"`);
     return;
   }
   
-  console.log(`🔧 restoreAllSectionStates called for page: "${pageName}"`);
   
   const sections = document.querySelectorAll('.content-section, .top-section');
   // console.log(`🔍 Found ${sections.length} sections to restore`);
@@ -944,7 +939,6 @@ window.restoreAllSectionStates = async function () {
     const icon = toggleBtn ? toggleBtn.querySelector('.section-toggle-icon, .filter-icon, .filter-arrow') : 
                   section.querySelector('.section-toggle-icon, .filter-icon');
 
-    console.log(`🔧 Processing section ${index + 1}/${sections.length}: ID="${sectionId}"`);
 
     if (sectionBody && sectionId) {
       // Check Unified Cache for saved state with page-specific key
@@ -1000,11 +994,9 @@ window.restoreAllSectionStates = async function () {
  * UPDATED: Now uses page-specific localStorage keys consistently
  */
 window.restoreSectionStates = async function () {
-  console.log(`🔧 restoreSectionStates called`);
   
   // Restore top section state with page-specific key
   const pageName = getCurrentPageName();
-  console.log(`🔧 restoreSectionStates called for page: "${pageName}"`);
   
   let topSectionHidden = false;
   
@@ -1288,7 +1280,6 @@ window.deleteTicker = deleteTicker;
 
 // Initialize modal backdrop and restore section states when DOM is loaded - הוסר כדי למנוע כפילות עם core-systems.js
 // האתחול מתבצע דרך מערכת האתחול המאוחדת
-console.log('🔧 UI Basic module ready - waiting for unified initialization');
 
 // ===== SECTION TOGGLE FUNCTIONS =====
 // These functions handle opening/closing sections across all pages
@@ -1393,7 +1384,6 @@ function getCurrentPageName() {
  */
 window.debugSectionStates = async function() {
   const pageName = getCurrentPageName();
-  console.log(`🔍 Debug Section States for page: "${pageName}"`);
   console.log('=====================================');
   
   // Check top section
@@ -1438,7 +1428,6 @@ window.debugSectionStates = async function() {
  * UPDATED: Now uses page-specific localStorage keys
  */
 async function toggleAllSections() {
-  console.log(`🔧 toggleAllSections (generic) called`);
   
   // Find all possible section types
   const contentSections = document.querySelectorAll('.content-section, .top-section');
@@ -1452,7 +1441,6 @@ async function toggleAllSections() {
     return;
   }
   
-  console.log(`🔍 Found ${allSections.length} sections to toggle`);
   
   // Check if all sections are collapsed
   // Filter out sections without section-body first
@@ -1461,15 +1449,12 @@ async function toggleAllSections() {
     return sectionBody !== null;
   });
   
-  console.log(`🔍 Sections with body: ${sectionsWithBody.length}/${allSections.length}`);
   
   const allCollapsed = sectionsWithBody.every(section => {
     const sectionBody = section.querySelector('.section-body, .section-content');
     return sectionBody.style.display === 'none' || section.classList.contains('collapsed');
   });
   
-  console.log(`🔍 All sections are collapsed: ${allCollapsed}`);
-  console.log(`🎯 Action: ${allCollapsed ? 'EXPANDING all sections' : 'COLLAPSING all sections'}`);
   
   const pageName = getCurrentPageName();
   
@@ -1481,7 +1466,6 @@ async function toggleAllSections() {
     const toggleBtn = section.querySelector('.filter-toggle-btn, [onclick*="toggle"]');
     const icon = section.querySelector('.section-toggle-icon, .filter-icon');
     
-    console.log(`🔧 Processing section ${index + 1}/${allSections.length}: ID="${sectionId}"`);
     
     if (sectionBody) {
       if (allCollapsed) {
@@ -1527,11 +1511,9 @@ async function toggleAllSections() {
     if (toggleAllIcon) {
       // If we just collapsed all, show ▶ (closed), if we expanded all, show ▼ (open)
       toggleAllIcon.textContent = allCollapsed ? '▼' : '▶';
-      console.log(`🔄 Updated toggleAllBtn icon to: ${toggleAllIcon.textContent}`);
     }
   }
   
-  console.log(`✅ toggleAllSections (generic) completed - processed ${allSections.length} sections`);
   console.log(`📂 All sections ${allCollapsed ? 'expanded' : 'collapsed'}`);
 }
 
@@ -1541,13 +1523,10 @@ async function toggleAllSections() {
  * UPDATED: Now uses page-specific localStorage keys
  */
 async function loadSectionStates() {
-  console.log(`🔧 loadSectionStates called`);
   
   const pageName = getCurrentPageName();
-  console.log(`🔧 loadSectionStates called for page: "${pageName}"`);
   
   const sections = document.querySelectorAll('.content-section, .top-section');
-  console.log(`🔍 Found ${sections.length} sections to load states for`);
   
   let restoredCount = 0;
   
@@ -1575,19 +1554,16 @@ async function loadSectionStates() {
       section.classList.add('collapsed');
       section.classList.remove('expanded');
       if (toggleIcon) toggleIcon.textContent = '▶';
-      console.log(`✅ Section "${sectionId}" RESTORED to COLLAPSED`);
       restoredCount++;
     } else if (sectionBody) {
       sectionBody.style.display = 'block';
       section.classList.remove('collapsed');
       section.classList.add('expanded');
       if (toggleIcon) toggleIcon.textContent = '▼';
-      console.log(`✅ Section "${sectionId}" RESTORED to EXPANDED`);
       restoredCount++;
     }
   }
   
-  console.log(`✅ loadSectionStates completed - restored ${restoredCount}/${sections.length} sections`);
 }
 
 // Export functions to global scope

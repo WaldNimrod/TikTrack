@@ -38,7 +38,6 @@
  * @lastUpdated January 15, 2025
  */
 
-console.log('🚀 Loading Header System v6.0.0...');
 
 /**
  * מערכת ראש דף מאוחדת עם פילטרים
@@ -447,16 +446,13 @@ class HeaderSystem {
       
       const openAccounts = accounts.filter(account => account.status === 'open');
       
-      console.log('🔧 נמצאו חשבונות:', openAccounts.length, openAccounts.map(a => a.name));
       
       // עדכון תפריט החשבונות
       const accountMenu = document.getElementById('accountFilterMenu');
-        console.log('🔧 accountMenu element:', accountMenu);
         
         if (accountMenu) {
           // מחיקת חשבונות קיימים (חוץ מ"הכול")
           const existingItems = accountMenu.querySelectorAll('.account-filter-item:not([data-value="הכול"])');
-          console.log('🔧 מוחק חשבונות קיימים:', existingItems.length);
           existingItems.forEach(item => item.remove());
           
           // הוספת חשבונות פתוחים
@@ -467,11 +463,8 @@ class HeaderSystem {
             accountItem.onclick = () => selectAccountOption(account.name);
             accountItem.innerHTML = `<span class="option-text">${account.name}</span>`;
             accountMenu.appendChild(accountItem);
-            console.log('🔧 הוספתי חשבון:', account.name);
           });
           
-          console.log(`✅ Loaded ${openAccounts.length} open trading accounts for filter`);
-          console.log('🔧 סה"כ פריטים בתפריט:', accountMenu.children.length);
       } else {
         console.error('❌ accountFilterMenu לא נמצא!');
       }
@@ -487,29 +480,24 @@ class HeaderSystem {
     // המתן שהמערכת תהיה מוכנה
     setTimeout(() => {
       if (window.filterSystem && window.filterSystem.currentFilters) {
-        console.log('🔧 Current filters from system:', window.filterSystem.currentFilters);
         
         // עדכון UI של פילטר הסטטוס
         if (window.filterSystem.currentFilters.status && window.filterSystem.currentFilters.status.length > 0) {
-          console.log('🔧 Updating status filter UI with:', window.filterSystem.currentFilters.status);
           HeaderSystem.updateFilterUI('status', window.filterSystem.currentFilters.status);
         }
         
         // עדכון UI של פילטר הסוג
         if (window.filterSystem.currentFilters.type && window.filterSystem.currentFilters.type.length > 0) {
-          console.log('🔧 Updating type filter UI with:', window.filterSystem.currentFilters.type);
           HeaderSystem.updateFilterUI('type', window.filterSystem.currentFilters.type);
         }
         
         // עדכון UI של פילטר החשבון
         if (window.filterSystem.currentFilters.account && window.filterSystem.currentFilters.account.length > 0) {
-          console.log('🔧 Updating account filter UI with:', window.filterSystem.currentFilters.account);
           HeaderSystem.updateFilterUI('account', window.filterSystem.currentFilters.account);
         }
         
         // עדכון UI של פילטר התאריכים
         if (window.filterSystem.currentFilters.dateRange) {
-          console.log('🔧 Updating date range filter UI with:', window.filterSystem.currentFilters.dateRange);
           HeaderSystem.updateFilterUI('dateRange', window.filterSystem.currentFilters.dateRange);
         }
       }
@@ -529,7 +517,6 @@ class HeaderSystem {
         const item = document.querySelector(`#statusFilterMenu .status-filter-item[data-value="${value}"]`);
         if (item) {
           item.classList.add('selected');
-          console.log(`🔧 Selected status item: ${value}`);
         }
       });
       
@@ -549,7 +536,6 @@ class HeaderSystem {
         const item = document.querySelector(`#typeFilterMenu .type-filter-item[data-value="${value}"]`);
         if (item) {
           item.classList.add('selected');
-          console.log(`🔧 Selected type item: ${value}`);
         }
       });
       
@@ -569,7 +555,6 @@ class HeaderSystem {
         const item = document.querySelector(`#accountFilterMenu .account-filter-item[data-value="${value}"]`);
         if (item) {
           item.classList.add('selected');
-          console.log(`🔧 Selected account item: ${value}`);
         }
       });
       
@@ -588,7 +573,6 @@ class HeaderSystem {
       const item = document.querySelector(`#dateRangeFilterMenu .date-range-filter-item[data-value="${selectedValues}"]`);
       if (item) {
         item.classList.add('selected');
-        console.log(`🔧 Selected date range item: ${selectedValues}`);
       }
       
       // עדכון הטקסט
@@ -636,7 +620,6 @@ class HeaderSystem {
               const cachedFilters = await window.UnifiedCacheManager.get('headerFilters');
               if (cachedFilters) {
                 this.currentFilters = { ...this.currentFilters, ...cachedFilters };
-                console.log('🔧 Loaded saved filters from Unified Cache:', this.currentFilters);
               }
             } catch (e) {
               console.log('⚠️ Error loading saved filters from Unified Cache:', e);
@@ -654,7 +637,6 @@ class HeaderSystem {
               try {
                 const parsedFilters = typeof saved === 'string' ? JSON.parse(saved) : saved;
                 this.currentFilters = { ...this.currentFilters, ...parsedFilters };
-                console.log('🔧 Loaded saved filters from localStorage (fallback):', this.currentFilters);
               } catch (e) {
                 console.log('⚠️ Error loading saved filters:', e);
               }
@@ -664,15 +646,12 @@ class HeaderSystem {
         
         // הפעלת פילטרים על כל הטבלאות
         applyAllFilters() {
-          console.log('🔧 applyAllFilters called');
           
           // מציאת כל הטבלאות בעמוד באופן דינמי
           const tables = document.querySelectorAll('table.data-table[data-table-type]');
-          console.log(`🔧 Found ${tables.length} tables to filter`);
           
           tables.forEach(table => {
             if (table.id) {
-              console.log(`🔧 Applying filters to table: ${table.id} (type: ${table.getAttribute('data-table-type')})`);
               this.applyFiltersToTable(table.id);
             }
           });
@@ -770,7 +749,6 @@ class HeaderSystem {
             }
           });
           
-          console.log(`✅ ${tableId}: ${visibleCount}/${rows.length} rows visible`);
         },
         
         // פונקציה לבדיקת תאריך בטווח
@@ -852,7 +830,6 @@ class HeaderSystem {
 
 // פונקציה לפתיחה וסגירה של הפילטר הראשי
 window.toggleHeaderFilters = function() {
-  console.log('🔧 toggleHeaderFilters called - Header filter system only');
   const section = document.getElementById('headerFilters');
   if (section) {
     const isVisible = !section.classList.contains('filters-hidden');
@@ -915,43 +892,34 @@ window.toggleHeaderFilters = function() {
       }
     }
     
-    console.log(`✅ Header filters ${isVisible ? 'hidden' : 'shown'}`);
   }
 };
 
 window.toggleStatusFilterMenu = function() {
-  console.log('🔧 toggleStatusFilterMenu called');
   const menu = document.getElementById('statusFilterMenu');
   if (menu) {
     menu.classList.toggle('show');
-    console.log('🔧 Status filter menu toggled:', menu.classList.contains('show') ? 'opened' : 'closed');
   }
 };
 
 window.toggleTypeFilterMenu = function() {
-  console.log('🔧 toggleTypeFilterMenu called');
   const menu = document.getElementById('typeFilterMenu');
   if (menu) {
     menu.classList.toggle('show');
-    console.log('🔧 Type filter menu toggled:', menu.classList.contains('show') ? 'opened' : 'closed');
   }
 };
 
 window.toggleAccountFilterMenu = function() {
-  console.log('🔧 toggleAccountFilterMenu called');
   const menu = document.getElementById('accountFilterMenu');
   if (menu) {
     menu.classList.toggle('show');
-    console.log('🔧 Account filter menu toggled:', menu.classList.contains('show') ? 'opened' : 'closed');
   }
 };
 
 window.toggleDateRangeFilterMenu = function() {
-  console.log('🔧 toggleDateRangeFilterMenu called');
   const menu = document.getElementById('dateRangeFilterMenu');
   if (menu) {
     menu.classList.toggle('show');
-    console.log('🔧 Date range filter menu toggled:', menu.classList.contains('show') ? 'opened' : 'closed');
   }
 };
 
@@ -959,7 +927,6 @@ window.toggleDateRangeFilterMenu = function() {
 
 // פונקציות בחירת פילטרים (מולטיסלקט)
 window.selectStatusOption = function(status) {
-  console.log('🔧 selectStatusOption called with:', status);
   
   const statusItems = document.querySelectorAll('#statusFilterMenu .status-filter-item');
   const clickedItem = Array.from(statusItems).find(item => item.getAttribute('data-value') === status);
@@ -1004,7 +971,6 @@ window.selectStatusOption = function(status) {
 };
 
 window.selectTypeOption = function(type) {
-  console.log('🔧 selectTypeOption called with:', type);
   
   const typeItems = document.querySelectorAll('#typeFilterMenu .type-filter-item');
   const clickedItem = Array.from(typeItems).find(item => item.getAttribute('data-value') === type);
@@ -1044,7 +1010,6 @@ window.selectTypeOption = function(type) {
 };
 
 window.selectAccountOption = function(account) {
-  console.log('🔧 selectAccountOption called with:', account);
   
   const accountItems = document.querySelectorAll('#accountFilterMenu .account-filter-item');
   const clickedItem = Array.from(accountItems).find(item => item.getAttribute('data-value') === account);
@@ -1084,7 +1049,6 @@ window.selectAccountOption = function(account) {
 };
 
 window.selectDateRangeOption = function(dateRange) {
-  console.log('🔧 selectDateRangeOption called with:', dateRange);
 
   const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
   
@@ -1241,20 +1205,17 @@ window.clearAllFilters = function() {
     if (typeof window.updateAccountFilterText === 'function') window.updateAccountFilterText();
     if (typeof window.updateDateRangeFilterText === 'function') window.updateDateRangeFilterText();
     
-    console.log('✅ כל הפילטרים נמחקו');
     
     // הצגת הודעת הצלחה
     if (typeof window.showNotification === 'function') {
       window.showNotification('כל הפילטרים נמחקו בהצלחה', 'success', 'הצלחה', 2000, 'system');
     } else {
-      console.log('🔔 הודעת הצלחה: כל הפילטרים נמחקו בהצלחה');
     }
   }
 };
 
 // פונקציה לעדכון UI של הפילטרים
 window.updateFilterUI = function(filters) {
-  console.log('🎨 עדכון UI של הפילטרים:', filters);
   
   // עדכון שדה החיפוש
   const searchInput = document.getElementById('searchFilterInput');
@@ -1366,13 +1327,11 @@ window.resetAllFilters = async function() {
       
     }
     
-    console.log('✅ פילטרים אופסו לערכי ברירת מחדל');
     
     // הצגת הודעת הצלחה
     if (typeof window.showNotification === 'function') {
       window.showNotification('פילטרים אופסו לערכי ברירת מחדל', 'success', 'הצלחה', 2000, 'system');
     } else {
-      console.log('🔔 הודעת הצלחה: פילטרים אופסו לערכי ברירת מחדל');
     }
     
   } catch (error) {
@@ -1401,13 +1360,11 @@ window.clearSearchFilter = function() {
       window.filterSystem.saveFilters();
       window.filterSystem.applyAllFilters();
     }
-    console.log('✅ חיפוש נוקה');
     
     // הצגת הודעת הצלחה
     if (typeof window.showNotification === 'function') {
       window.showNotification('חיפוש נוקה בהצלחה', 'success', 'הצלחה', 1500, 'system');
     } else {
-      console.log('🔔 הודעת הצלחה: חיפוש נוקה בהצלחה');
     }
   }
 };
@@ -1418,7 +1375,6 @@ window.HeaderSystemClass = HeaderSystem;
 // Create global HeaderSystem object for compatibility with unified initialization
 window.HeaderSystem = {
   initialize: function() {
-    console.log('🚀 HeaderSystem.initialize called');
     try {
       // Check if HeaderSystem class exists
       if (typeof window.HeaderSystemClass === 'function') {
@@ -1493,7 +1449,6 @@ window.updateToggleButtons = function() {
   
   if (isOpen) {
     // פילטר פתוח - הצג כפתור משני (בתוך הפילטר)
-    console.log('📤 Hiding main button, showing secondary button');
     mainBtn.style.display = 'none';
     secondaryBtn.style.display = 'block';
   } else {
@@ -1506,7 +1461,6 @@ window.updateToggleButtons = function() {
 
 // Z-Index Debug Function - בדיקת מצב z-index בפועל
 window.debugZIndexStatus = function() {
-    console.log('🔍 בדיקת מצב Z-Index במערכת ראש הדף');
     console.log('=====================================');
     
     // בדיקת אלמנטים רלוונטיים
@@ -1543,7 +1497,6 @@ window.debugZIndexStatus = function() {
     });
     
     // בדיקת כל התפריטים הפתוחים
-    console.log('🎯 בדיקת תפריטים פתוחים:');
     const openMenus = document.querySelectorAll('.tiktrack-dropdown-menu:not([style*="display: none"])');
     console.log(`תפריטים פתוחים: ${openMenus.length}`);
     
@@ -1563,7 +1516,6 @@ window.debugZIndexStatus = function() {
     }
     
     // בדיקת תפריטי פילטר
-    console.log('🔍 בדיקת תפריטי פילטר:');
     const filterMenus = document.querySelectorAll('.filter-menu');
     filterMenus.forEach((menu, index) => {
         const computedStyle = window.getComputedStyle(menu);
@@ -1571,7 +1523,6 @@ window.debugZIndexStatus = function() {
     });
     
     console.log('=====================================');
-    console.log('✅ בדיקת Z-Index הושלמה');
 };
 
 // ===== CACHE MANAGEMENT - REDIRECTED TO CACHE-TEST PAGE =====
@@ -1579,7 +1530,6 @@ window.debugZIndexStatus = function() {
 
 // כל בדיקות המטמון מרוכזות בעמוד /cache-test
 
-console.log('✅ Header System v6.0.0 loaded successfully!');
 
 // Note: Header system initialization is called from core-systems.js Stage 2: UI Systems
 // The function window.initializeHeaderSystem() is available and will be called automatically

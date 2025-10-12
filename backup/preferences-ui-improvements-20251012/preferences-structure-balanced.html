@@ -208,9 +208,8 @@
                         </div>
                     </div>
                 </div>
-              </div>
-            </div>
         </div>
+    </div>
         <!-- UI Content Section 1 End -->   
       
         <!-- UI Content Section 2 Start-->
@@ -909,6 +908,47 @@
                 
                 <div class="section-divider"></div>
                 
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>מסננים ברירת מחדל:</h6>
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 w-25">סטטוס:</label>
+                            <select id="defaultStatusFilter" class="form-select">
+                                <option value="all">הכל</option>
+                                <option value="active">פעיל</option>
+                                <option value="inactive">לא פעיל</option>
+                            </select>
+                        </div>
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 w-25">סוג:</label>
+                            <select id="defaultTypeFilter" class="form-select">
+                                <option value="all">הכל</option>
+                                <option value="buy">קנייה</option>
+                                <option value="sell">מכירה</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>הגדרות רענון:</h6>
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 w-25">רענון אוטומטי:</label>
+                            <input type="checkbox" id="chartAutoRefresh" class="form-check-input" checked>
+                        </div>
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 w-25">מרווח רענון (שניות):</label>
+                            <select id="chartRefreshInterval" class="form-select">
+                                <option value="30">30</option>
+                                <option value="60" selected>60</option>
+                                <option value="120">120</option>
+                                <option value="300">300</option>
+                            </select>
+                        </div>
+                    </div>
+              </div>
+            </div>
+            
+                <div class="section-divider"></div>
+                
                 <!-- Chart Settings -->
                 <div class="row">
                     <div class="col-12">
@@ -979,7 +1019,6 @@
             </div>
         </div>
         <!-- UI Content Section 7 End-->
-        </div>
     </div>
     <!-- 🔒 LOCKED TEMPLATE ZONE 3 - End Main Content Container (DO NOT MODIFY) -->
   

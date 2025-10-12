@@ -12,7 +12,6 @@
 
 // ===== COMMUNICATION MODULE =====
 
-console.log('🚀 Loading Communication Module...');
 
 // Communication utilities and API functions
 const CommunicationModule = {
@@ -52,7 +51,6 @@ const CommunicationModule = {
     // Data synchronization
     async syncData(source, target) {
         try {
-            console.log(`🔄 Syncing data from ${source} to ${target}`);
             // Implementation for data synchronization
             return true;
         } catch (error) {
@@ -64,5 +62,3 @@ const CommunicationModule = {
 
 // Export to global scope
 window.CommunicationModule = CommunicationModule;
-
-console.log('✅ Communication Module loaded successfully');

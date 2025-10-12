@@ -297,7 +297,6 @@ function loadEntityColorsFromPreferences(preferences) {
       ENTITY_BORDER_COLORS['trade_plan'] = `rgba(${hexToRgb(preferences.entityTradePlanColor)?.r || 0}, ${hexToRgb(preferences.entityTradePlanColor)?.g || 123}, ${hexToRgb(preferences.entityTradePlanColor)?.b || 255}, 0.3)`;
     }
     
-    console.log('✅ צבעי ישויות עודכנו מההעדפות:', ENTITY_COLORS);
   }
   
   // יצירת CSS דינמי
@@ -323,7 +322,6 @@ function generateAndApplyEntityCSS() {
     
     styleElement.textContent = newCSS;
     
-    console.log('✅ CSS דינמי נוצר והוחל על הדף');
   } catch (error) {
     console.error('❌ שגיאה ביצירת CSS דינמי:', error);
   }
@@ -348,7 +346,6 @@ function generateAndApplyStatusCSS() {
     
     styleElement.textContent = newCSS;
     
-    console.log('✅ CSS דינמי לסטטוסים נוצר והוחל על הדף');
   } catch (error) {
     console.error('❌ שגיאה ביצירת CSS דינמי לסטטוסים:', error);
   }
@@ -1590,7 +1587,6 @@ function getColorPreferences() {
  */
 function updateCSSVariablesFromPreferences(preferences) {
   try {
-    console.log('🎨 עדכון CSS Variables מהעדפות...', preferences);
 
       // עדכון צבעי סטטוסים - מהעדפות למשתני CSS (צבע אחד לכל סטטוס)
       if (preferences.statusOpenColor) {
@@ -1787,7 +1783,6 @@ function updateCSSVariablesFromPreferences(preferences) {
 
     // עדכון צבעים בסיסיים
     if (preferences.primaryColor) {
-      console.log('🎨 מעדכן --primary-color ל:', preferences.primaryColor);
       document.documentElement.style.setProperty('--primary-color', preferences.primaryColor);
     } else {
       console.log('⚠️ primaryColor לא נמצא בהעדפות');
@@ -1962,7 +1957,6 @@ function updateCSSVariablesFromPreferences(preferences) {
       document.documentElement.style.setProperty('--entity-note-border', `rgba(${hexToRgb(preferences.entityNoteColor)?.r || 196}, ${hexToRgb(preferences.entityNoteColor)?.g || 188}, ${hexToRgb(preferences.entityNoteColor)?.b || 0}, 0.3)`);
     }
 
-    console.log('✅ CSS Variables עודכנו בהצלחה');
     // console.log('🎨 צבעים מעודכנים:', {
     //   primary: preferences.primaryColor,
     //   secondary: preferences.secondaryColor,
@@ -1977,7 +1971,6 @@ function updateCSSVariablesFromPreferences(preferences) {
       window.dispatchEvent(new CustomEvent('colorPreferencesUpdated'));
     }
     
-    console.log('✅ CSS Variables updated and chart theme notified');
   } catch (error) {
     console.error('❌ שגיאה בעדכון CSS Variables:', error);
   }
@@ -1992,11 +1985,9 @@ async function loadColorPreferences() {
   try {
     // מניעת כפילויות
     if (window.colorPreferencesLoaded) {
-      console.log('✅ Color preferences already loaded');
       return;
     }
     
-    console.log('🎨 טוען הגדרות צבע מהעדפות...');
 
     // נסה ראשית מערכת העדפות
     try {
@@ -2005,26 +1996,21 @@ async function loadColorPreferences() {
         const newData = await newResponse.json();
         if (newData.success && newData.data.preferences) {
           const prefs = newData.data.preferences;
-          console.log('🚀 Using preferences color settings');
           
           // עדכון מערכת הצבעים מהעדפות
           if (prefs.colorScheme) {
             if (prefs.colorScheme.numericValues) {
               Object.assign(NUMERIC_VALUE_COLORS, prefs.colorScheme.numericValues);
-              console.log('✅ numeric colors loaded');
             }
             if (prefs.colorScheme.entities) {
               Object.assign(ENTITY_COLORS, prefs.colorScheme.entities);
-              console.log('✅ entity colors loaded');
             }
             if (prefs.colorScheme.status) {
               Object.assign(STATUS_COLORS, prefs.colorScheme.status);
-              console.log('✅ status colors loaded');
             }
           }
           
     // עדכון CSS Variables
-    console.log('🎨 קורא ל-updateCSSVariablesFromPreferences עם:', prefs);
     updateCSSVariablesFromPreferences(prefs);
           
           // עדכון כותרות עם הצבעים החדשים
@@ -2042,24 +2028,19 @@ async function loadColorPreferences() {
             }
           }
           
-          console.log('🎨 ✅ הגדרות צבע נטענו בהצלחה (new system)');
           window.colorPreferencesLoaded = true;
           return true;
         }
       }
     } catch (newError) {
       // preferences not available (likely database tables not created yet)
-      console.log('🔄 preferences colors not available, falling back to defaults');
     }
 
     // Fallback ל-legacy
-    console.log('🔄 Using legacy color preferences (fallback)');
     const response = await fetch('/api/preferences/user');
-    console.log('🔄 Response status:', response.status);
     if (response.ok) {
       const data = await response.json();
       const preferences = data.data || data;
-      console.log('🔄 Preferences loaded:', preferences.primaryColor);
 
       // עדכון מערכת הצבעים
       // הסרנו את preferences.numericValueColors כי הוא לא קיים במערכת ההעדפות
@@ -2069,7 +2050,6 @@ async function loadColorPreferences() {
       // במקום זה משתמשים במשתנים ספציפיים: entityTradeColor, entityTradingAccountColor וכו'
 
       // עדכון CSS Variables
-      console.log('🎨 קורא ל-updateCSSVariablesFromPreferences (fallback) עם:', preferences);
       updateCSSVariablesFromPreferences(preferences);
 
       // עדכון כותרות עם הצבעים החדשים
@@ -2091,7 +2071,6 @@ async function loadColorPreferences() {
           else if (type === 'trade-plans') type = 'trade-plan';
           else if (type === 'executions') type = 'execution';
           
-          console.log(`🎨 מעדכן כותרות עבור ${type}...`);
           if (window.applyEntityColorsToHeaders) {
             setTimeout(() => {
               window.applyEntityColorsToHeaders(type);
@@ -2100,7 +2079,6 @@ async function loadColorPreferences() {
         }
       }
 
-      console.log('✅ הגדרות צבע נטענו בהצלחה (fallback)');
       window.colorPreferencesLoaded = true;
     } else {
       console.log('❌ Response not ok:', response.status);
@@ -2114,14 +2092,12 @@ async function loadColorPreferences() {
 window.testUpdatePrimaryColor = function() {
   console.log('🧪 Testing manual primary color update...');
   document.documentElement.style.setProperty('--primary-color', '#26baac');
-  console.log('✅ Primary color updated to #26baac');
 };
 
 // Test function to manually load preferences
 window.testLoadPreferences = function() {
   console.log('🧪 Testing manual preferences load...');
   loadColorPreferences().then(() => {
-    console.log('✅ Preferences loaded manually');
   }).catch(error => {
     console.error('❌ Error loading preferences manually:', error);
   });
@@ -2139,7 +2115,6 @@ window.testCheckCSSVariables = function() {
 window.testForceUpdatePrimaryColor = function() {
   console.log('🧪 Force updating primary color...');
   document.documentElement.style.setProperty('--primary-color', '#26baac');
-  console.log('✅ Primary color force updated to #26baac');
   
   // Check if it worked
   const newColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color');
@@ -2157,9 +2132,7 @@ window.testColorSchemeSystem = function() {
   
   // Try to load preferences manually
   if (typeof loadColorPreferences === 'function') {
-    console.log('✅ loadColorPreferences is available');
     loadColorPreferences().then(() => {
-      console.log('✅ Manual preferences load successful');
     }).catch(error => {
       console.error('❌ Manual preferences load failed:', error);
     });
@@ -2178,7 +2151,6 @@ function updateEntityColors(preferences) {
     // הסרנו את preferences.entityColors כי הוא לא קיים במערכת ההעדפות
     // במקום זה משתמשים במשתנים ספציפיים
       updateCSSVariablesFromPreferences(preferences);
-      console.log('✅ צבעי ישויות עודכנו מהעדפות');
   } catch (error) {
     console.error('❌ שגיאה בעדכון צבעי ישויות:', error);
   }
@@ -2338,7 +2310,6 @@ function getSubHeaderOpacityHex() {
 
 // טעינת הגדרות צבע בטעינת הדף - הוסר כדי למנוע כפילות עם core-systems.js
 // האתחול מתבצע דרך מערכת האתחול המאוחדת
-console.log('🎨 UI Advanced module ready - waiting for unified initialization');
 
 // ===== COLOR SCHEME MANAGEMENT FUNCTIONS =====
 // פונקציות ניהול סכמות צבעים
@@ -2352,7 +2323,6 @@ console.log('🎨 UI Advanced module ready - waiting for unified initialization'
  */
 async function applyColorScheme(schemeName = 'light', customColors = null) {
   try {
-    console.log(`🎨 Applying color scheme: ${schemeName}`);
     
     // Remove existing scheme classes
     document.body.classList.remove('light-scheme', 'dark-scheme', 'custom-scheme');
@@ -2400,7 +2370,6 @@ async function applyColorScheme(schemeName = 'light', customColors = null) {
       detail: { scheme: schemeName, customColors }
     }));
     
-    console.log(`✅ Color scheme ${schemeName} applied successfully`);
     
   } catch (error) {
     console.error('❌ Error applying color scheme:', error);
@@ -2416,7 +2385,6 @@ async function toggleColorScheme() {
     const currentScheme = await getCurrentColorScheme();
     const newScheme = currentScheme === 'light' ? 'dark' : 'light';
     
-    console.log(`🔄 Toggling color scheme from ${currentScheme} to ${newScheme}`);
     await applyColorScheme(newScheme);
     
   } catch (error) {
@@ -2505,7 +2473,6 @@ async function saveColorScheme(schemeName, customColors = null) {
       }
     }
     
-    console.log(`✅ Color scheme ${schemeName} saved successfully`);
     
   } catch (error) {
     console.error('❌ Error saving color scheme:', error);
@@ -2583,7 +2550,6 @@ function applyDarkScheme() {
  */
 function applyCustomScheme(customColors) {
   try {
-    console.log('🎨 Applying custom color scheme');
     
     // Apply custom colors to CSS variables
     Object.entries(customColors).forEach(([key, value]) => {
@@ -2768,7 +2734,6 @@ window.colorSchemeSystem = {
  * טען צבעים דינמיים מהעדפות
  */
 async function loadDynamicColors() {
-  console.log('🎨 Loading dynamic colors...');
   try {
     // Load color scheme from preferences
     if (typeof window.loadColorScheme === 'function') {
@@ -2780,7 +2745,6 @@ async function loadDynamicColors() {
       window.applyColorScheme();
     }
     
-    console.log('✅ Dynamic colors loaded successfully');
     return true;
   } catch (error) {
     console.error('❌ Error loading dynamic colors:', error);

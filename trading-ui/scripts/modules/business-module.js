@@ -266,7 +266,6 @@ function addInvestmentTypeColorLegend() {
  */
 async function loadTradesData() {
   try {
-    console.log('🚀 loadTradesData: Starting to fetch trades data...');
 
     const response = await fetch('/api/trades/');
 
@@ -275,7 +274,6 @@ async function loadTradesData() {
     }
 
     const responseData = await response.json();
-    console.log('📊 loadTradesData: Received data:', responseData?.data?.length || 0, 'trades');
 
     if (responseData.status !== 'success') {
       throw new Error(`API error: ${responseData.message || 'Unknown error'}`);
@@ -307,7 +305,6 @@ async function loadTradesData() {
     window.tradesData = localTradesData;
     console.log('💾 loadTradesData: Stored', localTradesData.length, 'trades in window.tradesData');
 
-    console.log('🔄 loadTradesData: Calling updateTradesTable...');
     updateTradesTable(localTradesData);
 
     // עדכון סטטיסטיקות
@@ -353,7 +350,6 @@ async function loadTradesData() {
  * - Automatic row count updates
  */
 function updateTradesTable(trades) {
-  console.log('🔍 updateTradesTable called with:', trades?.length || 0, 'trades');
   
   // בדיקה שהנתונים תקינים
   if (!trades || !Array.isArray(trades)) {
@@ -369,10 +365,8 @@ function updateTradesTable(trades) {
     return;
   }
   
-  console.log('✅ Found #tradesTable, proceeding with update');
 
   const tbody = document.querySelector('#tradesTable tbody');
-  console.log('🔍 Looking for tbody:', tbody);
   if (!tbody) {
     console.error('❌ tbody not found!');
     if (typeof handleElementNotFound === 'function') {
@@ -382,7 +376,6 @@ function updateTradesTable(trades) {
     }
     return;
   }
-  console.log('✅ Found tbody, proceeding with HTML generation');
 
   const tableHTML = trades.map(trade => {
     const statusDisplay = trade.status === 'closed' ? 'סגור' : trade.status === 'cancelled' ? 'מבוטל' : 'פתוח';
@@ -1966,7 +1959,6 @@ function getCurrentPosition(_tradeId) {
 
 // אתחול הדף - הוסר כדי למנוע כפילות עם core-systems.js
 // האתחול מתבצע דרך מערכת האתחול המאוחדת
-console.log('💼 Business module ready - waiting for unified initialization');
 
 // ========================================
 // ייצוא פונקציות לגלובל
@@ -2375,7 +2367,6 @@ function setupSortEventListeners() {
 // קריאה לטעינת נתונים כשהדף נטען
 // הוסר DOMContentLoaded listener כדי למנוע כפילות עם core-systems.js
 // האתחול מתבצע דרך מערכת האתחול המאוחדת
-console.log('💼 Business module trades ready - waiting for unified initialization');
 
 /**
  * בדיקת התאמת תוכנית טרייד לטרייד
@@ -2883,7 +2874,6 @@ async function reactivateTrade(tradeId) {
  */
 function refreshTrades() {
   try {
-    console.log('🔄 מרענן נתוני טריידים...');
     
     // הצגת אינדיקטור טעינה
     if (typeof window.showNotification === 'function') {
@@ -2917,7 +2907,6 @@ function refreshTrades() {
  */
 function updateTrade(tradeId, tradeData) {
   try {
-    console.log('📝 מעדכן טרייד:', tradeId, tradeData);
     
     // ולידציה בסיסית
     if (!tradeId || !tradeData) {
@@ -2939,7 +2928,6 @@ function updateTrade(tradeId, tradeData) {
       return response.json();
     })
     .then(data => {
-      console.log('✅ טרייד עודכן בהצלחה:', data);
       
       // רענון הטבלה
       loadTradesData();

@@ -421,7 +421,6 @@ function getColumnValue(item, columnIndex, tableType) {
         }
       }
       
-      console.log(`🔍 [table-mappings.js] tickers mapping: ${fieldName} → ${actualFieldName} = ${result}`);
       return result;
     }
 
@@ -438,7 +437,6 @@ function getColumnValue(item, columnIndex, tableType) {
         }
       }
       
-      console.log(`🔍 [table-mappings.js] cash_flows mapping: ${fieldName} = ${result}`);
       return result;
     }
 
@@ -481,7 +479,6 @@ function getColumnValue(item, columnIndex, tableType) {
         }
       }
       
-      console.log(`🔍 [table-mappings.js] notes mapping: ${fieldName} = ${result}`);
       return result;
     }
 
@@ -909,7 +906,6 @@ function getTableConfig(tableName) {
     
     const config = tableConfigs[tableName];
     if (config) {
-      console.log(`✅ Table config loaded for: ${tableName}`);
       return config;
     } else {
       console.log(`ℹ️ No config found for table: ${tableName}`);
@@ -1267,7 +1263,6 @@ function getColumnDefinition(tableName, columnName) {
     const tableColumns = columnDefinitions[tableName];
     if (tableColumns && tableColumns[columnName]) {
       const definition = tableColumns[columnName];
-      console.log(`✅ Column definition loaded for: ${tableName}.${columnName}`);
       return definition;
     } else {
       console.log(`ℹ️ No definition found for column: ${tableName}.${columnName}`);
@@ -1299,7 +1294,6 @@ function setTableConfig(tableName, config) {
     }
     window._tableConfigs[tableName] = config;
     
-    console.log(`✅ Table config set for: ${tableName}`);
     return true;
     
   } catch (error) {
@@ -1331,7 +1325,6 @@ function setColumnDefinition(tableName, columnName, definition) {
     }
     window._columnDefinitions[tableName][columnName] = definition;
     
-    console.log(`✅ Column definition set for: ${tableName}.${columnName}`);
     return true;
     
   } catch (error) {
@@ -1368,9 +1361,6 @@ window.tableMappings = {
 };
 
 // Table Mappings loaded successfully
-console.log('✅ [table-mappings.js] Loaded successfully!');
-console.log('✅ [table-mappings.js] window.tableMappings available:', !!window.tableMappings);
-console.log('✅ [table-mappings.js] window.getColumnValue available:', !!window.getColumnValue);
 
 // ===== TABLE SORTING SYSTEM ======
 /**
@@ -1750,7 +1740,6 @@ window.sortTableData = async function (columnIndex, data, tableType, updateFunct
     })));
     
         // Log detailed price comparison
-        console.log(`🔍 [SORT] Price comparison - First 5 items:`);
         for (let i = 0; i < Math.min(5, sortedData.length); i++) {
           const item = sortedData[i];
           const price = getColumnValue(item, columnIndex, tableType);
@@ -1769,7 +1758,6 @@ window.sortTableData = async function (columnIndex, data, tableType, updateFunct
 
   // Update the table
   if (typeof updateFunction === 'function') {
-    console.log(`🔍 [SORT] Calling updateFunction with ${sortedData.length} items`);
     updateFunction(sortedData);
   } else {
     console.warn(`⚠️ [SORT] updateFunction is not a function:`, typeof updateFunction);
@@ -1820,7 +1808,6 @@ function updateSortIcons(tableType, columnIndex, direction) {
       }
     }
 
-    console.log(`🔍 [SORT] Updated sort icons for ${tableType} column ${columnIndex} to ${direction}`);
   } catch (error) {
     console.error('❌ Error updating sort icons:', error);
   }
@@ -2034,7 +2021,6 @@ window.sortTable = async function (tableTypeOrColumnIndex, columnIndex, dataArra
       return;
     }
     
-    console.log(`🔍 [SORT] Sorting ${tableData.length} items by column ${tableTypeOrColumnIndex}`);
     return await window.sortTableData(tableTypeOrColumnIndex, tableData, tableType, updateFn);
   }
   
@@ -2290,7 +2276,6 @@ window.loadTableData = async function(tableType, updateFunction, options = {}) {
  */
 window.refreshTable = async function(tableType, updateFunction) {
   try {
-    console.log(`🔄 Refreshing table: ${tableType}`);
     
     // Clear any cached data for this table type
     if (window.tableData && window.tableData[tableType]) {
@@ -2345,7 +2330,6 @@ window.loadTableDataFromCache = async function(tableId, filters = {}, serverLoad
       ttl: 300000 // 5 דקות
     });
     
-    console.log(`✅ Loaded table ${tableId} data from cache`);
     return data || [];
     
   } catch (error) {
@@ -2380,7 +2364,6 @@ window.saveTableDataToCache = async function(tableId, data, filters = {}) {
     });
     
     if (result) {
-      console.log(`✅ Saved table ${tableId} data to cache`);
     }
     
     return result;
@@ -2413,7 +2396,6 @@ window.saveTableState = async function(tableId, state) {
     });
     
     if (result) {
-      console.log(`✅ Saved table ${tableId} state to cache`);
     }
     
     return result;
@@ -2442,7 +2424,6 @@ window.loadTableState = async function(tableId) {
     const state = await window.UnifiedCacheManager.get(`table-${tableId}-state`);
     
     if (state) {
-      console.log(`✅ Loaded table ${tableId} state from cache`);
     }
     
     return state;
@@ -2454,7 +2435,4 @@ window.loadTableState = async function(tableId) {
 };
 
 // Tables.js loaded successfully
-console.log('✅ [tables.js] Loaded successfully!');
-console.log('✅ [tables.js] window.tableMappings available:', !!window.tableMappings);
-console.log('✅ [tables.js] window.getColumnValue available:', !!window.getColumnValue);
 

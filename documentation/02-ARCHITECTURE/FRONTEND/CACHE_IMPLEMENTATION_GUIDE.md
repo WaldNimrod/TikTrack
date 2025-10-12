@@ -650,9 +650,77 @@ if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
 
 ---
 
-**עודכן לאחרונה:** 6 בינואר 2025  
-**גרסה:** 2.0  
-**סטטוס:** ✅ מיגרציה הושלמה - מערכת המטמון המאוחדת פועלת
+## 🔄 **Post-Clear Behavior**
+
+**תאריך הוספה:** 12 ינואר 2025  
+**גרסה:** 2.1 - Auto-Reload System
+
+### **התנהגות אחרי ניקוי מטמון:**
+
+#### **כל הרמות (Light, Medium, Full):**
+1. ✅ **Auto-reload page data** - טעינה אוטומטית של נתונים מהשרת
+2. ✅ **Update tables** - עדכון טבלאות עם נתונים חדשים
+3. ✅ **Show completion notification** - הודעת סיום מפורטת
+4. ✅ **Log result** - תיעוד בconsole (אם verbose=true)
+
+#### **רמה Nuclear בלבד:**
+5. ✅ **Show 2-second countdown** - ספירה לאחור לפני refresh
+6. ✅ **Auto-refresh entire page** - רענון מלא של העמוד
+7. ✅ **Force cache bypass** - cache busting עם URL parameter
+
+### **Error Handling:**
+- **אם reload נכשל** → הצגת אזהרה + המשך תהליך
+- **אם refresh נכשל** → הצגת הוראות ידניות
+- **אם clearAllCache נכשל** → הצגת שגיאה מפורטת + rollback
+
+### **Flow Diagram:**
+
+```
+clearAllCache(level)
+       ↓
+   Confirmation Modal
+       ↓
+   Show "🧹 מנקה..."
+       ↓
+   Perform Clear
+       ↓
+   ┌─────────────────┐
+   │  level=nuclear? │
+   └─────────────────┘
+      No ↓        ↓ Yes
+         ↓        ↓
+    Reload Data   Show countdown
+         ↓        ↓
+    Show success  Hard Refresh
+         ↓        ↓
+       Done      Reload page
+```
+
+### **Lessons Learned (12 ינואר 2025):**
+
+**בעיה שזוהתה:**
+- ניקוי "גרעיני" מחק את trade_plans מהמטמון
+- לא טען נתונים מחדש מהשרת
+- העמוד נשאר ריק ללא נתונים
+- המשתמש תקוע ללא משוב
+
+**פתרון שיושם:**
+- הוספת פונקציה `reloadPageData()` שטוענת נתונים אוטומטית
+- הפרדה בין reload נתונים (Light/Medium/Full) ל-refresh עמוד (Nuclear)
+- הוספת הודעות progress במהלך התהליך
+- הוספת 2 שניות המתנה לפני refresh כדי להציג הודעות
+
+**תוצאה:**
+- ✅ לאחר ניקוי Light/Medium/Full - הנתונים נטענים מחדש אוטומטית
+- ✅ לאחר ניקוי Nuclear - העמוד מתרענן אוטומטית
+- ✅ המשתמש רואה הודעות ברורות על מה קורה
+- ✅ אין עוד מצבים של "עמוד ריק"
+
+---
+
+**עודכן לאחרונה:** 12 ינואר 2025  
+**גרסה:** 2.1 - Auto-Reload System  
+**סטטוס:** ✅ מערכת המטמון משופרת עם reload אוטומטי
 
 
 

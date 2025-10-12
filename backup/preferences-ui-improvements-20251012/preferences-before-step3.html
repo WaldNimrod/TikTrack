@@ -140,7 +140,7 @@
         <!-- UI Content Section 1 Start-->
       <div class="content-section" id="section1">
         <div class="section-header">
-            <h2>👤 ניהול פרופילים <small class="text-muted mx-3">| פעיל: <span id="currentActiveProfile">טוען...</span></small></h2>
+            <h2>👤 ניהול פרופילים</h2>
             <div class="header-actions">
                 <button class="btn btn-success btn-sm" onclick="window.saveAllPreferences()" title="שמור הכל">
                     <i class="bi bi-save"></i> שמור
@@ -151,32 +151,61 @@
             </div>
         </div>
                 <div class="section-body">
-                <!-- ממשק קומפקטי בשורה אחת -->
-                <div class="row align-items-end">
-                    <div class="col-md-3">
-                        <label class="form-label">בחר פרופיל להפעלה</label>
-                        <select id="profileSwitchSelect" class="form-select">
-                            <option value="">בחר פרופיל...</option>
-                        </select>
+                <!-- הצגת פרופיל פעיל -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <strong>📌 פרופיל פעיל נוכחי:</strong> 
+                            <span id="currentActiveProfile" class="fw-bold">טוען...</span>
+                        </div>
                     </div>
-                    <div class="col-md-2">
-                        <button class="btn btn-primary w-100" onclick="window.switchToSelectedProfile()" id="switchProfileBtn">
-                            <i class="bi bi-arrow-repeat"></i> החלף
-                        </button>
+                </div>
+                
+                <!-- בחירת פרופיל להחלפה -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">בחר פרופיל להפעלה</label>
+                            <select id="profileSwitchSelect" class="form-select">
+                                <option value="">בחר פרופיל...</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="col-md-3">
-                        <label class="form-label">שם פרופיל חדש</label>
-                        <input type="text" id="newProfileName" class="form-control" placeholder="הכנס שם פרופיל">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">&nbsp;</label>
+                            <button class="btn btn-primary w-100" onclick="window.switchToSelectedProfile()" id="switchProfileBtn">
+                                <i class="bi bi-arrow-repeat"></i> החלף לפרופיל זה
+                            </button>
+                        </div>
                     </div>
-                    <div class="col-md-2">
-                        <button class="btn btn-success w-100" onclick="window.createNewProfile()">
-                            <i class="bi bi-plus-circle"></i> צור חדש
-                        </button>
+                </div>
+                
+                <!-- ניהול פרופילים -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">שם פרופיל חדש</label>
+                            <input type="text" id="newProfileName" class="form-control" placeholder="הכנס שם פרופיל">
+                        </div>
                     </div>
-                    <div class="col-md-2">
-                        <button class="btn btn-danger w-100" onclick="window.deleteCurrentProfile()">
-                            <i class="bi bi-trash"></i> מחק פעיל
-                        </button>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">&nbsp;</label>
+                            <button class="btn btn-success w-100" onclick="window.createNewProfile()">
+                                <i class="bi bi-plus-circle"></i> צור פרופיל חדש
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-12">
+                        <div class="profile-buttons d-flex flex-wrap gap-2">
+                            <button class="btn btn-danger" onclick="window.deleteCurrentProfile()">
+                                <i class="bi bi-trash"></i> מחק פרופיל פעיל
+                            </button>
+                        </div>
                     </div>
                 </div>
               </div>
@@ -445,38 +474,42 @@
         </div>
         <div class="section-body">
                 <div class="row">
-                    <div class="col-md-3">
-                        <label class="form-label">Stop Loss ברירת מחדל (%)</label>
-                        <input type="number" id="defaultStopLoss" class="form-control" 
-                               step="0.1" min="0" max="100">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Target Price ברירת מחדל (%)</label>
-                        <input type="number" id="defaultTargetPrice" class="form-control" 
-                               step="0.1" min="0" max="1000">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">עמלה ברירת מחדל ($)</label>
-                        <input type="number" id="defaultCommission" class="form-control" 
-                               step="0.01" min="0">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">סיכון מקסימלי לחשבון (%) <span class="text-muted">(עתידי)</span></label>
-                        <input type="number" id="maxAccountRisk" class="form-control" 
-                               step="0.1" min="0" max="100" disabled>
-                    </div>
+                    <div class="col-md-6">
+                        <h5>הגדרות בסיסיות</h5>
+                        <div class="mb-3">
+                            <label class="form-label">Stop Loss ברירת מחדל (%)</label>
+                            <input type="number" id="defaultStopLoss" class="form-control control-narrow" 
+                                   step="0.1" min="0" max="100">
+            </div>
+                        <div class="mb-3">
+                            <label class="form-label">Target Price ברירת מחדל (%)</label>
+                            <input type="number" id="defaultTargetPrice" class="form-control control-narrow" 
+                                   step="0.1" min="0" max="1000">
                 </div>
-                <div class="row mt-3">
-                    <div class="col-md-3">
-                        <label class="form-label">סיכון מקסימלי לטריד (%) <span class="text-muted">(עתידי)</span></label>
-                        <input type="number" id="maxTradeRisk" class="form-control" 
-                               step="0.1" min="0" max="100" disabled>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">גודל פוזיציה מקסימלי (%) <span class="text-muted">(עתידי)</span></label>
-                        <input type="number" id="maxPositionSize" class="form-control" 
-                               step="0.1" min="0" max="100" disabled>
-                    </div>
+                        <div class="mb-3">
+                            <label class="form-label">עמלה ברירת מחדל ($)</label>
+                            <input type="number" id="defaultCommission" class="form-control control-narrow" 
+                                   step="0.01" min="0">
+                </div>
+                </div>
+                    <div class="col-md-6">
+                        <h5>ניהול סיכונים <span class="text-muted">(עתידי)</span></h5>
+                        <div class="mb-3">
+                            <label class="form-label">סיכון מקסימלי לחשבון (%)</label>
+                            <input type="number" id="maxAccountRisk" class="form-control control-narrow" 
+                                   step="0.1" min="0" max="100" disabled>
+              </div>
+                        <div class="mb-3">
+                            <label class="form-label">סיכון מקסימלי לטריד (%)</label>
+                            <input type="number" id="maxTradeRisk" class="form-control control-narrow" 
+                                   step="0.1" min="0" max="100" disabled>
+            </div>
+                        <div class="mb-3">
+                            <label class="form-label">גודל פוזיציה מקסימלי (%)</label>
+                            <input type="number" id="maxPositionSize" class="form-control control-narrow" 
+                                   step="0.1" min="0" max="100" disabled>
+          </div>
+            </div>
                   </div>
                 </div>
             </div>
@@ -680,35 +713,6 @@
                                 <input type="color" id="entityTradingAccountColorDark" class="form-control form-control-color color-picker" data-color-key="entityTradingAccountColorDark">
                 </div>
               </div>
-                    </div>
-                    </div>
-                </div>
-            </div>
-        <!-- UI Content Section 5 End--> 
-      
-        <!-- UI Content Section 5b Start-->
-      <div class="content-section" id="section5b">
-        <div class="section-header">
-            <h2>🎨 צבעי ישויות נוספות</h2>
-            <div class="header-actions">
-                <button class="btn btn-success btn-sm" onclick="window.saveAllPreferences()" title="שמור הכל">
-                    <i class="bi bi-save"></i> שמור
-                </button>
-                <button class="filter-toggle-btn" onclick="toggleSection('section5b')" title="הצג/הסתר סקשן">
-                    <span class="section-toggle-icon">▼</span>
-                </button>
-            </div>
-        </div>
-        <div class="section-body">
-                <!-- Entity Colors - Additional -->
-                <div class="row">
-                    <div class="col-12">
-                        <h5>צבעי ישויות נוספות</h5>
-                        <small class="text-muted">כל ישות כוללת 3 וריאנטים: רגיל, בהיר (רקע), כהה (טקסט)</small>
-              </div>
-                  </div>
-                <div class="row">
-                    <div class="col-md-6">
                         <!-- Tickers -->
           <div class="mb-3">
                             <label class="form-label">טיקרים:</label>
@@ -773,7 +777,7 @@
                     </div>
                 </div>
             </div>
-        <!-- UI Content Section 5b End--> 
+        <!-- UI Content Section 5 End--> 
       
       
         <!-- UI Content Section 6 Start-->

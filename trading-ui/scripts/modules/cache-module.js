@@ -1312,6 +1312,44 @@ function clearOrphanKeys(includeAuth = true) {
 }
 
 /**
+ * Reload current page data after cache clear
+ * טעינה מחדש של נתוני העמוד הנוכחי מהשרת
+ * @returns {Promise<Object>} Reload result { success, pageName, reloaded }
+ */
+async function reloadPageData() {
+    try {
+        const pathname = window.location.pathname;
+        const pageName = pathname.replace('/', '') || 'index';
+        
+        // Map of page reload functions
+        const reloadFunctions = {
+            'trade_plans': window.loadTradePlansData,
+            'trades': window.loadTradesData,
+            'tickers': window.loadTickersData,
+            'alerts': window.loadAlertsData,
+            'trading_accounts': window.loadTradingAccountsData,
+            'cash_flows': window.loadCashFlowsData,
+            'executions': window.loadExecutionsData,
+            'notes': window.loadNotesData,
+            'research': window.loadResearchData,
+            'index': window.loadHomeData
+        };
+        
+        const reloadFn = reloadFunctions[pageName];
+        
+        if (typeof reloadFn === 'function') {
+            await reloadFn();
+            return { success: true, pageName, reloaded: true };
+        }
+        
+        return { success: false, pageName, reloaded: false, reason: 'No reload function found' };
+    } catch (error) {
+        console.error('❌ Failed to reload page data:', error);
+        return { success: false, reloaded: false, error: error.message };
+    }
+}
+
+/**
  * Clear all cache - 4 levels of clearing intensity
  * @param {Object} options - Clearing options
  * @param {string} options.level - 'light'|'medium'|'full'|'nuclear' (default: 'medium')
@@ -1512,19 +1550,37 @@ window.clearAllCache = async function(options = {}) {
             window.showSuccessNotification('ניקוי מטמון הושלם', message);
         }
         
-        if (verbose) {
+        // === RELOAD PAGE DATA ===
+        // Reload data from server before showing final notification
+        if (results.success && level !== 'nuclear') {
+            if (typeof window.showNotification === 'function') {
+                window.showNotification('🔄 טוען נתונים מחדש מהשרת...', 'info', 'system');
+            }
+            
+            const reloadResult = await reloadPageData();
+            results.dataReloaded = reloadResult.reloaded;
+            results.pageName = reloadResult.pageName;
+            
+            if (!reloadResult.success) {
+                console.warn('⚠️ Data reload failed:', reloadResult.reason || reloadResult.error);
+            }
         }
         
-        // Auto page reload after successful cache clear
-        if (results.success && !options.skipReload) {
+        // === AUTO PAGE REFRESH (Nuclear only) ===
+        if (results.success && level === 'nuclear' && !options.skipReload) {
+            if (typeof window.showNotification === 'function') {
+                window.showNotification('🔄 מרענן עמוד בעוד 2 שניות...', 'warning', 'system');
+            }
+            
             setTimeout(() => {
                 // Hard reload with cache busting
                 const url = new URL(window.location.href);
                 url.searchParams.delete('_refresh');
                 url.searchParams.set('_refresh', Date.now());
-                console.log('⚡ Hard reload initiated');
                 window.location.replace(url.toString());
-            }, 1500);  // 1.5 seconds to show notification
+            }, 2000);  // 2 seconds to show notification
+            
+            return results;
         }
         
         return results;

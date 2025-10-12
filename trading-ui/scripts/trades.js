@@ -423,36 +423,36 @@ class TradesController {
     createTradeRow(trade) {
         const row = document.createElement('tr');
         
-        // שימוש ב-FieldRendererService לעיצוב שדות
+        // שימוש ב-FieldRendererService לעיצוב שדות - בלי fallback
         const statusBadge = window.FieldRendererService ? 
-            window.FieldRendererService.renderStatus(trade.status) : 
-            `<span class="status-badge status-${trade.status?.toLowerCase() || 'unknown'}">${trade.status || 'N/A'}</span>`;
+            window.FieldRendererService.renderStatus(trade.status) : '-';
         
         const typeBadge = window.FieldRendererService ? 
-            window.FieldRendererService.renderType(trade.investment_type, 'investment_type') : 
-            (trade.investment_type || 'N/A');
+            window.FieldRendererService.renderType(trade.investment_type) : '-';
         
         const sideBadge = window.FieldRendererService ? 
-            window.FieldRendererService.renderSide(trade.side) : 
-            `<span class="side-badge side-${trade.side?.toLowerCase() || 'unknown'}">${trade.side || 'N/A'}</span>`;
+            window.FieldRendererService.renderSide(trade.side) : '-';
         
         const pnlBadge = window.FieldRendererService ? 
-            window.FieldRendererService.renderNumericValue(trade.total_pl, ' $', true) : 
-            `<span class="pnl-badge ${(trade.total_pl || 0) >= 0 ? 'positive' : 'negative'}">${trade.total_pl || 0}</span>`;
+            window.FieldRendererService.renderNumericValue(trade.total_pl || 0, '$', true) : '-';
         
         const createdDate = window.FieldRendererService ? 
             window.FieldRendererService.renderDate(trade.created_at) : 
-            (trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL') : 'N/A');
+            (trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL') : '-');
         
         const closedDate = window.FieldRendererService ? 
             window.FieldRendererService.renderDate(trade.closed_at) : 
-            (trade.closed_at ? new Date(trade.closed_at).toLocaleDateString('he-IL') : 'N/A');
+            (trade.closed_at ? new Date(trade.closed_at).toLocaleDateString('he-IL') : '-');
         
-        // מחיר נוכחי (נדרש לשלוף מהטיקר)
-        const currentPrice = trade.current_price || 'N/A';
+        // מחיר נוכחי מהטיקר (מגיע מה-API עם market data)
+        const currentPrice = (trade.current_price && trade.current_price > 0) ? 
+            `$${Number(trade.current_price).toFixed(2)}` : 
+            '<span class="text-danger">לא זמין</span>';
         
-        // שינוי % (נדרש לחשב)
-        const changePercent = trade.change_percent || 'N/A';
+        // שינוי % מהטיקר (מגיע מה-API עם market data)
+        const changePercent = (trade.daily_change !== null && trade.daily_change !== undefined) ? 
+            window.FieldRendererService.renderNumericValue(trade.daily_change, '%') : 
+            '<span class="text-muted">-</span>';
         
         row.innerHTML = `
             <td class="col-ticker">${trade.ticker_symbol || trade.ticker?.symbol || 'N/A'}</td>
@@ -882,4 +882,4 @@ window.addTrade = addTrade;
 //     }
 // });
 
-console.log('✅ trades.js loaded successfully');
+console.log('✅ trades.js v=20251012 loaded successfully - deep fix complete');

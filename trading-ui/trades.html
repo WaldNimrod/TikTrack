@@ -64,7 +64,7 @@
     <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=20251010">
     
     <!-- 07-trumps - Page-specific Styles -->
-    <!-- <link rel="stylesheet" href="styles-new/07-trumps/_trades.css?v=20251010"> -->
+    <link rel="stylesheet" href="styles-new/07-trumps/_trades.css?v=1.0.0">
     
     <!-- 08-themes - Themes -->
     <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=20251010">
@@ -171,77 +171,77 @@
                     <!-- טבלת טריידים -->
                     <div class="section-body">
                         <div class="table-responsive" id="tradesContainer">
-                            <table class="data-table" id="tradesTable" data-table-type="trades">
+                            <table class="data-table trades-table" id="tradesTable" data-table-type="trades">
                                 <thead>
                                     <tr>
                                         <th class="col-ticker">
-                                            <button class="btn btn-link sortable-header"
+                                            <button class="sortable-header"
                                                 data-sort-column="0">
                                                 טיקר <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-price">
-                                            <button class="btn btn-link sortable-header"
+                                            <button class="sortable-header"
                                                 data-sort-column="1">
                                                 מחיר נוכחי <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-change">
-                                            <button class="btn btn-link sortable-header"
+                                            <button class="sortable-header"
                                                 data-sort-column="2">
                                                 שינוי % <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-status">
-                                            <button class="btn btn-link sortable-header"
+                                            <button class="sortable-header"
                                                 data-sort-column="3">
                                                 סטטוס <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-type">
-                                            <button class="btn btn-link sortable-header"
+                                            <button class="sortable-header"
                                                 data-sort-column="4">
                                                 סוג <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-side">
-                                            <button class="btn btn-link sortable-header"
+                                            <button class="sortable-header"
                                                 data-sort-column="5">
                                                 צד <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-plan">
-                                            <button class="btn btn-link sortable-header"
+                                            <button class="sortable-header"
                                                 data-sort-column="6">
                                                 תוכנית <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-pnl">
-                                            <button class="btn btn-link sortable-header"
+                                            <button class="sortable-header"
                                                 data-sort-column="7">
                                                 רווח/הפסד <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-created">
-                                            <button class="btn btn-link sortable-header"
+                                            <button class="sortable-header"
                                                 data-sort-column="8">
                                                 נוצר ב <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-closed">
-                                            <button class="btn btn-link sortable-header"
+                                            <button class="sortable-header"
                                                 data-sort-column="9">
                                                 נסגר ב <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-account">
-                                            <button class="btn btn-link sortable-header"
+                                            <button class="sortable-header"
                                                 data-sort-column="10">
                                                 חשבון <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-notes">
-                                            <button class="btn btn-link sortable-header"
+                                            <button class="sortable-header"
                                                 data-sort-column="11">
                                                 הערות <span class="sort-icon">↕</span>
                                             </button>
@@ -599,6 +599,6 @@
     <script src="scripts/services/statistics-calculator.js?v=1.0.0"></script>
     
     <!-- Stage 5: Page Script - REQUIRED -->
-    <script src="scripts/trades.js?v=20251010"></script>
+    <script src="scripts/trades.js?v=20251012"></script>
 </body>
 </html>

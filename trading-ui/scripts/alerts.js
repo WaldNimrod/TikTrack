@@ -99,8 +99,16 @@ const demoAlerts = [
  *
  * @returns {Array} מערך של התראות או מערך ריק במקרה של שגיאה (NEVER THROWS)
  */
+
+// Flag to prevent duplicate loading
+let _isLoadingAlerts = false;
 async function loadAlertsData() {
-  console.log('📊 טעינת נתוני התראות מהשרת...');
+  // Prevent duplicate loading
+  if (_isLoadingAlerts) {
+    return window.alertsData || [];
+  }
+  _isLoadingAlerts = true;
+
   
   // שימוש במערכת המאוחדת - טיפול אחיד בשגיאות עם Retry + Copy Error Log
   const data = await window.loadTableData('alerts', updateAlertsTable, {
@@ -112,8 +120,8 @@ async function loadAlertsData() {
   
   // עדכון המשתנה הגלובלי
   window.alertsData = data;
+      _isLoadingAlerts = false;
   
-  console.log(`✅ טעינת התראות הושלמה: ${data.length} התראות`);
   
   return data;
 }
@@ -509,7 +517,6 @@ function updateAlertsTable(alerts) {
     // עדכון סטטיסטיקות
     updatePageSummaryStats();
     
-    console.log('✅ טבלת התראות עודכנה בהצלחה עם', alerts.length, 'התראות');
     
 
   });
@@ -1218,7 +1225,6 @@ function validateAlertForm() {
  * לפי STANDARD_VALIDATION_GUIDE.md + לוגיקה עסקית מיוחדת
  */
 async function saveAlert() {
-  console.log('🔧 saveAlert function called');
   
   try {
     // 1. ולידציה בסיסית של הטופס
@@ -1293,8 +1299,6 @@ async function saveAlert() {
       is_triggered: 'false',
     };
 
-    console.log('🔧 === SAVING ALERT ===');
-    console.log('🔧 Alert data:', alertData);
 
     // 7. שליחה לשרת
     const response = await fetch('/api/alerts/', {
@@ -1314,7 +1318,6 @@ async function saveAlert() {
         // ניקוי מטמון
         if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
           await window.UnifiedCacheManager.remove('alerts');
-          console.log('✅ מטמון alerts נוקה');
         }
         // רענון נתונים
         if (typeof window.loadAlertsData === 'function') {
@@ -1747,7 +1750,6 @@ async function updateAlert() {
         // ניקוי מטמון
         if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
           await window.UnifiedCacheManager.remove('alerts');
-          console.log('✅ מטמון alerts נוקה');
         }
         // רענון נתונים
         await loadAlertsData();
@@ -2151,7 +2153,6 @@ window.initializeAlertsPage = function() {
         loadAlertsData();
     }
     
-    console.log('✅ Alerts page initialized successfully');
 };
 
 // Initialize modals

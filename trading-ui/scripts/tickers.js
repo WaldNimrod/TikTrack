@@ -685,7 +685,6 @@ async function saveTicker() {
         // ניקוי מטמון
         if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
           await window.UnifiedCacheManager.remove('tickers');
-          console.log('✅ מטמון tickers נוקה');
         }
         // רענון טבלה
         await loadTickersData();
@@ -884,7 +883,6 @@ async function updateTicker() {
         // ניקוי מטמון
         if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
           await window.UnifiedCacheManager.remove('tickers');
-          console.log('✅ מטמון tickers נוקה');
         }
         // רענון טבלה
         await loadTickersData();
@@ -1452,7 +1450,6 @@ async function confirmDeleteTicker(id) {
         // ניקוי מטמון
         if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
           await window.UnifiedCacheManager.remove('tickers');
-          console.log('✅ מטמון tickers נוקה');
         }
         // callback מיוחד
         if (window.onTickerDeleted) {
@@ -1491,7 +1488,16 @@ async function confirmDeleteTicker(id) {
  * טעינת נתוני טיקרים - משתמש במערכת הכללית
  * @deprecated Use window.loadTableData() from tables.js instead
  */
+
+// Flag to prevent duplicate loading
+let _isLoadingTickers = false;
 async function loadTickersData() {
+  // Prevent duplicate loading
+  if (_isLoadingTickers) {
+    return window.tickersData || [];
+  }
+  _isLoadingTickers = true;
+
   try {
     // טעינת מטבעות אם עוד לא נטענו (נדרש לפני טעינת טיקרים)
     if (!window.currenciesLoaded) {
@@ -1509,6 +1515,7 @@ async function loadTickersData() {
       
       // שמירת הנתונים הגלובליים
       window.tickersData = data;
+      _isLoadingTickers = false;
       
       // עדכון שדה active_trades
       await updateActiveTradesField();

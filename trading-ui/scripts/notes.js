@@ -88,7 +88,6 @@ function uploadFile(noteId) {
         return response.json();
       })
       .then(data => {
-        console.log('✅ קובץ הועלה:', data);
         
         // הודעת הצלחה
         if (typeof window.showSuccessNotification === 'function') {
@@ -332,8 +331,16 @@ window.deleteNote = deleteNote;
 // window.restoreNotesSectionState = restoreNotesSectionState; // REMOVED: Using global system
 
 // פונקציה לטעינת נתונים
+
+// Flag to prevent duplicate loading
+let _isLoadingNotes = false;
 async function loadNotesData() {
-  console.log('📊 טוען נתוני הערות...');
+  // Prevent duplicate loading
+  if (_isLoadingNotes) {
+    return window.notesData || [];
+  }
+  _isLoadingNotes = true;
+
 
   // שימוש במערכת המאוחדת loadTableData (v2.0.0)
   const notes = await window.loadTableData('notes', null, {
@@ -393,12 +400,10 @@ async function loadNotesData() {
   // עדכון הטבלה
   updateNotesTable(notes, accounts, trades, tradePlans, tickers);
   
-  console.log(`✅ טעינת הערות הושלמה: ${notes.length} הערות`);
 }
 
 // פונקציה לעדכון הטבלה
 function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], tickers = []) {
-  console.log('🚀🚀🚀 updateNotesTable התחיל עם', notes ? notes.length : 0, 'הערות 🚀🚀🚀');
   
   const tbody = document.querySelector('#notesTable tbody');
   if (!tbody) {
@@ -407,7 +412,6 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
     return;
   }
   
-  console.log('✅ tbody נמצא:', tbody);
 
   if (!notes || notes.length === 0) {
     tbody.innerHTML = `
@@ -560,8 +564,6 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
   }).join('');
 
   tbody.innerHTML = rows;
-  console.log('✅ טבלת הערות עודכנה בהצלחה עם', notes.length, 'הערות');
-  console.log('🔍 מספר שורות בטבלה:', tbody.children.length);
   
   // עדכון table-count ו-info-summary
   updateNotesSummary(notes);
@@ -1114,7 +1116,6 @@ async function saveNote() {
         // ניקוי מטמון
         if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
           await window.UnifiedCacheManager.remove('notes');
-          console.log('✅ מטמון notes נוקה אחרי שמירה');
         }
         // רענון טבלה
         await loadNotesData();
@@ -1214,7 +1215,6 @@ async function updateNoteFromModal() {
         // ניקוי מטמון
         if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
           await window.UnifiedCacheManager.remove('notes');
-          console.log('✅ מטמון notes נוקה אחרי עדכון');
         }
         // רענון טבלה
         await loadNotesData();
@@ -1253,7 +1253,6 @@ async function deleteNoteFromServer(noteId) {
         // ניקוי מטמון
         if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
           await window.UnifiedCacheManager.remove('notes');
-          console.log('✅ מטמון notes נוקה אחרי מחיקה');
         }
         // רענון טבלה
         await loadNotesData();
@@ -1350,7 +1349,6 @@ window.initializeNotesPage = function() {
     // שחזור מצב סידור
     restoreSortState();
     
-    console.log('✅ Notes page initialized successfully');
 };
 
 // פונקציה להגדרת אירועי ולידציה

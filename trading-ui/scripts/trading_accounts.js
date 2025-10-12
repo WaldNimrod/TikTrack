@@ -65,7 +65,6 @@ class TradingAccountsController {
      */
     async loadData() {
         if (this.isLoading || window.tradingAccountsDataLoaded) {
-            console.log('✅ Data already loading or loaded, skipping...');
             return;
         }
         
@@ -74,9 +73,7 @@ class TradingAccountsController {
 
         try {
             // שימוש ב-account-service הקיים עם Unified Cache
-            console.log('📊 Loading data from getAccounts...');
             this.data = await window.getAccounts();
-            console.log('📊 Data loaded:', this.data);
             
             // עדכון UI באמצעות מערכות כלליות
             this.updateTable();
@@ -103,14 +100,11 @@ class TradingAccountsController {
                 return;
             }
 
-            console.log('📊 updateTable called - data length:', this.data ? this.data.length : 'undefined');
-            console.log('📊 updateTable data:', this.data);
 
             // ניקוי הטבלה
             tbody.innerHTML = '';
 
             if (!this.data || this.data.length === 0) {
-                console.log('📊 No data to display');
                 const row = document.createElement('tr');
                 row.innerHTML = '<td colspan="8" class="text-center">אין נתונים להצגה</td>';
                 tbody.appendChild(row);
@@ -123,7 +117,6 @@ class TradingAccountsController {
                 tbody.appendChild(row);
             });
 
-            console.log(`✅ טבלה עודכנה עם ${this.data.length} חשבונות מסחר`);
 
         } catch (error) {
             console.error('❌ שגיאה בעדכון הטבלה:', error);
@@ -253,7 +246,6 @@ class TradingAccountsController {
             this.updateStatElement('activeAccounts', stats.activeAccounts);
             this.updateStatElement('totalBalance', `$${stats.totalBalance.toLocaleString()}`);
 
-            console.log('📊 סטטיסטיקות עודכנו:', stats);
 
         } catch (error) {
             console.error('❌ שגיאה בעדכון סטטיסטיקות:', error);
@@ -301,7 +293,6 @@ class TradingAccountsController {
      * הגדרת event listeners
      */
     setupEventListeners() {
-        console.log('🔧 Setting up event listeners...');
         
         // Event listeners בסיסיים
         this.setupBasicEventListeners();
@@ -342,7 +333,6 @@ class TradingAccountsController {
      * רענון נתונים
      */
     async refreshData() {
-        console.log('🔄 Refreshing data...');
         
         // ניקוי מטמון
         if (window.UnifiedCacheManager) {
@@ -365,7 +355,6 @@ class TradingAccountsController {
      */
     handleFilterClick(event) {
         const filterType = event.target.dataset.filter;
-        console.log('🔍 Filter clicked:', filterType);
         
         // כאן ניתן להוסיף לוגיקת פילטרים
         // נכון לעכשיו, הפילטרים מנוהלים על ידי header-system.js
@@ -412,7 +401,6 @@ class TradingAccountsController {
         // עדכון סטטיסטיקות
         this.updateStatistics();
         
-        console.log('✅ UI updated successfully');
     }
 
     /**
@@ -511,12 +499,10 @@ class TradingAccountsController {
             });
             
             if (response.ok) {
-                console.log('✅ Account deleted successfully');
                 
                 // ניקוי מטמון trading_accounts
                 if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
                     await window.UnifiedCacheManager.remove('trading_accounts');
-                    console.log('✅ מטמון trading_accounts נוקה אחרי מחיקה');
                 }
                 
                 // הסרה מהמערך המקומי
@@ -548,7 +534,6 @@ class TradingAccountsController {
 window.tradingAccountsController = new TradingAccountsController();
 window.TradingAccountsController = window.tradingAccountsController; // Alias for compatibility
 
-console.log('✅ Trading Accounts Controller instance created:', window.tradingAccountsController);
 
 // ===== פונקציות ולידציה סטנדרטיות =====
 
@@ -675,7 +660,6 @@ async function saveTradingAccount() {
                 // ניקוי מטמון trading_accounts
                 if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
                     await window.UnifiedCacheManager.remove('trading_accounts');
-                    console.log('✅ מטמון trading_accounts נוקה אחרי הוספה');
                 }
                 // רענון טבלה
                 if (window.tradingAccountsController && window.tradingAccountsController.loadData) {
@@ -774,6 +758,4 @@ window.updateTradingAccount = updateTradingAccount;
 
 // אתחול אוטומטי אם DOM מוכן - הוסר כדי למנוע כפילות עם core-systems.js
 // האתחול מתבצע דרך מערכת האתחול המאוחדת
-console.log('🚀 Trading Accounts Controller ready - waiting for unified initialization');
 
-console.log('✅ trading_accounts.js loaded successfully');

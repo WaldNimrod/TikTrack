@@ -229,13 +229,11 @@ async function showAddExecutionModal() {
       const accountFromPrefs = await window.getCurrentPreference('defaultTradingAccount');
       if (accountFromPrefs !== null && accountFromPrefs !== undefined) {
         defaultAccount = accountFromPrefs;
-        console.log(`✅ Using account from preferences: ${defaultAccount}`);
       }
     } 
     // Fallback ל-userPreferences
     else if (window.userPreferences && window.userPreferences.defaultTradingAccount) {
       defaultAccount = window.userPreferences.defaultTradingAccount;
-      console.log(`✅ Using account from userPreferences: ${defaultAccount}`);
     }
     
     const accountElement = document.getElementById('executionAccount');
@@ -573,14 +571,6 @@ async function showEditExecutionModal(id) {
   // חישוב ערכים מחושבים
   calculateEditExecutionValues();
 
-  console.log('🎯 [EDIT MODAL] סיכום מילוי טופס עריכה:');
-  console.log('🎯 [EDIT MODAL] - עסקה ID:', execution.id);
-  console.log('🎯 [EDIT MODAL] - טרייד מקושר:', linkedObject ? `${linkedObject.type}:${linkedObject.data.id}` : 'אין');
-  console.log('🎯 [EDIT MODAL] - טיקר:', tickerId);
-  console.log('🎯 [EDIT MODAL] - פעולה:', actionValue);
-  console.log('🎯 [EDIT MODAL] - כמות:', execution.quantity);
-  console.log('🎯 [EDIT MODAL] - מחיר:', execution.price);
-  console.log('🎯 [EDIT MODAL] - תאריך:', executionDate);
 
   // הצגת המודל
   const modal = new bootstrap.Modal(editExecutionModalElement);
@@ -784,7 +774,6 @@ async function saveExecution() {
             // ניקוי מטמון
             if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
                 await window.UnifiedCacheManager.remove('executions');
-                console.log('✅ מטמון executions נוקה אחרי הוספה');
             }
             // רענון טבלה
             if (typeof window.loadExecutionsData === 'function') {
@@ -847,7 +836,6 @@ async function updateExecution() {
             // ניקוי מטמון
             if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
                 await window.UnifiedCacheManager.remove('executions');
-                console.log('✅ מטמון executions נוקה אחרי עדכון');
             }
             // רענון טבלה
             if (typeof window.loadExecutionsData === 'function') {
@@ -893,7 +881,6 @@ async function confirmDeleteExecution(_id) {
       // ניקוי מטמון executions
       if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
         await window.UnifiedCacheManager.remove('executions');
-        console.log('✅ מטמון executions נוקה אחרי מחיקה');
       }
 
 
@@ -1052,7 +1039,16 @@ function goToNote(noteId) {
 /**
  * טעינת נתוני עסקעות
  */
+
+// Flag to prevent duplicate loading
+let _isLoadingExecutions = false;
 async function loadExecutionsData() {
+  // Prevent duplicate loading
+  if (_isLoadingExecutions) {
+    return window.executionsData || [];
+  }
+  _isLoadingExecutions = true;
+
   // loadExecutionsData called
   try {
     // טעינת נתוני עסקעות
@@ -2645,6 +2641,7 @@ async function loadTickersSummaryData() {
   } catch (error) {
     // console.error('❌ שגיאה בטעינת טיקרים חלקיים:', error);
     handleDataLoadError(error, 'טעינת טיקרים חלקיים');
+    _isLoadingExecutions = false;
     return [];
   }
 }
@@ -3210,5 +3207,4 @@ window.initializeExecutionsPage = function() {
         }
     }, 30000);
     
-    console.log('✅ Executions page initialized successfully');
 };

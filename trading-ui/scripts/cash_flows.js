@@ -35,7 +35,6 @@ window.initializeCashFlowsModals = function() {
  * פונקציה מאוחדת לטעינת נתונים עם טיפול בשגיאות מתקדם
  */
 async function loadCashFlows() {
-  console.log('📊 טוען נתוני תזרימי מזומנים...');
   
   // הצגת אינדיקטור טעינה
   if (typeof window.showInfoNotification === 'function') {
@@ -54,7 +53,6 @@ async function loadCashFlows() {
   window.cashFlowsData = data;
   cashFlowsData = data;
   
-  console.log(`✅ נטענו תזרימי מזומנים: ${data.length} פריטים`);
   
   updatePageSummaryStats();
   
@@ -177,7 +175,6 @@ function getAccountNameById(accountId) {
   if (window.HeaderSystem && window.HeaderSystem.accountsCache) {
     const account = window.HeaderSystem.accountsCache.find(acc => acc.id === accountId);
     if (account) {
-      console.log(`✅ מצאתי חשבון ${accountId} ב-HeaderSystem:`, account.name);
       return account.name;
     }
   }
@@ -186,7 +183,6 @@ function getAccountNameById(accountId) {
   if (window.trading_accountsData && Array.isArray(window.trading_accountsData)) {
     const account = window.trading_accountsData.find(acc => acc.id === accountId);
     if (account) {
-      console.log(`✅ מצאתי חשבון ${accountId} ב-trading_accountsData:`, account.name);
       return account.name;
     }
   }
@@ -201,13 +197,11 @@ function getAccountNameById(accountId) {
 async function ensureTradingAccountsLoaded() {
   // אם יש כבר נתונים ב-HeaderSystem, אין צורך לטעון שוב
   if (window.HeaderSystem && window.HeaderSystem.accountsCache && window.HeaderSystem.accountsCache.length > 0) {
-    console.log('✅ חשבונות זמינים מ-HeaderSystem:', window.HeaderSystem.accountsCache.length);
     return;
   }
   
   // אם יש נתונים גלובליים
   if (window.trading_accountsData && Array.isArray(window.trading_accountsData) && window.trading_accountsData.length > 0) {
-    console.log('✅ חשבונות זמינים מ-trading_accountsData:', window.trading_accountsData.length);
     return;
   }
   
@@ -221,7 +215,6 @@ async function ensureTradingAccountsLoaded() {
       const result = await response.json();
       if (result.status === 'success') {
         window.trading_accountsData = result.data;
-        console.log('✅ חשבונות נטענו מהשרת:', result.data.length);
       }
     }
   } catch (error) {
@@ -389,7 +382,6 @@ function showEditCashFlowModal(cashFlowId) {
     const field = document.getElementById(fieldId);
     if (field) {
       field.value = value || '';
-      console.log(`✅ שדה ${fieldId} הוגדר ל: ${value}`);
     } else {
       console.warn(`⚠️ שדה ${fieldId} לא נמצא במודל עריכה`);
     }
@@ -657,12 +649,10 @@ async function deleteCashFlow(id) {
         // ניקוי מטמון
         if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
           await window.UnifiedCacheManager.remove('cash_flows');
-          console.log('✅ מטמון cash_flows נוקה אחרי מחיקה');
         }
         // ניקוי global data
         if (window.cashFlowsData) {
           window.cashFlowsData = null;
-          console.log('✅ Global cashFlowsData נוקה');
         }
         // המתנה קצרה
         await new Promise(resolve => setTimeout(resolve, 100));
@@ -846,7 +836,6 @@ async function renderCashFlowsTable() {
     return;
   }
 
-  console.log('📊 מרנדר טבלת תזרימי מזומנים:', cashFlowsData.length, 'פריטים');
 
   // וידוא שנתוני חשבונות מסחר נטענו
   await ensureTradingAccountsLoaded();
@@ -1077,12 +1066,10 @@ window.updateCashFlowsTable = updateCashFlowsTable;
  * עדכון אוטומטי של נתוני תזרימי מזומנים
  */
 function startAutoRefresh() {
-  console.log('🔄 מתחיל עדכון אוטומטי של תזרימי מזומנים...');
   
   // עדכון נתונים כל 30 שניות
   setInterval(async () => {
     try {
-      console.log('🔄 עדכון אוטומטי של נתוני תזרימי מזומנים...');
       await loadCashFlows();
       
       // עדכון סטטיסטיקות
@@ -1090,13 +1077,11 @@ function startAutoRefresh() {
         updatePageSummaryStats();
       }
       
-      console.log('✅ עדכון אוטומטי הושלם בהצלחה');
     } catch (error) {
       console.error('❌ שגיאה בעדכון אוטומטי:', error);
     }
   }, 30000); // 30 שניות
   
-  console.log('✅ עדכון אוטומטי הופעל - רענון כל 30 שניות');
 }
 
 /**
@@ -1104,7 +1089,6 @@ function startAutoRefresh() {
  */
 async function loadUserPreferences() {
   try {
-    console.log('🔧 טוען העדפות משתמש...');
     
     // טעינת העדפות רלוונטיות לתזרימי מזומנים
     const preferences = await window.getPreferencesByNames([
@@ -1120,7 +1104,6 @@ async function loadUserPreferences() {
     // שמירת העדפות בגלובל scope
     window.cashFlowsPreferences = preferences;
     
-    console.log('✅ העדפות משתמש נטענו בהצלחה:', preferences);
     return preferences;
   } catch (error) {
     console.warn('⚠️ שגיאה בטעינת העדפות, משתמש בברירות מחדל:', error);
@@ -1139,7 +1122,6 @@ async function applyDynamicColors() {
     if (typeof window.loadEntityColors === 'function') {
       const entityColors = await window.loadEntityColors();
       if (entityColors) {
-        console.log('✅ צבעי ישויות נטענו:', entityColors);
         
         // החלת צבעי תזרימי מזומנים
         if (entityColors.cash_flow) {
@@ -1165,7 +1147,6 @@ async function applyDynamicColors() {
     if (typeof window.loadStatusColors === 'function') {
       const statusColors = await window.loadStatusColors();
       if (statusColors) {
-        console.log('✅ צבעי סטטוס נטענו:', statusColors);
         
         // החלת צבעי סטטוס לתזרימי מזומנים
         if (statusColors.income) {
@@ -1190,7 +1171,6 @@ async function applyDynamicColors() {
       await window.applyColorScheme();
     }
     
-    console.log('✅ מערכת צבעים דינמית הוחלה בהצלחה');
   } catch (error) {
     console.error('❌ שגיאה בהחלת מערכת צבעים דינמית:', error);
   }
@@ -1240,7 +1220,6 @@ function applyUserPreferences(preferences) {
       document.body.classList.add('cash-flows-cards-mode');
     }
     
-    console.log('✅ העדפות משתמש הוחלו בהצלחה');
   } catch (error) {
     console.error('❌ שגיאה בהחלת העדפות משתמש:', error);
   }
@@ -1250,7 +1229,6 @@ function applyUserPreferences(preferences) {
  * אתחול הדף
  */
 async function initializeCashFlowsPage() {
-  console.log('🚀 מאתחל עמוד תזרימי מזומנים...');
 
   try {
     // טעינת העדפות משתמש
@@ -1289,7 +1267,6 @@ async function initializeCashFlowsPage() {
     // ❌ ביטול רענון אוטומטי - לא עובד כך בשאר עמודי המערכת
     // startAutoRefresh();
     
-    console.log('✅ עמוד תזרימי מזומנים אותחל בהצלחה');
   } catch (error) {
     console.error('❌ שגיאה באתחול עמוד תזרימי מזומנים:', error);
     if (typeof window.showErrorNotification === 'function') {
@@ -1770,12 +1747,10 @@ async function saveCashFlow() {
         // ניקוי מטמון
         if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
           await window.UnifiedCacheManager.remove('cash_flows');
-          console.log('✅ מטמון cash_flows נוקה אחרי הוספה');
         }
         // ניקוי global data
         if (window.cashFlowsData) {
           window.cashFlowsData = null;
-          console.log('✅ Global cashFlowsData נוקה');
         }
         // המתנה קצרה לוידוא ניקוי מטמון
         await new Promise(resolve => setTimeout(resolve, 100));
@@ -1855,12 +1830,10 @@ async function updateCashFlow() {
         // ניקוי מטמון
         if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
           await window.UnifiedCacheManager.remove('cash_flows');
-          console.log('✅ מטמון cash_flows נוקה אחרי עדכון');
         }
         // ניקוי global data
         if (window.cashFlowsData) {
           window.cashFlowsData = null;
-          console.log('✅ Global cashFlowsData נוקה');
         }
         // המתנה קצרה
         await new Promise(resolve => setTimeout(resolve, 100));
@@ -2375,4 +2348,3 @@ window.setupSourceFieldListeners = setupSourceFieldListeners;
 window.initializeExternalIdFields = initializeExternalIdFields;
 window.manageExternalIdField = manageExternalIdField;
 
-console.log('✅ Cash Flows: All functions exported to global scope');

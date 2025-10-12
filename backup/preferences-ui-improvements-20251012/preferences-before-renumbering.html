@@ -280,15 +280,15 @@
                     </div>
         <!-- UI Content Section 2 End --> 
       
-        <!-- UI Content Section 3 Start-->
-      <div class="content-section" id="section3">
+        <!-- UI Content Section 2b Start-->
+      <div class="content-section" id="section2b">
         <div class="section-header">
             <h2>🔔 התראות ולוגים</h2>
             <div class="header-actions">
                 <button class="btn btn-success btn-sm" onclick="window.saveAllPreferences()" title="שמור הכל">
                     <i class="bi bi-save"></i> שמור
                 </button>
-                <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
+                <button class="filter-toggle-btn" onclick="toggleSection('section2b')" title="הצג/הסתר סקשן">
                     <span class="section-toggle-icon">▼</span>
                 </button>
                   </div>
@@ -344,7 +344,7 @@
                         <div class="mb-3">
                             <label class="form-label">היסטוריית התראות מקסימלית</label>
                             <input type="number" id="notificationMaxHistory" class="form-control" min="10" max="1000" value="100">
-                            </div>
+                        </div>
                         </div>
                         
                     <!-- עמודה שמאלית - הגדרות -->
@@ -414,14 +414,70 @@
                             </div>
                         </div>
                         </div>
-                        </div>
                     </div>
+                  </div>
+        <!-- UI Content Section 2b End --> 
+      
+        <!-- UI Content Section 3 Start-->
+      <div class="content-section" id="section3">
+                <div class="section-header">
+            <h2>📈 הגדרות מסחר</h2>
+            <div class="header-actions">
+                <button class="btn btn-success btn-sm" onclick="window.saveAllPreferences()" title="שמור הכל">
+                    <i class="bi bi-save"></i> שמור
+                </button>
+                <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
+                    <span class="section-toggle-icon">▼</span>
+                </button>
+            </div>
+        </div>
+        <div class="section-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>הגדרות בסיסיות</h5>
+                        <div class="mb-3">
+                            <label class="form-label">Stop Loss ברירת מחדל (%)</label>
+                            <input type="number" id="defaultStopLoss" class="form-control control-narrow" 
+                                   step="0.1" min="0" max="100">
+            </div>
+                        <div class="mb-3">
+                            <label class="form-label">Target Price ברירת מחדל (%)</label>
+                            <input type="number" id="defaultTargetPrice" class="form-control control-narrow" 
+                                   step="0.1" min="0" max="1000">
+                </div>
+                        <div class="mb-3">
+                            <label class="form-label">עמלה ברירת מחדל ($)</label>
+                            <input type="number" id="defaultCommission" class="form-control control-narrow" 
+                                   step="0.01" min="0">
+                </div>
+                </div>
+                    <div class="col-md-6">
+                        <h5>ניהול סיכונים <span class="text-muted">(עתידי)</span></h5>
+                        <div class="mb-3">
+                            <label class="form-label">סיכון מקסימלי לחשבון (%)</label>
+                            <input type="number" id="maxAccountRisk" class="form-control control-narrow" 
+                                   step="0.1" min="0" max="100" disabled>
+              </div>
+                        <div class="mb-3">
+                            <label class="form-label">סיכון מקסימלי לטריד (%)</label>
+                            <input type="number" id="maxTradeRisk" class="form-control control-narrow" 
+                                   step="0.1" min="0" max="100" disabled>
+            </div>
+                        <div class="mb-3">
+                            <label class="form-label">גודל פוזיציה מקסימלי (%)</label>
+                            <input type="number" id="maxPositionSize" class="form-control control-narrow" 
+                                   step="0.1" min="0" max="100" disabled>
+          </div>
+            </div>
+                  </div>
+                </div>
+                  </div>
         <!-- UI Content Section 3 End --> 
       
         <!-- UI Content Section 4 Start-->
       <div class="content-section" id="section4">
                 <div class="section-header">
-            <h2>📈 הגדרות מסחר</h2>
+            <h2>🔍 פילטרים ברירת מחדל</h2>
             <div class="header-actions">
                 <button class="btn btn-success btn-sm" onclick="window.saveAllPreferences()" title="שמור הכל">
                     <i class="bi bi-save"></i> שמור
@@ -433,120 +489,73 @@
         </div>
         <div class="section-body">
                 <div class="row">
-                    <div class="col-md-3">
-                            <label class="form-label">Stop Loss ברירת מחדל (%)</label>
-                        <input type="number" id="defaultStopLoss" class="form-control" 
-                                   step="0.1" min="0" max="100">
-            </div>
-                    <div class="col-md-3">
-                            <label class="form-label">Target Price ברירת מחדל (%)</label>
-                        <input type="number" id="defaultTargetPrice" class="form-control" 
-                                   step="0.1" min="0" max="1000">
-                </div>
-                    <div class="col-md-3">
-                            <label class="form-label">עמלה ברירת מחדל ($)</label>
-                        <input type="number" id="defaultCommission" class="form-control" 
-                                   step="0.01" min="0">
-                </div>
-                </div>
-                <div class="row mt-3">
-                    <div class="col-md-3">
-                        <label class="form-label">סיכון מקסימלי לחשבון (%) <span class="text-muted">(עתידי)</span></label>
-                        <input type="number" id="maxAccountRisk" class="form-control" 
-                                   step="0.1" min="0" max="100" disabled>
+                    <div class="col-md-6">
+                        <h5>פילטרים בסיסיים</h5>
+                        <div class="mb-3">
+                            <label class="form-label">סטטוס ברירת מחדל</label>
+                            <select id="defaultStatusFilter" class="form-select control-narrow">
+                                <option value="הכל">הכל</option>
+                                <option value="פתוח" selected>פתוח</option>
+                                <option value="סגור">סגור</option>
+                                <option value="מבוטל">מבוטל</option>
+                    </select>
               </div>
-                    <div class="col-md-3">
-                        <label class="form-label">סיכון מקסימלי לטריד (%) <span class="text-muted">(עתידי)</span></label>
-                        <input type="number" id="maxTradeRisk" class="form-control" 
-                                   step="0.1" min="0" max="100" disabled>
-            </div>
-                    <div class="col-md-3">
-                        <label class="form-label">גודל פוזיציה מקסימלי (%) <span class="text-muted">(עתידי)</span></label>
-                        <input type="number" id="maxPositionSize" class="form-control" 
-                                   step="0.1" min="0" max="100" disabled>
-          </div>
+                        <div class="mb-3">
+                            <label class="form-label">סוג ברירת מחדל</label>
+                            <select id="defaultTypeFilter" class="form-select control-narrow">
+                                <option value="הכל">הכל</option>
+                                <option value="Swing" selected>Swing</option>
+                                <option value="השקעה">השקעה</option>
+                                <option value="פסיבי">פסיבי</option>
+                    </select>
+                  </div>
+                        <div class="mb-3">
+                            <label class="form-label">טווח תאריכים</label>
+                            <select id="defaultDateRangeFilter" class="form-select">
+                                <option value="היום">היום</option>
+                                <option value="אתמול">אתמול</option>
+                                <option value="השבוע">השבוע</option>
+                                <option value="השבוע שעבר">השבוע שעבר</option>
+                                <option value="החודש">החודש</option>
+                                <option value="החודש שעבר">החודש שעבר</option>
+                                <option value="השנה">השנה</option>
+                                <option value="השנה שעברה">השנה שעברה</option>
+                                <option value="7 ימים אחרונים">7 ימים אחרונים</option>
+                                <option value="30 ימים אחרונים">30 ימים אחרונים</option>
+                                <option value="90 ימים אחרונים">90 ימים אחרונים</option>
+                                <option value="הכל">הכל</option>
+                                <option value="מותאם אישית">מותאם אישית</option>
+                    </select>
                   </div>
                 </div>
-        </div>
+                    <div class="col-md-6">
+                        <h5>פילטרים נוספים</h5>
+                        <div class="mb-3">
+                            <label class="form-label">חיפוש ברירת מחדל</label>
+                            <input type="text" id="defaultSearchFilter" class="form-control" 
+                                   placeholder="טקסט חיפוש ברירת מחדל">
+              </div>
+                        <div class="mb-3">
+                            <label class="form-label">חשבון מסחר ברירת מחדל</label>
+                            <select id="defaultAccountFilter" class="form-select">
+                                <!-- חשבונות מסחר פעילים נטענים אוטומטית על ידי SelectPopulatorService -->
+                            </select>
+                        </div>
+                  </div>
+                </div>
+              </div>
+            </div>
         <!-- UI Content Section 4 End -->
       
         <!-- UI Content Section 5 Start-->
       <div class="content-section" id="section5">
-                <div class="section-header">
-            <h2>🔍 פילטרים ברירת מחדל</h2>
-            <div class="header-actions">
-                <button class="btn btn-success btn-sm" onclick="window.saveAllPreferences()" title="שמור הכל">
-                    <i class="bi bi-save"></i> שמור
-                </button>
-                <button class="filter-toggle-btn" onclick="toggleSection('section5')" title="הצג/הסתר סקשן">
-                    <span class="section-toggle-icon">▼</span>
-                </button>
-            </div>
-        </div>
-        <div class="section-body">
-                <div class="row">
-                    <div class="col-md-3">
-                        <label class="form-label">סטטוס ברירת מחדל</label>
-                        <select id="defaultStatusFilter" class="form-select">
-                            <option value="הכל">הכל</option>
-                            <option value="פתוח" selected>פתוח</option>
-                            <option value="סגור">סגור</option>
-                            <option value="מבוטל">מבוטל</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">סוג ברירת מחדל</label>
-                        <select id="defaultTypeFilter" class="form-select">
-                            <option value="הכל">הכל</option>
-                            <option value="Swing" selected>Swing</option>
-                            <option value="השקעה">השקעה</option>
-                            <option value="פסיבי">פסיבי</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">חשבון מסחר ברירת מחדל</label>
-                        <select id="defaultAccountFilter" class="form-select">
-                            <!-- חשבונות מסחר פעילים נטענים אוטומטית על ידי SelectPopulatorService -->
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">טווח תאריכים</label>
-                        <select id="defaultDateRangeFilter" class="form-select">
-                            <option value="היום">היום</option>
-                            <option value="אתמול">אתמול</option>
-                            <option value="השבוע">השבוע</option>
-                            <option value="השבוע שעבר">השבוע שעבר</option>
-                            <option value="החודש">החודש</option>
-                            <option value="החודש שעבר">החודש שעבר</option>
-                            <option value="השנה">השנה</option>
-                            <option value="השנה שעברה">השנה שעברה</option>
-                            <option value="7 ימים אחרונים">7 ימים אחרונים</option>
-                            <option value="30 ימים אחרונים">30 ימים אחרונים</option>
-                            <option value="90 ימים אחרונים">90 ימים אחרונים</option>
-                            <option value="הכל">הכל</option>
-                            <option value="מותאם אישית">מותאם אישית</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row mt-3">
-                    <div class="col-md-3">
-                        <label class="form-label">חיפוש ברירת מחדל</label>
-                        <input type="text" id="defaultSearchFilter" class="form-control" 
-                               placeholder="טקסט חיפוש ברירת מחדל">
-                    </div>
-                </div>
-              </div>
-        <!-- UI Content Section 5 End -->
-      
-        <!-- UI Content Section 6 Start-->
-      <div class="content-section" id="section6">
                 <div class="section-header">
             <h2>🎨 צבעים</h2>
             <div class="header-actions">
                 <button class="btn btn-success btn-sm" onclick="window.saveAllPreferences()" title="שמור הכל">
                     <i class="bi bi-save"></i> שמור
                 </button>
-                <button class="filter-toggle-btn" onclick="toggleSection('section6')" title="הצג/הסתר סקשן">
+                <button class="filter-toggle-btn" onclick="toggleSection('section5')" title="הצג/הסתר סקשן">
                     <span class="section-toggle-icon">▼</span>
                 </button>
             </div>
@@ -657,17 +666,17 @@
                 </div>
             </div>
         </div>
-        <!-- UI Content Section 6 End --> 
+        <!-- UI Content Section 5 End --> 
       
-        <!-- UI Content Section 7 Start-->
-      <div class="content-section" id="section7">
+        <!-- UI Content Section 5b Start-->
+      <div class="content-section" id="section5b">
         <div class="section-header">
             <h2>🎨 צבעי ישויות</h2>
             <div class="header-actions">
                 <button class="btn btn-success btn-sm" onclick="window.saveAllPreferences()" title="שמור הכל">
                     <i class="bi bi-save"></i> שמור
                 </button>
-                <button class="filter-toggle-btn" onclick="toggleSection('section7')" title="הצג/הסתר סקשן">
+                <button class="filter-toggle-btn" onclick="toggleSection('section5b')" title="הצג/הסתר סקשן">
                     <span class="section-toggle-icon">▼</span>
                 </button>
             </div>
@@ -808,17 +817,17 @@
                   </div>
                     </div>
                   </div>
-        <!-- UI Content Section 7 End --> 
+        <!-- UI Content Section 5b End --> 
       
-        <!-- UI Content Section 8 Start-->
-      <div class="content-section" id="section8">
+        <!-- UI Content Section 7 Start-->
+      <div class="content-section" id="section7">
                     <div class="section-header">
             <h2>📊 הגדרות גרפים</h2>
             <div class="header-actions">
                 <button class="btn btn-success btn-sm" onclick="window.saveAllPreferences()" title="שמור הכל">
                     <i class="bi bi-save"></i> שמור
                 </button>
-                <button class="filter-toggle-btn" onclick="toggleSection('section8')" title="הצג/הסתר סקשן">
+                <button class="filter-toggle-btn" onclick="toggleSection('section7')" title="הצג/הסתר סקשן">
                     <span class="section-toggle-icon">▼</span>
                 </button>
             </div>
@@ -951,7 +960,7 @@
                     </div>
                 </div>
             </div>
-        <!-- UI Content Section 8 End -->
+        <!-- UI Content Section 7 End -->
             </div>
         </div>
     <!-- 🔒 LOCKED TEMPLATE ZONE 3 - End Main Content Container (DO NOT MODIFY) -->

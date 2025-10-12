@@ -161,7 +161,6 @@ async function addTrade() {
                 // ניקוי מטמון
                 if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
                     await window.UnifiedCacheManager.remove('trades');
-                    console.log('✅ מטמון trades נוקה אחרי הוספה');
                 }
                 // רענון טבלה
                 if (typeof window.loadTradesData === 'function') {
@@ -236,7 +235,6 @@ class TradesController {
             }
 
             // שימוש במערכת אתחול מאוחדת
-            console.log('🚀 Initializing Trades with Unified System...');
             
             // שלב 3: מערכות עמוד - אתחול ספציפי
             await this.initializePageSystems();
@@ -245,7 +243,6 @@ class TradesController {
             await this.initializeAdditionalSystems();
             
             this.initialized = true;
-            console.log('✅ Trades Page Initialized Successfully with Unified System');
             
         } catch (error) {
             console.error('❌ Error initializing Trades page:', error);
@@ -257,7 +254,6 @@ class TradesController {
      * אתחול מערכות עמוד ספציפיות
      */
     async initializePageSystems() {
-        console.log('🔧 Initializing Trades Page Systems...');
         
         // אתחול מערכות בסיסיות
         await this.loadTrades();
@@ -268,14 +264,12 @@ class TradesController {
         // אתחול אירועים
         this.initializeEventListeners();
         
-        console.log('✅ Trades Page Systems Initialized');
     }
 
     /**
      * אתחול מערכות נוספות
      */
     async initializeAdditionalSystems() {
-        console.log('🔧 Initializing Additional Trades Systems...');
         
         // אתחול מסננים
         this.initializeFilters();
@@ -283,14 +277,12 @@ class TradesController {
         // אתחול טבלאות
         this.initializeTables();
         
-        console.log('✅ Additional Trades Systems Initialized');
     }
 
     /**
      * אתחול חלופי ללא מערכת מאוחדת
      */
     async fallbackInitialize() {
-        console.log('🔄 Using Fallback Initialization for Trades...');
         
         try {
             await this.loadTrades();
@@ -303,7 +295,6 @@ class TradesController {
             this.initializeTables();
             
             this.initialized = true;
-            console.log('✅ Trades Page Fallback Initialization Complete');
             
         } catch (error) {
             console.error('❌ Fallback initialization failed:', error);
@@ -317,7 +308,6 @@ class TradesController {
         if (this.isLoading) return;
         
         this.isLoading = true;
-        console.log('📊 Loading trades...');
         
         try {
             const response = await fetch('/api/trades/');
@@ -332,7 +322,6 @@ class TradesController {
             window.tradesData = this.data;
             window.filteredTradesData = null;
             
-            console.log(`✅ Loaded ${this.data.length} trades`);
             
             // עדכון טבלה
             this.updateTradesTable();
@@ -360,7 +349,6 @@ class TradesController {
             const responseData = await response.json();
             const tickers = responseData.data || responseData || [];
             this.updateTickerSelects(tickers);
-            console.log(`✅ Loaded ${tickers.length} tickers`);
             
         } catch (error) {
             console.error('❌ Error loading tickers:', error);
@@ -380,7 +368,6 @@ class TradesController {
             const responseData = await response.json();
             const accounts = responseData.data || responseData || [];
             this.updateAccountSelects(accounts);
-            console.log(`✅ Loaded ${accounts.length} trading accounts`);
             
         } catch (error) {
             console.error('❌ Error loading trading accounts:', error);
@@ -400,7 +387,6 @@ class TradesController {
             const responseData = await response.json();
             const tradePlans = responseData.data || responseData || [];
             this.updateTradePlanSelects(tradePlans);
-            console.log(`✅ Loaded ${tradePlans.length} trade plans`);
             
         } catch (error) {
             console.error('❌ Error loading trade plans:', error);
@@ -415,7 +401,7 @@ class TradesController {
         if (!tableBody) return;
         
         if (!this.data || this.data.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="13" class="text-center text-muted">אין טריידים להצגה</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="12" class="text-center text-muted">אין טריידים להצגה</td></tr>';
             return;
         }
         
@@ -483,7 +469,6 @@ class TradesController {
                 <td class="col-created">${createdDate}</td>
                 <td class="col-closed">${closedDate}</td>
                 <td class="col-account">${accountName}</td>
-                <td class="col-notes">${trade.notes ? `<span title="${trade.notes}">📝</span>` : ''}</td>
                 <td class="col-actions actions-cell">
                     <button class="action-btn edit-btn" onclick="editTrade(${trade.id})" title="ערוך" data-entity-type="trade" data-entity-id="${trade.id}"></button>
                     <button class="action-btn view-btn" onclick="viewTrade(${trade.id})" title="צפה" data-entity-type="trade" data-entity-id="${trade.id}"></button>
@@ -558,7 +543,6 @@ class TradesController {
      * אתחול מאזינים לאירועים
      */
     initializeEventListeners() {
-        console.log('🔧 Initializing Trades Event Listeners...');
         
         // כפתור הוספת טרייד
         const addButton = addTradeBtn;
@@ -578,25 +562,20 @@ class TradesController {
             editForm.addEventListener('submit', (e) => this.handleEditTrade(e));
         }
         
-        console.log('✅ Trades Event Listeners Initialized');
     }
 
     /**
      * אתחול מסננים
      */
     initializeFilters() {
-        console.log('🔧 Initializing Trades Filters...');
         // יישום מסננים בהתאם לצורך
-        console.log('✅ Trades Filters Initialized');
     }
 
     /**
      * אתחול טבלאות
      */
     initializeTables() {
-        console.log('🔧 Initializing Trades Tables...');
         // יישום טבלאות בהתאם לצורך
-        console.log('✅ Trades Tables Initialized');
     }
 
     /**
@@ -748,7 +727,6 @@ class TradesController {
                     // ניקוי מטמון
                     if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
                         await window.UnifiedCacheManager.remove('trades');
-                        console.log('✅ מטמון trades נוקה אחרי עדכון');
                     }
                     // רענון נתונים
                     await this.loadTrades();
@@ -784,7 +762,6 @@ class TradesController {
                     // ניקוי מטמון
                     if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
                         await window.UnifiedCacheManager.remove('trades');
-                        console.log('✅ מטמון trades נוקה אחרי מחיקה');
                     }
                     // רענון נתונים
                     await this.loadTrades();
@@ -883,17 +860,139 @@ window.validateTradeForm = validateTradeForm;
 // Export save function
 window.addTrade = addTrade;
 
-// Export table update function (for sorting)
+// Export table update function (for sorting and data loading)
 window.updateTradesTable = function(trades) {
     if (window.tradesController) {
         window.tradesController.data = trades || window.tradesController.data;
         window.tradesController.updateTradesTable();
+        
+        // הפעלת button-icons לאחר עדכון הטבלה
+        if (typeof window.initializeButtonIcons === 'function') {
+            setTimeout(() => {
+                window.initializeButtonIcons();
+            }, 100);
+        }
     }
 };
 
 // Export data arrays for sorting
 window.tradesData = [];
 window.filteredTradesData = null;
+
+// ========================================
+// פונקציה לטעינת נתוני טריידים
+// ========================================
+
+/**
+ * טעינת כל הטריידים מהשרת ועדכון הטבלה
+ * משתמשת במערכת הכללית loadTableData
+ * Returns empty array on error with proper user notification (NO MOCK DATA per Rules 48-49)
+ *
+ * @returns {Array} מערך של טריידים או מערך ריק במקרה של שגיאה
+ */
+let _isLoadingTrades = false;
+
+
+// Flag to prevent duplicate loading
+let _isLoadingTrades = false;
+async function loadTradesData() {
+  // Prevent duplicate loading
+  if (_isLoadingTrades) {
+    return window.tradesData || [];
+  }
+  _isLoadingTrades = true;
+
+    // מניעת טעינה כפולה
+    if (_isLoadingTrades) {
+        return window.tradesData || [];
+    }
+    
+    _isLoadingTrades = true;
+    
+    try {
+        // שימוש במערכת הכללית לטעינת נתונים (v2.0.0 - with error handling)
+        if (typeof window.loadTableData === 'function') {
+            const data = await window.loadTableData('trades', updateTradesTable, {
+                tableId: 'tradesTable',
+                entityName: 'טריידים',
+                columns: 12,
+                onRetry: loadTradesData
+            });
+            
+            // עדכון נתונים גלובליים
+            window.tradesData = data;
+      _isLoadingTrades = false;
+            _isLoadingTrades = false;
+            
+            // הפעלת button-icons לאחר עדכון הטבלה
+            if (typeof window.initializeButtonIcons === 'function') {
+                setTimeout(() => {
+                    window.initializeButtonIcons();
+                }, 100);
+            }
+            
+            return data;
+        } else {
+            console.error('❌ window.loadTableData לא זמינה');
+            
+            // נסיון חלופי - טעינה ישירה מה-API
+            const response = await fetch('/api/trades/');
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const result = await response.json();
+            const data = result.data || result;
+            
+            window.tradesData = data;
+      _isLoadingTrades = false;
+            updateTradesTable(data);
+            _isLoadingTrades = false;
+            
+            // הפעלת button-icons לאחר עדכון הטבלה
+            if (typeof window.initializeButtonIcons === 'function') {
+                setTimeout(() => {
+                    window.initializeButtonIcons();
+                }, 100);
+            }
+            
+            return data;
+        }
+    } catch (error) {
+        console.error('❌ שגיאה בטעינת טריידים:', error);
+        
+        // הצגת שגיאה למשתמש
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification(
+                'שגיאה בטעינת טריידים',
+                `לא ניתן לטעון את נתוני הטריידים: ${error.message}`
+            );
+        }
+        
+        // עדכון טבלה עם שגיאה
+        const tableBody = document.getElementById('tradesTableBody');
+        if (tableBody) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="12" class="text-center text-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        שגיאה בטעינת נתונים: ${error.message}
+                        <br>
+                        <button class="btn btn-sm btn-primary mt-2" onclick="window.loadTradesData()">
+                            <i class="fas fa-redo"></i> נסה שוב
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }
+        
+        _isLoadingTrades = false;
+        return [];
+    }
+}
+
+// חשיפה כפונקציה גלובלית
+window.loadTradesData = loadTradesData;
 
 // אתחול אוטומטי - הוסר למערכת מאוחדת
 // document.addEventListener('DOMContentLoaded', function() {
@@ -902,4 +1001,3 @@ window.filteredTradesData = null;
 //     }
 // });
 
-console.log('✅ trades.js v=20251012b loaded successfully - matched to trade_plans structure');

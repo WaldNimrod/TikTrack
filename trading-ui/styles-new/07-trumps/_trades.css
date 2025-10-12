@@ -4,14 +4,14 @@
  * 
  * קובץ זה מכיל רוחבי עמודות ספציפיים לעמוד הטריידים
  * 
- * @version 1.0.0
- * @lastUpdated October 12, 2025
+ * @version 1.1.0
+ * @lastUpdated October 12, 2025 - Removed notes column (12 columns now)
  * @page trades.html
  * @note This is an exception to the "no 07-trumps for regular pages" rule
- *       Trades page has 13 columns requiring custom width definitions
+ *       Trades page has 12 columns requiring custom width definitions
  */
 
-/* ===== Trades Table - 13 Columns Layout ===== */
+/* ===== Trades Table - 12 Columns Layout (הוסרה עמודת הערות) ===== */
 
 /* עמודות טקסט קצר */
 .data-table.trades-table .col-ticker,
@@ -79,14 +79,6 @@
     min-width: 90px;
 }
 
-/* עמודת הערות */
-.data-table.trades-table .col-notes,
-.data-table[data-table-type="trades"] .col-notes {
-    width: 6%;
-    min-width: 50px;
-    text-align: center;
-}
-
 /* עמודת פעולות */
 .data-table.trades-table .col-actions,
 .data-table[data-table-type="trades"] .col-actions {
@@ -116,7 +108,7 @@
 
 /* ===== Summary ===== */
 /*
-Total columns: 13
+Total columns: 12 (הוסרה עמודת הערות)
 - ticker: 7%
 - price: 8%
 - change: 7%
@@ -128,8 +120,7 @@ Total columns: 13
 - created: 8%
 - closed: 8%
 - account: 9%
-- notes: 6%
 - actions: 12%
-Total: ~101% (allows for minor browser variations)
+Total: ~95% (allows for minor browser variations)
 */
 

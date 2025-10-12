@@ -147,7 +147,6 @@
                         <h2>
                             <img src="images/icons/trades.svg" alt="הטריידים שלי" class="section-icon">
                             הטריידים שלי
-                            <span class="table-count" id="tradesCount">טוען...</span>
                         </h2>
                         <div class="header-actions">
                             <button id="addTradeBtn" class="refresh-btn" onclick="showAddTradeModal()" title="הוסף טרייד חדש">
@@ -240,12 +239,6 @@
                                                 חשבון <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
-                                        <th class="col-notes">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(11, window.filteredTradesData || window.tradesData, 'trades', window.updateTradesTable); }">
-                                                הערות <span class="sort-icon">↕</span>
-                                            </button>
-                                        </th>
                                         <th class="col-actions actions-cell actions-3-btn">
                                             פעולות
                                         </th>
@@ -253,7 +246,7 @@
                                 </thead>
                                 <tbody id="tradesTableBody">
                                     <tr>
-                                        <td colspan="13" class="loading">טוען טריידים...</td>
+                                        <td colspan="12" class="loading">טוען טריידים...</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -599,6 +592,6 @@
     <script src="scripts/services/statistics-calculator.js?v=1.0.0"></script>
     
     <!-- Stage 5: Page Script - REQUIRED -->
-    <script src="scripts/trades.js?v=20251012b"></script>
+    <script src="scripts/trades.js?v=20250112opt"></script>
 </body>
 </html>

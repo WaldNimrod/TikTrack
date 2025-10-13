@@ -216,6 +216,7 @@ function translateCashFlowType(type) {
     'interest': 'ריבית',
     'bonus': 'בונוס',
     'tax': 'מס',
+    'other': 'אחר',
   };
   return typeNames[type] || type;
 }

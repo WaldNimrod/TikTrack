@@ -402,6 +402,8 @@ class TradesController {
         
         if (!this.data || this.data.length === 0) {
             tableBody.innerHTML = '<tr><td colspan="12" class="text-center text-muted">אין טריידים להצגה</td></tr>';
+            // עדכון סטטיסטיקות ל-0
+            this.updateStatistics([]);
             return;
         }
         
@@ -410,6 +412,43 @@ class TradesController {
         }).join('');
         
         tableBody.innerHTML = tableHTML;
+        
+        // עדכון סטטיסטיקות
+        this.updateStatistics(this.data);
+    }
+    
+    /**
+     * עדכון סטטיסטיקות בראש העמוד
+     */
+    updateStatistics(data) {
+        const totalTradesEl = document.getElementById('totalTrades');
+        const openTradesEl = document.getElementById('openTrades');
+        const closedTradesEl = document.getElementById('closedTrades');
+        const totalPLEl = document.getElementById('totalPL');
+        
+        if (!data || data.length === 0) {
+            if (totalTradesEl) totalTradesEl.textContent = '0';
+            if (openTradesEl) openTradesEl.textContent = '0';
+            if (closedTradesEl) closedTradesEl.textContent = '0';
+            if (totalPLEl) totalPLEl.textContent = '$0.00';
+            return;
+        }
+        
+        // חישוב סטטיסטיקות
+        const totalTrades = data.length;
+        const openTrades = data.filter(t => t.status === 'open').length;
+        const closedTrades = data.filter(t => t.status === 'closed').length;
+        const totalPL = data.reduce((sum, t) => sum + (parseFloat(t.total_pl) || 0), 0);
+        
+        // עדכון DOM
+        if (totalTradesEl) totalTradesEl.textContent = totalTrades;
+        if (openTradesEl) openTradesEl.textContent = openTrades;
+        if (closedTradesEl) closedTradesEl.textContent = closedTrades;
+        if (totalPLEl) {
+            const plClass = totalPL >= 0 ? 'numeric-text-positive' : 'numeric-text-negative';
+            totalPLEl.textContent = `$${totalPL.toFixed(2)}`;
+            totalPLEl.className = plClass;
+        }
     }
 
     /**

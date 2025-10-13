@@ -912,18 +912,9 @@ async function renderCashFlowsTable(cashFlows = null) {
     window.translateCashFlowSource(cashFlow.source) :
     cashFlow.source}</td>
             <td class="col-actions actions-cell actions-3-btn">
-                <button class="btn btn-sm btn-outline-info" onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})" title="פריטים מקושרים">
-                    <i class="bi bi-link-45deg"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-primary" onclick="editCashFlow(${cashFlow.id})" title="עריכה">
-                    <i class="bi bi-pencil"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-info" onclick="showCashFlowDetails(${cashFlow.id})" title="פרטים">
-                    <i class="bi bi-eye"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-danger" onclick="deleteCashFlow(${cashFlow.id})" title="מחיקה">
-                    <i class="bi bi-trash"></i>
-                </button>
+                ${window.createLinkButton ? window.createLinkButton(`showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})`) : ''}
+                ${window.createEditButton ? window.createEditButton(`editCashFlow(${cashFlow.id})`) : ''}
+                ${window.createDeleteButton ? window.createDeleteButton(`deleteCashFlow(${cashFlow.id})`) : ''}
             </td>
         `;
     tbody.appendChild(row);
@@ -932,7 +923,14 @@ async function renderCashFlowsTable(cashFlows = null) {
   // עדכון מספר הפריטים
   const countElement = document.querySelector('.table-count');
   if (countElement) {
-    countElement.textContent = `${cashFlowsData.length} תזרימים`;
+    countElement.textContent = `${dataToRender.length} תזרימים`;
+  }
+  
+  // הפעלת button-icons אחרי עדכון הטבלה
+  if (typeof window.initializeButtonIcons === 'function') {
+    setTimeout(() => {
+      window.initializeButtonIcons();
+    }, 50);
   }
 }
 

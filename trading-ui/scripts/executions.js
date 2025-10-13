@@ -1439,12 +1439,12 @@ window.confirmDeleteExecution = confirmDeleteExecution;
 
 // פונקציות מודל פריטים מקושרים
 window.showExecutionLinkedItemsModal = showExecutionLinkedItemsModal;
-window.loadLinkedItemsDetails = loadLinkedItemsDetails;
-window.displayLinkedItems = displayLinkedItems;
-window.goToLinkedItems = goToLinkedItems;
-window.goToTrade = goToTrade;
-window.goToPlan = goToPlan;
-window.goToAlert = goToAlert;
+// window.loadLinkedItemsDetails = loadLinkedItemsDetails; // ❌ הוסר - הפונקציה לא קיימת
+// window.displayLinkedItems = displayLinkedItems; // ❌ הוסר - הפונקציה לא קיימת
+// window.goToLinkedItems = goToLinkedItems; // ❌ הוסר - הפונקציה לא קיימת
+// window.goToTrade = goToTrade; // ❌ הוסר - הפונקציה לא קיימת
+// window.goToPlan = goToPlan; // ❌ הוסר - הפונקציה לא קיימת
+// window.goToAlert = goToAlert; // ❌ הוסר - הפונקציה לא קיימת
 window.goToNote = goToNote;
 
 // ===== פונקציות סידור =====

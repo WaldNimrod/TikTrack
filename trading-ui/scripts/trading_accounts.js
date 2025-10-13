@@ -167,10 +167,13 @@ class TradingAccountsController {
             ) : 
             (tradingAccount.currency_symbol || tradingAccount.currency_name || '-');
 
-        // רינדור יתרה באמצעות FieldRendererService (עם צבע לפי חיובי/שלילי/אפס)
-        const formattedBalance = window.FieldRendererService ? 
-            window.FieldRendererService.renderNumericValue(balanceValue, ' $', false) : 
-            (typeof balanceValue === 'number' ? `$${balanceValue.toLocaleString()}` : balanceValue);
+        // קבלת סמל המטבע לשימוש ביתרה
+        const currencySymbol = tradingAccount.currency_symbol || '$';
+
+        // רינדור יתרה - רק צבע טקסט (ללא רקע/מסגרת)
+        const balanceClass = balanceValue > 0 ? 'numeric-value-positive' : 
+                            (balanceValue < 0 ? 'numeric-value-negative' : '');
+        const formattedBalance = `<span class="${balanceClass}">${balanceValue.toFixed(2)} ${currencySymbol}</span>`;
         
         // רינדור תאריך באמצעות FieldRendererService (כמו trade_plans + cash_flows)
         const formattedDate = window.FieldRendererService ? 

@@ -73,31 +73,35 @@
 
 /* Related object badge (used inside tables) */
 .linked-object-badge {
-  display: inline-flex;
+  display: inline-grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 6px;
-  padding: 4px 8px;
-  border-radius: 12px;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: 16px;
   background-color: var(--entity-badge-bg, #f8f9fa);
   border: 1px solid var(--entity-badge-border, #e9ecef);
   cursor: pointer;
   user-select: none;
+  font-size: 13px;
+  line-height: 1.2;
+  direction: rtl;
 }
 .linked-object-badge:hover { filter: brightness(0.98); }
-.linked-object-badge .linked-object-icon { width: 16px; height: 16px; display: inline-block; }
-.linked-object-badge .linked-object-text { font-size: 12px; color: #333; }
-.linked-object-badge .linked-object-meta { font-size: 11px; color: #666; margin-inline-start: 6px; display: inline-flex; gap: 6px; align-items: center; }
-.linked-object-badge .linked-object-meta .badge { vertical-align: middle; }
-.linked-object-badge .linked-object-ticker { display: inline-flex; align-items: center; gap: 4px; }
-.linked-object-badge .linked-object-ticker-icon { width: 12px; height: 12px; }
+.linked-object-badge .linked-object-icon { width: 18px; height: 18px; display: inline-block; justify-self: start; }
+.linked-object-badge .linked-object-center { display: inline-flex; flex-direction: column; align-items: flex-end; text-align: right; min-width: 140px; width: 140px; }
+.linked-object-badge .linked-object-symbol { font-size: 12px; color: #333; font-weight: 600; line-height: 1.1; }
+.linked-object-badge .linked-object-date { font-size: 11px; color: #666; line-height: 1.1; margin-top: 2px; }
+.linked-object-badge .linked-object-status { margin-inline-start: 6px; justify-self: end; }
 
 /* Colors per entity (fallbacks; dynamic system may override via CSS vars) */
-.entity-trade    .linked-object-text { color: var(--entity-trade, #007bff); }
-.entity-account  .linked-object-text { color: var(--entity-account, #28a745); }
-.entity-ticker   .linked-object-text { color: var(--entity-ticker, #17a2b8); }
-.entity-alert    .linked-object-text { color: var(--entity-alert, #ffc107); }
-.entity-cash_flow .linked-object-text { color: var(--entity-cash_flow, #6c757d); }
-.entity-note     .linked-object-text { color: var(--entity-note, #343a40); }
-.entity-trade_plan .linked-object-text { color: var(--entity-trade_plan, #26baac); }
-.entity-execution .linked-object-text { color: var(--entity-execution, #28a745); }
+/* Background + border tints per entity (keeps text legible) */
+.linked-object-badge.entity-trade       { background: rgba(0,123,255,0.08);  border-color: rgba(0,123,255,0.25); }
+.linked-object-badge.entity-account     { background: rgba(40,167,69,0.10);  border-color: rgba(40,167,69,0.28); }
+.linked-object-badge.entity-ticker      { background: rgba(23,162,184,0.10); border-color: rgba(23,162,184,0.28); }
+.linked-object-badge.entity-alert       { background: rgba(252,90,6,0.10);   border-color: rgba(252,90,6,0.28); }
+.linked-object-badge.entity-cash_flow   { background: rgba(108,117,125,0.10); border-color: rgba(108,117,125,0.28); }
+.linked-object-badge.entity-note        { background: rgba(52,58,64,0.08);   border-color: rgba(52,58,64,0.22); }
+.linked-object-badge.entity-trade_plan  { background: rgba(38,186,172,0.12); border-color: rgba(38,186,172,0.30); }
+.linked-object-badge.entity-execution   { background: rgba(40,167,69,0.10);  border-color: rgba(40,167,69,0.28); }
 

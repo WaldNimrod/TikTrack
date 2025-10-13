@@ -465,7 +465,11 @@ function updateAlertsTable(alerts) {
                   alert.related_type || alert.related_type_id,
                   alert.related_id,
                   alert.related_entity_name,
-                  { ticker: alert.symbol || alert.ticker_symbol, side: alert.side, date: alert.created_at }
+                  {
+                    ticker: alert.ticker_symbol || alert.symbol || (alert.ticker && alert.ticker.symbol) || '',
+                    date: alert.created_at,
+                    status: alert.status
+                  }
                 )
               : `<div class=\"related-object-cell ${relatedClass}\" title=\"קישור לדף אובייקט - בפיתוח\">${relatedTypeBadge}</div>`}
           </td>

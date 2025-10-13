@@ -44,24 +44,22 @@ class FieldRendererService {
      * const html2 = FieldRendererService.renderStatus('triggered', 'alert');
      */
     static renderStatus(status, entityType = 'default') {
-        if (!status) return '<span class="badge badge-secondary">-</span>';
+        if (!status) return '<span class="status-badge" data-status-category="unknown">-</span>';
         
         // תרגום סטטוס לעברית
         const translatedStatus = this._translateStatus(status, entityType);
         
-        // קביעת קטגוריה לצבע
-        const statusLower = status.toLowerCase();
-        let category = '';
+        // קביעת קטגוריה לצבע (outline, טקסט כהה לפי קטגוריה)
+        const statusLower = String(status).toLowerCase();
+        let category = 'unknown';
+        if (statusLower === 'open' || statusLower === 'active') category = 'open';
+        else if (statusLower === 'closed' || statusLower === 'completed') category = 'closed';
+        else if (statusLower === 'cancelled' || statusLower === 'canceled') category = 'cancelled';
+        else if (statusLower === 'triggered') category = 'warning';
+        else if (statusLower === 'not_triggered') category = 'info';
         
-        if (statusLower === 'open' || statusLower === 'active' || statusLower === 'triggered') {
-            category = 'open';
-        } else if (statusLower === 'closed' || statusLower === 'completed') {
-            category = 'closed';
-        } else if (statusLower === 'cancelled' || statusLower === 'canceled' || statusLower === 'not_triggered') {
-            category = 'cancelled';
-        }
-        
-        return `<span class="badge badge-status badge-capsule" data-status-category="${category}">${translatedStatus}</span>`;
+        // שימוש במחלקה הייעודית שלנו ל-outline כדי למנוע טקסט לבן
+        return `<span class="status-badge" data-status-category="${category}" data-entity="${entityType}">${translatedStatus}</span>`;
     }
 
     /**
@@ -248,33 +246,42 @@ class FieldRendererService {
         // Normalize meta param (support calling with meta as 3rd argument)
         const metaObj = (meta && typeof meta === 'object') ? meta : (displayName && typeof displayName === 'object' ? displayName : null);
         
-        // Compose display parts per spec: [Icon] [Entity Type - bold] | [Ticker] | [dd.mm] | [Status]
-        const parts = [];
-        const typeHtml = `<strong class="linked-object-type">${label}</strong>`;
-        parts.push(typeHtml);
+        // Determine ticker to show: prefer meta.ticker; fallback to displayName for known types
+        let tickerText = null;
         if (metaObj && metaObj.ticker) {
-            const tickerIcon = '/trading-ui/images/icons/tickers.svg';
-            parts.push(`<span class="linked-object-ticker"><img class="linked-object-ticker-icon" src="${tickerIcon}" alt="טיקר"> ${metaObj.ticker}</span>`);
-        }
-        if (metaObj && metaObj.date) {
-            const dateShort = (typeof FieldRendererService !== 'undefined' && FieldRendererService.renderDateShort)
-                ? FieldRendererService.renderDateShort(metaObj.date)
-                : FieldRendererService._formatDateDdMm(metaObj.date);
-            parts.push(`<span class="linked-object-date">${dateShort}</span>`);
-        }
-        if (metaObj && metaObj.status) {
-            const statusHtml = (typeof FieldRendererService !== 'undefined' && FieldRendererService.renderStatus)
-                ? FieldRendererService.renderStatus(metaObj.status, type)
-                : `<span class="badge badge-secondary">${metaObj.status}</span>`;
-            parts.push(`<span class="linked-object-status">${statusHtml}</span>`);
+            tickerText = metaObj.ticker;
+        } else if ((type === 'ticker' || type === 'trade' || type === 'trade_plan') && typeof displayName === 'string' && displayName) {
+            tickerText = displayName;
         }
 
-        const bodyHtml = parts.join(' <span class="linked-object-sep">|</span> ');
+        // Format date dd.mm if exists
+        let dateShort = '';
+        if (metaObj && metaObj.date) {
+            dateShort = (typeof FieldRendererService !== 'undefined' && FieldRendererService.renderDateShort)
+                ? FieldRendererService.renderDateShort(metaObj.date)
+                : FieldRendererService._formatDateDdMm(metaObj.date);
+        }
+
+        // Status HTML if exists
+        let statusHtml = '';
+        if (metaObj && metaObj.status) {
+            statusHtml = (typeof FieldRendererService !== 'undefined' && FieldRendererService.renderStatus)
+                ? FieldRendererService.renderStatus(metaObj.status, type)
+                : `<span class="badge badge-secondary">${metaObj.status}</span>`;
+        }
+
+        // Compose new layout (RTL): [entity icon] | [symbol with date underneath] | [status]
+        const centerHtml = `
+            <span class="linked-object-center" aria-label="${label}">
+                ${tickerText ? `<span class=\"linked-object-symbol\">${tickerText}</span>` : `<span class=\"linked-object-symbol\"></span>`}
+                ${dateShort ? `<span class=\"linked-object-date\">${dateShort}</span>` : `<span class=\"linked-object-date\"></span>`}
+            </span>`;
 
         return `
         <div class="linked-object-badge entity-${type}" role="link" tabindex="0" ${onclick} data-entity-type="${type}" data-entity-id="${safeId}">
-            <img class="linked-object-icon" src="${iconPath}" alt="${label}">
-            <span class="linked-object-text">${bodyHtml}</span>
+            <span class="linked-object-kind"><img class="linked-object-icon" src="${iconPath}" alt="${label}"> <strong class="linked-object-type">${label}</strong></span>
+            ${centerHtml}
+            <span class="linked-object-status">${statusHtml}</span>
         </div>`;
     }
 

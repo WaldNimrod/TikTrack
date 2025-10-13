@@ -73,9 +73,10 @@
 
 /* Related object badge (used inside tables) */
 .linked-object-badge {
-  display: inline-flex;
+  display: inline-grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   padding: 6px 10px;
   border-radius: 16px;
   background-color: var(--entity-badge-bg, #f8f9fa);
@@ -84,14 +85,18 @@
   user-select: none;
   font-size: 13px;
   line-height: 1.2;
+  direction: rtl; /* פריסת RTL: איקון סוג מימין, סטטוס משמאל */
 }
 .linked-object-badge:hover { filter: brightness(0.98); }
-.linked-object-badge .linked-object-icon { width: 18px; height: 18px; display: inline-block; }
-.linked-object-badge .linked-object-text { font-size: 12px; color: #333; }
-.linked-object-badge .linked-object-meta { font-size: 11px; color: #666; margin-inline-start: 6px; display: inline-flex; gap: 6px; align-items: center; }
-.linked-object-badge .linked-object-meta .badge { vertical-align: middle; }
-.linked-object-badge .linked-object-ticker { display: inline-flex; align-items: center; gap: 4px; }
-.linked-object-badge .linked-object-ticker-icon { width: 12px; height: 12px; }
+.linked-object-badge .linked-object-kind { display: inline-flex; align-items: center; gap: 6px; }
+.linked-object-badge .linked-object-kind { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.linked-object-badge .linked-object-icon { width: 18px; height: 18px; display: inline-block; justify-self: start; }
+.linked-object-badge .linked-object-type { font-size: 12px; color: #333; font-weight: 600; }
+.linked-object-badge .linked-object-type { font-size: 12px; color: #333; font-weight: 600; }
+.linked-object-badge .linked-object-center { display: inline-flex; flex-direction: column; align-items: flex-end; text-align: right; min-width: 140px; width: 140px; }
+.linked-object-badge .linked-object-symbol { font-size: 12px; color: #333; font-weight: 600; line-height: 1.1; }
+.linked-object-badge .linked-object-date { font-size: 11px; color: #666; line-height: 1.1; margin-top: 2px; }
+.linked-object-badge .linked-object-status { margin-inline-start: 6px; justify-self: end; }
 
 /* Colors per entity (fallbacks; dynamic system may override via CSS vars) */
 /* Background + border tints per entity (keeps text legible) */

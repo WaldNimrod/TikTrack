@@ -1632,6 +1632,53 @@ window.exportReportMarkdown = function() {
 };
 
 /**
+ * ייצוא דוח CSV
+ */
+window.exportReportCSV = function() {
+    const report = JSON.parse(localStorage.getItem('lastCRUDTestReport') || '{}');
+    
+    if (!report.summary) {
+        if (window.showErrorNotification) {
+            window.showErrorNotification('אין דוח זמין', 'אנא הרץ בדיקות תחילה ואז נסה שוב.', 5000);
+        }
+        return;
+    }
+    
+    try {
+        // כותרות CSV
+        const headers = ['entity','displayName','type','score','responseTimeMs','p50','p95','issues'];
+        const rows = [headers.join(',')];
+        
+        (report.allResults || []).forEach(r => {
+            const issues = (r.issues || []).join(' | ').replace(/\n|\r/g, ' ');
+            const row = [
+                r.entity,
+                (r.displayName || '').replace(/,/g, ' '),
+                r.type || '',
+                r.score != null ? r.score : (r.overallScore != null ? r.overallScore : ''),
+                r.responseTime != null ? r.responseTime : '',
+                r.p50 != null ? Math.round(r.p50) : '',
+                r.p95 != null ? Math.round(r.p95) : '',
+                `"${issues}"`
+            ].join(',');
+            rows.push(row);
+        });
+        
+        const csv = rows.join('\n');
+        downloadFile(csv, `crud-test-report-${new Date().toISOString().split('T')[0]}.csv`, 'text/csv');
+        
+        if (window.showSuccessNotification) {
+            window.showSuccessNotification('ייצוא הושלם', 'דוח CSV הורד בהצלחה', 3000);
+        }
+    } catch (error) {
+        console.error('Failed to export CSV:', error);
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה בייצוא CSV', error.message || 'unknown', 5000);
+        }
+    }
+};
+
+/**
  * העתקת דוח ללוח
  */
 window.copyReportToClipboard = async function() {

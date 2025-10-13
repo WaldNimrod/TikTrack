@@ -37,7 +37,7 @@ class UnifiedLogDisplay {
         this.currentData = [];
         this.currentFilters = {};
         this.currentSort = { by: null, order: 'desc' };
-        this.currentPagination = { page: 1, itemsPerPage: 3 }; // Will be updated from preferences
+        this.currentPagination = { page: 1, itemsPerPage: 50 }; // Default; will be updated from preferences if available
         this.isLoading = false;
         this.paginationInstance = null;
         this.autoRefreshInterval = null;

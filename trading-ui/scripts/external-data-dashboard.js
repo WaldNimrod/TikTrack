@@ -328,6 +328,10 @@ class ExternalDataDashboard {
   updateYahooFinanceStatus(data) {
     const statusElement = document.getElementById('yahoo-status');
     const detailsElement = document.getElementById('yahoo-details');
+    // Elements in the top provider card
+    const badgeElement = document.getElementById('yahoo-status-badge');
+    const lastUpdateElement = document.getElementById('yahoo-last-update');
+    const recordsElement = document.getElementById('yahoo-records-count');
 
     if (statusElement && detailsElement) {
       console.log('🔍 updateYahooFinanceStatus called with data:', data);
@@ -337,7 +341,8 @@ class ExternalDataDashboard {
         const yahooData = data.yahoo_finance;
         console.log('🔍 Yahoo Finance data:', yahooData);
         
-        if (yahooData.status === 'active') {
+        const isActive = yahooData.status === 'active';
+        if (isActive) {
           statusElement.textContent = 'פעיל';
           statusElement.className = 'status-indicator active';
 
@@ -346,6 +351,17 @@ class ExternalDataDashboard {
             <div class="status-detail">📈 רשומות: ${yahooData.records?.toLocaleString() || 0}</div>
             <div class="status-detail">🕒 עדכון אחרון: ${yahooData.last_update ? this.formatLastUpdate(yahooData.last_update) : 'לא ידוע'}</div>
           `;
+          // Update top provider card elements if present
+          if (badgeElement) {
+            badgeElement.textContent = 'פעיל';
+            badgeElement.className = 'badge bg-success';
+          }
+          if (lastUpdateElement) {
+            lastUpdateElement.textContent = yahooData.last_update ? this.formatLastUpdate(yahooData.last_update) : 'לא ידוע';
+          }
+          if (recordsElement) {
+            recordsElement.textContent = (yahooData.records || 0).toLocaleString();
+          }
         } else {
           statusElement.textContent = 'לא פעיל';
           statusElement.className = 'status-indicator error';
@@ -354,6 +370,16 @@ class ExternalDataDashboard {
             <div class="status-detail">📈 רשומות: ${yahooData.records?.toLocaleString() || 0}</div>
             <div class="status-detail">🕒 עדכון אחרון: ${yahooData.last_update ? this.formatLastUpdate(yahooData.last_update) : 'לא ידוע'}</div>
           `;
+          if (badgeElement) {
+            badgeElement.textContent = 'לא פעיל';
+            badgeElement.className = 'badge bg-danger';
+          }
+          if (lastUpdateElement) {
+            lastUpdateElement.textContent = yahooData.last_update ? this.formatLastUpdate(yahooData.last_update) : 'לא ידוע';
+          }
+          if (recordsElement) {
+            recordsElement.textContent = (yahooData.records || 0).toLocaleString();
+          }
         }
       } else {
         // Fallback to old method
@@ -368,24 +394,69 @@ class ExternalDataDashboard {
             <div class="status-detail">⚡ בקשות נותרות: ${yahooProvider.rate_limit_remaining || 0}</div>
             <div class="status-detail">📈 אחוז הצלחה: ${yahooProvider.recent_success_rate || 0}%</div>
           `;
+          if (badgeElement) {
+            badgeElement.textContent = 'פעיל';
+            badgeElement.className = 'badge bg-success';
+          }
+          if (lastUpdateElement) {
+            lastUpdateElement.textContent = yahooProvider.last_successful_request ? this.formatLastUpdate(yahooProvider.last_successful_request) : 'לא ידוע';
+          }
+          if (recordsElement) {
+            // Use cache total if available on main data
+            const total = data.cache?.total_quotes || 0;
+            recordsElement.textContent = total.toLocaleString();
+          }
         } else if (yahooProvider && yahooProvider.is_active && !yahooProvider.is_healthy) {
           statusElement.textContent = 'בעיה';
           statusElement.className = 'status-indicator error';
           detailsElement.innerHTML = `
           <div class="status-detail error">❌ הספק פעיל אבל לא בריא</div>
         `;
+          if (badgeElement) {
+            badgeElement.textContent = 'בעיה';
+            badgeElement.className = 'badge bg-warning';
+          }
+          if (lastUpdateElement) {
+            lastUpdateElement.textContent = yahooProvider.last_successful_request ? this.formatLastUpdate(yahooProvider.last_successful_request) : 'לא ידוע';
+          }
+          if (recordsElement) {
+            const total = data.cache?.total_quotes || 0;
+            recordsElement.textContent = total.toLocaleString();
+          }
         } else if (yahooProvider && !yahooProvider.is_active) {
           statusElement.textContent = 'לא פעיל';
           statusElement.className = 'status-indicator inactive';
           detailsElement.innerHTML = `
             <div class="status-detail">⚠️ הספק לא פעיל</div>
           `;
+          if (badgeElement) {
+            badgeElement.textContent = 'לא פעיל';
+            badgeElement.className = 'badge bg-danger';
+          }
+          if (lastUpdateElement) {
+            lastUpdateElement.textContent = 'לא ידוע';
+          }
+          if (recordsElement) {
+            const total = data.cache?.total_quotes || 0;
+            recordsElement.textContent = total.toLocaleString();
+          }
         } else {
           statusElement.textContent = 'לא ידוע';
           statusElement.className = 'status-indicator inactive';
           detailsElement.innerHTML = `
             <div class="status-detail">❓ לא ניתן לקבוע סטטוס</div>
           `;
+          if (badgeElement) {
+            badgeElement.textContent = 'לא ידוע';
+            badgeElement.className = 'badge bg-secondary';
+          }
+          if (lastUpdateElement) {
+            lastUpdateElement.textContent = 'לא ידוע';
+          }
+          if (recordsElement) {
+            const total = data.cache?.total_quotes || 0;
+            recordsElement.textContent = total.toLocaleString();
+          }
         }
       }
     }

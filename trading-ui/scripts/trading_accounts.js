@@ -129,7 +129,13 @@ class TradingAccountsController {
                 const row = this.createTableRow(tradingAccount);
                 tbody.appendChild(row);
             });
-
+            
+            // אתחול כפתורי פעולה (כמו cash_flows)
+            if (typeof window.initializeButtonIcons === 'function') {
+                setTimeout(() => {
+                    window.initializeButtonIcons();
+                }, 50);
+            }
 
         } catch (error) {
             console.error('❌ שגיאה בעדכון הטבלה:', error);
@@ -213,16 +219,10 @@ class TradingAccountsController {
             <td class="col-balance">${formattedBalance}</td>
             <td class="col-status">${statusBadge}</td>
             <td class="col-created">${formattedDate}</td>
-            <td class="col-actions actions-cell">
-                <button class="btn btn-sm btn-outline-primary" onclick="window.tradingAccountsController.showEditModal(${tradingAccount.id})" title="עריכה">
-                    <i class="bi bi-pencil"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-info" onclick="window.tradingAccountsController.showDetails(${tradingAccount.id})" title="פרטים">
-                    <i class="bi bi-eye"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-danger" onclick="window.tradingAccountsController.deleteAccount(${tradingAccount.id})" title="מחיקה">
-                    <i class="bi bi-trash"></i>
-                </button>
+            <td class="col-actions actions-cell actions-3-btn">
+                ${window.createLinkButton ? window.createLinkButton(`if (window.showLinkedItemsModal) { window.showLinkedItemsModal([], 'trading_account', ${tradingAccount.id}); }`) : ''}
+                ${window.createEditButton ? window.createEditButton(`window.tradingAccountsController.showEditModal(${tradingAccount.id})`) : ''}
+                ${window.createDeleteButton ? window.createDeleteButton(`window.tradingAccountsController.deleteAccount(${tradingAccount.id})`) : ''}
             </td>
         `;
 

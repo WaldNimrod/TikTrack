@@ -151,45 +151,21 @@ class TradingAccountsController {
         // שימוש במערכת מיפוי טבלאות אם זמינה
         let nameValue, typeValue, currencyValue, balanceValue, statusValue, createdValue;
         
-        if (window.getColumnValue && window.tableMappings) {
-            const tableType = 'accounts';
-            nameValue = window.getColumnValue(tradingAccount, 1, tableType) || tradingAccount.name || '-';
-            typeValue = tradingAccount.type || 'רגיל'; // סוג החשבון
-            
-            // תצוגת מטבע: שם מלא (סמל) או סמל בלבד
-            if (tradingAccount.currency_name && tradingAccount.currency_symbol) {
-                currencyValue = `${tradingAccount.currency_name} (${tradingAccount.currency_symbol})`;
-            } else if (tradingAccount.currency_symbol) {
-                currencyValue = tradingAccount.currency_symbol;
-            } else if (tradingAccount.currency_name) {
-                currencyValue = tradingAccount.currency_name;
-            } else {
-                currencyValue = window.getColumnValue(tradingAccount, 2, tableType) || tradingAccount.currency || '-';
-            }
-            
-            balanceValue = window.getColumnValue(tradingAccount, 4, tableType) || tradingAccount.cashBalance || tradingAccount.cash_balance || 0;
-            statusValue = window.getColumnValue(tradingAccount, 3, tableType) || tradingAccount.status || '-';
-            createdValue = tradingAccount.created_at || '-';
-        } else {
-            // fallback למיפוי ידני
-            nameValue = tradingAccount.name || '-';
-            typeValue = tradingAccount.type || 'רגיל';
-            
-            // תצוגת מטבע: שם מלא (סמל) או סמל בלבד
-            if (tradingAccount.currency_name && tradingAccount.currency_symbol) {
-                currencyValue = `${tradingAccount.currency_name} (${tradingAccount.currency_symbol})`;
-            } else if (tradingAccount.currency_symbol) {
-                currencyValue = tradingAccount.currency_symbol;
-            } else if (tradingAccount.currency_name) {
-                currencyValue = tradingAccount.currency_name;
-            } else {
-                currencyValue = tradingAccount.currency || '-';
-            }
-            
-            balanceValue = tradingAccount.cashBalance || tradingAccount.cash_balance || 0;
-            statusValue = tradingAccount.status || '-';
-            createdValue = tradingAccount.created_at || '-';
-        }
+        // שימוש בערכים ישירות מהאובייקט (כמו trade_plans)
+        nameValue = tradingAccount.name || '-';
+        typeValue = tradingAccount.type || 'רגיל';
+        balanceValue = tradingAccount.cashBalance || tradingAccount.cash_balance || 0;
+        statusValue = tradingAccount.status || '-';
+        createdValue = tradingAccount.created_at || '-';
+
+        // רינדור מטבע באמצעות FieldRendererService
+        const currencyDisplay = window.FieldRendererService ? 
+            window.FieldRendererService.renderCurrency(
+                tradingAccount.currency_id || tradingAccount.currency,
+                tradingAccount.currency_name,
+                tradingAccount.currency_symbol
+            ) : 
+            (tradingAccount.currency_symbol || tradingAccount.currency_name || '-');
 
         // רינדור יתרה באמצעות FieldRendererService (עם צבע לפי חיובי/שלילי/אפס)
         const formattedBalance = window.FieldRendererService ? 
@@ -209,7 +185,7 @@ class TradingAccountsController {
         row.innerHTML = `
             <td class="col-name">${nameValue}</td>
             <td class="col-type">${typeValue}</td>
-            <td class="col-currency">${currencyValue}</td>
+            <td class="col-currency">${currencyDisplay}</td>
             <td class="col-balance">${formattedBalance}</td>
             <td class="col-status">${statusBadge}</td>
             <td class="col-created">${formattedDate}</td>

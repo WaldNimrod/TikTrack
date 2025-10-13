@@ -120,9 +120,9 @@ const response = await fetch('/api/executions', {
 ### **2. FieldRendererService** ⭐ גבוה (P1)
 
 **קובץ:** `trading-ui/scripts/services/field-renderer-service.js`  
-**שורות:** 417  
-**גרסה:** 1.2.0  
-**עדכון אחרון:** 11 בינואר 2025
+**שורות:** 355  
+**גרסה:** 1.3.0  
+**עדכון אחרון:** 13 באוקטובר 2025
 
 #### תיאור:
 מערכת מרכזית לרנדור שדות מורכבים: status badges, ערכים מספריים עם צבע לפי סימן, currency display, תאריכים, וכו'.

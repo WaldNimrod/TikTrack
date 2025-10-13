@@ -1193,24 +1193,11 @@ async function updateExecutionsTableMain(executions) {
       window.FieldRendererService.renderDate(execution.date || execution.execution_date) : 
       (execution.date || execution.execution_date ? new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL') : '-');
 
-    // P&L רק במכירה, בקניה ריק
+    // P&L - טרם הוטמע (TODO: חישוב P&L אמיתי)
+    // בקניה: ריק
+    // במכירה: N/A (ממתין להטמעה)
     const isSell = (execution.action || execution.type) === 'sell' || (execution.action || execution.type) === 'sale';
-    
-    // חישוב P&L אמיתי (אם קיים במסד) או דמה לבדיקה
-    let plValue = execution.pl || execution.total_pl || 0;
-    
-    // אם אין P&L ממסד - חישוב פשוט לדמו (sell - buy difference)
-    if (plValue === 0 && isSell && execution.price && execution.quantity) {
-        // חישוב פשוט: הנחה שמחיר קנייה ממוצע (לדוגמה בלבד)
-        const estimatedBuyPrice = execution.price * 0.95; // הנחה: רכשנו 5% זול יותר
-        plValue = (execution.price - estimatedBuyPrice) * execution.quantity - (execution.fee || 0);
-    }
-    
-    const plBadge = isSell ? 
-      (window.FieldRendererService ? 
-        window.FieldRendererService.renderNumericValue(plValue, '$', true) : 
-        `$${plValue.toFixed(2)}`) : 
-      '-';
+    const plBadge = isSell ? '<span class="text-muted fw-bold">N/A</span>' : '-';
 
     // שמירת הערכים המקוריים באנגלית לפילטר
     const typeForFilter = (execution.action || execution.type) === 'buy' ? 'קנייה' :

@@ -393,23 +393,23 @@ table td,
 
 /* 3 כפתורים */
 .actions-3-btn {
-  width: var(--actions-3-btn-width, 50px);
-  min-width: var(--actions-3-btn-width, 50px);
-  max-width: var(--actions-3-btn-width, 50px);
+  width: var(--actions-3-btn-width, 80px);
+  min-width: var(--actions-3-btn-width, 80px);
+  max-width: var(--actions-3-btn-width, 80px);
 }
 
 /* 4 כפתורים */
 .actions-4-btn {
-  width: var(--actions-4-btn-width, 50px);
-  min-width: var(--actions-4-btn-width, 50px);
-  max-width: var(--actions-4-btn-width, 50px);
+  width: var(--actions-4-btn-width, 80px);
+  min-width: var(--actions-4-btn-width, 80px);
+  max-width: var(--actions-4-btn-width, 80px);
 }
 
 /* 5 כפתורים */
 .actions-5-btn {
-  width: var(--actions-5-btn-width, 50px);
-  min-width: var(--actions-5-btn-width, 50px);
-  max-width: var(--actions-5-btn-width, 50px);
+  width: var(--actions-5-btn-width, 80px);
+  min-width: var(--actions-5-btn-width, 80px);
+  max-width: var(--actions-5-btn-width, 80px);
 }
 
 /* כפתורי פעולות בטבלאות - הגדרה מרכזית ואחידה לכל הכפתורים */
@@ -721,8 +721,8 @@ table tbody td button.btn-sm {
   .actions-1-btn { width: var(--actions-1-btn-width, 60px); min-width: var(--actions-1-btn-width, 60px); max-width: var(--actions-1-btn-width, 60px); }
   .actions-2-btn { width: var(--actions-2-btn-width, 80px); min-width: var(--actions-2-btn-width, 80px); max-width: var(--actions-2-btn-width, 80px); }
   .actions-3-btn { width: var(--actions-3-btn-width, 140px); min-width: var(--actions-3-btn-width, 140px); max-width: var(--actions-3-btn-width, 140px); }
-  .actions-4-btn { width: var(--actions-4-btn-width, 50px); min-width: var(--actions-4-btn-width, 50px); max-width: var(--actions-4-btn-width, 50px); }
-  .actions-5-btn { width: var(--actions-5-btn-width, 50px); min-width: var(--actions-5-btn-width, 50px); max-width: var(--actions-5-btn-width, 50px); }
+  .actions-4-btn { width: var(--actions-4-btn-width, 80px); min-width: var(--actions-4-btn-width, 80px); max-width: var(--actions-4-btn-width, 80px); }
+  .actions-5-btn { width: var(--actions-5-btn-width, 80px); min-width: var(--actions-5-btn-width, 80px); max-width: var(--actions-5-btn-width, 80px); }
 }
 
 /* טלפונים (SM - 480-767px) */
@@ -820,8 +820,8 @@ table tbody td button.btn-sm {
   .actions-1-btn { width: var(--actions-1-btn-width, 60px); min-width: var(--actions-1-btn-width, 60px); max-width: var(--actions-1-btn-width, 60px); }
   .actions-2-btn { width: var(--actions-2-btn-width, 80px); min-width: var(--actions-2-btn-width, 80px); max-width: var(--actions-2-btn-width, 80px); }
   .actions-3-btn { width: var(--actions-3-btn-width, 140px); min-width: var(--actions-3-btn-width, 140px); max-width: var(--actions-3-btn-width, 140px); }
-  .actions-4-btn { width: var(--actions-4-btn-width, 50px); min-width: var(--actions-4-btn-width, 50px); max-width: var(--actions-4-btn-width, 50px); }
-  .actions-5-btn { width: var(--actions-5-btn-width, 50px); min-width: var(--actions-5-btn-width, 50px); max-width: var(--actions-5-btn-width, 50px); }
+  .actions-4-btn { width: var(--actions-4-btn-width, 80px); min-width: var(--actions-4-btn-width, 80px); max-width: var(--actions-4-btn-width, 80px); }
+  .actions-5-btn { width: var(--actions-5-btn-width, 80px); min-width: var(--actions-5-btn-width, 80px); max-width: var(--actions-5-btn-width, 80px); }
 }
 
 /* טאבלטים (MD - 768-991px) */
@@ -964,8 +964,8 @@ table tbody td button.btn-sm {
   .actions-1-btn { width: var(--actions-1-btn-width, 60px); min-width: var(--actions-1-btn-width, 60px); max-width: var(--actions-1-btn-width, 60px); }
   .actions-2-btn { width: var(--actions-2-btn-width, 80px); min-width: var(--actions-2-btn-width, 80px); max-width: var(--actions-2-btn-width, 80px); }
   .actions-3-btn { width: var(--actions-3-btn-width, 145px); min-width: var(--actions-3-btn-width, 145px); max-width: var(--actions-3-btn-width, 145px); }
-  .actions-4-btn { width: var(--actions-4-btn-width, 50px); min-width: var(--actions-4-btn-width, 50px); max-width: var(--actions-4-btn-width, 50px); }
-  .actions-5-btn { width: var(--actions-5-btn-width, 50px); min-width: var(--actions-5-btn-width, 50px); max-width: var(--actions-5-btn-width, 50px); }
+  .actions-4-btn { width: var(--actions-4-btn-width, 80px); min-width: var(--actions-4-btn-width, 80px); max-width: var(--actions-4-btn-width, 80px); }
+  .actions-5-btn { width: var(--actions-5-btn-width, 80px); min-width: var(--actions-5-btn-width, 80px); max-width: var(--actions-5-btn-width, 80px); }
 }
 
 /* מחשבים (XL+ - 1200px+) - יעד: ללא גלילה */
@@ -1008,8 +1008,8 @@ table tbody td button.btn-sm {
   .actions-1-btn { width: var(--actions-1-btn-width, 60px); min-width: var(--actions-1-btn-width, 60px); max-width: var(--actions-1-btn-width, 60px); }
   .actions-2-btn { width: var(--actions-2-btn-width, 80px); min-width: var(--actions-2-btn-width, 80px); max-width: var(--actions-2-btn-width, 80px); }
   .actions-3-btn { width: var(--actions-3-btn-width, 145px); min-width: var(--actions-3-btn-width, 145px); max-width: var(--actions-3-btn-width, 145px); }
-  .actions-4-btn { width: var(--actions-4-btn-width, 50px); min-width: var(--actions-4-btn-width, 50px); max-width: var(--actions-4-btn-width, 50px); }
-  .actions-5-btn { width: var(--actions-5-btn-width, 50px); min-width: var(--actions-5-btn-width, 50px); max-width: var(--actions-5-btn-width, 50px); }
+  .actions-4-btn { width: var(--actions-4-btn-width, 80px); min-width: var(--actions-4-btn-width, 80px); max-width: var(--actions-4-btn-width, 80px); }
+  .actions-5-btn { width: var(--actions-5-btn-width, 80px); min-width: var(--actions-5-btn-width, 80px); max-width: var(--actions-5-btn-width, 80px); }
 }
 /* ===== Visual Feedback for Table Values (Added Jan 12, 2025) ===== */
 
@@ -1253,13 +1253,13 @@ table tbody td button.btn-sm {
   border-color: var(--info-color, #17a2b8);
 }
 
-/* עדכון לעמודת הפעולות - רוחב קבוע קטן */
+/* עדכון לעמודת הפעולות - רוחב מקסימלי 80px */
 .actions-cell {
-  width: 50px !important;
-  min-width: 50px !important;
-  max-width: 50px !important;
+  width: 80px !important;
+  min-width: 80px !important;
+  max-width: 80px !important;
   text-align: center;
-  padding: 2px !important;
+  padding: 4px !important;
   overflow: visible !important;
 }
 
@@ -1270,13 +1270,13 @@ table tbody td button.btn-sm {
   color: var(--text-muted, #6c757d);
 }
 
-/* עדכון classes ישנות של מספר כפתורים - כולם עכשיו 50px */
+/* עדכון classes ישנות של מספר כפתורים - כולם עכשיו 80px מקסימום */
 .actions-1-btn,
 .actions-2-btn,
 .actions-3-btn,
 .actions-4-btn,
 .actions-5-btn {
-  width: 50px;
-  min-width: 50px;
-  max-width: 50px;
+  width: 80px;
+  min-width: 80px;
+  max-width: 80px;
 }

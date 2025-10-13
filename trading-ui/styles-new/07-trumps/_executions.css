@@ -63,8 +63,9 @@
 
 .data-table.executions-table .col-actions,
 .data-table[data-table-type="executions"] .col-actions {
-    width: 12%;
-    min-width: 145px;
+    width: 80px !important;
+    min-width: 80px !important;
+    max-width: 80px !important;
 }
 
 /* ===== Responsive Behavior ===== */

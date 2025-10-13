@@ -79,11 +79,12 @@
     min-width: 90px;
 }
 
-/* עמודת פעולות - 5 כפתורים: Link, Edit, View, Cancel, Delete */
+/* עמודת פעולות - Actions Menu Popup (⋮ button) */
 .data-table.trades-table .col-actions,
 .data-table[data-table-type="trades"] .col-actions {
-    width: 15%;
-    min-width: 190px;
+    width: 80px !important;
+    min-width: 80px !important;
+    max-width: 80px !important;
 }
 
 /* ===== Responsive Behavior ===== */

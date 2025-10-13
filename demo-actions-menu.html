@@ -134,19 +134,26 @@
             pointer-events: none;
             transition: opacity 0.2s ease, transform 0.2s ease;
             left: 100%;
-            top: 0;
-            transform: scale(0.95);
-            
-            /* תיקון בעיית הרווח - padding בלתי נראה */
-            padding: 8px;
-            margin: -8px;
-            margin-left: 0;
+            top: 50%;
+            transform: translateY(-50%) scale(0.95);
+            margin-left: 2px; /* מרחק קטן מהכפתור - צמוד אבל לא עולה עליו */
+        }
+
+        /* Pseudo-element ליצירת אזור hover מורחב */
+        .actions-menu-popup::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            right: -8px; /* מכסה את הרווח לכפתור */
+            bottom: -8px;
+            left: -8px;
+            z-index: -1;
         }
 
         .actions-menu-wrapper:hover .actions-menu-popup {
             opacity: 1;
             pointer-events: all;
-            transform: scale(1);
+            transform: translateY(-50%) scale(1);
         }
 
         /* Popup Content - התוכן */
@@ -188,34 +195,59 @@
             transform: scale(1.05);
         }
 
-        /* Button Colors */
+        /* Button Colors - תואם למערכת */
         .btn-link {
-            background: #007aff;
+            background: white;
+            color: #29a6a8;
+            border: 1px solid #29a6a8;
+        }
+        
+        .btn-link:hover {
+            background: #29a6a8;
             color: white;
         }
 
-        .btn-edit {
-            background: #8e8e93;
+        .btn-secondary {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            color: #6c757d;
+            border: 1px solid #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
             color: white;
         }
 
-        .btn-view {
+        .btn-info {
+            background: white;
+            color: #5ac8fa;
+            border: 1px solid #5ac8fa;
+        }
+        
+        .btn-info:hover {
             background: #5ac8fa;
             color: white;
         }
 
-        .btn-cancel {
-            background: #ff3b30;
-            color: white;
+        .btn-danger {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            color: #dc3545;
+            border: 1px solid #dc3545;
         }
-
-        .btn-delete {
-            background: #ff3b30;
+        
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
             color: white;
         }
 
         .btn-success {
-            background: #34c759;
+            background: white;
+            color: #29a6a8;
+            border: 1px solid #29a6a8;
+        }
+        
+        .btn-success:hover {
+            background: #29a6a8;
             color: white;
         }
 
@@ -352,11 +384,12 @@
         <div class="fixes-box">
             <h4>✅ תיקונים שיושמו בדוגמה זו:</h4>
             <ul>
-                <li><strong>תיקון בעיית הרווח:</strong> padding בלתי נראה מאפשר מעבר חלק בין הכפתור לפופאפ</li>
+                <li><strong>תיקון בעיית הרווח:</strong> pseudo-element (::before) יוצר אזור hover בלתי נראה שמכסה את הרווח</li>
                 <li><strong>צבע ראשי:</strong> הכפתור משתמש ב-<code>--primary-color</code> (#26baac) מהמערכת</li>
                 <li><strong>גדלים תקניים:</strong> כפתורים בפופאפ 28x28px (כמו בטבלאות הקיימות)</li>
                 <li><strong>רווח נכון:</strong> margin של 2px בין כפתורים (כמו במערכת)</li>
-                <li><strong>מיקום מדויק:</strong> הפופאפ נפתח בדיוק במקביל לכפתור (top: 0)</li>
+                <li><strong>מיקום מדויק:</strong> הפופאפ ממורכז אנכית מול הכפתור (top: 50% + translateY(-50%))</li>
+                <li><strong>מרחק מהכפתור:</strong> margin-left: 2px - צמוד אבל לא עולה על הכפתור</li>
             </ul>
         </div>
 
@@ -379,10 +412,10 @@
                 <h3>❌ לפני - רשימת כפתורים (200px רוחב)</h3>
                 <div class="old-buttons">
                     <button class="btn-link" title="קישורים">🔗</button>
-                    <button class="btn-edit" title="ערוך">✏️</button>
-                    <button class="btn-view" title="צפה">👁️</button>
-                    <button class="btn-cancel" title="בטל">❌</button>
-                    <button class="btn-delete" title="מחק">🗑️</button>
+                    <button class="btn-secondary" title="ערוך">✏️</button>
+                    <button class="btn-info" title="צפה">👁️</button>
+                    <button class="btn-danger" title="בטל">❌</button>
+                    <button class="btn-danger" title="מחק">🗑️</button>
                 </div>
             </div>
 
@@ -395,10 +428,10 @@
                     <div class="actions-menu-popup">
                         <div class="actions-menu-content">
                             <button class="btn-link" title="קישורים">🔗</button>
-                            <button class="btn-edit" title="ערוך">✏️</button>
-                            <button class="btn-view" title="צפה">👁️</button>
-                            <button class="btn-cancel" title="בטל">❌</button>
-                            <button class="btn-delete" title="מחק">🗑️</button>
+                            <button class="btn-secondary" title="ערוך">✏️</button>
+                            <button class="btn-info" title="צפה">👁️</button>
+                            <button class="btn-danger" title="בטל">❌</button>
+                            <button class="btn-danger" title="מחק">🗑️</button>
                         </div>
                     </div>
                 </div>
@@ -432,15 +465,15 @@
                                 <button class="actions-menu-trigger" title="פעולות">
                                     <span class="actions-menu-icon">⋮</span>
                                 </button>
-                                <div class="actions-menu-popup">
-                                    <div class="actions-menu-content">
-                                        <button class="btn-link" title="קישורים">🔗</button>
-                                        <button class="btn-edit" title="ערוך">✏️</button>
-                                        <button class="btn-view" title="צפה">👁️</button>
-                                        <button class="btn-cancel" title="בטל">❌</button>
-                                        <button class="btn-delete" title="מחק">🗑️</button>
+                                    <div class="actions-menu-popup">
+                                        <div class="actions-menu-content">
+                                            <button class="btn-link" title="קישורים">🔗</button>
+                                            <button class="btn-secondary" title="ערוך">✏️</button>
+                                            <button class="btn-info" title="צפה">👁️</button>
+                                            <button class="btn-danger" title="בטל">❌</button>
+                                            <button class="btn-danger" title="מחק">🗑️</button>
+                                        </div>
                                     </div>
-                                </div>
                             </div>
                         </td>
                     </tr>
@@ -458,10 +491,10 @@
                                 <div class="actions-menu-popup">
                                     <div class="actions-menu-content">
                                         <button class="btn-link" title="קישורים">🔗</button>
-                                        <button class="btn-edit" title="ערוך">✏️</button>
-                                        <button class="btn-view" title="צפה">👁️</button>
+                                        <button class="btn-secondary" title="ערוך">✏️</button>
+                                        <button class="btn-info" title="צפה">👁️</button>
                                         <button class="btn-success" title="הפעל מחדש">✓</button>
-                                        <button class="btn-delete" title="מחק">🗑️</button>
+                                        <button class="btn-danger" title="מחק">🗑️</button>
                                     </div>
                                 </div>
                             </div>
@@ -478,15 +511,15 @@
                                 <button class="actions-menu-trigger" title="פעולות">
                                     <span class="actions-menu-icon">⋮</span>
                                 </button>
-                                <div class="actions-menu-popup">
-                                    <div class="actions-menu-content">
-                                        <button class="btn-link" title="קישורים">🔗</button>
-                                        <button class="btn-edit" title="ערוך">✏️</button>
-                                        <button class="btn-view" title="צפה">👁️</button>
-                                        <button class="btn-cancel" title="בטל">❌</button>
-                                        <button class="btn-delete" title="מחק">🗑️</button>
+                                    <div class="actions-menu-popup">
+                                        <div class="actions-menu-content">
+                                            <button class="btn-link" title="קישורים">🔗</button>
+                                            <button class="btn-secondary" title="ערוך">✏️</button>
+                                            <button class="btn-info" title="צפה">👁️</button>
+                                            <button class="btn-danger" title="בטל">❌</button>
+                                            <button class="btn-danger" title="מחק">🗑️</button>
+                                        </div>
                                     </div>
-                                </div>
                             </div>
                         </td>
                     </tr>
@@ -501,12 +534,12 @@
                                 <button class="actions-menu-trigger" title="פעולות">
                                     <span class="actions-menu-icon">⋮</span>
                                 </button>
-                                <div class="actions-menu-popup">
-                                    <div class="actions-menu-content">
-                                        <button class="btn-edit" title="ערוך">✏️</button>
-                                        <button class="btn-delete" title="מחק">🗑️</button>
+                                    <div class="actions-menu-popup">
+                                        <div class="actions-menu-content">
+                                            <button class="btn-secondary" title="ערוך">✏️</button>
+                                            <button class="btn-danger" title="מחק">🗑️</button>
+                                        </div>
                                     </div>
-                                </div>
                             </div>
                         </td>
                     </tr>
@@ -521,15 +554,15 @@
                                 <button class="actions-menu-trigger" title="פעולות">
                                     <span class="actions-menu-icon">⋮</span>
                                 </button>
-                                <div class="actions-menu-popup">
-                                    <div class="actions-menu-content">
-                                        <button class="btn-link" title="קישורים">🔗</button>
-                                        <button class="btn-edit" title="ערוך">✏️</button>
-                                        <button class="btn-view" title="צפה">👁️</button>
-                                        <button class="btn-cancel" title="בטל">❌</button>
-                                        <button class="btn-delete" title="מחק">🗑️</button>
+                                    <div class="actions-menu-popup">
+                                        <div class="actions-menu-content">
+                                            <button class="btn-link" title="קישורים">🔗</button>
+                                            <button class="btn-secondary" title="ערוך">✏️</button>
+                                            <button class="btn-info" title="צפה">👁️</button>
+                                            <button class="btn-danger" title="בטל">❌</button>
+                                            <button class="btn-danger" title="מחק">🗑️</button>
+                                        </div>
                                     </div>
-                                </div>
                             </div>
                         </td>
                     </tr>

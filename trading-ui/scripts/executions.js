@@ -151,7 +151,7 @@ function showExecutionDetails(executionId) {
         const details = `פרטי עסקה:
 ID: ${execution.id}
 פעולה: ${execution.action || execution.type || 'לא מוגדר'}
-כמות: ${execution.quantity ? '#' + execution.quantity : 'לא מוגדר'}
+כמות: ${execution.quantity || 'לא מוגדר'}
 מחיר: $${execution.price || '0'}
 תאריך: ${execution.date || execution.execution_date || 'לא מוגדר'}
 מקור: ${execution.source || 'לא מוגדר'}
@@ -229,11 +229,13 @@ async function showAddExecutionModal() {
       const accountFromPrefs = await window.getCurrentPreference('defaultTradingAccount');
       if (accountFromPrefs !== null && accountFromPrefs !== undefined) {
         defaultAccount = accountFromPrefs;
+        console.log(`✅ Using account from preferences: ${defaultAccount}`);
       }
     } 
     // Fallback ל-userPreferences
     else if (window.userPreferences && window.userPreferences.defaultTradingAccount) {
       defaultAccount = window.userPreferences.defaultTradingAccount;
+      console.log(`✅ Using account from userPreferences: ${defaultAccount}`);
     }
     
     const accountElement = document.getElementById('executionAccount');
@@ -571,6 +573,14 @@ async function showEditExecutionModal(id) {
   // חישוב ערכים מחושבים
   calculateEditExecutionValues();
 
+  console.log('🎯 [EDIT MODAL] סיכום מילוי טופס עריכה:');
+  console.log('🎯 [EDIT MODAL] - עסקה ID:', execution.id);
+  console.log('🎯 [EDIT MODAL] - טרייד מקושר:', linkedObject ? `${linkedObject.type}:${linkedObject.data.id}` : 'אין');
+  console.log('🎯 [EDIT MODAL] - טיקר:', tickerId);
+  console.log('🎯 [EDIT MODAL] - פעולה:', actionValue);
+  console.log('🎯 [EDIT MODAL] - כמות:', execution.quantity);
+  console.log('🎯 [EDIT MODAL] - מחיר:', execution.price);
+  console.log('🎯 [EDIT MODAL] - תאריך:', executionDate);
 
   // הצגת המודל
   const modal = new bootstrap.Modal(editExecutionModalElement);
@@ -774,6 +784,7 @@ async function saveExecution() {
             // ניקוי מטמון
             if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
                 await window.UnifiedCacheManager.remove('executions');
+                console.log('✅ מטמון executions נוקה אחרי הוספה');
             }
             // רענון טבלה
             if (typeof window.loadExecutionsData === 'function') {
@@ -836,6 +847,7 @@ async function updateExecution() {
             // ניקוי מטמון
             if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
                 await window.UnifiedCacheManager.remove('executions');
+                console.log('✅ מטמון executions נוקה אחרי עדכון');
             }
             // רענון טבלה
             if (typeof window.loadExecutionsData === 'function') {
@@ -881,6 +893,7 @@ async function confirmDeleteExecution(_id) {
       // ניקוי מטמון executions
       if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
         await window.UnifiedCacheManager.remove('executions');
+        console.log('✅ מטמון executions נוקה אחרי מחיקה');
       }
 
 
@@ -1039,16 +1052,7 @@ function goToNote(noteId) {
 /**
  * טעינת נתוני עסקעות
  */
-
-// Flag to prevent duplicate loading
-let _isLoadingExecutions = false;
 async function loadExecutionsData() {
-  // Prevent duplicate loading
-  if (_isLoadingExecutions) {
-    return window.executionsData || [];
-  }
-  _isLoadingExecutions = true;
-
   // loadExecutionsData called
   try {
     // טעינת נתוני עסקעות
@@ -1177,8 +1181,6 @@ async function updateExecutionsTableMain(executions) {
     // שימוש בנתונים שמגיעים מהשרת
     const symbol = execution.trade_ticker_symbol || 'לא מוגדר';
     const tradeInfo = execution.trade_display || `טרייד ${execution.trade_id}`;
-    const tickerId = execution.ticker_id || execution.trade_ticker_id || null;
-    const accountName = execution.account_name || execution.trading_account_name || 'לא מוגדר';
 
     // שימוש ב-FieldRendererService לעיצוב שדות
     const actionBadge = window.FieldRendererService ? 
@@ -1203,10 +1205,10 @@ async function updateExecutionsTableMain(executions) {
                                    <td class="ticker-cell">
                        <div class="ticker-cell-content">
                            <strong class="ticker-symbol-link ${execution.action === 'buy' ? 'action-buy' : 'action-sell'}" 
-                             onclick="window.showEntityDetailsModal && window.showEntityDetailsModal('ticker', ${tickerId || 'null'}, 'view')" 
+                             onclick="window.showEntityDetailsModal && window.showEntityDetailsModal('ticker', ${ticker ? ticker.id : 'null'}, 'view')" 
                              title="פתח פרטי סימבול">${symbol}</strong>
                            <button class="btn btn-sm btn-info" 
-                             onclick="window.viewLinkedItemsForTicker && window.viewLinkedItemsForTicker(${tickerId || 'null'})" 
+                             onclick="window.viewLinkedItemsForTicker && window.viewLinkedItemsForTicker(${ticker ? ticker.id : 'null'})" 
                              title="פריטים מקושרים לטיקר">🔗</button>
                        </div>
                    </td>
@@ -1214,16 +1216,16 @@ async function updateExecutionsTableMain(executions) {
                 <td data-account="${accountName}" class="account-cell-link" 
                   onclick="window.showEntityDetailsModal && window.showEntityDetailsModal('account', '${accountName}', 'view')" 
                   title="פתח פרטי חשבון">${accountName}</td>
-                <td>${window.FieldRendererService ? window.FieldRendererService.renderShares(execution.quantity) : (execution.quantity ? '#' + execution.quantity : '-')}</td>
+                <td>${execution.quantity}</td>
                 <td>$${execution.price}</td>
                 <td class="pl-cell">${plBadge}</td>
                 <td data-date="${execution.date || execution.execution_date}">${dateBadge}</td>
                 <td class="source-cell">${execution.source || '-'}</td>
-                <td class="col-actions actions-cell actions-3-btn">
-                    ${window.createEditButton ? window.createEditButton('execution', execution.id) : ''}
-                    ${window.createButton ? window.createButton('VIEW', 'execution', execution.id, 'showExecutionDetails') : ''}
-                    ${window.createDeleteButton ? window.createDeleteButton('execution', execution.id) : ''}
-                    ${window.createLinkButton ? window.createLinkButton('execution', execution.id) : ''}
+                <td class="actions-cell">
+                    ${window.createLinkButton ? window.createLinkButton(`viewLinkedItemsForExecution(${execution.id})`) : ''}
+                    ${window.createEditButton ? window.createEditButton(`editExecution(${execution.id})`) : ''}
+                    ${window.createButton ? window.createButton('VIEW', `showExecutionDetails(${execution.id})`) : ''}
+                    ${window.createDeleteButton ? window.createDeleteButton(`deleteExecution(${execution.id})`) : ''}
                 </td>
             </tr>
         `;
@@ -1433,12 +1435,12 @@ window.confirmDeleteExecution = confirmDeleteExecution;
 
 // פונקציות מודל פריטים מקושרים
 window.showExecutionLinkedItemsModal = showExecutionLinkedItemsModal;
-// window.loadLinkedItemsDetails = loadLinkedItemsDetails; // ❌ הוסר - הפונקציה לא קיימת
-// window.displayLinkedItems = displayLinkedItems; // ❌ הוסר - הפונקציה לא קיימת
-// window.goToLinkedItems = goToLinkedItems; // ❌ הוסר - הפונקציה לא קיימת
-// window.goToTrade = goToTrade; // ❌ הוסר - הפונקציה לא קיימת
-// window.goToPlan = goToPlan; // ❌ הוסר - הפונקציה לא קיימת
-// window.goToAlert = goToAlert; // ❌ הוסר - הפונקציה לא קיימת
+window.loadLinkedItemsDetails = loadLinkedItemsDetails;
+window.displayLinkedItems = displayLinkedItems;
+window.goToLinkedItems = goToLinkedItems;
+window.goToTrade = goToTrade;
+window.goToPlan = goToPlan;
+window.goToAlert = goToAlert;
 window.goToNote = goToNote;
 
 // ===== פונקציות סידור =====
@@ -2094,7 +2096,7 @@ function updateExecutionsTableForTradeModal(executions) {
       row.innerHTML = `
                 <td>${execution.date}</td>
                 <td>${typeBadge}</td>
-                <td>${window.FieldRendererService ? window.FieldRendererService.renderShares(execution.quantity) : (execution.quantity ? '#' + execution.quantity : '-')}</td>
+                <td>${execution.quantity}</td>
                 <td>$${execution.price.toFixed(2)}</td>
                 <td>$${execution.commission.toFixed(2)}</td>
                 <td>$${execution.total.toFixed(2)}</td>
@@ -2635,7 +2637,6 @@ async function loadTickersSummaryData() {
   } catch (error) {
     // console.error('❌ שגיאה בטעינת טיקרים חלקיים:', error);
     handleDataLoadError(error, 'טעינת טיקרים חלקיים');
-    _isLoadingExecutions = false;
     return [];
   }
 }
@@ -2898,6 +2899,64 @@ function toggleExecutionsSection() {
     }
 }
 
+// Execution CRUD functions
+function saveExecution() {
+    if (typeof window.saveExecution === 'function') {
+        window.saveExecution();
+    } else {
+        console.warn('saveExecution function not found');
+    }
+}
+
+function updateExecution() {
+    if (typeof window.updateExecution === 'function') {
+        window.updateExecution();
+    } else {
+        console.warn('updateExecution function not found');
+    }
+}
+
+function confirmDeleteExecution() {
+    if (typeof window.confirmDeleteExecution === 'function') {
+        window.confirmDeleteExecution();
+    } else {
+        console.warn('confirmDeleteExecution function not found');
+    }
+}
+
+// Navigation functions
+function goToLinkedTrade(mode = 'edit') {
+    if (typeof window.goToLinkedTrade === 'function') {
+        window.goToLinkedTrade(mode);
+    } else {
+        console.warn('goToLinkedTrade function not found');
+    }
+}
+
+function addNewPlan() {
+    if (typeof window.addNewPlan === 'function') {
+        window.addNewPlan();
+    } else {
+        console.warn('addNewPlan function not found');
+    }
+}
+
+function addNewTrade() {
+    if (typeof window.addNewTrade === 'function') {
+        window.addNewTrade();
+    } else {
+        console.warn('addNewTrade function not found');
+    }
+}
+
+function addNewTicker() {
+    if (typeof window.addNewTicker === 'function') {
+        window.addNewTicker();
+    } else {
+        console.warn('addNewTicker function not found');
+    }
+}
+
 // ===== GLOBAL EXPORTS =====
 // Export functions to global scope for onclick attributes
 // window.toggleSection removed - using global version from ui-utils.js
@@ -3143,6 +3202,5 @@ window.initializeExecutionsPage = function() {
         }
     }, 30000);
     
+    console.log('✅ Executions page initialized successfully');
 };
-
-console.log('✅ executions.js v=20251013_complete loaded - Fixed headers + action buttons + styles');

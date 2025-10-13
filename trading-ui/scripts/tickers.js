@@ -1823,7 +1823,7 @@ window.validateEditTickerForm = validateEditTickerForm;
 // UI & Display
 window.updateTickersTable = updateTickersTable;
 window.updateTickersSummaryStats = updateTickersSummaryStats;
-window.toggleTickersSection = toggleTickersSection;
+// toggleTickersSection removed - use toggleSection('main') instead
 window.restoreTickersSectionState = restoreTickersSectionState;
 
 // Filters

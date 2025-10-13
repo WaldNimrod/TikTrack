@@ -1527,8 +1527,7 @@ async function loadTickersData() {
     }
     
     // Fallback למקרה שהמערכת הכללית לא זמינה
-    // ניקוי מטמון לפני טעינה
-    clearTickersCache();
+    // (ניקוי מטמון מטופל ע"י המערכת המאוחדת)
 
     const response = await fetch(`/api/tickers/?_t=${Date.now()}`);
 
@@ -1836,7 +1835,7 @@ window.generateTickerCurrencyOptions = generateTickerCurrencyOptions;
 window.updateCurrencyOptions = updateCurrencyOptions;
 
 // Cache & Styles
-window.clearTickersCache = clearTickersCache;
+// clearTickersCache removed - handled by unified cache system
 window.getTickerTypeStyle = getTickerTypeStyle;
 window.getTickerStatusStyle = getTickerStatusStyle;
 window.getTickerStatusLabel = getTickerStatusLabel;

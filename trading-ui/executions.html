@@ -61,8 +61,11 @@
     <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=20251010">
     <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=20251010">
     <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=20251010">
-    <link rel="stylesheet" href="styles-new/06-components/_page-headers.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/06-components/_page-headers.css?v=2.0.1">
     <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=20251010">
+    
+    <!-- 07-trumps - Page-specific Styles -->
+    <link rel="stylesheet" href="styles-new/07-trumps/_executions.css?v=1.0.0">
     
     <!-- 08-themes - Themes -->
     <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=20251010">
@@ -142,7 +145,7 @@
                     <!-- Executions table -->
                     <div class="section-body">
                         <div class="table-responsive" id="executionsContainer">
-                            <table class="data-table" id="executionsTable" data-table-type="executions">
+                            <table class="data-table executions-table" id="executionsTable" data-table-type="executions">
                                 <thead>
                                     <tr>
                                         <th class="col-ticker">
@@ -153,50 +156,43 @@
                                         </th>
                                         <th class="col-action">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, window.filteredExecutionsData || window.executionsData, 'executions', window.updateExecutionsTable); }"
-
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, window.filteredExecutionsData || window.executionsData, 'executions', window.updateExecutionsTable); }">
                                                 פעולה <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-account">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(2, window.filteredExecutionsData || window.executionsData, 'executions', window.updateExecutionsTable); }"
-
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(2, window.filteredExecutionsData || window.executionsData, 'executions', window.updateExecutionsTable); }">
                                                 חשבון <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-quantity">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(3, window.filteredExecutionsData || window.executionsData, 'executions', window.updateExecutionsTable); }"
-
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(3, window.filteredExecutionsData || window.executionsData, 'executions', window.updateExecutionsTable); }">
                                                 כמות <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-price">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(4, window.filteredExecutionsData || window.executionsData, 'executions', window.updateExecutionsTable); }"
-
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(4, window.filteredExecutionsData || window.executionsData, 'executions', window.updateExecutionsTable); }">
                                                 מחיר <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-pnl">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(5, window.filteredExecutionsData || window.executionsData, 'executions', window.updateExecutionsTable); }"
-
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(5, window.filteredExecutionsData || window.executionsData, 'executions', window.updateExecutionsTable); }">
                                                 P&L <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-execution-date">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(6, window.filteredExecutionsData || window.executionsData, 'executions', window.updateExecutionsTable); }"
-
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(6, window.filteredExecutionsData || window.executionsData, 'executions', window.updateExecutionsTable); }">
                                                 תאריך ביצוע <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-source">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(7, window.filteredExecutionsData || window.executionsData, 'executions', window.updateExecutionsTable); }"
-
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(7, window.filteredExecutionsData || window.executionsData, 'executions', window.updateExecutionsTable); }">
                                                 מקור <span class="sort-icon">↕</span>
                                             </button>
                                         </th>

@@ -440,12 +440,12 @@ input[type="color"]:focus {
  */
 .user-input-field {
   background-color: white !important;
-  border-inline-start: 3px solid var(--entity-color, #0056b3) !important;
+  border-inline-start: 3px solid var(--entity-color) !important;
   font-weight: 500;
 }
 
 .user-input-field:focus {
-  border-inline-start-color: var(--entity-color, #0056b3) !important;
+  border-inline-start-color: var(--entity-color) !important;
   box-shadow: 0 0 0 0.2rem rgba(0, 86, 179, 0.15);
 }
 

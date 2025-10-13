@@ -229,8 +229,11 @@ function translateCashFlowType(type) {
 function translateCashFlowSource(source) {
   const sourceNames = {
     'manual': 'ידני',
-    'IBKR-tradelog-csv': 'ייבוא מקובץ IBKR',
-    'IBKR-api': 'ייבוא ישיר IBKR',
+    'file_import': 'יבוא קובץ',
+    'direct_import': 'יבוא ישיר',
+    'api': 'API',
+    'IBKR-tradelog-csv': 'יבוא מקובץ IBKR',
+    'IBKR-api': 'יבוא ישיר IBKR',
   };
   return sourceNames[source] || source;
 }

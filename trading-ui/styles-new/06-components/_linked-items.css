@@ -41,24 +41,24 @@
 .linked-items-container .linked-item-row .badge { margin: 0 4px; }
 
 /* Colored start-border per entity type using logical property */
-.linked-items-container .linked-item-row.trade { border-inline-start: 4px solid var(--entity-trade, #007bff); }
-.linked-items-container .linked-item-row.account { border-inline-start: 4px solid var(--entity-account, #28a745); }
-.linked-items-container .linked-item-row.ticker { border-inline-start: 4px solid var(--entity-ticker, #17a2b8); }
-.linked-items-container .linked-item-row.alert { border-inline-start: 4px solid var(--entity-alert, #ffc107); }
-.linked-items-container .linked-item-row.cash_flow { border-inline-start: 4px solid var(--entity-cash_flow, #6c757d); }
-.linked-items-container .linked-item-row.note { border-inline-start: 4px solid var(--entity-note, #343a40); }
-.linked-items-container .linked-item-row.trade_plan { border-inline-start: 4px solid var(--entity-trade_plan, #007bff); }
-.linked-items-container .linked-item-row.execution { border-inline-start: 4px solid var(--entity-execution, #28a745); }
+.linked-items-container .linked-item-row.trade { border-inline-start: 4px solid var(--entity-trade); }
+.linked-items-container .linked-item-row.account { border-inline-start: 4px solid var(--entity-account); }
+.linked-items-container .linked-item-row.ticker { border-inline-start: 4px solid var(--entity-ticker); }
+.linked-items-container .linked-item-row.alert { border-inline-start: 4px solid var(--entity-alert); }
+.linked-items-container .linked-item-row.cash_flow { border-inline-start: 4px solid var(--entity-cash_flow); }
+.linked-items-container .linked-item-row.note { border-inline-start: 4px solid var(--entity-note); }
+.linked-items-container .linked-item-row.trade_plan { border-inline-start: 4px solid var(--entity-trade_plan); }
+.linked-items-container .linked-item-row.execution { border-inline-start: 4px solid var(--entity-execution); }
 
 /* Modal header colored by entity type */
-.modal-header.entity-trade { background-color: var(--entity-trade, #26baac); color: #fff; }
-.modal-header.entity-ticker { background-color: var(--entity-ticker, #26baac); color: #fff; }
-.modal-header.entity-account { background-color: var(--entity-account, #26baac); color: #fff; }
-.modal-header.entity-alert { background-color: var(--entity-alert, #26baac); color: #fff; }
-.modal-header.entity-cash_flow { background-color: var(--entity-cash_flow, #26baac); color: #fff; }
-.modal-header.entity-note { background-color: var(--entity-note, #26baac); color: #fff; }
-.modal-header.entity-trade_plan { background-color: var(--entity-trade_plan, #26baac); color: #fff; }
-.modal-header.entity-execution { background-color: var(--entity-execution, #26baac); color: #fff; }
+.modal-header.entity-trade { background-color: var(--entity-trade); color: #fff; }
+.modal-header.entity-ticker { background-color: var(--entity-ticker); color: #fff; }
+.modal-header.entity-account { background-color: var(--entity-account); color: #fff; }
+.modal-header.entity-alert { background-color: var(--entity-alert); color: #fff; }
+.modal-header.entity-cash_flow { background-color: var(--entity-cash_flow); color: #fff; }
+.modal-header.entity-note { background-color: var(--entity-note); color: #fff; }
+.modal-header.entity-trade_plan { background-color: var(--entity-trade_plan); color: #fff; }
+.modal-header.entity-execution { background-color: var(--entity-execution); color: #fff; }
 
 .modal-header .btn-close-custom { 
   position: absolute; 
@@ -79,8 +79,8 @@
   gap: 10px;
   padding: 6px 10px;
   border-radius: 16px;
-  background-color: var(--entity-badge-bg, #f8f9fa);
-  border: 1px solid var(--entity-badge-border, #e9ecef);
+  background-color: var(--entity-badge-bg);
+  border: 1px solid var(--entity-badge-border);
   cursor: pointer;
   user-select: none;
   font-size: 13px;

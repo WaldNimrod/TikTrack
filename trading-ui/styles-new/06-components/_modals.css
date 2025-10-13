@@ -343,8 +343,8 @@
 
 /* כותרת מודל - וריאנט בהיר של הישות */
 .entity-header {
-  background-color: var(--entity-trade-plan-bg, rgba(0, 86, 179, 0.1)) !important;
-  border-bottom: 3px solid var(--entity-color, #0056b3) !important;
+  background-color: var(--entity-trade-plan-bg)) !important;
+  border-bottom: 3px solid var(--entity-color) !important;
   display: flex;
   align-items: center;
   padding: 1rem 1.5rem;
@@ -353,14 +353,14 @@
 
 /* Trade Plan Entity */
 .entity-trade-plan {
-  --entity-text: var(--entity-trade-plan-text, #004085);
-  --entity-color: var(--entity-trade-plan-color, #0056b3);
+  --entity-text: var(--entity-trade-plan-text);
+  --entity-color: var(--entity-trade-plan-color);
 }
 
 /* כותרת המודל - טקסט בצבע כהה */
 .entity-header .entity-title {
   font-weight: 700;
-  color: var(--entity-text, #004085);
+  color: var(--entity-text);
   margin: 0;
   flex: 1;
   font-size: 1.5rem; /* h4 size */
@@ -368,7 +368,7 @@
 
 /* Labels בטופס - צבע ישות */
 .entity-trade-plan .entity-label {
-  color: var(--entity-color, #0056b3);
+  color: var(--entity-color);
   font-weight: 700;
 }
 
@@ -383,11 +383,11 @@
   margin-right: 0 !important;
   inset: auto !important; /* ביטול left/right/top/bottom */
   background: white !important;
-  border: 1px solid var(--entity-color, #0056b3) !important;
+  border: 1px solid var(--entity-color) !important;
   border-radius: 6px !important;
   font-size: 1.5rem !important;
   line-height: 1 !important;
-  color: var(--entity-text, #004085) !important;
+  color: var(--entity-text) !important;
   opacity: 1 !important;
   padding: 0.2rem 0.4rem !important;
   width: 1.75rem !important;
@@ -408,9 +408,9 @@
 
 .entity-header .btn-close:hover,
 .entity-header .btn-close-end:hover {
-  background-color: var(--entity-color, #0056b3) !important;
+  background-color: var(--entity-color) !important;
   color: white !important;
-  border-color: var(--entity-color, #0056b3) !important;
+  border-color: var(--entity-color) !important;
 }
 
 /* Modal footer עם יישור לסוף השורה */
@@ -433,105 +433,105 @@
 
 /* כפתור ישות */
 .btn-entity {
-  border: 2px solid var(--entity-color, #007bff);
+  border: 2px solid var(--entity-color);
   background-color: white;
-  color: var(--entity-color, #007bff);
+  color: var(--entity-color);
   transition: all 0.2s ease;
 }
 
 .btn-entity:hover {
-  background-color: var(--entity-color, #007bff);
+  background-color: var(--entity-color);
   color: white;
-  border-color: var(--entity-color, #007bff);
+  border-color: var(--entity-color);
 }
 
 /* כפתור ביטול - צבע אזהרה מהעדפות */
 .modal-footer-end .btn-secondary {
-  border: 2px solid var(--warning-color, #ffc107);
+  border: 2px solid var(--warning-color);
   background-color: white;
-  color: var(--warning-color, #ffc107);
+  color: var(--warning-color);
 }
 
 .modal-footer-end .btn-secondary:hover {
-  background-color: var(--warning-color, #ffc107);
+  background-color: var(--warning-color);
   color: white;
-  border-color: var(--warning-color, #ffc107);
+  border-color: var(--warning-color);
 }
 
 /* כפתור ישות ספציפי */
 .btn-entity-trade-plan {
-  --entity-color: var(--entity-trade-plan-color, #0056b3);
+  --entity-color: var(--entity-trade-plan-color);
 }
 
 /* כפתורי ישויות נוספים - Round C */
 .btn-entity-trade {
-  --entity-color: var(--entity-trade-color, #17a2b8);
+  --entity-color: var(--entity-trade-color);
 }
 
 .btn-entity-ticker {
-  --entity-color: var(--entity-ticker-color, #6610f2);
+  --entity-color: var(--entity-ticker-color);
 }
 
 .btn-entity-alert {
-  --entity-color: var(--entity-alert-color, #ffc107);
+  --entity-color: var(--entity-alert-color);
 }
 
 .btn-entity-execution {
-  --entity-color: var(--entity-execution-color, #20c997);
+  --entity-color: var(--entity-execution-color);
 }
 
 .btn-entity-account {
-  --entity-color: var(--entity-account-color, #28a745);
+  --entity-color: var(--entity-account-color);
 }
 
 .btn-entity-cash-flow {
-  --entity-color: var(--entity-cash-flow-color, #fd7e14);
+  --entity-color: var(--entity-cash-flow-color);
 }
 
 .btn-entity-note {
-  --entity-color: var(--entity-note-color, #6c757d);
+  --entity-color: var(--entity-note-color);
 }
 
 /* Entity header colors */
 .entity-trade {
-  --entity-text: var(--entity-trade-text, #0c5460);
-  --entity-color: var(--entity-trade-color, #17a2b8);
+  --entity-text: var(--entity-trade-text);
+  --entity-color: var(--entity-trade-color);
   --entity-trade-bg: rgba(23, 162, 184, 0.1);
 }
 
 .entity-ticker {
-  --entity-text: var(--entity-ticker-text, #3d0a66);
-  --entity-color: var(--entity-ticker-color, #6610f2);
+  --entity-text: var(--entity-ticker-text);
+  --entity-color: var(--entity-ticker-color);
   --entity-ticker-bg: rgba(102, 16, 242, 0.1);
 }
 
 .entity-alert {
-  --entity-text: var(--entity-alert-text, #856404);
-  --entity-color: var(--entity-alert-color, #ffc107);
+  --entity-text: var(--entity-alert-text);
+  --entity-color: var(--entity-alert-color);
   --entity-alert-bg: rgba(255, 193, 7, 0.1);
 }
 
 .entity-execution {
-  --entity-text: var(--entity-execution-text, #0f6848);
-  --entity-color: var(--entity-execution-color, #20c997);
+  --entity-text: var(--entity-execution-text);
+  --entity-color: var(--entity-execution-color);
   --entity-execution-bg: rgba(32, 201, 151, 0.1);
 }
 
 .entity-account {
-  --entity-text: var(--entity-account-text, #155724);
-  --entity-color: var(--entity-account-color, #28a745);
+  --entity-text: var(--entity-account-text);
+  --entity-color: var(--entity-account-color);
   --entity-account-bg: rgba(40, 167, 69, 0.1);
 }
 
 .entity-cash-flow {
-  --entity-text: var(--entity-cash-flow-text, #7a3f0f);
-  --entity-color: var(--entity-cash-flow-color, #fd7e14);
+  --entity-text: var(--entity-cash-flow-text);
+  --entity-color: var(--entity-cash-flow-color);
   --entity-cash-flow-bg: rgba(253, 126, 20, 0.1);
 }
 
 .entity-note {
-  --entity-text: var(--entity-note-text, #383d41);
-  --entity-color: var(--entity-note-color, #6c757d);
+  --entity-text: var(--entity-note-text);
+  --entity-color: var(--entity-note-color);
   --entity-note-bg: rgba(108, 117, 125, 0.1);
 }
 

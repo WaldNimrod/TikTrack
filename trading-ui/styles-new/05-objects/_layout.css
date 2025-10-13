@@ -427,7 +427,7 @@
 }
 
 .filter-toggle-btn:hover .section-toggle-icon {
-  color: var(--secondary-color, #6c757d);
+  color: var(--secondary-color);
 }
 
 .filter-toggle-btn.collapsed .section-toggle-icon {

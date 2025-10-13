@@ -322,26 +322,26 @@ color: var(--numeric-zero-medium) ;
 }
 
 .profit-positive {
-  background-color: var(--numeric-positive-light, #d4edda);
-  color: var(--numeric-positive-medium, #28a745);
+  background-color: var(--numeric-positive-light);
+  color: var(--numeric-positive-medium);
   padding: 0.2rem 0.5rem;
   border-radius: 12px;
   font-size: 0.85rem;
   font-weight: 600;
-  border: 1px solid var(--numeric-positive-border, #c3e6cb);
+  border: 1px solid var(--numeric-positive-border);
   display: inline-block;
   text-align: center;
   min-width: 50px;
 }
 
 .profit-negative {
-  background-color: var(--numeric-negative-light, #f8d7da);
-  color: var(--numeric-negative-medium, #dc3545);
+  background-color: var(--numeric-negative-light);
+  color: var(--numeric-negative-medium);
   padding: 0.2rem 0.5rem;
   border-radius: 12px;
   font-size: 0.85rem;
   font-weight: 600;
-  border: 1px solid var(--numeric-negative-border, #f5c6cb);
+  border: 1px solid var(--numeric-negative-border);
   display: inline-block;
   text-align: center;
   min-width: 50px;
@@ -349,26 +349,26 @@ color: var(--numeric-zero-medium) ;
 
 /* Buy/Sell action badges - badges לפעולות קניה/מכירה */
 .buy-color {
-  background-color: var(--numeric-positive-light, #d4edda);
-  color: var(--numeric-positive-medium, #28a745);
+  background-color: var(--numeric-positive-light);
+  color: var(--numeric-positive-medium);
   padding: 0.2rem 0.5rem;
   border-radius: 12px;
   font-size: 0.85rem;
   font-weight: 600;
-  border: 1px solid var(--numeric-positive-border, #c3e6cb);
+  border: 1px solid var(--numeric-positive-border);
   display: inline-block;
   text-align: center;
   min-width: 50px;
 }
 
 .sell-color {
-  background-color: var(--numeric-negative-light, #f8d7da);
-  color: var(--numeric-negative-medium, #dc3545);
+  background-color: var(--numeric-negative-light);
+  color: var(--numeric-negative-medium);
   padding: 0.2rem 0.5rem;
   border-radius: 12px;
   font-size: 0.85rem;
   font-weight: 600;
-  border: 1px solid var(--numeric-negative-border, #f5c6cb);
+  border: 1px solid var(--numeric-negative-border);
   display: inline-block;
   text-align: center;
   min-width: 50px;
@@ -502,21 +502,21 @@ background-color: var(--status-pending-color);
 }
 
 .status-badge.status-open {
-  background-color: var(--status-open-color, #28a745);
+  background-color: var(--status-open-color);
   color: white;
-  border-color: var(--status-open-color, #28a745);
+  border-color: var(--status-open-color);
 }
 
 .status-badge.status-closed {
-  background-color: var(--status-closed-color, #6c757d);
+  background-color: var(--status-closed-color);
   color: white;
-  border-color: var(--status-closed-color, #6c757d);
+  border-color: var(--status-closed-color);
 }
 
 .status-badge.status-pending {
-  background-color: var(--status-pending-color, #ffc107);
+  background-color: var(--status-pending-color);
   color: #212529;
-  border-color: var(--status-pending-color, #ffc107);
+  border-color: var(--status-pending-color);
 }
 
 .status-badge.status-unknown {
@@ -541,15 +541,15 @@ background-color: var(--status-pending-color);
 }
 
 .pnl-badge.positive {
-  background-color: var(--numeric-positive-light, #d4edda);
-  color: var(--numeric-positive-medium, #28a745);
-  border-color: var(--numeric-positive-border, #c3e6cb);
+  background-color: var(--numeric-positive-light);
+  color: var(--numeric-positive-medium);
+  border-color: var(--numeric-positive-border);
 }
 
 .pnl-badge.negative {
-  background-color: var(--numeric-negative-light, #f8d7da);
-  color: var(--numeric-negative-medium, #dc3545);
-  border-color: var(--numeric-negative-border, #f5c6cb);
+  background-color: var(--numeric-negative-light);
+  color: var(--numeric-negative-medium);
+  border-color: var(--numeric-negative-border);
 }
 
 /* ===== Badge Fallback Styles (for non-FieldRendererService usage) ===== */
@@ -570,17 +570,17 @@ background-color: var(--status-pending-color);
  * Numeric value badge - for user-saved values
  */
 .numeric-value-neutral {
-  color: var(--numeric-zero-color, #6c757d);
+  color: var(--numeric-zero-color);
   font-weight: 500;
 }
 
 .numeric-value-positive {
-  color: var(--numeric-positive-color, #28a745);
+  color: var(--numeric-positive-color);
   font-weight: 500;
 }
 
 .numeric-value-negative {
-  color: var(--numeric-negative-color, #dc3545);
+  color: var(--numeric-negative-color);
   font-weight: 500;
 }
 

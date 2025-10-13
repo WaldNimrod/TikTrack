@@ -535,13 +535,13 @@ table tbody td button.btn-sm {
 }
 
 .sortable-header.active-sort {
-  color: var(--primary-color, #007bff);
+  color: var(--primary-color);
   font-weight: 600;
 }
 
 .sortable-header.active-sort .sort-icon {
   opacity: 1;
-  color: var(--primary-color, #007bff);
+  color: var(--primary-color);
   font-weight: bold;
 }
 
@@ -1022,7 +1022,7 @@ table tbody td button.btn-sm {
  */
 .data-table .user-saved-value,
 .table .user-saved-value {
-  color: var(--entity-text, #004085) !important;
+  color: var(--entity-text) !important;
 }
 
 /**
@@ -1065,7 +1065,7 @@ table tbody td button.btn-sm {
  * Warning display - for invalid Risk/Reward
  */
 .risk-reward-warning {
-  color: var(--warning-color, #ffc107);
+  color: var(--warning-color);
   font-size: 0.85em;
   direction: ltr;
   display: inline-block;
@@ -1092,21 +1092,21 @@ table tbody td button.btn-sm {
   align-items: center;
   justify-content: center;
   background: transparent;
-  border: 1px solid var(--primary-color, #26baac);
+  border: 1px solid var(--primary-color);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
-  color: var(--primary-color, #26baac);
+  color: var(--primary-color);
 }
 
 .actions-menu-trigger:hover {
-  background: var(--primary-color, #26baac);
+  background: var(--primary-color);
   color: white;
-  border-color: var(--primary-color, #26baac);
+  border-color: var(--primary-color);
 }
 
 .actions-menu-trigger:active {
-  background: var(--primary-color, #26baac);
+  background: var(--primary-color);
   opacity: 0.8;
 }
 
@@ -1211,7 +1211,7 @@ table tbody td button.btn-sm {
 .actions-menu-content .btn-outline-secondary,
 .actions-menu-content button[onclick*="edit"],
 .actions-menu-content button[onclick*="Edit"] {
-  border-color: var(--warning-color, #ffc107) !important; /* warning - כתום */
+  border-color: var(--warning-color) !important; /* warning - כתום */
 }
 
 /* ===== Hover States ===== */
@@ -1223,7 +1223,7 @@ table tbody td button.btn-sm {
 .actions-menu-content button[onclick*="Delete"]:hover {
   background: rgba(255, 193, 7, 0.5) !important; /* warning color - כתום */
   color: white;
-  border-color: var(--danger-color, #dc3545);
+  border-color: var(--danger-color);
 }
 
 /* כפתור צפייה/פרטים - צבע ראשי עם שקיפות */
@@ -1234,7 +1234,7 @@ table tbody td button.btn-sm {
 .actions-menu-content button[onclick*="VIEW"]:hover {
   background: rgba(38, 186, 172, 0.5) !important; /* primary color - טורקיז */
   color: white;
-  border-color: var(--primary-color, #26baac);
+  border-color: var(--primary-color);
 }
 
 /* כפתור עריכה - מסגרת אזהרה, רקע אזהרה 50% */
@@ -1244,7 +1244,7 @@ table tbody td button.btn-sm {
 .actions-menu-content button[onclick*="Edit"]:hover {
   background: rgba(255, 193, 7, 0.5) !important; /* warning color - כתום */
   color: white;
-  border-color: var(--warning-color, #ffc107); /* נשאר כתום */
+  border-color: var(--warning-color); /* נשאר כתום */
 }
 
 /* כפתור מקושרים - צבע מידע במסגרת, מידע ברקע */
@@ -1253,7 +1253,7 @@ table tbody td button.btn-sm {
 .actions-menu-content .btn-link:hover {
   background: rgba(23, 162, 184, 0.5) !important; /* info color - תכלת */
   color: white;
-  border-color: var(--info-color, #17a2b8);
+  border-color: var(--info-color);
 }
 
 /* הסרת ההגדרה הכפולה - הכל בשורה 362 */

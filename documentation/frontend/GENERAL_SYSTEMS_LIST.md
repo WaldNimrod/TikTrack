@@ -70,6 +70,10 @@
 - מערכת נתונים חיצוניים (Yahoo Finance)
 - מערכת אחסון מקומי
 - מערכת ניהול מערכת
+ - חנות הגדרות מערכתית (Backend) למדיניות רענון נתונים חיצוניים ✅ חדש (10/2025)
+   - קבצים: `Backend/models/system_settings.py`, `Backend/services/system_settings_service.py`
+   - ספק מדיניות: `Backend/services/external_data/policy_provider.py` (TTL לפי סטטוס ושעות מסחר NY)
+   - API: `Backend/routes/api/system_settings.py`, `GET /api/tickers/active`
 
 #### ** חבילת ממשק משתמש מתקדם**
 מערכות לממשק משתמש מתקדם:

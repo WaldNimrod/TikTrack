@@ -205,7 +205,8 @@ class UnifiedLogManager {
             fields: ['provider', 'action', 'timestamp', 'status', 'details', 'dataCount'],
             defaultFilters: ['provider', 'status', 'timeRange'],
             sortBy: 'timestamp',
-            sortOrder: 'desc'
+            sortOrder: 'desc',
+            endpoint: '/api/logs/raw/external_data'
         });
 
         // Server Logs
@@ -554,8 +555,8 @@ class UnifiedLogManager {
                     data = await this.getNotificationStats();
                     break;
                 case 'externalDataLog':
-                    // Fetch from server logs API (type=external_data)
-                    data = await this.getServerLogData('external_data', options);
+                    // Fetch from server logs API using the configured endpoint on the same key
+                    data = await this.getServerLogData('externalDataLog', options);
                     break;
                 case 'cacheLog':
                     data = await this.getCacheLog();

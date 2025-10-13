@@ -37,69 +37,72 @@ class CacheManager:
     def __init__(self, db_session: Session):
         self.db_session = db_session
         
-        # Load settings from user preferences
-        self._load_settings_from_preferences()
+        # Load settings from system settings (single source of truth)
+        self._load_settings_from_system_settings()
         
         # Cache hit tracking
         self.cache_hits = 0
         self.cache_misses = 0
         self.last_stats_reset = time.time()
     
-    def _load_settings_from_preferences(self):
-        """Load cache settings from user preferences"""
+    def _load_settings_from_system_settings(self):
+        """Load cache settings from system-level settings (external_data_settings group)."""
         try:
-            from services.user_service import UserService
+            from services.system_settings_service import SystemSettingsService
+            from config.database import get_db
+            db_session = next(get_db())
+            svc = SystemSettingsService(db_session)
+            settings = svc.get_group_settings('external_data_settings') or {}
             
-            # Get user preferences
-            user_preferences = UserService.get_user_preferences(1)  # Default user ID
+            # Map system TTLs (seconds) to cache tiers
+            ttl_active = int(settings.get('ttlActiveSeconds', 300))      # 5m
+            ttl_open = int(settings.get('ttlOpenSeconds', 900))          # 15m
+            ttl_closed = int(settings.get('ttlClosedSeconds', 3600))     # 60m
+            ttl_cancelled = int(settings.get('ttlCancelledSeconds', 86400))  # 24h
             
-            # Cache TTL settings (in seconds) - from preferences or defaults
-            cache_ttl_minutes = user_preferences.get('cacheTTL', 5)
             self.ttl_settings = {
-                'hot': cache_ttl_minutes * 60,           # Hot cache TTL
-                'warm': cache_ttl_minutes * 60 * 2,      # Warm cache TTL (2x hot)
-                'cool': cache_ttl_minutes * 60 * 6,      # Cool cache TTL (6x hot)
-                'cold': cache_ttl_minutes * 60 * 12      # Cold cache TTL (12x hot)
+                'hot': ttl_active,
+                'warm': ttl_open,
+                'cool': ttl_closed,
+                'cold': ttl_cancelled
             }
             
-            # Cache invalidation thresholds
+            # Invalidation thresholds (constants for now; can be promoted to system settings later)
             self.invalidation_thresholds = {
-                'price_change_pct': 0.5,    # 0.5% price change triggers invalidation
-                'volume_change_pct': 10.0,  # 10% volume change triggers invalidation
-                'time_threshold': cache_ttl_minutes * 60  # TTL-based threshold
+                'price_change_pct': 0.5,
+                'volume_change_pct': 10.0,
+                'time_threshold': ttl_open  # use warm TTL as baseline
             }
             
-            # Cache performance settings from preferences
-            self.max_cache_size = user_preferences.get('maxBatchSize', 25) * 400  # 400 quotes per batch
-            self.cleanup_batch_size = user_preferences.get('maxBatchSize', 25) * 40  # 40% of max size
+            # Performance settings
+            max_batch = int(settings.get('externalDataMaxBatchSize', 50))
+            self.max_cache_size = max_batch * 400
+            self.cleanup_batch_size = max_batch * 40
             
-            logger.info(f"Loaded cache settings from preferences: TTL={cache_ttl_minutes}min, max_batch={user_preferences.get('maxBatchSize', 25)}")
-            
+            logger.info(
+                f"Loaded cache settings from system settings: hot={ttl_active}s warm={ttl_open}s cool={ttl_closed}s cold={ttl_cancelled}s; max_batch={max_batch}"
+            )
         except Exception as e:
-            logger.error(f"Error loading settings from preferences: {e}, using defaults")
-            
-            # Fallback to default settings
+            logger.error(f"Error loading settings from system settings: {e}, using defaults")
             self.ttl_settings = {
-                'hot': 60,      # 1 minute for very fresh data
-                'warm': 300,    # 5 minutes for recent data
-                'cool': 1800,   # 30 minutes for older data
-                'cold': 3600    # 1 hour for historical data
+                'hot': 300,
+                'warm': 900,
+                'cool': 3600,
+                'cold': 86400
             }
-            
             self.invalidation_thresholds = {
-                'price_change_pct': 0.5,    # 0.5% price change triggers invalidation
-                'volume_change_pct': 10.0,  # 10% volume change triggers invalidation
-                'time_threshold': 300       # 5 minutes without updates triggers invalidation
+                'price_change_pct': 0.5,
+                'volume_change_pct': 10.0,
+                'time_threshold': 900
             }
-            
-            self.max_cache_size = 10000     # Maximum quotes in cache
-            self.cleanup_batch_size = 1000  # Batch size for cleanup operations
+            self.max_cache_size = 10000
+            self.cleanup_batch_size = 1000
     
     def refresh_settings(self):
-        """Refresh cache settings from user preferences"""
+        """Refresh cache settings from system settings"""
         try:
-            self._load_settings_from_preferences()
-            logger.info("Cache settings refreshed from preferences")
+            self._load_settings_from_system_settings()
+            logger.info("Cache settings refreshed from system settings")
         except Exception as e:
             logger.error(f"Error refreshing cache settings: {e}")
     

@@ -37,7 +37,7 @@ def get_system_status():
             # Get all providers
             providers = db_session.query(ExternalDataProvider).all()
             
-            # Get cache stats
+            # Get cache stats (settings from system-level)
             cache_manager = CacheManager(db_session)
             cache_stats = cache_manager.get_cache_stats()
             
@@ -135,6 +135,10 @@ def get_system_status():
                 }
             }
             
+            logger.info(
+                f"external_data_status: providers={total_providers} active={active_providers} healthy={healthy_providers} "
+                f"quotes={cache_stats.total_quotes} intraday={cache_stats.total_intraday_slots} recent_ops={len(recent_logs)}"
+            )
             return jsonify(response), 200
             
         finally:

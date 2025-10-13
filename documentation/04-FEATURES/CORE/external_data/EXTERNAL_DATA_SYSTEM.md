@@ -17,6 +17,11 @@ This system now uses a single, system-level source of truth for external-data re
 - Scheduler: controlled by `externalDataSchedulerEnabled` (system setting) and aligned to NY market hours.
 - No mock/fallback data: errors are surfaced via the unified notification system.
 
+### Logging & Monitoring
+- Server log file: `logs/external_data.log` (Rotating 10MB x5) emitted by YahooFinanceAdapter/status endpoints
+- API access: `GET /api/logs/raw/external_data` (זמין בעמוד System Management → נתונים חיצוניים)
+- Frontend display: `externalDataLog` דרך Unified Log System, עם מסנני timeRange ופאג׳ינציה 50/100
+
 ---
 
 ## 🏗️ **Layer Separation & Architecture Principles**

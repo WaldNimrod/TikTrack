@@ -125,4 +125,13 @@
 - [ ] Add unit/integration tests for settings, provider, endpoint, scheduler
 - [ ] Add UI tests for settings editor, freshness, partial-failure retry
 
+# Logging Standardization (external_data)
+
+- [x] Define external_data RotatingFileHandler (logs/external_data.log)
+- [x] Expose via Server Logs API type=external_data
+- [x] Emit adapter/status lifecycle entries
+- [x] Map unified log key externalDataLog → /api/logs/raw/external_data
+- [x] Remove UCM usage for logs (display only)
+- [x] Docs updated (UNIFIED_LOG_SYSTEM_GUIDE.md, EXTERNAL_DATA_SYSTEM.md)
+
 

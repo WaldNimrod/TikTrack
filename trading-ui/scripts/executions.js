@@ -1193,9 +1193,13 @@ async function updateExecutionsTableMain(executions) {
       window.FieldRendererService.renderDate(execution.date || execution.execution_date) : 
       (execution.date || execution.execution_date ? new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL') : '-');
 
-    const plBadge = window.FieldRendererService ? 
-      window.FieldRendererService.renderNumericValue(0, ' $', true) : 
-      '$0';
+    // P&L רק במכירה, בקניה ריק
+    const isSell = (execution.action || execution.type) === 'sell' || (execution.action || execution.type) === 'sale';
+    const plBadge = isSell ? 
+      (window.FieldRendererService ? 
+        window.FieldRendererService.renderNumericValue(execution.pl || 0, '$', true) : 
+        `$${(execution.pl || 0).toFixed(2)}`) : 
+      '-';
 
     // שמירת הערכים המקוריים באנגלית לפילטר
     const typeForFilter = (execution.action || execution.type) === 'buy' ? 'קנייה' :

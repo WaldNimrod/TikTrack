@@ -1203,10 +1203,12 @@ table tbody td button.btn-sm {
 
 /* ===== Hover States - צבעים מיוחדים לכל סוג כפתור ===== */
 
-/* כפתור מחיקה - צבע אזהרה עם שקיפות */
+/* כפתור מחיקה - צבע אזהרה (warning) עם שקיפות */
 .actions-menu-content .btn-danger:hover,
-.actions-menu-content button.btn-danger:hover {
-  background: rgba(220, 53, 69, 0.5) !important;
+.actions-menu-content button.btn-danger:hover,
+.actions-menu-content button[onclick*="delete"]:hover,
+.actions-menu-content button[onclick*="Delete"]:hover {
+  background: rgba(255, 193, 7, 0.5) !important; /* warning color - כתום */
   color: white;
   border-color: var(--danger-color, #dc3545);
 }
@@ -1217,16 +1219,17 @@ table tbody td button.btn-sm {
 .actions-menu-content button[onclick*="show"]:hover,
 .actions-menu-content button[onclick*="view"]:hover,
 .actions-menu-content button[onclick*="VIEW"]:hover {
-  background: rgba(38, 186, 172, 0.5) !important;
+  background: rgba(38, 186, 172, 0.5) !important; /* primary color - טורקיז */
   color: white;
   border-color: var(--primary-color, #26baac);
 }
 
-/* כפתור עריכה - צבע מישני במסגרת, אזהרה ברקע */
+/* כפתור עריכה - צבע מישני במסגרת, אזהרה (warning) ברקע */
 .actions-menu-content .btn-secondary:hover,
 .actions-menu-content .btn-outline-secondary:hover,
-.actions-menu-content button[onclick*="edit"]:hover {
-  background: rgba(220, 53, 69, 0.5) !important;
+.actions-menu-content button[onclick*="edit"]:hover,
+.actions-menu-content button[onclick*="Edit"]:hover {
+  background: rgba(255, 193, 7, 0.5) !important; /* warning color - כתום */
   color: white;
   border-color: var(--secondary-color, #6c757d);
 }
@@ -1235,7 +1238,7 @@ table tbody td button.btn-sm {
 .actions-menu-content button[onclick*="Linked"]:hover,
 .actions-menu-content button[onclick*="link"]:hover,
 .actions-menu-content .btn-link:hover {
-  background: rgba(23, 162, 184, 0.5) !important;
+  background: rgba(23, 162, 184, 0.5) !important; /* info color - תכלת */
   color: white;
   border-color: var(--info-color, #17a2b8);
 }

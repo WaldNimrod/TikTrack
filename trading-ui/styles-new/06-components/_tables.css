@@ -1121,12 +1121,12 @@ table tbody td button.btn-sm {
   pointer-events: none;
   transition: opacity 0.2s ease, transform 0.2s ease;
   
-  /* RTL: popup מצד ימין של הtrigger */
-  /* במצב RTL (עברית), left: 100% = מצד ימין */
-  inset-inline-start: 100%;
+  /* RTL: popup מצד שמאל של הtrigger (החוצה מהטבלה) */
+  /* במצב RTL (עברית), right: 100% = מצד שמאל */
+  inset-inline-end: 100%;
   top: 50%;
   transform: translateY(-50%) scale(0.95);
-  margin-inline-start: 2px; /* צמוד אבל לא עולה על הכפתור */
+  margin-inline-end: 2px; /* צמוד אבל לא עולה על הכפתור */
 }
 
 /* Pseudo-element ליצירת אזור hover מורחב */
@@ -1134,9 +1134,9 @@ table tbody td button.btn-sm {
   content: '';
   position: absolute;
   top: -8px;
-  inset-inline-end: -8px; /* מכסה את הרווח לכפתור */
+  inset-inline-start: -8px; /* מכסה את הרווח לכפתור */
   bottom: -8px;
-  inset-inline-start: -8px;
+  inset-inline-end: -8px;
   z-index: -1;
 }
 
@@ -1207,8 +1207,9 @@ table tbody td button.btn-sm {
   min-width: 50px !important;
   max-width: 50px !important;
   text-align: center;
-  padding: 4px !important;
+  padding: 2px !important;
   overflow: visible !important;
+  font-size: 0.8rem; /* טקסט קטן יותר כדי שהכותרת תיכנס */
 }
 
 /* עדכון classes ישנות של מספר כפתורים - כולם עכשיו 50px */

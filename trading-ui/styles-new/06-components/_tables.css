@@ -358,7 +358,7 @@ table td,
   border-bottom: none;
 }
 
-/* עמודת פעולות - רוחב מקסימלי 80px (Actions Menu Popup) */
+/* עמודת פעולות רספונסיבית (Actions Menu Popup) */
 .actions-cell {
   text-align: center;
   vertical-align: middle;
@@ -368,9 +368,10 @@ table td,
   white-space: nowrap;
   padding: 4px !important;
   overflow: visible !important;
-  width: 80px !important;
-  min-width: 80px !important;
-  max-width: 80px !important;
+  /* רוחב רספונסיבי - משתלב עם המערכת */
+  width: var(--col-actions-percent) !important;
+  min-width: var(--col-actions-min-width) !important;
+  max-width: var(--col-actions-max-width) !important;
 }
 
 /* תאי פעולות - padding מותאם */

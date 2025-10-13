@@ -5,9 +5,9 @@
  * מערכת מרכזית לרנדור שדות מורכבים: badges, currency, dates
  * מחליפה קוד חוזר ב-138 מקומות במערכת
  * 
- * @version 1.2.0
+ * @version 1.3.0
  * @created January 2025
- * @updated October 12, 2025 - Added renderShares() for # prefix
+ * @updated October 13, 2025 - Added renderBoolean() for yes/no icons
  * @author TikTrack Development Team
  * 
  * תכונות:
@@ -19,6 +19,7 @@
  * - רנדור action badges (buy, sale)
  * - רנדור priority badges (high, medium, low)
  * - רנדור shares/quantity (תמיד עם # prefix)
+ * - רנדור boolean (כן/לא עם איקונים ✓/✗)
  * - שימוש ב-date-utils.js לתאריכים
  * - אינטגרציה מלאה עם מערכת צבעים דינמית (3 ווריאנטים)
  */
@@ -48,21 +49,19 @@ class FieldRendererService {
         // תרגום סטטוס לעברית
         const translatedStatus = this._translateStatus(status, entityType);
         
-        // נרמול שם הסטטוס לclass
-        const normalizedStatus = status.toLowerCase().replace('_', '-');
+        // קביעת קטגוריה לצבע
+        const statusLower = status.toLowerCase();
+        let category = '';
         
-        // מיפוי לקטגוריית צבע
-        let colorCategory = normalizedStatus;
-        if (normalizedStatus === 'triggered') {
-            colorCategory = 'warning';
-        } else if (normalizedStatus === 'not-triggered') {
-            colorCategory = 'info';
+        if (statusLower === 'open' || statusLower === 'active' || statusLower === 'triggered') {
+            category = 'open';
+        } else if (statusLower === 'closed' || statusLower === 'completed') {
+            category = 'closed';
+        } else if (statusLower === 'cancelled' || statusLower === 'canceled' || statusLower === 'not_triggered') {
+            category = 'cancelled';
         }
         
-        // יצירת HTML עם data-attribute לקטגוריית הצבע
-        return `<span class="status-badge status-badge-${normalizedStatus}" data-status-category="${colorCategory}">
-            ${translatedStatus}
-        </span>`;
+        return `<span class="badge badge-status badge-capsule" data-status-category="${category}">${translatedStatus}</span>`;
     }
 
     /**
@@ -79,98 +78,68 @@ class FieldRendererService {
         
         const sideNormalized = side.toLowerCase();
         const isLong = sideNormalized === 'long';
+        const sideHebrew = isLong ? 'לונג' : 'שורט';
+        const sideClass = isLong ? 'badge-long' : 'badge-short';
         
-        // Long = positive (ירוק), Short = negative (אדום)
-        const colorClass = isLong ? 'positive' : 'negative';
-        
-        return `<span class="side-badge side-badge-${sideNormalized} side-badge-${colorClass}">
-            ${side}
-        </span>`;
+        return `<span class="badge ${sideClass}">${sideHebrew}</span>`;
     }
 
     /**
-     * רנדור ערך מספרי עם צבע לפי סימן (חיובי/שלילי/אפס)
-     * מתאים לכל ערך מספרי: יתרות, רווח/הפסד, שינויים, וכו'
+     * רנדור numeric value עם צבע (חיובי/שלילי/ניטרלי)
      * 
-     * @param {number} value - ערך מספרי
-     * @param {string} suffix - סיומת (מטבע, אחוז, וכו') - אופציונלי
-     * @param {boolean} showPrefix - האם להציג + לערכים חיוביים
-     * @returns {string} - HTML של ה-badge
+     * @param {number|string} value - ערך מספרי
+     * @param {string} suffix - סיומת (%, $, וכו')
+     * @param {boolean} showPrefix - להציג + לחיובי
+     * @returns {string} - HTML עם class מתאים
      * 
      * @example
-     * const html = FieldRendererService.renderNumericValue(123.45, ' $');
-     * const html2 = FieldRendererService.renderNumericValue(-50.00, '%', true);
+     * const html = FieldRendererService.renderNumericValue(5.2, '%', true);
+     * // Output: '<span class="profit-positive">+5.2%</span>'
      */
-    static renderNumericValue(value, suffix = '', showPrefix = true) {
-        if (value === null || value === undefined) return '<span class="badge badge-secondary">-</span>';
-        
-        const numValue = parseFloat(value);
-        if (isNaN(numValue)) return '<span class="badge badge-secondary">-</span>';
-        
-        const isPositive = numValue > 0;
-        const isZero = numValue === 0;
-        
-        // קביעת מחלקת CSS לפי סימן
-        let cssClass;
-        if (isZero) {
-            cssClass = 'neutral';
-        } else if (isPositive) {
-            cssClass = 'positive';
-        } else {
-            cssClass = 'negative';
+    static renderNumericValue(value, suffix = '', showPrefix = false) {
+        if (value === null || value === undefined || value === '' || isNaN(value)) {
+            return '<span class="profit-neutral">-</span>';
         }
         
+        const numValue = typeof value === 'string' ? parseFloat(value) : value;
+        const cssClass = numValue > 0 ? 'profit-positive' : (numValue < 0 ? 'profit-negative' : 'profit-neutral');
+        const prefix = (numValue > 0 && showPrefix) ? '+' : '';
         const displayValue = numValue.toFixed(2);
-        const prefix = (showPrefix && isPositive) ? '+' : '';
         
-        return `<span class="numeric-badge numeric-badge-${cssClass}">
-            ${prefix}${displayValue}${suffix}
-        </span>`;
+        return `<span class="${cssClass}">${prefix}${displayValue}${suffix}</span>`;
     }
 
     /**
-     * רנדור PnL badge (רווח/הפסד) - קיצור ל-renderNumericValue
+     * רנדור P&L (רווח/הפסד)
      * @deprecated - השתמש ב-renderNumericValue במקום
      */
-    static renderPnL(value, currency = '') {
+    static renderPnL(value, currency = '₪') {
         return this.renderNumericValue(value, currency, true);
     }
 
     /**
-     * רנדור currency display (1 → US Dollar)
+     * רנדור currency (מטבע)
      * 
-     * @param {number|string} currencyId - ID של המטבע
-     * @param {string} currencyName - שם המטבע (אופציונלי)
-     * @param {string} currencySymbol - סמל המטבע (אופציונלי)
-     * @returns {string} - תצוגת מטבע
+     * @param {number} id - מזהה מטבע
+     * @param {string} name - שם מטבע
+     * @param {string} symbol - סימול מטבע
+     * @returns {string} - HTML מעוצב
      * 
      * @example
-     * const html = FieldRendererService.renderCurrency(1, 'US Dollar', 'USD');
+     * const html = FieldRendererService.renderCurrency(1, 'US Dollar', '$');
+     * // Output: '<span class="currency-display" title="US Dollar">$</span>'
      */
-    static renderCurrency(currencyId, currencyName = null, currencySymbol = null) {
-        // אם יש שם וסמל - הצג אותם
-        if (currencyName && currencySymbol) {
-            return `${currencyName} (${currencySymbol})`;
-        }
-        
-        // אם יש רק שם - הצג אותו
-        if (currencyName) {
-            return currencyName;
-        }
-        
-        // אם יש רק סמל - הצג אותו
-        if (currencySymbol) {
-            return currencySymbol;
-        }
-        
-        // fallback - הצג את ה-ID
-        return currencyId || '-';
+    static renderCurrency(id, name, symbol) {
+        if (!symbol && !name) return '-';
+        const displayText = symbol || name || id;
+        const title = name || symbol || '';
+        return `<span class="currency-display" title="${title}">${displayText}</span>`;
     }
 
     /**
-     * רנדור type badge (swing, investment, passive)
+     * רנדור type badge (סוג השקעה)
      * 
-     * @param {string} type - סוג
+     * @param {string} type - סוג (swing, investment, passive)
      * @returns {string} - HTML של ה-badge
      * 
      * @example
@@ -179,8 +148,6 @@ class FieldRendererService {
     static renderType(type) {
         if (!type) return '<span class="badge badge-secondary">-</span>';
         
-        const typeNormalized = type.toLowerCase();
-        
         // תרגום לעברית
         const typeTranslations = {
             'swing': 'סווינג',
@@ -188,17 +155,16 @@ class FieldRendererService {
             'passive': 'פסיבי'
         };
         
-        const displayType = typeTranslations[typeNormalized] || type;
+        const typeLower = type.toLowerCase();
+        const typeHebrew = typeTranslations[typeLower] || type;
         
-        return `<span class="type-badge type-badge-${typeNormalized}">
-            ${displayType}
-        </span>`;
+        return `<span class="badge badge-type badge-capsule" data-type="${typeLower}">${typeHebrew}</span>`;
     }
 
     /**
-     * רנדור action badge (buy, sale)
+     * רנדור action badge (פעולה: קנייה/מכירה)
      * 
-     * @param {string} action - פעולה (buy, sale)
+     * @param {string} action - פעולה (buy, sale, sell)
      * @returns {string} - HTML של ה-badge
      * 
      * @example
@@ -207,22 +173,16 @@ class FieldRendererService {
     static renderAction(action) {
         if (!action) return '<span class="badge badge-secondary">-</span>';
         
-        const actionNormalized = action.toLowerCase();
-        const isBuy = actionNormalized === 'buy';
+        const actionLower = action.toLowerCase();
+        const isBuy = actionLower === 'buy' || actionLower === 'קנייה';
+        const actionHebrew = isBuy ? 'קנייה' : 'מכירה';
+        const actionClass = isBuy ? 'action-buy' : 'action-sell';
         
-        // Buy = positive (ירוק), Sale = negative (אדום)
-        const colorClass = isBuy ? 'positive' : 'negative';
-        
-        // תרגום
-        const displayAction = isBuy ? 'קניה' : 'מכירה';
-        
-        return `<span class="action-badge action-badge-${actionNormalized} action-badge-${colorClass}">
-            ${displayAction}
-        </span>`;
+        return `<span class="badge ${actionClass}">${actionHebrew}</span>`;
     }
 
     /**
-     * רנדור priority badge (high, medium, low)
+     * רנדור priority badge (עדיפות)
      * 
      * @param {string} priority - עדיפות (high, medium, low)
      * @returns {string} - HTML של ה-badge
@@ -233,70 +193,40 @@ class FieldRendererService {
     static renderPriority(priority) {
         if (!priority) return '<span class="badge badge-secondary">-</span>';
         
-        const priorityNormalized = priority.toLowerCase();
-        
-        // תרגום
+        // תרגום לעברית
         const priorityTranslations = {
             'high': 'גבוהה',
             'medium': 'בינונית',
             'low': 'נמוכה'
         };
         
-        const displayPriority = priorityTranslations[priorityNormalized] || priority;
+        const priorityLower = priority.toLowerCase();
+        const priorityHebrew = priorityTranslations[priorityLower] || priority;
         
-        return `<span class="priority-badge priority-badge-${priorityNormalized}">
-            ${displayPriority}
-        </span>`;
+        // קביעת class לפי עדיפות
+        const priorityClass = priorityLower === 'high' ? 'badge-danger' : 
+                             (priorityLower === 'medium' ? 'badge-warning' : 'badge-info');
+        
+        return `<span class="badge ${priorityClass}">${priorityHebrew}</span>`;
     }
 
     /**
-     * רנדור כמות מניות (תמיד עם סימן #)
-     * 
-     * @param {number} shares - כמות מניות
-     * @param {string} cssClass - מחלקת CSS נוספת (אופציונלי)
-     * @returns {string} - HTML עם # לפני המספר
-     * 
-     * @example
-     * const html = FieldRendererService.renderShares(150);
-     * // Output: "#150"
-     * const html2 = FieldRendererService.renderShares(0);
-     * // Output: "-"
-     */
-    static renderShares(shares, cssClass = 'numeric-ltr') {
-        if (!shares || shares === 0) return '-';
-        
-        const sharesNum = parseInt(shares);
-        if (isNaN(sharesNum)) return '-';
-        
-        return `<span class="${cssClass}">#${sharesNum}</span>`;
-    }
-
-    /**
-     * רנדור תאריך (עם או בלי שעה)
-     * משתמש ב-date-utils.js הקיים
-     * תמיד משתמש בפורמט קומפקטי (DD/MM/YY) לחיסכון במקום
+     * רנדור תאריך בפורמט עברי
      * 
      * @param {string|Date} date - תאריך
-     * @param {boolean} includeTime - האם לכלול שעה
-     * @returns {string} - תאריך מפורמט
+     * @param {boolean} includeTime - לכלול שעה (אופציונלי)
+     * @returns {string} - תאריך מעוצב
      * 
      * @example
-     * const html = FieldRendererService.renderDate('2025-01-09T10:30:00', true);
-     * // Output (with time): "09/01/25, 10:30"
-     * const html2 = FieldRendererService.renderDate('2025-01-09');
-     * // Output: "09/01/25"
+     * const html = FieldRendererService.renderDate('2025-01-10');
+     * const html2 = FieldRendererService.renderDate('2025-01-10T14:30:00', true);
      */
     static renderDate(date, includeTime = false) {
         if (!date) return '-';
         
-        // עם שעה - שימוש ב-formatDateTime
-        if (includeTime && typeof window.formatDateTime === 'function') {
-            return window.formatDateTime(date);
-        } 
-        
-        // ללא שעה - תמיד פורמט קומפקטי (DD/MM/YY)
-        if (typeof window.formatCompactDate === 'function') {
-            return window.formatCompactDate(date);
+        // אם יש date-utils.js - השתמש בו
+        if (window.formatDate) {
+            return window.formatDate(date, includeTime);
         }
         
         // Fallback
@@ -310,6 +240,59 @@ class FieldRendererService {
         } catch (e) {
             return date;
         }
+    }
+
+    /**
+     * רנדור shares/quantity עם # prefix
+     * 
+     * @param {number} shares - כמות מניות
+     * @param {string} cssClass - class נוסף (אופציונלי)
+     * @returns {string} - HTML עם # prefix
+     * 
+     * @example
+     * const html = FieldRendererService.renderShares(150);
+     * // Output: '<span class="numeric-ltr">#150</span>'
+     */
+    static renderShares(shares, cssClass = 'numeric-ltr') {
+        if (!shares || shares === 0) return '-';
+        return `<span class="${cssClass}">#${shares}</span>`;
+    }
+
+    /**
+     * רנדור בוליאני (כן/לא) עם איקונים
+     * 
+     * @param {boolean|string|number} value - ערך בוליאני (true, false, 1, 0, 'yes', 'no', 'כן', 'לא')
+     * @param {string} size - גודל (sm, md, lg) - ברירת מחדל md
+     * @returns {string} - HTML עם איקון
+     * 
+     * @example
+     * const html = FieldRendererService.renderBoolean(true);
+     * // Output: '<span class="text-success fw-bold">✓</span>'
+     * 
+     * const html2 = FieldRendererService.renderBoolean(false);
+     * // Output: '<span class="text-danger fw-bold">✗</span>'
+     */
+    static renderBoolean(value, size = 'md') {
+        // המרת ערכים שונים לבוליאני
+        let isTrue = false;
+        
+        if (typeof value === 'boolean') {
+            isTrue = value;
+        } else if (typeof value === 'number') {
+            isTrue = value === 1 || value > 0;
+        } else if (typeof value === 'string') {
+            const normalized = value.toLowerCase().trim();
+            isTrue = normalized === 'true' || normalized === 'yes' || 
+                     normalized === '1' || normalized === 'כן';
+        }
+        
+        // קביעת איקון וclass
+        const icon = isTrue ? '✓' : '✗';
+        const baseClass = isTrue ? 'text-success' : 'text-danger';
+        const sizeClass = size === 'lg' ? 'fs-4' : (size === 'sm' ? 'fs-6' : '');
+        const classes = `${baseClass} ${sizeClass} fw-bold`.trim();
+        
+        return `<span class="${classes}">${icon}</span>`;
     }
 
     // ===== PRIVATE HELPER METHODS =====
@@ -366,5 +349,7 @@ window.renderType = (type) => FieldRendererService.renderType(type);
 window.renderAction = (action) => FieldRendererService.renderAction(action);
 window.renderPriority = (priority) => FieldRendererService.renderPriority(priority);
 window.renderDate = (date, includeTime) => FieldRendererService.renderDate(date, includeTime);
+window.renderShares = (shares, cssClass) => FieldRendererService.renderShares(shares, cssClass);
+window.renderBoolean = (value, size) => FieldRendererService.renderBoolean(value, size);
 
-
+console.log('✅ field-renderer-service.js v=1.3.0 loaded - added renderBoolean() for yes/no icons');

@@ -196,16 +196,10 @@ class TradingAccountsController {
             window.FieldRendererService.renderNumericValue(balanceValue, ' $', false) : 
             (typeof balanceValue === 'number' ? `$${balanceValue.toLocaleString()}` : balanceValue);
         
-        // עיצוב תאריך
-        let formattedDate = '-';
-        if (createdValue && createdValue !== '-') {
-            try {
-                const date = new Date(createdValue);
-                formattedDate = date.toLocaleDateString('he-IL');
-            } catch (e) {
-                formattedDate = createdValue;
-            }
-        }
+        // רינדור תאריך באמצעות FieldRendererService (כמו trade_plans + cash_flows)
+        const formattedDate = window.FieldRendererService ? 
+            window.FieldRendererService.renderDate(createdValue) : 
+            (createdValue && window.formatDate ? window.formatDate(createdValue) : 'לא מוגדר');
         
         // רינדור status באמצעות FieldRendererService
         const statusBadge = window.FieldRendererService ? 

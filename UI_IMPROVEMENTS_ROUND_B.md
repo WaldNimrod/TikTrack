@@ -2,9 +2,9 @@
 ## UI Improvements - Master Work File (Rounds A-I)
 
 **תאריך יצירה:** 11 ינואר 2025  
-**עדכון אחרון:** 12 ינואר 2025 - 21:30  
-**גרסה:** 7.0.1 (+ Dynamic Colors Fix + Trades Complete + Syntax Fix)  
-**סטטוס:** A✅(19) | B✅(15) | C✅(8/8) | D✅ | E✅ | F✅ | **G✅(Colors) | H✅(Trades)**
+**עדכון אחרון:** 13 אוקטובר 2025 - 03:45  
+**גרסה:** 8.0.0 (+ renderBoolean for Yes/No Icons)  
+**סטטוס:** A✅(19) | B✅(15) | C✅(8/8) | D✅ | E✅ | F✅ | **G✅(Colors) | H✅(Trades) | I✅(Boolean)**
 
 ---
 
@@ -3953,6 +3953,161 @@ async function loadCashFlows() {
 
 **תאריך השלמה:** 12 ינואר 2025, 10:30  
 **מצב:** Production Ready ✨
+
+---
+
+## 📝 Section 19: Round I - הוספת renderBoolean לשירות רינדור
+
+**תאריך:** 13 אוקטובר 2025 - 03:45  
+**גרסה:** 8.0.0 - Added renderBoolean for Yes/No Icons  
+**מטרה:** הוספת פונקציה כללית לרינדור ערכי כן/לא עם איקונים
+
+### 🎯 הבקשה:
+
+משתמש ביקש להוסיף רינדור כללי לערכי כן/לא (boolean) עם איקונים ✓/✗ במקום טקסט, בדומה לכפתורי ביטול/שחזור שכבר קיימים במערכת.
+
+### 🔧 יישום:
+
+#### 1. פונקציה חדשה ב-FieldRendererService
+
+```javascript
+/**
+ * רנדור בוליאני (כן/לא) עם איקונים
+ * 
+ * @param {boolean|string|number} value - ערך בוליאני (true, false, 1, 0, 'yes', 'no', 'כן', 'לא')
+ * @param {string} size - גודל (sm, md, lg) - ברירת מחדל md
+ * @returns {string} - HTML עם איקון
+ */
+static renderBoolean(value, size = 'md') {
+    // המרת ערכים שונים לבוליאני
+    let isTrue = false;
+    
+    if (typeof value === 'boolean') {
+        isTrue = value;
+    } else if (typeof value === 'number') {
+        isTrue = value === 1 || value > 0;
+    } else if (typeof value === 'string') {
+        const normalized = value.toLowerCase().trim();
+        isTrue = normalized === 'true' || normalized === 'yes' || 
+                 normalized === '1' || normalized === 'כן';
+    }
+    
+    // קביעת איקון וclass
+    const icon = isTrue ? '✓' : '✗';
+    const baseClass = isTrue ? 'text-success' : 'text-danger';
+    const sizeClass = size === 'lg' ? 'fs-4' : (size === 'sm' ? 'fs-6' : '');
+    const classes = `${baseClass} ${sizeClass} fw-bold`.trim();
+    
+    return `<span class="${classes}">${icon}</span>`;
+}
+```
+
+#### 2. Global Shortcut
+
+```javascript
+window.renderBoolean = (value, size) => FieldRendererService.renderBoolean(value, size);
+```
+
+### 💡 דוגמאות שימוש:
+
+```javascript
+// דוגמה 1: ערך בוליאני
+renderBoolean(true)    // → ✓ (ירוק)
+renderBoolean(false)   // → ✗ (אדום)
+
+// דוגמה 2: ערך מספרי
+renderBoolean(1)       // → ✓ (ירוק)
+renderBoolean(0)       // → ✗ (אדום)
+
+// דוגמה 3: ערך טקסט
+renderBoolean('כן')    // → ✓ (ירוק)
+renderBoolean('לא')    // → ✗ (אדום)
+renderBoolean('yes')   // → ✓ (ירוק)
+renderBoolean('no')    // → ✗ (אדום)
+
+// דוגמה 4: גדלים
+renderBoolean(true, 'sm')  // → קטן
+renderBoolean(true, 'md')  // → בינוני (ברירת מחדל)
+renderBoolean(true, 'lg')  // → גדול
+```
+
+### 🎨 עיצוב:
+
+| ערך | איקון | צבע | Bootstrap Class |
+|-----|-------|-----|----------------|
+| כן/true/1 | ✓ | ירוק | `text-success fw-bold` |
+| לא/false/0 | ✗ | אדום | `text-danger fw-bold` |
+
+**גדלים:**
+- `sm` → `fs-6` (קטן)
+- `md` → רגיל (ברירת מחדל)
+- `lg` → `fs-4` (גדול)
+
+### 📦 קבצים ששונו:
+
+| קובץ | שינוי | גרסה |
+|------|-------|------|
+| `field-renderer-service.js` | הוספת `renderBoolean()` | v=1.3.0 |
+
+### 🔍 עדכוני Documentation:
+
+**קובץ מעודכן:** `field-renderer-service.js` (Header)
+```javascript
+ * @version 1.3.0
+ * @created January 2025
+ * @updated October 13, 2025 - Added renderBoolean() for yes/no icons
+ * 
+ * תכונות:
+ * - רנדור status badges (open, closed, cancelled, triggered, not_triggered)
+ * - רנדור side badges (Long/Short)
+ * - רנדור numeric badges (positive/negative/neutral)
+ * - רנדור currency display (1 → US Dollar)
+ * - רנדור type badges (swing, investment, passive)
+ * - רנדור action badges (buy, sale)
+ * - רנדור priority badges (high, medium, low)
+ * - רנדור shares/quantity (תמיד עם # prefix)
+ * - רנדור boolean (כן/לא עם איקונים ✓/✗)  ← חדש!
+```
+
+### ✅ יתרונות:
+
+1. **אחידות:** כל ערכי כן/לא במערכת יוצגו באופן זהה
+2. **נגישות:** איקונים צבעוניים יותר ברורים מטקסט
+3. **גמישות:** תמיכה במספר סוגי קלט (boolean, number, string)
+4. **ריכוזיות:** שירות כללי אחד לכל המערכת
+5. **קלות שימוש:** פונקציה קצרה וברורה: `${renderBoolean(value)}`
+
+### 🎯 איפה להשתמש:
+
+הפונקציה מוכנה לשימוש בכל מקום שמציג ערכי כן/לא:
+- עמוד alerts: `is_active`, `is_triggered`
+- עמוד notes: `is_pinned`, `is_archived`
+- עמוד tickers: `is_active`, `is_watchlist`
+- כל שדה boolean אחר במערכת
+
+**דוגמת שימוש בטבלה:**
+```javascript
+<td>${window.renderBoolean(note.is_active)}</td>
+<td>${window.renderBoolean(alert.is_triggered, 'lg')}</td>
+```
+
+---
+
+### 📋 Change Log
+
+**v1.3.0 - October 13, 2025**
+- ✅ Added `renderBoolean()` method to FieldRendererService
+- ✅ Supports boolean, number, and string inputs
+- ✅ Three size options: sm, md, lg
+- ✅ Uses Bootstrap text-success/text-danger colors
+- ✅ Global shortcut: `window.renderBoolean()`
+- ✅ Comprehensive documentation with examples
+
+---
+
+**תאריך השלמה:** 13 אוקטובר 2025, 03:45  
+**מצב:** Ready for Use ✨  
+**סטטוס:** ✅ Complete
 
 
 

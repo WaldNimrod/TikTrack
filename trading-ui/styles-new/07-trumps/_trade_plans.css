@@ -19,7 +19,11 @@
 .trade-plans-table .col-amount { width: 10%; min-width: 85px; }     /* 7. השקעה */
 .trade-plans-table .col-status { width: 8%; min-width: 70px; }      /* 8. סטטוס */
 .trade-plans-table .col-risk-reward { width: 18%; min-width: 150px; } /* 9. סיכוי/סיכון */
-.trade-plans-table .col-actions { width: 7%; min-width: 80px; max-width: 80px; }   /* 10. פעולות - Actions Menu Popup */
+.trade-plans-table .col-actions { 
+  width: var(--col-actions-percent); 
+  min-width: var(--col-actions-min-width); 
+  max-width: var(--col-actions-max-width); 
+}   /* 10. פעולות - Actions Menu Popup - רספונסיבי */
 
 /* Total: 100% */
 

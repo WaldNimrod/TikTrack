@@ -2,8 +2,8 @@
 ## ארכיטקטורת מערכות שירות כלליות
 
 **תאריך יצירה:** 9 בינואר 2025  
-**עדכון אחרון:** 10 באוקטובר 2025  
-**גרסה:** 4.0.0 🎊  
+**עדכון אחרון:** 13 באוקטובר 2025  
+**גרסה:** 4.1.0 🎊  
 **סטטוס:** 🏆 **6/6 מערכות + 8/8 עמודים - מושלמות מוחלטת (100%)!**
 
 ---
@@ -173,6 +173,8 @@ const badgeHTML = FieldRendererService.renderStatus(status, 'account');
 | `renderAction(action)` | action: string | string (HTML) | buy/sale badge |
 | `renderPriority(priority)` | priority: string | string (HTML) | high/medium/low badge |
 | `renderDate(date, includeTime)` | date: string/Date, includeTime: boolean | string | תאריך מפורמט |
+| `renderShares(shares, cssClass)` | shares: number, cssClass: string | string (HTML) | כמות מניות עם # prefix |
+| `renderBoolean(value, size)` | value: boolean/string/number, size: string | string (HTML) | ✅ **כן/לא עם איקונים ✓/✗** |
 
 #### 🆕 `renderNumericValue` - פונקציה כללית לערכים מספריים:
 **שם מדויק:** ערכים מספריים עם צבע לפי סימן (חיובי/שלילי/אפס)  
@@ -216,6 +218,8 @@ const zero = FieldRendererService.renderNumericValue(0, ' $', false);
 **אחרים:**
 7. **Currency** - תצוגה מלאה (US Dollar (USD))
 8. **Date** - **תמיד DD/MM/YY** (11/01/2025) - חיסכון 25% במקום
+9. **Shares** - כמות מניות עם # prefix (#150)
+10. **Boolean** - ✓ (ירוק) או ✗ (אדום) לערכי כן/לא
 
 #### ⭐ סטטוסים אחידים בכל המערכת (מאילוצי DB):
 

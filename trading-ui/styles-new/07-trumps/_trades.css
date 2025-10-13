@@ -82,9 +82,9 @@
 /* עמודת פעולות - Actions Menu Popup (⋮ button) */
 .data-table.trades-table .col-actions,
 .data-table[data-table-type="trades"] .col-actions {
-    width: 80px !important;
-    min-width: 80px !important;
-    max-width: 80px !important;
+    width: var(--col-actions-percent) !important;
+    min-width: var(--col-actions-min-width) !important;
+    max-width: var(--col-actions-max-width) !important;
 }
 
 /* ===== Responsive Behavior ===== */

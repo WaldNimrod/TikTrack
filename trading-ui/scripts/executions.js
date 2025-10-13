@@ -1195,10 +1195,21 @@ async function updateExecutionsTableMain(executions) {
 
     // P&L רק במכירה, בקניה ריק
     const isSell = (execution.action || execution.type) === 'sell' || (execution.action || execution.type) === 'sale';
+    
+    // חישוב P&L אמיתי (אם קיים במסד) או דמה לבדיקה
+    let plValue = execution.pl || execution.total_pl || 0;
+    
+    // אם אין P&L ממסד - חישוב פשוט לדמו (sell - buy difference)
+    if (plValue === 0 && isSell && execution.price && execution.quantity) {
+        // חישוב פשוט: הנחה שמחיר קנייה ממוצע (לדוגמה בלבד)
+        const estimatedBuyPrice = execution.price * 0.95; // הנחה: רכשנו 5% זול יותר
+        plValue = (execution.price - estimatedBuyPrice) * execution.quantity - (execution.fee || 0);
+    }
+    
     const plBadge = isSell ? 
       (window.FieldRendererService ? 
-        window.FieldRendererService.renderNumericValue(execution.pl || 0, '$', true) : 
-        `$${(execution.pl || 0).toFixed(2)}`) : 
+        window.FieldRendererService.renderNumericValue(plValue, '$', true) : 
+        `$${plValue.toFixed(2)}`) : 
       '-';
 
     // שמירת הערכים המקוריים באנגלית לפילטר

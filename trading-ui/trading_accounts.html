@@ -86,39 +86,42 @@
     <!-- Header System - Created automatically by header-system.js -->
     <div id="unified-header"></div>
     
-    <!-- Main Page Content - לפי התבנית הסטנדרטית -->
-    <div class="main-content">
-        <!-- UI Content Section Top Start-->
-        <div class="top-section entity-account" data-section="top">
-            <div class="section-header">
-                <!-- UI section main top header comes here -->
-                <h1>
-                    <img src="images/icons/trading_accounts.svg" alt="חשבונות מסחר" class="section-icon">
-                    חשבונות מסחר
-                </h1>
-                <div class="header-actions">
+    <!-- Page Content -->
+    <div class="background-wrapper">
+        <div class="page-body">
+            <!-- UI Content Section Top Start-->
+            <div class="top-section entity-account" data-section="top">
+                <div class="section-header">
+                    <!-- UI section main top header comes here -->
+                    <h1>
+                        <img src="images/icons/trading_accounts.svg" alt="חשבונות מסחר" class="section-icon">
+                        חשבונות מסחר
+                    </h1>
+                    <div class="header-actions">
                         <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והחשבונות המסחר">
                         <i class="fas fa-copy"></i> העתק לוג מפורט
                     </button>
                     <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר אזור חשבונות מסחר">
                         <span class="filter-icon">▲</span>
-                    </button>
+                        </button>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <!-- UI Top section body comes here -->
+                    <!-- Trading Accounts Summary -->
+                    <div class="info-summary" id="summaryStats">
+                        <div><strong>סה"כ חשבונות מסחר:</strong> <span id="totalAccounts">0</span></div>
+                        <div><strong>חשבונות מסחר פעילים:</strong> <span id="activeAccounts">0</span></div>
+                        <div><strong>סה"כ יתרה:</strong> <span id="totalBalance">$0</span></div>
+                    </div>
                 </div>
             </div>
-            <div class="section-body">
-                <!-- UI Top section body comes here -->
-                <!-- Trading Accounts Summary -->
-                <div class="info-summary" id="summaryStats">
-                    <div><strong>סה"כ חשבונות מסחר:</strong> <span id="totalAccounts">0</span></div>
-                    <div><strong>חשבונות מסחר פעילים:</strong> <span id="activeAccounts">0</span></div>
-                    <div><strong>סה"כ יתרה:</strong> <span id="totalBalance">$0</span></div>
-                </div>
-            </div>
-        </div>
-        <!-- UI Content Section Top End -->
+            <!-- UI Content Section Top End -->
 
-        <!-- UI Content Section 1 Start-->
-        <div class="content-section entity-account" id="main" data-section="main">
+        <!-- Main content -->
+        <div class="main-content">
+            <!-- UI Content Section 1 Start-->
+            <div class="content-section entity-account" id="main" data-section="main">
             <div class="section-header">
                 <!-- UI section title comes here -->
                 <h2>
@@ -190,19 +193,24 @@
                             </table>
                 </div>
             </div>
+            <!-- UI Content Section 1 End -->
         </div>
-        <!-- UI Content Section 1 End -->
+        <!-- End main-content -->
+    </div>
+    <!-- End page-body -->
+</div>
+<!-- End background-wrapper -->
 
-        <!-- Bottom page spacing -->
-        <div class="page-bottom-spacing"></div>
+    <!-- Bottom page spacing -->
+    <div class="page-bottom-spacing"></div>
 
-        <!-- Notification system -->
-        <div class="notification-container" id="notificationContainer"></div>
+    <!-- Notification system -->
+    <div class="notification-container" id="notificationContainer"></div>
 
-        <!-- Toast container for notifications -->
-        <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
+    <!-- Toast container for notifications -->
+    <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
 
-        <!-- Add Account Modal -->
+    <!-- Add Account Modal -->
         <div class="modal fade" id="addAccountModal" tabindex="-1" aria-labelledby="addAccountModalLabel" aria-hidden="true"
             data-bs-backdrop="true" data-bs-keyboard="true">
             <div class="modal-dialog modal-lg">

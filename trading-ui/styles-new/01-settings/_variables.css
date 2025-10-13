@@ -88,14 +88,15 @@
   --col-date-width: 12%;
   --col-description-width: 28%;
   --col-source-width: 12%;
-  --col-actions-width: 180px;
+  --col-actions-width: 50px; /* עודכן: 180px → 50px (Actions Menu Popup) */
 
   /* ===== רוחבי עמודות פעולות דינמיים ===== */
-  --actions-1-btn-width: 60px;
-  --actions-2-btn-width: 80px;
-  --actions-3-btn-width: 180px;
-  --actions-4-btn-width: 160px;
-  --actions-5-btn-width: 200px;
+  /* עודכן: כולם 50px (Actions Menu Popup - ינואר 2025) */
+  --actions-1-btn-width: 50px;
+  --actions-2-btn-width: 50px;
+  --actions-3-btn-width: 50px;
+  --actions-4-btn-width: 50px;
+  --actions-5-btn-width: 50px;
 
   /* ===== רוחבי מסכים לבדיקות ===== */
   --screen-xs-min: 320px;

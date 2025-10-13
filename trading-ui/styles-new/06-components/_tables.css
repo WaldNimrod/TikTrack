@@ -281,9 +281,9 @@
 }
 
 .col-actions { 
-  width: 12%;
-  min-width: 145px;
-  max-width: 200px;
+  width: 80px !important;
+  min-width: 80px !important;
+  max-width: 80px !important;
 }
 
 /* הגדרות כלליות לכל הטבלאות */

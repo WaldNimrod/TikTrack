@@ -353,7 +353,7 @@ async function loadNotesData() {
       tbody.innerHTML = `
         <tr>
           <td colspan="7" class="text-center text-muted">
-            <div style="padding: 20px;">
+            <div class="empty-state-message">
               <h5>📝 אין הערות</h5>
               <p>לא נמצאו הערות במערכת</p>
               <button class="btn btn-sm btn-primary" onclick="openNoteDetails()">הוסף הערה ראשונה</button>
@@ -413,7 +413,7 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
     tbody.innerHTML = `
       <tr>
         <td colspan="6" class="text-center text-muted">
-          <div style="padding: 20px;">
+          <div class="empty-state-message">
             <h5>📝 אין הערות</h5>
             <p>לא נמצאו הערות במערכת</p>
             <button class="btn btn-sm btn-primary" onclick="openNoteDetails()">הוסף הערה ראשונה</button>
@@ -504,7 +504,7 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
     // שימוש ב-FieldRendererService לעיצוב שדות
     const relatedTypeBadge = window.FieldRendererService ? 
       window.FieldRendererService.renderType(note.related_type, 'related_type') : 
-      `<div class='related-object-cell ${relatedClass}' style='justify-content: flex-start; text-align: right; min-width: 150px;'>${relatedDisplay}</div>`;
+      `<div class='related-object-cell ${relatedClass}'>${relatedDisplay}</div>`;
 
     const dateBadge = window.FieldRendererService ? 
       window.FieldRendererService.renderDate(note.created_at) : 
@@ -1449,10 +1449,10 @@ function setupNoteValidationEvents() {
         const displayElement = document.getElementById('currentAttachmentDisplay');
         if (displayElement) {
           displayElement.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="d-flex align-items-center gap-2">
               <span>${fileIcon}</span>
               <span>${fileName} (חדש)</span>
-              <span style="color: ${window.getTableColors ? window.getTableColors().positive : '#28a745'}; font-weight: bold;">✓ נבחר</span>
+              <span class="text-success fw-bold">✓ נבחר</span>
             </div>
           `;
         }
@@ -1917,13 +1917,12 @@ function displayCurrentAttachment(attachment) {
     }
 
     displayElement.innerHTML = `
-      <div style="display: flex; align-items: center; gap: 8px;">
+      <div class="d-flex align-items-center gap-2">
         <span>${fileIcon}</span>
         <span>${fileName}</span>
         <a href="/api/notes/files/${fileName}" 
            target="_blank" 
-           class="btn btn-sm btn-outline-primary" 
-           style="margin-right: auto;">
+           class="btn btn-sm btn-outline-primary ms-auto">
           👁️ צפה
         </a>
       </div>

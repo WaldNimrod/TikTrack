@@ -1225,7 +1225,7 @@ async function updateExecutionsTableMain(executions) {
                 <td class="pl-cell">${plBadge}</td>
                 <td data-date="${execution.date || execution.execution_date}">${dateBadge}</td>
                 <td class="source-cell">${execution.source || '-'}</td>
-                <td class="actions-cell">
+                <td class="col-actions actions-cell">
                     ${window.createActionsMenu ? window.createActionsMenu([
                         window.createLinkButton ? window.createLinkButton(`viewLinkedItemsForExecution(${execution.id})`) : '',
                         window.createEditButton ? window.createEditButton(`editExecution(${execution.id})`) : '',
@@ -2699,19 +2699,11 @@ function updateTickersSummaryTable(tickers = null) {
             <td><span class="${statusClass}">${ticker.status}</span></td>
             <td>${ticker.totalTrades} (${ticker.activeTrades} פעיל, ${ticker.closedTrades} סגור)</td>
             <td>${creationDate}</td>
-            <td class="actions-cell">
-                <button class="btn btn-sm btn-outline-primary" 
-                  onclick="viewTickerDetails(${ticker.id})" 
-                  title="צפה בפרטים">
-                    <img src="images/icons/tickers.svg" alt="צפה" 
-                      class="action-icon action-icon-sm">
-                </button>
-                <button class="btn btn-sm btn-outline-success" 
-                  onclick="addExecutionForTicker(${ticker.id})" 
-                  title="הוסף עסקה">
-                    <img src="images/icons/executions.svg" alt="הוסף" 
-                      class="action-icon action-icon-sm">
-                </button>
+            <td class="col-actions actions-cell">
+                ${window.createActionsMenu ? window.createActionsMenu([
+                    window.createButton ? window.createButton('VIEW', `viewTickerDetails(${ticker.id})`) : '',
+                    window.createButton ? window.createButton('ADD', `addExecutionForTicker(${ticker.id})`) : ''
+                ], ticker.id) : ''}
             </td>
         `;
 

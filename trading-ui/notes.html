@@ -146,7 +146,7 @@
                     <!-- Notes table -->
                     <div class="section-body">
                         <div class="table-responsive" id="notesContainer">
-                            <table class="data-table" id="notesTable" data-table-type="notes">
+                            <table class="data-table notes-table" id="notesTable" data-table-type="notes">
                                 <thead>
                                     <tr>
                                         <th class="col-title">
@@ -157,29 +157,25 @@
                                         </th>
                                         <th class="col-content">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, notesData, 'notes', updateNotesTable); }"
-
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, notesData, 'notes', updateNotesTable); }">
                                                 תוכן <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-status">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(2, notesData, 'notes', updateNotesTable); }"
-
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(2, notesData, 'notes', updateNotesTable); }">
                                                 סטטוס <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-created">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(3, notesData, 'notes', updateNotesTable); }"
-
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(3, notesData, 'notes', updateNotesTable); }">
                                                 נוצר ב <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-updated">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(4, notesData, 'notes', updateNotesTable); }"
-
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(4, notesData, 'notes', updateNotesTable); }">
                                                 עודכן ב <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
@@ -364,11 +360,11 @@
     
     <!-- Stage 4: Services - OPTIONAL -->
     <script src="scripts/services/data-collection-service.js?v=bd7dc47_20251013_044649"></script>
-    <script src="scripts/services/field-renderer-service.js?v=bd7dc47_20251013_044649"></script>
+    <script src="scripts/services/field-renderer-service.js?v=1.2.0"></script>
     <script src="scripts/services/select-populator-service.js?v=bd7dc47_20251013_044649"></script>
     <script src="scripts/services/crud-response-handler.js?v=bd7dc47_20251013_044649"></script>
     
     <!-- Stage 5: Page Script - REQUIRED -->
-    <script src="scripts/notes.js?v=bd7dc47_20251013_044649"></script>
+    <script src="scripts/notes.js?v=20251013_complete"></script>
 </body>
 </html>

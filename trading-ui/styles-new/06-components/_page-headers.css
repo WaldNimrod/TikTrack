@@ -5,8 +5,12 @@
  * קובץ זה מכיל את הסגנונות הספציפיים לכותרות כל עמוד
  * מבוסס על הסגנונות מהמערכת הישנה
  * 
- * @version 1.0.0
- * @lastUpdated January 6, 2025
+ * ⚠️ IMPORTANT: DYNAMIC COLORS ONLY!
+ * כל הצבעים במשתנים CSS בלבד - ללא fallback values קבועים
+ * גבולות משתמשים בווריאנט הכהה (--entity-XXX-text / --primary-color-dark)
+ * 
+ * @version 2.0.0
+ * @lastUpdated October 13, 2025 - Removed all fallback values, using dark variant for borders
  */
 
 /* ===== סגנונות כותרות עמודים עם צבעים ספציפיים ===== */
@@ -14,153 +18,153 @@
 /* עמוד מעקב טריידים - דינמי מהעדפות */
 .tracking-page .section-header,
 .tracking-page .top-section .section-header {
-  background-color: var(--primary-color-light, rgba(0, 123, 255, 0.3));
-  border-bottom: 2px solid var(--primary-color, #26baac);
-  color: var(--primary-color-dark, #0056b3);
+  background-color: var(--primary-color-light);
+  border-bottom: 2px solid var(--primary-color-dark); /* ✅ ווריאנט כהה */
+  color: var(--primary-color-dark);
 }
 
 /* עמוד חשבונות מסחר - דינמי מהעדפות */
 .accounts-page .section-header,
 .accounts-page .top-section .section-header {
-  background-color: var(--entity-account-bg, rgba(0, 123, 255, 0.8));
-  border-bottom: 2px solid var(--entity-account-color, #007bff);
-  color: var(--entity-account-text, #0056b3);
+  background-color: var(--entity-account-bg);
+  border-bottom: 2px solid var(--entity-account-text); /* ✅ ווריאנט כהה */
+  color: var(--entity-account-text);
 }
 
 /* עמוד תכנון טריידים - דינמי מהעדפות */
 .planning-page .section-header,
 .planning-page .top-section .section-header {
-  background-color: var(--primary-color-light, rgba(0, 123, 255, 0.3));
-  border-bottom: 2px solid var(--primary-color, #26baac);
-  color: var(--primary-color-dark, #0056b3);
+  background-color: var(--primary-color-light);
+  border-bottom: 2px solid var(--primary-color-dark); /* ✅ ווריאנט כהה */
+  color: var(--primary-color-dark);
 }
 
 /* עמוד התראות - דינמי מהעדפות */
 .alerts-page .section-header,
 .alerts-page .top-section .section-header {
-  background-color: var(--entity-alert-bg, rgba(255, 156, 5, 0.8));
-  border-bottom: 2px solid var(--entity-alert-color, #e67e22);
-  color: var(--entity-alert-text, #cc7a00);
+  background-color: var(--entity-alert-bg);
+  border-bottom: 2px solid var(--entity-alert-text); /* ✅ ווריאנט כהה */
+  color: var(--entity-alert-text);
 }
 
 /* עמוד תזרים מזומנים - דינמי מהעדפות */
 .cash-flows-page .section-header,
 .cash-flows-page .top-section .section-header {
-  background-color: var(--entity-cash-flow-bg, rgba(32, 201, 151, 0.8));
-  border-bottom: 2px solid var(--entity-cash-flow-color, #d4a574);
-  color: var(--entity-cash-flow-text, #1a8a75);
+  background-color: var(--entity-cash-flow-bg);
+  border-bottom: 2px solid var(--entity-cash-flow-text); /* ✅ ווריאנט כהה */
+  color: var(--entity-cash-flow-text);
 }
 
 /* עמוד עסקאות - דינמי מהעדפות */
 .executions-page .section-header,
 .executions-page .top-section .section-header {
-  background-color: var(--entity-execution-bg, rgba(255, 244, 230, 0.8));
-  border-bottom: 2px solid var(--entity-execution-color, #2c3e50);
-  color: var(--entity-execution-text, #e55a00);
+  background-color: var(--entity-execution-bg);
+  border-bottom: 2px solid var(--entity-execution-text); /* ✅ ווריאנט כהה */
+  color: var(--entity-execution-text);
 }
 
 /* עמוד הערות - דינמי מהעדפות */
 .notes-page .section-header,
 .notes-page .top-section .section-header {
-  background-color: var(--entity-note-bg, rgba(111, 66, 193, 0.8));
-  border-bottom: 2px solid var(--entity-note-color, #a29bfe);
-  color: var(--entity-note-text, #5a2d91);
+  background-color: var(--entity-note-bg);
+  border-bottom: 2px solid var(--entity-note-text); /* ✅ ווריאנט כהה */
+  color: var(--entity-note-text);
 }
 
 /* עמוד בסיס נתונים - דינמי מהעדפות */
 .db-display-page .section-header,
 .db-display-page .top-section .section-header {
-  background-color: var(--primary-color-light, rgba(0, 123, 255, 0.3));
-  border-bottom: 2px solid var(--primary-color, #26baac);
-  color: var(--primary-color-dark, #0056b3);
+  background-color: var(--primary-color-light);
+  border-bottom: 2px solid var(--primary-color-dark); /* ✅ ווריאנט כהה */
+  color: var(--primary-color-dark);
 }
 
 /* עמוד טבלאות עזר - דינמי מהעדפות */
 .extra-data-page .section-header,
 .extra-data-page .top-section .section-header {
-  background-color: var(--primary-color-light, rgba(0, 123, 255, 0.3));
-  border-bottom: 2px solid var(--primary-color, #26baac);
-  color: var(--primary-color-dark, #0056b3);
+  background-color: var(--primary-color-light);
+  border-bottom: 2px solid var(--primary-color-dark); /* ✅ ווריאנט כהה */
+  color: var(--primary-color-dark);
 }
 
 /* עמוד אילוצים - דינמי מהעדפות */
 .constraints-page .section-header,
 .constraints-page .top-section .section-header {
-  background-color: var(--primary-color-light, rgba(0, 123, 255, 0.3));
-  border-bottom: 2px solid var(--primary-color, #26baac);
-  color: var(--primary-color-dark, #0056b3);
+  background-color: var(--primary-color-light);
+  border-bottom: 2px solid var(--primary-color-dark); /* ✅ ווריאנט כהה */
+  color: var(--primary-color-dark);
 }
 
 /* עמוד עיצובים - דינמי מהעדפות */
 .designs-page .section-header,
 .designs-page .top-section .section-header {
-  background-color: var(--primary-color-light, rgba(0, 123, 255, 0.3));
-  border-bottom: 2px solid var(--primary-color, #26baac);
-  color: var(--primary-color-dark, #0056b3);
+  background-color: var(--primary-color-light);
+  border-bottom: 2px solid var(--primary-color-dark); /* ✅ ווריאנט כהה */
+  color: var(--primary-color-dark);
 }
 
 /* עמוד העדפות - דינמי מהעדפות */
 .preferences-page .section-header,
 .preferences-page .top-section .section-header {
-  background-color: var(--primary-color-light, rgba(0, 123, 255, 0.3));
-  border-bottom: 2px solid var(--primary-color, #26baac);
-  color: var(--primary-color-dark, #0056b3);
+  background-color: var(--primary-color-light);
+  border-bottom: 2px solid var(--primary-color-dark); /* ✅ ווריאנט כהה */
+  color: var(--primary-color-dark);
 }
 
 /* עמוד נתונים נוספים - דינמי מהעדפות */
 .db-extradata-page .section-header,
 .db-extradata-page .top-section .section-header {
-  background-color: var(--primary-color-light, rgba(0, 123, 255, 0.3));
-  border-bottom: 2px solid var(--primary-color, #26baac);
-  color: var(--primary-color-dark, #0056b3);
+  background-color: var(--primary-color-light);
+  border-bottom: 2px solid var(--primary-color-dark); /* ✅ ווריאנט כהה */
+  color: var(--primary-color-dark);
 }
 
 /* עמוד ראשי - דינמי מהעדפות */
 .index-page .section-header,
 .index-page .top-section .section-header {
-  background-color: var(--primary-color-light, rgba(0, 123, 255, 0.3));
-  border-bottom: 2px solid var(--primary-color, #26baac);
-  color: var(--primary-color-dark, #0056b3);
+  background-color: var(--primary-color-light);
+  border-bottom: 2px solid var(--primary-color-dark); /* ✅ ווריאנט כהה */
+  color: var(--primary-color-dark);
 }
 
 /* עמוד מחקר - דינמי מהעדפות */
 .research-page .section-header,
 .research-page .top-section .section-header {
-  background-color: var(--primary-color-light, rgba(0, 123, 255, 0.3));
-  border-bottom: 2px solid var(--primary-color, #26baac);
-  color: var(--primary-color-dark, #0056b3);
+  background-color: var(--primary-color-light);
+  border-bottom: 2px solid var(--primary-color-dark); /* ✅ ווריאנט כהה */
+  color: var(--primary-color-dark);
 }
 
 /* עמוד עסקאות - דינמי מהעדפות */
 .trades-page .section-header,
 .trades-page .top-section .section-header {
-  background-color: var(--primary-color-light, rgba(0, 123, 255, 0.3));
-  border-bottom: 2px solid var(--primary-color, #26baac);
-  color: var(--primary-color-dark, #0056b3);
+  background-color: var(--primary-color-light);
+  border-bottom: 2px solid var(--primary-color-dark); /* ✅ ווריאנט כהה */
+  color: var(--primary-color-dark);
 }
 
 /* עמוד חשבונות מסחר - דינמי מהעדפות */
 .trading-accounts-page .section-header,
 .trading-accounts-page .top-section .section-header {
-  background-color: var(--entity-account-bg, rgba(0, 123, 255, 0.8));
-  border-bottom: 2px solid var(--entity-account-color, #007bff);
-  color: var(--entity-account-text, #0056b3);
+  background-color: var(--entity-account-bg);
+  border-bottom: 2px solid var(--entity-account-text); /* ✅ ווריאנט כהה */
+  color: var(--entity-account-text);
 }
 
 /* עמוד סמלים - דינמי מהעדפות */
 .tickers-page .section-header,
 .tickers-page .top-section .section-header {
-  background-color: var(--entity-ticker-bg, rgba(111, 66, 193, 0.8));
-  border-bottom: 2px solid var(--entity-ticker-color, #229954);
-  color: var(--entity-ticker-text, #5a2d91);
+  background-color: var(--entity-ticker-bg);
+  border-bottom: 2px solid var(--entity-ticker-text); /* ✅ ווריאנט כהה */
+  color: var(--entity-ticker-text);
 }
 
 /* עמוד תוכניות מסחר - דינמי מהעדפות */
 .trade-plans-page .section-header,
 .trade-plans-page .top-section .section-header {
-  background-color: var(--entity-trade-plan-bg, rgba(32, 201, 151, 0.8));
-  border-bottom: 2px solid var(--entity-trade-plan-color, #8e44ad);
-  color: var(--entity-trade-plan-text, #1a8a75);
+  background-color: var(--entity-trade-plan-bg);
+  border-bottom: 2px solid var(--entity-trade-plan-text); /* ✅ ווריאנט כהה */
+  color: var(--entity-trade-plan-text);
 }
 
 /* ===== סגנונות כותרות עם איקונים ===== */
@@ -187,14 +191,14 @@
   align-items: center;
   margin-inline-end: 20px;
   margin-inline-start: 0;
-  color: var(--entity-alert-color, #ff9c05);
+  color: var(--entity-alert-color);
   font-size: 1.2rem;
   transition: all 0.3s ease;
 }
 
 .section-alert-icon:hover {
   transform: scale(1.1);
-  color: var(--entity-alert-text, #e55a00);
+  color: var(--entity-alert-text);
 }
 
 /* ===== סגנונות איקון בכותרת הקומפוננט ===== */
@@ -203,14 +207,14 @@
   align-items: center;
   position: relative;
   margin-inline-start: 8px;
-  color: var(--entity-alert-color, #ff9c05);
+  color: var(--entity-alert-color);
   font-size: 1.1rem;
   transition: all 0.3s ease;
 }
 
 .title-bell-icon:hover {
   transform: scale(1.1);
-  color: var(--entity-alert-text, #e55a00);
+  color: var(--entity-alert-text);
 }
 
 /* ===== סגנונות אייקון טריידים פעילים ===== */
@@ -220,10 +224,10 @@
   justify-content: center;
   width: 24px;
   height: 24px;
-  background: var(--entity-trade-bg, rgba(0, 123, 255, 0.1));
-  border: 1px solid var(--entity-trade-border, rgba(0, 123, 255, 0.3));
+  background: var(--entity-trade-bg);
+  border: 1px solid var(--entity-trade-border);
   border-radius: 50%;
-  color: var(--entity-trade-color, #26baac);
+  color: var(--entity-trade-color);
   font-size: 0.9rem;
   font-weight: 600;
   margin-inline-start: 8px;
@@ -231,7 +235,7 @@
 }
 
 .active-trades-icon:hover {
-  background: var(--entity-trade-color, #26baac);
+  background: var(--entity-trade-color);
   color: white;
   transform: scale(1.1);
 }
@@ -318,15 +322,15 @@
 }
 
 .entity-execution-main-header {
-  background-color: var(--entity-execution-bg, rgba(255, 244, 230, 0.8)); /* variant בהיר עם שקיפות 0.8 */
-  border-bottom: 2px solid var(--entity-execution-color, #2c3e50);
-  color: var(--entity-execution-text, #e55a00);
+  background-color: var(--entity-execution-bg);
+  border-bottom: 2px solid var(--entity-execution-text); /* ✅ ווריאנט כהה לגבול */
+  color: var(--entity-execution-text);
 }
 
 .entity-execution-sub-header {
-  background-color: var(--entity-execution-bg, rgba(255, 244, 230, 0.8)); /* variant בהיר עם שקיפות 0.8 */
-  border-bottom: 2px solid var(--entity-execution-color, #2c3e50);
-  color: var(--entity-execution-text, #e55a00);
+  background-color: var(--entity-execution-bg);
+  border-bottom: 2px solid var(--entity-execution-text); /* ✅ ווריאנט כהה לגבול */
+  color: var(--entity-execution-text);
 }
 
 .entity-trade-plan-main-header {

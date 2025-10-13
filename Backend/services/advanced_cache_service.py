@@ -672,21 +672,18 @@ def invalidate_cache(dependencies: List[str]):
                 
                 logger.info(f"✅ Cache invalidated for dependencies {dependencies}: {total_invalidated} entries removed")
                 
-                # NEW: Broadcast cache invalidation event to Frontend via WebSocket
+                # NEW: Log change for polling clients
                 try:
-                    from services.cache_invalidation_service import cache_invalidation_service
-                    cache_invalidation_service.invalidate_frontend_cache(
+                    from services.cache_changes_tracker import cache_changes_tracker
+                    cache_changes_tracker.log_change(
                         keys=dependencies,
-                        reason=f"API call: {func.__name__}",
-                        metadata={
-                            'function': func.__name__,
-                            'invalidated_count': total_invalidated
-                        }
+                        reason=f"API call: {f.__name__}",
+                        created_by="backend_api"
                     )
-                    logger.info(f"📡 WebSocket event broadcast for dependencies: {dependencies}")
-                except Exception as ws_error:
-                    logger.warning(f"⚠️ Failed to broadcast WebSocket event (non-critical): {ws_error}")
-                    # Don't fail the request if WebSocket fails - it's non-critical
+                    logger.debug(f"📝 Logged cache change for polling clients")
+                except Exception as log_error:
+                    logger.warning(f"⚠️ Failed to log cache change (non-critical): {log_error}")
+                    # Non-critical - don't fail the request
                 
             except Exception as e:
                 logger.error(f"❌ Failed to invalidate cache for dependencies {dependencies}: {e}")

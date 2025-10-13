@@ -93,22 +93,22 @@ class UnifiedCacheManager {
             // טעינת סטטיסטיקות
             await this.updateStats();
             
-            // NEW: Initialize WebSocket Bridge for real-time cache invalidation
-            if (window.WebSocketBridge) {
-                console.log('🔌 Initializing WebSocket Bridge...');
+            // NEW: Start Polling Manager for auto-invalidation (Option B-Lite)
+            if (window.PollingManager) {
+                console.log('🔄 Starting Polling Manager...');
                 try {
-                    const wsInitialized = await window.WebSocketBridge.initialize();
-                    if (wsInitialized) {
-                        console.log('✅ WebSocket Bridge connected successfully');
-                    } else {
-                        console.warn('⚠️ WebSocket Bridge failed to connect (will work offline)');
-                    }
-                } catch (wsError) {
-                    console.warn('⚠️ WebSocket Bridge initialization error (non-critical):', wsError);
-                    // Don't fail UnifiedCacheManager if WebSocket fails - it's optional
+                    window.PollingManager.start();
+                    console.log('✅ Polling Manager started (checking every 10 seconds)');
+                } catch (pollError) {
+                    console.warn('⚠️ Polling Manager failed to start (non-critical):', pollError);
                 }
             } else {
-                console.log('ℹ️ WebSocket Bridge not loaded (offline mode)');
+                console.log('ℹ️ Polling Manager not loaded (no auto-invalidation)');
+            }
+            
+            // LocalStorage Sync is auto-initialized on load
+            if (window.LocalStorageSync) {
+                console.log('✅ LocalStorage Sync active (multi-tab support)');
             }
             
             this.initialized = true;
@@ -1730,6 +1730,15 @@ window.clearAllCache = async function(options = {}) {
             } else {
                 // Light/Medium/Full: Just refresh page data (no reload needed!)
                 console.log(`🔄 ${level} clear: Refreshing page data without reload...`);
+                
+                // NEW: Broadcast to other tabs via LocalStorage
+                if (window.LocalStorageSync) {
+                    const allKeys = ['trades', 'tickers', 'alerts', 'notes', 
+                                     'executions', 'cash_flows', 'trade_plans', 
+                                     'trading_accounts', 'dashboard', 'research'];
+                    window.LocalStorageSync.broadcast(allKeys, 'manual_clear');
+                    console.log('📡 Broadcast to other tabs complete');
+                }
                 
                 setTimeout(async () => {
                     try {

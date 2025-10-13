@@ -121,6 +121,7 @@ from routes.api import (
     wal_bp
 )
 from routes.api.server_logs import server_logs_bp
+from routes.api.cache_changes import cache_changes_bp
 
 # Import CRUD testing modules
 import subprocess
@@ -139,46 +140,6 @@ CORS(app)
 
 # Initialize Flask-SocketIO with simpler configuration
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading', logger=True, engineio_logger=True)
-
-# Import cache invalidation service
-from services.cache_invalidation_service import cache_invalidation_service
-
-# WebSocket event handlers
-@socketio.on('connect')
-def handle_connect():
-    """Handle client connection"""
-    print('🔌 Client connected to WebSocket')
-    socketio.emit('connection', {
-        'status': 'connected',
-        'server_time': datetime.now().isoformat(),
-        'message': 'Successfully connected to TikTrack server'
-    })
-
-@socketio.on('disconnect')
-def handle_disconnect():
-    """Handle client disconnection"""
-    print('🔌 Client disconnected from WebSocket')
-
-@socketio.on('manual_cache_clear')
-def handle_manual_cache_clear(data):
-    """
-    Handle manual cache clear request from Frontend.
-    Broadcasts invalidation to all connected clients.
-    """
-    keys = data.get('keys', [])
-    level = data.get('level', 'medium')
-    
-    print(f'🧹 Manual cache clear requested - keys: {keys}, level: {level}')
-    
-    # Broadcast to all clients (including the requester)
-    socketio.emit('cache:invalidate', {
-        'keys': keys,
-        'reason': f'manual_clear_{level}',
-        'timestamp': datetime.utcnow().isoformat(),
-        'initiated_by': 'user'
-    }, broadcast=True)
-    
-    print(f'📡 Broadcast complete - {len(keys)} keys invalidated')
 
 # Initialize Background Task Manager without real-time notifications
 background_task_manager = BackgroundTaskManager()
@@ -254,6 +215,7 @@ app.register_blueprint(linked_items_bp)
 app.register_blueprint(note_relation_types_bp)
 app.register_blueprint(file_scanner_bp)
 app.register_blueprint(cache_management_bp)
+app.register_blueprint(cache_changes_bp, url_prefix='/api/cache')
 app.register_blueprint(query_optimization_bp)
 app.register_blueprint(server_management_bp)
 app.register_blueprint(system_overview_bp)

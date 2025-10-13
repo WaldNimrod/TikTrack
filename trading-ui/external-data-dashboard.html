@@ -62,17 +62,10 @@
     <!-- Page Headers - Development pages with white background -->
     <link rel="stylesheet" href="styles-new/06-components/_page-headers.css?v=2fba6e8_20251013_051239">
     
-    <!-- Dynamic Color System Scripts -->
-    <script src="scripts/color-scheme-system.js?v=2fba6e8_20251013_051239"></script>
-    
-    <!-- Preferences System Scripts -->
-    <script src="scripts/preferences.js?v=2fba6e8_20251013_051239"></script>
-    
     <!-- Color Demo Toggle Script -->
     <script src="scripts/color-demo-toggle.js?v=2fba6e8_20251013_051239"></script>
     
-    <!-- Header System Script -->
-    <script src="scripts/header-system.js?v=2fba6e8_20251013_051239"></script>
+    <!-- Header System Script (loaded later with other global systems) -->
 </head>
 
 <body>
@@ -488,18 +481,18 @@
     <!-- Global Systems -->
     <script src="scripts/global-favicon.js?v=2fba6e8_20251013_051239"></script>
     <script src="scripts/translation-utils.js?v=2fba6e8_20251013_051239"></script>
-    <script src="scripts/header-system.js?v=2fba6e8_20251013_051239"></script>
+    
+    <!-- header-system is already loaded once below in Global Systems -->
     <script src="scripts/date-utils.js?v=2fba6e8_20251013_051239"></script>
     <script src="scripts/button-icons.js?v=2fba6e8_20251013_051239"></script>
     <script src="scripts/page-utils.js?v=2fba6e8_20251013_051239"></script>
-    <script src="scripts/preferences.js?v=2fba6e8_20251013_051239"></script>
+    <!-- preferences.js is already loaded once below in Global Systems -->
     <script src="scripts/notification-category-detector.js?v=2fba6e8_20251013_051239"></script>
     <script src="scripts/global-notification-collector.js?v=2fba6e8_20251013_051239"></script>
     <script src="scripts/entity-details-modal.js?v=2fba6e8_20251013_051239"></script>
     <script src="scripts/warning-system.js?v=2fba6e8_20251013_051239"></script>
     
-    <!-- Page-specific Script -->
-    <script src="scripts/external-data-dashboard.js?v=2fba6e8_20251013_051239"></script>
+    <!-- Page-specific Script is loaded once below -->
     
     <!-- Unified Log System -->
     <script src="scripts/pagination-system.js?v=2fba6e8_20251013_051239"></script>
@@ -508,8 +501,8 @@
     <script src="scripts/unified-log-api.js?v=2fba6e8_20251013_051239"></script>
     
     <!-- Page-specific scripts (loaded before initialization system) -->
-    <!-- External Data Settings Service -->
-    <script src="scripts/external-data-settings-service.js?v=2fba6e8_20251013_051239"></script>
+    <!-- External Data Settings Service (Not found in repo) - temporarily disabled to avoid 404/MIME errors -->
+    <!-- <script src="scripts/external-data-settings-service.js?v=2fba6e8_20251013_051239"></script> -->
     
     <!-- External Data Dashboard Script -->
     <script src="scripts/external-data-dashboard.js?v=2fba6e8_20251013_051239"></script>

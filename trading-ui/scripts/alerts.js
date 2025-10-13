@@ -411,42 +411,23 @@ function updateAlertsTable(alerts) {
         window.FieldRendererService.renderType(alert.related_type, 'related_type') : 
         relatedDisplay;
 
-      // המרת מצב הפעלה לעברית להצגה עם צבעים דינמיים
-      // לפי הדוקומנטציה: false=לא הופעל, new=הופעל לא נקרא, true=נקרא/בוטל
+      // רינדור מצב הפעלה: 
+      // - 'new' = badge מיוחד "חדש"
+      // - true/false = איקונים ✓/✗ דרך renderBoolean
       let triggeredDisplay;
-      let triggeredClass = '';
-      let triggeredColor = '#6c757d';
-      let triggeredBgColor = 'rgba(108, 117, 125, 0.1)';
-      let triggeredBorderColor = '#6c757d';
       
-      if (alert.is_triggered === 'true' || alert.is_triggered === true) {
-        triggeredDisplay = 'כן';
-        triggeredClass = 'triggered-yes';
-        // צבע חיובי - הופעל בהצלחה
-        triggeredColor = window.getNumericValueColor ? window.getNumericValueColor(1, 'medium') : '#28a745';
-        triggeredBgColor = window.getNumericValueColor ? window.getNumericValueColor(1, 'light') : 'rgba(40, 167, 69, 0.1)';
-        triggeredBorderColor = window.getNumericValueColor ? window.getNumericValueColor(1, 'border') : 'rgba(40, 167, 69, 0.3)';
-      } else if (alert.is_triggered === 'false' || alert.is_triggered === false) {
-        triggeredDisplay = 'לא';
-        triggeredClass = 'triggered-no';
-        // צבע שלילי - לא הופעל
-        triggeredColor = window.getNumericValueColor ? window.getNumericValueColor(-1, 'medium') : '#dc3545';
-        triggeredBgColor = window.getNumericValueColor ? window.getNumericValueColor(-1, 'light') : 'rgba(220, 53, 69, 0.1)';
-        triggeredBorderColor = window.getNumericValueColor ? window.getNumericValueColor(-1, 'border') : 'rgba(220, 53, 69, 0.3)';
-      } else if (alert.is_triggered === 'new') {
-        triggeredDisplay = 'חדש';
-        triggeredClass = 'triggered-new';
-        // צבע חיובי - הופעל חדש
-        triggeredColor = window.getNumericValueColor ? window.getNumericValueColor(1, 'medium') : '#28a745';
-        triggeredBgColor = window.getNumericValueColor ? window.getNumericValueColor(1, 'light') : 'rgba(40, 167, 69, 0.1)';
-        triggeredBorderColor = window.getNumericValueColor ? window.getNumericValueColor(1, 'border') : 'rgba(40, 167, 69, 0.3)';
+      if (alert.is_triggered === 'new') {
+        // מצב מיוחד: התראה חדשה שהופעלה - badge עם צבע דינמי
+        const newColor = window.getNumericValueColor ? window.getNumericValueColor(1, 'medium') : '#28a745';
+        const newBgColor = window.getNumericValueColor ? window.getNumericValueColor(1, 'light') : 'rgba(40, 167, 69, 0.1)';
+        const newBorderColor = window.getNumericValueColor ? window.getNumericValueColor(1, 'border') : 'rgba(40, 167, 69, 0.3)';
+        triggeredDisplay = `<span class="badge badge-capsule triggered-new" 
+          style="color: ${newColor}; background-color: ${newBgColor}; border: 1px solid ${newBorderColor}">חדש</span>`;
       } else {
-        triggeredDisplay = 'לא מוגדר';
-        triggeredClass = 'triggered-unknown';
-        // צבע נייטרלי
-        triggeredColor = '#6c757d';
-        triggeredBgColor = 'rgba(108, 117, 125, 0.1)';
-        triggeredBorderColor = '#6c757d';
+        // מצבים רגילים: true (כן ✓) / false (לא ✗) - שימוש ב-renderBoolean
+        triggeredDisplay = window.FieldRendererService ? 
+          window.FieldRendererService.renderBoolean(alert.is_triggered) : 
+          (alert.is_triggered ? 'כן' : 'לא');
       }
 
       return `
@@ -477,7 +458,7 @@ function updateAlertsTable(alerts) {
     return alert.condition || '-';
   })()}</span></td>
           <td class="status-cell" data-status="${alert.status || ''}">${statusBadge}</td>
-          <td><span class="triggered-badge ${triggeredClass}">${triggeredDisplay}</span></td>
+          <td class="triggered-cell">${triggeredDisplay}</td>
           <td class="related-cell">
             <div class="related-object-cell ${relatedClass}" 
              title="קישור לדף אובייקט - בפיתוח">
@@ -2137,3 +2118,5 @@ window.initializeAlertsModals = function() {
     if (editAlertModalElement) window.editAlertModal = new bootstrap.Modal(editAlertModalElement);
     if (deleteAlertModalElement) window.deleteAlertModal = new bootstrap.Modal(deleteAlertModalElement);
 };
+
+console.log('✅ alerts.js v=20251013_boolean_hybrid loaded - new=badge, true/false=renderBoolean icons');

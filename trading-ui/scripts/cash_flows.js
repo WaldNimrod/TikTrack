@@ -870,13 +870,25 @@ async function renderCashFlowsTable(cashFlows = null) {
     const currencyDisplay = cashFlow.currency_symbol || '$';
 
     // קבלת סוג עם צבע
-    const typeDisplay = getCashFlowTypeWithColor(cashFlow.type);
-
-    // עיצוב סכום עם יישור נכון וצביעה
-    // שימוש ב-FieldRendererService לעיצוב שדות
-    const typeBadge = window.FieldRendererService ? 
-      window.FieldRendererService.renderType(cashFlow.type, 'cash_flow_type') : 
-      `<span class="cash-flow-${cashFlow.type.toLowerCase()}">${typeDisplay}</span>`;
+    // תרגום סוג התזרים באמצעות מערכת התרגום המרכזית
+    const typeTranslated = window.translateCashFlowType ? 
+      window.translateCashFlowType(cashFlow.type) : 
+      cashFlow.type;
+    
+    // עיצוב הסוג עם צבע מתאים
+    let typeClass = '';
+    switch (cashFlow.type) {
+      case 'deposit':
+        typeClass = 'numeric-value-positive';  // ירוק
+        break;
+      case 'withdrawal':
+        typeClass = 'numeric-value-negative';  // אדום
+        break;
+      default:
+        typeClass = 'text-muted';  // אפור
+    }
+    
+    const typeBadge = `<span class="${typeClass}">${typeTranslated}</span>`;
 
     const amountBadge = window.FieldRendererService ? 
       window.FieldRendererService.renderNumericValue(cashFlow.amount, ' $', true) : 

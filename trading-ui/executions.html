@@ -64,6 +64,9 @@
     <link rel="stylesheet" href="styles-new/06-components/_page-headers.css?v=2.0.1">
     <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=1e88302_20251013_022247">
     
+    <!-- 07-trumps - Page-specific Styles -->
+    <link rel="stylesheet" href="styles-new/07-trumps/_executions.css?v=1.0.0">
+    
     <!-- 08-themes - Themes -->
     <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=1e88302_20251013_022247">
     
@@ -153,54 +156,47 @@
                                         </th>
                                         <th class="col-action">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, window.filteredExecutionsData || window.executionsData, 'executions', window.updateExecutionsTable); }"
-
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, window.filteredExecutionsData || window.executionsData, 'executions', window.updateExecutionsTable); }">
                                                 פעולה <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-account">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(2, window.filteredExecutionsData || window.executionsData, 'executions', window.updateExecutionsTable); }"
-
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(2, window.filteredExecutionsData || window.executionsData, 'executions', window.updateExecutionsTable); }">
                                                 חשבון <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-quantity">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(3, window.filteredExecutionsData || window.executionsData, 'executions', window.updateExecutionsTable); }"
-
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(3, window.filteredExecutionsData || window.executionsData, 'executions', window.updateExecutionsTable); }">
                                                 כמות <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-price">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(4, window.filteredExecutionsData || window.executionsData, 'executions', window.updateExecutionsTable); }"
-
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(4, window.filteredExecutionsData || window.executionsData, 'executions', window.updateExecutionsTable); }">
                                                 מחיר <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-pnl">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(5, window.filteredExecutionsData || window.executionsData, 'executions', window.updateExecutionsTable); }"
-
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(5, window.filteredExecutionsData || window.executionsData, 'executions', window.updateExecutionsTable); }">
                                                 P&L <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-execution-date">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(6, window.filteredExecutionsData || window.executionsData, 'executions', window.updateExecutionsTable); }"
-
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(6, window.filteredExecutionsData || window.executionsData, 'executions', window.updateExecutionsTable); }">
                                                 תאריך ביצוע <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-source">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(7, window.filteredExecutionsData || window.executionsData, 'executions', window.updateExecutionsTable); }"
-
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(7, window.filteredExecutionsData || window.executionsData, 'executions', window.updateExecutionsTable); }">
                                                 מקור <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
-                                        <th class="col-actions actions-cell actions-3-btn">
+                                        <th class="col-actions actions-cell actions-4-btn">
                                             פעולות
                                         </th>
                                     </tr>
@@ -437,6 +433,6 @@
     <script src="scripts/services/statistics-calculator.js?v=1e88302_20251013_022247"></script>
     
     <!-- Stage 5: Page Script - REQUIRED -->
-    <script src="scripts/executions.js?v=20251013_fixed"></script>
+    <script src="scripts/executions.js?v=20251013_complete"></script>
 </body>
 </html>

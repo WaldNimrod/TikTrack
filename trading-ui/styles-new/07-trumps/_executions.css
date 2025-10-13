@@ -1,0 +1,96 @@
+/* MIME Type: text/css */
+/**
+ * Executions Page - Column Widths
+ * 
+ * קובץ זה מכיל רוחבי עמודות ספציפיים לעמוד העסקאות
+ * 
+ * @version 1.0.0
+ * @lastUpdated October 13, 2025 - Created for executions page
+ * @page executions.html
+ * @note This is an exception to the "no 07-trumps for regular pages" rule
+ *       Executions page has 9 columns requiring custom width definitions
+ */
+
+/* ===== Executions Table - 9 Columns Layout ===== */
+
+/* עמודות טקסט קצר */
+.data-table[data-table-type="executions"] .col-ticker {
+    width: 10%;
+    min-width: 80px;
+}
+
+.data-table[data-table-type="executions"] .col-action {
+    width: 8%;
+    min-width: 70px;
+}
+
+.data-table[data-table-type="executions"] .col-account {
+    width: 12%;
+    min-width: 100px;
+}
+
+/* עמודות מספריות */
+.data-table[data-table-type="executions"] .col-quantity {
+    width: 8%;
+    min-width: 70px;
+}
+
+.data-table[data-table-type="executions"] .col-price {
+    width: 9%;
+    min-width: 80px;
+}
+
+.data-table[data-table-type="executions"] .col-pnl {
+    width: 9%;
+    min-width: 80px;
+}
+
+/* עמודות תאריכים */
+.data-table[data-table-type="executions"] .col-execution-date {
+    width: 10%;
+    min-width: 90px;
+}
+
+/* עמודת מקור */
+.data-table[data-table-type="executions"] .col-source {
+    width: 8%;
+    min-width: 70px;
+}
+
+/* עמודת פעולות - 4 כפתורים: Edit, View, Delete, Link */
+.data-table[data-table-type="executions"] .col-actions {
+    width: 13%;
+    min-width: 160px;
+}
+
+/* ===== Responsive Behavior ===== */
+
+/* מסכים בינוניים - התאמת רוחבים */
+@media (max-width: 1400px) {
+    .data-table[data-table-type="executions"] .col-account {
+        width: 10%;
+    }
+}
+
+/* מסכים קטנים - גלילה אופקית */
+@media (max-width: 1200px) {
+    .data-table[data-table-type="executions"] {
+        min-width: 1100px;
+    }
+}
+
+/* ===== Summary ===== */
+/*
+Total columns: 9
+- ticker: 10%
+- action: 8%
+- account: 12%
+- quantity: 8%
+- price: 9%
+- pnl: 9%
+- execution-date: 10%
+- source: 8%
+- actions: 13% (4 כפתורים: Edit, View, Delete, Link)
+Total: ~97%
+*/
+

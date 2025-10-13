@@ -1220,18 +1220,10 @@ async function updateExecutionsTableMain(executions) {
                 <td data-date="${execution.date || execution.execution_date}">${dateBadge}</td>
                 <td class="source-cell">${execution.source || '-'}</td>
                 <td class="col-actions actions-cell actions-3-btn">
-                    <button class="btn btn-sm btn-outline-info" onclick="window.viewLinkedItemsForExecution && window.viewLinkedItemsForExecution(${execution.id})" title="פריטים מקושרים">
-                        <i class="bi bi-link-45deg"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-primary" onclick="editExecution(${execution.id})" title="עריכה">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-info" onclick="showExecutionDetails(${execution.id})" title="פרטים">
-                        <i class="bi bi-eye"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-danger" onclick="deleteExecution(${execution.id})" title="מחיקה">
-                        <i class="bi bi-trash"></i>
-                    </button>
+                    ${window.createEditButton ? window.createEditButton('execution', execution.id) : ''}
+                    ${window.createButton ? window.createButton('VIEW', 'execution', execution.id, 'showExecutionDetails') : ''}
+                    ${window.createDeleteButton ? window.createDeleteButton('execution', execution.id) : ''}
+                    ${window.createLinkButton ? window.createLinkButton('execution', execution.id) : ''}
                 </td>
             </tr>
         `;
@@ -3152,3 +3144,5 @@ window.initializeExecutionsPage = function() {
     }, 30000);
     
 };
+
+console.log('✅ executions.js v=20251013_complete loaded - Fixed headers + action buttons + styles');

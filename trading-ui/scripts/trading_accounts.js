@@ -158,14 +158,8 @@ class TradingAccountsController {
         statusValue = tradingAccount.status || '-';
         createdValue = tradingAccount.created_at || '-';
 
-        // רינדור מטבע באמצעות FieldRendererService
-        const currencyDisplay = window.FieldRendererService ? 
-            window.FieldRendererService.renderCurrency(
-                tradingAccount.currency_id || tradingAccount.currency,
-                tradingAccount.currency_name,
-                tradingAccount.currency_symbol
-            ) : 
-            (tradingAccount.currency_symbol || tradingAccount.currency_name || '-');
+        // רינדור מטבע - רק סימן (לא שם מלא)
+        const currencyDisplay = tradingAccount.currency_symbol || '-';
 
         // קבלת סמל המטבע לשימוש ביתרה
         const currencySymbol = tradingAccount.currency_symbol || '$';

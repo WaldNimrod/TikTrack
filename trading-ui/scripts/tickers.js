@@ -1529,16 +1529,47 @@ async function loadTickersData() {
     // Fallback למקרה שהמערכת הכללית לא זמינה
     // (ניקוי מטמון מטופל ע"י המערכת המאוחדת)
 
-    const response = await fetch(`/api/tickers/?_t=${Date.now()}`);
+    // Prefer UnifiedCacheManager with SWR+dedupe if available
+    const ucmAvailable = window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized && window.UnifiedCacheManager.isInitialized();
+    const fetchTickers = async () => {
+      const resp = await fetch(`/api/tickers/?fields=id,symbol,name,type,currency_id,status,current_price,change_percent,yahoo_updated_at&_t=${Date.now()}&limit=100&offset=0`);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const json = await resp.json();
+      return json.data || json;
+    };
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    let data;
+    if (ucmAvailable && window.UnifiedCacheManager.get) {
+      try {
+        // Key includes params to align with backend cache keying
+        const cacheKey = 'api:tickers:list:limit=100:offset=0:fields=id,symbol,name,type,currency_id,status,current_price,change_percent,yahoo_updated_at';
+        data = await window.UnifiedCacheManager.get(cacheKey);
+        // SWR: trigger background refresh with dedupe
+        (async () => {
+          try {
+            const fresh = await fetchTickers();
+            await window.UnifiedCacheManager.save(cacheKey, fresh, { layer: 'memory', ttl: 5_000 });
+            // עדכון טבלה אם נתונים השתנו
+            if (Array.isArray(fresh)) {
+              window.tickersData = fresh;
+              updateTickersTable(window.tickersData);
+              updateTickersSummaryStats(window.tickersData);
+            }
+          } catch (e) { /* silent */ }
+        })();
+        if (!data) {
+          data = await fetchTickers();
+          await window.UnifiedCacheManager.save(cacheKey, data, { layer: 'memory', ttl: 5_000 });
+        }
+      } catch {
+        data = await fetchTickers();
+      }
+    } else {
+      data = await fetchTickers();
     }
 
-    const data = await response.json();
-
     // שמירת הנתונים
-    window.tickersData = data.data || data;
+    window.tickersData = data;
 
     // עדכון שדה active_trades
     await updateActiveTradesField();
@@ -1548,7 +1579,6 @@ async function loadTickersData() {
 
     // עדכון סטטיסטיקות סיכום
     updateTickersSummaryStats(window.tickersData);
-
 
   } catch (error) {
     console.error('❌ שגיאה בטעינת נתוני טיקרים:', error);

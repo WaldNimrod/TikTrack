@@ -44,7 +44,7 @@ The TikTrack system uses SQLite as its primary database with SQLAlchemy ORM for 
 #### 5. Notes
 - **Purpose**: Note creation and relationship management
 - **Key Fields**: id, content, created_at
-- **Relationships**: Linked to note_relation_types
+- **Relationships**: Linked to entity_relation_types (renamed from note_relation_types)
 - **Constraints**: NOT NULL, FOREIGN KEY
 
 #### 6. Note Relation Types

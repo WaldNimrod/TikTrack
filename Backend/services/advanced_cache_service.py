@@ -666,9 +666,16 @@ def invalidate_cache(dependencies: List[str]):
                 
                 total_invalidated = 0
                 for dependency in dependencies:
-                    invalidated_count = len(advanced_cache_service.dependencies.get(dependency, set()))
-                    advanced_cache_service.invalidate_by_dependency(dependency)
-                    total_invalidated += invalidated_count
+                    # Support wildcard invalidation for dependency patterns
+                    if '*' in dependency:
+                        before = len(advanced_cache_service.cache.keys())
+                        advanced_cache_service.invalidate_pattern(dependency)
+                        after = len(advanced_cache_service.cache.keys())
+                        total_invalidated += max(0, before - after)
+                    else:
+                        invalidated_count = len(advanced_cache_service.dependencies.get(dependency, set()))
+                        advanced_cache_service.invalidate_by_dependency(dependency)
+                        total_invalidated += invalidated_count
                 
                 logger.info(f"✅ Cache invalidated for dependencies {dependencies}: {total_invalidated} entries removed")
                 

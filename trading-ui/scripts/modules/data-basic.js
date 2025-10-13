@@ -292,10 +292,10 @@ const TABLE_COLUMN_MAPPINGS = {
     'created_at',       // 5 - נוצר ב
   ],
 
-  'note_relation_types': [
+  'entity_relation_types': [
     'id',              // 0 - מזהה
-    'note_relation_type', // 1 - סוג קשר
-    'created_at',       // 2 - נוצר ב
+    'relation_type',   // 1 - סוג קשר
+    'created_at',      // 2 - נוצר ב
   ],
 
   // Test Page Tables - דף הבדיקה

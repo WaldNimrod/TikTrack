@@ -14,7 +14,7 @@ class Alert(BaseModel):
     is_triggered = Column(String(20), default='false', nullable=True)  # false, new, true
     
     # Generic relationship system (replaces old ticker_id and trading_account_id)
-    related_type_id = Column(Integer, ForeignKey('note_relation_types.id'), nullable=False, default=4)
+    related_type_id = Column(Integer, ForeignKey('entity_relation_types.id'), nullable=False, default=4)
     related_id = Column(Integer, nullable=False)
     
     # Alert condition

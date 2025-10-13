@@ -251,14 +251,14 @@ def create_tables(cursor):
         )
     """)
     
-    # Note Relation Types table
+    # Entity Relation Types table
     cursor.execute("""
-        CREATE TABLE note_relation_types (
-            note_relation_type VARCHAR(20) NOT NULL, 
+        CREATE TABLE entity_relation_types (
+            relation_type VARCHAR(20) NOT NULL, 
             id INTEGER NOT NULL, 
             created_at DATETIME DEFAULT (CURRENT_TIMESTAMP), 
             PRIMARY KEY (id), 
-            UNIQUE (note_relation_type)
+            UNIQUE (relation_type)
         )
     """)
     
@@ -819,8 +819,8 @@ def create_indexes(cursor):
     # Executions indexes
     cursor.execute("CREATE INDEX ix_executions_id ON executions (id)")
     
-    # Note relation types indexes
-    cursor.execute("CREATE INDEX ix_note_relation_types_id ON note_relation_types (id)")
+    # Entity relation types indexes
+    cursor.execute("CREATE INDEX ix_entity_relation_types_id ON entity_relation_types (id)")
     
     # Currencies indexes
     cursor.execute("CREATE INDEX ix_currencies_id ON currencies (id)")
@@ -901,14 +901,18 @@ def insert_essential_data(cursor):
         (1, 'nimrod', 'nimrod@tiktrack.com', 'Nimrod', 'User', 1, 1, datetime('now'), datetime('now'))
     """)
     
-    # Insert note relation types
+    # Insert entity relation types
     cursor.execute("""
-        INSERT INTO note_relation_types (id, note_relation_type, created_at) 
+        INSERT INTO entity_relation_types (id, relation_type, created_at) 
         VALUES 
         (1, 'account', datetime('now')),
         (2, 'trade', datetime('now')),
         (3, 'trade_plan', datetime('now')),
-        (4, 'ticker', datetime('now'))
+        (4, 'ticker', datetime('now')),
+        (5, 'alert', datetime('now')),
+        (6, 'cash_flow', datetime('now')),
+        (7, 'execution', datetime('now')),
+        (8, 'note', datetime('now'))
     """)
     
     # Insert external data providers

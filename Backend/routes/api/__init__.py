@@ -14,7 +14,7 @@ from .entity_details import entity_details_bp
 from .executions import executions_bp
 from .file_scanner import file_scanner_bp
 from .linked_items import linked_items_bp
-from .note_relation_types import note_relation_types_bp
+from .note_relation_types import note_relation_types_bp as entity_relation_types_bp
 from .notes import notes_bp
 from .preferences import preferences_bp
 from .query_optimization import query_optimization_bp
@@ -53,7 +53,7 @@ __all__ = [
     'executions_bp',
     'file_scanner_bp',
     'linked_items_bp',
-    'note_relation_types_bp',
+    'entity_relation_types_bp',
     'notes_bp',
     'preferences_bp',
     'query_optimization_bp',

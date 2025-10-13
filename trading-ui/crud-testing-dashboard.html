@@ -68,10 +68,15 @@
     <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=2fba6e8_20251013_051239">
     <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=2fba6e8_20251013_051239">
     <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=2fba6e8_20251013_051239">
+    <link rel="stylesheet" href="styles-new/06-components/_page-headers.css?v=2fba6e8_20251013_051239">
+    <link rel="stylesheet" href="styles-new/06-components/_bootstrap-overrides.css?v=2fba6e8_20251013_051239">
     <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=2fba6e8_20251013_051239">
     <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=2fba6e8_20251013_051239">
     <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=2fba6e8_20251013_051239">
     <link rel="stylesheet" href="styles-new/06-components/_crud-testing-dashboard.css?v=2fba6e8_20251013_051239">
+    
+    <!-- Header dedicated stylesheet -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=2fba6e8_20251013_051239">
     
     <!-- 07-trumps - Page-specific Styles -->
     <!-- הוסף כאן קובץ CSS ספציפי לעמוד (למשל: _crud-testing-dashboard.css) -->
@@ -158,12 +163,146 @@
                             <p><strong>שלב 4:</strong> סמן את הבדיקות שביצעת וסיים עם "סיימתי בדיקה" או "יש בעיות"</p>
                         </div>
 
+                        <!-- בדיקות API מהירות - מערכת חדשה -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6><i class="fas fa-rocket"></i> בדיקות מהירות (3 דקות) - מערכת היברידית חדשה</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-info">
+                                    <strong>מערכת בדיקות היברידית:</strong><br>
+                                    • <strong>עמודי משתמש (13):</strong> בדיקות מעמיקות מלאות<br>
+                                    • <strong>כלי פיתוח (16):</strong> בדיקות מהירות ופשוטות<br>
+                                    • <strong>זמן כולל צפוי:</strong> 1.5-2 שעות
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <button class="btn btn-primary mb-2 w-100" onclick="runSmartTestAllEntities()">
+                                            <i class="fas fa-play"></i> בדיקה מהירה לכל העמודים (3 דקות)
+                                        </button>
+                                        
+                                        <button class="btn btn-info mb-2 w-100" onclick="runSmartTestSingleEntity()">
+                                            <i class="fas fa-search"></i> בדיקה מהירה לישות אחת
+                                        </button>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <select id="singleEntitySelect" class="form-select mb-2">
+                                            <option value="">בחר ישות לבדיקה...</option>
+                                            <optgroup label="עמודי משתמש (בדיקות מעמיקות)">
+                                                <option value="trades">Trades - טריידים</option>
+                                                <option value="alerts">Alerts - התראות</option>
+                                                <option value="tickers">Tickers - טיקרים</option>
+                                                <option value="trading_accounts">Trading Accounts - חשבונות מסחר</option>
+                                                <option value="executions">Executions - ביצועי עסקאות</option>
+                                                <option value="cash_flows">Cash Flows - תזרימי מזומנים</option>
+                                                <option value="trade_plans">Trade Plans - תוכניות מסחר</option>
+                                                <option value="notes">Notes - הערות</option>
+                                                <option value="index">Index - דף הבית</option>
+                                                <option value="research">Research - מחקר וניתוח</option>
+                                                <option value="preferences">Preferences - העדפות</option>
+                                                <option value="db_display">DB Display - תצוגת בסיס נתונים</option>
+                                                <option value="db_extradata">DB Extra Data - נתונים נוספים</option>
+                                            </optgroup>
+                                            <optgroup label="כלי פיתוח (בדיקות מהירות)">
+                                                <option value="system-management">System Management - ניהול מערכת</option>
+                                                <option value="server-monitor">Server Monitor - ניטור שרת</option>
+                                                <option value="background-tasks">Background Tasks - משימות ברקע</option>
+                                                <option value="external-data-dashboard">External Data - נתונים חיצוניים</option>
+                                                <option value="notifications-center">Notifications Center - מרכז התראות</option>
+                                                <option value="js-map">JS Map - מפת JavaScript</option>
+                                                <option value="linter-realtime-monitor">Linter Monitor - ניטור Linter</option>
+                                                <option value="chart-management">Chart Management - ניהול גרפים</option>
+                                                <option value="css-management">CSS Management - ניהול CSS</option>
+                                                <option value="crud-testing-dashboard">CRUD Testing - דשבורד בדיקות</option>
+                                                <option value="cache-test">Cache Test - בדיקת מטמון</option>
+                                                <option value="constraints">Constraints - ניהול אילוצים</option>
+                                                <option value="dynamic-colors-display">Dynamic Colors - תצוגת צבעים</option>
+                                                <option value="test-header-only">Test Header - בדיקת כותרת</option>
+                                                <option value="designs">Designs - גלריית עיצובים</option>
+                                                <option value="page-scripts-matrix">Scripts Matrix - מטריצת סקריפטים</option>
+                                            </optgroup>
+                                        </select>
+                                        
+                                        <button class="btn btn-warning btn-sm w-100" onclick="runDeepTestingForProblematic()">
+                                            <i class="fas fa-microscope"></i> בדיקות מפורטות לעמודים בעייתיים
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- תוצאות בזמן אמת -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6><i class="fas fa-chart-line"></i> תוצאות בזמן אמת</h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="realTimeResults">
+                                    <div class="row mb-3">
+                                        <div class="col-md-3">
+                                            <div class="stat-card text-center p-3 bg-light rounded">
+                                                <div class="stat-number display-6 fw-bold" id="overallScore">-</div>
+                                                <div class="stat-label text-muted">ציון כללי</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="stat-card text-center p-3 bg-light rounded">
+                                                <div class="stat-number display-6 fw-bold" id="testedCount">0</div>
+                                                <div class="stat-label text-muted">נבדקו</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="stat-card text-center p-3 bg-light rounded">
+                                                <div class="stat-number display-6 fw-bold" id="passedCount">0</div>
+                                                <div class="stat-label text-muted">עברו</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="stat-card text-center p-3 bg-light rounded">
+                                                <div class="stat-number display-6 fw-bold" id="problematicCount">0</div>
+                                                <div class="stat-label text-muted">בעייתיים</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Progress Bar -->
+                                    <div class="mb-3">
+                                        <div class="progress">
+                                            <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                                 id="testProgress" role="progressbar" style="width: 0%">
+                                                0%
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- טבלת תוצאות -->
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-hover" id="testResultsTable">
+                                            <thead class="table-dark">
+                                                <tr>
+                                                    <th>ישות</th>
+                                                    <th>סטטוס</th>
+                                                    <th>ציון</th>
+                                                    <th>זמן תגובה</th>
+                                                    <th>פעולות</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <!-- שורות מתעדכנות בזמן אמת -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- כלי בדיקה כלליים -->
                         <div class="row mb-4">
                             <div class="col-md-6">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h6><i class="fas fa-tools"></i> כלי בדיקה אוטומטיים</h6>
+                                        <h6><i class="fas fa-tools"></i> כלי בדיקה אוטומטיים (מערכת ישנה)</h6>
                                     </div>
                                     <div class="card-body">
                                         <button class="btn btn-primary btn-sm mb-2" onclick="runAllBasicTests()">
@@ -287,6 +426,61 @@
                                             <i class="fas fa-info-circle"></i> עדיין לא בוצעו בדיקות. לחץ על אחד מכפתורי הבדיקה למעלה.
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- דוח סופי - ממצאים והמלצות -->
+                        <div class="card" id="finalReportCard" style="display: none;">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="fas fa-file-alt"></i> דוח סופי - ממצאים והמלצות</h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- סיכום כללי -->
+                                <div class="alert alert-info" id="overallSummary">
+                                    <!-- מתמלא אוטומטי -->
+                                </div>
+                                
+                                <div class="row">
+                                    <!-- עמודים תקינים -->
+                                    <div class="col-md-6 mb-4" id="healthyPagesSection">
+                                        <h6 class="text-success"><i class="fas fa-check-circle"></i> עמודים תקינים (ציון 80+)</h6>
+                                        <div id="healthyPagesList" class="bg-light p-3 rounded">
+                                            <!-- רשימה דינמית -->
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- עמודים בעייתיים -->
+                                    <div class="col-md-6 mb-4" id="problematicPagesSection">
+                                        <h6 class="text-danger"><i class="fas fa-exclamation-triangle"></i> עמודים בעייתיים (ציון מתחת ל-80)</h6>
+                                        <div id="problematicPagesList">
+                                            <!-- כל עמוד בעייתי עם פירוט מלא -->
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- המלצות תיקון -->
+                                <div class="mb-4" id="recommendationsSection">
+                                    <h6 class="text-warning"><i class="fas fa-tools"></i> המלצות תיקון מיידיות</h6>
+                                    <div id="recommendationsList">
+                                        <!-- רשימת פעולות בעדיפות -->
+                                    </div>
+                                </div>
+                                
+                                <!-- פעולות על הדוח -->
+                                <div class="text-center mt-4">
+                                    <button class="btn btn-primary me-2" onclick="exportReportHTML()">
+                                        <i class="fas fa-download"></i> ייצוא דוח HTML
+                                    </button>
+                                    <button class="btn btn-secondary me-2" onclick="exportReportMarkdown()">
+                                        <i class="fas fa-download"></i> ייצוא Markdown
+                                    </button>
+                                    <button class="btn btn-success me-2" onclick="copyReportToClipboard()">
+                                        <i class="fas fa-copy"></i> העתק ללוח
+                                    </button>
+                                    <button class="btn btn-info" onclick="printReport()">
+                                        <i class="fas fa-print"></i> הדפס דוח
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -1678,6 +1872,7 @@
     <script src="scripts/global-favicon.js?v=2fba6e8_20251013_051239"></script>
     <script src="scripts/translation-utils.js?v=2fba6e8_20251013_051239"></script>
     <script src="scripts/header-system.js?v=2fba6e8_20251013_051239"></script>
+    <script src="scripts/modules/cache-module.js?v=2fba6e8_20251013_051239"></script>
     <script src="scripts/date-utils.js?v=2fba6e8_20251013_051239"></script>
     <script src="scripts/button-icons.js?v=2fba6e8_20251013_051239"></script>
     <script src="scripts/page-utils.js?v=2fba6e8_20251013_051239"></script>
@@ -1688,7 +1883,10 @@
     <script src="scripts/entity-details-modal.js?v=2fba6e8_20251013_051239"></script>
     <script src="scripts/warning-system.js?v=2fba6e8_20251013_051239"></script>
     
-    <!-- Stage 5: Page-specific Script -->
+    <!-- Stage 5: Enhanced Testing System (New) -->
+    <script src="scripts/crud-testing-enhanced.js?v=2fba6e8_20251013_051239"></script>
+    
+    <!-- Stage 6: Page-specific Script -->
     <script src="scripts/crud-testing-dashboard.js?v=2fba6e8_20251013_051239"></script>
     
     <!-- Closing divs for main structure -->

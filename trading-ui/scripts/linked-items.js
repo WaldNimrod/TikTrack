@@ -206,18 +206,18 @@ function showLinkedItemsModal(data, itemType, itemId, mode = 'view') {
   // Create and show modal
   const modalId = 'linkedItemsModal';
 
-  // יצירת כותרת מותאמת עם סימבול הטיקר
+  // יצירת כותרת מותאמת לפי ישות (ללא מזהים גולמיים)
   let modalTitle = '';
   if (itemType === 'ticker') {
     const tickerSymbol = data.tickerSymbol ||
-      (window.getTickerSymbol ? window.getTickerSymbol(itemId) : `טיקר ${itemId}`) ||
-      `טיקר ${itemId}`;
-    modalTitle = `פריטים מקושרים לטיקר ${tickerSymbol}`;
+      (window.getTickerSymbol ? window.getTickerSymbol(itemId) : '') ||
+      '';
+    modalTitle = `פריטים מקושרים לטיקר ${tickerSymbol || ''}`.trim();
   } else if (itemType === 'trade_plan') {
     modalTitle = 'פריטים מקושרים לתוכנית השקעה';
   } else if (itemType === 'account') {
     // עבור חשבון - הוספת שם החשבון
-    const accountName = data.accountName || `חשבון ${itemId}`;
+    const accountName = data.accountName || '';
     modalTitle = `פריטים מקושרים לחשבון ${accountName}`;
   } else {
     modalTitle = `פריטים מקושרים ל-${getItemTypeDisplayName(itemType)}`;
@@ -230,7 +230,7 @@ function showLinkedItemsModal(data, itemType, itemId, mode = 'view') {
     modalTitle += ' - 👁️ תצוגה';
   }
 
-  createModal(modalId, modalTitle, modalContent, mode);
+  createModal(modalId, modalTitle, modalContent, mode, itemType);
 
   // Show the modal using the unified helper function to avoid ARIA warnings
   if (typeof window.createAndShowModal === 'function') {
@@ -319,170 +319,15 @@ function createLinkedItemsModalContent(data, itemType, itemId, mode = 'view') {
   // קבלת הסבר על הכללים לפי סוג האובייקט והפעולה (רק ב-warningBlock mode)
   const rulesExplanation = mode === 'warningBlock' ? getRulesExplanation(itemType, data) : null;
 
+  const entityColor = (window.getEntityColor && window.getEntityColor(itemType)) || '#26baac';
+
   let content = `
     <div class="linked-items-container">
-      <style>
-        .linked-item-icon-img {
-          width: 24px;
-          height: 24px;
-          vertical-align: middle;
-          margin-right: 8px;
-        }
-        .linked-item-row {
-          border-radius: 6px;
-          margin-bottom: 6px;
-          padding: 8px 12px;
-          border: 1px solid #e9ecef;
-          background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
-          box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-          transition: all 0.3s ease;
-        }
-        .linked-item-row:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-        }
-        .linked-item-row.trade { border-left: 4px solid ${window.getEntityColor ? window.getEntityColor('trade') : '#007bff'}; }
-        .linked-item-row.account { border-left: 4px solid ${window.getEntityColor ? window.getEntityColor('account') : '#28a745'}; }
-        .linked-item-row.ticker { border-left: 4px solid ${window.getEntityColor ? window.getEntityColor('ticker') : '#17a2b8'}; }
-        .linked-item-row.alert { border-left: 4px solid ${window.getEntityColor ? window.getEntityColor('alert') : '#ffc107'}; }
-        .linked-item-row.cash_flow { border-left: 4px solid ${window.getEntityColor ? window.getEntityColor('cash_flow') : '#6c757d'}; }
-        .linked-item-row.note { border-left: 4px solid ${window.getEntityColor ? window.getEntityColor('note') : '#343a40'}; }
-        .linked-item-row.trade_plan { border-left: 4px solid ${window.getEntityColor ? window.getEntityColor('trade_plan') : '#007bff'}; }
-        .linked-item-row.execution { border-left: 4px solid ${window.getEntityColor ? window.getEntityColor('execution') : '#28a745'}; }
-        
-        /* כותרת המודול עם רקע צבעוני לפי mode */
-        .modal-header {
-          background: linear-gradient(135deg, ${mode === 'warningBlock' ? (window.getTableColors ? window.getTableColors().negative : '#dc3545') + ', #c82333' : (window.getTableColors ? window.getTableColors().positive : '#28a745') + ', #20c997'});
-          color: white;
-          border-bottom: 2px solid ${mode === 'warningBlock' ? '#c82333' : '#20c997'};
-          position: relative;
-          padding-left: 60px;
-          min-height: 60px;
-          display: flex;
-          align-items: center;
-        }
-        
-        /* כפתור סגירה מיושר לשמאל עם עיצוב מתאים */
-        .modal-header .btn-close-custom {
-          position: absolute;
-          left: 15px;
-          top: 50%;
-          transform: translateY(-50%);
-          background-color: white;
-          color: ${mode === 'warningBlock' ? window.getTableColors ? window.getTableColors().negative : '#dc3545' : window.getTableColors ? window.getTableColors().positive : '#28a745'};
-          border: 2px solid ${mode === 'warningBlock' ? window.getTableColors ? window.getTableColors().negative : '#dc3545' : window.getTableColors ? window.getTableColors().positive : '#28a745'};
-          border-radius: 6px;
-          padding: 6px 12px;
-          font-size: 14px;
-          font-weight: bold;
-          text-decoration: none;
-          transition: all 0.3s ease;
-          z-index: 1056;
-        }
-        .modal-header .btn-close-custom:hover {
-          background-color: ${mode === 'warningBlock' ? window.getTableColors ? window.getTableColors().negative : '#dc3545' : window.getTableColors ? window.getTableColors().positive : '#28a745'};
-          color: white;
-        }
-        
-        /* צמצום רווחים בין אלמנטים */
-        .linked-item-col {
-          padding: 4px 8px;
-        }
-        .linked-item-title {
-          font-size: 14px;
-          margin-bottom: 2px;
-        }
-        .linked-item-description {
-          font-size: 12px;
-          margin-bottom: 2px;
-        }
-        .linked-item-status {
-          margin-bottom: 4px;
-        }
-        .linked-item-basic-details {
-          font-size: 11px;
-          margin-bottom: 4px;
-        }
-        .linked-item-actions .btn-group {
-          gap: 2px;
-        }
-        .linked-item-actions .btn {
-          padding: 2px 6px;
-          font-size: 12px;
-        }
-        
-        /* סגנונות סטטוסים זהה לעמודי הטבלאות */
-        .status-badge {
-          padding: 0.5rem 1rem !important;
-          border-radius: 20px !important;
-          font-size: 0.85rem !important;
-          font-weight: 700 !important;
-          font-family: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
-          text-transform: uppercase !important;
-          letter-spacing: 0.5px !important;
-          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
-          position: relative !important;
-          overflow: hidden !important;
-          display: inline-block !important;
-        }
-        
-        .status-badge.status-open {
-          background: linear-gradient(135deg, rgba(76, 175, 80, 0.15) 0%, rgba(67, 160, 71, 0.15) 100%) !important;
-          color: #2e7d32 !important;
-          border: 1px solid rgba(76, 175, 80, 0.3) !important;
-          box-shadow: 0 2px 8px rgba(76, 175, 80, 0.15) !important;
-        }
-        
-        .status-badge.status-closed {
-          background: linear-gradient(135deg, rgba(33, 150, 243, 0.15) 0%, rgba(30, 136, 229, 0.15) 100%) !important;
-          color: #1565c0 !important;
-          border: 1px solid rgba(33, 150, 243, 0.3) !important;
-          box-shadow: 0 2px 8px rgba(33, 150, 243, 0.15) !important;
-        }
-        
-        .status-badge.status-cancelled {
-          background: linear-gradient(135deg, rgba(255, 152, 0, 0.15) 0%, rgba(255, 143, 0, 0.15) 100%) !important;
-          color: #ef6c00 !important;
-          border: 1px solid rgba(255, 152, 0, 0.3) !important;
-          box-shadow: 0 2px 8px rgba(255, 152, 0, 0.15) !important;
-        }
-        
-        .status-badge.status-active {
-          background: linear-gradient(135deg, rgba(100, 181, 246, 0.2) 0%, rgba(66, 165, 245, 0.2) 100%) !important;
-          color: #1976d2 !important;
-          box-shadow: 0 2px 6px rgba(100, 181, 246, 0.1) !important;
-        }
-        
-        .status-badge.status-inactive {
-          background: linear-gradient(135deg, rgba(158, 158, 158, 0.2) 0%, rgba(117, 117, 117, 0.2) 100%) !important;
-          color: #616161 !important;
-          box-shadow: 0 2px 6px rgba(158, 158, 158, 0.1) !important;
-        }
-        
-        .status-badge.status-pending {
-          background: linear-gradient(135deg, rgba(255, 152, 0, 0.2) 0%, rgba(255, 143, 0, 0.2) 100%) !important;
-          color: #f57c00 !important;
-          box-shadow: 0 2px 6px rgba(255, 152, 0, 0.1) !important;
-        }
-        
-        .status-badge.status-completed {
-          background: linear-gradient(135deg, rgba(76, 175, 80, 0.2) 0%, rgba(67, 160, 71, 0.2) 100%) !important;
-          color: #388e3c !important;
-          box-shadow: 0 2px 6px rgba(76, 175, 80, 0.1) !important;
-        }
-        
-        .status-badge.status-archived {
-          background: linear-gradient(135deg, rgba(158, 158, 158, 0.2) 0%, rgba(117, 117, 117, 0.2) 100%) !important;
-          color: #616161 !important;
-          box-shadow: 0 2px 6px rgba(158, 158, 158, 0.1) !important;
-        }
-      </style>
       <div class="alert alert-info">
         <strong>📋 סקירת אלמנטים מקושרים</strong><br>
         מציג את כל האלמנטים המקושרים ל-${itemName}
         ${mode === 'warningBlock' ? '<br><strong style="color: ' + (window.getTableColors ? window.getTableColors().negative : '#dc3545') + ';">⚠️ לא ניתן לבצע פעולה זו עד לטיפול בפריטים המקושרים</strong>' : ''}
       </div>
-      
       ${rulesExplanation ? `
       <div class="alert alert-warning">
         <strong>⚠️ כללי ביטול/מחיקה</strong><br>
@@ -562,13 +407,19 @@ function createLinkedItemsModalContent(data, itemType, itemId, mode = 'view') {
  * @returns {string} HTML content for the linked items list
  */
 function createLinkedItemsList(items, mode = 'view') {
-  let listHtml = '<div class="linked-items-list">';
+  let listHtml = '<div class="linked-items-list" style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; align-items:start;">';
 
   items.forEach(item => {
     const icon = getItemTypeIcon(item.type);
     const displayName = getItemTypeDisplayName(item.type);
-    const basicInfo = createBasicItemInfo(item);
-    const statusBadge = getStatusBadge(item.status);
+
+    // Use FieldRendererService when available
+    const statusBadge = (window.FieldRendererService && window.FieldRendererService.renderStatus)
+      ? window.FieldRendererService.renderStatus(item.status, item.type)
+      : getStatusBadge(item.status);
+
+    const createdLabel = (window.FieldRendererService && window.FieldRendererService.renderDate) ? window.FieldRendererService.renderDate(item.created_at, false) : (item.created_at ? new Date(item.created_at).toLocaleDateString('he-IL') : 'לא מוגדר');
+    const basicInfo = `נוצר: ${createdLabel}`;
 
     listHtml += `
       <div class="linked-item-row ${item.type} linked-item-${item.type}">
@@ -579,30 +430,20 @@ function createLinkedItemsList(items, mode = 'view') {
           </div>
         </div>
         <div class="linked-item-col">
-          <div class="linked-item-title">${item.title || `אלמנט ${item.id}`}</div>
-          <div class="linked-item-description">${item.description || 'אין תיאור'} (מזהה: ${item.id})</div>
+          <div class="linked-item-title">${item.title || ''}</div>
+          <div class="linked-item-description">${item.description || ''}</div>
           <div class="linked-item-status">${statusBadge}</div>
         </div>
-        <div class="linked-item-col">
+        <div class="linked-item-col" style="margin-inline-start:auto;">
           <div class="linked-item-basic-details">${basicInfo}</div>
           ${mode === 'warningBlock' ? '' : `
-          <div class="linked-item-actions">
-            <div class="btn-group btn-group-sm" role="group">
-              <button class="btn btn-outline-primary" 
-                      onclick="viewItemDetails('${item.type}', ${item.id})" 
-                      title="צפה בפרטים">
-                👁️
-              </button>
-              <button class="btn btn-outline-secondary" onclick="editItem('${item.type}', ${item.id})" title="ערוך">
-                ✏️
-              </button>
-              <button class="btn btn-outline-info" onclick="openItemPage('${item.type}', ${item.id})" title="פתח דף">
-                🔗
-              </button>
-              <button class="btn btn-outline-danger" onclick="deleteItem('${item.type}', ${item.id})" title="מחק">
-                🗑️
-              </button>
-            </div>
+          <div class="linked-item-actions" style="margin-inline-start:auto;">
+            ${window.createActionsMenu ? window.createActionsMenu([
+              window.createButton ? window.createButton('VIEW', `viewItemDetails('${item.type}', ${item.id})`) : `<button class='btn btn-sm btn-outline-info' onclick=\"viewItemDetails('${item.type}', ${item.id})\" title='צפה'>👁️</button>`,
+              window.createEditButton ? window.createEditButton(`editItem('${item.type}', ${item.id})`) : `<button class='btn btn-sm btn-outline-secondary' onclick=\"editItem('${item.type}', ${item.id})\" title='ערוך'>✏️</button>`,
+              window.createLinkButton ? window.createLinkButton(`openItemPage('${item.type}', ${item.id})`) : `<button class='btn btn-sm btn-outline-info' onclick=\"openItemPage('${item.type}', ${item.id})\" title='פתח'>🔗</button>`,
+              window.createDeleteButton ? window.createDeleteButton(`deleteItem('${item.type}', ${item.id})`) : `<button class='btn btn-sm btn-danger' onclick=\"deleteItem('${item.type}', ${item.id})\" title='מחק'>🗑️</button>`
+            ], `${item.type}-${item.id}`) : ''}
           </div>
           `}
         </div>
@@ -958,7 +799,7 @@ function createBasicItemInfo(item) {
  * @param {string} title - Modal title
  * @param {string} content - Modal content
  */
-function createModal(id, title, content, mode = 'view') {
+function createModal(id, title, content, mode = 'view', entityType = '') {
   // Remove existing modal if it exists
   const existingModal = document.getElementById(id);
   if (existingModal) {
@@ -967,11 +808,12 @@ function createModal(id, title, content, mode = 'view') {
 
   // Create new modal with mode-specific styling
   // Note: No aria-hidden - let Bootstrap manage it to avoid accessibility warnings
+  const entityClass = entityType ? ` entity-${entityType}` : '';
   const modalHtml = `
     <div class="modal fade" id="${id}" tabindex="-1" aria-labelledby="${id}Label">
       <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-                          <div class="modal-header linkedItems_modal-header-colored modal-header-${mode}">
+        <div class="modal-content${entityClass}">
+                          <div class="modal-header linkedItems_modal-header-colored modal-header-${mode} entity-${entityType}">
             <button type="button" class="btn-close-custom btn-close-${mode}" data-bs-dismiss="modal" aria-label="Close">
               ✕
             </button>
@@ -1576,7 +1418,25 @@ async function loadLinkedItemsData(itemType, itemId) {
 // ===== EXPORT FUNCTIONS TO GLOBAL SCOPE =====
 // Generic functions (for backward compatibility)
 window.viewLinkedItems = viewLinkedItems;
-window.showLinkedItemsModal = showLinkedItemsModal;
+
+// עטיפה עם לוגים עבור חתימות ישנות של showLinkedItemsModal([],'type',id)
+const _showLinkedItemsModal = showLinkedItemsModal;
+window.showLinkedItemsModal = function(dataOrItemId, maybeType, maybeId, mode = 'view') {
+  const info = (window.consoleCleanup?.info || console.log);
+  const warn = (window.consoleCleanup?.warn || console.warn);
+  // תמיכה בחתימה הישנה: ([], 'ticker', 1)
+  if (Array.isArray(dataOrItemId) && typeof maybeType === 'string' && (typeof maybeId === 'number' || typeof maybeId === 'string')) {
+    info(`🔗 [LinkedItems] Legacy call detected: showLinkedItemsModal([], '${maybeType}', ${maybeId}, '${mode}')`);
+    // נטען נתונים ואז נקרא לגרסה החדשה
+    return loadLinkedItemsData(maybeType, maybeId).then((data) => {
+      info(`📦 [LinkedItems] Data loaded for ${maybeType}#${maybeId}`, data ? {count: (data.childEntities||[]).length} : {nullData: true});
+      return _showLinkedItemsModal(data || [], maybeType, maybeId, mode);
+    });
+  }
+  // חתימה חדשה: (data, 'type', id)
+  info(`🔗 [LinkedItems] showLinkedItemsModal called`, { type: maybeType, id: maybeId, mode });
+  return _showLinkedItemsModal(dataOrItemId, maybeType, maybeId, mode);
+};
 window.loadLinkedItemsData = loadLinkedItemsData;
 window.createLinkedItemsModalContent = createLinkedItemsModalContent;
 window.checkLinkedItems = checkLinkedItems;
@@ -1634,3 +1494,44 @@ window.linkedItems = {
 };
 
 // Linked Items loaded successfully
+
+// ===== Helper wrapper for legacy HTML buttons =====
+/**
+ * Open linked items modal from generic button calls
+ * Tries to auto-detect entityId from current edit modal if not provided
+ */
+function openLinkedItemsModal(entityType, entityId) {
+  const log = (window.consoleCleanup?.info || console.log);
+  const logErr = (window.consoleCleanup?.error || console.error);
+
+  log(`🔎 [LinkedItems] openLinkedItemsModal called`, { entityType, entityId });
+
+  let resolvedId = entityId;
+  if (!resolvedId) {
+    // Try to read from edit modal dataset (used in trades page)
+    const editModal = document.getElementById('editTradeModal');
+    if (editModal && editModal.dataset && editModal.dataset.tradeId) {
+      resolvedId = editModal.dataset.tradeId;
+    }
+    // Try actions-cell dataset
+    if (!resolvedId) {
+      const actionsCell = document.querySelector('.actions-cell:hover, .actions-cell:focus-within');
+      if (actionsCell && actionsCell.dataset && actionsCell.dataset.entityId) {
+        resolvedId = actionsCell.dataset.entityId;
+      }
+    }
+  }
+
+  if (!resolvedId) {
+    logErr(`❌ [LinkedItems] Missing entityId. Cannot open modal. entityType=${entityType}`);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('אלמנטים מקושרים', `לא זוהה מזהה רשומה עבור ${getItemTypeDisplayName(entityType)}.`);
+    }
+    return;
+  }
+
+  log(`✅ [LinkedItems] Opening modal`, { entityType, resolvedId });
+  viewLinkedItems(resolvedId, entityType);
+}
+
+window.openLinkedItemsModal = openLinkedItemsModal;

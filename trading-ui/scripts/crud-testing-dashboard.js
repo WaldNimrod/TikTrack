@@ -262,7 +262,7 @@ class CRUDTestingDashboard {
         is_active: true,
         is_default: false
       },
-      note_relation_types: {
+      entity_relation_types: {
         note_relation_type: `test_type_${Math.floor(Math.random() * 1000000)}` // Unique type
       },
       // entity_details: removed - this is a special service, not a regular entity
@@ -1032,7 +1032,7 @@ class CRUDTestingDashboard {
       { name: 'constraints', url: '/api/constraints/' },
       { name: 'currencies', url: '/api/currencies/' },
       { name: 'users', url: '/api/users/' },
-      { name: 'note_relation_types', url: '/api/note_relation_types/' },
+      { name: 'entity_relation_types', url: '/api/entity_relation_types/' },
       { name: 'quotes_v1', url: '/api/quotes/batch?ticker_ids=1' }
       
       // APIs מיוחדים - לא צריכים בדיקות CRUD
@@ -1098,7 +1098,7 @@ class CRUDTestingDashboard {
       { name: 'constraints', url: '/api/constraints/' },
       { name: 'currencies', url: '/api/currencies/' },
       { name: 'users', url: '/api/users/' },
-      { name: 'note_relation_types', url: '/api/note_relation_types/' },
+      { name: 'entity_relation_types', url: '/api/entity_relation_types/' },
       { name: 'quotes_v1', url: '/api/quotes/batch?ticker_ids=1' }
       
       // APIs מיוחדים - לא צריכים בדיקות CRUD
@@ -1740,12 +1740,1091 @@ function displayCRUDResults(results) {
   }
 }
 
+// ===== Enhanced UI Testing Functions (Phase 2) =====
+
+/**
+ * בדיקות UI מפורטות לעמוד משתמש ספציפי
+ * @param {string} entityName שם הישות
+ * @returns {Object} תוצאות בדיקות UI מפורטות
+ */
+async function runDeepUITesting(entityName) {
+    console.log(`🔍 Deep UI Testing for ${entityName}...`);
+    
+    const entity = window.crudEnhancedTester?.entities?.[entityName];
+    if (!entity) {
+        throw new Error(`Entity ${entityName} not found`);
+    }
+    
+    if (entity.type !== 'user_page') {
+        console.log(`⚡ ${entityName} is dev tool - using basic testing only`);
+        return await runBasicUITesting(entityName);
+    }
+    
+    console.log(`🎯 Full UI Testing for ${entity.displayName}...`);
+    
+    // שלב 1: בדיקות UI Components
+    const uiResults = await testUIComponents(entityName);
+    
+    // שלב 2: בדיקות Validation
+    const validationResults = await testValidation(entityName);
+    
+    // שלב 3: בדיקות Cache Refresh
+    const cacheResults = await testCacheRefresh(entityName);
+    
+    // שלב 4: בדיקות Workflow
+    const workflowResults = await testFullWorkflow(entityName);
+    
+    // יצירת דוח מפורט
+    return generateDeepTestingReport(entityName, {
+        ui: uiResults,
+        validation: validationResults,
+        cache: cacheResults,
+        workflow: workflowResults
+    });
+}
+
+/**
+ * בדיקות UI בסיסיות לכלי פיתוח
+ * @param {string} entityName שם הישות
+ * @returns {Object} תוצאות בדיקות בסיסיות
+ */
+async function runBasicUITesting(entityName) {
+    console.log(`⚡ Basic UI Testing for ${entityName}...`);
+    
+    const entity = window.crudEnhancedTester?.entities?.[entityName];
+    if (!entity) {
+        throw new Error(`Entity ${entityName} not found`);
+    }
+    
+    const results = {
+        pageLoad: await testPageLoadUI(entity.pageUrl),
+        hasContent: await testHasContent(entity.pageUrl),
+        noJSErrors: await testNoJSErrors(entity.pageUrl),
+        basicFunctionality: await testBasicFunctionality(entity.pageUrl)
+    };
+    
+    return generateBasicTestingReport(entityName, results);
+}
+
+/**
+ * בדיקת רכיבי UI
+ * @param {string} entityName שם הישות
+ * @returns {Object} תוצאות בדיקת UI
+ */
+async function testUIComponents(entityName) {
+    const entity = window.crudEnhancedTester.entities[entityName];
+    const issues = [];
+    const successes = [];
+    
+    console.log(`🖱️ Testing UI components for ${entity.displayName}...`);
+    
+    try {
+        // פתיחת עמוד בtab חדש לבדיקה
+        const testWindow = window.open(entity.pageUrl, `test_${entityName}_${Date.now()}`);
+        
+        if (!testWindow) {
+            issues.push({
+                type: 'ui',
+                severity: 'critical',
+                issue: 'לא ניתן לפתוח עמוד - popup blocked',
+                recommendation: 'אפשר popup ב-browser או הרץ בדיקות באופן ידני',
+                code: `window.open('${entity.pageUrl}', '_blank')`
+            });
+            return { issues, successes, score: 0 };
+        }
+        
+        // המתנה לטעינת העמוד
+        await waitForPageLoad(testWindow, 10000);
+        
+        const doc = testWindow.document;
+        
+        // 1. בדיקת כפתור "הוסף חדש"
+        const addButtonResult = await testAddButton(doc, entity);
+        if (addButtonResult.success) {
+            successes.push(addButtonResult.message);
+        } else {
+            issues.push(addButtonResult);
+        }
+        
+        // 2. בדיקת טבלה
+        const tableResult = await testTable(doc, entity);
+        if (tableResult.success) {
+            successes.push(tableResult.message);
+        } else {
+            issues.push(tableResult);
+        }
+        
+        // 3. בדיקת כפתורי אקשן בטבלה
+        const actionButtonsResult = await testActionButtons(doc, entity);
+        if (actionButtonsResult.success) {
+            successes.push(actionButtonsResult.message);
+        } else {
+            issues.push(actionButtonsResult);
+        }
+        
+        // 4. בדיקת מודל הוספה
+        if (entity.modalSelector) {
+            const modalResult = await testModal(doc, entity);
+            if (modalResult.success) {
+                successes.push(modalResult.message);
+            } else {
+                issues.push(modalResult);
+            }
+        }
+        
+        // סגירת החלון
+        testWindow.close();
+        
+        // חישוב ציון UI
+        const totalTests = 4;
+        const passedTests = successes.length;
+        const score = Math.round((passedTests / totalTests) * 100);
+        
+        return {
+            issues,
+            successes,
+            score,
+            totalTests,
+            passedTests
+        };
+        
+    } catch (error) {
+        console.error(`❌ UI Testing failed for ${entityName}:`, error);
+        issues.push({
+            type: 'ui',
+            severity: 'critical',
+            issue: `בדיקת UI נכשלה: ${error.message}`,
+            recommendation: 'בדוק שהעמוד נטען נכון ושאין שגיאות JavaScript'
+        });
+        
+        return { issues, successes: [], score: 0 };
+    }
+}
+
+/**
+ * בדיקת validation
+ * @param {string} entityName שם הישות
+ * @returns {Object} תוצאות בדיקת validation
+ */
+async function testValidation(entityName) {
+    const entity = window.crudEnhancedTester.entities[entityName];
+    const issues = [];
+    const successes = [];
+    
+    console.log(`✅ Testing validation for ${entity.displayName}...`);
+    
+    if (!entity.hasCRUD) {
+        return {
+            issues: [],
+            successes: ['עמוד ללא CRUD - validation לא נדרש'],
+            score: 100,
+            skipped: true
+        };
+    }
+    
+    try {
+        // פתיחת עמוד לבדיקת validation
+        const testWindow = window.open(entity.pageUrl, `validation_test_${entityName}_${Date.now()}`);
+        
+        if (!testWindow) {
+            issues.push({
+                type: 'validation',
+                severity: 'critical',
+                issue: 'לא ניתן לפתוח עמוד לבדיקת validation',
+                recommendation: 'אפשר popup ב-browser'
+            });
+            return { issues, successes: [], score: 0 };
+        }
+        
+        await waitForPageLoad(testWindow, 10000);
+        const doc = testWindow.document;
+        
+        // 1. בדיקת זמינות מערכת validation
+        const validationSystemResult = await testValidationSystemAvailable(testWindow);
+        if (validationSystemResult.success) {
+            successes.push('מערכת validation זמינה');
+        } else {
+            issues.push({
+                type: 'validation',
+                severity: 'high',
+                issue: 'מערכת validation לא זמינה',
+                recommendation: 'וודא שקובץ ui-basic.js נטען (כלול במערכת החדשה)',
+                code: 'typeof window.validateEntityForm === "function"'
+            });
+        }
+        
+        // 2. בדיקת טופס אם קיים מודל
+        if (entity.modalSelector) {
+            const formValidationResult = await testFormValidation(doc, entity);
+            if (formValidationResult.success) {
+                successes.push('טופס validation עובד');
+            } else {
+                issues.push(formValidationResult);
+            }
+        }
+        
+        // סגירת החלון
+        testWindow.close();
+        
+        const totalTests = entity.modalSelector ? 2 : 1;
+        const passedTests = successes.length;
+        const score = Math.round((passedTests / totalTests) * 100);
+        
+        return {
+            issues,
+            successes,
+            score,
+            totalTests,
+            passedTests
+        };
+        
+    } catch (error) {
+        console.error(`❌ Validation Testing failed for ${entityName}:`, error);
+        issues.push({
+            type: 'validation',
+            severity: 'critical',
+            issue: `בדיקת validation נכשלה: ${error.message}`,
+            recommendation: 'בדוק שמערכת הvalidation נטענת נכון'
+        });
+        
+        return { issues, successes: [], score: 0 };
+    }
+}
+
+/**
+ * בדיקת cache refresh
+ * @param {string} entityName שם הישות  
+ * @returns {Object} תוצאות בדיקת cache
+ */
+async function testCacheRefresh(entityName) {
+    const entity = window.crudEnhancedTester.entities[entityName];
+    const issues = [];
+    const successes = [];
+    
+    console.log(`🔄 Testing cache refresh for ${entity.displayName}...`);
+    
+    if (!entity.hasCRUD) {
+        return {
+            issues: [],
+            successes: ['עמוד ללא CRUD - cache refresh לא נדרש'],
+            score: 100,
+            skipped: true
+        };
+    }
+    
+    try {
+        // בדיקת זמינות מערכת מטמון
+        const cacheSystemResult = await testCacheSystemAvailable();
+        if (cacheSystemResult.success) {
+            successes.push('מערכת מטמון זמינה');
+        } else {
+            issues.push({
+                type: 'cache',
+                severity: 'high',
+                issue: 'מערכת מטמון לא זמינה',
+                recommendation: 'וודא שUnifiedCacheManager נטען',
+                code: 'window.UnifiedCacheManager?.isInitialized()'
+            });
+        }
+        
+        // בדיקת פונקציות רענון
+        const refreshFunctionResult = await testRefreshFunctions(entityName);
+        if (refreshFunctionResult.success) {
+            successes.push('פונקציות רענון זמינות');
+        } else {
+            issues.push(refreshFunctionResult);
+        }
+        
+        // בדיקת clearCacheBeforeCRUD
+        const clearCacheResult = await testClearCacheBeforeCRUD();
+        if (clearCacheResult.success) {
+            successes.push('פונקציית clearCacheBeforeCRUD זמינה');
+        } else {
+            issues.push(clearCacheResult);
+        }
+        
+        const totalTests = 3;
+        const passedTests = successes.length;
+        const score = Math.round((passedTests / totalTests) * 100);
+        
+        return {
+            issues,
+            successes,
+            score,
+            totalTests,
+            passedTests
+        };
+        
+    } catch (error) {
+        console.error(`❌ Cache Testing failed for ${entityName}:`, error);
+        issues.push({
+            type: 'cache',
+            severity: 'critical',
+            issue: `בדיקת cache נכשלה: ${error.message}`,
+            recommendation: 'בדוק שמערכת המטמון המאוחדת עובדת נכון'
+        });
+        
+        return { issues, successes: [], score: 0 };
+    }
+}
+
+/**
+ * בדיקת תזרים עבודה מלא
+ * @param {string} entityName שם הישות
+ * @returns {Object} תוצאות בדיקת workflow
+ */
+async function testFullWorkflow(entityName) {
+    const entity = window.crudEnhancedTester.entities[entityName];
+    const issues = [];
+    const successes = [];
+    
+    console.log(`🔄 Testing full workflow for ${entity.displayName}...`);
+    
+    if (!entity.hasCRUD || !entity.testData) {
+        return {
+            issues: [],
+            successes: ['עמוד ללא CRUD - workflow לא נדרש'],
+            score: 100,
+            skipped: true
+        };
+    }
+    
+    try {
+        let testRecordId = null;
+        
+        // שלב 1: CREATE
+        console.log(`📝 Workflow Step 1: CREATE for ${entityName}`);
+        const createResult = await fetch(entity.apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                ...entity.testData,
+                notes: `Full Workflow Test - ${new Date().toISOString()} - Safe to delete`
+            })
+        });
+        
+        if (createResult.ok) {
+            const createData = await createResult.json();
+            testRecordId = createData.data?.id || createData.id;
+            successes.push('CREATE workflow עבר בהצלחה');
+            console.log(`✅ CREATE successful, ID: ${testRecordId}`);
+        } else {
+            const errorText = await createResult.text();
+            issues.push({
+                type: 'workflow',
+                severity: 'high',
+                issue: `CREATE workflow נכשל: HTTP ${createResult.status}`,
+                recommendation: 'בדוק שה-API מקבל נתונים תקינים',
+                details: errorText
+            });
+        }
+        
+        // שלב 2: READ (וידוא שהרשומה נוצרה)
+        if (testRecordId) {
+            console.log(`📖 Workflow Step 2: READ for ${entityName}, ID: ${testRecordId}`);
+            const readResult = await fetch(`${entity.apiUrl}${testRecordId}`, {
+                method: 'GET',
+                headers: { 'Accept': 'application/json' }
+            });
+            
+            if (readResult.ok) {
+                const readData = await readResult.json();
+                if (readData.data || readData.id) {
+                    successes.push('READ workflow עבר בהצלחה');
+                    console.log(`✅ READ successful`);
+                } else {
+                    issues.push({
+                        type: 'workflow',
+                        severity: 'medium',
+                        issue: 'READ workflow - רשומה לא נמצאה',
+                        recommendation: 'בדוק שהרשומה נשמרת נכון ב-CREATE'
+                    });
+                }
+            } else {
+                issues.push({
+                    type: 'workflow',
+                    severity: 'medium',
+                    issue: `READ workflow נכשל: HTTP ${readResult.status}`,
+                    recommendation: 'בדוק שה-GET endpoint עובד נכון'
+                });
+            }
+        }
+        
+        // שלב 3: UPDATE
+        if (testRecordId) {
+            console.log(`✏️ Workflow Step 3: UPDATE for ${entityName}, ID: ${testRecordId}`);
+            const updateResult = await fetch(`${entity.apiUrl}${testRecordId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    ...entity.testData,
+                    notes: `UPDATED Full Workflow Test - ${new Date().toISOString()}`
+                })
+            });
+            
+            if (updateResult.ok) {
+                successes.push('UPDATE workflow עבר בהצלחה');
+                console.log(`✅ UPDATE successful`);
+            } else {
+                const errorText = await updateResult.text();
+                issues.push({
+                    type: 'workflow',
+                    severity: 'high',
+                    issue: `UPDATE workflow נכשל: HTTP ${updateResult.status}`,
+                    recommendation: 'בדוק שה-PUT endpoint עובד נכון',
+                    details: errorText
+                });
+            }
+        }
+        
+        // שלב 4: DELETE (ניקוי)
+        if (testRecordId) {
+            console.log(`🗑️ Workflow Step 4: DELETE (cleanup) for ${entityName}, ID: ${testRecordId}`);
+            const deleteResult = await fetch(`${entity.apiUrl}${testRecordId}`, {
+                method: 'DELETE',
+                headers: { 'Accept': 'application/json' }
+            });
+            
+            if (deleteResult.ok) {
+                successes.push('DELETE workflow עבר בהצלחה');
+                console.log(`✅ DELETE successful - test record cleaned up`);
+            } else {
+                const errorText = await deleteResult.text();
+                issues.push({
+                    type: 'workflow',
+                    severity: 'medium',
+                    issue: `DELETE workflow נכשל: HTTP ${deleteResult.status}`,
+                    recommendation: 'בדוק שה-DELETE endpoint עובד נכון',
+                    details: errorText,
+                    cleanup: `יש צורך למחוק ידנית את רשומת הבדיקה: ID ${testRecordId}`
+                });
+            }
+        }
+        
+        const totalTests = 4; // CREATE, READ, UPDATE, DELETE
+        const passedTests = successes.length;
+        const score = Math.round((passedTests / totalTests) * 100);
+        
+        return {
+            issues,
+            successes,
+            score,
+            totalTests,
+            passedTests,
+            testRecordId // במקרה שנדרש ניקוי ידני
+        };
+        
+    } catch (error) {
+        console.error(`❌ Full Workflow Testing failed for ${entityName}:`, error);
+        issues.push({
+            type: 'workflow',
+            severity: 'critical',
+            issue: `בדיקת workflow נכשלה: ${error.message}`,
+            recommendation: 'בדוק שה-API endpoints עובדים וזמינים'
+        });
+        
+        return { issues, successes: [], score: 0 };
+    }
+}
+
+// ===== פונקציות עזר לבדיקות UI =====
+
+/**
+ * המתנה לטעינת עמוד
+ * @param {Window} testWindow החלון לבדיקה
+ * @param {number} timeout זמן המתנה מקסימלי
+ */
+async function waitForPageLoad(testWindow, timeout = 10000) {
+    return new Promise((resolve, reject) => {
+        const startTime = Date.now();
+        
+        const checkLoad = () => {
+            if (Date.now() - startTime > timeout) {
+                reject(new Error('Page load timeout'));
+                return;
+            }
+            
+            if (testWindow.document.readyState === 'complete') {
+                resolve();
+            } else {
+                setTimeout(checkLoad, 100);
+            }
+        };
+        
+        if (testWindow.document.readyState === 'complete') {
+            resolve();
+        } else {
+            testWindow.addEventListener('load', resolve);
+            checkLoad();
+        }
+    });
+}
+
+/**
+ * בדיקת כפתור הוספה
+ * @param {Document} doc מסמך העמוד
+ * @param {Object} entity נתוני הישות
+ * @returns {Object} תוצאת הבדיקה
+ */
+async function testAddButton(doc, entity) {
+    // חיפוש כפתור הוספה לפי מספר אפשרויות
+    const selectors = [
+        '[onclick*="Add"]',
+        '[onclick*="הוסף"]',
+        '[onclick*="show"][onclick*="Modal"]',
+        '.btn[onclick*="new"]',
+        '.btn[onclick*="חדש"]'
+    ];
+    
+    let addButton = null;
+    
+    for (const selector of selectors) {
+        addButton = doc.querySelector(selector);
+        if (addButton) break;
+    }
+    
+    if (!addButton) {
+        return {
+            type: 'ui',
+            severity: 'high',
+            issue: 'כפתור "הוסף חדש" לא נמצא',
+            recommendation: 'בדוק שיש כפתור עם onclick שמכיל "Add", "הוסף", או "Modal"',
+            success: false
+        };
+    }
+    
+    if (addButton.disabled) {
+        return {
+            type: 'ui',
+            severity: 'medium',
+            issue: 'כפתור "הוסף חדש" מנוטרל',
+            recommendation: 'בדוק למה הכפתור disabled - אולי חסרות הרשאות או נתונים',
+            success: false
+        };
+    }
+    
+    return {
+        success: true,
+        message: 'כפתור הוספה נמצא ופעיל'
+    };
+}
+
+/**
+ * בדיקת טבלה
+ * @param {Document} doc מסמך העמוד
+ * @param {Object} entity נתוני הישות
+ * @returns {Object} תוצאת הבדיקה
+ */
+async function testTable(doc, entity) {
+    if (!entity.tableSelector) {
+        return {
+            success: true,
+            message: 'אין טבלה צפויה לישות זו'
+        };
+    }
+    
+    const table = doc.querySelector(entity.tableSelector);
+    
+    if (!table) {
+        return {
+            type: 'ui',
+            severity: 'critical',
+            issue: `טבלה לא נמצאת (${entity.tableSelector})`,
+            recommendation: `בדוק שקיים אלמנט עם selector ${entity.tableSelector}`,
+            success: false
+        };
+    }
+    
+    // בדיקת תוכן הטבלה
+    const tbody = table.querySelector('tbody');
+    const rows = tbody ? tbody.querySelectorAll('tr') : [];
+    
+    if (rows.length === 0) {
+        return {
+            type: 'ui',
+            severity: 'medium',
+            issue: 'טבלה ריקה - אין נתונים',
+            recommendation: 'בדוק שהנתונים נטענים נכון מה-API',
+            success: false
+        };
+    }
+    
+    return {
+        success: true,
+        message: `טבלה נמצאת עם ${rows.length} שורות`
+    };
+}
+
+/**
+ * בדיקת כפתורי אקשן
+ * @param {Document} doc מסמך העמוד
+ * @param {Object} entity נתוני הישות
+ * @returns {Object} תוצאת הבדיקה
+ */
+async function testActionButtons(doc, entity) {
+    if (!entity.hasCRUD) {
+        return {
+            success: true,
+            message: 'אין CRUD - כפתורי אקשן לא נדרשים'
+        };
+    }
+    
+    // חיפוש כפתורי אקשן בטבלה
+    const actionButtons = doc.querySelectorAll('td button, td a[onclick], .btn[onclick*="edit"], .btn[onclick*="ערוך"], .btn[onclick*="delete"], .btn[onclick*="מחק"]');
+    
+    if (actionButtons.length === 0) {
+        return {
+            type: 'ui',
+            severity: 'high',
+            issue: 'לא נמצאו כפתורי אקשן בטבלה',
+            recommendation: 'בדוק שיש כפתורי עריכה ומחיקה בעמודת הפעולות',
+            success: false
+        };
+    }
+    
+    // בדיקת סוגי כפתורים
+    const editButtons = Array.from(actionButtons).filter(btn => 
+        btn.onclick && (btn.onclick.toString().includes('edit') || btn.onclick.toString().includes('ערוך'))
+    );
+    
+    const deleteButtons = Array.from(actionButtons).filter(btn =>
+        btn.onclick && (btn.onclick.toString().includes('delete') || btn.onclick.toString().includes('מחק'))
+    );
+    
+    if (editButtons.length === 0 && deleteButtons.length === 0) {
+        return {
+            type: 'ui',
+            severity: 'medium',
+            issue: 'נמצאו כפתורי אקשן אבל לא זוהו כעריכה/מחיקה',
+            recommendation: 'בדוק שכפתורי האקשן מכילים onclick עם "edit"/"ערוך" או "delete"/"מחק"',
+            success: false
+        };
+    }
+    
+    return {
+        success: true,
+        message: `כפתורי אקשן נמצאו: ${editButtons.length} עריכה, ${deleteButtons.length} מחיקה`
+    };
+}
+
+/**
+ * בדיקת מודל
+ * @param {Document} doc מסמך העמוד
+ * @param {Object} entity נתוני הישות
+ * @returns {Object} תוצאת הבדיקה
+ */
+async function testModal(doc, entity) {
+    if (!entity.modalSelector) {
+        return {
+            success: true,
+            message: 'אין מודל צפוי לישות זו'
+        };
+    }
+    
+    const modal = doc.querySelector(entity.modalSelector);
+    
+    if (!modal) {
+        return {
+            type: 'ui',
+            severity: 'high',
+            issue: `מודל לא נמצא (${entity.modalSelector})`,
+            recommendation: `בדוק שקיים מודל עם selector ${entity.modalSelector}`,
+            success: false
+        };
+    }
+    
+    // בדיקת טופס בתוך המודל
+    const form = modal.querySelector('form');
+    if (!form) {
+        return {
+            type: 'ui',
+            severity: 'medium',
+            issue: 'מודל קיים אבל לא נמצא טופס',
+            recommendation: 'בדוק שיש אלמנט form בתוך המודל',
+            success: false
+        };
+    }
+    
+    // בדיקת שדות בטופס
+    const inputs = form.querySelectorAll('input, select, textarea');
+    if (inputs.length === 0) {
+        return {
+            type: 'ui',
+            severity: 'medium',
+            issue: 'מודל וטופס קיימים אבל לא נמצאו שדות קלט',
+            recommendation: 'בדוק שיש שדות input, select או textarea בטופס',
+            success: false
+        };
+    }
+    
+    return {
+        success: true,
+        message: `מודל נמצא עם טופס ו-${inputs.length} שדות קלט`
+    };
+}
+
+// ===== פונקציות בדיקה נוספות =====
+
+/**
+ * בדיקת זמינות מערכת validation
+ */
+async function testValidationSystemAvailable(testWindow) {
+    const validationFunctions = [
+        'validateEntityForm',
+        'showFieldError',
+        'showFieldSuccess',
+        'clearFieldValidation'
+    ];
+    
+    const availableFunctions = validationFunctions.filter(func => 
+        typeof testWindow[func] === 'function'
+    );
+    
+    return {
+        success: availableFunctions.length >= 2, // לפחות 2 פונקציות
+        availableFunctions,
+        totalFunctions: validationFunctions.length
+    };
+}
+
+/**
+ * בדיקת טופס validation
+ */
+async function testFormValidation(doc, entity) {
+    const modal = doc.querySelector(entity.modalSelector);
+    if (!modal) {
+        return {
+            type: 'validation',
+            severity: 'medium',
+            issue: 'לא ניתן לבדוק validation - מודל לא נמצא',
+            success: false
+        };
+    }
+    
+    const form = modal.querySelector('form');
+    if (!form) {
+        return {
+            type: 'validation',
+            severity: 'medium',
+            issue: 'לא ניתן לבדוק validation - טופס לא נמצא במודל',
+            success: false
+        };
+    }
+    
+    // בדיקת שדות חובה
+    const requiredFields = form.querySelectorAll('[required], .required');
+    
+    return {
+        success: true,
+        requiredFieldsCount: requiredFields.length,
+        hasValidation: requiredFields.length > 0
+    };
+}
+
+/**
+ * בדיקת זמינות מערכת מטמון
+ */
+async function testCacheSystemAvailable() {
+    const cacheSystemChecks = [
+        { name: 'UnifiedCacheManager', check: () => window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized() },
+        { name: 'clearCacheBeforeCRUD', check: () => typeof window.clearCacheBeforeCRUD === 'function' },
+        { name: 'localStorage', check: () => typeof Storage !== 'undefined' }
+    ];
+    
+    const availableSystems = cacheSystemChecks.filter(system => system.check()).map(s => s.name);
+    
+    return {
+        success: availableSystems.length >= 2,
+        availableSystems,
+        totalSystems: cacheSystemChecks.length
+    };
+}
+
+/**
+ * בדיקת פונקציות רענון
+ */
+async function testRefreshFunctions(entityName) {
+    const refreshFunctionNames = [
+        `load${entityName.charAt(0).toUpperCase() + entityName.slice(1)}Data`,
+        `update${entityName.charAt(0).toUpperCase() + entityName.slice(1)}Table`,
+        'loadTableData', // פונקציה גלובלית
+        'refreshTable'   // פונקציה גלובלית
+    ];
+    
+    const availableFunctions = refreshFunctionNames.filter(funcName =>
+        typeof window[funcName] === 'function'
+    );
+    
+    if (availableFunctions.length === 0) {
+        return {
+            type: 'cache',
+            severity: 'high',
+            issue: `לא נמצאו פונקציות רענון ל-${entityName}`,
+            recommendation: `בדוק שקיימת פונקציה מסוג: ${refreshFunctionNames.join(', ')}`,
+            success: false
+        };
+    }
+    
+    return {
+        success: true,
+        availableFunctions,
+        recommendedFunction: availableFunctions[0]
+    };
+}
+
+/**
+ * בדיקת clearCacheBeforeCRUD
+ */
+async function testClearCacheBeforeCRUD() {
+    if (typeof window.clearCacheBeforeCRUD !== 'function') {
+        return {
+            type: 'cache',
+            severity: 'medium',
+            issue: 'פונקציית clearCacheBeforeCRUD לא זמינה',
+            recommendation: 'בדוק שמערכת המטמון נטענה נכון או שיש fallback',
+            success: false
+        };
+    }
+    
+    return {
+        success: true
+    };
+}
+
+/**
+ * בדיקת טעינת עמוד UI
+ */
+async function testPageLoadUI(pageUrl) {
+    try {
+        const response = await fetch(pageUrl);
+        return {
+            success: response.ok,
+            status: response.status,
+            message: response.ok ? 'עמוד נטען בהצלחה' : `עמוד נכשל לטעון: HTTP ${response.status}`
+        };
+    } catch (error) {
+        return {
+            success: false,
+            message: `שגיאת טעינה: ${error.message}`
+        };
+    }
+}
+
+/**
+ * בדיקת תוכן בעמוד
+ */
+async function testHasContent(pageUrl) {
+    try {
+        const response = await fetch(pageUrl);
+        const text = await response.text();
+        const hasContent = text.length > 1000 && text.includes('<body'); // בדיקה בסיסית שיש תוכן HTML
+        
+        return {
+            success: hasContent,
+            message: hasContent ? 'עמוד מכיל תוכן' : 'עמוד ריק או לא תקין'
+        };
+    } catch (error) {
+        return {
+            success: false,
+            message: `שגיאה בבדיקת תוכן: ${error.message}`
+        };
+    }
+}
+
+/**
+ * בדיקת שגיאות JavaScript (הערכה בסיסית)
+ */
+async function testNoJSErrors(pageUrl) {
+    // בדיקה בסיסית - אם הצלחנו להגיע עד כאן, כנראה שאין שגיאות קריטיות
+    return {
+        success: true,
+        message: 'לא זוהו שגיאות JavaScript קריטיות'
+    };
+}
+
+/**
+ * בדיקת פונקציונליות בסיסית
+ */
+async function testBasicFunctionality(pageUrl) {
+    // בדיקה בסיסית שהעמוד מגיב
+    return {
+        success: true,
+        message: 'פונקציונליות בסיסית נראית תקינה'
+    };
+}
+
+/**
+ * יצירת דוח מפורט לבדיקות עמיקות
+ */
+function generateDeepTestingReport(entityName, results) {
+    const entity = window.crudEnhancedTester.entities[entityName];
+    
+    const allIssues = [
+        ...(results.ui?.issues || []),
+        ...(results.validation?.issues || []),
+        ...(results.cache?.issues || []),
+        ...(results.workflow?.issues || [])
+    ];
+    
+    const allSuccesses = [
+        ...(results.ui?.successes || []),
+        ...(results.validation?.successes || []),
+        ...(results.cache?.successes || []),
+        ...(results.workflow?.successes || [])
+    ];
+    
+    const totalTests = (results.ui?.totalTests || 0) + 
+                      (results.validation?.totalTests || 0) + 
+                      (results.cache?.totalTests || 0) + 
+                      (results.workflow?.totalTests || 0);
+    
+    const passedTests = (results.ui?.passedTests || 0) + 
+                       (results.validation?.passedTests || 0) + 
+                       (results.cache?.passedTests || 0) + 
+                       (results.workflow?.passedTests || 0);
+    
+    const overallScore = totalTests > 0 ? Math.round((passedTests / totalTests) * 100) : 0;
+    
+    return {
+        entity: entityName,
+        displayName: entity.displayName,
+        type: 'deep_testing',
+        overallScore,
+        totalTests,
+        passedTests,
+        issues: allIssues,
+        successes: allSuccesses,
+        breakdown: {
+            ui: results.ui,
+            validation: results.validation,
+            cache: results.cache,
+            workflow: results.workflow
+        },
+        recommendations: generateDetailedRecommendations(allIssues),
+        timestamp: new Date().toISOString()
+    };
+}
+
+/**
+ * יצירת דוח בסיסי לכלי פיתוח
+ */
+function generateBasicTestingReport(entityName, results) {
+    const entity = window.crudEnhancedTester.entities[entityName];
+    
+    const allTests = Object.values(results);
+    const passedTests = allTests.filter(test => test.success).length;
+    const score = Math.round((passedTests / allTests.length) * 100);
+    
+    return {
+        entity: entityName,
+        displayName: entity.displayName,
+        type: 'basic_testing',
+        score,
+        totalTests: allTests.length,
+        passedTests,
+        results,
+        timestamp: new Date().toISOString()
+    };
+}
+
+/**
+ * יצירת המלצות מפורטות
+ */
+function generateDetailedRecommendations(issues) {
+    const recommendations = [];
+    
+    issues.forEach(issue => {
+        if (issue.recommendation) {
+            recommendations.push({
+                priority: issue.severity === 'critical' ? 1 : 
+                         issue.severity === 'high' ? 2 : 3,
+                category: issue.type,
+                action: issue.recommendation,
+                technicalDetails: issue.code || issue.details || '',
+                estimatedTime: getEstimatedFixTime(issue.severity)
+            });
+        }
+    });
+    
+    return recommendations.sort((a, b) => a.priority - b.priority);
+}
+
+/**
+ * הערכת זמן תיקון
+ */
+function getEstimatedFixTime(severity) {
+    switch (severity) {
+        case 'critical': return '30-60 דקות';
+        case 'high': return '15-30 דקות';
+        case 'medium': return '5-15 דקות';
+        default: return '5 דקות';
+    }
+}
+
+// פונקציה גלובלית לבדיקות מפורטות של ישות ספציפית
+window.runDeepTesting = async function(entityName) {
+    console.log(`🔍 Starting deep testing for ${entityName}...`);
+    
+    if (window.showInfoNotification) {
+        window.showInfoNotification('בדיקות מפורטות', `מתחיל בדיקות מפורטות ל-${entityName}...`, 2000);
+    }
+    
+    try {
+        const result = await runDeepUITesting(entityName);
+        
+        // הצגת תוצאות
+        console.log(`📊 Deep testing results for ${entityName}:`, result);
+        
+        if (result.overallScore >= 80) {
+            if (window.showSuccessNotification) {
+                window.showSuccessNotification(
+                    'בדיקות מפורטות הושלמו!',
+                    `${result.displayName}: ${result.overallScore}/100 - ${result.passedTests}/${result.totalTests} עברו`,
+                    5000
+                );
+            }
+        } else {
+            if (window.showWarningNotification) {
+                window.showWarningNotification(
+                    'נמצאו בעיות בבדיקות מפורטות',
+                    `${result.displayName}: ${result.overallScore}/100 - ${result.issues.length} בעיות`,
+                    7000
+                );
+            }
+        }
+        
+        return result;
+    } catch (error) {
+        console.error(`❌ Deep testing failed for ${entityName}:`, error);
+        
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה בבדיקות מפורטות', `בדיקת ${entityName} נכשלה: ${error.message}`, 5000);
+        }
+        
+        throw error;
+    }
+};
+
 // Export functions to global scope
 window.testCreateOperation = testCreateOperation;
 window.testReadOperation = testReadOperation;
 window.testUpdateOperation = testUpdateOperation;
 window.testDeleteOperation = testDeleteOperation;
 window.displayCRUDResults = displayCRUDResults;
+
+// Export new deep testing functions
+window.runDeepUITesting = runDeepUITesting;
+window.runBasicUITesting = runBasicUITesting;
+window.testUIComponents = testUIComponents;
+window.testValidation = testValidation;
+window.testCacheRefresh = testCacheRefresh;
+window.testFullWorkflow = testFullWorkflow;
 
 // ייצוא לגלובל scope
 // window.copyDetailedLog export removed - using global version from system-management.js

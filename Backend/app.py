@@ -110,7 +110,7 @@ from routes.api import (
     currencies_bp,
     database_schema_bp,
     linked_items_bp,
-    note_relation_types_bp,
+    entity_relation_types_bp,
     file_scanner_bp,
     cache_management_bp,
     query_optimization_bp,
@@ -212,7 +212,7 @@ app.register_blueprint(constraints_bp)
 app.register_blueprint(currencies_bp)
 app.register_blueprint(database_schema_bp)
 app.register_blueprint(linked_items_bp)
-app.register_blueprint(note_relation_types_bp)
+app.register_blueprint(entity_relation_types_bp)
 app.register_blueprint(file_scanner_bp)
 app.register_blueprint(cache_management_bp)
 app.register_blueprint(cache_changes_bp, url_prefix='/api/cache')
@@ -1625,20 +1625,27 @@ def clear_indexeddb():
 # ===== END INDEXEDDB MANAGEMENT ENDPOINTS =====
 
 # Route for serving HTML files from trading-ui directory
+@app.route('/trading-ui/<path:filename>')
+def serve_ui_files(filename):
+    """Serve static UI files explicitly under /trading-ui/* with correct MIME types"""
+    import mimetypes
+    full_path = os.path.join(UI_DIR, filename)
+    if not os.path.exists(full_path):
+        return "File not found", 404
+    # Guess mimetype and set explicitly to avoid JSON default
+    guessed, _ = mimetypes.guess_type(full_path)
+    resp = send_from_directory(UI_DIR, filename)
+    if guessed:
+        resp.mimetype = guessed
+    return resp
+
 @app.route('/<path:filename>')
 def serve_static_files(filename):
-    """Serve static files (HTML, CSS, JS) from trading-ui directory"""
-    import os
-    from flask import send_from_directory
-    
-    # Check if file exists in trading-ui directory
-    file_path = os.path.join(UI_DIR, filename)
-    if os.path.exists(file_path):
-        # Serve HTML, CSS, JS, and other static files
-        if filename.endswith(('.html', '.css', '.js', '.svg', '.png', '.jpg', '.jpeg', '.gif', '.ico')):
-            return send_from_directory(UI_DIR, filename)
-    
-    # If not found, return 404
+    """Backward compatibility for existing relative links"""
+    # First try UI directory
+    ui_path = os.path.join(UI_DIR, filename)
+    if os.path.exists(ui_path):
+        return send_from_directory(UI_DIR, filename)
     return "File not found", 404
 
 # File discovery endpoint moved to /api/file-scanner/files

@@ -110,7 +110,12 @@ function createDeleteButton(onClick, _additionalClasses = '') {
 
 // פונקציה ליצירת כפתור קישור
 function createLinkButton(onClick, _additionalClasses = '') {
-  return createButton('LINK', onClick, _additionalClasses);
+  const btn = createButton('LINK', onClick, _additionalClasses);
+  // הוספת data-attr לניטור מיוחד של כפתור אלמנטים מקושרים
+  if (/viewLinkedItemsFor|openLinkedItemsModal\(/.test(onClick)) {
+    return btn.replace('<button ', '<button data-linked-items="1" ');
+  }
+  return btn;
 }
 
 // פונקציה ליצירת כפתור ביטול/הפעלה מחדש

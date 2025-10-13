@@ -66,7 +66,7 @@ def get_table_schema(table_name: str):
             'executions', 'alerts', 'notes', 'cash_flows',
             'currencies', 'users', 'external_data_providers',
             'market_data_quotes', 'intraday_data_slots',
-            'note_relation_types', 'preference_types',
+            'entity_relation_types', 'preference_types',
             'preference_groups', 'preference_profiles', 'user_preferences'
         ]
         
@@ -126,7 +126,7 @@ def get_table_data_with_schema(table_name: str):
             'executions', 'alerts', 'notes', 'cash_flows',
             'currencies', 'users', 'external_data_providers',
             'market_data_quotes', 'intraday_data_slots',
-            'note_relation_types', 'preference_types',
+            'entity_relation_types', 'preference_types',
             'preference_groups', 'preference_profiles', 'user_preferences'
         ]
         

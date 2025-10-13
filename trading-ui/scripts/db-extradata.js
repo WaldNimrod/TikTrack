@@ -27,7 +27,7 @@ async function initDatabaseExtraDisplay() {
  */
 async function loadAllExtraTables() {
   console.log('🔄 Loading all extra tables...');
-  const tables = ['currencies', 'users', 'note_relation_types', 'external_data'];
+  const tables = ['currencies', 'users', 'entity_relation_types', 'external_data'];
   
   for (const table of tables) {
     try {
@@ -85,7 +85,7 @@ async function fetchTableData(tableType) {
     const apiEndpoints = {
       'currencies': '/api/currencies/',
       'users': '/api/users/',
-      'note_relation_types': '/api/note_relation_types/',
+      'entity_relation_types': '/api/entity_relation_types/',
       'external_data': '/api/external-data/status/providers'
     };
     
@@ -144,7 +144,7 @@ function getEntityColor(entityType) {
   const fallbackColors = {
     'currencies': '#ffd700',      // זהב - מטבעות
     'users': '#17a2b8',            // כחול טורקיז - משתמשים
-    'note_relation_types': '#6f42c1',  // סגול - סוגי קשרים
+    'entity_relation_types': '#6f42c1',  // סגול - סוגי קשרים
     'external_data': '#20c997'     // ירוק טורקיז - נתונים חיצוניים
   };
   
@@ -187,10 +187,10 @@ function updateMainTableDisplay() {
       icon: 'fas fa-users',
       entityType: 'users'
     },
-    'note_relation_types': { 
+    'entity_relation_types': { 
       name: 'סוגי קשרים', 
       icon: 'fas fa-link',
-      entityType: 'note_relation_types'
+      entityType: 'entity_relation_types'
     },
     'external_data': { 
       name: 'נתונים חיצוניים', 

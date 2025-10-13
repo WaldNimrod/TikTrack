@@ -222,7 +222,7 @@ class ResponseOptimizer:
                 '/api/tickers',
                 '/api/currencies',
                 '/api/constraints',
-                '/api/note_relation_types',
+                '/api/entity_relation_types',
                 '/api/linked-items/types',
                 '/api/preferences',
                 '/api/users',

@@ -38,13 +38,35 @@ tickers_bp = Blueprint('tickers', __name__, url_prefix='/api/tickers')
 base_api = BaseEntityAPI('tickers', TickerService, 'tickers')
 
 @tickers_bp.route('/', methods=['GET'])
-@api_endpoint(cache_ttl=300, rate_limit=60)
+@api_endpoint(cache_ttl=5, rate_limit=60)
 @handle_database_session()
 def get_tickers():
-    """Get all tickers - enhanced with market data"""
+    """Get all tickers - enhanced with market data, with pagination/filters"""
     db: Session = g.db
     try:
-        tickers = TickerService.get_all(db)
+        # Parse query parameters
+        limit_param = request.args.get('limit', default=None, type=int)
+        offset_param = request.args.get('offset', default=None, type=int)
+        q_param = request.args.get('q', default=None, type=str)
+        type_param = request.args.get('type', default=None, type=str)
+        currency_param = request.args.get('currency_id', default=None, type=int)
+        sort_param = request.args.get('sort', default=None, type=str)
+        fields_param = request.args.get('fields', default=None, type=str)
+
+        fields_list = None
+        if fields_param:
+            fields_list = [f.strip() for f in fields_param.split(',') if f.strip()]
+
+        tickers = TickerService.get_all(
+            db,
+            limit=limit_param,
+            offset=offset_param,
+            fields=fields_list,
+            q=q_param,
+            ticker_type=type_param,
+            currency_id=currency_param,
+            sort=sort_param
+        )
         
         # Convert tickers to dict with market data
         tickers_data = []
@@ -179,11 +201,13 @@ def check_linked_items(ticker_id: int):
         db.close()
 
 @tickers_bp.route('/', methods=['POST'])
-@invalidate_cache(['tickers', 'dashboard'])  # Invalidate cache after creating ticker
+@invalidate_cache(['tickers', 'tickers:*', 'linked_items:ticker:*', 'dashboard'])  # Invalidate cache after creating ticker
 def create_ticker():
     """Create new ticker"""
     db = None
     try:
+        # Optional external fetch flag (opt-in to avoid blocking create)
+        fetch_external = request.args.get('fetch_external') in ('1', 'true', 'True')
         data = request.get_json()
         if data is None:
             return jsonify({
@@ -198,49 +222,50 @@ def create_ticker():
         # Create the ticker first
         ticker = TickerService.create(db, data)
         
-        # AFTER creating the ticker, try to fetch and cache external data
+        # AFTER creating the ticker, optionally fetch external data (non-blocking by default)
         external_data_available = False
         external_data_error = None
         quote_data = None
         
-        try:
-            from services.external_data.yahoo_finance_adapter import YahooFinanceAdapter
-            from models.external_data import ExternalDataProvider
-            
-            # Get or create Yahoo Finance provider
-            provider = db.query(ExternalDataProvider).filter(
-                ExternalDataProvider.name == 'yahoo_finance'
-            ).first()
-            
-            if not provider:
-                # Create provider if it doesn't exist
-                provider = ExternalDataProvider(
-                    name='yahoo_finance',
-                    display_name='Yahoo Finance',
-                    is_active=True,
-                    provider_type='finance',
-                    base_url='https://query1.finance.yahoo.com',
-                    rate_limit_per_hour=900,
-                    timeout_seconds=20
-                )
-                db.add(provider)
-                db.commit()
-                db.refresh(provider)
-            
-            # Initialize adapter with database session
-            yahoo_adapter = YahooFinanceAdapter(db, provider.id)
-            
-            # Now try to get and cache quote for the newly created ticker (using enhanced method)
-            quote_data = yahoo_adapter._get_enhanced_quote_data(data['symbol'])
-            if quote_data and quote_data.price:
-                external_data_available = True
-                logger.info(f"✅ External data fetched and cached for new ticker {data['symbol']}: ${quote_data.price}")
-            else:
-                external_data_error = "No external data available for this symbol"
-                logger.warning(f"⚠️ No external data available for new ticker {data['symbol']}")
-        except Exception as e:
-            external_data_error = f"Failed to fetch external data: {str(e)}"
-            logger.warning(f"⚠️ Failed to fetch external data for new ticker {data['symbol']}: {e}")
+        if fetch_external:
+            try:
+                from services.external_data.yahoo_finance_adapter import YahooFinanceAdapter
+                from models.external_data import ExternalDataProvider
+                
+                # Get or create Yahoo Finance provider
+                provider = db.query(ExternalDataProvider).filter(
+                    ExternalDataProvider.name == 'yahoo_finance'
+                ).first()
+                
+                if not provider:
+                    # Create provider if it doesn't exist
+                    provider = ExternalDataProvider(
+                        name='yahoo_finance',
+                        display_name='Yahoo Finance',
+                        is_active=True,
+                        provider_type='finance',
+                        base_url='https://query1.finance.yahoo.com',
+                        rate_limit_per_hour=900,
+                        timeout_seconds=20
+                    )
+                    db.add(provider)
+                    db.commit()
+                    db.refresh(provider)
+                
+                # Initialize adapter with database session
+                yahoo_adapter = YahooFinanceAdapter(db, provider.id)
+                
+                # Try to get and cache quote for the newly created ticker
+                quote_data = yahoo_adapter._get_enhanced_quote_data(data['symbol'])
+                if quote_data and quote_data.price:
+                    external_data_available = True
+                    logger.info(f"✅ External data fetched and cached for new ticker {data['symbol']}: ${quote_data.price}")
+                else:
+                    external_data_error = "No external data available for this symbol"
+                    logger.warning(f"⚠️ No external data available for new ticker {data['symbol']}")
+            except Exception as e:
+                external_data_error = f"Failed to fetch external data: {str(e)}"
+                logger.warning(f"⚠️ Failed to fetch external data for new ticker {data['symbol']}: {e}")
         
         # CACHE DISABLED - No need to clear cache
         
@@ -250,6 +275,7 @@ def create_ticker():
             "data": ticker.to_dict(),
             "message": "Ticker created successfully",
             "external_data": {
+                "attempted": fetch_external,
                 "available": external_data_available,
                 "error": external_data_error,
                 "quote": {
@@ -274,7 +300,7 @@ def create_ticker():
             db.close()
 
 @tickers_bp.route('/<int:ticker_id>', methods=['PUT'])
-@invalidate_cache(['tickers', 'dashboard'])  # Invalidate cache after updating ticker
+@invalidate_cache(['tickers', 'tickers:*', 'linked_items:ticker:*', 'dashboard'])  # Invalidate cache after updating ticker
 def update_ticker(ticker_id: int):
     """Update ticker"""
     db = None
@@ -349,7 +375,7 @@ def update_ticker(ticker_id: int):
             db.close()
 
 @tickers_bp.route('/<int:ticker_id>', methods=['DELETE'])
-@invalidate_cache(['tickers', 'dashboard'])  # Invalidate cache after deleting ticker
+@invalidate_cache(['tickers', 'tickers:*', 'linked_items:ticker:*', 'dashboard'])  # Invalidate cache after deleting ticker
 def delete_ticker(ticker_id: int):
     """Delete ticker"""
     try:
@@ -463,7 +489,7 @@ def update_active_trades(ticker_id: int):
         db.close()
 
 @tickers_bp.route('/update-all-active-trades', methods=['POST'])
-@invalidate_cache(['tickers', 'dashboard'])  # Invalidate cache after updating all active trades
+@invalidate_cache(['tickers', 'tickers:*', 'dashboard'])  # Invalidate cache after updating all active trades
 def update_all_active_trades():
     """Update active_trades field for all tickers based on open trades and plans"""
     try:
@@ -600,7 +626,7 @@ def update_all_statuses_auto():
         db.close()
 
 @tickers_bp.route('/<int:ticker_id>/cancel', methods=['POST'])
-@invalidate_cache(['tickers', 'dashboard'])  # Invalidate cache after cancelling ticker
+@invalidate_cache(['tickers', 'tickers:*', 'linked_items:ticker:*', 'dashboard'])  # Invalidate cache after cancelling ticker
 def cancel_ticker(ticker_id: int):
     """Cancel ticker"""
     db = None

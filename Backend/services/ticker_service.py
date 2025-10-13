@@ -12,7 +12,8 @@ Version: 1.0
 Date: August 2025
 """
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, load_only
+from sqlalchemy import func
 from models.ticker import Ticker
 from models.trade import Trade
 from models.trade_plan import TradePlan
@@ -63,8 +64,15 @@ class TickerService:
     MAX_REMARKS_LENGTH: int = 500
     # CURRENCY_LENGTH: int = 3  # Removed - now using currency_id
     @staticmethod
-    @cache_with_deps(ttl=30, dependencies=['tickers'])  # Cache for 30 seconds - critical data with frequent updates
-    def get_all(db: Session) -> List[Ticker]:
+    @cache_with_deps(ttl=5, dependencies=['tickers'])  # Backend cache for 5 seconds per unified cache policy
+    def get_all(db: Session,
+                limit: Optional[int] = None,
+                offset: Optional[int] = None,
+                fields: Optional[List[str]] = None,
+                q: Optional[str] = None,
+                ticker_type: Optional[str] = None,
+                currency_id: Optional[int] = None,
+                sort: Optional[str] = None) -> List[Ticker]:
         """
         Get all tickers from the system with external market data
         
@@ -77,27 +85,82 @@ class TickerService:
         Example:
             >>> tickers = TickerService.get_all(db_session)
         """
-        # Get tickers with latest market data
-        tickers = db.query(Ticker).all()
-        logger.info(f"Found {len(tickers)} tickers in database")
+        # Base query
+        query = db.query(Ticker)
+
+        # Filters
+        if q:
+            # prefix match on symbol
+            query = query.filter(Ticker.symbol.like(f"{q.upper()}%"))
+        if ticker_type:
+            query = query.filter(Ticker.type == ticker_type)
+        if currency_id is not None:
+            query = query.filter(Ticker.currency_id == currency_id)
+
+        # Default field projection if not provided: keep payload minimal
+        default_fields = ['id', 'symbol', 'name', 'type', 'currency_id', 'status']
+        requested_fields = fields or default_fields
+        safe_fields = [f for f in requested_fields if hasattr(Ticker, f)]
+        if safe_fields:
+            query = query.options(load_only(*safe_fields))
+
+        # Sorting
+        if sort == 'symbol':
+            query = query.order_by(Ticker.symbol.asc())
+        elif sort == 'name':
+            query = query.order_by(Ticker.name.asc())
+        else:
+            # default stable order
+            query = query.order_by(Ticker.id.asc())
+
+        # Pagination defaults
+        if limit is None:
+            limit = 100
+        if offset is None:
+            offset = 0
+        query = query.limit(limit).offset(offset)
+
+        # Execute base query
+        tickers = query.all()
+        logger.info(f"Found {len(tickers)} tickers in database (limit={limit}, offset={offset})")
         
-        # Add market data to each ticker
-        for ticker in tickers:
-            latest_quote = db.query(MarketDataQuote).filter(
-                MarketDataQuote.ticker_id == ticker.id
-            ).order_by(MarketDataQuote.fetched_at.desc()).first()
-            
-            if latest_quote:
-                # Add market data fields to ticker object
-                ticker.current_price = latest_quote.price
-                ticker.change_percent = latest_quote.change_pct_day
-                ticker.change_amount = latest_quote.change_amount_day
-                ticker.volume = latest_quote.volume
-                ticker.yahoo_updated_at = latest_quote.fetched_at
-                ticker.data_source = latest_quote.source
-                logger.debug(f"Added market data to {ticker.symbol}: price={latest_quote.price}")
-            else:
-                logger.debug(f"No market data found for {ticker.symbol}")
+        # Add market data to each ticker only if requested
+        wants_market_fields = any(x in (fields or []) for x in [
+            'current_price', 'change_percent', 'change_amount', 'volume', 'yahoo_updated_at', 'data_source'
+        ])
+        # Prefetch latest quotes in one query to avoid N+1
+        if tickers and wants_market_fields:
+            ticker_ids = [t.id for t in tickers]
+            latest_subq = (
+                db.query(
+                    MarketDataQuote.ticker_id.label('t_id'),
+                    func.max(MarketDataQuote.fetched_at).label('max_ts')
+                )
+                .filter(MarketDataQuote.ticker_id.in_(ticker_ids))
+                .group_by(MarketDataQuote.ticker_id)
+                .subquery()
+            )
+
+            latest_quotes = (
+                db.query(MarketDataQuote)
+                .join(latest_subq,
+                      (MarketDataQuote.ticker_id == latest_subq.c.t_id) &
+                      (MarketDataQuote.fetched_at == latest_subq.c.max_ts))
+                .all()
+            )
+            quote_by_ticker = {q.ticker_id: q for q in latest_quotes}
+
+            for ticker in tickers:
+                latest_quote = quote_by_ticker.get(ticker.id)
+                if latest_quote:
+                    # Add market data fields to ticker object
+                    ticker.current_price = latest_quote.price
+                    ticker.change_percent = latest_quote.change_pct_day
+                    ticker.change_amount = latest_quote.change_amount_day
+                    ticker.volume = latest_quote.volume
+                    ticker.yahoo_updated_at = latest_quote.fetched_at
+                    ticker.data_source = latest_quote.source
+                # else: leave without market fields
         
         return tickers
     

@@ -68,11 +68,11 @@ class DatabaseRecreator:
             )
         """)
         
-        # 2. Note relation types (referenced by notes)
+        # 2. Entity relation types (referenced by notes and alerts)
         cursor.execute("""
-            CREATE TABLE note_relation_types (
+            CREATE TABLE entity_relation_types (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                note_relation_type VARCHAR(20) NOT NULL UNIQUE,
+                relation_type VARCHAR(20) NOT NULL UNIQUE,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         """)
@@ -236,7 +236,7 @@ class DatabaseRecreator:
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 related_type_id INTEGER NOT NULL,
                 related_id INTEGER NOT NULL,
-                FOREIGN KEY (related_type_id) REFERENCES note_relation_types (id)
+                FOREIGN KEY (related_type_id) REFERENCES entity_relation_types (id)
             )
         """)
         
@@ -305,20 +305,20 @@ class DatabaseRecreator:
             currencies
         )
         
-        # 2. Insert note relation types
-        note_relation_types = [
-            ('trades',),
-            ('accounts',),
-            ('tickers',),
-            ('trade_plans',),
-            ('executions',),
-            ('cash_flows',),
-            ('alerts',),
-            ('notes',)
+        # 2. Insert entity relation types
+        entity_relation_types = [
+            ('account',),
+            ('trade',),
+            ('trade_plan',),
+            ('ticker',),
+            ('alert',),
+            ('cash_flow',),
+            ('execution',),
+            ('note',)
         ]
         cursor.executemany(
-            "INSERT INTO note_relation_types (note_relation_type) VALUES (?)",
-            note_relation_types
+            "INSERT INTO entity_relation_types (relation_type) VALUES (?)",
+            entity_relation_types
         )
         
         # 3. Insert default user
@@ -462,7 +462,7 @@ class DatabaseRecreator:
             ('notes', 'related_type_id', 'NOT_NULL', 'note_related_type_required', 'note_related_type_required', 1),
             ('currencies', 'symbol', 'UNIQUE', 'currency_symbol_unique', 'currency_symbol_unique', 1),
             ('currencies', 'name', 'UNIQUE', 'currency_name_unique', 'currency_name_unique', 1),
-            ('note_relation_types', 'note_relation_type', 'UNIQUE', 'note_relation_type_unique', 'note_relation_type_unique', 1)
+            ('entity_relation_types', 'relation_type', 'UNIQUE', 'entity_relation_type_unique', 'entity_relation_type_unique', 1)
         ]
         cursor.executemany(
             "INSERT INTO constraints (table_name, column_name, constraint_type, constraint_name, constraint_definition, is_active) VALUES (?, ?, ?, ?, ?, ?)",

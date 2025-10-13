@@ -211,6 +211,138 @@ class FieldRendererService {
     }
 
     /**
+     * Render linked object badge for tables
+     * Displays icon + text with entity-colored background and clickable behavior
+     * 
+     * @param {string|number} relatedType - entity type string (e.g. 'trade') or numeric type id (1=account,2=trade,3=trade_plan,4=ticker)
+     * @param {number|string} relatedId - related entity id
+     * @param {string} displayName - optional user-friendly name (e.g., ticker symbol)
+     * @returns {string} HTML of the linked object badge
+     */
+    static renderLinkedEntity(relatedType, relatedId, displayName = '', meta = null) {
+        const type = this._resolveEntityType(relatedType);
+        const label = this._getEntityHebrewLabel(type);
+        const text = (typeof displayName === 'string' && displayName) ? displayName : label;
+
+        // Select icon path by entity type (using existing icons set)
+        const iconMap = {
+            'trade': '/trading-ui/images/icons/trades.svg',
+            'account': '/trading-ui/images/icons/trading_accounts.svg',
+            'ticker': '/trading-ui/images/icons/tickers.svg',
+            'alert': '/trading-ui/images/icons/alerts.svg',
+            'cash_flow': '/trading-ui/images/icons/cash_flows.svg',
+            'note': '/trading-ui/images/icons/notes.svg',
+            'trade_plan': '/trading-ui/images/icons/trade_plans.svg',
+            'execution': '/trading-ui/images/icons/executions.svg',
+            'other': '/trading-ui/images/icons/home.svg',
+        };
+
+        const iconPath = iconMap[type] || iconMap['other'];
+        const safeId = typeof relatedId === 'number' || (typeof relatedId === 'string' && relatedId) ? relatedId : '';
+
+        // Click handler preference: showEntityDetails → openItemPage → viewLinkedItems
+        const onclick = safeId !== ''
+            ? `onclick="if (window.showEntityDetails) { showEntityDetails('${type}', ${safeId}); } else if (window.openItemPage) { openItemPage('${type}', ${safeId}); } else if (window.viewLinkedItems) { viewLinkedItems(${safeId}, '${type}'); } return false;"`
+            : '';
+
+        // Normalize meta param (support calling with meta as 3rd argument)
+        const metaObj = (meta && typeof meta === 'object') ? meta : (displayName && typeof displayName === 'object' ? displayName : null);
+        
+        // Compose display parts per spec: [Icon] [Entity Type - bold] | [Ticker] | [dd.mm] | [Status]
+        const parts = [];
+        const typeHtml = `<strong class="linked-object-type">${label}</strong>`;
+        parts.push(typeHtml);
+        if (metaObj && metaObj.ticker) {
+            const tickerIcon = '/trading-ui/images/icons/tickers.svg';
+            parts.push(`<span class="linked-object-ticker"><img class="linked-object-ticker-icon" src="${tickerIcon}" alt="טיקר"> ${metaObj.ticker}</span>`);
+        }
+        if (metaObj && metaObj.date) {
+            const dateShort = (typeof FieldRendererService !== 'undefined' && FieldRendererService.renderDateShort)
+                ? FieldRendererService.renderDateShort(metaObj.date)
+                : FieldRendererService._formatDateDdMm(metaObj.date);
+            parts.push(`<span class="linked-object-date">${dateShort}</span>`);
+        }
+        if (metaObj && metaObj.status) {
+            const statusHtml = (typeof FieldRendererService !== 'undefined' && FieldRendererService.renderStatus)
+                ? FieldRendererService.renderStatus(metaObj.status, type)
+                : `<span class="badge badge-secondary">${metaObj.status}</span>`;
+            parts.push(`<span class="linked-object-status">${statusHtml}</span>`);
+        }
+
+        const bodyHtml = parts.join(' <span class="linked-object-sep">|</span> ');
+
+        return `
+        <div class="linked-object-badge entity-${type}" role="link" tabindex="0" ${onclick} data-entity-type="${type}" data-entity-id="${safeId}">
+            <img class="linked-object-icon" src="${iconPath}" alt="${label}">
+            <span class="linked-object-text">${bodyHtml}</span>
+        </div>`;
+    }
+
+    // Backwards-compatible alias (generic naming enforced)
+    static renderLinkedObject(relatedType, relatedId, displayName = '') {
+        return this.renderLinkedEntity(relatedType, relatedId, displayName);
+    }
+
+    // ===== Private helpers =====
+    static _resolveEntityType(relatedType) {
+        if (typeof relatedType === 'string' && relatedType) {
+            const raw = relatedType.toString().toLowerCase().replace(/[-\s]/g, '_');
+            // Normalize synonyms → canonical
+            const map = {
+                'trading_account': 'account',
+                'account': 'account',
+                'trade': 'trade',
+                'tradeplan': 'trade_plan',
+                'trade_plan': 'trade_plan',
+                'plan': 'trade_plan',
+                'ticker': 'ticker',
+                'symbol': 'ticker',
+                'cashflow': 'cash_flow',
+                'cash_flow': 'cash_flow',
+                'alert': 'alert',
+                'note': 'note',
+                'execution': 'execution'
+            };
+            return map[raw] || raw || 'other';
+        }
+        if (typeof relatedType === 'number') {
+            switch (relatedType) {
+                case 1: return 'account';
+                case 2: return 'trade';
+                case 3: return 'trade_plan';
+                case 4: return 'ticker';
+                default: return 'other';
+            }
+        }
+        return 'other';
+    }
+
+    static _getEntityHebrewLabel(type) {
+        const map = {
+            'trade': 'טרייד',
+            'account': 'חשבון',
+            'ticker': 'טיקר',
+            'alert': 'התראה',
+            'cash_flow': 'תזרים מזומנים',
+            'note': 'הערה',
+            'trade_plan': 'תוכנית',
+            'execution': 'ביצוע',
+            'other': 'אובייקט'
+        };
+        return map[type] || map['other'];
+    }
+
+    static _formatDateDdMm(date) {
+        try {
+            const d = new Date(date);
+            const dd = String(d.getDate()).padStart(2, '0');
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            return `${dd}.${mm}`;
+        } catch (e) {
+            return '';
+        }
+    }
+    /**
      * רנדור תאריך בפורמט עברי
      * 
      * @param {string|Date} date - תאריך
@@ -240,6 +372,13 @@ class FieldRendererService {
         } catch (e) {
             return date;
         }
+    }
+
+    /**
+     * Render short date dd.mm
+     */
+    static renderDateShort(date) {
+        return this._formatDateDdMm(date);
     }
 
     /**

@@ -677,7 +677,11 @@ class TradesController {
         
         // הצגת המודל
         // Use cached modal;
-        addTradeModal ? addTradeModal.show() : editTradeModal.show();
+    addTradeModal ? addTradeModal.show() : editTradeModal.show();
+    // שמירת מזהה הטרייד לתוך המודל לצורך כפתור 'אלמנטים מקושרים'
+    if (editTradeModalElement) {
+        editTradeModalElement.dataset.tradeId = String(tradeId);
+    }
     }
 
     /**

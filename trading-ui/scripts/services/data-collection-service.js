@@ -357,7 +357,13 @@ class DataCollectionService {
                 console.warn(`⚠️ שגיאה בהמרת תאריך עבור ${fieldId}`, e);
             }
         } else {
-            element.value = value;
+            // Check if element supports .value (input, select, textarea)
+            if ('value' in element && (element.tagName === 'INPUT' || element.tagName === 'SELECT' || element.tagName === 'TEXTAREA')) {
+                element.value = value;
+            } else {
+                // For display elements (span, div, strong, etc.) use textContent
+                element.textContent = value;
+            }
         }
     }
 }

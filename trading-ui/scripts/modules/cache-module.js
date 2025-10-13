@@ -68,18 +68,12 @@ class UnifiedCacheManager {
      */
     async initialize() {
         try {
+            console.log('🔄 Initializing Unified Cache Manager...');
             
             // אתחול IndexedDB
             if (window.indexedDB) {
                 this.layers.indexedDB = new IndexedDBLayer();
-                const idbResult = await this.layers.indexedDB.initialize();
-                
-                // If IndexedDB failed, use localStorage as fallback
-                if (!idbResult) {
-                    console.warn('⚠️ IndexedDB initialization failed - using localStorage fallback');
-                    this.layers.indexedDB = new LocalStorageLayer();
-                    await this.layers.indexedDB.initialize();
-                }
+                await this.layers.indexedDB.initialize();
             } else {
                 console.warn('⚠️ IndexedDB not available, using localStorage fallback');
                 this.layers.indexedDB = new LocalStorageLayer();
@@ -93,27 +87,8 @@ class UnifiedCacheManager {
             // טעינת סטטיסטיקות
             await this.updateStats();
             
-            // NEW: Start Polling Manager for auto-invalidation (Option B-Lite)
-            // ⚠️ DISABLED: /api/cache/changes endpoint not implemented yet
-            // if (window.PollingManager) {
-            //     console.log('🔄 Starting Polling Manager...');
-            //     try {
-            //         window.PollingManager.start();
-            //         console.log('✅ Polling Manager started (checking every 10 seconds)');
-            //     } catch (pollError) {
-            //         console.warn('⚠️ Polling Manager failed to start (non-critical):', pollError);
-            //     }
-            // } else {
-            //     console.log('ℹ️ Polling Manager not loaded (no auto-invalidation)');
-            // }
-            console.log('ℹ️ Polling Manager disabled (endpoint not available)');
-            
-            // LocalStorage Sync is auto-initialized on load
-            if (window.LocalStorageSync) {
-                console.log('✅ LocalStorage Sync active (multi-tab support)');
-            }
-            
             this.initialized = true;
+            console.log('✅ Unified Cache Manager initialized successfully');
             
             // הודעת הצלחה - תציג מאוחדת עם האפליקציה
             // if (window.notificationSystem) {
@@ -187,6 +162,7 @@ class UnifiedCacheManager {
             const responseTime = performance.now() - startTime;
             this.updatePerformanceStats(responseTime, true);
             
+            console.log(`✅ Saved ${key} to ${layer} layer (${responseTime.toFixed(2)}ms)`);
             
             // עדכון סטטיסטיקות בזמן אמת
             this.updateStats().catch(console.warn);
@@ -229,6 +205,7 @@ class UnifiedCacheManager {
                         const responseTime = performance.now() - startTime;
                         this.updatePerformanceStats(responseTime, true);
                         
+                        console.log(`✅ Retrieved ${key} from ${layer} layer (${responseTime.toFixed(2)}ms)`);
                         
                         // עדכון סטטיסטיקות בזמן אמת
                         this.updateStats().catch(console.warn);
@@ -297,6 +274,7 @@ class UnifiedCacheManager {
             this.stats.operations.remove++;
             
             if (removed) {
+                console.log(`✅ Removed ${key} from cache`);
             } else {
                 console.log(`⚠️ Key ${key} not found for removal`);
             }
@@ -350,6 +328,7 @@ class UnifiedCacheManager {
             this.stats.operations.clear++;
             
             if (cleared) {
+                console.log(`✅ Cleared ${type} cache`);
                 
                 // הודעת הצלחה
                 if (window.notificationSystem) {
@@ -748,98 +727,31 @@ class LocalStorageLayer {
 class IndexedDBLayer {
     constructor() {
         this.db = null;
-        this.isInitializing = false;
     }
 
     async initialize() {
         if (window.indexedDB) {
-            // Prevent concurrent initialization attempts
-            if (this.isInitializing) {
-                console.warn('⚠️ IndexedDB already initializing - waiting...');
-                return new Promise(resolve => {
-                    const checkInterval = setInterval(() => {
-                        if (!this.isInitializing) {
-                            clearInterval(checkInterval);
-                            resolve(this.db !== null);
-                        }
-                    }, 100);
-                    // Timeout after 3 seconds
-                    setTimeout(() => {
-                        clearInterval(checkInterval);
-                        console.error('❌ Wait for initialization timeout');
-                        resolve(false);
-                    }, 3000);
-                });
-            }
-            
-            this.isInitializing = true;
-            
-            // Close any existing connection first
-            if (this.db) {
-                try {
-                    this.db.close();
-                    console.log('🔄 Closed previous IndexedDB connection');
-                } catch (e) {
-                    console.warn('⚠️ Error closing previous connection:', e);
-                }
-                this.db = null;
-            }
-            
-            // Create database instance with timeout
-            console.log('🔄 Opening IndexedDB: UnifiedCacheDB v2...');
-            
+            // Create database instance
             return new Promise((resolve, reject) => {
-                const timeout = setTimeout(() => {
-                    this.isInitializing = false;  // ✅ Reset flag
-                    console.error('❌ IndexedDB open TIMEOUT after 1 second');
-                    console.error('→ This usually means:');
-                    console.error('   1. Another tab/window has the DB open');
-                    console.error('   2. DB was just deleted and browser needs time');
-                    console.error('   3. Browser IndexedDB is corrupted');
-                    console.warn('⚠️ Falling back to localStorage');
-                    // Don't reject - just resolve with false to use fallback
-                    resolve(false);
-                }, 1000);  // 1 second - faster feedback
-                
                 const request = window.indexedDB.open('UnifiedCacheDB', 2);
-                console.log('📡 IndexedDB.open() request sent...');
                 
                 request.onerror = () => {
-                    clearTimeout(timeout);
-                    this.isInitializing = false;  // ✅ Reset flag
-                    console.error('❌ IndexedDB open failed:', request.error);
-                    // Don't reject - resolve with false to continue with fallback
-                    resolve(false);
+                    console.error('❌ IndexedDB open failed');
+                    reject(request.error);
                 };
                 
                 request.onsuccess = () => {
-                    clearTimeout(timeout);
-                    this.isInitializing = false;  // ✅ Reset flag
                     this.db = request.result;
-                    console.log('✅ IndexedDB Layer initialized successfully');
-                    console.log(`   DB version: ${this.db.version}, stores: ${Array.from(this.db.objectStoreNames).join(', ')}`);
+                    // console.log('✅ IndexedDB Layer initialized');
                     resolve(true);
                 };
                 
-                request.onblocked = (event) => {
-                    clearTimeout(timeout);
-                    this.isInitializing = false;  // ✅ Reset flag
-                    console.error('🔒 IndexedDB open BLOCKED!');
-                    console.error('→ Another connection to this DB is open');
-                    console.error('→ Close ALL other TikTrack tabs/windows');
-                    console.error('→ Or wait for blocking connection to close');
-                    console.warn('⚠️ Using localStorage fallback instead');
-                    // Resolve with false to use fallback
-                    resolve(false);
-                };
-                
                 request.onupgradeneeded = (event) => {
-                    console.log('🔄 IndexedDB upgrade needed - creating object store...');
                     const db = event.target.result;
                     if (!db.objectStoreNames.contains('unified-cache')) {
                         const store = db.createObjectStore('unified-cache', { keyPath: 'key' });
                         store.createIndex('timestamp', 'timestamp', { unique: false });
-                        console.log('✅ IndexedDB object store created');
+                        // console.log('✅ IndexedDB object store created');
                     }
                 };
             });
@@ -1049,6 +961,7 @@ class BackendCacheLayer {
                 request.onsuccess = () => {
                     try {
                         this.db = request.result;
+                        console.log('✅ IndexedDB initialized');
                         resolve();
                     } catch (successError) {
                         console.error('❌ Error after IndexedDB success:', successError);
@@ -1406,50 +1319,6 @@ function clearOrphanKeys(includeAuth = true) {
 }
 
 /**
- * Reload current page data after cache clear
- * טעינה מחדש של נתוני העמוד הנוכחי מהשרת
- * @returns {Promise<Object>} Reload result { success, pageName, reloaded }
- */
-async function reloadPageData() {
-    try {
-        const pathname = window.location.pathname;
-        const pageName = pathname.replace('/', '') || 'index';
-        
-        // Map of page reload functions
-        const reloadFunctions = {
-            'trade_plans': window.loadTradePlansData,
-            'trades': window.loadTradesData,
-            'tickers': window.loadTickersData,
-            'alerts': window.loadAlertsData,
-            'trading_accounts': window.loadTradingAccountsData,
-            'cash_flows': window.loadCashFlowsData,
-            'executions': window.loadExecutionsData,
-            'notes': window.loadNotesData,
-            'research': window.loadResearchData,
-            'index': window.loadHomeData
-        };
-        
-        const reloadFn = reloadFunctions[pageName];
-        
-        if (typeof reloadFn === 'function') {
-            await reloadFn();
-            
-            // Update page statistics if function exists
-            if (typeof window.updatePageSummaryStats === 'function') {
-                window.updatePageSummaryStats();
-            }
-            
-            return { success: true, pageName, reloaded: true };
-        }
-        
-        return { success: false, pageName, reloaded: false, reason: 'No reload function found' };
-    } catch (error) {
-        console.error('❌ Failed to reload page data:', error);
-        return { success: false, reloaded: false, error: error.message };
-    }
-}
-
-/**
  * Clear all cache - 4 levels of clearing intensity
  * @param {Object} options - Clearing options
  * @param {string} options.level - 'light'|'medium'|'full'|'nuclear' (default: 'medium')
@@ -1549,6 +1418,7 @@ window.clearAllCache = async function(options = {}) {
             const orphanResults = clearOrphanKeys(includeAuth);
             results.cleared.orphanKeys = orphanResults;
             if (verbose) {
+                console.log(`✅ Orphan keys cleared: ${orphanResults.total} keys`);
                 console.log(`   - State: ${orphanResults.state}`);
                 console.log(`   - Preferences: ${orphanResults.preferences}`);
                 console.log(`   - Auth: ${orphanResults.auth}`);
@@ -1568,54 +1438,12 @@ window.clearAllCache = async function(options = {}) {
             results.cleared.allLocalStorage = lsCountBefore;
             if (verbose) console.log(`☢️ ALL localStorage cleared: ${lsCountBefore} entries (including non-TikTrack!)`);
             
-            // Delete entire IndexedDB database - PROPERLY with Promise wrapper!
+            // Delete entire IndexedDB database
             try {
-                // CRITICAL: Close any open connections FIRST!
-                if (window.UnifiedCacheManager?.layers?.indexedDB?.db) {
-                    try {
-                        window.UnifiedCacheManager.layers.indexedDB.db.close();
-                        if (verbose) console.log('☢️ Closed existing IndexedDB connection');
-                    } catch (e) {
-                        console.warn('⚠️ Error closing IndexedDB connection:', e);
-                    }
-                }
-                
-                // CRITICAL: Delay to ensure DB is fully deleted and connections closed
-                // Without this, next open() may hang!
-                await new Promise(resolve => setTimeout(resolve, 500));
-                
-                // Wrap deleteDatabase in a Promise (it returns IDBRequest, not Promise!)
-                await new Promise((resolve, reject) => {
-                    const deleteRequest = indexedDB.deleteDatabase('UnifiedCacheDB');
-                    
-                    deleteRequest.onsuccess = () => {
-                        if (verbose) console.log('☢️ IndexedDB database DELETED successfully: UnifiedCacheDB');
-                        resolve();
-                    };
-                    
-                    deleteRequest.onerror = (event) => {
-                        console.error('❌ Failed to delete IndexedDB:', event.target.error);
-                        reject(event.target.error);
-                    };
-                    
-                    deleteRequest.onblocked = () => {
-                        console.warn('🔒 Delete BLOCKED - closing open connections...');
-                        // Wait a bit then resolve anyway
-                        setTimeout(() => {
-                            console.warn('⚠️ Proceeding despite block - may cause issues');
-                            resolve();
-                        }, 1000);
-                    };
-                });
-                
+                await indexedDB.deleteDatabase('UnifiedCacheDB');
                 results.cleared.indexedDBDeleted = true;
-                
-                // ✅ CRITICAL: Reset initialized flag so it will re-initialize on refresh!
-                if (window.UnifiedCacheManager) {
-                    window.UnifiedCacheManager.initialized = false;
-                    if (verbose) console.log('☢️ UnifiedCacheManager.initialized reset to false');
-                }
-            } catch (error) {
+                if (verbose) console.log('☢️ IndexedDB database DELETED: UnifiedCacheDB');
+    } catch (error) {
                 console.warn('⚠️ Failed to delete IndexedDB:', error);
                 results.cleared.indexedDBDeleted = false;
             }
@@ -1692,116 +1520,8 @@ window.clearAllCache = async function(options = {}) {
             window.showSuccessNotification('ניקוי מטמון הושלם', message);
         }
         
-        // === RELOAD PAGE DATA ===
-        // Reload data from server before showing final notification
-        if (results.success && level !== 'nuclear') {
-            if (typeof window.showNotification === 'function') {
-                window.showNotification('🔄 טוען נתונים מחדש מהשרת...', 'info', 'system');
-            }
-            
-            const reloadResult = await reloadPageData();
-            results.dataReloaded = reloadResult.reloaded;
-            results.pageName = reloadResult.pageName;
-            
-            if (!reloadResult.success) {
-                console.warn('⚠️ Data reload failed:', reloadResult.reason || reloadResult.error);
-            }
-        }
-        
-        // === CACHE BUSTING STRATEGY (January 2025) ===
-        // With cache busting (?v=hash) on all JS/CSS files:
-        // - Light/Medium/Full: Just refresh data (browser auto-loads new files via ?v=hash)
-        // - Nuclear: Full page reload (needed for complete reset)
-        if (results.success && !options.skipReload) {
-            
-            if (level === 'nuclear') {
-                // Nuclear level: Full page reload needed
-                const reloadMessage = '🔄 מרענן עמוד בעוד 2 שניות...';
-                
-                if (typeof window.showNotification === 'function') {
-                    window.showNotification(reloadMessage, 'warning', 'system');
-                }
-                
-                setTimeout(() => {
-                    const url = new URL(window.location.href);
-                    url.searchParams.set('_refresh', Date.now());
-                    console.log(`☢️ Nuclear clear: Performing full page reload`);
-                    window.location.replace(url.toString());
-                }, 2000);
-                
-            } else {
-                // Light/Medium/Full: Just refresh page data (no reload needed!)
-                console.log(`🔄 ${level} clear: Refreshing page data without reload...`);
-                
-                // NEW: Broadcast to other tabs via LocalStorage
-                if (window.LocalStorageSync) {
-                    const allKeys = ['trades', 'tickers', 'alerts', 'notes', 
-                                     'executions', 'cash_flows', 'trade_plans', 
-                                     'trading_accounts', 'dashboard', 'research'];
-                    window.LocalStorageSync.broadcast(allKeys, 'manual_clear');
-                    console.log('📡 Broadcast to other tabs complete');
-                }
-                
-                setTimeout(async () => {
-                    try {
-                        // Get current page name
-                        const currentPage = window.location.pathname.split('/').pop().replace('.html', '');
-                        
-                        // Map of pages to their load functions
-                        const loadFunctions = {
-                            'index': window.loadDashboardData,
-                            'trading_accounts': window.loadAccountsTable,
-                            'trades': window.loadTradesData,
-                            'trade_plans': window.loadTradePlansData,
-                            'executions': window.loadExecutionsData,
-                            'cash_flows': window.loadCashFlowsData,
-                            'alerts': window.loadAlertsData,
-                            'tickers': window.loadTickersData,
-                            'notes': window.loadNotesData,
-                            'research': window.loadResearchData,
-                            'cache-test': window.cacheTestPage?.loadCacheData
-                        };
-                        
-                        const loadFn = loadFunctions[currentPage];
-                        
-                        if (loadFn && typeof loadFn === 'function') {
-                            console.log(`   Calling load function for: ${currentPage}`);
-                            await loadFn();
-                            console.log(`✅ Page data refreshed without reload!`);
-                            
-                            if (typeof window.showNotification === 'function') {
-                                window.showNotification(
-                                    'המטמון נוקה והנתונים עודכנו',
-                                    'success',
-                                    'cache'
-                                );
-                            }
-                        } else {
-                            console.log(`ℹ️ Page ${currentPage} has no load function (may not need refresh)`);
-                            
-                            if (typeof window.showNotification === 'function') {
-                                window.showNotification(
-                                    'המטמון נוקה בהצלחה',
-                                    'success',
-                                    'cache'
-                                );
-                            }
-                        }
-                    } catch (error) {
-                        console.error('❌ Error refreshing page data:', error);
-                        
-                        if (typeof window.showNotification === 'function') {
-                            window.showNotification(
-                                'המטמון נוקה. נדרש רענון ידני (F5) במקרה של בעיה',
-                                'warning',
-                                'cache'
-                            );
-                        }
-                    }
-                }, 500);  // Short delay to show completion notification
-            }
-            
-            return results;
+        if (verbose) {
+            console.log('✅ Cache clearing completed:', results);
         }
         
         return results;
@@ -1913,6 +1633,7 @@ window.runCacheHealthCheck = async function() {
                     'system'
                 );
             } else {
+                console.log('✅ בדיקת בריאות הושלמה בהצלחה');
             }
         } else {
             // חלק מהשכבות בעייתיות - הודעת שגיאה מפורטת עם מודל
@@ -2051,6 +1772,7 @@ window.testCachePerformance = async function() {
                     'performance'
                 );
             } else {
+                console.log('✅ בדיקת ביצועים הושלמה בהצלחה');
             }
         } else {
             // חלק מהבדיקות נכשלו - הודעת שגיאה מפורטת עם מודל
@@ -2319,6 +2041,9 @@ window.clearUnifiedCacheLayer = async function(layer) {
             // Get stats after clearing
             const statsAfter = await window.UnifiedCacheManager.getLayerStats(layer);
             
+            console.log(`✅ Layer ${layer} cleared successfully`);
+            console.log(`📊 Stats before: ${statsBefore.entries} entries, ${statsBefore.size} bytes`);
+            console.log(`📊 Stats after: ${statsAfter.entries} entries, ${statsAfter.size} bytes`);
             
             if (window.cacheTestPage) {
                 const message = `שכבת ${layer} נוקתה בהצלחה - ${statsBefore.entries} → ${statsAfter.entries} פריטים`;
@@ -2343,6 +2068,7 @@ window.clearUnifiedCacheLayer = async function(layer) {
  */
 window.clearCacheByPattern = async function(pattern, layer = 'all') {
     try {
+        console.log(`🔍 Clearing cache by pattern: ${pattern} in layer: ${layer}`);
         
         if (!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) {
             throw new Error('UnifiedCacheManager not available');
@@ -2561,6 +2287,7 @@ window.clearCacheBySize = async function(maxSize = 1024 * 1024) { // 1MB default
  */
 window.showMemoryStats = async function() {
     try {
+        console.log('📊 Showing memory statistics...');
         
         if (!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) {
             throw new Error('UnifiedCacheManager not available');
@@ -2579,6 +2306,7 @@ window.showMemoryStats = async function() {
             timestamp: new Date().toISOString()
         };
 
+        console.log('📊 Memory statistics:', stats);
         
         if (window.cacheTestPage) {
             window.cacheTestPage.showSuccessMessage('סטטיסטיקות זיכרון', JSON.stringify(stats, null, 2));
@@ -2600,6 +2328,7 @@ window.showMemoryStats = async function() {
  */
 window.showLocalStorageStats = async function() {
     try {
+        console.log('📊 Showing localStorage statistics...');
         
         if (!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) {
             throw new Error('UnifiedCacheManager not available');
@@ -2629,6 +2358,7 @@ window.showLocalStorageStats = async function() {
             timestamp: new Date().toISOString()
         };
 
+        console.log('📊 localStorage statistics:', stats);
         
         if (window.cacheTestPage) {
             window.cacheTestPage.showSuccessMessage('סטטיסטיקות localStorage', JSON.stringify(stats, null, 2));
@@ -2650,6 +2380,7 @@ window.showLocalStorageStats = async function() {
  */
 window.showIndexedDBStats = async function() {
     try {
+        console.log('📊 Showing IndexedDB statistics...');
         
         if (!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) {
             throw new Error('UnifiedCacheManager not available');
@@ -2662,6 +2393,7 @@ window.showIndexedDBStats = async function() {
             timestamp: new Date().toISOString()
         };
 
+        console.log('📊 IndexedDB statistics:', stats);
         
         if (window.cacheTestPage) {
             window.cacheTestPage.showSuccessMessage('סטטיסטיקות IndexedDB', JSON.stringify(stats, null, 2));
@@ -2683,6 +2415,7 @@ window.showIndexedDBStats = async function() {
  */
 window.showBackendStats = async function() {
     try {
+        console.log('📊 Showing Backend statistics...');
         
         if (!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) {
             throw new Error('UnifiedCacheManager not available');
@@ -2695,6 +2428,7 @@ window.showBackendStats = async function() {
             timestamp: new Date().toISOString()
         };
 
+        console.log('📊 Backend statistics:', stats);
         
         if (window.cacheTestPage) {
             window.cacheTestPage.showSuccessMessage('סטטיסטיקות Backend', JSON.stringify(stats, null, 2));
@@ -2716,6 +2450,7 @@ window.showBackendStats = async function() {
  */
 window.fullSystemSync = async function() {
     try {
+        console.log('🔄 Running full system sync...');
         
         if (!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) {
             throw new Error('UnifiedCacheManager not available');
@@ -2756,6 +2491,7 @@ window.fullSystemSync = async function() {
             console.warn('Data sync failed:', error);
         }
 
+        console.log('🔄 Sync results:', syncResults);
         
         // עדכון משוב בממשק
         if (window.cacheTestPage) {
@@ -2967,6 +2703,7 @@ window.initializeAllCacheSystems = async function(isInitialLoad = false) {
     const startTime = Date.now();
     
     try {
+        console.log('🚀 Initializing UnifiedCacheManager (single cache system)...');
         
         const results = {
             unifiedCacheManager: false
@@ -2980,6 +2717,7 @@ window.initializeAllCacheSystems = async function(isInitialLoad = false) {
             results.unifiedCacheManager = true;
         }
         
+        console.log('📊 Cache system initialization result:', results);
         
         const initializedCount = Object.values(results).filter(Boolean).length;
         const totalCount = Object.keys(results).length;
@@ -2990,6 +2728,7 @@ window.initializeAllCacheSystems = async function(isInitialLoad = false) {
                 if (typeof window.showNotification === 'function') {
                     window.showNotification('UnifiedCacheManager אותחל בהצלחה', 'success');
                 } else {
+                    console.log('✅ UnifiedCacheManager אותחל בהצלחה - 4 שכבות פעילות');
                 }
             } else {
                 // אתחול ידני - הודעה מפורטת
@@ -2999,6 +2738,7 @@ window.initializeAllCacheSystems = async function(isInitialLoad = false) {
                         `UnifiedCacheManager אותחל בהצלחה!\n\n4 שכבות פעילות:\n• Memory Layer: ✅\n• localStorage Layer: ✅\n• IndexedDB Layer: ✅\n• Backend Layer: ✅\n\nזמן אתחול: ${Date.now() - startTime}ms`
                     );
                 } else {
+                    console.log('✅ UnifiedCacheManager אותחל בהצלחה - 4 שכבות פעילות');
                 }
             }
         } else {
@@ -3062,6 +2802,7 @@ window.getCacheSystemStatus = function() {
             }
         };
         
+        console.log('📊 Cache system status:', status);
         
         // הצגת סטטוס מפורט דרך מערכת ההודעות
         const activeSystems = Object.entries(status)
@@ -3091,6 +2832,7 @@ window.getCacheSystemStatus = function() {
                     'system'
                 );
             } else {
+                console.log('✅ סטטוס מערכות מטמון - כל המערכות פעילות');
             }
         } else {
             // חלק מהמערכות לא פעילות - הודעת שגיאה מפורטת עם מודל
@@ -3129,6 +2871,7 @@ window.testCacheCleanupMechanisms = async function() {
         };
         
         // שלב 1: בדיקת ניקוי שכבות בודדות
+        console.log('📋 Testing individual layer clearing...');
         
         // בדיקת Memory Layer
         try {
@@ -3188,6 +2931,7 @@ window.testCacheCleanupMechanisms = async function() {
         }
         
         // שלב 2: בדיקת ניקוי מתקדם
+        console.log('📋 Testing advanced clearing mechanisms...');
         
         // בדיקת ניקוי TTL פג תוקף
         try {
@@ -3236,6 +2980,7 @@ window.testCacheCleanupMechanisms = async function() {
         }
         
         // שלב 3: בדיקת ניקוי לפי קטגוריה
+        console.log('📋 Testing category-based clearing...');
         
         // בדיקת ניקוי העדפות
         try {
@@ -3257,6 +3002,7 @@ window.testCacheCleanupMechanisms = async function() {
         }
         
         // שלב 4: בדיקת ניקוי כל המערכות
+        console.log('📋 Testing complete system clearing...');
         
         try {
             // מילוי כל השכבות
@@ -3448,6 +3194,7 @@ window.testCacheSystemsIntegration = async function() {
                     'system'
                 );
             } else {
+                console.log('✅ בדיקת אינטגרציה הושלמה בהצלחה - כל 4 השכבות פעילות');
             }
         } else if (workingCount > 0) {
             // Some layers working - partial success
@@ -3511,6 +3258,7 @@ window.clearAllCacheSystems = async function() {
             try {
                 await window.UnifiedCacheManager.clear();
                 results.unifiedCacheManager = true;
+                console.log('✅ UnifiedCacheManager cleared - all 4 layers');
             } catch (error) {
                 console.error('❌ UnifiedCacheManager clear failed:', error);
             }
@@ -3531,6 +3279,7 @@ window.clearAllCacheSystems = async function() {
                     'UnifiedCacheManager נוקה בהצלחה!\n\n4 שכבות נוקו:\n• Memory Layer ✅\n• localStorage Layer ✅\n• IndexedDB Layer ✅\n• Backend Layer ✅'
                 );
             } else {
+                console.log('✅ UnifiedCacheManager cleared successfully - all 4 layers');
             }
         } else {
             // Failed to clear
@@ -3560,6 +3309,7 @@ window.clearAllCacheSystems = async function() {
  */
 window.generateCacheCleanupReport = async function() {
     try {
+        console.log('📊 Generating cache cleanup report...');
         
         const report = {
             timestamp: new Date().toISOString(),
@@ -3630,6 +3380,7 @@ window.generateCacheCleanupReport = async function() {
             report.recommendations.push('פונקציית ניקוי חכם לא זמינה');
         }
         
+        console.log('📊 Cache cleanup report generated:', report);
         
         // הצגת הדוח
         if (typeof window.showFinalSuccessNotification === 'function') {
@@ -3673,3 +3424,4 @@ window.generateCacheCleanupReport = async function() {
     }
 };
 
+console.log('📦 Unified Cache Manager loaded with all management functions');

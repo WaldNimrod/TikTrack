@@ -2169,7 +2169,7 @@ window.loadTableData = async function(tableType, updateFunction, options = {}) {
       'tickers': '/api/tickers/',
       'executions': '/api/executions/',
       'accounts': '/api/trading-accounts/',
-      'trading_accounts': '/api/trading_accounts/',
+      'trading_accounts': '/api/trading-accounts/',
       'alerts': '/api/alerts/',
       'notes': '/api/notes/',
       'trades': '/api/trades/',

@@ -705,12 +705,26 @@ class ExternalDataDashboard {
       
       this.renderCacheStats();
 
-      // Also update the current settings display
-      this.updateCurrentSettings({
-        cache: this.cacheStats,
-        providers: { total: 2, active: 2 },
-        status: 'active'
-      });
+      // Fetch system-level external data settings and update current settings display
+      try {
+        const settingsResp = await fetch('/api/system-settings/external-data');
+        const settingsJson = await settingsResp.json();
+        if (settingsJson && settingsJson.success) {
+          const s = settingsJson.data || {};
+          const minutes = (sec) => (typeof sec === 'number' ? Math.round(sec / 60) : null);
+          this.updateCurrentSettings({
+            cache: {
+              cache_ttl_minutes: minutes(s.ttlActiveSeconds) || 5,
+              warm_cache_ttl_minutes: minutes(s.ttlOpenSeconds) || 15,
+              max_requests_per_hour: (s.externalDataMaxBatchSize || 50) * 10
+            },
+            providers: { total: 2, active: 2 },
+            status: 'active'
+          });
+        }
+      } catch (_e) {
+        // Ignore settings load error; UI will show defaults
+      }
       
       console.log('✅ Cache stats loaded from API');
       
@@ -897,12 +911,12 @@ class ExternalDataDashboard {
       // console.log('💾 Saving settings...');
 
       const settings = {
-        hot_cache_ttl: document.getElementById('hot-cache-ttl')?.value || 1,
-        warm_cache_ttl: document.getElementById('warm-cache-ttl')?.value || 5,
-        max_requests_hour: document.getElementById('max-requests-hour')?.value || 900,
+        hot_cache_ttl: Number(document.getElementById('hot-cache-ttl')?.value || 5),
+        warm_cache_ttl: Number(document.getElementById('warm-cache-ttl')?.value || 15),
+        max_requests_hour: Number(document.getElementById('max-requests-hour')?.value || 900),
       };
 
-      const response = await fetch('/api/external-data/status/settings', {
+      const response = await fetch('/api/system-settings/external-data', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(settings),
@@ -910,10 +924,13 @@ class ExternalDataDashboard {
 
       if (response.ok) {
         const result = await response.json();
-        // console.log('✅ Settings saved successfully:', result.message);
-        // console.log('📋 Updated settings:', result.settings);
+        if (window.showSuccessNotification) {
+          window.showSuccessNotification('הגדרות נשמרו', 'הגדרות מערכת לנתונים חיצוניים עודכנו', 4000, 'system');
+        }
       } else {
-        // console.error('❌ Error saving settings:', response.status);
+        if (window.showErrorNotification) {
+          window.showErrorNotification('שגיאה בשמירת הגדרות');
+        }
       }
     } catch (error) {
       // console.error('❌ Error saving settings:', error);

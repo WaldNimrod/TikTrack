@@ -22,6 +22,7 @@ from .quotes_v1 import quotes_bp
 from .server_management import server_management_bp
 from .system_overview import system_overview_bp
 from .tickers import tickers_bp
+from .system_settings import system_settings_bp
 from .trade_plans import trade_plans_bp
 from .trades import trades_bp
 from .users import users_bp
@@ -65,6 +66,7 @@ __all__ = [
     'trades_bp',
     'users_bp',
     'wal_bp',
+    'system_settings_bp',
     
     # Base classes
     'BaseEntityAPI',

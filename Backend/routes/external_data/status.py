@@ -11,6 +11,7 @@ from datetime import datetime, timezone, timedelta
 from typing import Dict, Any, List
 
 from services.external_data import YahooFinanceAdapter, CacheManager
+from services.system_settings_service import SystemSettingsService
 from models.external_data import ExternalDataProvider, DataRefreshLog, MarketDataQuote
 from config.database import get_db
 
@@ -587,14 +588,14 @@ def clear_cache_endpoint():
         db_session = next(get_db())
         
         try:
-            # TODO: Implement actual cache clearing
-            # For now, return error indicating feature not implemented
-            return jsonify({
-                'success': False,
-                'error_code': 'FEATURE_NOT_IMPLEMENTED',
-                'message': 'Cache clearing not yet implemented',
-                'suggestion': 'This feature will be available in the next update'
-            }), 501  # Not Implemented
+            # Implement invalidate external_data + tickers per plan
+            from services.advanced_cache_service import advanced_cache_service
+            advanced_cache_service.invalidate_by_dependency('external_data')
+            advanced_cache_service.invalidate_by_dependency('tickers')
+            response = {
+                'success': True,
+                'message': 'External data cache invalidated (external_data, tickers)'
+            }
             
             return jsonify(response), 200
             
@@ -621,14 +622,13 @@ def optimize_cache_endpoint():
         db_session = next(get_db())
         
         try:
-            # TODO: Implement actual cache optimization
-            # For now, return error indicating feature not implemented
-            return jsonify({
-                'success': False,
-                'error_code': 'FEATURE_NOT_IMPLEMENTED',
-                'message': 'Cache optimization not yet implemented',
-                'suggestion': 'This feature will be available in the next update'
-            }), 501  # Not Implemented
+            cache_manager = CacheManager(db_session)
+            result = cache_manager.optimize_cache()
+            response = {
+                'success': True,
+                'message': 'Cache optimized',
+                'result': result
+            }
             
             return jsonify(response), 200
             
@@ -957,14 +957,24 @@ def update_external_data_settings():
                 'message': 'max_requests_hour must be between 100 and 2000'
             }), 400
         
-        # TODO: Implement actual settings update
-        # For now, return error indicating feature not implemented
+        svc = SystemSettingsService(next(get_db()))
+        updates = {
+            'ttlActiveSeconds': hot_cache_ttl * 60,
+            'ttlOpenSeconds': warm_cache_ttl * 60,
+            'externalDataMaxBatchSize': max_requests_hour // 10  # simple mapping; can be refined
+        }
+        results = {}
+        for k, v in updates.items():
+            results[k] = svc.set_setting(k, v, updated_by='external_data_dashboard')
+        # Invalidate caches per plan
+        from services.advanced_cache_service import advanced_cache_service
+        advanced_cache_service.invalidate_by_dependency('external_data')
+        advanced_cache_service.invalidate_by_dependency('tickers')
         return jsonify({
-            'success': False,
-            'error_code': 'FEATURE_NOT_IMPLEMENTED',
-            'message': 'Settings update not yet implemented',
-            'suggestion': 'This feature will be available in the next update'
-        }), 501  # Not Implemented
+            'success': True,
+            'message': 'Settings updated',
+            'results': results
+        }), 200
         
     except Exception as e:
         logger.error(f"Error in update_external_data_settings: {e}")

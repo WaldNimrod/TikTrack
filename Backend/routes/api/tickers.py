@@ -21,7 +21,7 @@ from flask import Blueprint, jsonify, request, g
 from sqlalchemy.orm import Session
 from config.database import get_db
 from services.ticker_service import TickerService
-from services.advanced_cache_service import cache_for, invalidate_cache
+from services.advanced_cache_service import cache_for, cache_with_deps, invalidate_cache
 import logging
 from typing import Dict, Any, Optional
 
@@ -100,6 +100,82 @@ def get_tickers():
         return jsonify({
             "status": "error",
             "error": {"message": "Failed to retrieve tickers"},
+            "version": "1.0"
+        }), 500
+
+
+@tickers_bp.route('/active', methods=['GET'])
+@handle_database_session()
+def get_active_tickers():
+    """Get active/open tickers with dynamic TTL based on refresh policy"""
+    db: Session = g.db
+    try:
+        from services.external_data.policy_provider import get_refresh_policy_for_status
+        # Parameters
+        active_mode = request.args.get('active_mode', default='active', type=str)
+        market_flag = request.args.get('market', default=None, type=str)
+        fields_param = request.args.get('fields', default=None, type=str)
+
+        fields_list = None
+        if fields_param:
+            fields_list = [f.strip() for f in fields_param.split(',') if f.strip()]
+
+        # Determine TTL via provider
+        market_hours = None
+        if market_flag is not None:
+            market_hours = market_flag.lower() in ('1', 'true', 'yes')
+        ttl_seconds = get_refresh_policy_for_status(db, active_mode, market_hours)
+
+        # Query tickers per mode
+        base_query = db.query(TickerService).session.query  # keep style consistent
+        from models.ticker import Ticker
+        query = db.query(Ticker)
+        if active_mode == 'active':
+            query = query.filter(Ticker.active_trades == True, Ticker.status == 'open')
+        elif active_mode == 'open':
+            query = query.filter(Ticker.status == 'open')
+        else:  # both
+            query = query.filter(Ticker.status == 'open')
+
+        tickers = TickerService.get_all(db, fields=fields_list)
+        # Filter per query conditions above (keep projection logic in service)
+        symbols_open = {t.id for t in query.all()}
+        filtered = [t for t in tickers if t.id in symbols_open]
+
+        # Build response JSON now
+        data = []
+        for t in filtered:
+            d = t.to_dict()
+            if hasattr(t, 'current_price'):
+                d['current_price'] = t.current_price
+            if hasattr(t, 'change_percent'):
+                d['change_percent'] = t.change_percent
+            if hasattr(t, 'change_amount'):
+                d['change_amount'] = t.change_amount
+            if hasattr(t, 'volume'):
+                d['volume'] = t.volume
+            if hasattr(t, 'yahoo_updated_at'):
+                d['yahoo_updated_at'] = t.yahoo_updated_at.isoformat() if t.yahoo_updated_at else None
+            if hasattr(t, 'data_source'):
+                d['data_source'] = t.data_source
+            data.append(d)
+
+        # Manually apply backend cache with dependencies
+        from services.advanced_cache_service import advanced_cache_service
+        cache_key = f"tickers_active:{active_mode}:{fields_param}:{market_hours}"
+        response_json = jsonify({
+            "status": "success",
+            "data": data,
+            "message": "Active tickers retrieved successfully",
+            "version": "1.0"
+        })
+        advanced_cache_service.set(cache_key, response_json, ttl=ttl_seconds, dependencies=['external_data', 'tickers'])
+        return response_json
+    except Exception as e:
+        logger.error(f"Error getting active tickers: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": "Failed to retrieve active tickers"},
             "version": "1.0"
         }), 500
 

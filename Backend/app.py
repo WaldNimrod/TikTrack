@@ -118,7 +118,8 @@ from routes.api import (
     system_overview_bp,
     css_management_bp,
     preferences_bp,
-    wal_bp
+    wal_bp,
+    system_settings_bp
 )
 from routes.api.server_logs import server_logs_bp
 from routes.api.cache_changes import cache_changes_bp
@@ -150,6 +151,7 @@ if EXTERNAL_DATA_AVAILABLE and DataRefreshScheduler:
     try:
         # Create a database session for the scheduler
         from config.database import SessionLocal
+        from services.system_settings_service import SystemSettingsService
         db_session = SessionLocal()
         data_refresh_scheduler = DataRefreshScheduler(db_session)
         print("✅ Data Refresh Scheduler initialized successfully")
@@ -221,6 +223,7 @@ app.register_blueprint(server_management_bp)
 app.register_blueprint(system_overview_bp)
 app.register_blueprint(css_management_bp)
 app.register_blueprint(wal_bp)
+app.register_blueprint(system_settings_bp)
 app.register_blueprint(server_logs_bp)
 
 # Register External Data Integration blueprints - DISABLED due to import issues
@@ -248,12 +251,22 @@ try:
 except Exception as e:
     logger.error(f"❌ Failed to start background task scheduler: {e}")
 
-# Start Data Refresh Scheduler for external data
+# Start Data Refresh Scheduler for external data (respect system setting)
 if data_refresh_scheduler:
     try:
-        logger.info("🚀 Starting external data refresh scheduler...")
-        data_refresh_scheduler.start()
-        logger.info("✅ External data refresh scheduler started successfully")
+        from config.database import SessionLocal as _SessionLocal
+        _db = _SessionLocal()
+        try:
+            settings = SystemSettingsService(_db)
+            enabled = settings.get_setting('externalDataSchedulerEnabled', True)
+        finally:
+            _db.close()
+        if enabled:
+            logger.info("🚀 Starting external data refresh scheduler (enabled by setting)...")
+            data_refresh_scheduler.start()
+            logger.info("✅ External data refresh scheduler started successfully")
+        else:
+            logger.info("⏸️ External data refresh scheduler disabled by system setting")
     except Exception as e:
         logger.error(f"❌ Failed to start external data refresh scheduler: {e}")
 else:

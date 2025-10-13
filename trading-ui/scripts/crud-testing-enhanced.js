@@ -1517,10 +1517,25 @@ window.runSmartTestSingleEntity = async function() {
  */
 window.runDeepTestingForProblematic = async function() {
     if (!window.crudEnhancedTester) {
-        if (window.showErrorNotification) {
-            window.showErrorNotification('שגיאה', 'אנא הרץ תחילה בדיקה מהירה לכל העמודים', 5000);
+        window.crudEnhancedTester = new CRUDEnhancedTester();
+    }
+
+    // אם אין תוצאות קודמות – מריץ אוטומטית בדיקה מהירה לכל העמודים
+    if (!Array.isArray(window.crudEnhancedTester.results) || window.crudEnhancedTester.results.length === 0) {
+        if (window.showInfoNotification) {
+            window.showInfoNotification('בדיקות CRUD', 'מריץ בדיקה מהירה לכל העמודים לפני בדיקות מפורטות...', 3000);
         }
-        return;
+        try {
+            await window.crudEnhancedTester.runAllEntitiesTest();
+            if (window.showSuccessNotification) {
+                window.showSuccessNotification('בדיקה מהירה הושלמה', 'כעת מריץ בדיקות מפורטות לעמודים הבעייתיים...', 3000);
+            }
+        } catch (e) {
+            if (window.showErrorNotification) {
+                window.showErrorNotification('שגיאה', `הבדיקה המהירה נכשלה: ${e?.message || 'unknown'}`, 6000);
+            }
+            return;
+        }
     }
 
     const problematicPages = window.crudEnhancedTester.results.filter(r =>

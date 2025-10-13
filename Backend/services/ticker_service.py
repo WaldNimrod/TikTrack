@@ -100,9 +100,10 @@ class TickerService:
         # Default field projection if not provided: keep payload minimal
         default_fields = ['id', 'symbol', 'name', 'type', 'currency_id', 'status']
         requested_fields = fields or default_fields
-        safe_fields = [f for f in requested_fields if hasattr(Ticker, f)]
-        if safe_fields:
-            query = query.options(load_only(*safe_fields))
+        # SQLAlchemy load_only expects ORM mapped attributes, not strings
+        safe_attr_fields = [getattr(Ticker, f) for f in requested_fields if hasattr(Ticker, f)]
+        if safe_attr_fields:
+            query = query.options(load_only(*safe_attr_fields))
 
         # Sorting
         if sort == 'symbol':

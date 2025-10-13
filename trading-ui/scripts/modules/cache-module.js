@@ -94,17 +94,19 @@ class UnifiedCacheManager {
             await this.updateStats();
             
             // NEW: Start Polling Manager for auto-invalidation (Option B-Lite)
-            if (window.PollingManager) {
-                console.log('🔄 Starting Polling Manager...');
-                try {
-                    window.PollingManager.start();
-                    console.log('✅ Polling Manager started (checking every 10 seconds)');
-                } catch (pollError) {
-                    console.warn('⚠️ Polling Manager failed to start (non-critical):', pollError);
-                }
-            } else {
-                console.log('ℹ️ Polling Manager not loaded (no auto-invalidation)');
-            }
+            // ⚠️ DISABLED: /api/cache/changes endpoint not implemented yet
+            // if (window.PollingManager) {
+            //     console.log('🔄 Starting Polling Manager...');
+            //     try {
+            //         window.PollingManager.start();
+            //         console.log('✅ Polling Manager started (checking every 10 seconds)');
+            //     } catch (pollError) {
+            //         console.warn('⚠️ Polling Manager failed to start (non-critical):', pollError);
+            //     }
+            // } else {
+            //     console.log('ℹ️ Polling Manager not loaded (no auto-invalidation)');
+            // }
+            console.log('ℹ️ Polling Manager disabled (endpoint not available)');
             
             // LocalStorage Sync is auto-initialized on load
             if (window.LocalStorageSync) {

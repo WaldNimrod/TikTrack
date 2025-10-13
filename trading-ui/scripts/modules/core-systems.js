@@ -559,6 +559,25 @@ class UnifiedAppInitializer {
     async finalizeInitialization() {
         const stageStart = Date.now();
         
+        // ✅ CRITICAL: Load dynamic colors (guarantee it runs)
+        if (typeof window.loadColorPreferences === 'function') {
+            try {
+                await window.loadColorPreferences();
+                console.log('✅ Dynamic colors loaded from preferences');
+            } catch (error) {
+                console.error('❌ Failed to load dynamic colors:', error);
+            }
+        } else if (typeof window.loadDynamicColors === 'function') {
+            try {
+                await window.loadDynamicColors();
+                console.log('✅ Dynamic colors loaded (legacy method)');
+            } catch (error) {
+                console.error('❌ Failed to load dynamic colors:', error);
+            }
+        } else {
+            console.warn('⚠️ No dynamic colors loading function available');
+        }
+        
         // Restore page state
         if (typeof window.loadPageState === 'function') {
             await window.loadPageState();

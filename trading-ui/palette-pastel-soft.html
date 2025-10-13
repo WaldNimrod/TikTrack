@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>פלטת צבעים פסטלית - TikTrack</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+        
+        .palette-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .color-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        
+        .color-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .color-group-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .color-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .color-item {
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .color-swatch {
+            height: 80px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border: 2px solid #e0e0e0;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .color-swatch:hover {
+            transform: scale(1.05);
+            border-color: #26baac;
+        }
+        
+        .color-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #34495e;
+            margin-bottom: 3px;
+        }
+        
+        .color-code {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #7f8c8d;
+        }
+        
+        .comparison {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .comparison-label {
+            font-size: 0.75rem;
+            color: #95a5a6;
+            margin-bottom: 3px;
+        }
+        
+        .old-color {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        
+        .arrow {
+            font-size: 1.2rem;
+            color: #95a5a6;
+        }
+        
+        .header {
+            text-align: center;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+        
+        .apply-btn {
+            background: linear-gradient(135deg, #26baac 0%, #1e8e7e 100%);
+            border: none;
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(38, 186, 172, 0.3);
+            transition: all 0.3s;
+        }
+        
+        .apply-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(38, 186, 172, 0.4);
+        }
+        
+        .locked-badge {
+            display: inline-block;
+            background: #26baac;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="palette-container">
+        <div class="header">
+            <h1>🎨 פלטת צבעים פסטלית ועדינה</h1>
+            <p>גרסה רכה ומעודנת של הפלטה המקורית - שומרת על כיוון וגוונים, מוסיפה עדינות</p>
+            <p class="text-muted">צבעים ראשי ומשני נשארים ללא שינוי (צבעי לוגו)</p>
+            <button class="apply-btn" onclick="applyPalette()">
+                ✨ החל פלטה לפרופיל נימרוד
+            </button>
+        </div>
+
+        <!-- Basic System Colors -->
+        <div class="color-card">
+            <div class="color-group-title">🎨 צבעי מערכת בסיסיים</div>
+            <div class="color-row">
+                <div class="color-item">
+                    <div class="color-name"><span class="locked-badge">🔒</span> צבע ראשי</div>
+                    <div class="color-swatch" style="background: #26baac"></div>
+                    <div class="color-code">#26baac</div>
+                    <div class="comparison-label">ללא שינוי - צבע לוגו</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name"><span class="locked-badge">🔒</span> צבע משני</div>
+                    <div class="color-swatch" style="background: #fc5a06"></div>
+                    <div class="color-code">#fc5a06</div>
+                    <div class="comparison-label">ללא שינוי - צבע לוגו</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">הצלחה</div>
+                    <div class="color-swatch" style="background: #a8e6cf"></div>
+                    <div class="color-code">#a8e6cf</div>
+                    <div class="comparison-label">מקור: #26baac → פסטל</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">אזהרה</div>
+                    <div class="color-swatch" style="background: #ffd89b"></div>
+                    <div class="color-code">#ffd89b</div>
+                    <div class="comparison-label">מקור: #f39c12 → פסטל</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">סכנה</div>
+                    <div class="color-swatch" style="background: #ffaaa5"></div>
+                    <div class="color-code">#ffaaa5</div>
+                    <div class="comparison-label">מקור: #c0392b → פסטל</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">מידע</div>
+                    <div class="color-swatch" style="background: #a8d8ea"></div>
+                    <div class="color-code">#a8d8ea</div>
+                    <div class="comparison-label">מקור: #2980b9 → פסטל</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Colors -->
+        <div class="color-card">
+            <div class="color-group-title">📊 צבעי סטטוסים</div>
+            <div class="color-row">
+                <div class="color-item">
+                    <div class="color-name">פתוח</div>
+                    <div class="color-swatch" style="background: #b4e7f0"></div>
+                    <div class="color-code">#b4e7f0</div>
+                    <div class="comparison-label">מקור: #5dade2</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">סגור</div>
+                    <div class="color-swatch" style="background: #d5d8dc"></div>
+                    <div class="color-code">#d5d8dc</div>
+                    <div class="comparison-label">מקור: #566573</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">מבוטל</div>
+                    <div class="color-swatch" style="background: #f5cba7"></div>
+                    <div class="color-code">#f5cba7</div>
+                    <div class="comparison-label">מקור: #dc7633</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Investment Types -->
+        <div class="color-card">
+            <div class="color-group-title">💼 סוגי השקעה</div>
+            <div class="color-row">
+                <div class="color-item">
+                    <div class="color-name">Swing</div>
+                    <div class="color-swatch" style="background: #d7bde2"></div>
+                    <div class="color-code">#d7bde2</div>
+                    <div class="comparison-label">מקור: #8e44ad</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">Investment</div>
+                    <div class="color-swatch" style="background: #a9cce3"></div>
+                    <div class="color-code">#a9cce3</div>
+                    <div class="comparison-label">מקור: #2874a6</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">Passive</div>
+                    <div class="color-swatch" style="background: #a3e4d7"></div>
+                    <div class="color-code">#a3e4d7</div>
+                    <div class="comparison-label">מקור: #16a085</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Priorities -->
+        <div class="color-card">
+            <div class="color-group-title">🎯 עדיפויות</div>
+            <div class="color-row">
+                <div class="color-item">
+                    <div class="color-name">גבוהה</div>
+                    <div class="color-swatch" style="background: #ffc3a0"></div>
+                    <div class="color-code">#ffc3a0</div>
+                    <div class="comparison-label">מקור: #fc5a06 → רך יותר</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">בינונית</div>
+                    <div class="color-swatch" style="background: #fff5ba"></div>
+                    <div class="color-code">#fff5ba</div>
+                    <div class="comparison-label">מקור: #f4d03f</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">נמוכה</div>
+                    <div class="color-swatch" style="background: #c5e1f5"></div>
+                    <div class="color-code">#c5e1f5</div>
+                    <div class="comparison-label">מקור: #85c1e2</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Numeric Values -->
+        <div class="color-card">
+            <div class="color-group-title">📈 ערכים מספריים</div>
+            <div class="color-row">
+                <div class="color-item">
+                    <div class="color-name">חיובי</div>
+                    <div class="color-swatch" style="background: #b8e6d5"></div>
+                    <div class="color-code">#b8e6d5</div>
+                    <div class="comparison-label">מקור: #52be80</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">שלילי</div>
+                    <div class="color-swatch" style="background: #f8c9c9"></div>
+                    <div class="color-code">#f8c9c9</div>
+                    <div class="comparison-label">מקור: #ec7063</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">ניטרלי</div>
+                    <div class="color-swatch" style="background: #e5e8e8"></div>
+                    <div class="color-code">#e5e8e8</div>
+                    <div class="comparison-label">מקור: #aeb6bf</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Entity Colors - Trade Plan -->
+        <div class="color-card">
+            <div class="color-group-title">📋 תכנוני טריידים</div>
+            <div class="color-row">
+                <div class="color-item">
+                    <div class="color-name">רגיל</div>
+                    <div class="color-swatch" style="background: #e8daef"></div>
+                    <div class="color-code">#e8daef</div>
+                    <div class="comparison-label">מקור: #8e44ad</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">כהה</div>
+                    <div class="color-swatch" style="background: #bb8fce"></div>
+                    <div class="color-code">#bb8fce</div>
+                    <div class="comparison-label">מקור: #6c3483</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">בהיר</div>
+                    <div class="color-swatch" style="background: #f4ecf7"></div>
+                    <div class="color-code">#f4ecf7</div>
+                    <div class="comparison-label">מקור: #d7bde2</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Entity Colors - Trading -->
+        <div class="color-card">
+            <div class="color-group-title">💹 מסחר</div>
+            <div class="color-row">
+                <div class="color-item">
+                    <div class="color-name"><span class="locked-badge">🔒</span> רגיל</div>
+                    <div class="color-swatch" style="background: #26baac"></div>
+                    <div class="color-code">#26baac</div>
+                    <div class="comparison-label">ללא שינוי - צבע לוגו</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">כהה</div>
+                    <div class="color-swatch" style="background: #73c6b6"></div>
+                    <div class="color-code">#73c6b6</div>
+                    <div class="comparison-label">מקור: #1e8e7e → רך יותר</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">בהיר</div>
+                    <div class="color-swatch" style="background: #d4f1ed"></div>
+                    <div class="color-code">#d4f1ed</div>
+                    <div class="comparison-label">מקור: #7dd3c7</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Entity Colors - Executions -->
+        <div class="color-card">
+            <div class="color-group-title">⚡ עסקעות</div>
+            <div class="color-row">
+                <div class="color-item">
+                    <div class="color-name">רגיל</div>
+                    <div class="color-swatch" style="background: #b0bec5"></div>
+                    <div class="color-code">#b0bec5</div>
+                    <div class="comparison-label">מקור: #2c3e50</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">כהה</div>
+                    <div class="color-swatch" style="background: #90a4ae"></div>
+                    <div class="color-code">#90a4ae</div>
+                    <div class="comparison-label">מקור: #1c2833</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">בהיר</div>
+                    <div class="color-swatch" style="background: #e8eaf6"></div>
+                    <div class="color-code">#e8eaf6</div>
+                    <div class="comparison-label">מקור: #aab7b8</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Entity Colors - Tickers -->
+        <div class="color-card">
+            <div class="color-group-title">📈 מניות</div>
+            <div class="color-row">
+                <div class="color-item">
+                    <div class="color-name">רגיל</div>
+                    <div class="color-swatch" style="background: #a9dfbf"></div>
+                    <div class="color-code">#a9dfbf</div>
+                    <div class="comparison-label">מקור: #229954</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">כהה</div>
+                    <div class="color-swatch" style="background: #82e0aa"></div>
+                    <div class="color-code">#82e0aa</div>
+                    <div class="comparison-label">מקור: #196f3d</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">בהיר</div>
+                    <div class="color-swatch" style="background: #d5f4e6"></div>
+                    <div class="color-code">#d5f4e6</div>
+                    <div class="comparison-label">מקור: #82e0aa</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Entity Colors - Cash Flows -->
+        <div class="color-card">
+            <div class="color-group-title">💰 תזרימי מזומנים</div>
+            <div class="color-row">
+                <div class="color-item">
+                    <div class="color-name">רגיל</div>
+                    <div class="color-swatch" style="background: #f5deb3"></div>
+                    <div class="color-code">#f5deb3</div>
+                    <div class="comparison-label">מקור: #d4a574</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">כהה</div>
+                    <div class="color-swatch" style="background: #deb887"></div>
+                    <div class="color-code">#deb887</div>
+                    <div class="comparison-label">מקור: #a67c52</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">בהיר</div>
+                    <div class="color-swatch" style="background: #fef5e7"></div>
+                    <div class="color-code">#fef5e7</div>
+                    <div class="comparison-label">מקור: #f5e1d0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Entity Colors - Alerts -->
+        <div class="color-card">
+            <div class="color-group-title">🔔 התראות</div>
+            <div class="color-row">
+                <div class="color-item">
+                    <div class="color-name">רגיל</div>
+                    <div class="color-swatch" style="background: #f8c471"></div>
+                    <div class="color-code">#f8c471</div>
+                    <div class="comparison-label">מקור: #e67e22</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">כהה</div>
+                    <div class="color-swatch" style="background: #f0b27a"></div>
+                    <div class="color-code">#f0b27a</div>
+                    <div class="comparison-label">מקור: #ca6f1e</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">בהיר</div>
+                    <div class="color-swatch" style="background: #fdebd0"></div>
+                    <div class="color-code">#fdebd0</div>
+                    <div class="comparison-label">מקור: #f5b041</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Entity Colors - Notes -->
+        <div class="color-card">
+            <div class="color-group-title">📝 הערות</div>
+            <div class="color-row">
+                <div class="color-item">
+                    <div class="color-name">רגיל</div>
+                    <div class="color-swatch" style="background: #d5c4f0"></div>
+                    <div class="color-code">#d5c4f0</div>
+                    <div class="comparison-label">מקור: #a29bfe</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">כהה</div>
+                    <div class="color-swatch" style="background: #b19cd9"></div>
+                    <div class="color-code">#b19cd9</div>
+                    <div class="comparison-label">מקור: #6c5ce7</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">בהיר</div>
+                    <div class="color-swatch" style="background: #f0ebf8"></div>
+                    <div class="color-code">#f0ebf8</div>
+                    <div class="comparison-label">מקור: #dfe4ea</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Entity Colors - Research -->
+        <div class="color-card">
+            <div class="color-group-title">🔬 מחקר</div>
+            <div class="color-row">
+                <div class="color-item">
+                    <div class="color-name">רגיל</div>
+                    <div class="color-swatch" style="background: #aed6f1"></div>
+                    <div class="color-code">#aed6f1</div>
+                    <div class="comparison-label">מקור: #5dade2</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">כהה</div>
+                    <div class="color-swatch" style="background: #85c1e2"></div>
+                    <div class="color-code">#85c1e2</div>
+                    <div class="comparison-label">מקור: #2874a6</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">בהיר</div>
+                    <div class="color-swatch" style="background: #ebf5fb"></div>
+                    <div class="color-code">#ebf5fb</div>
+                    <div class="comparison-label">מקור: #d6eaf8</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Entity Colors - Trading Accounts -->
+        <div class="color-card">
+            <div class="color-group-title">🏦 חשבונות מסחר</div>
+            <div class="color-row">
+                <div class="color-item">
+                    <div class="color-name">רגיל</div>
+                    <div class="color-swatch" style="background: #a9cce3"></div>
+                    <div class="color-code">#a9cce3</div>
+                    <div class="comparison-label">מקור: #5499c7</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">כהה</div>
+                    <div class="color-swatch" style="background: #85c1e2"></div>
+                    <div class="color-code">#85c1e2</div>
+                    <div class="comparison-label">מקור: #2874a6</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">בהיר</div>
+                    <div class="color-swatch" style="background: #ebf5fb"></div>
+                    <div class="color-code">#ebf5fb</div>
+                    <div class="comparison-label">מקור: #aed6f1</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Entity Colors - Preferences -->
+        <div class="color-card">
+            <div class="color-group-title">⚙️ העדפות</div>
+            <div class="color-row">
+                <div class="color-item">
+                    <div class="color-name">רגיל</div>
+                    <div class="color-swatch" style="background: #d5dbdb"></div>
+                    <div class="color-code">#d5dbdb</div>
+                    <div class="comparison-label">מקור: #95a5a6</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">כהה</div>
+                    <div class="color-swatch" style="background: #bdc3c7"></div>
+                    <div class="color-code">#bdc3c7</div>
+                    <div class="comparison-label">מקור: #7f8c8d</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">בהיר</div>
+                    <div class="color-swatch" style="background: #f2f4f4"></div>
+                    <div class="color-code">#f2f4f4</div>
+                    <div class="comparison-label">מקור: #e5e8e8</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart Colors -->
+        <div class="color-card">
+            <div class="color-group-title">📊 צבעי גרפים</div>
+            <div class="color-row">
+                <div class="color-item">
+                    <div class="color-name">רקע</div>
+                    <div class="color-swatch" style="background: #ffffff"></div>
+                    <div class="color-code">#ffffff</div>
+                    <div class="comparison-label">ללא שינוי</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">מסגרת</div>
+                    <div class="color-swatch" style="background: #e8eaf6"></div>
+                    <div class="color-code">#e8eaf6</div>
+                    <div class="comparison-label">מקור: #bdc3c7</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">רשת</div>
+                    <div class="color-swatch" style="background: #f5f7fa"></div>
+                    <div class="color-code">#f5f7fa</div>
+                    <div class="comparison-label">מקור: #ecf0f1</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">נקודות</div>
+                    <div class="color-swatch" style="background: #a3e4d7"></div>
+                    <div class="color-code">#a3e4d7</div>
+                    <div class="comparison-label">מקור: #26baac → פסטל</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">ראשי</div>
+                    <div class="color-swatch" style="background: #a9cce3"></div>
+                    <div class="color-code">#a9cce3</div>
+                    <div class="comparison-label">מקור: #2980b9</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-name">טקסט</div>
+                    <div class="color-swatch" style="background: #b0bec5"></div>
+                    <div class="color-code">#b0bec5</div>
+                    <div class="comparison-label">מקור: #2c3e50</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const pastelPalette = {
+            // Basic System Colors (2 locked, 4 pastel)
+            primaryColor: '#26baac',           // 🔒 LOCKED - Logo green
+            secondaryColor: '#fc5a06',         // 🔒 LOCKED - Logo orange
+            successColor: '#a8e6cf',           // Pastel green
+            warningColor: '#ffd89b',           // Pastel yellow-orange
+            dangerColor: '#ffaaa5',            // Pastel red
+            infoColor: '#a8d8ea',              // Pastel blue
+            
+            // Status Colors (3)
+            statusOpenColor: '#b4e7f0',        // Light blue
+            statusClosedColor: '#d5d8dc',      // Light gray
+            statusCancelledColor: '#f5cba7',   // Light orange
+            
+            // Investment Types (3)
+            typeSwingColor: '#d7bde2',         // Light purple
+            typeInvestmentColor: '#a9cce3',    // Light blue
+            typePassiveColor: '#a3e4d7',       // Light teal
+            
+            // Priorities (3)
+            priorityHighColor: '#ffc3a0',      // Soft coral (from logo orange)
+            priorityMediumColor: '#fff5ba',    // Soft yellow
+            priorityLowColor: '#c5e1f5',       // Soft blue
+            
+            // Numeric Values (3)
+            valuePositiveColor: '#b8e6d5',     // Soft green
+            valueNegativeColor: '#f8c9c9',     // Soft red
+            valueNeutralColor: '#e5e8e8',      // Soft gray
+            
+            // Entity: Trade Plans (3)
+            entityTradePlanColor: '#e8daef',          // Very light purple
+            entityTradePlanColorDark: '#bb8fce',      // Medium purple
+            entityTradePlanColorLight: '#f4ecf7',     // Ultra light purple
+            
+            // Entity: Trading (3) - Logo color locked
+            entityTradeColor: '#26baac',              // 🔒 Logo green
+            entityTradeColorDark: '#73c6b6',          // Softer dark teal
+            entityTradeColorLight: '#d4f1ed',         // Very light teal
+            
+            // Entity: Executions (3)
+            entityExecutionColor: '#b0bec5',          // Light blue-gray
+            entityExecutionColorDark: '#90a4ae',      // Medium blue-gray
+            entityExecutionColorLight: '#e8eaf6',     // Very light blue-gray
+            
+            // Entity: Tickers (3)
+            entityTickerColor: '#a9dfbf',             // Pastel green
+            entityTickerColorDark: '#82e0aa',         // Medium pastel green
+            entityTickerColorLight: '#d5f4e6',        // Very light green
+            
+            // Entity: Cash Flows (3)
+            entityCashFlowColor: '#f5deb3',           // Wheat/beige
+            entityCashFlowColorDark: '#deb887',       // Burlywood
+            entityCashFlowColorLight: '#fef5e7',      // Very light beige
+            
+            // Entity: Alerts (3)
+            entityAlertColor: '#f8c471',              // Soft orange
+            entityAlertColorDark: '#f0b27a',          // Medium orange
+            entityAlertColorLight: '#fdebd0',         // Very light orange
+            
+            // Entity: Notes (3)
+            entityNoteColor: '#d5c4f0',               // Soft lavender
+            entityNoteColorDark: '#b19cd9',           // Medium lavender
+            entityNoteColorLight: '#f0ebf8',          // Very light lavender
+            
+            // Entity: Research (3)
+            entityResearchColor: '#aed6f1',           // Soft sky blue
+            entityResearchColorDark: '#85c1e2',       // Medium sky blue
+            entityResearchColorLight: '#ebf5fb',      // Very light sky blue
+            
+            // Entity: Trading Accounts (3)
+            entityTradingAccountColor: '#a9cce3',     // Soft blue
+            entityTradingAccountColorDark: '#85c1e2', // Medium blue
+            entityTradingAccountColorLight: '#ebf5fb',// Very light blue
+            
+            // Entity: Preferences (3)
+            entityPreferencesColor: '#d5dbdb',        // Soft cool gray
+            entityPreferencesColorDark: '#bdc3c7',    // Medium cool gray
+            entityPreferencesColorLight: '#f2f4f4',   // Very light cool gray
+            
+            // Chart Colors (6)
+            chartBackgroundColor: '#ffffff',          // White
+            chartBorderColor: '#e8eaf6',              // Very light gray-blue
+            chartGridColor: '#f5f7fa',                // Very light gray
+            chartPointColor: '#a3e4d7',               // Pastel teal (from logo green)
+            chartPrimaryColor: '#a9cce3',             // Pastel blue
+            chartTextColor: '#b0bec5'                 // Soft blue-gray
+        };
+
+        function applyPalette() {
+            if (!confirm('האם להחיל את הפלטה הפסטלית לפרופיל נימרוד?\n\nזה ישנה את כל 54 הצבעים לגרסה הפסטלית.')) {
+                return;
+            }
+            
+            // Generate SQL
+            const sqlStatements = [];
+            sqlStatements.push('-- Applying Pastel Palette to Profile "נימרוד" (ID: 2)');
+            sqlStatements.push('-- Date: ' + new Date().toISOString());
+            sqlStatements.push('');
+            
+            for (const [colorName, colorValue] of Object.entries(pastelPalette)) {
+                sqlStatements.push(`UPDATE user_preferences SET saved_value = '${colorValue}', updated_at = CURRENT_TIMESTAMP WHERE user_id = 1 AND profile_id = 2 AND preference_id = (SELECT id FROM preference_types WHERE preference_name = '${colorName}');`);
+            }
+            
+            // Display SQL
+            const sqlText = sqlStatements.join('\n');
+            const blob = new Blob([sqlText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'apply-pastel-palette-nimrod.sql';
+            a.click();
+            
+            alert('קובץ SQL נוצר ירד להורדות!\n\nהרץ אותו כך:\nsqlite3 Backend/db/simpleTrade_new.db < apply-pastel-palette-nimrod.sql');
+        }
+        
+        // Add click to copy color code
+        document.querySelectorAll('.color-swatch').forEach(swatch => {
+            swatch.addEventListener('click', function() {
+                const colorCode = this.nextElementSibling.nextElementSibling.textContent;
+                navigator.clipboard.writeText(colorCode);
+                
+                // Visual feedback
+                const original = this.style.transform;
+                this.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    this.style.transform = original;
+                }, 200);
+                
+                // Toast notification
+                const toast = document.createElement('div');
+                toast.style.cssText = 'position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #26baac; color: white; padding: 10px 20px; border-radius: 8px; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.2);';
+                toast.textContent = `הועתק: ${colorCode}`;
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 2000);
+            });
+        });
+    </script>
+</body>
+</html>
+

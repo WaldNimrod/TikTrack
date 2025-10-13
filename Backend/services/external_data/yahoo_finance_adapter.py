@@ -17,9 +17,10 @@ from models.user import User
 from services.user_service import UserService
 import pytz
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
+# Configure logging (module logger) and dedicated external data logger
+from config.logging import get_external_data_logger
 logger = logging.getLogger(__name__)
+ext_logger = get_external_data_logger()
 
 @dataclass
 class QuoteData:
@@ -386,10 +387,12 @@ class YahooFinanceAdapter:
         ]
         
         logger.info(f"Processing {len(symbols)} symbols in {len(batches)} batches")
+        ext_logger.info(f"external_data: action=batch_start symbols_total={len(symbols)} batches={len(batches)} start={start_time.isoformat()}")
         
         for batch_num, batch_symbols in enumerate(batches, 1):
             try:
                 logger.debug(f"Processing batch {batch_num}/{len(batches)}: {batch_symbols}")
+                ext_logger.info(f"external_data: action=batch_fetch batch_num={batch_num} size={len(batch_symbols)} symbols={','.join(batch_symbols)}")
                 
                 # Check cache for batch
                 cached_quotes = self._get_cached_quotes_batch(batch_symbols)
@@ -413,11 +416,13 @@ class YahooFinanceAdapter:
                     
             except Exception as e:
                 logger.error(f"Error processing batch {batch_num}: {e}")
+                ext_logger.error(f"external_data: action=batch_error batch_num={batch_num} error={str(e)}")
                 continue
         
         # Log the operation
         end_time = datetime.now(timezone.utc)
         duration_ms = int((end_time - start_time).total_seconds() * 1000)
+        ext_logger.info(f"external_data: action=batch_end symbols_total={len(symbols)} quotes_total={len(all_quotes)} duration_ms={duration_ms}")
         
         self._log_refresh_operation(
             symbols_requested=len(symbols),

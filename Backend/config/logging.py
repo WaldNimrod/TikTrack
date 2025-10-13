@@ -77,6 +77,31 @@ def get_cache_logger() -> logging.Logger:
     
     return cache_logger
 
+def get_external_data_logger() -> logging.Logger:
+    """Get dedicated external data logger that writes to external_data.log"""
+    ext_logger = logging.getLogger('external_data')
+    ext_logger.setLevel(logging.INFO)
+    
+    # Only add handler if it doesn't exist
+    if not ext_logger.handlers:
+        log_dir = Path("logs")
+        log_dir.mkdir(exist_ok=True)
+        
+        log_format = logging.Formatter(
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        )
+        
+        handler = logging.handlers.RotatingFileHandler(
+            log_dir / "external_data.log",
+            maxBytes=10*1024*1024,  # 10MB
+            backupCount=5
+        )
+        handler.setLevel(logging.INFO)
+        handler.setFormatter(log_format)
+        ext_logger.addHandler(handler)
+    
+    return ext_logger
+
 # Create correlation ID for each request
 def generate_correlation_id() -> str:
     """Generate unique correlation identifier"""

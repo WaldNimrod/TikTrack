@@ -29,7 +29,7 @@ server_logs_bp = Blueprint('server_logs', __name__)
 # Configuration
 MAX_RECORDS = 1000
 MAX_FILE_SIZE_WARNING = 5 * 1024 * 1024  # 5MB warning threshold
-ALLOWED_LOG_TYPES = ['app', 'errors', 'performance', 'database', 'background_tasks', 'cache']
+ALLOWED_LOG_TYPES = ['app', 'errors', 'performance', 'database', 'background_tasks', 'cache', 'external_data']
 LOG_DIR = Path("logs")
 
 def get_log_file_path(log_type: str) -> Path:

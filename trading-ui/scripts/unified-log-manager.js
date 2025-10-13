@@ -537,14 +537,7 @@ class UnifiedLogManager {
         try {
             let data = [];
             
-            // Try UnifiedCacheManager first
-            if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
-                data = await window.UnifiedCacheManager.get(logType);
-                if (data && Array.isArray(data) && data.length > 0) {
-                    console.log(`📊 Loaded ${data.length} records from UnifiedCacheManager for ${logType}`);
-                    return data;
-                }
-            }
+            // Do not use UnifiedCacheManager for logs per standardization
             
             // Check if this is a server log type
             if (this.isServerLogType(logType)) {
@@ -561,7 +554,8 @@ class UnifiedLogManager {
                     data = await this.getNotificationStats();
                     break;
                 case 'externalDataLog':
-                    data = await this.getExternalDataLog();
+                    // Fetch from server logs API (type=external_data)
+                    data = await this.getServerLogData('external_data', options);
                     break;
                 case 'cacheLog':
                     data = await this.getCacheLog();

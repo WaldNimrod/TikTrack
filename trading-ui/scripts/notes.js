@@ -535,9 +535,9 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
     }
 
     return `
-      <tr onclick='viewNote(${note.id})' style='cursor: pointer;'>
+      <tr onclick='viewNote(${note.id})' class='clickable-row'>
         <td class='ticker-cell'><span class='symbol-text'>${symbolLink}</span></td>
-        <td style='padding: 0;' data-type='${typeForFilter}'>${relatedTypeBadge}</td>
+        <td class='no-padding' data-type='${typeForFilter}'>${relatedTypeBadge}</td>
         <td>${contentDisplay}</td>
         <td>${attachmentDisplay}</td>
         <td data-date='${note.created_at}'>${dateBadge}</td>

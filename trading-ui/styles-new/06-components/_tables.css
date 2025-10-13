@@ -358,7 +358,7 @@ table td,
   border-bottom: none;
 }
 
-/* עמודת פעולות - מחלקות לפי מספר כפתורים */
+/* עמודת פעולות - רוחב מקסימלי 80px (Actions Menu Popup) */
 .actions-cell {
   text-align: center;
   vertical-align: middle;
@@ -366,9 +366,11 @@ table td,
   min-height: 100%;
   display: table-cell;
   white-space: nowrap;
-  padding: 2px 5px;
-  overflow: visible;
-  width: auto;
+  padding: 4px !important;
+  overflow: visible !important;
+  width: 80px !important;
+  min-width: 80px !important;
+  max-width: 80px !important;
 }
 
 /* תאי פעולות - padding מותאם */
@@ -1253,15 +1255,7 @@ table tbody td button.btn-sm {
   border-color: var(--info-color, #17a2b8);
 }
 
-/* עדכון לעמודת הפעולות - רוחב מקסימלי 80px */
-.actions-cell {
-  width: 80px !important;
-  min-width: 80px !important;
-  max-width: 80px !important;
-  text-align: center;
-  padding: 4px !important;
-  overflow: visible !important;
-}
+/* הסרת ההגדרה הכפולה - הכל בשורה 362 */
 
 /* כותרת עמודת פעולות - איקון ⋮ במקום טקסט */
 .actions-header-icon {

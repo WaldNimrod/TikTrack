@@ -923,10 +923,12 @@ async function renderCashFlowsTable(cashFlows = null) {
             <td class="col-source">${window.translateCashFlowSource ?
     window.translateCashFlowSource(cashFlow.source) :
     cashFlow.source}</td>
-            <td class="col-actions actions-cell actions-3-btn">
-                ${window.createLinkButton ? window.createLinkButton(`showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})`) : ''}
-                ${window.createEditButton ? window.createEditButton(`editCashFlow(${cashFlow.id})`) : ''}
-                ${window.createDeleteButton ? window.createDeleteButton(`deleteCashFlow(${cashFlow.id})`) : ''}
+            <td class="col-actions actions-cell">
+                ${window.createActionsMenu ? window.createActionsMenu([
+                    window.createLinkButton ? window.createLinkButton(`showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})`) : '',
+                    window.createEditButton ? window.createEditButton(`editCashFlow(${cashFlow.id})`) : '',
+                    window.createDeleteButton ? window.createDeleteButton(`deleteCashFlow(${cashFlow.id})`) : ''
+                ], cashFlow.id) : ''}
             </td>
         `;
     tbody.appendChild(row);

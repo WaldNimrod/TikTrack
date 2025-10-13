@@ -541,19 +541,13 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
         <td>${contentDisplay}</td>
         <td>${attachmentDisplay}</td>
         <td data-date='${note.created_at}'>${dateBadge}</td>
-        <td class='col-actions actions-cell actions-3-btn' onclick='event.stopPropagation();'>
-            <button class="btn btn-sm btn-outline-info" onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'note', ${note.id})" title="פריטים מקושרים">
-                <i class="bi bi-link-45deg"></i>
-            </button>
-            <button class="btn btn-sm btn-outline-primary" onclick="editNote(${note.id})" title="עריכה">
-                <i class="bi bi-pencil"></i>
-            </button>
-            <button class="btn btn-sm btn-outline-info" onclick="showNoteDetails(${note.id})" title="פרטים">
-                <i class="bi bi-eye"></i>
-            </button>
-            <button class="btn btn-sm btn-outline-danger" onclick="deleteNote(${note.id})" title="מחיקה">
-                <i class="bi bi-trash"></i>
-            </button>
+        <td class='col-actions actions-cell' onclick='event.stopPropagation();'>
+            ${window.createActionsMenu ? window.createActionsMenu([
+                window.createLinkButton ? window.createLinkButton(`window.showLinkedItemsModal && window.showLinkedItemsModal([], 'note', ${note.id})`) : '',
+                window.createEditButton ? window.createEditButton(`editNote(${note.id})`) : '',
+                window.createButton ? window.createButton('VIEW', `showNoteDetails(${note.id})`) : '',
+                window.createDeleteButton ? window.createDeleteButton(`deleteNote(${note.id})`) : ''
+            ], note.id) : ''}
         </td>
       </tr>
     `;

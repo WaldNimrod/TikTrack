@@ -1067,3 +1067,157 @@ table tbody td button.btn-sm {
   direction: ltr;
   display: inline-block;
 }
+
+/* ============================================
+   Actions Menu Popup System
+   מערכת תפריט פעולות עם popup על hover
+   Created: January 13, 2025
+   ============================================ */
+
+/* Wrapper - מכיל trigger + popup */
+.actions-menu-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* Trigger Button - האיקון ⋮ */
+.actions-menu-trigger {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--primary-color, #26baac);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--primary-color, #26baac);
+}
+
+.actions-menu-trigger:hover {
+  background: var(--primary-color, #26baac);
+  color: white;
+  border-color: var(--primary-color, #26baac);
+}
+
+.actions-menu-trigger:active {
+  background: var(--primary-color, #26baac);
+  opacity: 0.8;
+}
+
+.actions-menu-icon {
+  font-size: 20px;
+  line-height: 1;
+  font-weight: bold;
+}
+
+/* Popup - החלון הצף */
+.actions-menu-popup {
+  position: absolute;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  
+  /* RTL: popup מצד ימין של הtrigger */
+  /* במצב RTL (עברית), left: 100% = מצד ימין */
+  inset-inline-start: 100%;
+  top: 50%;
+  transform: translateY(-50%) scale(0.95);
+  margin-inline-start: 2px; /* צמוד אבל לא עולה על הכפתור */
+}
+
+/* Pseudo-element ליצירת אזור hover מורחב */
+.actions-menu-popup::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  inset-inline-end: -8px; /* מכסה את הרווח לכפתור */
+  bottom: -8px;
+  inset-inline-start: -8px;
+  z-index: -1;
+}
+
+/* Hover state - פתיחת הפופאפ */
+.actions-menu-wrapper:hover .actions-menu-popup {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateY(-50%) scale(1);
+}
+
+/* Popup Content - התוכן */
+.actions-menu-content {
+  background: white;
+  border-radius: 8px;
+  padding: 6px 4px;
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
+  display: flex;
+  gap: 0; /* אין gap - הכפתורים עם margin 2px */
+  white-space: nowrap;
+  min-width: max-content; /* ⚠️ חשוב: הפופאפ מתאים אוטומטית לכמות הכפתורים (2-5) */
+}
+
+/* Dark mode support (לעתיד) */
+@media (prefers-color-scheme: dark) {
+  .actions-menu-content {
+    background: var(--apple-bg-elevated, #2c2c2e);
+    box-shadow: 
+      0 4px 6px -1px rgba(0, 0, 0, 0.3),
+      0 2px 4px -1px rgba(0, 0, 0, 0.2),
+      0 0 0 1px rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* Buttons inside popup - הכפתורים בפופאפ */
+/* ⚠️ הכפתורים ירשו אוטומטית את הסגנונות והצבעים מ-ITCSS */
+.actions-menu-content button,
+.actions-menu-content .btn {
+  /* גדלים תקניים - תואם ל-_tables.css */
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  max-width: 28px;
+  min-height: 28px;
+  max-height: 28px;
+  padding: 0;
+  margin: 0 2px; /* רווח תקני בין כפתורים */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  /* הצבעים והמסגרות יגיעו מ-_buttons-advanced.css */
+}
+
+.actions-menu-content button:hover,
+.actions-menu-content .btn:hover {
+  transform: scale(1.05);
+}
+
+/* עדכון לעמודת הפעולות - רוחב קבוע קטן */
+.actions-cell {
+  width: 50px !important;
+  min-width: 50px !important;
+  max-width: 50px !important;
+  text-align: center;
+  padding: 4px !important;
+  overflow: visible !important;
+}
+
+/* עדכון classes ישנות של מספר כפתורים - כולם עכשיו 50px */
+.actions-1-btn,
+.actions-2-btn,
+.actions-3-btn,
+.actions-4-btn,
+.actions-5-btn {
+  width: 50px;
+  min-width: 50px;
+  max-width: 50px;
+}

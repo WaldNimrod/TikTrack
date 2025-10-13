@@ -708,12 +708,12 @@ class EntityDetailsRenderer {
                     </td>
                     <td>${statusBadge}</td>
                     <td><small>${this.formatDateTime(item.created_at || item.updated_at)}</small></td>
-                    <td>
-                        ${window.createLinkButton ? window.createLinkButton(`window.showEntityDetails('${item.type}', ${item.id})`) : 
-                            `<button class="btn btn-sm btn-info" onclick="window.showEntityDetails('${item.type}', ${item.id})" title="צפה בפרטים"><i class="fas fa-eye"></i></button>`}
-                        ${window.createEditButton ? window.createEditButton(`window.editTicker(${item.id})`) : 
-                            `<button class="btn btn-sm btn-secondary" onclick="window.editTicker(${item.id})" title="ערוך"><i class="fas fa-edit"></i></button>`}
-                        ${this.getActionButtonForType(item.type, item.id, item.status)}
+                    <td class="actions-cell">
+                        ${window.createActionsMenu ? window.createActionsMenu([
+                            window.createLinkButton ? window.createLinkButton(`window.showEntityDetails('${item.type}', ${item.id})`) : '',
+                            window.createEditButton ? window.createEditButton(`window.editTicker(${item.id})`) : '',
+                            this.getActionButtonForType(item.type, item.id, item.status) || ''
+                        ], item.id) : ''}
                     </td>
                 </tr>
             `;

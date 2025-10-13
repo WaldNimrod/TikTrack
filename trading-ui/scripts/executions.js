@@ -1224,10 +1224,12 @@ async function updateExecutionsTableMain(executions) {
                 <td data-date="${execution.date || execution.execution_date}">${dateBadge}</td>
                 <td class="source-cell">${execution.source || '-'}</td>
                 <td class="actions-cell">
-                    ${window.createLinkButton ? window.createLinkButton(`viewLinkedItemsForExecution(${execution.id})`) : ''}
-                    ${window.createEditButton ? window.createEditButton(`editExecution(${execution.id})`) : ''}
-                    ${window.createButton ? window.createButton('VIEW', `showExecutionDetails(${execution.id})`) : ''}
-                    ${window.createDeleteButton ? window.createDeleteButton(`deleteExecution(${execution.id})`) : ''}
+                    ${window.createActionsMenu ? window.createActionsMenu([
+                        window.createLinkButton ? window.createLinkButton(`viewLinkedItemsForExecution(${execution.id})`) : '',
+                        window.createEditButton ? window.createEditButton(`editExecution(${execution.id})`) : '',
+                        window.createButton ? window.createButton('VIEW', `showExecutionDetails(${execution.id})`) : '',
+                        window.createDeleteButton ? window.createDeleteButton(`deleteExecution(${execution.id})`) : ''
+                    ], execution.id) : ''}
                 </td>
             </tr>
         `;

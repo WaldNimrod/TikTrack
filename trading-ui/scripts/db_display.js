@@ -571,12 +571,12 @@ function createActionsHTML(row, tableType) {
     return '<span class="text-muted">-</span>';
   }
 
-  return `
-    <div class="action-buttons">
-      ${window.createEditButton(`editRecord('${tableType}', ${recordId})`)}
-      ${window.createDeleteButton(`deleteRecord('${tableType}', ${recordId})`)}
-    </div>
-  `;
+  const buttons = [
+    window.createEditButton ? window.createEditButton(`editRecord('${tableType}', ${recordId})`) : '',
+    window.createDeleteButton ? window.createDeleteButton(`deleteRecord('${tableType}', ${recordId})`) : ''
+  ];
+
+  return window.createActionsMenu ? window.createActionsMenu(buttons, recordId) : buttons.join('');
 }
 
 /**

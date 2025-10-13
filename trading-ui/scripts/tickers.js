@@ -1661,12 +1661,13 @@ function formatTickerUpdateTime(ticker) {
  * יצירת HTML לכפתורי פעולה
  */
 function createTickerActionsHTML(tickerId) {
-  // שימוש בפונקציות הגלובליות לכפתורי פעולה (כמו cash_flows)
-  return `
-    ${window.createLinkButton ? window.createLinkButton(`if (window.showLinkedItemsModal) { window.showLinkedItemsModal([], 'ticker', ${tickerId}); }`) : ''}
-    ${window.createEditButton ? window.createEditButton(`editTicker(${tickerId})`) : ''}
-    ${window.createDeleteButton ? window.createDeleteButton(`deleteTicker(${tickerId})`) : ''}
-  `;
+  const buttons = [
+    window.createLinkButton ? window.createLinkButton(`if (window.showLinkedItemsModal) { window.showLinkedItemsModal([], 'ticker', ${tickerId}); }`) : '',
+    window.createEditButton ? window.createEditButton(`editTicker(${tickerId})`) : '',
+    window.createDeleteButton ? window.createDeleteButton(`deleteTicker(${tickerId})`) : ''
+  ];
+  
+  return window.createActionsMenu ? window.createActionsMenu(buttons, tickerId) : buttons.join('');
 }
 
 /**

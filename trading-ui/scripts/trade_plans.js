@@ -1954,10 +1954,12 @@ function updateTradePlansTable(trade_plans) {
         
         <!-- 10. פעולות -->
         <td class="actions-cell">
-            ${window.createLinkButton ? window.createLinkButton(`viewLinkedItemsForTradePlan(${design.id})`) : ''}
-            ${window.createEditButton ? window.createEditButton(`editTradePlan(${design.id})`) : ''}
-            ${window.createButton ? window.createButton('VIEW', `showTradePlanDetails(${design.id})`) : ''}
-            ${window.createDeleteButton ? window.createDeleteButton(`deleteTradePlan(${design.id})`) : ''}
+            ${window.createActionsMenu ? window.createActionsMenu([
+                window.createLinkButton ? window.createLinkButton(`viewLinkedItemsForTradePlan(${design.id})`) : '',
+                window.createEditButton ? window.createEditButton(`editTradePlan(${design.id})`) : '',
+                window.createButton ? window.createButton('VIEW', `showTradePlanDetails(${design.id})`) : '',
+                window.createDeleteButton ? window.createDeleteButton(`deleteTradePlan(${design.id})`) : ''
+            ], design.id) : ''}
         </td>
       </tr>
     `;

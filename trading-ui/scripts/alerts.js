@@ -487,17 +487,13 @@ function updateAlertsTable(alerts) {
 
           <td><span class="message-text">${alert.message || '-'}</span></td>
           <td data-date="${alert.created_at}"><span class="date-text">${dateBadge}</span></td>
-          <td class="col-actions actions-cell actions-3-btn" data-entity-id="${alert.id}" data-status="${alert.status || ''}">
-            ${window.createLinkButton(`viewLinkedItemsForAlert(${alert.id})`)}
-            <button class="btn btn-sm btn-outline-primary" onclick="editAlert(${alert.id})" title="עריכה">
-                <i class="bi bi-pencil"></i>
-            </button>
-            <button class="btn btn-sm btn-outline-info" onclick="showAlertDetails(${alert.id})" title="פרטים">
-                <i class="bi bi-eye"></i>
-            </button>
-            <button class="btn btn-sm btn-outline-danger" onclick="deleteAlert(${alert.id})" title="מחיקה">
-                <i class="bi bi-trash"></i>
-            </button>
+          <td class="col-actions actions-cell" data-entity-id="${alert.id}" data-status="${alert.status || ''}">
+            ${window.createActionsMenu ? window.createActionsMenu([
+                window.createLinkButton ? window.createLinkButton(`viewLinkedItemsForAlert(${alert.id})`) : '',
+                window.createEditButton ? window.createEditButton(`editAlert(${alert.id})`) : '',
+                window.createButton ? window.createButton('VIEW', `showAlertDetails(${alert.id})`) : '',
+                window.createDeleteButton ? window.createDeleteButton(`deleteAlert(${alert.id})`) : ''
+            ], alert.id) : ''}
           </td>
         </tr>
       `;

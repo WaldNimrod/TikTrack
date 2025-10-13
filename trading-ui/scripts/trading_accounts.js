@@ -71,12 +71,23 @@ class TradingAccountsController {
         this.showLoadingState();
 
         try {
-            // שימוש ב-account-service הקיים עם Unified Cache
-            this.data = await window.getAccounts();
-            
-            // עדכון UI באמצעות מערכות כלליות
-            this.updateTable();
-            this.updateStatistics();
+            // שימוש במערכת הכללית לטעינת נתונים (כמו trade_plans)
+            if (typeof window.loadTableData === 'function') {
+                this.data = await window.loadTableData('trading_accounts', this.updateTable.bind(this), {
+                    tableId: 'accountsTable',
+                    entityName: 'חשבונות מסחר',
+                    columns: 7,
+                    onRetry: () => this.loadData()
+                });
+                
+                // שמירת הנתונים הגלובליים
+                window.tradingAccountsData = this.data;
+                
+                // עדכון UI באמצעות מערכות כלליות
+                this.updateStatistics();
+            } else {
+                throw new Error('window.loadTableData is not available');
+            }
             
         } catch (error) {
             console.error('Error loading data:', error);
@@ -91,8 +102,11 @@ class TradingAccountsController {
     /**
      * עדכון הטבלה באמצעות מערכת מיפוי טבלאות
      */
-    updateTable() {
+    updateTable(tradingAccounts = null) {
         try {
+            // קבלת נתונים מפרמטר או מ-this.data (כמו trade_plans)
+            const dataToRender = tradingAccounts || this.data || [];
+            
             const tbody = document.querySelector('#accountsTableBody');
             if (!tbody) {
                 console.error('❌ לא נמצא tbody בטבלה');
@@ -103,7 +117,7 @@ class TradingAccountsController {
             // ניקוי הטבלה
             tbody.innerHTML = '';
 
-            if (!this.data || this.data.length === 0) {
+            if (!dataToRender || dataToRender.length === 0) {
                 const row = document.createElement('tr');
                 row.innerHTML = '<td colspan="8" class="text-center">אין נתונים להצגה</td>';
                 tbody.appendChild(row);
@@ -111,7 +125,7 @@ class TradingAccountsController {
             }
 
             // הוספת שורות נתונים
-            this.data.forEach(tradingAccount => {
+            dataToRender.forEach(tradingAccount => {
                 const row = this.createTableRow(tradingAccount);
                 tbody.appendChild(row);
             });
@@ -218,8 +232,11 @@ class TradingAccountsController {
     /**
      * עדכון סטטיסטיקות - באמצעות StatisticsCalculator
      */
-    updateStatistics() {
-        if (!this.data || !Array.isArray(this.data)) {
+    updateStatistics(tradingAccounts = null) {
+        // קבלת נתונים מפרמטר או מ-this.data (כמו cash_flows)
+        const dataToCalc = tradingAccounts || this.data || [];
+        
+        if (!dataToCalc || !Array.isArray(dataToCalc)) {
             console.warn('⚠️ אין נתונים לעדכון סטטיסטיקות');
             return;
         }
@@ -227,14 +244,14 @@ class TradingAccountsController {
         try {
             // חישוב סטטיסטיקות באמצעות StatisticsCalculator
             const stats = window.StatisticsCalculator ? {
-                totalAccounts: window.StatisticsCalculator.countRecords(this.data),
-                activeAccounts: window.StatisticsCalculator.countRecords(this.data, account => account.status === 'open'),
-                totalBalance: window.StatisticsCalculator.calculateSum(this.data, account => parseFloat(account.cashBalance || account.cash_balance) || 0)
+                totalAccounts: window.StatisticsCalculator.countRecords(dataToCalc),
+                activeAccounts: window.StatisticsCalculator.countRecords(dataToCalc, account => account.status === 'open'),
+                totalBalance: window.StatisticsCalculator.calculateSum(dataToCalc, account => parseFloat(account.cashBalance || account.cash_balance) || 0)
             } : {
                 // Fallback
-                totalAccounts: this.data.length,
-                activeAccounts: this.data.filter(account => account.status === 'open').length,
-                totalBalance: this.data.reduce((sum, account) => {
+                totalAccounts: dataToCalc.length,
+                activeAccounts: dataToCalc.filter(account => account.status === 'open').length,
+                totalBalance: dataToCalc.reduce((sum, account) => {
                     const balance = parseFloat(account.cashBalance || account.cash_balance) || 0;
                     return sum + balance;
                 }, 0)

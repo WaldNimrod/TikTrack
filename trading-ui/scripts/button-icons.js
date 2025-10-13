@@ -234,6 +234,46 @@ function createDeleteButtonByType(itemType, itemId, size = 'sm', additionalClass
          `<span class="delete-icon">${icon}</span></button>`;
 }
 
+/**
+ * יצירת תפריט פעולות עם popup על hover
+ * @param {Array} buttons - מערך של HTML של כפתורים (תומך ב-2-5 כפתורים)
+ * @param {string} entityId - ID של הישות (לייחודיות)
+ * @returns {string} HTML של trigger + popup
+ * 
+ * דוגמאות שימוש:
+ * - 2 כפתורים: createActionsMenu([editBtn, deleteBtn], id)
+ * - 5 כפתורים: createActionsMenu([linkBtn, editBtn, viewBtn, cancelBtn, deleteBtn], id)
+ */
+function createActionsMenu(buttons, entityId) {
+  // סינון כפתורים ריקים
+  const validButtons = buttons.filter(btn => btn && btn.trim() !== '');
+  
+  if (validButtons.length === 0) {
+    return '<span class="text-muted">-</span>';
+  }
+  
+  const menuId = `actions-menu-${entityId}`;
+  
+  // הפופאפ יתאים אוטומטית לכמות הכפתורים (CSS flex + min-width: max-content)
+  return `
+    <div class="actions-menu-wrapper">
+      <button class="actions-menu-trigger" 
+              data-menu-id="${menuId}"
+              title="פעולות"
+              aria-label="תפריט פעולות">
+        <span class="actions-menu-icon">⋮</span>
+      </button>
+      <div class="actions-menu-popup" 
+           id="${menuId}"
+           role="menu">
+        <div class="actions-menu-content">
+          ${validButtons.join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 // ייצוא לפונקציות גלובליות
 window.BUTTON_ICONS = BUTTON_ICONS;
 window.BUTTON_TEXTS = BUTTON_TEXTS;
@@ -244,3 +284,4 @@ window.createLinkButton = createLinkButton;
 window.createCancelButton = createCancelButton;
 window.createDeleteButtonByType = createDeleteButtonByType;
 window.getButtonClass = getButtonClass;
+window.createActionsMenu = createActionsMenu;

@@ -5,8 +5,8 @@
  * קובץ זה מכיל את הסגנונות הספציפיים לכותרות כל עמוד
  * מבוסס על הסגנונות מהמערכת הישנה
  * 
- * @version 1.0.0
- * @lastUpdated January 6, 2025
+ * @version 2.0.2
+ * @lastUpdated October 13, 2025 - Fixed executions dynamic colors
  */
 
 /* ===== סגנונות כותרות עמודים עם צבעים ספציפיים ===== */
@@ -54,9 +54,9 @@
 /* עמוד עסקאות - דינמי מהעדפות */
 .executions-page .section-header,
 .executions-page .top-section .section-header {
-  background-color: var(--entity-execution-bg, rgba(255, 244, 230, 0.8));
-  border-bottom: 2px solid var(--entity-execution-color, #fd7e14);
-  color: var(--entity-execution-text, #e55a00);
+  background-color: var(--entity-execution-bg);
+  border-bottom: 2px solid var(--entity-execution-text); /* ✅ ווריאנט כהה */
+  color: var(--entity-execution-text);
 }
 
 /* עמוד הערות - דינמי מהעדפות */
@@ -318,15 +318,15 @@
 }
 
 .entity-execution-main-header {
-  background-color: var(--entity-execution-bg, rgba(255, 244, 230, 0.8)); /* variant בהיר עם שקיפות 0.8 */
-  border-bottom: 2px solid var(--entity-execution-color, #fd7e14);
-  color: var(--entity-execution-text, #e55a00);
+  background-color: var(--entity-execution-bg);
+  border-bottom: 2px solid var(--entity-execution-text); /* ✅ ווריאנט כהה לגבול */
+  color: var(--entity-execution-text);
 }
 
 .entity-execution-sub-header {
-  background-color: var(--entity-execution-bg, rgba(255, 244, 230, 0.8)); /* variant בהיר עם שקיפות 0.8 */
-  border-bottom: 2px solid var(--entity-execution-color, #fd7e14);
-  color: var(--entity-execution-text, #e55a00);
+  background-color: var(--entity-execution-bg);
+  border-bottom: 2px solid var(--entity-execution-text); /* ✅ ווריאנט כהה לגבול */
+  color: var(--entity-execution-text);
 }
 
 .entity-trade-plan-main-header {

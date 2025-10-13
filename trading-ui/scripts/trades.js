@@ -546,11 +546,13 @@ class TradesController {
                 <td class="col-closed">${closedDate}</td>
                 <td class="col-account">${accountName}</td>
                 <td class="col-actions actions-cell">
-                    ${window.createLinkButton ? window.createLinkButton(`viewLinkedItemsForTrade(${trade.id})`) : ''}
-                    ${window.createEditButton ? window.createEditButton(`editTrade(${trade.id})`) : ''}
-                    ${window.createButton ? window.createButton('VIEW', `viewTrade(${trade.id})`) : ''}
-                    ${window.createCancelButton ? window.createCancelButton('trade', trade.id, trade.status) : ''}
-                    ${window.createDeleteButton ? window.createDeleteButton(`deleteTrade(${trade.id})`) : ''}
+                    ${window.createActionsMenu ? window.createActionsMenu([
+                        window.createLinkButton ? window.createLinkButton(`viewLinkedItemsForTrade(${trade.id})`) : '',
+                        window.createEditButton ? window.createEditButton(`editTrade(${trade.id})`) : '',
+                        window.createButton ? window.createButton('VIEW', `viewTrade(${trade.id})`) : '',
+                        window.createCancelButton ? window.createCancelButton('trade', trade.id, trade.status) : '',
+                        window.createDeleteButton ? window.createDeleteButton(`deleteTrade(${trade.id})`) : ''
+                    ], trade.id) : ''}
                 </td>
             </tr>
         `;

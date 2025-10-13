@@ -1824,7 +1824,7 @@ window.validateEditTickerForm = validateEditTickerForm;
 window.updateTickersTable = updateTickersTable;
 window.updateTickersSummaryStats = updateTickersSummaryStats;
 // toggleTickersSection removed - use toggleSection('main') instead
-window.restoreTickersSectionState = restoreTickersSectionState;
+// restoreTickersSectionState removed - handled by unified system
 
 // Filters
 window.filterTickersByType = filterTickersByType;
@@ -1975,8 +1975,10 @@ window.initializeTickersPage = function() {
         window.initializeTickersModals();
     }
     
-  // שחזור מצב הסגירה
-  restoreTickersSectionState();
+  // טעינת נתונים
+  if (typeof window.loadTickersData === 'function') {
+    window.loadTickersData();
+  }
 
   // טעינת צבעים מההעדפות לפני יישום על הכותרות
   loadColorsAndApplyToHeaders();
@@ -1997,33 +1999,7 @@ window.initializeTickersPage = function() {
     }
 };
 
-// אתחול נוסף כשהדף נטען לחלוטין
-window.addEventListener('load', async function () {
-  // בדיקה אם אנחנו בדף טיקרים
-  const isTickersPage = window.location.pathname.includes('tickers') ||
-                         document.querySelector('table[data-table-type="tickers"]') ||
-                         document.getElementById('tickersContainer');
-
-  if (!isTickersPage) {
-    return;
-  }
-
-  // טעינת נתונים - Promise-based (ללא polling)
-  try {
-    const tbody = await waitForElement('table[data-table-type="tickers"] tbody', 5000);
-    if (tbody) {
-      await loadTickersData();
-    } else {
-      // fallback - טעינה בכל מקרה
-      console.warn('⚠️ טבלה לא נמצאה, מנסה לטעון נתונים בכל מקרה');
-      await loadTickersData();
-    }
-  } catch (error) {
-    console.error('❌ שגיאה באתחול טעינת נתונים:', error);
-    // fallback - טעינה בכל מקרה
-    await loadTickersData();
-  }
-});
+// window.addEventListener('load') removed - handled by initializeTickersPage via unified system
 
 /**
  * המתנה לאלמנט להיות זמין - Promise-based (ללא polling)

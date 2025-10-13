@@ -459,20 +459,7 @@ function updateAlertsTable(alerts) {
   })()}</span></td>
           <td class="status-cell" data-status="${alert.status || ''}">${statusBadge}</td>
           <td class="triggered-cell">${triggeredDisplay}</td>
-          <td class="related-cell">
-            ${window.FieldRendererService && window.FieldRendererService.renderLinkedEntity
-              ? window.FieldRendererService.renderLinkedEntity(
-                  alert.related_type || alert.related_type_id,
-                  alert.related_id,
-                  alert.related_entity_name,
-                  {
-                    ticker: alert.ticker_symbol || alert.symbol || (alert.ticker && alert.ticker.symbol) || '',
-                    date: alert.created_at,
-                    status: alert.status
-                  }
-                )
-              : `<div class=\"related-object-cell ${relatedClass}\" title=\"קישור לדף אובייקט - בפיתוח\">${relatedTypeBadge}</div>`}
-          </td>
+          <td class="related-cell">${relatedTypeBadge}</td>
 
           <td><span class="message-text">${alert.message || '-'}</span></td>
           <td data-date="${alert.created_at}"><span class="date-text">${dateBadge}</span></td>

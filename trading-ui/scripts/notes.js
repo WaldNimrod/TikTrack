@@ -501,10 +501,18 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
     // הוספת האייקון לפני האובייקט
     relatedDisplay = relatedIcon + relatedDisplay;
 
-    // שימוש ב-FieldRendererService לעיצוב שדות
-    const relatedTypeBadge = window.FieldRendererService ? 
-      window.FieldRendererService.renderType(note.related_type, 'related_type') : 
-      `<div class='related-object-cell ${relatedClass}'>${relatedDisplay}</div>`;
+    // שימוש ברכיב הגנרי להצגת אובייקט קשור (Linked Object Badge v2)
+    const relatedBadge = (window.FieldRendererService && window.FieldRendererService.renderLinkedEntity)
+      ? window.FieldRendererService.renderLinkedEntity(
+          note.related_type || note.related_type_id,
+          note.related_id,
+          note.related_entity_name,
+          {
+            ticker: symbolDisplay || '',
+            date: note.created_at || '',
+          }
+        )
+      : `<div class='related-object-cell ${relatedClass}'>${relatedDisplay}</div>`;
 
     const dateBadge = window.FieldRendererService ? 
       window.FieldRendererService.renderDate(note.created_at) : 
@@ -537,7 +545,7 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
     return `
       <tr onclick='viewNote(${note.id})' class='clickable-row'>
         <td class='ticker-cell'><span class='symbol-text'>${symbolLink}</span></td>
-        <td class='no-padding' data-type='${typeForFilter}'>${relatedTypeBadge}</td>
+        <td class='no-padding' data-type='${typeForFilter}'>${relatedBadge}</td>
         <td>${contentDisplay}</td>
         <td>${attachmentDisplay}</td>
         <td data-date='${note.created_at}'>${dateBadge}</td>

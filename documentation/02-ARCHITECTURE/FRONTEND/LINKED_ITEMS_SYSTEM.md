@@ -1,3 +1,46 @@
+## Linked Object Badge v2 (Tables UI)
+
+Purpose: a compact, reusable badge for "related/linked object" cells across all user tables.
+
+Structure (RTL grid-as-table, 3 cells):
+- Kind cell: icon + bold entity label (same line)
+- Center cell: symbol (top) + date dd.mm (below)
+- Status cell: outline status badge with dark text
+
+HTML emitted by FieldRendererService.renderLinkedEntity:
+
+```html
+<div class="linked-object-badge entity-<type>" data-entity-type="<type>" data-entity-id="<id>">
+  <span class="linked-object-kind">
+    <span class="linked-object-kind-icon"><img class="linked-object-icon" src="/trading-ui/images/icons/<type>.svg" alt="<label>"></span>
+    <span class="linked-object-kind-title"><strong class="linked-object-type"><label></strong></span>
+  </span>
+  <span class="linked-object-center" aria-label="<label>">
+    <span class="linked-object-symbol">AAPL</span>
+    <span class="linked-object-date">24.08</span>
+  </span>
+  <span class="linked-object-status"><span class="status-badge" data-status-category="open">פתוח</span></span>
+  
+  <!-- click opens details (showEntityDetails/openItemPage fallback) -->
+</div>
+```
+
+CSS (ITCSS, Components layer - 06-components/_linked-items.css):
+- Badge uses inline-table layout (no !important) with RTL.
+- Icon size 36px; entity title font 15px/700.
+- Center column responsive: min-width 60px, max-width 80px.
+- Status badge uses outline variant (dark text) with data-status-category.
+
+JS API:
+- `FieldRendererService.renderLinkedEntity(relatedType, relatedId, displayName, { ticker, date, status })`
+- Normalizes types (account, trade, trade_plan, ticker, alert, note, execution, cash_flow).
+- Date format helper `renderDateShort` → dd.mm.
+
+Usage notes:
+- No raw IDs in UI. Use label + meta.
+- Colors/icons come from entity type mapping; trade_plan label is "תוכנית".
+- All inline styles are prohibited; only use the component CSS file.
+
 # מערכת פריטים מקושרים - TikTrack (מעודכן)
 
 ## 📋 סקירה כללית

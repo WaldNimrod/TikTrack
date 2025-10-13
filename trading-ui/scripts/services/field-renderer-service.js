@@ -279,7 +279,10 @@ class FieldRendererService {
 
         return `
         <div class="linked-object-badge entity-${type}" role="link" tabindex="0" ${onclick} data-entity-type="${type}" data-entity-id="${safeId}">
-            <span class="linked-object-kind"><img class="linked-object-icon" src="${iconPath}" alt="${label}"> <strong class="linked-object-type">${label}</strong></span>
+            <span class="linked-object-kind">
+                <span class="linked-object-kind-icon"><img class="linked-object-icon" src="${iconPath}" alt="${label}"></span>
+                <span class="linked-object-kind-title"><strong class="linked-object-type">${label}</strong></span>
+            </span>
             ${centerHtml}
             <span class="linked-object-status">${statusHtml}</span>
         </div>`;

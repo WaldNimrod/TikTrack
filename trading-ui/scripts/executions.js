@@ -1204,16 +1204,16 @@ async function updateExecutionsTableMain(executions) {
 
     return `
             <tr data-execution-id="${execution.id}">
-                                   <td class="ticker-cell">
-                       <div class="ticker-cell-content">
-                           <strong class="ticker-symbol-link ${execution.action === 'buy' ? 'action-buy' : 'action-sell'}" 
-                             onclick="window.showEntityDetailsModal && window.showEntityDetailsModal('ticker', ${tickerId || 'null'}, 'view')" 
-                             title="פתח פרטי סימבול">${symbol}</strong>
-                           <button class="btn btn-sm btn-info" 
-                             onclick="window.viewLinkedItemsForTicker && window.viewLinkedItemsForTicker(${tickerId || 'null'})" 
-                             title="פריטים מקושרים לטיקר">🔗</button>
-                       </div>
-                   </td>
+                <td class="ticker-cell">
+                    <div class="ticker-cell-content d-flex align-items-center gap-1" style="white-space: nowrap; flex-direction: row-reverse;">
+                        <strong class="ticker-symbol-link ${execution.action === 'buy' ? 'action-buy' : 'action-sell'}" 
+                          onclick="window.showEntityDetailsModal && window.showEntityDetailsModal('ticker', ${tickerId || 'null'}, 'view')" 
+                          title="פתח פרטי סימבול">${symbol}</strong>
+                        <button class="btn btn-sm btn-info" 
+                          onclick="window.viewLinkedItemsForTicker && window.viewLinkedItemsForTicker(${tickerId || 'null'})" 
+                          title="פריטים מקושרים לטיקר" style="padding: 2px 6px; font-size: 0.75rem;">🔗</button>
+                    </div>
+                </td>
                 <td class="type-cell" data-type="${typeForFilter}">${actionBadge}</td>
                 <td data-account="${accountName}" class="account-cell-link" 
                   onclick="window.showEntityDetailsModal && window.showEntityDetailsModal('account', '${accountName}', 'view')" 
@@ -3140,7 +3140,13 @@ window.initializeExecutionsPage = function() {
     }
     
     // 4. Load colors and apply to headers
-    loadColorsAndApplyToHeaders();
+    if (typeof window.loadColorPreferences === 'function') {
+        window.loadColorPreferences().then(() => {
+            console.log('✅ Dynamic colors loaded for executions');
+        }).catch(error => {
+            console.error('❌ Failed to load colors:', error);
+        });
+    }
     
     // 5. Setup filter functions
     setupExecutionsFilterFunctions();

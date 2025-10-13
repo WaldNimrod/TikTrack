@@ -1201,6 +1201,45 @@ table tbody td button.btn-sm {
   transform: scale(1.05);
 }
 
+/* ===== Hover States - צבעים מיוחדים לכל סוג כפתור ===== */
+
+/* כפתור מחיקה - צבע אזהרה עם שקיפות */
+.actions-menu-content .btn-danger:hover,
+.actions-menu-content button.btn-danger:hover {
+  background: rgba(220, 53, 69, 0.5) !important;
+  color: white;
+  border-color: var(--danger-color, #dc3545);
+}
+
+/* כפתור צפייה/פרטים - צבע ראשי עם שקיפות */
+.actions-menu-content .btn-outline-info:hover,
+.actions-menu-content .btn-info:hover,
+.actions-menu-content button[onclick*="show"]:hover,
+.actions-menu-content button[onclick*="view"]:hover,
+.actions-menu-content button[onclick*="VIEW"]:hover {
+  background: rgba(38, 186, 172, 0.5) !important;
+  color: white;
+  border-color: var(--primary-color, #26baac);
+}
+
+/* כפתור עריכה - צבע מישני במסגרת, אזהרה ברקע */
+.actions-menu-content .btn-secondary:hover,
+.actions-menu-content .btn-outline-secondary:hover,
+.actions-menu-content button[onclick*="edit"]:hover {
+  background: rgba(220, 53, 69, 0.5) !important;
+  color: white;
+  border-color: var(--secondary-color, #6c757d);
+}
+
+/* כפתור מקושרים - צבע מידע במסגרת, מידע ברקע */
+.actions-menu-content button[onclick*="Linked"]:hover,
+.actions-menu-content button[onclick*="link"]:hover,
+.actions-menu-content .btn-link:hover {
+  background: rgba(23, 162, 184, 0.5) !important;
+  color: white;
+  border-color: var(--info-color, #17a2b8);
+}
+
 /* עדכון לעמודת הפעולות - רוחב קבוע קטן */
 .actions-cell {
   width: 50px !important;
@@ -1209,7 +1248,13 @@ table tbody td button.btn-sm {
   text-align: center;
   padding: 2px !important;
   overflow: visible !important;
-  font-size: 0.8rem; /* טקסט קטן יותר כדי שהכותרת תיכנס */
+}
+
+/* כותרת עמודת פעולות - איקון ⋮ במקום טקסט */
+.actions-header-icon {
+  font-size: 20px;
+  font-weight: bold;
+  color: var(--text-muted, #6c757d);
 }
 
 /* עדכון classes ישנות של מספר כפתורים - כולם עכשיו 50px */

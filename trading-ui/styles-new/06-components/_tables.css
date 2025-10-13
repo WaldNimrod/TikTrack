@@ -1201,7 +1201,17 @@ table tbody td button.btn-sm {
   transform: scale(1.05);
 }
 
-/* ===== Hover States - צבעים מיוחדים לכל סוג כפתור ===== */
+/* ===== Custom Button Styles - צבעים מיוחדים לכל סוג כפתור ===== */
+
+/* כפתור עריכה - צבע אזהרה (warning) במסגרת */
+.actions-menu-content .btn-secondary,
+.actions-menu-content .btn-outline-secondary,
+.actions-menu-content button[onclick*="edit"],
+.actions-menu-content button[onclick*="Edit"] {
+  border-color: var(--warning-color, #ffc107) !important; /* warning - כתום */
+}
+
+/* ===== Hover States ===== */
 
 /* כפתור מחיקה - צבע אזהרה (warning) עם שקיפות */
 .actions-menu-content .btn-danger:hover,
@@ -1224,14 +1234,14 @@ table tbody td button.btn-sm {
   border-color: var(--primary-color, #26baac);
 }
 
-/* כפתור עריכה - צבע מישני במסגרת, אזהרה (warning) ברקע */
+/* כפתור עריכה - מסגרת אזהרה, רקע אזהרה 50% */
 .actions-menu-content .btn-secondary:hover,
 .actions-menu-content .btn-outline-secondary:hover,
 .actions-menu-content button[onclick*="edit"]:hover,
 .actions-menu-content button[onclick*="Edit"]:hover {
   background: rgba(255, 193, 7, 0.5) !important; /* warning color - כתום */
   color: white;
-  border-color: var(--secondary-color, #6c757d);
+  border-color: var(--warning-color, #ffc107); /* נשאר כתום */
 }
 
 /* כפתור מקושרים - צבע מידע במסגרת, מידע ברקע */

@@ -1181,6 +1181,8 @@ async function updateExecutionsTableMain(executions) {
     // שימוש בנתונים שמגיעים מהשרת
     const symbol = execution.trade_ticker_symbol || 'לא מוגדר';
     const tradeInfo = execution.trade_display || `טרייד ${execution.trade_id}`;
+    const tickerId = execution.ticker_id || execution.trade_ticker_id || null;
+    const accountName = execution.account_name || execution.trading_account_name || 'לא מוגדר';
 
     // שימוש ב-FieldRendererService לעיצוב שדות
     const actionBadge = window.FieldRendererService ? 
@@ -1205,10 +1207,10 @@ async function updateExecutionsTableMain(executions) {
                                    <td class="ticker-cell">
                        <div class="ticker-cell-content">
                            <strong class="ticker-symbol-link ${execution.action === 'buy' ? 'action-buy' : 'action-sell'}" 
-                             onclick="window.showEntityDetailsModal && window.showEntityDetailsModal('ticker', ${ticker ? ticker.id : 'null'}, 'view')" 
+                             onclick="window.showEntityDetailsModal && window.showEntityDetailsModal('ticker', ${tickerId || 'null'}, 'view')" 
                              title="פתח פרטי סימבול">${symbol}</strong>
                            <button class="btn btn-sm btn-info" 
-                             onclick="window.viewLinkedItemsForTicker && window.viewLinkedItemsForTicker(${ticker ? ticker.id : 'null'})" 
+                             onclick="window.viewLinkedItemsForTicker && window.viewLinkedItemsForTicker(${tickerId || 'null'})" 
                              title="פריטים מקושרים לטיקר">🔗</button>
                        </div>
                    </td>
@@ -1216,7 +1218,7 @@ async function updateExecutionsTableMain(executions) {
                 <td data-account="${accountName}" class="account-cell-link" 
                   onclick="window.showEntityDetailsModal && window.showEntityDetailsModal('account', '${accountName}', 'view')" 
                   title="פתח פרטי חשבון">${accountName}</td>
-                <td>${execution.quantity}</td>
+                <td>${window.FieldRendererService ? window.FieldRendererService.renderShares(execution.quantity) : (execution.quantity ? '#' + execution.quantity : '-')}</td>
                 <td>$${execution.price}</td>
                 <td class="pl-cell">${plBadge}</td>
                 <td data-date="${execution.date || execution.execution_date}">${dateBadge}</td>
@@ -1435,12 +1437,7 @@ window.confirmDeleteExecution = confirmDeleteExecution;
 
 // פונקציות מודל פריטים מקושרים
 window.showExecutionLinkedItemsModal = showExecutionLinkedItemsModal;
-window.loadLinkedItemsDetails = loadLinkedItemsDetails;
-window.displayLinkedItems = displayLinkedItems;
-window.goToLinkedItems = goToLinkedItems;
-window.goToTrade = goToTrade;
-window.goToPlan = goToPlan;
-window.goToAlert = goToAlert;
+// Removed non-existent function exports - these are in linked-items.js
 window.goToNote = goToNote;
 
 // ===== פונקציות סידור =====
@@ -2971,8 +2968,8 @@ window.toggleExecutionsSection = toggleExecutionsSection;
 function generateDetailedLog() {
     // יצירת timestamp באמצעות DefaultValueSetter או fallback
     let timestamp;
-    if (window.DefaultValueSetter) {
-        timestamp = window.DefaultValueSetter.getCurrentDateTime('he-IL');
+    if (window.DefaultValueSetter && typeof window.DefaultValueSetter.getFormattedDateTime === 'function') {
+        timestamp = window.DefaultValueSetter.getFormattedDateTime('he-IL');
     } else {
         timestamp = new Date().toLocaleString('he-IL');
     }

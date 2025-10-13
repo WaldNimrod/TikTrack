@@ -1662,19 +1662,11 @@ function formatTickerUpdateTime(ticker) {
  * יצירת HTML לכפתורי פעולה
  */
 function createTickerActionsHTML(tickerId) {
+  // שימוש בפונקציות הגלובליות לכפתורי פעולה (כמו cash_flows)
   return `
-    <button class="btn btn-sm btn-outline-info" onclick="viewLinkedItemsForTicker(${tickerId})" title="פריטים מקושרים">
-      <i class="bi bi-link-45deg"></i>
-    </button>
-    <button class="btn btn-sm btn-outline-primary" onclick="editTicker(${tickerId})" title="עריכה">
-      <i class="bi bi-pencil"></i>
-    </button>
-    <button class="btn btn-sm btn-outline-info" onclick="viewTickerDetails(${tickerId})" title="פרטים">
-      <i class="bi bi-eye"></i>
-    </button>
-    <button class="btn btn-sm btn-outline-danger" onclick="deleteTicker(${tickerId})" title="מחיקה">
-      <i class="bi bi-trash"></i>
-    </button>
+    ${window.createLinkButton ? window.createLinkButton(`if (window.showLinkedItemsModal) { window.showLinkedItemsModal([], 'ticker', ${tickerId}); }`) : ''}
+    ${window.createEditButton ? window.createEditButton(`editTicker(${tickerId})`) : ''}
+    ${window.createDeleteButton ? window.createDeleteButton(`deleteTicker(${tickerId})`) : ''}
   `;
 }
 
@@ -1773,6 +1765,13 @@ function updateTickersTable(tickers) {
 
     // עדכון סטטיסטיקות סיכום
     updateTickersSummaryStats(tickers);
+    
+    // אתחול כפתורי פעולה (כמו cash_flows)
+    if (typeof window.initializeButtonIcons === 'function') {
+      setTimeout(() => {
+        window.initializeButtonIcons();
+      }, 50);
+    }
 
   } catch (error) {
     console.error(error, 'עדכון טבלת טיקרים');

@@ -10,6 +10,25 @@
 console.log('📄 Loading preferences-page.js...');
 
 /**
+ * Schedule a hard page reload with a short delay and user notification
+ */
+function schedulePreferencesHardReload(delayMs = 500, message = 'ההגדרות יושמו. מרענן את העמוד...') {
+    try {
+        if (window.__ttReloadScheduled) { return; }
+        window.__ttReloadScheduled = true;
+        if (typeof window.showInfoNotification === 'function') {
+            window.showInfoNotification(message);
+        }
+        setTimeout(() => {
+            try { window.location?.reload?.(true); } catch { window.location.href = window.location.href; }
+        }, delayMs);
+    } catch (e) {
+        // fallback immediate reload
+        try { window.location?.reload?.(true); } catch { window.location.href = window.location.href; }
+    }
+}
+
+/**
  * Load trading accounts using SelectPopulatorService
  * טעינת חשבונות מסחר למילוי בשדה בחירה
  */
@@ -385,11 +404,30 @@ async function initializeInfoSummary() {
                                 if (typeof window.loadPreferences === 'function') {
                                     await window.loadPreferences(1, profile.id);
                                 }
+
+                                // Invalidate caches and broadcast preferences update
+                                try {
+                                    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                                        await window.UnifiedCacheManager.removeByDependencies(['preferences']);
+                                    }
+                                } catch {}
+                                try {
+                                    const versionResp = await fetch('/api/preferences/version?profile_id=' + profile.id);
+                                    const versionJson = versionResp.ok ? await versionResp.json() : null;
+                                    const info = versionJson?.data || {};
+                                    const signal = { profileId: info.profile_id, version: info.version, ts: Date.now(), source: 'profile-switch' };
+                                    localStorage.setItem('tt:preferences', JSON.stringify(signal));
+                                    if (typeof window.loadUserPreferences === 'function') {
+                                        await window.loadUserPreferences({ force: true, source: 'profile-switch' });
+                                    }
+                                } catch (e) { console.warn('⚠️ broadcast after profile switch failed:', e); }
                                 
                                 // Show success notification
                                 if (typeof window.showSuccessNotification === 'function') {
                                     window.showSuccessNotification(`פרופיל הוחלף ל: ${profile.name}`);
                                 }
+                                // Schedule hard reload
+                                schedulePreferencesHardReload(500, 'הפרופיל הוחלף. מרענן את העמוד בעוד 0.5 שנ׳...');
                             }
                         } else if (selectedProfile === 'ברירת מחדל') {
                             // Switch to default profile
@@ -403,11 +441,30 @@ async function initializeInfoSummary() {
                                 if (typeof window.loadPreferences === 'function') {
                                     await window.loadPreferences(1, defaultProfile.id);
                                 }
+
+                                // Invalidate caches and broadcast preferences update
+                                try {
+                                    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                                        await window.UnifiedCacheManager.removeByDependencies(['preferences']);
+                                    }
+                                } catch {}
+                                try {
+                                    const versionResp = await fetch('/api/preferences/version?profile_id=' + defaultProfile.id);
+                                    const versionJson = versionResp.ok ? await versionResp.json() : null;
+                                    const info = versionJson?.data || {};
+                                    const signal = { profileId: info.profile_id, version: info.version, ts: Date.now(), source: 'profile-switch' };
+                                    localStorage.setItem('tt:preferences', JSON.stringify(signal));
+                                    if (typeof window.loadUserPreferences === 'function') {
+                                        await window.loadUserPreferences({ force: true, source: 'profile-switch' });
+                                    }
+                                } catch (e) { console.warn('⚠️ broadcast after default profile switch failed:', e); }
                                 
                                 // Show success notification
                                 if (typeof window.showSuccessNotification === 'function') {
                                     window.showSuccessNotification('פרופיל הוחלף לברירת מחדל');
                                 }
+                                // Schedule hard reload
+                                schedulePreferencesHardReload(500, 'הפרופיל הוחלף. מרענן את העמוד בעוד 0.5 שנ׳...');
                             }
                         }
                     });
@@ -508,7 +565,14 @@ async function saveAllPreferences() {
                     window.preferencesCache.clear();
                 }
                 
-                // Reload preferences to update form
+                // Invalidate unified cache layers for 'preferences' and broadcast
+                try {
+                    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                        await window.UnifiedCacheManager.removeByDependencies(['preferences']);
+                    }
+                } catch {}
+
+                // Reload preferences globally and update UI
                 if (typeof window.loadPreferences === 'function') {
                     console.log('🔄 Reloading preferences to update form...');
                     await window.loadPreferences(1, profileId);
@@ -519,11 +583,31 @@ async function saveAllPreferences() {
                     console.log('🎨 Reloading colors to update color pickers...');
                     await window.loadColorsForPreferences();
                 }
+
+                // Force global preferences reload (no cache) and dispatch event + storage sync
+                try {
+                    const versionResp = await fetch('/api/preferences/version');
+                    const versionJson = versionResp.ok ? await versionResp.json() : null;
+                    const profileInfo = versionJson?.data || {};
+
+                    // write storage signal for other tabs/pages
+                    const signal = { profileId: profileInfo.profile_id, version: profileInfo.version, ts: Date.now(), source: 'save' };
+                    localStorage.setItem('tt:preferences', JSON.stringify(signal));
+
+                    // dispatch local event + apply
+                    if (typeof window.loadUserPreferences === 'function') {
+                        await window.loadUserPreferences({ force: true, source: 'save' });
+                    }
+                } catch (e) {
+                    console.warn('⚠️ preferences broadcast failed:', e);
+                }
                 
                 // Show success notification
                 if (typeof window.showSuccessNotification === 'function') {
                     window.showSuccessNotification('העדפות נשמרו בהצלחה!');
                 }
+                // Schedule hard reload with short delay to ensure fresh assets
+                schedulePreferencesHardReload(500, 'ההגדרות נשמרו והופצו. מרענן את העמוד בעוד 0.5 שנ׳...');
                 
                 return true;
             } else {

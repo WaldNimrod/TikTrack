@@ -126,21 +126,28 @@ def get_active_tickers():
             market_hours = market_flag.lower() in ('1', 'true', 'yes')
         ttl_seconds = get_refresh_policy_for_status(db, active_mode, market_hours)
 
-        # Query tickers per mode
-        base_query = db.query(TickerService).session.query  # keep style consistent
+        # Query tickers per mode (use Ticker directly to get IDs, then fetch projected list via service)
         from models.ticker import Ticker
-        query = db.query(Ticker)
+        ids_query = db.query(Ticker.id)
         if active_mode == 'active':
-            query = query.filter(Ticker.active_trades == True, Ticker.status == 'open')
+            ids_query = ids_query.filter(Ticker.active_trades == True, Ticker.status == 'open')
         elif active_mode == 'open':
-            query = query.filter(Ticker.status == 'open')
+            ids_query = ids_query.filter(Ticker.status == 'open')
         else:  # both
-            query = query.filter(Ticker.status == 'open')
+            ids_query = ids_query.filter(Ticker.status == 'open')
 
+        ids = [row[0] for row in ids_query.all()]
+        if not ids:
+            return jsonify({
+                "status": "success",
+                "data": [],
+                "message": "No active/open tickers found",
+                "version": "1.0"
+            })
+
+        # Fetch projected entities via service and filter by IDs
         tickers = TickerService.get_all(db, fields=fields_list)
-        # Filter per query conditions above (keep projection logic in service)
-        symbols_open = {t.id for t in query.all()}
-        filtered = [t for t in tickers if t.id in symbols_open]
+        filtered = [t for t in tickers if t.id in ids]
 
         # Build response JSON now
         data = []

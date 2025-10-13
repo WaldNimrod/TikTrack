@@ -780,3 +780,48 @@ def health_check() -> Any:
             "error": str(e),
             "timestamp": datetime.now().isoformat()
         }), 500
+
+# ============================================================================
+# Lightweight Version & Active Profile Endpoints
+# ============================================================================
+
+@preferences_bp.route('/profile/active', methods=['GET'])
+def get_active_profile() -> Any:
+    """
+    קבלת פרופיל פעיל למשתמש (id, last_used_at)
+    Query params:
+      - user_id (optional, default 1)
+    """
+    try:
+        user_id = request.args.get('user_id', 1, type=int)
+        info = preferences_service.get_active_profile_info(user_id)
+        return jsonify({
+            'success': True,
+            'data': info,
+            'timestamp': datetime.now().isoformat()
+        }), 200
+    except Exception as e:
+        logger.error(f"Error getting active profile: {e}")
+        return jsonify({'success': False, 'error': str(e), 'timestamp': datetime.now().isoformat()}), 500
+
+
+@preferences_bp.route('/version', methods=['GET'])
+def get_preferences_version() -> Any:
+    """
+    קבלת גרסת העדפות (מקסימום updated_at של user_preferences עבור הפרופיל הפעיל/נתון)
+    Query params:
+      - user_id (optional, default 1)
+      - profile_id (optional)
+    """
+    try:
+        user_id = request.args.get('user_id', 1, type=int)
+        profile_id = request.args.get('profile_id', type=int)
+        version_info = preferences_service.get_preferences_version(user_id, profile_id)
+        return jsonify({
+            'success': True,
+            'data': version_info,
+            'timestamp': datetime.now().isoformat()
+        }), 200
+    except Exception as e:
+        logger.error(f"Error getting preferences version: {e}")
+        return jsonify({'success': False, 'error': str(e), 'timestamp': datetime.now().isoformat()}), 500

@@ -614,6 +614,61 @@ class UnifiedAppInitializer {
                 console.warn(`⚠️ Custom initializer ${i + 1} is not a function:`, typeof initializer);
             }
         }
+
+        // === Preferences propagation listeners (storage + visibility) ===
+        try {
+            if (!window.__ttPreferencesListenersBound) {
+                window.__ttPreferencesListenersBound = true;
+
+                // storage listener to react to changes from other tabs/pages
+                window.addEventListener('storage', async (e) => {
+                    if (e && e.key === 'tt:preferences' && e.newValue) {
+                        try {
+                            const payload = JSON.parse(e.newValue);
+                            if (typeof window.loadUserPreferences === 'function') {
+                                await window.loadUserPreferences({ force: true, source: 'storage' });
+                            }
+                            window.dispatchEvent(new CustomEvent('preferences:updated', { detail: { source: 'storage', profileId: payload.profileId, version: payload.version } }));
+                        } catch {}
+                    }
+                });
+
+                // visibility/focus lightweight version check
+                let lastCheckTs = 0;
+                document.addEventListener('visibilitychange', async () => {
+                    if (document.visibilityState === 'visible') {
+                        const now = Date.now();
+                        if (now - lastCheckTs < 30000) return; // throttle 30s
+                        lastCheckTs = now;
+                        try {
+                            const resp = await fetch('/api/preferences/version');
+                            if (resp.ok) {
+                                const js = await resp.json();
+                                const incoming = js?.data?.version;
+                                const current = window.__ttPreferencesVersion;
+                                if (incoming && incoming !== current) {
+                                    window.__ttPreferencesVersion = incoming;
+                                    if (typeof window.loadUserPreferences === 'function') {
+                                        await window.loadUserPreferences({ force: true, source: 'visibility-check' });
+                                    }
+                                }
+                            }
+                        } catch {}
+                    }
+                });
+            }
+        } catch (err) {
+            console.warn('⚠️ Failed binding preferences listeners:', err);
+        }
+
+        // Initial preferences load to apply CSS vars and non-CSS prefs immediately
+        try {
+            if (typeof window.loadUserPreferences === 'function') {
+                await window.loadUserPreferences({ force: true, source: 'init' });
+            }
+        } catch (e) {
+            console.warn('⚠️ Initial loadUserPreferences failed:', e);
+        }
         
         this.performanceMetrics.stageTimes.finalize = Date.now() - stageStart;
         console.log('✅ Stage 4 Complete');

@@ -350,7 +350,7 @@ async function restoreCashFlowsSectionState() {
 /**
  * הצגת מודל הוספת תזרים מזומנים
  */
-function showAddCashFlowModal() {
+async function showAddCashFlowModal() {
   if (!addCashFlowModalElement) {
     handleElementNotFound('showAddCashFlowModal', 'מודל הוספת תזרים מזומנים לא נמצא');
     return;
@@ -367,18 +367,33 @@ function showAddCashFlowModal() {
   window.DefaultValueSetter.setLogicalDefault('cashFlowType', 'deposit');
 
   // טעינת נתונים למודל
-  loadAccountsForCashFlow();
-  loadCurrenciesForCashFlow();
+  try {
+    await loadAccountsForCashFlow();
+    // וידוא ברירת מחדל מהעדפות אם קיימת
+    if (window.DefaultValueSetter && typeof window.DefaultValueSetter.setPreferenceValue === 'function') {
+      await window.DefaultValueSetter.setPreferenceValue('cashFlowAccountId', 'default_trading_account');
+    }
+
+    await loadCurrenciesForCashFlow();
+  } catch (e) {
+    console.warn('⚠️ שגיאה בטעינת נתוני select למודל הוספה:', e);
+  }
+
+  // אין מילוי אוטומטי של שער דולר במודלי תזרימי מזומנים - עריכה ידנית בלבד
+  const addCurrencySelect = document.getElementById('cashFlowCurrencyId');
+  if (addCurrencySelect) {
+    addCurrencySelect.onchange = null;
+  }
 
   // הצגת המודל
-  const bootstrapModal = new bootstrap.Modal(modal);
-  bootstrapModal.show();
+  const instance = addCashFlowModal || bootstrap.Modal.getOrCreateInstance(addCashFlowModalElement);
+  instance.show();
 }
 
 /**
  * הצגת מודל עריכת תזרים מזומנים
  */
-function showEditCashFlowModal(cashFlowId) {
+async function showEditCashFlowModal(cashFlowId) {
   if (!editCashFlowModalElement) {
     handleElementNotFound('showEditCashFlowModal', 'מודל עריכת תזרים מזומנים לא נמצא');
     return;
@@ -417,20 +432,44 @@ function showEditCashFlowModal(cashFlowId) {
   setFieldValue('editCashFlowDate', dateTimeValue);
   setFieldValue('editCashFlowAmount', cashFlow.amount);
   setFieldValue('editCashFlowDescription', cashFlow.description);
-  setFieldValue('editCashFlowAccountId', cashFlow.trading_account_id); // ✅ שדה נכון
-  setFieldValue('editCashFlowCurrencyId', cashFlow.currency_id);
+  // קביעת טקסטים לברירות מחדל (שם חשבון ומטבע) לשימוש ב-populator
+  const defaultAccountText = cashFlow.account_name || cashFlow.account?.name || null;
+  const defaultCurrencyText = (cashFlow.currency_name && (cashFlow.currency_symbol || cashFlow.currency_code))
+    ? `${cashFlow.currency_name} (${cashFlow.currency_symbol || cashFlow.currency_code})`
+    : null;
   setFieldValue('editCashFlowType', cashFlow.type);
   setFieldValue('editCashFlowSource', cashFlow.source);
   setFieldValue('editCashFlowExternalId', cashFlow.external_id);
   setFieldValue('editCashFlowUsdRate', cashFlow.usd_rate || 1.000000);
 
-  // טעינת נתונים למודל
-  loadAccountsForEditCashFlow();
-  loadCurrenciesForEditCashFlow();
+  // טעינת נתונים למודל עם ברירת מחדל לפי טקסט (לוגיקה חדשה מבוססת שם)
+  try {
+    await window.SelectPopulatorService.populateAccountsSelect('editCashFlowAccountId', {
+      includeEmpty: true,
+      emptyText: 'בחר חשבון...',
+      filterFn: account => account.status === 'open',
+      defaultText: defaultAccountText
+    });
+
+    await window.SelectPopulatorService.populateCurrenciesSelect('editCashFlowCurrencyId', {
+      includeEmpty: true,
+      emptyText: 'בחר מטבע...',
+      format: 'symbol-name',
+      defaultText: defaultCurrencyText
+    });
+  } catch (e) {
+    console.warn('⚠️ שגיאה בטעינת נתוני select למודל עריכה:', e);
+  }
+
+  // אין מילוי אוטומטי של שער דולר במודלי תזרימי מזומנים - עריכה ידנית בלבד
+  const editCurrencySelect = document.getElementById('editCashFlowCurrencyId');
+  if (editCurrencySelect) {
+    editCurrencySelect.onchange = null;
+  }
 
   // הצגת המודל
-  const bootstrapModal = new bootstrap.Modal(modal);
-  bootstrapModal.show();
+  const instance = editCashFlowModal || bootstrap.Modal.getOrCreateInstance(editCashFlowModalElement);
+  instance.show();
 }
 
 
@@ -791,6 +830,63 @@ async function loadCurrenciesFromServer() {
 }
 
 /**
+ * פתרון מזהי חשבון ומטבע מרשומת תזרים גם כשחוזרים רק שמות/אובייקטים
+ */
+function resolveAccountIdFromCashFlow(cashFlow) {
+  if (!cashFlow) {return null;}
+  if (cashFlow.trading_account_id) {return cashFlow.trading_account_id;}
+  if (cashFlow.account && cashFlow.account.id) {return cashFlow.account.id;}
+  return null;
+}
+
+async function resolveCurrencyIdFromCashFlow(cashFlow) {
+  if (!cashFlow) {return null;}
+  if (cashFlow.currency_id) {return cashFlow.currency_id;}
+
+  // ננסה לזהות לפי סימול/שם מתוך רשימת מטבעות טעונה
+  if (!window.currenciesData || !Array.isArray(window.currenciesData) || window.currenciesData.length === 0) {
+    await loadCurrenciesFromServer();
+  }
+  const symbol = cashFlow.currency_symbol || null;
+  const name = cashFlow.currency_name || null;
+  const found = (window.currenciesData || []).find(c => {
+    if (symbol && c.symbol && c.symbol.toUpperCase() === String(symbol).toUpperCase()) {return true;}
+    if (name && c.name && c.name === name) {return true;}
+    return false;
+  });
+  return found ? found.id : null;
+}
+
+/**
+ * עדכון שדה שער דולר לפי המטבע הנבחר
+ * קורא ל- /api/currencies/<id> ומציב את usd_rate בשדה היעד
+ */
+async function updateUsdRateFromSelected(currencySelectId, usdRateInputId) {
+  try {
+    const select = document.getElementById(currencySelectId);
+    const usdInput = document.getElementById(usdRateInputId);
+    if (!select || !usdInput) {
+      return;
+    }
+    const currencyId = parseInt(select.value);
+    if (!currencyId) {
+      return;
+    }
+    const resp = await fetch(`/api/currencies/${currencyId}`);
+    if (!resp.ok) {
+      return;
+    }
+    const data = await resp.json();
+    const rate = data?.data?.usd_rate;
+    if (rate && !Number.isNaN(Number(rate))) {
+      usdInput.value = Number(rate).toFixed(6);
+    }
+  } catch (e) {
+    console.warn('⚠️ updateUsdRateFromSelected failed:', e);
+  }
+}
+
+/**
  * טעינת רשימת חשבונות למודל הוספה
  */
 async function loadAccountsForCashFlow() {
@@ -805,11 +901,12 @@ async function loadAccountsForCashFlow() {
 /**
  * טעינת רשימת חשבונות למודל עריכה
  */
-async function loadAccountsForEditCashFlow() {
+async function loadAccountsForEditCashFlow(defaultAccountId = null) {
     await window.SelectPopulatorService.populateAccountsSelect('editCashFlowAccountId', {
         includeEmpty: true,
         emptyText: 'בחר חשבון...',
-        filterFn: account => account.status === 'open' // רק חשבונות פתוחים
+        filterFn: account => account.status === 'open', // רק חשבונות פתוחים
+        defaultValue: defaultAccountId
     });
 }
 
@@ -828,11 +925,12 @@ async function loadCurrenciesForCashFlow() {
 /**
  * טעינת רשימת מטבעות למודל עריכה
  */
-async function loadCurrenciesForEditCashFlow() {
+async function loadCurrenciesForEditCashFlow(defaultCurrencyId = null) {
     await window.SelectPopulatorService.populateCurrenciesSelect('editCashFlowCurrencyId', {
         includeEmpty: true,
         emptyText: 'בחר מטבע...',
-        format: 'symbol-name' // "USD - US Dollar"
+        format: 'symbol-name', // "USD - US Dollar"
+        defaultValue: defaultCurrencyId
     });
 }
 
@@ -1297,6 +1395,37 @@ async function initializeCashFlowsPage() {
     
     // ❌ ביטול רענון אוטומטי - לא עובד כך בשאר עמודי המערכת
     // startAutoRefresh();
+
+    // === Diagnostics panel ===
+    try {
+      const diag = document.getElementById('prefsDiagnostics');
+      if (diag) {
+        const p = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim();
+        const s = getComputedStyle(document.documentElement).getPropertyValue('--secondary-color').trim();
+        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '—';
+        const pEl = document.getElementById('diagPrimaryValue');
+        const sEl = document.getElementById('diagSecondaryValue');
+        const profEl = document.getElementById('diagProfileIdValue');
+        const tzEl = document.getElementById('diagTimezoneValue');
+        if (pEl) pEl.textContent = `הצבע הראשי הוא: ${p || '—'}`;
+        if (sEl) sEl.textContent = `הצבע המשני הוא: ${s || '—'}`;
+        try {
+          const resp = await fetch('/api/preferences/profile/active');
+          if (resp.ok) {
+            const js = await resp.json();
+            if (profEl) profEl.textContent = `מזהה פרופיל פעיל: ${js?.data?.profile_id ?? '—'}`;
+          } else if (profEl) {
+            profEl.textContent = 'מזהה פרופיל פעיל: — (שגיאה)';
+          }
+        } catch {
+          if (profEl) profEl.textContent = 'מזהה פרופיל פעיל: — (שגיאה)';
+        }
+        if (tzEl) tzEl.textContent = `אזור הזמן: ${tz}`;
+        diag.hidden = false;
+      }
+    } catch (e) {
+      console.warn('⚠️ prefsDiagnostics update failed:', e);
+    }
     
   } catch (error) {
     console.error('❌ שגיאה באתחול עמוד תזרימי מזומנים:', error);
@@ -1825,6 +1954,36 @@ async function updateCashFlow() {
       source: { id: 'editCashFlowSource', type: 'text', default: 'manual' },
       external_id: { id: 'editCashFlowExternalId', type: 'text', default: '0' }
     });
+
+    // Fallbacks כדי להבטיח שמירה לפי הלוגיקה החדשה (בחירה לפי שם)
+    // 1) trading_account_id לפי שם חשבון אם חסר מזהה
+    if (!formData.trading_account_id) {
+      const sel = document.getElementById('editCashFlowAccountId');
+      const selectedText = sel && sel.selectedOptions && sel.selectedOptions[0] ? sel.selectedOptions[0].textContent.trim() : '';
+      if (selectedText) {
+        try {
+          const resp = await fetch('/api/trading-accounts/');
+          if (resp.ok) {
+            const respData = await resp.json();
+            const accounts = respData.data || respData || [];
+            const match = accounts.find(a => (a.name || '').trim() === selectedText);
+            if (match && match.id) {
+              formData.trading_account_id = match.id;
+            }
+          }
+        } catch (e) {
+          console.warn('⚠️ לא הצלחתי לגזור מזהה חשבון לפי שם:', e);
+        }
+      }
+    }
+
+    // 2) הבטחת type אם חסר
+    if (!formData.type) {
+      const typeEl = document.getElementById('editCashFlowType');
+      if (typeEl && typeEl.value) {
+        formData.type = typeEl.value;
+      }
+    }
 
     const response = await fetch(`http://127.0.0.1:8080/api/cash_flows/${id}`, {
       method: 'PUT',

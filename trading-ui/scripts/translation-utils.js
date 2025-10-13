@@ -211,12 +211,12 @@ function translateCashFlowType(type) {
   const typeNames = {
     'deposit': 'הפקדה',
     'withdrawal': 'משיכה',
-    'dividend': 'דיבידנד',
     'fee': 'עמלה',
-    'interest': 'ריבית',
-    'bonus': 'בונוס',
-    'tax': 'מס',
-    'other': 'אחר',
+    'dividend': 'דיבידנד',
+    'transfer_in': 'העברה מחשבון אחר',
+    'transfer_out': 'העברה לחשבון אחר',
+    'other_positive': 'אחר חיובי',
+    'other_negative': 'אחר שלילי',
   };
   return typeNames[type] || type;
 }

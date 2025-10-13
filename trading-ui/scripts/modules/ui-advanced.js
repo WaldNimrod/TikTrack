@@ -2088,6 +2088,57 @@ async function loadColorPreferences() {
   }
 }
 
+/**
+ * Load ALL user preferences and apply to UI (colors + non-CSS)
+ * Supports force reload bypassing caches
+ */
+window.loadUserPreferences = async function loadUserPreferences(options = {}) {
+  const { force = false, source = 'manual' } = options || {};
+  try {
+    const url = force ? '/api/preferences/user?use_cache=false' : '/api/preferences/user';
+    const res = await fetch(url);
+    if (!res.ok) {
+      console.warn('⚠️ preferences fetch not OK:', res.status);
+      return false;
+    }
+    const json = await res.json();
+    const prefs = json?.data?.preferences || {};
+
+    // store latest prefs globally for listeners
+    window.__latestPrefs = prefs;
+
+    // ensure primary/secondary also mapped from common keys if present
+    try {
+      if (prefs.primaryColor) {
+        document.documentElement.style.setProperty('--primary-color', prefs.primaryColor);
+      }
+      if (prefs.secondaryColor) {
+        document.documentElement.style.setProperty('--secondary-color', prefs.secondaryColor);
+      }
+    } catch {}
+
+    // apply CSS variables immediately without layout flash
+    requestAnimationFrame(() => {
+      try { updateCSSVariablesFromPreferences(prefs); } catch {}
+    });
+
+    // backward-compat hook
+    try { if (typeof window.onPreferencesReload === 'function') window.onPreferencesReload(prefs); } catch {}
+
+    // event for components to re-apply non-CSS prefs (toggles/flags)
+    try {
+      window.dispatchEvent(new CustomEvent('preferences:updated', {
+        detail: { source, prefs }
+      }));
+    } catch {}
+
+    return true;
+  } catch (e) {
+    console.error('❌ loadUserPreferences failed:', e);
+    return false;
+  }
+}
+
 // Test function to manually update primary color
 window.testUpdatePrimaryColor = function() {
   console.log('🧪 Testing manual primary color update...');

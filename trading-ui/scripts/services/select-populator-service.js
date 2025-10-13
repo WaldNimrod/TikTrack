@@ -120,7 +120,8 @@ class SelectPopulatorService {
                 textField: 'name',
                 includeEmpty: options.includeEmpty !== false,
                 emptyText: options.emptyText || 'בחר חשבון...',
-                defaultValue: defaultValue
+                defaultValue: defaultValue,
+                defaultText: options.defaultText
             });
             
             console.log(`✅ נטענו ${accounts.length} חשבונות ל-${selectId}`);
@@ -173,13 +174,14 @@ class SelectPopulatorService {
                 }
             }
             
-            // מילוי ה-select עם שם + סמל
+            // מילוי ה-select עם שם + קוד/סימול
             this._populateSelect(select, currencies, {
                 valueField: 'id',
-                textField: (item) => `${item.name} (${item.code})`,
+                textField: (item) => `${item.name} (${item.code || item.symbol})`,
                 includeEmpty: options.includeEmpty !== false,
                 emptyText: options.emptyText || 'בחר מטבע...',
-                defaultValue: defaultValue
+                defaultValue: defaultValue,
+                defaultText: options.defaultText
             });
             
             console.log(`✅ נטענו ${currencies.length} מטבעות ל-${selectId}`);
@@ -329,9 +331,15 @@ class SelectPopulatorService {
             select.appendChild(option);
         });
         
-        // סימון ברירת מחדל
+        // סימון ברירת מחדל לפי value או לפי טקסט
         if (config.defaultValue !== undefined && config.defaultValue !== null) {
             select.value = config.defaultValue;
+        } else if (config.defaultText) {
+            const options = Array.from(select.options);
+            const match = options.find(opt => (opt.textContent || '').trim() === String(config.defaultText).trim());
+            if (match) {
+                select.value = match.value;
+            }
         }
     }
 }

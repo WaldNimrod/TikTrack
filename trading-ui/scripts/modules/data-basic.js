@@ -2053,10 +2053,48 @@ window.restoreAnyTableSort = async function (tableType, data, updateFunction) {
  */
 window.applyDefaultSort = async function (tableType, data, updateFunction) {
   const sortState = await window.getSortState(tableType);
-  if (!sortState || sortState.columnIndex === null || sortState.columnIndex === undefined) {
-    // Apply default sort by first column (index 0)
-    await window.sortTableData(0, data, tableType, updateFunction);
+  if (sortState && sortState.columnIndex >= 0) {
+    return; // יש מצב שמור – לא לדרוס
   }
+
+  // ברירות מחדל לפי סוג טבלה
+  // cash_flows: תאריך בעמודה 3 → יורד (החדש ראשון)
+  // executions: תאריך ביצוע בעמודה 6 → יורד
+  // trades: תאריך יצירה/סגירה לפי העמודה אם קיימת; ברירת מחדל ללא שינוי
+  let defaultColumn = 0;
+  let defaultDirection = 'asc';
+
+  switch (tableType) {
+    case 'cash_flows':
+      defaultColumn = 3;
+      defaultDirection = 'desc';
+      break;
+    case 'executions':
+      defaultColumn = 6;
+      defaultDirection = 'desc';
+      break;
+    case 'trades':
+      // אם יש עמודת תאריך (לרוב 3 או 4 בעמוד), נשאיר 3 כי היא נפוצה
+      defaultColumn = 3;
+      defaultDirection = 'desc';
+      break;
+    case 'trade_plans':
+      defaultColumn = 2; // תאריך תכנון
+      defaultDirection = 'desc';
+      break;
+    default:
+      defaultColumn = 0;
+      defaultDirection = 'asc';
+  }
+
+  // החלת סידור ברירת מחדל
+  // אם ברירת המחדל היא יורדת, ניצור מצב קודם 'asc' לאותה עמודה כדי שהקריאה תתהפך ל-'desc'
+  if (defaultDirection === 'desc') {
+    await window.saveSortState(tableType, defaultColumn, 'asc');
+  }
+  await window.sortTableData(defaultColumn, data, tableType, updateFunction);
+  // עדכון שמירת מצב לאחר הסידור
+  await window.saveSortState(tableType, defaultColumn, defaultDirection);
 };
 
 /**

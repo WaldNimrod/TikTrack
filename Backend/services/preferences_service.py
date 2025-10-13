@@ -204,6 +204,77 @@ class PreferencesService:
         except Exception as e:
             logger.error(f"Error getting active profile for user {user_id}: {e}")
             raise
+
+    def get_active_profile_info(self, user_id: int) -> Dict[str, Any]:
+        """החזרת מידע על הפרופיל הפעיל של המשתמש (id, last_used_at)."""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+
+            cursor.execute(
+                '''
+                SELECT id, last_used_at
+                FROM preference_profiles
+                WHERE user_id = ? AND is_active = 1
+                ORDER BY is_default DESC, last_used_at DESC
+                LIMIT 1
+                ''',
+                (user_id,)
+            )
+
+            result = cursor.fetchone()
+            conn.close()
+
+            if not result:
+                raise ValueError(f"No active profile found for user {user_id}")
+
+            return {
+                'profile_id': result[0],
+                'last_used_at': result[1]
+            }
+        except Exception as e:
+            logger.error(f"Error getting active profile info for user {user_id}: {e}")
+            raise
+
+    @cache_with_deps(ttl=60, dependencies=['preferences'])
+    def get_preferences_version(self, user_id: int, profile_id: Optional[int] = None) -> Dict[str, Any]:
+        """
+        החזרת גרסת ההעדפות (timestamp מקסימלי של updated_at עבור פרופיל פעיל/נתון).
+
+        Returns: { 'profile_id': int, 'version': str(ISO8601) }
+        """
+        try:
+            # Resolve profile
+            if profile_id is None:
+                profile_id = self._get_active_profile_id(user_id)
+
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+
+            # Use MAX(updated_at); fallback to MAX(created_at) if updated_at is NULL
+            cursor.execute(
+                '''
+                SELECT COALESCE(MAX(updated_at), MAX(created_at))
+                FROM user_preferences
+                WHERE user_id = ? AND profile_id = ?
+                ''',
+                (user_id, profile_id)
+            )
+            row = cursor.fetchone()
+            conn.close()
+
+            max_ts = row[0] if row else None
+            # Fallback to current timestamp if no prefs exist yet
+            if not max_ts:
+                max_ts = datetime.utcnow().isoformat()
+
+            return {
+                'profile_id': profile_id,
+                'version': str(max_ts)
+            }
+        except Exception as e:
+            logger.error(f"Error computing preferences version for user {user_id}, profile {profile_id}: {e}")
+            raise
     
     def _get_preference_type_id(self, preference_name: str) -> int:
         """קבלת מזהה סוג העדפה"""

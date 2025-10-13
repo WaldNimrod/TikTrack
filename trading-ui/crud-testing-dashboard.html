@@ -299,66 +299,7 @@
 
                         <!-- כלי בדיקה כלליים (מערכת ישנה) הוסרו כדי למנוע כפילות עם המערכת החדשה -->
 
-                        <!-- טבלת תוצאות חיה -->
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h6><i class="fas fa-table"></i> תוצאות בדיקות בזמן אמת</h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <div id="liveResultsContainer" class="d-none">
-                                            <div class="table-responsive">
-                                                <table class="data-table table-sm table-striped" id="liveResultsTable">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>עמוד/API</th>
-                                                            <th>סטטוס</th>
-                                                            <th>זמן</th>
-                                                            <th>פרטים</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody id="liveResultsBody">
-                                                        <!-- תוצאות יופיעו כאן בזמן אמת -->
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                            <div class="mt-3">
-                                                <div class="row">
-                                                    <div class="col-md-3">
-                                                        <div class="text-center">
-                                                            <div class="h4 text-primary" id="totalTests">0</div>
-                                                            <small class="text-muted">סה"כ בדיקות</small>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <div class="text-center">
-                                                            <div class="h4 text-success" id="successTests">0</div>
-                                                            <small class="text-muted">הצלחות</small>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <div class="text-center">
-                                                            <div class="h4 text-danger" id="failedTests">0</div>
-                                                            <small class="text-muted">כישלונות</small>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <div class="text-center">
-                                                            <div class="h4 text-warning" id="pendingTests">0</div>
-                                                            <small class="text-muted">ממתינים</small>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div id="noLiveResultsMessage" class="text-muted text-center py-4">
-                                            <i class="fas fa-info-circle"></i> טבלת התוצאות תופיע כאן בזמן אמת בעת ביצוע בדיקות
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <!-- טבלת תוצאות חיה הוסרה לפי הנחיה -->
 
                         <!-- תצוגת תוצאות בדיקות -->
                         <div class="row mb-4">
@@ -436,7 +377,7 @@
                         </div>
 
                         <!-- טאבים לפי ישויות -->
-                        <ul class="nav nav-tabs" id="entityTabs" role="tablist">
+                        <ul class="nav nav-tabs d-none" id="entityTabs" role="tablist">
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link active" id="main-tab" data-bs-toggle="tab" data-bs-target="#main" type="button" role="tab">
                                     🏠 ראשי
@@ -510,7 +451,7 @@
                         </ul>
 
                         <!-- תוכן הטאבים -->
-                        <div class="tab-content" id="entityTabContent">
+                        <div class="tab-content d-none" id="entityTabContent">
                             <!-- טאב ראשי -->
                             <div class="tab-pane fade show active" id="main" role="tabpanel">
                                 <div class="page-test-card" id="pageCardIndex">

@@ -246,9 +246,7 @@ class FieldRendererService {
         // Normalize meta param (support calling with meta as 3rd argument)
         const metaObj = (meta && typeof meta === 'object') ? meta : (displayName && typeof displayName === 'object' ? displayName : null);
         
-        // Determine center content
-        // 1) For account: show account name (displayName/meta.name), no date
-        // 2) For other types: ticker symbol (meta.ticker or displayName for ticker/trade/trade_plan) + date if exists
+        // Determine ticker to show: prefer meta.ticker; fallback to displayName for known types
         let tickerText = null;
         if (metaObj && metaObj.ticker) {
             tickerText = metaObj.ticker;
@@ -256,20 +254,12 @@ class FieldRendererService {
             tickerText = displayName;
         }
 
+        // Format date dd.mm if exists
         let dateShort = '';
         if (metaObj && metaObj.date) {
             dateShort = (typeof FieldRendererService !== 'undefined' && FieldRendererService.renderDateShort)
                 ? FieldRendererService.renderDateShort(metaObj.date)
                 : FieldRendererService._formatDateDdMm(metaObj.date);
-        }
-
-        // For account override: use name in symbol slot, hide date
-        if (type === 'account') {
-            const accountName = (typeof displayName === 'string' && displayName)
-                ? displayName
-                : (metaObj && typeof metaObj.name === 'string' ? metaObj.name : '');
-            tickerText = accountName || '';
-            dateShort = '';
         }
 
         // Status HTML if exists
@@ -284,7 +274,7 @@ class FieldRendererService {
         const centerHtml = `
             <span class="linked-object-center" aria-label="${label}">
                 ${tickerText ? `<span class=\"linked-object-symbol\">${tickerText}</span>` : `<span class=\"linked-object-symbol\"></span>`}
-                ${dateShort ? `<span class=\"linked-object-date\">${dateShort}</span>` : ``}
+                ${dateShort ? `<span class=\"linked-object-date\">${dateShort}</span>` : `<span class=\"linked-object-date\"></span>`}
             </span>`;
 
         return `

@@ -920,12 +920,6 @@ async function renderCashFlowsTable(cashFlows = null) {
     tbody.appendChild(row);
   });
 
-  // עדכון מספר הפריטים
-  const countElement = document.querySelector('.table-count');
-  if (countElement) {
-    countElement.textContent = `${dataToRender.length} תזרימים`;
-  }
-  
   // הפעלת button-icons אחרי עדכון הטבלה
   if (typeof window.initializeButtonIcons === 'function') {
     setTimeout(() => {

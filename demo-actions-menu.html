@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>דוגמה - Actions Menu Popup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #f5f5f7;
+            padding: 40px 20px;
+            direction: rtl;
+        }
+
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            color: #1d1d1f;
+        }
+
+        .subtitle {
+            color: #86868b;
+            margin-bottom: 30px;
+        }
+
+        /* Table Styles */
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #d2d2d7;
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f5f5f7;
+        }
+
+        th {
+            padding: 12px;
+            text-align: right;
+            font-weight: 600;
+            color: #1d1d1f;
+            border-bottom: 1px solid #d2d2d7;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #f5f5f7;
+        }
+
+        tbody tr:hover {
+            background: #fafafa;
+        }
+
+        /* Actions Cell */
+        .actions-cell {
+            width: 50px !important;
+            min-width: 50px !important;
+            max-width: 50px !important;
+            text-align: center;
+            padding: 4px !important;
+            overflow: visible !important;
+        }
+
+        /* Actions Menu Wrapper */
+        .actions-menu-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        /* Trigger Button - האיקון ⋮ */
+        .actions-menu-trigger {
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: 1px solid #d2d2d7;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #1d1d1f;
+        }
+
+        .actions-menu-trigger:hover {
+            background: #f5f5f7;
+            border-color: #86868b;
+        }
+
+        .actions-menu-trigger:active {
+            background: #e8e8ed;
+        }
+
+        .actions-menu-icon {
+            font-size: 20px;
+            line-height: 1;
+            font-weight: bold;
+        }
+
+        /* Popup - החלון הצף */
+        .actions-menu-popup {
+            position: absolute;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            left: 100%;
+            top: 50%;
+            transform: translateY(-50%) translateX(8px) scale(0.95);
+            margin-left: 8px;
+        }
+
+        .actions-menu-wrapper:hover .actions-menu-popup {
+            opacity: 1;
+            pointer-events: all;
+            transform: translateY(-50%) translateX(0) scale(1);
+        }
+
+        /* Popup Content - התוכן */
+        .actions-menu-content {
+            background: white;
+            border-radius: 8px;
+            padding: 6px 8px;
+            box-shadow: 
+                0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                0 2px 4px -1px rgba(0, 0, 0, 0.06),
+                0 0 0 1px rgba(0, 0, 0, 0.05);
+            display: flex;
+            gap: 4px;
+            white-space: nowrap;
+            min-width: max-content;
+        }
+
+        /* Buttons inside popup */
+        .actions-menu-content button {
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+            max-width: 32px;
+            min-height: 32px;
+            max-height: 32px;
+            padding: 0;
+            margin: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            border-radius: 6px;
+            transition: all 0.15s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .actions-menu-content button:hover {
+            transform: scale(1.05);
+        }
+
+        /* Button Colors */
+        .btn-link {
+            background: #007aff;
+            color: white;
+        }
+
+        .btn-edit {
+            background: #8e8e93;
+            color: white;
+        }
+
+        .btn-view {
+            background: #5ac8fa;
+            color: white;
+        }
+
+        .btn-cancel {
+            background: #ff3b30;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #ff3b30;
+            color: white;
+        }
+
+        .btn-success {
+            background: #34c759;
+            color: white;
+        }
+
+        /* Comparison Section */
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .comparison-item h3 {
+            color: #1d1d1f;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .old-style {
+            opacity: 0.6;
+        }
+
+        .old-buttons {
+            display: flex;
+            gap: 4px;
+            justify-content: flex-start;
+            padding: 8px;
+            background: #f5f5f7;
+            border-radius: 8px;
+        }
+
+        .old-buttons button {
+            width: 28px;
+            height: 28px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border: 1px solid #90caf9;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .info-box h4 {
+            color: #1976d2;
+            margin-bottom: 8px;
+        }
+
+        .info-box ul {
+            margin-right: 20px;
+            color: #424242;
+        }
+
+        .info-box li {
+            margin-bottom: 5px;
+        }
+
+        .highlight-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .highlight-box strong {
+            color: #856404;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1>🎨 Actions Menu Popup - דוגמה חיה</h1>
+        <p class="subtitle">עבור עם העכבר על האיקון ⋮ כדי לראות את התפריט</p>
+
+        <div class="highlight-box">
+            <strong>👆 הוראה: עבור עם העכבר על האיקון ⋮ בטבלה למטה</strong>
+        </div>
+
+        <!-- Comparison -->
+        <div class="comparison">
+            <div class="comparison-item old-style">
+                <h3>❌ לפני - רשימת כפתורים (200px רוחב)</h3>
+                <div class="old-buttons">
+                    <button class="btn-link" title="קישורים">🔗</button>
+                    <button class="btn-edit" title="ערוך">✏️</button>
+                    <button class="btn-view" title="צפה">👁️</button>
+                    <button class="btn-cancel" title="בטל">❌</button>
+                    <button class="btn-delete" title="מחק">🗑️</button>
+                </div>
+            </div>
+
+            <div class="comparison-item">
+                <h3>✅ אחרי - תפריט פופאפ (50px רוחב)</h3>
+                <div class="actions-menu-wrapper">
+                    <button class="actions-menu-trigger" title="פעולות">
+                        <span class="actions-menu-icon">⋮</span>
+                    </button>
+                    <div class="actions-menu-popup">
+                        <div class="actions-menu-content">
+                            <button class="btn-link" title="קישורים">🔗</button>
+                            <button class="btn-edit" title="ערוך">✏️</button>
+                            <button class="btn-view" title="צפה">👁️</button>
+                            <button class="btn-cancel" title="בטל">❌</button>
+                            <button class="btn-delete" title="מחק">🗑️</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Example Table -->
+        <h2 style="margin: 30px 0 15px 0; color: #1d1d1f;">טבלה לדוגמה - עבור עם העכבר על ⋮</h2>
+        
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>טיקר</th>
+                        <th>סטטוס</th>
+                        <th>סכום</th>
+                        <th>תאריך</th>
+                        <th>פעולות</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>AAPL</td>
+                        <td>פעיל</td>
+                        <td>$1,500</td>
+                        <td>13/01/2025</td>
+                        <td class="actions-cell">
+                            <div class="actions-menu-wrapper">
+                                <button class="actions-menu-trigger" title="פעולות">
+                                    <span class="actions-menu-icon">⋮</span>
+                                </button>
+                                <div class="actions-menu-popup">
+                                    <div class="actions-menu-content">
+                                        <button class="btn-link" title="קישורים">🔗</button>
+                                        <button class="btn-edit" title="ערוך">✏️</button>
+                                        <button class="btn-view" title="צפה">👁️</button>
+                                        <button class="btn-cancel" title="בטל">❌</button>
+                                        <button class="btn-delete" title="מחק">🗑️</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>GOOGL</td>
+                        <td>סגור</td>
+                        <td>$2,300</td>
+                        <td>12/01/2025</td>
+                        <td class="actions-cell">
+                            <div class="actions-menu-wrapper">
+                                <button class="actions-menu-trigger" title="פעולות">
+                                    <span class="actions-menu-icon">⋮</span>
+                                </button>
+                                <div class="actions-menu-popup">
+                                    <div class="actions-menu-content">
+                                        <button class="btn-link" title="קישורים">🔗</button>
+                                        <button class="btn-edit" title="ערוך">✏️</button>
+                                        <button class="btn-view" title="צפה">👁️</button>
+                                        <button class="btn-success" title="הפעל מחדש">✓</button>
+                                        <button class="btn-delete" title="מחק">🗑️</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>MSFT</td>
+                        <td>פעיל</td>
+                        <td>$5,200</td>
+                        <td>11/01/2025</td>
+                        <td class="actions-cell">
+                            <div class="actions-menu-wrapper">
+                                <button class="actions-menu-trigger" title="פעולות">
+                                    <span class="actions-menu-icon">⋮</span>
+                                </button>
+                                <div class="actions-menu-popup">
+                                    <div class="actions-menu-content">
+                                        <button class="btn-link" title="קישורים">🔗</button>
+                                        <button class="btn-edit" title="ערוך">✏️</button>
+                                        <button class="btn-view" title="צפה">👁️</button>
+                                        <button class="btn-cancel" title="בטל">❌</button>
+                                        <button class="btn-delete" title="מחק">🗑️</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>TSLA</td>
+                        <td>פעיל</td>
+                        <td>$3,800</td>
+                        <td>10/01/2025</td>
+                        <td class="actions-cell">
+                            <div class="actions-menu-wrapper">
+                                <button class="actions-menu-trigger" title="פעולות">
+                                    <span class="actions-menu-icon">⋮</span>
+                                </button>
+                                <div class="actions-menu-popup">
+                                    <div class="actions-menu-content">
+                                        <button class="btn-edit" title="ערוך">✏️</button>
+                                        <button class="btn-delete" title="מחק">🗑️</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>NVDA</td>
+                        <td>פעיל</td>
+                        <td>$8,900</td>
+                        <td>09/01/2025</td>
+                        <td class="actions-cell">
+                            <div class="actions-menu-wrapper">
+                                <button class="actions-menu-trigger" title="פעולות">
+                                    <span class="actions-menu-icon">⋮</span>
+                                </button>
+                                <div class="actions-menu-popup">
+                                    <div class="actions-menu-content">
+                                        <button class="btn-link" title="קישורים">🔗</button>
+                                        <button class="btn-edit" title="ערוך">✏️</button>
+                                        <button class="btn-view" title="צפה">👁️</button>
+                                        <button class="btn-cancel" title="בטל">❌</button>
+                                        <button class="btn-delete" title="מחק">🗑️</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Info Box -->
+        <div class="info-box">
+            <h4>💡 תכונות מרכזיות:</h4>
+            <ul>
+                <li><strong>חיסכון במקום:</strong> מ-200px ל-50px בעמודת הפעולות (75% חיסכון!)</li>
+                <li><strong>Hover בלבד:</strong> אין צורך ללחוץ - רק לעבור עם העכבר</li>
+                <li><strong>Material Design:</strong> צל עדין, אנימציות חלקות (fade + scale)</li>
+                <li><strong>RTL מודע:</strong> הפופאפ נפתח מצד ימין (שמאל של הכפתור)</li>
+                <li><strong>Tooltips:</strong> כל כפתור עם הסבר על hover</li>
+                <li><strong>גמיש:</strong> עובד עם 2 כפתורים (שורה 4) או 5 כפתורים (שורות 1-3, 5)</li>
+                <li><strong>Delay חכם:</strong> 200ms לפתיחה, 150ms לסגירה (מונע פתיחות מיותרות)</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
+

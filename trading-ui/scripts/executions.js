@@ -1177,6 +1177,8 @@ async function updateExecutionsTableMain(executions) {
     // שימוש בנתונים שמגיעים מהשרת
     const symbol = execution.trade_ticker_symbol || 'לא מוגדר';
     const tradeInfo = execution.trade_display || `טרייד ${execution.trade_id}`;
+    const tickerId = execution.ticker_id || execution.trade_ticker_id || null;
+    const accountName = execution.account_name || execution.trading_account_name || 'לא מוגדר';
 
     // שימוש ב-FieldRendererService לעיצוב שדות
     const actionBadge = window.FieldRendererService ? 
@@ -1201,10 +1203,10 @@ async function updateExecutionsTableMain(executions) {
                                    <td class="ticker-cell">
                        <div class="ticker-cell-content">
                            <strong class="ticker-symbol-link ${execution.action === 'buy' ? 'action-buy' : 'action-sell'}" 
-                             onclick="window.showEntityDetailsModal && window.showEntityDetailsModal('ticker', ${ticker ? ticker.id : 'null'}, 'view')" 
+                             onclick="window.showEntityDetailsModal && window.showEntityDetailsModal('ticker', ${tickerId || 'null'}, 'view')" 
                              title="פתח פרטי סימבול">${symbol}</strong>
                            <button class="btn btn-sm btn-info" 
-                             onclick="window.viewLinkedItemsForTicker && window.viewLinkedItemsForTicker(${ticker ? ticker.id : 'null'})" 
+                             onclick="window.viewLinkedItemsForTicker && window.viewLinkedItemsForTicker(${tickerId || 'null'})" 
                              title="פריטים מקושרים לטיקר">🔗</button>
                        </div>
                    </td>

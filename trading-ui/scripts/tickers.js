@@ -312,13 +312,32 @@ function generateTickerCurrencyOptions(ticker = null) {
 /**
  * פונקציה לעדכון אפשרויות מטבע בטופס
  */
-function updateCurrencyOptions(ticker = null) {
+async function updateCurrencyOptions(ticker = null) {
   const addSelect = document.getElementById('addTickerCurrency');
   const editSelect = document.getElementById('editTickerCurrency');
 
   if (addSelect) {
     const addOptions = generateTickerCurrencyOptions();
     addSelect.innerHTML = '<option value="">בחר מטבע...</option>' + addOptions;
+    // קביעת ברירת מחדל מהעדפות
+    try {
+      if (typeof window.getPreference === 'function') {
+        const prefValue = await window.getPreference('default_currency');
+        if (prefValue) {
+          const prefId = parseInt(prefValue);
+          if (!Number.isNaN(prefId)) {
+            addSelect.value = String(prefId);
+          } else {
+            // ייתכן והעדפה היא קוד/סימול - נאתר לפי טקסט
+            const options = Array.from(addSelect.options);
+            const match = options.find(opt => (opt.textContent || '').includes(`(${String(prefValue)})`));
+            if (match) {
+              addSelect.value = match.value;
+            }
+          }
+        }
+      }
+    } catch {}
   }
 
   if (editSelect) {
@@ -442,11 +461,11 @@ async function updateAllActiveTradesStatuses() {
 /**
  * הצגת מודל הוספת טיקר
  */
-function showAddTickerModal() {
+async function showAddTickerModal() {
   // הצגת מודל הוספת טיקר
 
   // עדכון אפשרויות מטבע לפני הצגת הטופס
-  updateCurrencyOptions();
+  await updateCurrencyOptions();
 
   // ניקוי הטופס
   addTickerForm.reset();
@@ -488,7 +507,7 @@ function showAddTickerModal() {
 /**
  * הצגת מודל עריכת טיקר
  */
-function showEditTickerModal(id) {
+async function showEditTickerModal(id) {
   // הצגת מודל עריכת טיקר
 
   // מציאת הטיקר לפי ID
@@ -501,7 +520,7 @@ function showEditTickerModal(id) {
   }
 
   // עדכון אפשרויות מטבע לפני מילוי הטופס
-  updateCurrencyOptions(ticker);
+  await updateCurrencyOptions(ticker);
 
   // ניקוי וולידציה
   if (window.clearValidation) {

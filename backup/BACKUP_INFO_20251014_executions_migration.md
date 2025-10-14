@@ -7,16 +7,26 @@
 This backup was created before implementing flexible association for Executions table, allowing executions to be linked either to a Ticker (temporary state) or to a Trade (complete state).
 
 ## Database Backup
-- **Location:** `Backend/db/backups/backup_before_executions_migration_YYYYMMDD_HHMMSS.db`
-- **Created:** [See backup script output]
-- **Size:** [See backup script output]
-- **Checksum:** [See backup script output]
+
+### Pre-Migration Backup
+- **Location:** `Backend/db/backups/backup_before_executions_migration_20251014_131110.db`
+- **Created:** 2025-10-14 13:11:10
+- **Size:** 31M
+- **Checksum:** a0075b73a3e2b41e3cd13f3a90b4be7a
+
+### Post-Migration Backup
+- **Location:** `Backend/db/backups/backup_after_executions_migration_complete_20251014_143344.db`
+- **Created:** 2025-10-14 14:33:44
+- **Size:** 31M
+- **Checksum:** 4500b16f1474d76a26210f6c77aff366
 
 ## Git Status
 - **Branch:** master
-- **Last Commit:** [To be filled after git operations]
+- **Pre-Migration Commit:** d8f2095
+- **Final Commit:** e7850b3
 - **Tag:** v2.0.6-before-executions-refactor
-- **Remote:** GitHub origin/master
+- **Remote:** GitHub origin/master (pushed ✅)
+- **Total Commits:** 8
 
 ## Changes Summary
 ### Database Schema Changes:

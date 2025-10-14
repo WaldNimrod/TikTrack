@@ -116,7 +116,13 @@ These are the immediate rules to implement across pages. After each fix is appro
 - Add `.col-amount { text-align: right; }` in `_tables.css` if not already present
 - Verify RTL alignment: symbol at line-end (left), number at line-start (right)
 
-**Status**: Pending implementation
+**Status**: ✅ Completed
+
+**Edits**:
+- `field-renderer-service.js`: Added `renderAmount(value, currencySymbol, decimals)` with `dir="ltr"` to place symbol at line-end (left in RTL)
+- `cash_flows.js`: Updated `renderCashFlowsTable` to use `FieldRendererService.renderAmount(cashFlow.amount, currencyDisplay)`
+- `cash_flows.js`: Changed col-amount inline style from `text-align: left; direction: ltr;` to `text-align: right;`
+- `_tables.css`: `.col-amount` already has right-align; no changes needed
 
 ---
 
@@ -126,16 +132,17 @@ These are the immediate rules to implement across pages. After each fix is appro
 - Type column should be colored (positive/negative) based on the **amount value**, not the type text itself
 
 **Solution**:
-- Check if `FieldRendererService` supports conditional rendering (color based on external column value)
-- If supported: pass amount sign to type renderer
-- If not: extend renderer or implement inline logic in `updateCashFlowsTable`
+- Extended `FieldRendererService.renderType(type, amountForColor)` to accept optional second parameter
+- If `amountForColor` provided, apply `text-success` (green) or `text-danger` (red) class based on sign
+- Updated `renderCashFlowsTable` to pass `cashFlow.amount` as second parameter
 
-**Implementation**:
-- Investigate `FieldRendererService` conditional rendering capabilities
-- Apply positive/negative color classes to type cell based on amount sign
-- Use `var(--numeric-positive-medium)` / `var(--numeric-negative-medium)` for consistency
+**Status**: ✅ Completed
 
-**Status**: Pending investigation + implementation
+**Edits**:
+- `field-renderer-service.js`: Extended `renderType(type, amountForColor = null)` with conditional color class
+- `field-renderer-service.js`: Added cash flow type translations (deposit, withdrawal, fee, dividend, transfer_in/out, other_positive/negative)
+- `cash_flows.js`: Updated type rendering to `FieldRendererService.renderType(cashFlow.type, cashFlow.amount)`
+- CSS: Uses existing `text-success`/`text-danger` classes (Bootstrap/dynamic colors)
 
 ---
 

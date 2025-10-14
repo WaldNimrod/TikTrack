@@ -1014,22 +1014,9 @@ async function cancelTicker(id) {
         'danger', // צבע אדום לחלון האישור
       );
     } else {
-      // Fallback למקרה שהמערכת הגלובלית לא זמינה
-      const confirmed = typeof showConfirmationDialog === 'function' ? 
-        await new Promise(resolve => {
-          showConfirmationDialog(
-            `האם אתה בטוח שברצונך לבטל טיקר זה?${tickerDetails}`,
-            () => resolve(true),
-            () => resolve(false),
-            'ביטול טיקר',
-            'בטל',
-            'חזור'
-          );
-        }) : 
-        window.window.showConfirmationDialog('אישור', `האם אתה בטוח שברצונך לבטל טיקר זה?${tickerDetails}`);
-      if (!confirmed) {
-        return;
-      }
+      // Fallback: שימוש ב-confirm דפדפן
+      const confirmed = window.confirm(`האם אתה בטוח שברצונך לבטל טיקר זה?${tickerDetails}`);
+      if (!confirmed) return;
       await checkLinkedItemsAndCancelTicker(id);
     }
 

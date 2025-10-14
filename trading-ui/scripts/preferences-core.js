@@ -1285,6 +1285,13 @@ class PreferencesSystem {
             // Step 7: Update UI counters
             await this.ui.updateCounters(this.manager.currentPreferences);
             
+            // Step 7.1: Normalize critical defaults (aliases → canonical IDs) and persist once if needed
+            try {
+                await this._ensureCanonicalDefaults();
+            } catch (e) {
+                console.warn('⚠️ Preferences normalization failed:', e);
+            }
+
             // Step 8: Load accounts using SelectPopulatorService
             if (typeof window.SelectPopulatorService !== 'undefined') {
                 try {
@@ -1311,6 +1318,87 @@ class PreferencesSystem {
             console.error('❌ PreferencesSystem initialization failed:', error);
             this.ui.showError('שגיאה באתחול מערכת ההעדפות', error.message);
             return false;
+        }
+    }
+
+    /**
+     * Normalize and persist canonical defaults for all pages
+     * - primaryCurrency / default_currency_code / default_currency_symbol → default_currency (ID)
+     * - defaultTradingAccount (name) → default_trading_account (ID)
+     * Saves once to API if changes were made
+     */
+    async _ensureCanonicalDefaults() {
+        const prefs = this.manager.currentPreferences || {};
+        let updated = { ...prefs };
+        let modified = false;
+
+        const fetchCurrencies = async () => {
+            try {
+                const r = await fetch('/api/currencies/');
+                if (!r.ok) return [];
+                const js = await r.json();
+                return js?.data || js || [];
+            } catch { return []; }
+        };
+
+        const fetchAccounts = async () => {
+            try {
+                const r = await fetch('/api/trading-accounts/');
+                if (!r.ok) return [];
+                const js = await r.json();
+                return js?.data || js || [];
+            } catch { return []; }
+        };
+
+        // 1) Normalize default_currency
+        if (updated['default_currency'] == null) {
+            const aliasCurrency = updated['primaryCurrency']
+                || updated['default_currency_code']
+                || updated['default_currency_symbol']
+                || updated['defaultCurrency'];
+            if (aliasCurrency) {
+                const currencies = await fetchCurrencies();
+                const target = String(aliasCurrency).toLowerCase();
+                const match = currencies.find(c => {
+                    const code = (c.code || c.symbol || '').toString().toLowerCase();
+                    const name = (c.name || '').toString().toLowerCase();
+                    return code === target || name === target || `${name} (${code})` === target;
+                });
+                if (match?.id) {
+                    updated['default_currency'] = match.id;
+                    modified = true;
+                }
+            }
+        }
+
+        // 2) Normalize default_trading_account
+        if (updated['default_trading_account'] == null) {
+            const accountName = updated['defaultTradingAccount'] || null;
+            const accounts = await fetchAccounts();
+            if (accountName) {
+                const byName = accounts.find(a => (a.name || '').toString().trim() === accountName);
+                if (byName?.id) {
+                    updated['default_trading_account'] = byName.id;
+                    modified = true;
+                }
+            }
+            if (updated['default_trading_account'] == null) {
+                const openAccounts = accounts.filter(a => (a.status || '').toLowerCase() === 'open');
+                if (openAccounts.length === 1) {
+                    updated['default_trading_account'] = openAccounts[0].id;
+                    modified = true;
+                }
+            }
+        }
+
+        if (modified) {
+            try {
+                await this.manager.save(updated, this.manager.userId, this.manager.currentProfile);
+                console.log('✅ Canonical preferences normalized and saved');
+            } catch (e) {
+                console.warn('⚠️ Failed to persist canonical preferences:', e);
+                this.manager.currentPreferences = updated; // keep in memory to avoid runtime issues
+            }
         }
     }
     

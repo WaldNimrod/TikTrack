@@ -469,10 +469,7 @@ async function updateAllActiveTradesStatuses() {
 async function showAddTickerModal() {
   // הצגת מודל הוספת טיקר
 
-  // עדכון אפשרויות מטבע לפני הצגת הטופס
-  await updateCurrencyOptions();
-
-  // ניקוי הטופס
+  // ניקוי הטופס לפני אכלוס ברירת המחדל כדי שלא יימחק הבחירה
   addTickerForm.reset();
 
   // וידוא שאין ערכי ברירת מחדל בטופס ההוספה
@@ -487,12 +484,23 @@ async function showAddTickerModal() {
     if (symbolInput) symbolInput.value = '';
     if (nameInput) nameInput.value = '';
     if (typeSelect) typeSelect.value = '';
-    if (currencySelect) currencySelect.value = '';
     if (statusSelect) statusSelect.value = 'closed';
     if (remarksInput) remarksInput.value = '';
+
+    // Debug: ודא מה נבחר אחרי האכלוס מהעדפות
+    if (currencySelect) {
+      const selectedText = currencySelect.options[currencySelect.selectedIndex]?.text || '';
+      console.debug('[AddTicker] currency after populate:', {
+        value: currencySelect.value,
+        text: selectedText
+      });
+    }
   } catch (e) {
     // ignore
   }
+
+  // אכלוס אפשרויות מטבע לאחר reset כדי לבחור ברירת מחדל מהעדפות
+  await updateCurrencyOptions();
 
   // ניקוי וולידציה
   if (window.clearValidation) {
@@ -533,8 +541,11 @@ async function showEditTickerModal(id) {
   }
 
   // מילוי הטופס באמצעות DataCollectionService
-  const statusValue = ticker.status === 'cancelled' ? 'cancelled' : 'not_cancelled';
-  
+  // מיפוי סטטוס לערכים הקיימים ב-select: open/closed/cancelled
+  let statusValue = 'open';
+  if (ticker.status === 'cancelled') statusValue = 'cancelled';
+  else if (ticker.status === 'closed') statusValue = 'closed';
+
   window.DataCollectionService.setFormData({
     id: { id: 'editTickerId', type: 'int' },
     symbol: { id: 'editTickerSymbol', type: 'text' },
@@ -542,6 +553,7 @@ async function showEditTickerModal(id) {
     type: { id: 'editTickerType', type: 'text' },
     currency_id: { id: 'editTickerCurrency', type: 'int' },
     status: { id: 'editTickerStatus', type: 'text' },
+    active_trades: { id: 'editTickerActiveTrades', type: 'text' },
     remarks: { id: 'editTickerRemarks', type: 'text' }
   }, {
     id: ticker.id,
@@ -550,6 +562,7 @@ async function showEditTickerModal(id) {
     type: ticker.type,
     currency_id: ticker.currency_id || '',
     status: statusValue,
+    active_trades: (typeof ticker.active_trades === 'boolean') ? (ticker.active_trades ? 'true' : 'false') : '',
     remarks: ticker.remarks || ''
   });
 
@@ -566,6 +579,16 @@ async function showEditTickerModal(id) {
     editTickerModal = new bootstrap.Modal(editTickerModalElement);
     editTickerModal.show();
   }
+
+  // התאמת מטבע לפי קוד כאשר אין currency_id
+  try {
+    const sel = document.getElementById('editTickerCurrency');
+    if (sel && (!sel.value || sel.value === '') && ticker && ticker.currency) {
+      const code = (ticker.currency.symbol || ticker.currency.code || ticker.currency || '').toString().toUpperCase();
+      const opt = Array.from(sel.options).find(o => (o.text || '').toUpperCase() === code);
+      if (opt) sel.value = opt.value;
+    }
+  } catch (_) { /* שקט */ }
 }
 
 /**

@@ -110,32 +110,47 @@ These are the immediate rules to implement across pages. After each fix is appro
 ## 6) Testing Checklist – All User Pages (Round C scope)
 Use this short checklist per page after saving preferences or switching profile. Ensure both CSS and non‑CSS preferences propagate instantly.
 
-- alerts (`/alerts`)
-  - Primary/secondary button colors update instantly
-  - Linked object badge uses new CSS vars
-  - Alert feature toggles react to `preferences:updated`
-  - Headers centered, sorting intact
-- trades (`/trades`)
-  - Buttons/badges recolor
-  - Non‑CSS toggles (e.g., columns/filters) applied on event
-  - Actions column width unchanged
-- trade_plans (`/trade_plans`)
-  - Plan badges/headings recolor
-  - Feature flags toggle on event
-- tickers (`/tickers`)
-  - Filter/header recolor
-  - Display prefs (e.g., format) update via hook/event
-- executions (`/executions`)
-  - Headers centered; recolor
-  - Numeric/date renderers re‑apply based on prefs
-- notes (`/notes`)
-  - Linked object badge recolor
-  - Note preview length or related prefs applied
-- trading_accounts (`/trading_accounts`)
-  - Account name/tile styles recolor
-  - Visibility flags applied
 - cash_flows (`/cash_flows`)
   - Reference page: buttons recolor <300ms; 100% table width; % columns; fixed actions
+  - Section toggle buttons use secondary; hover = 30% mix
+  - Sorting wired on all headers; centered titles
+
+- executions (`/executions`)
+  - Headers centered; recolor from prefs
+  - Numeric/date renderers re‑apply on `preferences:updated`
+
+- tickers (`/tickers`)
+  - Filter/header recolor from prefs
+  - Display prefs (formats) update via hook/event
+
+- trading_accounts (`/trading_accounts`)
+  - Account badges/titles recolor from prefs
+  - Visibility flags applied on `preferences:updated`
+
+- notes (`/notes`)
+  - Linked object badge recolor from prefs
+  - Note preview length or related prefs applied
+
+- alerts (`/alerts`)
+  - Primary/secondary buttons recolor instantly
+  - Linked object badge uses new CSS vars
+  - Feature toggles react to `preferences:updated`
+
+- trade_plans (`/trade_plans`)
+  - Plan badges/headings recolor from prefs
+  - Feature flags toggle on event
+
+- trades (`/trades`)
+  - Buttons/badges recolor; actions column width unchanged
+  - Non‑CSS toggles (e.g., columns/filters) applied on event
+
+- db_display (`/db_display`)
+  - Table headers centered; sorting wired via general sorter
+  - Primary/secondary styles applied to controls (no hard‑coded colors)
+
+- db_extradata (`/db_extradata`)
+  - Cards/tables recolor from prefs; consistent actions column max‑width
+  - Preferences events update filters/toggles without refresh
 
 ---
 

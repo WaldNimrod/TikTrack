@@ -492,7 +492,6 @@ async function showEditCashFlowModal(cashFlowId) {
     await window.SelectPopulatorService.populateCurrenciesSelect('editCashFlowCurrencyId', {
       includeEmpty: true,
       emptyText: 'בחר מטבע...',
-      format: 'symbol-name',
       defaultText: defaultCurrencyText
     });
   } catch (e) {
@@ -955,8 +954,7 @@ async function loadCurrenciesForCashFlow() {
     await window.SelectPopulatorService.populateCurrenciesSelect('cashFlowCurrencyId', {
         includeEmpty: true,
         emptyText: 'בחר מטבע...',
-        defaultFromPreferences: true,
-        format: 'symbol-name' // "USD - US Dollar"
+        defaultFromPreferences: true
     });
 }
 
@@ -967,7 +965,6 @@ async function loadCurrenciesForEditCashFlow(defaultCurrencyId = null) {
     await window.SelectPopulatorService.populateCurrenciesSelect('editCashFlowCurrencyId', {
         includeEmpty: true,
         emptyText: 'בחר מטבע...',
-        format: 'symbol-name', // "USD - US Dollar"
         defaultValue: defaultCurrencyId
     });
 }

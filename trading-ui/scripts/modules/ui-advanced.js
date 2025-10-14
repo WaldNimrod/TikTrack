@@ -1784,8 +1784,6 @@ function updateCSSVariablesFromPreferences(preferences) {
     // עדכון צבעים בסיסיים
     if (preferences.primaryColor) {
       document.documentElement.style.setProperty('--primary-color', preferences.primaryColor);
-    } else {
-      console.log('⚠️ primaryColor לא נמצא בהעדפות');
     }
     if (preferences.chartPrimaryColor) {
       document.documentElement.style.setProperty('--chart-primary-color', preferences.chartPrimaryColor);
@@ -2194,7 +2192,16 @@ window.loadUserPreferences = async function loadUserPreferences(options = {}) {
           alert: prefs.entityAlertColor || getComputedStyle(document.documentElement).getPropertyValue('--entity-alert-color') || '#e67e22',
           note: prefs.entityNoteColor || getComputedStyle(document.documentElement).getPropertyValue('--entity-note-color') || '#a29bfe'
         };
-        Object.entries(entityMap).forEach(([k, v]) => docStyle.setProperty(`--entity-${k}`, String(v).trim()));
+        Object.entries(entityMap).forEach(([k, v]) => {
+          const val = String(v).trim();
+          // legacy underscore variable
+          docStyle.setProperty(`--entity-${k}`, val);
+          // dashed alias without suffix
+          docStyle.setProperty(`--entity-${k.replace('_','-')}`, val);
+          // ensure explicit -color alias too
+          if (k === 'cash_flow') docStyle.setProperty('--entity-cash-flow-color', val);
+          if (k === 'trade_plan') docStyle.setProperty('--entity-trade-plan-color', val);
+        });
 
         // 4) Synonyms used by some pages (cash_flows expects these)
         const getVar = (name) => (getComputedStyle(document.documentElement).getPropertyValue(name) || '').trim();
@@ -2204,13 +2211,13 @@ window.loadUserPreferences = async function loadUserPreferences(options = {}) {
           }
         };
         // Map entity colors to page synonyms if missing
-        ensureVar('--cash-flow-color', getVar('--entity-cash_flow'));
-        ensureVar('--account-color', getVar('--entity-account'));
+        ensureVar('--cash-flow-color', getVar('--entity-cash-flow-color') || getVar('--entity-cash-flow'));
+        ensureVar('--account-color', getVar('--entity-account-color') || getVar('--entity-account'));
         // Income/Expense derive from numeric positive/negative mediums
         ensureVar('--income-color', getVar('--numeric-positive-medium'));
         ensureVar('--expense-color', getVar('--numeric-negative-medium'));
         // Optional bg alias if used by CSS
-        ensureVar('--cash-flow-bg-color', getVar('--numeric-zero-light'));
+        ensureVar('--cash-flow-bg-color', getVar('--entity-cash-flow-bg') || getVar('--numeric-zero-light'));
       } catch (e) {
         // silent
       }

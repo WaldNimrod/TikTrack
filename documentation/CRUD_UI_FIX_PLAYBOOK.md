@@ -158,3 +158,64 @@
   - פתרון: להשתמש ב־`CRUDResponseHandler` עם `customValidationParser` למיפוי הודעות DB לשדות (type/source/amount/usd_rate/account_id).
 
 
+### 13) ברירת מחדל מטבע במודלי הוספה (tickers ועוד) – אליאסים והעדפות
+
+- בעיה:
+  - במערכת ההעדפות אין תמיד ערך קנוני `default_currency` (מזהה), ולעיתים נשמר רק אליאס טקסטואלי כגון `primaryCurrency` בפורמט "CODE - NAME" או "NAME (CODE)". אכלוס ה־select לפי ID בלבד לא מצליח לבחור ברירת מחדל.
+  - בטפסי הוספה חלק מהעמודים מבצעים `form.reset()` אחרי האכלוס – מה שמאפס את הבחירה שנקבעה אוטומטית.
+
+- פתרון:
+  - הרחבת `SelectPopulatorService.populateCurrenciesSelect` לזיהוי אליאסים טקסטואליים:
+    - פירוק תבניות "CODE - NAME" ו-"NAME (CODE)" וחילוץ קוד המטבע.
+    - ניסיון התאמה מול רשימת המטבעות לפי `code/symbol/name` כדי לגזור `id` תקני לברירת מחדל.
+  - הצגת טקסט אופציה אחיד: מטבע מוצג כ־"סמל/קוד" בלבד (ללא שם), כדי לשמור אחידות בממשק.
+  - סדר פעולות בטופס הוספה: לבצע `form.reset()` לפני קריאת האכלוס, ולאחר מכן לקרוא ל־`populateCurrenciesSelect(..., { defaultFromPreferences: true })`.
+
+- בדיקות ספציפיות:
+  - פתיחת מודל הוספת טיקר: ה־select של המטבע מכיל אופציה ריקה + רשימת מטבעות, ונבחר אוטומטית המטבע בהתאם להעדפות (ID קנוני אם קיים, אחרת התאמה לפי `primaryCurrency`).
+  - בקונסולה מופיע לוג שירות: `[SelectPopulator] addTickerCurrency defaultFromPreferences=true { defaultValue, selectedValue, selectedText }`.
+  - שינוי ההעדפה בצד שרת (או ניקוי cache) ובדיקה שהבחירה מתעדכנת בהתנהגות זהה.
+
+```javascript
+// דיאגנוסטיקה מהירה בקונסולה כשמודל פתוח
+(() => {
+  const prefs = window.PreferencesSystem?.manager?.currentPreferences || {};
+  const s = document.getElementById('addTickerCurrency');
+  const options = s ? Array.from(s.options).map(o => ({ value: o.value, text: o.text })) : [];
+  const selected = s ? { value: s.value, text: s.options[s.selectedIndex]?.text } : null;
+
+  const prefId = Number(prefs.default_currency || 0);
+  const prefCode = String(prefs.primaryCurrency || prefs.default_currency_code || prefs.default_currency_symbol || '').toUpperCase();
+
+  const matchById = options.find(o => Number(o.value) === prefId) || null;
+  const matchByCode = options.find(o => (o.text || '').toUpperCase() === prefCode) || null;
+
+  return { prefs: { default_currency: prefs.default_currency, primaryCurrency: prefs.primaryCurrency }, prefId, prefCode, options, selected, matchById, matchByCode };
+})();
+```
+
+
+### 14) צ'קליסט בדיקות רוחביות – Selectים, העדפות ואתחול
+
+- טעינת העדפות:
+  - `preferences-core.js` נטען לפני Services.
+  - `UnifiedAppInitializer` בשלב 3: קורא `PreferencesSystem.initialize()` ומשגר `preferences:loaded`.
+
+- Selectים של מטבע/חשבון:
+  - הוספה: `populate...Select(..., { includeEmpty: true, defaultFromPreferences: true })`.
+  - עריכה: שימוש ב־`defaultText` כדי לבחור לפי שם/סמל כפי שמוצג בטבלה.
+  - טקסט מטבע: "סמל/קוד" בלבד. טקסט חשבון: שם חשבון בלבד.
+
+- סדר פעולות בטפסי הוספה:
+  - `form.reset()` לפני האכלוס.
+  - לאחר מכן קריאה לשירות האכלוס שקובע ברירת מחדל.
+  - אין ניקוי ערכים אחרי האכלוס.
+
+- שמירה/עדכון:
+  - אם `*_id` חסר – לבצע גזירה לפי טקסט הנבחר (קריאת רשימת ישויות ומיפוי לשדה `id`).
+  - שימוש ב־`CRUDResponseHandler` למיפוי ולידציה והודעות שגיאה ידידותיות.
+
+- UI אחיד:
+  - כפתורי מודל: "ביטול" ואז "שמירה/עדכון".
+  - מיון ברירת מחדל: תאריך – חדש קודם (בלי לדרוס מצב שמור).
+

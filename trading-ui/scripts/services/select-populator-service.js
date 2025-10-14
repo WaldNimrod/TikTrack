@@ -179,19 +179,51 @@ class SelectPopulatorService {
             let defaultValue = options.defaultValue;
             if (options.defaultFromPreferences) {
                 try {
-                    // נסה קודם מזהה (id)
+                    // 1) מזהה ישיר
                     let prefValue = this._getPreferenceFromMemory('default_currency', ['defaultCurrencyId', 'currency_id']);
                     if (prefValue) {
                         defaultValue = parseInt(prefValue);
-                    } else {
-                        // נסה לפי קוד/סימול/שם (primaryCurrency וכו')
-                        const codeOrName = this._getPreferenceFromMemory('primaryCurrency', ['default_currency_code', 'default_currency_symbol', 'defaultCurrency']);
-                        if (codeOrName) {
+                    }
+
+                    // 2) אם עדיין אין, ננסה לפי אליאסים טקסטואליים (כולל "CODE - NAME" ו-"NAME (CODE)")
+                    if (!defaultValue) {
+                        const raw = this._getPreferenceFromMemory('primaryCurrency', ['default_currency_code', 'default_currency_symbol', 'defaultCurrency']);
+                        if (raw) {
+                            const s = String(raw).trim();
+                            const candidates = new Set();
+                            const upper = s.toUpperCase();
+                            const lower = s.toLowerCase();
+
+                            // המחרוזת המקורית בשני רישיות
+                            candidates.add(upper);
+                            candidates.add(lower);
+
+                            // תבנית "CODE - NAME"
+                            if (s.includes('-')) {
+                                candidates.add(s.split('-')[0].trim().toUpperCase());
+                                candidates.add(s.split('-')[0].trim().toLowerCase());
+                            }
+
+                            // תבנית "NAME (CODE)"
+                            const parenCode = (s.match(/\(([^)]+)\)/) || [])[1];
+                            if (parenCode) {
+                                candidates.add(parenCode.trim().toUpperCase());
+                                candidates.add(parenCode.trim().toLowerCase());
+                            }
+
+                            // קוד 3-4 אותיות גדולות מאותר מהמחרוזת
+                            const codeGuess = (s.match(/[A-Z]{3,4}/) || [])[0];
+                            if (codeGuess) {
+                                candidates.add(codeGuess.toUpperCase());
+                                candidates.add(codeGuess.toLowerCase());
+                            }
+
                             const match = currencies.find(c => {
-                                const code = (c.code || c.symbol || '').toString().toLowerCase();
-                                const name = (c.name || '').toString().toLowerCase();
-                                const target = codeOrName.toString().toLowerCase();
-                                return code === target || name === target || `${name} (${code})` === target;
+                                const code = (c.code || c.symbol || '').toString();
+                                const name = (c.name || '').toString();
+                                return candidates.has(code.toUpperCase()) || candidates.has(code.toLowerCase()) ||
+                                       candidates.has(name.toUpperCase()) || candidates.has(name.toLowerCase()) ||
+                                       candidates.has(`${name} (${code})`.toUpperCase()) || candidates.has(`${name} (${code})`.toLowerCase());
                             });
                             if (match) defaultValue = match.id;
                         }
@@ -202,12 +234,24 @@ class SelectPopulatorService {
             // מילוי ה-select עם שם + קוד/סימול
             this._populateSelect(select, currencies, {
                 valueField: 'id',
-                textField: (item) => `${item.name} (${item.code || item.symbol})`,
+                textField: (item) => `${item.code || item.symbol}`,
                 includeEmpty: options.includeEmpty !== false,
                 emptyText: options.emptyText || 'בחר מטבע...',
                 defaultValue: defaultValue,
                 defaultText: options.defaultText
             });
+
+            // Debug
+            try {
+                if (select && select.id) {
+                    const selectedText = select.options[select.selectedIndex]?.text || '';
+                    console.debug(`[SelectPopulator] ${select.id} defaultFromPreferences=${!!options.defaultFromPreferences}`, {
+                        defaultValue,
+                        selectedValue: select.value,
+                        selectedText
+                    });
+                }
+            } catch (_) {}
             
             console.log(`✅ נטענו ${currencies.length} מטבעות ל-${selectId}`);
             

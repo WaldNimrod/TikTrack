@@ -587,9 +587,7 @@ async function showAddAccountModal() {
 async function loadCurrenciesForAccount() {
     await window.SelectPopulatorService.populateCurrenciesSelect('accountCurrency', {
         includeEmpty: true,
-        emptyText: 'בחר מטבע...',
-        setDefault: true, // ישתמש ב-default_currency מהעדפות
-        format: 'symbol-name' // "USD - US Dollar"
+        emptyText: 'בחר מטבע...'
     });
 }
 
@@ -599,8 +597,7 @@ async function loadCurrenciesForAccount() {
 async function loadCurrenciesForEditAccount() {
     await window.SelectPopulatorService.populateCurrenciesSelect('editAccountCurrency', {
         includeEmpty: true,
-        emptyText: 'בחר מטבע...',
-        format: 'symbol-name' // "USD - US Dollar"
+        emptyText: 'בחר מטבע...'
     });
 }
 

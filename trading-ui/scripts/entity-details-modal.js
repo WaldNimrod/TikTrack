@@ -399,12 +399,13 @@ class EntityDetailsModal {
             console.log('⚠️ Using default color:', entityColor);
         }
 
-        // עדכון צבע הרקע של הכותרת
-        headerElement.style.backgroundColor = entityColor;
-        headerElement.style.color = 'white';
+        // עדכון צבע הרקע של הכותרת - וריאנט בהיר
+        const lightBg = `color-mix(in srgb, ${entityColor} 15%, white)`;
+        headerElement.style.backgroundColor = lightBg;
+        headerElement.style.color = entityColor; // טקסט כהה של הישות
         headerElement.style.borderBottom = `2px solid ${entityColor}`;
         
-        console.log('🎨 Applied color to modal header:', entityColor);
+        console.log('🎨 Applied color to modal header:', entityColor, 'light bg:', lightBg);
     }
 
     /**

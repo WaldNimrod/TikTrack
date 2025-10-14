@@ -642,6 +642,13 @@
     font-weight: 700;
 }
 
+/* לייבלים של שדות (col-5 text-muted) - בבולד */
+.modal-content.entity-details-modal .modal-body .col-5.text-muted,
+.modal-content.entity-details-modal .modal-body .col-md-3.text-muted,
+.modal-content.entity-details-modal .modal-body .col-md-4.text-muted {
+    font-weight: 700;
+}
+
 /* footer - כפתור סגירה משמאל */
 .modal-content.entity-details-modal .modal-footer {
     display: flex;

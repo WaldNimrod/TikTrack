@@ -517,6 +517,23 @@ class TradingAccountsController {
                     window.showSuccessNotification('החשבון נמחק בהצלחה', `החשבון "${account.name}" נמחק מהמערכת`);
                 }
             } else {
+                // אם המחיקה נכשלה – ננסה להציג חלון מקושרים אם קיימים
+                if ([400, 409, 422].includes(response.status)) {
+                    try {
+                        const resp = await fetch(`/api/linked-items/account/${accountId}`);
+                        if (resp.ok) {
+                            const data = await resp.json();
+                            const childEntities = data.child_entities || [];
+                            if (childEntities.length > 0) {
+                                if (typeof window.showLinkedItemsModal === 'function') {
+                                    data.accountName = account.name;
+                                    window.showLinkedItemsModal(data, 'trading_account', accountId, 'delete');
+                                    return; // עצירה – לא מציגים שגיאה כללית
+                                }
+                            }
+                        }
+                    } catch (_) { /* שקט */ }
+                }
                 throw new Error('Failed to delete account');
             }
         } catch (error) {
@@ -533,8 +550,8 @@ class TradingAccountsController {
 // ===== Linked Items helpers for accounts =====
 window.checkLinkedItemsBeforeDeleteAccount = async function(accountId) {
     try {
-        // שימוש ב-endpoint הכללי
-        const resp = await fetch(`/api/linked-items/trading_account/${accountId}`);
+        // שימוש ב-endpoint הכללי (entity_type='account')
+        const resp = await fetch(`/api/linked-items/account/${accountId}`);
         if (!resp.ok) return false; // אם לא ניתן לבדוק – לא חוסם
         const data = await resp.json();
         const childEntities = data.child_entities || [];

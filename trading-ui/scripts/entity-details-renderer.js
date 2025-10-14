@@ -322,8 +322,8 @@ class EntityDetailsRenderer {
         return `
             <div class="entity-details-header mb-4 pb-3 border-bottom d-flex justify-content-between align-items-center" style="border-bottom-color: ${color} !important;">
                 <div class="d-flex align-items-center">
-                    <div class="entity-icon-circle me-3" style="background-color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 10px; border: 2px solid ${color};">
-                        <img src="${iconPath}" alt="${entityTypeName}" style="width: 100%; height: 100%; object-fit: contain;">
+                    <div class="entity-icon-circle" style="border-color: ${color};">
+                        <img src="${iconPath}" alt="${entityTypeName}">
                     </div>
                     <div>
                         <h4 class="mb-1" style="color: ${color};">${entityTypeName}</h4>
@@ -1631,8 +1631,8 @@ class EntityDetailsRenderer {
                     <div class="linked-account-card p-3 border rounded" style="background-color: ${accountColorLight}; border-color: ${accountColorDark} !important; border-width: 2px !important;">
                         <div class="d-flex justify-content-between align-items-start">
                             <div class="d-flex align-items-start flex-grow-1">
-                                <div class="entity-icon-circle me-3" style="background-color: white; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 8px; border: 2px solid ${accountColorDark};">
-                                    <img src="${accountIconPath}" alt="חשבון" style="width: 100%; height: 100%; object-fit: contain;">
+                                <div class="entity-icon-circle icon-sm" style="border-color: ${accountColorDark};">
+                                    <img src="${accountIconPath}" alt="חשבון">
                                 </div>
                                 <div class="flex-grow-1">
                                     <h6 class="mb-2" style="color: ${accountColorDark};">${accountName}</h6>

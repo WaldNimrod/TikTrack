@@ -1,0 +1,92 @@
+/**
+ * Entity Details Modal - Component Styles
+ * ========================================
+ * 
+ * עיצוב למודל פרטי ישויות
+ * 
+ * קובץ: styles-new/06-components/_entity-details-modal.css
+ * שכבה: Components (06)
+ * תאריך: אוקטובר 2025
+ */
+
+/* ===== Modal Header ===== */
+
+/* כפתור סגירה - ריבוע כהה בסוף השורה (שמאל ב-RTL) */
+.entity-details-modal .modal-header .btn-close {
+    /* מיקום בסוף השורה (שמאל) */
+    margin-inline-start: auto;
+    margin-inline-end: 0;
+    order: 999; /* תמיד אחרון */
+    
+    /* ריבוע כהה של הישות - יוגדר דינמית ב-JS */
+    opacity: 0.8;
+    filter: invert(1) brightness(0.3);
+}
+
+.entity-details-modal .modal-header .btn-close:hover {
+    opacity: 1;
+    filter: invert(1) brightness(0.2);
+}
+
+/* כותרות בבולד */
+.entity-details-modal .modal-body h6,
+.entity-details-modal .modal-body .section-title,
+.entity-details-modal .modal-body .info-label,
+.entity-details-modal .modal-body label,
+.entity-details-modal .modal-body strong {
+    font-weight: 700 !important;
+}
+
+/* ===== Entity Icon Circle ===== */
+
+/* עיגול האייקון - בלי padding כדי שהאייקון ימלא את כל השטח */
+.entity-icon-circle {
+    background-color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* ללא padding - האייקון ימלא את כל העיגול */
+    padding: 0 !important;
+    
+    /* גבול לפי צבע הישות */
+    border: 2px solid currentColor;
+    
+    /* מרווח מהתוכן הבא */
+    margin-inline-end: 1rem;
+}
+
+/* האייקון עצמו - ימלא את כל העיגול */
+.entity-icon-circle img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    
+    /* הסרת כל padding/margin שעלול להיות */
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* גרסה קטנה יותר לאייקונים משניים */
+.entity-icon-circle.icon-sm {
+    width: 45px;
+    height: 45px;
+}
+
+/* ===== Responsive ===== */
+
+@media (max-width: 768px) {
+    .entity-icon-circle {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .entity-icon-circle.icon-sm {
+        width: 35px;
+        height: 35px;
+    }
+}
+

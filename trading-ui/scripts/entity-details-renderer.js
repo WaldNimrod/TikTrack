@@ -1577,7 +1577,7 @@ class EntityDetailsRenderer {
         }
     }
     renderCashFlow(cashFlowData, options = {}) {
-        const entityColor = this.entityColors.cash_flow || '#28a745';
+        const entityColor = this.entityColors.cash_flow || 'var(--entity-cash-flow-color)';
         
         // תרגום סוג תזרים לעברית
         const typeDisplay = this.translateCashFlowType(cashFlowData.type);
@@ -1610,9 +1610,9 @@ class EntityDetailsRenderer {
     renderLinkedAccount(cashFlowData, cashFlowColor) {
         if (!cashFlowData.trading_account_id) return '';
         
-        // צבעים של חשבונות
-        const accountColorDark = this.entityColors.account || '#6f42c1';
-        const accountColorLight = this.lightenColor(accountColorDark, 0.9); // רקע בהיר 90%
+        // צבעים של חשבונות - משתנים דינמיים
+        const accountColorDark = 'var(--entity-account-text)'; // צבע כהה
+        const accountColorLight = 'var(--entity-account-bg)'; // רקע בהיר
         const accountIconPath = this.getEntityIcon('trading_account');
         
         // שימוש בנתוני החשבון מה-cashFlowData (צריך לבוא מהשרת)
@@ -1636,7 +1636,7 @@ class EntityDetailsRenderer {
                                     <img src="${accountIconPath}" alt="חשבון">
                                 </div>
                                 <div class="flex-grow-1">
-                                    <h6 class="mb-2" style="color: ${accountColorDark};">${accountName}</h5>
+                                    <h5 class="mb-2" style="color: ${accountColorDark};">${accountName}</h5>
                                     <div class="row">
                                         <div class="col-md-3">
                                             <small class="text-muted d-block"><strong>מזהה:</strong> #${cashFlowData.trading_account_id}</small>

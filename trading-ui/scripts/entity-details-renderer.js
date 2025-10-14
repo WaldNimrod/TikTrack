@@ -1615,14 +1615,13 @@ class EntityDetailsRenderer {
         const accountColorLight = 'var(--entity-account-bg)'; // רקע בהיר
         const accountIconPath = this.getEntityIcon('trading_account');
         
-        // שימוש בנתוני החשבון מה-cashFlowData (צריך לבוא מהשרת)
-        const accountData = cashFlowData.account || {};
-        
-        const accountName = accountData.name || cashFlowData.account_name || 'חשבון לא ידוע';
-        const accountType = accountData.type || '-';
-        const accountStatus = accountData.status || '-';
-        const accountBalance = accountData.balance !== null && accountData.balance !== undefined 
-            ? this.formatCurrency(accountData.balance, cashFlowData.currency_symbol) 
+        // השרת מחזיר נתונים ישירות (account_name, account_type, וכו')
+        // לא צריך אובייקט מקונן account
+        const accountName = cashFlowData.account_name || 'חשבון לא ידוע';
+        const accountType = cashFlowData.account_type || '-';
+        const accountStatus = cashFlowData.account_status || '-';
+        const accountBalance = cashFlowData.account_balance !== null && cashFlowData.account_balance !== undefined 
+            ? this.formatCurrency(cashFlowData.account_balance, cashFlowData.currency_symbol) 
             : '-';
         
         return `

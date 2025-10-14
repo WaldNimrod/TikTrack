@@ -188,7 +188,7 @@ class TradingAccountsController {
             <td class="col-created">${formattedDate}</td>
             <td class="col-actions actions-cell">
                 ${window.createActionsMenu ? window.createActionsMenu([
-                    window.createLinkButton ? window.createLinkButton(`if (window.showLinkedItemsModal) { window.showLinkedItemsModal([], 'trading_account', ${tradingAccount.id}); }`) : '',
+                    window.createLinkButton ? window.createLinkButton(`if (window.showLinkedItemsModal) { window.showLinkedItemsModal([], 'account', ${tradingAccount.id}); }`) : '',
                     window.createEditButton ? window.createEditButton(`window.tradingAccountsController.showEditModal(${tradingAccount.id})`) : '',
                     window.createDeleteButton ? window.createDeleteButton(`window.tradingAccountsController.deleteAccount(${tradingAccount.id})`) : ''
                 ], tradingAccount.id) : ''}

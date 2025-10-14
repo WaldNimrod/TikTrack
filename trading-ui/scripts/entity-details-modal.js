@@ -399,13 +399,17 @@ class EntityDetailsModal {
             console.log('⚠️ Using default color:', entityColor);
         }
 
-        // עדכון צבע הרקע של הכותרת - וריאנט בהיר
-        const lightBg = `color-mix(in srgb, ${entityColor} 15%, white)`;
-        headerElement.style.backgroundColor = lightBg;
-        headerElement.style.color = entityColor; // טקסט כהה של הישות
-        headerElement.style.borderBottom = `2px solid ${entityColor}`;
+        // עדכון צבע הרקע של הכותרת - משתמש במשתני CSS דינמיים
+        const entityTypeNormalized = entityType.replace('_', '-'); // cash_flow -> cash-flow
+        headerElement.style.setProperty('--current-entity-color', `var(--entity-${entityTypeNormalized}-color)`);
+        headerElement.style.setProperty('--current-entity-bg', `var(--entity-${entityTypeNormalized}-bg)`);
+        headerElement.style.setProperty('--current-entity-text', `var(--entity-${entityTypeNormalized}-text)`);
         
-        console.log('🎨 Applied color to modal header:', entityColor, 'light bg:', lightBg);
+        headerElement.style.backgroundColor = `var(--current-entity-bg)`;
+        headerElement.style.color = `var(--current-entity-text)`; // צבע כהה
+        headerElement.style.borderBottom = `2px solid var(--current-entity-color)`;
+        
+        console.log('🎨 Applied color to modal header:', entityType, entityTypeNormalized);
     }
 
     /**

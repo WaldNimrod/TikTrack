@@ -98,6 +98,9 @@ def get_cash_flow(cash_flow_id: int):
             cf_dict = cash_flow.to_dict()
             if cash_flow.account:
                 cf_dict['account_name'] = cash_flow.account.name
+                cf_dict['account_type'] = cash_flow.account.type
+                cf_dict['account_status'] = cash_flow.account.status
+                cf_dict['account_balance'] = float(cash_flow.account.balance) if cash_flow.account.balance is not None else None
             if cash_flow.currency:
                 cf_dict['currency_symbol'] = cash_flow.currency.symbol
                 cf_dict['currency_name'] = cash_flow.currency.name

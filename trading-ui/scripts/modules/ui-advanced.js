@@ -2102,24 +2102,118 @@ window.loadUserPreferences = async function loadUserPreferences(options = {}) {
       return false;
     }
     const json = await res.json();
-    const prefs = json?.data?.preferences || {};
+    const prefsRaw = json?.data?.preferences || {};
+    let prefs = { ...prefsRaw };
+
+    // Merge colors from alternative shapes/groups if missing
+    const inlineColors = json?.data?.colors || prefsRaw?.colors || {};
+    if (!prefs.primaryColor && (inlineColors.primaryColor || inlineColors.primary)) {
+      prefs.primaryColor = inlineColors.primaryColor || inlineColors.primary;
+    }
+    if (!prefs.secondaryColor && (inlineColors.secondaryColor || inlineColors.secondary)) {
+      prefs.secondaryColor = inlineColors.secondaryColor || inlineColors.secondary;
+    }
+    if (!prefs.primaryColor || !prefs.secondaryColor) {
+      try {
+        const groupRes = await fetch('/api/preferences/user/group?group=colors');
+        if (groupRes.ok) {
+          const groupJson = await groupRes.json();
+          const g = groupJson?.data?.preferences || groupJson?.data || {};
+          if (!prefs.primaryColor && (g.primaryColor || g.primary)) {
+            prefs.primaryColor = g.primaryColor || g.primary;
+          }
+          if (!prefs.secondaryColor && (g.secondaryColor || g.secondary)) {
+            prefs.secondaryColor = g.secondaryColor || g.secondary;
+          }
+        }
+      } catch {}
+    }
 
     // store latest prefs globally for listeners
     window.__latestPrefs = prefs;
+    window.currentPreferences = prefs;
 
     // ensure primary/secondary also mapped from common keys if present
     try {
       if (prefs.primaryColor) {
         document.documentElement.style.setProperty('--primary-color', prefs.primaryColor);
+        document.documentElement.style.setProperty('--color-primary', prefs.primaryColor);
       }
       if (prefs.secondaryColor) {
         document.documentElement.style.setProperty('--secondary-color', prefs.secondaryColor);
+        document.documentElement.style.setProperty('--color-secondary', prefs.secondaryColor);
       }
     } catch {}
 
     // apply CSS variables immediately without layout flash
     requestAnimationFrame(() => {
       try { updateCSSVariablesFromPreferences(prefs); } catch {}
+      try {
+        // Ensure dynamic variables required by components are always defined
+        const docStyle = document.documentElement.style;
+
+        // 1) Status variables (used in badges/status CSS)
+        const statusOpen = prefs.statusOpenColor || getComputedStyle(document.documentElement).getPropertyValue('--user-status-open-color') || '#28a745';
+        const statusClosed = prefs.statusClosedColor || getComputedStyle(document.documentElement).getPropertyValue('--user-status-closed-color') || '#6c757d';
+        const statusCancelled = prefs.statusCancelledColor || getComputedStyle(document.documentElement).getPropertyValue('--user-status-cancelled-color') || '#dc3545';
+        const statusPending = prefs.statusPendingColor || prefs.warningColor || getComputedStyle(document.documentElement).getPropertyValue('--warning-color') || '#ffc107';
+        docStyle.setProperty('--status-open-color', String(statusOpen).trim());
+        docStyle.setProperty('--status-closed-color', String(statusClosed).trim());
+        docStyle.setProperty('--status-cancelled-color', String(statusCancelled).trim());
+        docStyle.setProperty('--status-pending-color', String(statusPending).trim());
+
+        // 2) Numeric variables (positive/negative/zero) used by _badges-status.css
+        const numPos = (prefs.valuePositiveColor || '#28a745').trim();
+        const numNeg = (prefs.valueNegativeColor || '#dc3545').trim();
+        const numZero = (prefs.valueNeutralColor || '#6c757d').trim();
+
+        const pRgb = hexToRgb(numPos) || { r: 40, g: 167, b: 69 };
+        const nRgb = hexToRgb(numNeg) || { r: 220, g: 53, b: 69 };
+        const zRgb = hexToRgb(numZero) || { r: 108, g: 117, b: 125 };
+
+        docStyle.setProperty('--numeric-positive-medium', numPos);
+        docStyle.setProperty('--numeric-positive-light', `rgba(${pRgb.r}, ${pRgb.g}, ${pRgb.b}, 0.1)`);
+        docStyle.setProperty('--numeric-positive-border', `rgba(${pRgb.r}, ${pRgb.g}, ${pRgb.b}, 0.3)`);
+
+        docStyle.setProperty('--numeric-negative-medium', numNeg);
+        docStyle.setProperty('--numeric-negative-light', `rgba(${nRgb.r}, ${nRgb.g}, ${nRgb.b}, 0.1)`);
+        docStyle.setProperty('--numeric-negative-border', `rgba(${nRgb.r}, ${nRgb.g}, ${nRgb.b}, 0.3)`);
+
+        docStyle.setProperty('--numeric-zero-color', numZero);
+        docStyle.setProperty('--numeric-zero-light', `rgba(${zRgb.r}, ${zRgb.g}, ${zRgb.b}, 0.1)`);
+        docStyle.setProperty('--numeric-zero-border', `rgba(${zRgb.r}, ${zRgb.g}, ${zRgb.b}, 0.3)`);
+
+        // 3) Entity aliases expected by some CSS (e.g. --entity-trade)
+        const entityMap = {
+          trade: prefs.entityTradeColor || getComputedStyle(document.documentElement).getPropertyValue('--entity-trade-color') || '#26baac',
+          trade_plan: prefs.entityTradePlanColor || getComputedStyle(document.documentElement).getPropertyValue('--entity-trade-plan-color') || '#8e44ad',
+          execution: prefs.entityExecutionColor || getComputedStyle(document.documentElement).getPropertyValue('--entity-execution-color') || '#2c3e50',
+          account: prefs.entityTradingAccountColor || getComputedStyle(document.documentElement).getPropertyValue('--entity-account-color') || '#5499c7',
+          cash_flow: prefs.entityCashFlowColor || getComputedStyle(document.documentElement).getPropertyValue('--entity-cash-flow-color') || '#d4a574',
+          ticker: prefs.entityTickerColor || getComputedStyle(document.documentElement).getPropertyValue('--entity-ticker-color') || '#229954',
+          alert: prefs.entityAlertColor || getComputedStyle(document.documentElement).getPropertyValue('--entity-alert-color') || '#e67e22',
+          note: prefs.entityNoteColor || getComputedStyle(document.documentElement).getPropertyValue('--entity-note-color') || '#a29bfe'
+        };
+        Object.entries(entityMap).forEach(([k, v]) => docStyle.setProperty(`--entity-${k}`, String(v).trim()));
+
+        // 4) Synonyms used by some pages (cash_flows expects these)
+        const getVar = (name) => (getComputedStyle(document.documentElement).getPropertyValue(name) || '').trim();
+        const ensureVar = (target, value) => {
+          if (!getVar(target) && value) {
+            docStyle.setProperty(target, String(value).trim());
+          }
+        };
+        // Map entity colors to page synonyms if missing
+        ensureVar('--cash-flow-color', getVar('--entity-cash_flow'));
+        ensureVar('--account-color', getVar('--entity-account'));
+        // Income/Expense derive from numeric positive/negative mediums
+        ensureVar('--income-color', getVar('--numeric-positive-medium'));
+        ensureVar('--expense-color', getVar('--numeric-negative-medium'));
+        // Optional bg alias if used by CSS
+        ensureVar('--cash-flow-bg-color', getVar('--numeric-zero-light'));
+      } catch (e) {
+        // silent
+      }
     });
 
     // backward-compat hook
@@ -2372,58 +2466,16 @@ function getSubHeaderOpacityHex() {
  * @param {string} schemeName - שם הסכמה (light, dark, custom)
  * @param {Object} customColors - צבעים מותאמים אישית (אופציונלי)
  */
-async function applyColorScheme(schemeName = 'light', customColors = null) {
+async function applyColorScheme(schemeName = 'disabled', customColors = null) {
   try {
-    
-    // Remove existing scheme classes
-    document.body.classList.remove('light-scheme', 'dark-scheme', 'custom-scheme');
-    
-    // Apply new scheme
-    document.body.classList.add(`${schemeName}-scheme`);
-    
-    // Store current scheme using Unified Cache Manager
-    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
-      await window.UnifiedCacheManager.save('colorScheme', schemeName, {
-        layer: 'localStorage',
-        ttl: null, // persistent
-        syncToBackend: false
-      });
-      console.log(`💾 Color scheme saved to Unified Cache: ${schemeName}`);
-    } else {
-      // Fallback to localStorage if Unified Cache is not available
-      localStorage.setItem('colorScheme', schemeName);
-      console.log(`💾 Color scheme saved to localStorage (fallback): ${schemeName}`);
-    }
-    
-    // Apply scheme-specific colors
-    switch (schemeName) {
-      case 'light':
-        applyLightScheme();
-        break;
-      case 'dark':
-        applyDarkScheme();
-        break;
-      case 'custom':
-        if (customColors) {
-          applyCustomScheme(customColors);
-        }
-        break;
-      default:
-        console.warn(`⚠️ Unknown color scheme: ${schemeName}`);
-        applyLightScheme();
-    }
-    
-    // Update CSS variables
+    // Color scheme system disabled: rely solely on user preferences
+    // No classes, no cache writes, no defaults
     updateCSSVariablesFromPreferences(window.currentPreferences || {});
-    
-    // Dispatch event for other systems
     window.dispatchEvent(new CustomEvent('colorSchemeChanged', {
-      detail: { scheme: schemeName, customColors }
+      detail: { scheme: 'disabled' }
     }));
-    
-    
   } catch (error) {
-    console.error('❌ Error applying color scheme:', error);
+    console.error('❌ Error applying color scheme (disabled mode):', error);
   }
 }
 
@@ -2451,26 +2503,12 @@ async function toggleColorScheme() {
  */
 async function loadColorScheme() {
   try {
-    let savedScheme = 'light';
-    
-    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
-      const cachedScheme = await window.UnifiedCacheManager.get('colorScheme');
-      savedScheme = cachedScheme || 'light';
-      console.log(`📥 Loading color scheme from Unified Cache: ${savedScheme}`);
-    } else {
-      // Fallback to localStorage if Unified Cache is not available
-      savedScheme = localStorage.getItem('colorScheme') || 'light';
-      console.log(`📥 Loading color scheme from localStorage (fallback): ${savedScheme}`);
-    }
-    
-    // Apply the saved scheme
-    await applyColorScheme(savedScheme);
-    
-    return savedScheme;
-    
+    // Color scheme system disabled: simply ensure preferences are applied
+    await applyColorScheme('disabled');
+    return 'disabled';
   } catch (error) {
-    console.error('❌ Error loading color scheme:', error);
-    return 'light';
+    console.error('❌ Error loading color scheme (disabled mode):', error);
+    return 'disabled';
   }
 }
 
@@ -2555,43 +2593,13 @@ async function getCurrentColorScheme() {
  * Apply light color scheme
  * יישום סכמת צבעים בהירה
  */
-function applyLightScheme() {
-  try {
-    // Light scheme is the default - no special changes needed
-    console.log('☀️ Applying light color scheme');
-    
-    // Ensure light theme variables are set
-    document.documentElement.style.setProperty('--scheme-background', '#ffffff');
-    document.documentElement.style.setProperty('--scheme-text', '#212529');
-    document.documentElement.style.setProperty('--scheme-border', '#dee2e6');
-    document.documentElement.style.setProperty('--scheme-card', '#ffffff');
-    
-  } catch (error) {
-    console.error('❌ Error applying light scheme:', error);
-  }
-}
+function applyLightScheme() { /* disabled */ }
 
 /**
  * Apply dark color scheme
  * יישום סכמת צבעים כהה
  */
-function applyDarkScheme() {
-  try {
-    console.log('🌙 Applying dark color scheme');
-    
-    // Set dark theme variables
-    document.documentElement.style.setProperty('--scheme-background', '#1a1a1a');
-    document.documentElement.style.setProperty('--scheme-text', '#ffffff');
-    document.documentElement.style.setProperty('--scheme-border', '#404040');
-    document.documentElement.style.setProperty('--scheme-card', '#2d2d2d');
-    
-    // Note: Dark mode support was removed in January 2025
-    // This function is kept for future implementation
-    
-  } catch (error) {
-    console.error('❌ Error applying dark scheme:', error);
-  }
-}
+function applyDarkScheme() { /* disabled */ }
 
 /**
  * Apply custom color scheme

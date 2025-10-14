@@ -343,7 +343,7 @@
 
 /* כותרת מודל - וריאנט בהיר של הישות */
 .entity-header {
-  background-color: var(--entity-trade-plan-bg)) !important;
+  background-color: var(--entity-trade-plan-bg) !important;
   border-bottom: 3px solid var(--entity-color) !important;
   display: flex;
   align-items: center;

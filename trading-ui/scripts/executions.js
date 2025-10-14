@@ -30,21 +30,7 @@ window.initializeExecutionsModals = function() {
  * הוספת ביצוע חדש
  * פותח מודל להוספת ביצוע חדש
  */
-function addExecution() {
-  try {
-
-    // פתיחת מודל הוספת ביצוע
-    showAddExecutionModal();
-    
-  } catch (error) {
-    console.error('שגיאה בהוספת ביצוע:', error);
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בהוספת ביצוע', error.message);
-    } else if (typeof window.showNotification === 'function') {
-      window.showErrorNotification('שגיאה בהוספת ביצוע');
-    }
-  }
-}
+// הוסר: addExecution() גרם לכפילות מול saveExecution
 /*
  * Executions.js - Executions Page Management
  * =========================================
@@ -172,16 +158,19 @@ ID: ${execution.id}
 function resetAddExecutionForm() {
   // ניקוי הטופס
   addExecutionForm.reset();
-  clearExecutionValidationErrors();
+  if (typeof window.clearValidation === 'function') {
+    window.clearValidation('addExecutionForm');
+  }
 
   // השבתת כל השדות חוץ מטיקר
   const fieldsToDisable = [
-    'executionTicker',
     'executionType',
     'executionQuantity',
     'executionPrice',
     'executionDate',
     'executionAccount',
+    'executionCommission',
+    'executionNotes',
   ];
 
   fieldsToDisable.forEach(fieldId => {
@@ -198,6 +187,24 @@ function resetAddExecutionForm() {
   }
 
 
+}
+
+function enableAddExecutionFields() {
+  const fieldsToEnable = [
+    'executionType',
+    'executionQuantity',
+    'executionPrice',
+    'executionDate',
+    'executionAccount',
+    'executionCommission',
+    'executionNotes',
+  ];
+  fieldsToEnable.forEach(fieldId => {
+    const element = document.getElementById(fieldId);
+    if (element) {
+      element.disabled = false;
+    }
+  });
 }
 
 /**
@@ -247,14 +254,31 @@ async function showAddExecutionModal() {
   }
 
   // טעינת טיקרים באמצעות SelectPopulatorService
-  if (window.SelectPopulatorService) {
-    await window.SelectPopulatorService.populate('addExecutionTicker', 'tickers', {
-      filter: 'active_trades_only',
-      placeholder: 'בחר טיקר...'
+  if (window.SelectPopulatorService && typeof window.SelectPopulatorService.populateTickersSelect === 'function') {
+    await window.SelectPopulatorService.populateTickersSelect('executionTicker', {
+      includeEmpty: true,
+      emptyText: 'בחר טיקר...'
     });
   } else {
     // Fallback למקרה שהשירות לא זמין
   await updateTickersList('add', false);
+  }
+
+  // הפעלת כל השדות לאחר בחירת טיקר
+  const tickerSelect = document.getElementById('executionTicker');
+  if (tickerSelect) {
+    tickerSelect.disabled = false;
+    tickerSelect.addEventListener('change', () => {
+      if (tickerSelect.value) {
+        enableAddExecutionFields();
+        // מילוי מחיר ברירת מחדל מהמחיר האחרון של הטיקר
+        fillDefaultPriceFromTicker(tickerSelect.value);
+        // עמלת ברירת מחדל מהעדפות
+        fillDefaultCommissionFromPreferences();
+        // טעינת טריידים פתוחים לטיקר
+        populateTradesForSelectedTicker(tickerSelect.value);
+      }
+    });
   }
 
   // חישוב ערכים מחושבים
@@ -265,13 +289,89 @@ async function showAddExecutionModal() {
   modal.show();
 }
 
+// מילוי מחיר ברירת מחדל לפי הטיקר הנבחר
+async function fillDefaultPriceFromTicker(tickerId) {
+  try {
+    const resp = await fetch(`/api/tickers/${tickerId}`);
+    if (!resp.ok) {return;}
+    const data = await resp.json();
+    const price = data?.data?.current_price;
+    const priceEl = document.getElementById('executionPrice');
+    if (priceEl && price && !Number.isNaN(Number(price))) {
+      priceEl.value = Number(price).toFixed(2);
+    }
+  } catch (e) {
+    // שקט - לא חוסם UX
+  }
+}
+
+// מילוי עמלת ברירת מחדל מהעדפות
+async function fillDefaultCommissionFromPreferences() {
+  try {
+    const commissionEl = document.getElementById('executionCommission');
+    if (!commissionEl) {return;}
+    // קודם ננסה דרך DefaultValueSetter כדי לשמור אחידות
+    if (window.DefaultValueSetter && typeof window.DefaultValueSetter.setPreferenceValue === 'function') {
+      const pref = await window.DefaultValueSetter.setPreferenceValue('executionCommission', 'default_execution_commission');
+      if (pref !== null && pref !== undefined && pref !== '') {
+        const val = Number(pref);
+        if (!Number.isNaN(val)) {
+          commissionEl.value = val.toFixed(2);
+          return;
+        }
+      }
+    }
+    // Fallback ישיר
+    if (typeof window.getPreference === 'function') {
+      const pref = await window.getPreference('default_execution_commission');
+      if (pref !== null && pref !== undefined && pref !== '') {
+        const val = Number(pref);
+        if (!Number.isNaN(val)) {
+          commissionEl.value = val.toFixed(2);
+        }
+      }
+    }
+  } catch (e) {
+    // שקט
+  }
+}
+
+// טעינת טריידים פתוחים לטיקר וסימון select הטרייד
+async function populateTradesForSelectedTicker(tickerId) {
+  try {
+    const select = document.getElementById('executionAccount');
+    if (!select) {return;}
+    // טען את כל הטריידים ובחר לפי ticker_id
+    const resp = await fetch('/api/trades/');
+    if (!resp.ok) {return;}
+    const data = await resp.json();
+    const trades = data?.data || [];
+    const filtered = trades.filter(t => String(t.ticker_id) === String(tickerId) && t.status === 'open');
+    select.innerHTML = '';
+    const empty = document.createElement('option');
+    empty.value = '';
+    empty.textContent = 'בחר טרייד';
+    select.appendChild(empty);
+    filtered.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t.id;
+      opt.textContent = t.display_name || t.remarks || `Trade ${t.id}`;
+      select.appendChild(opt);
+    });
+  } catch (e) {
+    // שקט
+  }
+}
+
 /**
  * ניקוי והשבתת שדות בטופס עריכת עסקה
  */
 function resetEditExecutionForm() {
   // ניקוי הטופס
   editExecutionForm.reset();
-  clearExecutionValidationErrors();
+  if (typeof window.clearValidation === 'function') {
+    window.clearValidation('editExecutionForm');
+  }
 
   // השבתת כל השדות חוץ מטיקר
   const fieldsToDisable = [
@@ -319,14 +419,22 @@ async function showEditExecutionModal(id) {
 
   // טעינת טיקרים באמצעות SelectPopulatorService
   const showClosedTrades = document.getElementById('editExecutionShowClosedTrades')?.checked || false;
-  if (window.SelectPopulatorService) {
-    await window.SelectPopulatorService.populate('editExecutionTicker', 'tickers', {
-      filter: showClosedTrades ? 'all_trades' : 'active_trades_only',
-      placeholder: 'בחר טיקר...'
+  if (window.SelectPopulatorService && typeof window.SelectPopulatorService.populateTickersSelect === 'function') {
+    await window.SelectPopulatorService.populateTickersSelect('editExecutionTicker', {
+      includeEmpty: true,
+      emptyText: 'בחר טיקר...'
     });
   } else {
     // Fallback למקרה שהשירות לא זמין
     await updateTickersList('edit', showClosedTrades);
+  }
+
+  // בחירת טיקר ברירת מחדל לפי המידע שנגזר (tickerId) אם קיים
+  if (tickerId) {
+    const tickerSelect = document.getElementById('editExecutionTicker');
+    if (tickerSelect) {
+      tickerSelect.value = String(tickerId);
+    }
   }
 
   // טעינת פרטי הטרייד/תכנון המקושר
@@ -565,7 +673,9 @@ async function showEditExecutionModal(id) {
     handleDataLoadError(error, 'פרטי אובייקט מקושר');
   }
 
-  clearExecutionValidationErrors();
+  if (typeof window.clearValidation === 'function') {
+    window.clearValidation('editExecutionForm');
+  }
 
   // הפעלת כל השדות בעריכת עסקה
   enableAllFields('edit');
@@ -751,17 +861,17 @@ async function saveExecution() {
     return;
   }
 
-    // 2. בניית אובייקט נתונים באמצעות DataCollectionService
-    const rawData = window.DataCollectionService.collectFormData({
-        trade_id: { id: 'addExecutionTradeId', type: 'int' },
-        action: { id: 'addExecutionType', type: 'text' },
-        quantity: { id: 'addExecutionQuantity', type: 'int' },
-        price: { id: 'addExecutionPrice', type: 'number' },
-        date: { id: 'addExecutionDate', type: 'text' },
-        fee: { id: 'addExecutionCommission', type: 'number', default: null },
-        source: { id: 'addExecutionSource', type: 'text', default: 'manual' },
-        notes: { id: 'addExecutionNotes', type: 'text', default: null }
-    });
+  // 2. בניית אובייקט נתונים באמצעות DataCollectionService (מיפוי לשמות ה-IDs הקיימים בטופס)
+  const rawData = window.DataCollectionService.collectFormData({
+      trade_id: { id: 'executionAccount', type: 'int' },
+      action: { id: 'executionType', type: 'text' },
+      quantity: { id: 'executionQuantity', type: 'int' },
+      price: { id: 'executionPrice', type: 'number' },
+      date: { id: 'executionDate', type: 'text' },
+      fee: { id: 'executionCommission', type: 'number', default: null },
+      source: { id: null, type: 'text', default: 'manual' },
+      notes: { id: 'executionNotes', type: 'text', default: null }
+  });
     
     // המרת תאריך ל-ISO
     const executionData = {
@@ -769,17 +879,41 @@ async function saveExecution() {
         date: rawData.date ? new Date(rawData.date).toISOString() : null
     };
 
-    // 3. שליחה לשרת
-    const response = await fetch('/api/executions', {
+  // DEBUG: לוג לפני שליחה
+  console.log('🟨 [Executions] About to POST /api/executions/ with payload:', executionData);
+
+  // 3. שליחה לשרת
+  const response = await fetch('/api/executions/', {
       method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(executionData),
     });
 
+  // DEBUG: סטטוס ותוכן תגובה
+  try {
+    const clone = response.clone();
+    const text = await clone.text();
+    console.log('🟨 [Executions] POST response status:', response.status, 'body:', text);
+  } catch (e) {
+    console.log('🟨 [Executions] Unable to read response clone');
+  }
+
     // 4. טיפול בתגובה באמצעות CRUDResponseHandler
     await window.CRUDResponseHandler.handleSaveResponse(response, {
         modalId: 'addExecutionModal',
         successMessage: 'עסקה נוספה בהצלחה',
+      customValidationParser: (errorMessage) => {
+        if (typeof errorMessage !== 'string') {return null;}
+        const normalized = String(errorMessage);
+        const out = [];
+        if (normalized.includes('action')) out.push({ fieldId: 'addExecutionType', message: 'יש לבחור פעולה' });
+        if (normalized.includes('quantity')) out.push({ fieldId: 'addExecutionQuantity', message: 'יש להזין כמות תקינה' });
+        if (normalized.includes('price')) out.push({ fieldId: 'addExecutionPrice', message: 'יש להזין מחיר תקין' });
+        if (normalized.includes('date')) out.push({ fieldId: 'addExecutionDate', message: 'יש לבחור תאריך' });
+        if (normalized.includes('fee')) out.push({ fieldId: 'addExecutionCommission', message: 'עמלה לא תקינה' });
+        if (normalized.includes('source')) out.push({ fieldId: 'addExecutionSource', message: 'מקור לא תקין' });
+        return out.length ? out : null;
+      },
         reloadFn: async () => {
             // ניקוי מטמון
             if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
@@ -816,13 +950,13 @@ async function updateExecution() {
     // 2. בניית אובייקט נתונים באמצעות DataCollectionService
     const id = window.DataCollectionService.getValue('editExecutionId', 'int');
     const rawData = window.DataCollectionService.collectFormData({
-        trade_id: { id: 'editExecutionTradeId', type: 'int' },
+        trade_id: { id: 'editExecutionAccount', type: 'int' },
         action: { id: 'editExecutionType', type: 'text' },
         quantity: { id: 'editExecutionQuantity', type: 'int' },
         price: { id: 'editExecutionPrice', type: 'number' },
         date: { id: 'editExecutionDate', type: 'text' },
         fee: { id: 'editExecutionCommission', type: 'number', default: null },
-        source: { id: 'editExecutionSource', type: 'text', default: 'manual' },
+        source: { id: null, type: 'text', default: 'manual' },
         notes: { id: 'editExecutionNotes', type: 'text', default: null }
     });
     
@@ -833,16 +967,37 @@ async function updateExecution() {
     };
 
     // 3. שליחה לשרת
+    console.log('🟨 [Executions] About to PUT /api/executions/'+id+' with payload:', executionData);
     const response = await fetch(`/api/executions/${id}`, {
       method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(executionData),
     });
 
+    try {
+      const clone = response.clone();
+      const text = await clone.text();
+      console.log('🟨 [Executions] PUT response status:', response.status, 'body:', text);
+    } catch (e) {
+      console.log('🟨 [Executions] Unable to read PUT response clone');
+    }
+
     // 4. טיפול בתגובה באמצעות CRUDResponseHandler
     await window.CRUDResponseHandler.handleUpdateResponse(response, {
         modalId: 'editExecutionModal',
         successMessage: 'עסקה עודכנה בהצלחה',
+      customValidationParser: (errorMessage) => {
+        if (typeof errorMessage !== 'string') {return null;}
+        const normalized = String(errorMessage);
+        const out = [];
+        if (normalized.includes('action')) out.push({ fieldId: 'editExecutionType', message: 'יש לבחור פעולה' });
+        if (normalized.includes('quantity')) out.push({ fieldId: 'editExecutionQuantity', message: 'יש להזין כמות תקינה' });
+        if (normalized.includes('price')) out.push({ fieldId: 'editExecutionPrice', message: 'יש להזין מחיר תקין' });
+        if (normalized.includes('date')) out.push({ fieldId: 'editExecutionDate', message: 'יש לבחור תאריך' });
+        if (normalized.includes('fee')) out.push({ fieldId: 'editExecutionCommission', message: 'עמלה לא תקינה' });
+        if (normalized.includes('source')) out.push({ fieldId: 'editExecutionSource', message: 'מקור לא תקין' });
+        return out.length ? out : null;
+      },
         reloadFn: async () => {
             // ניקוי מטמון
             if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {

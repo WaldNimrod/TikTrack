@@ -290,6 +290,40 @@ function toggleCashFlowsSection() {
   }
 }
 
+// ========================================
+// סימון +/− וצבע לפי סוג תזרים
+// ========================================
+function updateAmountSign(typeSelectId, signBadgeId) {
+  const typeEl = document.getElementById(typeSelectId);
+  const signEl = document.getElementById(signBadgeId);
+  if (!typeEl || !signEl) {return;}
+  const positiveTypes = ['deposit', 'dividend', 'transfer_in', 'other_positive'];
+  const negativeTypes = ['withdrawal', 'fee', 'transfer_out', 'other_negative'];
+  const t = typeEl.value;
+  let isPositive = positiveTypes.includes(t);
+  if (!isPositive && !negativeTypes.includes(t)) {
+    signEl.textContent = '+/-';
+    signEl.classList.remove('profit-positive', 'profit-negative');
+    return;
+  }
+  signEl.textContent = isPositive ? '+' : '−';
+  signEl.classList.toggle('profit-positive', isPositive);
+  signEl.classList.toggle('profit-negative', !isPositive);
+}
+
+function attachAmountSignListeners() {
+  const addType = document.getElementById('cashFlowType');
+  const editType = document.getElementById('editCashFlowType');
+  if (addType) {
+    addType.addEventListener('change', () => updateAmountSign('cashFlowType', 'cashFlowAmountSignBadge'));
+    updateAmountSign('cashFlowType', 'cashFlowAmountSignBadge');
+  }
+  if (editType) {
+    editType.addEventListener('change', () => updateAmountSign('editCashFlowType', 'editCashFlowAmountSignBadge'));
+    updateAmountSign('editCashFlowType', 'editCashFlowAmountSignBadge');
+  }
+}
+
 async function restoreCashFlowsSectionState() {
   let savedState = null;
   
@@ -365,6 +399,8 @@ async function showAddCashFlowModal() {
   // הגדרת ברירות מחדל באמצעות DefaultValueSetter
   window.DefaultValueSetter.setCurrentDateTime('cashFlowDate');
   window.DefaultValueSetter.setLogicalDefault('cashFlowType', 'deposit');
+  // עדכון סימן הסכום
+  attachAmountSignListeners();
 
   // טעינת נתונים למודל
   try {
@@ -441,6 +477,8 @@ async function showEditCashFlowModal(cashFlowId) {
   setFieldValue('editCashFlowSource', cashFlow.source);
   setFieldValue('editCashFlowExternalId', cashFlow.external_id);
   setFieldValue('editCashFlowUsdRate', cashFlow.usd_rate || 1.000000);
+  // עדכון סימן הסכום
+  attachAmountSignListeners();
 
   // טעינת נתונים למודל עם ברירת מחדל לפי טקסט (לוגיקה חדשה מבוססת שם)
   try {
@@ -1397,11 +1435,13 @@ async function initializeCashFlowsPage() {
     // startAutoRefresh();
 
     // === Diagnostics panel ===
-    try {
-      const diag = document.getElementById('prefsDiagnostics');
-      if (diag) {
-        const p = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim();
-        const s = getComputedStyle(document.documentElement).getPropertyValue('--secondary-color').trim();
+    async function updatePrefsDiagnostics() {
+      try {
+        const diag = document.getElementById('prefsDiagnostics');
+        if (!diag) return;
+        const cs = getComputedStyle(document.documentElement);
+        const p = cs.getPropertyValue('--primary-color').trim();
+        const s = cs.getPropertyValue('--secondary-color').trim();
         const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '—';
         const pEl = document.getElementById('diagPrimaryValue');
         const sEl = document.getElementById('diagSecondaryValue');
@@ -1421,11 +1461,39 @@ async function initializeCashFlowsPage() {
           if (profEl) profEl.textContent = 'מזהה פרופיל פעיל: — (שגיאה)';
         }
         if (tzEl) tzEl.textContent = `אזור הזמן: ${tz}`;
+
+        // Advanced vars for cash_flows
+        const cf = cs.getPropertyValue('--cash-flow-color').trim();
+        const cfb = cs.getPropertyValue('--cash-flow-bg-color').trim();
+        const acc = cs.getPropertyValue('--account-color').trim();
+        const inc = cs.getPropertyValue('--income-color').trim();
+        const exp = cs.getPropertyValue('--expense-color').trim();
+
+        console.groupCollapsed('👁️ Cash Flows Diagnostics');
+        console.log('primary=', p, 'secondary=', s);
+        console.log('--cash-flow-color=', cf || '—');
+        console.log('--cash-flow-bg-color=', cfb || '—');
+        console.log('--account-color=', acc || '—');
+        console.log('--income-color=', inc || '—', ' --expense-color=', exp || '—');
+        console.groupEnd();
+
         diag.hidden = false;
+      } catch (e) {
+        console.warn('⚠️ prefsDiagnostics update failed:', e);
       }
-    } catch (e) {
-      console.warn('⚠️ prefsDiagnostics update failed:', e);
     }
+
+    // ensure preferences are applied once per-page after scheme
+    if (typeof window.loadUserPreferences === 'function') {
+      try { await window.loadUserPreferences({ force: true, source: 'cash_flows-init' }); } catch {}
+    }
+    await updatePrefsDiagnostics();
+
+    // refresh diagnostics on preferences update events
+    window.addEventListener('preferences:updated', () => {
+      // allow CSS vars to apply
+      setTimeout(() => updatePrefsDiagnostics(), 0);
+    });
     
   } catch (error) {
     console.error('❌ שגיאה באתחול עמוד תזרימי מזומנים:', error);
@@ -1872,6 +1940,15 @@ async function saveCashFlow() {
       external_id: { id: 'cashFlowExternalId', type: 'text', default: '0' }
     });
 
+    // נרמול סכום: ערך מוחלט + סימן לפי סוג
+    if (formData && typeof formData.amount === 'number') {
+      const positiveTypes = ['deposit', 'dividend', 'transfer_in', 'other_positive'];
+      const negativeTypes = ['withdrawal', 'fee', 'transfer_out', 'other_negative'];
+      const type = formData.type;
+      const absVal = Math.abs(formData.amount);
+      formData.amount = positiveTypes.includes(type) ? absVal : -absVal;
+    }
+
     const response = await fetch('http://127.0.0.1:8080/api/cash_flows/', {
       method: 'POST',
       headers: {
@@ -1954,6 +2031,15 @@ async function updateCashFlow() {
       source: { id: 'editCashFlowSource', type: 'text', default: 'manual' },
       external_id: { id: 'editCashFlowExternalId', type: 'text', default: '0' }
     });
+
+    // נרמול סכום: ערך מוחלט + סימן לפי סוג
+    if (formData && typeof formData.amount === 'number') {
+      const positiveTypes = ['deposit', 'dividend', 'transfer_in', 'other_positive'];
+      const negativeTypes = ['withdrawal', 'fee', 'transfer_out', 'other_negative'];
+      const type = formData.type;
+      const absVal = Math.abs(formData.amount);
+      formData.amount = positiveTypes.includes(type) ? absVal : -absVal;
+    }
 
     // Fallbacks כדי להבטיח שמירה לפי הלוגיקה החדשה (בחירה לפי שם)
     // 1) trading_account_id לפי שם חשבון אם חסר מזהה

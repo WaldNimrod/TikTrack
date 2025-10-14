@@ -22,7 +22,7 @@
 /* עמוד חשבונות מסחר - דינמי מהעדפות */
 .accounts-page .section-header,
 .accounts-page .top-section .section-header {
-  background-color: var(--entity-account-bg));
+  background-color: var(--entity-account-bg);
   border-bottom: 2px solid var(--entity-account-color);
   color: var(--entity-account-text);
 }
@@ -38,7 +38,7 @@
 /* עמוד התראות - דינמי מהעדפות */
 .alerts-page .section-header,
 .alerts-page .top-section .section-header {
-  background-color: var(--entity-alert-bg));
+  background-color: var(--entity-alert-bg);
   border-bottom: 2px solid var(--entity-alert-color);
   color: var(--entity-alert-text);
 }
@@ -46,7 +46,7 @@
 /* עמוד תזרים מזומנים - דינמי מהעדפות */
 .cash-flows-page .section-header,
 .cash-flows-page .top-section .section-header {
-  background-color: var(--entity-cash-flow-bg));
+  background-color: var(--entity-cash-flow-bg);
   border-bottom: 2px solid var(--entity-cash-flow-color);
   color: var(--entity-cash-flow-text);
 }
@@ -62,7 +62,7 @@
 /* עמוד הערות - דינמי מהעדפות */
 .notes-page .section-header,
 .notes-page .top-section .section-header {
-  background-color: var(--entity-note-bg));
+  background-color: var(--entity-note-bg);
   border-bottom: 2px solid var(--entity-note-color);
   color: var(--entity-note-text);
 }
@@ -150,7 +150,7 @@
 /* עמוד סמלים - דינמי מהעדפות */
 .tickers-page .section-header,
 .tickers-page .top-section .section-header {
-  background-color: var(--entity-ticker-bg));
+  background-color: var(--entity-ticker-bg);
   border-bottom: 2px solid var(--entity-ticker-color);
   color: var(--entity-ticker-text);
 }
@@ -282,13 +282,13 @@
 }
 
 .entity-cash-flow-main-header {
-  background-color: var(--entity-cash-flow-bg)); /* טורקיז עם שקיפות 0.8 */
+  background-color: var(--entity-cash-flow-bg);
   border-bottom: 2px solid var(--entity-cash-flow-color);
   color: var(--entity-cash-flow-text);
 }
 
 .entity-cash-flow-sub-header {
-  background-color: var(--entity-cash-flow-bg)); /* טורקיז עם שקיפות 0.8 */
+  background-color: var(--entity-cash-flow-bg);
   border-bottom: 2px solid var(--entity-cash-flow-color);
   color: var(--entity-cash-flow-text);
 }
@@ -330,13 +330,13 @@
 }
 
 .entity-trade-plan-main-header {
-  background-color: var(--entity-trade-plan-bg)); /* כחול כהה עם שקיפות 0.8 */
+  background-color: var(--entity-trade-plan-bg);
   border-bottom: 2px solid var(--entity-trade-plan-color);
   color: var(--entity-trade-plan-text);
 }
 
 .entity-trade-plan-sub-header {
-  background-color: var(--entity-trade-plan-bg)); /* כחול כהה עם שקיפות 0.8 */
+  background-color: var(--entity-trade-plan-bg);
   border-bottom: 2px solid var(--entity-trade-plan-color);
   color: var(--entity-trade-plan-text);
 }

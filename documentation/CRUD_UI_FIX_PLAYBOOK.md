@@ -72,4 +72,40 @@
 - השתמשו במערכות הכלליות הקיימות: `SelectPopulatorService`, `DefaultValueSetter`, `CRUDResponseHandler`, `UnifiedCacheManager`.
 - שמרו עקביות טקסט האופציות ב־select בין השירות שממלא לבין הטקסט שמגיע מהשרת (שם + קוד/סימול).
 
+12) Cash Flows – פירוט בעיות → פתרונות לכל שדה חשוד
+
+- בעיה (type): רשימת סוגי התזרים בטופס חלקית/לא עדכנית; תצוגה בעברית אך שמירה באנגלית.
+  - פתרון: לעדכן את האופציות בטפסים לערכים באנגלית עם תווית בעברית:
+    - deposit=הפקדה, withdrawal=משיכה, fee=עמלה, dividend=דיבידנד,
+      transfer_in=העברה מחשבון אחר, transfer_out=העברה לחשבון אחר,
+      other_positive=אחר חיובי, other_negative=אחר שלילי.
+    - להצגה: להשתמש ב־`translateCashFlowType(type)`.
+
+- בעיה (source): ערכי מקור מגוונים; UI בעברית, שמירה באנגלית.
+  - פתרון: להשתמש בערכים: manual, file_import, direct_import, api.
+    - להצגה: `translateCashFlowSource(source)` ממפה: ידני / יבוא קובץ / יבוא ישיר / API.
+
+- בעיה (account): ה־API עשוי להחזיר שם חשבון במקום מזהה → ה־select לא נבחר, והשמירה נכשלת ללא id.
+  - פתרון: בטעינה להשתמש ב־`SelectPopulatorService.populateAccountsSelect` עם `defaultText` (שם החשבון).
+    - בשמירה: אם `trading_account_id` חסר, למפות לפי שם נבחר ל־id דרך `/api/trading-accounts/`.
+
+- בעיה (currency): בחירה על בסיס שם/סימול, לא תמיד יש `currency_id`.
+  - פתרון: בטעינה להשתמש ב־`populateCurrenciesSelect` עם `defaultText` בפורמט "שם (קוד/סימול)".
+    - אין לבצע auto-fill ל־usd_rate (ראה סעיף הבא).
+
+- בעיה (usd_rate): מולא אוטומטית ולא מייצג בהכרח את שער יום התזרים.
+  - פתרון: להסיר מילוי אוטומטי; שדה נשאר ידני בלבד; לוודא ולידציה שהערך חיובי ומספרי.
+
+- בעיה (hidden ids): חסר `editCashFlowId`/`editCashFlowExternalId` → PUT עם `null`.
+  - פתרון: להוסיף 2 שדות hidden ולוודא שה־id מוזן לפני שליחת הבקשה.
+
+- בעיה (מיון ברירת מחדל): הטבלה נטענת ישן→חדש.
+  - פתרון: `applyDefaultSort('cash_flows', ...)` ממוין לפי תאריך בסדר יורד (חדש ראשון), בלי לדרוס מצב שמור.
+
+- בעיה (סדר כפתורים במודלים): סדר הפוך בחלק מהעמודים.
+  - פתרון: אחיד – כפתור "ביטול" קודם, אחריו "שמירה/עדכון".
+
+- בעיה (שגיאות ולידציה): הודעות לא ממופות לשדות.
+  - פתרון: להשתמש ב־`CRUDResponseHandler` עם `customValidationParser` למיפוי הודעות DB לשדות (type/source/amount/usd_rate/account_id).
+
 

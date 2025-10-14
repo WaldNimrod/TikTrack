@@ -1,0 +1,9 @@
+.input-group-text.profit-positive {
+  color: var(--color-positive-600);
+}
+
+.input-group-text.profit-negative {
+  color: var(--color-negative-600);
+}
+
+

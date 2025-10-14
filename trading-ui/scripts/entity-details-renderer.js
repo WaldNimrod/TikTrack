@@ -217,7 +217,7 @@ class EntityDetailsRenderer {
                 <!-- כותרת מידע בסיסי -->
                 <div class="row">
                     <div class="col-12">
-                        <h6 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${tickerColor} !important;">מידע בסיסי</h6>
+                        <h5 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${tickerColor} !important;">מידע בסיסי</h5>
                     </div>
                 </div>
                 
@@ -456,7 +456,7 @@ class EntityDetailsRenderer {
         if (!hasExternalData) {
             return `
                 <div class="entity-market-data">
-                    <h6 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${entityColor} !important;">נתוני שוק</h6>
+                    <h5 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${entityColor} !important;">נתוני שוק</h5>
                     <div class="text-muted text-center py-4">
                         <i class="fas fa-chart-line fa-2x mb-3"></i>
                         <p>נתוני שוק לא זמינים</p>
@@ -469,7 +469,7 @@ class EntityDetailsRenderer {
         // הצגת נתוני שוק זמינים
         let html = `
             <div class="entity-market-data">
-                <h6 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${entityColor} !important;">נתוני שוק</h6>
+                <h5 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${entityColor} !important;">נתוני שוק</h5>
                 <div class="row">
                     <div class="col-md-6">
         `;
@@ -615,7 +615,7 @@ class EntityDetailsRenderer {
     renderActionButtons(entityType, entityId) {
         return `
             <div class="entity-action-buttons border-top pt-3">
-                <h6 class="mb-3">פעולות מהירות</h6>
+                <h6 class="mb-3">פעולות מהירות</h5>
                 <div class="d-flex gap-2 flex-wrap">
                     <button class="btn btn-primary btn-sm" onclick="window.editTicker(${entityId})">
                         <i class="fas fa-edit me-1"></i>עריכה
@@ -662,7 +662,7 @@ class EntityDetailsRenderer {
         if (!hasLinkedItems) {
             return `
                 <div class="entity-linked-items">
-                    <h6 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${entityColor} !important;">פריטים מקושרים</h6>
+                    <h5 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${entityColor} !important;">פריטים מקושרים</h5>
                     <div class="text-muted text-center py-4">
                         <i class="fas fa-link fa-2x mb-3"></i>
                         <p>אין פריטים מקושרים</p>
@@ -677,7 +677,7 @@ class EntityDetailsRenderer {
         // יצירת טבלה מינימלית של פריטים מקושרים
         let html = `
             <div class="entity-linked-items">
-                <h6 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${entityColor} !important;">פריטים מקושרים (${linkedItems.length})</h6>
+                <h5 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${entityColor} !important;">פריטים מקושרים (${linkedItems.length})</h5>
                 <div class="table-responsive">
                     <table class="table table-sm table-hover">
                         <thead style="background-color: ${entityColor}50 !important;">
@@ -1300,7 +1300,7 @@ class EntityDetailsRenderer {
                 <!-- כותרת מידע בסיסי -->
                 <div class="row">
                     <div class="col-12">
-                        <h6 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${planColor} !important;">מידע בסיסי</h6>
+                        <h5 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${planColor} !important;">מידע בסיסי</h5>
                     </div>
                 </div>
                 
@@ -1357,7 +1357,7 @@ class EntityDetailsRenderer {
                 <!-- כותרת מידע בסיסי -->
                 <div class="row">
                     <div class="col-12">
-                        <h6 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${accountColor} !important;">מידע בסיסי</h6>
+                        <h5 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${accountColor} !important;">מידע בסיסי</h5>
                     </div>
                 </div>
                 
@@ -1627,7 +1627,7 @@ class EntityDetailsRenderer {
         return `
             <div class="row mt-4">
                 <div class="col-12">
-                    <h6 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${cashFlowColor} !important;">חשבון מסחר מקושר</h6>
+                    <h5 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${cashFlowColor} !important;">חשבון מסחר מקושר</h5>
                     <div class="linked-account-card p-3 border rounded" style="background-color: ${accountColorLight}; border-color: ${accountColorDark} !important; border-width: 2px !important;">
                         <div class="d-flex justify-content-between align-items-start">
                             <div class="d-flex align-items-start flex-grow-1">
@@ -1635,7 +1635,7 @@ class EntityDetailsRenderer {
                                     <img src="${accountIconPath}" alt="חשבון">
                                 </div>
                                 <div class="flex-grow-1">
-                                    <h6 class="mb-2" style="color: ${accountColorDark};">${accountName}</h6>
+                                    <h6 class="mb-2" style="color: ${accountColorDark};">${accountName}</h5>
                                     <div class="row">
                                         <div class="col-md-3">
                                             <small class="text-muted d-block"><strong>מזהה:</strong> #${cashFlowData.trading_account_id}</small>
@@ -1721,7 +1721,7 @@ class EntityDetailsRenderer {
                 ${noteData.attachment ? `
                 <div class="row mt-3">
                     <div class="col-12">
-                        <h6 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${entityColor} !important;">קובץ מצורף</h6>
+                        <h5 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${entityColor} !important;">קובץ מצורף</h5>
                         <div class="attachment-preview p-3 border rounded">
                             <a href="/api/notes/files/${noteData.attachment}" target="_blank" class="btn btn-sm btn-outline-primary">
                                 <i class="fas fa-file-download me-2"></i>צפה בקובץ

@@ -1436,66 +1436,10 @@ async function initializeCashFlowsPage() {
     // ❌ ביטול רענון אוטומטי - לא עובד כך בשאר עמודי המערכת
     // startAutoRefresh();
 
-    // === Diagnostics panel ===
-    async function updatePrefsDiagnostics() {
-      try {
-        const diag = document.getElementById('prefsDiagnostics');
-        if (!diag) return;
-        const cs = getComputedStyle(document.documentElement);
-        const p = cs.getPropertyValue('--primary-color').trim();
-        const s = cs.getPropertyValue('--secondary-color').trim();
-        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '—';
-        const pEl = document.getElementById('diagPrimaryValue');
-        const sEl = document.getElementById('diagSecondaryValue');
-        const profEl = document.getElementById('diagProfileIdValue');
-        const tzEl = document.getElementById('diagTimezoneValue');
-        if (pEl) pEl.textContent = `הצבע הראשי הוא: ${p || '—'}`;
-        if (sEl) sEl.textContent = `הצבע המשני הוא: ${s || '—'}`;
-        try {
-          const resp = await fetch('/api/preferences/profile/active');
-          if (resp.ok) {
-            const js = await resp.json();
-            if (profEl) profEl.textContent = `מזהה פרופיל פעיל: ${js?.data?.profile_id ?? '—'}`;
-          } else if (profEl) {
-            profEl.textContent = 'מזהה פרופיל פעיל: — (שגיאה)';
-          }
-        } catch {
-          if (profEl) profEl.textContent = 'מזהה פרופיל פעיל: — (שגיאה)';
-        }
-        if (tzEl) tzEl.textContent = `אזור הזמן: ${tz}`;
-
-        // Advanced vars for cash_flows
-        const cf = cs.getPropertyValue('--cash-flow-color').trim();
-        const cfb = cs.getPropertyValue('--cash-flow-bg-color').trim();
-        const acc = cs.getPropertyValue('--account-color').trim();
-        const inc = cs.getPropertyValue('--income-color').trim();
-        const exp = cs.getPropertyValue('--expense-color').trim();
-
-        console.groupCollapsed('👁️ Cash Flows Diagnostics');
-        console.log('primary=', p, 'secondary=', s);
-        console.log('--cash-flow-color=', cf || '—');
-        console.log('--cash-flow-bg-color=', cfb || '—');
-        console.log('--account-color=', acc || '—');
-        console.log('--income-color=', inc || '—', ' --expense-color=', exp || '—');
-        console.groupEnd();
-
-        diag.hidden = false;
-      } catch (e) {
-        console.warn('⚠️ prefsDiagnostics update failed:', e);
-      }
-    }
-
     // ensure preferences are applied once per-page after scheme
     if (typeof window.loadUserPreferences === 'function') {
       try { await window.loadUserPreferences({ force: true, source: 'cash_flows-init' }); } catch {}
     }
-    await updatePrefsDiagnostics();
-
-    // refresh diagnostics on preferences update events
-    window.addEventListener('preferences:updated', () => {
-      // allow CSS vars to apply
-      setTimeout(() => updatePrefsDiagnostics(), 0);
-    });
     
   } catch (error) {
     console.error('❌ שגיאה באתחול עמוד תזרימי מזומנים:', error);

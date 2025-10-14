@@ -62,7 +62,6 @@
     <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=2fba6e8_20251013_051239">
     <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=2fba6e8_20251013_051239">
     <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=2fba6e8_20251013_051239">
-    <link rel="stylesheet" href="styles-new/06-components/_diagnostics.css?v=2fba6e8_20251013_051239">
     <link rel="stylesheet" href="/trading-ui/styles-new/06-components/_linked-items.css?v=2fba6e8_20251013_051239">
     
     <!-- 07-trumps - Page-specific Styles -->
@@ -147,27 +146,6 @@
 
                     <!-- Cash flows table -->
                     <div class="section-body">
-                    <!-- Preferences Diagnostics (temporary) -->
-                    <div id="prefsDiagnostics" class="diag-panel" aria-label="Preferences diagnostics" hidden>
-                        <div class="diag-box">
-                            <div class="title">Primary</div>
-                            <div class="swatch primary"></div>
-                            <div class="value" id="diagPrimaryValue">—</div>
-                        </div>
-                        <div class="diag-box">
-                            <div class="title">Secondary</div>
-                            <div class="swatch secondary"></div>
-                            <div class="value" id="diagSecondaryValue">—</div>
-                        </div>
-                        <div class="diag-box">
-                            <div class="title">Active Profile ID</div>
-                            <div class="value" id="diagProfileIdValue">—</div>
-                        </div>
-                        <div class="diag-box">
-                            <div class="title">Timezone</div>
-                            <div class="value" id="diagTimezoneValue">—</div>
-                        </div>
-                    </div>
                         <div class="table-responsive" id="cashFlowsContainer">
                             <table class="data-table" id="cashFlowsTable" data-table-type="cash_flows">
                                 <thead>

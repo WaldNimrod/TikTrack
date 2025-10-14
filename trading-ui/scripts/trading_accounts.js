@@ -519,20 +519,19 @@ window.checkLinkedItemsBeforeDeleteAccount = async function(accountId) {
 async function performAccountDeletion(accountId, accountName = '') {
     try {
         const response = await fetch(`/api/trading-accounts/${accountId}`, { method: 'DELETE' });
-
-        // השתמש בעותק עבור המטפל כדי שלא נצרוך את הזרם פעמיים
-        if (typeof window.handleApiResponseWithRefresh === 'function') {
-            const handled = await window.handleApiResponseWithRefresh(response.clone(), {
-                loadDataFunction: async () => window.tradingAccountsController?.loadData?.(),
-                updateActiveFieldsFunction: null,
-                operationName: 'מחיקה',
-                itemName: 'החשבון',
-                successMessage: `החשבון ${accountName || ''} נמחק בהצלחה`
-            });
-            if (handled) return;
-        }
-
+        
         if (response.ok) {
+            // הצלחה: אפשר להשתמש במטפל הסטנדרטי (רק במסלול הצלחה) או לבצע ידנית
+            if (typeof window.handleApiResponseWithRefresh === 'function') {
+                const handled = await window.handleApiResponseWithRefresh(response.clone(), {
+                    loadDataFunction: async () => window.tradingAccountsController?.loadData?.(),
+                    updateActiveFieldsFunction: null,
+                    operationName: 'מחיקה',
+                    itemName: 'החשבון',
+                    successMessage: `החשבון ${accountName || ''} נמחק בהצלחה`
+                });
+                if (handled) return;
+            }
             if (window.UnifiedCacheManager?.remove) await window.UnifiedCacheManager.remove('trading_accounts');
             await window.tradingAccountsController?.loadData?.();
             if (window.showSuccessNotification) window.showSuccessNotification('החשבון נמחק בהצלחה');

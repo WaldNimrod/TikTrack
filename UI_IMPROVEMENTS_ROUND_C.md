@@ -146,6 +146,26 @@ These are the immediate rules to implement across pages. After each fix is appro
 
 ---
 
+### 4.3) Delete Confirmation Modal – Dynamic Danger Color
+**Page**: `warning-system.js`, all user pages using delete  
+**Problem**:
+- Delete confirmation modal header and button used static `bg-danger`/`btn-danger` (Bootstrap classes) instead of dynamic `var(--danger-color)` from user preferences
+
+**Solution**:
+- Map color parameter ('danger', 'warning', etc.) to corresponding CSS variable
+- Apply inline `style="background-color: var(--danger-color);"` to modal-header
+- Button already uses `btn-danger` class which is defined in `_buttons-advanced.css` with `var(--danger-color)`
+
+**Status**: ✅ Completed
+
+**Edits**:
+- `warning-system.js`: Added `colorVarMap` object to map color names to CSS variables
+- `warning-system.js`: Changed modal-header from `bg-${color}` class to inline `style="background-color: ${bgColor};"`
+- Verified: `showDeleteWarning` calls `showConfirmationDialog` with `'danger'` parameter
+- Verified: `.btn-danger` in `_buttons-advanced.css` uses `var(--danger-color)` (no hardcoded hex)
+
+---
+
 ## 5) Appendix – Quick Links
 ---
 

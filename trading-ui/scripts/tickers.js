@@ -451,17 +451,38 @@ function showAddTickerModal() {
   // ניקוי הטופס
   addTickerForm.reset();
 
+  // וידוא שאין ערכי ברירת מחדל בטופס ההוספה
+  try {
+    const symbolInput = document.getElementById('addTickerSymbol');
+    const nameInput = document.getElementById('addTickerName');
+    const typeSelect = document.getElementById('addTickerType');
+    const currencySelect = document.getElementById('addTickerCurrency');
+    const statusSelect = document.getElementById('addTickerStatus');
+    const remarksInput = document.getElementById('addTickerRemarks');
+
+    if (symbolInput) symbolInput.value = '';
+    if (nameInput) nameInput.value = '';
+    if (typeSelect) typeSelect.value = '';
+    if (currencySelect) currencySelect.value = '';
+    if (statusSelect) statusSelect.value = 'closed';
+    if (remarksInput) remarksInput.value = '';
+  } catch (e) {
+    // ignore
+  }
+
   // ניקוי וולידציה
   if (window.clearValidation) {
     window.clearValidation('addTickerForm');
   }
 
-  // הצגת המודל
-  const modal = new bootstrap.Modal(addTickerModalElement, {
-    backdrop: true,
-    keyboard: true,
-  });
-  modal.show();
+  // הצגת המודל דרך המופע המאוחסן מראש
+  if (addTickerModal) {
+    addTickerModal.show();
+  } else if (addTickerModalElement) {
+    // Fallback חד-פעמי אם לא אותחל מסיבה כלשהי
+    addTickerModal = new bootstrap.Modal(addTickerModalElement);
+    addTickerModal.show();
+  }
 }
 
 /**
@@ -513,12 +534,14 @@ function showEditTickerModal(id) {
     window.clearValidation('editTickerForm');
   }
 
-  // הצגת המודל
-  const modal = new bootstrap.Modal(editTickerModalElement, {
-    backdrop: true,
-    keyboard: true,
-  });
-  modal.show();
+  // הצגת המודל דרך המופע המאוחסן מראש
+  if (editTickerModal) {
+    editTickerModal.show();
+  } else if (editTickerModalElement) {
+    // Fallback חד-פעמי אם לא אותחל מסיבה כלשהי
+    editTickerModal = new bootstrap.Modal(editTickerModalElement);
+    editTickerModal.show();
+  }
 }
 
 /**
@@ -670,12 +693,19 @@ async function saveTicker() {
       remarks: formData.remarks || null
     };
 
+    // DEBUG: לוג לפני שליחה
+    console.log('📤 About to POST /api/tickers payload:', tickerData);
+
     // שליחה לשרת
     const response = await fetch('/api/tickers', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(tickerData)
     });
+
+    // DEBUG: לוג אחרי שליחה
+    const debugBody = await (async () => { try { return await response.clone().json(); } catch { return await response.clone().text(); } })();
+    console.log('📥 POST response status', response.status, 'body', debugBody);
 
     // טיפול בתגובה באמצעות CRUDResponseHandler
     await window.CRUDResponseHandler.handleSaveResponse(response, {
@@ -873,7 +903,14 @@ async function updateTicker() {
       remarks: formData.remarks || null
     };
 
+    // DEBUG: לוג לפני שליחה
+    console.log('📤 About to PUT /api/tickers/' + formData.id, 'payload:', tickerData);
+
     const response = await performTickerUpdateToServer(formData.id, tickerData);
+
+    // DEBUG: לוג אחרי שליחה
+    const debugBody = await (async () => { try { return await response.clone().json(); } catch { return await response.clone().text(); } })();
+    console.log('📥 PUT response status', response.status, 'body', debugBody);
 
     // טיפול בתגובה באמצעות CRUDResponseHandler
     await window.CRUDResponseHandler.handleUpdateResponse(response, {

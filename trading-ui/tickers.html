@@ -128,7 +128,7 @@
                             <span class="table-count" id="tickersCount">טוען...</span>
                         </h2>
                         <div class="header-actions">
-                            <button id="addTickerBtn" class="refresh-btn" onclick="showAddTickerModal()" title="הוסף תיקר חדש">
+                            <button id="addTickerBtn" class="refresh-btn" onclick="window.showAddTickerModal && window.showAddTickerModal()" title="הוסף תיקר חדש">
                                 <img src="images/icons/tickers.svg" alt="הוסף" class="action-icon">
                                 הוסף
                             </button>
@@ -216,7 +216,7 @@
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="addTickerSymbol" class="form-label entity-label">סמל הטיקר</label>
-                                        <input type="text" class="form-control" id="addTickerSymbol" placeholder="AAPL" required>
+                                        <input type="text" class="form-control" id="addTickerSymbol" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -285,7 +285,7 @@
                     </div>
                     <div class="modal-footer modal-footer-end">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-entity btn-entity-ticker" onclick="saveTicker()">הוסף טיקר</button>
+                        <button type="button" class="btn btn-entity btn-entity-ticker" onclick="window.saveTicker && window.saveTicker()">הוסף טיקר</button>
                     </div>
                 </div>
             </div>
@@ -376,7 +376,7 @@
                     </div>
                     <div class="modal-footer modal-footer-end">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-entity btn-entity-ticker" onclick="updateTicker()">עדכן טיקר</button>
+                        <button type="button" class="btn btn-entity btn-entity-ticker" onclick="window.updateTicker && window.updateTicker()">עדכן טיקר</button>
                     </div>
                 </div>
             </div>

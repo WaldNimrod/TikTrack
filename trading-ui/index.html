@@ -180,6 +180,41 @@
 
             <!-- Main Content -->
             <div class="main-content">
+                <!-- Pending Executions Widget - Priority Section -->
+                <div class="content-section" id="pendingExecutions" data-section="pending-executions">
+                    <div class="section-header">
+                        <h2>
+                            <img src="images/icons/executions.svg" alt="עסקאות" class="section-icon">
+                            עסקאות הדורשות שיוך לטרייד
+                            <span class="badge bg-warning" id="pendingExecutionsCount">0</span>
+                        </h2>
+                        <div class="header-actions">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="refreshPendingExecutionsWidget()" title="רענן עסקאות ממתינות">
+                                <i class="fas fa-sync-alt"></i> רענן
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary" onclick="goToExecutionsPage()" title="עבור לדף עסקאות">
+                                <i class="fas fa-external-link-alt"></i> דף עסקאות
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleSection('pending-executions')" title="הצג/הסתר אזור עסקאות ממתינות">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="section-body">
+                        <!-- הודעה כשהכל תקין -->
+                        <div id="pendingExecutionsMessage" class="alert alert-success" style="display:none;">
+                            <i class="fas fa-check-circle"></i>
+                            <strong>הכל תקין!</strong> כל העסקאות משוייכות לטרייד.
+                        </div>
+                        
+                        <!-- טבלת עסקאות ממתינות -->
+                        <div id="pendingExecutionsTableContainer" class="table-responsive">
+                            <!-- הטבלה תיווצר על ידי JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Section 1: סטטיסטיקות מרכזיות וגישה מהירה -->
                 <div class="content-section" id="section1" data-section="section1">
                     <div class="section-header">
@@ -671,6 +706,9 @@
     <!-- Stage 5: Chart System - REQUIRED for Dashboard -->
     <script src="scripts/charts/chart-system.js?v=2fba6e8_20251013_051239"></script>
     <script src="scripts/charts/chart-theme.js?v=2fba6e8_20251013_051239"></script>
+    
+    <!-- Stage 5.5: Dashboard Widgets - REQUIRED for Dashboard -->
+    <script src="scripts/pending-executions-widget.js?v=2fba6e8_20251013_051239"></script>
     
     <!-- Stage 6: Page Script - REQUIRED -->
     <script src="scripts/index.js?v=2fba6e8_20251013_051239"></script>

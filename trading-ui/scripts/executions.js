@@ -404,18 +404,70 @@ function resetEditExecutionForm() {
  * הצגת מודל עריכת עסקה
  */
 async function showEditExecutionModal(id) {
-
+  console.log(`📝 Opening edit modal for execution ${id}`);
 
   // מציאת העסקה לפי ID
   const execution = executionsData.find(e => e.id === id);
   if (!execution) {
-
+    console.error(`❌ Execution ${id} not found in executionsData`);
     handleElementNotFound('execution', 'CRITICAL');
     return;
   }
 
   // מילוי שדה ה-ID לפני כל השאר
   window.DataCollectionService.setValue('editExecutionId', execution.id, 'int');
+  
+  // זיהוי סוג השיוך החדש
+  const assignmentType = execution.linked_type || (execution.trade_id ? 'trade' : 'ticker');
+  console.log(`🔗 Execution ${id} assignment type: ${assignmentType}`);
+  
+  // הגדרת רדיו באטן
+  const tickerRadio = document.getElementById('editAssignToTicker');
+  const tradeRadio = document.getElementById('editAssignToTrade');
+  
+  if (assignmentType === 'ticker') {
+    if (tickerRadio) tickerRadio.checked = true;
+    if (tradeRadio) tradeRadio.checked = false;
+  } else {
+    if (tickerRadio) tickerRadio.checked = false;
+    if (tradeRadio) tradeRadio.checked = true;
+  }
+  
+  // החלפת שדות בהתאם לסוג השיוך
+  if (typeof window.toggleAssignmentFields === 'function') {
+    window.toggleAssignmentFields('edit');
+  }
+  
+  // מילוי שדות בהתאם לסוג השיוך החדש
+  if (assignmentType === 'ticker') {
+    // שיוך לטיקר - מלא שדה טיקר
+    const tickerSelect = document.getElementById('editExecutionTicker');
+    if (tickerSelect && execution.ticker_id) {
+      // טען קודם את הטיקרים
+      if (window.SelectPopulatorService && typeof window.SelectPopulatorService.populateTickersSelect === 'function') {
+        await window.SelectPopulatorService.populateTickersSelect('editExecutionTicker', {
+          includeEmpty: true,
+          emptyText: 'בחר טיקר...'
+        });
+      }
+      tickerSelect.value = String(execution.ticker_id);
+    }
+    
+    // מלא שדה חשבון אם קיים
+    const accountSelect = document.getElementById('editExecutionAccount');
+    if (accountSelect && execution.trading_account_id) {
+      if (window.SelectPopulatorService && typeof window.SelectPopulatorService.populateAccountsSelect === 'function') {
+        await window.SelectPopulatorService.populateAccountsSelect('editExecutionAccount', {
+          includeEmpty: true,
+          emptyText: 'בחר חשבון (אופציונלי)'
+        });
+      }
+      accountSelect.value = String(execution.trading_account_id);
+    }
+    
+  } else {
+    // שיוך לטרייד - לוגיקה קיימת (בהמשך)
+  }
 
   // טעינת טיקרים באמצעות SelectPopulatorService
   const showClosedTrades = document.getElementById('editExecutionShowClosedTrades')?.checked || false;
@@ -1377,10 +1429,16 @@ async function updateExecutionsTableMain(executions) {
   }
 
   tbody.innerHTML = executions.map(execution => {
-    // שימוש בנתונים שמגיעים מהשרת
-    const symbol = execution.trade_ticker_symbol || 'לא מוגדר';
-    const tradeInfo = execution.trade_display || `טרייד ${execution.trade_id}`;
-    const tickerId = execution.ticker_id || execution.trade_ticker_id || null;
+    // שימוש בנתונים החדשים - תמיכה בשיוך גמיש
+    const linkedDisplay = execution.linked_display || execution.trade_display || execution.ticker_symbol || 'לא מוגדר';
+    const linkedType = execution.linked_type || 'trade'; // ברירת מחדל לתאימות לאחור
+    const linkedId = execution.linked_id || execution.trade_id || execution.ticker_id;
+    
+    // סימבול לתצוגה - לפי סוג השיוך
+    const symbol = linkedType === 'ticker' ? 
+      execution.ticker_symbol || execution.trade_ticker_symbol || 'לא מוגדר' : 
+      execution.trade_ticker_symbol || execution.ticker_symbol || 'לא מוגדר';
+    
     const accountName = execution.account_name || execution.trading_account_name || 'לא מוגדר';
 
     // שימוש ב-FieldRendererService לעיצוב שדות
@@ -1421,6 +1479,22 @@ async function updateExecutionsTableMain(executions) {
                   title="פתח פרטי חשבון">${accountName}</td>
                 <td>${window.FieldRendererService ? window.FieldRendererService.renderShares(execution.quantity) : (execution.quantity ? '#' + execution.quantity : '-')}</td>
                 <td>$${execution.price}</td>
+                <td class="linked-cell">
+                    ${linkedType === 'trade' ? 
+                        `<span class="linked-badge entity-trade" 
+                              onclick="window.location.href='/trades?highlight=${linkedId}'" 
+                              style="cursor: pointer;" 
+                              title="לחץ לפתיחת הטרייד">
+                            ${linkedDisplay}
+                        </span>` : 
+                        `<span class="linked-badge entity-ticker pending-assignment" 
+                              title="עסקה ממתינה לשיוך לטרייד - לחץ לעריכה" 
+                              onclick="editExecution(${execution.id})" 
+                              style="cursor: pointer;">
+                            ${linkedDisplay}
+                        </span>`
+                    }
+                </td>
                 <td class="pl-cell">${plBadge}</td>
                 <td data-date="${execution.date || execution.execution_date}">${dateBadge}</td>
                 <td class="source-cell">${execution.source || '-'}</td>

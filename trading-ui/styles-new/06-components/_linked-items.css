@@ -10,6 +10,21 @@
   align-items: start;
 }
 
+/* Ensure modal fits viewport and prevents horizontal overflow */
+#linkedItemsModal .modal-dialog { max-width: min(96vw, 1000px); }
+#linkedItemsModal .modal-body { overflow-x: hidden; }
+.linked-items-container { max-width: 100%; overflow-x: hidden; }
+.linked-items-container .linked-item-row { width: 100%; box-sizing: border-box; }
+.linked-items-container .linked-item-actions { display: flex; flex-wrap: wrap; gap: 6px; max-width: 100%; }
+
+/* Responsive: single column on medium/small screens */
+@media (max-width: 992px) {
+  .linked-items-container .linked-items-list { grid-template-columns: 1fr; }
+  .linked-items-container .linked-item-title,
+  .linked-items-container .linked-item-description,
+  .linked-items-container .linked-item-basic-details { white-space: normal; }
+}
+
 .linked-items-container .linked-item-row {
   border-radius: 6px;
   padding: 8px 12px;

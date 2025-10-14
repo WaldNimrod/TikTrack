@@ -80,15 +80,16 @@ class EntityDetailsRenderer {
      */
     async loadEntityColors() {
         // צבעי ברירת מחדל
+        // צבעי ברירת מחדל - יוחלפו בצבעים דינמיים מהעדפות
         this.entityColors = {
-            ticker: '#019193',
-            trade: '#007bff', 
-            trade_plan: '#0056b3',
-            execution: '#17a2b8',
-            account: '#28a745',
-            alert: '#ff9c05',
-            cash_flow: '#20c997',
-            note: '#6c757d'
+            ticker: 'var(--entity-ticker-color)',
+            trade: 'var(--entity-trade-color)', 
+            trade_plan: 'var(--entity-trade-plan-color)',
+            execution: 'var(--entity-execution-color)',
+            account: 'var(--entity-account-color)',
+            alert: 'var(--entity-alert-color)',
+            cash_flow: 'var(--entity-cash-flow-color)',
+            note: 'var(--entity-note-color)'
         };
 
         // ניסיון לטעון צבעים מהעדפות ראשית
@@ -205,7 +206,7 @@ class EntityDetailsRenderer {
         console.log(`🎨 Rendering ticker data:`, tickerData);
         
         // קבלת צבע הטיקר מההעדפות
-        const tickerColor = this.entityColors.ticker || '#019193';
+        const tickerColor = this.entityColors.ticker || 'var(--entity-ticker-color)';
         
         return `
             <div class="entity-details-container ticker-details">
@@ -249,7 +250,7 @@ class EntityDetailsRenderer {
      * @public
      */
     renderTrade(tradeData, options = {}) {
-        const entityColor = this.entityColors.trade || '#007bff';
+        const entityColor = this.entityColors.trade || 'var(--entity-trade-color)';
         
         return `
             <div class="entity-details-container trade-details">
@@ -363,7 +364,7 @@ class EntityDetailsRenderer {
     /**
      * Render basic info - רנדור מידע בסיסי
      */
-    renderBasicInfo(entityData, entityType, entityColor = '#019193') {
+    renderBasicInfo(entityData, entityType, entityColor = 'var(--entity-ticker-color)') {
         const fields = this.getBasicFields(entityType);
         // חלוקת השדות לשתי עמודות
         const fieldsPerColumn = Math.ceil(fields.length / 2);
@@ -403,7 +404,7 @@ class EntityDetailsRenderer {
     /**
      * Render additional info - רנדור מידע נוסף (עמודה שנייה)
      */
-    renderAdditionalInfo(entityData, entityType, entityColor = '#019193') {
+    renderAdditionalInfo(entityData, entityType, entityColor = 'var(--entity-ticker-color)') {
         const fields = this.getBasicFields(entityType);
         // חלוקת השדות לשתי עמודות
         const fieldsPerColumn = Math.ceil(fields.length / 2);
@@ -447,7 +448,7 @@ class EntityDetailsRenderer {
     /**
      * Render market data - רנדור נתוני שוק
      */
-    renderMarketData(tickerData, entityColor = '#019193') {
+    renderMarketData(tickerData, entityColor = 'var(--entity-ticker-color)') {
         console.log(`📈 Rendering market data for:`, tickerData);
         // בדיקה אם יש נתונים חיצוניים
         const hasExternalData = tickerData.current_price || tickerData.change_percent || tickerData.volume || tickerData.yahoo_updated_at;
@@ -634,7 +635,7 @@ class EntityDetailsRenderer {
     /**
      * Render linked items - רנדור פריטים מקושרים
      */
-    renderLinkedItems(linkedItems, entityColor = '#019193') {
+    renderLinkedItems(linkedItems, entityColor = 'var(--entity-ticker-color)') {
         console.log(`🔗 Rendering linked items:`, linkedItems);
         // בדיקה אם יש פריטים מקושרים
         const hasLinkedItems = linkedItems && linkedItems.length > 0;
@@ -693,7 +694,7 @@ class EntityDetailsRenderer {
         `;
 
         linkedItems.forEach(item => {
-            const itemEntityColor = this.entityColors[item.type] || '#6c757d';
+            const itemEntityColor = this.entityColors[item.type] || 'var(--entity-note-color)';
             const statusBadge = this.getStatusBadge(item.status);
             const typeBadge = this.getTypeBadge(item.type, itemEntityColor);
             

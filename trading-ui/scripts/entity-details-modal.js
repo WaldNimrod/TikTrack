@@ -378,7 +378,7 @@ class EntityDetailsModal {
         if (!headerElement) return;
 
         // קבלת צבע הישות מהמערכת הגלובלית
-        let entityColor = '#019193'; // ברירת מחדל
+        let entityColor = 'var(--entity-ticker-color)'; // ברירת מחדל
         
         console.log('🎨 Modal header color debug:');
         console.log('🔍 entityType:', entityType);

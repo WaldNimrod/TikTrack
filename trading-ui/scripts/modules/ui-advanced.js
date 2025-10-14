@@ -2008,8 +2008,10 @@ async function loadColorPreferences() {
             }
           }
           
-    // עדכון CSS Variables
-    updateCSSVariablesFromPreferences(prefs);
+    // עדכון CSS Variables (only if prefs not empty)
+    if (Object.keys(prefs).length > 0) {
+      updateCSSVariablesFromPreferences(prefs);
+    }
           
           // עדכון כותרות עם הצבעים החדשים
           const bodyClass = document.body.className;
@@ -2047,8 +2049,10 @@ async function loadColorPreferences() {
       // הסרנו את preferences.entityColors כי הוא לא קיים במערכת ההעדפות
       // במקום זה משתמשים במשתנים ספציפיים: entityTradeColor, entityTradingAccountColor וכו'
 
-      // עדכון CSS Variables
-      updateCSSVariablesFromPreferences(preferences);
+      // עדכון CSS Variables (only if prefs not empty)
+      if (Object.keys(preferences).length > 0) {
+        updateCSSVariablesFromPreferences(preferences);
+      }
 
       // עדכון כותרות עם הצבעים החדשים
       const bodyClass = document.body.className;
@@ -2477,7 +2481,7 @@ async function applyColorScheme(schemeName = 'disabled', customColors = null) {
   try {
     // Color scheme system disabled: rely solely on user preferences
     // No classes, no cache writes, no defaults
-    updateCSSVariablesFromPreferences(window.currentPreferences || {});
+    // updateCSSVariablesFromPreferences called from loadUserPreferences instead (disabled mode)
     window.dispatchEvent(new CustomEvent('colorSchemeChanged', {
       detail: { scheme: 'disabled' }
     }));

@@ -12,20 +12,28 @@
 /* ===== Modal Header ===== */
 
 /* כפתור סגירה - ריבוע כהה בסוף השורה (שמאל ב-RTL) */
+.entity-details-modal .modal-header {
+    display: flex !important;
+    flex-direction: row-reverse !important; /* הופך את הסדר: כפתור ראשון בDOM = אחרון בתצוגה (שמאל) */
+    align-items: center !important;
+    gap: 0.75rem !important;
+}
+
 .entity-details-modal .modal-header .btn-close {
-    /* מיקום בסוף השורה (שמאל) */
-    margin-inline-start: auto;
-    margin-inline-end: 0;
-    order: 999; /* תמיד אחרון */
-    
-    /* ריבוע כהה של הישות - יוגדר דינמית ב-JS */
-    opacity: 0.8;
-    filter: invert(1) brightness(0.3);
+    /* ריבוע כהה של הישות */
+    opacity: 0.8 !important;
+    filter: invert(1) brightness(0.3) !important;
+    margin: 0 !important; /* מבטל margins ברירת מחדל של Bootstrap */
 }
 
 .entity-details-modal .modal-header .btn-close:hover {
-    opacity: 1;
-    filter: invert(1) brightness(0.2);
+    opacity: 1 !important;
+    filter: invert(1) brightness(0.2) !important;
+}
+
+.entity-details-modal .modal-header .modal-title {
+    margin: 0 !important;
+    flex-grow: 1 !important;
 }
 
 /* כותרות בבולד */

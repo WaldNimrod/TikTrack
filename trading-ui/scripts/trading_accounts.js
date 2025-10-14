@@ -461,18 +461,16 @@ class TradingAccountsController {
             console.error('❌ Account not found:', accountId);
             return;
         }
-        
-        // בדיקת אובייקטים מקושרים לפני מחיקה
+
+        // 1) בדיקת מקושרים לפני מחיקה (כמו טיקרים)
         try {
             if (typeof window.checkLinkedItemsBeforeDeleteAccount === 'function') {
                 const hasLinked = await window.checkLinkedItemsBeforeDeleteAccount(accountId);
-                if (hasLinked) {
-                    return; // יוצג חלון מקושרים והפעולה תיעצר
-                }
+                if (hasLinked) return; // מוצג חלון מקושרים והפעולה נעצרת
             }
         } catch (_) { /* שקט */ }
 
-        // אישור מחיקה דרך מערכת האזהרות (fallback ל-confirm אם לא נטענה)
+        // 2) דיאלוג אישור מערכת (fallback ל-confirm)
         let confirmed = true;
         if (typeof window.showConfirmationDialog === 'function') {
             confirmed = await new Promise(resolve => {
@@ -488,62 +486,9 @@ class TradingAccountsController {
             confirmed = window.confirm(`האם אתה בטוח שברצונך למחוק את החשבון "${account.name}"?`);
         }
         if (!confirmed) return;
-        
-        try {
-            // קריאה ל-API למחיקה
-            const response = await fetch(`/api/trading-accounts/${accountId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            if (response.ok) {
-                
-                // ניקוי מטמון trading_accounts
-                if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-                    await window.UnifiedCacheManager.remove('trading_accounts');
-                }
-                
-                // הסרה מהמערך המקומי
-                this.data = this.data.filter(a => a.id !== accountId);
-                
-                // עדכון הטבלה
-                this.updateTable();
-                this.updateStatistics();
-                
-                // הצגת הודעת הצלחה
-                if (typeof window.showSuccessNotification === 'function') {
-                    window.showSuccessNotification('החשבון נמחק בהצלחה', `החשבון "${account.name}" נמחק מהמערכת`);
-                }
-            } else {
-                // אם המחיקה נכשלה – ננסה להציג חלון מקושרים אם קיימים
-                if ([400, 409, 422].includes(response.status)) {
-                    try {
-                        const resp = await fetch(`/api/linked-items/account/${accountId}`);
-                        if (resp.ok) {
-                            const data = await resp.json();
-                            const childEntities = data.child_entities || [];
-                            if (childEntities.length > 0) {
-                                if (typeof window.showLinkedItemsModal === 'function') {
-                                    data.accountName = account.name;
-                                    window.showLinkedItemsModal(data, 'trading_account', accountId, 'delete');
-                                    return; // עצירה – לא מציגים שגיאה כללית
-                                }
-                            }
-                        }
-                    } catch (_) { /* שקט */ }
-                }
-                throw new Error('Failed to delete account');
-            }
-        } catch (error) {
-            console.error('❌ Error deleting account:', error);
-            if (typeof window.showErrorNotification === 'function') {
-                window.showErrorNotification('שגיאה במחיקת החשבון', error.message);
-            } else {
-                alert('שגיאה במחיקת החשבון: ' + error.message);
-            }
-        }
+
+        // 3) ביצוע מחיקה בפועל דרך פונקציה ייעודית (כמו performTickerDeletion)
+        await performAccountDeletion(accountId, account.name);
     }
 }
 
@@ -569,6 +514,52 @@ window.checkLinkedItemsBeforeDeleteAccount = async function(accountId) {
         return false;
     }
 };
+
+// ביצוע מחיקת חשבון בפועל עם טיפול תגובה סטנדרטי
+async function performAccountDeletion(accountId, accountName = '') {
+    try {
+        const response = await fetch(`/api/trading-accounts/${accountId}`, { method: 'DELETE' });
+
+        if (typeof window.handleApiResponseWithRefresh === 'function') {
+            const handled = await window.handleApiResponseWithRefresh(response, {
+                loadDataFunction: async () => window.tradingAccountsController?.loadData?.(),
+                updateActiveFieldsFunction: null,
+                operationName: 'מחיקה',
+                itemName: 'החשבון',
+                successMessage: `החשבון ${accountName || ''} נמחק בהצלחה`
+            });
+            if (handled) return;
+        }
+
+        if (response.ok) {
+            if (window.UnifiedCacheManager?.remove) await window.UnifiedCacheManager.remove('trading_accounts');
+            await window.tradingAccountsController?.loadData?.();
+            if (window.showSuccessNotification) window.showSuccessNotification('החשבון נמחק בהצלחה');
+            return;
+        }
+
+        // במקרה כשל – בדיקת מקושרים ולהציג מודל
+        if ([400, 409, 422].includes(response.status)) {
+            try {
+                const resp = await fetch(`/api/linked-items/account/${accountId}`);
+                if (resp.ok) {
+                    const data = await resp.json();
+                    if ((data.child_entities || []).length > 0 && typeof window.showLinkedItemsModal === 'function') {
+                        data.accountName = accountName;
+                        window.showLinkedItemsModal(data, 'trading_account', accountId, 'delete');
+                        return;
+                    }
+                }
+            } catch (_) { /* שקט */ }
+        }
+
+        const errorText = await response.text();
+        if (window.showErrorNotification) window.showErrorNotification('שגיאה במחיקת החשבון', errorText || 'שגיאה לא ידועה');
+    } catch (e) {
+        console.error('❌ Error deleting account:', e);
+        if (window.showErrorNotification) window.showErrorNotification('שגיאה במחיקת החשבון', e.message);
+    }
+}
 
 // יצירת instance גלובלי - שני שמות לתאימות
 window.tradingAccountsController = new TradingAccountsController();

@@ -98,13 +98,13 @@ class EntityDetailsModal {
                 <div class="modal-dialog modal-xl modal-dialog-scrollable">
                     <div class="modal-content entity-details-modal">
                         <div class="modal-header modal-header-colored">
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             <h5 class="modal-title" id="${this.modalId}Label">
                                 פרטי ישות
                             </h5>
                             <div id="quickActionButtons" class="btn-group btn-group-sm" role="group">
                                 <!-- כפתורי פעולות מהירות יוכנסו כאן דינמית -->
                             </div>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body entity-details-body" id="entityDetailsContent">
                             <div class="entity-details-loading">

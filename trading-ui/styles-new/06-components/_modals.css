@@ -614,12 +614,14 @@
 .modal-content.entity-details-modal .modal-header {
     display: flex;
     flex-direction: row-reverse; /* הופך את הסדר: כפתור ראשון בDOM = אחרון בתצוגה (שמאל) */
+    justify-content: flex-start; /* דורס space-between של Bootstrap */
     align-items: center;
     gap: 0.75rem;
 }
 
 .modal-content.entity-details-modal .modal-header .btn-close {
     /* ריבוע כהה של הישות */
+    position: static; /* דורס position:absolute מהכלל הגנרי */
     opacity: 0.8;
     filter: invert(1) brightness(0.3);
     margin: 0; /* מבטל margins ברירת מחדל של Bootstrap */

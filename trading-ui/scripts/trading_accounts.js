@@ -542,6 +542,30 @@ async function performAccountDeletion(accountId, accountName = '') {
         let errorData = null;
         try { errorData = await response.clone().json(); } catch(_) {}
 
+        // אם השרת החזיר רשימת טריידים פתוחים - בנה נתוני מודל והצג במקום שגיאה
+        const openTrades = errorData?.error?.open_trades;
+        if (Array.isArray(openTrades) && openTrades.length > 0 && typeof window.showLinkedItemsModal === 'function') {
+            const data = {
+                entity_type: 'account',
+                entity_id: accountId,
+                accountName: accountName,
+                child_entities: openTrades.map(t => ({
+                    id: t.id,
+                    type: 'trade',
+                    title: 'טרייד',
+                    description: `${t.ticker_symbol} • ${t.investment_type || ''}`.trim(),
+                    created_at: t.created_at,
+                    status: t.status
+                })),
+                parent_entities: [],
+                total_child_count: openTrades.length,
+                total_parent_count: 0,
+                entity_details: { id: accountId, name: accountName }
+            };
+            window.showLinkedItemsModal(data, 'trading_account', accountId, 'delete');
+            return;
+        }
+
         // במקרה כשל – בדיקת מקושרים ולהציג מודל
         if ([400, 409, 422].includes(response.status)) {
             try {

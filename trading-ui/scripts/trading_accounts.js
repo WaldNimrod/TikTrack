@@ -520,8 +520,9 @@ async function performAccountDeletion(accountId, accountName = '') {
     try {
         const response = await fetch(`/api/trading-accounts/${accountId}`, { method: 'DELETE' });
 
+        // השתמש בעותק עבור המטפל כדי שלא נצרוך את הזרם פעמיים
         if (typeof window.handleApiResponseWithRefresh === 'function') {
-            const handled = await window.handleApiResponseWithRefresh(response, {
+            const handled = await window.handleApiResponseWithRefresh(response.clone(), {
                 loadDataFunction: async () => window.tradingAccountsController?.loadData?.(),
                 updateActiveFieldsFunction: null,
                 operationName: 'מחיקה',
@@ -538,6 +539,10 @@ async function performAccountDeletion(accountId, accountName = '') {
             return;
         }
 
+        // ניסיון לקרוא גוף שגיאה כ-JSON (מבלי לשבור את הזרם)
+        let errorData = null;
+        try { errorData = await response.clone().json(); } catch(_) {}
+
         // במקרה כשל – בדיקת מקושרים ולהציג מודל
         if ([400, 409, 422].includes(response.status)) {
             try {
@@ -553,8 +558,8 @@ async function performAccountDeletion(accountId, accountName = '') {
             } catch (_) { /* שקט */ }
         }
 
-        const errorText = await response.text();
-        if (window.showErrorNotification) window.showErrorNotification('שגיאה במחיקת החשבון', errorText || 'שגיאה לא ידועה');
+        const errorText = (errorData && (errorData.error?.message || errorData.message)) || `HTTP ${response.status}`;
+        if (window.showErrorNotification) window.showErrorNotification('שגיאה במחיקת החשבון', errorText);
     } catch (e) {
         console.error('❌ Error deleting account:', e);
         if (window.showErrorNotification) window.showErrorNotification('שגיאה במחיקת החשבון', e.message);

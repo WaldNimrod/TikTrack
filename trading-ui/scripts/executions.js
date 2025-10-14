@@ -226,32 +226,7 @@ async function showAddExecutionModal() {
     window.DataCollectionService.setValue('executionDate', todayString, 'text');
   }
 
-  // הגדרת חשבון ברירת מחדל לפי העדפות
-  // ✨ עודכן לתמיכה במערכת העדפות!
-  try {
-    let defaultAccount = ''; // ברירת מחדל
-    
-    // נסה לקבל מהמערכת החדשה
-    if (typeof window.getCurrentPreference === 'function') {
-      const accountFromPrefs = await window.getCurrentPreference('defaultTradingAccount');
-      if (accountFromPrefs !== null && accountFromPrefs !== undefined) {
-        defaultAccount = accountFromPrefs;
-        console.log(`✅ Using account from preferences: ${defaultAccount}`);
-      }
-    } 
-    // Fallback ל-userPreferences
-    else if (window.userPreferences && window.userPreferences.defaultTradingAccount) {
-      defaultAccount = window.userPreferences.defaultTradingAccount;
-      console.log(`✅ Using account from userPreferences: ${defaultAccount}`);
-    }
-    
-    const accountElement = document.getElementById('executionAccount');
-    if (accountElement) {
-      accountElement.value = defaultAccount;
-    }
-  } catch (error) {
-    console.warn('⚠️ Could not load default account from preferences:', error);
-  }
+  // טעינת חשבון ברירת מחדל תתבצע דרך SelectPopulatorService (בהמשך)
 
   // טעינת טיקרים באמצעות SelectPopulatorService
   if (window.SelectPopulatorService && typeof window.SelectPopulatorService.populateTickersSelect === 'function') {
@@ -264,25 +239,49 @@ async function showAddExecutionModal() {
   await updateTickersList('add', false);
   }
 
+  // טעינת חשבונות עם ברירת מחדל מהעדפות (מיד עם פתיחת המודל)
+  if (window.SelectPopulatorService && typeof window.SelectPopulatorService.populateAccountsSelect === 'function') {
+    await window.SelectPopulatorService.populateAccountsSelect('executionAccount', {
+      includeEmpty: true,
+      emptyText: 'בחר חשבון...',
+      defaultFromPreferences: true,
+      // ברירת מחדל נוספת למקרה שהמערכת לא זמינה
+      defaultValue: (typeof window.getPreference === 'function') 
+        ? (await window.getPreference('default_trading_account')) 
+        : undefined
+    });
+  }
+
   // הפעלת כל השדות לאחר בחירת טיקר
   const tickerSelect = document.getElementById('executionTicker');
   if (tickerSelect) {
     tickerSelect.disabled = false;
-    tickerSelect.addEventListener('change', () => {
+    tickerSelect.addEventListener('change', async () => {
       if (tickerSelect.value) {
         enableAddExecutionFields();
         // מילוי מחיר ברירת מחדל מהמחיר האחרון של הטיקר
         fillDefaultPriceFromTicker(tickerSelect.value);
-        // עמלת ברירת מחדל מהעדפות
-        fillDefaultCommissionFromPreferences();
+        // עמלת ברירת מחדל מהעדפות (טוען מידית ללא תלות במערכת המתקדמת)
+        await fillDefaultCommissionFromPreferences();
         // טעינת טריידים פתוחים לטיקר
-        populateTradesForSelectedTicker(tickerSelect.value);
+        await populateTradesForSelectedTicker(tickerSelect.value);
+        // טעינת חשבונות עם ברירת מחדל מהעדפות
+        if (window.SelectPopulatorService && typeof window.SelectPopulatorService.populateAccountsSelect === 'function') {
+          await window.SelectPopulatorService.populateAccountsSelect('executionAccount', {
+            includeEmpty: true,
+            emptyText: 'בחר חשבון...',
+            defaultFromPreferences: true
+          });
+        }
       }
     });
   }
 
   // חישוב ערכים מחושבים
   calculateAddExecutionValues();
+
+  // הגדרת עמלת ברירת מחדל באופן מיידי (גם לפני בחירת טיקר)
+  await fillDefaultCommissionFromPreferences();
 
   // הצגת המודל
   const modal = new bootstrap.Modal(addExecutionModalElement);
@@ -310,9 +309,9 @@ async function fillDefaultCommissionFromPreferences() {
   try {
     const commissionEl = document.getElementById('executionCommission');
     if (!commissionEl) {return;}
-    // קודם ננסה דרך DefaultValueSetter כדי לשמור אחידות
-    if (window.DefaultValueSetter && typeof window.DefaultValueSetter.setPreferenceValue === 'function') {
-      const pref = await window.DefaultValueSetter.setPreferenceValue('executionCommission', 'default_execution_commission');
+    // ניסיון 1: מפתח תקני במערכת v2 - defaultCommission
+    if (typeof window.getCurrentPreference === 'function') {
+      const pref = await window.getCurrentPreference('defaultCommission');
       if (pref !== null && pref !== undefined && pref !== '') {
         const val = Number(pref);
         if (!Number.isNaN(val)) {
@@ -321,16 +320,40 @@ async function fillDefaultCommissionFromPreferences() {
         }
       }
     }
-    // Fallback ישיר
-    if (typeof window.getPreference === 'function') {
-      const pref = await window.getPreference('default_execution_commission');
+    // ניסיון 2: DefaultValueSetter עם המפתח התקני
+    if (window.DefaultValueSetter && typeof window.DefaultValueSetter.setPreferenceValue === 'function') {
+      const pref = await window.DefaultValueSetter.setPreferenceValue('executionCommission', 'defaultCommission');
       if (pref !== null && pref !== undefined && pref !== '') {
         const val = Number(pref);
         if (!Number.isNaN(val)) {
           commissionEl.value = val.toFixed(2);
+          return;
         }
       }
     }
+    // ניסיון 3: API פשוטה של getPreference עם המפתח התקני
+    if (typeof window.getPreference === 'function') {
+      const pref = await window.getPreference('defaultCommission');
+      if (pref !== null && pref !== undefined && pref !== '') {
+        const val = Number(pref);
+        if (!Number.isNaN(val)) {
+          commissionEl.value = val.toFixed(2);
+          return;
+        }
+      }
+    }
+    // ניסיון 4 (תמיכה לאחור): מפתח ישן default_execution_commission
+    if (typeof window.getPreference === 'function') {
+      const prefLegacy = await window.getPreference('default_execution_commission');
+      if (prefLegacy !== null && prefLegacy !== undefined && prefLegacy !== '') {
+        const val = Number(prefLegacy);
+        if (!Number.isNaN(val)) {
+          commissionEl.value = val.toFixed(2);
+          return;
+        }
+      }
+    }
+    // אם לא נמצא ערך - משאירים שדה ריק (לא 0)
   } catch (e) {
     // שקט
   }
@@ -1441,6 +1464,23 @@ async function updateExecutionsTableMain(executions) {
     
     const accountName = execution.account_name || execution.trading_account_name || 'לא מוגדר';
 
+    // Determine a safe tickerId to use for links (may be null)
+    const tickerIdSafe = (linkedType === 'ticker' && linkedId)
+      ? linkedId
+      : (() => {
+          const symbolForLookup = execution.trade_ticker_symbol || execution.ticker_symbol || symbol;
+          const found = Array.isArray(tickers) ? tickers.find(t => t.symbol === symbolForLookup) : null;
+          return found ? found.id : null;
+        })();
+
+    // Build click attributes safely (omit onclick when tickerId is unavailable)
+    const tickerClickAttr = (tickerIdSafe !== null && tickerIdSafe !== undefined)
+      ? `onclick="window.showEntityDetailsModal && window.showEntityDetailsModal('ticker', ${tickerIdSafe}, 'view')"`
+      : '';
+    const tickerItemsClickAttr = (tickerIdSafe !== null && tickerIdSafe !== undefined)
+      ? `onclick="window.viewLinkedItemsForTicker && window.viewLinkedItemsForTicker(${tickerIdSafe})"`
+      : '';
+
     // שימוש ב-FieldRendererService לעיצוב שדות
     const actionBadge = window.FieldRendererService ? 
       window.FieldRendererService.renderAction(execution.action || execution.type) : 
@@ -1466,10 +1506,10 @@ async function updateExecutionsTableMain(executions) {
                 <td class="ticker-cell">
                     <div class="ticker-cell-content d-flex align-items-center gap-1" style="white-space: nowrap; flex-direction: row-reverse;">
                         <strong class="ticker-symbol-link ${execution.action === 'buy' ? 'action-buy' : 'action-sell'}" 
-                          onclick="window.showEntityDetailsModal && window.showEntityDetailsModal('ticker', ${tickerId || 'null'}, 'view')" 
+                          ${tickerClickAttr}
                           title="פתח פרטי סימבול">${symbol}</strong>
                         <button class="btn btn-sm btn-info" 
-                          onclick="window.viewLinkedItemsForTicker && window.viewLinkedItemsForTicker(${tickerId || 'null'})" 
+                          ${tickerItemsClickAttr}
                           title="פריטים מקושרים לטיקר" style="padding: 2px 6px; font-size: 0.75rem;">🔗</button>
                     </div>
                 </td>
@@ -3378,9 +3418,39 @@ async function copyDetailedLog() {
 // All DOMContentLoaded listeners merged into single initialization function
 // Called from PAGE_CONFIGS in core-systems.js
 
-window.initializeExecutionsPage = function() {
+window.initializeExecutionsPage = async function() {
     console.log('⚡ Initializing Executions Page...');
-    
+    // הוסר: אתחול העדפות מתבצע כעת גלובלית באתחול המאוחד
+
+    // 0. יישור קו עם מערכת ההעדפות המאוחדת: החלת ברירות מחדל כאשר המערכת מוכנה
+    try {
+        const applyPrefDefaults = async () => {
+            // ודא שמערכת ההעדפות מאותחלת לפני שימוש
+            if (window.PreferencesSystem && window.PreferencesSystem.initialized) {
+                await populateAccountsWithDefault('executionAccount');
+                await fillDefaultCommissionFromPreferences();
+            }
+        };
+
+        // אם כבר מאותחל בשלב זה - החל מיידית
+        if (window.PreferencesSystem?.initialized) {
+            await applyPrefDefaults();
+        }
+
+        // כאשר ההעדפות נטענות (מאתחל מאוחד) - החל ברירות מחדל
+        window.addEventListener('preferences:loaded', () => {
+            // לאפשר לצבעים/מטמון להתעדכן לפני מילוי שדות
+            setTimeout(() => { applyPrefDefaults(); }, 0);
+        });
+
+        // כאשר ההעדפות מתעדכנות בזמן ריצה - רענן ברירות מחדל
+        window.addEventListener('preferences:updated', () => {
+            setTimeout(() => { applyPrefDefaults(); }, 0);
+        });
+    } catch (_e) {
+        // לא חוסם את האתחול
+    }
+
     // 1. Initialize modals
     if (typeof window.initializeExecutionsModals === 'function') {
         window.initializeExecutionsModals();

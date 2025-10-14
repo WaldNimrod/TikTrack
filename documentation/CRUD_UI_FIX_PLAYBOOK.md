@@ -11,7 +11,9 @@
 
 2) טעינת ברירות מחדל ל־selectים (הוספה): חשבון מסחר ומטבע
 - **בעיה**: בחלון הוספה לא נבחר חשבון ברירת מחדל לפי העדפות.
-- **פתרון**: להשתמש ב־`SelectPopulatorService.populateAccountsSelect` עם `defaultFromPreferences: true` ובמידת הצורך לחזק עם `DefaultValueSetter.setPreferenceValue`.
+- **פתרון**: להשתמש ב־`SelectPopulatorService.populateAccountsSelect`/`populateCurrenciesSelect` עם `defaultFromPreferences: true` ובמידת הצורך לחזק עם `DefaultValueSetter.setPreferenceValue`.
+- **דוגמה (tickers – מטבע ברירת מחדל)**: `populateCurrenciesSelect('addTickerCurrency', { includeEmpty: true, defaultFromPreferences: true })`.
+- **דרישת מקדימה חשובה**: לפני שימוש ב־`defaultFromPreferences`, יש לאתחל את מערכת ההעדפות בעמוד: לטעון `scripts/preferences-core.js` ולהריץ `await window.PreferencesSystem.initialize()` במהלך אתחול הדף.
 - **הערות**: העיקרון – קודם טעינת אופציות, ואז הצבה/בחירה בערך ברירת מחדל.
 
 3) טעינת ערכי select במודל עריכה – מעבר מהתבססות על מזהים לשמות
@@ -61,6 +63,7 @@
 
 11) To-Do קצר ליישום בעמוד נוסף
 - לאתר selectים לישות חשבון/מטבע/וכו' ולשנות את מילוי ברירת המחדל ל־`defaultText` לפי שם.
+- בהוספה: להשתמש ב־`defaultFromPreferences: true` ב־SelectPopulatorService (למשל מטבע/חשבון).
 - להוסיף שדות `hidden` למזהים במודל עריכה אם חסרים.
 - בשמירה: אם מזהה חסר – לגזור מזהה לפי שם האופציה.
 - לאכוף סדר כפתורי מודל.

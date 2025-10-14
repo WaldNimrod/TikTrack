@@ -502,6 +502,25 @@ class UnifiedAppInitializer {
         } else {
             console.log('⚠️ Cache system not ready, using localStorage fallback');
         }
+
+        // Initialize Preferences System globally (once) before services/UI that rely on getPreference
+        try {
+            if (window.PreferencesSystem && !window.PreferencesSystem.initialized) {
+                console.log('🔧 Initializing PreferencesSystem (global)...');
+                await window.PreferencesSystem.initialize();
+                // Expose current preferences for consumers expecting window.currentPreferences
+                if (window.PreferencesSystem.manager?.currentPreferences) {
+                    window.currentPreferences = window.PreferencesSystem.manager.currentPreferences;
+                }
+                // Notify listeners that preferences are ready
+                window.dispatchEvent(new CustomEvent('preferences:loaded', {
+                    detail: { source: 'unified-initializer', profileId: window.PreferencesSystem.manager?.currentProfile }
+                }));
+                console.log('✅ PreferencesSystem initialized (global)');
+            }
+        } catch (err) {
+            console.warn('⚠️ PreferencesSystem global initialization failed or unavailable:', err);
+        }
         
         // Use the application initializer if available
         if (typeof window.initializeApplication === 'function') {

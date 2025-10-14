@@ -2059,12 +2059,15 @@ async function loadColorsAndApplyToHeaders() {
 
 // אתחול הדף
 // Second DOMContentLoaded removed - merged into initializeTickersPage
-window.initializeTickersPage = function() {
+window.initializeTickersPage = async function() {
     // אתחול modals
     if (typeof window.initializeTickersModals === 'function') {
         window.initializeTickersModals();
     }
     
+  // אתחול מערכת ההעדפות לפני שימוש ב-defaultFromPreferences
+  // הוסר: אתחול העדפות מתבצע כעת גלובלית באתחול המאוחד
+
   // טעינת נתונים
   if (typeof window.loadTickersData === 'function') {
     window.loadTickersData();

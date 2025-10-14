@@ -955,7 +955,7 @@ async function loadCurrenciesForCashFlow() {
     await window.SelectPopulatorService.populateCurrenciesSelect('cashFlowCurrencyId', {
         includeEmpty: true,
         emptyText: 'בחר מטבע...',
-        setDefault: true, // USD (id=1) או מהעדפות
+        defaultFromPreferences: true,
         format: 'symbol-name' // "USD - US Dollar"
     });
 }

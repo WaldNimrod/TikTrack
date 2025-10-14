@@ -2040,10 +2040,7 @@ async function loadActiveTradesForTicker(mode = 'add', _showClosedTrades = false
     ? document.getElementById('addExecutionTicker').value
     : document.getElementById('editExecutionTicker').value;
 
-  if (!tickerId) {
-
-    return;
-  }
+  if (!tickerId) { return; }
 
   // בדיקת הצ'קבוקס (אם לא הועבר כפרמטר)
   let showClosedTrades = _showClosedTrades;
@@ -2063,24 +2060,19 @@ async function loadActiveTradesForTicker(mode = 'add', _showClosedTrades = false
     let filteredTrades;
 
     if (showClosedTrades) {
-      // הצג טריידים פעילים + טריידים סגורים
+      // הצג טריידים פעילים + טריידים סגורים (ללא מבוטל)
       const activeTrades = trades.filter(trade =>
         trade.ticker_id === parseInt(tickerId) && (trade.status === 'active' || trade.status === 'open'),
       );
-
       const closedTrades = trades.filter(trade =>
-        trade.ticker_id === parseInt(tickerId) && (trade.status === 'closed' || trade.status === 'cancelled'),
+        trade.ticker_id === parseInt(tickerId) && (trade.status === 'closed'),
       );
-
       filteredTrades = [...activeTrades, ...closedTrades];
-
-
     } else {
       // הצג רק טריידים פעילים
       filteredTrades = trades.filter(trade =>
         trade.ticker_id === parseInt(tickerId) && (trade.status === 'active' || trade.status === 'open'),
       );
-
     }
 
     // במצב עריכה, נוודא שהטרייד המקושר לעסקה נמצא ברשימה
@@ -2160,12 +2152,12 @@ async function loadActiveTradesForTicker(mode = 'add', _showClosedTrades = false
 
       // הפעלת השדה
       tradeSelect.disabled = false;
-      // // console.log('✅ שדה טרייד עודכן:', filteredTrades.length, 'אפשרויות');
-      // מאזין לשינוי טרייד כדי לעדכן חשבון לשדה המושבת
+      // מאזין לשינוי טרייד כדי לעדכן חשבון לשדה המושבת (תומך add/edit)
       tradeSelect.addEventListener('change', async () => {
         try {
           const pickedId = tradeSelect.value;
-          const accountSelect = document.getElementById('executionAccount');
+          const accountSelectId = mode === 'add' ? 'executionAccount' : 'editExecutionAccount';
+          const accountSelect = document.getElementById(accountSelectId);
           if (!pickedId || !accountSelect) return;
           // חשבון מתוך רשימת הטריידים
           const picked = filteredTrades.find(t => String(t.id) === String(pickedId));
@@ -3745,12 +3737,12 @@ async function toggleAssignmentFields(mode = 'add') {
                 const tickerSelect = document.getElementById(mode === 'add' ? 'executionTicker' : 'editExecutionTicker');
                 const selectedTickerId = tickerSelect ? tickerSelect.value : '';
                 if (selectedTickerId) {
-                    if (typeof populateTradesForSelectedTicker === 'function') {
-                        populateTradesForSelectedTicker(selectedTickerId);
+                    if (typeof loadActiveTradesForTicker === 'function') {
+                        await loadActiveTradesForTicker(mode, true);
                     }
                 } else {
                     if (typeof window.populateAllRelevantTrades === 'function') {
-                        window.populateAllRelevantTrades(mode);
+                        await window.populateAllRelevantTrades(mode);
                     }
                 }
             } catch (_e) {}

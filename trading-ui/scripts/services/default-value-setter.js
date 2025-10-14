@@ -90,21 +90,18 @@ class DefaultValueSetter {
             return null;
         }
         
-        // בדיקה אם מערכת ההעדפות זמינה
-        if (typeof window.getPreference !== 'function') {
-            console.warn('⚠️ מערכת העדפות לא זמינה');
-            return null;
-        }
-        
         try {
-            const value = await window.getPreference(preferenceName);
-            if (value) {
-                element.value = value;
-                return value;
+            // 1) קודם מתוך ההעדפות שבזיכרון (ללא קריאת API)
+            const cachedPrefs = window.PreferencesSystem?.manager?.currentPreferences;
+            const cachedValue = cachedPrefs ? cachedPrefs[preferenceName] : null;
+            if (cachedValue) {
+                element.value = cachedValue;
+                return cachedValue;
             }
+            // 2) אם אין ערך במטמון – לא לקרוא ל-API כאן כדי להימנע משגיאות 500 על העדפות חסרות
             return null;
         } catch (error) {
-            console.warn(`⚠️ שגיאה בטעינת העדפה ${preferenceName}:`, error);
+            console.warn(`⚠️ setPreferenceValue (memory-first) failed for ${preferenceName}:`, error);
             return null;
         }
     }

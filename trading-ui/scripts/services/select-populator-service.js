@@ -20,6 +20,16 @@
 // ===== SELECT POPULATOR SERVICE =====
 
 class SelectPopulatorService {
+    static _getPreferenceFromMemory(preferenceName, aliases = []) {
+        try {
+            const prefs = window.PreferencesSystem?.manager?.currentPreferences || {};
+            if (preferenceName in prefs) return prefs[preferenceName];
+            for (const key of aliases) {
+                if (key in prefs) return prefs[key];
+            }
+        } catch (_) {}
+        return null;
+    }
     /**
      * מילוי select box של טיקרים
      * 
@@ -109,17 +119,8 @@ class SelectPopulatorService {
             let defaultValue = options.defaultValue;
             if (options.defaultFromPreferences) {
                 try {
-                    // ניסיון ראשון: לקרוא מתוך העדפות שכבר נטענו לזיכרון (ללא קריאת API נוספת)
-                    const cachedPrefs = window.PreferencesSystem?.manager?.currentPreferences;
-                    const prefValueCached = cachedPrefs ? cachedPrefs['default_trading_account'] : null;
-                    let prefValue = prefValueCached;
-                    // ניסיון שני (אופציונלי): קריאה יחידה ל-getPreference אם אין ערך בזיכרון
-                    if (!prefValue && typeof window.getPreference === 'function') {
-                        try { prefValue = await window.getPreference('default_trading_account'); } catch (_) { /* שקט */ }
-                    }
-                    if (prefValue) {
-                        defaultValue = parseInt(prefValue);
-                    }
+                    const prefValue = this._getPreferenceFromMemory('default_trading_account', ['defaultTradingAccount', 'trading_account_id']);
+                    if (prefValue) defaultValue = parseInt(prefValue);
                 } catch (_) { /* שקט */ }
             }
             
@@ -178,16 +179,22 @@ class SelectPopulatorService {
             let defaultValue = options.defaultValue;
             if (options.defaultFromPreferences) {
                 try {
-                    // ניסיון ראשון: ערך מטמון שכבר נטען
-                    const cachedPrefs = window.PreferencesSystem?.manager?.currentPreferences;
-                    const prefValueCached = cachedPrefs ? cachedPrefs['default_currency'] : null;
-                    let prefValue = prefValueCached;
-                    // ניסיון שני: קריאה ל-getPreference רק אם חסר במטמון
-                    if (!prefValue && typeof window.getPreference === 'function') {
-                        try { prefValue = await window.getPreference('default_currency'); } catch (_) { /* שקט */ }
-                    }
+                    // נסה קודם מזהה (id)
+                    let prefValue = this._getPreferenceFromMemory('default_currency', ['defaultCurrencyId', 'currency_id']);
                     if (prefValue) {
                         defaultValue = parseInt(prefValue);
+                    } else {
+                        // נסה לפי קוד/סימול/שם (primaryCurrency וכו')
+                        const codeOrName = this._getPreferenceFromMemory('primaryCurrency', ['default_currency_code', 'default_currency_symbol', 'defaultCurrency']);
+                        if (codeOrName) {
+                            const match = currencies.find(c => {
+                                const code = (c.code || c.symbol || '').toString().toLowerCase();
+                                const name = (c.name || '').toString().toLowerCase();
+                                const target = codeOrName.toString().toLowerCase();
+                                return code === target || name === target || `${name} (${code})` === target;
+                            });
+                            if (match) defaultValue = match.id;
+                        }
                     }
                 } catch (_) { /* שקט */ }
             }

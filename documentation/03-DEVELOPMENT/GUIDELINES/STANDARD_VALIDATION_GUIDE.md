@@ -1,3 +1,21 @@
+## Validation Standard (UI) — Simple Error + Field Highlight
+
+- All client-side validation errors must be presented as a simple error notification plus field highlight.
+- Use the central validation system:
+  - `validateForm()` to aggregate errors and call `showFieldError(fieldId, message)` per field
+  - Show a single simple error notification for the first error: `showSimpleErrorNotification('שגיאת ולידציה', firstError)`
+- Do NOT use critical/system error notifications for validation-only cases.
+- Page-level custom validators should return messages to be rendered via `showFieldError`, not call system errors directly.
+
+### Example
+```
+const { isValid, errors } = validateForm('addExecutionForm', rules);
+if (!isValid) {
+  // The system already highlighted fields; show the first error as a simple notification
+  showSimpleErrorNotification('שגיאת ולידציה', Object.values(errors)[0]);
+  return;
+}
+```
 # מדריך ולידציה סטנדרטית - TikTrack
 
 ## 📅 תאריך יצירה

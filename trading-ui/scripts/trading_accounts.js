@@ -503,7 +503,7 @@ window.checkLinkedItemsBeforeDeleteAccount = async function(accountId) {
         if (childEntities.length > 0) {
             if (typeof window.showLinkedItemsModal === 'function') {
                 data.accountName = (window.tradingAccountsData || []).find(a => a.id === accountId)?.name || '';
-                window.showLinkedItemsModal(data, 'trading_account', accountId, 'delete');
+                                    window.showLinkedItemsModal(data, 'account', accountId, 'delete');
             } else if (typeof window.showWarningNotification === 'function') {
                 window.showWarningNotification('לא ניתן למחוק חשבון עם פריטים מקושרים', 'בטל/סגור פריטים פתוחים לפני המחיקה');
             }

@@ -637,13 +637,16 @@
     flex-grow: 1;
 }
 
-/* כותרות בבולד */
-.modal-content.entity-details-modal .modal-body h6,
-.modal-content.entity-details-modal .modal-body .section-title,
-.modal-content.entity-details-modal .modal-body .info-label,
-.modal-content.entity-details-modal .modal-body label,
-.modal-content.entity-details-modal .modal-body strong {
+/* כותרות h6 בבולד */
+.modal-content.entity-details-modal .modal-body h6 {
     font-weight: 700;
+}
+
+/* footer - כפתור סגירה משמאל */
+.modal-content.entity-details-modal .modal-footer {
+    display: flex;
+    justify-content: flex-end; /* משמאל בעברית (סוף השורה) */
+    direction: rtl;
 }
 
 /* ===== Entity Icon Circle ===== */

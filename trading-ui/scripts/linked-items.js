@@ -218,7 +218,7 @@ function showLinkedItemsModal(data, itemType, itemId, mode = 'view') {
   } else if (itemType === 'account') {
     // עבור חשבון - הוספת שם החשבון
     const accountName = data.accountName || '';
-    modalTitle = `פריטים מקושרים לחשבון ${accountName}`;
+    modalTitle = accountName ? `פריטים מקושרים לחשבון ${accountName}` : `פריטים מקושרים לחשבון #${itemId}`;
   } else {
     modalTitle = `פריטים מקושרים ל-${getItemTypeDisplayName(itemType)}`;
   }
@@ -407,7 +407,7 @@ function createLinkedItemsModalContent(data, itemType, itemId, mode = 'view') {
  * @returns {string} HTML content for the linked items list
  */
 function createLinkedItemsList(items, mode = 'view') {
-  let listHtml = '<div class="linked-items-list" style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; align-items:start;">';
+  let listHtml = '<div class="linked-items-list">';
 
   items.forEach(item => {
     const icon = getItemTypeIcon(item.type);

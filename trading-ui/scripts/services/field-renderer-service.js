@@ -135,28 +135,66 @@ class FieldRendererService {
     }
 
     /**
+     * רנדור סכום עם מטבע (RTL: סימן משמאל למספר)
+     * 
+     * @param {number} value - ערך מספרי
+     * @param {string} currencySymbol - סמל מטבע ($, ₪, €)
+     * @param {number} decimals - מספר ספרות אחרי נקודה (ברירת מחדל 2)
+     * @returns {string} - HTML מיושר RTL עם סימן בסוף (משמאל)
+     * 
+     * @example
+     * const html = FieldRendererService.renderAmount(1234.56, '$');
+     * // Output RTL: '1,234.56 $' (סימן משמאל)
+     */
+    static renderAmount(value, currencySymbol = '$', decimals = 2) {
+        if (value === null || value === undefined) return '-';
+        const formatted = Number(value).toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+        const colorClass = value >= 0 ? 'text-success' : 'text-danger';
+        const sign = value >= 0 ? '+' : '';
+        // RTL: number first (right), then symbol (left in LTR span)
+        return `<span class="amount-display ${colorClass}" dir="ltr">${sign}${formatted} ${currencySymbol}</span>`;
+    }
+
+    /**
      * רנדור type badge (סוג השקעה)
      * 
      * @param {string} type - סוג (swing, investment, passive)
+     * @param {number|null} amountForColor - סכום לקביעת צבע (חיובי/שלילי), אופציונלי
      * @returns {string} - HTML של ה-badge
      * 
      * @example
      * const html = FieldRendererService.renderType('swing');
+     * const htmlColored = FieldRendererService.renderType('deposit', 100); // ירוק
      */
-    static renderType(type) {
+    static renderType(type, amountForColor = null) {
         if (!type) return '<span class="badge badge-secondary">-</span>';
         
         // תרגום לעברית
         const typeTranslations = {
             'swing': 'סווינג',
             'investment': 'השקעה',
-            'passive': 'פסיבי'
+            'passive': 'פסיבי',
+            'deposit': 'הפקדה',
+            'withdrawal': 'משיכה',
+            'fee': 'עמלה',
+            'dividend': 'דיבידנד',
+            'transfer_in': 'העברה פנימה',
+            'transfer_out': 'העברה החוצה',
+            'other_positive': 'אחר חיובי',
+            'other_negative': 'אחר שלילי',
+            'other': 'אחר'
         };
         
         const typeLower = type.toLowerCase();
         const typeHebrew = typeTranslations[typeLower] || type;
         
-        return `<span class="badge badge-type badge-capsule" data-type="${typeLower}">${typeHebrew}</span>`;
+        // קביעת צבע לפי amount אם סופק
+        let colorClass = '';
+        if (amountForColor !== null && amountForColor !== undefined) {
+            colorClass = amountForColor >= 0 ? ' text-success' : ' text-danger';
+        }
+        
+        return `<span class="badge badge-type badge-capsule${colorClass}" data-type="${typeLower}">${typeHebrew}</span>`;
     }
 
     /**
@@ -504,7 +542,8 @@ window.renderSide = (side) => FieldRendererService.renderSide(side);
 window.renderNumericValue = (value, suffix, showPrefix) => FieldRendererService.renderNumericValue(value, suffix, showPrefix);
 window.renderPnL = (value, currency) => FieldRendererService.renderPnL(value, currency); // deprecated - use renderNumericValue
 window.renderCurrency = (id, name, symbol) => FieldRendererService.renderCurrency(id, name, symbol);
-window.renderType = (type) => FieldRendererService.renderType(type);
+window.renderAmount = (value, currencySymbol, decimals) => FieldRendererService.renderAmount(value, currencySymbol, decimals);
+window.renderType = (type, amountForColor) => FieldRendererService.renderType(type, amountForColor);
 window.renderAction = (action) => FieldRendererService.renderAction(action);
 window.renderPriority = (priority) => FieldRendererService.renderPriority(priority);
 window.renderDate = (date, includeTime) => FieldRendererService.renderDate(date, includeTime);

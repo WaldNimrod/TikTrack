@@ -1008,23 +1008,13 @@ async function renderCashFlowsTable(cashFlows = null) {
       window.translateCashFlowType(cashFlow.type) : 
       cashFlow.type;
     
-    // עיצוב הסוג עם צבע מתאים
-    let typeClass = '';
-    switch (cashFlow.type) {
-      case 'deposit':
-        typeClass = 'numeric-value-positive';  // ירוק
-        break;
-      case 'withdrawal':
-        typeClass = 'numeric-value-negative';  // אדום
-        break;
-      default:
-        typeClass = 'text-muted';  // אפור
-    }
-    
-    const typeBadge = `<span class="${typeClass}">${typeTranslated}</span>`;
+    // עיצוב הסוג עם צבע מתאים (לפי סכום)
+    const typeBadge = window.FieldRendererService ? 
+      window.FieldRendererService.renderType(cashFlow.type, cashFlow.amount) : 
+      typeTranslated;
 
     const amountBadge = window.FieldRendererService ? 
-      window.FieldRendererService.renderNumericValue(cashFlow.amount, ' $', true) : 
+      window.FieldRendererService.renderAmount(cashFlow.amount, currencyDisplay) : 
       `<span class="${cashFlow.amount >= 0 ? 'numeric-value-positive' : 'numeric-value-negative'}" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">${formatCashFlowAmount(cashFlow.amount)}</span>`;
 
     const dateBadge = window.FieldRendererService ? 
@@ -1050,7 +1040,7 @@ async function renderCashFlowsTable(cashFlows = null) {
                 </div>
             </td>
             <td class="col-type type-cell">${typeBadge}</td>
-            <td class="col-amount" style="text-align: left; direction: ltr;">${amountBadge}</td>
+            <td class="col-amount" style="text-align: right;">${amountBadge}</td>
             <td class="col-date" style="text-align: center;">${dateBadge}</td>
             <td class="col-description">${cashFlow.description || '-'}</td>
             <td class="col-source">${window.translateCashFlowSource ?

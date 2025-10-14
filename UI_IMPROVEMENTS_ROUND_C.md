@@ -100,7 +100,42 @@ These are the immediate rules to implement across pages. After each fix is appro
 ---
 
 ## 4) Change Log (to be populated only after explicit approvals)
-1) [TBD – will be appended after the first approved fix in Round C]
+
+### 4.1) Cash Flows – Amount Column Formatting
+**Page**: `cash_flows.html`, `cash_flows.js`, `_tables.css`  
+**Problem**:
+- Currency symbol appearing on the wrong side (right of number instead of left in RTL)
+- Amount column not right-aligned
+
+**Solution**:
+- Currency symbol: always display to the left of the number (end of line in RTL)
+- Amount column: right-aligned (text-align: right)
+
+**Implementation**:
+- Update `FieldRendererService.renderCurrency()` or cash_flows rendering logic to ensure symbol placement uses logical properties
+- Add `.col-amount { text-align: right; }` in `_tables.css` if not already present
+- Verify RTL alignment: symbol at line-end (left), number at line-start (right)
+
+**Status**: Pending implementation
+
+---
+
+### 4.2) Cash Flows – Type Column Dynamic Coloring
+**Page**: `cash_flows.html`, `cash_flows.js`, `FieldRendererService`  
+**Problem**:
+- Type column should be colored (positive/negative) based on the **amount value**, not the type text itself
+
+**Solution**:
+- Check if `FieldRendererService` supports conditional rendering (color based on external column value)
+- If supported: pass amount sign to type renderer
+- If not: extend renderer or implement inline logic in `updateCashFlowsTable`
+
+**Implementation**:
+- Investigate `FieldRendererService` conditional rendering capabilities
+- Apply positive/negative color classes to type cell based on amount sign
+- Use `var(--numeric-positive-medium)` / `var(--numeric-negative-medium)` for consistency
+
+**Status**: Pending investigation + implementation
 
 ---
 

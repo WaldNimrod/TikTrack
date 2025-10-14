@@ -552,8 +552,7 @@ async function showEditTickerModal(id) {
     name: { id: 'editTickerName', type: 'text' },
     type: { id: 'editTickerType', type: 'text' },
     currency_id: { id: 'editTickerCurrency', type: 'int' },
-    status: { id: 'editTickerStatus', type: 'text' },
-    active_trades: { id: 'editTickerActiveTrades', type: 'text' },
+    // שדות סטטוס ו-active_trades הוסרו ממודל העריכה לפי דרישת UX
     remarks: { id: 'editTickerRemarks', type: 'text' }
   }, {
     id: ticker.id,
@@ -561,8 +560,7 @@ async function showEditTickerModal(id) {
     name: ticker.name,
     type: ticker.type,
     currency_id: ticker.currency_id || '',
-    status: statusValue,
-    active_trades: (typeof ticker.active_trades === 'boolean') ? (ticker.active_trades ? 'true' : 'false') : '',
+    // אין הצבה לשדות סטטוס/active_trades במודל העריכה
     remarks: ticker.remarks || ''
   });
 
@@ -820,7 +818,6 @@ function getEditFormData() {
     name: document.getElementById('editTickerName').value.trim(),
     type: document.getElementById('editTickerType').value,
     currency_id: parseInt(document.getElementById('editTickerCurrency').value),
-    status: document.getElementById('editTickerStatus').value,
     remarks: document.getElementById('editTickerRemarks').value.trim()
   };
 }
@@ -926,11 +923,10 @@ async function updateTicker() {
       return;
     }
 
-    // חישוב סטטוס סופי
-    const finalStatus = calculateFinalStatus(formData.status, formData.id);
+  // אין עדכון סטטוס דרך מודל עריכה; אם היה שינוי סטטוס זה נעשה מכפתור ייעודי
 
-    // בדיקת ביטול עם פריטים מקושרים
-    if (formData.status === 'cancelled') {
+  // בדיקת ביטול עם פריטים מקושרים (מסלול זה לא אמור לקרות יותר דרך המודל)
+  if (false && formData.status === 'cancelled') {
       const originalTicker = (window.tickersData || []).find(t => t.id == formData.id);
       if (originalTicker && originalTicker.status !== 'cancelled') {
         const hasLinkedItems = await checkLinkedItemsBeforeCancelInUpdate(formData.id, originalTicker);
@@ -1774,14 +1770,15 @@ function formatTickerUpdateTime(ticker) {
 /**
  * יצירת HTML לכפתורי פעולה
  */
-function createTickerActionsHTML(tickerId) {
+function createTickerActionsHTML(ticker) {
   const buttons = [
-    window.createLinkButton ? window.createLinkButton(`if (window.showLinkedItemsModal) { window.showLinkedItemsModal([], 'ticker', ${tickerId}); }`) : '',
-    window.createEditButton ? window.createEditButton(`editTicker(${tickerId})`) : '',
-    window.createDeleteButton ? window.createDeleteButton(`deleteTicker(${tickerId})`) : ''
+    window.createLinkButton ? window.createLinkButton(`if (window.showLinkedItemsModal) { window.showLinkedItemsModal([], 'ticker', ${ticker.id}); }`) : '',
+    window.createEditButton ? window.createEditButton(`editTicker(${ticker.id})`) : '',
+    window.createCancelButton ? window.createCancelButton('ticker', ticker.id, ticker.status, 'sm') : '',
+    window.createDeleteButton ? window.createDeleteButton(`deleteTicker(${ticker.id})`) : ''
   ];
   
-  return window.createActionsMenu ? window.createActionsMenu(buttons, tickerId) : buttons.join('');
+  return window.createActionsMenu ? window.createActionsMenu(buttons, ticker.id) : buttons.join('');
 }
 
 /**
@@ -1833,8 +1830,11 @@ function createTickerRowHTML(ticker) {
                     <td title="${getTickerStatusLabel(ticker.status)}">
         ${statusBadge}
                     </td>
+                    <td class="ticker-active-trades" title="טריידים פעילים">
+        ${window.FieldRendererService ? window.FieldRendererService.renderBoolean(!!ticker.active_trades) : (ticker.active_trades ? 'כן' : 'לא')}
+                    </td>
                     <td class="col-actions actions-cell actions-3-btn">
-        ${createTickerActionsHTML(ticker.id)}
+        ${createTickerActionsHTML(ticker)}
                     </td>
                 </tr>
             `;

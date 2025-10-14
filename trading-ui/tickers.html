@@ -175,6 +175,12 @@
                                                 סטטוס <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
+                                        <th class="col-active-trades">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(5, window.filteredTickersData || window.tickersData, 'tickers', window.updateTickersTable); }">
+                                                טריידים פעילים <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
                                         <th class="col-actions actions-cell">
                                             <span class="actions-header-icon">⋮</span>
                                         </th>
@@ -339,28 +345,6 @@
                                         <label for="editTickerCurrency" class="form-label entity-label">מטבע</label>
                                         <select class="form-select" id="editTickerCurrency" required>
                                             <option value="">בחר מטבע...</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="editTickerStatus" class="form-label entity-label">סטטוס</label>
-                                        <select class="form-select" id="editTickerStatus" required>
-                                            <option value="open">פתוח</option>
-                                            <option value="closed">סגור</option>
-                                            <option value="cancelled">מבוטל</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="editTickerActiveTrades" class="form-label entity-label">טריידים פעילים</label>
-                                        <select class="form-select" id="editTickerActiveTrades">
-                                            <option value="">לא מוגדר</option>
-                                            <option value="true">כן</option>
-                                            <option value="false">לא</option>
                                         </select>
                                     </div>
                                 </div>

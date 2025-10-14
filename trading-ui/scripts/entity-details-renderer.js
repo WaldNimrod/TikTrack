@@ -1741,5 +1741,11 @@ class EntityDetailsRenderer {
 /**
  * Auto-initialize when DOM is ready - אתחול אוטומטי כשה-DOM מוכן
  */
-// DOMContentLoaded removed - EntityDetailsRenderer auto-initializes when class is defined
-// Instance created automatically by the class definition above
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        new EntityDetailsRenderer();
+    });
+} else {
+    // DOM already loaded
+    new EntityDetailsRenderer();
+}

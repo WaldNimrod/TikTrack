@@ -894,10 +894,8 @@ window.hideEntityDetails = hideEntityDetails;
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         new EntityDetailsModal();
-        new EntityDetailsRenderer();
     });
 } else {
     // DOM already loaded
     new EntityDetailsModal();
-    new EntityDetailsRenderer();
 }

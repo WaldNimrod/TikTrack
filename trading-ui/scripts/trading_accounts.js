@@ -533,6 +533,7 @@ class TradingAccountsController {
 // ===== Linked Items helpers for accounts =====
 window.checkLinkedItemsBeforeDeleteAccount = async function(accountId) {
     try {
+        // שימוש ב-endpoint הכללי
         const resp = await fetch(`/api/linked-items/trading_account/${accountId}`);
         if (!resp.ok) return false; // אם לא ניתן לבדוק – לא חוסם
         const data = await resp.json();

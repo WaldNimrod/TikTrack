@@ -1020,3 +1020,13 @@ async function refreshEntityData(entityType, entityId) {
  * - getEntityDetails() - קבלת פרטי ישות
  * - refreshEntityData() - רענון נתוני ישות
  */
+
+// Auto-initialization - אתחול אוטומטי
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        new EntityDetailsAPI();
+    });
+} else {
+    // DOM already loaded
+    new EntityDetailsAPI();
+}

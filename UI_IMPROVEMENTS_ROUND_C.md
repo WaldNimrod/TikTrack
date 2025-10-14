@@ -166,6 +166,65 @@ These are the immediate rules to implement across pages. After each fix is appro
 
 ---
 
+### 4.4) Entity Details Modal – Dynamic Colors & Layout
+**Page**: `entity-details-modal.js`, `entity-details-renderer.js`, `_modals.css`, all pages using entity details  
+**Problem**:
+- Entity details modal used hardcoded hex colors instead of dynamic CSS variables
+- Header background was solid color instead of light variant
+- Close button (X) was not using entity's dark variant color
+- Close button positioned incorrectly (not at end of line in RTL)
+- Section headings (h6) not bold due to ITCSS layer override
+- Field labels (`.col-5.text-muted`) not bold
+
+**Solution**:
+- Replace all hardcoded colors with CSS variables: `var(--entity-X-color)`, `var(--entity-X-bg)`, `var(--entity-X-text)`
+- Header background: use `--entity-X-bg` (light variant, 10% mix)
+- Header text: use `--entity-X-text` (dark variant)
+- Close button: use `--current-entity-text` with mask for X icon
+- Header layout: `flex-direction: row-reverse` + `justify-content: flex-start`
+- Close button: `position: static` to enable flex positioning
+- Change section headings from h6 to h5 (avoid ITCSS `04-elements/_headings.css` override)
+- Field labels: add `.col-5.text-muted { font-weight: 700 }`
+- Footer button alignment: `justify-content: flex-end` (left in RTL)
+
+**Status**: ✅ Completed
+
+**Edits**:
+- `entity-details-renderer.js`: Replaced all hardcoded colors (`#019193`, `#007bff`, etc.) with `var(--entity-X-color)`
+- `entity-details-renderer.js`: Changed all `<h6>` to `<h5>` for section headings (9 occurrences)
+- `entity-details-modal.js`: Header uses `--current-entity-color/bg/text` CSS variables set via `setProperty()`
+- `entity-details-modal.js`: Normalized entity types: `cash_flow` → `cash-flow` for CSS variable names
+- `_modals.css`: Added `.modal-content.entity-details-modal` rules with specificity 0,3,X
+- `_modals.css`: Header: `flex-direction: row-reverse` + `justify-content: flex-start`
+- `_modals.css`: Close button: `position: static`, `background: var(--current-entity-text)`, SVG mask
+- `_modals.css`: Section headings: `.modal-body h5 { font-weight: 700 }`
+- `_modals.css`: Field labels: `.col-5.text-muted, .col-md-3.text-muted, .col-md-4.text-muted { font-weight: 700 }`
+- `_modals.css`: Footer: `.modal-footer { justify-content: flex-end }` (button at left in RTL)
+
+**Technical Notes**:
+- Specificity: `.modal-content.entity-details-modal .modal-header` = 0,3,0 (overrides Bootstrap 0,1,0)
+- No `!important` used (adheres to ITCSS rules)
+- CSS variables cascade from `:root` via `ui-advanced.js` → `updateCSSVariablesFromPreferences()`
+- Close button uses SVG data URI mask for X icon with dynamic background color
+
+---
+
+### 4.5) Entity Details Modal – Linked Items Display
+**Page**: `entity-details-renderer.js`, linked items in entity details modal  
+**Problem**: (To be documented after implementation)
+
+**Status**: 🚧 In Progress
+
+---
+
+### 4.6) Entity Details API – Endpoint Mapping
+**Page**: `entity-details-api.js`  
+**Problem**: Missing endpoint mapping for `trading_account` entity type causing "לא נמצא endpoint" errors
+
+**Status**: 🚧 Pending
+
+---
+
 ## 5) Appendix – Quick Links
 ---
 

@@ -42,7 +42,7 @@ function editTicker(tickerId) {
     }
     
     // פתיחת מודל עריכה עם נתוני הטיקר
-    showAddTickerModal(ticker);
+    showEditTickerModal(tickerId);
     
   } catch (error) {
     console.error('שגיאה בעריכת טיקר:', error);

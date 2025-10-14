@@ -3048,21 +3048,9 @@ function toggleExecutionsSection() {
 }
 
 // Execution CRUD functions
-function saveExecution() {
-    if (typeof window.saveExecution === 'function') {
-        window.saveExecution();
-    } else {
-        console.warn('saveExecution function not found');
-    }
-}
+// הוסר: עטיפת saveExecution כפולה שגרמה לרקורסיה
 
-function updateExecution() {
-    if (typeof window.updateExecution === 'function') {
-        window.updateExecution();
-    } else {
-        console.warn('updateExecution function not found');
-    }
-}
+// הוסר: עטיפת updateExecution כפולה שגרמה לרקורסיה
 
 function confirmDeleteExecution() {
     if (typeof window.confirmDeleteExecution === 'function') {

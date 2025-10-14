@@ -35,16 +35,19 @@ base_api = BaseEntityAPI('executions', execution_service, 'executions')
 @api_endpoint(cache_ttl=30, dependencies=['executions'], rate_limit=60)
 @handle_database_session()
 def get_executions():
-    """Get all executions with trade relationship data"""
+    """Get all executions with trade or ticker relationship data"""
     db: Session = g.db
     
     # Use joinedload to get trade, ticker, and account data
+    # Support both ticker_id and trade_id associations
     executions = db.query(Execution).options(
+        joinedload(Execution.ticker),
         joinedload(Execution.trade).joinedload(Trade.ticker),
-        joinedload(Execution.trade).joinedload(Trade.account)
+        joinedload(Execution.trade).joinedload(Trade.account),
+        joinedload(Execution.account)
     ).all()
     
-    # Convert to dict - the model will add trade_display automatically
+    # Convert to dict - the model will add linked_display automatically
     execution_dicts = [ex.to_dict() for ex in executions]
     
     return jsonify({
@@ -66,11 +69,46 @@ def get_execution(execution_id: int):
 @executions_bp.route('/', methods=['POST'])
 @invalidate_cache(['executions', 'trades', 'dashboard'])  # Invalidate cache after creating execution
 def create_execution():
-    """Create new execution"""
+    """Create new execution with flexible ticker/trade association"""
     try:
         data = request.get_json()
         logger.info(f"Received execution data: {data}")
         db: Session = next(get_db())
+        
+        # Validate ticker_id XOR trade_id constraint
+        has_ticker = data.get('ticker_id') is not None
+        has_trade = data.get('trade_id') is not None
+        
+        if has_ticker and has_trade:
+            logger.error("Cannot assign execution to both ticker and trade")
+            return jsonify({
+                "status": "error",
+                "error": {"message": "עסקה לא יכולה להיות משוייכת גם לטיקר וגם לטרייד"},
+                "version": "1.0"
+            }), 400
+        
+        if not has_ticker and not has_trade:
+            logger.error("Execution must be assigned to either ticker or trade")
+            return jsonify({
+                "status": "error",
+                "error": {"message": "עסקה חייבת להיות משוייכת לטיקר או לטרייד"},
+                "version": "1.0"
+            }), 400
+        
+        # If assigned to trade, validate account matches
+        if has_trade:
+            trade_id = data.get('trade_id')
+            account_id = data.get('trading_account_id')
+            
+            if account_id:
+                trade = db.query(Trade).filter(Trade.id == trade_id).first()
+                if trade and trade.trading_account_id != account_id:
+                    logger.error(f"Account mismatch: execution account {account_id} != trade account {trade.trading_account_id}")
+                    return jsonify({
+                        "status": "error",
+                        "error": {"message": "החשבון של העסקה חייב להתאים לחשבון של הטרייד"},
+                        "version": "1.0"
+                    }), 400
         
         # Validate data against constraints
         logger.info("Validating execution data before creation")
@@ -117,12 +155,47 @@ def create_execution():
 @executions_bp.route('/<int:execution_id>', methods=['PUT'])
 @invalidate_cache(['executions', 'trades', 'dashboard'])  # Invalidate cache after updating execution
 def update_execution(execution_id: int):
-    """Update execution"""
+    """Update execution with flexible ticker/trade association"""
     try:
         data = request.get_json()
         db: Session = next(get_db())
         execution = db.query(Execution).filter(Execution.id == execution_id).first()
         if execution:
+            # Validate ticker_id XOR trade_id constraint
+            has_ticker = data.get('ticker_id') is not None
+            has_trade = data.get('trade_id') is not None
+            
+            if has_ticker and has_trade:
+                logger.error("Cannot assign execution to both ticker and trade")
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": "עסקה לא יכולה להיות משוייכת גם לטיקר וגם לטרייד"},
+                    "version": "1.0"
+                }), 400
+            
+            if not has_ticker and not has_trade:
+                logger.error("Execution must be assigned to either ticker or trade")
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": "עסקה חייבת להיות משוייכת לטיקר או לטרייד"},
+                    "version": "1.0"
+                }), 400
+            
+            # If assigned to trade, validate account matches
+            if has_trade:
+                trade_id = data.get('trade_id')
+                account_id = data.get('trading_account_id')
+                
+                if account_id:
+                    trade = db.query(Trade).filter(Trade.id == trade_id).first()
+                    if trade and trade.trading_account_id != account_id:
+                        logger.error(f"Account mismatch: execution account {account_id} != trade account {trade.trading_account_id}")
+                        return jsonify({
+                            "status": "error",
+                            "error": {"message": "החשבון של העסקה חייב להתאים לחשבון של הטרייד"},
+                            "version": "1.0"
+                        }), 400
+            
             # Validate data against constraints
             logger.info("Validating execution data before update")
             is_valid, errors = ValidationService.validate_data(db, 'executions', data, exclude_id=execution_id)
@@ -198,3 +271,30 @@ def delete_execution(execution_id: int):
         }), 500
     finally:
         db.close()
+
+@executions_bp.route('/pending-assignment', methods=['GET'])
+@api_endpoint(cache_ttl=30, dependencies=['executions'], rate_limit=60)
+@handle_database_session()
+def get_pending_assignment_executions():
+    """Get executions that are assigned to ticker only (pending trade assignment)"""
+    db: Session = g.db
+    
+    # Get executions with ticker_id but no trade_id
+    executions = db.query(Execution).filter(
+        Execution.ticker_id.isnot(None),
+        Execution.trade_id.is_(None)
+    ).options(
+        joinedload(Execution.ticker),
+        joinedload(Execution.account)
+    ).all()
+    
+    # Convert to dict - the model will add linked_display automatically
+    execution_dicts = [ex.to_dict() for ex in executions]
+    
+    return jsonify({
+        "status": "success",
+        "data": execution_dicts,
+        "count": len(executions),
+        "message": f"Retrieved {len(executions)} executions pending trade assignment",
+        "version": "1.0"
+    }), 200

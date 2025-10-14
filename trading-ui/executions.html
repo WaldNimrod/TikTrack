@@ -233,12 +233,41 @@
                     </div>
                     <div class="modal-body">
                         <form id="addExecutionForm">
+                            <!-- Radio buttons for assignment type -->
+                            <div class="mb-3">
+                                <label class="form-label entity-label">סוג שיוך</label>
+                                <div class="d-flex gap-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="addAssignmentType" 
+                                               id="addAssignToTicker" value="ticker" checked 
+                                               onchange="window.toggleAssignmentFields && window.toggleAssignmentFields('add')">
+                                        <label class="form-check-label" for="addAssignToTicker">שיוך לטיקר</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="addAssignmentType" 
+                                               id="addAssignToTrade" value="trade" 
+                                               onchange="window.toggleAssignmentFields && window.toggleAssignmentFields('add')">
+                                        <label class="form-check-label" for="addAssignToTrade">שיוך לטרייד</label>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="row">
-                                <div class="col-md-6">
+                                <!-- Ticker field - shown when ticker assignment -->
+                                <div class="col-md-6" id="addTickerField">
                                     <div class="mb-3">
                                         <label for="executionTicker" class="form-label entity-label">טיקר</label>
-                                        <select class="form-select" id="executionTicker" required>
+                                        <select class="form-select" id="executionTicker">
                                             <option value="">בחר טיקר</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <!-- Trade field - hidden by default -->
+                                <div class="col-md-6" id="addTradeField" style="display:none;">
+                                    <div class="mb-3">
+                                        <label for="addExecutionTradeId" class="form-label entity-label">טרייד</label>
+                                        <select class="form-select" id="addExecutionTradeId">
+                                            <option value="">בחר טרייד</option>
                                         </select>
                                     </div>
                                 </div>
@@ -276,10 +305,13 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="executionAccount" class="form-label entity-label">טרייד</label>
-                                        <select class="form-select" id="executionAccount" required>
-                                            <option value="">בחר טרייד</option>
+                                        <label for="executionAccount" class="form-label entity-label">חשבון</label>
+                                        <select class="form-select" id="executionAccount">
+                                            <option value="">בחר חשבון (אופציונלי)</option>
                                         </select>
+                                        <small class="form-text text-muted" id="addAccountHint">
+                                            אופציונלי כאשר משויך לטיקר
+                                        </small>
                                     </div>
                                 </div>
                             </div>
@@ -301,7 +333,7 @@
                     </div>
                     <div class="modal-footer modal-footer-end">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-entity btn-entity-execution" onclick="saveExecution()">הוסף עסקה</button>
+                        <button type="button" class="btn btn-entity btn-entity-execution" onclick="window.saveExecution && window.saveExecution()">הוסף עסקה</button>
                     </div>
                 </div>
             </div>
@@ -385,7 +417,7 @@
                     </div>
                     <div class="modal-footer modal-footer-end">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-entity btn-entity-execution" onclick="updateExecution()">עדכן עסקה</button>
+                        <button type="button" class="btn btn-entity btn-entity-execution" onclick="window.updateExecution && window.updateExecution()">עדכן עסקה</button>
                     </div>
                 </div>
             </div>

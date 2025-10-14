@@ -3445,3 +3445,125 @@ function toggleAssignmentFields(mode = 'add') {
 }
 
 window.toggleAssignmentFields = toggleAssignmentFields;
+
+/**
+ * ולידציה משופרת לטופס הוספה - תומכת בשיוך גמיש
+ */
+function validateExecutionForm() {
+    try {
+        const assignmentType = document.querySelector('input[name="addAssignmentType"]:checked')?.value;
+        
+        // בדיקת שדות בסיסיים
+        const action = document.getElementById('executionType').value;
+        const quantity = document.getElementById('executionQuantity').value;
+        const price = document.getElementById('executionPrice').value;
+        const date = document.getElementById('executionDate').value;
+        
+        if (!action) {
+            window.showErrorNotification('חובה לבחור סוג עסקה');
+            return false;
+        }
+        
+        if (!quantity || parseFloat(quantity) <= 0) {
+            window.showErrorNotification('חובה להזין כמות חוקית');
+            return false;
+        }
+        
+        if (!price || parseFloat(price) <= 0) {
+            window.showErrorNotification('חובה להזין מחיר חוקי');
+            return false;
+        }
+        
+        if (!date) {
+            window.showErrorNotification('חובה לבחור תאריך');
+            return false;
+        }
+        
+        // ולידציה ספציפית לשיוך
+        if (assignmentType === 'ticker') {
+            const tickerId = document.getElementById('executionTicker').value;
+            if (!tickerId) {
+                window.showErrorNotification('חובה לבחור טיקר');
+                return false;
+            }
+        } else {
+            const tradeId = document.getElementById('addExecutionTradeId').value;
+            if (!tradeId) {
+                window.showErrorNotification('חובה לבחור טרייד');
+                return false;
+            }
+            
+            const accountId = document.getElementById('executionAccount').value;
+            if (!accountId) {
+                window.showErrorNotification('חובה לבחור חשבון כאשר משויך לטרייד');
+                return false;
+            }
+        }
+        
+        return true;
+    } catch (error) {
+        console.error('Error in validateExecutionForm:', error);
+        return false;
+    }
+}
+
+/**
+ * ולידציה משופרת לטופס עריכה - תומכת בשיוך גמיש
+ */
+function validateEditExecutionForm() {
+    try {
+        const assignmentType = document.querySelector('input[name="editAssignmentType"]:checked')?.value;
+        
+        // בדיקת שדות בסיסיים
+        const action = document.getElementById('editExecutionType').value;
+        const quantity = document.getElementById('editExecutionQuantity').value;
+        const price = document.getElementById('editExecutionPrice').value;
+        const date = document.getElementById('editExecutionDate').value;
+        
+        if (!action) {
+            window.showErrorNotification('חובה לבחור סוג עסקה');
+            return false;
+        }
+        
+        if (!quantity || parseFloat(quantity) <= 0) {
+            window.showErrorNotification('חובה להזין כמות חוקית');
+            return false;
+        }
+        
+        if (!price || parseFloat(price) <= 0) {
+            window.showErrorNotification('חובה להזין מחיר חוקי');
+            return false;
+        }
+        
+        if (!date) {
+            window.showErrorNotification('חובה לבחור תאריך');
+            return false;
+        }
+        
+        // ולידציה ספציפית לשיוך
+        if (assignmentType === 'ticker') {
+            const tickerId = document.getElementById('editExecutionTicker').value;
+            if (!tickerId) {
+                window.showErrorNotification('חובה לבחור טיקר');
+                return false;
+            }
+        } else {
+            const tradeId = document.getElementById('editExecutionTradeId').value;
+            if (!tradeId) {
+                window.showErrorNotification('חובה לבחור טרייד');
+                return false;
+            }
+            
+            const accountId = document.getElementById('editExecutionAccount').value;
+            if (!accountId) {
+                window.showErrorNotification('חובה לבחור חשבון כאשר משויך לטרייד');
+                return false;
+            }
+        }
+        
+        return true;
+    } catch (error) {
+        console.error('Error in validateEditExecutionForm:', error);
+        return false;
+    }
+}

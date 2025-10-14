@@ -110,3 +110,54 @@
 .linked-object-badge.entity-trade_plan  { background: color-mix(in srgb, var(--entity-trade-plan-color) 12%, transparent); border-color: color-mix(in srgb, var(--entity-trade-plan-color) 30%, transparent); }
 .linked-object-badge.entity-execution   { background: rgba(40,167,69,0.10);  border-color: rgba(40,167,69,0.28); }
 
+/* ========================================
+   Pending Assignment Badge
+   For executions waiting for trade assignment
+   ======================================== */
+
+.linked-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.linked-badge.pending-assignment {
+    background-color: #fff3cd;
+    border: 1px solid #ffc107;
+    color: #856404;
+    cursor: default;
+}
+
+.linked-badge.pending-assignment::before {
+    content: "⏳ ";
+    font-size: 1rem;
+}
+
+.linked-badge.pending-assignment:hover {
+    background-color: #ffe69c;
+    border-color: #ffb300;
+}
+
+.linked-badge.entity-trade {
+    background-color: rgba(0,123,255,0.08);
+    border-color: rgba(0,123,255,0.25);
+    color: #004085;
+}
+
+.linked-badge.entity-trade:hover {
+    background-color: rgba(0,123,255,0.15);
+}
+
+.linked-badge.entity-ticker {
+    background-color: rgba(23,162,184,0.10);
+    border-color: rgba(23,162,184,0.28);
+    color: #0c5460;
+}
+

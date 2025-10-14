@@ -462,11 +462,22 @@ class TradingAccountsController {
             return;
         }
         
-        // אישור מחיקה
-        const confirmed = confirm(`האם אתה בטוח שברצונך למחוק את החשבון "${account.name}"?`);
-        if (!confirmed) {
-            return;
+        // אישור מחיקה דרך מערכת האזהרות (fallback ל-confirm אם לא נטענה)
+        let confirmed = true;
+        if (typeof window.showConfirmationDialog === 'function') {
+            confirmed = await new Promise(resolve => {
+                window.showConfirmationDialog(
+                    'מחיקת חשבון',
+                    `האם אתה בטוח שברצונך למחוק את החשבון "${account.name}"?\nפעולה זו אינה ניתנת לביטול.`,
+                    () => resolve(true),
+                    () => resolve(false),
+                    'danger'
+                );
+            });
+        } else {
+            confirmed = window.confirm(`האם אתה בטוח שברצונך למחוק את החשבון "${account.name}"?`);
         }
+        if (!confirmed) return;
         
         try {
             // קריאה ל-API למחיקה

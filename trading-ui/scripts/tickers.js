@@ -316,33 +316,38 @@ async function updateCurrencyOptions(ticker = null) {
   const addSelect = document.getElementById('addTickerCurrency');
   const editSelect = document.getElementById('editTickerCurrency');
 
+  // === Add Modal ===
   if (addSelect) {
-    const addOptions = generateTickerCurrencyOptions();
-    addSelect.innerHTML = '<option value="">בחר מטבע...</option>' + addOptions;
-    // קביעת ברירת מחדל מהעדפות
-    try {
-      if (typeof window.getPreference === 'function') {
-        const prefValue = await window.getPreference('default_currency');
-        if (prefValue) {
-          const prefId = parseInt(prefValue);
-          if (!Number.isNaN(prefId)) {
-            addSelect.value = String(prefId);
-          } else {
-            // ייתכן והעדפה היא קוד/סימול - נאתר לפי טקסט
-            const options = Array.from(addSelect.options);
-            const match = options.find(opt => (opt.textContent || '').includes(`(${String(prefValue)})`));
-            if (match) {
-              addSelect.value = match.value;
-            }
-          }
-        }
-      }
-    } catch {}
+    if (window.SelectPopulatorService && window.SelectPopulatorService.populateCurrenciesSelect) {
+      await window.SelectPopulatorService.populateCurrenciesSelect('addTickerCurrency', {
+        includeEmpty: true,
+        defaultFromPreferences: true
+      });
+    } else {
+      // Fallback ישן
+      const addOptions = generateTickerCurrencyOptions();
+      addSelect.innerHTML = '<option value="">בחר מטבע...</option>' + addOptions;
+    }
   }
 
+  // === Edit Modal ===
   if (editSelect) {
-    const editOptions = generateTickerCurrencyOptions(ticker);
-    editSelect.innerHTML = '<option value="">בחר מטבע...</option>' + editOptions;
+    if (window.SelectPopulatorService && window.SelectPopulatorService.populateCurrenciesSelect) {
+      await window.SelectPopulatorService.populateCurrenciesSelect('editTickerCurrency', { includeEmpty: true });
+    } else {
+      const editOptions = generateTickerCurrencyOptions(ticker);
+      editSelect.innerHTML = '<option value="">בחר מטבע...</option>' + editOptions;
+    }
+
+    // עדיפות ל-id מהטיקר בעת עריכה
+    if (ticker && ticker.currency_id) {
+      editSelect.value = String(ticker.currency_id);
+    } else if (ticker && ticker.currency) {
+      const code = (ticker.currency.symbol || ticker.currency.code || ticker.currency || '').toString().toUpperCase();
+      const options = Array.from(editSelect.options || []);
+      const match = options.find(opt => (opt.textContent || '').toUpperCase().includes(`(${code})`));
+      if (match) editSelect.value = match.value;
+    }
   }
 }
 

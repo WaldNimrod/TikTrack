@@ -2237,6 +2237,13 @@ window.loadUserPreferences = async function loadUserPreferences(options = {}) {
       }));
     } catch {}
 
+    // Debug: log applied primary/secondary
+    console.log('✅ loadUserPreferences complete:', {
+      source,
+      primary: getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim(),
+      secondary: getComputedStyle(document.documentElement).getPropertyValue('--secondary-color').trim()
+    });
+
     return true;
   } catch (e) {
     console.error('❌ loadUserPreferences failed:', e);

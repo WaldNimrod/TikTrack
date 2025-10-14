@@ -1048,6 +1048,7 @@ async function renderCashFlowsTable(cashFlows = null) {
     cashFlow.source}</td>
             <td class="col-actions actions-cell">
                 ${window.createActionsMenu ? window.createActionsMenu([
+                    window.createButton ? window.createButton('VIEW', `if(window.showEntityDetails){showEntityDetails('cash_flow',${cashFlow.id})}else{editCashFlow(${cashFlow.id})}`) : '',
                     window.createLinkButton ? window.createLinkButton(`showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})`) : '',
                     window.createEditButton ? window.createEditButton(`editCashFlow(${cashFlow.id})`) : '',
                     window.createDeleteButton ? window.createDeleteButton(`deleteCashFlow(${cashFlow.id})`) : ''

@@ -1358,7 +1358,7 @@ async function reactivateTicker(tickerId) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        status: 'open',
+        status: 'closed',
       }),
     });
 
@@ -1366,12 +1366,12 @@ async function reactivateTicker(tickerId) {
     const handled = await window.handleApiResponseWithRefresh(response, {
       loadDataFunction: window.loadTickersData,
       updateActiveFieldsFunction: window.updateActiveTradesField,
-      operationName: 'שיחזור',
+      operationName: 'שחזור',
       itemName: 'הטיקר',
       successMessage: 'טיקר הופעל מחדש בהצלחה!',
       onSuccess: () => {
         if (typeof window.onTickerStatusChanged === 'function') {
-          window.onTickerStatusChanged(tickerId, 'open');
+          window.onTickerStatusChanged(tickerId, 'closed');
         }
       }
     });
@@ -1503,26 +1503,42 @@ async function performTickerDeletion(tickerId) {
  */
 async function confirmDeleteTicker(id) {
   try {
-  const ticker = (window.tickersData || []).find(t => t.id === id);
-  const tickerInfo = ticker ? `${ticker.symbol} - ${ticker.name}` : `טיקר ${id}`;
+    const ticker = (window.tickersData || []).find(t => t.id === id);
+    const tickerInfo = ticker ? `${ticker.symbol} - ${ticker.name}` : `טיקר ${id}`;
 
-    const response = await fetch(`/api/tickers/${id}`, {
-      method: 'DELETE'
-    });
+    // 1) בדיקת פריטים מקושרים - אם יש, מציגים חלון מקושרים ומבטלים מחיקה
+    if (typeof window.checkLinkedItemsBeforeDeleteTicker === 'function') {
+      const hasLinked = await window.checkLinkedItemsBeforeDeleteTicker(id);
+      if (hasLinked) return;
+    }
 
-    // טיפול בתגובה באמצעות CRUDResponseHandler
+    // 2) דיאלוג אישור דרך מערכת האזהרות
+    let confirmed = true;
+    if (typeof window.showConfirmationDialog === 'function') {
+      confirmed = await new Promise(resolve => {
+        window.showConfirmationDialog(
+          'מחיקת טיקר',
+          `האם אתה בטוח שברצונך למחוק את הטיקר ${tickerInfo}?
+פעולה זו אינה ניתנת לביטול.`,
+          () => resolve(true),
+          () => resolve(false),
+          'danger'
+        );
+      });
+    } else {
+      confirmed = window.confirm(`האם אתה בטוח שברצונך למחוק את הטיקר ${tickerInfo}?`);
+    }
+    if (!confirmed) return;
+
+    // 3) ביצוע מחיקה לשרת
+    const response = await fetch(`/api/tickers/${id}`, { method: 'DELETE' });
+
+    // 4) טיפול בתגובה באמצעות CRUDResponseHandler
     await window.CRUDResponseHandler.handleDeleteResponse(response, {
       successMessage: `טיקר ${tickerInfo} נמחק בהצלחה`,
       reloadFn: async () => {
-        // ניקוי מטמון
-        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-          await window.UnifiedCacheManager.remove('tickers');
-        }
-        // callback מיוחד
-        if (window.onTickerDeleted) {
-          window.onTickerDeleted(id);
-        }
-        // רענון טבלה
+        if (window.UnifiedCacheManager?.remove) await window.UnifiedCacheManager.remove('tickers');
+        if (window.onTickerDeleted) window.onTickerDeleted(id);
         await loadTickersData();
         await updateActiveTradesField();
       },

@@ -228,11 +228,26 @@ async function showAddExecutionModal() {
 
   // טעינת חשבון ברירת מחדל תתבצע דרך SelectPopulatorService (בהמשך)
 
-  // טעינת טיקרים באמצעות SelectPopulatorService
+  // טעינת טיקרים באמצעות SelectPopulatorService - סינון לפי טריידים קיימים (לא מבוטלים)
   if (window.SelectPopulatorService && typeof window.SelectPopulatorService.populateTickersSelect === 'function') {
+    let allowedTickerIds = new Set();
+    try {
+      const tradesResp = await fetch('/api/trades/');
+      if (tradesResp.ok) {
+        const tradesData = await tradesResp.json();
+        const trades = tradesData?.data || [];
+        trades.forEach(t => {
+          if (t && t.ticker_id != null && t.status !== 'cancelled') {
+            allowedTickerIds.add(Number(t.ticker_id));
+          }
+        });
+      }
+    } catch (_) {}
+
     await window.SelectPopulatorService.populateTickersSelect('executionTicker', {
       includeEmpty: true,
-      emptyText: 'בחר טיקר...'
+      emptyText: 'בחר טיקר...',
+      filterFn: (ticker) => allowedTickerIds.size === 0 ? true : allowedTickerIds.has(Number(ticker.id))
     });
   } else {
     // Fallback למקרה שהשירות לא זמין
@@ -359,28 +374,98 @@ async function fillDefaultCommissionFromPreferences() {
   }
 }
 
-// טעינת טריידים פתוחים לטיקר וסימון select הטרייד
+// ולידציה: התאמת חשבון העסקה לחשבון הטרייד (לשיוך לטרייד) עם הודעת שגיאה מפורטת
+async function validateTradeAccountConsistency(tradeId, accountSelectId = 'executionAccount') {
+  try {
+    if (!tradeId) return true;
+
+    // שליפת הטריידים (שירות קיים)
+    const tradesResp = await fetch('/api/trades/');
+    if (!tradesResp.ok) return true; // אם השרת לא זמין, לא נחסום כאן - יסומן בצד שרת
+    const js = await tradesResp.json();
+    const trades = js?.data || [];
+    const picked = trades.find(t => Number(t.id) === Number(tradeId));
+    if (!picked) return true;
+
+    const tradeAccountId = picked.trading_account_id || picked.account_id || null;
+    const accountSelect = document.getElementById(accountSelectId);
+    const selectedAccountId = accountSelect ? (accountSelect.value || null) : null;
+
+    // טעינת שמות חשבונות לשם הודעה מפורטת
+    let selectedAccountName = null;
+    let tradeAccountName = null;
+    if (typeof ensureTradingAccountsLoaded === 'function') {
+      await ensureTradingAccountsLoaded();
+    }
+    if (typeof getAccountNameById === 'function') {
+      if (selectedAccountId) selectedAccountName = getAccountNameById(Number(selectedAccountId)) || null;
+      if (tradeAccountId) tradeAccountName = getAccountNameById(Number(tradeAccountId)) || null;
+    }
+
+    // אם קיים אי-התאמה – החזר שגיאה מפורטת (לא שגיאה פשוטה)
+    if (selectedAccountId && tradeAccountId && String(selectedAccountId) !== String(tradeAccountId)) {
+      const title = '❌ אי התאמה בין חשבון העסקה וחשבון הטרייד';
+      const message = `
+העסקה משויכת לטרייד אך החשבון שנבחר אינו תואם לחשבון הטרייד.
+
+פרטים:
+• טרייד: #${tradeId}
+• חשבון הטרייד: ${tradeAccountName || tradeAccountId || 'לא ידוע'}
+• חשבון שנבחר בטופס: ${selectedAccountName || selectedAccountId || 'לא ידוע'}
+
+פתרון:
+בחר טרייד אחר או חזור לשיוך לטיקר. כאשר משייכים לטרייד, החשבון נקבע אוטומטית בהתאם לטרייד.
+`; 
+      if (typeof window.showErrorNotification === 'function') {
+        await window.showErrorNotification(title, message, 9000, 'business');
+      } else {
+        alert(title + '\n\n' + message);
+      }
+      return false;
+    }
+
+    // במקרה שאין חשבון נבחר – נעדכן את השדה לערך של הטרייד (נשאר disabled)
+    if (accountSelect && tradeAccountId && !selectedAccountId) {
+      let option = Array.from(accountSelect.options).find(o => String(o.value) === String(tradeAccountId));
+      if (!option) {
+        option = document.createElement('option');
+        option.value = String(tradeAccountId);
+        option.textContent = tradeAccountName || `חשבון ${tradeAccountId}`;
+        accountSelect.appendChild(option);
+      }
+      accountSelect.value = String(tradeAccountId);
+    }
+
+    return true;
+  } catch (e) {
+    // לא חוסם – השרת יאמת בצד שלו
+    return true;
+  }
+}
+
+// טעינת טריידים רלוונטיים לטיקר וסימון select הטרייד (ללא מבוטל)
 async function populateTradesForSelectedTicker(tickerId) {
   try {
-    const select = document.getElementById('executionAccount');
-    if (!select) {return;}
     // טען את כל הטריידים ובחר לפי ticker_id
     const resp = await fetch('/api/trades/');
     if (!resp.ok) {return;}
     const data = await resp.json();
     const trades = data?.data || [];
-    const filtered = trades.filter(t => String(t.ticker_id) === String(tickerId) && t.status === 'open');
-    select.innerHTML = '';
-    const empty = document.createElement('option');
-    empty.value = '';
-    empty.textContent = 'בחר טרייד';
-    select.appendChild(empty);
-    filtered.forEach(t => {
-      const opt = document.createElement('option');
-      opt.value = t.id;
-      opt.textContent = t.display_name || t.remarks || `Trade ${t.id}`;
-      select.appendChild(opt);
-    });
+    const filtered = trades.filter(t => String(t.ticker_id) === String(tickerId) && t.status !== 'cancelled');
+
+    const tradeSelect = document.getElementById('addExecutionTradeId');
+    if (tradeSelect) {
+      tradeSelect.innerHTML = '<option value="">בחר טרייד</option>';
+      filtered.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = String(t.id);
+        const statusText = t.status === 'active' ? 'פעיל' : t.status === 'closed' ? 'סגור' : t.status;
+        const created = t.created_at ? new Date(t.created_at).toLocaleDateString('he-IL') : '';
+        opt.textContent = `${t.side} | ${t.investment_type}${created ? ' | ' + created : ''} (${statusText})`;
+        tradeSelect.appendChild(opt);
+      });
+      tradeSelect.disabled = false;
+    }
   } catch (e) {
     // שקט
   }
@@ -971,9 +1056,30 @@ async function saveExecution() {
         executionData.trade_id = tradeId ? parseInt(tradeId) : null;
         executionData.ticker_id = null;
         
-        // חשבון חובה
-        const accountId = document.getElementById('executionAccount').value;
-        executionData.trading_account_id = accountId ? parseInt(accountId) : null;
+        // חשבון נגזר אוטומטית מהטרייד שנבחר - ללא קלט ידני
+        try {
+          const tradesResp = await fetch('/api/trades/');
+          if (tradesResp.ok) {
+            const js = await tradesResp.json();
+            const trades = js?.data || [];
+            const picked = trades.find(t => Number(t.id) === Number(tradeId));
+            if (picked && picked.trading_account_id) {
+              executionData.trading_account_id = Number(picked.trading_account_id);
+            } else if (picked && picked.account_id) {
+              executionData.trading_account_id = Number(picked.account_id);
+            } else {
+              executionData.trading_account_id = null; // השרת יוודא התאמה
+            }
+          }
+        } catch (_) {
+          executionData.trading_account_id = null;
+        }
+
+        // ולידציה מפורטת: התאמת חשבון העסקה לחשבון הטרייד
+        const ok = await validateTradeAccountConsistency(tradeId, 'executionAccount');
+        if (!ok) {
+          return;
+        }
     }
 
   // DEBUG: לוג לפני שליחה
@@ -1083,6 +1189,12 @@ async function updateExecution() {
         // חשבון חובה
         const accountId = document.getElementById('editExecutionAccount').value;
         executionData.trading_account_id = accountId ? parseInt(accountId) : null;
+
+        // ולידציה מפורטת: התאמת חשבון העסקה לחשבון הטרייד
+        const ok = await validateTradeAccountConsistency(tradeId, 'editExecutionAccount');
+        if (!ok) {
+          return;
+        }
     }
 
     // 3. שליחה לשרת
@@ -2049,6 +2161,35 @@ async function loadActiveTradesForTicker(mode = 'add', _showClosedTrades = false
       // הפעלת השדה
       tradeSelect.disabled = false;
       // // console.log('✅ שדה טרייד עודכן:', filteredTrades.length, 'אפשרויות');
+      // מאזין לשינוי טרייד כדי לעדכן חשבון לשדה המושבת
+      tradeSelect.addEventListener('change', async () => {
+        try {
+          const pickedId = tradeSelect.value;
+          const accountSelect = document.getElementById('executionAccount');
+          if (!pickedId || !accountSelect) return;
+          // חשבון מתוך רשימת הטריידים
+          const picked = filteredTrades.find(t => String(t.id) === String(pickedId));
+          let accountId = picked?.trading_account_id || picked?.account_id || null;
+          // עדכון select לערך החשבון ומוצג כ-disabled
+          if (accountId) {
+            // ודא שהרשימה מכילה את החשבון
+            if (typeof ensureTradingAccountsLoaded === 'function') {
+              await ensureTradingAccountsLoaded();
+            }
+            // אם אין option תואם, נוסיף זמנית לתצוגה
+            let option = Array.from(accountSelect.options).find(o => String(o.value) === String(accountId));
+            if (!option) {
+              option = document.createElement('option');
+              option.value = String(accountId);
+              option.textContent = (typeof getAccountNameById === 'function' ? (getAccountNameById(Number(accountId)) || `חשבון ${accountId}`) : `חשבון ${accountId}`);
+              accountSelect.appendChild(option);
+            }
+            accountSelect.value = String(accountId);
+          } else {
+            accountSelect.value = '';
+          }
+        } catch (_) {}
+      });
     }
 
   } catch (error) {
@@ -3543,7 +3684,7 @@ window.initializeExecutionsPage = async function() {
  * החלפת שדות שיוך בהתאם לבחירה ברדיו באטן
  * @param {string} mode - 'add' או 'edit'
  */
-function toggleAssignmentFields(mode = 'add') {
+async function toggleAssignmentFields(mode = 'add') {
     try {
         const assignmentType = document.querySelector(`input[name="${mode}AssignmentType"]:checked`)?.value;
         
@@ -3566,22 +3707,57 @@ function toggleAssignmentFields(mode = 'add') {
             const tradeSelect = document.getElementById(mode === 'add' ? 'addExecutionTradeId' : 'editExecutionTradeId');
             if (tradeSelect) tradeSelect.value = '';
             
-            // חשבון אופציונלי
-            if (accountField) accountField.removeAttribute('required');
+            // חשבון אופציונלי ומאפשר בחירה; טען ברירת מחדל והפעל
+            if (accountField) {
+                accountField.removeAttribute('required');
+                accountField.disabled = false;
+            }
             if (accountHint) accountHint.textContent = 'אופציונלי כאשר משויך לטיקר';
+            // טען חשבונות פתוחים + ברירת מחדל מהעדפות
+            try {
+                const selectId = mode === 'add' ? 'executionAccount' : 'editExecutionAccount';
+                if (window.SelectPopulatorService && typeof window.SelectPopulatorService.populateAccountsSelect === 'function') {
+                    await window.SelectPopulatorService.populateAccountsSelect(selectId, {
+                        includeEmpty: true,
+                        emptyText: 'בחר חשבון...',
+                        defaultFromPreferences: true,
+                        filterFn: (account) => account.status === 'open'
+                    });
+                }
+            } catch (_) {}
             
         } else if (assignmentType === 'trade') {
-            // הצג טרייד, הסתר טיקר
-            if (tickerField) tickerField.style.display = 'none';
+            // הצג גם טיקר לסינון וגם טרייד לבחירה
+            if (tickerField) tickerField.style.display = 'block';
             if (tradeField) tradeField.style.display = 'block';
+
+            // השבתת שדה חשבון והצגת ערך ריק עד בחירת טרייד; החשבון ייקבע אוטומטית לפי הטרייד
+            try {
+                const accountSelect = document.getElementById(mode === 'add' ? 'executionAccount' : 'editExecutionAccount');
+                if (accountSelect) {
+                    accountSelect.disabled = true;
+                    accountSelect.value = '';
+                }
+            } catch(_) {}
+
+            // אם אין טיקר נבחר, נטען את כל הטריידים (פתוח/סגור, ללא מבוטל)
+            try {
+                const tickerSelect = document.getElementById(mode === 'add' ? 'executionTicker' : 'editExecutionTicker');
+                const selectedTickerId = tickerSelect ? tickerSelect.value : '';
+                if (selectedTickerId) {
+                    if (typeof populateTradesForSelectedTicker === 'function') {
+                        populateTradesForSelectedTicker(selectedTickerId);
+                    }
+                } else {
+                    if (typeof window.populateAllRelevantTrades === 'function') {
+                        window.populateAllRelevantTrades(mode);
+                    }
+                }
+            } catch (_e) {}
             
-            // נקה את שדה הטיקר
-            const tickerSelect = document.getElementById(mode === 'add' ? 'executionTicker' : 'editExecutionTicker');
-            if (tickerSelect) tickerSelect.value = '';
-            
-            // חשבון חובה
+            // חשבון חובה אך נקבע אוטומטית דרך הטרייד
             if (accountField) accountField.setAttribute('required', 'required');
-            if (accountHint) accountHint.textContent = 'חובה כאשר משויך לטרייד';
+            if (accountHint) accountHint.textContent = 'נקבע אוטומטית לפי הטרייד';
         }
     } catch (error) {
         console.error('Error in toggleAssignmentFields:', error);
@@ -3604,22 +3780,30 @@ function validateExecutionForm() {
         const date = document.getElementById('executionDate').value;
         
         if (!action) {
-            window.showErrorNotification('חובה לבחור סוג עסקה');
+            if (typeof window.showFieldError === 'function') window.showFieldError('executionType', 'חובה לבחור סוג עסקה');
+            if (typeof window.showSimpleErrorNotification === 'function') window.showSimpleErrorNotification('שגיאת ולידציה', 'חובה לבחור סוג עסקה');
+            else if (typeof window.showNotification === 'function') window.showNotification('חובה לבחור סוג עסקה', 'error', 'שגיאת ולידציה', 4000, 'ui');
             return false;
         }
         
         if (!quantity || parseFloat(quantity) <= 0) {
-            window.showErrorNotification('חובה להזין כמות חוקית');
+            if (typeof window.showFieldError === 'function') window.showFieldError('executionQuantity', 'חובה להזין כמות חוקית');
+            if (typeof window.showSimpleErrorNotification === 'function') window.showSimpleErrorNotification('שגיאת ולידציה', 'חובה להזין כמות חוקית');
+            else if (typeof window.showNotification === 'function') window.showNotification('חובה להזין כמות חוקית', 'error', 'שגיאת ולידציה', 4000, 'ui');
             return false;
         }
         
         if (!price || parseFloat(price) <= 0) {
-            window.showErrorNotification('חובה להזין מחיר חוקי');
+            if (typeof window.showFieldError === 'function') window.showFieldError('executionPrice', 'חובה להזין מחיר חוקי');
+            if (typeof window.showSimpleErrorNotification === 'function') window.showSimpleErrorNotification('שגיאת ולידציה', 'חובה להזין מחיר חוקי');
+            else if (typeof window.showNotification === 'function') window.showNotification('חובה להזין מחיר חוקי', 'error', 'שגיאת ולידציה', 4000, 'ui');
             return false;
         }
         
         if (!date) {
-            window.showErrorNotification('חובה לבחור תאריך');
+            if (typeof window.showFieldError === 'function') window.showFieldError('executionDate', 'חובה לבחור תאריך');
+            if (typeof window.showSimpleErrorNotification === 'function') window.showSimpleErrorNotification('שגיאת ולידציה', 'חובה לבחור תאריך');
+            else if (typeof window.showNotification === 'function') window.showNotification('חובה לבחור תאריך', 'error', 'שגיאת ולידציה', 4000, 'ui');
             return false;
         }
         
@@ -3627,19 +3811,25 @@ function validateExecutionForm() {
         if (assignmentType === 'ticker') {
             const tickerId = document.getElementById('executionTicker').value;
             if (!tickerId) {
-                window.showErrorNotification('חובה לבחור טיקר');
+                if (typeof window.showFieldError === 'function') window.showFieldError('executionTicker', 'חובה לבחור טיקר');
+                if (typeof window.showSimpleErrorNotification === 'function') window.showSimpleErrorNotification('שגיאת ולידציה', 'חובה לבחור טיקר');
+                else if (typeof window.showNotification === 'function') window.showNotification('חובה לבחור טיקר', 'error', 'שגיאת ולידציה', 4000, 'ui');
                 return false;
             }
         } else {
             const tradeId = document.getElementById('addExecutionTradeId').value;
             if (!tradeId) {
-                window.showErrorNotification('חובה לבחור טרייד');
+                if (typeof window.showFieldError === 'function') window.showFieldError('addExecutionTradeId', 'חובה לבחור טרייד');
+                if (typeof window.showSimpleErrorNotification === 'function') window.showSimpleErrorNotification('שגיאת ולידציה', 'חובה לבחור טרייד');
+                else if (typeof window.showNotification === 'function') window.showNotification('חובה לבחור טרייד', 'error', 'שגיאת ולידציה', 4000, 'ui');
                 return false;
             }
             
             const accountId = document.getElementById('executionAccount').value;
             if (!accountId) {
-                window.showErrorNotification('חובה לבחור חשבון כאשר משויך לטרייד');
+                if (typeof window.showFieldError === 'function') window.showFieldError('executionAccount', 'חובה לבחור חשבון כאשר משויך לטרייד');
+                if (typeof window.showSimpleErrorNotification === 'function') window.showSimpleErrorNotification('שגיאת ולידציה', 'חובה לבחור חשבון כאשר משויך לטרייד');
+                else if (typeof window.showNotification === 'function') window.showNotification('חובה לבחור חשבון כאשר משויך לטרייד', 'error', 'שגיאת ולידציה', 4000, 'ui');
                 return false;
             }
         }

@@ -107,11 +107,20 @@ class SelectPopulatorService {
             
             // ברירת מחדל מהעדפות
             let defaultValue = options.defaultValue;
-            if (options.defaultFromPreferences && typeof window.getPreference === 'function') {
-                const prefValue = await window.getPreference('default_trading_account');
-                if (prefValue) {
-                    defaultValue = parseInt(prefValue);
-                }
+            if (options.defaultFromPreferences) {
+                try {
+                    // ניסיון ראשון: לקרוא מתוך העדפות שכבר נטענו לזיכרון (ללא קריאת API נוספת)
+                    const cachedPrefs = window.PreferencesSystem?.manager?.currentPreferences;
+                    const prefValueCached = cachedPrefs ? cachedPrefs['default_trading_account'] : null;
+                    let prefValue = prefValueCached;
+                    // ניסיון שני (אופציונלי): קריאה יחידה ל-getPreference אם אין ערך בזיכרון
+                    if (!prefValue && typeof window.getPreference === 'function') {
+                        try { prefValue = await window.getPreference('default_trading_account'); } catch (_) { /* שקט */ }
+                    }
+                    if (prefValue) {
+                        defaultValue = parseInt(prefValue);
+                    }
+                } catch (_) { /* שקט */ }
             }
             
             // מילוי ה-select
@@ -167,11 +176,20 @@ class SelectPopulatorService {
             
             // ברירת מחדל מהעדפות
             let defaultValue = options.defaultValue;
-            if (options.defaultFromPreferences && typeof window.getPreference === 'function') {
-                const prefValue = await window.getPreference('default_currency');
-                if (prefValue) {
-                    defaultValue = parseInt(prefValue);
-                }
+            if (options.defaultFromPreferences) {
+                try {
+                    // ניסיון ראשון: ערך מטמון שכבר נטען
+                    const cachedPrefs = window.PreferencesSystem?.manager?.currentPreferences;
+                    const prefValueCached = cachedPrefs ? cachedPrefs['default_currency'] : null;
+                    let prefValue = prefValueCached;
+                    // ניסיון שני: קריאה ל-getPreference רק אם חסר במטמון
+                    if (!prefValue && typeof window.getPreference === 'function') {
+                        try { prefValue = await window.getPreference('default_currency'); } catch (_) { /* שקט */ }
+                    }
+                    if (prefValue) {
+                        defaultValue = parseInt(prefValue);
+                    }
+                } catch (_) { /* שקט */ }
             }
             
             // מילוי ה-select עם שם + קוד/סימול

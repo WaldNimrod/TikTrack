@@ -1421,6 +1421,11 @@ async function initializeCashFlowsPage() {
     // שחזור מצב סידור
     restoreSortState();
 
+  // החלת סידור ברירת מחדל אם אין מצב שמור (תאריך - החדש קודם)
+  if (typeof window.applyDefaultSort === 'function') {
+    await window.applyDefaultSort('cash_flows', window.cashFlowsData || [], updateCashFlowsTable);
+  }
+
     // הגדרת event listeners לשדות מקור ווולידציה מיידית
     setupSourceFieldListeners();
     setupValidationListeners();

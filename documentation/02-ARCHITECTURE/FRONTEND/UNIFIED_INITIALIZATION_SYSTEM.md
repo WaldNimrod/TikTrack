@@ -103,10 +103,13 @@ The unified system includes:
 
 #### **Stage 3: Page Systems**
 - **Purpose:** Initialize page-specific functionality
-- **Systems:** Page filters, tables, custom initializers, Data Basic Operations
-- **Dependencies:** None (parallel with cache init)
+- **Systems:** Page filters, tables, custom initializers, Data Basic Operations, **PreferencesSystem (global init)**
+- **Dependencies:** Cache ready flag (UnifiedCacheManager), Core/UI systems
 - **Duration:** ~0.15ms (parallel execution)
-- **Note:** Header and Notification systems initialize in parallel with cache, using localStorage fallback
+- **Notes:**
+  - ✅ לפני כל Service הצורך העדפות, המערכת מריצה פעם אחת `await window.PreferencesSystem.initialize()` אם קיים `preferences-core.js`.
+  - ✅ לאחר האתחול, המערכת מציבה `window.currentPreferences` ומשדרת אירוע `preferences:loaded` כדי לאפשר לצרכנים להמתין.
+  - ❌ אין אתחולי העדפות נקודתיים בעמודים.
 
 #### **Stage 4: Validation Systems**
 - **Purpose:** Initialize validation and error handling

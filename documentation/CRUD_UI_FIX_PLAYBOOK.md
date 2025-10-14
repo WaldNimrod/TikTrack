@@ -1,6 +1,52 @@
 ## מדריך עבודה: Playbook לבדיקות ותיקוני CRUD בעמודי UI
 
-מסמך זה מרכז בעיות אופייניות שנתגלו בעמוד `cash_flows` והפתרונות שבוצעו. מטרתו לאפשר למפתח עתידי ליישם את אותן בדיקות ותיקונים בעמודים נוספים באופן עקבי. לכל סעיף מופיעים: בעיה → פתרון קצר וברור, עם הערות יישום.
+מסמך זה מגדיר כללים מחייבים, רשימת עמודים נבדקים, וסדר פעולות ממוספר לטיפול עקבי בכל בעיות ה־CRUD בממשק. כולל דוגמאות בעיה→פתרון מכלל העמודים (עם דגש על `cash_flows`, `executions`, `tickers`).
+
+---
+
+### 1) כללים מחייבים וסטנדרטים (ליישם תחילה)
+
+- טעינה ואתחול מערכת העדפות
+  - חובה לטעון `trading-ui/scripts/preferences-core.js` לפני כל Services.
+  - האתחול מתבצע גלובלית ב־Stage 3 דרך `UnifiedAppInitializer` ב־`scripts/modules/core-systems.js` ומשדר `preferences:loaded`.
+  - איסור על `preferences.js` הישן ואתחולי Preferences נקודתיים בעמודים.
+  - אפיון: `documentation/02-ARCHITECTURE/FRONTEND/UNIFIED_INITIALIZATION_SYSTEM.md`, `documentation/02-ARCHITECTURE/FRONTEND/PAGE_STRUCTURE_TEMPLATE.md`.
+
+- שימוש במערכות כלליות בלבד (ללא כפילויות עמודיות)
+  - SelectPopulatorService – ברירות מחדל, `defaultFromPreferences`, `defaultText`:
+    - קוד: `trading-ui/scripts/services/select-populator-service.js`
+    - אפיון: `documentation/frontend/SERVICES_ARCHITECTURE.md`
+  - DefaultValueSetter – קביעת ברירות מחדל בטפסים:
+    - קוד: `trading-ui/scripts/services/default-value-setter.js`
+    - אפיון: `documentation/frontend/SERVICES_ARCHITECTURE.md`
+  - CRUDResponseHandler – טיפול שמירה/עדכון אחיד:
+    - קוד: `trading-ui/scripts/services/crud-response-handler.js`
+    - אפיון: `SERVICES_TESTING_GUIDE.md`
+  - UnifiedCacheManager – מטמון 4 שכבות:
+    - קוד: `trading-ui/scripts/modules/cache-module.js`
+    - אפיון: `CACHE_IMPLEMENTATION_GUIDE.md`
+  - Translation Utils – מיפוי ערכים עברית/אנגלית:
+    - קוד: `trading-ui/scripts/translation-utils.js`
+
+- אחידות UI ותהליכים
+  - מודלים: שימוש ב־`bootstrap.Modal.getOrCreateInstance(element)` בלבד.
+  - סדר כפתורי מודל: "ביטול" → "שמירה/עדכון" בכל המודלים.
+  - טפסי הוספה: פתיחה ריקה (ללא placeholders סטטיים).
+  - מיון ברירת מחדל: עמודת תאריך בסדר יורד (חדש ראשון) בלי לדרוס מצב סידור שמור (`applyDefaultSort`).
+
+---
+
+### 2) רשימת עמודים (משתמשים תחילה → כלי פיתוח)
+
+- עמודי משתמש (13):
+  - alerts.html, cash_flows.html, executions.html, notes.html, preferences.html, tickers.html, trade_plans.html, trades.html, trading_accounts.html, db_display.html, db_extradata.html, notifications-center.html, constraints.html
+
+- עמודי כלי פיתוח:
+  - system-management.html, server-monitor.html, crud-testing-dashboard.html, external-data-dashboard.html, css-management.html, linter-realtime-monitor.html, cache-test.html, research.html (דמה), index.html (דמה), js-map.html (עזר), designs.html, chart-management.html, dynamic-colors-display.html, background-tasks.html
+
+---
+
+### 3) סעיפי ביצוע ממוספרים (עם דוגמאות בעיה→פתרון)
 
 1) מודלים לא נפתחים / ReferenceError על modal
 - **בעיה**: קריאה ל־Bootstrap Modal עם משתנה `modal` לא מוגדר, לדוגמה: `new bootstrap.Modal(modal)`.

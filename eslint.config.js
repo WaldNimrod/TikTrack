@@ -201,6 +201,10 @@ module.exports = [
       
       // === ASYNC ===
       'require-await': 'warn',
+      'no-async-promise-executor': 'warn',
+
+      // === CONSISTENCY ===
+      'consistent-return': 'warn',
       
       // === REGEX ===
       'no-control-regex': 'error',

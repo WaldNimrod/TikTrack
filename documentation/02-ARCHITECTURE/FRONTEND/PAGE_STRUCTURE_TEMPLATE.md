@@ -119,7 +119,8 @@
     <script src="scripts/date-utils.js?v=20251006"></script>
     <script src="scripts/button-icons.js?v=20251006"></script>
     <script src="scripts/page-utils.js?v=20251006"></script>
-    <script src="scripts/preferences.js?v=20251006"></script>
+    <!-- Preferences System v2 - חובה לטעון לפני Services המשתמשים בהעדפות -->
+    <script src="scripts/preferences-core.js?v=20251006"></script>
     <script src="scripts/notification-category-detector.js?v=20251006"></script>
     <script src="scripts/global-notification-collector.js?v=20251006"></script>
     <script src="scripts/entity-details-modal.js?v=20251006"></script>

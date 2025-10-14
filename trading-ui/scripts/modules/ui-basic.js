@@ -2223,10 +2223,12 @@ function validateForm(formId, validationRules = {}) {
   });
 
   if (!isValid) {
-    // הצגת הודעת שגיאה מפורטת
-    const errorSummary = errorMessages.join('\n• ');
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאות בטופס', `נמצאו ${errorMessages.length} שגיאות:\n• ${errorSummary}`);
+    // הצגת הודעת שגיאה פשוטה (כפי שמוגדר באפיון) + סימון שדות כבר בוצע למעלה
+    const firstError = errorMessages[0] || 'שגיאה בטופס';
+    if (typeof window.showSimpleErrorNotification === 'function') {
+      window.showSimpleErrorNotification('שגיאת ולידציה', firstError);
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification(firstError, 'error', 'שגיאת ולידציה', 4000, 'ui');
     }
   }
 

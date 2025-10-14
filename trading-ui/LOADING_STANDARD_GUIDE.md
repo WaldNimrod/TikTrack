@@ -51,7 +51,7 @@
 
 <!-- Dynamic Systems -->
 <script src="scripts/color-scheme-system.js"></script>
-<script src="scripts/preferences.js"></script>
+<script src="scripts/preferences-core.js"></script>
 <script src="scripts/color-demo-toggle.js"></script>
 
 <!-- Bootstrap JS -->

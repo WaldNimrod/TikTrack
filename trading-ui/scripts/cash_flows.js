@@ -429,17 +429,23 @@ async function showAddCashFlowModal() {
 /**
  * הצגת מודל עריכת תזרים מזומנים
  */
-async function showEditCashFlowModal(cashFlowId) {
+async function showEditCashFlowModal(cashFlowId, viewMode = false) {
   if (!editCashFlowModalElement) {
     handleElementNotFound('showEditCashFlowModal', 'מודל עריכת תזרים מזומנים לא נמצא');
     return;
   }
 
-  // מציאת התזרים לעריכה
+  // מציאת התזרים לעריכה/צפייה
   const cashFlow = cashFlowsData.find(cf => cf.id === cashFlowId);
   if (!cashFlow) {
     handleElementNotFound('showEditCashFlowModal', 'תזרים מזומנים לא נמצא');
     return;
+  }
+
+  // Set modal title based on mode
+  const modalTitle = editCashFlowModalElement.querySelector('.modal-title');
+  if (modalTitle) {
+    modalTitle.textContent = viewMode ? 'צפייה בתזרים מזומנים' : 'עריכת תזרים מזומנים';
   }
 
   // ניקוי ולידציה קודמת
@@ -479,6 +485,28 @@ async function showEditCashFlowModal(cashFlowId) {
   setFieldValue('editCashFlowUsdRate', cashFlow.usd_rate || 1.000000);
   // עדכון סימן הסכום
   attachAmountSignListeners();
+
+  // Set readonly if view mode
+  const formFields = editCashFlowModalElement.querySelectorAll('input, select, textarea');
+  formFields.forEach(field => {
+    if (viewMode) {
+      field.setAttribute('readonly', 'readonly');
+      field.setAttribute('disabled', 'disabled');
+    } else {
+      field.removeAttribute('readonly');
+      field.removeAttribute('disabled');
+    }
+  });
+
+  // Update footer button
+  const updateBtn = editCashFlowModalElement.querySelector('.btn-entity-cash-flow');
+  if (updateBtn) {
+    if (viewMode) {
+      updateBtn.style.display = 'none';
+    } else {
+      updateBtn.style.display = '';
+    }
+  }
 
   // טעינת נתונים למודל עם ברירת מחדל לפי טקסט (לוגיקה חדשה מבוססת שם)
   try {
@@ -1048,7 +1076,7 @@ async function renderCashFlowsTable(cashFlows = null) {
     cashFlow.source}</td>
             <td class="col-actions actions-cell">
                 ${window.createActionsMenu ? window.createActionsMenu([
-                    window.createButton ? window.createButton('VIEW', `if(window.showEntityDetails){showEntityDetails('cash_flow',${cashFlow.id})}else{editCashFlow(${cashFlow.id})}`) : '',
+                    window.createButton ? window.createButton('VIEW', `showEditCashFlowModal(${cashFlow.id}, true)`) : '',
                     window.createLinkButton ? window.createLinkButton(`showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})`) : '',
                     window.createEditButton ? window.createEditButton(`editCashFlow(${cashFlow.id})`) : '',
                     window.createDeleteButton ? window.createDeleteButton(`deleteCashFlow(${cashFlow.id})`) : ''

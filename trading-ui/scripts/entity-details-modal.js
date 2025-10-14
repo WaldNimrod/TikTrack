@@ -889,3 +889,15 @@ function editTicker(tickerId) {
 // הגדרת פונקציות גלובליות
 window.showEntityDetails = showEntityDetails;
 window.hideEntityDetails = hideEntityDetails;
+
+// Auto-initialization - אתחול אוטומטי כשה-DOM מוכן
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        new EntityDetailsModal();
+        new EntityDetailsRenderer();
+    });
+} else {
+    // DOM already loaded
+    new EntityDetailsModal();
+    new EntityDetailsRenderer();
+}

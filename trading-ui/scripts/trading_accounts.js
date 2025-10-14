@@ -462,6 +462,16 @@ class TradingAccountsController {
             return;
         }
         
+        // בדיקת אובייקטים מקושרים לפני מחיקה
+        try {
+            if (typeof window.checkLinkedItemsBeforeDeleteAccount === 'function') {
+                const hasLinked = await window.checkLinkedItemsBeforeDeleteAccount(accountId);
+                if (hasLinked) {
+                    return; // יוצג חלון מקושרים והפעולה תיעצר
+                }
+            }
+        } catch (_) { /* שקט */ }
+
         // אישור מחיקה דרך מערכת האזהרות (fallback ל-confirm אם לא נטענה)
         let confirmed = true;
         if (typeof window.showConfirmationDialog === 'function') {
@@ -519,6 +529,28 @@ class TradingAccountsController {
         }
     }
 }
+
+// ===== Linked Items helpers for accounts =====
+window.checkLinkedItemsBeforeDeleteAccount = async function(accountId) {
+    try {
+        const resp = await fetch(`/api/linked-items/trading_account/${accountId}`);
+        if (!resp.ok) return false; // אם לא ניתן לבדוק – לא חוסם
+        const data = await resp.json();
+        const childEntities = data.child_entities || [];
+        if (childEntities.length > 0) {
+            if (typeof window.showLinkedItemsModal === 'function') {
+                data.accountName = (window.tradingAccountsData || []).find(a => a.id === accountId)?.name || '';
+                window.showLinkedItemsModal(data, 'trading_account', accountId, 'delete');
+            } else if (typeof window.showWarningNotification === 'function') {
+                window.showWarningNotification('לא ניתן למחוק חשבון עם פריטים מקושרים', 'בטל/סגור פריטים פתוחים לפני המחיקה');
+            }
+            return true;
+        }
+        return false;
+    } catch (_) {
+        return false;
+    }
+};
 
 // יצירת instance גלובלי - שני שמות לתאימות
 window.tradingAccountsController = new TradingAccountsController();

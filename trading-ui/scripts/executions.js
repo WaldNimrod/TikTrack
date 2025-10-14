@@ -861,9 +861,11 @@ async function saveExecution() {
     return;
   }
 
-  // 2. בניית אובייקט נתונים באמצעות DataCollectionService (מיפוי לשמות ה-IDs הקיימים בטופס)
-  const rawData = window.DataCollectionService.collectFormData({
-      trade_id: { id: 'executionAccount', type: 'int' },
+  // 2. קבלת סוג שיוך (ticker/trade)
+  const assignmentType = document.querySelector('input[name="addAssignmentType"]:checked')?.value || 'ticker';
+  
+  // 3. בניית אובייקט נתונים בסיסי
+  const baseData = window.DataCollectionService.collectFormData({
       action: { id: 'executionType', type: 'text' },
       quantity: { id: 'executionQuantity', type: 'int' },
       price: { id: 'executionPrice', type: 'number' },
@@ -873,11 +875,31 @@ async function saveExecution() {
       notes: { id: 'executionNotes', type: 'text', default: null }
   });
     
-    // המרת תאריך ל-ISO
+    // 4. הוספת שדות שיוך בהתאם לסוג
     const executionData = {
-        ...rawData,
-        date: rawData.date ? new Date(rawData.date).toISOString() : null
+        ...baseData,
+        date: baseData.date ? new Date(baseData.date).toISOString() : null
     };
+    
+    if (assignmentType === 'ticker') {
+        // שיוך לטיקר
+        const tickerId = document.getElementById('executionTicker').value;
+        executionData.ticker_id = tickerId ? parseInt(tickerId) : null;
+        executionData.trade_id = null;
+        
+        // חשבון אופציונלי
+        const accountId = document.getElementById('executionAccount').value;
+        executionData.trading_account_id = accountId ? parseInt(accountId) : null;
+    } else {
+        // שיוך לטרייד
+        const tradeId = document.getElementById('addExecutionTradeId').value;
+        executionData.trade_id = tradeId ? parseInt(tradeId) : null;
+        executionData.ticker_id = null;
+        
+        // חשבון חובה
+        const accountId = document.getElementById('executionAccount').value;
+        executionData.trading_account_id = accountId ? parseInt(accountId) : null;
+    }
 
   // DEBUG: לוג לפני שליחה
   console.log('🟨 [Executions] About to POST /api/executions/ with payload:', executionData);
@@ -947,10 +969,12 @@ async function updateExecution() {
     return;
   }
 
-    // 2. בניית אובייקט נתונים באמצעות DataCollectionService
+    // 2. קבלת מזהה ו סוג שיוך
     const id = window.DataCollectionService.getValue('editExecutionId', 'int');
-    const rawData = window.DataCollectionService.collectFormData({
-        trade_id: { id: 'editExecutionAccount', type: 'int' },
+    const assignmentType = document.querySelector('input[name="editAssignmentType"]:checked')?.value || 'trade';
+    
+    // 3. בניית אובייקט נתונים בסיסי
+    const baseData = window.DataCollectionService.collectFormData({
         action: { id: 'editExecutionType', type: 'text' },
         quantity: { id: 'editExecutionQuantity', type: 'int' },
         price: { id: 'editExecutionPrice', type: 'number' },
@@ -960,11 +984,31 @@ async function updateExecution() {
         notes: { id: 'editExecutionNotes', type: 'text', default: null }
     });
     
-    // המרת תאריך ל-ISO
+    // 4. הוספת שדות שיוך בהתאם לסוג
     const executionData = {
-        ...rawData,
-        date: rawData.date ? new Date(rawData.date).toISOString() : null
+        ...baseData,
+        date: baseData.date ? new Date(baseData.date).toISOString() : null
     };
+    
+    if (assignmentType === 'ticker') {
+        // שיוך לטיקר
+        const tickerId = document.getElementById('editExecutionTicker').value;
+        executionData.ticker_id = tickerId ? parseInt(tickerId) : null;
+        executionData.trade_id = null;
+        
+        // חשבון אופציונלי
+        const accountId = document.getElementById('editExecutionAccount').value;
+        executionData.trading_account_id = accountId ? parseInt(accountId) : null;
+    } else {
+        // שיוך לטרייד
+        const tradeId = document.getElementById('editExecutionTradeId').value;
+        executionData.trade_id = tradeId ? parseInt(tradeId) : null;
+        executionData.ticker_id = null;
+        
+        // חשבון חובה
+        const accountId = document.getElementById('editExecutionAccount').value;
+        executionData.trading_account_id = accountId ? parseInt(accountId) : null;
+    }
 
     // 3. שליחה לשרת
     console.log('🟨 [Executions] About to PUT /api/executions/'+id+' with payload:', executionData);
@@ -3346,3 +3390,58 @@ window.initializeExecutionsPage = function() {
     
     console.log('✅ Executions page initialized successfully');
 };
+
+// ========================================
+// Flexible Assignment Logic (Ticker/Trade)
+// ========================================
+
+/**
+ * החלפת שדות שיוך בהתאם לבחירה ברדיו באטן
+ * @param {string} mode - 'add' או 'edit'
+ */
+function toggleAssignmentFields(mode = 'add') {
+    try {
+        const assignmentType = document.querySelector(`input[name="${mode}AssignmentType"]:checked`)?.value;
+        
+        if (!assignmentType) {
+            console.warn('No assignment type selected');
+            return;
+        }
+        
+        const tickerField = document.getElementById(`${mode}TickerField`);
+        const tradeField = document.getElementById(`${mode}TradeField`);
+        const accountField = document.getElementById(mode === 'add' ? 'executionAccount' : 'editExecutionAccount');
+        const accountHint = document.getElementById(`${mode}AccountHint`);
+        
+        if (assignmentType === 'ticker') {
+            // הצג טיקר, הסתר טרייד
+            if (tickerField) tickerField.style.display = 'block';
+            if (tradeField) tradeField.style.display = 'none';
+            
+            // נקה את שדה הטרייד
+            const tradeSelect = document.getElementById(mode === 'add' ? 'addExecutionTradeId' : 'editExecutionTradeId');
+            if (tradeSelect) tradeSelect.value = '';
+            
+            // חשבון אופציונלי
+            if (accountField) accountField.removeAttribute('required');
+            if (accountHint) accountHint.textContent = 'אופציונלי כאשר משויך לטיקר';
+            
+        } else if (assignmentType === 'trade') {
+            // הצג טרייד, הסתר טיקר
+            if (tickerField) tickerField.style.display = 'none';
+            if (tradeField) tradeField.style.display = 'block';
+            
+            // נקה את שדה הטיקר
+            const tickerSelect = document.getElementById(mode === 'add' ? 'executionTicker' : 'editExecutionTicker');
+            if (tickerSelect) tickerSelect.value = '';
+            
+            // חשבון חובה
+            if (accountField) accountField.setAttribute('required', 'required');
+            if (accountHint) accountHint.textContent = 'חובה כאשר משויך לטרייד';
+        }
+    } catch (error) {
+        console.error('Error in toggleAssignmentFields:', error);
+    }
+}
+
+window.toggleAssignmentFields = toggleAssignmentFields;

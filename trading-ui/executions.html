@@ -350,12 +350,41 @@
                     </div>
                     <div class="modal-body">
                         <form id="editExecutionForm">
+                            <!-- Radio buttons for assignment type -->
+                            <div class="mb-3">
+                                <label class="form-label entity-label">סוג שיוך</label>
+                                <div class="d-flex gap-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="editAssignmentType" 
+                                               id="editAssignToTicker" value="ticker" 
+                                               onchange="window.toggleAssignmentFields && window.toggleAssignmentFields('edit')">
+                                        <label class="form-check-label" for="editAssignToTicker">שיוך לטיקר</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="editAssignmentType" 
+                                               id="editAssignToTrade" value="trade" checked
+                                               onchange="window.toggleAssignmentFields && window.toggleAssignmentFields('edit')">
+                                        <label class="form-check-label" for="editAssignToTrade">שיוך לטרייד</label>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="row">
-                                <div class="col-md-6">
+                                <!-- Ticker field - hidden by default in edit -->
+                                <div class="col-md-6" id="editTickerField" style="display:none;">
                                     <div class="mb-3">
                                         <label for="editExecutionTicker" class="form-label entity-label">טיקר</label>
-                                        <select class="form-select" id="editExecutionTicker" required>
+                                        <select class="form-select" id="editExecutionTicker">
                                             <option value="">בחר טיקר</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <!-- Trade field - shown by default in edit -->
+                                <div class="col-md-6" id="editTradeField">
+                                    <div class="mb-3">
+                                        <label for="editExecutionTradeId" class="form-label entity-label">טרייד</label>
+                                        <select class="form-select" id="editExecutionTradeId">
+                                            <option value="">בחר טרייד</option>
                                         </select>
                                     </div>
                                 </div>
@@ -392,10 +421,13 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="editExecutionAccount" class="form-label entity-label">טרייד</label>
-                                        <select class="form-select" id="editExecutionAccount" required>
-                                            <option value="">בחר טרייד</option>
+                                        <label for="editExecutionAccount" class="form-label entity-label">חשבון</label>
+                                        <select class="form-select" id="editExecutionAccount">
+                                            <option value="">בחר חשבון (אופציונלי)</option>
                                         </select>
+                                        <small class="form-text text-muted" id="editAccountHint">
+                                            חובה כאשר משויך לטרייד
+                                        </small>
                                     </div>
                                 </div>
                             </div>

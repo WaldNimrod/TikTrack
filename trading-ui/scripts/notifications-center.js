@@ -715,15 +715,12 @@ class NotificationsCenter {
 
 
   updateHistoryUI() {
-    console.log('🔍 updateHistoryUI called, history length:', this.history.length);
     const container = document.getElementById('unified-logs-container');
     if (!container) {
-      console.log('❌ unified-logs-container not found');
       return; // לא בעמוד מרכז ההתראות
     }
 
     if (this.history.length === 0) {
-      console.log('❌ History is empty, showing no history message');
       container.innerHTML = `
                 <div class="no-history">
                     <i class="fas fa-history"></i>
@@ -733,38 +730,28 @@ class NotificationsCenter {
       return;
     }
 
-    console.log('✅ History has', this.history.length, 'notifications, updating UI');
-
     // פילטור לפי בחירת המשתמש
-    console.log('🔍 Getting filter elements...');
     const filterElement = document.getElementById('historyFilter');
     const periodElement = document.getElementById('historyPeriod');
 
     if (!filterElement || !periodElement) {
-      console.log('❌ Filter elements not found');
       return; // אלמנטי פילטר לא קיימים
     }
 
-    console.log('✅ Filter elements found');
     const filter = filterElement.value;
     const period = periodElement.value;
 
     let filteredHistory = this.history;
-    console.log('🔍 Original history length:', this.history.length);
 
     // פילטר לפי סוג
     if (filter) {
       filteredHistory = filteredHistory.filter(n => n.type === filter);
-      console.log('🔍 After type filter:', filteredHistory.length);
     }
 
     // פילטר לפי זמן
-    console.log('🔍 Applying time filter...');
     const now = Date.now();
     const periodMs = NotificationsCenter.getPeriodInMs(period);
-    console.log('🔍 Period MS:', periodMs);
     filteredHistory = filteredHistory.filter(n => now - n.timestamp <= periodMs);
-    console.log('🔍 After time filter:', filteredHistory.length);
 
     if (filteredHistory.length === 0) {
       container.innerHTML = `

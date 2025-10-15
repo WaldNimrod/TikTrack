@@ -430,11 +430,6 @@ class UnifiedAppInitializer {
         // Load page-specific configuration from page-initialization-configs.js
         let pageConfig = null;
         // Debug info only in verbose mode
-        if (window.DEBUG_MODE) {
-            console.log('🔍 Checking pageInitializationConfigs:', typeof window.pageInitializationConfigs);
-            console.log('🔍 Available configs:', window.pageInitializationConfigs ? Object.keys(window.pageInitializationConfigs) : 'undefined');
-            console.log('🔍 Looking for config:', this.pageInfo.name);
-        }
         
         if (typeof window.pageInitializationConfigs !== 'undefined' && 
             window.pageInitializationConfigs[this.pageInfo.name]) {
@@ -442,15 +437,11 @@ class UnifiedAppInitializer {
             console.log(`📋 Loaded page config for ${this.pageInfo.name}:`, pageConfig);
         } else {
             console.log(`⚠️ No page config found for ${this.pageInfo.name}`);
-            console.log('🔍 Available configs:', window.pageInitializationConfigs ? Object.keys(window.pageInitializationConfigs) : 'undefined');
         }
         
         // Store custom initializers from page config
         if (pageConfig?.customInitializers) {
             this.customInitializers = pageConfig.customInitializers;
-            if (window.DEBUG_MODE) {
-                console.log('🔧 Loaded custom initializers from page config:', this.customInitializers.length);
-            }
         }
         
         const config = {

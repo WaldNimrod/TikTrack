@@ -356,44 +356,26 @@ table td,
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
-/* וידוא ששורה עם actions-cell לא תעלה מעל ה-actions menu */
-.data-table tbody tr:hover .actions-cell {
-  z-index: 1049;
-}
-
-/* תיקון: וידוא שהפופאפ יהיה נראה גם עם hover על השורה */
-.data-table tbody tr:hover .actions-menu-popup {
-  z-index: 9999 !important;
-}
 
 .data-table tbody tr:last-child td {
   border-bottom: none;
 }
 
-/* תיקון ספציפי ל-triggered-cell שלא יחסם את הפופאפ */
-.data-table tbody .triggered-cell {
-  z-index: 1;
-  position: relative;
-  /* הבטחה שהתא לא יוצר stacking context שיפריע */
-}
 
 /* עמודת פעולות רספונסיבית (Actions Menu Popup) */
 .actions-cell {
-  position: relative; /* חשוב ל-positioning של actions-menu-popup */
   text-align: center;
   vertical-align: middle;
   height: auto;
   min-height: 100%;
   display: table-cell;
   white-space: nowrap;
-  padding: 4px ;
-  overflow: visible ;
-  /* וידוא שה-actions menu יהיה מעל השורה עם hover effect */
-  z-index: 1049;
+  padding: 4px !important;
+  overflow: visible !important;
   /* רוחב רספונסיבי - משתלב עם המערכת */
-  width: var(--col-actions-percent) ;
-  min-width: var(--col-actions-min-width) ;
-  max-width: var(--col-actions-max-width) ;
+  width: var(--col-actions-percent) !important;
+  min-width: var(--col-actions-min-width) !important;
+  max-width: var(--col-actions-max-width) !important;
 }
 
 /* תאי פעולות - padding מותאם */
@@ -1145,7 +1127,7 @@ table tbody td button.btn-sm {
 /* Popup - החלון הצף */
 .actions-menu-popup {
   position: absolute;
-  z-index: 9999 !important; /* גבוה מאוד כדי לעקף כל stacking context */
+  z-index: 1000;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s ease, transform 0.2s ease;

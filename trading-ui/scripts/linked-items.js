@@ -231,12 +231,7 @@ function showLinkedItemsModal(data, itemType, itemId, mode = 'view') {
     modalTitle = `פריטים מקושרים ל-${getItemTypeDisplayName(itemType)}`;
   }
 
-  // Add mode indicator to title
-  if (mode === 'warningBlock') {
-    modalTitle += ' - ⚠️ אזהרה';
-  } else if (mode === 'view') {
-    modalTitle += ' - 👁️ תצוגה';
-  }
+  // Title kept clean without mode suffix per UI standard
 
   createModal(modalId, modalTitle, modalContent, mode, itemType, { enableExport: true, exportType: itemType, exportId: itemId });
 
@@ -395,9 +390,6 @@ function createLinkedItemsModalContent(data, itemType, itemId, mode = 'view') {
   content += `
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
-        <button type="button" class="btn btn-primary" onclick="exportLinkedItemsData('${itemType}', ${itemId})">
-          📤 ייצוא נתונים
-        </button>
       </div>
     </div>
   `;

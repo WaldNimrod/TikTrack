@@ -527,11 +527,6 @@ function updatePageSummaryStats(alertsToUse = null) {
   // שימוש בנתונים שמועברים או במשתנה הגלובלי כגיבוי
   const currentAlerts = alertsToUse || alertsData || [];
   
-  console.log('🔍 updatePageSummaryStats called with:', {
-    alertsToUse: alertsToUse?.length || 0,
-    alertsDataLength: alertsData?.length || 0,
-    currentAlertsLength: currentAlerts.length
-  });
   
   // סטטיסטיקות לפי הדוקומנטציה של מערכת ההתראות
   const totalAlerts = currentAlerts.length;

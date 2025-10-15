@@ -34,31 +34,23 @@ window.preferencesCache = {
         }
     },
     get: async function() {
-        console.log('🔍 preferencesCache.get() called, isValid():', this.isValid());
         if (this.isValid()) {
-            console.log('🔍 Returning cached data:', Object.keys(this.data || {}).length, 'keys');
             return this.data;
         }
-        
-        console.log('🔍 Cache not valid, loading from UnifiedCacheManager...');
         
         // טעינה ממטמון מאוחד
         if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
             const cachedData = await window.UnifiedCacheManager.get('user-preferences', {
                 fallback: () => this.data
             });
-            console.log('🔍 UnifiedCacheManager returned:', cachedData ? Object.keys(cachedData).length + ' keys' : 'null');
             if (cachedData) {
                 this.data = cachedData;
                 this.timestamp = Date.now();
-                console.log('🔍 Updated local cache with UnifiedCacheManager data');
                 return cachedData;
             }
         } else {
             console.warn('⚠️ UnifiedCacheManager not available for getting user-preferences');
         }
-        
-        console.log('🔍 No cached data available, returning null');
         return null;
     },
     clear: async function() {

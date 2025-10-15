@@ -442,10 +442,6 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
 
   // בניית שורות הטבלה
   const rows = notes.map(note => {
-    // דיבוג לבדיקת נתוני הערה
-    if (window.location.search.includes('debug=1')) {
-      console.log('🔍 Note data:', note);
-    }
     const date = note.created_at ? new Date(note.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
 
     // הצגת תוכן כטקסט פשוט בלבד
@@ -761,21 +757,9 @@ async function loadNoteData(noteId) {
 
     // הצגת קובץ מצורף נוכחי
     try {
-      console.log('🔍 Note data for attachment:', {
-        note: note,
-        attachment: note.attachment,
-        attachmentType: typeof note.attachment,
-        allAttachmentFields: {
-          attachment: note.attachment,
-          file_name: note.file_name,
-          filename: note.filename,
-          attached_file: note.attached_file
-        }
-      });
       
       // בדיקה רחבה יותר לשדות קובץ אפשריים (כמו בטבלה)
       const attachmentField = note.attachment || note.file_name || note.filename || note.attached_file;
-      console.log('🔍 Using attachment field:', attachmentField);
       
       displayCurrentAttachment(attachmentField);
     } catch (error) {
@@ -2233,15 +2217,8 @@ function editCurrentNote() {
 
 // פונקציה להצגת קובץ מצורף נוכחי במודל עריכה
 function displayCurrentAttachment(attachment) {
-  console.log('🔍 displayCurrentAttachment called with:', attachment, typeof attachment);
-  
   const displayElement = document.getElementById('currentAttachmentDisplay');
   const actionsElement = document.getElementById('attachmentActions');
-
-  console.log('🔍 Elements found:', {
-    displayElement: !!displayElement,
-    actionsElement: !!actionsElement
-  });
 
   if (!displayElement || !actionsElement) {
     console.warn('⚠️ Missing elements for attachment display');
@@ -2249,7 +2226,6 @@ function displayCurrentAttachment(attachment) {
   }
 
   if (attachment && attachment !== 'null' && attachment !== '') {
-    console.log('🔍 Processing attachment:', attachment);
     const fileName = attachment;
     const fileExtension = fileName.split('.').pop()?.toLowerCase();
     let fileIcon = '📄';

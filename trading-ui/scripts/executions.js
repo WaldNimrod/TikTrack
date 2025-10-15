@@ -736,11 +736,6 @@ async function showEditExecutionModal(id) {
     // עיבוד תאריך ביצוע - בדיקה של שדות שונים
     executionDate = execution.date || execution.execution_date || execution.created_at;
 
-    console.log('🔍 [EDIT MODAL] שדות תאריך זמינים:', {
-      date: execution.date,
-      execution_date: execution.execution_date,
-      created_at: execution.created_at
-    });
     if (executionDate) {
       try {
         // המרה לפורמט datetime-local
@@ -843,14 +838,6 @@ async function showEditExecutionModal(id) {
   // חישוב ערכים מחושבים
   calculateEditExecutionValues();
 
-  console.log('🎯 [EDIT MODAL] סיכום מילוי טופס עריכה:');
-  console.log('🎯 [EDIT MODAL] - עסקה ID:', execution.id);
-  console.log('🎯 [EDIT MODAL] - טרייד מקושר:', linkedObject ? `${linkedObject.type}:${linkedObject.data.id}` : 'אין');
-  console.log('🎯 [EDIT MODAL] - טיקר:', tickerId);
-  console.log('🎯 [EDIT MODAL] - פעולה:', actionValue);
-  console.log('🎯 [EDIT MODAL] - כמות:', execution.quantity);
-  console.log('🎯 [EDIT MODAL] - מחיר:', execution.price);
-  console.log('🎯 [EDIT MODAL] - תאריך:', executionDate);
 
   // הצגת המודל
   const modal = new bootstrap.Modal(editExecutionModalElement);
@@ -1082,8 +1069,6 @@ async function saveExecution() {
         }
     }
 
-  // DEBUG: לוג לפני שליחה
-  console.log('🟨 [Executions] About to POST /api/executions/ with payload:', executionData);
 
   // 3. שליחה לשרת
   const response = await fetch('/api/executions/', {
@@ -1092,14 +1077,6 @@ async function saveExecution() {
       body: JSON.stringify(executionData),
     });
 
-  // DEBUG: סטטוס ותוכן תגובה
-  try {
-    const clone = response.clone();
-    const text = await clone.text();
-    console.log('🟨 [Executions] POST response status:', response.status, 'body:', text);
-  } catch (e) {
-    console.log('🟨 [Executions] Unable to read response clone');
-  }
 
     // 4. טיפול בתגובה באמצעות CRUDResponseHandler
     await window.CRUDResponseHandler.handleSaveResponse(response, {

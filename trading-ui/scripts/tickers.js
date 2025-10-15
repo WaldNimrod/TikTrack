@@ -748,9 +748,6 @@ async function saveTicker() {
       body: JSON.stringify(tickerData)
     });
 
-    // DEBUG: לוג אחרי שליחה
-    const debugBody = await (async () => { try { return await response.clone().json(); } catch { return await response.clone().text(); } })();
-    console.log('📥 POST response status', response.status, 'body', debugBody);
 
     // טיפול בתגובה באמצעות CRUDResponseHandler
     await window.CRUDResponseHandler.handleSaveResponse(response, {
@@ -946,14 +943,9 @@ async function updateTicker() {
       remarks: formData.remarks || null
     };
 
-    // DEBUG: לוג לפני שליחה
-    console.log('📤 About to PUT /api/tickers/' + formData.id, 'payload:', tickerData);
 
     const response = await performTickerUpdateToServer(formData.id, tickerData);
 
-    // DEBUG: לוג אחרי שליחה
-    const debugBody = await (async () => { try { return await response.clone().json(); } catch { return await response.clone().text(); } })();
-    console.log('📥 PUT response status', response.status, 'body', debugBody);
 
     // טיפול בתגובה באמצעות CRUDResponseHandler
     await window.CRUDResponseHandler.handleUpdateResponse(response, {

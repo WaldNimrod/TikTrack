@@ -753,6 +753,95 @@ clearAllCache(level)
 - [OPTION_A_IMPLEMENTATION_SUMMARY.md](../../05-REPORTS/COMPLETION/OPTION_A_IMPLEMENTATION_SUMMARY.md)
 - [OPTION_A_CACHE_BUSTING_TESTING_GUIDE.md](../../03-DEVELOPMENT/TESTING/OPTION_A_CACHE_BUSTING_TESTING_GUIDE.md)
 
+---
+
+## 🆕 Cache Clearing - 4 Levels with Validation (15 אוקטובר 2025)
+
+### **מה חדש:**
+- ✅ **Dynamic Service Cache Clearing** - סריקה אוטומטית של window objects
+- ✅ **Comprehensive ORPHAN_KEYS** - 6 קטגוריות במקום 4
+- ✅ **Validation System** - בדיקה אוטומטית אחרי ניקוי
+- ✅ **Detailed Reports** - דוחות מפורטים עם העתקה ללוח
+- ✅ **Enhanced UI** - checkbox ולידציה בעמוד ניהול
+
+### **4 רמות ניקוי:**
+
+#### **🟢 Light (25%)**
+```
+✅ Memory Layer - כל הנתונים הזמניים
+✅ Service Caches - כל המטמון של שירותים חיצוניים
+❌ localStorage/IndexedDB - לא נוגע
+```
+
+#### **🔵 Medium (60%)**
+```
+✅ כל מה שב-Light
+✅ localStorage Layer - מפתחות tiktrack_*
+✅ IndexedDB Layer - מסד נתונים מקומי
+✅ Backend Layer - מטמון שרת
+```
+
+#### **🟠 Full (100%)**
+```
+✅ כל מה שב-Medium
+✅ Orphan Keys - כל המפתחות מחוץ למערכת המרכזית:
+  - State keys (cashFlowsSectionState, executionsTopSectionCollapsed)
+  - Preferences (colorScheme, customColorScheme, headerFilters, consoleSettings, tikTrack_preferences, tt:preferences)
+  - Auth keys (authToken, currentUser)
+  - Testing (crud_test_results, linterLogs, css-duplicates-results, serverMonitorSettings, lastCRUDTestReport)
+  - Notifications (tiktrack_global_notifications_history, tiktrack_global_notifications_stats)
+  - App (appStatus, cache_mode, lastExternalDataRefresh)
+  - Dynamic patterns (sortState_, section-visibility-, top-section-collapsed-, accounts_ui_state_)
+```
+
+#### **☢️ Nuclear (150%+)**
+```
+✅ כל מה שב-Full
+✅ ALL localStorage - כולל נתונים לא של TikTrack
+✅ Complete IndexedDB - מחיקת כל המסד
+✅ sessionStorage - כל נתוני הפעלה
+```
+
+### **מערכת ולידציה:**
+
+#### **איך להפעיל:**
+```javascript
+// ללא ולידציה (מהיר)
+clearAllCache({ level: 'medium' })
+
+// עם ולידציה (מומלץ בפיתוח)
+clearAllCache({ level: 'medium', validateAfter: true })
+```
+
+#### **מה הולידציה בודקת:**
+- ✅ Memory Layer נוקה לחלוטין
+- ✅ Service Caches נוקו
+- ✅ localStorage keys לפי רמה (tiktrack_*, orphan keys)
+- ✅ IndexedDB נוקה (Medium ומעלה)
+- ✅ Backend cache נוקה
+
+#### **דוחות ולידציה:**
+```javascript
+{
+  success: true/false,
+  before: { memoryEntries, localStorageKeys, tiktrackKeys, servicesCaches, indexedDBEntries },
+  after: { memoryEntries, localStorageKeys, tiktrackKeys, servicesCaches, indexedDBEntries },
+  remainingKeys: [], // מפתחות שנשארו
+  issues: [], // בעיות שזוהו
+  level: 'medium'
+}
+```
+
+### **מערכת דוחות:**
+- **תצוגת סיכום**: הודעת הצלחה עם כל הפרטים
+- **העתקה ללוח**: `copyCacheReportToClipboard(report)`
+- **JSON מובנה**: כולל timestamp, level, duration, clearedItems
+
+### **אינטגרציה בממשק:**
+- **Checkbox ולידציה** בעמוד ניהול מטמון (כבוי כברירת מחדל)
+- **כל 4 הכפתורים** תומכים ב-`validateAfter`
+- **הודעות מותאמות** לפי רמת ניקוי ותוצאות ולידציה
+
 
 
 

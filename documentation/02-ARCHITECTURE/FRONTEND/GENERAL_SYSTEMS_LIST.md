@@ -318,15 +318,21 @@
 - **תיאור:** ניהול מערכת כללי
 - **דוקומנטציה:** [JAVASCRIPT_ARCHITECTURE.md](JAVASCRIPT_ARCHITECTURE.md#system-management)
 
-### **Cache Management System** 🟢 **חבילת בסיס**
-- **קובץ:** `cache-management.js`
-- **תיאור:** מערכת ניהול מטמון
-- **דוקומנטציה:** [ADVANCED_CACHE_SYSTEM_GUIDE.md](../development/ADVANCED_CACHE_SYSTEM_GUIDE.md)
+### **Cache Management System** 🟢 **חבילת בסיס** ✅ **עודכן אוקטובר 2025**
+- **קובץ:** `modules/cache-module.js`
+- **תיאור:** מערכת ניהול מטמון משופרת עם ולידציה ודוחות
+- **דוקומנטציה:** [CACHE_IMPLEMENTATION_GUIDE.md](CACHE_IMPLEMENTATION_GUIDE.md)
 - **פונקציות עיקריות:**
-  - `clearAllCache()`
-  - `clearDevelopmentCache()`
-  - `clearCacheBeforeCRUD()`
-  - `clearExpiredCache()`
+  - `clearAllCache()` - 4 רמות ניקוי (Light/Medium/Full/Nuclear)
+  - `validateCacheClearing()` - ולידציה אוטומטית אחרי ניקוי
+  - `collectCacheStats()` - איסוף סטטיסטיקות מטמון
+  - `copyCacheReportToClipboard()` - העתקת דוחות ללוח
+
+#### **מערכות משנה חדשות:**
+- **Dynamic Service Cache Clearing** - סריקה אוטומטית של window objects
+- **Comprehensive ORPHAN_KEYS Inventory** - 6 קטגוריות (state, preferences, auth, testing, notifications, app)
+- **Post-Clear Validation System** - בדיקה מקיפה אחרי ניקוי
+- **Detailed Reporting System** - דוחות מפורטים עם JSON export
 
 ---
 

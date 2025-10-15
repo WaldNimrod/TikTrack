@@ -981,12 +981,17 @@ function onTickerChange(tickerSelect) {
   const relationTypeSelect = document.getElementById('alertRelationType');
   const relationType = relationTypeSelect ? parseInt(relationTypeSelect.value) : null;
   
-  // טיקר משמש כפילטר רק עבור תוכנית(3) וטרייד(2)
-  // עבור טיקר(4) - הטיקר הוא הבחירה עצמה, לא צריך לסנן
   if (relationType === 2 || relationType === 3) {
+    // טיקר משמש כפילטר עבור תוכנית וטרייד
     const selectedTicker = tickerSelect.value;
-    // רענן את רשימת האובייקטים עם הסינון החדש
     populateRelatedObjects(relationType, selectedTicker);
+  } else if (relationType === 4) {
+    // עבור טיקר - הטיקר הוא הבחירה עצמה
+    if (tickerSelect.value) {
+      enableConditionFields();
+    } else {
+      disableConditionFields();
+    }
   }
 }
 
@@ -995,7 +1000,15 @@ function onTickerChange(tickerSelect) {
  * @param {HTMLSelectElement} selectElement - אלמנט הבחירה
  */
 function onRelatedObjectChange(selectElement) {
-
+  const relationTypeSelect = document.getElementById('alertRelationType');
+  const relationType = relationTypeSelect ? parseInt(relationTypeSelect.value) : null;
+  
+  // עבור טיקר - לא רלוונטי כי הטיקר עצמו הוא הבחירה
+  if (relationType === 4) {
+    return;
+  }
+  
+  // עבור שאר הסוגים - בדוק אם נבחר אובייקט לקישור
   if (selectElement.value) {
     // הפעלת שדות התנאי ישירות
     enableConditionFields();
@@ -1364,7 +1377,6 @@ async function saveAlert() {
 
     const formData = new FormData(form);
     const relatedType = formData.get('alertRelationType');
-    const relatedId = alertRelatedObjectSelect.value;
 
     // 4. איסוף שדות נוספים (אחרי שהולידציה הבסיסית עברה)
     const conditionAttributeElement = document.getElementById('conditionAttribute');

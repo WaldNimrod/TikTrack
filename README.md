@@ -268,6 +268,15 @@
 - **ביצועים משופרים** ב-70-90%
 - **כפתור ניקוי מטמון** עובד בכל העמודים
 
+### **🎉 Enhanced Cache Clearing System (15 אוקטובר 2025):**
+- ✅ **Dynamic Service Cache Clearing** - סריקה אוטומטית של window objects
+- ✅ **Comprehensive ORPHAN_KEYS** - 6 קטגוריות במקום 4 (state, preferences, auth, testing, notifications, app)
+- ✅ **Post-Clear Validation System** - בדיקה אוטומטית אחרי כל ניקוי
+- ✅ **Detailed Reporting** - דוחות מפורטים עם העתקה ללוח
+- ✅ **Enhanced UI** - checkbox ולידציה בעמוד ניהול מטמון (כבוי כברירת מחדל)
+- ✅ **4 רמות ניקוי משופרות** - Light (25%), Medium (60%), Full (100%), Nuclear (150%+)
+- ✅ **Cache Statistics** - איסוף סטטיסטיקות מקיף עם ולידציה מקבילה
+
 ### **קבצים שנוצרו/עודכנו:**
 
 #### **🗺️ מערכת JS-Map מתקדמת (19 בספטמבר 2025) - 8 קבצים חדשים:**

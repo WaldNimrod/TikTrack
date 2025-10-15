@@ -4,6 +4,46 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [2.0.8] - 2025-10-15
+
+### Added
+- **Dynamic Service Cache Clearing** - מערכת סריקה אוטומטית של כל Service Caches במערכת
+- **Comprehensive ORPHAN_KEYS Inventory** - הרחבה ל-6 קטגוריות: state, preferences, auth, testing, notifications, app
+- **Post-Clear Validation System** - בדיקה אוטומטית מקיפה אחרי כל ניקוי מטמון
+- **Detailed Reporting System** - דוחות מפורטים עם JSON export והעתקה ללוח
+- **Enhanced Cache Clearing UI** - checkbox ולידציה אופציונלית בעמוד ניהול המטמון
+
+### Enhanced
+- **Cache Clearing Levels** - 4 רמות ניקוי משופרות:
+  - Light (25%): Memory + Service Caches בלבד
+  - Medium (60%): + localStorage/IndexedDB/Backend cache
+  - Full (100%): + כל ה-Orphan Keys (כולל הגדרות משתמש)
+  - Nuclear (150%+): כל localStorage/IndexedDB כולל נתונים לא של TikTrack
+
+### Changed
+- **clearServiceCaches()** - המרה מרשימה סטטית לסריקה דינמית של window objects
+- **ORPHAN_KEYS** - הוספת קטגוריות חדשות: notifications, app + 5 מפתחות נוספים
+- **clearAllCache()** - תמיכה בפרמטר `validateAfter` לולידציה אופציונלית
+- **system-management.html** - הוספת checkbox ולידציה (כבוי כברירת מחדל)
+- **Header cache button** - שינוי ברירת מחדל מ-Medium ל-Full
+
+### Technical Improvements
+- **Validation Functions**:
+  - `validateCacheClearing()` - בדיקת תוצאות ניקוי
+  - `collectCacheStats()` - איסוף סטטיסטיקות מטמון
+  - `countServiceCaches()` - ספירת service cache entries
+- **Reporting Functions**:
+  - `copyCacheReportToClipboard()` - העתקת דוחות JSON ללוח
+  - Enhanced `detailedReport` object עם מידע מקיף
+
+### Documentation
+- **Updated:** `CACHE_IMPLEMENTATION_GUIDE.md` - סקשן חדש על מערכת ניקוי מתקדמת
+- **Updated:** `GENERAL_SYSTEMS_LIST.md` - עדכון רשימת מערכות מטמון
+- **New:** `CACHE_CLEARING_GUIDE.md` - מדריך מפורט לשימוש במערכת
+- **Updated:** `README.md` - תיעוד המערכת המשופרת
+
+---
+
 ## [2.0.7] - 2025-10-14
 
 ### Added

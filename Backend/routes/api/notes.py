@@ -31,13 +31,30 @@ notes_bp = Blueprint('notes', __name__, url_prefix='/api/notes')
 
 # File settings
 UPLOAD_FOLDER = 'uploads/notes'
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'pdf'}
-MAX_FILE_SIZE = 524288  # 512KB
+ALLOWED_EXTENSIONS = {
+    # תמונות
+    'png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp', 'svg', 'tiff', 'tif',
+    # מסמכים
+    'pdf',
+    # מסמכי Office
+    'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx',
+    # קבצי טקסט
+    'txt', 'rtf'
+}
+MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
 
 def allowed_file(filename: str) -> bool:
     """Check if file extension is allowed"""
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    if not filename or '.' not in filename:
+        logger.warning(f"❌ Invalid filename: {filename}")
+        return False
+    
+    extension = filename.rsplit('.', 1)[1].lower()
+    is_allowed = extension in ALLOWED_EXTENSIONS
+    
+    logger.info(f"📎 File extension check: {filename} -> .{extension} -> {'✅ Allowed' if is_allowed else '❌ Not allowed'}")
+    
+    return is_allowed
 
 def save_uploaded_file(file: FileStorage) -> Optional[str]:
     """Save uploaded file with unique name"""
@@ -55,6 +72,9 @@ def save_uploaded_file(file: FileStorage) -> Optional[str]:
         file_path = os.path.join(UPLOAD_FOLDER, new_filename)
         
         logger.info(f"📎 Saving file to: {file_path}")
+        
+        # Create directory if it doesn't exist
+        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
         
         # Save file
         try:
@@ -136,6 +156,13 @@ def get_notes():
             
             # Resolve related entity name based on related_type_id
             try:
+                related_entity_type_names = {
+                    1: 'חשבון',
+                    2: 'טרייד', 
+                    3: 'תוכנית השקעה',
+                    4: 'טיקר'
+                }
+                
                 if note.related_type_id == 1:  # account
                     entity = TradingAccountService.get_by_id(db, note.related_id)
                     note_dict['related_entity_name'] = entity.name if entity else None
@@ -150,9 +177,13 @@ def get_notes():
                     note_dict['related_entity_name'] = ticker.symbol if ticker else None
                 else:
                     note_dict['related_entity_name'] = None
+                
+                # הוספת סוג האובייקט המקושר
+                note_dict['related_entity_type'] = related_entity_type_names.get(note.related_type_id, 'לא ידוע')
             except Exception as e:
                 logger.warning(f"Could not resolve related entity for note {note.id}: {str(e)}")
                 note_dict['related_entity_name'] = None
+                note_dict['related_entity_type'] = None
             
             enhanced_data.append(note_dict)
             
@@ -182,9 +213,42 @@ def get_note(note_id: int):
         db = next(get_db())
         note = db.query(Note).filter(Note.id == note_id).first()
         if note:
+            note_dict = note.to_dict()
+            
+            # Resolve related entity name based on related_type_id
+            try:
+                related_entity_type_names = {
+                    1: 'חשבון',
+                    2: 'טרייד', 
+                    3: 'תוכנית השקעה',
+                    4: 'טיקר'
+                }
+                
+                if note.related_type_id == 1:  # account
+                    entity = TradingAccountService.get_by_id(db, note.related_id)
+                    note_dict['related_entity_name'] = entity.name if entity else None
+                elif note.related_type_id == 2:  # trade
+                    trade = db.query(Trade).options(joinedload(Trade.ticker)).filter(Trade.id == note.related_id).first()
+                    note_dict['related_entity_name'] = trade.ticker.symbol if trade and trade.ticker else None
+                elif note.related_type_id == 3:  # trade_plan
+                    plan = db.query(TradePlan).options(joinedload(TradePlan.ticker)).filter(TradePlan.id == note.related_id).first()
+                    note_dict['related_entity_name'] = plan.ticker.symbol if plan and plan.ticker else None
+                elif note.related_type_id == 4:  # ticker
+                    ticker = db.query(Ticker).filter(Ticker.id == note.related_id).first()
+                    note_dict['related_entity_name'] = ticker.symbol if ticker else None
+                else:
+                    note_dict['related_entity_name'] = None
+                
+                # הוספת סוג האובייקט המקושר
+                note_dict['related_entity_type'] = related_entity_type_names.get(note.related_type_id, 'לא ידוע')
+            except Exception as e:
+                logger.warning(f"Could not resolve related entity for note {note.id}: {str(e)}")
+                note_dict['related_entity_name'] = None
+                note_dict['related_entity_type'] = None
+            
             return jsonify({
                 "status": "success",
-                "data": note.to_dict(),
+                "data": note_dict,
                 "message": "Note retrieved successfully",
                 "version": "1.0"
             })
@@ -211,6 +275,11 @@ def create_note():
     try:
         db = next(get_db())
         
+        logger.info(f"📋 Request method: {request.method}")
+        logger.info(f"📋 Request content type: {request.content_type}")
+        logger.info(f"📋 Request files: {list(request.files.keys()) if request.files else 'No files'}")
+        logger.info(f"📋 Request form: {dict(request.form) if request.form else 'No form data'}")
+        
         # Check if there's a file or JSON
         if request.files:
             # File handling
@@ -218,11 +287,31 @@ def create_note():
             attachment_filename = None
             
             if file and file.filename:
-                # Check file size
-                if file.content_length and file.content_length > MAX_FILE_SIZE:
+                logger.info(f"📎 Processing file: {file.filename}, size: {file.content_length}")
+                logger.info(f"📎 ALLOWED_EXTENSIONS: {ALLOWED_EXTENSIONS}")
+                
+                # Check file size first
+                file_size = file.content_length or 0
+                if file_size > MAX_FILE_SIZE:
+                    size_mb = file_size / (1024 * 1024)
+                    max_mb = MAX_FILE_SIZE / (1024 * 1024)
                     return jsonify({
                         "status": "error",
-                        "error": {"message": "File too large. Maximum size is 512KB"},
+                        "error": {
+                            "message": f"קובץ גדול מדי: {size_mb:.1f}MB. הגודל המקסימלי המותר הוא {max_mb:.1f}MB. אנא בחר קובץ קטן יותר."
+                        },
+                        "version": "1.0"
+                    }), 400
+                
+                # Check file type
+                if not allowed_file(file.filename):
+                    file_ext = file.filename.split('.')[-1].upper() if '.' in file.filename else 'לא ידוע'
+                    allowed_exts = ', '.join([ext.upper() for ext in ALLOWED_EXTENSIONS])
+                    return jsonify({
+                        "status": "error",
+                        "error": {
+                            "message": f"פורמט קובץ לא נתמך: .{file_ext}. הפורמטים הנתמכים הם: {allowed_exts}"
+                        },
                         "version": "1.0"
                     }), 400
                 
@@ -230,7 +319,9 @@ def create_note():
                 if not attachment_filename:
                     return jsonify({
                         "status": "error",
-                        "error": {"message": "Invalid file type. Allowed: JPG, PNG, GIF, PDF"},
+                        "error": {
+                            "message": "שגיאה בשמירת הקובץ. אנא נסה שוב או בחר קובץ אחר."
+                        },
                         "version": "1.0"
                     }), 400
             
@@ -238,6 +329,7 @@ def create_note():
             content = request.form.get('content', '')
             related_type_id = request.form.get('related_type_id')
             related_id = request.form.get('related_id')
+            logger.info(f"📋 Form data - content: {content[:50]}..., related_type_id: {related_type_id}, related_id: {related_id}")
         else:
             # Get data from JSON
             data = request.get_json()
@@ -245,6 +337,21 @@ def create_note():
             related_type_id = data.get('related_type_id')
             related_id = data.get('related_id')
             attachment_filename = data.get('attachment')
+            logger.info(f"📋 JSON data - content: {content[:50]}..., related_type_id: {related_type_id}, related_id: {related_id}")
+        
+        logger.info(f"📋 Final values - content: {content}, related_type_id: {related_type_id}, related_id: {related_id}, attachment: {attachment_filename}")
+        
+        # Convert string values to integers if they come from FormData
+        try:
+            related_type_id = int(related_type_id) if related_type_id else None
+            related_id = int(related_id) if related_id else None
+        except (ValueError, TypeError) as e:
+            logger.error(f"❌ Error converting to integers: {e}")
+            return jsonify({
+                "status": "error",
+                "error": {"message": f"Invalid related_type_id or related_id: {str(e)}"},
+                "version": "1.0"
+            }), 400
         
         # Determine relation using related_type_id and related_id
         if not related_type_id or not related_id:
@@ -256,7 +363,7 @@ def create_note():
         
         # Validate related_type_id
         valid_types = [1, 2, 3, 4]  # account, trade, trade_plan, ticker
-        if int(related_type_id) not in valid_types:
+        if related_type_id not in valid_types:
             return jsonify({
                 "status": "error",
                 "error": {"message": "Invalid related_type_id. Must be: 1 (account), 2 (trade), 3 (trade_plan), or 4 (ticker)"},
@@ -337,12 +444,30 @@ def update_note(note_id: int):
                 
                 if file and file.filename:
                     logger.info(f"📎 File received: {file.filename}, size: {file.content_length}")
-                    # Check file size
-                    if file.content_length and file.content_length > MAX_FILE_SIZE:
+                    
+                    # Check file size first
+                    file_size = file.content_length or 0
+                    if file_size > MAX_FILE_SIZE:
+                        size_mb = file_size / (1024 * 1024)
+                        max_mb = MAX_FILE_SIZE / (1024 * 1024)
                         logger.warning(f"❌ File too large: {file.content_length} > {MAX_FILE_SIZE}")
                         return jsonify({
                             "status": "error",
-                            "error": {"message": "File too large. Maximum size is 512KB"},
+                            "error": {
+                                "message": f"קובץ גדול מדי: {size_mb:.1f}MB. הגודל המקסימלי המותר הוא {max_mb:.1f}MB. אנא בחר קובץ קטן יותר."
+                            },
+                            "version": "1.0"
+                        }), 400
+                    
+                    # Check file type
+                    if not allowed_file(file.filename):
+                        file_ext = file.filename.split('.')[-1].upper() if '.' in file.filename else 'לא ידוע'
+                        allowed_exts = ', '.join([ext.upper() for ext in ALLOWED_EXTENSIONS])
+                        return jsonify({
+                            "status": "error",
+                            "error": {
+                                "message": f"פורמט קובץ לא נתמך: .{file_ext}. הפורמטים הנתמכים הם: {allowed_exts}"
+                            },
                             "version": "1.0"
                         }), 400
                     
@@ -352,7 +477,9 @@ def update_note(note_id: int):
                         logger.error("❌ Failed to save file")
                         return jsonify({
                             "status": "error",
-                            "error": {"message": "Invalid file type. Allowed: JPG, PNG, GIF, PDF"},
+                            "error": {
+                                "message": "שגיאה בשמירת הקובץ. אנא נסה שוב או בחר קובץ אחר."
+                            },
                             "version": "1.0"
                         }), 400
                 

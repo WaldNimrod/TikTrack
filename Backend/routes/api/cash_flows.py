@@ -64,7 +64,6 @@ def get_cash_flows():
                 cf_dict['account'] = {
                     'id': account.id,
                     'name': account.name,
-                    'type': account.type if hasattr(account, 'type') else None,
                     'status': account.status if hasattr(account, 'status') else None,
                     'balance': float(account.cash_balance) if hasattr(account, 'cash_balance') and account.cash_balance is not None else None
                 }
@@ -87,6 +86,7 @@ def get_cash_flows():
 @cash_flows_bp.route('/<int:cash_flow_id>', methods=['GET'])
 def get_cash_flow(cash_flow_id: int):
     """Get cash flow by ID"""
+    db = None
     try:
         db: Session = next(get_db())
         cash_flow = db.query(CashFlow).options(
@@ -96,14 +96,35 @@ def get_cash_flow(cash_flow_id: int):
         
         if cash_flow:
             cf_dict = cash_flow.to_dict()
-            if cash_flow.account:
-                cf_dict['account_name'] = cash_flow.account.name
-                cf_dict['account_type'] = cash_flow.account.type
-                cf_dict['account_status'] = cash_flow.account.status
-                cf_dict['account_balance'] = float(cash_flow.account.balance) if cash_flow.account.balance is not None else None
-            if cash_flow.currency:
-                cf_dict['currency_symbol'] = cash_flow.currency.symbol
-                cf_dict['currency_name'] = cash_flow.currency.name
+            
+            # Safe handling for account relationship
+            try:
+                if cash_flow.account:
+                    cf_dict['account_name'] = cash_flow.account.name
+                    cf_dict['account_status'] = getattr(cash_flow.account, 'status', None)
+                    cf_dict['account_balance'] = float(cash_flow.account.cash_balance) if cash_flow.account.cash_balance is not None else None
+                else:
+                    cf_dict['account_name'] = None
+                    cf_dict['account_status'] = None
+                    cf_dict['account_balance'] = None
+            except Exception as account_error:
+                logger.warning(f"Error accessing account for cash flow {cash_flow_id}: {str(account_error)}")
+                cf_dict['account_name'] = None
+                cf_dict['account_status'] = None
+                cf_dict['account_balance'] = None
+            
+            # Safe handling for currency relationship
+            try:
+                if cash_flow.currency:
+                    cf_dict['currency_symbol'] = cash_flow.currency.symbol
+                    cf_dict['currency_name'] = cash_flow.currency.name
+                else:
+                    cf_dict['currency_symbol'] = None
+                    cf_dict['currency_name'] = None
+            except Exception as currency_error:
+                logger.warning(f"Error accessing currency for cash flow {cash_flow_id}: {str(currency_error)}")
+                cf_dict['currency_symbol'] = None
+                cf_dict['currency_name'] = None
             
             return jsonify({
                 "status": "success",
@@ -117,14 +138,17 @@ def get_cash_flow(cash_flow_id: int):
             "version": "1.0"
         }), 404
     except Exception as e:
+        import traceback
         logger.error(f"Error getting cash flow {cash_flow_id}: {str(e)}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
         return jsonify({
             "status": "error",
-            "error": {"message": "Failed to retrieve cash flow"},
+            "error": {"message": f"Failed to retrieve cash flow: {str(e)}"},
             "version": "1.0"
         }), 500
     finally:
-        db.close()
+        if db:
+            db.close()
 
 @cash_flows_bp.route('/', methods=['POST'])
 @invalidate_cache(['cash_flows'])

@@ -439,7 +439,7 @@ class HeaderSystem {
 
 
   static async loadAccountsForFilter() {
-    console.log('🔧 loadAccountsForFilter - מתחיל טעינת חשבונות מסחר');
+    // console.log('🔧 loadAccountsForFilter - מתחיל טעינת חשבונות מסחר');
     
     try {
       // שימוש בפונקציה מקובץ השירותים
@@ -455,13 +455,8 @@ class HeaderSystem {
         accounts = data.data || data;
       }
       
-      // עדכון window.trading_accountsData תמיד (גם אם השתמשנו ב-loadTradingAccountsFromServer)
-      window.trading_accountsData = accounts;
-      console.log('💾 עדכנו window.trading_accountsData עם', accounts.length, 'חשבונות');
-      
       const openAccounts = accounts.filter(account => account.status === 'open');
       
-      console.log('✅ נטענו', accounts.length, 'חשבונות, פתוחים:', openAccounts.length);
       
       // עדכון תפריט החשבונות
       const accountMenu = document.getElementById('accountFilterMenu');
@@ -481,7 +476,6 @@ class HeaderSystem {
             accountMenu.appendChild(accountItem);
           });
           
-          console.log('✅ עדכנו תפריט עם', openAccounts.length, 'חשבונות');
       } else {
         console.error('❌ accountFilterMenu לא נמצא!');
       }
@@ -1334,7 +1328,7 @@ window.updateFilterUI = function(filters) {
     console.log('🔧 Checking status item:', value, 'against:', filters.status);
     if (!filters.status || filters.status.length === 0) {
       if (value === 'הכול' || value === 'הכל' || value === 'all') {
-      item.classList.add('selected');
+        item.classList.add('selected');
         console.log('🔧 Selected default status item:', value);
       }
     } else if (filters.status && filters.status.includes(value)) {
@@ -1356,7 +1350,7 @@ window.updateFilterUI = function(filters) {
     console.log('🔧 Checking type item:', value, 'against:', filters.type);
     if (!filters.type || filters.type.length === 0) {
       if (value === 'הכול' || value === 'הכל' || value === 'all') {
-      item.classList.add('selected');
+        item.classList.add('selected');
         console.log('🔧 Selected default type item:', value);
       }
     } else if (filters.type && filters.type.includes(value)) {
@@ -1378,7 +1372,7 @@ window.updateFilterUI = function(filters) {
     console.log('🔧 Checking account item:', value, 'against:', filters.account);
     if (!filters.account || filters.account.length === 0) {
       if (value === 'הכול' || value === 'הכל' || value === 'כל החשבונות' || value === 'all') {
-      item.classList.add('selected');
+        item.classList.add('selected');
         console.log('🔧 Selected default account item:', value);
       }
     } else if (filters.account && filters.account.includes(value)) {
@@ -1456,106 +1450,12 @@ window.updateFilterUI = function(filters) {
   }
 }
 
-/**
- * איפוס כל הפילטרים לערכי ברירת מחדל מהעדפות המשתמש
- * 
- * מיישם את מערכת האתחול המאוחדת והמערכות הכלליות:
- * 
- * מערכת אתחול מאוחדת (UNIFIED_INITIALIZATION_SYSTEM):
- * - Stage 2: UI Systems - HeaderSystem initialization
- * - Stage 3: Preferences System - PreferencesSystem initialization  
- * - window.cacheSystemReady - flag של מערכת המטמון המאוחדת
- * 
- * מערכות העדפות:
- * - PreferencesSystem V2 (preferences-core.js) - מערכת חדשה ראשית
- * - preferencesCache (preferences.js) - מערכת ישנה לתמיכה
- * 
- * מערכת מטמון מאוחדת:
- * - UnifiedCacheManager (cache-module.js) - מערכת מטמון 4 שכבות
- * - Cache policies: user-preferences, ui-state, filter-state
- * 
- * מערכות כללית:
- * - window.showNotification - מערכת התראות כללית
- * - window.filterSystem - מערכת פילטרים
- * - HeaderSystem.loadAccountsForFilter - טעינת חשבונות
- * - window.trading_accountsData - נתוני חשבונות
- */
 window.resetAllFilters = async function() {
+  console.log('↻ resetAllFilters - מחזיר לערכי ברירת מחדל מהעדפות');
+  console.log('↻ resetAllFilters - פונקציה נקראת!');
+  
   try {
-    // 1. המתנה למערכת האתחול המאוחדת (לפי LOADING_STANDARD)
-    if (!isSystemsReady()) {
-      console.log('⏳ מערכות עדיין לא מוכנות, ממתין לאתחול...');
-      await waitForSystemsReady();
-    }
-
-    // 2. קבלת ההעדפות מהמערכת
-    const preferences = await loadUserFilterPreferences();
-    
-    // 3. וידוא טעינת חשבונות מסחר לפני המרה
-    if (typeof HeaderSystem !== 'undefined' && typeof HeaderSystem.loadAccountsForFilter === 'function') {
-      try {
-        console.log('🏦 טוען חשבונות מסחר לפני המרת העדפות...');
-        await HeaderSystem.loadAccountsForFilter();
-        console.log('✅ חשבונות מסחר נטענו:', window.trading_accountsData?.length || 0, 'חשבונות');
-        
-        // בדיקה מה יש בנתונים
-        if (window.trading_accountsData && Array.isArray(window.trading_accountsData)) {
-          console.log('📋 רשימת חשבונות נטענים:', window.trading_accountsData.map(acc => ({ id: acc.id, name: acc.name, status: acc.status })));
-        }
-      } catch (error) {
-        console.warn('שגיאה בטעינת חשבונות מסחר:', error);
-      }
-    }
-    
-    // 4. המרת ההעדפות לפורמט הנדרש (אסינכרונית)
-    const filterValues = await convertPreferencesToFilterValues(preferences);
-    
-    // 5. עדכון הפילטרים במערכת
-    if (window.filterSystem) {
-      window.filterSystem.currentFilters = filterValues;
-      window.filterSystem.saveFilters();
-      await updateFilterUI(filterValues);
-    }
-    
-    // 6. הצגת הודעה דרך מערכת ההודעות הכללית
-    if (typeof window.showNotification === 'function') {
-      window.showNotification('פילטרים אופסו לערכי ברירת מחדל', 'success', 'הצלחה', 2000, 'system');
-    }
-    
-    return true;
-  } catch (error) {
-    console.error('שגיאה באיפוס פילטרים:', error);
-    // fallback לאיפוס רגיל
-    if (typeof window.clearAllFilters === 'function') {
-      window.clearAllFilters();
-    }
-    return false;
-  }
-};
-
-/**
- * המתנה למערכת האתחול המאוחדת (עד 10 שניות)
- */
-async function waitForSystemsReady(timeout = 10000) {
-  const startTime = Date.now();
-  
-  while (!isSystemsReady()) {
-    if (Date.now() - startTime > timeout) {
-      throw new Error('המערכות לא אותחלו תוך הזמן המוקצב');
-    }
-    
-    // המתנה של 100ms לפני בדיקה חוזרת
-    await new Promise(resolve => setTimeout(resolve, 100));
-  }
-  
-  console.log('✅ מערכות מוכנות להמשך');
-}
-
-/**
- * טעינת העדפות פילטרים מהמערכת
- * מיישם את מערכת האתחול המאוחדת ומערכות העדפות הנכונות
- */
-async function loadUserFilterPreferences() {
+    // טעינת הגדרות ברירת מחדל מהעדפות באמצעות מערכת ההעדפות הקיימת
     const preferenceNames = [
       'defaultSearchFilter',
       'defaultDateRangeFilter', 
@@ -1564,247 +1464,250 @@ async function loadUserFilterPreferences() {
       'defaultAccountFilter'
     ];
     
-  // 1. בדיקה שהמערכות אותחלו (לפי מערכת האתחול המאוחדת)
-  if (!isSystemsReady()) {
-    throw new Error('מערכות העדפות ומטמון עדיין לא אותחלו - אנא המתין לאתחול');
-  }
-
-  // 2. ניקוי מטמון לפי הארכיטקטורה הנכונה
-  await clearPreferencesCache();
-
-  // 3. טעינה מהמערכת הראשית (PreferencesSystem V2) - לפי מערכת האתחול המאוחדת
-  if (window.PreferencesSystem && window.PreferencesSystem.manager && window.PreferencesSystem.initialized) {
-    try {
-      console.log('🔄 טוען העדפות דרך PreferencesSystem V2');
-      const allPrefs = await window.PreferencesSystem.manager.load(1, null, true);
-      const result = preferenceNames.reduce((result, name) => {
-        if (allPrefs[name] !== undefined) {
-          result[name] = allPrefs[name];
-          // לוג מיוחד עבור חשבון מסחר
-          if (name === 'defaultAccountFilter') {
-            console.log('🏦 העדפת חשבון מסחר נטענה:', { value: allPrefs[name], type: typeof allPrefs[name] });
-          }
-        }
-        return result;
-      }, {});
-      
-      console.log('📋 כל ההעדפות שנטענו:', result);
-      return result;
-    } catch (error) {
-      console.warn('שגיאה בטעינה דרך PreferencesSystem V2:', error);
-    }
-  }
-
-  // 4. Fallback למערכת הישנה - רק אם החדשה לא זמינה
-  if (typeof window.getPreferencesByNames === 'function') {
-    try {
-      console.log('🔄 טוען העדפות דרך getPreferencesByNames (fallback)');
-      const fallbackResult = await window.getPreferencesByNames(preferenceNames, 1, null, true);
-      
-      // לוג מיוחד עבור חשבון מסחר
-      if (fallbackResult && fallbackResult.defaultAccountFilter) {
-        console.log('🏦 העדפת חשבון מסחר (fallback):', { 
-          value: fallbackResult.defaultAccountFilter, 
-          type: typeof fallbackResult.defaultAccountFilter 
-        });
-      }
-      
-      return fallbackResult;
-    } catch (error) {
-      console.warn('שגיאה בטעינה דרך getPreferencesByNames:', error);
-    }
-  }
-
-  throw new Error('לא ניתן לטעון העדפות - מערכות לא מוכנות או לא זמינות');
-}
-
-/**
- * בדיקה שהמערכות אותחלו לפי מערכת האתחול המאוחדת
- * מיישם את השלבים הנכונים מ-UNIFIED_INITIALIZATION_SYSTEM
- */
-function isSystemsReady() {
-  // בדיקה לפי שלבי האתחול המאוחד - Stage 3: Preferences System initialized
-  const cacheReady = window.cacheSystemReady || 
-                    (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized);
-  
-  // בדיקה שהמערכת אותחלה לפי שלב 3 במערכת האתחול המאוחדת
-  const preferencesReady = (window.PreferencesSystem && window.PreferencesSystem.initialized) || 
-                          (window.currentPreferences !== undefined) ||
-                          (typeof window.getPreferencesByNames === 'function');
-  
-  // בדיקה שהכותרות אותחלו (Stage 2: UI Systems)
-  const headerReady = (typeof window.HeaderSystem !== 'undefined') || 
-                     (typeof window.initializeHeaderSystem === 'function');
-  
-  return cacheReady && preferencesReady && headerReady;
-}
-
-/**
- * ניקוי מטמון לפי הארכיטקטורה הנכונה
- */
-async function clearPreferencesCache() {
-  try {
-    // ניקוי UnifiedCacheManager (המערכת הראשית)
-    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
-      await window.UnifiedCacheManager.remove('user-preferences');
-    }
-
-    // ניקוי preferencesCache (מערכת הישנה לתמיכה)
-    if (window.preferencesCache && typeof window.preferencesCache.clear === 'function') {
-      await window.preferencesCache.clear();
-    }
-  } catch (error) {
-    console.warn('שגיאה בניקוי מטמון העדפות:', error);
-  }
-}
-
-/**
- * המרת העדפות לפורמט נדרש לפילטרים
- * מיישם מערכות כלליות: מיפוי ערכים וטיפול בחשבונות
- */
-async function convertPreferencesToFilterValues(preferences) {
-  console.log('🔄 ממיר העדפות לפילטרים:', preferences);
-
-  // מיפוי ערכים מאנגלית לעברית (לפי אפיון המערכת)
-  const valueMappings = {
-    type: { 'Swing': 'סווינג', 'Investment': 'השקעה', 'Passive': 'פסיבי' },
-    status: { 'Open': 'פתוח', 'Closed': 'סגור', 'Cancelled': 'מבוטל' }
-  };
-
-  // המרת ערכי סוג וסטטוס
-  const typeValue = valueMappings.type[preferences.defaultTypeFilter] || preferences.defaultTypeFilter;
-  const statusValue = valueMappings.status[preferences.defaultStatusFilter] || preferences.defaultStatusFilter;
-
-  // המרת ערך חשבון מסחר (השרת כבר מחזיר שם ולא ID)
-  console.log('🏦 מטפל בערך חשבון מסחר מלא:', preferences.defaultAccountFilter);
-  const accountValue = await mapAccountIdToName(preferences.defaultAccountFilter);
-  console.log('🏦 ערך חשבון מסחר אחרי טיפול:', accountValue);
-
-  const filterValues = {
-    search: preferences.defaultSearchFilter || '',
-    dateRange: preferences.defaultDateRangeFilter || 'כל זמן',
-    status: isValidFilterValue(statusValue) ? [statusValue] : [],
-    type: isValidFilterValue(typeValue) ? [typeValue] : [],
-    account: isValidFilterValue(accountValue) ? [accountValue] : []
-  };
-
-  console.log('✅ פילטרים מומרים:', filterValues);
-  return filterValues;
-}
-
-/**
- * בדיקה אם ערך פילטר תקין (לא "הכול" או ריק)
- */
-function isValidFilterValue(value) {
-  if (!value) return false;
-  // ערכים לא תקינים שלא צריכים להיבחר
-  const invalidValues = ['', 'all', 'הכל', 'הכול', 'כל החשבונות', 'כל החשבונות מסחר'];
-  return !invalidValues.includes(value);
-}
-
-/**
- * טיפול בערך חשבון מסחר
- * השרת יכול להחזיר ID או שם חשבון מסחר - הקוד מטפל בשני המקרים:
- * 1. אם זה שם - מחזיר אותו ישירות
- * 2. אם זה ID - מחפש את השם המתאים ברשימת החשבונות
- */
-async function mapAccountIdToName(accountValue) {
-  // אם הערך לא קיים או ריק, החזר אותו ככה
-  if (!accountValue || accountValue === '') {
-    return accountValue;
-  }
-
-  // בדיקה אם זה כבר שם חשבון מסחר (לא מספרי) - השרת החזיר שם
-  if (typeof accountValue === 'string' && isNaN(accountValue)) {
-    // זה כבר שם חשבון מסחר, החזר אותו
-    console.log('🔄 השרת החזיר שם חשבון מסחר:', accountValue);
-    return accountValue;
-  }
-
-  // אם זה ID מספרי, נסה למצוא את השם המתאים
-  if (typeof accountValue === 'string' && !isNaN(accountValue)) {
-    console.log('🔄 מחליף ID חשבון מסחר לשם:', accountValue);
+    console.log('↻ בודק אם getPreferencesByNames קיימת:', typeof window.getPreferencesByNames);
     
-    // 1. חיפוש בנתונים הקיימים (window.trading_accountsData)
-    if (window.trading_accountsData && Array.isArray(window.trading_accountsData)) {
-      const account = window.trading_accountsData.find(acc => 
-        String(acc.id) === String(accountValue) && acc.status === 'open'
-      );
-      if (account) {
-        console.log('✅ נמצא שם חשבון מסחר:', account.name);
-        return account.name;
-      }
+    if (typeof window.getPreferencesByNames !== 'function') {
+      throw new Error('getPreferencesByNames לא קיימת');
     }
-
-    // 2. נסיון לטעון חשבונות דרך HeaderSystem אם קיים
-    if (typeof HeaderSystem !== 'undefined' && typeof HeaderSystem.loadAccountsForFilter === 'function') {
+    
+    // קבלת העדפות עם פרופיל פעיל (null = פרופיל פעיל אוטומטית)
+    // נקה מטמון כדי לוודא שקוראים ערכים עדכניים
+    console.log('↻ מנקה מטמון העדפות כדי לקבל ערכים עדכניים...');
+    try {
+      await window.preferencesCache.clear();
+      console.log('↻ מטמון העדפות נוקה בהצלחה');
+    } catch (cacheError) {
+      console.warn('↻ שגיאה בניקוי מטמון:', cacheError);
+    }
+    
+    // שימוש במערכת ההעדפות הנכונה
+    console.log('↻ קורא העדפות דרך מערכת ההעדפות...');
+    let prefs;
+    let serverResponse = null;
+    
+    try {
+      // שימוש במערכת ההעדפות החדשה אם זמינה, אחרת fallback למערכת הישנה
+      if (window.PreferencesSystem && window.PreferencesSystem.manager) {
+        console.log('↻ משתמש במערכת העדפות חדשה (PreferencesSystem)');
+        prefs = await window.PreferencesSystem.manager.load(1, null, true);
+        // סינון רק את ההעדפות שאנחנו צריכים
+        prefs = preferenceNames.reduce((filtered, name) => {
+          if (prefs[name] !== undefined) {
+            filtered[name] = prefs[name];
+          }
+          return filtered;
+        }, {});
+        console.log('↻ קיבל העדפות דרך PreferencesSystem:', prefs);
+      } else {
+        // fallback למערכת הישנה
+        console.log('↻ משתמש במערכת העדפות הישנה (getPreferencesByNames)');
+        prefs = await window.getPreferencesByNames(preferenceNames, 1, null, true);
+        console.log('↻ קיבל העדפות דרך getPreferencesByNames:', prefs);
+      }
+      
+      // לקבל מידע על הפרופיל הפעיל דרך קריאה לAPI
       try {
-        await HeaderSystem.loadAccountsForFilter();
-        // המתנה קצרה לוודא שהנתונים נטענו
-        await new Promise(resolve => setTimeout(resolve, 100));
+        const response = await fetch('/api/preferences/user/multiple', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            preference_names: preferenceNames,
+            user_id: 1,
+            profile_id: null,
+            use_cache: false
+          })
+        });
         
-        // בדיקה חוזרת לאחר הטעינה
-        if (window.trading_accountsData && Array.isArray(window.trading_accountsData)) {
-          console.log('🔍 מחפש ID:', accountValue, 'בין', window.trading_accountsData.length, 'חשבונות');
-          const account = window.trading_accountsData.find(acc => 
-            String(acc.id) === String(accountValue) && acc.status === 'open'
-          );
-          if (account) {
-            console.log('✅ נמצא שם חשבון מסחר אחרי טעינה:', account.name);
-            return account.name;
+        if (response.ok) {
+          const result = await response.json();
+          serverResponse = result;
+          console.log('↻ פרופיל פעיל:', result.data?.actual_profile_id, 'פרופיל שנשלח:', result.data?.profile_id);
+        }
+      } catch (profileError) {
+        console.warn('↻ לא ניתן לקבל מידע על הפרופיל הפעיל:', profileError);
+      }
+    } catch (error) {
+      console.error('↻ שגיאה בקריאת העדפות:', error);
+      prefs = {};
+    }
+    
+    console.log('↻ העדפות מקוריות:', prefs);
+    console.log('↻ defaultStatusFilter:', prefs.defaultStatusFilter, 'type:', typeof prefs.defaultStatusFilter);
+    console.log('↻ defaultTypeFilter:', prefs.defaultTypeFilter, 'type:', typeof prefs.defaultTypeFilter);
+    console.log('↻ defaultAccountFilter:', prefs.defaultAccountFilter, 'type:', typeof prefs.defaultAccountFilter);
+    
+    // שמירת הערכים המקוריים מההעדפות ללוגים
+    window.currentPreferencesDebug = {
+      defaultStatusFilter: prefs.defaultStatusFilter,
+      defaultTypeFilter: prefs.defaultTypeFilter,
+      defaultAccountFilter: prefs.defaultAccountFilter,
+      defaultDateRangeFilter: prefs.defaultDateRangeFilter,
+      defaultSearchFilter: prefs.defaultSearchFilter,
+      // מידע על הפרופיל הפעיל
+      activeProfileId: serverResponse?.data?.actual_profile_id || 'לא ידוע',
+      requestedProfileId: serverResponse?.data?.profile_id || null
+    };
+    
+    // עדכון ליבלים דיבוג
+    window.updateDebugLabels();
+    
+    // לוג מפורט של המרת הערכים
+    console.log('↻ מעתיק העדפות:');
+    console.log('  - defaultStatusFilter:', prefs.defaultStatusFilter, '-> בדיקה שזה לא all/הכל/הכול');
+    console.log('  - defaultTypeFilter:', prefs.defaultTypeFilter, '-> בדיקה שזה לא all/הכל/הכול');
+    console.log('  - defaultAccountFilter:', prefs.defaultAccountFilter, '-> בדיקה שזה לא ריק/כל החשבונות/הכול');
+    
+    // מיפוי ערכים מאנגלית לעברית לפילטרים
+    const typeMapping = {
+      'Swing': 'סווינג',
+      'Investment': 'השקעה', 
+      'Passive': 'פסיבי'
+    };
+    
+    const statusMapping = {
+      'Open': 'פתוח',
+      'Closed': 'סגור', 
+      'Cancelled': 'מבוטל'
+    };
+    
+    // המרת ערכי הסוג מאנגלית לעברית
+    const mappedTypeValue = typeMapping[prefs.defaultTypeFilter] || prefs.defaultTypeFilter;
+    const mappedStatusValue = statusMapping[prefs.defaultStatusFilter] || prefs.defaultStatusFilter;
+    
+    // המרת ID חשבון לשם חשבון
+    let mappedAccountValue = prefs.defaultAccountFilter;
+    if (prefs.defaultAccountFilter && typeof prefs.defaultAccountFilter === 'string') {
+      try {
+        const accountMap = {};
+        
+        // נסה לקבל חשבונות מנתונים קיימים
+        if (typeof window.trading_accountsData === 'object' && window.trading_accountsData.length > 0) {
+          const openAccounts = window.trading_accountsData.filter(account => account.status === 'open');
+          openAccounts.forEach(account => {
+            accountMap[String(account.id)] = account.name;
+          });
+          
+          if (accountMap[prefs.defaultAccountFilter]) {
+            mappedAccountValue = accountMap[prefs.defaultAccountFilter];
+            console.log('↻ ממופה חשבון:', prefs.defaultAccountFilter, '->', mappedAccountValue);
           } else {
-            console.log('⚠️ לא נמצא חשבון עם ID:', accountValue, 'פתוחים:', window.trading_accountsData.filter(a => a.status === 'open').length);
+            console.log('↻ לא נמצא מיפוי עבור חשבון ID:', prefs.defaultAccountFilter);
+          }
+        } else {
+          // נסה לטעון חשבונות אם לא זמינים
+          console.log('↻ מנסה לטעון חשבונות...');
+          if (typeof HeaderSystem !== 'undefined' && typeof HeaderSystem.loadAccountsForFilter === 'function') {
+            await HeaderSystem.loadAccountsForFilter();
+            // נסה שוב לאחר הטעינה
+            if (typeof window.trading_accountsData === 'object' && window.trading_accountsData.length > 0) {
+              const openAccounts = window.trading_accountsData.filter(account => account.status === 'open');
+              openAccounts.forEach(account => {
+                accountMap[String(account.id)] = account.name;
+              });
+              
+              if (accountMap[prefs.defaultAccountFilter]) {
+                mappedAccountValue = accountMap[prefs.defaultAccountFilter];
+                console.log('↻ ממופה חשבון לאחר טעינה:', prefs.defaultAccountFilter, '->', mappedAccountValue);
+              }
+            }
           }
         }
       } catch (error) {
-        console.warn('לא ניתן לטעון חשבונות דרך HeaderSystem:', error);
+        console.warn('↻ לא ניתן להמיר ID חשבון לשם:', error);
       }
     }
     
-    // 3. Fallback אחרון - טעינה ישירה מ-API
-    try {
-      console.log('🔄 טעינה ישירה מהשרת עבור ID:', accountValue);
-      const response = await fetch('/api/trading-accounts/');
-      const data = await response.json();
-      const accounts = data.data || data;
+    console.log('↻ מיפוי ערכים:', {
+      originalType: prefs.defaultTypeFilter,
+      mappedType: mappedTypeValue,
+      originalStatus: prefs.defaultStatusFilter, 
+      mappedStatus: mappedStatusValue,
+      originalAccount: prefs.defaultAccountFilter,
+      mappedAccount: mappedAccountValue
+    });
+    
+    // הגדרות ברירת מחדל מהעדפות - טיפול נכון בערכים
+    const defaultFilters = {
+      search: prefs.defaultSearchFilter || '',
+      dateRange: prefs.defaultDateRangeFilter || 'כל זמן',
+      status: (mappedStatusValue && 
+               mappedStatusValue !== 'all' && 
+               mappedStatusValue !== 'הכל' && 
+               mappedStatusValue !== 'הכול' &&
+               mappedStatusValue !== '') ? [mappedStatusValue] : [],
+      type: (mappedTypeValue && 
+             mappedTypeValue !== 'all' && 
+             mappedTypeValue !== 'הכל' && 
+             mappedTypeValue !== 'הכול' &&
+             mappedTypeValue !== '') ? [mappedTypeValue] : [],
+      account: (mappedAccountValue && 
+                mappedAccountValue !== '' && 
+                mappedAccountValue !== 'כל החשבונות' &&
+                mappedAccountValue !== 'הכול') ? 
+               [mappedAccountValue] : []
+    };
+    
+    console.log('↻ טוען הגדרות ברירת מחדל:', defaultFilters);
+    console.log('↻ תוצאות המרה:');
+    console.log('  - status:', defaultFilters.status, '(length:', defaultFilters.status.length, ')');
+    console.log('  - type:', defaultFilters.type, '(length:', defaultFilters.type.length, ')');
+    console.log('  - account:', defaultFilters.account, '(length:', defaultFilters.account.length, ')');
+    
+    // עדכון הפילטרים הנוכחיים
+    if (window.filterSystem) {
+      window.filterSystem.currentFilters = defaultFilters;
+      window.filterSystem.saveFilters();
       
-      const account = accounts.find(acc => 
-        String(acc.id) === String(accountValue) && acc.status === 'open'
-      );
+      // עדכון UI עם המתנה כדי לוודא שהאלמנטים נטענו
+      console.log('↻ קורא ל-updateFilterUI');
       
-      if (account) {
-        console.log('✅ נמצא שם חשבון מסחר דרך API ישיר:', account.name);
-        return account.name;
+      // נסה לעדכן מיד
+      if (typeof window.updateFilterUI === 'function') {
+        window.updateFilterUI(defaultFilters);
+      } else {
+        console.error('❌ window.updateFilterUI לא קיימת!');
       }
-    } catch (error) {
-      console.warn('שגיאה בטעינה ישירה מהשרת:', error);
+      
+      // נסה שוב עם המתנה ארוכה יותר כדי לוודא שהאלמנטים נטענו
+      setTimeout(() => {
+        if (typeof window.updateFilterUI === 'function') {
+          console.log('↻ ניסיון שני לעדכון UI של הפילטרים');
+          window.updateFilterUI(defaultFilters);
+        }
+        
+        if (typeof window.filterSystem !== 'undefined' && window.filterSystem.applyAllFilters) {
+          window.filterSystem.applyAllFilters();
+        }
+        
+        // עדכון ליבלים דיבוג גם אחרי העדכון המאוחר
+        if (typeof window.updateDebugLabels === 'function') {
+          window.updateDebugLabels();
+        }
+      }, 300);
+      
     }
-  }
-
-  // fallback - החזרת הערך המקורי
-  console.log('⚠️ החזרת ערך מקורי:', accountValue);
-  return accountValue;
-}
-
-/**
- * עדכון UI של הפילטרים
- */
-async function updateFilterUI(filterValues) {
-  if (typeof window.updateFilterUI !== 'function') {
-    return;
-  }
-
-  // עדכון מיידי
-  window.updateFilterUI(filterValues);
-
-  // עדכון נוסף אחרי המתנה קצרה (למקרה שהאלמנטים עדיין נטענים)
-  setTimeout(() => {
-    window.updateFilterUI(filterValues);
-    if (window.filterSystem && typeof window.filterSystem.applyAllFilters === 'function') {
-      window.filterSystem.applyAllFilters();
+    
+    
+    // הצגת הודעת הצלחה
+    if (typeof window.showNotification === 'function') {
+      window.showNotification('פילטרים אופסו לערכי ברירת מחדל', 'success', 'הצלחה', 2000, 'system');
+    } else {
     }
-  }, 300);
-}
+    
+    // עדכון ליבלים דיבוג
+    if (typeof window.updateDebugLabels === 'function') {
+      window.updateDebugLabels();
+    }
+    
+  } catch (error) {
+    console.error('❌ שגיאה בטעינת העדפות:', error);
+    console.error('❌ פרטי השגיאה:', error.message, error.stack);
+    // fallback לאיפוס רגיל
+    window.clearAllFilters();
+  }
+};
 
 window.handleSearchInput = function(event) {
   const searchTerm = event.target.value;
@@ -1887,39 +1790,10 @@ window.initializeHeaderSystem = function() {
     if (typeof window.HeaderSystemClass.createFilterSystem === 'function') {
       window.HeaderSystemClass.createFilterSystem();
     }
-    
-    // הוספת מאזינים לאירועי מערכת האתחול המאוחדת
-    setupInitializationEventListeners();
   } else {
     console.error('❌ HeaderSystem class not found');
   }
 };
-
-/**
- * הגדרת מאזיני אירועים למערכת האתחול המאוחדת
- * מיישם את האינטגרציה עם מערכת האתחול המאוחדת
- */
-function setupInitializationEventListeners() {
-  // מאזין לאירוע כאשר מערכת ההעדפות מוכנה
-  window.addEventListener('preferences:loaded', async (event) => {
-    console.log('📥 Preferences loaded event received:', event.detail);
-    
-    // עדכון debug labels אם הם קיימים
-    if (typeof window.updateDebugLabels === 'function') {
-      // המתנה קצרה לוודא שהערכים נטענו
-      setTimeout(() => {
-        window.updateDebugLabels();
-      }, 500);
-    }
-  });
-
-  // מאזין לאירוע כאשר מטמון מאוחד מוכן
-  if (window.UnifiedCacheManager) {
-    window.UnifiedCacheManager.addEventListener?.('ready', () => {
-      console.log('💾 Unified cache manager ready - header system can use cache');
-    });
-  }
-}
 
 // פונקציה לעדכון ליבלים דיבוג
 window.updateDebugLabels = function() {

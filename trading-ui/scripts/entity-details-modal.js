@@ -115,8 +115,9 @@ class EntityDetailsModal {
                             </div>
                         </div>
                         <div class="modal-footer entity-details-footer">
-                            <button type="button" class="btn btn-secondary" 
-                                    data-bs-dismiss="modal">סגירה</button>
+                            <button type="button" class="btn" 
+                                    data-bs-dismiss="modal" 
+                                    style="background-color: var(--secondary-color); color: var(--secondary-color-text); border-color: var(--secondary-color);">סגירה</button>
                         </div>
                     </div>
                 </div>
@@ -363,6 +364,9 @@ class EntityDetailsModal {
         // עדכון צבע כותרת המודל לפי סוג הישות
         this.updateModalHeaderColor(entityType);
         
+        // עדכון כפתור הסגירה בסוף המודול
+        this.updateModalFooterColor();
+        
         // עדכון כפתורי פעולות מהירות
         this.updateQuickActionButtons(entityType, entityData);
     }
@@ -399,17 +403,49 @@ class EntityDetailsModal {
             console.log('⚠️ Using default color:', entityColor);
         }
 
-        // עדכון צבע הרקע של הכותרת - משתמש במשתני CSS דינמיים
+        // עדכון צבע הרקע של הכותרת - משתמש במשתני CSS דינמיים מהעדפות המשתמש
         const entityTypeNormalized = entityType.replace('_', '-'); // cash_flow -> cash-flow
-        headerElement.style.setProperty('--current-entity-color', `var(--entity-${entityTypeNormalized}-color)`);
-        headerElement.style.setProperty('--current-entity-bg', `var(--entity-${entityTypeNormalized}-bg)`);
-        headerElement.style.setProperty('--current-entity-text', `var(--entity-${entityTypeNormalized}-text)`);
+        const modalContent = this.modal?.querySelector('.modal-content');
         
-        headerElement.style.backgroundColor = `var(--current-entity-bg)`;
-        headerElement.style.color = `var(--current-entity-text)`; // צבע כהה
-        headerElement.style.borderBottom = `2px solid var(--current-entity-color)`;
+        if (modalContent) {
+            // הגדרת משתנים מקומיים למודול על בסיס העדפות המשתמש
+            modalContent.style.setProperty('--current-entity-color', `var(--entity-${entityTypeNormalized}-color)`);
+            modalContent.style.setProperty('--current-entity-bg', `var(--entity-${entityTypeNormalized}-bg)`);
+            modalContent.style.setProperty('--current-entity-text', `var(--entity-${entityTypeNormalized}-text)`);
+        }
+        
+        if (headerElement) {
+            headerElement.style.setProperty('--current-entity-color', `var(--entity-${entityTypeNormalized}-color)`);
+            headerElement.style.setProperty('--current-entity-bg', `var(--entity-${entityTypeNormalized}-bg)`);
+            headerElement.style.setProperty('--current-entity-text', `var(--entity-${entityTypeNormalized}-text)`);
+            
+            // החלת הצבעים הדינמיים מהעדפות המשתמש
+            headerElement.style.backgroundColor = `var(--current-entity-bg)`;
+            headerElement.style.color = `var(--current-entity-text)`;
+            headerElement.style.borderBottom = `2px solid var(--current-entity-color)`;
+        }
+        
+        // כפתור הסגירה יקבל את הצבע מהמשתנה הדינמי
+        // אין צורך בעדכון ידני כיון שה-CSS כבר מוגדר להשתמש ב-var(--current-entity-text)
         
         console.log('🎨 Applied color to modal header:', entityType, entityTypeNormalized);
+    }
+    
+    /**
+     * Update modal footer color - עדכון צבע כפתור הסגירה בסוף המודול
+     * 
+     * @private
+     */
+    updateModalFooterColor() {
+        const footerButton = this.modal?.querySelector('.modal-footer .btn');
+        if (!footerButton) return;
+        
+        // עדכון הצבעים הדינמיים
+        footerButton.style.backgroundColor = 'var(--secondary-color)';
+        footerButton.style.color = 'var(--secondary-color-text, white)';
+        footerButton.style.borderColor = 'var(--secondary-color)';
+        
+        console.log('🎨 Applied secondary color to modal footer button');
     }
 
     /**
@@ -746,9 +782,26 @@ function showEntityDetails(entityType, entityId, options = {}) {
         if (window.entityDetailsModal) {
             window.entityDetailsModal.show(entityType, entityId, options);
         } else {
-            console.error('EntityDetailsModal not initialized');
-            if (window.showErrorNotification) {
-                window.showErrorNotification('מערכת פרטי ישויות לא מוכנה');
+            // נסיון לאתחל את המערכת אם היא לא מאותחלת
+            console.warn('EntityDetailsModal not initialized, attempting to initialize...');
+            if (window.initializeEntityDetailsModal) {
+                window.initializeEntityDetailsModal();
+                // נחכה קצת ונסה שוב
+                setTimeout(() => {
+                    if (window.entityDetailsModal) {
+                        window.entityDetailsModal.show(entityType, entityId, options);
+                    } else {
+                        console.error('EntityDetailsModal initialization failed');
+                        if (window.showErrorNotification) {
+                            window.showErrorNotification('מערכת פרטי ישויות לא מוכנה');
+                        }
+                    }
+                }, 200);
+            } else {
+                console.error('EntityDetailsModal not initialized and no initializer available');
+                if (window.showErrorNotification) {
+                    window.showErrorNotification('מערכת פרטי ישויות לא מוכנה');
+                }
             }
         }
     } catch (error) {
@@ -895,12 +948,24 @@ function editTicker(tickerId) {
 window.showEntityDetails = showEntityDetails;
 window.hideEntityDetails = hideEntityDetails;
 
-// Auto-initialization - אתחול אוטומטי כשה-DOM מוכן
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        new EntityDetailsModal();
-    });
-} else {
-    // DOM already loaded
-    new EntityDetailsModal();
-}
+// Auto-initialization דרך UnifiedAppInitializer - כלל 43
+// DOMContentLoaded listener הוסר לטובת מערכת האתחול המאוחדת
+window.EntityDetailsModal = EntityDetailsModal;
+
+// יצירת אינסטנס גלובלי עבור showEntityDetails
+window.initializeEntityDetailsModal = () => {
+    if (!window.entityDetailsModal) {
+        window.entityDetailsModal = new EntityDetailsModal();
+        console.log('✅ EntityDetailsModal initialized');
+    }
+};
+
+// אתחול מיידי - מתאים לכלל 43 ללא DOMContentLoaded listeners
+// נחכה קצת שמערכות אחרות יסתיימו, ואז ניצור את האינסטנס
+setTimeout(() => {
+    try {
+        window.initializeEntityDetailsModal();
+    } catch (error) {
+        console.error('Failed to initialize EntityDetailsModal:', error);
+    }
+}, 100);

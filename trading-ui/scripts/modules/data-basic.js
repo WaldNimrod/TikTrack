@@ -1845,7 +1845,8 @@ window.saveSortState = async function (tableType, columnIndex, direction) {
       syncToBackend: false
     });
   } else {
-    localStorage.setItem(`sortState_${tableType}`, JSON.stringify(sortState)); // fallback
+    // UnifiedCacheManager לא זמין - כלל 44 violation prevented
+    console.error(`UnifiedCacheManager לא זמין - לא ניתן לשמור מצב מיון (כלל 44 violation prevented): ${tableType}`);
   }
   // Sort state saved for table
 };
@@ -1861,7 +1862,9 @@ window.getSortState = async function (tableType) {
   if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
     savedState = await window.UnifiedCacheManager.get(`sortState_${tableType}`);
   } else {
-    savedState = localStorage.getItem(`sortState_${tableType}`); // fallback
+    // UnifiedCacheManager לא זמין - כלל 44 violation prevented
+    console.warn(`UnifiedCacheManager לא זמין - לא ניתן לטעון מצב מיון (כלל 44 violation prevented): ${tableType}`);
+    savedState = null;
   }
   if (savedState) {
     try {

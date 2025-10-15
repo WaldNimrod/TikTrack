@@ -3,7 +3,9 @@
  * Handles content injection into locked template sections
  */
 
-document.addEventListener('DOMContentLoaded', function() {
+// אתחול דרך UnifiedAppInitializer - כלל 43
+// DOMContentLoaded listener הוסר לטובת מערכת האתחול המאוחדת
+window.initializeDynamicColorsDisplay = function() {
     console.log('=== Dynamic Colors Display Page Loaded ===');
 
     // Initialize color scheme system
@@ -23,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize section toggle functionality
     initializeSectionToggles();
-});
+};
 
 /**
  * Inject content into Section 1 (Dynamic Colors - Numeric Values)

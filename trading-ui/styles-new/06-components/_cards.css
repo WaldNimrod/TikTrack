@@ -510,33 +510,33 @@
 /* ===== סגנונות אייקונים לפי צבעים דינאמיים ===== */
 
 .section-icon.success {
-  color: var(--success-color) !important;
+  color: var(--success-color);
 }
 
 .section-icon.info {
-  color: var(--info-color) !important;
+  color: var(--info-color);
 }
 
 .section-icon.danger {
-  color: var(--danger-color) !important;
+  color: var(--danger-color);
 }
 
 .section-icon.warning {
-  color: var(--warning-color) !important;
+  color: var(--warning-color);
 }
 
 .section-icon.primary {
-  color: var(--primary-color) !important;
+  color: var(--primary-color);
 }
 
 .section-icon.gold {
-  color: #ffd700 !important; /* Gold - נשאר קבוע */
+  color: #ffd700; /* Gold - נשאר קבוע */
 }
 
 .section-icon.teal {
-  color: #20c997 !important; /* Teal - נשאר קבוע */
+  color: #20c997; /* Teal - נשאר קבוע */
 }
 
 .section-icon.purple {
-  color: #6f42c1 !important; /* Purple - נשאר קבוע */
+  color: #6f42c1; /* Purple - נשאר קבוע */
 }

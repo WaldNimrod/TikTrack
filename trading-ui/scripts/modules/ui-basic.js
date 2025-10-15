@@ -899,9 +899,8 @@ window.toggleSection = async function (sectionId) {
         });
         console.log(`💾 State saved to Unified Cache: ${storageKey} = "${isHidden}"`);
     } else {
-        // Fallback to localStorage if Unified Cache is not available
-        localStorage.setItem(storageKey, isHidden.toString());
-        console.log(`💾 State saved to localStorage (fallback): ${storageKey} = "${isHidden}"`);
+        // UnifiedCacheManager לא זמין - כלל 44 violation prevented
+        console.error(`UnifiedCacheManager לא זמין - לא ניתן לשמור מצב Section (כלל 44 violation prevented): ${storageKey}`);
     }
     
   } else {
@@ -950,9 +949,9 @@ window.restoreAllSectionStates = async function () {
         isHidden = cachedState === true;
         console.log(`💾 Retrieved state from Unified Cache for "${sectionId}" on page "${pageName}": hidden=${isHidden}`);
       } else {
-        // Fallback to localStorage if Unified Cache is not available
-        isHidden = localStorage.getItem(storageKey) === 'true';
-        console.log(`💾 Retrieved state from localStorage (fallback) for "${sectionId}" on page "${pageName}": hidden=${isHidden}`);
+        // UnifiedCacheManager לא זמין - כלל 44 violation prevented
+        console.warn(`UnifiedCacheManager לא זמין - משתמש בברירת מחדל (כלל 44 violation prevented) עבור "${sectionId}"`);
+        isHidden = false; // ברירת מחדל
       }
 
       if (isHidden) {
@@ -1005,9 +1004,9 @@ window.restoreSectionStates = async function () {
     topSectionHidden = cachedState === true;
     console.log(`💾 Retrieved top section state from Unified Cache for page "${pageName}": collapsed=${topSectionHidden}`);
   } else {
-    // Fallback to localStorage if Unified Cache is not available
-    topSectionHidden = localStorage.getItem(`${pageName}_top-section_collapsed`) === 'true';
-    console.log(`💾 Retrieved top section state from localStorage (fallback) for page "${pageName}": collapsed=${topSectionHidden}`);
+    // UnifiedCacheManager לא זמין - כלל 44 violation prevented
+    console.warn(`UnifiedCacheManager לא זמין - משתמש בברירת מחדל (כלל 44 violation prevented) עבור top-section בדף "${pageName}"`);
+    topSectionHidden = false;
   }
   
   const topSection = document.querySelector('.top-section .section-body, .top-section .section-content');
@@ -1044,9 +1043,9 @@ window.restoreSectionStates = async function () {
         sectionHidden = cachedState === true;
         console.log(`💾 Retrieved state from Unified Cache for section "${sectionId}" on page "${pageName}": hidden=${sectionHidden}`);
       } else {
-        // Fallback to localStorage if Unified Cache is not available
-        sectionHidden = localStorage.getItem(`${pageName}_${sectionId}_SectionHidden`) === 'true';
-        console.log(`💾 Retrieved state from localStorage (fallback) for section "${sectionId}" on page "${pageName}": hidden=${sectionHidden}`);
+        // UnifiedCacheManager לא זמין - כלל 44 violation prevented
+        console.warn(`UnifiedCacheManager לא זמין - משתמש בברירת מחדל (כלל 44 violation prevented) עבור "${sectionId}" בדף "${pageName}"`);
+        sectionHidden = false;
       }
       
       const sectionBody = section.querySelector('.section-body, .section-content');
@@ -1350,9 +1349,8 @@ async function toggleTopSection(sectionId = 'top-section') {
     });
     console.log(`💾 Top section state saved to Unified Cache: ${storageKey} = "${!isCollapsed}"`);
   } else {
-    // Fallback to localStorage if Unified Cache is not available
-    localStorage.setItem(storageKey, (!isCollapsed).toString());
-    console.log(`💾 Top section state saved to localStorage (fallback): ${storageKey} = "${!isCollapsed}"`);
+    // UnifiedCacheManager לא זמין - כלל 44 violation prevented
+    console.error(`UnifiedCacheManager לא זמין - לא ניתן לשמור מצב Top Section (כלל 44 violation prevented): ${storageKey}`);
   }
 }
 
@@ -1394,8 +1392,9 @@ window.debugSectionStates = async function() {
     topSectionState = await window.UnifiedCacheManager.get(topSectionKey);
     console.log(`📍 Top Section from Unified Cache: ${topSectionKey} = "${topSectionState}"`);
   } else {
-    // Fallback to localStorage if Unified Cache is not available
-    topSectionState = localStorage.getItem(topSectionKey);
+    // UnifiedCacheManager לא זמין - כלל 44 violation prevented
+    console.warn(`UnifiedCacheManager לא זמין - משתמש בברירת מחדל (כלל 44 violation prevented): ${topSectionKey}`);
+    topSectionState = null;
     console.log(`📍 Top Section from localStorage (fallback): ${topSectionKey} = "${topSectionState}"`);
   }
   
@@ -1412,8 +1411,9 @@ window.debugSectionStates = async function() {
         sectionState = await window.UnifiedCacheManager.get(sectionKey);
         console.log(`📍 Section ${index + 1} from Unified Cache: ${sectionKey} = "${sectionState}"`);
       } else {
-        // Fallback to localStorage if Unified Cache is not available
-        sectionState = localStorage.getItem(sectionKey);
+        // UnifiedCacheManager לא זמין - כלל 44 violation prevented
+        console.warn(`UnifiedCacheManager לא זמין - משתמש בברירת מחדל (כלל 44 violation prevented): ${sectionKey}`);
+        sectionState = null;
         console.log(`📍 Section ${index + 1} from localStorage (fallback): ${sectionKey} = "${sectionState}"`);
       }
     }
@@ -1495,8 +1495,8 @@ async function toggleAllSections() {
         });
         console.log(`💾 State saved to Unified Cache: ${storageKey} = "${isHidden}"`);
       } else {
-        // Fallback to localStorage if Unified Cache is not available
-        localStorage.setItem(storageKey, isHidden.toString());
+        // UnifiedCacheManager לא זמין - כלל 44 violation prevented
+        console.error(`UnifiedCacheManager לא זמין - לא ניתן לשמור מצב Section (כלל 44 violation prevented): ${storageKey}`);
         console.log(`💾 State saved to localStorage (fallback): ${storageKey} = "${isHidden}"`);
       }
     } else {
@@ -1541,8 +1541,9 @@ async function loadSectionStates() {
       isCollapsed = cachedState === true;
       console.log(`💾 Retrieved state from Unified Cache for "${sectionId}" on page "${pageName}": hidden=${isCollapsed}`);
     } else {
-      // Fallback to localStorage if Unified Cache is not available
-      isCollapsed = localStorage.getItem(storageKey) === 'true';
+      // UnifiedCacheManager לא זמין - כלל 44 violation prevented
+      console.warn(`UnifiedCacheManager לא זמין - משתמש בברירת מחדל (כלל 44 violation prevented): ${storageKey}`);
+      isCollapsed = false;
       console.log(`💾 Retrieved state from localStorage (fallback) for "${sectionId}" on page "${pageName}": hidden=${isCollapsed}`);
     }
     

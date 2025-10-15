@@ -1022,12 +1022,18 @@ async function refreshEntityData(entityType, entityId) {
  * - refreshEntityData() - רענון נתוני ישות
  */
 
-// Auto-initialization - אתחול אוטומטי
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        new EntityDetailsAPI();
-    });
-} else {
-    // DOM already loaded
-    new EntityDetailsAPI();
-}
+// Auto-initialization דרך UnifiedAppInitializer - כלל 43
+// DOMContentLoaded listener הוסר לטובת מערכת האתחול המאוחדת
+window.EntityDetailsAPI = EntityDetailsAPI;
+
+// יצירת אינסטנס גלובלי
+setTimeout(() => {
+    try {
+        if (!window.entityDetailsAPI) {
+            window.entityDetailsAPI = new EntityDetailsAPI();
+            console.log('✅ EntityDetailsAPI initialized');
+        }
+    } catch (error) {
+        console.error('Failed to initialize EntityDetailsAPI:', error);
+    }
+}, 150);

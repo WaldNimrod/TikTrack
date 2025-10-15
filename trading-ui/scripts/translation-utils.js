@@ -285,7 +285,8 @@ async function setLanguage(language, options = {}) {
         syncToBackend: false
       });
     } else {
-      localStorage.setItem('tiktrack_language', language); // fallback
+      // UnifiedCacheManager לא זמין - כלל 44 violation prevented
+      console.error('UnifiedCacheManager לא זמין - לא ניתן לשמור שפה (כלל 44 violation prevented)');
     }
     
     // Update document language attribute
@@ -357,7 +358,9 @@ async function getCurrentLanguage() {
     if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
       storedLanguage = await window.UnifiedCacheManager.get('tiktrack_language');
     } else {
-      storedLanguage = localStorage.getItem('tiktrack_language'); // fallback
+      // UnifiedCacheManager לא זמין - כלל 44 violation prevented
+      console.warn('UnifiedCacheManager לא זמין - לא ניתן לטעון שפה (כלל 44 violation prevented)');
+      storedLanguage = null;
     }
     
     if (storedLanguage) {
@@ -442,7 +445,9 @@ async function initializeLanguageSystem() {
     if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
       hasLanguage = await window.UnifiedCacheManager.get('tiktrack_language') !== null;
     } else {
-      hasLanguage = localStorage.getItem('tiktrack_language') !== null; // fallback
+      // UnifiedCacheManager לא זמין - כלל 44 violation prevented
+      console.warn('UnifiedCacheManager לא זמין - לא ניתן לבדוק שפה (כלל 44 violation prevented)');
+      hasLanguage = false;
     }
     
     if (!hasLanguage) {

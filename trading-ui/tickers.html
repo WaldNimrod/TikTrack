@@ -57,7 +57,7 @@
     <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=2fba6e8_20251013_051239">
     <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=2fba6e8_20251013_051239">
     <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=2fba6e8_20251013_051239">
-    <link rel="stylesheet" href="/trading-ui/styles-new/06-components/_linked-items.css?v=2fba6e8_20251013_051239">
+    <link rel="stylesheet" href="styles-new/06-components/_linked-items.css?v=2fba6e8_20251013_051239">
     <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=2fba6e8_20251013_051239">
     <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=2fba6e8_20251013_051239">
     <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=2fba6e8_20251013_051239">
@@ -393,6 +393,9 @@
     <!-- Stage 2: Core Utilities (3) - ALWAYS REQUIRED -->
     <script src="scripts/global-favicon.js?v=2fba6e8_20251013_051239"></script>
     <script src="scripts/page-utils.js?v=2fba6e8_20251013_051239"></script>
+    <!-- Preferences System (required before header-system using getPreferencesByNames) -->
+    <script src="scripts/preferences-core.js?v=2fba6e8_20251013_051239"></script>
+    <script src="scripts/preferences.js?v=2fba6e8_20251013_051239"></script>
     <script src="scripts/header-system.js?v=2fba6e8_20251013_051239"></script>
     
     <!-- Stage 3: Common Utilities - OPTIONAL -->
@@ -404,8 +407,6 @@
     <script src="scripts/button-icons.js?v=2fba6e8_20251013_051239"></script>
     <!-- Warning/Confirmation System -->
     <script src="scripts/warning-system.js?v=2fba6e8_20251014_214200"></script>
-    <!-- Preferences System (must load before services that use getPreference) -->
-    <script src="scripts/preferences-core.js?v=2fba6e8_20251013_051239"></script>
     
     <!-- Stage 4: Services - OPTIONAL -->
     <script src="scripts/services/data-collection-service.js?v=2fba6e8_20251013_051239"></script>

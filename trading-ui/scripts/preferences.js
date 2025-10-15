@@ -34,29 +34,45 @@ window.preferencesCache = {
         }
     },
     get: async function() {
-        if (this.isValid()) return this.data;
+        console.log('🔍 preferencesCache.get() called, isValid():', this.isValid());
+        if (this.isValid()) {
+            console.log('🔍 Returning cached data:', Object.keys(this.data || {}).length, 'keys');
+            return this.data;
+        }
+        
+        console.log('🔍 Cache not valid, loading from UnifiedCacheManager...');
         
         // טעינה ממטמון מאוחד
         if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
             const cachedData = await window.UnifiedCacheManager.get('user-preferences', {
                 fallback: () => this.data
             });
+            console.log('🔍 UnifiedCacheManager returned:', cachedData ? Object.keys(cachedData).length + ' keys' : 'null');
             if (cachedData) {
                 this.data = cachedData;
                 this.timestamp = Date.now();
+                console.log('🔍 Updated local cache with UnifiedCacheManager data');
                 return cachedData;
             }
+        } else {
+            console.warn('⚠️ UnifiedCacheManager not available for getting user-preferences');
         }
         
+        console.log('🔍 No cached data available, returning null');
         return null;
     },
     clear: async function() {
+        console.log('🗑️ Clearing preferencesCache - local data and timestamp');
         this.data = {};
         this.timestamp = null;
         
         // ניקוי ממטמון מאוחד
         if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
-            await window.UnifiedCacheManager.remove('user-preferences');
+            console.log('🗑️ Clearing user-preferences from UnifiedCacheManager');
+            const removed = await window.UnifiedCacheManager.remove('user-preferences');
+            console.log('🗑️ UnifiedCacheManager remove result:', removed);
+        } else {
+            console.warn('⚠️ UnifiedCacheManager not available for clearing');
         }
     }
 };
@@ -220,9 +236,10 @@ window.getGroupPreferences = async function(groupName, userId = 1, profileId = n
  * @param {Array<string>} preferenceNames - רשימת שמות העדפות
  * @param {number} userId - מזהה משתמש (ברירת מחדל: 1)
  * @param {number} profileId - מזהה פרופיל (אופציונלי)
+ * @param {boolean} forceRefresh - האם לעקוף מטמון ולטעון מהשרת (ברירת מחדל: false)
  * @returns {Promise<Object>} - מילון עם העדפות
  */
-window.getPreferencesByNames = async function(preferenceNames, userId = null, profileId = null) {
+window.getPreferencesByNames = async function(preferenceNames, userId = null, profileId = null, forceRefresh = false) {
     try {
         // קבלת המשתמש הפעיל אם לא סופק
         // כרגע יש רק משתמש אחד - נימרוד (ID: 1)
@@ -235,18 +252,25 @@ window.getPreferencesByNames = async function(preferenceNames, userId = null, pr
             }
         }
         
-        console.log(`🔍 Getting multiple preferences:`, preferenceNames, `for user: ${userId}`);
+        console.log(`🔍 Getting multiple preferences:`, preferenceNames, `for user: ${userId}, forceRefresh: ${forceRefresh}`);
         
-        // בדיקת מטמון
-        const cached = await window.preferencesCache.get();
-        const missingFromCache = preferenceNames.filter(name => !cached || cached[name] === undefined);
+        // בדיקת מטמון - רק אם לא ביקשנו טעינה מחדש
+        let cached = null;
+        let missingFromCache = preferenceNames;
         
-        if (missingFromCache.length === 0 && cached) {
-            console.log(`✅ All preferences found in cache`);
-            return preferenceNames.reduce((result, name) => {
-                result[name] = cached[name];
-                return result;
-            }, {});
+        if (!forceRefresh) {
+            cached = await window.preferencesCache.get();
+            missingFromCache = preferenceNames.filter(name => !cached || cached[name] === undefined);
+            
+            if (missingFromCache.length === 0 && cached) {
+                console.log(`✅ All preferences found in cache`);
+                return preferenceNames.reduce((result, name) => {
+                    result[name] = cached[name];
+                    return result;
+                }, {});
+            }
+        } else {
+            console.log(`🔄 Force refresh requested - bypassing cache`);
         }
         
         // שאילתה לשרת

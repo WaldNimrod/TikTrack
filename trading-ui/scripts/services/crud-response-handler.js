@@ -45,7 +45,11 @@ class CRUDResponseHandler {
                 
                 // שגיאת ולידציה (HTTP 400)
                 if (response.status === 400) {
-                    const message = errorData.message || errorData.error || 'נתונים לא תקינים';
+                    // Ensure message is a string
+                    let message = errorData.message || errorData.error || 'נתונים לא תקינים';
+                    if (typeof message === 'object') {
+                        message = message.message || JSON.stringify(message);
+                    }
                     
                     // אם יש parser מותאם לשגיאות validation ברמת שדות
                     if (options.customValidationParser && typeof options.customValidationParser === 'function') {
@@ -92,10 +96,8 @@ class CRUDResponseHandler {
                 }
             }
 
-            // רענון טבלה
-            if (options.reloadFn && typeof options.reloadFn === 'function') {
-                await options.reloadFn();
-            }
+            // רענון טבלה - מערכת מרכזית
+            await this.handleTableRefresh(options);
 
             return result;
             
@@ -134,7 +136,11 @@ class CRUDResponseHandler {
                 
                 // שגיאת ולידציה (HTTP 400)
                 if (response.status === 400) {
-                    const message = errorData.message || errorData.error || 'נתונים לא תקינים';
+                    // Ensure message is a string
+                    let message = errorData.message || errorData.error || 'נתונים לא תקינים';
+                    if (typeof message === 'object') {
+                        message = message.message || JSON.stringify(message);
+                    }
                     
                     // אם יש parser מותאם לשגיאות validation ברמת שדות
                     if (options.customValidationParser && typeof options.customValidationParser === 'function') {
@@ -181,10 +187,8 @@ class CRUDResponseHandler {
                 }
             }
 
-            // רענון טבלה
-            if (options.reloadFn && typeof options.reloadFn === 'function') {
-                await options.reloadFn();
-            }
+            // רענון טבלה - מערכת מרכזית
+            await this.handleTableRefresh(options);
 
             return result;
             
@@ -241,10 +245,8 @@ class CRUDResponseHandler {
                 window.showSuccessNotification('הצלחה', message);
             }
 
-            // רענון טבלה
-            if (options.reloadFn && typeof options.reloadFn === 'function') {
-                await options.reloadFn();
-            }
+            // רענון טבלה - מערכת מרכזית
+            await this.handleTableRefresh(options);
 
             return true;
             
@@ -512,6 +514,192 @@ class CRUDResponseHandler {
                 </td>
             </tr>
         `;
+    }
+
+    /**
+     * מערכת רענון טבלאות אוטומטית
+     * מטפלת בניקוי מטמון ורענון אוטומטי לפי תלויות
+     */
+    static async handleTableRefresh(options = {}) {
+        try {
+            // אם יש reloadFn מותאם אישית - להשתמש בו
+            if (options.reloadFn && typeof options.reloadFn === 'function') {
+                await options.reloadFn();
+                return;
+            }
+
+            // מערכת אוטומטית - זיהוי entity type מה-URL או מהoptions
+            const entityType = this.detectEntityType(options);
+            
+            if (entityType) {
+                await this.refreshEntityTables(entityType);
+            }
+
+        } catch (error) {
+            console.error('❌ שגיאה ברענון טבלה:', error);
+        }
+    }
+
+    /**
+     * זיהוי סוג ישות מהURL או options
+     */
+    static detectEntityType(options = {}) {
+        // זיהוי מה-URL אם קיים
+        if (options.apiUrl) {
+            const urlMatch = options.apiUrl.match(/\/api\/([^\/]+)/);
+            if (urlMatch) return urlMatch[1];
+        }
+
+        // זיהוי מהentityName
+        if (options.entityName) {
+            const entityMap = {
+                'הערה': 'notes',
+                'התראה': 'alerts', 
+                'טרייד': 'trades',
+                'ביצוע': 'executions',
+                'טיקר': 'tickers',
+                'חשבון מסחר': 'trading_accounts',
+                'תזרים מזומנים': 'cash_flows',
+                'תוכנית מסחר': 'trade_plans'
+            };
+            return entityMap[options.entityName] || null;
+        }
+
+        return null;
+    }
+
+    /**
+     * רענון טבלאות אוטומטי לפי entity type
+     */
+    static async refreshEntityTables(entityType) {
+        try {
+            // ניקוי מטמון עבור הישות
+            if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+                await window.UnifiedCacheManager.remove(entityType);
+                console.log(`🔄 נוקה מטמון עבור ${entityType}`);
+            }
+
+            // איפוס דגלי טעינה קיימים אם יש גישה אליהם
+            this.resetLoadingFlags(entityType);
+
+            // איפוס דגלים מיוחדים עבור ישויות ספציפיות
+            this.resetSpecialFlags(entityType);
+
+            // קריאה לפונקציית הטעינה המתאימה
+            const loadFunction = this.getLoadFunctionForEntity(entityType);
+            
+            if (loadFunction && typeof loadFunction === 'function') {
+                await loadFunction();
+                console.log(`✅ רוען טבלה עבור ${entityType}`);
+            } else {
+                console.warn(`⚠️ לא נמצאה פונקציית טעינה עבור ${entityType}`);
+            }
+
+        } catch (error) {
+            console.error(`❌ שגיאה ברענון ${entityType}:`, error);
+        }
+    }
+
+    /**
+     * איפוס דגלי טעינה - מנסה לגשת לדגלים דרך פונקציות עזר
+     */
+    static resetLoadingFlags(entityType) {
+        try {
+            // קריאה לפונקציות עזר אם הן קיימות לאיפוס דגלים
+            const resetFunctionMap = {
+                'notes': () => {
+                    // קריאה לפונקציה שמאפסת את הדגל
+                    if (typeof window.resetNotesLoadingFlag === 'function') {
+                        window.resetNotesLoadingFlag();
+                    }
+                },
+                'alerts': () => {
+                    if (typeof window.resetAlertsLoadingFlag === 'function') {
+                        window.resetAlertsLoadingFlag();
+                    }
+                },
+                'trades': () => {
+                    if (typeof window.resetTradesLoadingFlag === 'function') {
+                        window.resetTradesLoadingFlag();
+                    }
+                },
+                'executions': () => {
+                    if (typeof window.resetExecutionsLoadingFlag === 'function') {
+                        window.resetExecutionsLoadingFlag();
+                    }
+                },
+                'tickers': () => {
+                    if (typeof window.resetTickersLoadingFlag === 'function') {
+                        window.resetTickersLoadingFlag();
+                    }
+                },
+                'trading_accounts': () => {
+                    if (typeof window.resetAccountsLoadingFlag === 'function') {
+                        window.resetAccountsLoadingFlag();
+                    }
+                },
+                'cash_flows': () => {
+                    if (typeof window.resetCashFlowsLoadingFlag === 'function') {
+                        window.resetCashFlowsLoadingFlag();
+                    }
+                },
+                'trade_plans': () => {
+                    if (typeof window.resetTradePlansLoadingFlag === 'function') {
+                        window.resetTradePlansLoadingFlag();
+                    }
+                }
+            };
+
+            const resetFunction = resetFunctionMap[entityType];
+            if (resetFunction) {
+                resetFunction();
+            }
+        } catch (error) {
+            // אי אפשר לגשת לדגלים - זה בסדר, פונקציית הטעינה תטפל בזה
+            console.log(`ℹ️ לא ניתן לאפס דגל טעינה עבור ${entityType}`);
+        }
+    }
+
+    /**
+     * איפוס דגלים מיוחדים עבור ישויות ספציפיות
+     */
+    static resetSpecialFlags(entityType) {
+        try {
+            // דגלים מיוחדים עבור notes
+            if (entityType === 'notes') {
+                if (typeof window.removeAttachmentFlag !== 'undefined') {
+                    window.removeAttachmentFlag = false;
+                }
+                if (typeof window.replaceAttachmentFlag !== 'undefined') {
+                    window.replaceAttachmentFlag = false;
+                }
+            }
+            
+            // כאן אפשר להוסיף דגלים מיוחדים נוספים עבור ישויות אחרות
+        } catch (error) {
+            console.log(`ℹ️ לא ניתן לאפס דגלים מיוחדים עבור ${entityType}`);
+        }
+    }
+
+    /**
+     * מיפוי entity type לפונקציית טעינה עם איפוס דגלי טעינה
+     */
+    static getLoadFunctionForEntity(entityType) {
+        const loadFunctionMap = {
+            'notes': () => {
+                // הloadNotesData עצמה מטפלת באיפוס הדגל
+                return window.loadNotesData ? window.loadNotesData() : null;
+            },
+            'alerts': () => window.loadAlertsData ? window.loadAlertsData() : null,
+            'trades': () => window.loadTradesData ? window.loadTradesData() : null,
+            'executions': () => window.loadExecutionsData ? window.loadExecutionsData() : null,
+            'tickers': () => window.loadTickersData ? window.loadTickersData() : null,
+            'trading_accounts': () => window.loadAccountsData ? window.loadAccountsData() : null,
+            'cash_flows': () => window.loadCashFlowsData ? window.loadCashFlowsData() : null,
+            'trade_plans': () => window.loadTradePlansData ? window.loadTradePlansData() : null
+        };
+
+        return loadFunctionMap[entityType];
     }
 }
 

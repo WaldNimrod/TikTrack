@@ -55,6 +55,18 @@ img.action-icon {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
+/* ייחודי לכפתורי פילטר - איקונים קטנים יותר */
+.filter-icon-btn .action-icon,
+.filter-icon-btn img.action-icon {
+  width: 16px !important;
+  height: 16px !important;
+  margin: 0 !important;
+  vertical-align: middle !important;
+  background-color: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
 /* .btn מוגדר ב-_buttons-base.css לפי ITCSS */
 
 /* כפתור הוסף - רקע לבן, טקסט ומסגרת צבע ראשי */

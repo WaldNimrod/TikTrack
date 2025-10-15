@@ -208,35 +208,51 @@ class EntityDetailsRenderer {
         // קבלת צבע הטיקר מההעדפות
         const tickerColor = this.entityColors.ticker || 'var(--entity-ticker-color)';
         
+        // חילוץ רכיבים מקושרים
+        const linkedItems = tickerData.linked_items || [];
+        const trades = linkedItems.filter(item => item.type === 'trade');
+        const alerts = linkedItems.filter(item => item.type === 'alert');
+        
         return `
-            <div class="entity-details-container ticker-details">
-                <!-- נתוני שוק למעלה -->
-                <div class="mb-4">
-                    ${this.renderMarketData(tickerData, tickerColor)}
-                </div>
-                
-                <!-- כותרת מידע בסיסי -->
-                <div class="row">
-                    <div class="col-12">
-                        <h5 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${tickerColor} !important;">מידע בסיסי</h5>
+            <div class="ticker-details">
+                <!-- כותרת הטיקר -->
+                <div class="ticker-header">
+                    <div class="ticker-symbol">
+                        <h3>${tickerData.symbol}</h3>
+                        <span class="ticker-name">${tickerData.name || '-'}</span>
+                    </div>
+                    <div class="ticker-status">
+                        ${this.formatStatus(tickerData.status || 'active')}
                     </div>
                 </div>
                 
-                <!-- מידע בסיסי בשתי עמודות -->
-                <div class="row">
-                    <div class="col-md-6">
-                        ${this.renderBasicInfo(tickerData, 'ticker', tickerColor)}
-                    </div>
-                    <div class="col-md-6">
-                        ${this.renderAdditionalInfo(tickerData, 'ticker', tickerColor)}
+                <!-- מידע בסיסי -->
+                <div class="ticker-info-section">
+                    <h5><i class="fas fa-info-circle"></i> מידע בסיסי</h5>
+                    <div class="info-grid">
+                        ${this.createInfoRow('סימבול', tickerData.symbol)}
+                        ${this.createInfoRow('שם', tickerData.name || '-')}
+                        ${this.createInfoRow('סוג', this.translateTickerType(tickerData.type))}
+                        ${this.createInfoRow('סטטוס', this.formatStatus(tickerData.status || 'active'))}
+                        ${this.createInfoRow('תאריך יצירה', this.formatDate(tickerData.created_at))}
+                        ${this.createInfoRow('תאריך עדכון', this.formatDate(tickerData.updated_at))}
                     </div>
                 </div>
                 
-                <div class="row mt-4">
-                    <div class="col-12">
-                        ${this.renderLinkedItems(tickerData.linked_items || [], tickerColor)}
-                    </div>
-                </div>
+                <!-- נתוני שוק -->
+                ${this.renderMarketData(tickerData, tickerColor)}
+                
+                <!-- טריידים -->
+                ${trades && trades.length > 0 ? this.renderTrades(trades) : ''}
+                
+                <!-- התראות -->
+                ${alerts && alerts.length > 0 ? this.renderAlerts(alerts) : ''}
+                
+                <!-- הערות -->
+                ${tickerData.notes ? this.renderNotes(tickerData.notes) : ''}
+                
+                <!-- פריטים מקושרים נוספים -->
+                ${this.renderAdditionalLinkedItems(linkedItems, tickerColor)}
             </div>
         `;
     }
@@ -254,7 +270,7 @@ class EntityDetailsRenderer {
         
         return `
             <div class="entity-details-container trade-details">
-                ${this.renderEntityHeader('טרייד', tradeData.symbol || tradeData.id, entityColor)}
+                ${this.renderEntityHeader('טרייד', tradeData.symbol || tradeData.id, entityColor, 'trade', tradeData.id)}
                 
                 <div class="row">
                     <div class="col-md-6">
@@ -267,13 +283,7 @@ class EntityDetailsRenderer {
                 
                 <div class="row mt-4">
                     <div class="col-12">
-                        ${this.renderLinkedItems(tradeData.linked_items || [])}
-                    </div>
-                </div>
-                
-                <div class="row mt-4">
-                    <div class="col-12">
-                        ${this.renderActionButtons('trade', tradeData.id)}
+                        ${this.renderLinkedItems(tradeData.linked_items || [], entityColor, 'trade')}
                     </div>
                 </div>
             </div>
@@ -320,14 +330,31 @@ class EntityDetailsRenderer {
         const actionButtons = entityId ? this.renderHeaderActionButtons(entityType, entityId, color) : '';
         const iconPath = this.getEntityIcon(entityType || entityTypeName);
         
+        // קביעת כותרת ספציפית לפי סוג הישות
+        const getSpecificTitle = (type) => {
+            const titles = {
+                'note': 'פרטי הערה',
+                'trade': 'פרטי טרייד',
+                'trade_plan': 'פרטי תוכנית השקעה',
+                'execution': 'פרטי ביצוע',
+                'account': 'פרטי חשבון',
+                'alert': 'פרטי התראה',
+                'cash_flow': 'פרטי תזרים מזומנים',
+                'ticker': 'פרטי טיקר'
+            };
+            return titles[type] || entityTypeName;
+        };
+        
+        const specificTitle = getSpecificTitle(entityType);
+        
         return `
-            <div class="entity-details-header mb-4 pb-3 border-bottom d-flex justify-content-between align-items-center" style="border-bottom-color: ${color} !important;">
+            <div class="entity-details-header mb-4 pb-3 border-bottom d-flex justify-content-between align-items-center" style="border-bottom-color: ${color};">
                 <div class="d-flex align-items-center">
-                    <div class="entity-icon-circle" style="border-color: ${color};">
+                    <div class="entity-icon-circle" style="border-color: ${color}; color: ${color};">
                         <img src="${iconPath}" alt="${entityTypeName}">
                     </div>
                     <div>
-                        <h4 class="mb-1" style="color: ${color};">${entityTypeName}</h4>
+                        <h3 class="mb-1" style="color: ${color};">${specificTitle}</h3>
                         <p class="text-muted mb-0">${entityIdentifier}</p>
                     </div>
                 </div>
@@ -342,17 +369,28 @@ class EntityDetailsRenderer {
      * Render header action buttons - כפתורי פעולה בכותרת
      */
     renderHeaderActionButtons(entityType, entityId, color) {
-        return `
-            <button class="btn btn-sm btn-outline-primary" onclick="edit${this.capitalizeFirst(entityType)}(${entityId})" title="עריכה">
-                <i class="fas fa-edit"></i>
-            </button>
-            <button class="btn btn-sm btn-outline-danger" onclick="delete${this.capitalizeFirst(entityType)}(${entityId})" title="מחיקה">
-                <i class="fas fa-trash"></i>
-            </button>
-            <button class="btn btn-sm btn-outline-secondary" onclick="document.querySelector('.modal.show .btn-close')?.click()" title="סגירה">
-                <i class="fas fa-times"></i>
-            </button>
-        `;
+        const buttons = [];
+        const editFunction = this.getEditFunction(entityType);
+        const deleteFunction = this.getDeleteFunction(entityType);
+        const cancelableTypes = ['trade', 'trade_plan', 'alert', 'account'];
+        
+        // 1. כפתור עריכה - תמיד ראשון
+        if (window.createEditButton) {
+            buttons.push(window.createEditButton(`${editFunction}(${entityId})`));
+        }
+        
+        // 2. כפתור ביטול/שיחזור (אם יש)
+        if (cancelableTypes.includes(entityType) && window.createCancelButton) {
+            buttons.push(window.createCancelButton(entityType, entityId, 'active'));
+        }
+        
+        // 3. כפתור מחיקה
+        if (window.createDeleteButton) {
+            buttons.push(window.createDeleteButton(`${deleteFunction}(${entityId})`));
+        }
+        
+        // החזרת כפתורים באותו עיצוב כמו בטבלה הראשית
+        return buttons.join('');
     }
 
     capitalizeFirst(str) {
@@ -456,8 +494,8 @@ class EntityDetailsRenderer {
         
         if (!hasExternalData) {
             return `
-                <div class="entity-market-data">
-                    <h5 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${entityColor} !important;">נתוני שוק</h5>
+                <div class="market-data-section">
+                    <h5><i class="fas fa-chart-line"></i> נתוני שוק</h5>
                     <div class="text-muted text-center py-4">
                         <i class="fas fa-chart-line fa-2x mb-3"></i>
                         <p>נתוני שוק לא זמינים</p>
@@ -467,75 +505,69 @@ class EntityDetailsRenderer {
             `;
         }
 
-        // הצגת נתוני שוק זמינים
+        // הצגת נתוני שוק זמינים - בסגנון החדש מהמערכת הישנה
         let html = `
-            <div class="entity-market-data">
-                <h5 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${entityColor} !important;">נתוני שוק</h5>
-                <div class="row">
-                    <div class="col-md-6">
+            <div class="market-data-section">
+                <h5><i class="fas fa-chart-line"></i> נתוני שוק</h5>
+                <div class="market-data-grid">
         `;
 
-        // עמודה ראשונה - מחיר ושינויים
+        // מחיר נוכחי
         if (tickerData.current_price) {
             html += `
-                <div class="row mb-2">
-                    <div class="col-5 text-muted">מחיר נוכחי:</div>
-                    <div class="col-7 fw-bold">${this.formatPrice(tickerData.current_price)}</div>
+                <div class="market-data-item">
+                    <label>מחיר נוכחי:</label>
+                    <span class="price">${this.formatCurrency(tickerData.current_price)}</span>
                 </div>
             `;
         }
 
-        if (tickerData.change_percent !== null && tickerData.change_percent !== undefined) {
-            const changeClass = tickerData.change_percent >= 0 ? 'text-success' : 'text-danger';
-            const changeSign = tickerData.change_percent >= 0 ? '+' : '';
-            html += `
-                <div class="row mb-2">
-                    <div class="col-5 text-muted">שינוי %:</div>
-                    <div class="col-7 ${changeClass} fw-bold">${changeSign}${tickerData.change_percent.toFixed(2)}%</div>
-                </div>
-            `;
-        }
-
+        // שינוי בסכום
         if (tickerData.change_amount !== null && tickerData.change_amount !== undefined) {
-            const changeClass = tickerData.change_amount >= 0 ? 'text-success' : 'text-danger';
-            const changeSign = tickerData.change_amount >= 0 ? '+' : '';
             html += `
-                <div class="row mb-2">
-                    <div class="col-5 text-muted">שינוי $:</div>
-                    <div class="col-7 ${changeClass} fw-bold">${changeSign}$${tickerData.change_amount.toFixed(2)}</div>
+                <div class="market-data-item">
+                    <label>שינוי יומי:</label>
+                    <span class="change ${tickerData.change_amount >= 0 ? 'positive' : 'negative'}">
+                        ${tickerData.change_amount >= 0 ? '+' : ''}${this.formatCurrency(tickerData.change_amount)}
+                    </span>
                 </div>
             `;
         }
 
-        html += `
-                    </div>
-                    <div class="col-md-6">
-        `;
+        // שינוי באחוזים
+        if (tickerData.change_percent !== null && tickerData.change_percent !== undefined) {
+            html += `
+                <div class="market-data-item">
+                    <label>שינוי %:</label>
+                    <span class="change ${tickerData.change_percent >= 0 ? 'positive' : 'negative'}">
+                        ${tickerData.change_percent >= 0 ? '+' : ''}${this.formatPercentage(tickerData.change_percent)}
+                    </span>
+                </div>
+            `;
+        }
 
-        // עמודה שנייה - נפח ועדכון
+        // נפח מסחר
         if (tickerData.volume) {
             html += `
-                <div class="row mb-2">
-                    <div class="col-5 text-muted">נפח מסחר:</div>
-                    <div class="col-7">${parseInt(tickerData.volume).toLocaleString('he-IL')}</div>
+                <div class="market-data-item">
+                    <label>נפח מסחר:</label>
+                    <span>${this.formatNumber(tickerData.volume, 0)}</span>
                 </div>
             `;
         }
 
-        if (tickerData.yahoo_updated_at) {
-            const updateTime = new Date(tickerData.yahoo_updated_at).toLocaleString('he-IL');
-            html += `
-                <div class="row mb-2">
-                    <div class="col-5 text-muted">עדכון נתונים:</div>
-                    <div class="col-7 text-info">${updateTime}</div>
-                </div>
-            `;
-        }
-
+        // מטבע ותאריך עדכון
         html += `
-                    </div>
+                <div class="market-data-item">
+                    <label>מטבע:</label>
+                    <span>${tickerData.currency || 'USD'}</span>
+                </div>
+                <div class="market-data-item">
+                    <label>תאריך עדכון:</label>
+                    <span>${this.formatDate(tickerData.yahoo_updated_at)}</span>
                 </div>
             </div>
+        </div>
         `;
         return html;
     }
@@ -614,28 +646,90 @@ class EntityDetailsRenderer {
      * Render action buttons - רנדור כפתורי פעולה
      */
     renderActionButtons(entityType, entityId) {
+        // יצירת כפתורי פעולה כמו בטבלה הראשית - לפי הסדר הנכון
+        const buttons = [];
+        
+        // 1. כפתור פרטים - תמיד ראשון
+        if (window.createButton) {
+            buttons.push(window.createButton('VIEW', `window.showEntityDetails('${entityType}', ${entityId})`));
+        }
+        
+        // 2. כפתור מקושרים
+        if (window.createLinkButton) {
+            buttons.push(window.createLinkButton(`window.showLinkedItemsModal && window.showLinkedItemsModal([], '${entityType}', ${entityId})`));
+        }
+        
+        // 3. כפתור עריכה
+        if (window.createEditButton) {
+            const editFunction = this.getEditFunction(entityType);
+            buttons.push(window.createEditButton(`${editFunction}(${entityId})`));
+        }
+        
+        // 4. כפתור ביטול/שיחזור (אם יש)
+        const cancelableTypes = ['trade', 'trade_plan', 'alert', 'account'];
+        if (cancelableTypes.includes(entityType) && window.createCancelButton) {
+            buttons.push(window.createCancelButton(entityType, entityId, 'active'));
+        }
+        
+        // 5. כפתור מחיקה
+        if (window.createDeleteButton) {
+            const deleteFunction = this.getDeleteFunction(entityType);
+            buttons.push(window.createDeleteButton(`${deleteFunction}(${entityId})`));
+        }
+        
+        // שימוש ב-createActionsMenu כמו בטבלאות הראשיות
+        const actionsMenu = window.createActionsMenu ? 
+            window.createActionsMenu(buttons, entityId) : 
+            buttons.join('');
+            
         return `
             <div class="entity-action-buttons border-top pt-3">
-                <h6 class="mb-3">פעולות מהירות</h5>
-                <div class="d-flex gap-2 flex-wrap">
-                    <button class="btn btn-primary btn-sm" onclick="window.editTicker(${entityId})">
-                        <i class="fas fa-edit me-1"></i>עריכה
-                    </button>
-                    <button class="btn btn-secondary btn-sm" onclick="window.entityDetailsModal.showLinkedItems('${entityType}', ${entityId})">
-                        <i class="fas fa-link me-1"></i>פריטים מקושרים
-                    </button>
-                    <button class="btn btn-warning btn-sm" onclick="window.entityDetailsModal.exportEntity('${entityType}', ${entityId})">
-                        <i class="fas fa-download me-1"></i>ייצוא
-                    </button>
+                <h6 class="mb-3"><i class="fas fa-cogs me-2"></i>פעולות מהירות</h6>
+                <div class="d-flex justify-content-center">
+                    ${actionsMenu}
                 </div>
             </div>
         `;
+    }
+    
+    /**
+     * Get edit function name for entity type
+     */
+    getEditFunction(entityType) {
+        const editFunctions = {
+            ticker: 'editTicker',
+            trade: 'editTrade', 
+            trade_plan: 'editTradePlan',
+            execution: 'editExecution',
+            account: 'editAccount',
+            alert: 'editAlert',
+            cash_flow: 'editCashFlow',
+            note: 'editNote'
+        };
+        return editFunctions[entityType] || `edit${this.capitalizeFirst(entityType)}`;
+    }
+    
+    /**
+     * Get delete function name for entity type
+     */
+    getDeleteFunction(entityType) {
+        const deleteFunctions = {
+            ticker: 'deleteTicker',
+            trade: 'deleteTrade',
+            trade_plan: 'deleteTradePlan', 
+            execution: 'deleteExecution',
+            account: 'deleteAccount',
+            alert: 'deleteAlert',
+            cash_flow: 'deleteCashFlow',
+            note: 'deleteNote'
+        };
+        return deleteFunctions[entityType] || `delete${this.capitalizeFirst(entityType)}`;
     }
 
     /**
      * Render linked items - רנדור פריטים מקושרים
      */
-    renderLinkedItems(linkedItems, entityColor = 'var(--entity-ticker-color)') {
+    renderLinkedItems(linkedItems, entityColor = 'var(--entity-ticker-color)', currentEntityType = null) {
         console.log(`🔗 Rendering linked items:`, linkedItems);
         // בדיקה אם יש פריטים מקושרים
         const hasLinkedItems = linkedItems && linkedItems.length > 0;
@@ -663,13 +757,10 @@ class EntityDetailsRenderer {
         if (!hasLinkedItems) {
             return `
                 <div class="entity-linked-items">
-                    <h5 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${entityColor} !important;">פריטים מקושרים</h5>
+                    <h5 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${entityColor};">פריטים מקושרים</h5>
                     <div class="text-muted text-center py-4">
                         <i class="fas fa-link fa-2x mb-3"></i>
                         <p>אין פריטים מקושרים</p>
-                        <button class="btn btn-outline-primary btn-sm mt-2" onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'ticker', window.currentEntityId || 'null')">
-                            <i class="fas fa-search me-1"></i>חפש פריטים מקושרים
-                        </button>
                     </div>
                 </div>
             `;
@@ -678,10 +769,10 @@ class EntityDetailsRenderer {
         // יצירת טבלה מינימלית של פריטים מקושרים
         let html = `
             <div class="entity-linked-items">
-                <h5 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${entityColor} !important;">פריטים מקושרים (${linkedItems.length})</h5>
+                <h5 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${entityColor};">פריטים מקושרים (${linkedItems.length})</h5>
                 <div class="table-responsive">
                     <table class="table table-sm table-hover">
-                        <thead style="background-color: ${entityColor}50 !important;">
+                        <thead style="background-color: ${entityColor}50;">
                             <tr>
                                 <th>סוג</th>
                                 <th>שם</th>
@@ -695,25 +786,40 @@ class EntityDetailsRenderer {
 
         linkedItems.forEach(item => {
             const itemEntityColor = this.entityColors[item.type] || 'var(--entity-note-color)';
-            const statusBadge = this.getStatusBadge(item.status);
+            const statusBadge = this.formatStatus(item.status, itemEntityColor);
             const typeBadge = this.getTypeBadge(item.type, itemEntityColor);
+            
+            // נתונים נוספים לפי סוג הפריט
+            let additionalInfo = '';
+            if (item.type === 'trade') {
+                additionalInfo = item.investment_amount ? 
+                    `<br><small class="text-muted">השקעה: ${this.formatCurrency(item.investment_amount)}</small>` : '';
+            } else if (item.type === 'alert') {
+                additionalInfo = item.condition ? 
+                    `<br><small class="text-muted">תנאי: ${item.condition}</small>` : 
+                    (item.description ? `<br><small class="text-muted">${item.description}</small>` : '');
+            } else if (item.description) {
+                additionalInfo = `<br><small class="text-muted">${item.description}</small>`;
+            }
             
             html += `
                 <tr>
                     <td>${typeBadge}</td>
                     <td>
-                        <strong>${this.getCleanEntityName(item)}</strong>
-                        ${item.type === 'alert' && item.condition ? 
-                            `<br><small class="text-muted">תנאי: ${item.condition}</small>` : 
-                            (item.description ? `<br><small class="text-muted">${item.description}</small>` : '')}
+                        <div class="linked-item-info">
+                            <strong>${this.getCleanEntityName(item)}</strong>
+                            ${additionalInfo}
+                        </div>
                     </td>
                     <td>${statusBadge}</td>
                     <td><small>${this.formatDateTime(item.created_at || item.updated_at)}</small></td>
                     <td class="actions-cell">
                         ${window.createActionsMenu ? window.createActionsMenu([
-                            window.createLinkButton ? window.createLinkButton(`window.showEntityDetails('${item.type}', ${item.id})`) : '',
-                            window.createEditButton ? window.createEditButton(`window.editTicker(${item.id})`) : '',
-                            this.getActionButtonForType(item.type, item.id, item.status) || ''
+                            window.createButton ? window.createButton('VIEW', `window.showEntityDetails('${item.type}', ${item.id})`) : '',
+                            window.createLinkButton ? window.createLinkButton(`window.showLinkedItemsModal && window.showLinkedItemsModal([], '${item.type}', ${item.id})`) : '',
+                            window.createEditButton ? window.createEditButton(`${this.getEditFunction(item.type)}(${item.id})`) : '',
+                            this.getActionButtonForType && this.getActionButtonForType(item.type, item.id, item.status) || '',
+                            window.createDeleteButton ? window.createDeleteButton(`${this.getDeleteFunction(item.type)}(${item.id})`) : ''
                         ], item.id) : ''}
                     </td>
                 </tr>
@@ -1077,6 +1183,40 @@ class EntityDetailsRenderer {
     }
 
     /**
+     * Format number with specific decimal places
+     */
+    formatNumber(number, decimals = 2) {
+        if (number === null || number === undefined) return '-';
+        
+        try {
+            return parseFloat(number).toLocaleString('he-IL', {
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals
+            });
+        } catch (error) {
+            return number.toString();
+        }
+    }
+
+    /**
+     * Format percentage with decimals
+     */
+    formatPercentage(value, decimals = 2) {
+        if (value === null || value === undefined) return '-';
+        
+        try {
+            const formatted = parseFloat(value).toLocaleString('he-IL', {
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals
+            });
+            
+            return `${formatted}%`;
+        } catch (error) {
+            return `${value}%`;
+        }
+    }
+
+    /**
      * Format date to dd/MM/yy
      */
     formatDate(dateString) {
@@ -1298,14 +1438,8 @@ class EntityDetailsRenderer {
         
         return `
             <div class="entity-details-container trade-plan-details">
-                <!-- כותרת מידע בסיסי -->
-                <div class="row">
-                    <div class="col-12">
-                        <h5 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${planColor} !important;">מידע בסיסי</h5>
-                    </div>
-                </div>
+                ${this.renderEntityHeader('תוכנית השקעה', tradePlanData.name || tradePlanData.id, planColor, 'trade_plan', tradePlanData.id)}
                 
-                <!-- מידע בסיסי בשתי עמודות -->
                 <div class="row">
                     <div class="col-md-6">
                         ${this.renderBasicInfo(tradePlanData, 'trade_plan', planColor)}
@@ -1317,7 +1451,7 @@ class EntityDetailsRenderer {
                 
                 <div class="row mt-4">
                     <div class="col-12">
-                        ${this.renderLinkedItems(tradePlanData.linked_items || [], planColor)}
+                        ${this.renderLinkedItems(tradePlanData.linked_items || [], planColor, 'trade_plan')}
                     </div>
                 </div>
             </div>
@@ -1343,6 +1477,13 @@ class EntityDetailsRenderer {
                         ${this.renderAdditionalInfo(executionData, 'execution', entityColor)}
                     </div>
                 </div>
+                
+                <div class="row mt-4">
+                    <div class="col-12">
+                        ${this.renderLinkedItems(executionData.linked_items || [], entityColor, 'execution')}
+                    </div>
+                </div>
+                
             </div>
         `;
     }
@@ -1355,14 +1496,8 @@ class EntityDetailsRenderer {
         
         return `
             <div class="entity-details-container account-details">
-                <!-- כותרת מידע בסיסי -->
-                <div class="row">
-                    <div class="col-12">
-                        <h5 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${accountColor} !important;">מידע בסיסי</h5>
-                    </div>
-                </div>
+                ${this.renderEntityHeader('חשבון מסחר', accountData.name || accountData.id, accountColor, 'account', accountData.id)}
                 
-                <!-- מידע בסיסי בשתי עמודות -->
                 <div class="row">
                     <div class="col-md-6">
                         ${this.renderBasicInfo(accountData, 'account', accountColor)}
@@ -1374,7 +1509,7 @@ class EntityDetailsRenderer {
                 
                 <div class="row mt-4">
                     <div class="col-12">
-                        ${this.renderLinkedItems(accountData.linked_items || [], accountColor)}
+                        ${this.renderLinkedItems(accountData.linked_items || [], accountColor, 'account')}
                     </div>
                 </div>
             </div>
@@ -1384,11 +1519,12 @@ class EntityDetailsRenderer {
         try {
             console.log('🎨 Rendering alert data:', alertData);
             
-            // יצירת כותרת המודול
-            const header = this.renderEntityHeader('התראה', alertData.id || 'לא זמין', this.entityColors.alert);
+            // יצירת כותרת המודול עם פרמטרים נכונים
+            const entityColor = this.entityColors.alert || '#dc3545';
+            const header = this.renderEntityHeader('התראה', alertData.id || 'לא זמין', entityColor, 'alert', alertData.id);
             
             // יצירת מידע בסיסי
-            const basicInfo = this.renderBasicInfo(alertData, 'alert');
+            const basicInfo = this.renderBasicInfo(alertData, 'alert', entityColor);
             
             // יצירת מידע ספציפי להתראה
             const alertSpecific = this.renderAlertSpecific(alertData);
@@ -1397,10 +1533,7 @@ class EntityDetailsRenderer {
             const alertCondition = this.renderAlertCondition(alertData);
             
             // יצירת פריטים מקושרים
-            const linkedItems = this.renderLinkedItems(alertData.linked_items || []);
-            
-            // יצירת כפתורי פעולה
-            const actionButtons = this.renderActionButtons('alert', alertData.id);
+            const linkedItems = this.renderLinkedItems(alertData.linked_items || [], entityColor, 'alert');
             
             return `
                 <div class="entity-details-content">
@@ -1411,7 +1544,6 @@ class EntityDetailsRenderer {
                         ${alertCondition}
                         ${linkedItems}
                     </div>
-                    ${actionButtons}
                 </div>
             `;
             
@@ -1627,8 +1759,8 @@ class EntityDetailsRenderer {
         return `
             <div class="row mt-4">
                 <div class="col-12">
-                    <h5 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${cashFlowColor} !important;">חשבון מסחר מקושר</h5>
-                    <div class="linked-account-card p-3 border rounded" style="background-color: ${accountColorLight}; border-color: ${accountColorDark} !important; border-width: 2px !important;">
+                    <h5 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${cashFlowColor};">חשבון מסחר מקושר</h5>
+                    <div class="linked-account-card p-3 border rounded" style="background-color: ${accountColorLight}; border-color: ${accountColorDark}; border-width: 2px;">
                         <div class="d-flex justify-content-between align-items-start">
                             <div class="d-flex align-items-start flex-grow-1">
                                 <div class="entity-icon-circle icon-sm" style="border-color: ${accountColorDark};">
@@ -1721,31 +1853,238 @@ class EntityDetailsRenderer {
                 ${noteData.attachment ? `
                 <div class="row mt-3">
                     <div class="col-12">
-                        <h5 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${entityColor} !important;">קובץ מצורף</h5>
-                        <div class="attachment-preview p-3 border rounded">
-                            <a href="/api/notes/files/${noteData.attachment}" target="_blank" class="btn btn-sm btn-outline-primary">
-                                <i class="fas fa-file-download me-2"></i>צפה בקובץ
-                            </a>
+                        <h5 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${entityColor};">קובץ מצורף</h5>
+                        <div class="attachment-preview p-3 border rounded d-flex align-items-center gap-3">
+                            <div class="attachment-thumbnail">
+                                <img src="/api/notes/files/${noteData.attachment}" 
+                                     class="img-thumbnail" 
+                                     style="max-width: 80px; max-height: 80px; cursor: pointer;"
+                                     onclick="window.open('/api/notes/files/${noteData.attachment}', '_blank')"
+                                     alt="קובץ מצורף" 
+                                     title="לחץ להגדלה">
+                            </div>
+                            <div class="attachment-actions">
+                                <a href="/api/notes/files/${noteData.attachment}" 
+                                   download="${noteData.attachment}" 
+                                   class="btn btn-sm btn-outline-secondary me-2">
+                                    <i class="fas fa-download me-1"></i>הורדה
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
                 ` : ''}
+                
+                ${noteData.related_entity_name ? `
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h5 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${entityColor};">אובייקט מקושר</h5>
+                        <div class="p-3 border rounded">
+                            <p class="mb-1">
+                                <strong>${noteData.related_entity_type || 'אובייקט'}:</strong> 
+                                <span>${noteData.related_entity_name}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+                
+                <div class="row mt-4">
+                    <div class="col-12">
+                        ${this.renderLinkedItems(noteData.linked_items || [], entityColor, 'note')}
+                    </div>
+                </div>
+                
             </div>
         `;
     }
+
+    /**
+     * יצירת שורת מידע - מהמערכת הישנה
+     */
+    createInfoRow(label, value, additionalClasses = '') {
+        return `
+            <div class="info-row ${additionalClasses}">
+                <label>${label}:</label>
+                <span>${value}</span>
+            </div>
+        `;
+    }
+
+    /**
+     * הצגת טריידים - מהמערכת הישנה
+     */
+    renderTrades(trades) {
+        const tradesHTML = trades.slice(0, 5).map(trade => `
+            <div class="trade-item">
+                <div class="trade-info">
+                    <span class="trade-name">${trade.name || `טרייד #${trade.id}`}</span>
+                    <span class="trade-status">${this.formatStatus(trade.status)}</span>
+                </div>
+                <div class="trade-details">
+                    <small class="text-muted">
+                        ${this.formatDate(trade.created_at)} | 
+                        ${this.formatCurrency(trade.investment_amount || 0)}
+                    </small>
+                </div>
+            </div>
+        `).join('');
+        
+        return `
+            <div class="trades-section">
+                <h5><i class="fas fa-exchange-alt"></i> טריידים (${trades.length})</h5>
+                <div class="trades-list">
+                    ${tradesHTML}
+                </div>
+                ${trades.length > 5 ? `
+                    <div class="text-center mt-2">
+                        <small class="text-muted">ועוד ${trades.length - 5} טריידים...</small>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }
+
+    /**
+     * הצגת התראות - מהמערכת הישנה
+     */
+    renderAlerts(alerts) {
+        const alertsHTML = alerts.slice(0, 5).map(alert => `
+            <div class="alert-item">
+                <div class="alert-info">
+                    <span class="alert-name">${alert.name || `התראה #${alert.id}`}</span>
+                    <span class="alert-status">${this.formatStatus(alert.status)}</span>
+                </div>
+                <div class="alert-details">
+                    <small class="text-muted">
+                        ${this.formatDate(alert.created_at)} | 
+                        ${alert.condition || 'ללא תנאי'}
+                    </small>
+                </div>
+            </div>
+        `).join('');
+        
+        return `
+            <div class="alerts-section">
+                <h5><i class="fas fa-bell"></i> התראות (${alerts.length})</h5>
+                <div class="alerts-list">
+                    ${alertsHTML}
+                </div>
+                ${alerts.length > 5 ? `
+                    <div class="text-center mt-2">
+                        <small class="text-muted">ועוד ${alerts.length - 5} התראות...</small>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }
+
+    /**
+     * הצגת הערות - מהמערכת הישנה
+     */
+    renderNotes(notes) {
+        return `
+            <div class="notes-section">
+                <h5><i class="fas fa-sticky-note"></i> הערות</h5>
+                <div class="notes-content">
+                    <p>${notes}</p>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * תרגום סוג טיקר - מהמערכת הישנה
+     */
+    translateTickerType(type) {
+        const translations = {
+            'stock': 'מניה',
+            'etf': 'קרן נסחרת',
+            'bond': 'אג"ח',
+            'crypto': 'מטבע דיגיטלי',
+            'commodity': 'סחורה',
+            'forex': 'מט"ח',
+            'index': 'מדד'
+        };
+        
+        return translations[type] || type || '-';
+    }
+
+    /**
+     * הצגת פריטים מקושרים נוספים - לא טריידים והתראות
+     */
+    renderAdditionalLinkedItems(linkedItems, entityColor) {
+        const otherItems = linkedItems.filter(item => 
+            item.type !== 'trade' && item.type !== 'alert'
+        );
+        
+        if (otherItems.length === 0) {
+            return '';
+        }
+        
+        return `
+            <div class="entity-linked-items">
+                <h5 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${entityColor};">פריטים מקושרים נוספים (${otherItems.length})</h5>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover">
+                        <thead style="background-color: ${entityColor}50;">
+                            <tr>
+                                <th>סוג</th>
+                                <th>שם</th>
+                                <th>סטטוס</th>
+                                <th>תאריך</th>
+                                <th>פעולות</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${otherItems.map(item => {
+                                const itemEntityColor = this.entityColors[item.type] || 'var(--entity-note-color)';
+                                const statusBadge = this.formatStatus(item.status, itemEntityColor);
+                                const typeBadge = this.getTypeBadge(item.type, itemEntityColor);
+                                
+                                return `
+                                    <tr>
+                                        <td>${typeBadge}</td>
+                                        <td>
+                                            <div class="linked-item-info">
+                                                <strong>${this.getCleanEntityName(item)}</strong>
+                                                ${item.description ? `<br><small class="text-muted">${item.description}</small>` : ''}
+                                            </div>
+                                        </td>
+                                        <td>${statusBadge}</td>
+                                        <td><small>${this.formatDateTime(item.created_at || item.updated_at)}</small></td>
+                                        <td class="actions-cell">
+                                            <button class="btn btn-sm btn-outline-primary" onclick="window.showEntityDetails('${item.type}', ${item.id})" title="צפייה בפרטים">פרטים</button>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    }
+
     renderGeneric(entityData, entityType, options) { return '<div>ישות כללית</div>'; }
 }
 
 // ===== AUTO INITIALIZATION =====
 
 /**
- * Auto-initialize when DOM is ready - אתחול אוטומטי כשה-DOM מוכן
+ * Auto-initialization דרך UnifiedAppInitializer - כלל 43
+ * DOMContentLoaded listener הוסר לטובת מערכת האתחול המאוחדת
  */
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        new EntityDetailsRenderer();
-    });
-} else {
-    // DOM already loaded
-    new EntityDetailsRenderer();
-}
+window.EntityDetailsRenderer = EntityDetailsRenderer;
+
+// יצירת אינסטנס גלובלי
+setTimeout(() => {
+    try {
+        if (!window.entityDetailsRenderer) {
+            window.entityDetailsRenderer = new EntityDetailsRenderer();
+            console.log('✅ EntityDetailsRenderer initialized');
+        }
+    } catch (error) {
+        console.error('Failed to initialize EntityDetailsRenderer:', error);
+    }
+}, 200);

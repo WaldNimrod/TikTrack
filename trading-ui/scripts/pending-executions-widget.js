@@ -295,8 +295,9 @@ window.goToExecutionsPage = goToExecutionsPage;
 // Auto-Initialization
 // ========================================
 
-// טעינה אוטומטית כשהדף נטען
-document.addEventListener('DOMContentLoaded', () => {
+// אתחול דרך UnifiedAppInitializer - כלל 43
+// DOMContentLoaded listener הוסר לטובת מערכת האתחול המאוחדת
+window.initializePendingExecutionsWidget = () => {
     console.log('📊 Pending Executions Widget initialized');
     
     // בדיקה שהאלמנטים קיימים
@@ -314,6 +315,6 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         console.warn('⚠️ Pending Executions Widget elements not found - widget disabled');
     }
-});
+};
 
 console.log('📊 Pending Executions Widget script loaded');

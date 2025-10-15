@@ -62,7 +62,7 @@
     <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=2fba6e8_20251013_051239">
     <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=2fba6e8_20251013_051239">
     <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=2fba6e8_20251013_051239">
-    <link rel="stylesheet" href="/trading-ui/styles-new/06-components/_linked-items.css?v=2fba6e8_20251013_051239">
+    <link rel="stylesheet" href="styles-new/06-components/_linked-items.css?v=2fba6e8_20251013_051239">
     
     <!-- 07-trumps - Page-specific Styles -->
     <!-- <link rel="stylesheet" href="styles-new/07-trumps/_notes.css?v=2fba6e8_20251013_051239"> -->
@@ -133,6 +133,25 @@
                             ניהול הערות
                         </h2>
                         <div class="header-actions">
+                            <div class="filter-buttons-container button-row">
+                                <button class="btn btn-sm btn-outline-primary filter-all-btn active" onclick="filterNotesByRelatedObjectType('all')" data-type="all" title="הצג כל ההערות">
+                                    הכל
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterNotesByRelatedObjectType('account')" data-type="account" title="הצג הערות המקושרות לחשבונות מסחר">
+                                    <img src="images/icons/trading_accounts.svg" alt="חשבונות מסחר" class="action-icon">
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterNotesByRelatedObjectType('trade')" data-type="trade" title="הצג הערות המקושרות לטריידים">
+                                    <img src="images/icons/trades.svg" alt="טריידים" class="action-icon">
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterNotesByRelatedObjectType('trade_plan')" data-type="trade_plan" title="הצג הערות המקושרות לתוכניות טרייד">
+                                    <img src="images/icons/trade_plans.svg" alt="תוכניות" class="action-icon">
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterNotesByRelatedObjectType('ticker')" data-type="ticker" title="הצג הערות המקושרות לטיקרים">
+                                    <img src="images/icons/tickers.svg" alt="טיקרים" class="action-icon">
+                                </button>
+                                
+                                <span class="filter-divider">|</span>
+                            </div>
                             <button id="addNoteBtn" class="refresh-btn" onclick="showAddNoteModal()" title="הוסף הערה חדשה">
                                 <img src="images/icons/home.svg" alt="הוסף" class="action-icon">
                                 הוסף
@@ -258,7 +277,7 @@
                     </div>
                     <div class="modal-footer modal-footer-end">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-entity btn-entity-note" onclick="addNote()">הוסף הערה</button>
+                        <button type="button" class="btn btn-entity btn-entity-note" onclick="saveNote()">הוסף הערה</button>
                     </div>
                 </div>
             </div>
@@ -275,6 +294,8 @@
                     </div>
                     <div class="modal-body">
                         <form id="editNoteForm">
+                            <!-- Hidden field to store note ID -->
+                            <input type="hidden" id="editNoteId" value="">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">
@@ -308,7 +329,17 @@
                                 <div class="col-md-12">
                                     <div class="mb-3">
                                         <label for="editNoteAttachment" class="form-label entity-label">קובץ מצורף (אופציונלי)</label>
-                                        <input type="file" class="form-control" id="editNoteAttachment" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png">
+                                        <input type="file" class="form-control" id="editNoteAttachment" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.webp,.tiff,.tif,.xls,.xlsx,.ppt,.pptx,.rtf">
+                                        
+                                        <!-- Display current attachment -->
+                                        <div id="currentAttachmentDisplay" class="mt-2" style="display: none;">
+                                            <!-- Content will be populated by JavaScript -->
+                                        </div>
+                                        
+                                        <!-- Attachment actions -->
+                                        <div id="attachmentActions" class="mt-2" style="display: none;">
+                                            <!-- Action buttons will be populated by JavaScript -->
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -348,6 +379,9 @@
     <!-- Stage 2: Core Utilities (3) - ALWAYS REQUIRED -->
     <script src="scripts/global-favicon.js?v=2fba6e8_20251013_051239"></script>
     <script src="scripts/page-utils.js?v=2fba6e8_20251013_051239"></script>
+    <!-- Preferences System (required before header-system using getPreferencesByNames) -->
+    <script src="scripts/preferences-core.js?v=2fba6e8_20251013_051239"></script>
+    <script src="scripts/preferences.js?v=2fba6e8_20251013_051239"></script>
     <script src="scripts/header-system.js?v=2fba6e8_20251013_051239"></script>
     
     <!-- Stage 3: Common Utilities - OPTIONAL -->
@@ -358,9 +392,10 @@
     <script src="scripts/button-icons.js?v=2fba6e8_20251013_051239"></script>
     <script src="scripts/linked-items.js?v=2fba6e8_20251013_051239"></script>
     <script src="scripts/warning-system.js?v=2fba6e8_20251013_051239"></script>
+    <script src="scripts/entity-details-api.js?v=2fba6e8_20251013_051239"></script>
+    <script src="scripts/entity-details-renderer.js?v=2fba6e8_20251013_051239"></script>
+    <script src="scripts/entity-details-modal.js?v=2fba6e8_20251013_051239"></script>
     <script src="scripts/related-object-filters.js?v=2fba6e8_20251013_051239"></script>
-    <!-- Preferences System (required before services using getPreference) -->
-    <script src="scripts/preferences-core.js?v=2fba6e8_20251013_051239"></script>
     
     <!-- Stage 4: Services - OPTIONAL -->
     <script src="scripts/services/data-collection-service.js?v=2fba6e8_20251013_051239"></script>

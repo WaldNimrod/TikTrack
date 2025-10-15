@@ -157,16 +157,7 @@ async function addTrade() {
         await window.CRUDResponseHandler.handleSaveResponse(response, {
             modalId: 'addTradeModal',
             successMessage: 'הטרייד נוסף בהצלחה',
-            reloadFn: async () => {
-                // ניקוי מטמון
-                if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-                    await window.UnifiedCacheManager.remove('trades');
-                }
-                // רענון טבלה
-                if (typeof window.loadTradesData === 'function') {
-                    await window.loadTradesData();
-                }
-            },
+            apiUrl: '/api/trades/',
             entityName: 'טרייד'
         });
 
@@ -547,9 +538,9 @@ class TradesController {
                 <td class="col-account">${accountName}</td>
                 <td class="col-actions actions-cell">
                     ${window.createActionsMenu ? window.createActionsMenu([
+                        window.createButton ? window.createButton('VIEW', `viewTrade(${trade.id})`) : '',
                         window.createLinkButton ? window.createLinkButton(`viewLinkedItemsForTrade(${trade.id})`) : '',
                         window.createEditButton ? window.createEditButton(`editTrade(${trade.id})`) : '',
-                        window.createButton ? window.createButton('VIEW', `viewTrade(${trade.id})`) : '',
                         window.createCancelButton ? window.createCancelButton('trade', trade.id, trade.status) : '',
                         window.createDeleteButton ? window.createDeleteButton(`deleteTrade(${trade.id})`) : ''
                     ], trade.id) : ''}
@@ -807,14 +798,7 @@ class TradesController {
             await handler(response, {
                 modalId: mode === 'add' ? 'addTradeModal' : 'editTradeModal',
                 successMessage: `טרייד ${mode === 'add' ? 'נוסף' : 'עודכן'} בהצלחה`,
-                reloadFn: async () => {
-                    // ניקוי מטמון
-                    if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-                        await window.UnifiedCacheManager.remove('trades');
-                    }
-                    // רענון נתונים
-                    await this.loadTrades();
-                },
+                apiUrl: mode === 'add' ? '/api/trades/' : `/api/trades/${tradeId}`,
                 entityName: 'טרייד'
             });
             
@@ -973,16 +957,7 @@ window.cancelTradeRecord = async function(tradeId) {
         // טיפול בתגובה
         await window.CRUDResponseHandler.handleUpdateResponse(response, {
             successMessage: 'הטרייד בוטל בהצלחה',
-            reloadFn: async () => {
-                // ניקוי מטמון
-                if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-                    await window.UnifiedCacheManager.remove('trades');
-                }
-                // רענון טבלה
-                if (typeof window.loadTradesData === 'function') {
-                    await window.loadTradesData();
-                }
-            },
+            apiUrl: `/api/trades/${tradeId}`,
             entityName: 'טרייד'
         });
         
@@ -1019,16 +994,7 @@ window.reactivateTrade = async function(tradeId) {
         // טיפול בתגובה
         await window.CRUDResponseHandler.handleUpdateResponse(response, {
             successMessage: 'הטרייד הופעל מחדש בהצלחה',
-            reloadFn: async () => {
-                // ניקוי מטמון
-                if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-                    await window.UnifiedCacheManager.remove('trades');
-                }
-                // רענון טבלה
-                if (typeof window.loadTradesData === 'function') {
-                    await window.loadTradesData();
-                }
-            },
+            apiUrl: `/api/trades/${tradeId}`,
             entityName: 'טרייד'
         });
         
@@ -1141,6 +1107,7 @@ async function loadTradesData() {
 
 // חשיפה כפונקציה גלובלית
 window.loadTradesData = loadTradesData;
+window.resetTradesLoadingFlag = () => { _isLoadingTrades = false; };
 
 // אתחול אוטומטי - הוסר למערכת מאוחדת
 // document.addEventListener('DOMContentLoaded', function() {

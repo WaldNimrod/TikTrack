@@ -1105,7 +1105,8 @@ async function saveExecution() {
     await window.CRUDResponseHandler.handleSaveResponse(response, {
         modalId: 'addExecutionModal',
         successMessage: 'עסקה נוספה בהצלחה',
-      customValidationParser: (errorMessage) => {
+        apiUrl: '/api/executions/',
+        customValidationParser: (errorMessage) => {
         if (typeof errorMessage !== 'string') {return null;}
         const normalized = String(errorMessage);
         const out = [];
@@ -1117,18 +1118,7 @@ async function saveExecution() {
         if (normalized.includes('source')) out.push({ fieldId: 'addExecutionSource', message: 'מקור לא תקין' });
         return out.length ? out : null;
       },
-        reloadFn: async () => {
-            // ניקוי מטמון
-            if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-                await window.UnifiedCacheManager.remove('executions');
-                console.log('✅ מטמון executions נוקה אחרי הוספה');
-            }
-            // רענון טבלה
-            if (typeof window.loadExecutionsData === 'function') {
-                await window.loadExecutionsData();
-            }
-        },
-        entityName: 'עסקה'
+        entityName: 'ביצוע'
     });
 
   } catch (error) {
@@ -1217,6 +1207,7 @@ async function updateExecution() {
     await window.CRUDResponseHandler.handleUpdateResponse(response, {
         modalId: 'editExecutionModal',
         successMessage: 'עסקה עודכנה בהצלחה',
+        apiUrl: `/api/executions/${id}`,
       customValidationParser: (errorMessage) => {
         if (typeof errorMessage !== 'string') {return null;}
         const normalized = String(errorMessage);
@@ -1229,18 +1220,7 @@ async function updateExecution() {
         if (normalized.includes('source')) out.push({ fieldId: 'editExecutionSource', message: 'מקור לא תקין' });
         return out.length ? out : null;
       },
-        reloadFn: async () => {
-            // ניקוי מטמון
-            if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-                await window.UnifiedCacheManager.remove('executions');
-                console.log('✅ מטמון executions נוקה אחרי עדכון');
-            }
-            // רענון טבלה
-            if (typeof window.loadExecutionsData === 'function') {
-                await window.loadExecutionsData();
-            }
-        },
-        entityName: 'עסקה'
+        entityName: 'ביצוע'
     });
 
   } catch (error) {
@@ -1652,9 +1632,9 @@ async function updateExecutionsTableMain(executions) {
                 <td class="source-cell">${execution.source || '-'}</td>
                 <td class="col-actions actions-cell">
                     ${window.createActionsMenu ? window.createActionsMenu([
+                        window.createButton ? window.createButton('VIEW', `showExecutionDetails(${execution.id})`) : '',
                         window.createLinkButton ? window.createLinkButton(`viewLinkedItemsForExecution(${execution.id})`) : '',
                         window.createEditButton ? window.createEditButton(`editExecution(${execution.id})`) : '',
-                        window.createButton ? window.createButton('VIEW', `showExecutionDetails(${execution.id})`) : '',
                         window.createDeleteButton ? window.createDeleteButton(`deleteExecution(${execution.id})`) : ''
                     ], execution.id) : ''}
                 </td>
@@ -2633,10 +2613,12 @@ async function _initializeExecutionsPageValidation() {
         });
         topSectionHidden = savedState === 'true' || savedState === true;
       } catch (err) {
-        topSectionHidden = localStorage.getItem('executionsTopSectionCollapsed') === 'true';
+        console.error('שגיאה בטעינה דרך UnifiedCacheManager (כלל 44 violation prevented):', err);
+        topSectionHidden = false; // ברירת מחדל
       }
     } else {
-      topSectionHidden = localStorage.getItem('executionsTopSectionCollapsed') === 'true';
+      console.warn('UnifiedCacheManager לא זמין - משתמש בברירת מחדל (כלל 44 violation prevented)');
+      topSectionHidden = false;
     }
     
     const topSection = document.querySelector('.top-section .section-body');

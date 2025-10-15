@@ -429,13 +429,13 @@
 }
 
 .test-status.text-success {
-    color: #28a745 !important;
+    color: #28a745 ;
 }
 
 .test-status.text-danger {
-    color: #dc3545 !important;
+    color: #dc3545 ;
 }
 
 .test-status.text-muted {
-    color: #6c757d !important;
+    color: #6c757d ;
 }

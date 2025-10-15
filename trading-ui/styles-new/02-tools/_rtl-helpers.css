@@ -304,10 +304,10 @@
 /* RTL Print Helpers */
 @media print {
   .rtl-print-hide {
-    display: none !important;
+    display: none ;
   }
   
   .rtl-print-show {
-    display: block !important;
+    display: block ;
   }
 }

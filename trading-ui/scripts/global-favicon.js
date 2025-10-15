@@ -88,12 +88,9 @@ function autoSetFavicon() {
     setPageSpecificFavicon(pageType);
 }
 
-// Auto-set favicon when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', autoSetFavicon);
-} else {
-    autoSetFavicon();
-}
+// אתחול דרך UnifiedAppInitializer - כלל 43
+// DOMContentLoaded listener הוסר לטובת מערכת האתחול המאוחדת
+window.autoSetFavicon = autoSetFavicon;
 
 /**
  * Set favicon (alias for setGlobalFavicon)

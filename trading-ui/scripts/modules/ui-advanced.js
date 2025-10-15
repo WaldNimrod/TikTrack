@@ -806,10 +806,10 @@ function generateStatusCSS() {
 
 /* תמיכה בשילוב status-badge + status-${status} */
 .status-badge.status-${status} {
-  background: linear-gradient(135deg, color-mix(in srgb, ${colors.medium} 15%, transparent) 0%, color-mix(in srgb, ${colors.medium} 10%, transparent) 100%) !important;
-  color: ${colors.medium} !important;
-  border: 1px solid color-mix(in srgb, ${colors.medium} 30%, transparent) !important;
-  box-shadow: 0 2px 8px color-mix(in srgb, ${colors.medium} 15%, transparent) !important;
+  background: linear-gradient(135deg, color-mix(in srgb, ${colors.medium} 15%, transparent) 0%, color-mix(in srgb, ${colors.medium} 10%, transparent) 100%);
+  color: ${colors.medium};
+  border: 1px solid color-mix(in srgb, ${colors.medium} 30%, transparent);
+  box-shadow: 0 2px 8px color-mix(in srgb, ${colors.medium} 15%, transparent);
 }
 
 .status-${status}-text {
@@ -830,10 +830,10 @@ function generateStatusCSS() {
   // תמיכה בסטטוס "מבוטל" (נוסף לטבלה)
   css += `
 .status-badge.status-cancelled {
-  background: linear-gradient(135deg, color-mix(in srgb, #ff6600 15%, transparent) 0%, color-mix(in srgb, #ff6600 10%, transparent) 100%) !important;
-  color: #ff6600 !important;
-  border: 1px solid color-mix(in srgb, #ff6600 30%, transparent) !important;
-  box-shadow: 0 2px 8px color-mix(in srgb, #ff6600 15%, transparent) !important;
+  background: linear-gradient(135deg, color-mix(in srgb, #ff6600 15%, transparent) 0%, color-mix(in srgb, #ff6600 10%, transparent) 100%);
+  color: #ff6600;
+  border: 1px solid color-mix(in srgb, #ff6600 30%, transparent);
+  box-shadow: 0 2px 8px color-mix(in srgb, #ff6600 15%, transparent);
 }
   `;
 
@@ -2561,15 +2561,9 @@ async function saveColorScheme(schemeName, customColors = null) {
         console.log(`💾 Custom color scheme saved to Unified Cache`);
       }
     } else {
-      // Fallback to localStorage if Unified Cache is not available
-      localStorage.setItem('colorScheme', schemeName);
-      console.log(`💾 Color scheme saved to localStorage (fallback): ${schemeName}`);
-      
-      // Save custom colors if provided
-      if (customColors && schemeName === 'custom') {
-        localStorage.setItem('customColorScheme', JSON.stringify(customColors));
-        console.log(`💾 Custom color scheme saved to localStorage (fallback)`);
-      }
+      // UnifiedCacheManager לא זמין - כלל 44 violation prevented
+      console.error('UnifiedCacheManager לא זמין - לא ניתן לשמור סכמת צבעים (כלל 44 violation prevented)');
+      return;
     }
     
     // Update current preferences
@@ -2598,8 +2592,9 @@ async function getCurrentColorScheme() {
       const cachedScheme = await window.UnifiedCacheManager.get('colorScheme');
       return cachedScheme || 'light';
     } else {
-      // Fallback to localStorage if Unified Cache is not available
-      return localStorage.getItem('colorScheme') || 'light';
+      // UnifiedCacheManager לא זמין - כלל 44 violation prevented
+      console.warn('UnifiedCacheManager לא זמין - מחזיר ערך ברירת מחדל (כלל 44 violation prevented)');
+      return 'light';
     }
   } catch (error) {
     console.error('❌ Error getting current color scheme:', error);

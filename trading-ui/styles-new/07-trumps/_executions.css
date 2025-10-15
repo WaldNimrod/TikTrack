@@ -63,9 +63,9 @@
 
 .data-table.executions-table .col-actions,
 .data-table[data-table-type="executions"] .col-actions {
-    width: var(--col-actions-percent) !important;
-    min-width: var(--col-actions-min-width) !important;
-    max-width: var(--col-actions-max-width) !important;
+    width: var(--col-actions-percent) ;
+    min-width: var(--col-actions-min-width) ;
+    max-width: var(--col-actions-max-width) ;
 }
 
 /* ===== Responsive Behavior ===== */

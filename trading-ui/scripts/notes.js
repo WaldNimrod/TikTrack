@@ -248,17 +248,26 @@ function showNoteDetails(noteId) {
 
     // שימוש במערכת הצגת פרטים כללית אם זמינה
     if (typeof window.showEntityDetails === 'function') {
+        console.log(`📋 Opening note details for ID: ${noteId}`);
         window.showEntityDetails('note', noteId, { mode: 'view' });
     } else {
-        // הצגה פשוטה
-        const details = `פרטי הערה:
-ID: ${note.id}
-תוכן: ${note.content || 'אין תוכן'}
-קובץ מצורף: ${note.attachment || 'אין קובץ'}
-נוצר: ${note.created_at ? new Date(note.created_at).toLocaleString('he-IL') : 'לא מוגדר'}
-עודכן: ${note.updated_at ? new Date(note.updated_at).toLocaleString('he-IL') : 'לא מוגדר'}
-קשור ל: ${note.related_type_id ? `סוג ${note.related_type_id}` : 'לא מוגדר'}`;
-        alert(details);
+        // נסיון לאתחל את המערכת אם היא לא מאותחלת
+        console.warn('showEntityDetails not available, attempting to initialize...');
+        
+        // נחכה קצת למערכת להיטען
+        setTimeout(() => {
+            if (typeof window.showEntityDetails === 'function') {
+                console.log(`📋 Opening note details for ID: ${noteId} (after delay)`);
+                window.showEntityDetails('note', noteId, { mode: 'view' });
+            } else {
+                console.error('showEntityDetails still not available after timeout');
+                if (typeof window.showErrorNotification === 'function') {
+                    window.showErrorNotification('שגיאה', 'מערכת הצגת פרטי ישויות לא זמינה');
+                } else {
+                    alert('מערכת הצגת פרטי ישויות לא זמינה');
+                }
+            }
+        }, 500);
     }
 }
 
@@ -337,65 +346,72 @@ async function loadNotesData() {
   }
   _isLoadingNotes = true;
 
+  try {
+    // שימוש במערכת המאוחדת loadTableData (v2.0.0)
+    const notes = await window.loadTableData('notes', null, {
+      tableId: 'notesTable',
+      entityName: 'הערות',
+      columns: 7,
+      onRetry: loadNotesData
+    });
 
-  // שימוש במערכת המאוחדת loadTableData (v2.0.0)
-  const notes = await window.loadTableData('notes', null, {
-    tableId: 'notesTable',
-    entityName: 'הערות',
-    columns: 7,
-    onRetry: loadNotesData
-  });
-
-  // בדיקה אם הנתונים ריקים
-  if (!notes || notes.length === 0) {
-    const tbody = document.querySelector('#notesTable tbody');
-    if (tbody) {
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="7" class="text-center text-muted">
-            <div class="empty-state-message">
-              <h5>📝 אין הערות</h5>
-              <p>לא נמצאו הערות במערכת</p>
-              <button class="btn btn-sm btn-primary" onclick="openNoteDetails()">הוסף הערה ראשונה</button>
-            </div>
-          </td>
-        </tr>
-      `;
+    // בדיקה אם הנתונים ריקים
+    if (!notes || notes.length === 0) {
+      const tbody = document.querySelector('#notesTable tbody');
+      if (tbody) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="text-center text-muted">
+              <div class="empty-state-message">
+                <h5>📝 אין הערות</h5>
+                <p>לא נמצאו הערות במערכת</p>
+                <button class="btn btn-sm btn-primary" onclick="openNoteDetails()">הוסף הערה ראשונה</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }
+      window.notesData = [];
+      _isLoadingNotes = false; // איפוס הדגל גם במקרה של נתונים ריקים
+      return;
     }
-    window.notesData = [];
-    return;
+
+    // טעינת נתונים נוספים (חשבונות, טריידים, תוכניות, טיקרים)
+    const loadDataSafely = async (url, _dataName) => {
+      try {
+        const innerResponse = await fetch(url);
+        if (!innerResponse.ok) return [];
+        const data = await innerResponse.json();
+        if (data.status === 'error') return [];
+        return Array.isArray(data.data) ? data.data : [];
+      } catch {
+        return [];
+      }
+    };
+
+    const [accounts, trades, tradePlans, tickers] = await Promise.all([
+      loadDataSafely('/api/trading-accounts/', 'חשבונות מסחר'),
+      loadDataSafely('/api/trades/', 'טריידים'),
+      loadDataSafely('/api/trade_plans/', 'תוכניות'),
+      loadDataSafely('/api/tickers/', 'טיקרים'),
+    ]);
+
+    // שמירת הנתונים ב-window
+    window.notesData = notes;
+    window.accountsData = accounts;
+    window.tradesData = trades;
+    window.tradePlansData = tradePlans;
+    window.tickersData = tickers;
+
+    // עדכון הטבלה
+    updateNotesTable(notes, accounts, trades, tradePlans, tickers);
+
+  } catch (error) {
+    console.error('❌ שגיאה בטעינת נתוני הערות:', error);
+  } finally {
+    // איפוס הדגל בסוף הפונקציה
+    _isLoadingNotes = false;
   }
-
-  // טעינת נתונים נוספים (חשבונות, טריידים, תוכניות, טיקרים)
-  const loadDataSafely = async (url, _dataName) => {
-    try {
-      const innerResponse = await fetch(url);
-      if (!innerResponse.ok) return [];
-      const data = await innerResponse.json();
-      if (data.status === 'error') return [];
-      return Array.isArray(data.data) ? data.data : [];
-    } catch {
-      return [];
-    }
-  };
-
-  const [accounts, trades, tradePlans, tickers] = await Promise.all([
-    loadDataSafely('/api/trading-accounts/', 'חשבונות מסחר'),
-    loadDataSafely('/api/trades/', 'טריידים'),
-    loadDataSafely('/api/trade_plans/', 'תוכניות'),
-    loadDataSafely('/api/tickers/', 'טיקרים'),
-  ]);
-
-  // שמירת הנתונים ב-window
-  window.notesData = notes;
-  window.accountsData = accounts;
-  window.tradesData = trades;
-  window.tradePlansData = tradePlans;
-  window.tickersData = tickers;
-
-  // עדכון הטבלה
-  updateNotesTable(notes, accounts, trades, tradePlans, tickers);
-  
 }
 
 // פונקציה לעדכון הטבלה
@@ -426,6 +442,10 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
 
   // בניית שורות הטבלה
   const rows = notes.map(note => {
+    // דיבוג לבדיקת נתוני הערה
+    if (window.location.search.includes('debug=1')) {
+      console.log('🔍 Note data:', note);
+    }
     const date = note.created_at ? new Date(note.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
 
     // הצגת תוכן כטקסט פשוט בלבד
@@ -439,27 +459,47 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
 
     // הצגת קובץ עם אייקון ו-10 תווים ראשונים
     let attachmentDisplay = '-';
-    if (note.attachment) {
-      const fileName = note.attachment;
+    
+    // דיבוג לבדיקת נתוני קובץ
+    if (note.id && window.location.search.includes('debug=1')) {
+      console.log(`📎 Note ${note.id} attachment:`, note.attachment, typeof note.attachment);
+      console.log(`📎 Note ${note.id} all attachment fields:`, {
+        attachment: note.attachment,
+        file_name: note.file_name,
+        filename: note.filename,
+        attached_file: note.attached_file
+      });
+    }
+    
+    // בדיקה רחבה יותר לשדות קובץ אפשריים
+    const attachmentField = note.attachment || note.file_name || note.filename || note.attached_file;
+    
+    if (attachmentField && attachmentField !== null && attachmentField !== '' && attachmentField !== 'null') {
+      const fileName = attachmentField;
       const fileExtension = fileName.split('.').pop()?.toLowerCase();
       let fileIcon = '📄'; // ברירת מחדל
 
       // קביעת אייקון לפי סוג הקובץ
-      if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'].includes(fileExtension)) {
+      if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'tiff', 'tif'].includes(fileExtension)) {
         fileIcon = '🖼️';
       } else if (['pdf'].includes(fileExtension)) {
         fileIcon = '📕';
       } else if (['doc', 'docx'].includes(fileExtension)) {
         fileIcon = '📘';
-      } else if (['txt'].includes(fileExtension)) {
+      } else if (['txt', 'rtf'].includes(fileExtension)) {
         fileIcon = '📄';
       } else if (['xls', 'xlsx'].includes(fileExtension)) {
         fileIcon = '📊';
+      } else if (['ppt', 'pptx'].includes(fileExtension)) {
+        fileIcon = '📋';
       }
 
-      // הצגת אייקון + 10 תווים ראשונים
+      // הצגת אייקון + 10 תווים ראשונים עם אפשרות להורדה
       const shortName = fileName.length > 10 ? fileName.substring(0, 10) + '...' : fileName;
-      attachmentDisplay = `${fileIcon} ${shortName}`;
+      attachmentDisplay = `<span title="${fileName}" style="cursor: pointer;" onclick="window.open('/api/notes/files/${fileName}', '_blank')">${fileIcon} ${shortName}</span>`;
+    } else if (window.location.search.includes('debug=1') && (note.attachment || note.file_name || note.filename)) {
+      // במקרה של debug - הצג מידע על שדות שקיימים אבל לא מוצגים
+      attachmentDisplay = `🔍 DEBUG: Has fields but not displayed`;
     }
 
     // קביעת סימבול ואובייקט מקושר (כמו בעמוד התראות)
@@ -551,9 +591,9 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
         <td data-date='${note.created_at}'>${dateBadge}</td>
         <td class='col-actions actions-cell' onclick='event.stopPropagation();'>
             ${window.createActionsMenu ? window.createActionsMenu([
+                window.createButton ? window.createButton('VIEW', `showNoteDetails(${note.id})`) : '',
                 window.createLinkButton ? window.createLinkButton(`window.showLinkedItemsModal && window.showLinkedItemsModal([], 'note', ${note.id})`) : '',
                 window.createEditButton ? window.createEditButton(`editNote(${note.id})`) : '',
-                window.createButton ? window.createButton('VIEW', `showNoteDetails(${note.id})`) : '',
                 window.createDeleteButton ? window.createDeleteButton(`deleteNote(${note.id})`) : ''
             ], note.id) : ''}
         </td>
@@ -672,21 +712,25 @@ function showAddNoteModal() {
   }
 }
 
-function showEditNoteModal(noteId) {
+async function showEditNoteModal(noteId) {
   // ניקוי דגלים
   window.removeAttachmentFlag = false;
   window.replaceAttachmentFlag = false;
 
-  // טעינת נתוני ההערה
-  loadNoteData(noteId);
-
-  // הצגת המודל
+  // הצגת המודל קודם
+  let modal;
   if (editNoteModal) {
-    editNoteModal.show();
+    modal = editNoteModal;
+    modal.show();
   } else {
-    const modal = bootstrap.Modal.getOrCreateInstance(editNoteModalElement);
+    modal = bootstrap.Modal.getOrCreateInstance(editNoteModalElement);
     modal.show();
   }
+
+  // המתנה שהמודל יפתח ואז טעינת נתוני ההערה
+  setTimeout(async () => {
+    await loadNoteData(noteId);
+  }, 100);
 }
 
 async function loadNoteData(noteId) {
@@ -699,12 +743,44 @@ async function loadNoteData(noteId) {
     const responseData = await response.json();
     // חילוץ הנתונים מהמבנה הנכון
     const note = responseData.data || responseData;
+    
+    // הגנה על נתונים חסרים
+    if (!note || !note.id) {
+      throw new Error('נתוני הערה לא נמצאו או לא תקינים');
+    }
     // מילוי הטופס
-    document.getElementById('editNoteId').value = note.id;
-    setEditorContent(note.content || '', 'edit');
+    try {
+      const editNoteIdElement = document.getElementById('editNoteId');
+      if (editNoteIdElement) {
+        editNoteIdElement.value = note.id;
+      }
+      setEditorContent(note.content || '', 'edit');
+    } catch (error) {
+      console.error('❌ שגיאה במילוי טופס העריכה:', error);
+    }
 
     // הצגת קובץ מצורף נוכחי
-    displayCurrentAttachment(note.attachment);
+    try {
+      console.log('🔍 Note data for attachment:', {
+        note: note,
+        attachment: note.attachment,
+        attachmentType: typeof note.attachment,
+        allAttachmentFields: {
+          attachment: note.attachment,
+          file_name: note.file_name,
+          filename: note.filename,
+          attached_file: note.attached_file
+        }
+      });
+      
+      // בדיקה רחבה יותר לשדות קובץ אפשריים (כמו בטבלה)
+      const attachmentField = note.attachment || note.file_name || note.filename || note.attached_file;
+      console.log('🔍 Using attachment field:', attachmentField);
+      
+      displayCurrentAttachment(attachmentField);
+    } catch (error) {
+      console.error('❌ שגיאה בהצגת קובץ מצורף:', error);
+    }
 
     // בחירת סוג הקשר
     const relationType = note.related_type_id;
@@ -725,9 +801,15 @@ async function loadNoteData(noteId) {
       }
     }
 
-  } catch {
+  } catch (error) {
+    console.error('❌ שגיאה בטעינת נתוני הערה:', error);
+    console.error('❌ שגיאה מפורטת:', {
+      message: error.message,
+      stack: error.stack,
+      noteId: noteId
+    });
     if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני הערה');
+      window.showErrorNotification('שגיאה', `שגיאה בטעינת נתוני הערה: ${error.message}`);
     }
   }
 }
@@ -947,33 +1029,57 @@ async function populateEditSelectByType(relationType, selectedId) {
 
     switch (parseInt(relationType)) {
     case 1: { // חשבון
-      const accountsResponse = await fetch('/api/trading-accounts/');
-      const accountsData = await accountsResponse.json();
-      data = Array.isArray(accountsData.data) ? accountsData.data : [];
+      try {
+        const accountsResponse = await fetch('/api/trading-accounts/');
+        if (!accountsResponse.ok) throw new Error(`HTTP error! status: ${accountsResponse.status}`);
+        const accountsData = await accountsResponse.json();
+        data = Array.isArray(accountsData.data) ? accountsData.data : [];
+      } catch (error) {
+        console.error('❌ שגיאה בטעינת חשבונות:', error);
+        data = [];
+      }
       displayField = 'name';
       placeholder = 'חשבון';
       break;
     }
     case 2: { // טרייד
-      const tradesResponse = await fetch('/api/trades/');
-      const tradesData = await tradesResponse.json();
-      data = Array.isArray(tradesData.data) ? tradesData.data : [];
+      try {
+        const tradesResponse = await fetch('/api/trades/');
+        if (!tradesResponse.ok) throw new Error(`HTTP error! status: ${tradesResponse.status}`);
+        const tradesData = await tradesResponse.json();
+        data = Array.isArray(tradesData.data) ? tradesData.data : [];
+      } catch (error) {
+        console.error('❌ שגיאה בטעינת טריידים:', error);
+        data = [];
+      }
       displayField = null;
       placeholder = 'טרייד';
       break;
     }
     case 3: { // תוכנית
-      const plansResponse = await fetch('/api/trade_plans/');
-      const plansData = await plansResponse.json();
-      data = Array.isArray(plansData.data) ? plansData.data : [];
+      try {
+        const plansResponse = await fetch('/api/trade_plans/');
+        if (!plansResponse.ok) throw new Error(`HTTP error! status: ${plansResponse.status}`);
+        const plansData = await plansResponse.json();
+        data = Array.isArray(plansData.data) ? plansData.data : [];
+      } catch (error) {
+        console.error('❌ שגיאה בטעינת תוכניות:', error);
+        data = [];
+      }
       displayField = null;
       placeholder = 'תכנון';
       break;
     }
     case 4: { // טיקר
-      const tickersResponse = await fetch('/api/tickers/');
-      const tickersData = await tickersResponse.json();
-      data = Array.isArray(tickersData.data) ? tickersData.data : [];
+      try {
+        const tickersResponse = await fetch('/api/tickers/');
+        if (!tickersResponse.ok) throw new Error(`HTTP error! status: ${tickersResponse.status}`);
+        const tickersData = await tickersResponse.json();
+        data = Array.isArray(tickersData.data) ? tickersData.data : [];
+      } catch (error) {
+        console.error('❌ שגיאה בטעינת טיקרים:', error);
+        data = [];
+      }
       displayField = 'symbol';
       placeholder = 'טיקר';
       break;
@@ -996,8 +1102,14 @@ async function populateEditSelectByType(relationType, selectedId) {
       }, 100);
     }
 
-  } catch {
-    // שגיאה במילוי רשימה לעריכה
+  } catch (error) {
+    console.error('❌ שגיאה במילוי רשימה לעריכה:', error);
+    console.error('❌ פרטים נוספים:', {
+      relationType: relationType,
+      selectedId: selectedId,
+      message: error.message,
+      stack: error.stack
+    });
   }
 }
 
@@ -1015,24 +1127,35 @@ function validateNoteForm(content, relationType, relatedId, attachment) {
   // 1. ולידציה בסיסית של שדות HTML רגילים
   const basicValidation = window.validateEntityForm('addNoteForm', [
     { id: 'noteRelationType', name: 'סוג אובייקט' },
-    { id: 'noteRelatedObjectSelect', name: 'אובייקט מקושר' }
+    { id: 'noteRelationId', name: 'אובייקט מקושר' }
   ]);
   
   if (!basicValidation) {
     return false;
   }
 
-  // 2. ולידציה מיוחדת לתוכן העורך (לא שדה HTML רגיל)
-  if (!content) {
-    if (window.showSimpleErrorNotification) {
-      window.showSimpleErrorNotification('שגיאת ולידציה', 'תוכן הערה הוא שדה חובה');
+  // ולידציה מותאמת לשדות ספציפיים
+  if (!relationType || relationType === '') {
+    if (typeof window.showFieldError === 'function') {
+      window.showFieldError('noteRelationType', 'יש לבחור סוג אובייקט לשיוך');
     }
     return false;
   }
-  
-  if (content.length < 1) {
+
+  if (!relatedId || relatedId === '') {
+    if (typeof window.showFieldError === 'function') {
+      window.showFieldError('noteRelationId', 'יש לבחור אובייקט לשיוך');
+    }
+    return false;
+  }
+
+  // 2. ולידציה מיוחדת לתוכן העורך (לא שדה HTML רגיל)
+  if (!content || content.trim().length === 0) {
+    if (typeof window.showFieldError === 'function') {
+      window.showFieldError('noteContent', 'תוכן הערה הוא שדה חובה');
+    }
     if (window.showSimpleErrorNotification) {
-      window.showSimpleErrorNotification('שגיאת ולידציה', 'תוכן ההערה חייב להכיל לפחות תו אחד');
+      window.showSimpleErrorNotification('שגיאת ולידציה', 'תוכן הערה הוא שדה חובה');
     }
     return false;
   }
@@ -1046,18 +1169,29 @@ function validateNoteForm(content, relationType, relatedId, attachment) {
 
   // 3. ולידציה של קובץ מצורף (אם קיים)
   if (attachment) {
-    const maxSize = 10 * 1024 * 1024; // 10MB
+    const maxSize = 5 * 1024 * 1024; // 5MB - מתאים לשרת
     if (attachment.size > maxSize) {
       if (window.showSimpleErrorNotification) {
-        window.showSimpleErrorNotification('שגיאת ולידציה', 'קובץ מצורף גדול מדי (מקסימום 10MB)');
+        window.showSimpleErrorNotification('שגיאת ולידציה', 'קובץ מצורף גדול מדי (מקסימום 5MB)');
       }
       return false;
     }
 
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'application/pdf'];
+    const allowedTypes = [
+      // תמונות
+      'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'image/svg+xml', 'image/tiff',
+      // מסמכים
+      'application/pdf',
+      // מסמכי Office
+      'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      // קבצי טקסט
+      'text/plain', 'application/rtf'
+    ];
     if (!allowedTypes.includes(attachment.type)) {
       if (window.showSimpleErrorNotification) {
-        window.showSimpleErrorNotification('שגיאת ולידציה', 'סוג קובץ לא נתמך. מותרים: תמונות ו-PDF בלבד');
+        window.showSimpleErrorNotification('שגיאת ולידציה', 'סוג קובץ לא נתמך. מותרים: תמונות, מסמכי PDF, Office וטקסט');
       }
       return false;
     }
@@ -1079,25 +1213,36 @@ function validateNoteForm(content, relationType, relatedId, attachment) {
 function validateEditNoteForm(content, relationType, relatedId, attachment) {
   // 1. ולידציה בסיסית של שדות HTML רגילים
   const basicValidation = window.validateEntityForm('editNoteForm', [
-    { id: 'editNoteRelationType', name: 'סוג אובייקט' },
-    { id: 'editNoteRelatedObjectSelect', name: 'אובייקט מקושר' }
+    { id: 'editNoteRelatedType', name: 'סוג אובייקט' },
+    { id: 'editNoteRelatedId', name: 'אובייקט מקושר' }
   ]);
   
   if (!basicValidation) {
     return false;
   }
 
-  // 2. ולידציה מיוחדת לתוכן העורך
-  if (!content) {
-    if (window.showSimpleErrorNotification) {
-      window.showSimpleErrorNotification('שגיאת ולידציה', 'תוכן הערה הוא שדה חובה');
+  // ולידציה מותאמת לשדות ספציפיים
+  if (!relationType || relationType === '') {
+    if (typeof window.showFieldError === 'function') {
+      window.showFieldError('editNoteRelatedType', 'יש לבחור סוג אובייקט לשיוך');
     }
     return false;
   }
-  
-  if (content.length < 1) {
+
+  if (!relatedId || relatedId === '') {
+    if (typeof window.showFieldError === 'function') {
+      window.showFieldError('editNoteRelatedId', 'יש לבחור אובייקט לשיוך');
+    }
+    return false;
+  }
+
+  // 2. ולידציה מיוחדת לתוכן העורך
+  if (!content || content.trim().length === 0) {
+    if (typeof window.showFieldError === 'function') {
+      window.showFieldError('editNoteContent', 'תוכן הערה הוא שדה חובה');
+    }
     if (window.showSimpleErrorNotification) {
-      window.showSimpleErrorNotification('שגיאת ולידציה', 'תוכן ההערה חייב להכיל לפחות תו אחד');
+      window.showSimpleErrorNotification('שגיאת ולידציה', 'תוכן הערה הוא שדה חובה');
     }
     return false;
   }
@@ -1111,18 +1256,29 @@ function validateEditNoteForm(content, relationType, relatedId, attachment) {
 
   // 3. ולידציה של קובץ מצורף (אם קיים)
   if (attachment) {
-    const maxSize = 10 * 1024 * 1024; // 10MB
+    const maxSize = 5 * 1024 * 1024; // 5MB - מתאים לשרת
     if (attachment.size > maxSize) {
       if (window.showSimpleErrorNotification) {
-        window.showSimpleErrorNotification('שגיאת ולידציה', 'קובץ מצורף גדול מדי (מקסימום 10MB)');
+        window.showSimpleErrorNotification('שגיאת ולידציה', 'קובץ מצורף גדול מדי (מקסימום 5MB)');
       }
       return false;
     }
 
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'application/pdf'];
+    const allowedTypes = [
+      // תמונות
+      'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'image/svg+xml', 'image/tiff',
+      // מסמכים
+      'application/pdf',
+      // מסמכי Office
+      'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      // קבצי טקסט
+      'text/plain', 'application/rtf'
+    ];
     if (!allowedTypes.includes(attachment.type)) {
       if (window.showSimpleErrorNotification) {
-        window.showSimpleErrorNotification('שגיאת ולידציה', 'סוג קובץ לא נתמך. מותרים: תמונות ו-PDF בלבד');
+        window.showSimpleErrorNotification('שגיאת ולידציה', 'סוג קובץ לא נתמך. מותרים: תמונות, מסמכי PDF, Office וטקסט');
       }
       return false;
     }
@@ -1135,8 +1291,8 @@ function validateEditNoteForm(content, relationType, relatedId, attachment) {
 async function saveNote() {
   // איסוף נתונים מהטופס
   const content = getEditorContent('add');
-  const relationType = document.querySelector('input[name="noteRelationType"]:checked')?.value;
-  const relatedId = window.DataCollectionService.getValue('noteRelatedObjectSelect', 'int');
+  const relationType = document.getElementById('noteRelationType')?.value;
+  const relatedId = document.getElementById('noteRelationId')?.value;
   const attachment = document.getElementById('noteAttachment').files[0];
 
   // ולידציה מקיפה
@@ -1147,52 +1303,104 @@ async function saveNote() {
   clearNoteValidationErrors();
 
   try {
-    // יצירת אובייקט JSON לשליחה
-    const requestData = {
-      content,
-      related_type_id: parseInt(relationType),
-      related_id: parseInt(relatedId),
-    };
+    let response;
 
-    const response = await fetch('/api/notes/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestData),
-    });
+    // אם יש קובץ מצורף, השתמש ב-FormData
+    if (attachment) {
+      console.log('📎 יש קובץ מצורף, שולח דרך FormData:', attachment.name, attachment.size);
+      const formData = new FormData();
+      formData.append('content', content);
+      formData.append('related_type_id', relationType);
+      formData.append('related_id', relatedId);
+      formData.append('attachment', attachment);
+
+      response = await fetch('/api/notes/', {
+        method: 'POST',
+        body: formData, // אין headers עבור FormData - הדפדפן יוסיף אותם אוטומטית
+      });
+      
+      // לוג לתגובה
+      console.log('📋 Response status:', response.status, response.statusText);
+      
+      // אם יש שגיאה, נוסיף לוג מפורט
+      if (!response.ok) {
+        try {
+          const errorResponse = await response.clone().json();
+          console.log('❌ Error response:', errorResponse);
+        } catch (e) {
+          console.log('❌ Could not parse error response:', e);
+        }
+      }
+    } else {
+      console.log('📎 אין קובץ מצורף, שולח דרך JSON');
+      // אם אין קובץ, השתמש ב-JSON
+      const requestData = {
+        content,
+        related_type_id: parseInt(relationType),
+        related_id: parseInt(relatedId),
+      };
+
+      response = await fetch('/api/notes/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+    }
 
     // טיפול בתגובה באמצעות CRUDResponseHandler עם customValidationParser
-    await window.CRUDResponseHandler.handleSaveResponse(response, {
+    const result = await window.CRUDResponseHandler.handleSaveResponse(response, {
       modalId: 'addNoteModal',
       successMessage: 'הערה נשמרה בהצלחה',
-      customValidationParser: (errorMessage) => {
-        if (!errorMessage.includes('validation failed')) return null;
+      apiUrl: '/api/notes/',
+      customValidationParser: (errorMessage, errorData) => {
+        // errorMessage יכול להיות מחרוזת או אובייקט
+        let messageStr = '';
+        if (typeof errorMessage === 'string') {
+          messageStr = errorMessage;
+        } else if (typeof errorMessage === 'object' && errorMessage.message) {
+          messageStr = errorMessage.message;
+        } else if (typeof errorMessage === 'object') {
+          messageStr = JSON.stringify(errorMessage);
+        } else {
+          messageStr = String(errorMessage);
+        }
         
-        const validationErrors = errorMessage.replace('Note validation failed: ', '').split('; ');
+        // בדיקה אם זה שגיאת קובץ (לא validation של בסיס נתונים)
+        if (messageStr.includes('קובץ גדול מדי') || 
+            messageStr.includes('פורמט קובץ לא נתמך') || 
+            messageStr.includes('שגיאה בשמירת הקובץ')) {
+          // שגיאות קובץ - לא צריכים field error, רק הודעת שגיאה כללית
+          return null; // CRUDResponseHandler יציג את ההודעה הכללית
+        }
+        
+        // בדיקת שגיאות ולידציה של בסיס נתונים
+        if (!messageStr || !messageStr.includes('validation failed')) return null;
+        
+        const validationErrors = messageStr.replace('Note validation failed: ', '').split('; ');
         return validationErrors.map(error => {
           if (error.includes("Field 'content' is required")) {
-            return { fieldId: 'contentError', message: 'תוכן הערה הוא שדה חובה' };
+            return { fieldId: 'noteContent', message: 'תוכן הערה הוא שדה חובה' };
           } else if (error.includes("Field 'related_type_id' is required")) {
-            return { fieldId: 'relationTypeError', message: 'יש לבחור סוג אובייקט לשיוך' };
+            return { fieldId: 'noteRelationType', message: 'יש לבחור סוג אובייקט לשיוך' };
           } else if (error.includes("Field 'related_id' is required")) {
-            return { fieldId: 'relatedObjectError', message: 'יש לבחור אובייקט לשיוך' };
+            return { fieldId: 'noteRelationId', message: 'יש לבחור אובייקט לשיוך' };
           } else if (error.includes("Field 'related_id' references non-existent record")) {
-            return { fieldId: 'relatedObjectError', message: 'האובייקט שנבחר לא קיים במערכת' };
+            return { fieldId: 'noteRelationId', message: 'האובייקט שנבחר לא קיים במערכת' };
           }
           return null;
         }).filter(Boolean);
       },
-      reloadFn: async () => {
-        // ניקוי מטמון
-        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-          await window.UnifiedCacheManager.remove('notes');
-        }
-        // רענון טבלה
-        await loadNotesData();
-      },
       entityName: 'הערה'
     });
+
+    // אם הפעולה הצליחה, הטופס יתאפס והמודל ייסגר אוטומטית
+    // אם נכשלה, הטופס יישאר פתוח עם שגיאות ולידציה
+    if (result === null) {
+      // שגיאה - הטופס נשאר פתוח
+      console.log('שמירת הערה נכשלה - הטופס נשאר פתוח לתקנות');
+    }
 
   } catch {
     window.showErrorNotification('שגיאה בשמירה', 'שגיאה בשמירת הערה - בדוק את הנתונים שהוזנו');
@@ -1201,11 +1409,24 @@ async function saveNote() {
 
 async function updateNoteFromModal() {
   // איסוף נתונים מהטופס
-  const noteId = document.getElementById('editNoteId').value;
+  const editNoteIdElement = document.getElementById('editNoteId');
+  if (!editNoteIdElement) {
+    console.error('❌ אלמנט editNoteId לא נמצא');
+    window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני ההערה');
+    return;
+  }
+  
+  const noteId = editNoteIdElement.value;
+  if (!noteId) {
+    console.error('❌ מזהה הערה לא נמצא');
+    window.showErrorNotification('שגיאה', 'מזהה ההערה לא נמצא');
+    return;
+  }
+  
   const content = getEditorContent('edit');
-  const relationType = document.querySelector('input[name="editNoteRelationType"]:checked')?.value;
-  const relatedId = editNoteRelatedObjectSelect.value;
-  const attachment = document.getElementById('editNoteAttachment').files[0];
+  const relationType = document.getElementById('editNoteRelatedType')?.value;
+  const relatedId = document.getElementById('editNoteRelatedId')?.value;
+  const attachment = document.getElementById('editNoteAttachment')?.files[0];
 
   // בדיקה אם נדרשת מחיקת קובץ
   const shouldRemoveAttachment = window.removeAttachmentFlag === true;
@@ -1258,40 +1479,57 @@ async function updateNoteFromModal() {
     }
 
     // טיפול בתגובה באמצעות CRUDResponseHandler עם customValidationParser
-    await window.CRUDResponseHandler.handleUpdateResponse(response, {
+    const result = await window.CRUDResponseHandler.handleUpdateResponse(response, {
       modalId: 'editNoteModal',
       successMessage: 'הערה עודכנה בהצלחה',
-      customValidationParser: (errorMessage) => {
-        if (!errorMessage.includes('validation failed')) return null;
+      apiUrl: `/api/notes/${noteId}`,
+      customValidationParser: (errorMessage, errorData) => {
+        // errorMessage יכול להיות מחרוזת או אובייקט
+        let messageStr = '';
+        if (typeof errorMessage === 'string') {
+          messageStr = errorMessage;
+        } else if (typeof errorMessage === 'object' && errorMessage.message) {
+          messageStr = errorMessage.message;
+        } else if (typeof errorMessage === 'object') {
+          messageStr = JSON.stringify(errorMessage);
+        } else {
+          messageStr = String(errorMessage);
+        }
         
-        const validationErrors = errorMessage.replace('Note validation failed: ', '').split('; ');
+        // בדיקה אם זה שגיאת קובץ (לא validation של בסיס נתונים)
+        if (messageStr.includes('קובץ גדול מדי') || 
+            messageStr.includes('פורמט קובץ לא נתמך') || 
+            messageStr.includes('שגיאה בשמירת הקובץ')) {
+          // שגיאות קובץ - לא צריכים field error, רק הודעת שגיאה כללית
+          return null; // CRUDResponseHandler יציג את ההודעה הכללית
+        }
+        
+        // בדיקת שגיאות ולידציה של בסיס נתונים
+        if (!messageStr || !messageStr.includes('validation failed')) return null;
+        
+        const validationErrors = messageStr.replace('Note validation failed: ', '').split('; ');
         return validationErrors.map(error => {
           if (error.includes("Field 'content' is required")) {
-            return { fieldId: 'editContentError', message: 'תוכן הערה הוא שדה חובה' };
+            return { fieldId: 'editNoteContent', message: 'תוכן הערה הוא שדה חובה' };
           } else if (error.includes("Field 'related_type_id' is required")) {
-            return { fieldId: 'editRelationTypeError', message: 'יש לבחור סוג אובייקט לשיוך' };
+            return { fieldId: 'editNoteRelatedType', message: 'יש לבחור סוג אובייקט לשיוך' };
           } else if (error.includes("Field 'related_id' is required")) {
-            return { fieldId: 'editRelatedObjectError', message: 'יש לבחור אובייקט לשיוך' };
+            return { fieldId: 'editNoteRelatedId', message: 'יש לבחור אובייקט לשיוך' };
           } else if (error.includes("Field 'related_id' references non-existent record")) {
-            return { fieldId: 'editRelatedObjectError', message: 'האובייקט שנבחר לא קיים במערכת' };
+            return { fieldId: 'editNoteRelatedId', message: 'האובייקט שנבחר לא קיים במערכת' };
           }
           return null;
         }).filter(Boolean);
       },
-      reloadFn: async () => {
-        // ניקוי דגלים
-        window.removeAttachmentFlag = false;
-        window.replaceAttachmentFlag = false;
-        
-        // ניקוי מטמון
-        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-          await window.UnifiedCacheManager.remove('notes');
-        }
-        // רענון טבלה
-        await loadNotesData();
-      },
       entityName: 'הערה'
     });
+
+    // אם הפעולה הצליחה, הטופס יתאפס והמודל ייסגר אוטומטית
+    // אם נכשלה, הטופס יישאר פתוח עם שגיאות ולידציה
+    if (result === null) {
+      // שגיאה - הטופס נשאר פתוח
+      console.log('עדכון הערה נכשל - הטופס נשאר פתוח לתקנות');
+    }
 
   } catch {
     window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון הערה - בדוק את הנתונים שהוזנו');
@@ -1381,6 +1619,7 @@ function clearNoteValidationErrors() {
 // }
 
 window.loadNotesData = loadNotesData;
+window.resetNotesLoadingFlag = () => { _isLoadingNotes = false; };
 window.updateNotesTable = updateNotesTable;
 window.updateNotesSummary = updateNotesSummary;
 window.updateGridFromComponent = updateGridFromComponent;
@@ -1388,6 +1627,7 @@ window.showAddNoteModal = showAddNoteModal;
 window.showEditNoteModal = showEditNoteModal;
 window.saveNote = saveNote;
 window.updateNoteFromModal = updateNoteFromModal;
+window.updateNote = updateNoteFromModal; // Alias for backward compatibility
 window.deleteNoteFromServer = deleteNoteFromServer;
 // window.showDeleteNoteModal = showDeleteNoteModal; // הוסר - שימוש במערכת הגלובלית
 window.confirmDeleteNote = confirmDeleteNote;
@@ -1403,6 +1643,11 @@ window.initializeNotesPage = function() {
     // אתחול modals
     if (typeof window.initializeNotesModals === 'function') {
         window.initializeNotesModals();
+    }
+    
+    // אתחול מערכת פילטרים לפי סוג אובייקט מקושר
+    if (typeof window.initializeRelatedObjectFilters === 'function') {
+        window.initializeRelatedObjectFilters();
     }
     
     // שחזור מצב הסגירה (המערכת המאוחדת כבר מטפלת בזה)
@@ -1515,7 +1760,7 @@ function setupNoteValidationEvents() {
         const fileExtension = fileName.split('.').pop()?.toLowerCase();
         let fileIcon = '📄';
 
-        if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'].includes(fileExtension)) {
+        if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'tiff', 'tif'].includes(fileExtension)) {
           fileIcon = '🖼️';
         } else if (['pdf'].includes(fileExtension)) {
           fileIcon = '📕';
@@ -1737,16 +1982,22 @@ function getEditorContent(mode = 'add') {
     return '';
   }
 
-  // בדיקה אם העורך ריק או מכיל רק תגיות HTML ריקות
-  const content = editor.innerHTML;
-  const textContent = editor.textContent || editor.innerText || '';
+  // בדיקה אם זה textarea או עורך עשיר
+  if (editor.tagName === 'TEXTAREA') {
+    // עבור textarea רגיל - השתמש ב-value
+    return editor.value || '';
+  } else {
+    // עבור עורך עשיר - בדיקה של innerHTML ו-textContent
+    const content = editor.innerHTML;
+    const textContent = editor.textContent || editor.innerText || '';
 
-  // אם אין תוכן טקסט, החזר מחרוזת ריקה
-  if (!textContent.trim()) {
-    return '';
+    // אם אין תוכן טקסט, החזר מחרוזת ריקה
+    if (!textContent.trim()) {
+      return '';
+    }
+
+    return content;
   }
-
-  return content;
 }
 
 /**
@@ -1762,7 +2013,14 @@ function setEditorContent(content, mode = 'add') {
     return;
   }
 
-  editor.innerHTML = content || '';
+  // בדיקה אם זה textarea או עורך עשיר
+  if (editor.tagName === 'TEXTAREA') {
+    // עבור textarea רגיל - השתמש ב-value
+    editor.value = content || '';
+  } else {
+    // עבור עורך עשיר - השתמש ב-innerHTML
+    editor.innerHTML = content || '';
+  }
 }
 
 // הגדרת הפונקציות כגלובליות
@@ -1915,16 +2173,18 @@ async function loadNoteForViewing(noteId) {
       const fileExtension = fileName.split('.').pop()?.toLowerCase();
       let fileIcon = '📄';
 
-      if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'].includes(fileExtension)) {
+      if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'tiff', 'tif'].includes(fileExtension)) {
         fileIcon = '🖼️';
       } else if (['pdf'].includes(fileExtension)) {
         fileIcon = '📕';
       } else if (['doc', 'docx'].includes(fileExtension)) {
         fileIcon = '📘';
-      } else if (['txt'].includes(fileExtension)) {
+      } else if (['txt', 'rtf'].includes(fileExtension)) {
         fileIcon = '📄';
       } else if (['xls', 'xlsx'].includes(fileExtension)) {
         fileIcon = '📊';
+      } else if (['ppt', 'pptx'].includes(fileExtension)) {
+        fileIcon = '📋';
       }
 
       attachmentElement.innerHTML = `
@@ -1973,28 +2233,40 @@ function editCurrentNote() {
 
 // פונקציה להצגת קובץ מצורף נוכחי במודל עריכה
 function displayCurrentAttachment(attachment) {
+  console.log('🔍 displayCurrentAttachment called with:', attachment, typeof attachment);
+  
   const displayElement = document.getElementById('currentAttachmentDisplay');
   const actionsElement = document.getElementById('attachmentActions');
 
+  console.log('🔍 Elements found:', {
+    displayElement: !!displayElement,
+    actionsElement: !!actionsElement
+  });
+
   if (!displayElement || !actionsElement) {
+    console.warn('⚠️ Missing elements for attachment display');
     return;
   }
 
-  if (attachment) {
+  if (attachment && attachment !== 'null' && attachment !== '') {
+    console.log('🔍 Processing attachment:', attachment);
     const fileName = attachment;
     const fileExtension = fileName.split('.').pop()?.toLowerCase();
     let fileIcon = '📄';
 
-    if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'].includes(fileExtension)) {
+    // קביעת אייקון לפי סוג הקובץ (כמו בטבלה)
+    if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'tiff', 'tif'].includes(fileExtension)) {
       fileIcon = '🖼️';
     } else if (['pdf'].includes(fileExtension)) {
       fileIcon = '📕';
     } else if (['doc', 'docx'].includes(fileExtension)) {
       fileIcon = '📘';
-    } else if (['txt'].includes(fileExtension)) {
+    } else if (['txt', 'rtf'].includes(fileExtension)) {
       fileIcon = '📄';
     } else if (['xls', 'xlsx'].includes(fileExtension)) {
       fileIcon = '📊';
+    } else if (['ppt', 'pptx'].includes(fileExtension)) {
+      fileIcon = '📋';
     }
 
     displayElement.innerHTML = `
@@ -2008,9 +2280,24 @@ function displayCurrentAttachment(attachment) {
         </a>
       </div>
     `;
+    
+    // הוספת כפתורי פעולה
+    actionsElement.innerHTML = `
+      <div class="d-flex gap-2">
+        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeCurrentAttachment()">
+          🗑️ הסר
+        </button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearSelectedFile()">
+          ✏️ החלף
+        </button>
+      </div>
+    `;
+    
     actionsElement.style.display = 'block';
+    displayElement.style.display = 'block';
   } else {
     displayElement.textContent = 'אין קובץ מצורף';
+    displayElement.style.display = 'none';
     actionsElement.style.display = 'none';
   }
 }

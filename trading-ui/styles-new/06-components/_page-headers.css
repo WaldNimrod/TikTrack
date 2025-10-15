@@ -358,7 +358,7 @@
 .notifications-center-page .section-header,
 .page-scripts-matrix-page .section-header,
 .unified-logs-demo-page .section-header {
-  background: white !important; /* רקע לבן מלא לעמודי כלי פיתוח */
+  background: white ; /* רקע לבן מלא לעמודי כלי פיתוח */
   border-bottom: 1px solid #dee2e6; /* גבול עדין */
 }
 

@@ -169,17 +169,32 @@ testSelects();
 
 ---
 
-### **בדיקה 4: CRUDResponseHandler**
+### **בדיקה 4: CRUDResponseHandler** ⭐ מעודכן - ינואר 2025
 
 #### מה לבדוק:
 1. לחץ על **"סימולציה הצלחה"**
    - ✅ הודעת הצלחה ירוקה: "פריט נשמר בהצלחה"
+   - ✅ **חדש:** רענון אוטומטי של טבלאות (אם יש apiUrl או entityName)
 
 2. לחץ על **"סימולציה שגיאת ולידציה (400)"**
    - ✅ הודעת שגיאה אדומה פשוטה (toast): "שגיאת ולידציה"
 
 3. לחץ על **"סימולציה שגיאת מערכת (500)"**
    - ✅ מודל שגיאה מפורט עם stack trace
+
+#### מערכת רענון אוטומטי חדשה:
+המערכת מזהה אוטומטית את סוג הישות מה-URL או מה-entityName ורעננת את הטבלה ללא צורך בהגדרת reloadFn ידני.
+
+**דוגמה:**
+```javascript
+// במקום הקוד הישן עם reloadFn ידני:
+await window.CRUDResponseHandler.handleSaveResponse(response, {
+    successMessage: 'הערה נשמרה בהצלחה',
+    apiUrl: '/api/notes/',  // המערכת מזהה אוטומטית 'notes'
+    entityName: 'הערה'      // או זיהוי חלופי בעברית
+    // אין צורך ב-reloadFn!
+});
+```
 
 #### סקריפט Console לבדיקה:
 ```javascript
@@ -190,7 +205,8 @@ const mockSuccess = new Response(JSON.stringify({ id: 1, name: 'Test' }), {
 });
 await window.CRUDResponseHandler.handleSaveResponse(mockSuccess, {
     successMessage: 'בדיקה עברה!',
-    entityName: 'פריט בדיקה'
+    apiUrl: '/api/test/',     // המערכת תזהה אוטומטית 'test'
+    entityName: 'פריט בדיקה'  // או זיהוי חלופי בעברית
 });
 console.log('✅ Success response handled');
 

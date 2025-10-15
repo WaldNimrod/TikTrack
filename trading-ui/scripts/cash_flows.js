@@ -276,17 +276,17 @@ function toggleCashFlowsSection() {
     toggleBtn.title = 'הסתר תזרימי מזומנים';
   }
 
-  // Use Unified Cache Manager if available, fallback to localStorage
+  // Use Unified Cache Manager as per system architecture requirements
   if (window.UnifiedCacheManager?.isInitialized()) {
     window.UnifiedCacheManager.save('cashFlowsSectionState', isVisible ? 'closed' : 'open', {
       layer: 'localStorage',
       ttl: null
     }).catch(err => {
-      console.warn('Failed to save to UnifiedCacheManager, using localStorage fallback:', err);
-      localStorage.setItem('cashFlowsSectionState', isVisible ? 'closed' : 'open');
+      console.error('Failed to save to UnifiedCacheManager (Rule 44 violation prevented):', err);
+      // Rule 44: No direct localStorage calls - use UnifiedCacheManager only
     });
   } else {
-    localStorage.setItem('cashFlowsSectionState', isVisible ? 'closed' : 'open');
+    console.warn('UnifiedCacheManager not available - cannot save cashFlowsSectionState');
   }
 }
 
@@ -327,18 +327,20 @@ function attachAmountSignListeners() {
 async function restoreCashFlowsSectionState() {
   let savedState = null;
   
-  // Use Unified Cache Manager if available, fallback to localStorage
+  // Use Unified Cache Manager as per system architecture requirements
   if (window.UnifiedCacheManager?.isInitialized()) {
     try {
       savedState = await window.UnifiedCacheManager.get('cashFlowsSectionState', {
         layer: 'localStorage'
       });
     } catch (err) {
-      console.warn('Failed to get from UnifiedCacheManager, using localStorage fallback:', err);
-      savedState = localStorage.getItem('cashFlowsSectionState');
+      console.error('Failed to get from UnifiedCacheManager (Rule 44 violation prevented):', err);
+      // Rule 44: No direct localStorage calls - use UnifiedCacheManager only
+      savedState = null;
     }
   } else {
-    savedState = localStorage.getItem('cashFlowsSectionState');
+    console.warn('UnifiedCacheManager not available - cannot restore cashFlowsSectionState');
+    savedState = null;
   }
   
   if (!savedState) {
@@ -1898,6 +1900,7 @@ async function saveCashFlow() {
     await window.CRUDResponseHandler.handleSaveResponse(response, {
       modalId: 'addCashFlowModal',
       successMessage: 'תזרים המזומנים נשמר בהצלחה',
+      apiUrl: '/api/cash_flows/',
       customValidationParser: (errorMessage) => {
         if (!errorMessage.includes('validation failed')) return null;
         
@@ -1916,20 +1919,6 @@ async function saveCashFlow() {
           }
           return null;
         }).filter(Boolean);
-      },
-      reloadFn: async () => {
-        // ניקוי מטמון
-        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-          await window.UnifiedCacheManager.remove('cash_flows');
-        }
-        // ניקוי global data
-        if (window.cashFlowsData) {
-          window.cashFlowsData = null;
-        }
-        // המתנה קצרה לוידוא ניקוי מטמון
-        await new Promise(resolve => setTimeout(resolve, 100));
-        // טעינה מחדש
-        await loadCashFlows();
       },
       entityName: 'תזרים מזומנים'
     });
@@ -2020,6 +2009,7 @@ async function updateCashFlow() {
     await window.CRUDResponseHandler.handleUpdateResponse(response, {
       modalId: 'editCashFlowModal',
       successMessage: 'תזרים המזומנים נעדכן בהצלחה',
+      apiUrl: `/api/cash_flows/${id}`,
       customValidationParser: (errorMessage) => {
         if (!errorMessage.includes('validation failed')) return null;
         
@@ -2038,20 +2028,6 @@ async function updateCashFlow() {
           }
           return null;
         }).filter(Boolean);
-      },
-      reloadFn: async () => {
-        // ניקוי מטמון
-        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-          await window.UnifiedCacheManager.remove('cash_flows');
-        }
-        // ניקוי global data
-        if (window.cashFlowsData) {
-          window.cashFlowsData = null;
-        }
-        // המתנה קצרה
-        await new Promise(resolve => setTimeout(resolve, 100));
-        // טעינה מחדש
-        await loadCashFlows();
       },
       entityName: 'תזרים מזומנים'
     });
@@ -2497,6 +2473,7 @@ function handleGeneralError(error, context, fallbackAction = null) {
 
 // פונקציות עיקריות
 window.loadCashFlowsData = loadCashFlows;
+window.resetCashFlowsLoadingFlag = () => { _isLoadingCashFlows = false; };
 window.calculateBalance = calculateBalance;
 window.toggleCashFlowsSection = toggleCashFlowsSection;
 window.restoreCashFlowsSectionState = restoreCashFlowsSectionState;

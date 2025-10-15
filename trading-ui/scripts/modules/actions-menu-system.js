@@ -17,6 +17,210 @@
  * No manual initialization needed.
  */
 
+// הגדרת פונקציה גלובלית לבדיקה מיידית - זמינה מיד
+console.log('🔧 ActionsMenuSystem: מגדיר את debugActionsMenu באופן גלובלי');
+
+// וידוא שהפונקציה מוגדרת מיד
+if (typeof window.debugActionsMenu === 'undefined') {
+    console.log('🔧 ActionsMenuSystem: מגדיר debugActionsMenu לראשונה');
+    window.debugActionsMenu = () => {
+    const allWrappers = document.querySelectorAll('.actions-menu-wrapper');
+    console.log(`🔍 מצאתי ${allWrappers.length} actions menu wrappers`);
+    
+    allWrappers.forEach((wrapper, index) => {
+        const popup = wrapper.querySelector('.actions-menu-popup');
+        const actionsCell = wrapper.closest('.actions-cell');
+        const tableRow = wrapper.closest('tr');
+        
+        if (!popup || !actionsCell || !tableRow) return;
+        
+        console.log(`\n📊 Actions Menu ${index + 1}:`);
+        
+        // בדיקת styles בפועל
+        const popupStyle = window.getComputedStyle(popup);
+        const cellStyle = window.getComputedStyle(actionsCell);
+        const rowStyle = window.getComputedStyle(tableRow);
+        
+        console.log('Popup styles:', {
+            zIndex: popupStyle.zIndex,
+            position: popupStyle.position,
+            opacity: popupStyle.opacity,
+            visibility: popupStyle.visibility,
+            pointerEvents: popupStyle.pointerEvents,
+            transform: popupStyle.transform
+        });
+        
+        // בדיקה מקיפה של z-index במיקום הפופאפ
+        const popupRect = popup.getBoundingClientRect();
+        const popupCenterX = popupRect.left + popupRect.width / 2;
+        const popupCenterY = popupRect.top + popupRect.height / 2;
+        
+        // מציאת אלמנטים עם z-index גבוה יותר במיקום הפופאפ
+        const elementsAtPoint = document.elementsFromPoint(popupCenterX, popupCenterY);
+        const higherZIndexElements = [];
+        
+        elementsAtPoint.forEach((element, index) => {
+            if (element === popup) return;
+            
+            const elementStyle = window.getComputedStyle(element);
+            const elementZIndex = parseInt(elementStyle.zIndex) || 0;
+            
+            if (elementZIndex >= 1070) {
+                higherZIndexElements.push({
+                    tagName: element.tagName,
+                    className: element.className,
+                    id: element.id,
+                    zIndex: elementZIndex,
+                    depth: index,
+                    rect: element.getBoundingClientRect()
+                });
+            }
+        });
+        
+        if (higherZIndexElements.length > 0) {
+            console.log('⚠️ אלמנטים עם z-index גבוה מ-1070 במיקום הפופאפ:', higherZIndexElements);
+        }
+        
+        console.log('Actions Cell styles:', {
+            zIndex: cellStyle.zIndex,
+            position: cellStyle.position,
+            overflow: cellStyle.overflow
+        });
+        
+        console.log('Table Row styles:', {
+            zIndex: rowStyle.zIndex,
+            position: rowStyle.position,
+            transform: rowStyle.transform,
+            boxShadow: rowStyle.boxShadow
+        });
+        
+        // בדיקת מיקומים - popupRect כבר מוגדר למעלה
+        const cellRect = actionsCell.getBoundingClientRect();
+        const rowRect = tableRow.getBoundingClientRect();
+        
+        // חישוב גבהים
+        const rowHeight = Math.round(rowRect.bottom - rowRect.top);
+        const cellHeight = Math.round(cellRect.bottom - cellRect.top);
+        const popupHeight = Math.round(popupRect.bottom - popupRect.top);
+        
+        console.log('📏 גבהים:');
+        console.log(`   שורה: ${rowHeight}px`);
+        console.log(`   תא פעולות: ${cellHeight}px`);
+        console.log(`   תפריט פעולות: ${popupHeight}px`);
+        
+        console.log('מיקומים בפועל:');
+        console.log('Popup:', {
+            top: Math.round(popupRect.top),
+            bottom: Math.round(popupRect.bottom),
+            left: Math.round(popupRect.left),
+            right: Math.round(popupRect.right),
+            width: Math.round(popupRect.width),
+            height: popupHeight
+        });
+        
+        console.log('Cell:', {
+            top: Math.round(cellRect.top),
+            bottom: Math.round(cellRect.bottom),
+            height: cellHeight
+        });
+        
+        console.log('Row:', {
+            top: Math.round(rowRect.top),
+            bottom: Math.round(rowRect.bottom),
+            height: rowHeight
+        });
+    });
+    
+    console.log('\n💡 טיפ: הרץ את הפקודה הזו כשהתפריט פתוח (hover) כדי לראות את המיקומים במצב פתוח');
+    
+    // בדיקה נוספת - האם יש popups שמוצגים?
+    const visiblePopups = [];
+    allWrappers.forEach((wrapper, index) => {
+        const popup = wrapper.querySelector('.actions-menu-popup');
+        if (popup) {
+            const style = window.getComputedStyle(popup);
+            if (style.opacity !== '0' && style.visibility !== 'hidden') {
+                visiblePopups.push({index: index + 1, opacity: style.opacity, visibility: style.visibility});
+            }
+        }
+    });
+    
+    if (visiblePopups.length > 0) {
+        console.log('🎯 Popups הנראים כרגע:', visiblePopups);
+    } else {
+        console.log('ℹ️ אין popups נראים כרגע (זה נורמלי כשמעכברים מחוץ ל-actions menu)');
+    }
+    };
+} // סיום של ה-if שהתחיל בשורה 24
+
+// פונקציה נוספת לבדיקת hover state בזמן אמת
+window.debugActionsMenuHover = () => {
+    const allWrappers = document.querySelectorAll('.actions-menu-wrapper');
+    console.log('🔍 בדיקת hover state ל-actions menus...');
+    
+    allWrappers.forEach((wrapper, index) => {
+        const popup = wrapper.querySelector('.actions-menu-popup');
+        if (popup) {
+            const rect = popup.getBoundingClientRect();
+            const style = window.getComputedStyle(popup);
+            
+            // בדיקה אם הפופאפ נראה
+            const isVisible = style.opacity !== '0' && 
+                             style.visibility !== 'hidden' && 
+                             rect.width > 0 && 
+                             rect.height > 0;
+            
+            if (isVisible) {
+                console.log(`✅ Actions Menu ${index + 1} נראה:`);
+                console.log(`   Opacity: ${style.opacity}`);
+                console.log(`   Visibility: ${style.visibility}`);
+                console.log(`   Size: ${rect.width}x${rect.height}`);
+            }
+        }
+    });
+};
+
+// פונקציה לבדיקת overflow - מה שמסתיר את התפריט
+window.debugActionsMenuOverflow = () => {
+    const allWrappers = document.querySelectorAll('.actions-menu-wrapper');
+    console.log('🔍 בדיקת overflow - מה מסתיר את התפריט...');
+    
+    allWrappers.forEach((wrapper, index) => {
+        const popup = wrapper.querySelector('.actions-menu-popup');
+        if (!popup) return;
+        
+        // בדיקה של כל ההורים עד הטבלה
+        const checkOverflow = (element, path = '') => {
+            if (!element) return;
+            
+            const style = window.getComputedStyle(element);
+            const rect = element.getBoundingClientRect();
+            const tagName = element.tagName.toLowerCase();
+            const className = element.className || 'no-class';
+            
+            console.log(`${path}${tagName}.${className}:`, {
+                overflow: style.overflow,
+                overflowX: style.overflowX,
+                overflowY: style.overflowY,
+                position: style.position,
+                zIndex: style.zIndex,
+                clip: style.clip,
+                clipPath: style.clipPath
+            });
+            
+            // המשך בדיקה של ההורה
+            if (element.parentElement && element !== document.body) {
+                checkOverflow(element.parentElement, path + '  ');
+            }
+        };
+        
+        console.log(`\n📊 Actions Menu ${index + 1} - בדיקת overflow:`);
+        checkOverflow(popup, '');
+    });
+};
+
+console.log('✅ ActionsMenuSystem: debugActionsMenu מוגדרת וזמינה');
+
 class ActionsMenuSystem {
     constructor() {
         this.init();
@@ -42,6 +246,7 @@ class ActionsMenuSystem {
         
         this.initAccessibility();
         this.attachLinkedItemsDebugLogger();
+        this.attachZIndexDebugLogger();
     }
     
     /**
@@ -109,14 +314,31 @@ class ActionsMenuSystem {
             }
         }, true);
     }
+
+    /**
+     * הוספת לוגים לבדיקת z-index כשהתפריט נפתח
+     */
+    attachZIndexDebugLogger() {
+        // הפונקציה debugActionsMenu כבר מוגדרת בתחילת הקובץ
+        
+        // נוסיף event listener פשוט יותר - עם בדיקת בטיחות
+        document.addEventListener('mouseenter', (e) => {
+            if (e.target && typeof e.target.closest === 'function' && e.target.closest('.actions-menu-wrapper')) {
+                console.log('🎯 [Actions Menu Debug] Mouse entered actions menu');
+            }
+        }, true);
+        
+        document.addEventListener('mouseleave', (e) => {
+            if (e.target && typeof e.target.closest === 'function' && e.target.closest('.actions-menu-wrapper')) {
+                console.log('🎯 [Actions Menu Debug] Mouse left actions menu');
+            }
+        }, true);
+        
+        console.log('✅ Actions Menu Debug Logger הותקן. הרץ debugActionsMenu() כדי לבדוק');
+    }
 }
 
-// Initialize on DOM ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        window.actionsMenuSystem = new ActionsMenuSystem();
-    });
-} else {
-    window.actionsMenuSystem = new ActionsMenuSystem();
-}
+// Initialize דרך UnifiedAppInitializer - כלל 43
+// DOMContentLoaded listener הוסר לטובת מערכת האתחול המאוחדת
+window.ActionsMenuSystem = ActionsMenuSystem;
 

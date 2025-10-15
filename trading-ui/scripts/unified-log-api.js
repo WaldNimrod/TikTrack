@@ -468,20 +468,9 @@ window.getAvailableLogTypes = function() {
 /**
  * Initialize API when unified system is ready
  */
-document.addEventListener('DOMContentLoaded', async function() {
-    // Wait for unified initialization system
-    if (window.UnifiedAppInitializer) {
-        // API will be initialized when needed
-        console.log('📊 UnifiedLogAPI ready for initialization');
-    } else {
-        // Fallback initialization
-        try {
-            await window.UnifiedLogAPI.initialize();
-        } catch (error) {
-            console.warn('⚠️ Failed to initialize UnifiedLogAPI:', error);
-        }
-    }
-});
+// אתחול דרך UnifiedAppInitializer - כלל 43
+// DOMContentLoaded listener הוסר לטובת מערכת האתחול המאוחדת
+window.UnifiedLogAPI = UnifiedLogAPI;
 
 // Export for module systems
 if (typeof module !== 'undefined' && module.exports) {

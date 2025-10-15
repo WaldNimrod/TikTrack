@@ -109,21 +109,31 @@ async function loadAlertsData() {
   }
   _isLoadingAlerts = true;
 
-  
-  // שימוש במערכת המאוחדת - טיפול אחיד בשגיאות עם Retry + Copy Error Log
-  const data = await window.loadTableData('alerts', updateAlertsTable, {
-    tableId: 'alertsTable',
-    entityName: 'התראות',
-    columns: 8,
-    onRetry: loadAlertsData
-  });
-  
-  // עדכון המשתנה הגלובלי
-  window.alertsData = data;
-      _isLoadingAlerts = false;
-  
-  
-  return data;
+  try {
+    // שימוש במערכת המאוחדת - טיפול אחיד בשגיאות עם Retry + Copy Error Log
+    const data = await window.loadTableData('alerts', updateAlertsTable, {
+      tableId: 'alertsTable',
+      entityName: 'התראות',
+      columns: 6,
+      onRetry: loadAlertsData
+    });
+    
+    // עדכון המשתנה הגלובלי והמקומי
+    window.alertsData = data;
+    alertsData = data;
+    
+    // עדכון הסטטיסטיקות אחרי טעינת הנתונים
+    if (data && Array.isArray(data)) {
+      updatePageSummaryStats(data);
+    }
+    
+    return data;
+  } catch (error) {
+    console.error('Error loading alerts data:', error);
+    return [];
+  } finally {
+    _isLoadingAlerts = false;
+  }
 }
 
 /**
@@ -275,6 +285,12 @@ function updateAlertsTable(alerts) {
     return;
   }
 
+  // עדכון המשתנה המקומי והגלובלי עם הנתונים החדשים
+  if (alerts && Array.isArray(alerts)) {
+    alertsData = alerts;
+    window.alertsData = alerts;
+  }
+
   // טעינת נתונים נוספים לצורך הצגת סימבולים
   let accounts = [];
   let trades = [];
@@ -310,7 +326,7 @@ function updateAlertsTable(alerts) {
     // בדיקה שהנתונים קיימים
     if (!alerts || !Array.isArray(alerts)) {
       console.warn('⚠️ alerts parameter is not available or not an array');
-      tbody.innerHTML = '<tr><td colspan="8" class="text-center">אין התראות להצגה</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center">אין התראות להצגה</td></tr>';
       return;
     }
 
@@ -446,19 +462,6 @@ function updateAlertsTable(alerts) {
               </span>
             </div>
           </td>
-          <td><span class="condition-text">${(() => {
-    if (alert.condition_attribute && alert.condition_operator &&
-        alert.condition_number && window.translateConditionFields) {
-      return window.translateConditionFields(
-        alert.condition_attribute,
-        alert.condition_operator,
-        alert.condition_number,
-      );
-    }
-    return alert.condition || '-';
-  })()}</span></td>
-          <td class="status-cell" data-status="${alert.status || ''}">${statusBadge}</td>
-          <td class="triggered-cell">${triggeredDisplay}</td>
           <td class="related-cell">
             ${window.FieldRendererService && window.FieldRendererService.renderLinkedEntity
               ? window.FieldRendererService.renderLinkedEntity(
@@ -473,14 +476,24 @@ function updateAlertsTable(alerts) {
                 )
               : `<div class=\"related-object-cell ${relatedClass}\" title=\"קישור לדף אובייקט - בפיתוח\">${relatedTypeBadge}</div>`}
           </td>
-
-          <td><span class="message-text">${alert.message || '-'}</span></td>
-          <td data-date="${alert.created_at}"><span class="date-text">${dateBadge}</span></td>
-          <td class="col-actions actions-cell" data-entity-id="${alert.id}" data-status="${alert.status || ''}">
+          <td><span class="condition-text">${(() => {
+    if (alert.condition_attribute && alert.condition_operator &&
+        alert.condition_number && window.translateConditionFields) {
+      return window.translateConditionFields(
+        alert.condition_attribute,
+        alert.condition_operator,
+        alert.condition_number,
+      );
+    }
+    return alert.condition || '-';
+  })()}</span></td>
+          <td class="status-cell" data-status="${alert.status || ''}">${statusBadge}</td>
+          <td class="triggered-cell">${triggeredDisplay}</td>
+          <td class="col-actions actions-cell" data-entity-id="${alert.id}" data-status="${alert.status || ''}" onclick="event.stopPropagation();">
             ${window.createActionsMenu ? window.createActionsMenu([
+                window.createButton ? window.createButton('VIEW', `showAlertDetails(${alert.id})`) : '',
                 window.createLinkButton ? window.createLinkButton(`viewLinkedItemsForAlert(${alert.id})`) : '',
                 window.createEditButton ? window.createEditButton(`editAlert(${alert.id})`) : '',
-                window.createButton ? window.createButton('VIEW', `showAlertDetails(${alert.id})`) : '',
                 window.createDeleteButton ? window.createDeleteButton(`deleteAlert(${alert.id})`) : ''
             ], alert.id) : ''}
           </td>
@@ -496,10 +509,13 @@ function updateAlertsTable(alerts) {
       countElement.textContent = `${alerts.length} התראות`;
     }
 
-    // עדכון סטטיסטיקות
-    updatePageSummaryStats();
+    // עדכון סטטיסטיקות עם הנתונים הטעונים
+    updatePageSummaryStats(alerts);
     
-    
+    // מיון ברירת מחדל - תאריך בסדר יורד (חדש ראשון)
+    if (typeof window.applyDefaultSort === 'function') {
+      window.applyDefaultSort('alerts', alerts, updateAlertsTable);
+    }
 
   });
 }
@@ -507,31 +523,62 @@ function updateAlertsTable(alerts) {
 /**
  * עדכון סטטיסטיקות סיכום
  */
-function updatePageSummaryStats() {
+function updatePageSummaryStats(alertsToUse = null) {
+  // שימוש בנתונים שמועברים או במשתנה הגלובלי כגיבוי
+  const currentAlerts = alertsToUse || alertsData || [];
+  
+  console.log('🔍 updatePageSummaryStats called with:', {
+    alertsToUse: alertsToUse?.length || 0,
+    alertsDataLength: alertsData?.length || 0,
+    currentAlertsLength: currentAlerts.length
+  });
+  
   // סטטיסטיקות לפי הדוקומנטציה של מערכת ההתראות
-  const totalAlerts = alertsData.length;
-  const openAlerts = alertsData.filter(alert =>
+  const totalAlerts = currentAlerts.length;
+  const openAlerts = currentAlerts.filter(alert =>
     alert.status === 'open',
   ).length; // התראות פעילות
-  const newAlerts = alertsData.filter(alert =>
+  const newAlerts = currentAlerts.filter(alert =>
     alert.is_triggered === 'new',
   ).length; // התראות חדשות (הופעלו ולא נקראו)
-  const todayAlerts = alertsData.filter(alert => {
+  const todayAlerts = currentAlerts.filter(alert => {
     const today = new Date().toDateString();
     const alertDate = new Date(alert.created_at).toDateString();
     return alertDate === today;
   }).length;
-  const weekAlerts = alertsData.filter(alert => {
+  const weekAlerts = currentAlerts.filter(alert => {
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
     return new Date(alert.created_at) >= weekAgo;
   }).length;
 
-  document.getElementById('totalAlerts').textContent = totalAlerts;
-  document.getElementById('activeAlerts').textContent = openAlerts;
-  document.getElementById('newAlerts').textContent = newAlerts;
-  document.getElementById('todayAlerts').textContent = todayAlerts;
-  document.getElementById('weekAlerts').textContent = weekAlerts;
+  // עדכון האלמנטים רק אם הם קיימים
+  const totalAlertsEl = document.getElementById('totalAlerts');
+  const activeAlertsEl = document.getElementById('activeAlerts');
+  const newAlertsEl = document.getElementById('newAlerts');
+  const todayAlertsEl = document.getElementById('todayAlerts');
+  const weekAlertsEl = document.getElementById('weekAlerts');
+  
+  if (totalAlertsEl) totalAlertsEl.textContent = totalAlerts;
+  if (activeAlertsEl) activeAlertsEl.textContent = openAlerts;
+  if (newAlertsEl) newAlertsEl.textContent = newAlerts;
+  if (todayAlertsEl) todayAlertsEl.textContent = todayAlerts;
+  if (weekAlertsEl) weekAlertsEl.textContent = weekAlerts;
+  
+  console.log('📊 Updated summary stats:', {
+    totalAlerts,
+    openAlerts,
+    newAlerts,
+    todayAlerts,
+    weekAlerts,
+    elementsFound: {
+      totalAlertsEl: !!totalAlertsEl,
+      activeAlertsEl: !!activeAlertsEl,
+      newAlertsEl: !!newAlertsEl,
+      todayAlertsEl: !!todayAlertsEl,
+      weekAlertsEl: !!weekAlertsEl
+    }
+  });
 }
 
 
@@ -539,13 +586,28 @@ function updatePageSummaryStats() {
  * הצגת מודל הוספת התראה
  */
 function showAddAlertModal() {
-  // טעינת נתונים למודל
-  loadModalData();
-
-  // ניקוי הטופס
+  // ניקוי הטופס לפני הטעינה
   const form = addAlertForm;
   if (form) {
     form.reset();
+  }
+
+  // טעינת נתונים למודל עם מערכות כלליות
+  loadModalData();
+
+  // השתמש ב-SelectPopulatorService עם ברירות מחדל מהעדפות
+  if (typeof window.SelectPopulatorService !== 'undefined') {
+    // טיקר עם ברירת מחדל מהעדפות
+    window.SelectPopulatorService.populateTickersSelect('alertTicker', { 
+      includeEmpty: true, 
+      defaultFromPreferences: true 
+    });
+    
+    // חשבון מסחר עם ברירת מחדל מהעדפות
+    window.SelectPopulatorService.populateAccountsSelect('alertTradingAccount', { 
+      includeEmpty: true, 
+      defaultFromPreferences: true 
+    });
   }
 
   // ניקוי ולידציה
@@ -571,12 +633,10 @@ function showAddAlertModal() {
   // הצגת המודל
   const modalElement = addAlertModalElement;
   if (modalElement) {
-    // הגדרת z-index גבוה מאוד
-    modalElement.style.zIndex = '999999';
-
     // בדיקה אם Bootstrap זמין
     if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-      const modal = new bootstrap.Modal(modalElement, {
+      // שימוש ב-getOrCreateInstance במקום new bootstrap.Modal
+      const modal = bootstrap.Modal.getOrCreateInstance(modalElement, {
         backdrop: 'static',
         keyboard: false,
       });
@@ -1274,16 +1334,7 @@ async function saveAlert() {
     await window.CRUDResponseHandler.handleSaveResponse(response, {
       modalId: 'addAlertModal',
       successMessage: 'התראה נשמרה בהצלחה',
-      reloadFn: async () => {
-        // ניקוי מטמון
-        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-          await window.UnifiedCacheManager.remove('alerts');
-        }
-        // רענון נתונים
-        if (typeof window.loadAlertsData === 'function') {
-          await window.loadAlertsData();
-        }
-      },
+      apiUrl: '/api/alerts/',
       entityName: 'התראה'
     });
 
@@ -1344,6 +1395,15 @@ function editAlert(alertId) {
 
   // טעינת נתונים למודל ואז מילוי השדות
   loadModalData().then(() => {
+    // מילוי טיקר במודל עריכה
+    if (typeof window.SelectPopulatorService !== 'undefined' && alert.ticker_symbol) {
+      // טעינת טיקרים ואז בחירה לפי סימבול
+      window.SelectPopulatorService.populateTickersSelect('editAlertTicker', { 
+        includeEmpty: false,
+        defaultText: alert.ticker_symbol 
+      });
+    }
+
     // בחירת סוג הקשר
     const relationType = alert.related_type_id;
     const radioButton = document.querySelector(`input[name="editAlertRelationType"][value="${relationType}"]`);
@@ -1394,7 +1454,8 @@ function editAlert(alertId) {
 
     // בדיקה אם Bootstrap זמין
     if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-      const modal = new bootstrap.Modal(modalElement, {
+      // שימוש ב-getOrCreateInstance במקום new bootstrap.Modal
+      const modal = bootstrap.Modal.getOrCreateInstance(modalElement, {
         backdrop: 'static',
         keyboard: false,
       });
@@ -1705,14 +1766,7 @@ async function updateAlert() {
     await window.CRUDResponseHandler.handleUpdateResponse(response, {
       modalId: 'editAlertModal',
       successMessage: 'התראה עודכנה בהצלחה',
-      reloadFn: async () => {
-        // ניקוי מטמון
-        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-          await window.UnifiedCacheManager.remove('alerts');
-        }
-        // רענון נתונים
-        await loadAlertsData();
-      },
+      apiUrl: `/api/alerts/${alertId}`,
       entityName: 'התראה'
     });
   } catch {
@@ -1985,6 +2039,7 @@ function generateDetailedLog() {
 // window.toggleSection export removed - using global version from ui-utils.js
 window.filterAlertsByRelatedObjectType = filterAlertsByRelatedObjectType;
 window.loadAlertsData = loadAlertsData;
+window.resetAlertsLoadingFlag = () => { _isLoadingAlerts = false; };
 window.updateAlertsTable = updateAlertsTable;
 window.showAddAlertModal = showAddAlertModal;
 window.editAlert = editAlert;
@@ -2105,7 +2160,12 @@ window.initializeAlertsPage = function() {
         window.initializeAlertsModals();
     }
     
-    // 2. Load alerts data
+    // 2. Initialize related object filters system
+    if (typeof window.initializeRelatedObjectFilters === 'function') {
+        window.initializeRelatedObjectFilters();
+    }
+    
+    // 3. Load alerts data
     if (typeof window.loadAlertsData === 'function') {
         loadAlertsData();
     }
@@ -2122,9 +2182,9 @@ window.initializeAlertsModals = function() {
     const alertRelatedObjectSelect = document.getElementById('alertRelatedObjectSelect');
     const editAlertRelatedObjectSelect = document.getElementById('editAlertRelatedObjectSelect');
     
-    if (addAlertModalElement) window.addAlertModal = new bootstrap.Modal(addAlertModalElement);
-    if (editAlertModalElement) window.editAlertModal = new bootstrap.Modal(editAlertModalElement);
-    if (deleteAlertModalElement) window.deleteAlertModal = new bootstrap.Modal(deleteAlertModalElement);
+    if (addAlertModalElement) window.addAlertModal = bootstrap.Modal.getOrCreateInstance(addAlertModalElement);
+    if (editAlertModalElement) window.editAlertModal = bootstrap.Modal.getOrCreateInstance(editAlertModalElement);
+    if (deleteAlertModalElement) window.deleteAlertModal = bootstrap.Modal.getOrCreateInstance(deleteAlertModalElement);
 };
 
 console.log('✅ alerts.js v=20251013_boolean_hybrid loaded - new=badge, true/false=renderBoolean icons');

@@ -188,6 +188,7 @@ class TradingAccountsController {
             <td class="col-created">${formattedDate}</td>
             <td class="col-actions actions-cell">
                 ${window.createActionsMenu ? window.createActionsMenu([
+                    window.createButton ? window.createButton('VIEW', `window.tradingAccountsController.showDetails(${tradingAccount.id})`) : '',
                     window.createLinkButton ? window.createLinkButton(`if (window.showLinkedItemsModal) { window.showLinkedItemsModal([], 'account', ${tradingAccount.id}); }`) : '',
                     window.createEditButton ? window.createEditButton(`window.tradingAccountsController.showEditModal(${tradingAccount.id})`) : '',
                     window.createDeleteButton ? window.createDeleteButton(`window.tradingAccountsController.deleteAccount(${tradingAccount.id})`) : ''
@@ -712,16 +713,7 @@ async function saveTradingAccount() {
         const result = await window.CRUDResponseHandler.handleSaveResponse(response, {
             modalId: 'addAccountModal',
             successMessage: 'חשבון המסחר נשמר בהצלחה',
-            reloadFn: async () => {
-                // ניקוי מטמון trading_accounts
-                if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-                    await window.UnifiedCacheManager.remove('trading_accounts');
-                }
-                // רענון טבלה
-                if (window.tradingAccountsController && window.tradingAccountsController.loadData) {
-                    await window.tradingAccountsController.loadData();
-                }
-            },
+            apiUrl: '/api/trading-accounts/',
             entityName: 'חשבון מסחר'
         });
 
@@ -767,16 +759,7 @@ async function updateTradingAccount() {
         const result = await window.CRUDResponseHandler.handleUpdateResponse(response, {
             modalId: 'editAccountModal',
             successMessage: 'חשבון המסחר עודכן בהצלחה',
-            reloadFn: async () => {
-                // ניקוי מטמון
-                if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-                    await window.UnifiedCacheManager.remove('trading_accounts');
-                }
-                // רענון טבלה
-                if (window.tradingAccountsController && window.tradingAccountsController.loadData) {
-                    await window.tradingAccountsController.loadData();
-                }
-            },
+            apiUrl: `/api/trading-accounts/${accountId}`,
             entityName: 'חשבון מסחר'
         });
 

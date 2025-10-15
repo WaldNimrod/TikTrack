@@ -8,13 +8,23 @@ The TikTrack Header System is a comprehensive navigation and filtering solution 
 ## File Location
 - **Main File**: `trading-ui/scripts/header-system.js` (UNIFIED SYSTEM)
 - **CSS File**: `trading-ui/styles-new/header-styles.css` (EXTERNAL CSS)
-- **Version**: 6.0.1 (October 2025)
-- **Status**: **OPTIMIZED** - Animation and visibility fully optimized
-- **Performance**: Header visible in ~150ms (78% faster than v6.0.0, Oct 2025)
+- **Version**: 6.0.3 (January 2025)
+- **Status**: **PREFERENCES INTEGRATED** - Full integration with unified initialization system
+- **Performance**: Header visible in ~150ms with proper preferences loading and cache management
 
-## 🎉 Current Status (October 2025)
+## 🎉 Current Status (January 2025)
 
-### 1. **Unified Header System v6.0.2 - FILTER SYSTEM OPTIMIZED** ✅ NEW!
+### 1. **Unified Header System v6.0.3 - PREFERENCES INTEGRATION COMPLETE** ✅ NEW!
+- **Status**: **COMPLETED** - Full integration with unified initialization system and preferences
+- **Date**: 15 January 2025
+- **Key Improvements**:
+  - **Unified Initialization Integration**: Full compliance with LOADING_STANDARD and UNIFIED_INITIALIZATION_SYSTEM
+  - **Preferences System Integration**: Proper integration with PreferencesSystem V2 and fallback support
+  - **Account Filter Enhancement**: Smart ID-to-name conversion for trading accounts
+  - **Cache Management**: Proper cache clearing and preference loading
+  - **Error Handling**: Comprehensive error handling with fallback mechanisms
+
+### 2. **Unified Header System v6.0.2 - FILTER SYSTEM OPTIMIZED** ✅
 - **Status**: **COMPLETED** - Dynamic table detection and filter improvements
 - **Date**: 12 October 2025
 - **Key Improvements**:
@@ -50,6 +60,84 @@ The TikTrack Header System is a comprehensive navigation and filtering solution 
   - Total: 0.45s (ultra-responsive)
 - **Git Commits**: 13 commits total (refactoring + optimization)
 - **Documentation**: `HEADER_ANIMATION_OPTIMIZATION_REPORT.md`
+
+### Implementation Details (v6.0.3)
+
+#### **Unified Initialization System Integration**
+```javascript
+// New: Proper integration with unified initialization stages
+function isSystemsReady() {
+  const cacheReady = window.cacheSystemReady || 
+                    (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized);
+  const preferencesReady = (window.PreferencesSystem && window.PreferencesSystem.initialized) || 
+                          (window.currentPreferences !== undefined) ||
+                          (typeof window.getPreferencesByNames === 'function');
+  const headerReady = (typeof window.HeaderSystem !== 'undefined') || 
+                     (typeof window.initializeHeaderSystem === 'function');
+  
+  return cacheReady && preferencesReady && headerReady;
+}
+
+// New: Wait for systems to be ready before processing
+async function waitForSystemsReady(timeout = 10000) {
+  const startTime = Date.now();
+  while (!isSystemsReady()) {
+    if (Date.now() - startTime > timeout) {
+      throw new Error('המערכות לא אותחלו תוך הזמן המוקצב');
+    }
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+}
+```
+
+#### **Smart Account Filter Processing**
+```javascript
+// New: Intelligent ID-to-name conversion for trading accounts
+async function mapAccountIdToName(accountValue) {
+  // If it's already a name (non-numeric), return as-is
+  if (typeof accountValue === 'string' && isNaN(accountValue)) {
+    return accountValue; // Server already returned name
+  }
+  
+  // If it's an ID (numeric), find the corresponding name
+  if (typeof accountValue === 'string' && !isNaN(accountValue)) {
+    // Load accounts if not available
+    if (!window.trading_accountsData || window.trading_accountsData.length === 0) {
+      await HeaderSystem.loadAccountsForFilter();
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    
+    // Find account by ID
+    const account = window.trading_accountsData.find(acc => 
+      String(acc.id) === String(accountValue) && acc.status === 'open'
+    );
+    
+    return account ? account.name : accountValue;
+  }
+  
+  return accountValue;
+}
+```
+
+#### **Enhanced Cache Management**
+```javascript
+// New: Proper cache clearing according to unified architecture
+async function clearPreferencesCache() {
+  try {
+    // Clear UnifiedCacheManager (primary system)
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+      await window.UnifiedCacheManager.remove('user-preferences');
+    }
+
+    // Clear preferencesCache (legacy system for support)
+    if (window.preferencesCache && typeof window.preferencesCache.clear === 'function') {
+      await window.preferencesCache.clear();
+    }
+  } catch (error) {
+    console.warn('שגיאה בניקוי מטמון העדפות:', error);
+  }
+}
+```
 
 ### Implementation Details (v6.0.2)
 
@@ -117,9 +205,36 @@ All filters now have explicit logic for conditional application:
 - **Integration**: All existing pages will use the new header system
 - **Estimated Time**: 80 minutes (1.5 hours)
 
-## 🏗️ Final Header Architecture (January 2025)
+## 🏗️ Final Header Architecture (January 2025 - v6.0.3)
 
-### 1. **Two-Part Component Structure**
+### 1. **Unified Initialization Integration**
+The header system now fully integrates with the unified initialization system:
+
+```javascript
+// Integration with loadUserFilterPreferences()
+async function loadUserFilterPreferences() {
+  // 1. Check systems are ready (compatible with unified initialization)
+  if (!isSystemsReady()) {
+    throw new Error('מערכות העדפות ומטמון עדיין לא אותחלו - אנא המתין לאתחול');
+  }
+
+  // 2. Clear cache according to unified architecture
+  await clearPreferencesCache();
+
+  // 3. Load from PreferencesSystem V2 (primary system)
+  if (window.PreferencesSystem && window.PreferencesSystem.manager && window.PreferencesSystem.initialized) {
+    const allPrefs = await window.PreferencesSystem.manager.load(1, null, true);
+    return preferenceNames.reduce((result, name) => {
+      if (allPrefs[name] !== undefined) {
+        result[name] = allPrefs[name];
+      }
+      return result;
+    }, {});
+  }
+}
+```
+
+### 2. **Two-Part Component Structure**
 The final header system uses a simple two-part architecture:
 
 ```

@@ -1188,12 +1188,9 @@ async function initializeBackgroundTasks() {
   }
 }
 
-// Initialize when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializeBackgroundTasks);
-} else {
-  initializeBackgroundTasks();
-}
+// אתחול דרך UnifiedAppInitializer - כלל 43
+// DOMContentLoaded listener הוסר לטובת מערכת האתחול המאוחדת
+window.initializeBackgroundTasks = initializeBackgroundTasks;
 
 // Global functions for onclick handlers - Background Tasks specific
 // Local copyDetailedLog function for background-tasks page

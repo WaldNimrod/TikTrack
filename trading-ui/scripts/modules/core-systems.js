@@ -543,7 +543,7 @@ class UnifiedAppInitializer {
     async manualInitialization(config) {
         console.log('🔧 Manual initialization fallback...');
         
-        // Initialize Header + Notifications in parallel (both independent of cache)
+        // Initialize Header + Notifications + Actions Menu System in parallel (all independent of cache)
         console.log('🎯 Initializing UI Systems in parallel...');
         await Promise.all([
             // Header System - has localStorage fallback, doesn't need cache
@@ -561,6 +561,22 @@ class UnifiedAppInitializer {
                 if (this.availableSystems.has('notification') && typeof window.NotificationSystem !== 'undefined') {
                     console.log('🔔 Initializing Notification System...');
                     await window.NotificationSystem.initialize();
+                }
+            })(),
+            
+            // Actions Menu System - required for table action menus
+            (async () => {
+                if (typeof window.ActionsMenuSystem !== 'undefined') {
+                    console.log('🎯 Initializing Actions Menu System...');
+                    // Initialize ActionsMenuSystem instance if not already initialized
+                    if (!window.actionsMenuSystemInstance) {
+                        window.actionsMenuSystemInstance = new window.ActionsMenuSystem();
+                        console.log('✅ Actions Menu System instance created');
+                    } else {
+                        console.log('✅ Actions Menu System already initialized');
+                    }
+                } else {
+                    console.warn('⚠️ ActionsMenuSystem not available');
                 }
             })()
         ]);
@@ -743,6 +759,7 @@ class UnifiedAppInitializer {
         // UI Systems
         if (typeof window.toggleSection === 'function') systems.add('uiUtils');
         if (typeof window.showNotification === 'function') systems.add('notifications');
+        if (typeof window.ActionsMenuSystem !== 'undefined') systems.add('actionsMenu');
         
         return systems;
     }
@@ -2797,12 +2814,23 @@ async function saveNotificationToGlobalHistory(type, title, message, category = 
       console.debug('⚠️ Cache system not initialized - skipping notification history save');
     }
 
-    // Fallback ל-localStorage במקרה של בעיה
+    // Fallback דרך UnifiedCacheManager - כלל 44
     try {
       let globalHistory = [];
-      const savedHistory = localStorage.getItem('tiktrack_global_notifications_history');
-      if (savedHistory) {
-        globalHistory = JSON.parse(savedHistory);
+      if (window.UnifiedCacheManager?.isInitialized()) {
+        try {
+          const savedHistory = await window.UnifiedCacheManager.get('tiktrack_global_notifications_history', {
+            layer: 'localStorage'
+          });
+          if (savedHistory) {
+            globalHistory = savedHistory;
+          }
+        } catch (cacheErr) {
+          console.warn('שגיאה בטעינה מ-UnifiedCacheManager:', cacheErr);
+        }
+      } else {
+        console.warn('UnifiedCacheManager לא זמין - לא ניתן לשמור היסטוריית התראות');
+        return;
       }
 
       globalHistory.unshift(notification);
@@ -2810,9 +2838,12 @@ async function saveNotificationToGlobalHistory(type, title, message, category = 
         globalHistory = globalHistory.slice(0, 100);
       }
 
-      localStorage.setItem('tiktrack_global_notifications_history', JSON.stringify(globalHistory));
+      await window.UnifiedCacheManager.save('tiktrack_global_notifications_history', globalHistory, {
+        layer: 'localStorage',
+        ttl: null
+      });
     } catch (e) {
-      console.warn('שגיאה בשמירת fallback ל-localStorage:', e);
+      console.error('שגיאה בשמירת היסטוריית התראות (כלל 44 violation prevented):', e);
     }
 
     // עדכון סטטיסטיקות גלובליות
@@ -2849,12 +2880,18 @@ async function updateGlobalNotificationStats() {
     // Fallback ל-localStorage
     if (history.length === 0) {
       try {
-        const savedHistory = localStorage.getItem('tiktrack_global_notifications_history');
-        if (savedHistory) {
-          history = JSON.parse(savedHistory);
+        if (window.UnifiedCacheManager?.isInitialized()) {
+          const savedHistory = await window.UnifiedCacheManager.get('tiktrack_global_notifications_history', {
+            layer: 'localStorage'
+          });
+          if (savedHistory) {
+            history = savedHistory;
+          }
+        } else {
+          console.warn('UnifiedCacheManager לא זמין - לא ניתן לטעון היסטוריית התראות');
         }
       } catch (e) {
-        console.warn('שגיאה בטעינת היסטוריה מ-localStorage:', e);
+        console.warn('שגיאה בטעינת היסטוריה דרך UnifiedCacheManager:', e);
       }
     }
 
@@ -2884,11 +2921,18 @@ async function updateGlobalNotificationStats() {
       console.debug('⚠️ Cache system not initialized - skipping notification stats save');
     }
 
-    // Fallback ל-localStorage
+    // Fallback דרך UnifiedCacheManager - כלל 44
     try {
-    localStorage.setItem('tiktrack_global_notifications_stats', JSON.stringify(stats));
+      if (window.UnifiedCacheManager?.isInitialized()) {
+        await window.UnifiedCacheManager.save('tiktrack_global_notifications_stats', stats, {
+          layer: 'localStorage',
+          ttl: 24 * 60 * 60 * 1000 // 24 hours
+        });
+      } else {
+        console.warn('UnifiedCacheManager לא זמין - לא ניתן לשמור סטטיסטיקות התראות');
+      }
     } catch (e) {
-      console.warn('שגיאה בשמירת סטטיסטיקות ל-localStorage:', e);
+      console.error('שגיאה בשמירת סטטיסטיקות דרך UnifiedCacheManager (כלל 44 violation prevented):', e);
     }
   } catch (error) {
     console.warn('שגיאה בעדכון סטטיסטיקות גלובליות:', error);
@@ -2914,9 +2958,21 @@ async function loadGlobalNotificationHistory() {
       // console.log('UnifiedIndexedDB לא מאותחל עדיין, מדלג על טעינת היסטוריה');
     }
     
-    // Fallback ל-localStorage
-    const savedHistory = localStorage.getItem('tiktrack_global_notifications_history');
-    return savedHistory ? JSON.parse(savedHistory) : [];
+    // Fallback דרך UnifiedCacheManager - כלל 44
+    if (window.UnifiedCacheManager?.isInitialized()) {
+      try {
+        const savedHistory = await window.UnifiedCacheManager.get('tiktrack_global_notifications_history', {
+          layer: 'localStorage'
+        });
+        return savedHistory ? savedHistory : [];
+      } catch (cacheErr) {
+        console.warn('שגיאה בטעינה דרך UnifiedCacheManager:', cacheErr);
+        return [];
+      }
+    } else {
+      console.warn('UnifiedCacheManager לא זמין - לא ניתן לטעון היסטוריית התראות');
+      return [];
+    }
   } catch (error) {
     console.warn('שגיאה בטעינת היסטוריית התראות גלובלית:', error);
     return [];
@@ -2942,10 +2998,20 @@ async function loadGlobalNotificationStats() {
       console.log('UnifiedIndexedDB לא מאותחל עדיין, מדלג על טעינת סטטיסטיקות');
     }
     
-    // Fallback ל-localStorage
-    const savedStats = localStorage.getItem('tiktrack_global_notifications_stats');
-    if (savedStats) {
-      return JSON.parse(savedStats);
+    // Fallback דרך UnifiedCacheManager - כלל 44
+    if (window.UnifiedCacheManager?.isInitialized()) {
+      try {
+        const savedStats = await window.UnifiedCacheManager.get('tiktrack_global_notifications_stats', {
+          layer: 'localStorage'
+        });
+        if (savedStats) {
+          return savedStats;
+        }
+      } catch (cacheErr) {
+        console.warn('שגיאה בטעינה דרך UnifiedCacheManager:', cacheErr);
+      }
+    } else {
+      console.warn('UnifiedCacheManager לא זמין - לא ניתן לטעון סטטיסטיקות התראות');
     }
   } catch (error) {
     console.warn('שגיאה בטעינת סטטיסטיקות גלובליות:', error);

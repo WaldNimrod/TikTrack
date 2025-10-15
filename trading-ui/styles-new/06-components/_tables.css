@@ -281,9 +281,9 @@
 }
 
 .col-actions { 
-  width: 80px !important;
-  min-width: 80px !important;
-  max-width: 80px !important;
+  width: 80px ;
+  min-width: 80px ;
+  max-width: 80px ;
 }
 
 /* הגדרות כלליות לכל הטבלאות */
@@ -298,6 +298,8 @@ table,
   border-collapse: separate;
   border-spacing: 0;
   font-family: var(--font-family-primary);
+  /* וידוא שטבלאות לא חותכות actions menu */
+  overflow: visible;
 }
 
 /* כותרות טבלה */
@@ -354,24 +356,39 @@ table td,
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
+/* וידוא ששורה עם actions-cell לא תעלה מעל ה-actions menu */
+.data-table tbody tr:hover .actions-cell {
+  z-index: 1049;
+}
+
 .data-table tbody tr:last-child td {
   border-bottom: none;
 }
 
+/* תיקון ספציפי ל-triggered-cell שלא יחסם את הפופאפ */
+.data-table tbody .triggered-cell {
+  z-index: 1;
+  position: relative;
+  /* הבטחה שהתא לא יוצר stacking context שיפריע */
+}
+
 /* עמודת פעולות רספונסיבית (Actions Menu Popup) */
 .actions-cell {
+  position: relative; /* חשוב ל-positioning של actions-menu-popup */
   text-align: center;
   vertical-align: middle;
   height: auto;
   min-height: 100%;
   display: table-cell;
   white-space: nowrap;
-  padding: 4px !important;
-  overflow: visible !important;
+  padding: 4px ;
+  overflow: visible ;
+  /* וידוא שה-actions menu יהיה מעל השורה עם hover effect */
+  z-index: 1049;
   /* רוחב רספונסיבי - משתלב עם המערכת */
-  width: var(--col-actions-percent) !important;
-  min-width: var(--col-actions-min-width) !important;
-  max-width: var(--col-actions-max-width) !important;
+  width: var(--col-actions-percent) ;
+  min-width: var(--col-actions-min-width) ;
+  max-width: var(--col-actions-max-width) ;
 }
 
 /* תאי פעולות - padding מותאם */
@@ -443,7 +460,7 @@ table tbody td button.btn-sm {
   background: var(--apple-bg-elevated);
   border-radius: var(--apple-radius-medium);
   border: 1px solid var(--apple-border-light);
-  overflow: hidden;
+  overflow: visible; /* תיקון: מאפשר לפופאפ להיות נראה */
   box-shadow: var(--apple-shadow-light);
 }
 
@@ -452,6 +469,7 @@ table tbody td button.btn-sm {
   width: 100%;
   max-width: 100%;
   overflow-x: auto; /* גלילה אופקית לגדלים קטנים */
+  overflow-y: visible; /* מאפשר לפופאפים לצאת מגבולות הטבלה */
   -webkit-overflow-scrolling: touch;
   display: block; /* מאפשר לטבלה להתאים לרוחב */
 }
@@ -486,7 +504,7 @@ table tbody td button.btn-sm {
 .data-table {
   background: #ffffff;
   border-radius: 20px;
-  overflow: hidden;
+  overflow: visible; /* תיקון: מאפשר לפופאפ actions menu להיות נראה */
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
   border: 2px solid #e9ecef;
 }
@@ -665,6 +683,7 @@ table tbody td button.btn-sm {
   /* גלילה אופקית */
   .table-responsive {
     overflow-x: auto;
+    overflow-y: visible;
   }
   
   /* רק עמודות חיוניות */
@@ -739,6 +758,7 @@ table tbody td button.btn-sm {
   /* גלילה אופקית לגדלים קטנים */
   .table-responsive {
     overflow-x: auto;
+    overflow-y: visible;
   }
   
   .table-container {
@@ -838,6 +858,7 @@ table tbody td button.btn-sm {
   /* גלילה אופקית לגדלים בינוניים */
   .table-responsive {
     overflow-x: auto;
+    overflow-y: visible;
   }
   
   .table-container {
@@ -921,6 +942,7 @@ table tbody td button.btn-sm {
   /* גלילה אופקית לגדלים גדולים */
   .table-responsive {
     overflow-x: auto;
+    overflow-y: visible;
   }
   
   .table-container {
@@ -989,6 +1011,7 @@ table tbody td button.btn-sm {
   /* גלילה אם הקונטיינר קטן מ-1000px */
   .table-responsive {
     overflow-x: auto;
+    overflow-y: visible;
   }
   
   /* כל העמודות נראות */
@@ -1022,7 +1045,7 @@ table tbody td button.btn-sm {
  */
 .data-table .user-saved-value,
 .table .user-saved-value {
-  color: var(--entity-text) !important;
+  color: var(--entity-text) ;
 }
 
 /**
@@ -1041,13 +1064,13 @@ table tbody td button.btn-sm {
  * מספרים בכיוון LTR (שמאל לימין) כדי שהסימנים יהיו נכון
  */
 .numeric-ltr {
-  direction: ltr !important;
+  direction: ltr ;
   display: inline-block;
   font-size: 0.85em;
 }
 
 .numeric-ltr-large {
-  direction: ltr !important;
+  direction: ltr ;
   display: inline-block;
   font-size: 0.9em;
 }
@@ -1119,7 +1142,7 @@ table tbody td button.btn-sm {
 /* Popup - החלון הצף */
 .actions-menu-popup {
   position: absolute;
-  z-index: 1000;
+  z-index: 1080; /* גבוה יותר מ-triggered-cell וכל דבר אחר */
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s ease, transform 0.2s ease;
@@ -1131,6 +1154,7 @@ table tbody td button.btn-sm {
   transform: translateY(-50%) scale(0.95);
   margin-inline-end: 2px; /* צמוד אבל לא עולה על הכפתור */
 }
+
 
 /* Pseudo-element ליצירת אזור hover מורחב */
 .actions-menu-popup::before {
@@ -1211,7 +1235,7 @@ table tbody td button.btn-sm {
 .actions-menu-content .btn-outline-secondary,
 .actions-menu-content button[onclick*="edit"],
 .actions-menu-content button[onclick*="Edit"] {
-  border-color: var(--warning-color) !important; /* warning - כתום */
+  border-color: var(--warning-color) ; /* warning - כתום */
 }
 
 /* ===== Hover States ===== */
@@ -1221,7 +1245,7 @@ table tbody td button.btn-sm {
 .actions-menu-content button.btn-danger:hover,
 .actions-menu-content button[onclick*="delete"]:hover,
 .actions-menu-content button[onclick*="Delete"]:hover {
-  background: rgba(255, 193, 7, 0.5) !important; /* warning color - כתום */
+  background: rgba(255, 193, 7, 0.5) ; /* warning color - כתום */
   color: white;
   border-color: var(--danger-color);
 }
@@ -1232,7 +1256,7 @@ table tbody td button.btn-sm {
 .actions-menu-content button[onclick*="show"]:hover,
 .actions-menu-content button[onclick*="view"]:hover,
 .actions-menu-content button[onclick*="VIEW"]:hover {
-  background: rgba(38, 186, 172, 0.5) !important; /* primary color - טורקיז */
+  background: rgba(38, 186, 172, 0.5) ; /* primary color - טורקיז */
   color: white;
   border-color: var(--primary-color);
 }
@@ -1242,7 +1266,7 @@ table tbody td button.btn-sm {
 .actions-menu-content .btn-outline-secondary:hover,
 .actions-menu-content button[onclick*="edit"]:hover,
 .actions-menu-content button[onclick*="Edit"]:hover {
-  background: rgba(255, 193, 7, 0.5) !important; /* warning color - כתום */
+  background: rgba(255, 193, 7, 0.5) ; /* warning color - כתום */
   color: white;
   border-color: var(--warning-color); /* נשאר כתום */
 }
@@ -1251,7 +1275,7 @@ table tbody td button.btn-sm {
 .actions-menu-content button[onclick*="Linked"]:hover,
 .actions-menu-content button[onclick*="link"]:hover,
 .actions-menu-content .btn-link:hover {
-  background: rgba(23, 162, 184, 0.5) !important; /* info color - תכלת */
+  background: rgba(23, 162, 184, 0.5) ; /* info color - תכלת */
   color: white;
   border-color: var(--info-color);
 }
@@ -1275,3 +1299,5 @@ table tbody td button.btn-sm {
   min-width: 80px;
   max-width: 80px;
 }
+
+/* וידוא ש-table-responsive לא חותך את הפופאפ בכלל העמודים */

@@ -63,7 +63,7 @@
     <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=2fba6e8_20251013_051239">
     <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=2fba6e8_20251013_051239">
     <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=2fba6e8_20251013_051239">
-    <link rel="stylesheet" href="/trading-ui/styles-new/06-components/_linked-items.css?v=2fba6e8_20251013_051239">
+    <link rel="stylesheet" href="styles-new/06-components/_linked-items.css?v=2fba6e8_20251013_051239">
     
     <!-- 07-trumps - Page-specific Styles -->
     <!-- <link rel="stylesheet" href="styles-new/07-trumps/_alerts.css?v=2fba6e8_20251013_051239"> -->
@@ -165,7 +165,7 @@
                     <div class="section-body">
                         <!-- Alerts table -->
                         <div class="table-responsive" id="alertsContainer">
-                            <table class="data-table" id="alertsTable" data-table-type="alerts">
+                            <table class="data-table alerts-table" id="alertsTable" data-table-type="alerts">
                                 <thead>
                                     <tr>
                                         <th class="col-ticker">
@@ -174,40 +174,28 @@
                                                 טיקר <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
-                                        <th class="col-condition">
+                                        <th class="col-linked">
                                             <button class="btn btn-link sortable-header"
                                                 onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
+                                                קשור ל: <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-condition">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(2, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
                                                 תנאי <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-status">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(2, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(3, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
                                                 סטטוס <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-triggered">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(3, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
-                                                הופעל <span class="sort-icon">↕</span>
-                                            </button>
-                                        </th>
-                                        <th class="col-linked">
-                                            <button class="btn btn-link sortable-header"
                                                 onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(4, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
-                                                קשור ל: <span class="sort-icon">↕</span>
-                                            </button>
-                                        </th>
-                                        <th class="col-message">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(5, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
-                                                הודעה <span class="sort-icon">↕</span>
-                                            </button>
-                                        </th>
-                                        <th class="col-created">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(6, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
-                                                נוצר ב: <span class="sort-icon">↕</span>
+                                                הופעל <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-actions actions-cell">
@@ -217,7 +205,7 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td colspan="8" class="loading">טוען התראות...</td>
+                                        <td colspan="6" class="loading">טוען התראות...</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -382,6 +370,8 @@
                     </div>
                     <div class="modal-body">
                         <form id="editAlertForm">
+                            <!-- Hidden field for alert ID - חובה! -->
+                            <input type="hidden" id="editAlertId" value="">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">
@@ -467,6 +457,9 @@
     <!-- ===== Stage 2: Core Utilities (3) ===== -->
     <script src="scripts/global-favicon.js?v=2fba6e8_20251013_051239"></script>
     <script src="scripts/page-utils.js?v=2fba6e8_20251013_051239"></script>
+    <!-- Preferences System (required before header-system using getPreferencesByNames) -->
+    <script src="scripts/preferences-core.js?v=2fba6e8_20251013_051239"></script>
+    <script src="scripts/preferences.js?v=2fba6e8_20251013_051239"></script>
     <script src="scripts/header-system.js?v=2fba6e8_20251013_051239"></script>
     
     <!-- ===== Stage 3: Common Utilities ===== -->
@@ -475,14 +468,13 @@
     <!-- Actions Menu System -->
     <script src="scripts/modules/actions-menu-system.js?v=2fba6e8_20251013_051239"></script>
     <script src="scripts/button-icons.js?v=2fba6e8_20251013_051239"></script>
-    <!-- Preferences System (required before services using getPreference) -->
-    <script src="scripts/preferences-core.js?v=2fba6e8_20251013_051239"></script>
     
     <!-- ===== Stage 4: Services ===== -->
     <script src="scripts/services/data-collection-service.js?v=2fba6e8_20251013_051239"></script>
     <script src="scripts/services/field-renderer-service.js?v=1.3.0"></script>
     <script src="scripts/services/select-populator-service.js?v=2fba6e8_20251013_051239"></script>
     <script src="scripts/services/crud-response-handler.js?v=2fba6e8_20251013_051239"></script>
+    <script src="scripts/related-object-filters.js?v=2fba6e8_20251013_051239"></script>
     
     <!-- ===== Stage 5: Page Script ===== -->
     <script src="scripts/alerts.js?v=20251013_boolean_hybrid"></script>

@@ -8,7 +8,7 @@
  * @version 1.3.0
  * @lastUpdated January 12, 2025
  * @changes Round C: Added all entity button styles, modal-footer-dual, entity headers for 7 entities
- * @note !important used to override Bootstrap - documented as approved (11/01/2025)
+ * @note  used to override Bootstrap - documented as approved (11/01/2025)
  */
 
 /* מודל בסיסי - מבוסס על apple-theme.css */
@@ -22,12 +22,12 @@
 
 /* ===== הגדרות מודל מאוחדות ===== */
 .modal-dialog {
-  z-index: 1000000000 !important;
+  z-index: 1000000000 ;
 }
 
 .modal-dialog.modal-lg {
-  border: 2px solid #6c757d !important;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+  border: 2px solid #6c757d ;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) ;
   border-radius: 6px;
   overflow: hidden;
 }
@@ -53,11 +53,11 @@
 
 /* ===== הגדרות modal-backdrop מאוחדות ===== */
 .modal-backdrop {
-  z-index: 999999998 !important;
+  z-index: 999999998 ;
 }
 
 .modal-backdrop.show {
-  z-index: 999999998 !important;
+  z-index: 999999998 ;
 }
 
 /* pointer-events definitions */
@@ -90,24 +90,24 @@
 
 /* ===== הגדרות toast מאוחדות ===== */
 .toast {
-  z-index: 100000000 !important;
+  z-index: 100000000 ;
 }
 
 .toast-container {
-  z-index: 100000000 !important;
+  z-index: 100000000 ;
 }
 
 /* ===== הגדרות modal.show מאוחדות ===== */
 .modal.show {
-  z-index: 999999999 !important;
+  z-index: 999999999 ;
 }
 
 .modal.show .modal-dialog {
-  z-index: 1000000000 !important;
+  z-index: 1000000000 ;
 }
 
 .modal.show .modal-content {
-  z-index: 1000000001 !important;
+  z-index: 1000000001 ;
 }
 
 /* .modal-backdrop.show styles moved to _bootstrap-overrides.css */
@@ -120,7 +120,7 @@
 #deleteExecutionModal,
 #linkedItemsModal,
 #warningModal {
-  z-index: 999999999 !important;
+  z-index: 999999999 ;
 }
 
 #addAlertModal .modal-dialog,
@@ -130,7 +130,7 @@
 #deleteExecutionModal .modal-dialog,
 #linkedItemsModal .modal-dialog,
 #warningModal .modal-dialog {
-  z-index: 1000000000 !important;
+  z-index: 1000000000 ;
 }
 
 #addAlertModal .modal-content,
@@ -140,7 +140,7 @@
 #deleteExecutionModal .modal-content,
 #linkedItemsModal .modal-content,
 #warningModal .modal-content {
-  z-index: 1000000001 !important;
+  z-index: 1000000001 ;
 }
 
 /* מניעת סגירת מודלים בלחיצה על הרקע */
@@ -330,21 +330,21 @@
 
 /* רקע לבן תמיד */
 .modal-content.entity-trade-plan {
-  background-color: white !important;
+  background-color: white ;
 }
 
 .modal-content.entity-trade-plan .modal-body {
-  background-color: white !important;
+  background-color: white ;
 }
 
 .modal-content.entity-trade-plan .modal-footer {
-  background-color: white !important;
+  background-color: white ;
 }
 
 /* כותרת מודל - וריאנט בהיר של הישות */
 .entity-header {
-  background-color: var(--entity-trade-plan-bg) !important;
-  border-bottom: 3px solid var(--entity-color) !important;
+  background-color: var(--entity-trade-plan-bg) ;
+  border-bottom: 3px solid var(--entity-color) ;
   display: flex;
   align-items: center;
   padding: 1rem 1.5rem;
@@ -373,30 +373,30 @@
 }
 
 /* כפתור סגירה בסוף השורה (שמאל בעברית) */
-/* NOTE: !important נדרש כאן כי Bootstrap משתמש ב-position: absolute */
+/* NOTE:  נדרש כאן כי Bootstrap משתמש ב-position: absolute */
 .entity-header .btn-close,
 .entity-header .btn-close-end {
-  position: static !important; /* ביטול position: absolute של Bootstrap */
-  margin-inline-start: auto !important; /* דוחף לסוף השורה - שמאל */
-  margin-inline-end: 0 !important;
-  margin-left: auto !important; /* fallback */
-  margin-right: 0 !important;
-  inset: auto !important; /* ביטול left/right/top/bottom */
-  background: white !important;
-  border: 1px solid var(--entity-color) !important;
-  border-radius: 6px !important;
-  font-size: 1.5rem !important;
-  line-height: 1 !important;
-  color: var(--entity-text) !important;
-  opacity: 1 !important;
-  padding: 0.2rem 0.4rem !important;
-  width: 1.75rem !important;
-  height: 1.75rem !important;
-  font-weight: 400 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  flex-shrink: 0 !important;
+  position: static ; /* ביטול position: absolute של Bootstrap */
+  margin-inline-start: auto ; /* דוחף לסוף השורה - שמאל */
+  margin-inline-end: 0 ;
+  margin-left: auto ; /* fallback */
+  margin-right: 0 ;
+  inset: auto ; /* ביטול left/right/top/bottom */
+  background: white ;
+  border: 1px solid var(--entity-color) ;
+  border-radius: 6px ;
+  font-size: 1.5rem ;
+  line-height: 1 ;
+  color: var(--entity-text) ;
+  opacity: 1 ;
+  padding: 0.2rem 0.4rem ;
+  width: 1.75rem ;
+  height: 1.75rem ;
+  font-weight: 400 ;
+  display: flex ;
+  align-items: center ;
+  justify-content: center ;
+  flex-shrink: 0 ;
 }
 
 .entity-header .btn-close::after,
@@ -408,9 +408,9 @@
 
 .entity-header .btn-close:hover,
 .entity-header .btn-close-end:hover {
-  background-color: var(--entity-color) !important;
-  color: white !important;
-  border-color: var(--entity-color) !important;
+  background-color: var(--entity-color) ;
+  color: white ;
+  border-color: var(--entity-color) ;
 }
 
 /* Modal footer עם יישור לסוף השורה */
@@ -620,13 +620,17 @@
 }
 
 .modal-content.entity-details-modal .modal-header .btn-close {
-    /* ריבוע כהה של הישות - משתמש בצבע דינמי כהה */
-    position: static; /* דורס position:absolute מהכלל הגנרי */
-    opacity: 0.7;
-    background: var(--current-entity-text, currentColor); /* צבע כהה */
-    -webkit-mask: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat;
-    mask: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat;
+    /* כפתור סגירה עם צבע דינמי */
+    position: static;
+    opacity: 0.8;
+    background-color: transparent;
+    color: var(--current-entity-text);
+    -webkit-mask: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='currentColor'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat;
+    mask: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='currentColor'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat;
     margin: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    border: none;
 }
 
 .modal-content.entity-details-modal .modal-header .btn-close:hover {
@@ -638,9 +642,200 @@
     flex-grow: 1;
 }
 
-/* כותרות h5 בבולד */
+/* כותרות h3, h4 ו-h5 בבולד */
+.modal-content.entity-details-modal .modal-body h3,
+.modal-content.entity-details-modal .modal-body h4,
 .modal-content.entity-details-modal .modal-body h5 {
     font-weight: 700;
+}
+
+/* כותרת h3 בכותרת המודול */
+.entity-details-header h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.2;
+}
+
+/* ===== Entity Details Layout - מהמערכת הישנה ===== */
+
+/* כותרת הטיקר */
+.ticker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.ticker-symbol h3 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.ticker-name {
+    color: #6c757d;
+    font-size: 1rem;
+}
+
+.ticker-status {
+    margin-left: 1rem;
+}
+
+/* סקציות מידע */
+.ticker-info-section,
+.market-data-section,
+.trades-section,
+.alerts-section,
+.notes-section {
+    margin-bottom: 2rem;
+}
+
+.ticker-info-section h5,
+.market-data-section h5,
+.trades-section h5,
+.alerts-section h5,
+.notes-section h5 {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 0.5rem;
+}
+
+.ticker-info-section h5 i,
+.market-data-section h5 i,
+.trades-section h5 i,
+.alerts-section h5 i,
+.notes-section h5 i {
+    margin-left: 0.5rem;
+    width: 16px;
+}
+
+/* רשת מידע */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 0.75rem;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.info-row label {
+    font-weight: 600;
+    color: #495057;
+    margin: 0;
+}
+
+.info-row span {
+    color: #212529;
+}
+
+/* נתוני שוק */
+.market-data-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.market-data-item {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 0.375rem;
+    border-left: 4px solid var(--primary-color, #007bff);
+}
+
+.market-data-item label {
+    font-weight: 600;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+    font-size: 0.875rem;
+}
+
+.market-data-item span {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #212529;
+}
+
+.market-data-item .price {
+    color: var(--success-color, #28a745);
+    font-size: 1.3rem;
+}
+
+.market-data-item .change.positive {
+    color: var(--success-color, #28a745);
+}
+
+.market-data-item .change.negative {
+    color: var(--danger-color, #dc3545);
+}
+
+/* רשימות טריידים והתראות */
+.trades-list,
+.alerts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.trade-item,
+.alert-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 0.375rem;
+    border-left: 4px solid var(--info-color, #17a2b8);
+}
+
+.trade-info,
+.alert-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.trade-name,
+.alert-name {
+    font-weight: 600;
+    color: #212529;
+}
+
+.trade-status,
+.alert-status {
+    font-size: 0.75rem;
+}
+
+.trade-details,
+.alert-details {
+    text-align: left;
+    color: #6c757d;
+}
+
+/* הערות */
+.notes-content {
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 0.375rem;
+    border-left: 4px solid var(--warning-color, #ffc107);
+}
+
+.notes-content p {
+    margin: 0;
+    line-height: 1.6;
 }
 
 /* לייבלים של שדות (col-5 text-muted) - בבולד */
@@ -662,8 +857,8 @@
 /* עיגול האייקון - בלי padding כדי שהאייקון ימלא את כל השטח */
 .entity-icon-circle {
     background-color: white;
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -672,7 +867,7 @@
     /* ללא padding - האייקון ימלא את כל העיגול */
     padding: 0;
     
-    /* גבול לפי צבע הישות */
+    /* גבול לפי צבע הישות - רק אם לא מוגדר inline */
     border: 2px solid currentColor;
     
     /* מרווח מהתוכן הבא */
@@ -681,8 +876,8 @@
 
 /* האייקון עצמו - ימלא את כל העיגול */
 .entity-icon-circle img {
-    width: 100%;
-    height: 100%;
+    width: 42px;
+    height: 42px;
     object-fit: contain;
     
     /* הסרת כל padding/margin שעלול להיות */
@@ -700,33 +895,38 @@
 
 @media (max-width: 768px) {
     .entity-icon-circle {
-        width: 40px;
-        height: 40px;
+        width: 50px;
+        height: 50px;
+    }
+    
+    .entity-icon-circle img {
+        width: 35px;
+        height: 35px;
     }
     
     .entity-icon-circle.icon-sm {
-        width: 35px;
-        height: 35px;
+        width: 40px;
+        height: 40px;
     }
 }
 
 /* ===== Modal Headers with Dynamic Colors ===== */
 .modal-header-success {
-  background-color: var(--success-color) !important;
+  background-color: var(--success-color) ;
 }
 
 .modal-header-danger {
-  background-color: var(--danger-color) !important;
+  background-color: var(--danger-color) ;
 }
 
 .modal-header-warning {
-  background-color: var(--warning-color) !important;
+  background-color: var(--warning-color) ;
 }
 
 .modal-header-info {
-  background-color: var(--info-color) !important;
+  background-color: var(--info-color) ;
 }
 
 .modal-header-primary {
-  background-color: var(--primary-color) !important;
+  background-color: var(--primary-color) ;
 }

@@ -397,12 +397,21 @@ if (modal) modal.hide();
 
 await loadData();
 
-// אחרי - קריאה אחת:
+// אחרי - קריאה אחת (ישן עם reloadFn):
 await CRUDResponseHandler.handleSaveResponse(response, {
     modalId: 'addTradeModal',
     successMessage: 'טרייד נוסף בהצלחה',
     reloadFn: window.loadTradesData,
     entityName: 'טרייד'
+});
+
+// 🆕 חדש - רענון אוטומטי (ינואר 2025):
+await CRUDResponseHandler.handleSaveResponse(response, {
+    modalId: 'addTradeModal',
+    successMessage: 'טרייד נוסף בהצלחה',
+    apiUrl: '/api/trades/',           // זיהוי אוטומטי של 'trades'
+    entityName: 'טרייד'              // או זיהוי חלופי בעברית
+    // אין צורך ב-reloadFn!
 });
 ```
 
@@ -420,8 +429,9 @@ await CRUDResponseHandler.handleSaveResponse(response, {
 {
     modalId: 'addTradeModal',              // ID של modal לסגירה
     successMessage: 'טרייד נוסף בהצלחה',  // הודעת הצלחה
-    reloadFn: window.loadTradesData,       // פונקציית רענון
-    entityName: 'טרייד',                   // שם הישות (להודעות)
+    reloadFn: window.loadTradesData,       // פונקציית רענון (אופציונלי - deprecated)
+    apiUrl: '/api/trades/',               // 🆕 URL לזיהוי ישות אוטומטי
+    entityName: 'טרייד',                   // שם הישות (להודעות וזיהוי אוטומטי)
     customValidationParser: (errorMessage, errorData) => [  // ⭐ חדש! parser לשגיאות ברמת שדות
         { fieldId: 'fieldName', message: 'הודעת שגיאה' }
     ]
@@ -454,6 +464,41 @@ await CRUDResponseHandler.handleSaveResponse(response, {
 - ✅ סימון אדום של שדות בעייתיים
 - ✅ הודעות שגיאה ספציפיות ומתורגמות
 
+#### 🎯 חדש! מערכת רענון אוטומטי - ינואר 2025
+**תיאור:** חסירה על הבעיה הארכיטקטונית של רענון טבלאות לא עקבי אחרי פעולות CRUD.
+המערכת המרכזית מזהה אוטומטית את סוג הישות ומבצעת רענון מלא ללא צורך ב-`reloadFn` ידני.
+
+**מיפוי ישויות:**
+```javascript
+const entityMap = {
+    'הערה': 'notes',           // alerts.html
+    'התראה': 'alerts',          // notes.html  
+    'טרייד': 'trades',          // trades.html
+    'ביצוע': 'executions',      // executions.html
+    'טיקר': 'tickers',          // tickers.html
+    'חשבון מסחר': 'trading_accounts', // trading_accounts.html
+    'תזרים מזומנים': 'cash_flows',    // cash_flows.html
+    'תוכנית מסחר': 'trade_plans'      // trade_plans.html
+};
+```
+
+**תהליך אוטומטי:**
+1. **זיהוי ישות**: מה-`apiUrl` (`/api/notes/` → `'notes'`) או מה-`entityName`
+2. **ניקוי מטמון**: `await window.UnifiedCacheManager.remove(entityType)`
+3. **איפוס דגלים**: קריאה לפונקציות `window.resetXXXLoadingFlag()`
+4. **רענון טבלה**: קריאה ל-`window.loadXXXData()`
+
+**דוגמה מעודכנת:**
+```javascript
+await CRUDResponseHandler.handleSaveResponse(response, {
+    modalId: 'addNoteModal',
+    successMessage: 'הערה נשמרה בהצלחה',
+    apiUrl: '/api/notes/',     // זיהוי אוטומטי של 'notes'
+    entityName: 'הערה'         // או חלופי בעברית
+    // המערכת רעננת אוטומטית את הטבלה!
+});
+```
+
 #### דוגמת שימוש מלאה:
 ```javascript
 async function saveTrade() {
@@ -474,7 +519,7 @@ async function saveTrade() {
         await CRUDResponseHandler.handleSaveResponse(response, {
             modalId: 'addTradeModal',
             successMessage: 'טרייד נוסף בהצלחה',
-            reloadFn: window.loadTradesData,
+            apiUrl: '/api/trades/',
             entityName: 'טרייד'
         });
         

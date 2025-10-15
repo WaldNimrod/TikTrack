@@ -440,8 +440,8 @@ function createLinkedItemsList(items, mode = 'view') {
           <div class="linked-item-actions">
             ${window.createActionsMenu ? window.createActionsMenu([
               window.createButton ? window.createButton('VIEW', `viewItemDetails('${item.type}', ${item.id})`) : `<button class='btn btn-sm btn-outline-info' onclick=\"viewItemDetails('${item.type}', ${item.id})\" title='צפה'>👁️</button>`,
-              window.createEditButton ? window.createEditButton(`editItem('${item.type}', ${item.id})`) : `<button class='btn btn-sm btn-outline-secondary' onclick=\"editItem('${item.type}', ${item.id})\" title='ערוך'>✏️</button>`,
               window.createLinkButton ? window.createLinkButton(`openItemPage('${item.type}', ${item.id})`) : `<button class='btn btn-sm btn-outline-info' onclick=\"openItemPage('${item.type}', ${item.id})\" title='פתח'>🔗</button>`,
+              window.createEditButton ? window.createEditButton(`editItem('${item.type}', ${item.id})`) : `<button class='btn btn-sm btn-outline-secondary' onclick=\"editItem('${item.type}', ${item.id})\" title='ערוך'>✏️</button>`,
               window.createDeleteButton ? window.createDeleteButton(`deleteItem('${item.type}', ${item.id})`) : `<button class='btn btn-sm btn-danger' onclick=\"deleteItem('${item.type}', ${item.id})\" title='מחק'>🗑️</button>`
             ], `${item.type}-${item.id}`) : ''}
           </div>

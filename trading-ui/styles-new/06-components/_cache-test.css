@@ -297,7 +297,7 @@
 .cache-status-card .badge {
     font-size: 0.8em;
     padding: 4px 8px;
-    color: white !important;
+    color: white ;
 }
 
 /* Dependencies Matrix Styles */
@@ -927,20 +927,20 @@
 }
 
 .bg-success {
-    background-color: #28a745 !important;
+    background-color: #28a745 ;
 }
 
 .bg-info {
-    background-color: #17a2b8 !important;
+    background-color: #17a2b8 ;
 }
 
 .bg-warning {
-    background-color: #ffc107 !important;
-    color: #212529 !important;
+    background-color: #ffc107 ;
+    color: #212529 ;
 }
 
 .bg-primary {
-    background-color: #007bff !important;
+    background-color: #007bff ;
 }
 
 /* Cache Actions Styles */

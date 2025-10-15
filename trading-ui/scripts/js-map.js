@@ -1624,7 +1624,7 @@ JsMapSystem.prototype.showLogModal = function(logText) {
         width: 100%;
         height: 100%;
         background: rgba(0, 0, 0, 0.8);
-        z-index: 10000;
+        z-index: 999999998;
         display: flex;
         justify-content: center;
         align-items: center;

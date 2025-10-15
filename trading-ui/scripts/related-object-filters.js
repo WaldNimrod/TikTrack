@@ -107,12 +107,12 @@ function filterAlertsByRelatedObjectType(type) {
 }
 
 /**
- * פילטר הודעות לפי סוג אובייקט מקושר
+ * פילטר הערות לפי סוג אובייקט מקושר
  * @param {string} type - סוג האובייקט
  */
 function filterNotesByRelatedObjectType(type) {
   if (typeof window.notesData === 'undefined') {
-    // נתוני הודעות לא זמינים
+    // נתוני הערות לא זמינים
     return;
   }
 
@@ -121,7 +121,7 @@ function filterNotesByRelatedObjectType(type) {
     window.notesData,
     window.updateNotesTable,
     '.table-count',
-    'הודעות',
+    'הערות',
   );
 }
 
@@ -174,7 +174,7 @@ function initializeRelatedObjectFilters() {
       entityName: 'notes',
       dataVarName: 'notesData', 
       updateFunctionName: 'updateNotesTable',
-      itemName: 'הודעות'
+      itemName: 'הערות'
     }
     // נוכל להוסיף עוד יישויות כאן בקלות בעתיד
   ];
@@ -192,12 +192,9 @@ function initializeRelatedObjectFilters() {
   console.log('🚀 מערכת הפילטרים לפי סוג אובייקט מקושר אותחלה');
 }
 
-// אתחול אוטומטי כאשר הקובץ נטען
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializeRelatedObjectFilters);
-} else {
-  initializeRelatedObjectFilters();
-}
+// אתחול דרך UnifiedAppInitializer - כלל 43
+// DOMContentLoaded listener הוסר לטובת מערכת האתחול המאוחדת
+window.initializeRelatedObjectFilters = initializeRelatedObjectFilters;
 
 // ייצוא הפונקציות לגלובל
 window.filterByRelatedObjectType = filterByRelatedObjectType;

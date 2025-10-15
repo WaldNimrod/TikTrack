@@ -71,30 +71,30 @@
 
 /* כפתורי קישור ירוקים */
 .btn-outline-success.link-button {
-  background-color: white !important;
-  border-color: var(--success-color) !important;
-  color: var(--success-color) !important;
+  background-color: white ;
+  border-color: var(--success-color) ;
+  color: var(--success-color) ;
 }
 
 .btn-outline-success.link-button:hover {
-  background-color: var(--success-color) !important;
-  color: white !important;
+  background-color: var(--success-color) ;
+  color: white ;
 }
 
 /* כפתורי מחיקה עם מסגרת - מועבר ל-_buttons-advanced.css */
 
 /* כפתורי מחיקה בתוך modals */
 .modal .btn-danger {
-  border: 2px solid var(--danger-color) !important;
-  background-color: white !important;
-  color: var(--danger-color) !important;
-  font-size: 0.9rem !important;
-  padding: 0.375rem 0.75rem !important;
+  border: 2px solid var(--danger-color) ;
+  background-color: white ;
+  color: var(--danger-color) ;
+  font-size: 0.9rem ;
+  padding: 0.375rem 0.75rem ;
 }
 
 .modal .btn-danger:hover {
-  background-color: var(--danger-color) !important;
-  color: white !important;
+  background-color: var(--danger-color) ;
+  color: white ;
 }
 
 /* ===== סגנונות טבלאות ===== */

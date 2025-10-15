@@ -44,7 +44,7 @@ if (!copyButton) {
   console.log(`%c✅ הוספתי --test-color: red`, 'color: #27ae60;');
   
   // נסה לעדכן רקע ישירות
-  copyButton.style.backgroundColor = 'yellow !important';
+  copyButton.style.backgroundColor = 'yellow';
   console.log(`%c✅ הוספתי רקע צהוב ישירות`, 'color: #27ae60;');
   
   // בדיקה אחרי העדכון

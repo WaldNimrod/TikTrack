@@ -904,22 +904,72 @@ function populateSelect(selectId, data, field, prefix = '') {
  * @param {HTMLSelectElement} selectElement - אלמנט הבחירה שנבחר
  */
 function onRelationTypeChange(selectElement) {
-  // הפעלת שדה בחירת אובייקט
-  const relatedObjectSelect = alertRelatedObjectSelect;
-  if (relatedObjectSelect && selectElement.value) {
-    relatedObjectSelect.disabled = false;
-    relatedObjectSelect.classList.remove('disabled-field');
-    
-    // קבל את הטיקר הנבחר אם קיים
-    const tickerSelect = document.getElementById('alertTicker');
+  const relationType = parseInt(selectElement.value);
+  const tickerSelect = document.getElementById('alertTicker');
+  const relatedObjectSelect = document.getElementById('alertRelationId');
+  
+  // 1. סוג שיוך - תמיד פעיל (אין צורך לשנות)
+  
+  // 2. טיקר - פעיל רק עבור טיקר(4)/תוכנית(3)/טרייד(2)
+  if (tickerSelect) {
+    if (relationType === 4) {
+      // עבור טיקר - הטיקר הוא הבחירה של האובייקט לשיוך
+      tickerSelect.disabled = false;
+      tickerSelect.classList.remove('disabled-field');
+      tickerSelect.required = true;
+      
+      // השבתת אלמנט לקישור עבור טיקר
+      if (relatedObjectSelect) {
+        relatedObjectSelect.disabled = true;
+        relatedObjectSelect.classList.add('disabled-field');
+        relatedObjectSelect.required = false;
+        relatedObjectSelect.innerHTML = '<option value="">לא רלוונטי עבור טיקר</option>';
+      }
+    } else if (relationType === 3 || relationType === 2) {
+      // עבור תוכנית/טרייד - הטיקר משמש כפילטר
+      tickerSelect.disabled = false;
+      tickerSelect.classList.remove('disabled-field');
+      tickerSelect.required = false; // לא חובה כי זה רק פילטר
+      
+      // הפעלת אלמנט לקישור
+      if (relatedObjectSelect) {
+        relatedObjectSelect.disabled = false;
+        relatedObjectSelect.classList.remove('disabled-field');
+        relatedObjectSelect.required = true;
+      }
+    } else if (relationType === 1) {
+      // עבור חשבון - הטיקר לא פעיל
+      tickerSelect.disabled = true;
+      tickerSelect.classList.add('disabled-field');
+      tickerSelect.required = false;
+      tickerSelect.value = '';
+      
+      // הפעלת אלמנט לקישור
+      if (relatedObjectSelect) {
+        relatedObjectSelect.disabled = false;
+        relatedObjectSelect.classList.remove('disabled-field');
+        relatedObjectSelect.required = true;
+      }
+    } else {
+      // אין בחירה - השבתת הכל
+      tickerSelect.disabled = true;
+      tickerSelect.classList.add('disabled-field');
+      tickerSelect.required = false;
+      tickerSelect.value = '';
+      
+      if (relatedObjectSelect) {
+        relatedObjectSelect.disabled = true;
+        relatedObjectSelect.classList.add('disabled-field');
+        relatedObjectSelect.required = false;
+        relatedObjectSelect.innerHTML = '<option value="">בחר קודם סוג התראה</option>';
+      }
+    }
+  }
+  
+  // 3. אלמנט לקישור - פעיל עבור חשבון(1)/תוכנית(3)/טרייד(2), לא פעיל עבור טיקר(4)
+  if (relationType && relationType !== 4) {
     const selectedTicker = tickerSelect ? tickerSelect.value : null;
-    
-    // מילוי רשימת האובייקטים לפי הסוג שנבחר עם סינון לפי טיקר
-    populateRelatedObjects(parseInt(selectElement.value), selectedTicker);
-  } else if (relatedObjectSelect) {
-    relatedObjectSelect.disabled = true;
-    relatedObjectSelect.classList.add('disabled-field');
-    relatedObjectSelect.innerHTML = '<option value="">בחר קודם סוג התראה</option>';
+    populateRelatedObjects(relationType, selectedTicker);
   }
 }
 
@@ -928,13 +978,15 @@ function onRelationTypeChange(selectElement) {
  * @param {HTMLSelectElement} tickerSelect - אלמנט בחירת הטיקר
  */
 function onTickerChange(tickerSelect) {
-  // קבל את הטיקר הנבחר ואת סוג השיוך הנוכחי
-  const selectedTicker = tickerSelect.value;
   const relationTypeSelect = document.getElementById('alertRelationType');
+  const relationType = relationTypeSelect ? parseInt(relationTypeSelect.value) : null;
   
-  if (relationTypeSelect && relationTypeSelect.value) {
+  // טיקר משמש כפילטר רק עבור תוכנית(3) וטרייד(2)
+  // עבור טיקר(4) - הטיקר הוא הבחירה עצמה, לא צריך לסנן
+  if (relationType === 2 || relationType === 3) {
+    const selectedTicker = tickerSelect.value;
     // רענן את רשימת האובייקטים עם הסינון החדש
-    populateRelatedObjects(parseInt(relationTypeSelect.value), selectedTicker);
+    populateRelatedObjects(relationType, selectedTicker);
   }
 }
 
@@ -1057,7 +1109,8 @@ function populateRelatedObjects(relationTypeId, selectedTicker = null) {
     break;
 
   case 4: // טיקר
-    populateSelect('alertRelationId', window.tickersData || [], 'symbol', '');
+    // עבור טיקר - הטיקר הוא הבחירה עצמה, לא נמלא את אלמנט הקישור
+    selectElement.innerHTML = '<option value="">לא רלוונטי עבור טיקר</option>';
     break;
   }
 }
@@ -1353,9 +1406,21 @@ async function saveAlert() {
     }
 
     // 6. בניית אובייקט נתונים
+    const relationTypeId = parseInt(formData.get('alertRelationType'));
+    let relatedId;
+    
+    // עבור טיקר - ה-related_id הוא הטיקר שנבחר
+    if (relationTypeId === 4) {
+      const tickerSelect = document.getElementById('alertTicker');
+      relatedId = tickerSelect ? parseInt(tickerSelect.value) : null;
+    } else {
+      // עבור שאר הסוגים - ה-related_id הוא מה-alertRelationId
+      relatedId = window.DataCollectionService.getValue('alertRelationId', 'int');
+    }
+    
     const alertData = {
-      related_type_id: parseInt(formData.get('alertRelationType')),
-      related_id: window.DataCollectionService.getValue('alertRelatedObjectSelect', 'int'),
+      related_type_id: relationTypeId,
+      related_id: relatedId,
       condition_attribute: conditionAttribute,
       condition_operator: conditionOperator,
       condition_number: conditionNumber,

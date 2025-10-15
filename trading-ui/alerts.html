@@ -238,11 +238,12 @@
                     </div>
                     <div class="modal-body">
                         <form id="addAlertForm">
-                            <!-- חלק השיוך -->
-                            <div class="row mb-4">
-                                <div class="col-md-6">
+                            <!-- 3 אלמנטים לשיוך -->
+                            <div class="row">
+                                <!-- 1. סוג שיוך - תמיד פעיל -->
+                                <div class="col-md-4">
                                     <div class="mb-3">
-                                        <label for="alertRelationType" class="form-label entity-label">התראה עבור:</label>
+                                        <label for="alertRelationType" class="form-label entity-label">סוג שיוך:</label>
                                         <select class="form-select" id="alertRelationType" required onchange="onRelationTypeChange(this)">
                                             <option value="">בחר סוג התראה</option>
                                             <option value="1">חשבון</option>
@@ -252,29 +253,26 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <!-- 2. טיקר - פעיל רק עבור טיקר/תוכנית/טרייד -->
+                                <div class="col-md-4">
                                     <div class="mb-3">
-                                        <label for="alertRelationId" class="form-label entity-label">בחר פריט לשיוך:</label>
-                                        <select class="form-select" id="alertRelationId" required disabled>
+                                        <label for="alertTicker" class="form-label entity-label">טיקר:</label>
+                                        <select class="form-select" id="alertTicker" required onchange="onTickerChange(this)" disabled>
+                                            <option value="">בחר טיקר</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <!-- 3. אלמנט לקישור - פעיל עבור חשבון/תוכנית/טרייד -->
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="alertRelationId" class="form-label entity-label">אלמנט לקישור:</label>
+                                        <select class="form-select" id="alertRelationId" required disabled onchange="onRelatedObjectChange(this)">
                                             <option value="">בחר קודם סוג התראה</option>
                                         </select>
                                     </div>
                                 </div>
                             </div>
-                            
-                            <!-- קו מפריד -->
-                            <hr class="my-4">
-                            
-                            <!-- חלק פרטי ההתראה -->
                             <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="alertTicker" class="form-label entity-label">טיקר</label>
-                                        <select class="form-select" id="alertTicker" required onchange="onTickerChange(this)">
-                                            <option value="">בחר טיקר</option>
-                                        </select>
-                                    </div>
-                                </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="alertCondition" class="form-label entity-label">תנאי התראה</label>

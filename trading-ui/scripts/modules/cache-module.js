@@ -1322,7 +1322,7 @@ function clearOrphanKeys(includeAuth = true) {
         results.total = results.state + results.preferences + results.auth + 
                        results.testing + results.notifications + results.app + results.dynamic;
         
-                } catch (error) {
+    } catch (error) {
         console.error('❌ Error clearing orphan keys:', error);
     }
     
@@ -1610,6 +1610,8 @@ window.clearAllCache = async function(options = {}) {
                 console.log(`   - Preferences: ${orphanResults.preferences}`);
                 console.log(`   - Auth: ${orphanResults.auth}`);
                 console.log(`   - Testing: ${orphanResults.testing}`);
+                console.log(`   - Notifications: ${orphanResults.notifications}`);
+                console.log(`   - App: ${orphanResults.app}`);
                 console.log(`   - Dynamic: ${orphanResults.dynamic}`);
             }
         }

@@ -175,20 +175,11 @@ class HeaderSystem {
                         
                         <li class="separator"></li>
                         
-                        <!-- כלי פיתוח -->
-                        <li><a class="tiktrack-dropdown-item" href="/cache-test">🗄️ בדיקת מטמון</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/js-map">🗺️ מפת JS</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/linter-realtime-monitor.html">🔍 דשבורד Linter</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/chart-management">📊 ניהול גרפים</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/css-management">🎨 מנהל CSS</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/crud-testing-dashboard">🧪 בדיקות CRUD</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/constraints">🔒 אילוצים</a></li>
                         
                         <li class="separator"></li>
                         
                         <!-- ממשק משתמש -->
                         <li><a class="tiktrack-dropdown-item" href="/dynamic-colors-display">🌈 צבעים דינמיים</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/test-header-only">🧪 בדיקת כותרת</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/designs">🎭 עיצובים</a></li>
 
 
@@ -364,17 +355,6 @@ class HeaderSystem {
               <button class="clear-btn" onclick="clearAllFilters()" title="נקה כל הפילטרים">
                 <span class="btn-text">×</span>
               </button>
-            </div>
-            
-            <!-- ליבלים דיבוג -->
-            <div class="debug-labels" id="debugLabels" style="display: none; margin-top: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px; font-size: 12px; color: #666;">
-              <div><strong>העדפות משתמש:</strong></div>
-              <div>פרופיל פעיל: <span id="debugActiveProfile">-</span></div>
-              <div>סטטוס: <span id="debugStatus">-</span></div>
-              <div>סוג: <span id="debugType">-</span></div>
-              <div>חשבון: <span id="debugAccount">-</span></div>
-              <div>תאריכים: <span id="debugDateRange">-</span></div>
-              <div>חיפוש: <span id="debugSearch">-</span></div>
             </div>
             
             <!-- כפתור פתיחה/סגירה של הפילטר - בתוך הפילטר -->
@@ -837,15 +817,6 @@ class HeaderSystem {
       // טעינת פילטרים ועדכון ליבלים
       window.filterSystem.loadFilters();
       
-      // עדכון ליבלים דיבוג אחרי טעינת פילטרים
-      setTimeout(() => {
-        if (typeof window.updateDebugLabels === 'function') {
-          // בטעינה ראשונית, אם אין העדפות מקוריות, נדלג על עדכון הליבלים
-          if (window.currentPreferencesDebug) {
-            window.updateDebugLabels();
-          }
-        }
-      }, 200);
     }
     return window.filterSystem;
   }
@@ -1108,27 +1079,13 @@ window.updateStatusFilterText = function() {
   const selectedItems = document.querySelectorAll('#statusFilterMenu .status-filter-item.selected');
   const statusElement = document.getElementById('selectedStatus');
   
-  // לוג לעדכון טקסט פילטר סטטוס עם העדפות
-  if (window.currentPreferencesDebug) {
-    console.log('🏷️ updateStatusFilterText - העדפה מקורית:', window.currentPreferencesDebug.defaultStatusFilter);
-  }
-  
   if (statusElement) {
     if (selectedItems.length === 0 || (selectedItems.length === 1 && selectedItems[0].getAttribute('data-value') === 'הכול')) {
       statusElement.textContent = 'כל סטטוס';
-      if (window.currentPreferencesDebug) {
-        console.log('🏷️ מציג "כל סטטוס" - העדפה מקורית:', window.currentPreferencesDebug.defaultStatusFilter);
-      }
     } else if (selectedItems.length === 1) {
       statusElement.textContent = selectedItems[0].getAttribute('data-value');
-      if (window.currentPreferencesDebug) {
-        console.log('🏷️ מציג ערך ספציפי:', selectedItems[0].getAttribute('data-value'), '- העדפה מקורית:', window.currentPreferencesDebug.defaultStatusFilter);
-      }
     } else {
       statusElement.textContent = `${selectedItems.length} סטטוסים`;
-      if (window.currentPreferencesDebug) {
-        console.log('🏷️ מציג מספר סטטוסים:', selectedItems.length, '- העדפה מקורית:', window.currentPreferencesDebug.defaultStatusFilter);
-      }
     }
   }
 };
@@ -1137,27 +1094,13 @@ window.updateTypeFilterText = function() {
   const selectedItems = document.querySelectorAll('#typeFilterMenu .type-filter-item.selected');
   const typeElement = document.getElementById('selectedType');
   
-  // לוג לעדכון טקסט פילטר סוג עם העדפות
-  if (window.currentPreferencesDebug) {
-    console.log('🏷️ updateTypeFilterText - העדפה מקורית:', window.currentPreferencesDebug.defaultTypeFilter);
-  }
-  
   if (typeElement) {
     if (selectedItems.length === 0 || (selectedItems.length === 1 && selectedItems[0].getAttribute('data-value') === 'הכול')) {
       typeElement.textContent = 'כל סוג השקעה';
-      if (window.currentPreferencesDebug) {
-        console.log('🏷️ מציג "כל סוג השקעה" - העדפה מקורית:', window.currentPreferencesDebug.defaultTypeFilter);
-      }
     } else if (selectedItems.length === 1) {
       typeElement.textContent = selectedItems[0].getAttribute('data-value');
-      if (window.currentPreferencesDebug) {
-        console.log('🏷️ מציג ערך ספציפי:', selectedItems[0].getAttribute('data-value'), '- העדפה מקורית:', window.currentPreferencesDebug.defaultTypeFilter);
-      }
     } else {
       typeElement.textContent = `${selectedItems.length} סוגים`;
-      if (window.currentPreferencesDebug) {
-        console.log('🏷️ מציג מספר סוגים:', selectedItems.length, '- העדפה מקורית:', window.currentPreferencesDebug.defaultTypeFilter);
-      }
     }
   }
 };
@@ -1166,27 +1109,13 @@ window.updateAccountFilterText = function() {
   const selectedItems = document.querySelectorAll('#accountFilterMenu .account-filter-item.selected');
   const accountElement = document.getElementById('selectedAccount');
 
-  // לוג לעדכון טקסט פילטר חשבון עם העדפות
-  if (window.currentPreferencesDebug) {
-    console.log('🏷️ updateAccountFilterText - העדפה מקורית:', window.currentPreferencesDebug.defaultAccountFilter);
-  }
-
   if (accountElement) {
     if (selectedItems.length === 0 || (selectedItems.length === 1 && selectedItems[0].getAttribute('data-value') === 'הכול')) {
       accountElement.textContent = 'כל חשבון';
-      if (window.currentPreferencesDebug) {
-        console.log('🏷️ מציג "כל חשבון" - העדפה מקורית:', window.currentPreferencesDebug.defaultAccountFilter);
-      }
     } else if (selectedItems.length === 1) {
       accountElement.textContent = selectedItems[0].getAttribute('data-value');
-      if (window.currentPreferencesDebug) {
-        console.log('🏷️ מציג ערך ספציפי:', selectedItems[0].getAttribute('data-value'), '- העדפה מקורית:', window.currentPreferencesDebug.defaultAccountFilter);
-      }
     } else {
       accountElement.textContent = `${selectedItems.length} חשבונות`;
-      if (window.currentPreferencesDebug) {
-        console.log('🏷️ מציג מספר חשבונות:', selectedItems.length, '- העדפה מקורית:', window.currentPreferencesDebug.defaultAccountFilter);
-      }
     }
   }
 };
@@ -1195,30 +1124,16 @@ window.updateDateRangeFilterText = function() {
   const selectedItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item.selected');
   const dateRangeElement = document.getElementById('selectedDateRange');
 
-  // לוג לעדכון טקסט פילטר תאריך עם העדפות
-  if (window.currentPreferencesDebug) {
-    console.log('🏷️ updateDateRangeFilterText - העדפה מקורית:', window.currentPreferencesDebug.defaultDateRangeFilter);
-  }
-
   if (dateRangeElement) {
     if (selectedItems.length === 0) {
       dateRangeElement.textContent = 'כל זמן';
-      if (window.currentPreferencesDebug) {
-        console.log('🏷️ מציג "כל זמן" - העדפה מקורית:', window.currentPreferencesDebug.defaultDateRangeFilter);
-      }
     } else if (selectedItems.length === 1) {
       const item = selectedItems[0];
       const value = item.getAttribute('data-value');
       dateRangeElement.textContent = value;
-      if (window.currentPreferencesDebug) {
-        console.log('🏷️ מציג ערך ספציפי:', value, '- העדפה מקורית:', window.currentPreferencesDebug.defaultDateRangeFilter);
-      }
     } else {
       // בחירה יחידה - לא אמור לקרות
       dateRangeElement.textContent = 'כל זמן';
-      if (window.currentPreferencesDebug) {
-        console.log('🏷️ מציג "כל זמן" (multiple selection) - העדפה מקורית:', window.currentPreferencesDebug.defaultDateRangeFilter);
-      }
     }
   }
 };
@@ -1289,18 +1204,6 @@ window.clearAllFilters = function() {
     if (typeof window.updateAccountFilterText === 'function') window.updateAccountFilterText();
     if (typeof window.updateDateRangeFilterText === 'function') window.updateDateRangeFilterText();
     
-    // עדכון ליבלים דיבוג - ניקוי פילטרים מציג "לא זמין"
-    if (typeof window.updateDebugLabels === 'function') {
-      // לאחר ניקוי, אין העדפות מקוריות להציג
-      window.currentPreferencesDebug = {
-        defaultStatusFilter: '',
-        defaultTypeFilter: '',
-        defaultAccountFilter: '',
-        defaultDateRangeFilter: '',
-        defaultSearchFilter: ''
-      };
-      window.updateDebugLabels();
-    }
     
     // הצגת הודעת הצלחה
     if (typeof window.showNotification === 'function') {
@@ -1752,7 +1655,7 @@ async function mapAccountIdToName(accountValue) {
           if (account) {
             console.log('✅ נמצא שם חשבון מסחר אחרי טעינה:', account.name);
             return account.name;
-          } else {
+    } else {
             console.log('⚠️ לא נמצא חשבון עם ID:', accountValue, 'פתוחים:', window.trading_accountsData.filter(a => a.status === 'open').length);
           }
         }
@@ -1776,7 +1679,7 @@ async function mapAccountIdToName(accountValue) {
         console.log('✅ נמצא שם חשבון מסחר דרך API ישיר:', account.name);
         return account.name;
       }
-    } catch (error) {
+  } catch (error) {
       console.warn('שגיאה בטעינה ישירה מהשרת:', error);
     }
   }
@@ -1904,13 +1807,6 @@ function setupInitializationEventListeners() {
   window.addEventListener('preferences:loaded', async (event) => {
     console.log('📥 Preferences loaded event received:', event.detail);
     
-    // עדכון debug labels אם הם קיימים
-    if (typeof window.updateDebugLabels === 'function') {
-      // המתנה קצרה לוודא שהערכים נטענו
-      setTimeout(() => {
-        window.updateDebugLabels();
-      }, 500);
-    }
   });
 
   // מאזין לאירוע כאשר מטמון מאוחד מוכן
@@ -1921,63 +1817,6 @@ function setupInitializationEventListeners() {
   }
 }
 
-// פונקציה לעדכון ליבלים דיבוג
-window.updateDebugLabels = function() {
-  const debugLabels = document.getElementById('debugLabels');
-  if (!debugLabels) {
-    console.log('🔍 updateDebugLabels: debugLabels element לא נמצא');
-    return;
-  }
-  
-  // הצג את הליבלים
-  debugLabels.style.display = 'block';
-  
-  // בדיקה שcurrentPreferencesDebug קיים
-  if (!window.currentPreferencesDebug) {
-    console.log('🔍 updateDebugLabels: currentPreferencesDebug לא מוגדר עדיין');
-    return;
-  }
-  
-  console.log('🔍 updateDebugLabels: מעדכן ליבלים עם העדפות:', window.currentPreferencesDebug);
-  
-  // עדכון הערכים
-  const activeProfileEl = document.getElementById('debugActiveProfile');
-  const statusEl = document.getElementById('debugStatus');
-  const typeEl = document.getElementById('debugType');
-  const accountEl = document.getElementById('debugAccount');
-  const dateRangeEl = document.getElementById('debugDateRange');
-  const searchEl = document.getElementById('debugSearch');
-  
-  if (activeProfileEl) {
-    const activeProfile = window.currentPreferencesDebug.activeProfileId || 'לא ידוע';
-    activeProfileEl.textContent = activeProfile;
-  }
-  
-  if (statusEl) {
-    const status = window.currentPreferencesDebug.defaultStatusFilter || 'לא זמין';
-    statusEl.textContent = status === 'all' ? 'כל הסטטוסים' : status;
-  }
-  
-  if (typeEl) {
-    const type = window.currentPreferencesDebug.defaultTypeFilter || 'לא זמין';
-    typeEl.textContent = type === 'all' ? 'כל הסוגים' : type;
-  }
-  
-  if (accountEl) {
-    const account = window.currentPreferencesDebug.defaultAccountFilter || 'לא זמין';
-    accountEl.textContent = account === '' ? 'כל החשבונות' : account;
-  }
-  
-  if (dateRangeEl) {
-    const dateRange = window.currentPreferencesDebug.defaultDateRangeFilter || 'לא זמין';
-    dateRangeEl.textContent = dateRange;
-  }
-  
-  if (searchEl) {
-    const search = window.currentPreferencesDebug.defaultSearchFilter || 'לא זמין';
-    searchEl.textContent = search === '' ? 'אין חיפוש' : search;
-  }
-};
 
 // Update Toggle Buttons Function - עדכון מצב הכפתורים
 window.updateToggleButtons = function() {

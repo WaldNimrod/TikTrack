@@ -361,6 +361,11 @@ table td,
   z-index: 1049;
 }
 
+/* תיקון: וידוא שהפופאפ יהיה נראה גם עם hover על השורה */
+.data-table tbody tr:hover .actions-menu-popup {
+  z-index: 9999 !important;
+}
+
 .data-table tbody tr:last-child td {
   border-bottom: none;
 }
@@ -461,7 +466,11 @@ table tbody td button.btn-sm {
   border-radius: var(--apple-radius-medium);
   border: 1px solid var(--apple-border-light);
   overflow: visible; /* תיקון: מאפשר לפופאפ להיות נראה */
+  overflow-x: hidden; /* גלילה אופקית מוגבלת */
+  overflow-y: visible; /* מאפשר לפופאפים לצאת אנכית */
   box-shadow: var(--apple-shadow-light);
+  width: 100%;
+  max-width: 100%;
 }
 
 /* Table responsive */
@@ -493,12 +502,6 @@ table tbody td button.btn-sm {
   opacity: 0.8;
 }
 
-/* וידוא שהקונטיינר לא יוצר גלילה */
-.table-container {
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden;
-}
 
 /* Data table עם עיצוב מתקדם */
 .data-table {
@@ -1142,7 +1145,7 @@ table tbody td button.btn-sm {
 /* Popup - החלון הצף */
 .actions-menu-popup {
   position: absolute;
-  z-index: 1080; /* גבוה יותר מ-triggered-cell וכל דבר אחר */
+  z-index: 9999 !important; /* גבוה מאוד כדי לעקף כל stacking context */
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s ease, transform 0.2s ease;

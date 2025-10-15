@@ -181,6 +181,7 @@ class HeaderSystem {
                         <!-- ממשק משתמש -->
                         <li><a class="tiktrack-dropdown-item" href="/dynamic-colors-display">🌈 צבעים דינמיים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/designs">🎭 עיצובים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/debug-actions-menu">🔧 בדיקת Actions Menu</a></li>
 
 
                       </ul>

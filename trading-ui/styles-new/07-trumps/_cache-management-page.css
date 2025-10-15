@@ -1,0 +1,404 @@
+/* ========================================
+   Cache Management Page - Page Specific Styles
+   ========================================
+   
+   קובץ עיצוב ספציפי לעמוד ניהול המטמון
+   
+   תכונות:
+   - עיצוב לסקשנים 5 (ניטור, פעולות, בדיקות, כלים, לוגים)
+   - משוב מותאם למפתחים
+   - אינטגרציה עם מערכות כלליות
+   
+   מחבר: TikTrack Development Team
+   תאריך יצירה: 15 אוקטובר 2025
+   ======================================== */
+
+/* Page specific styles */
+.cache-test-page,
+.cache-management-page {
+    min-height: 100vh;
+}
+
+/* Section headers */
+.action-group {
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color, #e9ecef);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.action-group-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 0.5rem;
+}
+
+.action-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.action-feedback {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    border-radius: 6px;
+    min-height: 2.5rem;
+    background: var(--light-bg, #f8f9fa);
+    border: 1px solid var(--border-color, #e9ecef);
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    display: none;
+}
+
+.action-feedback.show {
+    display: block;
+}
+
+.action-feedback.success {
+    background: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.action-feedback.error {
+    background: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.action-feedback.info {
+    background: #d1ecf1;
+    border-color: #bee5eb;
+    color: #0c5460;
+}
+
+/* Test categories */
+.test-category {
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color, #e9ecef);
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.test-category-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.test-category-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.test-feedback {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    border-radius: 6px;
+    min-height: 2.5rem;
+    background: var(--light-bg, #f8f9fa);
+    border: 1px solid var(--border-color, #e9ecef);
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    display: none;
+}
+
+.test-feedback.show {
+    display: block;
+}
+
+.test-feedback.success {
+    background: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.test-feedback.error {
+    background: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.test-feedback.info {
+    background: #d1ecf1;
+    border-color: #bee5eb;
+    color: #0c5460;
+}
+
+.test-feedback.warning {
+    background: #fff3cd;
+    border-color: #ffeaa7;
+    color: #856404;
+}
+
+/* Test results */
+.test-results {
+    margin-top: 2rem;
+    padding: 1rem;
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color, #e9ecef);
+    border-radius: 8px;
+    display: none;
+}
+
+.test-results.show {
+    display: block;
+}
+
+.test-result-item {
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 0.5rem;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+}
+
+.test-result-pass {
+    background: #d4edda;
+    color: #155724;
+    border-left: 4px solid #28a745;
+}
+
+.test-result-fail {
+    background: #f8d7da;
+    color: #721c24;
+    border-left: 4px solid #dc3545;
+}
+
+.test-result-info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border-left: 4px solid #17a2b8;
+}
+
+.test-result-warning {
+    background: #fff3cd;
+    color: #856404;
+    border-left: 4px solid #ffc107;
+}
+
+/* Cache layers table */
+.cache-layers-table {
+    font-size: 0.9rem;
+}
+
+.cache-layers-table th {
+    background: var(--dark-bg, #343a40);
+    color: white;
+    font-weight: 600;
+    border: none;
+}
+
+.cache-layers-table td {
+    vertical-align: middle;
+    border-color: var(--border-color, #e9ecef);
+}
+
+.cache-layers-table .badge {
+    font-size: 0.75rem;
+}
+
+/* Overview cards */
+.overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.overview-card {
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color, #e9ecef);
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.overview-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.overview-card-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.overview-card-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.overview-card-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.overview-card-change {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* Stat cards */
+.stat-card {
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color, #e9ecef);
+    border-radius: 8px;
+    padding: 1.5rem;
+    height: 100%;
+}
+
+.stat-header {
+    border-bottom: 1px solid var(--border-color, #e9ecef);
+    padding-bottom: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.stat-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.stat-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.25rem 0;
+    border-bottom: 1px solid var(--border-light, #f8f9fa);
+}
+
+.stat-row:last-child {
+    border-bottom: none;
+}
+
+.stat-row span:first-child {
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.stat-row .badge {
+    font-size: 0.8rem;
+}
+
+/* Log display integration */
+.unified-log-display {
+    min-height: 400px;
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color, #e9ecef);
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+/* Auto-refresh indicator */
+#autoRefreshBtn.active {
+    background-color: var(--success-color, #28a745);
+    border-color: var(--success-color, #28a745);
+    color: white;
+}
+
+#autoRefreshBtn.active .fas {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* Loading states */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+    position: relative;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid var(--primary-color);
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .overview-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 0.75rem;
+    }
+    
+    .action-group,
+    .test-category {
+        padding: 1rem;
+    }
+    
+    .btn-group {
+        flex-direction: column;
+    }
+    
+    .btn-group .btn {
+        border-radius: 4px !important;
+        margin-bottom: 0.25rem;
+    }
+}
+
+/* Dark mode support (if implemented) */
+@media (prefers-color-scheme: dark) {
+    .cache-test-page {
+        --card-bg: #2d3748;
+        --border-color: #4a5568;
+        --border-light: #4a5568;
+        --text-primary: #e2e8f0;
+        --text-secondary: #a0aec0;
+        --text-muted: #718096;
+        --light-bg: #1a202c;
+    }
+}
+
+/* Print styles */
+@media print {
+    .header-actions,
+    .btn-group,
+    .action-feedback,
+    .test-feedback {
+        display: none !important;
+    }
+    
+    .action-group,
+    .test-category {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+}

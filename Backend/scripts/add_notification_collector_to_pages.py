@@ -77,7 +77,7 @@ def main():
         'trading-ui/linter-realtime-monitor.html',
         'trading-ui/css-management.html',
         'trading-ui/crud-testing-dashboard.html',
-        'trading-ui/cache-test.html',
+        'trading-ui/cache-management.html',
         'trading-ui/constraints.html',
         'trading-ui/style_demonstration.html',
         'trading-ui/dynamic-colors-display.html',

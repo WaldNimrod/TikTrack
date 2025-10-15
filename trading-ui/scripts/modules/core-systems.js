@@ -768,7 +768,7 @@ class UnifiedAppInitializer {
      */
     determinePageType(pageName) {
         if (['trades', 'executions', 'alerts'].includes(pageName)) return 'trading';
-        if (['system-management', 'crud-testing-dashboard', 'linter-realtime-monitor', 'cache-test'].includes(pageName)) return 'development';
+        if (['system-management', 'crud-testing-dashboard', 'linter-realtime-monitor', 'cache-management'].includes(pageName)) return 'development';
         if (['preferences'].includes(pageName)) return 'preferences';
         if (['index'].includes(pageName)) return 'dashboard';
         return 'general';
@@ -4019,18 +4019,18 @@ const PAGE_CONFIGS = {
         ]
     },
     
-    'cache-test': {
-        name: 'Cache Test',
+    'cache-management': {
+        name: 'Cache Management',
         requiresFilters: true,
         requiresValidation: false,
         requiresTables: false,
         customInitializers: [
             async (pageConfig) => {
-                console.log('🧪 Initializing Cache Test Page via UnifiedAppInitializer...');
+                console.log('⚙️ Initializing Cache Management Page via UnifiedAppInitializer...');
                 
-                // Initialize Cache Test Page if not already initialized
-                if (!window.cacheTestPage) {
-                    console.log('🚀 Creating Cache Test Page instance...');
+                // Initialize Cache Management Page if not already initialized
+                if (!window.cacheManagementPage) {
+                    console.log('🚀 Creating Cache Management Page instance...');
                     
                     // Wait for DOM to be ready
                     if (document.readyState === 'loading') {
@@ -4039,23 +4039,23 @@ const PAGE_CONFIGS = {
                         });
                     }
                     
-                    // Create and initialize Cache Test Page
-                    if (typeof CacheTestPage !== 'undefined') {
-                        window.cacheTestPage = new CacheTestPage();
-                        window.cacheTestPage.init();
-                        console.log('✅ Cache Test Page initialized via UnifiedAppInitializer');
+                    // Create and initialize Cache Management Page
+                    if (typeof CacheManagementPage !== 'undefined') {
+                        window.cacheManagementPage = new CacheManagementPage();
+                        window.cacheManagementPage.init();
+                        console.log('✅ Cache Management Page initialized via UnifiedAppInitializer');
                     } else {
-                        console.error('❌ CacheTestPage class not available');
+                        console.error('❌ CacheManagementPage class not available');
                     }
                 } else {
-                    console.log('✅ Cache Test Page already initialized');
+                    console.log('✅ Cache Management Page already initialized');
                 }
                 
                 // Ensure cache systems are ready
                 if (typeof window.initializeAllCacheSystems === 'function') {
                     try {
                         await window.initializeAllCacheSystems(true); // isInitialLoad = true
-                        console.log('✅ Cache systems initialized for Cache Test Page');
+                        console.log('✅ Cache systems initialized for Cache Management Page');
                     } catch (error) {
                         console.error('❌ Failed to initialize cache systems:', error);
                     }

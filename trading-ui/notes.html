@@ -235,11 +235,13 @@
                     </div>
                     <div class="modal-body">
                         <form id="addNoteForm">
+                            <!-- 3 אלמנטים לשיוך -->
                             <div class="row">
-                                <div class="col-md-6">
+                                <!-- 1. סוג שיוך - תמיד פעיל -->
+                                <div class="col-md-4">
                                     <div class="mb-3">
-                                        <label for="noteRelatedType" class="form-label entity-label">סוג קשר</label>
-                                        <select class="form-select" id="noteRelationType" required>
+                                        <label for="noteRelatedType" class="form-label entity-label">סוג שיוך:</label>
+                                        <select class="form-select" id="noteRelationType" required onchange="onNoteRelationTypeChange(this)">
                                             <option value="">בחר סוג קשר</option>
                                             <option value="1">חשבון</option>
                                             <option value="2">טרייד</option>
@@ -248,10 +250,20 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <!-- 2. טיקר - פעיל רק עבור טיקר/תוכנית/טרייד -->
+                                <div class="col-md-4">
                                     <div class="mb-3">
-                                        <label for="noteRelatedId" class="form-label entity-label">מזהה פריט</label>
-                                        <select class="form-select" id="noteRelationId" required disabled>
+                                        <label for="noteTicker" class="form-label entity-label">טיקר:</label>
+                                        <select class="form-select" id="noteTicker" required onchange="onNoteTickerChange(this)" disabled>
+                                            <option value="">בחר טיקר</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <!-- 3. אלמנט לקישור - פעיל עבור חשבון/תוכנית/טרייד -->
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="noteRelatedId" class="form-label entity-label">אלמנט לקישור:</label>
+                                        <select class="form-select" id="noteRelationId" required disabled onchange="onNoteRelatedObjectChange(this)">
                                             <option value="">בחר קודם סוג קשר</option>
                                         </select>
                                     </div>
@@ -296,11 +308,13 @@
                         <form id="editNoteForm">
                             <!-- Hidden field to store note ID -->
                             <input type="hidden" id="editNoteId" value="">
+                            <!-- 3 אלמנטים לשיוך -->
                             <div class="row">
-                                <div class="col-md-6">
+                                <!-- 1. סוג שיוך - תמיד פעיל -->
+                                <div class="col-md-4">
                                     <div class="mb-3">
-                                        <label for="editNoteRelatedType" class="form-label entity-label">סוג קשר</label>
-                                        <select class="form-select" id="editNoteRelatedType" required>
+                                        <label for="editNoteRelatedType" class="form-label entity-label">סוג שיוך:</label>
+                                        <select class="form-select" id="editNoteRelatedType" required onchange="onEditNoteRelationTypeChange(this)">
                                             <option value="1">חשבון</option>
                                             <option value="2">טרייד</option>
                                             <option value="3">תוכנית טרייד</option>
@@ -308,10 +322,20 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <!-- 2. טיקר - פעיל רק עבור טיקר/תוכנית/טרייד -->
+                                <div class="col-md-4">
                                     <div class="mb-3">
-                                        <label for="editNoteRelatedId" class="form-label entity-label">מזהה פריט</label>
-                                        <select class="form-select" id="editNoteRelatedId" required>
+                                        <label for="editNoteTicker" class="form-label entity-label">טיקר:</label>
+                                        <select class="form-select" id="editNoteTicker" required onchange="onEditNoteTickerChange(this)" disabled>
+                                            <option value="">בחר טיקר</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <!-- 3. אלמנט לקישור - פעיל עבור חשבון/תוכנית/טרייד -->
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="editNoteRelatedId" class="form-label entity-label">אלמנט לקישור:</label>
+                                        <select class="form-select" id="editNoteRelatedId" required onchange="onEditNoteRelatedObjectChange(this)">
                                             <option value="">בחר פריט</option>
                                         </select>
                                     </div>

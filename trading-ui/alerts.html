@@ -361,15 +361,42 @@
                         <form id="editAlertForm">
                             <!-- Hidden field for alert ID - חובה! -->
                             <input type="hidden" id="editAlertId" value="">
+                            
+                            <!-- 3 אלמנטים לשיוך -->
                             <div class="row">
-                                <div class="col-md-6">
+                                <!-- 1. סוג שיוך - תמיד פעיל -->
+                                <div class="col-md-4">
                                     <div class="mb-3">
-                                        <label for="editAlertTicker" class="form-label entity-label">טיקר</label>
-                                        <select class="form-select" id="editAlertTicker" required>
+                                        <label for="editAlertRelationType" class="form-label entity-label">סוג שיוך:</label>
+                                        <select class="form-select" id="editAlertRelationType" required onchange="onEditAlertRelationTypeChange(this)">
+                                            <option value="1">חשבון</option>
+                                            <option value="2">טרייד</option>
+                                            <option value="3">תוכנית טרייד</option>
+                                            <option value="4">טיקר</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <!-- 2. טיקר - פעיל לפי סוג -->
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="editAlertTicker" class="form-label entity-label">טיקר:</label>
+                                        <select class="form-select" id="editAlertTicker" required onchange="onEditAlertTickerChange(this)" disabled>
                                             <option value="">בחר טיקר</option>
                                         </select>
                                     </div>
                                 </div>
+                                <!-- 3. אלמנט לקישור - פעיל לפי סוג -->
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="editAlertRelationId" class="form-label entity-label">אלמנט לקישור:</label>
+                                        <select class="form-select" id="editAlertRelationId" required disabled onchange="onEditAlertRelatedObjectChange(this)">
+                                            <option value="">בחר פריט</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="editAlertCondition" class="form-label entity-label">תנאי התראה</label>

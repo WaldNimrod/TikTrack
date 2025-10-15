@@ -2432,6 +2432,107 @@ function generateDetailedLog() {
     }
 }
 
+// ===== פונקציות לטיפול באובייקטים מקושרים (משותף עם התראות) =====
+
+/**
+ * טיפול בשינוי סוג שיוך בהערות
+ * @param {HTMLSelectElement} selectElement - אלמנט הבחירה שנבחר
+ */
+function onNoteRelationTypeChange(selectElement) {
+  const config = {
+    tickerSelectId: 'noteTicker',
+    relatedSelectId: 'noteRelationId'
+  };
+  
+  handleRelationTypeChange(selectElement, config);
+  
+  // מילוי אובייקטים מקושרים אחרי שינוי הטיפול
+  const relationType = parseInt(selectElement.value);
+  if (relationType && relationType !== 4) {
+    const tickerSelect = document.getElementById('noteTicker');
+    const selectedTicker = tickerSelect ? tickerSelect.value : null;
+    populateRelatedObjects(relationType, selectedTicker, 'noteRelationId');
+  }
+}
+
+/**
+ * טיפול בבחירת טיקר בהערות
+ * @param {HTMLSelectElement} tickerSelect - אלמנט בחירת הטיקר
+ */
+function onNoteTickerChange(tickerSelect) {
+  const config = {
+    relationTypeId: 'noteRelationType',
+    onTickerChangeCallback: function(relationType, selectedTicker) {
+      if (relationType === 2 || relationType === 3) {
+        // טיקר משמש כפילטר עבור תוכנית וטרייד
+        populateRelatedObjects(relationType, selectedTicker, 'noteRelationId');
+      }
+      // עבור הערות אין שדות תנאי מנוהלים כמו בהתראות
+    }
+  };
+  
+  handleTickerChange(tickerSelect, config);
+}
+
+/**
+ * טיפול בבחירת אובייקט בהערות
+ * @param {HTMLSelectElement} selectElement - אלמנט הבחירה
+ */
+function onNoteRelatedObjectChange(selectElement) {
+  // עבור הערות אין צורך לבדוק שדות נוספים
+  // הפונקציה נדרשת לתאימות עם הממשק
+}
+
+// ===== פונקציות לטיפול באובייקטים מקושרים במודל העריכה (משותף עם התראות) =====
+
+/**
+ * טיפול בשינוי סוג שיוך במודל העריכה של הערות
+ * @param {HTMLSelectElement} selectElement - אלמנט הבחירה שנבחר
+ */
+function onEditNoteRelationTypeChange(selectElement) {
+  const config = {
+    tickerSelectId: 'editNoteTicker',
+    relatedSelectId: 'editNoteRelatedId'
+  };
+  
+  handleRelationTypeChange(selectElement, config);
+  
+  // מילוי אובייקטים מקושרים אחרי שינוי הטיפול
+  const relationType = parseInt(selectElement.value);
+  if (relationType && relationType !== 4) {
+    const tickerSelect = document.getElementById('editNoteTicker');
+    const selectedTicker = tickerSelect ? tickerSelect.value : null;
+    populateRelatedObjects(relationType, selectedTicker, 'editNoteRelatedId');
+  }
+}
+
+/**
+ * טיפול בבחירת טיקר במודל העריכה של הערות
+ * @param {HTMLSelectElement} tickerSelect - אלמנט בחירת הטיקר
+ */
+function onEditNoteTickerChange(tickerSelect) {
+  const config = {
+    relationTypeId: 'editNoteRelatedType',
+    onTickerChangeCallback: function(relationType, selectedTicker) {
+      if (relationType === 2 || relationType === 3) {
+        // טיקר משמש כפילטר עבור תוכנית וטרייד
+        populateRelatedObjects(relationType, selectedTicker, 'editNoteRelatedId');
+      }
+      // עבור הערות אין שדות תנאי מנוהלים כמו בהתראות
+    }
+  };
+  
+  handleTickerChange(tickerSelect, config);
+}
+
+/**
+ * טיפול בבחירת אובייקט במודל העריכה של הערות
+ * @param {HTMLSelectElement} selectElement - אלמנט הבחירה
+ */
+function onEditNoteRelatedObjectChange(selectElement) {
+  // עבור הערות אין צורך לבדוק שדות נוספים
+  // הפונקציה נדרשת לתאימות עם הממשק
+}
 
 window.deleteNote = deleteNote;
 // window.filterNotesByRelatedObjectType = filterNotesByRelatedObjectType; // REMOVED: Function is defined in related-object-filters.js
@@ -2441,6 +2542,16 @@ window.addNote = addNote;
 window.uploadFile = uploadFile;
 window.removeCurrentAttachment = removeCurrentAttachment;
 window.replaceCurrentAttachment = replaceCurrentAttachment;
+
+// פונקציות לטיפול באובייקטים מקושרים
+window.onNoteRelationTypeChange = onNoteRelationTypeChange;
+window.onNoteTickerChange = onNoteTickerChange;
+window.onNoteRelatedObjectChange = onNoteRelatedObjectChange;
+
+// פונקציות לטיפול באובייקטים מקושרים במודל העריכה
+window.onEditNoteRelationTypeChange = onEditNoteRelationTypeChange;
+window.onEditNoteTickerChange = onEditNoteTickerChange;
+window.onEditNoteRelatedObjectChange = onEditNoteRelatedObjectChange;
 // window.copyDetailedLog export removed - using global version from system-management.js
 // window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 

@@ -899,77 +899,27 @@ function populateSelect(selectId, data, field, prefix = '') {
 }
 
 
+// פונקציות סינון וטיפול באובייקטים מקושרים - משותף עם הערות
+// הטעינה מקובץ related-objects-handler.js
+
 /**
  * טיפול בשינוי סוג שיוך
  * @param {HTMLSelectElement} selectElement - אלמנט הבחירה שנבחר
  */
 function onRelationTypeChange(selectElement) {
+  const config = {
+    tickerSelectId: 'alertTicker',
+    relatedSelectId: 'alertRelationId'
+  };
+  
+  handleRelationTypeChange(selectElement, config);
+  
+  // מילוי אובייקטים מקושרים אחרי שינוי הטיפול
   const relationType = parseInt(selectElement.value);
-  const tickerSelect = document.getElementById('alertTicker');
-  const relatedObjectSelect = document.getElementById('alertRelationId');
-  
-  // 1. סוג שיוך - תמיד פעיל (אין צורך לשנות)
-  
-  // 2. טיקר - פעיל רק עבור טיקר(4)/תוכנית(3)/טרייד(2)
-  if (tickerSelect) {
-    if (relationType === 4) {
-      // עבור טיקר - הטיקר הוא הבחירה של האובייקט לשיוך
-      tickerSelect.disabled = false;
-      tickerSelect.classList.remove('disabled-field');
-      tickerSelect.required = true;
-      
-      // השבתת אלמנט לקישור עבור טיקר
-      if (relatedObjectSelect) {
-        relatedObjectSelect.disabled = true;
-        relatedObjectSelect.classList.add('disabled-field');
-        relatedObjectSelect.required = false;
-        relatedObjectSelect.innerHTML = '<option value="">לא רלוונטי עבור טיקר</option>';
-      }
-    } else if (relationType === 3 || relationType === 2) {
-      // עבור תוכנית/טרייד - הטיקר משמש כפילטר
-      tickerSelect.disabled = false;
-      tickerSelect.classList.remove('disabled-field');
-      tickerSelect.required = false; // לא חובה כי זה רק פילטר
-      
-      // הפעלת אלמנט לקישור
-      if (relatedObjectSelect) {
-        relatedObjectSelect.disabled = false;
-        relatedObjectSelect.classList.remove('disabled-field');
-        relatedObjectSelect.required = true;
-      }
-    } else if (relationType === 1) {
-      // עבור חשבון - הטיקר לא פעיל
-      tickerSelect.disabled = true;
-      tickerSelect.classList.add('disabled-field');
-      tickerSelect.required = false;
-      tickerSelect.value = '';
-      
-      // הפעלת אלמנט לקישור
-      if (relatedObjectSelect) {
-        relatedObjectSelect.disabled = false;
-        relatedObjectSelect.classList.remove('disabled-field');
-        relatedObjectSelect.required = true;
-      }
-    } else {
-      // אין בחירה - השבתת הכל
-      tickerSelect.disabled = true;
-      tickerSelect.classList.add('disabled-field');
-      tickerSelect.required = false;
-      tickerSelect.value = '';
-      
-      if (relatedObjectSelect) {
-        relatedObjectSelect.disabled = true;
-        relatedObjectSelect.classList.add('disabled-field');
-        relatedObjectSelect.required = false;
-        relatedObjectSelect.innerHTML = '<option value="">בחר קודם סוג התראה</option>';
-      }
-    }
-  }
-  
-  // 3. אלמנט לקישור - פעיל עבור חשבון(1)/תוכנית(3)/טרייד(2), לא פעיל עבור טיקר(4)
   if (relationType && relationType !== 4) {
+    const tickerSelect = document.getElementById('alertTicker');
     const selectedTicker = tickerSelect ? tickerSelect.value : null;
-    populateRelatedObjects(relationType, selectedTicker);
+    populateRelatedObjects(relationType, selectedTicker, 'alertRelationId');
   }
 }
 
@@ -978,21 +928,24 @@ function onRelationTypeChange(selectElement) {
  * @param {HTMLSelectElement} tickerSelect - אלמנט בחירת הטיקר
  */
 function onTickerChange(tickerSelect) {
-  const relationTypeSelect = document.getElementById('alertRelationType');
-  const relationType = relationTypeSelect ? parseInt(relationTypeSelect.value) : null;
-  
-  if (relationType === 2 || relationType === 3) {
-    // טיקר משמש כפילטר עבור תוכנית וטרייד
-    const selectedTicker = tickerSelect.value;
-    populateRelatedObjects(relationType, selectedTicker);
-  } else if (relationType === 4) {
-    // עבור טיקר - הטיקר הוא הבחירה עצמה
-    if (tickerSelect.value) {
-      enableConditionFields();
-    } else {
-      disableConditionFields();
+  const config = {
+    relationTypeId: 'alertRelationType',
+    onTickerChangeCallback: function(relationType, selectedTicker) {
+      if (relationType === 2 || relationType === 3) {
+        // טיקר משמש כפילטר עבור תוכנית וטרייד
+        populateRelatedObjects(relationType, selectedTicker, 'alertRelationId');
+      } else if (relationType === 4) {
+        // עבור טיקר - הטיקר הוא הבחירה עצמה
+        if (selectedTicker) {
+          enableConditionFields();
+        } else {
+          disableConditionFields();
+        }
+      }
     }
-  }
+  };
+  
+  handleTickerChange(tickerSelect, config);
 }
 
 /**
@@ -1077,104 +1030,72 @@ function disableConditionFields() {
   }
 }
 
+// מילוי רשימת אובייקטים לפי סוג השיוך - משתמש בפונקציה משותפת
+// הטעינה מקובץ related-objects-handler.js
+
+// מילוי רשימת אובייקטים למודל העריכה - משתמש בפונקציה משותפת
+// הטעינה מקובץ related-objects-handler.js
+
 /**
- * מילוי רשימת אובייקטים לפי סוג השיוך
- * @param {number} relationTypeId - מזהה סוג השיוך
- * @param {string} selectedTicker - טיקר נבחר לסינון (אופציונלי)
+ * טיפול בשינוי סוג שיוך במודל העריכה של התראות
+ * @param {HTMLSelectElement} selectElement - אלמנט הבחירה שנבחר
  */
-function populateRelatedObjects(relationTypeId, selectedTicker = null) {
-  const selectElement = alertRelatedObjectSelect;
-  if (!selectElement) {return;}
-
-  // ניקוי הרשימה
-  selectElement.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
-
-  // מילוי לפי סוג השיוך עם סינון לפי טיקר
-  switch (relationTypeId) {
-  case 1: // חשבון
-    populateSelect('alertRelationId', window.accountsData || [], 'name', 'חשבון');
-    break;
-
-  case 2: // טרייד - סינון לפי טיקר אם נבחר
-    let tradesData = window.tradesData || [];
-    if (selectedTicker) {
-      tradesData = tradesData.filter(trade => 
-        trade.symbol === selectedTicker || 
-        trade.ticker_symbol === selectedTicker ||
-        trade.ticker?.symbol === selectedTicker ||
-        trade.ticker_id === parseInt(selectedTicker)
-      );
-    }
-    populateSelect('alertRelationId', tradesData, 'symbol', 'טרייד');
-    break;
-
-  case 3: // תכנון טרייד - סינון לפי טיקר אם נבחר
-    let tradePlansData = window.tradePlansData || [];
-    if (selectedTicker) {
-      tradePlansData = tradePlansData.filter(plan => 
-        plan.symbol === selectedTicker || 
-        plan.ticker_symbol === selectedTicker ||
-        plan.ticker?.symbol === selectedTicker ||
-        plan.ticker_id === parseInt(selectedTicker)
-      );
-    }
-    populateSelect('alertRelationId', tradePlansData, 'symbol', 'תכנון');
-    break;
-
-  case 4: // טיקר
-    // עבור טיקר - הטיקר הוא הבחירה עצמה, לא נמלא את אלמנט הקישור
-    selectElement.innerHTML = '<option value="">לא רלוונטי עבור טיקר</option>';
-    break;
+function onEditAlertRelationTypeChange(selectElement) {
+  const config = {
+    tickerSelectId: 'editAlertTicker',
+    relatedSelectId: 'editAlertRelationId'
+  };
+  
+  handleRelationTypeChange(selectElement, config);
+  
+  // מילוי אובייקטים מקושרים אחרי שינוי הטיפול
+  const relationType = parseInt(selectElement.value);
+  if (relationType && relationType !== 4) {
+    const tickerSelect = document.getElementById('editAlertTicker');
+    const selectedTicker = tickerSelect ? tickerSelect.value : null;
+    populateRelatedObjects(relationType, selectedTicker, 'editAlertRelationId');
   }
 }
 
 /**
- * מילוי רשימת אובייקטים למודל העריכה
- * @param {number} relationTypeId - מזהה סוג השיוך
+ * טיפול בבחירת טיקר במודל העריכה של התראות
+ * @param {HTMLSelectElement} tickerSelect - אלמנט בחירת הטיקר
  */
-function populateEditRelatedObjects(relationTypeId) {
-  const selectElement = editAlertRelatedObjectSelect;
-  if (!selectElement) {return;}
-
-  // ניקוי הרשימה
-  selectElement.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
-
-  // מילוי לפי סוג השיוך
-  switch (relationTypeId) {
-  case 1: // חשבון
-    populateSelect('editAlertRelatedObjectSelect', window.accountsData || [], 'name', 'חשבון');
-    break;
-
-  case 2: // טרייד
-    populateSelect('editAlertRelatedObjectSelect', window.tradesData || [], 'symbol', 'טרייד');
-    break;
-
-  case 3: // תכנון טרייד
-    populateSelect('editAlertRelatedObjectSelect', window.tradePlansData || [], 'symbol', 'תכנון');
-    break;
-
-  case 4: // טיקר
-    populateSelect('editAlertRelatedObjectSelect', window.tickersData || [], 'symbol', '');
-    break;
-  }
+function onEditAlertTickerChange(tickerSelect) {
+  const config = {
+    relationTypeId: 'editAlertRelationType',
+    onTickerChangeCallback: function(relationType, selectedTicker) {
+      if (relationType === 2 || relationType === 3) {
+        // טיקר משמש כפילטר עבור תוכנית וטרייד
+        populateRelatedObjects(relationType, selectedTicker, 'editAlertRelationId');
+      } else if (relationType === 4) {
+        // עבור טיקר - הטיקר הוא הבחירה עצמה
+        if (selectedTicker) {
+          enableEditConditionFields();
+        } else {
+          disableEditConditionFields();
+        }
+      }
+    }
+  };
+  
+  handleTickerChange(tickerSelect, config);
 }
 
 /**
- * טיפול בשינוי סוג שיוך במודל העריכה
- * @param {HTMLInputElement} radioElement - אלמנט הרדיו שנבחר
- */
-function onEditRelationTypeChange(radioElement) {
-
-  // מילוי רשימת האובייקטים לפי הסוג שנבחר
-  populateEditRelatedObjects(parseInt(radioElement.value));
-}
-
-/**
- * טיפול בבחירת אובייקט במודל העריכה
+ * טיפול בבחירת אובייקט במודל העריכה של התראות
  * @param {HTMLSelectElement} selectElement - אלמנט הבחירה
  */
-function onEditRelatedObjectChange(selectElement) {
-
+function onEditAlertRelatedObjectChange(selectElement) {
+  const relationTypeSelect = document.getElementById('editAlertRelationType');
+  const relationType = relationTypeSelect ? parseInt(relationTypeSelect.value) : null;
+  
+  // עבור טיקר - לא רלוונטי כי הטיקר עצמו הוא הבחירה
+  if (relationType === 4) {
+    return;
+  }
+  
+  // עבור שאר הסוגים - בדוק אם נבחר אובייקט לקישור
   if (selectElement.value) {
     // הפעלת שדות התנאי ישירות
     enableEditConditionFields();
@@ -2309,5 +2230,10 @@ window.initializeAlertsModals = function() {
         window.deleteAlertModal = bootstrap.Modal.getOrCreateInstance(deleteAlertModalElement);
     }
 };
+
+// ייצוא פונקציות מודל העריכה
+window.onEditAlertRelationTypeChange = onEditAlertRelationTypeChange;
+window.onEditAlertTickerChange = onEditAlertTickerChange;
+window.onEditAlertRelatedObjectChange = onEditAlertRelatedObjectChange;
 
 console.log('✅ alerts.js v=20251013_boolean_hybrid loaded - new=badge, true/false=renderBoolean icons');

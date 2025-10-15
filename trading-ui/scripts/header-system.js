@@ -1916,9 +1916,9 @@ window.debugZIndexStatus = function() {
 };
 
 // ===== CACHE MANAGEMENT - REDIRECTED TO CACHE-TEST PAGE =====
-// כל ניהול המטמון מרוכז בעמוד /cache-test
+// כל ניהול המטמון מרוכז בעמוד /cache-management
 
-// כל בדיקות המטמון מרוכזות בעמוד /cache-test
+// כל בדיקות המטמון מרוכזות בעמוד /cache-management
 
 
 // Note: Header system initialization is called from core-systems.js Stage 2: UI Systems

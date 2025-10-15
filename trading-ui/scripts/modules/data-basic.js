@@ -1716,45 +1716,6 @@ window.sortTableData = async function (columnIndex, data, tableType, updateFunct
     return 0;
   });
 
-  // Log sorted data for debugging
-  console.log(`🔍 [SORT] Sorted data (first 3):`, sortedData.slice(0, 3).map(item => {
-    const value = getColumnValue(item, columnIndex, tableType);
-    return { value, symbol: item.symbol, data: item };
-  }));
-  console.log(`🔍 [SORT] Original data (first 3):`, data.slice(0, 3).map(item => {
-    const value = getColumnValue(item, columnIndex, tableType);
-    return { value, symbol: item.symbol, data: item };
-  }));
-  
-  // Log all price values for debugging when sorting by price
-  if (tableType === 'tickers' && columnIndex === 3) {
-    console.log(`🔍 [SORT] All price values before sort:`, data.map(item => ({
-      symbol: item.symbol,
-      price: getColumnValue(item, columnIndex, tableType),
-      raw_price: item.current_price
-    })));
-    console.log(`🔍 [SORT] All price values after sort:`, sortedData.map(item => ({
-      symbol: item.symbol,
-      price: getColumnValue(item, columnIndex, tableType),
-      raw_price: item.current_price
-    })));
-    
-        // Log detailed price comparison
-        for (let i = 0; i < Math.min(5, sortedData.length); i++) {
-          const item = sortedData[i];
-          const price = getColumnValue(item, columnIndex, tableType);
-          const fieldName = window.TABLE_COLUMN_MAPPINGS?.[tableType]?.[columnIndex] || 'unknown';
-          console.log(`  ${item.symbol || item.name}: ${price} (fieldName: ${fieldName})`);
-        }
-  }
-  console.log(`🔍 [SORT] Sorted symbols (ALL):`, sortedData.map(item => item.symbol));
-  console.log(`🔍 [SORT] Original symbols (ALL):`, data.map(item => item.symbol));
-  // Use centralized table mappings for debugging
-  if (window.TABLE_COLUMN_MAPPINGS) {
-    const columnMappings = window.TABLE_COLUMN_MAPPINGS;
-    console.log(`🔍 [SORT] Column mapping for ${tableType}:`, columnMappings[tableType]);
-    console.log(`🔍 [SORT] Column ${columnIndex} maps to:`, columnMappings[tableType]?.[columnIndex]);
-  }
 
   // Update the table
   if (typeof updateFunction === 'function') {
@@ -1939,7 +1900,6 @@ window.sortTable = async function (tableTypeOrColumnIndex, columnIndex, dataArra
     if (tableType === 'executions' && window.executionsData) {
       tableData = window.executionsData;
       updateFn = (sortedData) => window.updateExecutionsTableMain(sortedData);
-      console.log(`🔍 [SORT] Found executions data:`, tableData.length, 'items');
     } else if (tableType === 'tickers' && window.tickersData) {
       tableData = window.tickersData;
       updateFn = (sortedData) => {
@@ -1953,47 +1913,36 @@ window.sortTable = async function (tableTypeOrColumnIndex, columnIndex, dataArra
           console.warn('⚠️ updateTickersTable function not available');
         }
       };
-      console.log(`🔍 [SORT] Found tickers data:`, tableData.length, 'items');
     } else if (tableType === 'accounts' && window.accountsData) {
       tableData = window.accountsData;
       updateFn = (sortedData) => window.updateAccountsTableMain(sortedData);
-      console.log(`🔍 [SORT] Found accounts data:`, tableData.length, 'items');
     } else if (tableType === 'cash_flows' && window.cashFlowsData) {
       tableData = window.cashFlowsData;
       updateFn = (sortedData) => window.updateCashFlowsTable(sortedData);
-      console.log(`🔍 [SORT] Found cash_flows data:`, tableData.length, 'items');
     } else if (tableType === 'alerts' && window.alertsData) {
       tableData = window.alertsData;
       updateFn = (sortedData) => window.updateAlertsTable(sortedData);
-      console.log(`🔍 [SORT] Found alerts data:`, tableData.length, 'items');
     } else if (tableType === 'notes' && window.notesData) {
       tableData = window.notesData;
       updateFn = (sortedData) => window.updateNotesTable(sortedData);
-      console.log(`🔍 [SORT] Found notes data:`, tableData.length, 'items');
     } else if (tableType === 'trades' && window.tradesData) {
       tableData = window.tradesData;
       updateFn = (sortedData) => window.updateTradesTable(sortedData);
-      console.log(`🔍 [SORT] Found trades data:`, tableData.length, 'items');
     } else if (tableType === 'trade_plans' && window.tradePlansData) {
       tableData = window.tradePlansData;
       updateFn = (sortedData) => window.updateTradePlansTable(sortedData);
-      console.log(`🔍 [SORT] Found trade_plans data:`, tableData.length, 'items');
     } else if (tableType === 'db_extradata' && window.extraDataData) {
       tableData = window.extraDataData;
       updateFn = (sortedData) => window.updateExtraDataTable(sortedData);
-      console.log(`🔍 [SORT] Found db_extradata data:`, tableData.length, 'items');
     } else if (tableType === 'db_display' && window.dbData) {
       tableData = window.dbData;
       updateFn = (sortedData) => window.updateDbTable(sortedData);
-      console.log(`🔍 [SORT] Found db_display data:`, tableData.length, 'items');
     } else if (tableType === 'constraints' && window.constraintsData) {
       tableData = window.constraintsData;
       updateFn = (sortedData) => window.updateConstraintsTable(sortedData);
-      console.log(`🔍 [SORT] Found constraints data:`, tableData.length, 'items');
     } else if (tableType === 'preferences' && window.preferencesData) {
       tableData = window.preferencesData;
       updateFn = (sortedData) => window.updatePreferencesTable(sortedData);
-      console.log(`🔍 [SORT] Found preferences data:`, tableData.length, 'items');
     } else {
       console.warn(`❌ [SORT] No data found for table type: ${tableType}`);
       console.warn(`❌ [SORT] Available data:`, {

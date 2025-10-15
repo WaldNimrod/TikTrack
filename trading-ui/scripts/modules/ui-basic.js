@@ -856,16 +856,9 @@ async function autoRefreshCurrentPage(operationName = 'פעולה') {
 window.toggleSection = async function (sectionId) {
   
   const section = document.getElementById(sectionId) || document.querySelector(`[data-section="${sectionId}"]`);
-  console.log(`🔍 Section found:`, section ? 'YES' : 'NO', section ? `(ID: ${section.id || 'no-id'}, data-section: ${section.getAttribute('data-section') || 'no-data-section'})` : '');
-  
   const sectionBody = section ? section.querySelector('.section-body') : null;
-  console.log(`🔍 Section body found:`, sectionBody ? 'YES' : 'NO');
-  
   const toggleBtn = section ? section.querySelector('button[onclick*="toggleSection"]') : null;
-  console.log(`🔍 Toggle button found:`, toggleBtn ? 'YES' : 'NO');
-  
   const icon = toggleBtn ? toggleBtn.querySelector('.section-toggle-icon, .filter-icon, .filter-arrow') : null;
-  console.log(`🔍 Icon found:`, icon ? 'YES' : 'NO');
   
   if (sectionBody) {
     const isCollapsed = sectionBody.classList.contains('collapsed') || sectionBody.style.display === 'none';
@@ -926,7 +919,6 @@ window.restoreAllSectionStates = async function () {
   
   
   const sections = document.querySelectorAll('.content-section, .top-section');
-  // console.log(`🔍 Found ${sections.length} sections to restore`);
   
   let restoredCount = 0;
   
@@ -1028,7 +1020,6 @@ window.restoreSectionStates = async function () {
 
   // Restore main section states
   const sections = document.querySelectorAll('.content-section');
-  // console.log(`🔍 Found ${sections.length} content sections to restore`);
   
   let restoredCount = 0;
   

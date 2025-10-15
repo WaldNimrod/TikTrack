@@ -2251,58 +2251,6 @@ window.loadUserPreferences = async function loadUserPreferences(options = {}) {
   }
 }
 
-// Test function to manually update primary color
-window.testUpdatePrimaryColor = function() {
-  console.log('🧪 Testing manual primary color update...');
-  document.documentElement.style.setProperty('--primary-color', '#26baac');
-};
-
-// Test function to manually load preferences
-window.testLoadPreferences = function() {
-  console.log('🧪 Testing manual preferences load...');
-  loadColorPreferences().then(() => {
-  }).catch(error => {
-    console.error('❌ Error loading preferences manually:', error);
-  });
-};
-
-// Test function to check current CSS variables
-window.testCheckCSSVariables = function() {
-  console.log('🧪 Checking current CSS variables...');
-  const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color');
-  console.log('Current --primary-color:', primaryColor);
-  return primaryColor;
-};
-
-// Test function to force update primary color
-window.testForceUpdatePrimaryColor = function() {
-  console.log('🧪 Force updating primary color...');
-  document.documentElement.style.setProperty('--primary-color', '#26baac');
-  
-  // Check if it worked
-  const newColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color');
-  console.log('New --primary-color:', newColor);
-  
-  return newColor;
-};
-
-// Test function to check if color scheme system is loaded
-window.testColorSchemeSystem = function() {
-  console.log('🧪 Testing color scheme system...');
-  console.log('loadColorPreferences function:', typeof loadColorPreferences);
-  console.log('updateCSSVariablesFromPreferences function:', typeof updateCSSVariablesFromPreferences);
-  console.log('window.currentPreferences:', window.currentPreferences);
-  
-  // Try to load preferences manually
-  if (typeof loadColorPreferences === 'function') {
-    loadColorPreferences().then(() => {
-    }).catch(error => {
-      console.error('❌ Manual preferences load failed:', error);
-    });
-  } else {
-    console.log('❌ loadColorPreferences is not available');
-  }
-};
 
 
 /**

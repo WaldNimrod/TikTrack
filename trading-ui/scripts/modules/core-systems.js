@@ -1711,58 +1711,14 @@ async function loadLinkedItemsData(itemType, itemId) {
  * @returns {HTMLElement} Notification container element
  */
 function createNotificationContainer() {
-  console.log('🔧 createNotificationContainer נקרא');
   let container = document.getElementById('notification-container');
-  console.log('🔍 קונטיינר קיים?', !!container);
 
   if (!container) {
-    console.log('🔧 יוצר קונטיינר חדש...');
     container = document.createElement('div');
     container.id = 'notification-container';
     container.className = 'notification-container';
     document.body.appendChild(container);
-    console.log('✅ קונטיינר נוצר ונוסף ל-DOM');
-    
-    // בדיקת סגנונות מחושבים
-    const computedStyle = window.getComputedStyle(container);
-    console.log('🔍 סגנונות מחושבים לקונטיינר:');
-    console.log('  position:', computedStyle.position);
-    console.log('  top:', computedStyle.top);
-    console.log('  right:', computedStyle.right);
-    console.log('  z-index:', computedStyle.zIndex);
-    console.log('  max-width:', computedStyle.maxWidth);
-    
-    // בדיקת טעינת CSS
-    console.log('🔍 בדיקת טעינת CSS:');
-    const styleSheets = Array.from(document.styleSheets);
-    const headerCss = styleSheets.find(sheet => 
-      sheet.href && sheet.href.includes('header-styles.css')
-    );
-    console.log('  header-styles.css נטען?', !!headerCss);
-    if (headerCss) {
-      console.log('  header-styles.css URL:', headerCss.href);
-    }
-    
-    // בדיקת סגנונות notification-container
-    const notificationStyles = Array.from(styleSheets).map(sheet => {
-      try {
-        const rules = Array.from(sheet.cssRules || sheet.rules || []);
-        return rules.filter(rule => 
-          rule.selectorText && rule.selectorText.includes('notification-container')
-        );
-      } catch (e) {
-        return [];
-      }
-    }).flat();
-    console.log('  סגנונות notification-container נמצאו:', notificationStyles.length);
-    notificationStyles.forEach(rule => {
-      console.log('    כלל:', rule.selectorText);
-    });
-  } else {
-    console.log('✅ קונטיינר קיים');
   }
-
-  console.log('🔍 קונטיינר סופי:', container);
   return container;
 }
 

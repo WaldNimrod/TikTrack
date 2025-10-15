@@ -177,25 +177,44 @@
                                             <h6 class="mb-2">🎚️ רמות ניקוי מטמון:</h6>
                                             <div class="btn-group btn-group-sm w-100" role="group">
                                                 <button class="btn btn-outline-success" 
-                                                        onclick="clearAllCache({ level: 'light' })" 
+                                                        onclick="clearAllCache({ 
+                                                            level: 'light', 
+                                                            validateAfter: document.getElementById('enableCacheValidation').checked 
+                                                        })" 
                                                         title="Light: Memory + Services בלבד (25% כיסוי)">
                                                     🟢 Light
                                                 </button>
                                                 <button class="btn btn-outline-primary" 
-                                                        onclick="clearAllCache({ level: 'medium' })" 
+                                                        onclick="clearAllCache({ 
+                                                            level: 'medium', 
+                                                            validateAfter: document.getElementById('enableCacheValidation').checked 
+                                                        })" 
                                                         title="Medium: UnifiedCM + Services (60% כיסוי) - ברירת מחדל">
                                                     🔵 Medium
                                                 </button>
                                                 <button class="btn btn-outline-warning" 
-                                                        onclick="clearAllCache({ level: 'full' })" 
+                                                        onclick="clearAllCache({ 
+                                                            level: 'full', 
+                                                            validateAfter: document.getElementById('enableCacheValidation').checked 
+                                                        })" 
                                                         title="Full: כולל Orphan Keys (100% כיסוי) - דורש login מחדש!">
                                                     🟠 Full
                                                 </button>
                                                 <button class="btn btn-outline-danger" 
-                                                        onclick="clearAllCache({ level: 'nuclear' })" 
+                                                        onclick="clearAllCache({ 
+                                                            level: 'nuclear', 
+                                                            validateAfter: document.getElementById('enableCacheValidation').checked 
+                                                        })" 
                                                         title="Nuclear: מוחק הכל! (150%+ כיסוי) - חירום בלבד!">
                                                     ☢️ Nuclear
                                                 </button>
+                                            </div>
+                                            <div class="form-check mt-3 mb-2">
+                                                <input class="form-check-input" type="checkbox" id="enableCacheValidation">
+                                                <label class="form-check-label" for="enableCacheValidation">
+                                                    <i class="fas fa-check-circle text-success"></i>
+                                                    בצע ולידציה מפורטת אחרי ניקוי (מומלץ בפיתוח)
+                                                </label>
                                             </div>
                                             <p class="small text-muted mb-0 mt-1" style="text-align: right;">
                                                 <i class="fas fa-info-circle"></i>

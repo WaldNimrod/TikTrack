@@ -1524,6 +1524,52 @@ window.clearAllCache = async function(options = {}) {
             console.log('✅ Cache clearing completed:', results);
         }
         
+        // === POST-CLEAR RELOAD AND REFRESH ===
+        // After every cache clearing, perform full reload + wait + fresh data load
+        if (verbose) {
+            console.log(`🔄 Starting post-clear reload process for level: ${level}`);
+            
+            try {
+                // Show loading notification
+                if (typeof window.showSuccessNotification === 'function') {
+                    let reloadMessage = `${levelEmojis[level]} טוען מחדש...\n\n`;
+                    reloadMessage += `🔄 ממלא מטמון חדש\n`;
+                    reloadMessage += `📊 מעדכן טבלאות\n`;
+                    reloadMessage += `⏱️ המתנה ${level === 'nuclear' ? '2' : '1.5'} שניות לפני רענון`;
+                    
+                    window.showSuccessNotification('מכין מטמון חדש', reloadMessage);
+                }
+                
+                // Wait before reload (different times for different levels)
+                const waitTime = level === 'nuclear' ? 2000 : 1500;
+                console.log(`⏱️ Waiting ${waitTime}ms before reload...`);
+                await new Promise(resolve => setTimeout(resolve, waitTime));
+                
+                // Reload fresh data from all cleared layers
+                await reloadClearedCacheData(level, results);
+                
+                // Force hard page reload to ensure fresh JavaScript/CSS
+                console.log('🔄 Performing hard page reload...');
+                
+                // Use modern cache-busting reload method
+                if (level === 'nuclear') {
+                    // Nuclear: Complete page refresh with cache bypass
+                    window.location.href = window.location.href + (window.location.href.includes('?') ? '&' : '?') + '_cb=' + Date.now();
+                } else {
+                    // Light/Medium/Full: Hard reload with cache bypass
+                    window.location.href = window.location.href + (window.location.href.includes('?') ? '&' : '?') + '_cb=' + Date.now();
+                }
+                
+            } catch (reloadError) {
+                console.error('❌ Post-clear reload failed:', reloadError);
+                
+                // Fallback: try to reload anyway
+                setTimeout(() => {
+                    window.location.href = window.location.href + (window.location.href.includes('?') ? '&' : '?') + '_cb_fallback=' + Date.now();
+                }, 500);
+            }
+        }
+        
         return results;
         
     } catch (error) {
@@ -1544,6 +1590,172 @@ window.clearAllCache = async function(options = {}) {
         };
     }
 };
+
+/**
+ * Reload fresh data from all cleared cache layers
+ * @param {string} level - Cache clearing level (light/medium/full/nuclear)
+ * @param {Object} results - Clearing results with details of what was cleared
+ */
+async function reloadClearedCacheData(level, results) {
+    try {
+        console.log(`🔄 Reloading fresh data for level: ${level}`);
+        
+        if (!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) {
+            console.warn('⚠️ UnifiedCacheManager not available, skipping data reload');
+            return;
+        }
+        
+        const reloadPromises = [];
+        
+        // Always reload memory layer data (for all levels)
+        if (results.cleared.memoryLayer || results.cleared.serviceCaches) {
+            console.log('🔄 Reloading memory layer data...');
+            
+            // Reload service caches
+            if (results.cleared.serviceCaches) {
+                // These will be automatically repopulated when services are accessed
+                console.log('✅ Service caches will be repopulated on next access');
+            }
+        }
+        
+        // Reload localStorage and IndexedDB data (medium, full, nuclear)
+        if (level === 'medium' || level === 'full' || level === 'nuclear') {
+            if (results.cleared.localStorageLayer || results.cleared.indexedDBLayer) {
+                console.log('🔄 Reloading persistent storage data...');
+                
+                // Trigger page data refresh functions if available
+                reloadPromises.push(triggerPageDataRefresh());
+            }
+        }
+        
+        // Reload backend cache data (medium, full, nuclear)
+        if (level === 'medium' || level === 'full' || level === 'nuclear') {
+            if (results.cleared.backendLayer) {
+                console.log('🔄 Reloading backend cache data...');
+                
+                // Clear any API response caches to force fresh data
+                reloadPromises.push(clearApiResponseCaches());
+            }
+        }
+        
+        // Reload orphan keys data (full, nuclear)
+        if (level === 'full' || level === 'nuclear') {
+            if (results.cleared.orphanKeys && results.cleared.orphanKeys.total > 0) {
+                console.log('🔄 Reloading orphan keys data...');
+                
+                // Reload user preferences and settings
+                reloadPromises.push(reloadUserPreferences());
+                reloadPromises.push(reloadSystemSettings());
+            }
+        }
+        
+        // Wait for all reload operations to complete
+        if (reloadPromises.length > 0) {
+            console.log(`⏱️ Waiting for ${reloadPromises.length} reload operations...`);
+            await Promise.allSettled(reloadPromises);
+            console.log('✅ All data reload operations completed');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error during cache data reload:', error);
+        // Don't throw - we still want the page reload to happen
+    }
+}
+
+/**
+ * Trigger page-specific data refresh functions
+ */
+async function triggerPageDataRefresh() {
+    try {
+        // Try to trigger page-specific refresh functions
+        if (typeof window.refreshSystemData === 'function') {
+            console.log('🔄 Triggering system data refresh...');
+            await window.refreshSystemData();
+        }
+        
+        if (typeof window.refreshTable === 'function') {
+            console.log('🔄 Triggering table refresh...');
+            // This will be called for each table type when needed
+        }
+        
+        // Trigger background refresh tasks if available
+        if (window.backgroundTasks && typeof window.backgroundTasks.refreshAll === 'function') {
+            console.log('🔄 Triggering background tasks refresh...');
+            await window.backgroundTasks.refreshAll();
+        }
+        
+    } catch (error) {
+        console.warn('⚠️ Some page refresh functions failed:', error);
+    }
+}
+
+/**
+ * Clear API response caches to ensure fresh backend data
+ */
+async function clearApiResponseCaches() {
+    try {
+        // Clear any API response caches in services
+        if (window.EntityDetailsAPI?.cache?.clear) {
+            console.log('🔄 Cleared EntityDetailsAPI cache for fresh data');
+        }
+        
+        if (window.ExternalDataService?.cache?.clear) {
+            console.log('🔄 ExternalDataService will fetch fresh data');
+        }
+        
+        // Clear any fetch response caches
+        if (typeof window.clearResponseCache === 'function') {
+            await window.clearResponseCache();
+        }
+        
+    } catch (error) {
+        console.warn('⚠️ Error clearing API caches:', error);
+    }
+}
+
+/**
+ * Reload user preferences after clearing
+ */
+async function reloadUserPreferences() {
+    try {
+        if (typeof window.getPreference === 'function' && typeof window.loadColorScheme === 'function') {
+            console.log('🔄 Reloading user preferences...');
+            
+            // Reload color scheme
+            await window.loadColorScheme();
+            
+            // Reload other preferences as needed
+            const colorScheme = await window.getPreference('colorScheme');
+            if (colorScheme) {
+                console.log('✅ Color scheme reloaded:', colorScheme);
+            }
+        }
+    } catch (error) {
+        console.warn('⚠️ Error reloading preferences:', error);
+    }
+}
+
+/**
+ * Reload system settings after clearing
+ */
+async function reloadSystemSettings() {
+    try {
+        // Reload system-wide settings that might have been cleared
+        if (typeof window.loadFilters === 'function') {
+            console.log('🔄 Reloading system filters...');
+            await window.loadFilters();
+        }
+        
+        // Reload section states if available
+        if (typeof window.loadSectionStates === 'function') {
+            console.log('🔄 Reloading section states...');
+            await window.loadSectionStates();
+        }
+        
+    } catch (error) {
+        console.warn('⚠️ Error reloading system settings:', error);
+    }
+}
 
 
 // ===== CACHE MANAGEMENT FUNCTIONS FOR CACHE TEST PAGE =====

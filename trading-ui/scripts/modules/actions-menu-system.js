@@ -65,7 +65,7 @@ if (typeof window.debugActionsMenu === 'undefined') {
             const elementStyle = window.getComputedStyle(element);
             const elementZIndex = parseInt(elementStyle.zIndex) || 0;
             
-            if (elementZIndex >= 1070) {
+            if (elementZIndex >= 956) { // גבוה מ-actions menu popup (955-956)
                 higherZIndexElements.push({
                     tagName: element.tagName,
                     className: element.className,
@@ -78,7 +78,7 @@ if (typeof window.debugActionsMenu === 'undefined') {
         });
         
         if (higherZIndexElements.length > 0) {
-            console.log('⚠️ אלמנטים עם z-index גבוה מ-1070 במיקום הפופאפ:', higherZIndexElements);
+            console.log('⚠️ אלמנטים עם z-index גבוה מ-955 במיקום הפופאפ:', higherZIndexElements);
         }
         
         console.log('Actions Cell styles:', {

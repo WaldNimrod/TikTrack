@@ -154,9 +154,11 @@
                                 <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterAlertsByRelatedObjectType('ticker')" data-type="ticker" title="טיקרים">
                                     <img src="images/icons/tickers.svg" alt="טיקרים" class="action-icon">
                                 </button>
-                                
-                                <span class="filter-divider">|</span>
                             </div>
+                            <span class="filter-divider">|</span>
+                            <button id="addAlertBtn" class="refresh-btn" onclick="showAddAlertModal()" title="הוסף התראה חדשה">
+                                <img src="images/icons/alerts.svg" alt="הוסף" class="action-icon"> הוסף
+                            </button>
                             <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
@@ -237,41 +239,24 @@
                     <div class="modal-body">
                         <form id="addAlertForm">
                             <div class="row">
-                                <div class="col-md-12">
+                                <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label class="form-label">התראה עבור:</label>
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="radio-group-item">
-                                                    <input type="radio" name="alertRelationType" id="alertRelationTradePlan" value="3" required
-                                                        onchange="onRelationTypeChange(this)">
-                                                    <label for="alertRelationTradePlan">תוכנית טרייד</label>
-                                                </div>
-                                                <div class="radio-group-item">
-                                                    <input type="radio" name="alertRelationType" id="alertRelationTrade" value="2" required
-                                                        onchange="onRelationTypeChange(this)">
-                                                    <label for="alertRelationTrade">טרייד</label>
-                                                </div>
-                                                <div class="radio-group-item">
-                                                    <input type="radio" name="alertRelationType" id="alertRelationAccount" value="1" required
-                                                        onchange="onRelationTypeChange(this)">
-                                                    <label for="alertRelationAccount">חשבון</label>
-                                                </div>
-                                                <div class="radio-group-item">
-                                                    <input type="radio" name="alertRelationType" id="alertRelationTicker" value="4" required
-                                                        onchange="onRelationTypeChange(this)">
-                                                    <label for="alertRelationTicker">טיקר</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="mb-3">
-                                                    <label for="alertRelationId" class="form-label entity-label">בחר:</label>
-                                                    <select class="form-select" id="alertRelationId" required disabled>
-                                                        <option value="">בחר קודם סוג התראה</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <label for="alertRelationType" class="form-label entity-label">התראה עבור:</label>
+                                        <select class="form-select" id="alertRelationType" required onchange="onRelationTypeChange(this)">
+                                            <option value="">בחר סוג התראה</option>
+                                            <option value="1">חשבון</option>
+                                            <option value="2">טרייד</option>
+                                            <option value="3">תוכנית טרייד</option>
+                                            <option value="4">טיקר</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="alertRelationId" class="form-label entity-label">בחר פריט לשיוך:</label>
+                                        <select class="form-select" id="alertRelationId" required disabled>
+                                            <option value="">בחר קודם סוג התראה</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -279,7 +264,7 @@
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="alertTicker" class="form-label entity-label">טיקר</label>
-                                        <select class="form-select" id="alertTicker" required>
+                                        <select class="form-select" id="alertTicker" required onchange="onTickerChange(this)">
                                             <option value="">בחר טיקר</option>
                                         </select>
                                     </div>

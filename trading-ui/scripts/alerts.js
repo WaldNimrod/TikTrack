@@ -125,6 +125,11 @@ async function loadAlertsData() {
     // עדכון הסטטיסטיקות אחרי טעינת הנתונים
     if (data && Array.isArray(data)) {
       updatePageSummaryStats(data);
+      
+      // מיון ברירת מחדל - תאריך בסדר יורד (חדש ראשון)
+      if (typeof window.applyDefaultSort === 'function') {
+        window.applyDefaultSort('alerts', data, updateAlertsTable);
+      }
     }
     
     return data;
@@ -581,8 +586,24 @@ function updatePageSummaryStats(alertsToUse = null) {
  * הצגת מודל הוספת התראה
  */
 function showAddAlertModal() {
+  // וידוא שהאלמנטים מאותחלים
+  if (!addAlertModalElement) {
+    if (typeof window.initializeAlertsModals === 'function') {
+      window.initializeAlertsModals();
+    }
+    // אם עדיין לא קיים, ננסה להגדיר ישירות
+    if (!addAlertModalElement) {
+      addAlertModalElement = document.getElementById('addAlertModal');
+    }
+  }
+  
+  if (!addAlertModalElement) {
+    console.error('❌ addAlertModalElement לא נמצא!');
+    return;
+  }
+
   // ניקוי הטופס לפני הטעינה
-  const form = addAlertForm;
+  const form = addAlertForm || document.getElementById('addAlertForm');
   if (form) {
     form.reset();
   }
@@ -627,44 +648,32 @@ function showAddAlertModal() {
 
   // הצגת המודל
   const modalElement = addAlertModalElement;
+  console.log('🔍 showAddAlertModal - modalElement:', modalElement);
+  
   if (modalElement) {
     // בדיקה אם Bootstrap זמין
     if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+      console.log('🚀 מנסה להציג מודל עם Bootstrap');
       // שימוש ב-getOrCreateInstance במקום new bootstrap.Modal
       const modal = bootstrap.Modal.getOrCreateInstance(modalElement, {
         backdrop: 'static',
         keyboard: false,
       });
       modal.show();
-
-      // וידוא שהמודל מופיע מעל הכל
-      setTimeout(() => {
-        modalElement.style.zIndex = '999999';
-        const dialog = modalElement.querySelector('.modal-dialog');
-        if (dialog) {
-          dialog.style.zIndex = '1000000';
-        }
-        const content = modalElement.querySelector('.modal-content');
-        if (content) {
-          content.style.zIndex = '1000001';
-        }
-      }, 100);
     } else {
       // אם Bootstrap לא זמין, נציג את המודל באופן ידני
       modalElement.style.display = 'block';
       modalElement.classList.add('show');
-      modalElement.style.zIndex = '999999';
       document.body.classList.add('modal-open');
 
       // הוספת backdrop
       const backdrop = document.createElement('div');
       backdrop.className = 'modal-backdrop fade show';
       backdrop.id = 'modalBackdrop';
-      backdrop.style.zIndex = '999998';
       document.body.appendChild(backdrop);
     }
   } else {
-    // console.error('Modal element not found');
+    console.error('❌ Modal element not found - addAlertModalElement is null');
   }
 }
 
@@ -892,19 +901,41 @@ function populateSelect(selectId, data, field, prefix = '') {
 
 /**
  * טיפול בשינוי סוג שיוך
- * @param {HTMLInputElement} radioElement - אלמנט הרדיו שנבחר
+ * @param {HTMLSelectElement} selectElement - אלמנט הבחירה שנבחר
  */
-function onRelationTypeChange(radioElement) {
-
+function onRelationTypeChange(selectElement) {
   // הפעלת שדה בחירת אובייקט
   const relatedObjectSelect = alertRelatedObjectSelect;
-  if (relatedObjectSelect) {
+  if (relatedObjectSelect && selectElement.value) {
     relatedObjectSelect.disabled = false;
     relatedObjectSelect.classList.remove('disabled-field');
+    
+    // קבל את הטיקר הנבחר אם קיים
+    const tickerSelect = document.getElementById('alertTicker');
+    const selectedTicker = tickerSelect ? tickerSelect.value : null;
+    
+    // מילוי רשימת האובייקטים לפי הסוג שנבחר עם סינון לפי טיקר
+    populateRelatedObjects(parseInt(selectElement.value), selectedTicker);
+  } else if (relatedObjectSelect) {
+    relatedObjectSelect.disabled = true;
+    relatedObjectSelect.classList.add('disabled-field');
+    relatedObjectSelect.innerHTML = '<option value="">בחר קודם סוג התראה</option>';
   }
+}
 
-  // מילוי רשימת האובייקטים לפי הסוג שנבחר
-  populateRelatedObjects(parseInt(radioElement.value));
+/**
+ * טיפול בבחירת טיקר - מסנן רשימה לפי טיקר
+ * @param {HTMLSelectElement} tickerSelect - אלמנט בחירת הטיקר
+ */
+function onTickerChange(tickerSelect) {
+  // קבל את הטיקר הנבחר ואת סוג השיוך הנוכחי
+  const selectedTicker = tickerSelect.value;
+  const relationTypeSelect = document.getElementById('alertRelationType');
+  
+  if (relationTypeSelect && relationTypeSelect.value) {
+    // רענן את רשימת האובייקטים עם הסינון החדש
+    populateRelatedObjects(parseInt(relationTypeSelect.value), selectedTicker);
+  }
 }
 
 /**
@@ -984,30 +1015,49 @@ function disableConditionFields() {
 /**
  * מילוי רשימת אובייקטים לפי סוג השיוך
  * @param {number} relationTypeId - מזהה סוג השיוך
+ * @param {string} selectedTicker - טיקר נבחר לסינון (אופציונלי)
  */
-function populateRelatedObjects(relationTypeId) {
+function populateRelatedObjects(relationTypeId, selectedTicker = null) {
   const selectElement = alertRelatedObjectSelect;
   if (!selectElement) {return;}
 
   // ניקוי הרשימה
   selectElement.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
 
-  // מילוי לפי סוג השיוך
+  // מילוי לפי סוג השיוך עם סינון לפי טיקר
   switch (relationTypeId) {
   case 1: // חשבון
-    populateSelect('alertRelatedObjectSelect', window.accountsData || [], 'name', 'חשבון');
+    populateSelect('alertRelationId', window.accountsData || [], 'name', 'חשבון');
     break;
 
-  case 2: // טרייד
-    populateSelect('alertRelatedObjectSelect', window.tradesData || [], 'id', 'טרייד');
+  case 2: // טרייד - סינון לפי טיקר אם נבחר
+    let tradesData = window.tradesData || [];
+    if (selectedTicker) {
+      tradesData = tradesData.filter(trade => 
+        trade.symbol === selectedTicker || 
+        trade.ticker_symbol === selectedTicker ||
+        trade.ticker?.symbol === selectedTicker ||
+        trade.ticker_id === parseInt(selectedTicker)
+      );
+    }
+    populateSelect('alertRelationId', tradesData, 'symbol', 'טרייד');
     break;
 
-  case 3: // תכנון טרייד
-    populateSelect('alertRelatedObjectSelect', window.tradePlansData || [], 'id', 'תכנון');
+  case 3: // תכנון טרייד - סינון לפי טיקר אם נבחר
+    let tradePlansData = window.tradePlansData || [];
+    if (selectedTicker) {
+      tradePlansData = tradePlansData.filter(plan => 
+        plan.symbol === selectedTicker || 
+        plan.ticker_symbol === selectedTicker ||
+        plan.ticker?.symbol === selectedTicker ||
+        plan.ticker_id === parseInt(selectedTicker)
+      );
+    }
+    populateSelect('alertRelationId', tradePlansData, 'symbol', 'תכנון');
     break;
 
   case 4: // טיקר
-    populateSelect('alertRelatedObjectSelect', window.tickersData || [], 'symbol', '');
+    populateSelect('alertRelationId', window.tickersData || [], 'symbol', '');
     break;
   }
 }
@@ -1030,11 +1080,11 @@ function populateEditRelatedObjects(relationTypeId) {
     break;
 
   case 2: // טרייד
-    populateSelect('editAlertRelatedObjectSelect', window.tradesData || [], 'id', 'טרייד');
+    populateSelect('editAlertRelatedObjectSelect', window.tradesData || [], 'symbol', 'טרייד');
     break;
 
   case 3: // תכנון טרייד
-    populateSelect('editAlertRelatedObjectSelect', window.tradePlansData || [], 'id', 'תכנון');
+    populateSelect('editAlertRelatedObjectSelect', window.tradePlansData || [], 'symbol', 'תכנון');
     break;
 
   case 4: // טיקר
@@ -1818,14 +1868,7 @@ async function confirmDeleteAlert(alertId) {
     // טיפול בתגובה באמצעות CRUDResponseHandler
     await window.CRUDResponseHandler.handleDeleteResponse(response, {
       successMessage: 'התראה נמחקה בהצלחה',
-      reloadFn: async () => {
-        // ניקוי מטמון
-        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-          await window.UnifiedCacheManager.remove('alerts');
-        }
-        // רענון נתונים
-        await loadAlertsData();
-      },
+      apiUrl: `/api/alerts/${alertId}`,
       entityName: 'התראה'
     });
   } catch {
@@ -2169,17 +2212,25 @@ window.initializeAlertsPage = function() {
 
 // Initialize modals
 window.initializeAlertsModals = function() {
-    const addAlertModalElement = document.getElementById('addAlertModal');
-    const editAlertModalElement = document.getElementById('editAlertModal');
-    const deleteAlertModalElement = document.getElementById('deleteAlertModal');
-    const addAlertForm = document.getElementById('addAlertForm');
-    const editAlertForm = document.getElementById('editAlertForm');
-    const alertRelatedObjectSelect = document.getElementById('alertRelatedObjectSelect');
-    const editAlertRelatedObjectSelect = document.getElementById('editAlertRelatedObjectSelect');
+    // עדכון המשתנים הגלובליים
+    addAlertModalElement = document.getElementById('addAlertModal');
+    editAlertModalElement = document.getElementById('editAlertModal');
+    deleteAlertModalElement = document.getElementById('deleteAlertModal');
+    addAlertForm = document.getElementById('addAlertForm');
+    editAlertForm = document.getElementById('editAlertForm');
+    alertRelatedObjectSelect = document.getElementById('alertRelationId');
+    editAlertRelatedObjectSelect = document.getElementById('editAlertRelatedObjectSelect');
     
-    if (addAlertModalElement) window.addAlertModal = bootstrap.Modal.getOrCreateInstance(addAlertModalElement);
-    if (editAlertModalElement) window.editAlertModal = bootstrap.Modal.getOrCreateInstance(editAlertModalElement);
-    if (deleteAlertModalElement) window.deleteAlertModal = bootstrap.Modal.getOrCreateInstance(deleteAlertModalElement);
+    // עדכון המשתנים הגלובליים
+    if (addAlertModalElement) {
+        window.addAlertModal = bootstrap.Modal.getOrCreateInstance(addAlertModalElement);
+    }
+    if (editAlertModalElement) {
+        window.editAlertModal = bootstrap.Modal.getOrCreateInstance(editAlertModalElement);
+    }
+    if (deleteAlertModalElement) {
+        window.deleteAlertModal = bootstrap.Modal.getOrCreateInstance(deleteAlertModalElement);
+    }
 };
 
 console.log('✅ alerts.js v=20251013_boolean_hybrid loaded - new=badge, true/false=renderBoolean icons');

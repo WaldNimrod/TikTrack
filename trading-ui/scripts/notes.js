@@ -648,17 +648,28 @@ function showAddNoteModal() {
 
   // בחירת טיקר כברירת מחדל אחרי טעינת הנתונים
   setTimeout(() => {
-    document.getElementById('noteRelationTicker').checked = true;
-    // טעינת אפשרויות לטיקר
-    const tickerRadio = document.getElementById('noteRelationTicker');
-    if (tickerRadio && window.modalTickers) {
-      populateSelect('noteRelatedObjectSelect', window.modalTickers, 'symbol', '');
+    const relationTypeSelect = document.getElementById('noteRelationType');
+    if (relationTypeSelect) {
+      relationTypeSelect.value = '4'; // טיקר = 4
+      // טעינת אפשרויות לטיקר
+      if (window.modalTickers) {
+        populateSelect('noteRelationId', window.modalTickers, 'symbol', '');
+        // הפעלת השדה
+        const relationIdSelect = document.getElementById('noteRelationId');
+        if (relationIdSelect) {
+          relationIdSelect.disabled = false;
+        }
+      }
     }
   }, 200);
 
   // הצגת המודל
-  const modal = new bootstrap.Modal(addNoteModalElement);
-  modal.show();
+  if (addNoteModal) {
+    addNoteModal.show();
+  } else {
+    const modal = bootstrap.Modal.getOrCreateInstance(addNoteModalElement);
+    modal.show();
+  }
 }
 
 function showEditNoteModal(noteId) {
@@ -670,8 +681,12 @@ function showEditNoteModal(noteId) {
   loadNoteData(noteId);
 
   // הצגת המודל
-  const modal = new bootstrap.Modal(editNoteModalElement);
-  modal.show();
+  if (editNoteModal) {
+    editNoteModal.show();
+  } else {
+    const modal = bootstrap.Modal.getOrCreateInstance(editNoteModalElement);
+    modal.show();
+  }
 }
 
 async function loadNoteData(noteId) {
@@ -694,10 +709,10 @@ async function loadNoteData(noteId) {
     // בחירת סוג הקשר
     const relationType = note.related_type_id;
     if (relationType) {
-      // בחירת הרדיו באטון הנכון
-      const radioButton = document.querySelector(`input[name="editNoteRelationType"][value="${relationType}"]`);
-      if (radioButton) {
-        radioButton.checked = true;
+      const relationTypeSelect = document.getElementById('editNoteRelatedType');
+      if (relationTypeSelect) {
+        relationTypeSelect.value = relationType;
+        
         // טעינת נתונים למודל אם עוד לא נטענו
         if (typeof window.loadModalData === 'function') {
           await window.loadModalData();
@@ -706,10 +721,8 @@ async function loadNoteData(noteId) {
         // מילוי הרשימה הנכונה לפי סוג הקשר
         await populateEditSelectByType(relationType, note.related_id);
       } else {
-        handleElementNotFound('populateEditSelectByType', `לא נמצא רדיו באטון עבור ערך: ${relationType}`);
+        console.warn('⚠️ לא נמצא select לסוג הקשר במודל העריכה');
       }
-    } else {
-      // console.warn('⚠️ אין סוג קשר מוגדר');
     }
 
   } catch {
@@ -737,9 +750,7 @@ async function loadModalData() {
     // עדכון רדיו באטונים
     updateRadioButtons(accounts, trades, tradePlans, tickers);
 
-    // הגדרת נתונים ראשוניים (ברירת מחדל לטיקר)
-    populateSelect('noteRelatedObjectSelect', tickers, 'symbol', '');
-    populateSelect('editNoteRelatedObjectSelect', tickers, 'symbol', '');
+    // הערה: מילוי הנתונים יתבצע באופן דינמי כאשר המשתמש בוחר סוג קשר
 
   } catch {
     // המשך עם מערכים ריקים
@@ -748,71 +759,105 @@ async function loadModalData() {
 }
 
 /**
- * עדכון רדיו באטונים
+ * עדכון select handlers לפי סוג הקשר
  */
 function updateRadioButtons(accounts, trades, tradePlans, tickers) {
-  // עדכון רדיו באטון לחשבונות
-  const accountRadio = document.getElementById('noteRelationAccount');
-  const editAccountRadio = document.getElementById('editNoteRelationAccount');
+  // שמירת הנתונים בגלובל לשימוש מאוחר יותר
+  window.modalAccounts = accounts;
+  window.modalTrades = trades;
+  window.modalTradePlans = tradePlans;
+  window.modalTickers = tickers;
 
-  if (accountRadio) {
-    accountRadio.addEventListener('change', () => {
-      populateSelect('noteRelatedObjectSelect', accounts, 'name', 'חשבון');
-    });
+  // עדכון select לסוג קשר במודל הוספה
+  const relationTypeSelect = document.getElementById('noteRelationType');
+  if (relationTypeSelect) {
+    // הסרת listeners קודמים כדי להימנע מהכפלה
+    relationTypeSelect.removeEventListener('change', handleRelationTypeChange);
+    relationTypeSelect.addEventListener('change', handleRelationTypeChange);
   }
 
-  if (editAccountRadio) {
-    editAccountRadio.addEventListener('change', () => {
-      populateSelect('editNoteRelatedObjectSelect', accounts, 'name', 'חשבון');
-    });
+  // עדכון select לסוג קשר במודל עריכה
+  const editRelationTypeSelect = document.getElementById('editNoteRelatedType');
+  if (editRelationTypeSelect) {
+    editRelationTypeSelect.removeEventListener('change', handleEditRelationTypeChange);
+    editRelationTypeSelect.addEventListener('change', handleEditRelationTypeChange);
   }
+}
 
-  // עדכון רדיו באטון לטריידים
-  const tradeRadio = document.getElementById('noteRelationTrade');
-  const editTradeRadio = document.getElementById('editNoteRelationTrade');
-
-  if (tradeRadio) {
-    tradeRadio.addEventListener('change', () => {
-      populateSelect('noteRelatedObjectSelect', trades, 'id', 'טרייד');
-    });
+/**
+ * טיפול בשינוי סוג קשר במודל הוספה
+ */
+function handleRelationTypeChange(event) {
+  const relationType = event.target.value;
+  const relationIdSelect = document.getElementById('noteRelationId');
+  
+  if (!relationIdSelect) return;
+  
+  // מחיקת אפשרויות קודמות
+  relationIdSelect.innerHTML = '<option value="">בחר פריט</option>';
+  
+  // הפעלת השדה
+  relationIdSelect.disabled = false;
+  
+  // מילוי לפי סוג הקשר
+  switch (relationType) {
+    case '1': // חשבון
+      if (window.modalAccounts) {
+        populateSelect('noteRelationId', window.modalAccounts, 'name', 'חשבון');
+      }
+      break;
+    case '2': // טרייד
+      if (window.modalTrades) {
+        populateSelect('noteRelationId', window.modalTrades, null, 'טרייד');
+      }
+      break;
+    case '3': // תוכנית
+      if (window.modalTradePlans) {
+        populateSelect('noteRelationId', window.modalTradePlans, null, 'תכנון');
+      }
+      break;
+    case '4': // טיקר
+      if (window.modalTickers) {
+        populateSelect('noteRelationId', window.modalTickers, 'symbol', '');
+      }
+      break;
   }
+}
 
-  if (editTradeRadio) {
-    editTradeRadio.addEventListener('change', () => {
-      populateSelect('editNoteRelatedObjectSelect', trades, 'id', 'טרייד');
-    });
-  }
-
-  // עדכון רדיו באטון לתכנונים
-  const planRadio = document.getElementById('noteRelationTradePlan');
-  const editPlanRadio = document.getElementById('editNoteRelationTradePlan');
-
-  if (planRadio) {
-    planRadio.addEventListener('change', () => {
-      populateSelect('noteRelatedObjectSelect', tradePlans, 'id', 'תכנון');
-    });
-  }
-
-  if (editPlanRadio) {
-    editPlanRadio.addEventListener('change', () => {
-      populateSelect('editNoteRelatedObjectSelect', tradePlans, 'id', 'תכנון');
-    });
-  }
-
-  // עדכון רדיו באטון לטיקרים
-  const tickerRadio = document.getElementById('noteRelationTicker');
-  const editTickerRadio = document.getElementById('editNoteRelationTicker');
-
-  if (tickerRadio) {
-    tickerRadio.addEventListener('change', () => {
-      populateSelect('noteRelatedObjectSelect', tickers, 'symbol', '');
-    });
-  }
-
-  if (editTickerRadio) {
-    editTickerRadio.addEventListener('change', () => {
-      populateSelect('editNoteRelatedObjectSelect', tickers, 'symbol', '');
-    });
+/**
+ * טיפול בשינוי סוג קשר במודל עריכה
+ */
+function handleEditRelationTypeChange(event) {
+  const relationType = event.target.value;
+  const relationIdSelect = document.getElementById('editNoteRelatedId');
+  
+  if (!relationIdSelect) return;
+  
+  // מחיקת אפשרויות קודמות
+  relationIdSelect.innerHTML = '<option value="">בחר פריט</option>';
+  
+  // מילוי לפי סוג הקשר
+  switch (relationType) {
+    case '1': // חשבון
+      if (window.modalAccounts) {
+        populateSelect('editNoteRelatedId', window.modalAccounts, 'name', 'חשבון');
+      }
+      break;
+    case '2': // טרייד
+      if (window.modalTrades) {
+        populateSelect('editNoteRelatedId', window.modalTrades, null, 'טרייד');
+      }
+      break;
+    case '3': // תוכנית
+      if (window.modalTradePlans) {
+        populateSelect('editNoteRelatedId', window.modalTradePlans, null, 'תכנון');
+      }
+      break;
+    case '4': // טיקר
+      if (window.modalTickers) {
+        populateSelect('editNoteRelatedId', window.modalTickers, 'symbol', '');
+      }
+      break;
   }
 }
 
@@ -829,7 +874,28 @@ function populateSelect(selectId, data, field, prefix = '') {
 
   select.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
 
-  data.forEach(item => {
+  // מיון הרשומות לפי סימבול/שם לפני הצגה
+  const sortedData = [...data].sort((a, b) => {
+    let compareA, compareB;
+    
+    if (prefix === 'חשבון') {
+      // לחשבונות: מיון לפי שם
+      compareA = a.name || a.account_name || '';
+      compareB = b.name || b.account_name || '';
+    } else if (prefix === 'טרייד' || prefix === 'תכנון') {
+      // לטריידים ותוכניות: מיון לפי סימבול
+      compareA = a.symbol || a.ticker_symbol || a.ticker?.symbol || '';
+      compareB = b.symbol || b.ticker_symbol || b.ticker?.symbol || '';
+    } else {
+      // לטיקרים: מיון לפי סימבול
+      compareA = a.symbol || a.ticker_symbol || a[field] || '';
+      compareB = b.symbol || b.ticker_symbol || b[field] || '';
+    }
+    
+    return compareA.localeCompare(compareB, 'he', { numeric: true });
+  });
+
+  sortedData.forEach(item => {
     const option = document.createElement('option');
     option.value = item.id;
 
@@ -842,17 +908,21 @@ function populateSelect(selectId, data, field, prefix = '') {
       const currency = item.currency || 'ILS';
       displayText = `${name} (${currency})`;
     } else if (prefix === 'טרייד') {
-      // עבור טרייד: סימבול + תאריך
+      // עבור טרייד: סימבול | צד | סוג השקעה | תאריך
       const symbol = item.symbol || item.ticker_symbol || item.ticker?.symbol || 'לא מוגדר';
+      const side = item.side || 'לא מוגדר';
+      const investmentType = item.investment_type || 'לא מוגדר';
       const date = item.created_at || item.date;
       const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
-      displayText = `${symbol} - ${formattedDate}`;
+      displayText = `${symbol} | ${side} | ${investmentType} | ${formattedDate}`;
     } else if (prefix === 'תכנון') {
-      // עבור תכנון: סימבול + תאריך
+      // עבור תכנון: סימבול | צד | סוג השקעה | תאריך
       const symbol = item.symbol || item.ticker_symbol || item.ticker?.symbol || 'לא מוגדר';
+      const side = item.side || 'לא מוגדר';
+      const investmentType = item.investment_type || 'לא מוגדר';
       const date = item.created_at || item.date;
       const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
-      displayText = `${symbol} - ${formattedDate}`;
+      displayText = `${symbol} | ${side} | ${investmentType} | ${formattedDate}`;
     } else {
       // עבור טיקר: רק סימבול
       displayText = item[field] || item.symbol || 'לא מוגדר';
@@ -888,7 +958,7 @@ async function populateEditSelectByType(relationType, selectedId) {
       const tradesResponse = await fetch('/api/trades/');
       const tradesData = await tradesResponse.json();
       data = Array.isArray(tradesData.data) ? tradesData.data : [];
-      displayField = 'id';
+      displayField = null;
       placeholder = 'טרייד';
       break;
     }
@@ -896,8 +966,8 @@ async function populateEditSelectByType(relationType, selectedId) {
       const plansResponse = await fetch('/api/trade_plans/');
       const plansData = await plansResponse.json();
       data = Array.isArray(plansData.data) ? plansData.data : [];
-      displayField = 'id';
-      placeholder = 'תוכנית';
+      displayField = null;
+      placeholder = 'תכנון';
       break;
     }
     case 4: { // טיקר
@@ -911,12 +981,15 @@ async function populateEditSelectByType(relationType, selectedId) {
     }
 
     // מילוי הרשימה
-    populateSelect('editNoteRelatedObjectSelect', data, displayField, placeholder);
+    const prefix = (placeholder === 'טרייד') ? 'טרייד' : 
+                   (placeholder === 'תכנון') ? 'תכנון' : 
+                   (placeholder === 'חשבון') ? 'חשבון' : '';
+    populateSelect('editNoteRelatedId', data, displayField, prefix);
 
     // בחירת הערך הנכון
     if (selectedId) {
       setTimeout(() => {
-        const select = editNoteRelatedObjectSelect;
+        const select = document.getElementById('editNoteRelatedId');
         if (select) {
           select.value = selectedId;
         }
@@ -2098,7 +2171,7 @@ function generateDetailedLog() {
 
 
 window.deleteNote = deleteNote;
-window.filterNotesByRelatedObjectType = filterNotesByRelatedObjectType;
+// window.filterNotesByRelatedObjectType = filterNotesByRelatedObjectType; // REMOVED: Function is defined in related-object-filters.js
 window.formatText = formatText;
 // window.loadNotesData = loadNotesData; // REMOVED: Already exported above
 window.addNote = addNote;

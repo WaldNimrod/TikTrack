@@ -210,18 +210,35 @@ These are the immediate rules to implement across pages. After each fix is appro
 ---
 
 ### 4.5) Entity Details Modal – Linked Items Display
-**Page**: `entity-details-renderer.js`, linked items in entity details modal  
-**Problem**: (To be documented after implementation)
+**Page**: `entity-details-renderer.js`, `Backend/routes/api/cash_flows.py`  
+**Problem**: 
+- Linked account details showed only ID instead of full account information (name, type, status, balance)
+- Backend API returned only `account_name` but not `account_type`, `account_status`, `account_balance`
 
-**Status**: 🚧 In Progress
+**Solution**:
+- Backend: Added missing account fields to cash flow API response
+- Frontend: Updated `renderLinkedAccount` to read flat account fields directly from API response
+
+**Status**: ✅ Completed
+
+**Edits**:
+- `Backend/routes/api/cash_flows.py`: Added `account_type`, `account_status`, `account_balance` to response in `get_cash_flow` function
+- `entity-details-renderer.js`: Updated `renderLinkedAccount` to use `cashFlowData.account_name/type/status/balance` instead of nested `account` object
 
 ---
 
 ### 4.6) Entity Details API – Endpoint Mapping
 **Page**: `entity-details-api.js`  
-**Problem**: Missing endpoint mapping for `trading_account` entity type causing "לא נמצא endpoint" errors
+**Problem**: Missing endpoint mapping for `trading_account` entity type causing "לא נמצא endpoint עבור סוג ישות: trading_account" errors
 
-**Status**: 🚧 Pending
+**Solution**:
+- Added `trading_account: `/api/trading-accounts/${entityId}` mapping to `endpointMappings` object
+- This allows the entity details system to handle both `account` and `trading_account` entity types
+
+**Status**: ✅ Completed
+
+**Edits**:
+- `entity-details-api.js`: Added `trading_account: `/api/trading-accounts/${entityId}` to `endpointMappings` in `fetchFromExistingEndpoints` method
 
 ---
 

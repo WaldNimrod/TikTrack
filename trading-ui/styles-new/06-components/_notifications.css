@@ -424,3 +424,91 @@
   opacity: 0.6;
   color: var(--apple-text-tertiary);
 }
+
+/* ===== מחלקות צבעים לסמלי התראות (Legend Colors) ===== */
+
+/* סמלי התראות - צבעי ישויות */
+.legend-color-danger {
+  background-color: #ffffff;
+  border-left: 4px solid var(--danger-color);
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 80px;
+}
+
+.legend-color-danger span {
+  color: var(--danger-color);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.legend-color-warning {
+  background-color: #ffffff;
+  border-left: 4px solid var(--warning-color);
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 80px;
+}
+
+.legend-color-warning span {
+  color: var(--warning-color);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.legend-color-success {
+  background-color: rgba(40, 167, 69, 0.1);
+  border-left: 4px solid var(--success-color);
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 80px;
+}
+
+.legend-color-success span {
+  color: var(--success-color);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.legend-color-primary {
+  background-color: rgba(41, 166, 168, 0.1);
+  border-left: 4px solid var(--primary-color);
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 80px;
+}
+
+.legend-color-primary span {
+  color: var(--primary-color);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* סגנון כללי לסמלי ההתראות */
+.legend-color-danger img,
+.legend-color-warning img,
+.legend-color-success img,
+.legend-color-primary img {
+  width: 14px;
+  height: 14px;
+}
+
+/* סגנון לheader של מפתח הצבעים */
+.alerts-color-legend-header {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 0px;
+}

@@ -261,3 +261,35 @@
 - הערת סטטוס מעל הטבלה (UI):
   - טקסט חד-שורי עדין: "פתוח = יש תוכנית או טרייד | סגור = אין תוכנית או טרייד | מבוטל = לא פעיל ולא מוצג".
 
+### 17) מערכת פילטרים לפי סוג אובייקט מקושר - מערכת כללית
+
+- **בעיה**: כל עמוד צריך למימוש נפרד של פילטרים לפי סוג אובייקט מקושר (התראות/הערות לפי חשבון/טרייד/תוכנית/טיקר).
+- **פתרון**: מערכת מרכזית ב-`related-object-filters.js` שיוצרת פילטרים אוטומטית לכל יישות.
+
+**יישום לעמוד חדש**:
+1. **HTML**: הוסף כפתורי פילטור עם `data-type` attribute:
+   ```html
+   <div class="filter-buttons-container">
+     <button class="btn btn-sm active" onclick="filterMyEntityByRelatedObjectType('all')" data-type="all">הכל</button>
+     <button class="btn btn-sm btn-outline-primary" onclick="filterMyEntityByRelatedObjectType('account')" data-type="account">חשבונות</button>
+     <button class="btn btn-sm btn-outline-primary" onclick="filterMyEntityByRelatedObjectType('trade')" data-type="trade">טריידים</button>
+     <button class="btn btn-sm btn-outline-primary" onclick="filterMyEntityByRelatedObjectType('trade_plan')" data-type="trade_plan">תוכניות</button>
+     <button class="btn btn-sm btn-outline-primary" onclick="filterMyEntityByRelatedObjectType('ticker')" data-type="ticker">טיקרים</button>
+   </div>
+   ```
+
+2. **JavaScript**: לטעון `related-object-filters.js` ולקרוא ל-`createRelatedObjectFilter`:
+   ```javascript
+   // נוצר אוטומטית אם הקובץ נטען, או לקרוא ידנית:
+   window.createRelatedObjectFilter(
+     'myEntity',        // שם היישות
+     'myEntityData',    // שם משתנה הנתונים הגלובלי  
+     'updateMyEntityTable', // פונקציית עדכון הטבלה
+     'הפריטים שלי'     // שם הפריטים בעברית
+   );
+   ```
+
+**דרישות נתונים**: הנתונים חייבים לכלול שדה `related_type_id` עם הערכים: 1=חשבון, 2=טרייד, 3=תוכנית, 4=טיקר.
+
+**יישות קיימות עם תמיכה אוטומטית**: alerts, notes.
+

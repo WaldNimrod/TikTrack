@@ -5,7 +5,7 @@
 
 .linked-items-container .linked-items-list {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 8px 12px;
   align-items: start;
 }
@@ -33,7 +33,7 @@
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
 }
 
 .linked-items-container .linked-item-row:hover {
@@ -41,12 +41,18 @@
 }
 
 .linked-items-container .linked-item-row .linked-item-col { 
-  padding: 0 4px; display: flex; align-items: center; gap: 8px; 
+  padding: 0 2px; display: flex; align-items: flex-start; gap: 6px; 
 }
 
-.linked-items-container .linked-item-row .linked-item-col:first-child { flex: 0 0 180px; }
-.linked-items-container .linked-item-row .linked-item-col:nth-child(2) { flex: 1 1 auto; min-width: 0; }
-.linked-items-container .linked-item-row .linked-item-col:last-child { flex: 0 0 auto; margin-inline-start: auto; }
+/* Dynamic width distribution by percentage */
+.linked-items-container .linked-item-row .linked-item-col:first-child { flex: 0 0 auto; min-width: 0; }
+.linked-items-container .linked-item-row .linked-item-col:nth-child(2) { flex: 1 1 auto; min-width: 0; flex-direction: column; align-items: flex-start; }
+.linked-items-container .linked-item-row .linked-item-col:last-child { flex: 0 0 auto; min-width: 0; }
+.linked-items-container .linked-item-actions-col { margin-inline-start: auto; justify-content: flex-end; }
+.linked-items-container .linked-item-meta { flex: 1 1 auto; min-width: 0; flex-direction: column; align-items: flex-start; text-align: right; gap: 4px; }
+/* actions column already pushed to line end via margin-inline-start:auto above */
+.linked-items-container .linked-item-status { display: block; align-self: flex-start; }
+.linked-items-container .linked-item-basic-details { display: block; align-self: flex-start; margin-top: 2px; }
 
 .linked-items-container .linked-item-title { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .linked-items-container .linked-item-description { font-size: 12px; color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

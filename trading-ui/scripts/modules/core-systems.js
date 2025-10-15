@@ -2244,7 +2244,7 @@ function showFinalSuccessModal(successInfo) {
     <div class="modal fade" id="finalSuccessModal" tabindex="-1" aria-labelledby="finalSuccessModalLabel">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
-          <div class="modal-header text-white d-flex justify-content-between align-items-center" style="direction: rtl; background-color: #28a745;">
+          <div class="modal-header modal-header-success text-white d-flex justify-content-between align-items-center" style="direction: rtl;">
             <h4 class="modal-title fw-bold" id="finalSuccessModalLabel">
               <i class="fas fa-check-circle"></i> ${successInfo.title}
             </h4>
@@ -2324,7 +2324,7 @@ async function showCriticalErrorModal(errorInfo, detailedMessage) {
     <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}-label">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
-          <div class="modal-header text-white d-flex justify-content-between align-items-center" style="direction: rtl; background-color: #dc3545;">
+          <div class="modal-header modal-header-danger text-white d-flex justify-content-between align-items-center" style="direction: rtl;">
             <h4 class="modal-title fw-bold" id="${modalId}-label">
               <i class="fas fa-exclamation-triangle"></i> ${errorInfo.title}
             </h4>
@@ -2552,7 +2552,7 @@ async function showDetailsModal(title, content, options = {}) {
     <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}-label">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
-          <div class="modal-header text-white d-flex justify-content-between align-items-center" style="direction: rtl; background-color: ${window.getEntityColor ? window.getEntityColor('trade') || '#007bff' : '#007bff'};">
+          <div class="modal-header modal-header-info text-white d-flex justify-content-between align-items-center" style="direction: rtl;">
             <h4 class="modal-title fw-bold" id="${modalId}-label">${title}</h4>
             <div class="d-flex gap-2">
               <button type="button" class="btn btn-sm btn-secondary" id="${modalId}-close-btn" title="סגור">

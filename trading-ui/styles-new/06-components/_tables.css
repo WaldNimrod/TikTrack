@@ -564,7 +564,7 @@ table tbody td button.btn-sm {
 
 /* מונה טבלה */
 .table-count {
-  background: linear-gradient(135deg, #29a6a8 0%, #1f8a8c 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, color-mix(in srgb, var(--primary-color) 80%, black) 100%);
   color: white;
   padding: 0.4rem 0.8rem;
   border-radius: 15px;
@@ -572,7 +572,7 @@ table tbody td button.btn-sm {
   font-weight: 600;
   font-family: var(--font-family-primary);
   display: inline-block;
-  box-shadow: 0 2px 8px rgba(41, 166, 168, 0.3);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--primary-color) 30%, transparent);
   position: relative;
   overflow: hidden;
 }

@@ -671,7 +671,7 @@
 }
 
 .system-check-results-container .card.border-danger {
-  border-color: #dc3545 ;
+  border-color: var(--danger-color) ;
 }
 
 .system-check-results-container .card.border-info {
@@ -719,7 +719,7 @@
 }
 
 .system-check-results-container .text-danger {
-  color: #dc3545 ;
+  color: var(--danger-color) ;
 }
 
 /* Details Pre */
@@ -794,9 +794,9 @@
 }
 
 .summary-value.text-danger {
-  color: #dc3545;
-  background: #f8d7da;
-  border-color: #dc3545;
+  color: var(--danger-color);
+  background: color-mix(in srgb, var(--danger-color) 10%, white);
+  border-color: var(--danger-color);
 }
 
 .summary-value.text-info {
@@ -822,7 +822,7 @@
 
 /* Alerts Overview Specific */
 .alerts-overview {
-  border-left: 4px solid #dc3545;
+  border-left: 4px solid var(--danger-color);
 }
 
 /* External Data Details */

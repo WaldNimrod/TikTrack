@@ -192,13 +192,13 @@ select option {
 /* ===== ולידציה ===== */
 .form-control.is-invalid,
 .form-select.is-invalid {
-  border-color: #dc3545;
-  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+  border-color: var(--danger-color);
+  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--danger-color) 25%, transparent);
 }
 
 .invalid-feedback {
   display: block;
-  color: #dc3545;
+  color: var(--danger-color);
   font-size: 0.875rem;
   margin-top: 0.25rem;
   text-align: right;

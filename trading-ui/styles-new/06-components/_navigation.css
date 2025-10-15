@@ -52,13 +52,13 @@
 
 .nav-link:hover {
   background: var(--apple-bg-secondary);
-  color: #29a6a8;
+  color: var(--primary-color);
   text-decoration: none;
 }
 
 .nav-link.active {
-  background: rgba(41, 166, 168, 0.1);
-  color: #29a6a8;
+  background: color-mix(in srgb, var(--primary-color) 10%, transparent);
+  color: var(--primary-color);
   font-weight: 600;
 }
 
@@ -85,7 +85,7 @@
 
 .dropdown-item:hover {
   background: var(--apple-bg-secondary);
-  color: #29a6a8;
+  color: var(--primary-color);
   text-decoration: none;
 }
 
@@ -115,7 +115,7 @@
 }
 
 .breadcrumb-item a {
-  color: #29a6a8;
+  color: var(--primary-color);
   text-decoration: none;
 }
 

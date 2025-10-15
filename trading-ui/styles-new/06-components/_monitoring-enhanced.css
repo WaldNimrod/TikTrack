@@ -36,18 +36,18 @@
 }
 
 .status-circle.active {
-    background-color: #28a745;
+    background-color: var(--success-color);
     color: white;
     animation: pulse 2s infinite;
 }
 
 .status-circle.paused {
-    background-color: #ffc107;
+    background-color: var(--warning-color);
     color: white;
 }
 
 .status-circle.stopped {
-    background-color: #dc3545;
+    background-color: var(--danger-color);
     color: white;
 }
 
@@ -109,16 +109,16 @@
 }
 
 .light.green {
-    background-color: #28a745;
+    background-color: var(--success-color);
     animation: pulse 2s infinite;
 }
 
 .light.yellow {
-    background-color: #ffc107;
+    background-color: var(--warning-color);
 }
 
 .light.red {
-    background-color: #dc3545;
+    background-color: var(--danger-color);
     animation: blink 1s infinite;
 }
 

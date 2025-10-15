@@ -138,11 +138,11 @@
 }
 
 .metric-trend.up {
-    color: #28a745;
+    color: var(--success-color);
 }
 
 .metric-trend.down {
-    color: #dc3545;
+    color: var(--danger-color);
 }
 
 /* Alert Styles */

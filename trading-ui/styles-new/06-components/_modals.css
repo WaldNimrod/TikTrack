@@ -266,7 +266,7 @@
 .modal-header:not(.modal-header-colored):not(.modal-header-danger) .btn-close {
   opacity: 1 ;
   visibility: visible ;
-  color: #28a745 ;
+  color: var(--success-color) ;
   filter: none ;
   background: none ;
   border: none ;
@@ -284,7 +284,7 @@
 /* הודעות שגיאה בתוך המודול */
 .modal-body .invalid-feedback {
   display: block;
-  color: #dc3545;
+  color: var(--danger-color);
   font-size: 0.875rem;
   margin-top: 0.25rem;
 }
@@ -292,21 +292,21 @@
 /* שדות עם שגיאה */
 .modal-body .form-control.is-invalid,
 .modal-body .form-select.is-invalid {
-  border-color: #dc3545;
-  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+  border-color: var(--danger-color);
+  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--danger-color) 25%, transparent);
 }
 
 /* כפתורי מחיקה בתוך modals */
 .modal .btn-danger {
-  border: 2px solid #dc3545 ;
+  border: 2px solid var(--danger-color) ;
   background-color: white ;
-  color: #dc3545 ;
+  color: var(--danger-color) ;
   font-size: 0.9rem ;
   padding: 0.375rem 0.75rem ;
 }
 
 .modal .btn-danger:hover {
-  background-color: #dc3545 ;
+  background-color: var(--danger-color) ;
   color: white ;
 }
 
@@ -708,4 +708,25 @@
         width: 35px;
         height: 35px;
     }
+}
+
+/* ===== Modal Headers with Dynamic Colors ===== */
+.modal-header-success {
+  background-color: var(--success-color) !important;
+}
+
+.modal-header-danger {
+  background-color: var(--danger-color) !important;
+}
+
+.modal-header-warning {
+  background-color: var(--warning-color) !important;
+}
+
+.modal-header-info {
+  background-color: var(--info-color) !important;
+}
+
+.modal-header-primary {
+  background-color: var(--primary-color) !important;
 }

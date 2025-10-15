@@ -2055,18 +2055,12 @@ window.updateSaveButtonState = function() {
     const saveButton = document.querySelector('button[onclick="saveAllPreferences()"]');
     if (saveButton) {
         if (hasUnsavedChanges) {
-            saveButton.classList.remove('btn-success', 'btn-sm');
-            saveButton.classList.add('btn-lg');
-            saveButton.style.backgroundColor = '#ff9e04'; // כתום הלוגו
-            saveButton.style.borderColor = '#ff9e04';
-            saveButton.style.color = 'white';
+            saveButton.classList.remove('btn-success', 'btn-sm', 'btn-primary');
+            saveButton.classList.add('btn-warning', 'btn-lg');
             saveButton.innerHTML = '<i class="fas fa-exclamation-triangle"></i> יש לשמור שינויים';
         } else {
-            saveButton.classList.remove('btn-lg');
-            saveButton.classList.add('btn-success', 'btn-sm');
-            saveButton.style.backgroundColor = '#26baac'; // ירוק הלוגו
-            saveButton.style.borderColor = '#26baac';
-            saveButton.style.color = 'white';
+            saveButton.classList.remove('btn-lg', 'btn-warning');
+            saveButton.classList.add('btn-primary', 'btn-sm');
             saveButton.innerHTML = '<i class="fas fa-save"></i> שמור שינויים';
         }
     }
@@ -2151,20 +2145,14 @@ window.saveAllPreferences = async function() {
             
             // עדכון כפתור השמירה
             saveButton.innerHTML = '<i class="fas fa-check"></i> נשמר בהצלחה';
-            saveButton.classList.remove('btn-lg');
+            saveButton.classList.remove('btn-lg', 'btn-warning', 'btn-primary');
             saveButton.classList.add('btn-success', 'btn-sm');
-            saveButton.style.backgroundColor = '#26baac'; // ירוק הלוגו
-            saveButton.style.borderColor = '#26baac';
-            saveButton.style.color = 'white';
             
             // החזרת הכפתור למצב רגיל אחרי 2 שניות
             setTimeout(() => {
                 saveButton.innerHTML = '<i class="fas fa-save"></i> שמור שינויים';
                 saveButton.classList.remove('btn-success', 'btn-sm');
-                saveButton.classList.add('btn-lg');
-                saveButton.style.backgroundColor = '#26baac'; // ירוק הלוגו
-                saveButton.style.borderColor = '#26baac';
-                saveButton.style.color = 'white';
+                saveButton.classList.add('btn-primary', 'btn-lg');
                 saveButton.disabled = false;
             }, 2000);
             

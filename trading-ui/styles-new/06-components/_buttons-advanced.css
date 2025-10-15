@@ -404,8 +404,8 @@ button .cancel-icon,
 
 .btn-sm.btn-secondary {
   background: #ffffff;
-  color: #29a6a8;
-  border: 1px solid #29a6a8;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
   border-radius: 8px;
   padding: 0;
   font-size: 0.75rem;
@@ -424,7 +424,7 @@ button .cancel-icon,
 .add-btn {
   background: transparent;
   color: #000000;
-  border: 2px solid #29a6a8;
+  border: 2px solid var(--primary-color);
   box-shadow: none;
   padding: 6px 13px;
   border-radius: 6px;
@@ -438,7 +438,7 @@ button .cancel-icon,
 }
 
 .add-btn:hover {
-  background-color: #29a6a8;
+  background-color: var(--primary-color);
   color: white;
   transform: translateY(-1px);
   box-shadow: 0 2px 4px rgba(41, 166, 168, 0.3);
@@ -450,9 +450,9 @@ button[onclick*="restore"],
 button[onclick*="reactivate"],
 button[title*="החזר"],
 button[title*="הפעל מחדש"] {
-  border: 1px solid #28a745;
+  border: 1px solid var(--success-color);
   background-color: transparent;
-  color: #28a745;
+  color: var(--success-color);
   padding: 0.375rem 0.75rem;
   font-size: 0.875rem;
   border-radius: 0.25rem;
@@ -464,18 +464,18 @@ button[onclick*="restore"]:hover,
 button[onclick*="reactivate"]:hover,
 button[title*="החזר"]:hover,
 button[title*="הפעל מחדש"]:hover {
-  background-color: #28a745;
+  background-color: var(--success-color);
   color: #ffffff;
-  border-color: #28a745;
+  border-color: var(--success-color);
   transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+  box-shadow: 0 2px 4px color-mix(in srgb, var(--success-color) 30%, transparent);
 }
 
 /* כפתורי outline נוספים */
 .btn-success-outline {
-  border: 2px solid #28a745;
+  border: 2px solid var(--success-color);
   background-color: white;
-  color: #28a745;
+  color: var(--success-color);
   padding: 0.375rem 0.75rem;
   font-size: 0.875rem;
   border-radius: 0.25rem;
@@ -483,17 +483,17 @@ button[title*="הפעל מחדש"]:hover {
 }
 
 .btn-success-outline:hover {
-  background-color: #28a745;
+  background-color: var(--success-color);
   color: white;
-  border-color: #28a745;
+  border-color: var(--success-color);
   transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+  box-shadow: 0 2px 4px color-mix(in srgb, var(--success-color) 30%, transparent);
 }
 
 .btn-danger-outline {
-  border: 2px solid #dc3545;
+  border: 2px solid var(--danger-color);
   background-color: white;
-  color: #dc3545;
+  color: var(--danger-color);
   padding: 0.375rem 0.75rem;
   font-size: 0.875rem;
   border-radius: 0.25rem;
@@ -501,11 +501,11 @@ button[title*="הפעל מחדש"]:hover {
 }
 
 .btn-danger-outline:hover {
-  background-color: #dc3545;
+  background-color: var(--danger-color);
   color: white;
-  border-color: #dc3545;
+  border-color: var(--danger-color);
   transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+  box-shadow: 0 2px 4px color-mix(in srgb, var(--danger-color) 30%, transparent);
 }
 
 /* כפתורי secondary במודלים */
@@ -551,8 +551,8 @@ button[title*="הפעל מחדש"]:hover {
 .btn-secondary-custom,
 button.btn-secondary-custom {
   background-color: white;
-  color: #29a6a8;
-  border: 2px solid #29a6a8;
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color);
   border-radius: 4px;
   padding: 0.375rem 0.75rem;
   font-size: 0.875rem;
@@ -632,52 +632,52 @@ button, .btn, .btn-sm, .btn-lg {
 }
 
 .btn-action.btn-secondary {
-  color: #29a6a8;
-  border-color: #29a6a8;
+  color: var(--primary-color);
+  border-color: var(--primary-color);
 }
 
 .btn-action.btn-secondary:hover {
-  background: #29a6a8;
+  background: var(--primary-color);
   color: white;
 }
 
 .btn-action.btn-success {
-  color: #28a745;
-  border-color: #28a745;
+  color: var(--success-color);
+  border-color: var(--success-color);
 }
 
 .btn-action.btn-success:hover {
-  background: #28a745;
+  background: var(--success-color);
   color: white;
 }
 
 .btn-action.btn-danger {
-  color: #dc3545;
-  border-color: #dc3545;
+  color: var(--danger-color);
+  border-color: var(--danger-color);
 }
 
 .btn-action.btn-danger:hover {
-  background: #dc3545;
+  background: var(--danger-color);
   color: white;
 }
 
 .btn-action.btn-warning {
-  color: #ffc107;
-  border-color: #ffc107;
+  color: var(--warning-color);
+  border-color: var(--warning-color);
 }
 
 .btn-action.btn-warning:hover {
-  background: #ffc107;
+  background: var(--warning-color);
   color: #212529;
 }
 
 .btn-action.btn-info {
-  color: #007bff;
-  border-color: #007bff;
+  color: var(--info-color);
+  border-color: var(--info-color);
 }
 
 .btn-action.btn-info:hover {
-  background: #007bff;
+  background: var(--info-color);
   color: white;
 }
 

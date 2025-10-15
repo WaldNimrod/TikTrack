@@ -201,6 +201,14 @@ function viewLinkedItems(itemId, itemType = null) {
 function showLinkedItemsModal(data, itemType, itemId, mode = 'view') {
 
   // Create modal content based on mode
+  // Enrich data with friendly names when missing (e.g., account name)
+  try {
+    if (itemType === 'account' && (!data.accountName || data.accountName === '')) {
+      const acc = (window.tradingAccountsData || []).find(a => a.id === Number(itemId));
+      if (acc && acc.name) data.accountName = acc.name;
+    }
+  } catch (_) {}
+
   const modalContent = createLinkedItemsModalContent(data, itemType, itemId, mode);
 
   // Create and show modal
@@ -230,7 +238,7 @@ function showLinkedItemsModal(data, itemType, itemId, mode = 'view') {
     modalTitle += ' - 👁️ תצוגה';
   }
 
-  createModal(modalId, modalTitle, modalContent, mode, itemType);
+  createModal(modalId, modalTitle, modalContent, mode, itemType, { enableExport: true, exportType: itemType, exportId: itemId });
 
   // Show the modal using the unified helper function to avoid ARIA warnings
   if (typeof window.createAndShowModal === 'function') {
@@ -326,7 +334,7 @@ function createLinkedItemsModalContent(data, itemType, itemId, mode = 'view') {
       <div class="alert alert-info">
         <strong>📋 סקירת אלמנטים מקושרים</strong><br>
         מציג את כל האלמנטים המקושרים ל-${itemName}
-        ${mode === 'warningBlock' ? '<br><strong style="color: ' + (window.getTableColors ? window.getTableColors().negative : '#dc3545') + ';">⚠️ לא ניתן לבצע פעולה זו עד לטיפול בפריטים המקושרים</strong>' : ''}
+        ${mode === 'warningBlock' ? '<br><strong class="text-danger">⚠️ לא ניתן לבצע פעולה זו עד לטיפול בפריטים המקושרים</strong>' : ''}
       </div>
       ${rulesExplanation ? `
       <div class="alert alert-warning">
@@ -411,33 +419,33 @@ function createLinkedItemsList(items, mode = 'view') {
 
   items.forEach(item => {
     const icon = getItemTypeIcon(item.type);
-    const displayName = getItemTypeDisplayName(item.type);
 
     // Use FieldRendererService when available
     const statusBadge = (window.FieldRendererService && window.FieldRendererService.renderStatus)
       ? window.FieldRendererService.renderStatus(item.status, item.type)
       : getStatusBadge(item.status);
 
-    const createdLabel = (window.FieldRendererService && window.FieldRendererService.renderDate) ? window.FieldRendererService.renderDate(item.created_at, false) : (item.created_at ? new Date(item.created_at).toLocaleDateString('he-IL') : 'לא מוגדר');
-    const basicInfo = `נוצר: ${createdLabel}`;
+    // Date only (no label)
+    const createdLabel = (window.FieldRendererService && window.FieldRendererService.renderDate)
+      ? window.FieldRendererService.renderDate(item.created_at, false)
+      : (item.created_at ? new Date(item.created_at).toLocaleDateString('he-IL') : 'לא מוגדר');
 
     listHtml += `
       <div class="linked-item-row ${item.type} linked-item-${item.type}">
         <div class="linked-item-col">
           <div class="linked-item-icon">${icon}</div>
-          <div class="linked-item-type">
-            <span class="badge ${getTypeBadgeClass(item.type)}">${displayName}</span>
-          </div>
         </div>
         <div class="linked-item-col">
           <div class="linked-item-title">${item.title || ''}</div>
           <div class="linked-item-description">${item.description || ''}</div>
-          <div class="linked-item-status">${statusBadge}</div>
         </div>
-        <div class="linked-item-col" style="margin-inline-start:auto;">
-          <div class="linked-item-basic-details">${basicInfo}</div>
-          ${mode === 'warningBlock' ? '' : `
-          <div class="linked-item-actions" style="margin-inline-start:auto;">
+        <div class="linked-item-col linked-item-meta">
+          <div class="linked-item-status">${statusBadge}</div>
+          <div class="linked-item-basic-details">${createdLabel}</div>
+        </div>
+        ${mode === 'warningBlock' ? '' : `
+        <div class="linked-item-col linked-item-actions-col">
+          <div class="linked-item-actions">
             ${window.createActionsMenu ? window.createActionsMenu([
               window.createButton ? window.createButton('VIEW', `viewItemDetails('${item.type}', ${item.id})`) : `<button class='btn btn-sm btn-outline-info' onclick=\"viewItemDetails('${item.type}', ${item.id})\" title='צפה'>👁️</button>`,
               window.createEditButton ? window.createEditButton(`editItem('${item.type}', ${item.id})`) : `<button class='btn btn-sm btn-outline-secondary' onclick=\"editItem('${item.type}', ${item.id})\" title='ערוך'>✏️</button>`,
@@ -445,8 +453,8 @@ function createLinkedItemsList(items, mode = 'view') {
               window.createDeleteButton ? window.createDeleteButton(`deleteItem('${item.type}', ${item.id})`) : `<button class='btn btn-sm btn-danger' onclick=\"deleteItem('${item.type}', ${item.id})\" title='מחק'>🗑️</button>`
             ], `${item.type}-${item.id}`) : ''}
           </div>
-          `}
         </div>
+        `}
       </div>
     `;
   });
@@ -799,7 +807,7 @@ function createBasicItemInfo(item) {
  * @param {string} title - Modal title
  * @param {string} content - Modal content
  */
-function createModal(id, title, content, mode = 'view', entityType = '') {
+function createModal(id, title, content, mode = 'view', entityType = '', options = {}) {
   // Remove existing modal if it exists
   const existingModal = document.getElementById(id);
   if (existingModal) {
@@ -809,18 +817,27 @@ function createModal(id, title, content, mode = 'view', entityType = '') {
   // Create new modal with mode-specific styling
   // Note: No aria-hidden - let Bootstrap manage it to avoid accessibility warnings
   const entityClass = entityType ? ` entity-${entityType}` : '';
+  const exportBtn = options.enableExport ? `
+    <div class="header-actions-start">
+      <button class="btn btn-outline-primary btn-sm export-btn" onclick="exportLinkedItemsData('${options.exportType}', ${options.exportId})" title="ייצוא נתונים">📤 ייצוא</button>
+    </div>` : '';
+
   const modalHtml = `
     <div class="modal fade" id="${id}" tabindex="-1" aria-labelledby="${id}Label">
       <div class="modal-dialog modal-xl">
         <div class="modal-content${entityClass}">
-                          <div class="modal-header linkedItems_modal-header-colored modal-header-${mode} entity-${entityType}">
-            <button type="button" class="btn-close-custom btn-close-${mode}" data-bs-dismiss="modal" aria-label="Close">
-              ✕
-            </button>
+          <div class="modal-header linkedItems_modal-header-colored entity-${entityType}">
             <h5 class="modal-title" id="${id}Label">${title}</h5>
+            <div class="ms-auto d-flex align-items-center gap-2">
+              ${exportBtn}
+              <button type="button" class="btn btn-sm btn-light btn-close-entity" data-bs-dismiss="modal" aria-label="Close">סגור ✕</button>
+            </div>
           </div>
           <div class="modal-body">
             ${content}
+            <div class="modal-footer d-flex justify-content-end">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
+            </div>
           </div>
         </div>
       </div>

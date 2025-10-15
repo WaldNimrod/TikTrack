@@ -470,18 +470,16 @@ class CRUDResponseHandler {
         // Store error log globally for copy button access
         window._currentErrorLog = errorLogString;
 
-        // Retry button (only if onRetry provided) - using TikTrack button classes with inline style for consistency
+        // Retry button (only if onRetry provided) - using TikTrack button classes
         const retryBtn = onRetry && typeof onRetry === 'function' ? `
-            <button class="btn" style="background-color: #29a6a8; color: white; border: 1px solid #29a6a8; padding: 0.5rem 1rem; font-size: 0.875rem; margin-top: 1rem; margin-left: 0.5rem;" 
-                    onclick="(${onRetry.toString()})()">
+            <button class="btn btn-primary mt-3 ms-2" onclick="(${onRetry.toString()})()">
                 <i class="fas fa-sync"></i> נסה שוב
             </button>
         ` : '';
 
-        // Copy error log button - same size and font, different color
+        // Copy error log button - using secondary button style
         const copyBtn = `
-            <button class="btn" style="background-color: #6c757d; color: white; border: 1px solid #6c757d; padding: 0.5rem 1rem; font-size: 0.875rem; margin-top: 1rem; margin-left: 0.5rem;" 
-                    onclick="window.copyCurrentErrorLog()">
+            <button class="btn btn-secondary mt-3 ms-2" onclick="window.copyCurrentErrorLog()">
                 <i class="fas fa-copy"></i> העתק פרטי שגיאה
             </button>
         `;
@@ -505,7 +503,7 @@ class CRUDResponseHandler {
 
         tbody.innerHTML = `
             <tr>
-                <td colspan="${columnCount}" class="text-center" style="color: #e74c3c; padding: 20px;">
+                <td colspan="${columnCount}" class="text-center text-danger" style="padding: 20px;">
                     <i class="fas ${icon} fa-2x mb-2"></i><br>
                     <strong style="font-size: 1.1em;">${title}</strong><br>
                     <small>${message}</small><br>

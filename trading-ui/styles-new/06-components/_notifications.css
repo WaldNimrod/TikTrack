@@ -92,51 +92,51 @@
 
 /* סוגי התראות ספציפיים */
 .notification-success {
-  border-left: 4px solid #28a745 !important;
+  border-left: 4px solid var(--success-color) !important;
 }
 
 .notification-success .notification-icon {
-  color: #28a745 !important;
+  color: var(--success-color) !important;
 }
 
 .notification-success .notification-title {
-  color: #28a745 !important;
+  color: var(--success-color) !important;
 }
 
 .notification-error {
-  border-left: 4px solid #dc3545 !important;
+  border-left: 4px solid var(--danger-color) !important;
 }
 
 .notification-error .notification-icon {
-  color: #dc3545 !important;
+  color: var(--danger-color) !important;
 }
 
 .notification-error .notification-title {
-  color: #dc3545 !important;
+  color: var(--danger-color) !important;
 }
 
 .notification-warning {
-  border-left: 4px solid #ffc107 !important;
+  border-left: 4px solid var(--warning-color) !important;
 }
 
 .notification-warning .notification-icon {
-  color: #ffc107 !important;
+  color: var(--warning-color) !important;
 }
 
 .notification-warning .notification-title {
-  color: #ffc107 !important;
+  color: var(--warning-color) !important;
 }
 
 .notification-info {
-  border-left: 4px solid #17a2b8 !important;
+  border-left: 4px solid var(--info-color) !important;
 }
 
 .notification-info .notification-icon {
-  color: #17a2b8 !important;
+  color: var(--info-color) !important;
 }
 
 .notification-info .notification-title {
-  color: #17a2b8 !important;
+  color: var(--info-color) !important;
 }
 
 .notification-close {
@@ -163,11 +163,11 @@
 
 /* סוגי התראות */
 .notification.success {
-  border-color: #28a745 !important;
+  border-color: var(--success-color) !important;
 }
 
 .notification.success .notification-icon {
-  color: #28a745 !important;
+  color: var(--success-color) !important;
 }
 
 .notification.success .notification-title {
@@ -179,11 +179,11 @@
 }
 
 .notification.error {
-  border-color: #dc3545 !important;
+  border-color: var(--danger-color) !important;
 }
 
 .notification.error .notification-icon {
-  color: #dc3545 !important;
+  color: var(--danger-color) !important;
 }
 
 .notification.error .notification-title {
@@ -195,11 +195,11 @@
 }
 
 .notification.warning {
-  border-color: #ffc107 !important;
+  border-color: var(--warning-color) !important;
 }
 
 .notification.warning .notification-icon {
-  color: #ffc107 !important;
+  color: var(--warning-color) !important;
 }
 
 .notification.warning .notification-title {
@@ -211,11 +211,11 @@
 }
 
 .notification.info {
-  border-color: #007bff !important;
+  border-color: var(--info-color) !important;
 }
 
 .notification.info .notification-icon {
-  color: #007bff !important;
+  color: var(--info-color) !important;
 }
 
 .notification.info .notification-title {
@@ -279,8 +279,8 @@
 }
 
 .active-alert-item:hover {
-  border-color: #29a6a8;
-  box-shadow: 0 2px 8px rgba(41, 166, 168, 0.1);
+  border-color: var(--primary-color);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--primary-color) 10%, transparent);
   transform: translateY(-1px);
 }
 

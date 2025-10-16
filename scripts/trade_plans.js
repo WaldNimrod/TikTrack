@@ -372,6 +372,12 @@ function enableEditFields() {
  */
 function enableAddFormFields() {
   console.log('🔍 enableAddFormFields - התחלה');
+  console.log('🔍 הפונקציה נקראת!');
+  
+  // בדיקה מהירה
+  const testField = document.getElementById('addTradePlanInvestmentType');
+  console.log('🔍 בתוך enableAddFormFields - testField:', testField);
+  console.log('🔍 בתוך enableAddFormFields - testField.disabled:', testField ? testField.disabled : 'לא נמצא');
   
   const fields = [
     'addTradePlanTradingAccount',
@@ -396,6 +402,7 @@ function enableAddFormFields() {
       console.log(`🔍 מפעיל שדה: ${fieldId} (disabled: ${field.disabled})`);
       field.disabled = false;
       field.classList.remove('disabled');
+      console.log(`🔍 אחרי הפעלה: ${fieldId} (disabled: ${field.disabled})`);
       enabledCount++;
     } else {
       console.warn(`🔍 שדה לא נמצא: ${fieldId}`);
@@ -412,6 +419,10 @@ function enableAddFormFields() {
     
     const disabledFields = Array.from(allInputs).filter(el => el.disabled && el.id !== 'addTradePlanTickerId');
     console.log('🔍 שדות שעדיין מושבתים:', disabledFields.map(el => el.id));
+    
+    // בדיקה נוספת
+    const testField2 = document.getElementById('addTradePlanInvestmentType');
+    console.log('🔍 בדיקה סופית - testField2.disabled:', testField2 ? testField2.disabled : 'לא נמצא');
   }
 }
 
@@ -420,6 +431,7 @@ function enableAddFormFields() {
  */
 function disableAddFormFields() {
   console.log('🔍 disableAddFormFields - התחלה');
+  console.log('🔍 הפונקציה נקראת!');
   
   const fields = [
     'addTradePlanTradingAccount',
@@ -456,6 +468,7 @@ function disableAddFormFields() {
  */
 async function updateAddTickerInfo() {
   console.log('🔍 updateAddTickerInfo - התחלה');
+  console.log('🔍 הפונקציה נקראת!');
   
   const tickerId = document.getElementById('addTradePlanTickerId').value;
   const tickerDisplay = document.getElementById('selectedTickerDisplay');
@@ -469,14 +482,16 @@ async function updateAddTickerInfo() {
 
   if (!tickerId) {
     console.log('🔍 אין טיקר נבחר - השבתת שדות');
-    tickerDisplay.textContent = 'לא נבחר';
-    priceDisplay.textContent = '-';
-    changeDisplay.textContent = '-';
+    if (tickerDisplay) tickerDisplay.textContent = 'לא נבחר';
+    if (priceDisplay) priceDisplay.textContent = '-';
+    if (changeDisplay) changeDisplay.textContent = '-';
     
     // השבתת כל השדות
     disableAddFormFields();
     return;
   }
+
+  console.log('🔍 יש טיקר נבחר - ממשיך לעיבוד');
 
   try {
     console.log('🔍 שליחת בקשת API לטיקר:', tickerId);
@@ -518,7 +533,17 @@ async function updateAddTickerInfo() {
 
       // הפעלת כל השדות
       console.log('🔍 הפעלת כל השדות...');
+      console.log('🔍 קריאה ל-enableAddFormFields()');
+      
+      // בדיקה לפני הפעלה
+      const testField = document.getElementById('addTradePlanInvestmentType');
+      console.log('🔍 לפני הפעלה - addTradePlanInvestmentType disabled:', testField ? testField.disabled : 'לא נמצא');
+      
       enableAddFormFields();
+      
+      // בדיקה אחרי הפעלה
+      console.log('🔍 אחרי הפעלה - addTradePlanInvestmentType disabled:', testField ? testField.disabled : 'לא נמצא');
+      console.log('🔍 enableAddFormFields() הושלם');
 
       // עדכון מחירי עצירה ויעד ברירת מחדל
       console.log('🔍 עדכון מחירי ברירת מחדל...');
@@ -1644,6 +1669,7 @@ function updatePageSummaryStats() {
  */
 function showAddTradePlanModal() {
   console.log('🔍 showAddTradePlanModal - התחלה');
+  console.log('🔍 הפונקציה נקראת!');
   
   // Clearing the form completely
   const form = document.getElementById('addTradePlanForm');

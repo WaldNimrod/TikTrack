@@ -167,22 +167,13 @@
                                             </button>
                                         </th>
                                         <th class="col-related-type">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, notesData, 'notes', updateNotesTable); }">
-                                                קשור ל <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${window.createSortableHeader ? window.createSortableHeader('linked', 1, 'קשור ל') : '<button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === \'function\') { window.sortTableData(1, notesData, \'notes\', updateNotesTable); }">קשור ל <span class="sort-icon">↕</span></button>'}
                                         </th>
                                         <th class="col-content">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(2, notesData, 'notes', updateNotesTable); }">
-                                                תוכן <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${window.createSortableHeader ? window.createSortableHeader('content', 2, 'תוכן') : '<button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === \'function\') { window.sortTableData(2, notesData, \'notes\', updateNotesTable); }">תוכן <span class="sort-icon">↕</span></button>'}
                                         </th>
                                         <th class="col-attachment">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(3, notesData, 'notes', updateNotesTable); }">
-                                                קובץ <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${window.createSortableHeader ? window.createSortableHeader('attachment', 3, 'קובץ') : '<button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === \'function\') { window.sortTableData(3, notesData, \'notes\', updateNotesTable); }">קובץ <span class="sort-icon">↕</span></button>'}
                                         </th>
                                         <th class="col-created">
                                             <button class="btn btn-link sortable-header"
@@ -280,8 +271,8 @@
                         </form>
                     </div>
                     <div class="modal-footer modal-footer-end">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-entity btn-entity-note" onclick="saveNote()">הוסף הערה</button>
+                        ${window.createFormCancelButton ? window.createFormCancelButton('', 'ביטול') : '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>'}
+                        ${window.createSaveButton ? window.createSaveButton('saveNote()', 'הוסף הערה', 'note') : '<button type="button" class="btn btn-entity btn-entity-note" onclick="saveNote()">הוסף הערה</button>'}
                     </div>
                 </div>
             </div>
@@ -362,8 +353,8 @@
                         </form>
                     </div>
                     <div class="modal-footer modal-footer-end">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-entity btn-entity-note" onclick="updateNote()">עדכן הערה</button>
+                        ${window.createFormCancelButton ? window.createFormCancelButton('', 'ביטול') : '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>'}
+                        ${window.createSaveButton ? window.createSaveButton('updateNote()', 'עדכן הערה', 'note') : '<button type="button" class="btn btn-entity btn-entity-note" onclick="updateNote()">עדכן הערה</button>'}
                     </div>
                 </div>
             </div>

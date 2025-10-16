@@ -105,9 +105,7 @@
                         <button class="btn btn-sm btn-outline-secondary" onclick="refreshDashboard()" title="רענן דשבורד">
                             <i class="fas fa-sync-alt"></i> רענן
                         </button>
-                        <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר סקשן">
-                            <span class="filter-icon">▲</span>
-                        </button>
+                        ${window.createToggleButton ? window.createToggleButton('top', false, 'הצג/הסתר סקשן') : '<button class="filter-toggle-btn" onclick="toggleSection(\'top\')" title="הצג/הסתר סקשן"><span class="filter-icon">▲</span></button>'}
                     </div>
                 </div>
 
@@ -195,9 +193,7 @@
                             <button class="btn btn-sm btn-outline-primary" onclick="goToExecutionsPage()" title="עבור לדף עסקאות">
                                 <i class="fas fa-external-link-alt"></i> דף עסקאות
                             </button>
-                            <button class="filter-toggle-btn" onclick="toggleSection('pending-executions')" title="הצג/הסתר אזור עסקאות ממתינות">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
+                            ${window.createToggleButton ? window.createToggleButton('pending-executions', true, 'הצג/הסתר אזור עסקאות ממתינות') : '<button class="filter-toggle-btn" onclick="toggleSection(\'pending-executions\')" title="הצג/הסתר אזור עסקאות ממתינות"><span class="section-toggle-icon">▼</span></button>'}
                         </div>
                     </div>
                     
@@ -226,9 +222,7 @@
                             <button class="btn btn-sm btn-outline-primary" onclick="window.location.href='db_display.html'" title="צפה בכל הנתונים">
                                 <i class="fas fa-database"></i> בסיס נתונים
                             </button>
-                            <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
+                            ${window.createToggleButton ? window.createToggleButton('section1', true, 'הצג/הסתר סקשן') : '<button class="filter-toggle-btn" onclick="toggleSection(\'section1\')" title="הצג/הסתר סקשן"><span class="section-toggle-icon">▼</span></button>'}
                         </div>
                     </div>
                     <div class="section-body">
@@ -336,9 +330,7 @@
                             ניתוח ביצועים
                         </h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
+                            ${window.createToggleButton ? window.createToggleButton('section2', true, 'הצג/הסתר סקשן') : '<button class="filter-toggle-btn" onclick="toggleSection(\'section2\')" title="הצג/הסתר סקשן"><span class="section-toggle-icon">▼</span></button>'}
                         </div>
                     </div>
                     <div class="section-body">
@@ -413,9 +405,7 @@
                             <button class="btn btn-sm btn-outline-primary" onclick="window.location.href='trades.html'" title="עבור לעמוד טריידים">
                                 <i class="fas fa-arrow-left"></i> כל הטריידים
                             </button>
-                            <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
+                            ${window.createToggleButton ? window.createToggleButton('section3', true, 'הצג/הסתר סקשן') : '<button class="filter-toggle-btn" onclick="toggleSection(\'section3\')" title="הצג/הסתר סקשן"><span class="section-toggle-icon">▼</span></button>'}
                         </div>
                     </div>
                     <div class="section-body">
@@ -491,9 +481,7 @@
                             <button class="btn btn-sm btn-outline-primary" onclick="window.location.href='alerts.html'" title="עבור לעמוד התראות">
                                 <i class="fas fa-arrow-left"></i> כל ההתראות
                             </button>
-                            <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
+                            ${window.createToggleButton ? window.createToggleButton('section4', true, 'הצג/הסתר סקשן') : '<button class="filter-toggle-btn" onclick="toggleSection(\'section4\')" title="הצג/הסתר סקשן"><span class="section-toggle-icon">▼</span></button>'}
                         </div>
                     </div>
                     <div class="section-body">
@@ -578,9 +566,7 @@
                             תכונות המערכת
                         </h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('section5')" title="הצג/הסתר סקשן">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
+                            ${window.createToggleButton ? window.createToggleButton('section5', true, 'הצג/הסתר סקשן') : '<button class="filter-toggle-btn" onclick="toggleSection(\'section5\')" title="הצג/הסתר סקשן"><span class="section-toggle-icon">▼</span></button>'}
                         </div>
                     </div>
                     <div class="section-body">

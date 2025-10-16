@@ -135,21 +135,15 @@
                         <h2>📋 ניהול התראות</h2>
                         <div class="header-actions">
                             <div class="filter-buttons-container button-row">
-                                <button class="btn btn-sm active filter-all-btn" onclick="filterAlertsByRelatedObjectType('all')" data-type="all" title="הצג הכל">
-                                    הכל
-                                </button>
+                                ${window.createFilterAllButton ? window.createFilterAllButton('filterAlertsByRelatedObjectType(\'all\')', 'הצג הכל', true) : '<button class="btn btn-sm active filter-all-btn" onclick="filterAlertsByRelatedObjectType(\'all\')" data-type="all" title="הצג הכל">הכל</button>'}
                                 ${window.createFilterButton ? window.createFilterButton('trading_accounts', 'filterAlertsByRelatedObjectType(\'account\')', 'חשבונות') : '<button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterAlertsByRelatedObjectType(\'account\')" data-type="account" title="חשבונות"><img src="images/icons/trading_accounts.svg" alt="חשבונות מסחר" class="action-icon"></button>'}
                                 ${window.createFilterButton ? window.createFilterButton('trades', 'filterAlertsByRelatedObjectType(\'trade\')', 'טריידים') : '<button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterAlertsByRelatedObjectType(\'trade\')" data-type="trade" title="טריידים"><img src="images/icons/trades.svg" alt="טריידים" class="action-icon"></button>'}
                                 ${window.createFilterButton ? window.createFilterButton('trade_plans', 'filterAlertsByRelatedObjectType(\'trade_plan\')', 'תוכניות') : '<button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterAlertsByRelatedObjectType(\'trade_plan\')" data-type="trade_plan" title="תוכניות"><img src="images/icons/trade_plans.svg" alt="תוכניות" class="action-icon"></button>'}
                                 ${window.createFilterButton ? window.createFilterButton('tickers', 'filterAlertsByRelatedObjectType(\'ticker\')', 'טיקרים') : '<button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterAlertsByRelatedObjectType(\'ticker\')" data-type="ticker" title="טיקרים"><img src="images/icons/tickers.svg" alt="טיקרים" class="action-icon"></button>'}
                             </div>
                             <span class="filter-divider">|</span>
-                            <button id="addAlertBtn" class="refresh-btn" onclick="showAddAlertModal()" title="הוסף התראה חדשה">
-                                <img src="images/icons/alerts.svg" alt="הוסף" class="action-icon"> הוסף
-                            </button>
-                            <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
+                            ${window.createAddButton ? window.createAddButton('alerts', 'showAddAlertModal()', 'הוסף התראה חדשה') : '<button id="addAlertBtn" class="refresh-btn" onclick="showAddAlertModal()" title="הוסף התראה חדשה"><img src="images/icons/alerts.svg" alt="הוסף" class="action-icon"> הוסף</button>'}
+                            ${window.createToggleButton ? window.createToggleButton('section1', true, 'הצג/הסתר סקשן') : '<button class="filter-toggle-btn" onclick="toggleSection(\'section1\')" title="הצג/הסתר סקשן"><span class="section-toggle-icon">▼</span></button>'}
                         </div>
                     </div>
                     <div class="section-body">

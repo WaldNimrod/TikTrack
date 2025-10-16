@@ -61,6 +61,12 @@
     - `createNavigationButton()` - כפתורי ניווט בין עמודים
     - `createCloseButton()` - כפתורי סגירה
     - `createModalActionButton()` - כפתורי פעולות במודולים
+    - `createFilterAllButton()` - כפתורי "הכל" בפילטרים
+    - `createNoteButton()` - כפתורי הערות חשובות
+    - `createReminderButton()` - כפתורי תזכורות
+    - `createLinkButton()` - כפתורי פריטים מקושרים
+    - `createInternalNavigationButton()` - כפתורי ניווט פנימיים
+    - `createSimpleCloseButton()` - כפתורי סגירה פשוטים
   - **שימוש:** `${window.createSaveButton ? window.createSaveButton(...) : 'fallback'}`
 
 #### ** חבילת פילטרים וחיפוש**

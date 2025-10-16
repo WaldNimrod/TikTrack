@@ -166,6 +166,84 @@ ${window.createNavigationButton ? window.createNavigationButton('trades', 'trade
 
 ---
 
+### פונקציות חדשות - כפתורים נוספים
+
+#### `createFilterAllButton(onClick, text, isActive)`
+יצירת כפתור "הכל" בפילטרים עם צבע primary דינמי.
+
+**פרמטרים:**
+- `onClick` (string) - פונקציה להרצה בלחיצה
+- `text` (string, אופציונלי) - טקסט הכפתור (ברירת מחדל: "הכל")
+- `isActive` (boolean, אופציונלי) - האם הכפתור פעיל (ברירת מחדל: false)
+
+**דוגמה:**
+```javascript
+${window.createFilterAllButton ? window.createFilterAllButton('filterAlertsByRelatedObjectType(\'all\')', 'הצג הכל', true) : '<button class="btn btn-sm active filter-all-btn" onclick="filterAlertsByRelatedObjectType(\'all\')">הכל</button>'}
+```
+
+#### `createNoteButton(onClick, text)`
+יצירת כפתור הוסף הערה חשובה עם צבע info דינמי.
+
+**פרמטרים:**
+- `onClick` (string) - פונקציה להרצה בלחיצה
+- `text` (string, אופציונלי) - טקסט הכפתור (ברירת מחדל: "הוסף הערה חשובה")
+
+**דוגמה:**
+```javascript
+${window.createNoteButton ? window.createNoteButton('addImportantNote()', 'הוסף הערה חשובה') : '<button class="btn btn-sm btn-outline-info" onclick="addImportantNote()"><i class="fas fa-sticky-note"></i></button>'}
+```
+
+#### `createReminderButton(onClick, text)`
+יצירת כפתור הוסף תזכורת עם צבע warning דינמי.
+
+**פרמטרים:**
+- `onClick` (string) - פונקציה להרצה בלחיצה
+- `text` (string, אופציונלי) - טקסט הכפתור (ברירת מחדל: "הוסף תזכורת")
+
+**דוגמה:**
+```javascript
+${window.createReminderButton ? window.createReminderButton('addReminder()', 'הוסף תזכורת') : '<button class="btn btn-sm btn-outline-warning" onclick="addReminder()"><i class="fas fa-bell"></i></button>'}
+```
+
+#### `createLinkButton(onClick, text)`
+יצירת כפתור פריטים מקושרים עם צבע primary דינמי.
+
+**פרמטרים:**
+- `onClick` (string) - פונקציה להרצה בלחיצה
+- `text` (string, אופציונלי) - טקסט הכפתור (ברירת מחדל: "פריטים מקושרים")
+
+**דוגמה:**
+```javascript
+${window.createLinkButton ? window.createLinkButton('openLinkedItemsModal(\'trade\', \'\')', 'הצג פריטים מקושרים') : '<button class="btn btn-sm btn-outline-primary" onclick="openLinkedItemsModal(\'trade\', \'\')"><i class="fas fa-link"></i></button>'}
+```
+
+#### `createInternalNavigationButton(pageName, text, icon)`
+יצירת כפתור ניווט פנימי עם צבע primary דינמי.
+
+**פרמטרים:**
+- `pageName` (string) - שם העמוד (ללא .html)
+- `text` (string) - טקסט הכפתור
+- `icon` (string, אופציונלי) - שם אייקון FontAwesome
+
+**דוגמה:**
+```javascript
+${window.createInternalNavigationButton ? window.createInternalNavigationButton('executions', 'דף עסקאות', 'external-link-alt') : '<button class="btn btn-sm btn-outline-primary" onclick="goToExecutionsPage()"><i class="fas fa-external-link-alt"></i> דף עסקאות</button>'}
+```
+
+#### `createSimpleCloseButton(onClick, text)`
+יצירת כפתור סגירה פשוט עם צבע secondary דינמי.
+
+**פרמטרים:**
+- `onClick` (string, אופציונלי) - פונקציה להרצה (ברירת מחדל: סגירת מודול)
+- `text` (string, אופציונלי) - טקסט הכפתור (ברירת מחדל: "סגור")
+
+**דוגמה:**
+```javascript
+${window.createSimpleCloseButton ? window.createSimpleCloseButton('', 'סגור') : '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>'}
+```
+
+---
+
 ## 🎨 מערכת צבעים דינמיים
 
 ### משתני צבעים בשימוש:
@@ -232,7 +310,7 @@ ${window.createSaveButton ? window.createSaveButton('addTrade()', 'הוסף טר
 ## 🚀 יתרונות
 
 ### 1. חיסכון בקוד
-- **~1,500 שורות קוד** נחסכו
+- **~1,700 שורות קוד** נחסכו
 - **DRY principle** - אין כפילויות
 - **מקור יחיד לאמת** לכל סוג כפתור
 

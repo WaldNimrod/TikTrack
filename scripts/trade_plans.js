@@ -371,6 +371,8 @@ function enableEditFields() {
  * הפעלת השדות במודל הוספה
  */
 function enableAddFormFields() {
+  console.log('🔍 enableAddFormFields - התחלה');
+  
   const fields = [
     'addTradePlanInvestmentType',
     'addTradePlanSide',
@@ -384,19 +386,28 @@ function enableAddFormFields() {
     'addTradePlanReasons',
   ];
 
+  let enabledCount = 0;
   fields.forEach(fieldId => {
     const field = document.getElementById(fieldId);
     if (field) {
+      console.log(`🔍 מפעיל שדה: ${fieldId}`);
       field.disabled = false;
       field.classList.remove('disabled');
+      enabledCount++;
+    } else {
+      console.warn(`🔍 שדה לא נמצא: ${fieldId}`);
     }
   });
+  
+  console.log(`🔍 enableAddFormFields - הופעלו ${enabledCount} שדות`);
 }
 
 /**
  * השבתת השדות במודל הוספה
  */
 function disableAddFormFields() {
+  console.log('🔍 disableAddFormFields - התחלה');
+  
   const fields = [
     'addTradePlanInvestmentType',
     'addTradePlanSide',
@@ -410,25 +421,40 @@ function disableAddFormFields() {
     'addTradePlanReasons',
   ];
 
+  let disabledCount = 0;
   fields.forEach(fieldId => {
     const field = document.getElementById(fieldId);
     if (field) {
+      console.log(`🔍 משבית שדה: ${fieldId}`);
       field.disabled = true;
       field.classList.add('disabled');
+      disabledCount++;
+    } else {
+      console.warn(`🔍 שדה לא נמצא: ${fieldId}`);
     }
   });
+  
+  console.log(`🔍 disableAddFormFields - הושבתו ${disabledCount} שדות`);
 }
 
 /**
  * עדכון מידע על הטיקר במודל הוספה
  */
 async function updateAddTickerInfo() {
+  console.log('🔍 updateAddTickerInfo - התחלה');
+  
   const tickerId = document.getElementById('addTradePlanTickerId').value;
   const tickerDisplay = document.getElementById('selectedTickerDisplay');
   const priceDisplay = document.getElementById('currentPriceDisplay');
   const changeDisplay = document.getElementById('dailyChangeDisplay');
 
+  console.log('🔍 tickerId:', tickerId);
+  console.log('🔍 tickerDisplay element:', tickerDisplay);
+  console.log('🔍 priceDisplay element:', priceDisplay);
+  console.log('🔍 changeDisplay element:', changeDisplay);
+
   if (!tickerId) {
+    console.log('🔍 אין טיקר נבחר - השבתת שדות');
     tickerDisplay.textContent = 'לא נבחר';
     priceDisplay.textContent = '-';
     changeDisplay.textContent = '-';
@@ -439,22 +465,31 @@ async function updateAddTickerInfo() {
   }
 
   try {
+    console.log('🔍 שליחת בקשת API לטיקר:', tickerId);
     // קבלת מידע על הטיקר מהשרת
     const response = await fetch(`/api/tickers/${tickerId}`);
+    console.log('🔍 תגובת API:', response.status, response.ok);
+    
     if (response.ok) {
       const tickerData = await response.json();
+      console.log('🔍 נתוני הטיקר:', tickerData);
       
       // עדכון תצוגת הטיקר
-      tickerDisplay.textContent = tickerData.data?.symbol || 'לא ידוע';
+      const symbol = tickerData.data?.symbol || 'לא ידוע';
+      tickerDisplay.textContent = symbol;
+      console.log('🔍 עדכון שם הטיקר:', symbol);
       
       // עדכון מחיר נוכחי
       const currentPrice = tickerData.data?.current_price || 0;
-      priceDisplay.textContent = `$${currentPrice.toFixed(2)}`;
+      const priceText = `$${currentPrice.toFixed(2)}`;
+      priceDisplay.textContent = priceText;
+      console.log('🔍 עדכון מחיר:', priceText);
       
       // עדכון שינוי יומי
       const dailyChange = tickerData.data?.daily_change_percent || 0;
       const changeText = dailyChange >= 0 ? `+${dailyChange.toFixed(2)}%` : `${dailyChange.toFixed(2)}%`;
       changeDisplay.textContent = changeText;
+      console.log('🔍 עדכון שינוי יומי:', changeText);
       
       // צבע השינוי
       if (dailyChange > 0) {
@@ -468,29 +503,34 @@ async function updateAddTickerInfo() {
       }
 
       // הפעלת כל השדות
+      console.log('🔍 הפעלת כל השדות...');
       enableAddFormFields();
 
       // עדכון מחירי עצירה ויעד ברירת מחדל
+      console.log('🔍 עדכון מחירי ברירת מחדל...');
       updateDefaultPrices(currentPrice);
 
       // עדכון מספר מניות אם יש סכום
       const amountInput = document.getElementById('addTradePlanPlannedAmount');
       if (amountInput && amountInput.value) {
+        console.log('🔍 עדכון מספר מניות...');
         updateSharesFromAmount();
       }
 
     } else {
-      console.error('שגיאה בטעינת מידע הטיקר:', response.statusText);
+      console.error('🔍 שגיאה בטעינת מידע הטיקר:', response.statusText);
       tickerDisplay.textContent = 'שגיאה בטעינה';
       priceDisplay.textContent = '-';
       changeDisplay.textContent = '-';
     }
   } catch (error) {
-    console.error('שגיאה בטעינת מידע הטיקר:', error);
+    console.error('🔍 שגיאה בטעינת מידע הטיקר:', error);
     tickerDisplay.textContent = 'שגיאה בטעינה';
     priceDisplay.textContent = '-';
     changeDisplay.textContent = '-';
   }
+  
+  console.log('🔍 updateAddTickerInfo - סיום');
 }
 
 /**
@@ -1589,6 +1629,8 @@ function updatePageSummaryStats() {
  * הצגת מודל הוספת תכנון
  */
 function showAddTradePlanModal() {
+  console.log('🔍 showAddTradePlanModal - התחלה');
+  
   // Clearing the form completely
   const form = document.getElementById('addTradePlanForm');
   if (form) {
@@ -1641,9 +1683,11 @@ function showAddTradePlanModal() {
   }
 
   // השבתת כל השדות עד לבחירת טיקר
+  console.log('🔍 השבתת כל השדות...');
   disableAddFormFields();
   
   // עדכון מידע הטיקר (אם יש טיקר נבחר)
+  console.log('🔍 קריאה ל-updateAddTickerInfo תוך 100ms...');
   setTimeout(() => {
     updateAddTickerInfo();
   }, 100);
@@ -3199,19 +3243,34 @@ function calculateDefaultPrices(currentPrice) {
  * עדכון מחירי עצירה ויעד ברירת מחדל
  */
 function updateDefaultPrices(currentPrice) {
+  console.log('🔍 updateDefaultPrices - התחלה עם מחיר:', currentPrice);
+  
   const stopPriceInput = document.getElementById('addTradePlanStopPrice');
   const targetPriceInput = document.getElementById('addTradePlanTargetPrice');
 
+  console.log('🔍 stopPriceInput element:', stopPriceInput);
+  console.log('🔍 targetPriceInput element:', targetPriceInput);
+
   // שימוש בפונקציה הכללית
   const prices = calculateDefaultPrices(currentPrice);
+  console.log('🔍 מחירים מחושבים:', prices);
 
   // עדכון השדות רק אם הם ריקים
   if (!stopPriceInput.value) {
     stopPriceInput.value = prices.stopPrice;
+    console.log('🔍 עדכון מחיר עצירה:', prices.stopPrice);
+  } else {
+    console.log('🔍 מחיר עצירה כבר מוגדר:', stopPriceInput.value);
   }
+  
   if (!targetPriceInput.value) {
     targetPriceInput.value = prices.targetPrice;
+    console.log('🔍 עדכון מחיר יעד:', prices.targetPrice);
+  } else {
+    console.log('🔍 מחיר יעד כבר מוגדר:', targetPriceInput.value);
   }
+  
+  console.log('🔍 updateDefaultPrices - סיום');
 }
 
 /**

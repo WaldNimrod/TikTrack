@@ -420,6 +420,86 @@ function createNavigationButton(pageName, entityType, displayText) {
           </button>`;
 }
 
+// ========================================
+// פונקציות חדשות - כפתורים נוספים
+// ========================================
+
+// כפתור "הכל" בפילטרים - primary דינמי
+function createFilterAllButton(onClick, text = 'הכל', isActive = false) {
+  const activeClass = isActive ? 'active' : '';
+  return `<button class="btn btn-sm btn-outline-primary filter-all-btn ${activeClass}" 
+          onclick="${onClick}" data-type="all" title="${text}"
+          style="border: 1px solid var(--primary-color); color: var(--primary-color); 
+          background: ${isActive ? 'var(--primary-color)' : 'transparent'}; 
+          height: 30px; padding: 0 12px; border-radius: 6px; transition: all 0.2s ease;"
+          onmouseover="this.style.background='color-mix(in srgb, var(--primary-color) 10%, transparent)'"
+          onmouseout="this.style.background='${isActive ? 'var(--primary-color)' : 'transparent'}'">
+          ${text}
+          </button>`;
+}
+
+// כפתור הוסף הערה חשובה - info דינמי
+function createNoteButton(onClick, text = 'הוסף הערה חשובה') {
+  return `<button class="btn btn-sm btn-outline-info" onclick="${onClick}" 
+          title="${text}"
+          style="border: 1px solid var(--info-color, #17a2b8); color: var(--info-color, #17a2b8); 
+          background: transparent; height: 30px; padding: 0 8px; border-radius: 6px; transition: all 0.2s ease;"
+          onmouseover="this.style.background='color-mix(in srgb, var(--info-color, #17a2b8) 10%, transparent)'"
+          onmouseout="this.style.background='transparent'">
+          <i class="fas fa-sticky-note"></i>
+          </button>`;
+}
+
+// כפתור הוסף תזכורת - warning דינמי
+function createReminderButton(onClick, text = 'הוסף תזכורת') {
+  return `<button class="btn btn-sm btn-outline-warning" onclick="${onClick}" 
+          title="${text}"
+          style="border: 1px solid var(--warning-color, #ffc107); color: var(--warning-color, #ffc107); 
+          background: transparent; height: 30px; padding: 0 8px; border-radius: 6px; transition: all 0.2s ease;"
+          onmouseover="this.style.background='color-mix(in srgb, var(--warning-color, #ffc107) 10%, transparent)'"
+          onmouseout="this.style.background='transparent'">
+          <i class="fas fa-bell"></i>
+          </button>`;
+}
+
+// כפתור פריטים מקושרים - primary דינמי
+function createLinkButton(onClick, text = 'פריטים מקושרים') {
+  return `<button class="btn btn-sm btn-outline-primary" onclick="${onClick}" 
+          title="${text}"
+          style="border: 1px solid var(--primary-color); color: var(--primary-color); 
+          background: transparent; height: 30px; padding: 0 8px; border-radius: 6px; transition: all 0.2s ease;"
+          onmouseover="this.style.background='color-mix(in srgb, var(--primary-color) 10%, transparent)'"
+          onmouseout="this.style.background='transparent'">
+          <i class="fas fa-link"></i>
+          </button>`;
+}
+
+// כפתור ניווט פנימי - primary דינמי
+function createInternalNavigationButton(pageName, text, icon = null) {
+  const iconHtml = icon ? `<i class="fas fa-${icon}"></i> ` : '';
+  return `<button class="btn btn-sm btn-outline-primary" onclick="window.location.href='${pageName}.html'" 
+          title="${text}"
+          style="border: 1px solid var(--primary-color); color: var(--primary-color); 
+          background: transparent; height: 30px; padding: 0 12px; border-radius: 6px; transition: all 0.2s ease;"
+          onmouseover="this.style.background='color-mix(in srgb, var(--primary-color) 10%, transparent)'"
+          onmouseout="this.style.background='transparent'">
+          ${iconHtml}${text}
+          </button>`;
+}
+
+// כפתור סגירה פשוט - secondary דינמי
+function createSimpleCloseButton(onClick = '', text = 'סגור') {
+  const dismiss = onClick ? `onclick="${onClick}"` : 'data-bs-dismiss="modal"';
+  return `<button type="button" class="btn btn-secondary" ${dismiss}
+          style="background: transparent; color: var(--secondary-color); 
+          border: 1px solid var(--secondary-color); min-width: 80px; height: 36px; 
+          border-radius: 6px; transition: all 0.2s ease;"
+          onmouseover="this.style.background='color-mix(in srgb, var(--secondary-color) 10%, transparent)'"
+          onmouseout="this.style.background='transparent'">
+          ${text}
+          </button>`;
+}
+
 // ייצוא לפונקציות גלובליות
 window.BUTTON_ICONS = BUTTON_ICONS;
 window.BUTTON_TEXTS = BUTTON_TEXTS;
@@ -447,3 +527,10 @@ window.createSortableHeader = createSortableHeader;
 // קטגוריה ו: כפתורים מיוחדים
 window.createFilterButton = createFilterButton;
 window.createNavigationButton = createNavigationButton;
+// פונקציות חדשות - כפתורים נוספים
+window.createFilterAllButton = createFilterAllButton;
+window.createNoteButton = createNoteButton;
+window.createReminderButton = createReminderButton;
+window.createLinkButton = createLinkButton;
+window.createInternalNavigationButton = createInternalNavigationButton;
+window.createSimpleCloseButton = createSimpleCloseButton;

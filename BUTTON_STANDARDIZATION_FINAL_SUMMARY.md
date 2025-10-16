@@ -221,3 +221,4 @@ ${window.createSaveButton ? window.createSaveButton(...) : '<button class="btn b
 **קבצים שעודכנו:** 5 קבצים
 
 **המערכת מוכנה לשימוש מלא! 🚀**
+

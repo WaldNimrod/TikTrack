@@ -149,12 +149,8 @@
                             ${window.createAddButton ? window.createAddButton('trades', 'showAddTradeModal()', 'הוסף טרייד חדש') : '<button id="addTradeBtn" class="refresh-btn" onclick="showAddTradeModal()" title="הוסף טרייד חדש"><img src="images/icons/trades.svg" alt="הוסף" class="action-icon"> הוסף</button>'}
                             
                             <!-- כפתורי עריכה ומחיקה נסתרים (לזיהוי בבדיקות) -->
-                            <button id="editTradeBtn" class="refresh-btn d-none" onclick="editTradeRecord('')" title="ערוך טרייד נבחר">
-                                <img src="images/icons/trades.svg" alt="ערוך" class="action-icon"> ערוך
-                            </button>
-                            <button id="deleteTradeBtn" class="refresh-btn d-none" onclick="deleteTradeRecord('')" title="מחק טרייד נבחר">
-                                <img src="images/icons/trades.svg" alt="מחק" class="action-icon"> מחק
-                            </button>
+                            ${window.createEditButton ? window.createEditButton('editTradeRecord(\'\')', 'ערוך טרייד נבחר') : '<button id="editTradeBtn" class="refresh-btn d-none" onclick="editTradeRecord(\'\')" title="ערוך טרייד נבחר"><img src="images/icons/trades.svg" alt="ערוך" class="action-icon"> ערוך</button>'}
+                            ${window.createDeleteButton ? window.createDeleteButton('deleteTradeRecord(\'\')', 'מחק טרייד נבחר') : '<button id="deleteTradeBtn" class="refresh-btn d-none" onclick="deleteTradeRecord(\'\')" title="מחק טרייד נבחר"><img src="images/icons/trades.svg" alt="מחק" class="action-icon"> מחק</button>'}
 
                             ${window.createToggleButton ? window.createToggleButton('main', true, 'הצג/הסתר אזור הטריידים שלי') : '<button class="filter-toggle-btn" onclick="toggleSection(\'main\')" title="הצג/הסתר אזור הטריידים שלי"><span class="section-toggle-icon">▼</span></button>'}
                         </div>
@@ -387,15 +383,9 @@
 
                         <!-- איקונים לפעולות נוספות -->
                         <div class="d-flex gap-2">
-                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="openLinkedItemsModal('trade', '')" title="הצג פריטים מקושרים">
-                                <i class="fas fa-link"></i>
-                            </button>
-                            <button type="button" class="btn btn-outline-info btn-sm" onclick="addImportantNote()" title="הוסף הערה חשובה">
-                                <i class="fas fa-sticky-note"></i>
-                            </button>
-                            <button type="button" class="btn btn-outline-warning btn-sm" onclick="addReminder()" title="הוסף תזכורת">
-                                <i class="fas fa-bell"></i>
-                            </button>
+                            ${window.createLinkButton ? window.createLinkButton('openLinkedItemsModal(\'trade\', \'\')', 'הצג פריטים מקושרים') : '<button type="button" class="btn btn-outline-primary btn-sm" onclick="openLinkedItemsModal(\'trade\', \'\')" title="הצג פריטים מקושרים"><i class="fas fa-link"></i></button>'}
+                            ${window.createNoteButton ? window.createNoteButton('addImportantNote()', 'הוסף הערה חשובה') : '<button type="button" class="btn btn-outline-info btn-sm" onclick="addImportantNote()" title="הוסף הערה חשובה"><i class="fas fa-sticky-note"></i></button>'}
+                            ${window.createReminderButton ? window.createReminderButton('addReminder()', 'הוסף תזכורת') : '<button type="button" class="btn btn-outline-warning btn-sm" onclick="addReminder()" title="הוסף תזכורת"><i class="fas fa-bell"></i></button>'}
                         </div>
                     </div>
 
@@ -474,12 +464,8 @@
                     <div class="modal-footer modal-footer-dual">
                         <div class="modal-footer-actions-start">
                             <!-- כפתורים בצד שמאל -->
-                            <button type="button" class="btn btn-info" onclick="addImportantNote()">
-                                <img src="images/icons/home.svg" alt="יש לי עוד משהו חשוב" class="action-icon"> יש לי עוד משהו חשוב
-                            </button>
-                            <button type="button" class="btn btn-warning" onclick="addReminder()">
-                                <img src="images/icons/alerts.svg" alt="תזכיר לי כש..." class="action-icon"> תזכיר לי כש...
-                            </button>
+                            ${window.createNoteButton ? window.createNoteButton('addImportantNote()', 'יש לי עוד משהו חשוב') : '<button type="button" class="btn btn-info" onclick="addImportantNote()"><img src="images/icons/home.svg" alt="יש לי עוד משהו חשוב" class="action-icon"> יש לי עוד משהו חשוב</button>'}
+                            ${window.createReminderButton ? window.createReminderButton('addReminder()', 'תזכיר לי כש...') : '<button type="button" class="btn btn-warning" onclick="addReminder()"><img src="images/icons/alerts.svg" alt="תזכיר לי כש..." class="action-icon"> תזכיר לי כש...</button>'}
                         </div>
 
                         <div class="modal-footer-actions-end">
@@ -504,7 +490,7 @@
                         <!-- תוכן המודל יוכנס כאן דינמית -->
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
+                        ${window.createSimpleCloseButton ? window.createSimpleCloseButton('', 'סגור') : '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>'}
                     </div>
                 </div>
             </div>

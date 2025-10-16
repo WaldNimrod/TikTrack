@@ -279,3 +279,4 @@ ${window.createSaveButton ? window.createSaveButton('addTrade()', 'הוסף טר
 ---
 
 **המערכת מוכנה לשימוש מלא! 🚀**
+

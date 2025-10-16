@@ -284,3 +284,4 @@ function createNavigationButton(pageName, entityType, displayText) {
 **סה"כ כפתורים לסטנדרטיזציה:** 14 כפתורים  
 **סה"כ כפתורים לעדכון צבעים:** 8 כפתורים  
 **חיסכון בקוד משוער:** ~200 שורות
+

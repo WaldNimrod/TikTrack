@@ -740,8 +740,8 @@ const PAGE_CONFIGS = {
         ]
     },
     
-    'cache-test': {
-        name: 'Cache Test',
+    'cache-management': {
+        name: 'Cache Management',
         requiresFilters: true,
         requiresValidation: false,
         requiresTables: false,

@@ -172,6 +172,7 @@ class HeaderSystem {
                         <li><a class="tiktrack-dropdown-item" href="/notifications-center">🔔 מרכז התראות</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/background-tasks">⚙️ ניהול משימות ברקע</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/server-monitor">🖥️ ניטור שרת</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/cache-management">⚙️ ניהול מטמון</a></li>
                         
                         <li class="separator"></li>
                         
@@ -189,7 +190,7 @@ class HeaderSystem {
 
                     <li class="tiktrack-nav-item">
                       <button class="tiktrack-nav-link cache-clear-btn" 
-                              onclick="window.clearAllCache({ level: 'full' })" 
+                              onclick="window.clearAllCache({ level: 'full', simpleNotification: true })" 
                               title="ניקוי מטמון מלא (Full) - כולל Orphan Keys (100% כיסוי) - דורש login מחדש!">
                         <span class="nav-text">🧹</span>
                       </button>

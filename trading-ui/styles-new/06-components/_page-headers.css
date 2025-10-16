@@ -343,6 +343,7 @@
 
 /* ===== עמודי כלי פיתוח - רקע לבן מלא ===== */
 .cache-test-page .section-header,
+.cache-management-page .section-header,
 .system-management-page .section-header,
 .server-monitor-page .section-header,
 .background-tasks-page .section-header,

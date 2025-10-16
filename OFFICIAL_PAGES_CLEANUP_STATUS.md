@@ -101,3 +101,4 @@
 **קבצים נוספים שזוהו:**
 - `active-alerts-component.js`
 - `pending-executions-widget.js`
+

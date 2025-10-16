@@ -110,16 +110,16 @@ async function loadAlertsData() {
   _isLoadingAlerts = true;
 
   try {
-  // שימוש במערכת המאוחדת - טיפול אחיד בשגיאות עם Retry + Copy Error Log
-  const data = await window.loadTableData('alerts', updateAlertsTable, {
-    tableId: 'alertsTable',
-    entityName: 'התראות',
+    // שימוש במערכת המאוחדת - טיפול אחיד בשגיאות עם Retry + Copy Error Log
+    const data = await window.loadTableData('alerts', updateAlertsTable, {
+      tableId: 'alertsTable',
+      entityName: 'התראות',
       columns: 6,
-    onRetry: loadAlertsData
-  });
-  
+      onRetry: loadAlertsData
+    });
+    
     // עדכון המשתנה הגלובלי והמקומי
-  window.alertsData = data;
+    window.alertsData = data;
     alertsData = data;
     
     // עדכון הסטטיסטיקות אחרי טעינת הנתונים
@@ -131,8 +131,8 @@ async function loadAlertsData() {
         window.applyDefaultSort('alerts', data, updateAlertsTable);
       }
     }
-  
-  return data;
+    
+    return data;
   } catch (error) {
     console.error('Error loading alerts data:', error);
     return [];
@@ -626,12 +626,6 @@ function showAddAlertModal() {
     });
   }
 
-  // מילוי select boxes רגשי תנאי התראות
-  if (typeof window.AlertConditionPopulator !== 'undefined') {
-    window.AlertConditionPopulator.populateAttributeSelect('conditionAttribute');
-    window.AlertConditionPopulator.populateOperatorSelect('conditionOperator');
-  }
-
   // ניקוי ולידציה
   clearAlertValidation();
 
@@ -652,18 +646,10 @@ function showAddAlertModal() {
     }
   }, 100);
 
-  // עדכון אינדיקטורי הממשק
-  setTimeout(() => {
-    if (window.AlertConditionRenderer) {
-      const isDynamic = window.AlertConditionRenderer.isDynamicMode();
-      updateInterfaceIndicators(isDynamic);
-    }
-  }, 150);
-
   // הצגת המודל
   const modalElement = addAlertModalElement;
   console.log('🔍 showAddAlertModal - modalElement:', modalElement);
-
+  
   if (modalElement) {
     // בדיקה אם Bootstrap זמין
     if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
@@ -966,20 +952,12 @@ function onTickerChange(tickerSelect) {
  * טיפול בבחירת אובייקט
  * @param {HTMLSelectElement} selectElement - אלמנט הבחירה
  */
-async function onRelatedObjectChange(selectElement) {
+function onRelatedObjectChange(selectElement) {
   const relationTypeSelect = document.getElementById('alertRelationType');
   const relationType = relationTypeSelect ? parseInt(relationTypeSelect.value) : null;
   
-  // עבור טיקר - עדכון מטבע ושדות התנאי
+  // עבור טיקר - לא רלוונטי כי הטיקר עצמו הוא הבחירה
   if (relationType === 4) {
-    if (selectElement.value && window.AlertConditionRenderer) {
-      // עדכון מטבע לפי הטיקר שנבחר
-      await window.AlertConditionRenderer.updatePriceUnit(selectElement.value);
-      // הפעלת שדות התנאי
-      enableConditionFields();
-    } else {
-      disableConditionFields();
-    }
     return;
   }
   
@@ -1108,20 +1086,12 @@ function onEditAlertTickerChange(tickerSelect) {
  * טיפול בבחירת אובייקט במודל העריכה של התראות
  * @param {HTMLSelectElement} selectElement - אלמנט הבחירה
  */
-async function onEditAlertRelatedObjectChange(selectElement) {
+function onEditAlertRelatedObjectChange(selectElement) {
   const relationTypeSelect = document.getElementById('editAlertRelationType');
   const relationType = relationTypeSelect ? parseInt(relationTypeSelect.value) : null;
   
-  // עבור טיקר - עדכון מטבע ושדות התנאי
+  // עבור טיקר - לא רלוונטי כי הטיקר עצמו הוא הבחירה
   if (relationType === 4) {
-    if (selectElement.value && window.AlertConditionRenderer) {
-      // עדכון מטבע לפי הטיקר שנבחר
-      await window.AlertConditionRenderer.updatePriceUnit(selectElement.value);
-      // הפעלת שדות התנאי
-      enableEditConditionFields();
-    } else {
-      disableEditConditionFields();
-    }
     return;
   }
   
@@ -1329,43 +1299,14 @@ async function saveAlert() {
     const formData = new FormData(form);
     const relatedType = formData.get('alertRelationType');
 
-    // 4. איסוף שדות התנאי החדשים (אחרי שהולידציה הבסיסית עברה)
-    // בדיקת מצב ממשק - מתקדם או בסיסי
-    let conditionAttribute, conditionOperator, conditionNumber;
-    
-    if (window.AlertConditionRenderer && window.AlertConditionRenderer.isDynamicMode()) {
-      // ממשק חכם - 3 שדות במבנה חכם
-      const smartAttributeElement = document.getElementById('smartAttributeSelect');
-      const smartOperatorElement = document.getElementById('smartOperatorSelect');
-      const smartValueElement = document.getElementById('smartValueInput') || 
-        document.getElementById('smartValueContainer')?.querySelector('input');
-
-      if (smartAttributeElement && smartOperatorElement && smartValueElement) {
-        conditionAttribute = smartAttributeElement.value;
-        conditionOperator = smartOperatorElement.value;
-        conditionNumber = smartValueElement.value;
-      } else {
-        // fallback לממשק הישן
+    // 4. איסוף שדות נוספים (אחרי שהולידציה הבסיסית עברה)
     const conditionAttributeElement = document.getElementById('conditionAttribute');
     const conditionOperatorElement = document.getElementById('conditionOperator');
-        const conditionNumberElement = document.getElementById('conditionNumber') || 
-          document.getElementById('conditionNumberContainer')?.querySelector('input');
+    const conditionNumberElement = document.getElementById('conditionNumber');
 
-        conditionAttribute = conditionAttributeElement?.value;
-        conditionOperator = conditionOperatorElement?.value;
-        conditionNumber = conditionNumberElement?.value;
-      }
-    } else {
-      // ממשק קבוע - 3 שדות נפרדים (Option C)
-      const conditionAttributeElement = document.getElementById('conditionAttribute');
-      const conditionOperatorElement = document.getElementById('conditionOperator');
-      const conditionNumberElement = document.getElementById('conditionNumber') || 
-        document.getElementById('conditionNumberContainer')?.querySelector('input');
-
-      conditionAttribute = conditionAttributeElement?.value;
-      conditionOperator = conditionOperatorElement?.value;
-      conditionNumber = conditionNumberElement?.value;
-    }
+    const conditionAttribute = conditionAttributeElement.value;
+    const conditionOperator = conditionOperatorElement.value;
+    const conditionNumber = conditionNumberElement.value;
 
     // 5. ולידציות עסקיות מיוחדות (נוסף על הולידציה הסטנדרטית)
     
@@ -1495,12 +1436,6 @@ function editAlert(alertId) {
   const currentState = getAlertState(alert.status, alert.is_triggered);
   if (editAlertState) {editAlertState.value = currentState;}
 
-  // מילוי שדות תנאי במודל עריכה
-  if (typeof window.AlertConditionPopulator !== 'undefined') {
-    window.AlertConditionPopulator.populateAttributeSelect('editConditionAttribute', alert.condition_attribute);
-    window.AlertConditionPopulator.populateOperatorSelect('editConditionOperator', alert.condition_operator);
-  }
-
   // טעינת נתונים למודל ואז מילוי השדות
   loadModalData().then(() => {
     // מילוי טיקר במודל עריכה
@@ -1512,19 +1447,18 @@ function editAlert(alertId) {
       });
     }
 
-    // בחירת סוג השיוך החדש
+    // בחירת סוג הקשר
     const relationType = alert.related_type_id;
-    const relationTypeSelect = document.getElementById('editAlertRelationType');
-    if (relationTypeSelect) {
-      relationTypeSelect.value = relationType;
+    const radioButton = document.querySelector(`input[name="editAlertRelationType"][value="${relationType}"]`);
+    if (radioButton) {
+      radioButton.checked = true;
       // הפעלת אירוע change לטעינת האובייקטים
-      const changeEvent = new Event('change');
-      relationTypeSelect.dispatchEvent(changeEvent);
+      radioButton.dispatchEvent(new Event('change'));
     }
 
     // בחירת האובייקט המקושר
     setTimeout(() => {
-      const relatedObjectSelect = document.getElementById('editAlertRelationId');
+      const relatedObjectSelect = editAlertRelatedObjectSelect;
       if (relatedObjectSelect && alert.related_id) {
         relatedObjectSelect.value = alert.related_id;
         // הפעלת אירוע change להפעלת שדות נוספים
@@ -1532,24 +1466,9 @@ function editAlert(alertId) {
       }
     }, 200);
 
-    // הפעלת שדות התנאי ועדכון תצוגה מקדימה - תמיכה בשני ממשקים
+    // הפעלת שדות התנאי
     setTimeout(() => {
       enableEditConditionFields();
-      if (window.AlertConditionRenderer) {
-        // טעינה לממשק המתקדם
-        window.AlertConditionRenderer.renderDynamicInput('editConditionNumberContainer', alert.condition_attribute, alert.condition_number);
-        window.AlertConditionRenderer.renderPreview('editConditionPreview', 
-          alert.condition_attribute, 
-          alert.condition_operator, 
-          alert.condition_number
-        );
-        
-        // טעינה גם לממשק הבסיסי
-        const basicInput = document.getElementById('editBasicConditionInput');
-        if (basicInput) {
-          basicInput.value = alert.condition_number || '0';
-        }
-      }
     }, 300);
   });
 
@@ -1569,14 +1488,6 @@ function editAlert(alertId) {
       });
     }
   }, 100);
-
-  // עדכון אינדיקטורי הממשק
-  setTimeout(() => {
-    if (window.AlertConditionRenderer) {
-      const isDynamic = window.AlertConditionRenderer.isDynamicMode();
-      updateInterfaceIndicators(isDynamic);
-    }
-  }, 150);
 
   // הצגת המודל
   const modalElement = editAlertModalElement;
@@ -1777,9 +1688,9 @@ async function updateAlert() {
     return;
   }
 
-  // בדיקת בחירת אובייקט - עדכון למבנה החדש
-  const relatedTypeId = parseInt(document.getElementById('editAlertRelationType')?.value);
-  const relatedId = parseInt(document.getElementById('editAlertRelationId')?.value);
+  // בדיקת בחירת אובייקט
+  const relatedTypeId = parseInt(document.querySelector('input[name="editAlertRelationType"]:checked')?.value);
+  const relatedId = parseInt(editAlertRelatedObjectSelect.value);
 
   // ולידציה באמצעות מערכת הולידציה הגלובלית
   let hasErrors = false;
@@ -1793,66 +1704,20 @@ async function updateAlert() {
 
   if (!relatedId || isNaN(relatedId)) {
     if (window.showValidationWarning) {
-      window.showValidationWarning('editAlertRelationId', 'יש לבחור אובייקט לשיוך');
+      window.showValidationWarning('editAlertRelatedObjectSelect', 'יש לבחור אובייקט לשיוך');
     }
     hasErrors = true;
   }
 
-  // בדיקת תנאי התראה - עדכון למבנה החדש עם תמיכה בשני ממשקים
-  let conditionAttribute, conditionOperator, conditionNumber;
-  
-  if (window.AlertConditionRenderer && window.AlertConditionRenderer.isDynamicMode()) {
-    // ממשק חכם בעריכה - 3 שדות במבנה חכם
-    const smartAttributeElement = document.getElementById('editSmartAttributeSelect');
-    const smartOperatorElement = document.getElementById('editSmartOperatorSelect');
-    const smartValueElement = document.getElementById('editSmartValueInput') || 
-      document.getElementById('editSmartValueContainer')?.querySelector('input');
-
-    if (smartAttributeElement && smartOperatorElement && smartValueElement) {
-      conditionAttribute = smartAttributeElement.value;
-      conditionOperator = smartOperatorElement.value;
-      conditionNumber = smartValueElement.value;
-    } else {
-      // fallback לממשק הישן בעריכה
+  // בדיקת תנאי התראה
   const conditionAttributeElement = document.getElementById('editConditionAttribute');
   const conditionOperatorElement = document.getElementById('editConditionOperator');
-      const conditionNumberElement = document.getElementById('editConditionNumber') || 
-        document.getElementById('editConditionNumberContainer')?.querySelector('input');
+  const conditionNumberElement = document.getElementById('editConditionNumber');
 
-      conditionAttribute = conditionAttributeElement?.value;
-      conditionOperator = conditionOperatorElement?.value;
-      conditionNumber = conditionNumberElement?.value;
-    }
-  } else {
-    // ממשק קבוע בעריכה - 3 שדות נפרדים (Option C)
-    const conditionAttributeElement = document.getElementById('editConditionAttribute');
-    const conditionOperatorElement = document.getElementById('editConditionOperator');
-    const conditionNumberElement = document.getElementById('editConditionNumber') || 
-      document.getElementById('editConditionNumberContainer')?.querySelector('input');
+  const conditionAttribute = conditionAttributeElement.value;
+  const conditionOperator = conditionOperatorElement.value;
+  const conditionNumber = conditionNumberElement.value;
 
-    conditionAttribute = conditionAttributeElement?.value;
-    conditionOperator = conditionOperatorElement?.value;
-    conditionNumber = conditionNumberElement?.value;
-  }
-
-  // ולידציות - רק בממשק המתאים
-  if (window.AlertConditionRenderer && window.AlertConditionRenderer.isDynamicMode()) {
-    // ולידציות לממשק חכם
-    if (!conditionAttribute) {
-      if (window.showValidationWarning) {
-        window.showValidationWarning('smartAttributeSelect', 'יש לבחור מאפיין לתנאי');
-      }
-      hasErrors = true;
-    }
-
-    if (!conditionOperator) {
-      if (window.showValidationWarning) {
-        window.showValidationWarning('smartOperatorSelect', 'יש לבחור אופרטור לתנאי');
-      }
-      hasErrors = true;
-    }
-  } else {
-    // ולידציות לממשק קבוע
   if (!conditionAttribute) {
     if (window.showValidationWarning) {
       window.showValidationWarning('editConditionAttribute', 'יש לבחור מאפיין לתנאי');
@@ -1865,16 +1730,11 @@ async function updateAlert() {
       window.showValidationWarning('editConditionOperator', 'יש לבחור אופרטור לתנאי');
     }
     hasErrors = true;
-    }
   }
 
-  // ולידציה משותפת לערך מספרי
   if (!conditionNumber) {
-    const warningField = (window.AlertConditionRenderer && window.AlertConditionRenderer.isDynamicMode()) 
-      ? 'editConditionNumber' 
-      : 'editBasicConditionInput';
     if (window.showValidationWarning) {
-      window.showValidationWarning(warningField, 'יש להזין ערך לתנאי');
+      window.showValidationWarning('editConditionNumber', 'יש להזין ערך לתנאי');
     }
     hasErrors = true;
   }
@@ -2371,791 +2231,9 @@ window.initializeAlertsModals = function() {
     }
 };
 
-// ===== NEW CONDITION HANDLING FUNCTIONS =====
-
-/**
- * טיפול בשינוי מאפיין תנאי בתראות
- */
-function onConditionAttributeChange(selectElement) {
-  const attribute = selectElement.value;
-  const operatorSelect = document.getElementById('conditionOperator');
-  const numberInput = document.getElementById('conditionNumber');
-  
-  // הפעלת select האופרטור
-  if (operatorSelect) {
-    operatorSelect.disabled = !attribute;
-    if (attribute) {
-      window.AlertConditionPopulator.populateOperatorSelect('conditionOperator');
-    } else {
-      operatorSelect.innerHTML = '<option value="">בחר אופרטור</option>';
-    }
-  }
-  
-  // עדכון שדה הערך והפעלתו
-  if (numberInput) {
-    numberInput.disabled = !attribute;
-    if (attribute && window.AlertConditionRenderer) {
-      window.AlertConditionRenderer.renderDynamicInput('conditionNumberContainer', attribute, numberInput.value);
-    }
-  }
-  
-  // עדכון תצוגה מקדימה
-  onConditionChange();
-}
-
-/**
- * טיפול בשינוי מאפיין תנאי במודל עריכה
- */
-function onEditConditionAttributeChange(selectElement) {
-  const attribute = selectElement.value;
-  const operatorSelect = document.getElementById('editConditionOperator');
-  const numberInput = document.getElementById('editConditionNumber');
-  
-  // הפעלת select האופרטור
-  if (operatorSelect) {
-    operatorSelect.disabled = !attribute;
-    if (attribute) {
-      window.AlertConditionPopulator.populateOperatorSelect('editConditionOperator');
-    } else {
-      operatorSelect.innerHTML = '<option value="">בחר אופרטור</option>';
-    }
-  }
-  
-  // עדכון שדה הערך והפעלתו
-  if (numberInput) {
-    numberInput.disabled = !attribute;
-    if (attribute && window.AlertConditionRenderer) {
-      window.AlertConditionRenderer.renderDynamicInput('editConditionNumberContainer', attribute, numberInput.value);
-    }
-  }
-  
-  // עדכון תצוגה מקדימה
-  onEditConditionChange();
-}
-
-/**
- * עדכון תצוגה מקדימה של תנאי בהתראות
- */
-function onConditionChange() {
-  const attributeSelect = document.getElementById('conditionAttribute');
-  const operatorSelect = document.getElementById('conditionOperator');
-  const numberInput = document.getElementById('conditionNumber') || document.getElementById('conditionNumberContainer').querySelector('input');
-  
-  if (window.AlertConditionRenderer && attributeSelect && operatorSelect && numberInput) {
-    window.AlertConditionRenderer.renderPreview('conditionPreview', 
-      attributeSelect.value, 
-      operatorSelect.value, 
-      numberInput.value
-    );
-  }
-}
-
-/**
- * עדכון תצוגה מקדימה של תנאי במודל עריכה
- */
-function onEditConditionChange() {
-  const attributeSelect = document.getElementById('editConditionAttribute');
-  const operatorSelect = document.getElementById('editConditionOperator');
-  const numberInput = document.getElementById('editConditionNumber') || document.getElementById('editConditionNumberContainer').querySelector('input');
-  
-  if (window.AlertConditionRenderer && attributeSelect && operatorSelect && numberInput) {
-    window.AlertConditionRenderer.renderPreview('editConditionPreview', 
-      attributeSelect.value, 
-      operatorSelect.value, 
-      numberInput.value
-    );
-  }
-}
-
 // ייצוא פונקציות מודל העריכה
 window.onEditAlertRelationTypeChange = onEditAlertRelationTypeChange;
 window.onEditAlertTickerChange = onEditAlertTickerChange;
 window.onEditAlertRelatedObjectChange = onEditAlertRelatedObjectChange;
 
-/**
- * החלפת ממשק תנאי - דינמי (ברירת מחדל) / קבוע (פולבאק)
- */
-function toggleConditionInterface() {
-  if (typeof window.AlertConditionRenderer === 'undefined') {
-    console.warn('AlertConditionRenderer לא זמין');
-    return;
-  }
-
-  const currentMode = window.AlertConditionRenderer.toggleInterfaceMode();
-  const isDynamic = window.AlertConditionRenderer.isDynamicMode();
-  
-  console.log(`החלפת ממשק ל-${isDynamic ? 'דינמי (ברירת מחדל)' : 'קבוע (פולבאק)'}`);
-
-  // עדכון אינדיקטורים ויזואליים
-  updateInterfaceIndicators(isDynamic);
-
-  // החלפת מצב במודל הוספה
-  const dynamicRow = document.getElementById('dynamicConditionRow');
-  const fixedRow = document.getElementById('fixedConditionRow'); // זה ה-advancedConditionRow הקיים
-  
-  console.log('🔍 toggleConditionInterface - אלמנטים:', {
-    dynamicRow: dynamicRow ? 'נמצא' : 'לא נמצא',
-    fixedRow: fixedRow ? 'נמצא' : 'לא נמצא',
-    isDynamic: isDynamic
-  });
-  
-  if (dynamicRow && fixedRow) {
-    if (isDynamic) {
-      // מצב דינמי (ברירת מחדל) - מציגים את הממשק הדינמי
-      dynamicRow.classList.remove('d-none');
-      dynamicRow.style.display = 'flex';
-      fixedRow.classList.add('d-none');
-      fixedRow.style.display = 'none';
-      
-      // מציגים תצוגה מקדימה בממשק דינמי
-      const previewRow = document.getElementById('conditionPreviewRow');
-      if (previewRow) {
-        previewRow.style.display = 'flex';
-      }
-    } else {
-      // מצב קבוע (פולבאק) - מציגים את 3 השדות הקבועים
-      dynamicRow.classList.add('d-none');
-      dynamicRow.style.display = 'none';
-      fixedRow.classList.remove('d-none');
-      fixedRow.style.display = 'flex';
-      
-      // מסתירים תצוגה מקדימה בממשק קבוע
-      const previewRow = document.getElementById('conditionPreviewRow');
-      if (previewRow) {
-        previewRow.style.display = 'none';
-      }
-      
-      // מילוי select boxes בממשק קבוע
-      if (typeof window.AlertConditionPopulator !== 'undefined') {
-        window.AlertConditionPopulator.populateAttributeSelect('conditionAttribute');
-        window.AlertConditionPopulator.populateOperatorSelect('conditionOperator');
-      }
-    }
-  } else {
-    // fallback לשמות הישנים
-    const advancedRow = document.getElementById('advancedPreviewRow');
-    const basicRow = document.getElementById('basicConditionRow');
-    const conditionRow = document.getElementById('advancedConditionRow');
-    
-    if (advancedRow && basicRow && conditionRow) {
-      if (isDynamic) {
-        conditionRow.style.display = 'none'; // מסתירים 3 השדות
-        basicRow.classList.remove('d-none'); // מציגים ממשק בסיסי
-      } else {
-        conditionRow.style.display = 'flex'; // מציגים 3 השדות
-        basicRow.classList.add('d-none'); // מסתירים ממשק בסיסי
-      }
-    }
-  }
-
-  // החלפת מצב במודל עריכה - אותה לוגיקה
-  const editDynamicRow = document.getElementById('editDynamicConditionRow');
-  const editFixedRow = document.getElementById('editFixedConditionRow');
-  
-  if (editDynamicRow && editFixedRow) {
-    if (isDynamic) {
-      editDynamicRow.classList.remove('d-none');
-      editDynamicRow.style.display = 'flex';
-      editFixedRow.classList.add('d-none');
-      editFixedRow.style.display = 'none';
-      
-      // מציגים תצוגה מקדימה בממשק דינמי בעריכה
-      const editPreviewRow = document.getElementById('editConditionPreviewRow');
-      if (editPreviewRow) {
-        editPreviewRow.style.display = 'flex';
-      }
-    } else {
-      editDynamicRow.classList.add('d-none');
-      editDynamicRow.style.display = 'none';
-      editFixedRow.classList.remove('d-none');
-      editFixedRow.style.display = 'flex';
-      
-      // מסתירים תצוגה מקדימה בממשק קבוע בעריכה
-      const editPreviewRow = document.getElementById('editConditionPreviewRow');
-      if (editPreviewRow) {
-        editPreviewRow.style.display = 'none';
-      }
-      
-      // מילוי select boxes בממשק קבוע בעריכה
-      if (typeof window.AlertConditionPopulator !== 'undefined') {
-        window.AlertConditionPopulator.populateAttributeSelect('editConditionAttribute');
-        window.AlertConditionPopulator.populateOperatorSelect('editConditionOperator');
-      }
-    }
-  } else {
-    // fallback לשמות הישנים
-    const editAdvancedRow = document.getElementById('editAdvancedPreviewRow');
-    const editBasicRow = document.getElementById('editBasicConditionRow');
-    const editConditionRow = document.getElementById('editAdvancedConditionRow');
-    
-    if (editAdvancedRow && editBasicRow && editConditionRow) {
-      if (isDynamic) {
-        editConditionRow.style.display = 'none';
-        editBasicRow.classList.remove('d-none');
-      } else {
-        editConditionRow.style.display = 'flex';
-        editBasicRow.classList.add('d-none');
-      }
-    }
-  }
-}
-
-/**
- * עדכון אינדיקטורים ויזואליים למצב הממשק
- */
-function updateInterfaceIndicators(isDynamic) {
-  // עדכון אינדיקטור במודל הוספה
-  const modeIndicator = document.getElementById('interfaceModeIndicator');
-  const toggleButtonText = document.getElementById('toggleButtonText');
-  
-  if (modeIndicator && toggleButtonText) {
-    if (isDynamic) {
-      modeIndicator.innerHTML = '<i class="fas fa-magic"></i> ממשק חכם (ברירת מחדל)';
-      modeIndicator.className = 'text-info';
-      toggleButtonText.textContent = 'החלף';
-    } else {
-      modeIndicator.innerHTML = '<i class="fas fa-cogs"></i> ממשק קבוע (3 שדות נפרדים)';
-      modeIndicator.className = 'text-warning';
-      toggleButtonText.textContent = 'החלף';
-    }
-  }
-
-  // עדכון אינדיקטור במודל עריכה
-  const editModeIndicator = document.getElementById('editInterfaceModeIndicator');
-  const editToggleButtonText = document.getElementById('editToggleButtonText');
-  
-  if (editModeIndicator && editToggleButtonText) {
-    if (isDynamic) {
-      editModeIndicator.innerHTML = '<i class="fas fa-magic"></i> ממשק חכם (ברירת מחדל)';
-      editModeIndicator.className = 'text-info';
-      editToggleButtonText.textContent = 'החלף';
-    } else {
-      editModeIndicator.innerHTML = '<i class="fas fa-cogs"></i> ממשק קבוע (3 שדות נפרדים)';
-      editModeIndicator.className = 'text-warning';
-      editToggleButtonText.textContent = 'החלף';
-    }
-  }
-}
-
-/**
- * טיפול בממשק החכם - ברירת מחדל
- */
-function onSmartConditionChange(element) {
-  if (!element) return;
-  
-  const attributeSelect = document.getElementById('smartAttributeSelect');
-  const operatorSelect = document.getElementById('smartOperatorSelect');
-  const valueContainer = document.getElementById('smartValueContainer');
-  
-  if (!attributeSelect || !operatorSelect || !valueContainer) return;
-  
-  // קבלת הערך הנוכחי לפני שינוי השדה
-  let currentValue = '';
-  const currentValueInput = document.getElementById('smartValueInput');
-  if (currentValueInput) {
-    currentValue = currentValueInput.value;
-  }
-  
-  console.log('🔍 onSmartConditionChange:', {
-    elementId: element.id,
-    attributeValue: attributeSelect.value,
-    operatorValue: operatorSelect.value,
-    currentValue: currentValue
-  });
-  
-  // אם נבחר מאפיין - נטען אופרטורים ותצוגה דינמית
-  if (attributeSelect.value && element.id === 'smartAttributeSelect') {
-    console.log('🔄 Processing attribute change');
-    
-    // טעינת אופרטורים חכמים
-    loadSmartOperators(attributeSelect.value, 'smartOperatorSelect');
-    operatorSelect.disabled = false;
-    
-    // רינדור שדה ערך דינמי וחכם - מעדכן גם אחרי בחירת אופרטור
-    setTimeout(() => {
-      if (window.AlertConditionRenderer) {
-        const currentOperator = operatorSelect.value;
-        window.AlertConditionRenderer.renderDynamicInput('smartValueContainer', attributeSelect.value, currentValue, currentOperator);
-      }
-    }, 100);
-    
-    // מצא את השדה החדש שנוצר ועדכן מצב
-    setTimeout(() => {
-      const newValueInput = document.querySelector('#smartValueContainer input');
-      if (newValueInput) {
-        newValueInput.disabled = false;
-        console.log('✅ New value input created and enabled');
-      }
-      updateSmartPreview();
-    }, 50);
-    
-    return;
-  }
-  
-  // אם נבחר אופרטור - נפעיל שדה הערך ועדכן יחידות
-  if (operatorSelect.value && element.id === 'smartOperatorSelect') {
-    console.log('🔄 Processing operator change');
-    
-    // עדכן את השדה עם האופרטור החדש
-    setTimeout(() => {
-      if (window.AlertConditionRenderer) {
-        const currentValue = document.querySelector('#smartValueContainer input')?.value || '';
-        window.AlertConditionRenderer.renderDynamicInput('smartValueContainer', attributeSelect.value, currentValue, operatorSelect.value);
-      }
-    }, 50);
-    
-    // הפעל את השדה
-    setTimeout(() => {
-      const valueInput = document.querySelector('#smartValueContainer input') || document.getElementById('smartValueInput');
-      if (valueInput) {
-        valueInput.disabled = false;
-        valueInput.focus();
-        console.log('✅ Value input enabled and focused');
-      }
-    }, 100);
-  }
-  
-  // עדכון תצוגה מקדימה - תמיד
-  setTimeout(() => {
-    updateSmartPreview();
-  }, 100);
-}
-
-/**
- * טעינת אופרטורים חכמים לפי מאפיין
- */
-function loadSmartOperators(attribute, selectId) {
-  const select = document.getElementById(selectId);
-  if (!select) return;
-  
-  select.innerHTML = '<option value="">בחר פעולה</option>';
-  
-  // מיפוי אופרטורים לפי מאפיין - מותאם לוגית למסחר בשוק ההון
-  const smartOperators = {
-    price: [
-      { value: 'more_than', label: 'יותר מ' },      // מחיר > X
-      { value: 'less_than', label: 'פחות מ' },      // מחיר < X  
-      { value: 'equals', label: 'שווה בדיוק ל' },   // מחיר = X (די נדיר)
-      { value: 'change', label: 'שינוי בכל כיוון' }, // שינוי בכל כיוון X%
-      { value: 'change_up', label: 'עליה של' },     // עליה של X%
-      { value: 'change_down', label: 'ירידה של' },   // ירידה של X%
-      { value: 'cross_up', label: 'חוצה למעלה' },   // חוצה קו עקומה למעלה
-      { value: 'cross_down', label: 'חוצה למטה' }   // חוצה קו עקומה למטה
-    ],
-    change: [
-      { value: 'more_than', label: 'יותר מ' },      // שינוי > X%
-      { value: 'less_than', label: 'פחות מ' },      // שינוי < X% 
-      { value: 'change_up', label: 'עליה של' },     // עליה של X%
-      { value: 'change_down', label: 'ירידה של' },   // ירידה של X%
-      { value: 'change', label: 'שינוי גדול מ' } // שינוי גדול מ X%
-    ],
-    volume: [
-      { value: 'more_than', label: 'יותר מ' },      // נפח גבוה מהרגיל
-      { value: 'less_than', label: 'פחות מ' },      // נפח נמוך מהרגיל
-      { value: 'cross_up', label: 'פורץ ממוצע יומי' },   // נפח פורץ את הממוצע היומי למעלה
-      { value: 'cross_down', label: 'יורד מתחת לממוצע' }   // נפח יורד מתחת לממוצע היומי
-    ],
-    ma: [
-      { value: 'cross_up', label: 'חוצה למעלה' },   // מחיר חוצה MA למעלה (אות קנייה)
-      { value: 'cross_down', label: 'חוצה למטה' },   // מחיר חוצה MA למטה (אות מכירה)
-      { value: 'cross', label: 'חוצה' },            // חוצה בכל כיוון
-      { value: 'more_than', label: 'מעל' },         // מחיר מעל MA
-      { value: 'less_than', label: 'מתחת' }         // מחיר מתחת MA
-    ]
-  };
-  
-  const operators = smartOperators[attribute] || [
-    { value: 'more_than', label: 'more than' },
-    { value: 'less_than', label: 'less than' }
-  ];
-  
-  operators.forEach(op => {
-    const option = document.createElement('option');
-    option.value = op.value;
-    option.textContent = op.label;
-    select.appendChild(option);
-  });
-}
-
-/**
- * עדכון תצוגה מקדימה חכמה
- */
-function updateSmartPreview() {
-  const attributeSelect = document.getElementById('smartAttributeSelect');
-  const operatorSelect = document.getElementById('smartOperatorSelect');
-  const preview = document.getElementById('conditionPreview');
-  
-  if (!attributeSelect || !operatorSelect || !preview) {
-    console.log('🔍 updateSmartPreview - missing elements');
-    return;
-  }
-  
-  // חיפוש הערך מהשדה - תמיד נחפש ב-container
-  const valueContainer = document.getElementById('smartValueContainer');
-  let valueInput = null;
-  
-  if (valueContainer) {
-    valueInput = valueContainer.querySelector('input');
-  }
-  
-  // fallback לשדה הישן
-  if (!valueInput) {
-    valueInput = document.getElementById('smartValueInput');
-  }
-  
-  if (!valueInput) {
-    console.log('🔍 updateSmartPreview - לא נמצא valueInput');
-    preview.textContent = 'בחר תנאי...';
-    preview.className = 'condition-preview text-muted';
-    return;
-  }
-  
-  const attributeValue = attributeSelect.value;
-  const operatorValue = operatorSelect.value;
-  const numberValue = valueInput.value;
-  
-  console.log('🔍 updateSmartPreview:', {
-    attributeValue,
-    operatorValue,
-    numberValue,
-    allFieldsPresent: !!(attributeValue && operatorValue && numberValue)
-  });
-  
-  if (!attributeValue || !operatorValue || !numberValue) {
-    preview.textContent = 'בחר תנאי...';
-    preview.className = 'condition-preview text-muted';
-    return;
-  }
-  
-  // בניית טקסט חכם ותמוך - אנגלית לעכשיו
-  const attributeLabels = {
-    price: 'מחיר',
-    change: 'שינוי באחוזים',
-    volume: 'נפח מסחר', 
-    ma: 'ממוצע נע'
-  };
-  
-  const operatorLabels = {
-    more_than: 'יותר מ',
-    less_than: 'פחות מ',
-    equals: 'שווה בדיוק ל',
-    cross: 'חוצה',
-    cross_up: 'חוצה למעלה',
-    cross_down: 'חוצה למטה',
-    change: 'שינוי בכל כיוון',
-    change_up: 'עליה של',
-    change_down: 'ירידה של'
-  };
-  
-  const attributeLabel = attributeLabels[attributeValue] || attributeValue;
-  let operatorLabel = operatorLabels[operatorValue] || operatorValue;
-  
-  // עדכון תוויות דינמי לפי סוג הנתון
-  if (attributeValue === 'change' && operatorValue === 'change') {
-    operatorLabel = 'שינוי גדול מ';
-  }
-  if (attributeValue === 'volume') {
-    if (operatorValue === 'cross_up') operatorLabel = 'פורץ ממוצע יומי';
-    if (operatorValue === 'cross_down') operatorLabel = 'יורד מתחת לממוצע';
-  }
-  
-  // יחידות לפי attribute ו-operator
-  let unit = '';
-  if (attributeValue === 'price') {
-    // למחיר - אם זה שינוי, אז באחוזים או במטבע של הטיקר
-    if (operatorValue === 'change' || operatorValue === 'change_up' || operatorValue === 'change_down') {
-      unit = '%'; // שינוי באחוזים
-    } else {
-      // קבלת המטבע הדינמי מהטיקר
-      const currencyUnit = window.AlertConditionRenderer?.attributeConfig?.price?.unit || '$';
-      unit = currencyUnit;
-    }
-  } else if (attributeValue === 'change') {
-    unit = '%'; // תמיד אחוזים
-  } else if (attributeValue === 'ma') {
-    // ממוצע נע באותו מטבע כמו מחיר
-    const currencyUnit = window.AlertConditionRenderer?.attributeConfig?.price?.unit || '$';
-    unit = currencyUnit;
-  }
-  
-  // היחידה תוצג רק אם יש ערך
-  const unitDisplay = unit ? ` ${unit}` : '';
-  
-  const previewText = `${attributeLabel} ${operatorLabel} ${numberValue}${unitDisplay}`;
-  preview.textContent = previewText;
-  preview.className = 'condition-preview text-success fw-bold';
-  
-  console.log('✅ Preview updated:', previewText);
-}
-
-/**
- * טיפול בממשק החכם במודל עריכה
- */
-function onEditSmartConditionChange(element) {
-  if (!element) return;
-  
-  const attributeSelect = document.getElementById('editSmartAttributeSelect');
-  const operatorSelect = document.getElementById('editSmartOperatorSelect');
-  const valueContainer = document.getElementById('editSmartValueContainer');
-  
-  if (!attributeSelect || !operatorSelect || !valueContainer) return;
-  
-  // קבלת הערך הנוכחי לפני שינוי השדה
-  let currentValue = '';
-  const currentValueInput = document.getElementById('editSmartValueInput');
-  if (currentValueInput) {
-    currentValue = currentValueInput.value;
-  }
-  
-  console.log('🔍 onEditSmartConditionChange:', {
-    elementId: element.id,
-    attributeValue: attributeSelect.value,
-    operatorValue: operatorSelect.value,
-    currentValue: currentValue
-  });
-  
-  if (attributeSelect.value && element.id === 'editSmartAttributeSelect') {
-    console.log('🔄 Processing edit attribute change');
-    
-    loadSmartOperators(attributeSelect.value, 'editSmartOperatorSelect');
-    operatorSelect.disabled = false;
-    
-    // רינדור שדה ערך דינמי וחכם - מעדכן גם אחרי בחירת אופרטור
-    setTimeout(() => {
-      if (window.AlertConditionRenderer) {
-        const currentOperator = operatorSelect.value;
-        window.AlertConditionRenderer.renderDynamicInput('editSmartValueContainer', attributeSelect.value, currentValue, currentOperator);
-      }
-    }, 100);
-    
-    // מצא את השדה החדש שנוצר ועדכן מצב
-    setTimeout(() => {
-      const newValueInput = document.querySelector('#editSmartValueContainer input');
-      if (newValueInput) {
-        newValueInput.disabled = false;
-        console.log('✅ New edit value input created and enabled');
-      }
-      updateEditSmartPreview();
-    }, 50);
-    
-    return;
-  }
-  
-  if (operatorSelect.value && element.id === 'editSmartOperatorSelect') {
-    console.log('🔄 Processing edit operator change');
-    
-    // עדכן את השדה עם האופרטור החדש
-    setTimeout(() => {
-      if (window.AlertConditionRenderer) {
-        const currentValue = document.querySelector('#editSmartValueContainer input')?.value || '';
-        window.AlertConditionRenderer.renderDynamicInput('editSmartValueContainer', attributeSelect.value, currentValue, operatorSelect.value);
-      }
-    }, 50);
-    
-    // הפעל את השדה
-    setTimeout(() => {
-      const valueInput = document.querySelector('#editSmartValueContainer input') || document.getElementById('editSmartValueInput');
-      if (valueInput) {
-        valueInput.disabled = false;
-        valueInput.focus();
-        console.log('✅ Edit value input enabled and focused');
-      }
-    }, 100);
-  }
-  
-  // עדכון תצוגה מקדימה - תמיד
-  setTimeout(() => {
-    updateEditSmartPreview();
-  }, 100);
-}
-
-/**
- * עדכון תצוגה מקדימה חכמה בעריכה
- */
-function updateEditSmartPreview() {
-  const attributeSelect = document.getElementById('editSmartAttributeSelect');
-  const operatorSelect = document.getElementById('editSmartOperatorSelect');
-  const preview = document.getElementById('editConditionPreview');
-  
-  if (!attributeSelect || !operatorSelect || !preview) {
-    console.log('🔍 updateEditSmartPreview - missing elements');
-    return;
-  }
-  
-  // חיפוש הערך מהשדה - תמיד נחפש ב-container
-  const valueContainer = document.getElementById('editSmartValueContainer');
-  let valueInput = null;
-  
-  if (valueContainer) {
-    valueInput = valueContainer.querySelector('input');
-  }
-  
-  // fallback לשדה הישן
-  if (!valueInput) {
-    valueInput = document.getElementById('editSmartValueInput');
-  }
-  
-  if (!valueInput) {
-    console.log('🔍 updateEditSmartPreview - לא נמצא valueInput');
-    preview.textContent = 'בחר תנאי...';
-    preview.className = 'condition-preview text-muted';
-    return;
-  }
-  
-  const attributeValue = attributeSelect.value;
-  const operatorValue = operatorSelect.value;
-  const numberValue = valueInput.value;
-  
-  console.log('🔍 updateEditSmartPreview:', {
-    attributeValue,
-    operatorValue,
-    numberValue,
-    allFieldsPresent: !!(attributeValue && operatorValue && numberValue)
-  });
-  
-  if (!attributeValue || !operatorValue || !numberValue) {
-    preview.textContent = 'בחר תנאי...';
-    preview.className = 'condition-preview text-muted';
-    return;
-  }
-  
-  // בניית טקסט חכם ותמוך - אנגלית לעכשיו
-  const attributeLabels = {
-    price: 'מחיר',
-    change: 'שינוי באחוזים',
-    volume: 'נפח מסחר', 
-    ma: 'ממוצע נע'
-  };
-  
-  const operatorLabels = {
-    more_than: 'יותר מ',
-    less_than: 'פחות מ',
-    equals: 'שווה בדיוק ל',
-    cross: 'חוצה',
-    cross_up: 'חוצה למעלה',
-    cross_down: 'חוצה למטה',
-    change: 'שינוי בכל כיוון',
-    change_up: 'עליה של',
-    change_down: 'ירידה של'
-  };
-  
-  const attributeLabel = attributeLabels[attributeValue] || attributeValue;
-  let operatorLabel = operatorLabels[operatorValue] || operatorValue;
-  
-  // עדכון תוויות דינמי לפי סוג הנתון
-  if (attributeValue === 'change' && operatorValue === 'change') {
-    operatorLabel = 'שינוי גדול מ';
-  }
-  if (attributeValue === 'volume') {
-    if (operatorValue === 'cross_up') operatorLabel = 'פורץ ממוצע יומי';
-    if (operatorValue === 'cross_down') operatorLabel = 'יורד מתחת לממוצע';
-  }
-  
-  // יחידות לפי attribute ו-operator
-  let unit = '';
-  if (attributeValue === 'price') {
-    // למחיר - אם זה שינוי, אז באחוזים או במטבע של הטיקר
-    if (operatorValue === 'change' || operatorValue === 'change_up' || operatorValue === 'change_down') {
-      unit = '%'; // שינוי באחוזים
-    } else {
-      // קבלת המטבע הדינמי מהטיקר
-      const currencyUnit = window.AlertConditionRenderer?.attributeConfig?.price?.unit || '$';
-      unit = currencyUnit;
-    }
-  } else if (attributeValue === 'change') {
-    unit = '%'; // תמיד אחוזים
-  } else if (attributeValue === 'ma') {
-    // ממוצע נע באותו מטבע כמו מחיר
-    const currencyUnit = window.AlertConditionRenderer?.attributeConfig?.price?.unit || '$';
-    unit = currencyUnit;
-  }
-  
-  // היחידה תוצג רק אם יש ערך
-  const unitDisplay = unit ? ` ${unit}` : '';
-  
-  const previewText = `${attributeLabel} ${operatorLabel} ${numberValue}${unitDisplay}`;
-  preview.textContent = previewText;
-  preview.className = 'condition-preview text-success fw-bold';
-  
-  console.log('✅ Edit Preview updated:', previewText);
-}
-
-// ייצוא פונקציות תנאי חדשות
-window.onConditionAttributeChange = onConditionAttributeChange;
-window.onEditConditionAttributeChange = onEditConditionAttributeChange;
-window.onConditionChange = onConditionChange;
-window.onEditConditionChange = onEditConditionChange;
-window.toggleConditionInterface = toggleConditionInterface;
-window.onSmartConditionChange = onSmartConditionChange;
-window.onEditSmartConditionChange = onEditSmartConditionChange;
-window.updateInterfaceIndicators = updateInterfaceIndicators;
-
-// עדכון ראשוני של אינדיקטורי הממשק והמצב הוויזואלי
-document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(() => {
-    if (window.AlertConditionRenderer) {
-      const isDynamic = window.AlertConditionRenderer.isDynamicMode();
-      updateInterfaceIndicators(isDynamic);
-      
-      // עדכון מצב ויזואלי ראשוני
-      const dynamicRow = document.getElementById('dynamicConditionRow');
-      const fixedRow = document.getElementById('fixedConditionRow');
-      const editDynamicRow = document.getElementById('editDynamicConditionRow');
-      const editFixedRow = document.getElementById('editFixedConditionRow');
-      
-      if (dynamicRow && fixedRow) {
-        if (isDynamic) {
-          dynamicRow.classList.remove('d-none');
-          dynamicRow.style.display = 'flex';
-          fixedRow.classList.add('d-none');
-          fixedRow.style.display = 'none';
-          
-          // מציגים תצוגה מקדימה בממשק דינמי
-          const previewRow = document.getElementById('conditionPreviewRow');
-          if (previewRow) {
-            previewRow.style.display = 'flex';
-          }
-        } else {
-          dynamicRow.classList.add('d-none');
-          dynamicRow.style.display = 'none';
-          fixedRow.classList.remove('d-none');
-          fixedRow.style.display = 'flex';
-          
-          // מסתירים תצוגה מקדימה בממשק קבוע
-          const previewRow = document.getElementById('conditionPreviewRow');
-          if (previewRow) {
-            previewRow.style.display = 'none';
-          }
-        }
-      }
-      
-      if (editDynamicRow && editFixedRow) {
-        if (isDynamic) {
-          editDynamicRow.classList.remove('d-none');
-          editDynamicRow.style.display = 'flex';
-          editFixedRow.classList.add('d-none');
-          editFixedRow.style.display = 'none';
-          
-          // מציגים תצוגה מקדימה בממשק דינמי בעריכה
-          const editPreviewRow = document.getElementById('editConditionPreviewRow');
-          if (editPreviewRow) {
-            editPreviewRow.style.display = 'flex';
-          }
-        } else {
-          editDynamicRow.classList.add('d-none');
-          editDynamicRow.style.display = 'none';
-          editFixedRow.classList.remove('d-none');
-          editFixedRow.style.display = 'flex';
-          
-          // מסתירים תצוגה מקדימה בממשק קבוע בעריכה
-          const editPreviewRow = document.getElementById('editConditionPreviewRow');
-          if (editPreviewRow) {
-            editPreviewRow.style.display = 'none';
-          }
-        }
-      }
-    }
-  }, 500);
-});
-
-console.log('✅ alerts.js v=20251013_boolean_hybrid loaded - new=badge, true/false=renderBoolean icons + interface indicators');
+console.log('✅ alerts.js v=20251013_boolean_hybrid loaded - new=badge, true/false=renderBoolean icons');

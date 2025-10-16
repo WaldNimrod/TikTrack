@@ -331,58 +331,19 @@ class AlertService:
     
     @staticmethod
     def _process_condition_fields(alert_data: Dict[str, Any]) -> None:
-        """Process condition fields for new format"""
+        """Validate condition fields - new format only"""
         try:
-            # If legacy condition field is provided, convert to new format
-            if 'condition' in alert_data and alert_data['condition']:
-                legacy_condition = alert_data['condition']
-                
-                # Check if it's already in new format (contains |)
-                if ' | ' in legacy_condition:
-                    parts = legacy_condition.split(' | ')
-                    if len(parts) == 3:
-                        alert_data['condition_attribute'] = parts[0].strip()
-                        alert_data['condition_operator'] = parts[1].strip()
-                        alert_data['condition_number'] = parts[2].strip()
-                        # Remove legacy field
-                        del alert_data['condition']
-                else:
-                    # Convert old format to new format
-                    condition_mapping = {
-                        'below': ('price', 'less_than', '0'),
-                        'above': ('price', 'more_than', '0'),
-                        'equals': ('price', 'equals', '0'),
-                        'price_target': ('price', 'more_than', '0'),
-                        'volume_high': ('volume', 'more_than', '0'),
-                        'stop_loss': ('price', 'less_than', '0'),
-                        'breakout': ('price', 'more_than', '0'),
-                        'daily_change_positive': ('change', 'more_than', '0'),
-                        'profit_target': ('price', 'more_than', '0'),
-                        'entry_condition': ('price', 'cross', '0'),
-                        'balance_low': ('price', 'less_than', '0'),
-                        'profit_milestone': ('price', 'more_than', '0')
-                    }
-                    
-                    if legacy_condition in condition_mapping:
-                        attribute, operator, number = condition_mapping[legacy_condition]
-                        alert_data['condition_attribute'] = attribute
-                        alert_data['condition_operator'] = operator
-                        alert_data['condition_number'] = number
-                        # Remove legacy field
-                        del alert_data['condition']
-            
-            # Don't set defaults for new fields - require them to be provided
-            # if 'condition_attribute' not in alert_data:
-            #     alert_data['condition_attribute'] = 'price'
-            # if 'condition_operator' not in alert_data:
-            #     alert_data['condition_operator'] = 'more_than'
-            # if 'condition_number' not in alert_data:
-            #     alert_data['condition_number'] = '0'
-            
             # Validate new condition fields
             valid_attributes = ['price', 'change', 'ma', 'volume']
             valid_operators = ['more_than', 'less_than', 'cross', 'cross_up', 'cross_down', 'change', 'change_up', 'change_down', 'equals']
             
+            if 'condition_attribute' not in alert_data:
+                raise ValueError("condition_attribute is required")
+            if 'condition_operator' not in alert_data:
+                raise ValueError("condition_operator is required")
+            if 'condition_number' not in alert_data:
+                raise ValueError("condition_number is required")
+                
             if alert_data['condition_attribute'] not in valid_attributes:
                 raise ValueError(f"Invalid condition_attribute: {alert_data['condition_attribute']}")
             if alert_data['condition_operator'] not in valid_operators:

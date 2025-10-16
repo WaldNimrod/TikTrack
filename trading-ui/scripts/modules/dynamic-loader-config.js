@@ -162,9 +162,9 @@ const PAGE_REQUIREMENTS = {
         modules: ['core-systems', 'ui-basic', 'data-basic', 'communication-module'],
         description: 'ניהול מערכת - דורש מערכות תקשורת'
     },
-    'cache-test': {
+    'cache-management': {
         modules: ['core-systems', 'cache-module', 'ui-basic'],
-        description: 'בדיקת מטמון - דורש מערכת מטמון'
+        description: 'ניהול מטמון - דורש מערכת מטמון'
     },
     'js-map': {
         modules: ['core-systems', 'ui-basic', 'data-advanced'],

@@ -272,99 +272,30 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- קטע התנאי - מבנה חדש -->
-                            <div class="row mb-3">
-                                <div class="col-8">
-                                    <h6 class="text-muted">תנאי ההתראה</h6>
-                                </div>
-                                <div class="col-4 text-end">
-                                    <small class="text-info me-2" id="interfaceModeIndicator">
-                                        <i class="fas fa-magic"></i> ממשק חכם (ברירת מחדל)
-                                    </small>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" 
-                                            onclick="toggleConditionInterface()" title="החלף לממשק קבוע (3 שדות נפרדים)">
-                                        <span id="toggleButtonText">החלף</span>
-                                    </button>
-                                </div>
-                            </div>
-                            <!-- ממשק חכם (ברירת מחדל - Option A) -->
-                            <div class="row" id="dynamicConditionRow">
-                                <div class="col-12">
+                            <div class="row">
+                                <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label class="form-label entity-label">התראה כאשר</label>
-                                        <div class="smart-condition-builder">
-                                            <div class="input-group">
-                                                <select class="form-select" id="smartAttributeSelect" required onchange="onSmartConditionChange(this)">
-                                                    <option value="">בחר מאיזה נתון</option>
-                                                    <option value="price">💰 מחיר</option>
-                                                    <option value="change">📈 שינוי באחוזים</option>
-                                                    <option value="volume">📊 נפח מסחר</option>
-                                                    <option value="ma">📉 ממוצע נע</option>
-                                                </select>
-                                                <select class="form-select" id="smartOperatorSelect" required disabled onchange="onSmartConditionChange(this)">
-                                                    <option value="">בחר פעולה</option>
-                                                </select>
-                                                <div id="smartValueContainer" style="flex: 2;">
-                                                    <input type="number" class="form-control" id="smartValueInput" 
-                                                           step="0.01" placeholder="הזן ערך" required disabled
-                                                           onchange="onSmartConditionChange(this)">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <small class="text-muted">בחר תנאי פשוט ונוח לבנייה</small>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- ממשק קבוע (פולבאק - Option C) -->
-                            <div class="row d-none" id="fixedConditionRow">
-                                <!-- מאפיין התנאי -->
-                                <div class="col-md-4">
-                                    <div class="mb-3">
-                                        <label for="conditionAttribute" class="form-label entity-label">מאפיין</label>
-                                        <select class="form-select" id="conditionAttribute" required 
-                                                onchange="onConditionAttributeChange(this)">
-                                            <option value="">בחר מאפיין</option>
+                                        <label for="alertCondition" class="form-label entity-label">תנאי התראה</label>
+                                        <select class="form-select" id="conditionAttribute" onchange="toggleConditionNumber()" required>
+                                            <option value="">בחר תנאי</option>
+                                            <option value="price_above">מחיר מעל</option>
+                                            <option value="price_below">מחיר מתחת</option>
+                                            <option value="price_change_percent">שינוי מחיר באחוזים</option>
+                                            <option value="volume_above">נפח מעל</option>
+                                            <option value="volume_below">נפח מתחת</option>
                                         </select>
                                     </div>
                                 </div>
-                                
-                                <!-- אופרטור -->
-                                <div class="col-md-4">
+                            </div>
+                            <div class="row">
+                                <div class="col-md-8">
                                     <div class="mb-3">
-                                        <label for="conditionOperator" class="form-label entity-label">אופרטור</label>
-                                        <select class="form-select" id="conditionOperator" required disabled
-                                                onchange="onConditionChange()">
-                                            <option value="">בחר אופרטור</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                
-                                <!-- ערך מספרי -->
-                                <div class="col-md-4">
-                                    <div class="mb-3">
-                                        <label for="conditionNumber" class="form-label entity-label">ערך</label>
-                                        <div id="conditionNumberContainer">
-                                            <input type="number" class="form-control" id="conditionNumber" 
-                                                   step="0.01" placeholder="הזן ערך" required disabled
-                                                   onchange="onConditionChange()">
-                                        </div>
+                                        <label for="alertConditionNumber" class="form-label entity-label">ערך התנאי</label>
+                                        <input type="number" class="form-control" id="conditionOperator" step="0.01" placeholder="ערך"
+                                            required disabled>
                                     </div>
                                 </div>
                             </div>
-                            
-                            <!-- תצוגה מקדימה -->
-                            <div class="row" id="conditionPreviewRow">
-                                <div class="col-12">
-                                    <div class="card bg-light border-info mb-3" style="max-width: 400px;">
-                                        <div class="card-body py-2">
-                                            <small class="text-muted d-block">תצוגה מקדימה:</small>
-                                            <span id="conditionPreview" class="fw-bold">בחר תנאי...</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">
@@ -382,6 +313,27 @@
                                             <option value="unread">לא נקרא (סגור + חדש)</option>
                                             <option value="read">נקרא (סגור + נקרא)</option>
                                             <option value="cancelled">מבוטל (מבוטל + לא הופעל)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="alertTradingAccount" class="form-label entity-label">חשבון מסחר</label>
+                                        <select class="form-select" id="alertTradingAccount" required>
+                                            <option value="">בחר חשבון</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="alertConditionOperator" class="form-label entity-label">אופרטור תנאי</label>
+                                        <select class="form-select" id="alertConditionOperator" required>
+                                            <option value="more_than">יותר מ-</option>
+                                            <option value="less_than">פחות מ-</option>
+                                            <option value="equals">שווה ל-</option>
+                                            <option value="not_equals">לא שווה ל-</option>
                                         </select>
                                     </div>
                                 </div>
@@ -444,92 +396,27 @@
                                 </div>
                             </div>
                             
-                            <!-- קטע התנאי במודל עריכה -->
-                            <div class="row mb-3">
-                                <div class="col-8">
-                                    <h6 class="text-muted">תנאי ההתראה</h6>
-                                </div>
-                                <div class="col-4 text-end">
-                                    <small class="text-info me-2" id="editInterfaceModeIndicator">
-                                        <i class="fas fa-magic"></i> ממשק חכם (ברירת מחדל)
-                                    </small>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" 
-                                            onclick="toggleConditionInterface()" title="החלף לממשק קבוע (3 שדות נפרדים)">
-                                        <span id="editToggleButtonText">החלף</span>
-                                    </button>
-                                </div>
-                            </div>
-                            <!-- ממשק חכם בעריכה (ברירת מחדל - Option A) -->
-                            <div class="row" id="editDynamicConditionRow">
-                                <div class="col-12">
+                            <div class="row">
+                                <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label class="form-label entity-label">התראה כאשר</label>
-                                        <div class="smart-condition-builder">
-                                            <div class="input-group">
-                                                <select class="form-select" id="editSmartAttributeSelect" required onchange="onEditSmartConditionChange(this)">
-                                                    <option value="">בחר מאיזה נתון</option>
-                                                    <option value="price">💰 מחיר</option>
-                                                    <option value="change">📈 שינוי באחוזים</option>
-                                                    <option value="volume">📊 נפח מסחר</option>
-                                                    <option value="ma">📉 ממוצע נע</option>
-                                                </select>
-                                                <select class="form-select" id="editSmartOperatorSelect" required disabled onchange="onEditSmartConditionChange(this)">
-                                                    <option value="">בחר פעולה</option>
-                                                </select>
-                                                <div id="editSmartValueContainer" style="flex: 2;">
-                                                    <input type="number" class="form-control" id="editSmartValueInput" 
-                                                           step="0.01" placeholder="הזן ערך" required disabled
-                                                           onchange="onEditSmartConditionChange(this)">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <small class="text-muted">בחר תנאי פשוט ונוח לבנייה</small>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- ממשק קבוע בעריכה (פולבאק - Option C) -->
-                            <div class="row d-none" id="editFixedConditionRow">
-                                <div class="col-md-4">
-                                    <div class="mb-3">
-                                        <label for="editConditionAttribute" class="form-label entity-label">מאפיין</label>
-                                        <select class="form-select" id="editConditionAttribute" required 
-                                                onchange="onEditConditionAttributeChange(this)">
-                                            <option value="">בחר מאפיין</option>
+                                        <label for="editAlertCondition" class="form-label entity-label">תנאי התראה</label>
+                                        <select class="form-select" id="editAlertCondition" onchange="updateEditConditionNumber()" required disabled>
+                                            <option value="">בחר תנאי</option>
+                                            <option value="price_above">מחיר מעל</option>
+                                            <option value="price_below">מחיר מתחת</option>
+                                            <option value="price_change_percent">שינוי מחיר באחוזים</option>
+                                            <option value="volume_above">נפח מעל</option>
+                                            <option value="volume_below">נפח מתחת</option>
                                         </select>
                                     </div>
                                 </div>
-                                
-                                <div class="col-md-4">
-                                    <div class="mb-3">
-                                        <label for="editConditionOperator" class="form-label entity-label">אופרטור</label>
-                                        <select class="form-select" id="editConditionOperator" required disabled
-                                                onchange="onEditConditionChange()">
-                                            <option value="">בחר אופרטור</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-4">
-                                    <div class="mb-3">
-                                        <label for="editConditionNumber" class="form-label entity-label">ערך</label>
-                                        <div id="editConditionNumberContainer">
-                                            <input type="number" class="form-control" id="editConditionNumber" 
-                                                   step="0.01" placeholder="הזן ערך" required disabled
-                                                   onchange="onEditConditionChange()">
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
-                            
-                            <!-- תצוגה מקדימה בעריכה -->
-                            <div class="row" id="editConditionPreviewRow">
-                                <div class="col-12">
-                                    <div class="card bg-light border-info mb-3" style="max-width: 400px;">
-                                        <div class="card-body py-2">
-                                            <small class="text-muted d-block">תצוגה מקדימה:</small>
-                                            <span id="editConditionPreview" class="fw-bold">בחר תנאי...</span>
-                                        </div>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="mb-3">
+                                        <label for="editConditionNumber" class="form-label entity-label">ערך התנאי</label>
+                                        <input type="number" class="form-control" id="editConditionNumber" step="0.01" placeholder="ערך"
+                                            required disabled>
                                     </div>
                                 </div>
                             </div>
@@ -602,7 +489,6 @@
     <script src="scripts/services/data-collection-service.js?v=2fba6e8_20251013_051239"></script>
     <script src="scripts/services/field-renderer-service.js?v=1.3.0"></script>
     <script src="scripts/services/select-populator-service.js?v=2fba6e8_20251013_051239"></script>
-    <script src="scripts/services/alert-condition-renderer.js?v=2fba6e8_20251013_051239"></script>
     <script src="scripts/services/crud-response-handler.js?v=2fba6e8_20251013_051239"></script>
     <script src="scripts/related-object-filters.js?v=2fba6e8_20251013_051239"></script>
     

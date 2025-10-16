@@ -292,6 +292,22 @@
   - `saveHeaderState()`
   - `saveLinterScanningResults()`
 
+### **Select Populator Service** 🔵 **חבילת CRUD** ✅ **הורחב ינואר 2025**
+- **קובץ:** `scripts/services/select-populator-service.js`
+- **תיאור:** מערכת מרכזית למילוי select boxes ואובייקטים מקושרים
+- **דוקומנטציה:** [SELECT_POPULATOR_SERVICE.md](SELECT_POPULATOR_SERVICE.md)
+- **שינויים:** הורחב עם פונקציות לטיפול באובייקטים מקושרים
+- **פונקציות עיקריות:**
+  - `SelectPopulatorService.populateTickersSelect()`
+  - `SelectPopulatorService.populateAccountsSelect()`
+  - `SelectPopulatorService.populateCurrenciesSelect()`
+  - `SelectPopulatorService.populateTradePlansSelect()`
+  - **פונקציות חדשות לטיפול באובייקטים מקושרים:**
+    - `getFilteredTickers()` - סינון טיקרים לפי סוג השיוך
+    - `populateRelatedObjects()` - מילוי אובייקטים מקושרים עם סינון ומיון
+    - `handleRelationTypeChange()` - טיפול בשינוי סוג שיוך
+    - `handleTickerChange()` - טיפול בבחירת טיקר
+
 ---
 
 ## ⚙️ **מערכות העדפות והגדרות**

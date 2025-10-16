@@ -2274,6 +2274,176 @@ function showFinalSuccessModal(successInfo) {
   }
 }
 
+/**
+ * Show final success notification with reload option
+ * NOTIFICATION SYSTEM - Shows success modal and allows user to choose reload
+ */
+async function showFinalSuccessNotificationWithReload(title, message, details = {}, category = 'system') {
+  console.log('🎉 Final success notification with reload option:', { title, message, details, category });
+  
+  // Collect detailed success information
+  const successInfo = {
+    title,
+    message,
+    details,
+    category,
+    timestamp: new Date().toISOString(),
+    type: 'critical-success-with-reload',
+    id: generateNotificationId()
+  };
+  
+  // Add browser and system information (same as regular function)
+  successInfo.browser = {
+    userAgent: navigator.userAgent,
+    language: navigator.language,
+    platform: navigator.platform,
+    cookieEnabled: navigator.cookieEnabled,
+    onLine: navigator.onLine
+  };
+  
+  successInfo.system = {
+    screenWidth: screen.width,
+    screenHeight: screen.height,
+    colorDepth: screen.colorDepth,
+    pixelDepth: screen.pixelDepth,
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+  };
+  
+  // Add performance information if available
+  if (performance.memory) {
+    successInfo.performance = {
+      usedJSHeapSize: performance.memory.usedJSHeapSize,
+      totalJSHeapSize: performance.memory.totalJSHeapSize,
+      jsHeapSizeLimit: performance.memory.jsHeapSizeLimit
+    };
+  }
+  
+  // Save to history
+  saveNotificationToGlobalHistory('success', title, message, category);
+  
+  // Show modal with reload option
+  showFinalSuccessModalWithReload(successInfo);
+  
+  return successInfo;
+}
+
+/**
+ * Show final success modal with reload button
+ */
+function showFinalSuccessModalWithReload(successInfo) {
+  console.log('🔍 showFinalSuccessModalWithReload called:', { successInfo });
+  
+  // Create modal HTML with reload button
+  const modalHtml = `
+    <div class="modal fade" id="finalSuccessModalWithReload" tabindex="-1" aria-labelledby="finalSuccessModalWithReloadLabel">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header modal-header-success text-white d-flex justify-content-between align-items-center" style="direction: rtl;">
+            <h4 class="modal-title fw-bold" id="finalSuccessModalWithReloadLabel">
+              <i class="fas fa-check-circle"></i> ${successInfo.title}
+            </h4>
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-sm btn-light" id="finalSuccessModal-copy-btn" title="העתק פרטים ללוח">
+                <i class="fas fa-copy"></i> העתק
+              </button>
+              <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal" title="סגור">
+                <i class="fas fa-times"></i> סגור
+              </button>
+            </div>
+          </div>
+          <div class="modal-body">
+            <div class="alert alert-success" role="alert">
+              <h6 class="alert-heading">
+                <i class="fas fa-check-circle"></i> ${successInfo.message.replace(/🔄.*$/m, '')}
+              </h6>
+              <hr>
+              <p class="mb-2">
+                <strong>זמן:</strong> ${new Date(successInfo.timestamp).toLocaleString('he-IL')}<br>
+                <strong>קטגוריה:</strong> ${successInfo.category}<br>
+                <strong>מזהה:</strong> ${successInfo.id}
+              </p>
+              <div class="alert alert-warning mt-2">
+                <i class="fas fa-exclamation-triangle"></i> <strong>חשוב:</strong> כדי לראות את תוצאות הולידציה ולבצע רענון מלא של המטמון, לחץ על "רענן עכשיו".
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6">
+                <h6><i class="fas fa-info-circle text-success"></i> פרטי הצלחה:</h6>
+                <pre class="bg-light p-2 rounded" style="font-size: 0.8rem; max-height: 200px; overflow-y: auto;">${JSON.stringify(successInfo.details, null, 2)}</pre>
+              </div>
+              <div class="col-md-6">
+                <h6><i class="fas fa-desktop text-success"></i> מידע מערכת:</h6>
+                <pre class="bg-light p-2 rounded" style="font-size: 0.8rem; max-height: 200px; overflow-y: auto;">${JSON.stringify({
+                  browser: successInfo.browser,
+                  system: successInfo.system,
+                  performance: successInfo.performance
+                }, null, 2)}</pre>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer" style="justify-content: space-between; direction: rtl;">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              <i class="fas fa-times"></i> סגור בלי רענון
+            </button>
+            <button type="button" class="btn btn-primary" id="finalSuccessModal-reload-btn">
+              <i class="fas fa-sync-alt"></i> רענן עכשיו
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Use the unified helper function to create and show modal
+  const modal = window.createAndShowModal(modalHtml, 'finalSuccessModalWithReload');
+  
+  // Store success info globally for copying
+  window.currentSuccessInfo = successInfo;
+  
+  // Add copy button functionality
+  const copyButton = document.getElementById('finalSuccessModal-copy-btn');
+  if (copyButton) {
+    copyButton.addEventListener('click', () => {
+      copySuccessDetails();
+    });
+  }
+  
+  // Add reload button functionality
+  const reloadButton = document.getElementById('finalSuccessModal-reload-btn');
+  if (reloadButton) {
+    reloadButton.addEventListener('click', async () => {
+      console.log('🔄 User requested reload after cache clearing');
+      
+      // Close modal first
+      const modalInstance = bootstrap.Modal.getInstance(modal);
+      if (modalInstance) {
+        modalInstance.hide();
+      }
+      
+      // Wait a moment for modal to close, then reload
+      setTimeout(async () => {
+        if (window.pendingCacheReload) {
+          try {
+            // Reload fresh data from all cleared layers
+            await reloadClearedCacheData(window.pendingCacheReload.level, window.pendingCacheReload.results);
+            
+            // Perform reload with cache busting
+            window.location.href = window.location.href + (window.location.href.includes('?') ? '&' : '?') + '_cb=' + Date.now();
+          } catch (error) {
+            console.error('❌ Error during user-initiated reload:', error);
+            // Fallback reload
+            window.location.reload();
+          }
+        } else {
+          // Fallback if no pending reload data
+          window.location.href = window.location.href + (window.location.href.includes('?') ? '&' : '?') + '_cb=' + Date.now();
+        }
+      }, 300);
+    });
+  }
+}
+
 async function showCriticalErrorModal(errorInfo, detailedMessage) {
   console.log('🔍 showCriticalErrorModal called:', { errorInfo, detailedMessage });
   
@@ -3048,6 +3218,7 @@ window.markAlertAsRead = markAlertAsRead;
 window.showNotification = showNotification;
 window.showSuccessNotification = showSuccessNotification;
 window.showFinalSuccessNotification = showFinalSuccessNotification;
+window.showFinalSuccessNotificationWithReload = showFinalSuccessNotificationWithReload;
 window.showErrorNotification = showErrorNotification;
 window.showSimpleErrorNotification = showSimpleErrorNotification;
 window.showCriticalErrorNotification = showCriticalErrorNotification;

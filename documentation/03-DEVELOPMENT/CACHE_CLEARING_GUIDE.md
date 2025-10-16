@@ -329,3 +329,4 @@ try {
 
 **עודכן לאחרונה:** 15 אוקטובר 2025  
 **גרסה:** 1.0 - Enhanced Cache Clearing System
+

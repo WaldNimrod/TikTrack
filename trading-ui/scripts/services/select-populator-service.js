@@ -706,4 +706,63 @@ window.populateCurrenciesSelect = (selectId, options) => SelectPopulatorService.
 window.populateTradePlansSelect = (selectId, options) => SelectPopulatorService.populateTradePlansSelect(selectId, options);
 window.populateGenericSelect = (selectId, endpoint, config) => SelectPopulatorService.populateGenericSelect(selectId, endpoint, config);
 
+// ===== ALERT CONDITION POPULATOR =====
+
+/**
+ * מילוי select boxes לתנאי התראות
+ */
+class AlertConditionPopulator {
+    
+    static populateAttributeSelect(selectId, selectedValue = null) {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+        
+        select.innerHTML = '<option value="">בחר מאפיין</option>';
+        
+        const attributes = [
+            { value: 'price', label: 'מחיר' },
+            { value: 'change', label: 'שינוי' },
+            { value: 'volume', label: 'נפח' },
+            { value: 'ma', label: 'ממוצע נע' }
+        ];
+        
+        attributes.forEach(attr => {
+            const option = document.createElement('option');
+            option.value = attr.value;
+            option.textContent = attr.label;
+            if (selectedValue === attr.value) option.selected = true;
+            select.appendChild(option);
+        });
+    }
+    
+    static populateOperatorSelect(selectId, selectedValue = null) {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+        
+        select.innerHTML = '<option value="">בחר אופרטור</option>';
+        
+        const operators = [
+            { value: 'more_than', label: 'יותר מ' },
+            { value: 'less_than', label: 'פחות מ' },
+            { value: 'equals', label: 'שווה ל' },
+            { value: 'change', label: 'שינוי' },
+            { value: 'change_up', label: 'שינוי למעלה' },
+            { value: 'change_down', label: 'שינוי למטה' },
+            { value: 'cross', label: 'חוצה' },
+            { value: 'cross_up', label: 'חוצה למעלה' },
+            { value: 'cross_down', label: 'חוצה למטה' }
+        ];
+        
+        operators.forEach(op => {
+            const option = document.createElement('option');
+            option.value = op.value;
+            option.textContent = op.label;
+            if (selectedValue === op.value) option.selected = true;
+            select.appendChild(option);
+        });
+    }
+}
+
+window.AlertConditionPopulator = AlertConditionPopulator;
+
 

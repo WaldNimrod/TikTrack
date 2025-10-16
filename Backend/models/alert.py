@@ -89,8 +89,7 @@ class Alert(BaseModel):
         return f"<Alert(id={self.id}, condition='{self.get_condition_display_text()}', triggered={self.is_triggered})>"
     
     def to_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary with backward compatibility"""
-        # Create result dictionary with actual columns only
+        """Convert to dictionary - new format only"""
         result: Dict[str, Any] = {
             'id': self.id,
             'message': self.message,
@@ -115,39 +114,5 @@ class Alert(BaseModel):
             result['related_type'] = 'trade_plan'
         else:
             result['related_type'] = None
-        
-        # Create legacy condition string from new fields for backward compatibility
-        result['condition'] = f"{self.condition_attribute} | {self.condition_operator} | {self.condition_number}"
-        
-        # Add fields for backward compatibility
-        if self.related_type_id == 1:  # account
-            result['trading_account_id'] = self.related_id
-            result['ticker_id'] = None
-            result['trade_id'] = None
-            result['trade_plan_id'] = None
-        elif self.related_type_id == 2:  # trade
-            result['trading_account_id'] = None
-            result['ticker_id'] = None
-            result['trade_id'] = self.related_id
-            result['trade_plan_id'] = None
-        elif self.related_type_id == 3:  # trade_plan
-            result['trading_account_id'] = None
-            result['ticker_id'] = None
-            result['trade_id'] = None
-            result['trade_plan_id'] = self.related_id
-        elif self.related_type_id == 4:  # ticker
-            result['trading_account_id'] = None
-            result['ticker_id'] = self.related_id
-            result['trade_id'] = None
-            result['trade_plan_id'] = None
-        else:
-            # General or unknown type
-            result['trading_account_id'] = None
-            result['ticker_id'] = None
-            result['trade_id'] = None
-            result['trade_plan_id'] = None
-        
-        # Note: related_entity_name will be added by the API layer
-        # when it has access to the database session for lookups
         
         return result

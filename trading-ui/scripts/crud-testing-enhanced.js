@@ -428,11 +428,11 @@ class CRUDEnhancedTester {
                 priority: 4
             },
             
-            'cache-test': {
+            'cache-management': {
                 type: 'dev_tool',
-                displayName: 'בדיקת מטמון',
+                displayName: 'ניהול מטמון',
                 apiUrl: null,
-                pageUrl: '/cache-test',
+                pageUrl: '/cache-management',
                 hasCRUD: false,
                 testData: null,
                 expectedButtons: [],

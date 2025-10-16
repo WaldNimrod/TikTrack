@@ -281,6 +281,18 @@ class EntityDetailsAPI {
     }
 
     /**
+     * Check if entityId is an account name (string) rather than ID (number)
+     * 
+     * @param {number|string} entityId - מזהה הישות
+     * @returns {boolean} - true if it's an account name
+     * @private
+     */
+    isAccountName(entityId) {
+        // If it's a string and not a number, it's likely an account name
+        return typeof entityId === 'string' && isNaN(Number(entityId));
+    }
+
+    /**
      * Fetch from existing endpoints - קריאה מהendpoints הקיימים
      * 
      * @param {string} entityType - סוג הישות
@@ -294,8 +306,8 @@ class EntityDetailsAPI {
             trade: `/api/trades/${entityId}`,
             trade_plan: `/api/trade_plans/${entityId}`,
             execution: `/api/executions/${entityId}`,
-            account: `/api/trading-accounts/${entityId}`,
-            trading_account: `/api/trading-accounts/${entityId}`, // Added alias for trading_account
+            account: this.isAccountName(entityId) ? `/api/trading-accounts/by-name/${encodeURIComponent(entityId)}` : `/api/trading-accounts/${entityId}`,
+            trading_account: this.isAccountName(entityId) ? `/api/trading-accounts/by-name/${encodeURIComponent(entityId)}` : `/api/trading-accounts/${entityId}`, // Added alias for trading_account
             alert: `/api/alerts/${entityId}`,
             cash_flow: `/api/cash_flows/${entityId}`,
             note: `/api/notes/${entityId}`

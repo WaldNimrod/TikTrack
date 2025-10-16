@@ -348,13 +348,11 @@ class EntityDetailsRenderer {
         const specificTitle = getSpecificTitle(entityType);
         
         return `
-            <div class="entity-details-header mb-4 pb-3 border-bottom d-flex justify-content-between align-items-center" style="border-bottom-color: ${color};">
+            <div class="entity-details-header mb-4 pb-3 border-bottom d-flex justify-content-between align-items-center entity-details-header-colored">
                 <div class="d-flex align-items-center">
-                    <div class="entity-icon-circle" style="border-color: ${color}; color: ${color};">
-                        <img src="${iconPath}" alt="${entityTypeName}">
-                    </div>
+                    <img src="${iconPath}" alt="${entityTypeName}" class="entity-details-main-icon">
                     <div>
-                        <h3 class="mb-1" style="color: ${color};">${specificTitle}</h3>
+                        <h3 class="mb-1 entity-details-title">${specificTitle}</h3>
                         <p class="text-muted mb-0">${entityIdentifier}</p>
                     </div>
                 </div>
@@ -1745,7 +1743,7 @@ class EntityDetailsRenderer {
         // צבעים של חשבונות - משתנים דינמיים
         const accountColorDark = 'var(--entity-account-text)'; // צבע כהה
         const accountColorLight = 'var(--entity-account-bg)'; // רקע בהיר
-        const accountIconPath = this.getEntityIcon('trading_account');
+        const accountIconPath = this.getEntityIcon('account');
         
         // השרת מחזיר נתונים ישירות (account_name, account_type, וכו')
         // לא צריך אובייקט מקונן account
@@ -1763,9 +1761,7 @@ class EntityDetailsRenderer {
                     <div class="linked-account-card p-3 border rounded" style="background-color: ${accountColorLight}; border-color: ${accountColorDark}; border-width: 2px;">
                         <div class="d-flex justify-content-between align-items-start">
                             <div class="d-flex align-items-start flex-grow-1">
-                                <div class="entity-icon-circle icon-sm" style="border-color: ${accountColorDark};">
-                                    <img src="${accountIconPath}" alt="חשבון">
-                                </div>
+                                <img src="${accountIconPath}" alt="חשבון" style="width: 45px; height: 45px; margin-inline-end: 1rem;">
                                 <div class="flex-grow-1">
                                     <h5 class="mb-2" style="color: ${accountColorDark};">${accountName}</h5>
                                     <div class="row">
@@ -1785,7 +1781,7 @@ class EntityDetailsRenderer {
                                 </div>
                             </div>
                             <div>
-                                <button class="btn btn-sm" style="background-color: ${accountColorDark}; color: white; border: none;" onclick="window.showEntityDetails('trading_account', ${cashFlowData.trading_account_id})" title="פרטי חשבון">
+                                <button class="btn btn-sm" style="background-color: ${accountColorDark}; color: white; border: none;" onclick="window.showEntityDetails('account', ${cashFlowData.trading_account_id})" title="פרטי חשבון">
                                     <i class="fas fa-external-link-alt"></i> פרטים
                                 </button>
                             </div>

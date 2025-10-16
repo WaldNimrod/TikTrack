@@ -242,37 +242,54 @@
   direction: rtl;
 }
 
-/* כפתור סגירה - פינה שמאלית עליונה */
+/* ========================================
+   כפתור סגירה סטנדרטי - גודל 30px
+   ======================================== */
+
+/* כפתור סגירה בסיסי - גודל 30px × 30px */
 .modal .btn-close {
-  position: absolute;
-  top: 1rem;
-  inset-inline-start: 1rem; /* ימין ב-RTL */
-}
-
-/* כפתורי סגירה במודולים */
-.modal-header .btn-close {
-  opacity: 1;
-  visibility: visible;
-  color: white;
-  filter: brightness(0) invert(1);
-  background: none;
-  border: none;
-  font-size: 1.5rem;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--current-entity-text, #333);
+  border-radius: 0.25rem;
+  background-color: transparent;
+  color: var(--current-entity-text, #333);
+  font-size: 1.4rem;
   font-weight: bold;
-  content: none;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.8;
+  transition: all 0.2s ease;
 }
 
-/* כפתור סגירה בכותרת רגילה - צבע ירוק */
+/* X גדול בכפתור הסגירה */
+.modal .btn-close::after {
+  content: "×";
+  font-size: 1.4rem;
+  font-weight: bold;
+  line-height: 1;
+}
+
+/* הובר - צבע רגיל של הישות */
+.modal .btn-close:hover {
+  opacity: 1;
+  color: var(--current-entity-color, #007bff);
+  border-color: var(--current-entity-color, #007bff);
+  background-color: rgba(var(--current-entity-color-rgb, 0, 123, 255), 0.1);
+}
+
+.modal .btn-close:hover::after {
+  color: var(--current-entity-color, #007bff);
+}
+
+/* כפתור סגירה בכותרת רגילה - צבע ירוק (סטנדרטי) */
 .modal-header:not(.modal-header-colored):not(.modal-header-danger) .btn-close {
-  opacity: 1 ;
-  visibility: visible ;
-  color: var(--success-color) ;
-  filter: none ;
-  background: none ;
-  border: none ;
-  font-size: 1.5rem ;
-  font-weight: bold ;
-  content: none ;
+  color: var(--success-color, #28a745);
+  border-color: var(--success-color, #28a745);
 }
 
 /* וידוא שהודעות שגיאה מופיעות מעל המודול */
@@ -372,27 +389,24 @@
   font-weight: 700;
 }
 
-/* כפתור סגירה בסוף השורה (שמאל בעברית) */
-/* NOTE:  נדרש כאן כי Bootstrap משתמש ב-position: absolute */
+/* כפתור סגירה בסוף השורה (שמאל בעברית) - סטנדרטי */
+/* NOTE: נדרש כאן כי Bootstrap משתמש ב-position: absolute */
 .entity-header .btn-close,
-.entity-header .btn-close-end {
-  position: static ; /* ביטול position: absolute של Bootstrap */
-  margin-inline-start: auto ; /* דוחף לסוף השורה - שמאל */
-  margin-inline-end: 0 ;
-  margin-left: auto ; /* fallback */
-  margin-right: 0 ;
-  inset: auto ; /* ביטול left/right/top/bottom */
-  background: white ;
-  border: 1px solid var(--entity-color) ;
-  border-radius: 6px ;
-  font-size: 1.5rem ;
-  line-height: 1 ;
-  color: var(--entity-text) ;
-  opacity: 1 ;
-  padding: 0.2rem 0.4rem ;
-  width: 1.75rem ;
-  height: 1.75rem ;
-  font-weight: 400 ;
+.entity-header .btn-close-end,
+.modal-header .btn-close {
+  position: static !important; /* ביטול position: absolute של Bootstrap */
+  margin-inline-start: auto !important; /* דוחף לסוף השורה - שמאל */
+  margin-inline-end: 0 !important;
+  margin-left: auto !important; /* fallback */
+  margin-right: 0 !important;
+  inset: auto !important; /* ביטול left/right/top/bottom */
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  /* גודל סטנדרטי 30px × 30px */
+  width: 30px !important;
+  height: 30px !important;
+  padding: 0 !important;
   display: flex ;
   align-items: center ;
   justify-content: center ;
@@ -613,33 +627,59 @@
 /* Specificity: .modal-content.entity-details-modal .modal-header = 0,3,0 (overrides Bootstrap) */
 .modal-content.entity-details-modal .modal-header {
     display: flex;
-    flex-direction: row-reverse; /* הופך את הסדר: כפתור ראשון בDOM = אחרון בתצוגה (שמאל) */
-    justify-content: flex-start; /* דורס space-between של Bootstrap */
+    flex-direction: row; /* סדר רגיל: כותרת, כפתורים, כפתור סגירה */
+    justify-content: space-between; /* כותרת משמאל, כפתור סגירה מימין */
     align-items: center;
     gap: 0.75rem;
 }
 
-.modal-content.entity-details-modal .modal-header .btn-close {
-    /* כפתור סגירה עם צבע דינמי */
-    position: static;
-    opacity: 0.8;
-    background-color: transparent;
-    color: var(--current-entity-text);
-    -webkit-mask: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='currentColor'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat;
-    mask: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='currentColor'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat;
-    margin: 0;
-    width: 1.25rem;
-    height: 1.25rem;
-    border: none;
+/* כפתור סגירה במודול פרטי ישות - צבע דינמי */
+.modal-content.entity-details-modal .modal-header.modal-header-colored .btn-close {
+    color: var(--current-entity-text, #333);
+    border-color: var(--current-entity-text, #333);
 }
 
-.modal-content.entity-details-modal .modal-header .btn-close:hover {
-    opacity: 1;
+.modal-content.entity-details-modal .modal-header.modal-header-colored .btn-close:hover {
+    color: var(--current-entity-color, #007bff);
+    border-color: var(--current-entity-color, #007bff);
 }
 
 .modal-content.entity-details-modal .modal-header .modal-title {
     margin: 0;
     flex-grow: 1;
+}
+
+/* כפתור סגירה במודול פרטי ישות */
+.modal-content.entity-details-modal .btn-entity-details-close {
+    background-color: var(--secondary-color);
+    color: var(--secondary-color-text);
+    border-color: var(--secondary-color);
+}
+
+/* מצבי טעינה ושגיאה */
+.entity-details-loading-container,
+.entity-details-error-container {
+    min-height: 300px;
+}
+
+.entity-details-spinner {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* כותרת מודול פרטי ישות */
+.entity-details-header-colored {
+    border-bottom-color: var(--current-entity-color);
+}
+
+.entity-details-main-icon {
+    width: 60px;
+    height: 60px;
+    margin-inline-end: 1rem;
+}
+
+.entity-details-title {
+    color: var(--current-entity-color);
 }
 
 /* כותרות h3, h4 ו-h5 בבולד */
@@ -852,62 +892,12 @@
     direction: rtl;
 }
 
-/* ===== Entity Icon Circle ===== */
+/* ===== Entity Icons ===== */
 
-/* עיגול האייקון - בלי padding כדי שהאייקון ימלא את כל השטח */
-.entity-icon-circle {
-    background-color: white;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    
-    /* ללא padding - האייקון ימלא את כל העיגול */
-    padding: 0;
-    
-    /* גבול לפי צבע הישות - רק אם לא מוגדר inline */
-    border: 2px solid currentColor;
-    
-    /* מרווח מהתוכן הבא */
-    margin-inline-end: 1rem;
-}
-
-/* האייקון עצמו - ימלא את כל העיגול */
-.entity-icon-circle img {
-    width: 42px;
-    height: 42px;
+/* אייקונים ישירות ללא קונטיינר מיותר */
+.entity-icon {
     object-fit: contain;
-    
-    /* הסרת כל padding/margin שעלול להיות */
-    padding: 0;
-    margin: 0;
-}
-
-/* גרסה קטנה יותר לאייקונים משניים */
-.entity-icon-circle.icon-sm {
-    width: 45px;
-    height: 45px;
-}
-
-/* ===== Responsive ===== */
-
-@media (max-width: 768px) {
-    .entity-icon-circle {
-        width: 50px;
-        height: 50px;
-    }
-    
-    .entity-icon-circle img {
-        width: 35px;
-        height: 35px;
-    }
-    
-    .entity-icon-circle.icon-sm {
-        width: 40px;
-        height: 40px;
-    }
+    background: transparent;
 }
 
 /* ===== Modal Headers with Dynamic Colors ===== */

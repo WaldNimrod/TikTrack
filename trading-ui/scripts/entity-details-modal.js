@@ -98,13 +98,13 @@ class EntityDetailsModal {
                 <div class="modal-dialog modal-xl modal-dialog-scrollable">
                     <div class="modal-content entity-details-modal">
                         <div class="modal-header modal-header-colored">
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             <h5 class="modal-title" id="${this.modalId}Label">
                                 פרטי ישות
                             </h5>
                             <div id="quickActionButtons" class="btn-group btn-group-sm" role="group">
                                 <!-- כפתורי פעולות מהירות יוכנסו כאן דינמית -->
                             </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body entity-details-body" id="entityDetailsContent">
                             <div class="entity-details-loading">
@@ -115,9 +115,8 @@ class EntityDetailsModal {
                             </div>
                         </div>
                         <div class="modal-footer entity-details-footer">
-                            <button type="button" class="btn" 
-                                    data-bs-dismiss="modal" 
-                                    style="background-color: var(--secondary-color); color: var(--secondary-color-text); border-color: var(--secondary-color);">סגירה</button>
+                            <button type="button" class="btn btn-entity-details-close" 
+                                    data-bs-dismiss="modal">סגירה</button>
                         </div>
                     </div>
                 </div>
@@ -142,6 +141,8 @@ class EntityDetailsModal {
         // מאזין לסגירת המודל
         this.modal.addEventListener('hidden.bs.modal', () => {
             this.onModalHidden();
+            // ניקוי רקעים נוספים
+            this.cleanupBackdrops();
         });
 
         // מאזין למקש ESC
@@ -152,6 +153,20 @@ class EntityDetailsModal {
         });
 
         console.debug('EntityDetailsModal event listeners set up');
+    }
+
+    /**
+     * Cleanup modal backdrops - ניקוי רקעים של מודלים
+     * 
+     * @private
+     */
+    cleanupBackdrops() {
+        // הסרת רקעים כפולים
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => backdrop.remove());
+        
+        // ניקוי classes של modal-open מהגוף
+        document.body.classList.remove('modal-open');
     }
 
     /**
@@ -197,7 +212,7 @@ class EntityDetailsModal {
             // הצגת מצב טעינה
             this.showLoadingState();
 
-            // הצגת המודל
+            // הצגת המודל עם מצב טעינה
             this.showModal();
 
             // טעינת הנתונים
@@ -263,8 +278,8 @@ class EntityDetailsModal {
         if (!contentElement) return;
 
         contentElement.innerHTML = `
-            <div class="entity-details-loading d-flex flex-column align-items-center justify-content-center" style="min-height: 300px;">
-                <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+            <div class="entity-details-loading d-flex flex-column align-items-center justify-content-center entity-details-loading-container">
+                <div class="spinner-border text-primary entity-details-spinner" role="status">
                     <span class="visually-hidden">טוען...</span>
                 </div>
                 <p class="mt-3 text-muted">טוען פרטי ישות...</p>
@@ -499,7 +514,7 @@ class EntityDetailsModal {
         if (!contentElement) return;
 
         contentElement.innerHTML = `
-            <div class="entity-details-error d-flex flex-column align-items-center justify-content-center" style="min-height: 300px;">
+            <div class="entity-details-error d-flex flex-column align-items-center justify-content-center entity-details-error-container">
                 <div class="alert alert-danger text-center">
                     <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
                     <h6>שגיאה בטעינת פרטי הישות</h6>
@@ -521,8 +536,19 @@ class EntityDetailsModal {
         if (!this.modal) return;
 
         try {
-            const bsModal = new bootstrap.Modal(this.modal);
-            bsModal.show();
+            // בדיקה אם המודל כבר פתוח
+            const isAlreadyOpen = this.modal.classList.contains('show');
+            
+            if (!isAlreadyOpen) {
+                // סגירת כל המודלים הפתוחים לפני פתיחת מודל חדש
+                this.closeAllModals();
+                
+                const bsModal = new bootstrap.Modal(this.modal);
+                bsModal.show();
+            } else {
+                // המודל כבר פתוח - רק ניקוי רקעים כפולים
+                this.cleanupBackdrops();
+            }
         } catch (error) {
             console.error('Error showing modal with Bootstrap:', error);
             // fallback להצגה ישירה
@@ -530,6 +556,35 @@ class EntityDetailsModal {
             this.modal.classList.add('show');
             document.body.classList.add('modal-open');
         }
+    }
+
+    /**
+     * Close all open modals - סגירת כל המודלים הפתוחים
+     * 
+     * @private
+     */
+    closeAllModals() {
+        // סגירת כל המודלים של Bootstrap חוץ מהמודל הנוכחי
+        const openModals = document.querySelectorAll('.modal.show');
+        openModals.forEach(modal => {
+            // לא סוגרים את המודל הנוכחי
+            if (modal.id !== this.modalId) {
+                const bsModal = bootstrap.Modal.getInstance(modal);
+                if (bsModal) {
+                    bsModal.hide();
+                }
+            }
+        });
+
+        // ניקוי classes של modal-open מהגוף רק אם אין מודלים פתוחים
+        const remainingOpenModals = document.querySelectorAll('.modal.show');
+        if (remainingOpenModals.length === 0) {
+            document.body.classList.remove('modal-open');
+        }
+        
+        // הסרת רקעים כפולים
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => backdrop.remove());
     }
 
     /**

@@ -22,6 +22,13 @@ class TradingAccountService:
         ).filter(TradingAccount.id == trading_account_id).first()
     
     @staticmethod
+    def get_by_name(db: Session, account_name: str) -> Optional[TradingAccount]:
+        """Get trading_account by name with currency relationship"""
+        return db.query(TradingAccount).options(
+            joinedload(TradingAccount.currency)
+        ).filter(TradingAccount.name == account_name).first()
+    
+    @staticmethod
     def get_open_trading_accounts(db: Session) -> List[TradingAccount]:
         """Get all open trading_accounts"""
         return db.query(TradingAccount).filter(TradingAccount.status == 'open').all()

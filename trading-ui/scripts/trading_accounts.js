@@ -442,7 +442,7 @@ class TradingAccountsController {
         
         // שימוש במערכת פרטי ישות אם זמינה
         if (typeof window.showEntityDetails === 'function') {
-            window.showEntityDetails('trading_account', account);
+            window.showEntityDetails('account', account);
         } else {
             // fallback - הצגה בהתראה
             const currencyDisplay = account.currency_name ? 
@@ -563,7 +563,7 @@ async function performAccountDeletion(accountId, accountName = '') {
                 total_parent_count: 0,
                 entity_details: { id: accountId, name: accountName }
             };
-            window.showLinkedItemsModal(data, 'trading_account', accountId, 'delete');
+            window.showLinkedItemsModal(data, 'account', accountId, 'delete');
             return;
         }
 
@@ -575,7 +575,7 @@ async function performAccountDeletion(accountId, accountName = '') {
                     const data = await resp.json();
                     if ((data.child_entities || []).length > 0 && typeof window.showLinkedItemsModal === 'function') {
                         data.accountName = accountName;
-                        window.showLinkedItemsModal(data, 'trading_account', accountId, 'delete');
+                        window.showLinkedItemsModal(data, 'account', accountId, 'delete');
                         return;
                     }
                 }

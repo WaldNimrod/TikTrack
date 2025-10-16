@@ -1584,7 +1584,7 @@ async function updateExecutionsTableMain(executions) {
                 </td>
                 <td class="type-cell" data-type="${typeForFilter}">${actionBadge}</td>
                 <td data-account="${accountName}" class="account-cell-link" 
-                  onclick="window.showEntityDetailsModal && window.showEntityDetailsModal('account', '${accountName}', 'view')" 
+                  onclick="window.showEntityDetails && window.showEntityDetails('account', '${accountName}', { mode: 'view' })" 
                   title="פתח פרטי חשבון">${accountName}</td>
                 <td>${window.FieldRendererService ? window.FieldRendererService.renderShares(execution.quantity) : (execution.quantity ? '#' + execution.quantity : '-')}</td>
                 <td>$${execution.price}</td>

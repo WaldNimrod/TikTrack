@@ -822,7 +822,7 @@ function createModal(id, title, content, mode = 'view', entityType = '', options
             <h5 class="modal-title" id="${id}Label">${title}</h5>
             <div class="ms-auto d-flex align-items-center gap-2">
               ${exportBtn}
-              <button type="button" class="btn btn-sm btn-light btn-close-entity" data-bs-dismiss="modal" aria-label="Close">סגור ✕</button>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
           </div>
           <div class="modal-body">

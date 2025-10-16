@@ -88,25 +88,12 @@
   background-color: transparent;
 }
 
-#linkedItemsModal .modal-header .btn-close-entity {
-  color: currentColor;
-  border: 1px solid currentColor;
-  background-color: transparent;
-}
+/* כפתור סגירה במודול linked-items - משתמש בהגדרות הסטנדרטיות */
 
 /* Footer alignment: end of line (left in RTL) */
 #linkedItemsModal .modal-footer { justify-content: flex-end; }
 
-.modal-header .btn-close-custom { 
-  position: absolute; 
-  left: 15px; top: 50%; transform: translateY(-50%);
-  background-color: #ffffff; 
-  border: 1px solid #fc5a06; /* orange border */
-  color: #fc5a06; /* orange X */
-  border-radius: 6px; 
-  padding: 6px 12px; 
-  font-weight: bold; 
-}
+/* כפתור סגירה מותאם אישית - הוסר לטובת הסטנדרט */
 
 /* Related object badge (used inside tables) */
 .linked-object-badge {

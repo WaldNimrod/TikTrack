@@ -2379,7 +2379,7 @@ async function changeServerMode() {
                         <div class="modal-content">
                             <div class="modal-header bg-info text-white">
                                 <h5 class="modal-title" id="${modalId}Label">שינוי מצב מטמון</h5>
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
                             <div class="modal-body">
                                 ${optionsHTML}
@@ -2734,7 +2734,7 @@ async function showMonitoringAnalysis() {
                         <div class="modal-content">
                             <div class="modal-header bg-info text-white">
                                 <h5 class="modal-title" id="${modalId}Label">ניתוח ניטור מפורט</h5>
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
                             <div class="modal-body">
                                 ${reportHTML}

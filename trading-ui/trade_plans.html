@@ -242,7 +242,7 @@
                 <div class="modal-content entity-trade-plan">
                     <div class="modal-header entity-header entity-trade-plan">
                         <h4 class="modal-title entity-title">הוספת תכנון חדש</h4>
-                        <button type="button" class="btn-close btn-close-end" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <form id="addTradePlanForm">
@@ -387,7 +387,7 @@
                 <div class="modal-content entity-trade-plan">
                     <div class="modal-header entity-header entity-trade-plan">
                         <h4 class="modal-title entity-title">עריכת תכנון</h4>
-                        <button type="button" class="btn-close btn-close-end" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <form id="editTradePlanForm">
@@ -598,6 +598,8 @@
     <script src="scripts/services/statistics-calculator.js?v=2fba6e8_20251013_051239"></script>
     
     <!-- Legacy Services - REQUIRED for Trade Plans -->
+    <!-- select-populator-service.js: טעינת dropdowns (tickers, accounts) -->
+    <!-- ticker-service.js: LEGACY - לתמיכה לאחור, מומלץ להחליף -->
     <script src="scripts/ticker-service.js?v=2fba6e8_20251013_051239"></script>
     
     <!-- Stage 5: Page Script - REQUIRED -->

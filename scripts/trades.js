@@ -353,7 +353,6 @@ async function loadTradesData() {
  * - Automatic row count updates
  */
 function updateTradesTable(trades) {
-  console.log('🔍 updateTradesTable called with:', trades?.length || 0, 'trades');
   
   // בדיקה שהנתונים תקינים
   if (!trades || !Array.isArray(trades)) {
@@ -372,7 +371,6 @@ function updateTradesTable(trades) {
   console.log('✅ Found #tradesTable, proceeding with update');
 
   const tbody = document.querySelector('#tradesTable tbody');
-  console.log('🔍 Looking for tbody:', tbody);
   if (!tbody) {
     console.error('❌ tbody not found!');
     if (typeof handleElementNotFound === 'function') {

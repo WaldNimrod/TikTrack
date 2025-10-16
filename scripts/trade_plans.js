@@ -2446,7 +2446,8 @@ async function loadUserPreferences() {
       };
     }
     
-    // Fallback ל-API     try {
+    // Fallback ל-API
+    try {
       const newResponse = await fetch('/api/preferences/user');
       if (newResponse.ok) {
         const newData = await newResponse.json();

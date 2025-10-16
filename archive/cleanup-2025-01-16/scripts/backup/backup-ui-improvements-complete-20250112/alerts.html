@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Favicon will be set by global-favicon.js -->
+    <title>התראות - TikTrack</title>
+    
+    <!-- 
+    ===== CORRECTED ALERTS PAGE =====
+    
+    This page has been corrected to follow the proper architecture:
+    1. Single HTML tag (removed duplicate)
+    2. Complete ITCSS implementation
+    3. All base package systems included
+    4. Correct loading order
+    5. Scripts moved to body
+    
+    ======================================
+    -->
+    
+    
+    <!-- Bootstrap CSS - Must load first -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    
+    <!-- ITCSS Architecture - Complete Implementation -->
+    
+    <!-- 01-settings - Variables and Settings -->
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=20251010">
+    
+    <!-- 02-tools - Functions and Mixins -->
+    <link rel="stylesheet" href="styles-new/02-tools/_mixins.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/02-tools/_functions.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/02-tools/_utilities.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/02-tools/_rtl-helpers.css?v=20251010">
+    
+    <!-- 03-generic - Reset and Normalization -->
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=20251010">
+    
+    <!-- 04-elements - Basic HTML Elements -->
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=20251010">
+    
+    <!-- 05-objects - Layout Structures -->
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=20251010">
+    
+    <!-- 06-components - UI Components -->
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=20251010">
+    
+    <!-- 07-trumps - Page-specific Styles -->
+    <!-- <link rel="stylesheet" href="styles-new/07-trumps/_alerts.css?v=20251010"> -->
+    
+    <!-- 08-themes - Themes -->
+    <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=20251010">
+    
+    <!-- 09-utilities - Utility Classes -->
+    <link rel="stylesheet" href="styles-new/09-utilities/_utilities.css?v=20251010">
+    
+    <!-- External Libraries -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.1">
+    
+    <!-- Page Headers - Entity-specific header colors -->
+    <link rel="stylesheet" href="styles-new/06-components/_page-headers.css?v=20251010">
+</head>
+
+<body class="alerts-page">
+    <!-- Header System - Created automatically by header-system.js -->
+    <div id="unified-header"></div>
+    
+    <!-- Page Content -->
+    <div class="background-wrapper">
+        <div class="page-body">
+            <div class="main-content">
+                <!-- Top Section Start -->
+                <div class="top-section" id="topSection" data-section="top">
+                    <div class="section-header">
+                        <h2>🔔 התראות - סקירה כללית</h2>
+                        <div class="header-actions">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים וההתראות">
+                                <i class="fas fa-copy"></i> העתק לוג מפורט
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר סקשן">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- Color Scheme Demo for Alerts -->
+                        <div id="alertsColorDemo" class="mb-3 d-none">
+                            <div class="d-flex gap-2 mb-2">
+                                <span class="entity-alert-badge">התראה פעילה</span>
+                                <span class="entity-ticker-badge">טיקר AAPL</span>
+                                <span class="entity-trade-badge">טרייד #123</span>
+                            </div>
+                            <div class="alert alert-info">
+                                <small>🎨 דמונסטרציה למערכת הצבעים הדינמית - נוצרה אוטומטית עם מחלקות ישויות</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Active alerts web component -->
+                        <active-alerts></active-alerts>
+
+                        <!-- Data summary -->
+                        <div class="info-summary" id="summaryStats">
+                            <div>סה"כ התראות: <strong id="totalAlerts">12</strong></div>
+                            <div>התראות פעילות: <strong id="activeAlerts">8</strong></div>
+                            <div>התראות חדשות: <strong id="newAlerts">0</strong></div>
+                            <div>התראות היום: <strong id="todayAlerts">0</strong></div>
+                            <div>התראות השבוע: <strong id="weekAlerts">0</strong></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Top Section End -->
+
+                <!-- UI Content Section 1 Start -->
+                <div class="content-section" id="section1" data-section="main">
+                    <div class="section-header entity-test-sub-header">
+                        <h2>📋 ניהול התראות</h2>
+                        <div class="header-actions">
+                            <div class="filter-buttons-container button-row">
+                                <button class="btn btn-sm active filter-all-btn" onclick="filterAlertsByRelatedObjectType('all')" data-type="all" title="הצג הכל">
+                                    הכל
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterAlertsByRelatedObjectType('account')" data-type="account" title="חשבונות">
+                                    <img src="images/icons/trading_accounts.svg" alt="חשבונות מסחר" class="action-icon">
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterAlertsByRelatedObjectType('trade')" data-type="trade" title="טריידים">
+                                    <img src="images/icons/trades.svg" alt="טריידים" class="action-icon">
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterAlertsByRelatedObjectType('trade_plan')" data-type="trade_plan" title="תוכניות">
+                                    <img src="images/icons/trade_plans.svg" alt="תוכניות" class="action-icon">
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterAlertsByRelatedObjectType('ticker')" data-type="ticker" title="טיקרים">
+                                    <img src="images/icons/tickers.svg" alt="טיקרים" class="action-icon">
+                                </button>
+                                
+                                <span class="filter-divider">|</span>
+                            </div>
+                            <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- Alerts table -->
+                        <div class="table-responsive" id="alertsContainer">
+                            <table class="data-table" id="alertsTable" data-table-type="alerts">
+                                <thead>
+                                    <tr>
+                                        <th class="col-ticker">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(0, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
+                                                טיקר <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-condition">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
+                                                תנאי <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-status">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(2, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
+                                                סטטוס <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-triggered">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(3, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
+                                                הופעל <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-linked">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(4, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
+                                                קשור ל: <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-message">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(5, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
+                                                הודעה <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-created">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(6, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
+                                                נוצר ב: <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-actions actions-cell actions-3-btn">
+                                            פעולות
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="8" class="loading">טוען התראות...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 1 End -->
+            </div>
+        </div>
+
+        <!-- Bottom page spacing -->
+        <div class="page-bottom-spacing"></div>
+
+        <!-- Notification system -->
+        <div class="notification-container" id="notificationContainer"></div>
+
+        <!-- Toast container for notifications -->
+        <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+        <!-- Add Alert Modal -->
+        <div class="modal fade" id="addAlertModal" tabindex="-1" aria-labelledby="addAlertModalLabel" aria-hidden="true"
+            data-bs-backdrop="true" data-bs-keyboard="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content entity-alert">
+                    <div class="modal-header entity-header entity-alert">
+                        <h4 class="modal-title entity-title">הוספת התראה</h4>
+                        <button type="button" class="btn-close btn-close-end" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addAlertForm">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <label class="form-label">התראה עבור:</label>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="radio-group-item">
+                                                    <input type="radio" name="alertRelationType" id="alertRelationTradePlan" value="3" required
+                                                        onchange="onRelationTypeChange(this)">
+                                                    <label for="alertRelationTradePlan">תוכנית טרייד</label>
+                                                </div>
+                                                <div class="radio-group-item">
+                                                    <input type="radio" name="alertRelationType" id="alertRelationTrade" value="2" required
+                                                        onchange="onRelationTypeChange(this)">
+                                                    <label for="alertRelationTrade">טרייד</label>
+                                                </div>
+                                                <div class="radio-group-item">
+                                                    <input type="radio" name="alertRelationType" id="alertRelationAccount" value="1" required
+                                                        onchange="onRelationTypeChange(this)">
+                                                    <label for="alertRelationAccount">חשבון</label>
+                                                </div>
+                                                <div class="radio-group-item">
+                                                    <input type="radio" name="alertRelationType" id="alertRelationTicker" value="4" required
+                                                        onchange="onRelationTypeChange(this)">
+                                                    <label for="alertRelationTicker">טיקר</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="alertRelationId" class="form-label entity-label">בחר:</label>
+                                                    <select class="form-select" id="alertRelationId" required disabled>
+                                                        <option value="">בחר קודם סוג התראה</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="alertTicker" class="form-label entity-label">טיקר</label>
+                                        <select class="form-select" id="alertTicker" required>
+                                            <option value="">בחר טיקר</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="alertCondition" class="form-label entity-label">תנאי התראה</label>
+                                        <select class="form-select" id="conditionAttribute" onchange="toggleConditionNumber()" required>
+                                            <option value="">בחר תנאי</option>
+                                            <option value="price_above">מחיר מעל</option>
+                                            <option value="price_below">מחיר מתחת</option>
+                                            <option value="price_change_percent">שינוי מחיר באחוזים</option>
+                                            <option value="volume_above">נפח מעל</option>
+                                            <option value="volume_below">נפח מתחת</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="mb-3">
+                                        <label for="alertConditionNumber" class="form-label entity-label">ערך התנאי</label>
+                                        <input type="number" class="form-control" id="conditionOperator" step="0.01" placeholder="ערך"
+                                            required disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="alertMessage" class="form-label entity-label">הודעת התראה</label>
+                                        <input type="text" class="form-control" id="alertMessage"
+                                            placeholder="הודעה שתוצג בעת הפעלת ההתראה" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="alertState" class="form-label entity-label">מצב התראה</label>
+                                        <select class="form-select" id="alertState">
+                                            <option value="new">חדש (פתוח + לא הופעל)</option>
+                                            <option value="active">פעיל (פתוח + שומר על מצב הפעלה)</option>
+                                            <option value="unread">לא נקרא (סגור + חדש)</option>
+                                            <option value="read">נקרא (סגור + נקרא)</option>
+                                            <option value="cancelled">מבוטל (מבוטל + לא הופעל)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="alertTradingAccount" class="form-label entity-label">חשבון מסחר</label>
+                                        <select class="form-select" id="alertTradingAccount" required>
+                                            <option value="">בחר חשבון</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="alertConditionOperator" class="form-label entity-label">אופרטור תנאי</label>
+                                        <select class="form-select" id="alertConditionOperator" required>
+                                            <option value="more_than">יותר מ-</option>
+                                            <option value="less_than">פחות מ-</option>
+                                            <option value="equals">שווה ל-</option>
+                                            <option value="not_equals">לא שווה ל-</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer modal-footer-end">
+                        <button type="button" class="btn btn-entity btn-entity-alert" onclick="saveAlert()">הוסף התראה</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Alert Modal -->
+        <div class="modal fade" id="editAlertModal" tabindex="-1" aria-labelledby="editAlertModalLabel" aria-hidden="true"
+            data-bs-backdrop="true" data-bs-keyboard="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content entity-alert">
+                    <div class="modal-header entity-header entity-alert">
+                        <h4 class="modal-title entity-title">עריכת התראה</h4>
+                        <button type="button" class="btn-close btn-close-end" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editAlertForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editAlertTicker" class="form-label entity-label">טיקר</label>
+                                        <select class="form-select" id="editAlertTicker" required>
+                                            <option value="">בחר טיקר</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editAlertCondition" class="form-label entity-label">תנאי התראה</label>
+                                        <select class="form-select" id="editAlertCondition" onchange="updateEditConditionNumber()" required disabled>
+                                            <option value="">בחר תנאי</option>
+                                            <option value="price_above">מחיר מעל</option>
+                                            <option value="price_below">מחיר מתחת</option>
+                                            <option value="price_change_percent">שינוי מחיר באחוזים</option>
+                                            <option value="volume_above">נפח מעל</option>
+                                            <option value="volume_below">נפח מתחת</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="mb-3">
+                                        <label for="editConditionNumber" class="form-label entity-label">ערך התנאי</label>
+                                        <input type="number" class="form-control" id="editConditionNumber" step="0.01" placeholder="ערך"
+                                            required disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editAlertMessage" class="form-label entity-label">הודעת התראה</label>
+                                        <input type="text" class="form-control" id="editAlertMessage"
+                                            placeholder="הודעה שתוצג בעת הפעלת ההתראה" disabled>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editAlertState" class="form-label entity-label">מצב התראה</label>
+                                        <select class="form-select" id="editAlertState" onchange="updateStatusAndTriggered()">
+                                            <option value="new">חדש (פתוח + לא הופעל)</option>
+                                            <option value="active">פעיל (פתוח + שומר על מצב הפעלה)</option>
+                                            <option value="unread">לא נקרא (סגור + חדש)</option>
+                                            <option value="read">נקרא (סגור + נקרא)</option>
+                                            <option value="cancelled">מבוטל (מבוטל + לא הופעל)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer modal-footer-end">
+                        <button type="button" class="btn btn-entity btn-entity-alert" onclick="updateAlert()">עדכן התראה</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- ===== STATIC LOADING SYSTEM - Stage 1: Core Modules (8) ===== -->
+    <script src="scripts/modules/core-systems.js?v=20251010"></script>
+    <script src="scripts/modules/ui-basic.js?v=20251010"></script>
+    <script src="scripts/modules/data-basic.js?v=20251010"></script>
+    <script src="scripts/modules/ui-advanced.js?v=20251010"></script>
+    <script src="scripts/modules/data-advanced.js?v=20251010"></script>
+    <script src="scripts/modules/business-module.js?v=20251010"></script>
+    <script src="scripts/modules/communication-module.js?v=20251010"></script>
+    <script src="scripts/modules/cache-module.js?v=20251010"></script>
+    
+    <!-- ===== Stage 2: Core Utilities (3) ===== -->
+    <script src="scripts/global-favicon.js?v=20251010"></script>
+    <script src="scripts/page-utils.js?v=20251010"></script>
+    <script src="scripts/header-system.js?v=v6.0.0"></script>
+    
+    <!-- ===== Stage 3: Common Utilities ===== -->
+    <script src="scripts/translation-utils.js?v=20251010"></script>
+    <script src="scripts/date-utils.js?v=20251010"></script>
+    
+    <!-- ===== Stage 4: Services ===== -->
+    <script src="scripts/services/data-collection-service.js?v=1.0.0"></script>
+    <script src="scripts/services/field-renderer-service.js?v=1.0.0"></script>
+    <script src="scripts/services/select-populator-service.js?v=1.0.0"></script>
+    <script src="scripts/services/crud-response-handler.js?v=2.0.0"></script>
+    
+    <!-- ===== Stage 5: Page Script ===== -->
+    <script src="scripts/alerts.js?v=20251010"></script>
+    
+</body>
+</html>
+

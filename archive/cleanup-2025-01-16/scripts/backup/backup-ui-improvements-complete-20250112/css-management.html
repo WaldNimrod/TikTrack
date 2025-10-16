@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Favicon will be set by global-favicon.js -->
+    <title>ניהול CSS - TikTrack</title>
+    
+    <!-- 
+    ===== IMPORTANT DEVELOPMENT RULES =====
+    
+    CSS RULES:
+    - Only external CSS files are used, following the system's CSS architecture
+    - NO inline styles or styles within the page are allowed in this system
+    - All styling must be defined in external stylesheets according to ITCSS methodology
+    
+    JAVASCRIPT RULES:
+    - All functions are located in external files
+    - NO functions are allowed within the page
+    - All system functions use shared global functions located in dedicated files
+    - Page-specific functions should be centralized only in the page's dedicated script file
+    
+    ======================================
+    -->
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    
+    <!-- Unified CSS - אחרי Bootstrap כדי לדרוס אותו -->
+    <!-- CSS Files - אחרי Bootstrap כדי לדרוס אותו -->
+    <!-- ITCSS Architecture - Individual Files (September 2025) -->
+    <!-- 🔄 MAJOR ARCHITECTURE CHANGE - September 2025: Individual <link> tags instead of @import -->
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=20251001">
+    
+    <!-- Header Styles -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.1">
+    <!-- Page Headers - Development pages with white background -->
+    <link rel="stylesheet" href="styles-new/06-components/_page-headers.css?v=20251001">    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="background-wrapper">
+        <!-- Header System -->
+        <div id="unified-header"></div>
+
+        <!-- Page body -->
+        <div class="page-body">
+            <!-- Main content limited in width -->
+            <div class="main-content">
+                <!-- TEMPLATE ZONE LOCKED - DO NOT MODIFY HEADER STRUCTURE -->
+                <!-- CONTENT SECTIONS EDITABLE - START -->
+                <!-- UI Content Section Top Start-->
+                <div class="top-section" data-section="top">
+                    <div class="section-header">
+                        <h2>🎨 ניהול CSS</h2>
+                        <div class="header-actions">
+                            <button class="btn btn-sm btn-outline-info" onclick="window.clearAllCache()" title="ניקוי מטמון מלא">
+                                <i class="fas fa-broom"></i> ניקוי מטמון
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט">
+                                <i class="fas fa-copy"></i> העתק לוג מפורט
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- סטטיסטיקות כלליות -->
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-primary">📁 קבצים</h5>
+                                        <h3 class="text-primary" id="activeCssFiles">70</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-info">💾 גודל</h5>
+                                        <h3 class="text-info" id="totalCssSize">2.1MB</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-success">🎨 שכבות</h5>
+                                        <h3 class="text-success">9</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-warning">📏 כללים</h5>
+                                        <h3 class="text-warning" id="totalCssRules">16,282</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section Top End -->   
+
+                <!-- UI Content Section 1 - מידע נוסף Start-->
+                <div class="content-section" id="section1">
+                    <div class="section-header">
+                        <h2>📋 מידע נוסף</h2>
+                        <div class="header-actions">
+                            <button class="btn btn-sm btn-outline-success" onclick="loadCssFilesList()" title="רענן רשימת קבצים">
+                                <i class="fas fa-sync"></i> רענן
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- שכבות ITCSS וקבצי CSS -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3>🎨 שכבות ITCSS</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label class="form-label">01-Settings:</label>
+                                            <span class="badge bg-success">7 קבצים</span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">02-Tools:</label>
+                                            <span class="badge bg-success">3 קבצים</span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">03-Generic:</label>
+                                            <span class="badge bg-success">2 קבצים</span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">04-Elements:</label>
+                                            <span class="badge bg-success">4 קבצים</span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">05-Objects:</label>
+                                            <span class="badge bg-success">2 קבצים</span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">06-Components:</label>
+                                            <span class="badge bg-success">23 קבצים</span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">07-Trumps:</label>
+                                            <span class="badge bg-success">7 קבצים</span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">08-Themes:</label>
+                                            <span class="badge bg-success">2 קבצים</span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">09-Utilities:</label>
+                                            <span class="badge bg-success">1 קובץ</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3>📁 קבצי CSS</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- טבלת קבצי CSS -->
+                                        <div class="table-responsive" style="max-height: 300px;">
+                                            <table class="data-table table-sm table-striped" id="cssFilesTable">
+                                                <thead class="table-dark">
+                                                    <tr>
+                                                        <th>קובץ</th>
+                                                        <th>גודל</th>
+                                                        <th>כללים</th>
+                                                        <th>פעולות</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <!-- יטען דינמית -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 1 End--> 
+
+                <!-- UI Content Section 2 - בדיקות + משוב Start-->
+                <div class="content-section" id="section2">
+                    <div class="section-header">
+                        <h2>🔍 בדיקות + משוב</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <!-- כפתורי בדיקות -->
+                        <div class="row mb-3">
+                            <div class="col-md-3 mb-2">
+                                <button class="btn btn-warning w-100" onclick="validateCss()" title="בדוק תקינות CSS">
+                                    <i class="fas fa-check"></i> בדוק תקינות
+                                </button>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <button class="btn btn-outline-primary w-100" onclick="detectCssDuplicates()" title="זהה כפילויות CSS">
+                                    <i class="fas fa-search"></i> זהה כפילויות
+                                </button>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <button class="btn btn-outline-success w-100" onclick="startAutomaticAnalysis()" title="ניתוח אוטומטי חכם">
+                                    <i class="fas fa-robot"></i> ניתוח חכם
+                                </button>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <button class="btn btn-danger w-100" onclick="startAutomaticCleanup()" title="ניקוי אוטומטי של כפילויות">
+                                    <i class="fas fa-broom"></i> ניקוי אוטומטי
+                                </button>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <button class="btn btn-outline-secondary w-100" onclick="checkArchitectureCompliance()" title="בדוק תאימות ITCSS">
+                                    <i class="fas fa-check-circle"></i> בדוק תאימות
+                                </button>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <button class="btn btn-outline-info w-100" onclick="copyTestResults()" title="העתק תוצאות בדיקות ללוח">
+                                    <i class="fas fa-copy"></i> העתק תוצאות
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- אזור משוב לתוצאות בדיקות -->
+                        <div id="testResultsContainer" class="mt-3">
+                            <!-- תוצאות בדיקות יוצגו כאן -->
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 2 End-->
+
+                <!-- UI Content Section 3 - כלים + משוב Start-->
+                <div class="content-section" id="section3">
+                    <div class="section-header">
+                        <h2>🔧 כלים + משוב</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <!-- כפתורי כלים -->
+                        <div class="row mb-3">
+                            <div class="col-md-3 mb-2">
+                                <button class="btn btn-success w-100" onclick="refreshCssStats()" title="רענן נתוני CSS">
+                                    <i class="fas fa-sync"></i> רענן CSS
+                                </button>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <button class="btn btn-info w-100" onclick="minifyCss()" title="דחוס קבצי CSS">
+                                    <i class="fas fa-compress"></i> דחוס קבצים
+                                </button>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <button class="btn btn-outline-danger w-100" onclick="removeUnusedCss()" title="הסר CSS לא בשימוש">
+                                    <i class="fas fa-trash"></i> הסר לא בשימוש
+                                </button>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <button class="btn btn-outline-success w-100" onclick="showAddCssFileModal()" title="הוסף קובץ CSS חדש">
+                                    <i class="fas fa-plus"></i> הוסף קובץ
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- כפתורי העתקה -->
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-2">
+                                <button class="btn btn-outline-info w-100" onclick="copyToolsResults()" title="העתק תוצאות כלים ללוח">
+                                    <i class="fas fa-copy"></i> העתק תוצאות כלים
+                                </button>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <button class="btn btn-outline-warning w-100" onclick="copyAllResults()" title="העתק את כל התוצאות ללוח">
+                                    <i class="fas fa-copy"></i> העתק הכל
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- אזור משוב להתקדמות ותוצאות הכלים -->
+                        <div id="toolsResultsContainer" class="mt-3">
+                            <!-- תוצאות כלים יוצגו כאן -->
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 3 End-->
+
+                <!-- UI Content Section 4 - לוג Start-->
+                <div class="content-section" id="section4">
+                    <div class="section-header">
+                        <h2>📝 לוג</h2>
+                        <div class="header-actions">
+                            <button class="btn btn-sm btn-outline-primary" onclick="searchCssRules()" title="חפש בקבצי CSS">
+                                <i class="fas fa-search"></i> חיפוש
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="clearCssSearch()" title="נקה חיפוש">
+                                <i class="fas fa-times"></i> נקה
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- חיפוש CSS -->
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" id="cssSearchInput" 
+                                       placeholder="הזן מונח לחיפוש בקבצי CSS...">
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex gap-2 justify-content-start">
+                                    <button class="btn btn-primary" onclick="searchCssRules()" title="חפש בקבצי CSS">
+                                        <i class="fas fa-search"></i> חפש
+                                    </button>
+                                    <button class="btn btn-outline-secondary" onclick="clearCssSearch()" title="נקה חיפוש">
+                                        <i class="fas fa-times"></i> נקה
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- אזור לוג פעולות ותוצאות -->
+                        <div id="logContainer" class="mt-3">
+                            <!-- תוצאות חיפוש ולוג פעולות יוצגו כאן -->
+                            <div id="searchResults"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 4 End-->
+                <!-- CONTENT SECTIONS EDITABLE - END -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Core System Scripts -->
+    <!-- 🔄 NEW UNIFIED INITIALIZATION SYSTEM -->
+    <!-- מערכת כללית חדשה - 8 מודולים מאוחדים -->
+    
+    <!-- Load the new general systems architecture -->
+    <script src="scripts/modules/core-systems.js?v=20251006"></script>
+    <script src="scripts/modules/ui-basic.js?v=20251006"></script>
+    <script src="scripts/modules/data-basic.js?v=20251006"></script>
+    <script src="scripts/modules/ui-advanced.js?v=20251006"></script>
+    <script src="scripts/modules/data-advanced.js?v=20251006"></script>
+    <script src="scripts/modules/business-module.js?v=20251006"></script>
+    <script src="scripts/modules/communication-module.js?v=20251006"></script>
+    <script src="scripts/modules/cache-module.js?v=20251006"></script>
+    
+    <!-- Page Initialization Configurations -->
+    <!-- PAGE_CONFIGS integrated in core-systems.js -->
+    
+    <!-- Global Systems -->
+    <script src="scripts/global-favicon.js?v=20251006"></script>
+    <script src="scripts/translation-utils.js?v=20251006"></script>
+    <script src="scripts/header-system.js?v=v6.0.0"></script>
+    <script src="scripts/date-utils.js?v=20251006"></script>
+    <script src="scripts/button-icons.js?v=20251006"></script>
+    <script src="scripts/page-utils.js?v=20251006"></script>
+    <script src="scripts/preferences.js?v=20251006"></script>
+    <script src="scripts/notification-category-detector.js?v=20251006"></script>
+    <script src="scripts/global-notification-collector.js?v=20251006"></script>
+    <script src="scripts/entity-details-modal.js?v=20251006"></script>
+    <script src="scripts/warning-system.js?v=20251006"></script>
+    
+    <!-- Page-specific Scripts -->
+    <script src="scripts/css-management.js?v=20251006"></script>
+    <script src="scripts/css-specificity-analyzer.js?v=20251006"></script>
+    <script src="scripts/css-duplicates-analyzer.js?v=20251006"></script>
+
+    <!-- 🔓 TEMPLATE ZONE 6 - Page-Specific Scripts (ADD NEW SCRIPTS HERE) -->
+    <!-- No manual DOMContentLoaded listener needed - handled by unified system -->
+</body>
+</html>

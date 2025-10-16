@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Favicon will be set by global-favicon.js -->
+    <title>בסיס נתונים - TikTrack</title>
+    
+    <!-- 
+    ===== CORRECTED DB_DISPLAY PAGE =====
+    
+    This page has been corrected to follow the proper architecture:
+    1. Single HTML tag (removed duplicate)
+    2. Complete ITCSS implementation
+    3. All base package systems included
+    4. Correct loading order
+    5. Scripts moved to body
+    6. Single header (removed duplicate)
+    
+    ======================================
+    -->
+    
+    
+    <!-- Bootstrap CSS - Must load first -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    
+    <!-- ITCSS Architecture - Complete Implementation -->
+    
+    <!-- 01-settings - Variables and Settings -->
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=20251010">
+    
+    <!-- 02-tools - Functions and Mixins -->
+    <link rel="stylesheet" href="styles-new/02-tools/_mixins.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/02-tools/_functions.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/02-tools/_utilities.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/02-tools/_rtl-helpers.css?v=20251010">
+    
+    <!-- 03-generic - Reset and Normalization -->
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=20251010">
+    
+    <!-- 04-elements - Basic HTML Elements -->
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=20251010">
+    
+    <!-- 05-objects - Layout Structures -->
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=20251010">
+    
+    <!-- 06-components - UI Components -->
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=20251010">
+    
+    <!-- 07-trumps - Page-specific Styles -->
+    <!-- <link rel="stylesheet" href="styles-new/07-trumps/_db_display.css?v=20251010"> -->
+    
+    <!-- 08-themes - Themes -->
+    <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=20251010">
+    
+    <!-- 09-utilities - Utility Classes -->
+    <link rel="stylesheet" href="styles-new/09-utilities/_utilities.css?v=20251010">
+    
+    <!-- External Libraries -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">
+    <!-- Page Headers - Entity-specific header colors -->
+    <link rel="stylesheet" href="styles-new/06-components/_page-headers.css?v=20251010"></head>
+
+<body class="db-display-page">
+    <!-- Header System - Created automatically by header-system.js -->
+    <div id="unified-header"></div>
+    
+    <!-- Page Content -->
+    <div class="background-wrapper">
+        <div class="page-body db-display">
+            <!-- Database area - top-Section -->
+            <div class="top-section" data-section="top">
+                <!-- Main header -->
+                <div class="section-header">
+                    <h1>
+                        <i class="fas fa-database section-icon"></i>
+                        בסיס נתונים
+                    </h1>
+                    <div class="header-actions">
+                        <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים מבסיס הנתונים">
+                            <i class="fas fa-copy"></i> העתק לוג מפורט
+                        </button>
+                        <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר אזור בסיס נתונים">
+                            <span class="filter-icon">▲</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Database tables as cards -->
+                <div class="section-body">
+                    <div class="container-fluid" id="dbContainer">
+                        <div class="row" id="dbCardsContainer">
+                            <!-- Cards will be dynamically generated here -->
+                            <div class="col-12 text-center">
+                                <div class="loading">טוען נתוני בסיס נתונים...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- End top-section -->
+
+            <!-- Main content -->
+            <div class="main-content">
+                <!-- Section 1: חשבונות מסחר -->
+                <div class="content-section" id="section1" data-section="section1">
+                    <div class="section-header">
+                        <h2>
+                            <i class="fas fa-wallet section-icon" style="color: #28a745;"></i>
+                            חשבונות מסחר
+                        </h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר נתוני חשבונות מסחר">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-responsive">
+                            <table class="data-table table-striped table-hover" id="accountsTable">
+                                <thead class="table-dark">
+                                    <tr id="accountsTableHeader">
+                                        <!-- Headers will be dynamically generated -->
+                                    </tr>
+                                </thead>
+                                <tbody id="accountsTableBody">
+                                    <tr>
+                                        <td colspan="100%" class="text-center loading">טוען נתוני חשבונות מסחר...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: טריידים -->
+                <div class="content-section" id="section2" data-section="section2">
+                    <div class="section-header">
+                        <h2>
+                            <i class="fas fa-chart-line section-icon" style="color: #007bff;"></i>
+                            טריידים
+                        </h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר נתוני טריידים">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-responsive">
+                            <table class="data-table table-striped table-hover" id="tradesTable">
+                                <thead class="table-dark">
+                                    <tr id="tradesTableHeader">
+                                        <!-- Headers will be dynamically generated -->
+                                    </tr>
+                                </thead>
+                                <tbody id="tradesTableBody">
+                                    <tr>
+                                        <td colspan="100%" class="text-center loading">טוען נתוני טריידים...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: טיקרים -->
+                <div class="content-section" id="section3" data-section="section3">
+                    <div class="section-header">
+                        <h2>
+                            <i class="fas fa-tags section-icon" style="color: #dc3545;"></i>
+                            טיקרים
+                        </h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר נתוני טיקרים">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-responsive">
+                            <table class="data-table table-striped table-hover" id="tickersTable">
+                                <thead class="table-dark">
+                                    <tr id="tickersTableHeader">
+                                        <!-- Headers will be dynamically generated -->
+                                    </tr>
+                                </thead>
+                                <tbody id="tickersTableBody">
+                                    <tr>
+                                        <td colspan="100%" class="text-center loading">טוען נתוני טיקרים...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 4: תכנוני טרייד -->
+                <div class="content-section" id="section4" data-section="section4">
+                    <div class="section-header">
+                        <h2>
+                            <i class="fas fa-clipboard-list section-icon" style="color: #0056b3;"></i>
+                            תכנוני טרייד
+                        </h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר נתוני תכנוני טרייד">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-responsive">
+                            <table class="data-table table-striped table-hover" id="tradePlansTable">
+                                <thead class="table-dark">
+                                    <tr id="tradePlansTableHeader">
+                                        <!-- Headers will be dynamically generated -->
+                                    </tr>
+                                </thead>
+                                <tbody id="tradePlansTableBody">
+                                    <tr>
+                                        <td colspan="100%" class="text-center loading">טוען נתוני תכנוני טרייד...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 5: ביצועים -->
+                <div class="content-section" id="section5" data-section="section5">
+                    <div class="section-header">
+                        <h2>
+                            <i class="fas fa-play-circle section-icon" style="color: #17a2b8;"></i>
+                            ביצועים
+                        </h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('section5')" title="הצג/הסתר נתוני ביצועים">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-responsive">
+                            <table class="data-table table-striped table-hover" id="executionsTable">
+                                <thead class="table-dark">
+                                    <tr id="executionsTableHeader">
+                                        <!-- Headers will be dynamically generated -->
+                                    </tr>
+                                </thead>
+                                <tbody id="executionsTableBody">
+                                    <tr>
+                                        <td colspan="100%" class="text-center loading">טוען נתוני ביצועים...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 6: התראות -->
+                <div class="content-section" id="section6" data-section="section6">
+                    <div class="section-header">
+                        <h2>
+                            <i class="fas fa-bell section-icon" style="color: #ff9c05;"></i>
+                            התראות
+                        </h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('section6')" title="הצג/הסתר נתוני התראות">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-responsive">
+                            <table class="data-table table-striped table-hover" id="alertsTable">
+                                <thead class="table-dark">
+                                    <tr id="alertsTableHeader">
+                                        <!-- Headers will be dynamically generated -->
+                                    </tr>
+                                </thead>
+                                <tbody id="alertsTableBody">
+                                    <tr>
+                                        <td colspan="100%" class="text-center loading">טוען נתוני התראות...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 7: הערות -->
+                <div class="content-section" id="section7" data-section="section7">
+                    <div class="section-header">
+                        <h2>
+                            <i class="fas fa-sticky-note section-icon" style="color: #6f42c1;"></i>
+                            הערות
+                        </h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('section7')" title="הצג/הסתר נתוני הערות">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-responsive">
+                            <table class="data-table table-striped table-hover" id="notesTable">
+                                <thead class="table-dark">
+                                    <tr id="notesTableHeader">
+                                        <!-- Headers will be dynamically generated -->
+                                    </tr>
+                                </thead>
+                                <tbody id="notesTableBody">
+                                    <tr>
+                                        <td colspan="100%" class="text-center loading">טוען נתוני הערות...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 8: תזרימי מזומנים -->
+                <div class="content-section" id="section8" data-section="section8">
+                    <div class="section-header">
+                        <h2>
+                            <i class="fas fa-money-bill-wave section-icon" style="color: #20c997;"></i>
+                            תזרימי מזומנים
+                        </h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('section8')" title="הצג/הסתר נתוני תזרימי מזומנים">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-responsive">
+                            <table class="data-table table-striped table-hover" id="cashFlowsTable">
+                                <thead class="table-dark">
+                                    <tr id="cashFlowsTableHeader">
+                                        <!-- Headers will be dynamically generated -->
+                                    </tr>
+                                </thead>
+                                <tbody id="cashFlowsTableBody">
+                                    <tr>
+                                        <td colspan="100%" class="text-center loading">טוען נתוני תזרימי מזומנים...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom page spacing -->
+        <div style="height: 3rem;"></div>
+
+        <!-- Notification system -->
+        <div class="notification-container" id="notificationContainer"></div>
+
+        <!-- Toast container for notifications -->
+        <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1000000002;"></div>
+    </div>
+    
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- ===== STATIC LOADING SYSTEM - Template 2: Management Pages ===== -->
+    
+    <!-- Stage 1: Core Modules (8) - ALWAYS REQUIRED -->
+    <script src="scripts/modules/core-systems.js?v=20251010"></script>
+    <script src="scripts/modules/ui-basic.js?v=20251010"></script>
+    <script src="scripts/modules/data-basic.js?v=20251010"></script>
+    <script src="scripts/modules/ui-advanced.js?v=20251010"></script>
+    <script src="scripts/modules/data-advanced.js?v=20251010"></script>
+    <script src="scripts/modules/business-module.js?v=20251010"></script>
+    <script src="scripts/modules/communication-module.js?v=20251010"></script>
+    <script src="scripts/modules/cache-module.js?v=20251010"></script>
+    
+    <!-- Stage 2: Core Utilities (3) - ALWAYS REQUIRED -->
+    <script src="scripts/global-favicon.js?v=20251010"></script>
+    <script src="scripts/page-utils.js?v=20251010"></script>
+    <script src="scripts/header-system.js?v=v6.0.0"></script>
+    
+    <!-- Stage 3: Common Utilities - OPTIONAL -->
+    <script src="scripts/translation-utils.js?v=20251010"></script>
+    <script src="scripts/date-utils.js?v=20251010"></script>
+    
+    <!-- Stage 4: Services - OPTIONAL -->
+    <!-- No services needed for db_display -->
+    
+    <!-- Stage 5: Page Script - REQUIRED -->
+    <script src="scripts/db_display.js?v=20251010"></script>
+</body>
+</html>

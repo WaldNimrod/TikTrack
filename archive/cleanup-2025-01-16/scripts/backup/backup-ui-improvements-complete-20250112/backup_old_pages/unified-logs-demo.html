@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מערכת הלוגים החדשה - TikTrack</title>
+    
+    <!-- Google Fonts - עם font-display: swap -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet" crossorigin="anonymous">
+    
+    <!-- Bootstrap CSS - Must load first -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    
+    <!-- ITCSS Architecture - Individual Files (September 2025) -->
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/02-tools/_functions.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/02-tools/_mixins.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/06-components/_unified-log-display.css?v=20251001">
+    
+    <!-- Page Headers - Development pages with white background -->
+    <link rel="stylesheet" href="styles-new/06-components/_page-headers.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/07-trumps/index-hero-section.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=20251001">
+    <link rel="stylesheet" href="styles-new/09-utilities/_utilities.css?v=20251001">
+    
+    <!-- Bootstrap 5 (after our CSS for proper override) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css?v=20251001">
+    
+    <style>
+        body {
+            background: var(--color-background-primary);
+            color: var(--color-text-primary);
+            font-family: var(--font-family-base);
+        }
+        
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--spacing-lg);
+        }
+        
+        .demo-header {
+            text-align: center;
+            margin-block-end: var(--spacing-xl);
+            padding-block-end: var(--spacing-lg);
+            border-block-end: 2px solid var(--color-primary);
+            background: white;
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius-md);
+        }
+        
+        .demo-section {
+            margin-block-end: var(--spacing-xl);
+            padding: var(--spacing-lg);
+            background: var(--color-background-secondary);
+            border-radius: var(--border-radius-md);
+            border: 1px solid var(--color-border-light);
+        }
+        
+        .demo-controls {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-block-end: var(--spacing-lg);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .log-container {
+            min-height: 400px;
+            background: var(--color-background-primary);
+            border-radius: var(--border-radius-md);
+            border: 1px solid var(--color-border-medium);
+        }
+        
+        .multi-log-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: var(--spacing-lg);
+        }
+        
+        @media (max-width: 768px) {
+            .demo-container {
+                padding: var(--spacing-md);
+            }
+            
+            .demo-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .multi-log-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <!-- Header -->
+        <div class="demo-header">
+            <h1 class="display-4">
+                <i class="fas fa-list-alt text-primary"></i>
+                מערכת הלוגים החדשה - TikTrack
+            </h1>
+            <p class="lead text-muted">
+                מערכת כללית לתצוגת לוג של כל סוגי IndexedDB עם עיצוב אחיד ומרכזי
+            </p>
+        </div>
+
+        <!-- Single Log Demo -->
+        <div class="demo-section">
+            <h2 class="h3 mb-4">
+                <i class="fas fa-play-circle text-success"></i>
+                דוגמה - לוג יחיד
+            </h2>
+            
+            <div class="demo-controls">
+                <button class="btn btn-primary" onclick="showNotificationLog()">
+                    <i class="fas fa-bell"></i>
+                    היסטוריית התראות
+                </button>
+                <button class="btn btn-info" onclick="showLinterLog()">
+                    <i class="fas fa-code"></i>
+                    לוג Linter
+                </button>
+                <button class="btn btn-warning" onclick="showSystemLogs()">
+                    <i class="fas fa-cog"></i>
+                    לוגים מערכתיים
+                </button>
+                <button class="btn btn-danger" onclick="showErrorReports()">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    דוחות שגיאות
+                </button>
+                <button class="btn btn-secondary" onclick="showFileMappings()">
+                    <i class="fas fa-folder"></i>
+                    מיפוי קבצים
+                </button>
+                <button class="btn btn-success" onclick="showChartHistory()">
+                    <i class="fas fa-chart-line"></i>
+                    היסטוריית גרפים
+                </button>
+            </div>
+            
+            <div id="single-log-container" class="log-container">
+                <div class="d-flex justify-content-center align-items-center h-100">
+                    <div class="text-center">
+                        <i class="fas fa-mouse-pointer fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">לחץ על אחד מהכפתורים למעלה כדי להציג לוג</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Multiple Logs Demo -->
+        <div class="demo-section">
+            <h2 class="h3 mb-4">
+                <i class="fas fa-th-large text-info"></i>
+                דוגמה - מספר לוגים במקביל
+            </h2>
+            
+            <div class="demo-controls">
+                <button class="btn btn-primary" onclick="showMultipleLogs()">
+                    <i class="fas fa-th"></i>
+                    הצג כל הלוגים
+                </button>
+                <button class="btn btn-outline-secondary" onclick="hideAllLogs()">
+                    <i class="fas fa-eye-slash"></i>
+                    הסתר הכל
+                </button>
+                <button class="btn btn-outline-success" onclick="refreshAllLogs()">
+                    <i class="fas fa-sync-alt"></i>
+                    רענן הכל
+                </button>
+            </div>
+            
+            <div class="multi-log-grid">
+                <div>
+                    <h4 class="h6 mb-3">
+                        <i class="fas fa-bell text-success"></i>
+                        התראות
+                    </h4>
+                    <div id="multi-notifications-log" class="log-container">
+                        <div class="d-flex justify-content-center align-items-center h-100">
+                            <span class="text-muted">לא נטען</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="h6 mb-3">
+                        <i class="fas fa-code text-warning"></i>
+                        Linter
+                    </h4>
+                    <div id="multi-linter-log" class="log-container">
+                        <div class="d-flex justify-content-center align-items-center h-100">
+                            <span class="text-muted">לא נטען</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="h6 mb-3">
+                        <i class="fas fa-cog text-info"></i>
+                        מערכת
+                    </h4>
+                    <div id="multi-system-log" class="log-container">
+                        <div class="d-flex justify-content-center align-items-center h-100">
+                            <span class="text-muted">לא נטען</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="h6 mb-3">
+                        <i class="fas fa-exclamation-triangle text-danger"></i>
+                        שגיאות
+                    </h4>
+                    <div id="multi-errors-log" class="log-container">
+                        <div class="d-flex justify-content-center align-items-center h-100">
+                            <span class="text-muted">לא נטען</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Demo -->
+        <div class="demo-section">
+            <h2 class="h3 mb-4">
+                <i class="fas fa-download text-primary"></i>
+                דוגמה - ייצוא נתונים
+            </h2>
+            
+            <div class="demo-controls">
+                <button class="btn btn-success" onclick="exportAsCSV()">
+                    <i class="fas fa-file-csv"></i>
+                    ייצוא CSV
+                </button>
+                <button class="btn btn-info" onclick="exportAsJSON()">
+                    <i class="fas fa-file-code"></i>
+                    ייצוא JSON
+                </button>
+                <button class="btn btn-warning" onclick="copyToClipboard()">
+                    <i class="fas fa-clipboard"></i>
+                    העתקה ללוח
+                </button>
+            </div>
+            
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                <strong>מידע:</strong> ייצוא הנתונים יתבצע לפי הלוג הפעיל כרגע או לפי ההתראות (ברירת מחדל).
+            </div>
+        </div>
+
+        <!-- API Demo -->
+        <div class="demo-section">
+            <h2 class="h3 mb-4">
+                <i class="fas fa-code text-secondary"></i>
+                דוגמה - שימוש ב-API
+            </h2>
+            
+            <div class="demo-controls">
+                <button class="btn btn-outline-primary" onclick="showAPIStatus()">
+                    <i class="fas fa-info"></i>
+                    סטטוס API
+                </button>
+                <button class="btn btn-outline-secondary" onclick="showAvailableLogTypes()">
+                    <i class="fas fa-list"></i>
+                    סוגי לוג זמינים
+                </button>
+                <button class="btn btn-outline-success" onclick="showActiveDisplays()">
+                    <i class="fas fa-eye"></i>
+                    תצוגות פעילות
+                </button>
+            </div>
+            
+            <div id="api-info" class="mt-3">
+                <!-- API information will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Unified IndexedDB -->
+    
+    <!-- Unified Log System -->
+    <script src="scripts/unified-log-manager.js"></script>
+    <script src="scripts/unified-log-display.js"></script>
+    <script src="scripts/unified-log-api.js"></script>
+    
+    <!-- Notification System -->
+    <script src="scripts/notification-system.js"></script>
+
+    <script>
+        // Demo functions
+        async function showNotificationLog() {
+            try {
+                await window.showNotificationLog('single-log-container', {
+                    displayConfig: 'default',
+                    autoRefresh: false
+                });
+            } catch (error) {
+                console.error('Error showing notification log:', error);
+                showDemoError('שגיאה בהצגת לוג התראות: ' + error.message);
+            }
+        }
+
+        async function showLinterLog() {
+            try {
+                await window.showLinterLog('single-log-container', {
+                    displayConfig: 'default'
+                });
+            } catch (error) {
+                console.error('Error showing linter log:', error);
+                showDemoError('שגיאה בהצגת לוג Linter: ' + error.message);
+            }
+        }
+
+        async function showSystemLogs() {
+            try {
+                await window.showSystemLogs('single-log-container', {
+                    displayConfig: 'default'
+                });
+            } catch (error) {
+                console.error('Error showing system logs:', error);
+                showDemoError('שגיאה בהצגת לוגים מערכתיים: ' + error.message);
+            }
+        }
+
+        async function showErrorReports() {
+            try {
+                await window.showErrorReports('single-log-container', {
+                    displayConfig: 'default'
+                });
+            } catch (error) {
+                console.error('Error showing error reports:', error);
+                showDemoError('שגיאה בהצגת דוחות שגיאות: ' + error.message);
+            }
+        }
+
+        async function showFileMappings() {
+            try {
+                await window.showFileMappings('single-log-container', {
+                    displayConfig: 'default'
+                });
+            } catch (error) {
+                console.error('Error showing file mappings:', error);
+                showDemoError('שגיאה בהצגת מיפוי קבצים: ' + error.message);
+            }
+        }
+
+        async function showChartHistory() {
+            try {
+                await window.showChartHistory('single-log-container', {
+                    displayConfig: 'default'
+                });
+            } catch (error) {
+                console.error('Error showing chart history:', error);
+                showDemoError('שגיאה בהצגת היסטוריית גרפים: ' + error.message);
+            }
+        }
+
+        async function showMultipleLogs() {
+            try {
+                const results = await window.UnifiedLogAPI.showMultipleLogs([
+                    { type: 'notificationHistory', container: 'multi-notifications-log' },
+                    { type: 'linterHistory', container: 'multi-linter-log' },
+                    { type: 'systemLogs', container: 'multi-system-log' },
+                    { type: 'errorReports', container: 'multi-errors-log' }
+                ], {
+                    displayConfig: 'compact'
+                });
+                
+                console.log('Multiple logs results:', results);
+            } catch (error) {
+                console.error('Error showing multiple logs:', error);
+                showDemoError('שגיאה בהצגת מספר לוגים: ' + error.message);
+            }
+        }
+
+        async function hideAllLogs() {
+            try {
+                window.UnifiedLogAPI.hideAllLogs();
+            } catch (error) {
+                console.error('Error hiding all logs:', error);
+                showDemoError('שגיאה בהסתרת הלוגים: ' + error.message);
+            }
+        }
+
+        async function refreshAllLogs() {
+            try {
+                await window.UnifiedLogAPI.refreshAllLogs();
+            } catch (error) {
+                console.error('Error refreshing all logs:', error);
+                showDemoError('שגיאה ברענון הלוגים: ' + error.message);
+            }
+        }
+
+        async function exportAsCSV() {
+            try {
+                await window.exportLog('notificationHistory', 'csv');
+            } catch (error) {
+                console.error('Error exporting as CSV:', error);
+                showDemoError('שגיאה בייצוא CSV: ' + error.message);
+            }
+        }
+
+        async function exportAsJSON() {
+            try {
+                await window.exportLog('notificationHistory', 'json');
+            } catch (error) {
+                console.error('Error exporting as JSON:', error);
+                showDemoError('שגיאה בייצוא JSON: ' + error.message);
+            }
+        }
+
+        async function copyToClipboard() {
+            try {
+                await window.exportLog('notificationHistory', 'clipboard');
+            } catch (error) {
+                console.error('Error copying to clipboard:', error);
+                showDemoError('שגיאה בהעתקה ללוח: ' + error.message);
+            }
+        }
+
+        function showAPIStatus() {
+            const status = window.UnifiedLogAPI.getStatus();
+            document.getElementById('api-info').innerHTML = `
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">סטטוס UnifiedLogAPI</h5>
+                        <pre class="bg-light p-3 rounded">${JSON.stringify(status, null, 2)}</pre>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showAvailableLogTypes() {
+            const logTypes = window.getAvailableLogTypes();
+            document.getElementById('api-info').innerHTML = `
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">סוגי לוג זמינים</h5>
+                        <div class="row">
+                            ${logTypes.map(logType => `
+                                <div class="col-md-6 mb-2">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas ${logType.icon} text-primary me-2"></i>
+                                        <div>
+                                            <strong>${logType.name}</strong><br>
+                                            <small class="text-muted">${logType.description}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showActiveDisplays() {
+            const displays = window.UnifiedLogAPI.getActiveDisplays();
+            document.getElementById('api-info').innerHTML = `
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">תצוגות פעילות</h5>
+                        ${displays.length > 0 ? `
+                            <ul class="list-group">
+                                ${displays.map(display => `
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>${display.containerId}</strong><br>
+                                            <small class="text-muted">${display.logType}</small>
+                                        </div>
+                                        <span class="badge bg-primary">${display.displayConfig}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        ` : '<p class="text-muted">אין תצוגות פעילות</p>'}
+                    </div>
+                </div>
+            `;
+        }
+
+        function showDemoError(message) {
+            if (window.showNotification) {
+                window.showNotification(message, 'error');
+            } else {
+                alert('שגיאה: ' + message);
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 Initializing Unified Logs Demo...');
+            
+            try {
+                // Initialize the API
+                await window.UnifiedLogAPI.initialize();
+                console.log('✅ Demo initialized successfully');
+                
+                // Show initial status
+                showAPIStatus();
+            } catch (error) {
+                console.error('❌ Failed to initialize demo:', error);
+                showDemoError('שגיאה באתחול הדמו: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>
+
+

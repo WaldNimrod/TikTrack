@@ -368,6 +368,132 @@ function enableEditFields() {
 }
 
 /**
+ * הפעלת השדות במודל הוספה
+ */
+function enableAddFormFields() {
+  const fields = [
+    'addTradePlanInvestmentType',
+    'addTradePlanSide',
+    'addTradePlanPlannedAmount',
+    'addTradePlanShares',
+    'addTradePlanStopPrice',
+    'addTradePlanStopPercentage',
+    'addTradePlanTargetPrice',
+    'addTradePlanTargetPercentage',
+    'addTradePlanEntryConditions',
+    'addTradePlanReasons',
+  ];
+
+  fields.forEach(fieldId => {
+    const field = document.getElementById(fieldId);
+    if (field) {
+      field.disabled = false;
+      field.classList.remove('disabled');
+    }
+  });
+}
+
+/**
+ * השבתת השדות במודל הוספה
+ */
+function disableAddFormFields() {
+  const fields = [
+    'addTradePlanInvestmentType',
+    'addTradePlanSide',
+    'addTradePlanPlannedAmount',
+    'addTradePlanShares',
+    'addTradePlanStopPrice',
+    'addTradePlanStopPercentage',
+    'addTradePlanTargetPrice',
+    'addTradePlanTargetPercentage',
+    'addTradePlanEntryConditions',
+    'addTradePlanReasons',
+  ];
+
+  fields.forEach(fieldId => {
+    const field = document.getElementById(fieldId);
+    if (field) {
+      field.disabled = true;
+      field.classList.add('disabled');
+    }
+  });
+}
+
+/**
+ * עדכון מידע על הטיקר במודל הוספה
+ */
+async function updateAddTickerInfo() {
+  const tickerId = document.getElementById('addTradePlanTickerId').value;
+  const tickerDisplay = document.getElementById('selectedTickerDisplay');
+  const priceDisplay = document.getElementById('currentPriceDisplay');
+  const changeDisplay = document.getElementById('dailyChangeDisplay');
+
+  if (!tickerId) {
+    tickerDisplay.textContent = 'לא נבחר';
+    priceDisplay.textContent = '-';
+    changeDisplay.textContent = '-';
+    
+    // השבתת כל השדות
+    disableAddFormFields();
+    return;
+  }
+
+  try {
+    // קבלת מידע על הטיקר מהשרת
+    const response = await fetch(`/api/tickers/${tickerId}`);
+    if (response.ok) {
+      const tickerData = await response.json();
+      
+      // עדכון תצוגת הטיקר
+      tickerDisplay.textContent = tickerData.data?.symbol || 'לא ידוע';
+      
+      // עדכון מחיר נוכחי
+      const currentPrice = tickerData.data?.current_price || 0;
+      priceDisplay.textContent = `$${currentPrice.toFixed(2)}`;
+      
+      // עדכון שינוי יומי
+      const dailyChange = tickerData.data?.daily_change_percent || 0;
+      const changeText = dailyChange >= 0 ? `+${dailyChange.toFixed(2)}%` : `${dailyChange.toFixed(2)}%`;
+      changeDisplay.textContent = changeText;
+      
+      // צבע השינוי
+      if (dailyChange > 0) {
+        changeDisplay.style.color = '#28a745'; // ירוק
+        changeDisplay.style.fontWeight = 'bold';
+      } else if (dailyChange < 0) {
+        changeDisplay.style.color = '#dc3545'; // אדום
+        changeDisplay.style.fontWeight = 'bold';
+      } else {
+        changeDisplay.style.color = '#6c757d'; // אפור
+      }
+
+      // הפעלת כל השדות
+      enableAddFormFields();
+
+      // עדכון מחירי עצירה ויעד ברירת מחדל
+      updateDefaultPrices(currentPrice);
+
+      // עדכון מספר מניות אם יש סכום
+      const amountInput = document.getElementById('addTradePlanPlannedAmount');
+      if (amountInput && amountInput.value) {
+        updateSharesFromAmount();
+      }
+
+    } else {
+      console.error('שגיאה בטעינת מידע הטיקר:', response.statusText);
+      tickerDisplay.textContent = 'שגיאה בטעינה';
+      priceDisplay.textContent = '-';
+      changeDisplay.textContent = '-';
+    }
+  } catch (error) {
+    console.error('שגיאה בטעינת מידע הטיקר:', error);
+    tickerDisplay.textContent = 'שגיאה בטעינה';
+    priceDisplay.textContent = '-';
+    changeDisplay.textContent = '-';
+  }
+}
+
+/**
  * עדכון מידע על הטיקר במודל העריכה
  */
 async function updateEditTickerInfo() {
@@ -1513,6 +1639,14 @@ function showAddTradePlanModal() {
       window.showNotification('tickerService.loadTickersForTradePlan not available', 'warning');
     }
   }
+
+  // השבתת כל השדות עד לבחירת טיקר
+  disableAddFormFields();
+  
+  // עדכון מידע הטיקר (אם יש טיקר נבחר)
+  setTimeout(() => {
+    updateAddTickerInfo();
+  }, 100);
 
   // Clear any existing validation errors
   if (typeof window.clearValidation === 'function') {
@@ -2715,6 +2849,7 @@ document.addEventListener('DOMContentLoaded', function () {
 window.loadTradePlansData = loadTradePlansData;
 window.updateTradePlansTable = updateTradePlansTable;
 window.showAddTradePlanModal = showAddTradePlanModal;
+window.updateAddTickerInfo = updateAddTickerInfo;
 window.saveNewTradePlan = saveNewTradePlan;
 window.editTradePlan = editTradePlan;
 window.deleteTradePlan = deleteTradePlan;
@@ -3043,6 +3178,24 @@ function updateTickerInfo() {
 }
 
 /**
+ * חישוב מחירי עצירה ויעד ברירת מחדל
+ */
+function calculateDefaultPrices(currentPrice) {
+  const price = parseFloat(currentPrice) || 0;
+  
+  // מחיר עצירה - 5% למטה
+  const stopPrice = (price * 0.95).toFixed(2);
+  
+  // מחיר יעד - 10% למעלה
+  const targetPrice = (price * 1.10).toFixed(2);
+  
+  return {
+    stopPrice: stopPrice,
+    targetPrice: targetPrice
+  };
+}
+
+/**
  * עדכון מחירי עצירה ויעד ברירת מחדל
  */
 function updateDefaultPrices(currentPrice) {
@@ -3084,7 +3237,7 @@ function updateSharesFromAmount() {
           // לא מעדכנים את הסכום חזרה - רק מספר מניות
           // amountInput.value = result.adjustedAmount;
         } else {
-          handleFunctionNotFound('convertAmountToShares', 'פונקציית המרת סכום למניות לא נמצאה');
+          console.warn('פונקציית המרת סכום למניות לא נמצאה');
           // fallback
           const shares = Math.floor(amount / price);
           sharesInput.value = shares;
@@ -3092,7 +3245,7 @@ function updateSharesFromAmount() {
       }
     }
   } else {
-    handleElementNotFound('updateSharesFromAmount', 'אלמנטים נדרשים לא נמצאו לעדכון מניות');
+    console.warn('אלמנטים נדרשים לא נמצאו לעדכון מניות');
   }
 }
 
@@ -3115,7 +3268,7 @@ function updateAmountFromShares() {
           const amount = window.convertSharesToAmount(shares, price);
           amountInput.value = amount;
         } else {
-          handleFunctionNotFound('convertSharesToAmount', 'פונקציית המרת מניות לסכום לא נמצאה');
+          console.warn('פונקציית המרת מניות לסכום לא נמצאה');
           // fallback
           const amount = shares * price;
           amountInput.value = amount.toFixed(2);
@@ -3123,7 +3276,7 @@ function updateAmountFromShares() {
       }
     }
   } else {
-    handleElementNotFound('updateAmountFromShares', 'אלמנטים נדרשים לא נמצאו לעדכון סכום');
+    console.warn('אלמנטים נדרשים לא נמצאו לעדכון סכום');
   }
 }
 

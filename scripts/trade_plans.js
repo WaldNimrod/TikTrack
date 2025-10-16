@@ -374,23 +374,26 @@ function enableAddFormFields() {
   console.log('🔍 enableAddFormFields - התחלה');
   
   const fields = [
+    'addTradePlanTradingAccount',
     'addTradePlanInvestmentType',
     'addTradePlanSide',
     'addTradePlanPlannedAmount',
     'addTradePlanShares',
+    'addTradePlanEntryConditions',
+    'addTradePlanReasons',
     'addTradePlanStopPrice',
     'addTradePlanStopPercentage',
     'addTradePlanTargetPrice',
     'addTradePlanTargetPercentage',
-    'addTradePlanEntryConditions',
-    'addTradePlanReasons',
   ];
+
+  console.log('🔍 רשימת שדות לפעלה:', fields);
 
   let enabledCount = 0;
   fields.forEach(fieldId => {
     const field = document.getElementById(fieldId);
     if (field) {
-      console.log(`🔍 מפעיל שדה: ${fieldId}`);
+      console.log(`🔍 מפעיל שדה: ${fieldId} (disabled: ${field.disabled})`);
       field.disabled = false;
       field.classList.remove('disabled');
       enabledCount++;
@@ -400,6 +403,16 @@ function enableAddFormFields() {
   });
   
   console.log(`🔍 enableAddFormFields - הופעלו ${enabledCount} שדות`);
+  
+  // בדיקה נוספת - כל השדות בטופס
+  const form = document.getElementById('addTradePlanForm');
+  if (form) {
+    const allInputs = form.querySelectorAll('input, select, textarea');
+    console.log('🔍 כל השדות בטופס:', Array.from(allInputs).map(el => el.id));
+    
+    const disabledFields = Array.from(allInputs).filter(el => el.disabled && el.id !== 'addTradePlanTickerId');
+    console.log('🔍 שדות שעדיין מושבתים:', disabledFields.map(el => el.id));
+  }
 }
 
 /**
@@ -409,16 +422,17 @@ function disableAddFormFields() {
   console.log('🔍 disableAddFormFields - התחלה');
   
   const fields = [
+    'addTradePlanTradingAccount',
     'addTradePlanInvestmentType',
     'addTradePlanSide',
     'addTradePlanPlannedAmount',
     'addTradePlanShares',
+    'addTradePlanEntryConditions',
+    'addTradePlanReasons',
     'addTradePlanStopPrice',
     'addTradePlanStopPercentage',
     'addTradePlanTargetPrice',
     'addTradePlanTargetPercentage',
-    'addTradePlanEntryConditions',
-    'addTradePlanReasons',
   ];
 
   let disabledCount = 0;

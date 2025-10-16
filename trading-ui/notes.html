@@ -137,18 +137,10 @@
                                 <button class="btn btn-sm btn-outline-primary filter-all-btn active" onclick="filterNotesByRelatedObjectType('all')" data-type="all" title="הצג כל ההערות">
                                     הכל
                                 </button>
-                                <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterNotesByRelatedObjectType('account')" data-type="account" title="הצג הערות המקושרות לחשבונות מסחר">
-                                    <img src="images/icons/trading_accounts.svg" alt="חשבונות מסחר" class="action-icon">
-                                </button>
-                                <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterNotesByRelatedObjectType('trade')" data-type="trade" title="הצג הערות המקושרות לטריידים">
-                                    <img src="images/icons/trades.svg" alt="טריידים" class="action-icon">
-                                </button>
-                                <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterNotesByRelatedObjectType('trade_plan')" data-type="trade_plan" title="הצג הערות המקושרות לתוכניות טרייד">
-                                    <img src="images/icons/trade_plans.svg" alt="תוכניות" class="action-icon">
-                                </button>
-                                <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterNotesByRelatedObjectType('ticker')" data-type="ticker" title="הצג הערות המקושרות לטיקרים">
-                                    <img src="images/icons/tickers.svg" alt="טיקרים" class="action-icon">
-                                </button>
+                                ${window.createFilterButton ? window.createFilterButton('trading_accounts', 'filterNotesByRelatedObjectType(\'account\')', 'הצג הערות המקושרות לחשבונות מסחר') : '<button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterNotesByRelatedObjectType(\'account\')" data-type="account" title="הצג הערות המקושרות לחשבונות מסחר"><img src="images/icons/trading_accounts.svg" alt="חשבונות מסחר" class="action-icon"></button>'}
+                                ${window.createFilterButton ? window.createFilterButton('trades', 'filterNotesByRelatedObjectType(\'trade\')', 'הצג הערות המקושרות לטריידים') : '<button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterNotesByRelatedObjectType(\'trade\')" data-type="trade" title="הצג הערות המקושרות לטריידים"><img src="images/icons/trades.svg" alt="טריידים" class="action-icon"></button>'}
+                                ${window.createFilterButton ? window.createFilterButton('trade_plans', 'filterNotesByRelatedObjectType(\'trade_plan\')', 'הצג הערות המקושרות לתוכניות טרייד') : '<button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterNotesByRelatedObjectType(\'trade_plan\')" data-type="trade_plan" title="הצג הערות המקושרות לתוכניות טרייד"><img src="images/icons/trade_plans.svg" alt="תוכניות" class="action-icon"></button>'}
+                                ${window.createFilterButton ? window.createFilterButton('tickers', 'filterNotesByRelatedObjectType(\'ticker\')', 'הצג הערות המקושרות לטיקרים') : '<button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterNotesByRelatedObjectType(\'ticker\')" data-type="ticker" title="הצג הערות המקושרות לטיקרים"><img src="images/icons/tickers.svg" alt="טיקרים" class="action-icon"></button>'}
                                 
                                 <span class="filter-divider">|</span>
                             </div>

@@ -38,6 +38,30 @@
     - תמיכה ב-2-5 כפתורים דינמית
     - צבעים דינאמיים מ-ITCSS
   - **שימוש:** `createActionsMenu([buttons], entityId)`
+- **מערכת כפתורים מאוחדת (Button System)** ✅ **חדש!** - ינואר 2025
+  - **קובץ:** `button-icons.js`
+  - **תיאור:** מערכת מרכזית ליצירת כל סוגי הכפתורים במערכת
+  - **תכונות:**
+    - 9 פונקציות חדשות לכפתורים חוזרים (2+ מופעים)
+    - צבעים דינמיים מלאים (--primary-color, --secondary-color, --danger-color)
+    - גודל סטנדרטי 30px × 30px
+    - Hover effects עם color-mix()
+    - Fallback בטיחותי לכל הפונקציות
+    - תמיכה ב-RTL ועברית
+    - נגישות מלאה (title, aria-label, data attributes)
+  - **פונקציות זמינות:**
+    - `createSaveButton()` - כפתורי שמירה
+    - `createFormCancelButton()` - כפתורי ביטול
+    - `createRefreshButton()` - כפתורי רענון
+    - `createCopyButton()` - כפתורי העתקה
+    - `createAddButton()` - כפתורי הוסף עיקריים
+    - `createToggleButton()` - כפתורי הצג/הסתר
+    - `createSortableHeader()` - כפתורי מיון בטבלאות
+    - `createFilterButton()` - כפתורי פילטר ישויות
+    - `createNavigationButton()` - כפתורי ניווט בין עמודים
+    - `createCloseButton()` - כפתורי סגירה
+    - `createModalActionButton()` - כפתורי פעולות במודולים
+  - **שימוש:** `${window.createSaveButton ? window.createSaveButton(...) : 'fallback'}`
 
 #### ** חבילת פילטרים וחיפוש**
 מערכות לחיפוש וסינון נתונים:

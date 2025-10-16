@@ -235,28 +235,16 @@
                         <!-- Quick Actions Row -->
                         <div class="row g-2 mb-4">
                             <div class="col-lg-3 col-md-6">
-                                <button class="btn w-100" onclick="window.location.href='trades.html'" style="border: 2px solid var(--entity-trade-color); color: var(--entity-trade-color);">
-                                    <img src="images/icons/trades.svg" alt="" style="width: 20px; height: 20px; vertical-align: middle;">
-                                    <span class="ms-2">טריידים</span>
-                                </button>
+                                ${window.createNavigationButton ? window.createNavigationButton('trades', 'trade', 'טריידים') : '<button class="btn w-100" onclick="window.location.href=\'trades.html\'" style="border: 2px solid var(--entity-trade-color); color: var(--entity-trade-color);"><img src="images/icons/trades.svg" alt="" style="width: 20px; height: 20px; vertical-align: middle;"><span class="ms-2">טריידים</span></button>'}
                             </div>
                             <div class="col-lg-3 col-md-6">
-                                <button class="btn w-100" onclick="window.location.href='trade_plans.html'" style="border: 2px solid var(--entity-trade-plan-color); color: var(--entity-trade-plan-color);">
-                                    <img src="images/icons/trade_plans.svg" alt="" style="width: 20px; height: 20px; vertical-align: middle;">
-                                    <span class="ms-2">תכנוני טרייד</span>
-                                </button>
+                                ${window.createNavigationButton ? window.createNavigationButton('trade_plans', 'trade-plan', 'תכנוני טרייד') : '<button class="btn w-100" onclick="window.location.href=\'trade_plans.html\'" style="border: 2px solid var(--entity-trade-plan-color); color: var(--entity-trade-plan-color);"><img src="images/icons/trade_plans.svg" alt="" style="width: 20px; height: 20px; vertical-align: middle;"><span class="ms-2">תכנוני טרייד</span></button>'}
                             </div>
                             <div class="col-lg-3 col-md-6">
-                                <button class="btn w-100" onclick="window.location.href='alerts.html'" style="border: 2px solid var(--entity-alert-color); color: var(--entity-alert-color);">
-                                    <img src="images/icons/alerts.svg" alt="" style="width: 20px; height: 20px; vertical-align: middle;">
-                                    <span class="ms-2">התראות</span>
-                                </button>
+                                ${window.createNavigationButton ? window.createNavigationButton('alerts', 'alert', 'התראות') : '<button class="btn w-100" onclick="window.location.href=\'alerts.html\'" style="border: 2px solid var(--entity-alert-color); color: var(--entity-alert-color);"><img src="images/icons/alerts.svg" alt="" style="width: 20px; height: 20px; vertical-align: middle;"><span class="ms-2">התראות</span></button>'}
                             </div>
                             <div class="col-lg-3 col-md-6">
-                                <button class="btn w-100" onclick="window.location.href='research.html'" style="border: 2px solid var(--primary-color); color: var(--primary-color);">
-                                    <img src="images/icons/reserch.svg" alt="" style="width: 20px; height: 20px; vertical-align: middle;">
-                                    <span class="ms-2">מחקר וניתוח</span>
-                                </button>
+                                ${window.createNavigationButton ? window.createNavigationButton('research', 'research', 'מחקר וניתוח') : '<button class="btn w-100" onclick="window.location.href=\'research.html\'" style="border: 2px solid var(--primary-color); color: var(--primary-color);"><img src="images/icons/reserch.svg" alt="" style="width: 20px; height: 20px; vertical-align: middle;"><span class="ms-2">מחקר וניתוח</span></button>'}
                             </div>
                         </div>
                         

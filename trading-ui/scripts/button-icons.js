@@ -297,6 +297,129 @@ function createModalActionButton(type, onClick, additionalClasses = '', addition
          `title="${text}" ${additionalAttributes}>${icon}</button>`;
 }
 
+// ===== קטגוריה ב: כפתורי טפסים =====
+
+// כפתור שמירה - צבע primary דינמי
+function createSaveButton(onClick, text = 'שמור', entityType = null) {
+  const entityClass = entityType ? `btn-entity-${entityType}` : '';
+  return `<button class="btn ${entityClass}" onclick="${onClick}" 
+          style="background: var(--primary-color); color: white; border: none; min-width: 80px; height: 36px; border-radius: 6px; font-weight: 600; transition: all 0.2s ease;"
+          onmouseover="this.style.background='color-mix(in srgb, var(--primary-color) 85%, black)'"
+          onmouseout="this.style.background='var(--primary-color)'">
+          ${text}
+          </button>`;
+}
+
+// כפתור ביטול - צבע secondary דינמי
+function createFormCancelButton(onClick = '', text = 'ביטול') {
+  const dismiss = onClick ? `onclick="${onClick}"` : 'data-bs-dismiss="modal"';
+  return `<button class="btn" ${dismiss}
+          style="background: transparent; color: var(--secondary-color); 
+          border: 1px solid var(--secondary-color); min-width: 80px; height: 36px; border-radius: 6px; font-weight: 600; transition: all 0.2s ease;"
+          onmouseover="this.style.background='color-mix(in srgb, var(--secondary-color) 10%, transparent)'"
+          onmouseout="this.style.background='transparent'">
+          ${text}
+          </button>`;
+}
+
+// ===== קטגוריה ג: כפתורי ניווט וכלים =====
+
+// כפתור רענון - secondary דינמי
+function createRefreshButton(onClick, text = 'רענן') {
+  return `<button class="btn btn-sm" onclick="${onClick}"
+          style="border: 1px solid var(--secondary-color); color: var(--secondary-color); 
+          background: transparent; height: 30px; padding: 0 12px; border-radius: 6px; font-weight: 500; transition: all 0.2s ease;"
+          title="${text}"
+          onmouseover="this.style.background='color-mix(in srgb, var(--secondary-color) 10%, transparent)'"
+          onmouseout="this.style.background='transparent'">
+          <i class="fas fa-sync-alt"></i> ${text}
+          </button>`;
+}
+
+// כפתור העתקה - secondary דינמי
+function createCopyButton(onClick, text = 'העתק לוג מפורט') {
+  return `<button class="btn btn-sm" onclick="${onClick}"
+          style="border: 1px solid var(--secondary-color); color: var(--secondary-color); 
+          background: transparent; height: 30px; padding: 0 12px; border-radius: 6px; font-weight: 500; transition: all 0.2s ease;"
+          title="${text}"
+          onmouseover="this.style.background='color-mix(in srgb, var(--secondary-color) 10%, transparent)'"
+          onmouseout="this.style.background='transparent'">
+          <i class="fas fa-copy"></i> ${text}
+          </button>`;
+}
+
+// כפתור הוסף עיקרי - primary דינמי + אייקון ישות
+function createAddButton(entityType, onClick, text = 'הוסף') {
+  const iconPath = `images/icons/${entityType}.svg`;
+  return `<button id="add${entityType.charAt(0).toUpperCase() + entityType.slice(1)}Btn" class="refresh-btn" onclick="${onClick}"
+          style="border: 2px solid var(--primary-color); color: var(--primary-color); 
+          background: transparent; height: 36px; padding: 0 16px; border-radius: 6px; font-weight: 600; transition: all 0.2s ease;"
+          title="${text}"
+          onmouseover="this.style.background='color-mix(in srgb, var(--primary-color) 30%, transparent)'"
+          onmouseout="this.style.background='transparent'">
+          <img src="${iconPath}" alt="${text}" class="action-icon" style="width: 20px; height: 20px;"> ${text}
+          </button>`;
+}
+
+// ===== קטגוריה ד: כפתורי Toggle Sections =====
+
+// כפתור toggle - secondary דינמי
+function createToggleButton(sectionId, isOpen = true, title = 'הצג/הסתר') {
+  const icon = isOpen ? '▼' : '▲';
+  return `<button class="filter-toggle-btn" onclick="toggleSection('${sectionId}')"
+          style="border: 1px solid var(--secondary-color); color: var(--secondary-color); 
+          background: transparent; width: 30px; height: 30px; padding: 0; border-radius: 6px; transition: all 0.2s ease;"
+          title="${title}"
+          onmouseover="this.style.background='color-mix(in srgb, var(--secondary-color) 10%, transparent)'"
+          onmouseout="this.style.background='transparent'">
+          <span class="section-toggle-icon">${icon}</span>
+          </button>`;
+}
+
+// ===== קטגוריה ה: כפתורי מיון בכותרות טבלאות =====
+
+// כפתור מיון - primary דינמי
+function createSortableHeader(columnName, columnIndex, displayText) {
+  return `<button class="btn btn-link sortable-header"
+          data-sort-column="${columnIndex}"
+          style="color: var(--primary-color); text-decoration: none; font-weight: 600; padding: 0; border: none; background: transparent; transition: all 0.2s ease;"
+          onmouseover="this.style.opacity='0.8'"
+          onmouseout="this.style.opacity='1'">
+          ${displayText} <i class="fas fa-sort" style="color: var(--primary-color); opacity: 0.5; margin-right: 4px;"></i>
+          </button>`;
+}
+
+// ===== קטגוריה ו: כפתורים מיוחדים =====
+
+// כפתור פילטר ישויות - primary דינמי
+function createFilterButton(entityType, onClick, title, isActive = false) {
+  const activeClass = isActive ? 'active' : '';
+  const iconPath = `images/icons/${entityType}.svg`;
+  return `<button class="btn btn-sm filter-icon-btn ${activeClass}" 
+          onclick="${onClick}" data-type="${entityType}" title="${title}"
+          style="border: 1px solid var(--primary-color); color: var(--primary-color); 
+          background: ${isActive ? 'var(--primary-color)' : 'transparent'}; 
+          height: 30px; padding: 0 8px; border-radius: 6px; transition: all 0.2s ease;"
+          onmouseover="this.style.background='color-mix(in srgb, var(--primary-color) 10%, transparent)'"
+          onmouseout="this.style.background='${isActive ? 'var(--primary-color)' : 'transparent'}'">
+          <img src="${iconPath}" alt="${title}" class="action-icon" style="width: 16px; height: 16px;">
+          </button>`;
+}
+
+// כפתור ניווט בין עמודים - entity color דינמי
+function createNavigationButton(pageName, entityType, displayText) {
+  const iconPath = `images/icons/${entityType}.svg`;
+  return `<button class="btn w-100" onclick="window.location.href='${pageName}.html'"
+          style="border: 2px solid var(--entity-${entityType}-color); 
+          color: var(--entity-${entityType}-color); background: transparent; 
+          height: 60px; border-radius: 8px; font-weight: 600; transition: all 0.2s ease;"
+          onmouseover="this.style.background='color-mix(in srgb, var(--entity-${entityType}-color) 10%, transparent)'"
+          onmouseout="this.style.background='transparent'">
+          <img src="${iconPath}" alt="" style="width: 20px; height: 20px; vertical-align: middle; margin-left: 8px;">
+          ${displayText}
+          </button>`;
+}
+
 // ייצוא לפונקציות גלובליות
 window.BUTTON_ICONS = BUTTON_ICONS;
 window.BUTTON_TEXTS = BUTTON_TEXTS;
@@ -310,3 +433,17 @@ window.getButtonClass = getButtonClass;
 window.createActionsMenu = createActionsMenu;
 window.createCloseButton = createCloseButton;
 window.createModalActionButton = createModalActionButton;
+// קטגוריה ב: כפתורי טפסים
+window.createSaveButton = createSaveButton;
+window.createFormCancelButton = createFormCancelButton;
+// קטגוריה ג: כפתורי ניווט וכלים
+window.createRefreshButton = createRefreshButton;
+window.createCopyButton = createCopyButton;
+window.createAddButton = createAddButton;
+// קטגוריה ד: כפתורי Toggle Sections
+window.createToggleButton = createToggleButton;
+// קטגוריה ה: כפתורי מיון בכותרות טבלאות
+window.createSortableHeader = createSortableHeader;
+// קטגוריה ו: כפתורים מיוחדים
+window.createFilterButton = createFilterButton;
+window.createNavigationButton = createNavigationButton;

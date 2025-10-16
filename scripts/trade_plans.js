@@ -2,6 +2,9 @@
  * ========================================
  * Trade Plans Page - Trade Plans Page
  * ========================================
+ */
+
+console.log('🔍 trade_plans.js נטען!');
 
 /**
  * ביצוע תוכנית מסחר
@@ -2932,7 +2935,9 @@ document.addEventListener('DOMContentLoaded', function () {
 // Adding functions to global scope
 window.loadTradePlansData = loadTradePlansData;
 window.updateTradePlansTable = updateTradePlansTable;
+console.log('🔍 מייצא showAddTradePlanModal לגלובלי');
 window.showAddTradePlanModal = showAddTradePlanModal;
+console.log('🔍 showAddTradePlanModal מיוצא:', typeof window.showAddTradePlanModal);
 window.updateAddTickerInfo = updateAddTickerInfo;
 window.saveNewTradePlan = saveNewTradePlan;
 window.editTradePlan = editTradePlan;

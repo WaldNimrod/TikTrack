@@ -2449,6 +2449,31 @@ function filterTradesData(_selectedStatuses, _selectedTypes, _selectedAccounts, 
 // ייצוא פונקציה לפילטור נתונים
 window.filterTradesData = filterTradesData;
 
+/**
+ * הצגת פריטים מקושרים לטרייד
+ * View linked items for trade
+ * @param {number} tradeId - מזהה הטרייד
+ */
+function viewLinkedItemsForTrade(tradeId) {
+  try {
+    console.log('🔗 הצגת פריטים מקושרים לטרייד:', tradeId);
+    
+    if (typeof window.viewLinkedItems === 'function') {
+      window.viewLinkedItems('trade', tradeId);
+    } else {
+      console.error('פונקציה viewLinkedItems לא נטענה');
+      if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification('שגיאה', 'פונקציה viewLinkedItems לא נטענה');
+      }
+    }
+  } catch (error) {
+    console.error('שגיאה בהצגת פריטים מקושרים:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'שגיאה בהצגת פריטים מקושרים');
+    }
+  }
+}
+
 // הוספת event listeners לכפתורי המיון - משתמש בפונקציות הגלובליות
 function setupSortEventListeners() {
   const sortButtons = document.querySelectorAll('.sortable-header[data-sort-column]');

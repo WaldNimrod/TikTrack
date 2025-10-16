@@ -341,6 +341,32 @@ These are the immediate rules to implement across pages. After each fix is appro
 **Edits**:
 - `entity-details-api.js`: Added `trading_account: `/api/trading-accounts/${entityId}` to `endpointMappings` in `fetchFromExistingEndpoints` method
 
+### 5.7) Trade Plans & Trades Pages – Table Headers & Linked Items
+**Page**: `trade_plans.html`, `trades.html`, `trade_plans.js`, `trades.js`  
+**Problem**:
+- Table headers not centered (missing `text-center` class)
+- Missing linked items functionality wrapper functions
+- Sorting function calling wrong update function (causing RangeError)
+
+**Solution**:
+- Added `text-center` class to all table headers in both pages
+- Added `viewLinkedItemsForTradePlan()` and `viewLinkedItemsForTrade()` wrapper functions
+- Fixed sorting function to call `updateTradePlansTable` instead of `updateDesignsTable`
+
+**Status**: ✅ Completed
+
+**Edits**:
+- `trade_plans.html`: Added `text-center` class to all 10 table headers
+- `trades.html`: Added `text-center` class to all 12 table headers  
+- `trade_plans.js`: Added `viewLinkedItemsForTradePlan()` wrapper function
+- `trades.js`: Added `viewLinkedItemsForTrade()` wrapper function
+- `trade_plans.js`: Fixed `sortTable()` to call `updateTradePlansTable` instead of `updateDesignsTable`
+
+**Technical Notes**:
+- All table headers now properly centered according to Rule 4.2
+- Linked items functionality now properly integrated with existing `viewLinkedItems()` function
+- Sorting RangeError issue resolved by fixing function call
+
 ---
 
 ## 6) Appendix – Quick Links

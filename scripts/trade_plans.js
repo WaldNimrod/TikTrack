@@ -2102,7 +2102,7 @@ function sortTable(columnIndex) {
       columnIndex,
       window.filteredTradePlansData || window.tradePlansData,
       'trade_plans',
-      updateDesignsTable,
+      updateTradePlansTable,
     );
   } else {
     handleFunctionNotFound('sortTableData');
@@ -2115,6 +2115,31 @@ function sortTable(columnIndex) {
  * פונקציה מקומית לסידור (fallback)
  * Local sorting function (fallback)
  */
+
+/**
+ * הצגת פריטים מקושרים לתכנון טרייד
+ * View linked items for trade plan
+ * @param {number} planId - מזהה התכנון
+ */
+function viewLinkedItemsForTradePlan(planId) {
+  try {
+    console.log('🔗 הצגת פריטים מקושרים לתכנון טרייד:', planId);
+    
+    if (typeof window.viewLinkedItems === 'function') {
+      window.viewLinkedItems('trade_plan', planId);
+    } else {
+      console.error('פונקציה viewLinkedItems לא נטענה');
+      if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification('שגיאה', 'פונקציה viewLinkedItems לא נטענה');
+      }
+    }
+  } catch (error) {
+    console.error('שגיאה בהצגת פריטים מקושרים:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'שגיאה בהצגת פריטים מקושרים');
+    }
+  }
+}
 function performLocalSort(columnIndex) {
   const data = window.filteredTradePlansData || window.tradePlansData;
   const currentSortState = window.getSortState ? window.getSortState('trade_plans') : { columnIndex: -1, direction: 'asc' };

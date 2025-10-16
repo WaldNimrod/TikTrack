@@ -1030,8 +1030,8 @@ async function renderCashFlowsTable(cashFlows = null) {
             <td class="col-account ticker-cell">
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <button class="btn btn-sm btn-outline-info" 
-                      onclick="showEntityDetails('cash_flow', ${cashFlow.id})" 
-                      title="פרטי תזרים" 
+                      onclick="showEntityDetails('account', ${cashFlow.trading_account_id})" 
+                      title="פרטי חשבון" 
                       style="background-color: white; font-size: 0.8em;">
                         🔗
                     </button>
@@ -1051,7 +1051,7 @@ async function renderCashFlowsTable(cashFlows = null) {
             <td class="col-actions actions-cell">
                 ${window.createActionsMenu ? window.createActionsMenu([
                     window.createButton ? window.createButton('VIEW', `showEntityDetails('cash_flow', ${cashFlow.id})`) : '',
-                    window.createLinkButton ? window.createLinkButton(`showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})`) : '',
+                    window.createLinkButton ? window.createLinkButton(`showLinkedItemsModal([{type: 'account', id: ${cashFlow.trading_account_id}, name: '${accountName.replace(/'/g, "\\'")}'}], 'cash_flow', ${cashFlow.id})`) : '',
                     window.createEditButton ? window.createEditButton(`editCashFlow(${cashFlow.id})`) : '',
                     window.createDeleteButton ? window.createDeleteButton(`deleteCashFlow(${cashFlow.id})`) : ''
                 ], cashFlow.id) : ''}

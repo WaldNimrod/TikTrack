@@ -97,12 +97,8 @@
                             טיקרים
                         </h1>
                         <div class="header-actions">
-                            <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והטיקרים">
-                                <i class="fas fa-copy"></i> העתק לוג מפורט
-                            </button>
-                            <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר אזור טיקרים">
-                                <span class="filter-icon">▲</span>
-                            </button>
+                            ${window.createCopyButton ? window.createCopyButton('copyDetailedLog()', 'העתק לוג מפורט עם כל הנתונים והטיקרים') : '<button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והטיקרים"><i class="fas fa-copy"></i> העתק לוג מפורט</button>'}
+                            ${window.createToggleButton ? window.createToggleButton('top', false, 'הצג/הסתר אזור טיקרים') : '<button class="filter-toggle-btn" onclick="toggleSection(\'top\')" title="הצג/הסתר אזור טיקרים"><span class="filter-icon">▲</span></button>'}
                         </div>
                     </div>
                     <div class="section-body">
@@ -129,13 +125,8 @@
                             <span class="table-count" id="tickersCount">טוען...</span>
                         </h2>
                         <div class="header-actions">
-                            <button id="addTickerBtn" class="refresh-btn" onclick="window.showAddTickerModal && window.showAddTickerModal()" title="הוסף תיקר חדש">
-                                <img src="images/icons/tickers.svg" alt="הוסף" class="action-icon">
-                                הוסף
-                            </button>
-                            <button class="filter-toggle-btn" onclick="toggleSection('main')" title="הצג/הסתר אזור ניהול טיקרים">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
+                            ${window.createAddButton ? window.createAddButton('tickers', 'window.showAddTickerModal && window.showAddTickerModal()', 'הוסף תיקר חדש') : '<button id="addTickerBtn" class="refresh-btn" onclick="window.showAddTickerModal && window.showAddTickerModal()" title="הוסף תיקר חדש"><img src="images/icons/tickers.svg" alt="הוסף" class="action-icon"> הוסף</button>'}
+                            ${window.createToggleButton ? window.createToggleButton('main', true, 'הצג/הסתר אזור ניהול טיקרים') : '<button class="filter-toggle-btn" onclick="toggleSection(\'main\')" title="הצג/הסתר אזור ניהול טיקרים"><span class="section-toggle-icon">▼</span></button>'}
                         </div>
                     </div>
 

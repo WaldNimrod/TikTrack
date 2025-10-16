@@ -100,12 +100,8 @@
                         תכנון טריידים והשקעות
                     </h1>
                     <div class="header-actions">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והתכנונים">
-                            <i class="fas fa-copy"></i> העתק לוג מפורט
-                        </button>
-                        <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר אזור עיצובים">
-                            <span class="filter-icon">▲</span>
-                        </button>
+                        ${window.createCopyButton ? window.createCopyButton('copyDetailedLog()', 'העתק לוג מפורט עם כל הנתונים והתכנונים') : '<button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והתכנונים"><i class="fas fa-copy"></i> העתק לוג מפורט</button>'}
+                        ${window.createToggleButton ? window.createToggleButton('top', false, 'הצג/הסתר אזור עיצובים') : '<button class="filter-toggle-btn" onclick="toggleSection(\'top\')" title="הצג/הסתר אזור עיצובים"><span class="filter-icon">▲</span></button>'}
                     </div>
                 </div>
 
@@ -138,14 +134,8 @@
                             התכנונים שלי
                         </div>
                         <div class="header-actions">
-                            <button id="addTradePlanBtn" class="refresh-btn"
-                                onclick="if (typeof window.showAddTradePlanModal === 'function') { window.showAddTradePlanModal(); }"
-                                title="הוסף תכנון חדש">
-                                <img src="images/icons/trade_plans.svg" alt="הוסף" class="action-icon"> הוסף
-                            </button>
-                            <button class="filter-toggle-btn" onclick="toggleSection('main')" title="הצג/הסתר אזור התכנונים שלי">
-                                <span class="filter-icon">▲</span>
-                            </button>
+                            ${window.createAddButton ? window.createAddButton('trade_plans', 'if (typeof window.showAddTradePlanModal === \'function\') { window.showAddTradePlanModal(); }', 'הוסף תכנון חדש') : '<button id="addTradePlanBtn" class="refresh-btn" onclick="if (typeof window.showAddTradePlanModal === \'function\') { window.showAddTradePlanModal(); }" title="הוסף תכנון חדש"><img src="images/icons/trade_plans.svg" alt="הוסף" class="action-icon"> הוסף</button>'}
+                            ${window.createToggleButton ? window.createToggleButton('main', false, 'הצג/הסתר אזור התכנונים שלי') : '<button class="filter-toggle-btn" onclick="toggleSection(\'main\')" title="הצג/הסתר אזור התכנונים שלי"><span class="filter-icon">▲</span></button>'}
                         </div>
                     </div>
 

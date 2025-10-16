@@ -73,18 +73,14 @@
                 <div class="section-header">
             <h2><i class="bi bi-gear-fill"></i> העדפות</h2>
             <div class="header-actions">
-                    <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט">
-                            <i class="fas fa-copy"></i> העתק לוג מפורט
-                        </button>
+                    ${window.createCopyButton ? window.createCopyButton('copyDetailedLog()', 'העתק לוג מפורט') : '<button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט"><i class="fas fa-copy"></i> העתק לוג מפורט</button>'}
                     <button class="btn btn-success btn-sm" onclick="window.saveAllPreferences()" id="saveAllBtn">
                         <i class="bi bi-save"></i> שמור הכל
                     </button>
                     <button class="btn btn-warning btn-sm" onclick="window.resetToDefaults()" id="resetBtn">
                         <i class="bi bi-arrow-clockwise"></i> איפוס
                     </button>
-                    <button class="filter-toggle-btn" onclick="toggleAllSections()" id="toggleAllBtn" title="הצג/הסתר כל הסקשנים">
-                        <span class="filter-icon">▼</span>
-                        </button>
+                    ${window.createToggleButton ? window.createToggleButton('all', true, 'הצג/הסתר כל הסקשנים') : '<button class="filter-toggle-btn" onclick="toggleAllSections()" id="toggleAllBtn" title="הצג/הסתר כל הסקשנים"><span class="filter-icon">▼</span></button>'}
                 </div>
       </div>
             <div class="section-body" id="infoSummary">

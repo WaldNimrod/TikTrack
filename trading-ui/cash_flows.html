@@ -100,12 +100,8 @@
                         תזרימי מזומנים
                     </h1>
                     <div class="header-actions">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים ותזרימי המזומנים">
-                            <i class="fas fa-copy"></i> העתק לוג מפורט
-                        </button>
-                        <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר אזור תזרימי מזומנים">
-                            <span class="filter-icon">▲</span>
-                        </button>
+                        ${window.createCopyButton ? window.createCopyButton('copyDetailedLog()', 'העתק לוג מפורט עם כל הנתונים ותזרימי המזומנים') : '<button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים ותזרימי המזומנים"><i class="fas fa-copy"></i> העתק לוג מפורט</button>'}
+                        ${window.createToggleButton ? window.createToggleButton('top', false, 'הצג/הסתר אזור תזרימי מזומנים') : '<button class="filter-toggle-btn" onclick="toggleSection(\'top\')" title="הצג/הסתר אזור תזרימי מזומנים"><span class="filter-icon">▲</span></button>'}
                     </div>
                 </div>
 
@@ -134,13 +130,8 @@
                             ניהול תזרימי מזומנים
                         </h2>
                         <div class="header-actions">
-                            <button id="addCashFlowBtn" class="refresh-btn" onclick="showAddCashFlowModal()" title="הוסף תזרים מזומנים חדש">
-                                <img src="images/icons/cash_flows.svg" alt="הוסף" class="action-icon">
-                                הוסף
-                            </button>
-                            <button class="filter-toggle-btn" onclick="toggleSection('main')" title="הצג/הסתר אזור ניהול תזרימי מזומנים">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
+                            ${window.createAddButton ? window.createAddButton('cash_flows', 'showAddCashFlowModal()', 'הוסף תזרים מזומנים חדש') : '<button id="addCashFlowBtn" class="refresh-btn" onclick="showAddCashFlowModal()" title="הוסף תזרים מזומנים חדש"><img src="images/icons/cash_flows.svg" alt="הוסף" class="action-icon"> הוסף</button>'}
+                            ${window.createToggleButton ? window.createToggleButton('main', true, 'הצג/הסתר אזור ניהול תזרימי מזומנים') : '<button class="filter-toggle-btn" onclick="toggleSection(\'main\')" title="הצג/הסתר אזור ניהול תזרימי מזומנים"><span class="section-toggle-icon">▼</span></button>'}
                         </div>
                     </div>
 
@@ -157,16 +148,10 @@
                                             </button>
                                         </th>
                                         <th class="col-type">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, cashFlowsData, 'cash_flows', updateCashFlowsTable); }">
-                                                סוג <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${window.createSortableHeader ? window.createSortableHeader('type', 1, 'סוג') : '<button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === \'function\') { window.sortTableData(1, cashFlowsData, \'cash_flows\', updateCashFlowsTable); }">סוג <span class="sort-icon">↕</span></button>'}
                                         </th>
                                         <th class="col-amount">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(2, cashFlowsData, 'cash_flows', updateCashFlowsTable); }">
-                                                סכום <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${window.createSortableHeader ? window.createSortableHeader('amount', 2, 'סכום') : '<button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === \'function\') { window.sortTableData(2, cashFlowsData, \'cash_flows\', updateCashFlowsTable); }">סכום <span class="sort-icon">↕</span></button>'}
                                         </th>
                                         <th class="col-date">
                                             <button class="btn btn-link sortable-header"
@@ -308,8 +293,8 @@
                         </form>
                     </div>
                     <div class="modal-footer modal-footer-end">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-entity btn-entity-cash-flow" onclick="saveCashFlow()">הוסף תזרים</button>
+                        ${window.createFormCancelButton ? window.createFormCancelButton('', 'ביטול') : '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>'}
+                        ${window.createSaveButton ? window.createSaveButton('saveCashFlow()', 'הוסף תזרים', 'cash-flow') : '<button type="button" class="btn btn-entity btn-entity-cash-flow" onclick="saveCashFlow()">הוסף תזרים</button>'}
                     </div>
                 </div>
             </div>
@@ -411,8 +396,8 @@
                         </form>
                     </div>
                     <div class="modal-footer modal-footer-end">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-entity btn-entity-cash-flow" onclick="updateCashFlow()">עדכן תזרים</button>
+                        ${window.createFormCancelButton ? window.createFormCancelButton('', 'ביטול') : '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>'}
+                        ${window.createSaveButton ? window.createSaveButton('updateCashFlow()', 'עדכן תזרים', 'cash-flow') : '<button type="button" class="btn btn-entity btn-entity-cash-flow" onclick="updateCashFlow()">עדכן תזרים</button>'}
                     </div>
                 </div>
             </div>

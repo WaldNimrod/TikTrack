@@ -98,12 +98,8 @@
                         בסיס נתונים
                     </h1>
                     <div class="header-actions">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים מבסיס הנתונים">
-                            <i class="fas fa-copy"></i> העתק לוג מפורט
-                        </button>
-                        <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר אזור בסיס נתונים">
-                            <span class="filter-icon">▲</span>
-                        </button>
+                        ${window.createCopyButton ? window.createCopyButton('copyDetailedLog()', 'העתק לוג מפורט עם כל הנתונים מבסיס הנתונים') : '<button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים מבסיס הנתונים"><i class="fas fa-copy"></i> העתק לוג מפורט</button>'}
+                        ${window.createToggleButton ? window.createToggleButton('top', false, 'הצג/הסתר אזור בסיס נתונים') : '<button class="filter-toggle-btn" onclick="toggleSection(\'top\')" title="הצג/הסתר אזור בסיס נתונים"><span class="filter-icon">▲</span></button>'}
                     </div>
                 </div>
 

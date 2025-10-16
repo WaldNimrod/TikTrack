@@ -102,12 +102,8 @@
                         מחקר וניתוח
                     </h1>
                     <div class="header-actions">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="refreshResearch()" title="רענן ניתוחים">
-                            <i class="fas fa-sync-alt"></i> רענן
-                        </button>
-                        <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר סקשן">
-                            <span class="filter-icon">▲</span>
-                        </button>
+                        ${window.createRefreshButton ? window.createRefreshButton('refreshResearch()', 'רענן ניתוחים') : '<button class="btn btn-sm btn-outline-secondary" onclick="refreshResearch()" title="רענן ניתוחים"><i class="fas fa-sync-alt"></i> רענן</button>'}
+                        ${window.createToggleButton ? window.createToggleButton('top', false, 'הצג/הסתר סקשן') : '<button class="filter-toggle-btn" onclick="toggleSection(\'top\')" title="הצג/הסתר סקשן"><span class="filter-icon">▲</span></button>'}
                     </div>
                 </div>
 

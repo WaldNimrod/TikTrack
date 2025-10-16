@@ -99,12 +99,8 @@
                         עסקעות
                     </h1>
                     <div class="header-actions">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והעסקעות">
-                            <i class="fas fa-copy"></i> העתק לוג מפורט
-                        </button>
-                        <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר אזור עסקעות">
-                            <span class="filter-icon">▲</span>
-                        </button>
+                        ${window.createCopyButton ? window.createCopyButton('copyDetailedLog()', 'העתק לוג מפורט עם כל הנתונים והעסקעות') : '<button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והעסקעות"><i class="fas fa-copy"></i> העתק לוג מפורט</button>'}
+                        ${window.createToggleButton ? window.createToggleButton('top', false, 'הצג/הסתר אזור עסקעות') : '<button class="filter-toggle-btn" onclick="toggleSection(\'top\')" title="הצג/הסתר אזור עסקעות"><span class="filter-icon">▲</span></button>'}
                     </div>
                 </div>
 
@@ -133,13 +129,8 @@
                             ניהול עסקעות
                         </h2>
                         <div class="header-actions">
-                            <button id="addExecutionBtn" class="refresh-btn" onclick="openExecutionDetails()" title="הוסף עסקה חדשה">
-                                <img src="images/icons/executions.svg" alt="הוסף" class="action-icon">
-                                הוסף
-                            </button>
-                            <button class="filter-toggle-btn" onclick="toggleSection('main')" title="הצג/הסתר אזור ניהול עסקעות">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
+                            ${window.createAddButton ? window.createAddButton('executions', 'openExecutionDetails()', 'הוסף עסקה חדשה') : '<button id="addExecutionBtn" class="refresh-btn" onclick="openExecutionDetails()" title="הוסף עסקה חדשה"><img src="images/icons/executions.svg" alt="הוסף" class="action-icon"> הוסף</button>'}
+                            ${window.createToggleButton ? window.createToggleButton('main', true, 'הצג/הסתר אזור ניהול עסקעות') : '<button class="filter-toggle-btn" onclick="toggleSection(\'main\')" title="הצג/הסתר אזור ניהול עסקעות"><span class="section-toggle-icon">▼</span></button>'}
                         </div>
                     </div>
 

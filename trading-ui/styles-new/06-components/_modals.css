@@ -644,6 +644,38 @@
     border-color: var(--current-entity-color, #007bff);
 }
 
+/* ========================================
+   כפתורי פעולות במודולים - גודל 30px
+   ======================================== */
+
+/* כפתורי פעולות בתוך מודולים - גודל סטנדרטי 30px × 30px */
+.btn-modal-action {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--current-entity-text, #333);
+  border-radius: 0.25rem;
+  background-color: transparent;
+  color: var(--current-entity-text, #333);
+  font-size: 1rem;
+  font-weight: bold;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.8;
+  transition: all 0.2s ease;
+}
+
+/* הובר - צבע רגיל של הישות */
+.btn-modal-action:hover {
+  opacity: 1;
+  color: var(--current-entity-color, #007bff);
+  border-color: var(--current-entity-color, #007bff);
+  background-color: rgba(var(--current-entity-color-rgb, 0, 123, 255), 0.1);
+}
+
 .modal-content.entity-details-modal .modal-header .modal-title {
     margin: 0;
     flex-grow: 1;

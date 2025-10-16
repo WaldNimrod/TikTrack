@@ -234,7 +234,7 @@
                 <div class="modal-content entity-alert">
                     <div class="modal-header entity-header entity-alert">
                         <h4 class="modal-title entity-title">הוספת התראה</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        ${window.createCloseButton ? window.createCloseButton('', 'Close') : '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'}
                     </div>
                     <div class="modal-body">
                         <form id="addAlertForm">
@@ -403,7 +403,7 @@
                 <div class="modal-content entity-alert">
                     <div class="modal-header entity-header entity-alert">
                         <h4 class="modal-title entity-title">עריכת התראה</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        ${window.createCloseButton ? window.createCloseButton('', 'Close') : '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'}
                     </div>
                     <div class="modal-body">
                         <form id="editAlertForm">

@@ -242,7 +242,7 @@
                 <div class="modal-content entity-trade-plan">
                     <div class="modal-header entity-header entity-trade-plan">
                         <h4 class="modal-title entity-title">הוספת תכנון חדש</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        ${window.createCloseButton ? window.createCloseButton('', 'Close') : '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'}
                     </div>
                     <div class="modal-body">
                         <form id="addTradePlanForm">
@@ -387,7 +387,7 @@
                 <div class="modal-content entity-trade-plan">
                     <div class="modal-header entity-header entity-trade-plan">
                         <h4 class="modal-title entity-title">עריכת תכנון</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        ${window.createCloseButton ? window.createCloseButton('', 'Close') : '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'}
                     </div>
                     <div class="modal-body">
                         <form id="editTradePlanForm">

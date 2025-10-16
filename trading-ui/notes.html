@@ -231,7 +231,7 @@
                 <div class="modal-content entity-note">
                     <div class="modal-header entity-header entity-note">
                         <h4 class="modal-title entity-title">הוספת הערה חדשה</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        ${window.createCloseButton ? window.createCloseButton('', 'Close') : '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'}
                     </div>
                     <div class="modal-body">
                         <form id="addNoteForm">
@@ -302,7 +302,7 @@
                 <div class="modal-content entity-note">
                     <div class="modal-header entity-header entity-note">
                         <h4 class="modal-title entity-title">עריכת הערה</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        ${window.createCloseButton ? window.createCloseButton('', 'Close') : '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'}
                     </div>
                     <div class="modal-body">
                         <form id="editNoteForm">

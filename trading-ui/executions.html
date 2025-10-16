@@ -236,7 +236,7 @@
                 <div class="modal-content entity-execution">
                     <div class="modal-header entity-header entity-execution">
                         <h4 class="modal-title entity-title">הוספת עסקה חדשה</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        ${window.createCloseButton ? window.createCloseButton('', 'Close') : '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'}
                     </div>
                     <div class="modal-body">
                         <form id="addExecutionForm">
@@ -356,7 +356,7 @@
                 <div class="modal-content entity-execution">
                     <div class="modal-header entity-header entity-execution">
                         <h4 class="modal-title entity-title">עריכת עסקה</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        ${window.createCloseButton ? window.createCloseButton('', 'Close') : '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'}
                     </div>
                     <div class="modal-body">
                         <form id="editExecutionForm">

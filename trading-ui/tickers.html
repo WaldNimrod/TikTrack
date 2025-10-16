@@ -217,7 +217,7 @@
                 <div class="modal-content entity-ticker">
                     <div class="modal-header entity-header entity-ticker">
                         <h4 class="modal-title entity-title">הוספת טיקר חדש</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        ${window.createCloseButton ? window.createCloseButton('', 'Close') : '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'}
                     </div>
                     <div class="modal-body">
                         <form id="addTickerForm">
@@ -307,7 +307,7 @@
                 <div class="modal-content entity-ticker">
                     <div class="modal-header entity-header entity-ticker">
                         <h4 class="modal-title entity-title">עריכת טיקר</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        ${window.createCloseButton ? window.createCloseButton('', 'Close') : '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'}
                     </div>
                     <div class="modal-body">
                         <form id="editTickerForm">

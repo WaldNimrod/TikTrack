@@ -279,6 +279,24 @@ function createActionsMenu(buttons, entityId) {
   `;
 }
 
+// פונקציה ליצירת כפתור סגירה סטנדרטי
+function createCloseButton(modalId = '', ariaLabel = 'Close') {
+  const dataDismiss = modalId ? `data-bs-dismiss="modal"` : '';
+  const ariaLabelAttr = ariaLabel ? `aria-label="${ariaLabel}"` : '';
+  
+  return `<button type="button" class="btn-close" ${dataDismiss} ${ariaLabelAttr}></button>`;
+}
+
+// פונקציה ליצירת כפתור פעולה בתוך מודול (גודל 30px)
+function createModalActionButton(type, onClick, additionalClasses = '', additionalAttributes = '') {
+  const icon = BUTTON_ICONS[type.toUpperCase()] || '';
+  const text = BUTTON_TEXTS[type.toUpperCase()] || '';
+  const buttonClass = getButtonClass(type);
+
+  return `<button class="btn btn-modal-action ${buttonClass} ${additionalClasses}" onclick="${onClick}" ` +
+         `title="${text}" ${additionalAttributes}>${icon}</button>`;
+}
+
 // ייצוא לפונקציות גלובליות
 window.BUTTON_ICONS = BUTTON_ICONS;
 window.BUTTON_TEXTS = BUTTON_TEXTS;
@@ -290,3 +308,5 @@ window.createCancelButton = createCancelButton;
 window.createDeleteButtonByType = createDeleteButtonByType;
 window.getButtonClass = getButtonClass;
 window.createActionsMenu = createActionsMenu;
+window.createCloseButton = createCloseButton;
+window.createModalActionButton = createModalActionButton;

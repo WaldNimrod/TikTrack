@@ -270,7 +270,7 @@
                 <div class="modal-content entity-trade">
                     <div class="modal-header entity-header entity-trade">
                         <h4 class="modal-title entity-title">הוספת טרייד חדש</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        ${window.createCloseButton ? window.createCloseButton('', 'Close') : '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'}
                     </div>
                     <div class="modal-body">
                         <form id="addTradeForm">
@@ -399,7 +399,7 @@
                 <div class="modal-content entity-trade">
                     <div class="modal-header entity-header entity-trade">
                         <h4 class="modal-title entity-title">עריכת טרייד</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        ${window.createCloseButton ? window.createCloseButton('', 'Close') : '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'}
                     </div>
 
                     <!-- שורת מידע ואיקונים מתחת לכותרת -->
@@ -535,7 +535,7 @@
                 <div class="modal-content">
                     <div class="modal-header modal-header-colored">
                         <h5 class="modal-title" id="linkedItemsModalLabel">פרטים מקושרים</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        ${window.createCloseButton ? window.createCloseButton('', 'Close') : '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'}
                     </div>
                     <div class="modal-body" id="linkedItemsModalBody">
                         <!-- תוכן המודל יוכנס כאן דינמית -->

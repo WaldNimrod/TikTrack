@@ -104,7 +104,7 @@ class EntityDetailsModal {
                             <div id="quickActionButtons" class="btn-group btn-group-sm" role="group">
                                 <!-- כפתורי פעולות מהירות יוכנסו כאן דינמית -->
                             </div>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            ${window.createCloseButton ? window.createCloseButton('', 'Close') : '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'}
                         </div>
                         <div class="modal-body entity-details-body" id="entityDetailsContent">
                             <div class="entity-details-loading">

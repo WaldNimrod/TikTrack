@@ -3325,7 +3325,7 @@ window.showDetailedNotification = async function(title, message, type = 'info', 
           <div class="modal-content">
             <div class="modal-header bg-${type === 'error' ? 'danger' : type === 'warning' ? 'warning' : type === 'success' ? 'success' : 'info'} text-white">
               <h5 class="modal-title" id="${modalId}Label">${title}</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              ${window.createCloseButton ? window.createCloseButton('', 'Close') : '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'}
             </div>
             <div class="modal-body">
               <div style="white-space: pre-line; font-family: monospace; font-size: 0.9em;">${message}</div>

@@ -151,9 +151,7 @@
                                 <img src="images/icons/trade_plans.svg" alt="הוסף" class="action-icon"
                                     style="width: 16px; height: 16px;"> הוסף
                             </button>
-                            <button class="filter-toggle-btn" onclick="toggleSection('main')" title="הצג/הסתר אזור התכנונים שלי">
-                                <span class="filter-icon">▲</span>
-                            </button>
+                            ${window.createToggleButton ? window.createToggleButton('main', false, 'הצג/הסתר אזור התכנונים שלי') : '<button class="filter-toggle-btn" onclick="toggleSection(\'main\')" title="הצג/הסתר אזור התכנונים שלי"><span class="filter-icon">▲</span></button>'}
                         </div>
                     </div>
 
@@ -266,7 +264,7 @@
                 <div class="modal-content">
                     <div class="modal-header modal-header-colored">
                         <h5 class="modal-title" id="addTradePlanModalLabel">הוספת תכנון חדש</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        ${window.createCloseButton ? window.createCloseButton('', 'סגור') : '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'}
                     </div>
                     <div class="modal-body">
                         <form id="addTradePlanForm">
@@ -331,7 +329,7 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                        ${window.createFormCancelButton ? window.createFormCancelButton('', 'ביטול') : '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>'}
                         <button type="button" class="btn btn-success" onclick="addTradePlan()"
                             style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">הוסף
                             תכנון</button>
@@ -347,7 +345,7 @@
                 <div class="modal-content">
                     <div class="modal-header modal-header-colored">
                         <h5 class="modal-title" id="editTradePlanModalLabel">עריכת תכנון</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        ${window.createCloseButton ? window.createCloseButton('', 'סגור') : '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'}
                     </div>
                     <div class="modal-body">
                         <form id="editTradePlanForm">
@@ -410,7 +408,7 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                        ${window.createFormCancelButton ? window.createFormCancelButton('', 'ביטול') : '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>'}
                         <button type="button" class="btn btn-success" onclick="updateTradePlan()"
                             style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">עדכן
                             תכנון</button>

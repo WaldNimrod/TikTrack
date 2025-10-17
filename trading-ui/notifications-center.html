@@ -193,6 +193,126 @@
                 </div>
                 <!-- UI Content Section Top End -->  
 
+                <!-- Notification Modes Testing Section -->
+                <div class="content-section" id="notification-modes-testing">
+                    <div class="section-header">
+                        <h2>🔧 בדיקת מצבי עבודה</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('notification-modes-testing')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-cogs text-primary"></i>
+                                            בדיקת מצבי עבודה למערכת התראות
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text text-muted">
+                                            בדוק איך כל מצב עבודה משפיע על הצגת התראות שונות
+                                        </p>
+                                        
+                                        <!-- Mode Testing Buttons -->
+                                        <div class="row mb-4">
+                                            <div class="col-md-6 mb-3">
+                                                <button class="btn btn-outline-secondary w-100" onclick="testNotificationMode('debug')">
+                                                    <i class="fas fa-bug me-2"></i>
+                                                    בדוק מצב דיבג
+                                                </button>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <button class="btn btn-outline-primary w-100" onclick="testNotificationMode('development')">
+                                                    <i class="fas fa-code me-2"></i>
+                                                    בדוק מצב פיתוח
+                                                </button>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <button class="btn btn-outline-success w-100" onclick="testNotificationMode('work')">
+                                                    <i class="fas fa-briefcase me-2"></i>
+                                                    בדוק מצב עבודה
+                                                </button>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <button class="btn btn-outline-danger w-100" onclick="testNotificationMode('silent')">
+                                                    <i class="fas fa-volume-mute me-2"></i>
+                                                    בדוק מצב מושתק
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Full Test Button -->
+                                        <div class="row mb-4">
+                                            <div class="col-12">
+                                                <button class="btn btn-primary w-100" onclick="runFullNotificationModeTest()">
+                                                    <i class="fas fa-play me-2"></i>
+                                                    הרץ בדיקה מלאה לכל המצבים
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Test Results -->
+                                        <div class="test-results" id="notificationModeTestResults" style="display: none;">
+                                            <h6 class="text-primary mb-3">
+                                                <i class="fas fa-chart-bar me-2"></i>
+                                                תוצאות בדיקה
+                                            </h6>
+                                            <div id="testResultsContent">
+                                                <!-- תוצאות יוצגו כאן -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Current Mode Status -->
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="card-title mb-0">
+                                            <i class="fas fa-info-circle text-info"></i>
+                                            מצב נוכחי
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="currentNotificationMode" class="mode-status">
+                                            <div class="status-indicator">
+                                                <i class="fas fa-briefcase status-icon text-success"></i>
+                                                <span class="status-text">מצב עבודה</span>
+                                            </div>
+                                            <div class="status-description">
+                                                מצב ברירת מחדל - מאזן בין מידע לרעש
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Mode Statistics -->
+                                        <div class="mt-3">
+                                            <h6 class="text-muted mb-2">סטטיסטיקות מצב נוכחי</h6>
+                                            <div id="modeStatistics">
+                                                <div class="stat-item">
+                                                    <span class="stat-label">הודעות שהוצגו:</span>
+                                                    <span class="stat-value" id="displayedCount">0</span>
+                                                </div>
+                                                <div class="stat-item">
+                                                    <span class="stat-label">הודעות שנחסמו:</span>
+                                                    <span class="stat-value" id="blockedCount">0</span>
+                                                </div>
+                                                <div class="stat-item">
+                                                    <span class="stat-label">אחוז הצגה:</span>
+                                                    <span class="stat-value" id="displayPercentage">0%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Notification Modes Testing Section -->
 
                 <!-- UI Content Section 1 Start-->
                 <div class="content-section" id="section1">
@@ -304,6 +424,320 @@
     <script>
         // Make the local copyDetailedLog function available globally for this page only
         window.copyDetailedLog = copyDetailedLog;
+    </script>
+
+    <!-- Notification Modes Testing Functions -->
+    <script>
+        // מצבי עבודה למערכת התראות
+        const NOTIFICATION_MODES = {
+            debug: {
+                name: 'debug',
+                title: 'מצב דיבג',
+                description: 'הצגת כל ההתראות המפורטות כולל הודעות משניות',
+                icon: 'fas fa-bug',
+                color: '#6c757d'
+            },
+            development: {
+                name: 'development', 
+                title: 'מצב פיתוח',
+                description: 'הצגת הודעות מרכזיות בלבד',
+                icon: 'fas fa-code',
+                color: '#6f42c1'
+            },
+            work: {
+                name: 'work',
+                title: 'מצב עבודה', 
+                description: 'הצגת הודעות שגיאה והודעות שהם תוצאה של פעולות ותהליכים שהמשתמש הריץ',
+                icon: 'fas fa-briefcase',
+                color: '#28a745'
+            },
+            silent: {
+                name: 'silent',
+                title: 'מצב מושתק',
+                description: 'הצגת הודעות שגיאה בלבד',
+                icon: 'fas fa-volume-mute',
+                color: '#dc3545'
+            }
+        };
+
+        // סטטיסטיקות בדיקה
+        let testStatistics = {
+            total: 0,
+            displayed: 0,
+            blocked: 0
+        };
+
+        /**
+         * בדוק מצב עבודה ספציפי
+         */
+        async function testNotificationMode(mode) {
+            try {
+                console.log(`🔧 Testing notification mode: ${mode}`);
+                
+                // שמור את המצב הנוכחי
+                const originalMode = await window.getPreference('notification_mode', 1, null) || 'work';
+                
+                // שנה למצב הבדיקה
+                await window.savePreference('notification_mode', mode, 1, null);
+                
+                // עדכן תצוגה
+                updateCurrentModeDisplay(mode);
+                
+                // אפס סטטיסטיקות
+                resetTestStatistics();
+                
+                // הצג הודעות בדיקה
+                await runNotificationTests(mode);
+                
+                // הצג תוצאות
+                displayTestResults(mode);
+                
+                // החזר למצב המקורי
+                setTimeout(async () => {
+                    await window.savePreference('notification_mode', originalMode, 1, null);
+                    updateCurrentModeDisplay(originalMode);
+                }, 5000);
+                
+            } catch (error) {
+                console.error('Error testing notification mode:', error);
+                await showErrorNotification('שגיאה', 'נכשל בבדיקת מצב העבודה');
+            }
+        }
+
+        /**
+         * הרץ בדיקה מלאה לכל המצבים
+         */
+        async function runFullNotificationModeTest() {
+            try {
+                console.log('🔧 Running full notification mode test');
+                
+                const modes = ['debug', 'development', 'work', 'silent'];
+                const results = {};
+                
+                for (const mode of modes) {
+                    console.log(`Testing mode: ${mode}`);
+                    
+                    // שנה למצב
+                    await window.savePreference('notification_mode', mode, 1, null);
+                    updateCurrentModeDisplay(mode);
+                    
+                    // אפס סטטיסטיקות
+                    resetTestStatistics();
+                    
+                    // הרץ בדיקות
+                    await runNotificationTests(mode);
+                    
+                    // שמור תוצאות
+                    results[mode] = {
+                        displayed: testStatistics.displayed,
+                        blocked: testStatistics.blocked,
+                        total: testStatistics.total
+                    };
+                    
+                    // המתן קצת בין בדיקות
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+                
+                // הצג תוצאות מלאות
+                displayFullTestResults(results);
+                
+                // החזר למצב עבודה
+                await window.savePreference('notification_mode', 'work', 1, null);
+                updateCurrentModeDisplay('work');
+                
+            } catch (error) {
+                console.error('Error running full test:', error);
+                await showErrorNotification('שגיאה', 'נכשל בבדיקת מצבי העבודה');
+            }
+        }
+
+        /**
+         * הרץ בדיקות התראות
+         */
+        async function runNotificationTests(mode) {
+            const testNotifications = [
+                { type: 'info', category: 'system', message: 'הודעת מידע לבדיקה', title: 'בדיקת מידע' },
+                { type: 'success', category: 'business', message: 'הודעת הצלחה לבדיקה', title: 'בדיקת הצלחה', userInitiated: true },
+                { type: 'warning', category: 'system', message: 'הודעת אזהרה לבדיקה', title: 'בדיקת אזהרה' },
+                { type: 'error', category: 'system', message: 'הודעת שגיאה לבדיקה', title: 'בדיקת שגיאה' },
+                { type: 'info', category: 'development', message: 'הודעת פיתוח לבדיקה', title: 'בדיקת פיתוח' },
+                { type: 'success', category: 'business', message: 'פעולת משתמש הושלמה', title: 'פעולת משתמש', userInitiated: true }
+            ];
+            
+            for (const notification of testNotifications) {
+                testStatistics.total++;
+                
+                try {
+                    // בדוק אם ההודעה צריכה להיות מוצגת
+                    const shouldShow = await shouldShowNotification(
+                        notification.category,
+                        notification.type,
+                        notification.userInitiated || false,
+                        notification.message,
+                        notification.title,
+                        'testNotificationMode'
+                    );
+                    
+                    if (shouldShow) {
+                        testStatistics.displayed++;
+                        await showNotification(
+                            notification.message,
+                            notification.type,
+                            notification.title,
+                            2000,
+                            notification.category,
+                            { userInitiated: notification.userInitiated || false }
+                        );
+                    } else {
+                        testStatistics.blocked++;
+                        console.log(`🔍 Notification blocked: ${notification.type} - ${notification.category}`);
+                    }
+                } catch (error) {
+                    console.warn('Error testing notification:', error);
+                }
+                
+                // המתן קצת בין הודעות
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+        }
+
+        /**
+         * עדכן תצוגת מצב נוכחי
+         */
+        function updateCurrentModeDisplay(mode) {
+            const modeData = NOTIFICATION_MODES[mode];
+            if (!modeData) return;
+            
+            const statusElement = document.getElementById('currentNotificationMode');
+            if (statusElement) {
+                statusElement.innerHTML = `
+                    <div class="status-indicator">
+                        <i class="${modeData.icon} status-icon" style="color: ${modeData.color};"></i>
+                        <span class="status-text">${modeData.title}</span>
+                    </div>
+                    <div class="status-description">
+                        ${modeData.description}
+                    </div>
+                `;
+            }
+        }
+
+        /**
+         * אפס סטטיסטיקות בדיקה
+         */
+        function resetTestStatistics() {
+            testStatistics = {
+                total: 0,
+                displayed: 0,
+                blocked: 0
+            };
+        }
+
+        /**
+         * הצג תוצאות בדיקה
+         */
+        function displayTestResults(mode) {
+            const resultsElement = document.getElementById('notificationModeTestResults');
+            const contentElement = document.getElementById('testResultsContent');
+            
+            if (resultsElement && contentElement) {
+                const percentage = testStatistics.total > 0 ? 
+                    Math.round((testStatistics.displayed / testStatistics.total) * 100) : 0;
+                
+                contentElement.innerHTML = `
+                    <div class="alert alert-info">
+                        <h6>תוצאות בדיקת מצב: ${NOTIFICATION_MODES[mode].title}</h6>
+                        <div class="row">
+                            <div class="col-4">
+                                <strong>${testStatistics.displayed}</strong><br>
+                                <small>הוצגו</small>
+                            </div>
+                            <div class="col-4">
+                                <strong>${testStatistics.blocked}</strong><br>
+                                <small>נחסמו</small>
+                            </div>
+                            <div class="col-4">
+                                <strong>${percentage}%</strong><br>
+                                <small>אחוז הצגה</small>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                resultsElement.style.display = 'block';
+            }
+            
+            // עדכן סטטיסטיקות
+            updateModeStatistics();
+        }
+
+        /**
+         * הצג תוצאות בדיקה מלאה
+         */
+        function displayFullTestResults(results) {
+            const resultsElement = document.getElementById('notificationModeTestResults');
+            const contentElement = document.getElementById('testResultsContent');
+            
+            if (resultsElement && contentElement) {
+                let html = '<div class="alert alert-success"><h6>תוצאות בדיקה מלאה לכל המצבים</h6>';
+                
+                for (const [mode, stats] of Object.entries(results)) {
+                    const percentage = stats.total > 0 ? 
+                        Math.round((stats.displayed / stats.total) * 100) : 0;
+                    
+                    html += `
+                        <div class="row mb-2">
+                            <div class="col-3">
+                                <strong>${NOTIFICATION_MODES[mode].title}</strong>
+                            </div>
+                            <div class="col-3">
+                                ${stats.displayed} הוצגו
+                            </div>
+                            <div class="col-3">
+                                ${stats.blocked} נחסמו
+                            </div>
+                            <div class="col-3">
+                                ${percentage}%
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                html += '</div>';
+                contentElement.innerHTML = html;
+                resultsElement.style.display = 'block';
+            }
+        }
+
+        /**
+         * עדכן סטטיסטיקות מצב
+         */
+        function updateModeStatistics() {
+            const displayedElement = document.getElementById('displayedCount');
+            const blockedElement = document.getElementById('blockedCount');
+            const percentageElement = document.getElementById('displayPercentage');
+            
+            if (displayedElement) displayedElement.textContent = testStatistics.displayed;
+            if (blockedElement) blockedElement.textContent = testStatistics.blocked;
+            
+            if (percentageElement) {
+                const percentage = testStatistics.total > 0 ? 
+                    Math.round((testStatistics.displayed / testStatistics.total) * 100) : 0;
+                percentageElement.textContent = `${percentage}%`;
+            }
+        }
+
+        // טען מצב נוכחי כשהדף נטען
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(async () => {
+                try {
+                    const currentMode = await window.getPreference('notification_mode', 1, null) || 'work';
+                    updateCurrentModeDisplay(currentMode);
+                } catch (error) {
+                    console.warn('Failed to load current notification mode:', error);
+                }
+            }, 1000);
+        });
     </script>
 </body>
 </html>

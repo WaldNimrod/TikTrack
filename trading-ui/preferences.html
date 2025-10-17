@@ -83,6 +83,87 @@
     
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">
+    
+    <!-- Notification Modes Styles -->
+    <style>
+        .notification-mode-option {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .notification-mode-option:hover {
+            border-color: #29a6a8;
+            background-color: #f8f9fa;
+        }
+        
+        .notification-mode-option input[type="radio"]:checked + label {
+            color: #29a6a8;
+        }
+        
+        .notification-mode-option:has(input[type="radio"]:checked) {
+            border-color: #29a6a8;
+            background-color: #e8f4f4;
+        }
+        
+        .mode-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .mode-icon {
+            font-size: 1.2em;
+            margin-left: 8px;
+        }
+        
+        .mode-description {
+            font-size: 0.9em;
+            color: #6c757d;
+            line-height: 1.4;
+        }
+        
+        .mode-status {
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .status-icon {
+            font-size: 1.3em;
+            margin-left: 10px;
+        }
+        
+        .status-text {
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+        
+        .status-description {
+            font-size: 0.9em;
+            color: #6c757d;
+            line-height: 1.4;
+        }
+        
+        .notification-modes-container .form-check-label {
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .notification-modes-container .form-check-input {
+            margin-top: 0.25em;
+        }
+    </style>
 </head>
 
 <body class="preferences-page">
@@ -126,6 +207,143 @@
 
             <!-- Main content -->
             <div class="main-content">
+                <!-- Notification Modes Section -->
+                <div class="content-section" id="notification-modes">
+                    <!-- Notification Modes header -->
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/notifications.svg" alt="מצבי עבודה להתראות" class="section-icon">
+                            מצבי עבודה להתראות
+                        </div>
+                        <div class="table-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('notification-modes')" title="הצג/הסתר אזור מצבי עבודה">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Notification Modes body -->
+                    <div class="section-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <i class="fas fa-cog me-2"></i>
+                                            בחר מצב עבודה למערכת ההתראות
+                                        </h5>
+                                        <p class="card-text text-muted">
+                                            כל מצב עבודה מגדיר רמת פירוט שונה של התראות שמוצגות במערכת
+                                        </p>
+                                        
+                                        <!-- Notification Mode Selection -->
+                                        <div class="notification-modes-container">
+                                            <div class="row">
+                                                <!-- Debug Mode -->
+                                                <div class="col-md-6 mb-3">
+                                                    <div class="form-check notification-mode-option" data-mode="debug">
+                                                        <input class="form-check-input" type="radio" name="notificationMode" id="modeDebug" value="debug">
+                                                        <label class="form-check-label" for="modeDebug">
+                                                            <div class="mode-header">
+                                                                <i class="fas fa-bug mode-icon" style="color: #6c757d;"></i>
+                                                                <strong>מצב דיבג</strong>
+                                                            </div>
+                                                            <div class="mode-description">
+                                                                הצגת כל ההתראות המפורטות כולל הודעות משניות
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Development Mode -->
+                                                <div class="col-md-6 mb-3">
+                                                    <div class="form-check notification-mode-option" data-mode="development">
+                                                        <input class="form-check-input" type="radio" name="notificationMode" id="modeDevelopment" value="development">
+                                                        <label class="form-check-label" for="modeDevelopment">
+                                                            <div class="mode-header">
+                                                                <i class="fas fa-code mode-icon" style="color: #6f42c1;"></i>
+                                                                <strong>מצב פיתוח</strong>
+                                                            </div>
+                                                            <div class="mode-description">
+                                                                הצגת הודעות מרכזיות בלבד
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Work Mode -->
+                                                <div class="col-md-6 mb-3">
+                                                    <div class="form-check notification-mode-option" data-mode="work">
+                                                        <input class="form-check-input" type="radio" name="notificationMode" id="modeWork" value="work" checked>
+                                                        <label class="form-check-label" for="modeWork">
+                                                            <div class="mode-header">
+                                                                <i class="fas fa-briefcase mode-icon" style="color: #28a745;"></i>
+                                                                <strong>מצב עבודה</strong>
+                                                            </div>
+                                                            <div class="mode-description">
+                                                                הצגת הודעות שגיאה והודעות שהם תוצאה של פעולות ותהליכים שהמשתמש הריץ
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Silent Mode -->
+                                                <div class="col-md-6 mb-3">
+                                                    <div class="form-check notification-mode-option" data-mode="silent">
+                                                        <input class="form-check-input" type="radio" name="notificationMode" id="modeSilent" value="silent">
+                                                        <label class="form-check-label" for="modeSilent">
+                                                            <div class="mode-header">
+                                                                <i class="fas fa-volume-mute mode-icon" style="color: #dc3545;"></i>
+                                                                <strong>מצב מושתק</strong>
+                                                            </div>
+                                                            <div class="mode-description">
+                                                                הצגת הודעות שגיאה בלבד
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Save Button -->
+                                        <div class="mt-4">
+                                            <button type="button" class="btn btn-primary" onclick="saveNotificationMode()">
+                                                <i class="fas fa-save me-2"></i>
+                                                שמור מצב עבודה
+                                            </button>
+                                            <button type="button" class="btn btn-outline-secondary ms-2" onclick="testNotificationMode()">
+                                                <i class="fas fa-play me-2"></i>
+                                                בדוק מצב נוכחי
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Current Mode Status -->
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            מצב נוכחי
+                                        </h6>
+                                        <div id="currentModeStatus" class="mode-status">
+                                            <div class="status-indicator">
+                                                <i class="fas fa-briefcase status-icon" style="color: #28a745;"></i>
+                                                <span class="status-text">מצב עבודה</span>
+                                            </div>
+                                            <div class="status-description">
+                                                מצב ברירת מחדל - מאזן בין מידע לרעש
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- End notification-modes section -->
+
                 <!-- Preferences management area - content-section -->
                 <div class="content-section" id="main">
                     <!-- Preferences header -->
@@ -405,6 +623,147 @@
     <script>
         // Make the local copyDetailedLog function available globally for this page only
         window.copyDetailedLog = copyDetailedLog;
+    </script>
+
+    <!-- Notification Modes Functions -->
+    <script>
+        // מצבי עבודה למערכת התראות
+        const NOTIFICATION_MODES = {
+            debug: {
+                name: 'debug',
+                title: 'מצב דיבג',
+                description: 'הצגת כל ההתראות המפורטות כולל הודעות משניות',
+                icon: 'fas fa-bug',
+                color: '#6c757d'
+            },
+            development: {
+                name: 'development', 
+                title: 'מצב פיתוח',
+                description: 'הצגת הודעות מרכזיות בלבד',
+                icon: 'fas fa-code',
+                color: '#6f42c1'
+            },
+            work: {
+                name: 'work',
+                title: 'מצב עבודה', 
+                description: 'הצגת הודעות שגיאה והודעות שהם תוצאה של פעולות ותהליכים שהמשתמש הריץ',
+                icon: 'fas fa-briefcase',
+                color: '#28a745'
+            },
+            silent: {
+                name: 'silent',
+                title: 'מצב מושתק',
+                description: 'הצגת הודעות שגיאה בלבד',
+                icon: 'fas fa-volume-mute',
+                color: '#dc3545'
+            }
+        };
+
+        /**
+         * טען מצב עבודה נוכחי
+         */
+        async function loadNotificationMode() {
+            try {
+                const currentMode = await window.getPreference('notification_mode', 1, null);
+                const mode = currentMode || 'work'; // ברירת מחדל: מצב עבודה
+                
+                // עדכן את הרדיו בוטון
+                const radioButton = document.getElementById(`mode${mode.charAt(0).toUpperCase() + mode.slice(1)}`);
+                if (radioButton) {
+                    radioButton.checked = true;
+                }
+                
+                // עדכן את התצוגה הנוכחית
+                updateCurrentModeStatus(mode);
+                
+                console.log(`🔍 Loaded notification mode: ${mode}`);
+            } catch (error) {
+                console.warn('Failed to load notification mode:', error);
+                // ברירת מחדל: מצב עבודה
+                document.getElementById('modeWork').checked = true;
+                updateCurrentModeStatus('work');
+            }
+        }
+
+        /**
+         * עדכן תצוגת מצב נוכחי
+         */
+        function updateCurrentModeStatus(mode) {
+            const modeData = NOTIFICATION_MODES[mode];
+            if (!modeData) return;
+            
+            const statusElement = document.getElementById('currentModeStatus');
+            if (statusElement) {
+                statusElement.innerHTML = `
+                    <div class="status-indicator">
+                        <i class="${modeData.icon} status-icon" style="color: ${modeData.color};"></i>
+                        <span class="status-text">${modeData.title}</span>
+                    </div>
+                    <div class="status-description">
+                        ${modeData.description}
+                    </div>
+                `;
+            }
+        }
+
+        /**
+         * שמור מצב עבודה
+         */
+        async function saveNotificationMode() {
+            try {
+                const selectedMode = document.querySelector('input[name="notificationMode"]:checked');
+                if (!selectedMode) {
+                    await showErrorNotification('שגיאה', 'אנא בחר מצב עבודה');
+                    return;
+                }
+                
+                const mode = selectedMode.value;
+                await window.savePreference('notification_mode', mode, 1, null);
+                
+                // עדכן תצוגה
+                updateCurrentModeStatus(mode);
+                
+                await showSuccessNotification('הצלחה', `מצב העבודה נשמר: ${NOTIFICATION_MODES[mode].title}`, 3000, 'system', { userInitiated: true });
+                
+                console.log(`🔍 Saved notification mode: ${mode}`);
+            } catch (error) {
+                console.error('Failed to save notification mode:', error);
+                await showErrorNotification('שגיאה', 'נכשל בשמירת מצב העבודה');
+            }
+        }
+
+        /**
+         * בדוק מצב עבודה נוכחי
+         */
+        async function testNotificationMode() {
+            try {
+                const selectedMode = document.querySelector('input[name="notificationMode"]:checked');
+                if (!selectedMode) {
+                    await showErrorNotification('שגיאה', 'אנא בחר מצב עבודה');
+                    return;
+                }
+                
+                const mode = selectedMode.value;
+                const modeData = NOTIFICATION_MODES[mode];
+                
+                // הצג הודעות בדיקה לכל סוג
+                await showInfoNotification('בדיקת מצב', `מצב נוכחי: ${modeData.title}`, 2000, 'system');
+                await showSuccessNotification('בדיקת הצלחה', 'הודעת הצלחה לבדיקה', 2000, 'business');
+                await showWarningNotification('בדיקת אזהרה', 'הודעת אזהרה לבדיקה', 2000, 'system');
+                await showErrorNotification('בדיקת שגיאה', 'הודעת שגיאה לבדיקה', 2000, 'system');
+                
+                console.log(`🔍 Tested notification mode: ${mode}`);
+            } catch (error) {
+                console.error('Failed to test notification mode:', error);
+                await showErrorNotification('שגיאה', 'נכשל בבדיקת מצב העבודה');
+            }
+        }
+
+        // טען מצב עבודה כשהדף נטען
+        document.addEventListener('DOMContentLoaded', function() {
+            // המתן קצת שהמערכות יטענו
+            setTimeout(loadNotificationMode, 1000);
+        });
     </script>
 </body>
 </html>

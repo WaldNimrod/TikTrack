@@ -100,6 +100,9 @@
       "staleData": false,
       "priceAlerts": true
     },
+    "modes": {
+      "notification_mode": "work"
+    },
     "categories": {
       "notifications_development_enabled": true,
       "notifications_system_enabled": true,

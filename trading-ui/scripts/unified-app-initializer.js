@@ -385,12 +385,12 @@ class UnifiedAppInitializer {
                     
                     const initResult = await Promise.race([initPromise, timeoutPromise]);
                     if (initResult) {
-                        console.log('✅ UnifiedCacheManager initialized successfully');
+                        // console.log('✅ UnifiedCacheManager initialized successfully');
                     } else {
                         throw new Error('UnifiedCacheManager initialization returned false');
                     }
                 } else {
-                    console.log('✅ UnifiedCacheManager already initialized');
+                    // console.log('✅ UnifiedCacheManager already initialized');
                 }
             } catch (error) {
                 console.error('❌ UnifiedCacheManager initialization failed:', error);
@@ -406,7 +406,7 @@ class UnifiedAppInitializer {
         if (typeof window.CacheSyncManager !== 'undefined') {
             try {
                 if (!window.CacheSyncManager.initialized) {
-                    console.log('🔧 Initializing CacheSyncManager...');
+                    // console.log('🔧 Initializing CacheSyncManager...');
                     
                     const initPromise = window.CacheSyncManager.initialize();
                     const timeoutPromise = new Promise((_, reject) => 
@@ -414,39 +414,39 @@ class UnifiedAppInitializer {
                     );
                     
                     await Promise.race([initPromise, timeoutPromise]);
-                    console.log('✅ CacheSyncManager initialized successfully');
+                    // console.log('✅ CacheSyncManager initialized successfully');
                 } else {
-                    console.log('✅ CacheSyncManager already initialized');
+                    // console.log('✅ CacheSyncManager already initialized');
                 }
             } catch (error) {
                 console.error('❌ CacheSyncManager initialization failed:', error);
             }
         } else {
-            console.log('⚠️ CacheSyncManager not available');
+            // console.log('⚠️ CacheSyncManager not available');
         }
 
         // Initialize CachePolicyManager
         if (typeof window.CachePolicyManager !== 'undefined') {
             try {
                 if (!window.CachePolicyManager.initialized) {
-                    console.log('🔧 Initializing CachePolicyManager...');
+                    // console.log('🔧 Initializing CachePolicyManager...');
                     await window.CachePolicyManager.initialize();
-                    console.log('✅ CachePolicyManager initialized successfully');
+                    // console.log('✅ CachePolicyManager initialized successfully');
                 } else {
-                    console.log('✅ CachePolicyManager already initialized');
+                    // console.log('✅ CachePolicyManager already initialized');
                 }
             } catch (error) {
                 console.error('❌ CachePolicyManager initialization failed:', error);
             }
         } else {
-            console.log('⚠️ CachePolicyManager not available');
+            // console.log('⚠️ CachePolicyManager not available');
         }
 
         // Initialize MemoryOptimizer with timeout
         if (typeof window.MemoryOptimizer !== 'undefined') {
             try {
                 if (!window.MemoryOptimizer.initialized) {
-                    console.log('🔧 Initializing MemoryOptimizer...');
+                    // console.log('🔧 Initializing MemoryOptimizer...');
                     
                     const initPromise = window.MemoryOptimizer.initialize();
                     const timeoutPromise = new Promise((_, reject) => 
@@ -454,15 +454,15 @@ class UnifiedAppInitializer {
                     );
                     
                     await Promise.race([initPromise, timeoutPromise]);
-                    console.log('✅ MemoryOptimizer initialized successfully');
+                    // console.log('✅ MemoryOptimizer initialized successfully');
                 } else {
-                    console.log('✅ MemoryOptimizer already initialized');
+                    // console.log('✅ MemoryOptimizer already initialized');
                 }
             } catch (error) {
                 console.error('❌ MemoryOptimizer initialization failed:', error);
             }
         } else {
-            console.log('⚠️ MemoryOptimizer not available');
+            // console.log('⚠️ MemoryOptimizer not available');
         }
         
         // Initialize registered core systems (only if not already initialized)
@@ -478,8 +478,8 @@ class UnifiedAppInitializer {
      * Report cache system status
      */
     reportCacheSystemStatus() {
-        console.log('📊 Cache System Status Report:');
-        console.log('================================');
+        // console.log('📊 Cache System Status Report:');
+        // console.log('================================');
         
         const systems = [
             { name: 'UnifiedCacheManager', instance: window.UnifiedCacheManager },
@@ -491,13 +491,13 @@ class UnifiedAppInitializer {
         systems.forEach(system => {
             if (system.instance) {
                 const status = system.instance.initialized ? '✅ Ready' : '⚠️ Not Initialized';
-                console.log(`${system.name}: ${status}`);
+                // console.log(`${system.name}: ${status}`);
             } else {
-                console.log(`${system.name}: ❌ Not Available`);
+                // console.log(`${system.name}: ❌ Not Available`);
             }
         });
         
-        console.log('================================');
+        // console.log('================================');
         
         // Set comprehensive cache system ready flag
         window.cacheSystemReady = systems.every(system => 
@@ -505,9 +505,9 @@ class UnifiedAppInitializer {
         );
         
         if (window.cacheSystemReady) {
-            console.log('🎉 All cache systems are ready!');
+            // console.log('🎉 All cache systems are ready!');
         } else {
-            console.log('⚠️ Some cache systems are not ready - using fallback modes');
+            // console.log('⚠️ Some cache systems are not ready - using fallback modes');
         }
     }
 

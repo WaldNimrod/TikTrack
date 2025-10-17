@@ -24,7 +24,202 @@
  * - Bootstrap 5.3.0 (לפונקציונליות מודלים)
  *
  * דוקומנטציה מפורטת: documentation/frontend/NOTIFICATION_SYSTEM.md
+ * 
+ * עדכון: ינואר 2025 - הוספת מצבי עבודה למערכת התראות
+ * - 4 מצבי עבודה: DEBUG, DEVELOPMENT, WORK, SILENT
+ * - זיהוי אוטומטי של רמות חשיבות
+ * - תמיכה בפעולות משתמש
  */
+
+// ===== NOTIFICATION MODES SYSTEM =====
+// מערכת מצבי עבודה להתראות
+
+/**
+ * מצבי עבודה למערכת התראות
+ * NOTIFICATION MODES - 4 מצבים שונים לשליטה על הצגת התראות
+ */
+const NOTIFICATION_MODES = {
+  DEBUG: {
+    name: 'debug',
+    title: 'מצב דיבג',
+    description: 'הצגת כל ההתראות המפורטות כולל הודעות משניות',
+    icon: 'fas fa-bug',
+    color: '#6c757d'
+  },
+  DEVELOPMENT: {
+    name: 'development', 
+    title: 'מצב פיתוח',
+    description: 'הצגת הודעות מרכזיות בלבד',
+    icon: 'fas fa-code',
+    color: '#6f42c1'
+  },
+  WORK: {
+    name: 'work',
+    title: 'מצב עבודה', 
+    description: 'הצגת הודעות שגיאה והודעות שהם תוצאה של פעולות ותהליכים שהמשתמש הריץ',
+    icon: 'fas fa-briefcase',
+    color: '#28a745'
+  },
+  SILENT: {
+    name: 'silent',
+    title: 'מצב מושתק',
+    description: 'הצגת הודעות שגיאה בלבד',
+    icon: 'fas fa-volume-mute',
+    color: '#dc3545'
+  }
+};
+
+/**
+ * רמות חשיבות לכל קטגוריית התראות
+ * CATEGORY SEVERITY - מגדיר איזה סוגי הודעות נחשבים מרכזיים בכל קטגוריה
+ */
+const CATEGORY_SEVERITY = {
+  system: { 
+    primary: ['error'], 
+    secondary: ['warning', 'info'] 
+  },
+  business: { 
+    primary: ['success', 'error'], 
+    secondary: ['info'] 
+  },
+  development: { 
+    primary: [], 
+    secondary: ['all'] 
+  },
+  performance: { 
+    primary: ['error', 'warning'], 
+    secondary: ['info'] 
+  },
+  ui: { 
+    primary: [], 
+    secondary: ['all'] 
+  },
+  security: {
+    primary: ['error', 'warning'],
+    secondary: ['info']
+  },
+  network: {
+    primary: ['error', 'warning'],
+    secondary: ['info']
+  },
+  database: {
+    primary: ['error', 'warning'],
+    secondary: ['info']
+  },
+  general: {
+    primary: ['error'],
+    secondary: ['warning', 'info', 'success']
+  }
+};
+
+/**
+ * בדוק אם הודעה נחשבת לרמת חשיבות מרכזית
+ * NOTIFICATION MODES - בודק אם הודעה צריכה להיות מוצגת במצב DEVELOPMENT
+ * 
+ * @param {string} category - קטגוריית ההודעה
+ * @param {string} type - סוג ההודעה (success, error, warning, info)
+ * @returns {boolean} - האם ההודעה נחשבת מרכזית
+ */
+function isPrimarySeverity(category, type) {
+  try {
+    const severity = CATEGORY_SEVERITY[category];
+    if (!severity) {
+      // אם הקטגוריה לא מוגדרת, נשתמש בברירת מחדל
+      return type === 'error';
+    }
+    
+    // בדוק אם הסוג נמצא ברשימת הודעות מרכזיות
+    return severity.primary.includes(type);
+  } catch (error) {
+    console.warn('Error checking primary severity:', error);
+    return type === 'error'; // ברירת מחדל: רק שגיאות
+  }
+}
+
+/**
+ * בדוק אם הודעה נחשבת לפעולה שהמשתמש הפעיל
+ * NOTIFICATION MODES - בודק אם הודעה צריכה להיות מוצגת במצב WORK
+ * 
+ * @param {string} message - תוכן ההודעה
+ * @param {string} title - כותרת ההודעה
+ * @param {string} functionName - שם הפונקציה שהפעילה את ההודעה
+ * @returns {boolean} - האם ההודעה נחשבת לפעולת משתמש
+ */
+function isUserInitiatedAction(message, title, functionName) {
+  try {
+    const text = `${message} ${title} ${functionName}`.toLowerCase();
+    
+    // מילות מפתח המציינות פעולות משתמש
+    const userActionKeywords = [
+      'נשמר', 'נוסף', 'נמחק', 'עודכן', 'נוצר', 'הצלחה',
+      'saved', 'added', 'deleted', 'updated', 'created', 'success',
+      'הושלם', 'הופעל', 'בוטל', 'אושר', 'נדחה'
+    ];
+    
+    // פונקציות שמציינות פעולות משתמש
+    const userActionFunctions = [
+      'save', 'add', 'delete', 'update', 'create', 'submit',
+      'confirm', 'approve', 'reject', 'activate', 'deactivate'
+    ];
+    
+    // בדוק מילות מפתח בהודעה
+    const hasUserKeywords = userActionKeywords.some(keyword => 
+      text.includes(keyword)
+    );
+    
+    // בדוק שם פונקציה
+    const hasUserFunction = userActionFunctions.some(func => 
+      functionName && functionName.toLowerCase().includes(func)
+    );
+    
+    return hasUserKeywords || hasUserFunction;
+  } catch (error) {
+    console.warn('Error checking user initiated action:', error);
+    return false;
+  }
+}
+
+/**
+ * בדוק אם הודעה צריכה להיות מוצגת במצב עבודה נתון
+ * NOTIFICATION MODES - הלוגיקה המרכזית לקביעת הצגת הודעות
+ * 
+ * @param {string} mode - מצב העבודה (debug, development, work, silent)
+ * @param {string} category - קטגוריית ההודעה
+ * @param {string} type - סוג ההודעה
+ * @param {boolean} userInitiated - האם ההודעה נחשבת לפעולת משתמש
+ * @returns {boolean} - האם ההודעה צריכה להיות מוצגת
+ */
+function shouldShowInMode(mode, category, type, userInitiated = false) {
+  try {
+    switch (mode) {
+      case 'debug':
+        // מצב דיבג: הצגת כל ההתראות
+        return true;
+        
+      case 'development':
+        // מצב פיתוח: הודעות מרכזיות בלבד
+        return isPrimarySeverity(category, type);
+        
+      case 'work':
+        // מצב עבודה: הודעות תוצאות פעולות משתמש + שגיאות + אזהרות חשובות
+        return userInitiated || 
+               type === 'error' || 
+               (type === 'warning' && isPrimarySeverity(category, type));
+        
+      case 'silent':
+        // מצב מושתק: שגיאות בלבד
+        return type === 'error';
+        
+      default:
+        // ברירת מחדל: מצב עבודה
+        return userInitiated || type === 'error';
+    }
+  } catch (error) {
+    console.warn('Error in shouldShowInMode:', error);
+    // במקרה של שגיאה, הצג רק שגיאות
+    return type === 'error';
+  }
+}
 
 // ===== ALERTS SYSTEM FUNCTIONS =====
 // These functions handle business alerts for market conditions
@@ -169,8 +364,29 @@ function getNotificationIcon(type) {
  * @param {string} category - Category of notification (development, system, business, performance, ui)
  * @returns {Promise<boolean>} - Whether notification should be shown
  */
-async function shouldShowNotification(category) {
+async function shouldShowNotification(category, type = 'info', userInitiated = false, message = '', title = '', functionName = '') {
   try {
+    // בדוק קודם את מצב העבודה החדש
+    if (typeof window.getPreference === 'function') {
+      const notificationMode = await window.getPreference('notification_mode', 1, null);
+      const mode = notificationMode || 'work'; // ברירת מחדל: מצב עבודה
+      
+      if (window.DEBUG_MODE) {
+        console.log(`🔍 Notification mode: ${mode}, category: ${category}, type: ${type}, userInitiated: ${userInitiated}`);
+      }
+      
+      // בדוק אם ההודעה צריכה להיות מוצגת במצב הנוכחי
+      const shouldShow = shouldShowInMode(mode, category, type, userInitiated);
+      
+      if (!shouldShow) {
+        if (window.DEBUG_MODE) {
+          console.log(`🔍 Notification filtered out by mode ${mode}: category=${category}, type=${type}, userInitiated=${userInitiated}`);
+        }
+        return false;
+      }
+    }
+    
+    // בדוק את ההגדרות הישנות (תאימות לאחור)
     const preferenceName = `notifications_${category}_enabled`;
     console.log(`🔍 Checking preference: ${preferenceName}`);
     
@@ -202,7 +418,7 @@ async function shouldShowNotification(category) {
     // For general category, map to system category; for others, show by default
     if (category === 'general') {
       // Map general to system category since general doesn't exist
-      return await shouldShowNotification('system');
+      return await shouldShowNotification('system', type, userInitiated, message, title, functionName);
     }
     return true; // Default: show notification
   }
@@ -270,15 +486,28 @@ function getLogEmoji(level) {
  * @param {number} duration - Optional duration in milliseconds (default: 5000)
  * @param {string} category - Category of notification (development, system, business, performance, ui)
  */
-async function showNotification(message, type = 'info', title = 'מערכת', duration = 5000, category = null) {
+async function showNotification(message, type = 'info', title = 'מערכת', duration = 5000, category = null, options = {}) {
   // Auto-detect category if not provided
   if (!category && typeof window.detectNotificationCategory === 'function') {
     try {
-      category = window.detectNotificationCategory(message, type, title, {
+      const context = {
         fileName: window.location.pathname,
-        functionName: 'showNotification',
+        functionName: options.functionName || 'showNotification',
         stackTrace: ''
-      });
+      };
+      const detectionResult = window.detectNotificationCategory(message, type, title, context);
+      
+      // Handle both old and new detection formats
+      if (typeof detectionResult === 'string') {
+        category = detectionResult;
+      } else if (detectionResult && detectionResult.category) {
+        category = detectionResult.category;
+        // Update userInitiated from detection if not explicitly set
+        if (options.userInitiated === undefined && detectionResult.userInitiated !== undefined) {
+          options.userInitiated = detectionResult.userInitiated;
+        }
+      }
+      
       // console.log(`🔍 Auto-detected category: ${category} for type: ${type}`);
     } catch (error) {
       console.warn('Failed to detect category, using default:', error);
@@ -295,15 +524,22 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
     }
   }
   
-  // Check if notification should be shown based on category preferences
-  console.log(`🔔 showNotification called: "${message}", type: ${type}, category: ${category}`);
+  // Check if notification should be shown based on category preferences and notification mode
+  console.log(`🔔 showNotification called: "${message}", type: ${type}, category: ${category}, options:`, options);
   
   if (category) {
     try {
-      const shouldShow = await shouldShowNotification(category);
+      const shouldShow = await shouldShowNotification(
+        category, 
+        type, 
+        options.userInitiated || false, 
+        message, 
+        title, 
+        options.functionName || 'showNotification'
+      );
       if (window.DEBUG_MODE) {
-      console.log(`🔍 Category ${category} enabled:`, shouldShow);
-    }
+        console.log(`🔍 Category ${category} enabled:`, shouldShow);
+      }
       if (!shouldShow) {
         console.log(`❌ Notification blocked for category: ${category}`);
         return; // Don't show notification if category is disabled
@@ -671,13 +907,13 @@ function hideNotification(notification) {
  * @param {number} duration - Display duration in milliseconds (default: 4000)
  * @param {string} category - Category of notification (default: 'system')
  */
-async function showSuccessNotification(title, message, duration = 4000, category = null) {
+async function showSuccessNotification(title, message, duration = 4000, category = null, options = {}) {
   // Ensure title and message are provided
   const finalTitle = title || 'הצלחה';
   const finalMessage = message || 'הפעולה הושלמה בהצלחה';
 
-  // showSuccessNotification calling showNotification with category
-  await showNotification(finalMessage, 'success', finalTitle, duration, category);
+  // showSuccessNotification calling showNotification with category and options
+  await showNotification(finalMessage, 'success', finalTitle, duration, category, options);
 }
 
 /**
@@ -689,9 +925,9 @@ async function showSuccessNotification(title, message, duration = 4000, category
  * @param {number} duration - Display duration in milliseconds (default: 6000)
  * @param {string} category - Category of notification (default: 'system')
  */
-async function showErrorNotification(title, message, duration = 6000, category = null) {
-  // showErrorNotification calling showNotification with category
-  await showNotification(message, 'error', title, duration, category);
+async function showErrorNotification(title, message, duration = 6000, category = null, options = {}) {
+  // showErrorNotification calling showNotification with category and options
+  await showNotification(message, 'error', title, duration, category, options);
 }
 
 /**
@@ -703,9 +939,9 @@ async function showErrorNotification(title, message, duration = 6000, category =
  * @param {number} duration - Display duration in milliseconds (default: 5000)
  * @param {string} category - Category of notification (default: 'system')
  */
-async function showWarningNotification(title, message, duration = 5000, category = null) {
-  // showWarningNotification calling showNotification with category
-  await showNotification(message, 'warning', title, duration, category);
+async function showWarningNotification(title, message, duration = 5000, category = null, options = {}) {
+  // showWarningNotification calling showNotification with category and options
+  await showNotification(message, 'warning', title, duration, category, options);
 }
 
 /**
@@ -717,9 +953,9 @@ async function showWarningNotification(title, message, duration = 5000, category
  * @param {number} duration - Display duration in milliseconds (default: 4000)
  * @param {string} category - Category of notification (default: 'system')
  */
-async function showInfoNotification(title, message, duration = 4000, category = null) {
-  // showInfoNotification calling showNotification with category
-  await showNotification(message, 'info', title, duration, category);
+async function showInfoNotification(title, message, duration = 4000, category = null, options = {}) {
+  // showInfoNotification calling showNotification with category and options
+  await showNotification(message, 'info', title, duration, category, options);
 }
 
 /**

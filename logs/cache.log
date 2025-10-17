@@ -22513,3 +22513,566 @@ AssertionError: write() before start_response
 2025-10-17 19:39:22,679 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
 2025-10-17 19:39:22,679 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
 2025-10-17 19:39:22,679 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:39:22] "GET /api/system/alerts HTTP/1.1" 200 -
+2025-10-17 19:39:49,633 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:39:49] "GET /api/system/settings/primaryDataProvider HTTP/1.1" 200 -
+2025-10-17 19:39:49,639 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+2025-10-17 19:39:49,639 - cache - INFO - Cache SET: health_check_1760719189 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:39:49,639 - cache - INFO - Cache SET: health_check_1760719189 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:39:49,639 - cache - INFO - Cache HIT: health_check_1760719189 (Access count: 1)
+2025-10-17 19:39:49,639 - cache - INFO - Cache HIT: health_check_1760719189 (Access count: 1)
+2025-10-17 19:39:49,640 - cache - INFO - Cache DELETE: health_check_1760719189 (Was accessed 1 times)
+2025-10-17 19:39:49,640 - cache - INFO - Cache DELETE: health_check_1760719189 (Was accessed 1 times)
+2025-10-17 19:39:49,640 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.001s - Success: True
+2025-10-17 19:39:49,640 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:39:49,640 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:39:50,646 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.006s - Success: True
+2025-10-17 19:39:50,646 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.006s
+2025-10-17 19:39:50,650 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.003s - Success: True
+2025-10-17 19:39:50,651 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.001s - Success: True
+2025-10-17 19:39:50,652 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:39:50,667 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:39:50] "GET /api/system/overview HTTP/1.1" 200 -
+2025-10-17 19:39:50,675 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:39:50] "GET /api/system/external-data HTTP/1.1" 200 -
+2025-10-17 19:39:50,675 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.002s - Success: True
+2025-10-17 19:39:50,676 - cache - INFO - Cache SET: health_check_1760719190 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:39:50,675 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:39:50] "GET /api/system/backup/list HTTP/1.1" 200 -
+2025-10-17 19:39:50,676 - cache - INFO - Cache SET: health_check_1760719190 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:39:50,676 - cache - INFO - Cache HIT: health_check_1760719190 (Access count: 1)
+2025-10-17 19:39:50,676 - cache - INFO - Cache HIT: health_check_1760719190 (Access count: 1)
+2025-10-17 19:39:50,676 - cache - INFO - Cache DELETE: health_check_1760719190 (Was accessed 1 times)
+2025-10-17 19:39:50,676 - cache - INFO - Cache DELETE: health_check_1760719190 (Was accessed 1 times)
+2025-10-17 19:39:50,676 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.001s - Success: True
+2025-10-17 19:39:50,677 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:39:50,677 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:39:50,678 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:39:50] "GET /api/system/external-data HTTP/1.1" 200 -
+2025-10-17 19:39:51,680 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.003s - Success: True
+2025-10-17 19:39:51,681 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.003s
+2025-10-17 19:39:51,685 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.004s - Success: True
+2025-10-17 19:39:51,687 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.001s - Success: True
+2025-10-17 19:39:51,687 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:39:51,688 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:39:51] "GET /api/system/alerts HTTP/1.1" 200 -
+2025-10-17 19:39:51,691 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+2025-10-17 19:39:51,691 - cache - INFO - Cache SET: health_check_1760719191 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:39:51,691 - cache - INFO - Cache SET: health_check_1760719191 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:39:51,691 - cache - INFO - Cache HIT: health_check_1760719191 (Access count: 1)
+2025-10-17 19:39:51,691 - cache - INFO - Cache HIT: health_check_1760719191 (Access count: 1)
+2025-10-17 19:39:51,692 - cache - INFO - Cache DELETE: health_check_1760719191 (Was accessed 1 times)
+2025-10-17 19:39:51,692 - cache - INFO - Cache DELETE: health_check_1760719191 (Was accessed 1 times)
+2025-10-17 19:39:51,692 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.001s - Success: True
+2025-10-17 19:39:51,693 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.001s - Success: True
+2025-10-17 19:39:51,693 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:39:52,697 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.004s - Success: True
+2025-10-17 19:39:52,698 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.004s
+2025-10-17 19:39:52,703 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.005s - Success: True
+2025-10-17 19:39:52,704 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.001s - Success: True
+2025-10-17 19:39:52,705 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:39:52,705 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:39:52] "GET /api/system/alerts HTTP/1.1" 200 -
+2025-10-17 19:40:19,630 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:40:19] "GET /api/system/settings/primaryDataProvider HTTP/1.1" 200 -
+2025-10-17 19:40:19,634 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:40:19,634 - cache - INFO - Cache SET: health_check_1760719219 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:40:19,634 - cache - INFO - Cache SET: health_check_1760719219 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:40:19,634 - cache - INFO - Cache HIT: health_check_1760719219 (Access count: 1)
+2025-10-17 19:40:19,634 - cache - INFO - Cache HIT: health_check_1760719219 (Access count: 1)
+2025-10-17 19:40:19,634 - cache - INFO - Cache DELETE: health_check_1760719219 (Was accessed 1 times)
+2025-10-17 19:40:19,634 - cache - INFO - Cache DELETE: health_check_1760719219 (Was accessed 1 times)
+2025-10-17 19:40:19,634 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:40:19,634 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:40:19,634 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:40:20,635 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.001s - Success: True
+2025-10-17 19:40:20,636 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.001s
+2025-10-17 19:40:20,637 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.001s - Success: True
+2025-10-17 19:40:20,638 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:40:20,638 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:40:20,647 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:40:20] "GET /api/system/overview HTTP/1.1" 200 -
+2025-10-17 19:40:20,651 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:40:20] "GET /api/system/external-data HTTP/1.1" 200 -
+2025-10-17 19:40:20,651 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:40:20] "GET /api/system/backup/list HTTP/1.1" 200 -
+2025-10-17 19:40:20,652 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.002s - Success: True
+2025-10-17 19:40:20,652 - cache - INFO - Cache SET: health_check_1760719220 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:40:20,652 - cache - INFO - Cache SET: health_check_1760719220 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:40:20,655 - cache - INFO - Cache HIT: health_check_1760719220 (Access count: 1)
+2025-10-17 19:40:20,655 - cache - INFO - Cache HIT: health_check_1760719220 (Access count: 1)
+2025-10-17 19:40:20,655 - cache - INFO - Cache DELETE: health_check_1760719220 (Was accessed 1 times)
+2025-10-17 19:40:20,655 - cache - INFO - Cache DELETE: health_check_1760719220 (Was accessed 1 times)
+2025-10-17 19:40:20,655 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.002s - Success: True
+2025-10-17 19:40:20,655 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:40:20] "GET /api/system/external-data HTTP/1.1" 200 -
+2025-10-17 19:40:20,655 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:40:20,656 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:40:21,658 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.002s - Success: True
+2025-10-17 19:40:21,658 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.002s
+2025-10-17 19:40:21,659 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.001s - Success: True
+2025-10-17 19:40:21,660 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:40:21,660 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:40:21,660 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:40:21] "GET /api/system/alerts HTTP/1.1" 200 -
+2025-10-17 19:40:21,662 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:40:21,662 - cache - INFO - Cache SET: health_check_1760719221 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:40:21,662 - cache - INFO - Cache SET: health_check_1760719221 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:40:21,662 - cache - INFO - Cache HIT: health_check_1760719221 (Access count: 1)
+2025-10-17 19:40:21,662 - cache - INFO - Cache HIT: health_check_1760719221 (Access count: 1)
+2025-10-17 19:40:21,662 - cache - INFO - Cache DELETE: health_check_1760719221 (Was accessed 1 times)
+2025-10-17 19:40:21,662 - cache - INFO - Cache DELETE: health_check_1760719221 (Was accessed 1 times)
+2025-10-17 19:40:21,662 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:40:21,662 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:40:21,662 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:40:22,668 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.005s - Success: True
+2025-10-17 19:40:22,668 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.005s
+2025-10-17 19:40:22,670 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.001s - Success: True
+2025-10-17 19:40:22,670 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:40:22,670 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:40:22,670 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:40:22] "GET /api/system/alerts HTTP/1.1" 200 -
+2025-10-17 19:40:49,631 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:40:49] "GET /api/system/settings/primaryDataProvider HTTP/1.1" 200 -
+2025-10-17 19:40:49,635 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:40:49,635 - cache - INFO - Cache SET: health_check_1760719249 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:40:49,635 - cache - INFO - Cache SET: health_check_1760719249 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:40:49,635 - cache - INFO - Cache HIT: health_check_1760719249 (Access count: 1)
+2025-10-17 19:40:49,635 - cache - INFO - Cache HIT: health_check_1760719249 (Access count: 1)
+2025-10-17 19:40:49,635 - cache - INFO - Cache DELETE: health_check_1760719249 (Was accessed 1 times)
+2025-10-17 19:40:49,635 - cache - INFO - Cache DELETE: health_check_1760719249 (Was accessed 1 times)
+2025-10-17 19:40:49,635 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:40:49,635 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:40:49,635 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:40:50,637 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.001s - Success: True
+2025-10-17 19:40:50,637 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.001s
+2025-10-17 19:40:50,638 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.001s - Success: True
+2025-10-17 19:40:50,639 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:40:50,639 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:40:50,650 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:40:50] "GET /api/system/overview HTTP/1.1" 200 -
+2025-10-17 19:40:50,655 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:40:50] "GET /api/system/external-data HTTP/1.1" 200 -
+2025-10-17 19:40:50,656 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:40:50] "GET /api/system/backup/list HTTP/1.1" 200 -
+2025-10-17 19:40:50,656 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.002s - Success: True
+2025-10-17 19:40:50,656 - cache - INFO - Cache SET: health_check_1760719250 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:40:50,656 - cache - INFO - Cache SET: health_check_1760719250 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:40:50,657 - cache - INFO - Cache HIT: health_check_1760719250 (Access count: 1)
+2025-10-17 19:40:50,657 - cache - INFO - Cache HIT: health_check_1760719250 (Access count: 1)
+2025-10-17 19:40:50,657 - cache - INFO - Cache DELETE: health_check_1760719250 (Was accessed 1 times)
+2025-10-17 19:40:50,657 - cache - INFO - Cache DELETE: health_check_1760719250 (Was accessed 1 times)
+2025-10-17 19:40:50,657 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.001s - Success: True
+2025-10-17 19:40:50,657 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:40:50,657 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:40:50,658 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:40:50] "GET /api/system/external-data HTTP/1.1" 200 -
+2025-10-17 19:40:51,662 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.004s - Success: True
+2025-10-17 19:40:51,662 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.004s
+2025-10-17 19:40:51,664 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.002s - Success: True
+2025-10-17 19:40:51,664 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:40:51,664 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:40:51,664 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:40:51] "GET /api/system/alerts HTTP/1.1" 200 -
+2025-10-17 19:40:51,666 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:40:51,666 - cache - INFO - Cache SET: health_check_1760719251 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:40:51,666 - cache - INFO - Cache SET: health_check_1760719251 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:40:51,666 - cache - INFO - Cache HIT: health_check_1760719251 (Access count: 1)
+2025-10-17 19:40:51,666 - cache - INFO - Cache HIT: health_check_1760719251 (Access count: 1)
+2025-10-17 19:40:51,666 - cache - INFO - Cache DELETE: health_check_1760719251 (Was accessed 1 times)
+2025-10-17 19:40:51,666 - cache - INFO - Cache DELETE: health_check_1760719251 (Was accessed 1 times)
+2025-10-17 19:40:51,666 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:40:51,667 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:40:51,667 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:40:52,667 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.000s - Success: True
+2025-10-17 19:40:52,667 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.000s
+2025-10-17 19:40:52,669 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.001s - Success: True
+2025-10-17 19:40:52,669 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:40:52,670 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:40:52,670 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:40:52] "GET /api/system/alerts HTTP/1.1" 200 -
+2025-10-17 19:41:25,630 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:41:25] "GET /api/system/settings/primaryDataProvider HTTP/1.1" 200 -
+2025-10-17 19:41:25,634 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:41:25,634 - cache - INFO - Cache SET: health_check_1760719285 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:41:25,634 - cache - INFO - Cache SET: health_check_1760719285 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:41:25,634 - cache - INFO - Cache HIT: health_check_1760719285 (Access count: 1)
+2025-10-17 19:41:25,634 - cache - INFO - Cache HIT: health_check_1760719285 (Access count: 1)
+2025-10-17 19:41:25,634 - cache - INFO - Cache DELETE: health_check_1760719285 (Was accessed 1 times)
+2025-10-17 19:41:25,634 - cache - INFO - Cache DELETE: health_check_1760719285 (Was accessed 1 times)
+2025-10-17 19:41:25,634 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:41:25,634 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:41:25,634 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:41:26,636 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.001s - Success: True
+2025-10-17 19:41:26,636 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.001s
+2025-10-17 19:41:26,638 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.002s - Success: True
+2025-10-17 19:41:26,638 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:41:26,638 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:41:26,649 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:41:26] "GET /api/system/overview HTTP/1.1" 200 -
+2025-10-17 19:41:26,655 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:41:26] "GET /api/system/external-data HTTP/1.1" 200 -
+2025-10-17 19:41:26,656 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:41:26] "GET /api/system/backup/list HTTP/1.1" 200 -
+2025-10-17 19:41:26,657 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.002s - Success: True
+2025-10-17 19:41:26,657 - cache - INFO - Cache SET: health_check_1760719286 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:41:26,657 - cache - INFO - Cache SET: health_check_1760719286 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:41:26,657 - cache - INFO - Cache HIT: health_check_1760719286 (Access count: 1)
+2025-10-17 19:41:26,657 - cache - INFO - Cache HIT: health_check_1760719286 (Access count: 1)
+2025-10-17 19:41:26,657 - cache - INFO - Cache DELETE: health_check_1760719286 (Was accessed 1 times)
+2025-10-17 19:41:26,657 - cache - INFO - Cache DELETE: health_check_1760719286 (Was accessed 1 times)
+2025-10-17 19:41:26,657 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:41:26,658 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:41:26,658 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:41:26] "GET /api/system/external-data HTTP/1.1" 200 -
+2025-10-17 19:41:26,659 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:41:27,661 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.002s - Success: True
+2025-10-17 19:41:27,661 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.002s
+2025-10-17 19:41:27,663 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.002s - Success: True
+2025-10-17 19:41:27,663 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:41:27,664 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:41:27,664 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:41:27] "GET /api/system/alerts HTTP/1.1" 200 -
+2025-10-17 19:41:27,666 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:41:27,666 - cache - INFO - Cache SET: health_check_1760719287 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:41:27,666 - cache - INFO - Cache SET: health_check_1760719287 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:41:27,666 - cache - INFO - Cache HIT: health_check_1760719287 (Access count: 1)
+2025-10-17 19:41:27,666 - cache - INFO - Cache HIT: health_check_1760719287 (Access count: 1)
+2025-10-17 19:41:27,666 - cache - INFO - Cache DELETE: health_check_1760719287 (Was accessed 1 times)
+2025-10-17 19:41:27,666 - cache - INFO - Cache DELETE: health_check_1760719287 (Was accessed 1 times)
+2025-10-17 19:41:27,666 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:41:27,666 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:41:27,666 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:41:28,672 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.005s - Success: True
+2025-10-17 19:41:28,672 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.005s
+2025-10-17 19:41:28,674 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.001s - Success: True
+2025-10-17 19:41:28,674 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:41:28,674 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:41:28,674 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:41:28] "GET /api/system/alerts HTTP/1.1" 200 -
+2025-10-17 19:42:21,880 - cache - INFO - Cache DELETE: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Was accessed 1 times)
+2025-10-17 19:42:21,880 - cache - INFO - Cache DELETE: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Was accessed 1 times)
+2025-10-17 19:42:25,633 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:42:25] "GET /api/system/settings/primaryDataProvider HTTP/1.1" 200 -
+2025-10-17 19:42:25,638 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+2025-10-17 19:42:25,638 - cache - INFO - Cache SET: health_check_1760719345 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:42:25,638 - cache - INFO - Cache SET: health_check_1760719345 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:42:25,639 - cache - INFO - Cache HIT: health_check_1760719345 (Access count: 1)
+2025-10-17 19:42:25,639 - cache - INFO - Cache HIT: health_check_1760719345 (Access count: 1)
+2025-10-17 19:42:25,639 - cache - INFO - Cache DELETE: health_check_1760719345 (Was accessed 1 times)
+2025-10-17 19:42:25,639 - cache - INFO - Cache DELETE: health_check_1760719345 (Was accessed 1 times)
+2025-10-17 19:42:25,639 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.001s - Success: True
+2025-10-17 19:42:25,639 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:42:25,639 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:42:26,646 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.006s - Success: True
+2025-10-17 19:42:26,646 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.006s
+2025-10-17 19:42:26,651 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.004s - Success: True
+2025-10-17 19:42:26,652 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.001s - Success: True
+2025-10-17 19:42:26,652 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:42:26,671 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:42:26] "GET /api/system/overview HTTP/1.1" 200 -
+2025-10-17 19:42:26,678 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:42:26] "GET /api/system/external-data HTTP/1.1" 200 -
+2025-10-17 19:42:26,680 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.002s - Success: True
+2025-10-17 19:42:26,681 - cache - INFO - Cache SET: health_check_1760719346 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:42:26,680 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:42:26] "GET /api/system/backup/list HTTP/1.1" 200 -
+2025-10-17 19:42:26,681 - cache - INFO - Cache SET: health_check_1760719346 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:42:26,681 - cache - INFO - Cache HIT: health_check_1760719346 (Access count: 1)
+2025-10-17 19:42:26,681 - cache - INFO - Cache HIT: health_check_1760719346 (Access count: 1)
+2025-10-17 19:42:26,681 - cache - INFO - Cache DELETE: health_check_1760719346 (Was accessed 1 times)
+2025-10-17 19:42:26,681 - cache - INFO - Cache DELETE: health_check_1760719346 (Was accessed 1 times)
+2025-10-17 19:42:26,681 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.001s - Success: True
+2025-10-17 19:42:26,682 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:42:26] "GET /api/system/external-data HTTP/1.1" 200 -
+2025-10-17 19:42:26,682 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:42:26,682 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:42:27,688 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.006s - Success: True
+2025-10-17 19:42:27,689 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.006s
+2025-10-17 19:42:27,692 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.004s - Success: True
+2025-10-17 19:42:27,693 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.001s - Success: True
+2025-10-17 19:42:27,693 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:42:27,694 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:42:27] "GET /api/system/alerts HTTP/1.1" 200 -
+2025-10-17 19:42:27,698 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+2025-10-17 19:42:27,698 - cache - INFO - Cache SET: health_check_1760719347 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:42:27,698 - cache - INFO - Cache SET: health_check_1760719347 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:42:27,698 - cache - INFO - Cache HIT: health_check_1760719347 (Access count: 1)
+2025-10-17 19:42:27,698 - cache - INFO - Cache HIT: health_check_1760719347 (Access count: 1)
+2025-10-17 19:42:27,699 - cache - INFO - Cache DELETE: health_check_1760719347 (Was accessed 1 times)
+2025-10-17 19:42:27,699 - cache - INFO - Cache DELETE: health_check_1760719347 (Was accessed 1 times)
+2025-10-17 19:42:27,699 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.001s - Success: True
+2025-10-17 19:42:27,699 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:42:27,699 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:42:28,704 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.004s - Success: True
+2025-10-17 19:42:28,705 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.004s
+2025-10-17 19:42:28,707 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.002s - Success: True
+2025-10-17 19:42:28,708 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:42:28,708 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:42:28,708 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:42:28] "GET /api/system/alerts HTTP/1.1" 200 -
+2025-10-17 19:43:25,629 - utils.rate_limiter - INFO - Rate limiter cleanup: removed 0 empty entries
+2025-10-17 19:43:25,631 - utils.rate_limiter - INFO - Rate limiter cleanup: removed 0 empty entries
+2025-10-17 19:43:25,632 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:43:25] "GET /api/system/settings/primaryDataProvider HTTP/1.1" 200 -
+2025-10-17 19:43:25,635 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:43:25,636 - cache - INFO - Cache SET: health_check_1760719405 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:43:25,636 - cache - INFO - Cache SET: health_check_1760719405 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:43:25,636 - cache - INFO - Cache HIT: health_check_1760719405 (Access count: 1)
+2025-10-17 19:43:25,636 - cache - INFO - Cache HIT: health_check_1760719405 (Access count: 1)
+2025-10-17 19:43:25,636 - cache - INFO - Cache DELETE: health_check_1760719405 (Was accessed 1 times)
+2025-10-17 19:43:25,636 - cache - INFO - Cache DELETE: health_check_1760719405 (Was accessed 1 times)
+2025-10-17 19:43:25,636 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:43:25,636 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:43:25,636 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:43:26,637 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.001s - Success: True
+2025-10-17 19:43:26,637 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.001s
+2025-10-17 19:43:26,639 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.001s - Success: True
+2025-10-17 19:43:26,639 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:43:26,639 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:43:26,649 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:43:26] "GET /api/system/overview HTTP/1.1" 200 -
+2025-10-17 19:43:26,655 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:43:26] "GET /api/system/external-data HTTP/1.1" 200 -
+2025-10-17 19:43:26,655 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:43:26] "GET /api/system/backup/list HTTP/1.1" 200 -
+2025-10-17 19:43:26,656 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.002s - Success: True
+2025-10-17 19:43:26,656 - cache - INFO - Cache SET: health_check_1760719406 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:43:26,656 - cache - INFO - Cache SET: health_check_1760719406 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:43:26,657 - cache - INFO - Cache HIT: health_check_1760719406 (Access count: 1)
+2025-10-17 19:43:26,657 - cache - INFO - Cache HIT: health_check_1760719406 (Access count: 1)
+2025-10-17 19:43:26,657 - cache - INFO - Cache DELETE: health_check_1760719406 (Was accessed 1 times)
+2025-10-17 19:43:26,657 - cache - INFO - Cache DELETE: health_check_1760719406 (Was accessed 1 times)
+2025-10-17 19:43:26,657 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:43:26,657 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:43:26,657 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:43:26,658 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:43:26] "GET /api/system/external-data HTTP/1.1" 200 -
+2025-10-17 19:43:27,660 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.003s - Success: True
+2025-10-17 19:43:27,660 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.003s
+2025-10-17 19:43:27,662 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.002s - Success: True
+2025-10-17 19:43:27,662 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.001s - Success: True
+2025-10-17 19:43:27,663 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:43:27,663 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:43:27] "GET /api/system/alerts HTTP/1.1" 200 -
+2025-10-17 19:43:27,664 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:43:27,665 - cache - INFO - Cache SET: health_check_1760719407 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:43:27,665 - cache - INFO - Cache SET: health_check_1760719407 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:43:27,665 - cache - INFO - Cache HIT: health_check_1760719407 (Access count: 1)
+2025-10-17 19:43:27,665 - cache - INFO - Cache HIT: health_check_1760719407 (Access count: 1)
+2025-10-17 19:43:27,665 - cache - INFO - Cache DELETE: health_check_1760719407 (Was accessed 1 times)
+2025-10-17 19:43:27,665 - cache - INFO - Cache DELETE: health_check_1760719407 (Was accessed 1 times)
+2025-10-17 19:43:27,665 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:43:27,665 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:43:27,665 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:43:28,666 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.001s - Success: True
+2025-10-17 19:43:28,666 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.001s
+2025-10-17 19:43:28,668 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.001s - Success: True
+2025-10-17 19:43:28,668 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:43:28,668 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:43:28,668 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:43:28] "GET /api/system/alerts HTTP/1.1" 200 -
+2025-10-17 19:44:25,631 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:44:25] "GET /api/system/settings/primaryDataProvider HTTP/1.1" 200 -
+2025-10-17 19:44:25,636 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+2025-10-17 19:44:25,636 - cache - INFO - Cache SET: health_check_1760719465 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:44:25,636 - cache - INFO - Cache SET: health_check_1760719465 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:44:25,636 - cache - INFO - Cache HIT: health_check_1760719465 (Access count: 1)
+2025-10-17 19:44:25,636 - cache - INFO - Cache HIT: health_check_1760719465 (Access count: 1)
+2025-10-17 19:44:25,636 - cache - INFO - Cache DELETE: health_check_1760719465 (Was accessed 1 times)
+2025-10-17 19:44:25,636 - cache - INFO - Cache DELETE: health_check_1760719465 (Was accessed 1 times)
+2025-10-17 19:44:25,636 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:44:25,637 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:44:25,637 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:44:26,642 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.005s - Success: True
+2025-10-17 19:44:26,643 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.005s
+2025-10-17 19:44:26,644 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.001s - Success: True
+2025-10-17 19:44:26,644 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:44:26,644 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:44:26,652 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:44:26] "GET /api/system/overview HTTP/1.1" 200 -
+2025-10-17 19:44:26,657 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:44:26] "GET /api/system/external-data HTTP/1.1" 200 -
+2025-10-17 19:44:26,657 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:44:26] "GET /api/system/backup/list HTTP/1.1" 200 -
+2025-10-17 19:44:26,658 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+2025-10-17 19:44:26,658 - cache - INFO - Cache SET: health_check_1760719466 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:44:26,658 - cache - INFO - Cache SET: health_check_1760719466 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:44:26,658 - cache - INFO - Cache HIT: health_check_1760719466 (Access count: 1)
+2025-10-17 19:44:26,658 - cache - INFO - Cache HIT: health_check_1760719466 (Access count: 1)
+2025-10-17 19:44:26,658 - cache - INFO - Cache DELETE: health_check_1760719466 (Was accessed 1 times)
+2025-10-17 19:44:26,658 - cache - INFO - Cache DELETE: health_check_1760719466 (Was accessed 1 times)
+2025-10-17 19:44:26,658 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:44:26,659 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:44:26,659 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:44:26,660 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:44:26] "GET /api/system/external-data HTTP/1.1" 200 -
+2025-10-17 19:44:27,661 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.002s - Success: True
+2025-10-17 19:44:27,661 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.002s
+2025-10-17 19:44:27,663 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.002s - Success: True
+2025-10-17 19:44:27,664 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:44:27,664 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:44:27,664 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:44:27] "GET /api/system/alerts HTTP/1.1" 200 -
+2025-10-17 19:44:27,666 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:44:27,666 - cache - INFO - Cache SET: health_check_1760719467 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:44:27,666 - cache - INFO - Cache SET: health_check_1760719467 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:44:27,666 - cache - INFO - Cache HIT: health_check_1760719467 (Access count: 1)
+2025-10-17 19:44:27,666 - cache - INFO - Cache HIT: health_check_1760719467 (Access count: 1)
+2025-10-17 19:44:27,666 - cache - INFO - Cache DELETE: health_check_1760719467 (Was accessed 1 times)
+2025-10-17 19:44:27,666 - cache - INFO - Cache DELETE: health_check_1760719467 (Was accessed 1 times)
+2025-10-17 19:44:27,666 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:44:27,666 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:44:27,666 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:44:28,672 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.005s - Success: True
+2025-10-17 19:44:28,672 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.005s
+2025-10-17 19:44:28,673 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.001s - Success: True
+2025-10-17 19:44:28,674 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:44:28,674 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:44:28,674 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:44:28] "GET /api/system/alerts HTTP/1.1" 200 -
+2025-10-17 19:45:25,632 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:45:25] "GET /api/system/settings/primaryDataProvider HTTP/1.1" 200 -
+2025-10-17 19:45:25,638 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+2025-10-17 19:45:25,639 - cache - INFO - Cache SET: health_check_1760719525 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:45:25,639 - cache - INFO - Cache SET: health_check_1760719525 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:45:25,639 - cache - INFO - Cache HIT: health_check_1760719525 (Access count: 1)
+2025-10-17 19:45:25,639 - cache - INFO - Cache HIT: health_check_1760719525 (Access count: 1)
+2025-10-17 19:45:25,639 - cache - INFO - Cache DELETE: health_check_1760719525 (Was accessed 1 times)
+2025-10-17 19:45:25,639 - cache - INFO - Cache DELETE: health_check_1760719525 (Was accessed 1 times)
+2025-10-17 19:45:25,639 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.001s - Success: True
+2025-10-17 19:45:25,640 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:45:25,640 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:45:26,645 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.005s - Success: True
+2025-10-17 19:45:26,646 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.005s
+2025-10-17 19:45:26,648 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.002s - Success: True
+2025-10-17 19:45:26,648 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:45:26,648 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:45:26,660 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:45:26] "GET /api/system/overview HTTP/1.1" 200 -
+2025-10-17 19:45:26,668 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:45:26] "GET /api/system/external-data HTTP/1.1" 200 -
+2025-10-17 19:45:26,669 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:45:26] "GET /api/system/backup/list HTTP/1.1" 200 -
+2025-10-17 19:45:26,669 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.003s - Success: True
+2025-10-17 19:45:26,669 - cache - INFO - Cache SET: health_check_1760719526 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:45:26,669 - cache - INFO - Cache SET: health_check_1760719526 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:45:26,670 - cache - INFO - Cache HIT: health_check_1760719526 (Access count: 1)
+2025-10-17 19:45:26,670 - cache - INFO - Cache HIT: health_check_1760719526 (Access count: 1)
+2025-10-17 19:45:26,670 - cache - INFO - Cache DELETE: health_check_1760719526 (Was accessed 1 times)
+2025-10-17 19:45:26,670 - cache - INFO - Cache DELETE: health_check_1760719526 (Was accessed 1 times)
+2025-10-17 19:45:26,670 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:45:26,670 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:45:26,671 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:45:26,672 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:45:26] "GET /api/system/external-data HTTP/1.1" 200 -
+2025-10-17 19:45:27,681 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.010s - Success: True
+2025-10-17 19:45:27,681 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.010s
+2025-10-17 19:45:27,683 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.002s - Success: True
+2025-10-17 19:45:27,683 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:45:27,684 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:45:27,684 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:45:27] "GET /api/system/alerts HTTP/1.1" 200 -
+2025-10-17 19:45:27,686 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:45:27,686 - cache - INFO - Cache SET: health_check_1760719527 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:45:27,686 - cache - INFO - Cache SET: health_check_1760719527 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:45:27,686 - cache - INFO - Cache HIT: health_check_1760719527 (Access count: 1)
+2025-10-17 19:45:27,686 - cache - INFO - Cache HIT: health_check_1760719527 (Access count: 1)
+2025-10-17 19:45:27,686 - cache - INFO - Cache DELETE: health_check_1760719527 (Was accessed 1 times)
+2025-10-17 19:45:27,686 - cache - INFO - Cache DELETE: health_check_1760719527 (Was accessed 1 times)
+2025-10-17 19:45:27,687 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:45:27,687 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:45:27,687 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:45:28,697 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.010s - Success: True
+2025-10-17 19:45:28,697 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.010s
+2025-10-17 19:45:28,699 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.001s - Success: True
+2025-10-17 19:45:28,699 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:45:28,699 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:45:28,700 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:45:28] "GET /api/system/alerts HTTP/1.1" 200 -
+2025-10-17 19:46:25,628 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:46:25] "GET /api/system/settings/primaryDataProvider HTTP/1.1" 200 -
+2025-10-17 19:46:25,631 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+2025-10-17 19:46:25,631 - cache - INFO - Cache SET: health_check_1760719585 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:46:25,631 - cache - INFO - Cache SET: health_check_1760719585 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:46:25,631 - cache - INFO - Cache HIT: health_check_1760719585 (Access count: 1)
+2025-10-17 19:46:25,631 - cache - INFO - Cache HIT: health_check_1760719585 (Access count: 1)
+2025-10-17 19:46:25,631 - cache - INFO - Cache DELETE: health_check_1760719585 (Was accessed 1 times)
+2025-10-17 19:46:25,631 - cache - INFO - Cache DELETE: health_check_1760719585 (Was accessed 1 times)
+2025-10-17 19:46:25,632 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:46:25,632 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:46:25,632 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:46:26,635 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.003s - Success: True
+2025-10-17 19:46:26,635 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.003s
+2025-10-17 19:46:26,643 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.008s - Success: True
+2025-10-17 19:46:26,643 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:46:26,644 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:46:26,654 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:46:26] "GET /api/system/overview HTTP/1.1" 200 -
+2025-10-17 19:46:26,660 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+2025-10-17 19:46:26,661 - cache - INFO - Cache SET: health_check_1760719586 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:46:26,660 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:46:26] "GET /api/system/backup/list HTTP/1.1" 200 -
+2025-10-17 19:46:26,661 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:46:26] "GET /api/system/external-data HTTP/1.1" 200 -
+2025-10-17 19:46:26,661 - cache - INFO - Cache SET: health_check_1760719586 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:46:26,662 - cache - INFO - Cache HIT: health_check_1760719586 (Access count: 1)
+2025-10-17 19:46:26,662 - cache - INFO - Cache HIT: health_check_1760719586 (Access count: 1)
+2025-10-17 19:46:26,662 - cache - INFO - Cache DELETE: health_check_1760719586 (Was accessed 1 times)
+2025-10-17 19:46:26,662 - cache - INFO - Cache DELETE: health_check_1760719586 (Was accessed 1 times)
+2025-10-17 19:46:26,662 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.001s - Success: True
+2025-10-17 19:46:26,662 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:46:26,662 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:46:26,663 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:46:26] "GET /api/system/external-data HTTP/1.1" 200 -
+2025-10-17 19:46:27,673 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.010s - Success: True
+2025-10-17 19:46:27,673 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.010s
+2025-10-17 19:46:27,676 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.003s - Success: True
+2025-10-17 19:46:27,677 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.001s - Success: True
+2025-10-17 19:46:27,678 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:46:27,678 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:46:27] "GET /api/system/alerts HTTP/1.1" 200 -
+2025-10-17 19:46:27,680 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:46:27,680 - cache - INFO - Cache SET: health_check_1760719587 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:46:27,680 - cache - INFO - Cache SET: health_check_1760719587 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:46:27,680 - cache - INFO - Cache HIT: health_check_1760719587 (Access count: 1)
+2025-10-17 19:46:27,680 - cache - INFO - Cache HIT: health_check_1760719587 (Access count: 1)
+2025-10-17 19:46:27,680 - cache - INFO - Cache DELETE: health_check_1760719587 (Was accessed 1 times)
+2025-10-17 19:46:27,680 - cache - INFO - Cache DELETE: health_check_1760719587 (Was accessed 1 times)
+2025-10-17 19:46:27,680 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:46:27,680 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:46:27,680 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:46:28,691 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.011s - Success: True
+2025-10-17 19:46:28,691 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.011s
+2025-10-17 19:46:28,694 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.002s - Success: True
+2025-10-17 19:46:28,694 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.001s - Success: True
+2025-10-17 19:46:28,695 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:46:28,695 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:46:28] "GET /api/system/alerts HTTP/1.1" 200 -
+2025-10-17 19:47:23,179 - services.background_tasks - INFO - Starting background task: collect_metrics
+2025-10-17 19:47:24,182 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.001s - Success: True
+2025-10-17 19:47:24,182 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.001s
+2025-10-17 19:47:24,183 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.001s - Success: True
+2025-10-17 19:47:24,184 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:47:24,184 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:47:24,184 - services.background_tasks - INFO - Metrics collection completed
+2025-10-17 19:47:24,184 - utils.performance_monitor - INFO - Performance: collect_metrics - Duration: 1.004s - Success: True
+2025-10-17 19:47:24,184 - utils.performance_monitor - WARNING - Slow operation detected: collect_metrics - Duration: 1.004s
+2025-10-17 19:47:24,184 - services.background_tasks - INFO - Background task 'collect_metrics' completed successfully in 1004ms
+2025-10-17 19:47:25,629 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:47:25] "GET /api/system/settings/primaryDataProvider HTTP/1.1" 200 -
+2025-10-17 19:47:25,633 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+2025-10-17 19:47:25,633 - cache - INFO - Cache SET: health_check_1760719645 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:47:25,633 - cache - INFO - Cache SET: health_check_1760719645 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:47:25,634 - cache - INFO - Cache HIT: health_check_1760719645 (Access count: 1)
+2025-10-17 19:47:25,634 - cache - INFO - Cache HIT: health_check_1760719645 (Access count: 1)
+2025-10-17 19:47:25,634 - cache - INFO - Cache DELETE: health_check_1760719645 (Was accessed 1 times)
+2025-10-17 19:47:25,634 - cache - INFO - Cache DELETE: health_check_1760719645 (Was accessed 1 times)
+2025-10-17 19:47:25,634 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:47:25,634 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:47:25,635 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:47:26,644 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.009s - Success: True
+2025-10-17 19:47:26,644 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.009s
+2025-10-17 19:47:26,646 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.001s - Success: True
+2025-10-17 19:47:26,646 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:47:26,646 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:47:26,655 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:47:26] "GET /api/system/overview HTTP/1.1" 200 -
+2025-10-17 19:47:26,658 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:47:26] "GET /api/system/external-data HTTP/1.1" 200 -
+2025-10-17 19:47:26,659 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:47:26] "GET /api/system/backup/list HTTP/1.1" 200 -
+2025-10-17 19:47:26,659 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+2025-10-17 19:47:26,660 - cache - INFO - Cache SET: health_check_1760719646 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:47:26,660 - cache - INFO - Cache SET: health_check_1760719646 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:47:26,660 - cache - INFO - Cache HIT: health_check_1760719646 (Access count: 1)
+2025-10-17 19:47:26,660 - cache - INFO - Cache HIT: health_check_1760719646 (Access count: 1)
+2025-10-17 19:47:26,660 - cache - INFO - Cache DELETE: health_check_1760719646 (Was accessed 1 times)
+2025-10-17 19:47:26,660 - cache - INFO - Cache DELETE: health_check_1760719646 (Was accessed 1 times)
+2025-10-17 19:47:26,660 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:47:26,660 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:47:26] "GET /api/system/external-data HTTP/1.1" 200 -
+2025-10-17 19:47:26,661 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:47:26,661 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:47:27,671 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.010s - Success: True
+2025-10-17 19:47:27,671 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.010s
+2025-10-17 19:47:27,673 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.001s - Success: True
+2025-10-17 19:47:27,673 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:47:27,673 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:47:27,673 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:47:27] "GET /api/system/alerts HTTP/1.1" 200 -
+2025-10-17 19:47:27,675 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:47:27,675 - cache - INFO - Cache SET: health_check_1760719647 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:47:27,675 - cache - INFO - Cache SET: health_check_1760719647 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 19:47:27,675 - cache - INFO - Cache HIT: health_check_1760719647 (Access count: 1)
+2025-10-17 19:47:27,675 - cache - INFO - Cache HIT: health_check_1760719647 (Access count: 1)
+2025-10-17 19:47:27,675 - cache - INFO - Cache DELETE: health_check_1760719647 (Was accessed 1 times)
+2025-10-17 19:47:27,675 - cache - INFO - Cache DELETE: health_check_1760719647 (Was accessed 1 times)
+2025-10-17 19:47:27,676 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:47:27,676 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:47:27,676 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 19:47:28,686 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.010s - Success: True
+2025-10-17 19:47:28,686 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.010s
+2025-10-17 19:47:28,688 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.001s - Success: True
+2025-10-17 19:47:28,688 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:47:28,688 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 19:47:28,688 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 19:47:28] "GET /api/system/alerts HTTP/1.1" 200 -
+2025-10-17 19:47:38,674 - root - INFO - 🚀 Starting TikTrack server...
+2025-10-17 19:47:38,675 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
+2025-10-17 19:47:38,675 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-10-17 19:47:38,675 - root - INFO - 📦 Flask version: 2.3.3
+2025-10-17 19:47:38,675 - root - INFO - 🗄️ Initializing database...
+2025-10-17 19:47:38,675 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-10-17 19:47:38,678 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.003s
+2025-10-17 19:47:38,678 - root - INFO - ✅ Database initialized successfully
+2025-10-17 19:47:39,685 - utils.performance_monitor - INFO - System metrics: CPU: 47.1%, Memory: 61.1%, Disk: 3.5%
+2025-10-17 19:47:39,685 - root - INFO - ✅ Database initialized successfully
+2025-10-17 19:47:39,685 - root - INFO - ✅ Server initialization completed
+2025-10-17 19:47:39,736 - root - INFO - 🚀 Starting background task scheduler...
+2025-10-17 19:47:39,736 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-10-17 19:47:39,736 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-10-17 19:47:39,736 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-10-17 19:47:39,736 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-10-17 19:47:39,736 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-10-17 19:47:39,736 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-10-17 19:47:39,736 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-10-17 19:47:39,736 - services.background_tasks - INFO - Background task scheduler started
+2025-10-17 19:47:39,736 - root - INFO - ✅ Background task scheduler started successfully
+2025-10-17 19:47:39,737 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:d5228d23c09075eb9886f93fd00fa26e
+2025-10-17 19:47:39,737 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:d5228d23c09075eb9886f93fd00fa26e
+2025-10-17 19:47:39,757 - cache - INFO - Cache SET: services.system_settings_service.get_setting:d5228d23c09075eb9886f93fd00fa26e (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-17 19:47:39,757 - cache - INFO - Cache SET: services.system_settings_service.get_setting:d5228d23c09075eb9886f93fd00fa26e (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-17 19:47:39,758 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-10-17 19:47:39,759 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-10-17 19:47:39,759 - root - INFO - ✅ External data refresh scheduler started successfully

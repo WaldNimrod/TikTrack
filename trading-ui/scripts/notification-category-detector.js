@@ -25,7 +25,7 @@
  * @param {string} type - סוג ההודעה (success, error, warning, info)
  * @param {string} title - כותרת ההודעה
  * @param {Object} context - הקשר (קובץ, פונקציה, etc.)
- * @returns {string} - הקטגוריה המתאימה
+ * @returns {string|Object} - הקטגוריה המתאימה או אובייקט עם קטגוריה ומידע על פעולת משתמש
  */
 window.detectNotificationCategory = function(message, type, title, context = {}) {
   // Context-based detection
@@ -33,33 +33,55 @@ window.detectNotificationCategory = function(message, type, title, context = {})
   const functionName = context.functionName || '';
   const stackTrace = context.stackTrace || '';
   
+  // בדוק אם זו פעולת משתמש
+  const userInitiated = isUserInitiatedAction(message, title, functionName);
+  
   // Business indicators (check first for success messages)
   if (isBusinessContext(fileName, functionName, message, type)) {
-    return 'business';
+    return {
+      category: 'business',
+      userInitiated: userInitiated
+    };
   }
   
   // Development indicators
   if (isDevelopmentContext(fileName, functionName, message)) {
-    return 'development';
+    return {
+      category: 'development',
+      userInitiated: userInitiated
+    };
   }
   
   // System indicators
   if (isSystemContext(fileName, functionName, message, type)) {
-    return 'system';
+    return {
+      category: 'system',
+      userInitiated: userInitiated
+    };
   }
   
   // Performance indicators
   if (isPerformanceContext(fileName, functionName, message, type)) {
-    return 'performance';
+    return {
+      category: 'performance',
+      userInitiated: userInitiated
+    };
   }
   
   // UI indicators
   if (isUIContext(fileName, functionName, message, type)) {
-    return 'ui';
+    return {
+      category: 'ui',
+      userInitiated: userInitiated
+    };
   }
   
   // Default based on message type
-  return getDefaultCategoryByType(type);
+  const defaultResult = getDefaultCategoryByType(type);
+  return {
+    category: defaultResult,
+    userInitiated: userInitiated
+  };
 };
 
 /**
@@ -185,6 +207,51 @@ function getDefaultCategoryByType(type) {
       return 'ui';       // Info messages are usually UI-related
     default:
       return 'general';  // Default to general
+  }
+}
+
+/**
+ * בדוק אם הודעה נחשבת לפעולה שהמשתמש הפעיל
+ * NOTIFICATION MODES - בודק אם הודעה צריכה להיות מוצגת במצב WORK
+ * 
+ * @param {string} message - תוכן ההודעה
+ * @param {string} title - כותרת ההודעה
+ * @param {string} functionName - שם הפונקציה שהפעילה את ההודעה
+ * @returns {boolean} - האם ההודעה נחשבת לפעולת משתמש
+ */
+function isUserInitiatedAction(message, title, functionName) {
+  try {
+    const text = `${message} ${title} ${functionName}`.toLowerCase();
+    
+    // מילות מפתח המציינות פעולות משתמש
+    const userActionKeywords = [
+      'נשמר', 'נוסף', 'נמחק', 'עודכן', 'נוצר', 'הצלחה',
+      'saved', 'added', 'deleted', 'updated', 'created', 'success',
+      'הושלם', 'הופעל', 'בוטל', 'אושר', 'נדחה', 'נטען',
+      'נפתח', 'נסגר', 'נשמרה', 'נוספה', 'נמחקה', 'עודכנה'
+    ];
+    
+    // פונקציות שמציינות פעולות משתמש
+    const userActionFunctions = [
+      'save', 'add', 'delete', 'update', 'create', 'submit',
+      'confirm', 'approve', 'reject', 'activate', 'deactivate',
+      'load', 'open', 'close', 'import', 'export', 'upload', 'download'
+    ];
+    
+    // בדוק מילות מפתח בהודעה
+    const hasUserKeywords = userActionKeywords.some(keyword => 
+      text.includes(keyword)
+    );
+    
+    // בדוק שם פונקציה
+    const hasUserFunction = userActionFunctions.some(func => 
+      functionName && functionName.toLowerCase().includes(func)
+    );
+    
+    return hasUserKeywords || hasUserFunction;
+  } catch (error) {
+    console.warn('Error checking user initiated action:', error);
+    return false;
   }
 }
 

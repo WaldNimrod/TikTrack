@@ -939,7 +939,7 @@ class HeaderSystem {
 
 
   static async loadAccountsForFilter() {
-    console.log('🔧 loadAccountsForFilter - מתחיל טעינת חשבונות מסחר');
+    // console.log('🔧 loadAccountsForFilter - מתחיל טעינת חשבונות מסחר');
     
     try {
       // שימוש בפונקציה מקובץ השירותים
@@ -957,16 +957,16 @@ class HeaderSystem {
       
       const openAccounts = accounts.filter(account => account.status === 'open');
       
-      console.log('🔧 נמצאו חשבונות:', openAccounts.length, openAccounts.map(a => a.name));
+      // console.log('🔧 נמצאו חשבונות:', openAccounts.length, openAccounts.map(a => a.name));
       
       // עדכון תפריט החשבונות
       const accountMenu = document.getElementById('accountFilterMenu');
-        console.log('🔧 accountMenu element:', accountMenu);
+        // console.log('🔧 accountMenu element:', accountMenu);
         
         if (accountMenu) {
           // מחיקת חשבונות קיימים (חוץ מ"הכול")
           const existingItems = accountMenu.querySelectorAll('.account-filter-item:not([data-value="הכול"])');
-          console.log('🔧 מוחק חשבונות קיימים:', existingItems.length);
+          // console.log('🔧 מוחק חשבונות קיימים:', existingItems.length);
           existingItems.forEach(item => item.remove());
           
           // הוספת חשבונות פתוחים
@@ -977,31 +977,31 @@ class HeaderSystem {
             accountItem.onclick = () => selectAccountOption(account.name);
             accountItem.innerHTML = `<span class="option-text">${account.name}</span>`;
             accountMenu.appendChild(accountItem);
-            console.log('🔧 הוספתי חשבון:', account.name);
+            // console.log('🔧 הוספתי חשבון:', account.name);
           });
           
-          console.log(`✅ Loaded ${openAccounts.length} open trading accounts for filter`);
-          console.log('🔧 סה"כ פריטים בתפריט:', accountMenu.children.length);
+          // console.log(`✅ Loaded ${openAccounts.length} open trading accounts for filter`);
+          // console.log('🔧 סה"כ פריטים בתפריט:', accountMenu.children.length);
       } else {
-        console.error('❌ accountFilterMenu לא נמצא!');
+        // console.error('❌ accountFilterMenu לא נמצא!');
       }
       
     } catch (error) {
-      console.log('⚠️ Error loading trading accounts for filter:', error);
+      // console.log('⚠️ Error loading trading accounts for filter:', error);
     }
   }
 
   static loadSavedState() {
-    console.log('🔧 Loading saved filter state...');
+    // console.log('🔧 Loading saved filter state...');
     
     // המתן שהמערכת תהיה מוכנה
     setTimeout(() => {
       if (window.filterSystem && window.filterSystem.currentFilters) {
-        console.log('🔧 Current filters from system:', window.filterSystem.currentFilters);
+        // console.log('🔧 Current filters from system:', window.filterSystem.currentFilters);
         
         // עדכון UI של פילטר הסטטוס
         if (window.filterSystem.currentFilters.status && window.filterSystem.currentFilters.status.length > 0) {
-          console.log('🔧 Updating status filter UI with:', window.filterSystem.currentFilters.status);
+          // console.log('🔧 Updating status filter UI with:', window.filterSystem.currentFilters.status);
           HeaderSystem.updateFilterUI('status', window.filterSystem.currentFilters.status);
         }
         
@@ -1911,27 +1911,27 @@ window.updateToggleButtons = function() {
   const mainBtn = document.querySelector('.filter-toggle-main');
   const secondaryBtn = document.querySelector('.filter-toggle-secondary');
   
-  console.log('🔧 updateToggleButtons called');
-  console.log('headerFilters:', headerFilters);
-  console.log('mainBtn:', mainBtn);
-  console.log('secondaryBtn:', secondaryBtn);
+        // console.log('🔧 updateToggleButtons called');
+  // console.log('headerFilters:', headerFilters);
+  // console.log('mainBtn:', mainBtn);
+  // console.log('secondaryBtn:', secondaryBtn);
   
   if (!headerFilters || !mainBtn || !secondaryBtn) {
-    console.log('❌ Missing elements');
+    // console.log('❌ Missing elements');
     return;
   }
   
   const isOpen = headerFilters.style.display !== 'none';
-  console.log('isOpen:', isOpen);
+  // console.log('isOpen:', isOpen);
   
   if (isOpen) {
     // פילטר פתוח - הצג כפתור משני (בתוך הפילטר)
-    console.log('📤 Hiding main button, showing secondary button');
+    // console.log('📤 Hiding main button, showing secondary button');
     mainBtn.style.display = 'none';
     secondaryBtn.style.display = 'block';
   } else {
     // פילטר סגור - הצג כפתור ראשי (בתוך התפריט הראשי)
-    console.log('📥 Showing main button, hiding secondary button');
+    // console.log('📥 Showing main button, hiding secondary button');
     mainBtn.style.display = 'block';
     secondaryBtn.style.display = 'none';
   }

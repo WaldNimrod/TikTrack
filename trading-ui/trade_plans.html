@@ -109,12 +109,8 @@
                             הוסף
                         </button>
                         <div class="action-separator"></div>
-                        <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והתכנונים">
-                            <i class="fas fa-copy"></i> העתק לוג מפורט
-                        </button>
-                        <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר אזור עיצובים">
-                            <span class="filter-icon">▲</span>
-                        </button>
+                        ${window.createCopyButton ? window.createCopyButton('copyDetailedLog()', 'העתק לוג מפורט עם כל הנתונים והתכנונים') : '<button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והתכנונים"><i class="fas fa-copy"></i> העתק לוג מפורט</button>'}
+                        ${window.createToggleButton ? window.createToggleButton('top', false, 'הצג/הסתר אזור עיצובים') : '<button class="filter-toggle-btn" onclick="toggleSection(\'top\')" title="הצג/הסתר אזור עיצובים"><span class="filter-icon">▲</span></button>'}
                     </div>
                 </div>
 
@@ -467,8 +463,11 @@
     <script src="scripts/realtime-notifications-client.js?v=1.0.0"></script>
     <script src="scripts/error-handlers.js?v=1.0.0"></script>
     
-    <!-- Stage 8: Page-specific Script -->
-    <script src="scripts/trade_plans.js?v=1.0.0"></script>
+    <!-- Stage 8: Trade Plans Modules -->
+    <script src="scripts/trade_plans/trade-plans-data.js?v=1.0.0"></script>
+    <script src="scripts/trade_plans/trade-plans-business.js?v=1.0.0"></script>
+    <script src="scripts/trade_plans/trade-plans-ui.js?v=1.0.0"></script>
+    <script src="scripts/trade_plans/trade-plans-main.js?v=1.0.0"></script>
     
     <!-- Local copyDetailedLog function for trade_plans page -->
     <script>
@@ -477,3 +476,4 @@
     </script>
 </body>
 </html>
+

@@ -1,0 +1,12 @@
+{
+    "window.commandCenter": true,
+    "workbench.colorTheme": "Cursor Dark Midnight",
+    "git.autofetch": true,
+    "cursor.preferNotificationsSameAsChat": true,
+    "cursor.composer.shouldChimeAfterChatFinishes": true,
+    "workbench.list.fastScrollSensitivity": 10,
+    "workbench.settings.applyToAllProfiles": [
+        "cursor.composer.shouldAutoScrollToBottom"
+    ],
+    "workbench.editor.enablePreview": false
+}

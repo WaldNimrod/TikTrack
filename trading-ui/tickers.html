@@ -101,22 +101,12 @@
                         טיקרים
                     </div>
                     <div class="table-actions">
-                        <button class="refresh-btn" onclick="refreshYahooFinanceData()" title="רענן נתוני מחירים מ-Yahoo Finance" id="yahooRefreshBtn">
-                            <span class="action-icon">🔄</span>
-                            רענן נתונים
-                        </button>
+                        ${window.createRefreshButton ? window.createRefreshButton('refreshYahooFinanceData()', 'רענן נתוני מחירים מ-Yahoo Finance') : '<button class="refresh-btn" onclick="refreshYahooFinanceData()" title="רענן נתוני מחירים מ-Yahoo Finance" id="yahooRefreshBtn"><span class="action-icon">🔄</span> רענן נתונים</button>'}
                         <div class="action-separator"></div>
-                        <button id="addTickerBtn" class="refresh-btn" onclick="showAddTickerModal()" title="הוסף תיקר חדש">
-                            <img src="images/icons/tickers.svg" alt="הוסף" class="action-icon">
-                            הוסף טיקר
-                        </button>
+                        ${window.createAddButton ? window.createAddButton('tickers', 'showAddTickerModal()', 'הוסף טיקר חדש') : '<button id="addTickerBtn" class="refresh-btn" onclick="showAddTickerModal()" title="הוסף תיקר חדש"><img src="images/icons/tickers.svg" alt="הוסף" class="action-icon"> הוסף טיקר</button>'}
                         <div class="action-separator"></div>
-                        <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והטיקרים">
-                            <i class="fas fa-copy"></i> העתק לוג מפורט
-                        </button>
-                        <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר אזור טיקרים">
-                            <span class="filter-icon">▲</span>
-                        </button>
+                        ${window.createCopyButton ? window.createCopyButton('copyDetailedLog()', 'העתק לוג מפורט עם כל הנתונים והטיקרים') : '<button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והטיקרים"><i class="fas fa-copy"></i> העתק לוג מפורט</button>'}
+                        ${window.createToggleButton ? window.createToggleButton('top', false, 'הצג/הסתר אזור טיקרים') : '<button class="filter-toggle-btn" onclick="toggleSection(\'top\')" title="הצג/הסתר אזור טיקרים"><span class="filter-icon">▲</span></button>'}
                     </div>
                 </div>
 
@@ -146,9 +136,7 @@
                         </div>
                         <div class="table-count" id="tickersCount">טוען...</div>
                         <div class="table-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('main')" title="הצג/הסתר אזור ניהול טיקרים">
-                                <span class="filter-icon">▲</span>
-                            </button>
+                            ${window.createToggleButton ? window.createToggleButton('main', false, 'הצג/הסתר אזור ניהול טיקרים') : '<button class="filter-toggle-btn" onclick="toggleSection(\'main\')" title="הצג/הסתר אזור ניהול טיקרים"><span class="filter-icon">▲</span></button>'}
                         </div>
                     </div>
 
@@ -289,10 +277,8 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-success" onclick="addTicker()"
-                            style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">הוסף
-                            טיקר</button>
+                        ${window.createFormCancelButton ? window.createFormCancelButton('', 'ביטול') : '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>'}
+                        ${window.createSaveButton ? window.createSaveButton('addTicker()', 'הוסף טיקר', 'tickers') : '<button type="button" class="btn btn-success" onclick="addTicker()" style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">הוסף טיקר</button>'}
                     </div>
                 </div>
             </div>
@@ -359,10 +345,8 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-success" onclick="updateTicker()"
-                            style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">עדכן
-                            טיקר</button>
+                        ${window.createFormCancelButton ? window.createFormCancelButton('', 'ביטול') : '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>'}
+                        ${window.createSaveButton ? window.createSaveButton('updateTicker()', 'עדכן טיקר', 'tickers') : '<button type="button" class="btn btn-success" onclick="updateTicker()" style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">עדכן טיקר</button>'}
                     </div>
                 </div>
             </div>

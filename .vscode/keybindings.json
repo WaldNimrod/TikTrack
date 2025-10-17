@@ -1,0 +1,54 @@
+[
+    // ========================================
+    // 🚀 TikTrack Server Management Shortcuts
+    // ========================================
+    {
+        "key": "cmd+shift+r",
+        "command": "workbench.action.tasks.runTask",
+        "args": "TT: Restart Server",
+        "when": "!inDebugMode"
+    },
+    
+    // ========================================
+    // 🧹 TikTrack Cache Management Shortcuts
+    // ========================================
+    {
+        "key": "cmd+shift+k",
+        "command": "workbench.action.tasks.runTask",
+        "args": "TT: Clear Cache",
+        "when": "!inDebugMode"
+    },
+    {
+        "key": "cmd+shift+alt+k",
+        "command": "workbench.action.tasks.runTask",
+        "args": "TT: Clear Cache Full",
+        "when": "!inDebugMode"
+    },
+    
+    // ========================================
+    // 🏥 TikTrack System Health Shortcuts
+    // ========================================
+    {
+        "key": "cmd+shift+h",
+        "command": "workbench.action.tasks.runTask",
+        "args": "TT: System Health",
+        "when": "!inDebugMode"
+    },
+    
+    // ========================================
+    // 📝 TikTrack Logs Shortcuts
+    // ========================================
+    {
+        "key": "cmd+shift+l",
+        "command": "workbench.action.tasks.runTask",
+        "args": "TT: View Server Logs",
+        "when": "!inDebugMode"
+    },
+    {
+        "key": "cmd+shift+e",
+        "command": "workbench.action.tasks.runTask",
+        "args": "TT: View Error Logs",
+        "when": "!inDebugMode"
+    }
+]
+

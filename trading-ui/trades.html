@@ -101,12 +101,8 @@
                         מעקב טריידים
                     </div>
                     <div class="table-actions">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והטריידים">
-                            <i class="fas fa-copy"></i> העתק לוג מפורט
-                        </button>
-                        <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר אזור מעקב טריידים">
-                            <span class="filter-icon">▲</span>
-                        </button>
+                        ${window.createCopyButton ? window.createCopyButton('copyDetailedLog()', 'העתק לוג מפורט עם כל הנתונים והטריידים') : '<button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והטריידים"><i class="fas fa-copy"></i> העתק לוג מפורט</button>'}
+                        ${window.createToggleButton ? window.createToggleButton('top', false, 'הצג/הסתר אזור מעקב טריידים') : '<button class="filter-toggle-btn" onclick="toggleSection(\'top\')" title="הצג/הסתר אזור מעקב טריידים"><span class="filter-icon">▲</span></button>'}
                     </div>
                 </div>
 
@@ -152,9 +148,7 @@
                         </div>
                         <div class="table-count" id="tradesCount">טוען...</div>
                         <div class="table-actions">
-                            <button id="addTradeBtn" class="refresh-btn" onclick="showAddTradeModal()" title="הוסף טרייד חדש">
-                                <img src="images/icons/trades.svg" alt="הוסף" class="action-icon" style="width: 16px; height: 16px;"> הוסף
-                            </button>
+                            ${window.createAddButton ? window.createAddButton('trades', 'showAddTradeModal()', 'הוסף טרייד חדש') : '<button id="addTradeBtn" class="refresh-btn" onclick="showAddTradeModal()" title="הוסף טרייד חדש"><img src="images/icons/trades.svg" alt="הוסף" class="action-icon" style="width: 16px; height: 16px;"> הוסף</button>'}
                             
                             <!-- כפתורי עריכה ומחיקה נסתרים (לזיהוי בבדיקות) -->
                             <button id="editTradeBtn" class="refresh-btn d-none" onclick="editTradeRecord('')" title="ערוך טרייד נבחר">
@@ -494,8 +488,11 @@
     <script src="scripts/error-handlers.js?v=1.0.0"></script>
     <script src="scripts/validation-utils.js?v=1.0.0"></script>
     
-    <!-- Stage 8: Page-specific Script -->
-    <script src="scripts/trades.js?v=1.0.0"></script>
+    <!-- Stage 8: Trades Modules -->
+    <script src="scripts/trades/trades-data.js?v=1.0.0"></script>
+    <script src="scripts/trades/trades-business.js?v=1.0.0"></script>
+    <script src="scripts/trades/trades-ui.js?v=1.0.0"></script>
+    <script src="scripts/trades/trades-main.js?v=1.0.0"></script>
     
     <!-- Local copyDetailedLog function for trades page -->
     <script>

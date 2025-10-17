@@ -1,0 +1,15 @@
+{
+  "php.validate.enable": false,
+  "php.suggest.basic": false,
+  
+  // Task settings
+  "task.problemMatchers.neverPrompt": true,
+  "task.quickOpen.detail": true,
+  "task.quickOpen.skip": false,
+  "task.autoDetect": "off",
+  
+  // Terminal settings for background tasks
+  "terminal.integrated.automationProfile.osx": {
+    "path": "/bin/zsh"
+  }
+}

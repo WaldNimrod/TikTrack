@@ -1,0 +1,3 @@
+./restart-v3/test-robust-solution.sh: line 52: setsid: command not found
+./restart-v3/test-robust-solution.sh: line 52: setsid: command not found
+Control test completed

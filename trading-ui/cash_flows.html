@@ -101,12 +101,8 @@
                         תזרימי מזומנים
                     </div>
                     <div class="table-actions">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים ותזרימי המזומנים">
-                            <i class="fas fa-copy"></i> העתק לוג מפורט
-                        </button>
-                        <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר אזור תזרימי מזומנים">
-                            <span class="filter-icon">▲</span>
-                        </button>
+                        ${window.createCopyButton ? window.createCopyButton('copyDetailedLog()', 'העתק לוג מפורט עם כל הנתונים ותזרימי המזומנים') : '<button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים ותזרימי המזומנים"><i class="fas fa-copy"></i> העתק לוג מפורט</button>'}
+                        ${window.createToggleButton ? window.createToggleButton('top', false, 'הצג/הסתר אזור תזרימי מזומנים') : '<button class="filter-toggle-btn" onclick="toggleSection(\'top\')" title="הצג/הסתר אזור תזרימי מזומנים"><span class="filter-icon">▲</span></button>'}
                     </div>
                 </div>
 
@@ -136,13 +132,8 @@
                         </div>
                         <div class="table-count" id="cashFlowsCount">טוען...</div>
                         <div class="table-actions">
-                            <button id="addCashFlowBtn" class="refresh-btn" onclick="showAddCashFlowModal()" title="הוסף תזרים מזומנים חדש">
-                                <img src="images/icons/cash_flows.svg" alt="הוסף" class="action-icon">
-                                הוסף
-                            </button>
-                            <button class="filter-toggle-btn" onclick="toggleSection('main')" title="הצג/הסתר אזור ניהול תזרימי מזומנים">
-                                <span class="filter-icon">▲</span>
-                            </button>
+                            ${window.createAddButton ? window.createAddButton('cash_flows', 'showAddCashFlowModal()', 'הוסף תזרים מזומנים חדש') : '<button id="addCashFlowBtn" class="refresh-btn" onclick="showAddCashFlowModal()" title="הוסף תזרים מזומנים חדש"><img src="images/icons/cash_flows.svg" alt="הוסף" class="action-icon"> הוסף</button>'}
+                            ${window.createToggleButton ? window.createToggleButton('main', false, 'הצג/הסתר אזור ניהול תזרימי מזומנים') : '<button class="filter-toggle-btn" onclick="toggleSection(\'main\')" title="הצג/הסתר אזור ניהול תזרימי מזומנים"><span class="filter-icon">▲</span></button>'}
                         </div>
                     </div>
 
@@ -292,10 +283,8 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-success" onclick="addCashFlow()"
-                            style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">הוסף
-                            תזרים</button>
+                        ${window.createFormCancelButton ? window.createFormCancelButton('', 'ביטול') : '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>'}
+                        ${window.createSaveButton ? window.createSaveButton('addCashFlow()', 'הוסף תזרים', 'cash_flows') : '<button type="button" class="btn btn-success" onclick="addCashFlow()" style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">הוסף תזרים</button>'}
                     </div>
                 </div>
             </div>
@@ -370,10 +359,8 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-success" onclick="updateCashFlow()"
-                            style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">עדכן
-                            תזרים</button>
+                        ${window.createFormCancelButton ? window.createFormCancelButton('', 'ביטול') : '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>'}
+                        ${window.createSaveButton ? window.createSaveButton('updateCashFlow()', 'עדכן תזרים', 'cash_flows') : '<button type="button" class="btn btn-success" onclick="updateCashFlow()" style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">עדכן תזרים</button>'}
                     </div>
                 </div>
             </div>

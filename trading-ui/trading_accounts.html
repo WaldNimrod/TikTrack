@@ -102,12 +102,8 @@
                         חשבונות מסחר
                     </div>
                     <div class="table-actions">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והחשבונות">
-                            <i class="fas fa-copy"></i> העתק לוג מפורט
-                        </button>
-                        <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר אזור חשבונות מסחר">
-                            <span class="filter-icon">▲</span>
-                        </button>
+                        ${window.createCopyButton ? window.createCopyButton('copyDetailedLog()', 'העתק לוג מפורט עם כל הנתונים והחשבונות') : '<button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והחשבונות"><i class="fas fa-copy"></i> העתק לוג מפורט</button>'}
+                        ${window.createToggleButton ? window.createToggleButton('top', false, 'הצג/הסתר אזור חשבונות מסחר') : '<button class="filter-toggle-btn" onclick="toggleSection(\'top\')" title="הצג/הסתר אזור חשבונות מסחר"><span class="filter-icon">▲</span></button>'}
                     </div>
                 </div>
 
@@ -137,13 +133,8 @@
                         </div>
                         <div class="table-count" id="accountsCount">טוען...</div>
                         <div class="table-actions">
-                            <button id="addAccountBtn" class="refresh-btn" onclick="showAddAccountModal()" title="הוסף חשבון מסחר חדש">
-                                <img src="images/icons/accounts.svg" alt="הוסף" class="action-icon">
-                                הוסף
-                            </button>
-                            <button class="filter-toggle-btn" onclick="toggleSection('main')" title="הצג/הסתר אזור ניהול חשבונות מסחר">
-                                <span class="filter-icon">▲</span>
-                            </button>
+                            ${window.createAddButton ? window.createAddButton('trading_accounts', 'showAddAccountModal()', 'הוסף חשבון מסחר חדש') : '<button id="addAccountBtn" class="refresh-btn" onclick="showAddAccountModal()" title="הוסף חשבון מסחר חדש"><img src="images/icons/accounts.svg" alt="הוסף" class="action-icon"> הוסף</button>'}
+                            ${window.createToggleButton ? window.createToggleButton('main', false, 'הצג/הסתר אזור ניהול חשבונות מסחר') : '<button class="filter-toggle-btn" onclick="toggleSection(\'main\')" title="הצג/הסתר אזור ניהול חשבונות מסחר"><span class="filter-icon">▲</span></button>'}
                         </div>
                     </div>
 

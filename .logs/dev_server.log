@@ -1,0 +1,288 @@
+INFO:constraint_service:ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+INFO:services.smart_query_optimizer:Smart Query Optimizer initialized
+INFO:services.constraint_service:ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+INFO:services.user_service:UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+Server initialized for threading.
+INFO:engineio.server:Server initialized for threading.
+INFO:services.realtime_notifications:Real-time Notifications Service initialized
+INFO:services.background_tasks:Background Task Manager initialized with real-time notifications support
+INFO:services.data_refresh_scheduler:Data Refresh Scheduler initialized with NY market clock
+INFO:root:🚀 Starting TikTrack server...
+2025-09-28 23:24:08,948 - root - INFO - 🚀 Starting TikTrack server...
+INFO:root:📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend
+2025-09-28 23:24:08,948 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend
+INFO:root:🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-09-28 23:24:08,948 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+INFO:root:📦 Flask version: 3.1.2
+2025-09-28 23:24:08,949 - root - INFO - 📦 Flask version: 3.1.2
+INFO:root:🗄️ Initializing database...
+2025-09-28 23:24:08,949 - root - INFO - 🗄️ Initializing database...
+INFO:utils.performance_monitor:Starting operation: Database initialization
+2025-09-28 23:24:08,949 - utils.performance_monitor - INFO - Starting operation: Database initialization
+INFO:utils.performance_monitor:Completed operation: Database initialization - Duration: 0.003s
+2025-09-28 23:24:08,953 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.003s
+INFO:root:✅ Database initialized successfully
+2025-09-28 23:24:08,953 - root - INFO - ✅ Database initialized successfully
+INFO:utils.performance_monitor:System metrics: CPU: 24.7%, Memory: 60.7%, Disk: 14.9%
+2025-09-28 23:24:09,958 - utils.performance_monitor - INFO - System metrics: CPU: 24.7%, Memory: 60.7%, Disk: 14.9%
+INFO:root:✅ Database initialized successfully
+2025-09-28 23:24:09,958 - root - INFO - ✅ Database initialized successfully
+INFO:root:✅ Server initialization completed
+2025-09-28 23:24:09,958 - root - INFO - ✅ Server initialization completed
+INFO:root:🚀 Starting background task scheduler...
+2025-09-28 23:24:09,990 - root - INFO - 🚀 Starting background task scheduler...
+INFO:services.background_tasks:Registered background task: cleanup_expired_data (1d)
+2025-09-28 23:24:09,990 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+emitting event "background_task_started" to all [/]
+INFO:socketio.server:emitting event "background_task_started" to all [/]
+2025-09-28 23:24:09,990 - socketio.server - INFO - emitting event "background_task_started" to all [/]
+INFO:services.realtime_notifications:Broadcasted background_task_started to all clients
+2025-09-28 23:24:09,990 - services.realtime_notifications - INFO - Broadcasted background_task_started to all clients
+INFO:services.background_tasks:Registered background task: cleanup_cache (1h)
+2025-09-28 23:24:09,990 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+emitting event "background_task_started" to all [/]
+INFO:socketio.server:emitting event "background_task_started" to all [/]
+2025-09-28 23:24:09,990 - socketio.server - INFO - emitting event "background_task_started" to all [/]
+INFO:services.realtime_notifications:Broadcasted background_task_started to all clients
+2025-09-28 23:24:09,990 - services.realtime_notifications - INFO - Broadcasted background_task_started to all clients
+INFO:services.background_tasks:Registered background task: rotate_logs (1w)
+2025-09-28 23:24:09,990 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+emitting event "background_task_started" to all [/]
+INFO:socketio.server:emitting event "background_task_started" to all [/]
+2025-09-28 23:24:09,990 - socketio.server - INFO - emitting event "background_task_started" to all [/]
+INFO:services.realtime_notifications:Broadcasted background_task_started to all clients
+2025-09-28 23:24:09,990 - services.realtime_notifications - INFO - Broadcasted background_task_started to all clients
+INFO:services.background_tasks:Registered background task: collect_metrics (30m)
+2025-09-28 23:24:09,990 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+emitting event "background_task_started" to all [/]
+INFO:socketio.server:emitting event "background_task_started" to all [/]
+2025-09-28 23:24:09,990 - socketio.server - INFO - emitting event "background_task_started" to all [/]
+INFO:services.realtime_notifications:Broadcasted background_task_started to all clients
+2025-09-28 23:24:09,990 - services.realtime_notifications - INFO - Broadcasted background_task_started to all clients
+INFO:services.background_tasks:Registered background task: database_maintenance (1w)
+2025-09-28 23:24:09,990 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+emitting event "background_task_started" to all [/]
+INFO:socketio.server:emitting event "background_task_started" to all [/]
+2025-09-28 23:24:09,990 - socketio.server - INFO - emitting event "background_task_started" to all [/]
+INFO:services.realtime_notifications:Broadcasted background_task_started to all clients
+2025-09-28 23:24:09,990 - services.realtime_notifications - INFO - Broadcasted background_task_started to all clients
+INFO:services.background_tasks:Registered background task: system_health_check (1h)
+2025-09-28 23:24:09,991 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+emitting event "background_task_started" to all [/]
+INFO:socketio.server:emitting event "background_task_started" to all [/]
+2025-09-28 23:24:09,991 - socketio.server - INFO - emitting event "background_task_started" to all [/]
+INFO:services.realtime_notifications:Broadcasted background_task_started to all clients
+2025-09-28 23:24:09,991 - services.realtime_notifications - INFO - Broadcasted background_task_started to all clients
+INFO:services.background_tasks:Registered background task: update_closed_tickers_daily (1d)
+2025-09-28 23:24:09,991 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+emitting event "background_task_started" to all [/]
+INFO:socketio.server:emitting event "background_task_started" to all [/]
+2025-09-28 23:24:09,991 - socketio.server - INFO - emitting event "background_task_started" to all [/]
+INFO:services.realtime_notifications:Broadcasted background_task_started to all clients
+2025-09-28 23:24:09,991 - services.realtime_notifications - INFO - Broadcasted background_task_started to all clients
+INFO:services.background_tasks:Background task scheduler started
+2025-09-28 23:24:09,991 - services.background_tasks - INFO - Background task scheduler started
+INFO:root:✅ Background task scheduler started successfully
+2025-09-28 23:24:09,991 - root - INFO - ✅ Background task scheduler started successfully
+INFO:root:🚀 Starting external data refresh scheduler...
+2025-09-28 23:24:09,991 - root - INFO - 🚀 Starting external data refresh scheduler...
+INFO:services.data_refresh_scheduler:Data Refresh Scheduler started
+2025-09-28 23:24:09,998 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+INFO:root:✅ External data refresh scheduler started successfully
+2025-09-28 23:24:10,009 - root - INFO - ✅ External data refresh scheduler started successfully
+🔍 PROJECT_ROOT: /Users/nimrod/Documents/TikTrack/TikTrackApp
+🔍 UI_DIR: /Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui
+🔍 SCRIPTS_DIR: /Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts
+✅ Data Refresh Scheduler initialized successfully
+ * Serving Flask app 'app'
+ * Debug mode: on
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:8080
+2025-09-28 23:24:10,034 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:8080
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+2025-09-28 23:24:10,034 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+INFO:cache:Cache MISS: routes.api.file_scanner.get_files:11e7903cf562f028d788fc601ffc9a04
+2025-09-28 23:24:15,059 - cache - INFO - Cache MISS: routes.api.file_scanner.get_files:11e7903cf562f028d788fc601ffc9a04
+INFO:werkzeug:127.0.0.1 - - [28/Sep/2025 23:24:15] "GET /api/preferences/user/preference?name=primaryDataProvider&user_id=1 HTTP/1.1" 200 -
+2025-09-28 23:24:15,085 - werkzeug - INFO - 127.0.0.1 - - [28/Sep/2025 23:24:15] "GET /api/preferences/user/preference?name=primaryDataProvider&user_id=1 HTTP/1.1" 200 -
+INFO:utils.performance_monitor:Performance: database_health_check - Duration: 0.001s - Success: True
+2025-09-28 23:24:15,089 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+INFO:cache:Cache SET: health_check_1759091055 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-09-28 23:24:15,089 - cache - INFO - Cache SET: health_check_1759091055 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+INFO:cache:Cache HIT: health_check_1759091055 (Access count: 1)
+2025-09-28 23:24:15,089 - cache - INFO - Cache HIT: health_check_1759091055 (Access count: 1)
+INFO:cache:Cache DELETE: health_check_1759091055 (Was accessed 1 times)
+2025-09-28 23:24:15,089 - cache - INFO - Cache DELETE: health_check_1759091055 (Was accessed 1 times)
+INFO:utils.performance_monitor:Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-09-28 23:24:15,089 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+INFO:utils.performance_monitor:Performance: system_health_check - Duration: 0.000s - Success: True
+2025-09-28 23:24:15,090 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+INFO:utils.performance_monitor:Performance: api_health_check - Duration: 0.000s - Success: True
+2025-09-28 23:24:15,090 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+INFO:cache:Cache SET: routes.api.file_scanner.get_files:11e7903cf562f028d788fc601ffc9a04 (TTL: 600s, Dependencies: None, Data size: 31 chars)
+2025-09-28 23:24:15,916 - cache - INFO - Cache SET: routes.api.file_scanner.get_files:11e7903cf562f028d788fc601ffc9a04 (TTL: 600s, Dependencies: None, Data size: 31 chars)
+INFO:werkzeug:127.0.0.1 - - [28/Sep/2025 23:24:15] "GET /api/file-scanner/files HTTP/1.1" 200 -
+2025-09-28 23:24:15,916 - werkzeug - INFO - 127.0.0.1 - - [28/Sep/2025 23:24:15] "GET /api/file-scanner/files HTTP/1.1" 200 -
+INFO:utils.performance_monitor:Performance: collect_performance_metrics - Duration: 1.005s - Success: True
+2025-09-28 23:24:16,095 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.005s - Success: True
+WARNING:utils.performance_monitor:Slow operation detected: collect_performance_metrics - Duration: 1.005s
+2025-09-28 23:24:16,096 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.005s
+INFO:utils.performance_monitor:Performance: collect_database_metrics - Duration: 0.004s - Success: True
+2025-09-28 23:24:16,099 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.004s - Success: True
+INFO:utils.performance_monitor:Performance: collect_business_metrics - Duration: 0.001s - Success: True
+2025-09-28 23:24:16,101 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.001s - Success: True
+INFO:utils.performance_monitor:Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-09-28 23:24:16,101 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+INFO:werkzeug:127.0.0.1 - - [28/Sep/2025 23:24:16] "GET /api/system/overview HTTP/1.1" 200 -
+2025-09-28 23:24:16,116 - werkzeug - INFO - 127.0.0.1 - - [28/Sep/2025 23:24:16] "GET /api/system/overview HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Sep/2025 23:24:16] "GET /api/system/backup/list HTTP/1.1" 200 -
+2025-09-28 23:24:16,128 - werkzeug - INFO - 127.0.0.1 - - [28/Sep/2025 23:24:16] "GET /api/system/backup/list HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Sep/2025 23:24:16] "GET /api/system/external-data HTTP/1.1" 200 -
+2025-09-28 23:24:16,129 - werkzeug - INFO - 127.0.0.1 - - [28/Sep/2025 23:24:16] "GET /api/system/external-data HTTP/1.1" 200 -
+INFO:utils.performance_monitor:Performance: database_health_check - Duration: 0.002s - Success: True
+2025-09-28 23:24:16,129 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.002s - Success: True
+INFO:cache:Cache SET: health_check_1759091056 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-09-28 23:24:16,133 - cache - INFO - Cache SET: health_check_1759091056 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+INFO:cache:Cache HIT: health_check_1759091056 (Access count: 1)
+2025-09-28 23:24:16,133 - cache - INFO - Cache HIT: health_check_1759091056 (Access count: 1)
+INFO:cache:Cache DELETE: health_check_1759091056 (Was accessed 1 times)
+2025-09-28 23:24:16,133 - cache - INFO - Cache DELETE: health_check_1759091056 (Was accessed 1 times)
+INFO:utils.performance_monitor:Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-09-28 23:24:16,133 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+INFO:utils.performance_monitor:Performance: system_health_check - Duration: 0.000s - Success: True
+2025-09-28 23:24:16,134 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+INFO:utils.performance_monitor:Performance: api_health_check - Duration: 0.000s - Success: True
+2025-09-28 23:24:16,134 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+INFO:werkzeug:127.0.0.1 - - [28/Sep/2025 23:24:16] "GET /api/system/external-data HTTP/1.1" 200 -
+2025-09-28 23:24:16,136 - werkzeug - INFO - 127.0.0.1 - - [28/Sep/2025 23:24:16] "GET /api/system/external-data HTTP/1.1" 200 -
+INFO:utils.performance_monitor:Performance: collect_performance_metrics - Duration: 1.006s - Success: True
+2025-09-28 23:24:17,140 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.006s - Success: True
+WARNING:utils.performance_monitor:Slow operation detected: collect_performance_metrics - Duration: 1.006s
+2025-09-28 23:24:17,141 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.006s
+INFO:utils.performance_monitor:Performance: collect_database_metrics - Duration: 0.004s - Success: True
+2025-09-28 23:24:17,145 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.004s - Success: True
+INFO:utils.performance_monitor:Performance: collect_business_metrics - Duration: 0.001s - Success: True
+2025-09-28 23:24:17,146 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.001s - Success: True
+INFO:utils.performance_monitor:Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-09-28 23:24:17,146 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+INFO:werkzeug:127.0.0.1 - - [28/Sep/2025 23:24:17] "GET /api/system/alerts HTTP/1.1" 200 -
+2025-09-28 23:24:17,147 - werkzeug - INFO - 127.0.0.1 - - [28/Sep/2025 23:24:17] "GET /api/system/alerts HTTP/1.1" 200 -
+INFO:utils.performance_monitor:Performance: database_health_check - Duration: 0.001s - Success: True
+2025-09-28 23:24:17,151 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+INFO:cache:Cache SET: health_check_1759091057 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-09-28 23:24:17,151 - cache - INFO - Cache SET: health_check_1759091057 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+INFO:cache:Cache HIT: health_check_1759091057 (Access count: 1)
+2025-09-28 23:24:17,151 - cache - INFO - Cache HIT: health_check_1759091057 (Access count: 1)
+INFO:cache:Cache DELETE: health_check_1759091057 (Was accessed 1 times)
+2025-09-28 23:24:17,151 - cache - INFO - Cache DELETE: health_check_1759091057 (Was accessed 1 times)
+INFO:utils.performance_monitor:Performance: cache_health_check - Duration: 0.001s - Success: True
+2025-09-28 23:24:17,151 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.001s - Success: True
+INFO:utils.performance_monitor:Performance: system_health_check - Duration: 0.001s - Success: True
+2025-09-28 23:24:17,152 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.001s - Success: True
+INFO:utils.performance_monitor:Performance: api_health_check - Duration: 0.000s - Success: True
+2025-09-28 23:24:17,152 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+INFO:utils.performance_monitor:Performance: collect_performance_metrics - Duration: 1.005s - Success: True
+2025-09-28 23:24:18,158 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.005s - Success: True
+WARNING:utils.performance_monitor:Slow operation detected: collect_performance_metrics - Duration: 1.005s
+2025-09-28 23:24:18,158 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.005s
+INFO:utils.performance_monitor:Performance: collect_database_metrics - Duration: 0.002s - Success: True
+2025-09-28 23:24:18,160 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.002s - Success: True
+INFO:utils.performance_monitor:Performance: collect_business_metrics - Duration: 0.001s - Success: True
+2025-09-28 23:24:18,160 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.001s - Success: True
+INFO:utils.performance_monitor:Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-09-28 23:24:18,161 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+INFO:werkzeug:127.0.0.1 - - [28/Sep/2025 23:24:18] "GET /api/system/alerts HTTP/1.1" 200 -
+2025-09-28 23:24:18,161 - werkzeug - INFO - 127.0.0.1 - - [28/Sep/2025 23:24:18] "GET /api/system/alerts HTTP/1.1" 200 -
+INFO:cache:Cache HIT: routes.api.file_scanner.get_files:11e7903cf562f028d788fc601ffc9a04 (Access count: 1)
+2025-09-28 23:25:15,060 - cache - INFO - Cache HIT: routes.api.file_scanner.get_files:11e7903cf562f028d788fc601ffc9a04 (Access count: 1)
+INFO:werkzeug:127.0.0.1 - - [28/Sep/2025 23:25:15] "GET /api/file-scanner/files HTTP/1.1" 200 -
+2025-09-28 23:25:15,060 - werkzeug - INFO - 127.0.0.1 - - [28/Sep/2025 23:25:15] "GET /api/file-scanner/files HTTP/1.1" 200 -
+INFO:utils.performance_monitor:Performance: database_health_check - Duration: 0.000s - Success: True
+2025-09-28 23:25:15,063 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.000s - Success: True
+INFO:cache:Cache SET: health_check_1759091115 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-09-28 23:25:15,063 - cache - INFO - Cache SET: health_check_1759091115 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+INFO:cache:Cache HIT: health_check_1759091115 (Access count: 1)
+2025-09-28 23:25:15,064 - cache - INFO - Cache HIT: health_check_1759091115 (Access count: 1)
+INFO:cache:Cache DELETE: health_check_1759091115 (Was accessed 1 times)
+2025-09-28 23:25:15,064 - cache - INFO - Cache DELETE: health_check_1759091115 (Was accessed 1 times)
+INFO:utils.performance_monitor:Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-09-28 23:25:15,064 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+INFO:utils.performance_monitor:Performance: system_health_check - Duration: 0.000s - Success: True
+2025-09-28 23:25:15,064 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+INFO:utils.performance_monitor:Performance: api_health_check - Duration: 0.000s - Success: True
+2025-09-28 23:25:15,064 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+INFO:utils.performance_monitor:Performance: collect_performance_metrics - Duration: 1.005s - Success: True
+2025-09-28 23:25:16,069 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.005s - Success: True
+WARNING:utils.performance_monitor:Slow operation detected: collect_performance_metrics - Duration: 1.005s
+2025-09-28 23:25:16,070 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.005s
+INFO:utils.performance_monitor:Performance: collect_database_metrics - Duration: 0.001s - Success: True
+2025-09-28 23:25:16,071 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.001s - Success: True
+INFO:utils.performance_monitor:Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-09-28 23:25:16,071 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+INFO:utils.performance_monitor:Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-09-28 23:25:16,071 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+INFO:werkzeug:127.0.0.1 - - [28/Sep/2025 23:25:16] "GET /api/system/overview HTTP/1.1" 200 -
+2025-09-28 23:25:16,080 - werkzeug - INFO - 127.0.0.1 - - [28/Sep/2025 23:25:16] "GET /api/system/overview HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Sep/2025 23:25:16] "GET /api/system/external-data HTTP/1.1" 200 -
+2025-09-28 23:25:16,087 - werkzeug - INFO - 127.0.0.1 - - [28/Sep/2025 23:25:16] "GET /api/system/external-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Sep/2025 23:25:16] "GET /api/system/backup/list HTTP/1.1" 200 -
+2025-09-28 23:25:16,087 - werkzeug - INFO - 127.0.0.1 - - [28/Sep/2025 23:25:16] "GET /api/system/backup/list HTTP/1.1" 200 -
+INFO:utils.performance_monitor:Performance: database_health_check - Duration: 0.001s - Success: True
+2025-09-28 23:25:16,087 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+INFO:cache:Cache SET: health_check_1759091116 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-09-28 23:25:16,087 - cache - INFO - Cache SET: health_check_1759091116 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+INFO:cache:Cache HIT: health_check_1759091116 (Access count: 1)
+2025-09-28 23:25:16,087 - cache - INFO - Cache HIT: health_check_1759091116 (Access count: 1)
+INFO:cache:Cache DELETE: health_check_1759091116 (Was accessed 1 times)
+2025-09-28 23:25:16,088 - cache - INFO - Cache DELETE: health_check_1759091116 (Was accessed 1 times)
+INFO:utils.performance_monitor:Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-09-28 23:25:16,088 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+INFO:utils.performance_monitor:Performance: system_health_check - Duration: 0.000s - Success: True
+2025-09-28 23:25:16,088 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+INFO:utils.performance_monitor:Performance: api_health_check - Duration: 0.000s - Success: True
+2025-09-28 23:25:16,088 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+INFO:werkzeug:127.0.0.1 - - [28/Sep/2025 23:25:16] "GET /api/system/external-data HTTP/1.1" 200 -
+2025-09-28 23:25:16,089 - werkzeug - INFO - 127.0.0.1 - - [28/Sep/2025 23:25:16] "GET /api/system/external-data HTTP/1.1" 200 -
+INFO:utils.performance_monitor:Performance: collect_performance_metrics - Duration: 1.004s - Success: True
+2025-09-28 23:25:17,092 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.004s - Success: True
+WARNING:utils.performance_monitor:Slow operation detected: collect_performance_metrics - Duration: 1.004s
+2025-09-28 23:25:17,092 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.004s
+INFO:utils.performance_monitor:Performance: collect_database_metrics - Duration: 0.002s - Success: True
+2025-09-28 23:25:17,094 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.002s - Success: True
+INFO:utils.performance_monitor:Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-09-28 23:25:17,095 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+INFO:utils.performance_monitor:Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-09-28 23:25:17,095 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+INFO:werkzeug:127.0.0.1 - - [28/Sep/2025 23:25:17] "GET /api/system/alerts HTTP/1.1" 200 -
+2025-09-28 23:25:17,095 - werkzeug - INFO - 127.0.0.1 - - [28/Sep/2025 23:25:17] "GET /api/system/alerts HTTP/1.1" 200 -
+INFO:utils.performance_monitor:Performance: database_health_check - Duration: 0.000s - Success: True
+2025-09-28 23:25:17,097 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.000s - Success: True
+INFO:cache:Cache SET: health_check_1759091117 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-09-28 23:25:17,097 - cache - INFO - Cache SET: health_check_1759091117 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+INFO:cache:Cache HIT: health_check_1759091117 (Access count: 1)
+2025-09-28 23:25:17,097 - cache - INFO - Cache HIT: health_check_1759091117 (Access count: 1)
+INFO:cache:Cache DELETE: health_check_1759091117 (Was accessed 1 times)
+2025-09-28 23:25:17,097 - cache - INFO - Cache DELETE: health_check_1759091117 (Was accessed 1 times)
+INFO:utils.performance_monitor:Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-09-28 23:25:17,097 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+INFO:utils.performance_monitor:Performance: system_health_check - Duration: 0.000s - Success: True
+2025-09-28 23:25:17,097 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+INFO:utils.performance_monitor:Performance: api_health_check - Duration: 0.000s - Success: True
+2025-09-28 23:25:17,097 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+INFO:utils.performance_monitor:Performance: collect_performance_metrics - Duration: 1.001s - Success: True
+2025-09-28 23:25:18,098 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.001s - Success: True
+WARNING:utils.performance_monitor:Slow operation detected: collect_performance_metrics - Duration: 1.001s
+2025-09-28 23:25:18,098 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.001s
+INFO:utils.performance_monitor:Performance: collect_database_metrics - Duration: 0.001s - Success: True
+2025-09-28 23:25:18,100 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.001s - Success: True
+INFO:utils.performance_monitor:Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-09-28 23:25:18,100 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+INFO:utils.performance_monitor:Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-09-28 23:25:18,100 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+INFO:werkzeug:127.0.0.1 - - [28/Sep/2025 23:25:18] "GET /api/system/alerts HTTP/1.1" 200 -
+2025-09-28 23:25:18,100 - werkzeug - INFO - 127.0.0.1 - - [28/Sep/2025 23:25:18] "GET /api/system/alerts HTTP/1.1" 200 -
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/multiprocessing/resource_tracker.py:216: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '

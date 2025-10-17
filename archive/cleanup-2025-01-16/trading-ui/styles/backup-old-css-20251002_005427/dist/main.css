@@ -1,0 +1,6835 @@
+/* ==========================================================================
+   TikTrack CSS Architecture - Main Import File
+   ITCSS Structure: Settings → Tools → Generic → Elements → Objects → Components
+   ========================================================================== */
+
+/* 01 - SETTINGS (Variables & Global Configuration) */
+/**
+ * CSS Variables - משתנים גלובליים
+ * 
+ * קובץ זה מכיל את כל המשתנים הגלובליים של המערכת
+ * מבוסס על Apple Design System עם התאמה לעברית ו-RTL
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 5, 2025
+ */
+
+:root {
+  /* ===== צבעי Apple System ===== */
+  --apple-blue: #007AFF;
+  --apple-blue-dark: #0056CC;
+  --logo-orange: #ff9e04;
+  --apple-gray-1: #F2F2F7;
+  --apple-gray-2: #E5E5EA;
+  --apple-gray-3: #D1D1D6;
+  --apple-gray-4: #C7C7CC;
+  --apple-gray-5: #AEAEB2;
+  --apple-gray-6: #8E8E93;
+  --apple-gray-7: #636366;
+  --apple-gray-8: #48484A;
+  --apple-gray-9: #3A3A3C;
+  --apple-gray-10: #2C2C2E;
+  --apple-gray-11: #1C1C1E;
+  --apple-red: #FF3B30;
+  --apple-green: #34C759;
+  --apple-orange: #FF9500;
+  --apple-yellow: #FFCC02;
+  --apple-purple: #AF52DE;
+  --apple-pink: #FF2D92;
+
+  /* ===== רקעים ===== */
+  --apple-bg-primary: #FFFFFF;
+  --apple-bg-secondary: #F2F2F7;
+  --apple-bg-tertiary: #FFFFFF;
+  --apple-bg-elevated: #FFFFFF;
+
+  /* ===== טקסט ===== */
+  --apple-text-primary: #000000;
+  --apple-text-secondary: #3C3C43;
+  --apple-text-tertiary: #3C3C4399;
+  --apple-text-quaternary: #3C3C434D;
+
+  /* ===== גבולות ===== */
+  --apple-border: #C6C6C8;
+  --apple-border-light: #E5E5EA;
+
+  /* ===== צללים ===== */
+  --apple-shadow-light: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --apple-shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --apple-shadow-heavy: 0 8px 24px rgba(0, 0, 0, 0.2);
+
+  /* ===== רדיוס ===== */
+  --apple-radius-small: 6px;
+  --apple-radius-medium: 10px;
+  --apple-radius-large: 16px;
+}
+/**
+ * צבעים סמנטיים - Semantic Colors
+ * 
+ * קובץ זה מכיל צבעים לפי משמעות סמנטית
+ * הצלחה, שגיאה, אזהרה, מידע וכו'
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 5, 2025
+ */
+
+:root {
+  /* ===== צבעים סמנטיים ===== */
+  
+  /* הצלחה - Success */
+  --color-success: #28a745;
+  --color-success-light: #d4edda;
+  --color-success-dark: #155724;
+  --color-success-border: #c3e6cb;
+  
+  /* שגיאה - Danger */
+  --color-danger: #dc3545;
+  --color-danger-light: #f8d7da;
+  --color-danger-dark: #721c24;
+  --color-danger-border: #f5c6cb;
+  
+  /* אזהרה - Warning */
+  --color-warning: #ffc107;
+  --color-warning-light: #fff3cd;
+  --color-warning-dark: #856404;
+  --color-warning-border: #ffeaa7;
+  
+  /* מידע - Info */
+  --color-info: #007bff;
+  --color-info-light: #d1ecf1;
+  --color-info-dark: #0c5460;
+  --color-info-border: #bee5eb;
+  
+  /* ===== צבעי ערכים מספריים ===== */
+  
+  /* חיובי - Positive */
+  --numeric-positive-light: #d4edda;
+  --numeric-positive-medium: #28a745;
+  --numeric-positive-dark: #155724;
+  --numeric-positive-border: #c3e6cb;
+  
+  /* שלילי - Negative */
+  --numeric-negative-light: #f8d7da;
+  --numeric-negative-medium: #dc3545;
+  --numeric-negative-dark: #721c24;
+  --numeric-negative-border: #f5c6cb;
+  
+  /* אפס - Zero */
+  --numeric-zero-light: #e2e3e5;
+  --numeric-zero-medium: #6c757d;
+  --numeric-zero-dark: #383d41;
+  --numeric-zero-border: #d6d8db;
+}
+/**
+ * צבעי ישויות דינמיים - Dynamic Entity Colors
+ * 
+ * קובץ זה מכיל את צבעי הישויות השונות במערכת
+ * הצבעים נטענים דינמית מה-API ומעודכנים בזמן אמת
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 5, 2025
+ */
+
+:root {
+  /* ===== צבעי ישויות דינמיים ===== */
+  
+  /* טרייד - Trade */
+  --entity-trade-color: #007bff;
+  --entity-trade-bg: rgba(0, 123, 255, 0.1);
+  --entity-trade-text: #0056b3;
+  --entity-trade-border: rgba(0, 123, 255, 0.3);
+  
+  /* תוכנית מסחר - Trade Plan */
+  --entity-trade-plan-color: #0056b3;
+  --entity-trade-plan-bg: rgba(0, 86, 179, 0.1);
+  --entity-trade-plan-text: #004085;
+  --entity-trade-plan-border: rgba(0, 86, 179, 0.3);
+  
+  /* ביצוע - Execution */
+  --entity-execution-color: #17a2b8;
+  --entity-execution-bg: rgba(23, 162, 184, 0.1);
+  --entity-execution-text: #138496;
+  --entity-execution-border: rgba(23, 162, 184, 0.3);
+  
+  /* חשבון - Account */
+  --entity-account-color: #28a745;
+  --entity-account-bg: rgba(40, 167, 69, 0.1);
+  --entity-account-text: #1e7e34;
+  --entity-account-border: rgba(40, 167, 69, 0.3);
+  
+  /* תזרים מזומנים - Cash Flow */
+  --entity-cash-flow-color: #20c997;
+  --entity-cash-flow-bg: rgba(32, 201, 151, 0.1);
+  --entity-cash-flow-text: #17a2b8;
+  --entity-cash-flow-border: rgba(32, 201, 151, 0.3);
+  
+  /* טיקר - Ticker */
+  --entity-ticker-color: #dc3545;
+  --entity-ticker-bg: rgba(220, 53, 69, 0.1);
+  --entity-ticker-text: #c82333;
+  --entity-ticker-border: rgba(220, 53, 69, 0.3);
+  
+  /* התראה - Alert */
+  --entity-alert-color: #ff9c05;
+  --entity-alert-bg: rgba(255, 156, 5, 0.1);
+  --entity-alert-text: #e55a00;
+  --entity-alert-border: rgba(255, 156, 5, 0.3);
+  
+  /* הערה - Note */
+  --entity-note-color: #6f42c1;
+  --entity-note-bg: rgba(111, 66, 193, 0.1);
+  --entity-note-text: #5a32a3;
+  --entity-note-border: rgba(111, 66, 193, 0.3);
+}
+/**
+ * מרווחים - Spacing System
+ * 
+ * קובץ זה מכיל את מערכת המרווחים הגלובלית
+ * מבוסס על Apple Design System עם scale עקבי
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 5, 2025
+ */
+
+:root {
+  /* ===== מרווחים - Spacing ===== */
+  --spacing-xs: 4px;    /* 0.25rem */
+  --spacing-sm: 8px;    /* 0.5rem */
+  --spacing-md: 16px;   /* 1rem */
+  --spacing-lg: 24px;   /* 1.5rem */
+  --spacing-xl: 32px;   /* 2rem */
+  --spacing-xxl: 48px;  /* 3rem */
+  --spacing-xxxl: 64px; /* 4rem */
+  
+  /* ===== מרווחי Apple ===== */
+  --apple-spacing-xs: 4px;
+  --apple-spacing-sm: 8px;
+  --apple-spacing-md: 16px;
+  --apple-spacing-lg: 24px;
+  --apple-spacing-xl: 32px;
+}
+/**
+ * טיפוגרפיה - Typography System
+ * 
+ * קובץ זה מכיל את מערכת הטיפוגרפיה הגלובלית
+ * עם תמיכה מלאה בעברית ו-RTL
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 5, 2025
+ */
+
+:root {
+  /* ===== גופנים - Fonts ===== */
+  --font-family-primary: 'Noto Sans Hebrew', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif;
+  --font-family-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+  
+  /* ===== גדלי גופן - Font Sizes ===== */
+  --font-size-xs: 12px;    /* 0.75rem */
+  --font-size-sm: 14px;    /* 0.875rem */
+  --font-size-base: 16px;  /* 1rem */
+  --font-size-lg: 18px;    /* 1.125rem */
+  --font-size-xl: 20px;    /* 1.25rem */
+  --font-size-xxl: 24px;   /* 1.5rem */
+  --font-size-xxxl: 32px;  /* 2rem */
+  
+  /* ===== משקלי גופן - Font Weights ===== */
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  /* ===== גובה שורה - Line Heights ===== */
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.4;
+  --line-height-relaxed: 1.6;
+  --line-height-loose: 1.8;
+}
+/**
+ * RTL & CSS Logical Properties
+ * 
+ * קובץ זה מכיל הגדרות RTL ו-Logical Properties
+ * מבטיח עבודה נכונה עם עברית ו-RTL
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 5, 2025
+ */
+
+:root {
+  /* ===== כיוון מסמך ===== */
+  --document-direction: rtl;
+  --text-align-start: right;
+  --text-align-end: left;
+  
+  /* ===== Logical Properties Mapping ===== */
+  --inline-start: right;  /* ימין ב-RTL */
+  --inline-end: left;     /* שמאל ב-RTL */
+  --block-start: top;     /* למעלה */
+  --block-end: bottom;    /* למטה */
+}
+
+/* 02 - TOOLS (Functions & Mixins) */
+/**
+ * Functions - פונקציות
+ * 
+ * קובץ זה מכיל פונקציות CSS לשימוש חוזר במערכת
+ * מבוסס על חישובים נפוצים במערכת TikTrack
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 6, 2025
+ */
+
+/* ===== פונקציות צבעים ===== */
+
+/* פונקציה ליצירת צבעים בהירים */
+@function lighten($color, $amount: 10%) {
+  @return color-mix(in srgb, $color $amount, white);
+}
+
+/* פונקציה ליצירת צבעים כהים */
+@function darken($color, $amount: 10%) {
+  @return color-mix(in srgb, $color $amount, black);
+}
+
+/* פונקציה ליצירת צבעים שקופים */
+@function transparentize($color, $amount: 0.1) {
+  @return color-mix(in srgb, $color $amount, transparent);
+}
+
+/* פונקציה לחישוב ניגודיות */
+@function contrast($color) {
+  $lightness: lightness($color);
+  @if $lightness > 50% {
+    @return black;
+  } @else {
+    @return white;
+  }
+}
+
+/* ===== פונקציות מרווחים ===== */
+
+/* פונקציה לחישוב מרווחים יחסיים */
+@function spacing($multiplier: 1) {
+  @return calc(var(--apple-spacing-md) * #{$multiplier});
+}
+
+/* פונקציה לחישוב רדיוס יחסי */
+@function radius($multiplier: 1) {
+  @return calc(var(--apple-radius-medium) * #{$multiplier});
+}
+
+/* פונקציה לחישוב גודל גופן יחסי */
+@function font-size($multiplier: 1) {
+  @return calc(var(--font-size-base) * #{$multiplier});
+}
+
+/* ===== פונקציות רספונסיביות ===== */
+
+/* פונקציה לחישוב גדלים רספונסיביים */
+@function responsive-size($base, $mobile-ratio: 0.8) {
+  @return clamp(#{$base * $mobile-ratio}, #{$base}, #{$base * 1.2});
+}
+
+/* פונקציה לחישוב מרווחים רספונסיביים */
+@function responsive-spacing($base) {
+  @return clamp(0.5rem, #{$base}, 2rem);
+}
+
+/* ===== פונקציות צללים ===== */
+
+/* פונקציה ליצירת צללים דינמיים */
+@function shadow($depth: 1) {
+  @if $depth == 1 {
+    @return 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  @if $depth == 2 {
+    @return 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  @if $depth == 3 {
+    @return 0 8px 24px rgba(0, 0, 0, 0.2);
+  }
+}
+
+/* פונקציה ליצירת צללים צבעוניים */
+@function colored-shadow($color, $opacity: 0.2) {
+  @return 0 4px 8px rgba($color, $opacity);
+}
+
+/* ===== פונקציות זוויות ===== */
+
+/* פונקציה ליצירת זוויות רנדומליות */
+@function random-angle() {
+  @return #{random(360)}deg;
+}
+
+/* פונקציה ליצירת זוויות מבוססות על מיקום */
+@function angle-from-position($x, $y) {
+  @return #{atan2($y, $x)}deg;
+}
+
+/* ===== פונקציות מתמטיות ===== */
+
+/* פונקציה לחישוב יחס זהב */
+@function golden-ratio($base: 1) {
+  @return #{$base * 1.618};
+}
+
+/* פונקציה לחישוב יחס כסף */
+@function silver-ratio($base: 1) {
+  @return #{$base * 1.414};
+}
+
+/* פונקציה לחישוב עיגול */
+@function circle($size: 1rem) {
+  @return #{$size};
+}
+
+/* ===== פונקציות טיפוגרפיה ===== */
+
+/* פונקציה לחישוב גובה שורה אופטימלי */
+@function line-height($font-size) {
+  @return #{$font-size * 1.4};
+}
+
+/* פונקציה לחישוב רוחב אות אופטימלי */
+@function letter-spacing($font-size) {
+  @return #{$font-size * 0.01};
+}
+
+/* ===== פונקציות אנימציה ===== */
+
+/* פונקציה לחישוב משך אנימציה אופטימלי */
+@function animation-duration($distance: 100px) {
+  @return #{($distance / 100) * 0.3}s;
+}
+
+/* פונקציה לחישוב עיכוב אנימציה */
+@function animation-delay($index: 0, $step: 0.1s) {
+  @return #{$index * $step};
+}
+
+/* ===== פונקציות רשת ===== */
+
+/* פונקציה לחישוב רוחב עמודה */
+@function column-width($columns: 12, $gap: 1rem) {
+  @return calc((100% - #{$gap * ($columns - 1)}) / #{$columns});
+}
+
+/* פונקציה לחישוב מרווח רשת */
+@function grid-gap($base: 1rem, $ratio: 1.5) {
+  @return #{$base * $ratio};
+}
+
+
+/**
+ * Mixins - מיקסינים
+ * 
+ * קובץ זה מכיל מיקסינים (mixins) לשימוש חוזר במערכת
+ * מבוסס על דפוסי עיצוב נפוצים במערכת TikTrack
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 6, 2025
+ */
+
+/* ===== מיקסינים בסיסיים ===== */
+
+/* מיקסין לכפתורים */
+@mixin button-base {
+  display: inline-block;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  border: 1px solid transparent;
+  border-radius: var(--apple-radius-small);
+  transition: all 0.2s ease;
+}
+
+/* מיקסין לכרטיסים */
+@mixin card-base {
+  background: var(--apple-bg-primary);
+  border: 1px solid var(--apple-border-light);
+  border-radius: var(--apple-radius-medium);
+  box-shadow: var(--apple-shadow-light);
+  padding: var(--apple-spacing-lg);
+  margin-bottom: var(--apple-spacing-md);
+}
+
+/* מיקסין לטבלאות */
+@mixin table-base {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-family: var(--font-family-primary);
+  direction: rtl;
+}
+
+/* מיקסין למודלים */
+@mixin modal-base {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000000000;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* מיקסין להתראות */
+@mixin notification-base {
+  background: var(--apple-bg-primary);
+  border: 1px solid var(--apple-border-light);
+  border-radius: var(--apple-radius-medium);
+  padding: var(--apple-spacing-md);
+  box-shadow: var(--apple-shadow-medium);
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--apple-spacing-sm);
+}
+
+/* ===== מיקסינים מתקדמים ===== */
+
+/* מיקסין לרספונסיביות */
+@mixin responsive($breakpoint) {
+  @if $breakpoint == mobile {
+    @media (max-width: 768px) { @content; }
+  }
+  @if $breakpoint == tablet {
+    @media (max-width: 1024px) { @content; }
+  }
+  @if $breakpoint == desktop {
+    @media (min-width: 1025px) { @content; }
+  }
+}
+
+/* מיקסין לאנימציות */
+@mixin fade-in($duration: 0.3s) {
+  opacity: 0;
+  animation: fadeIn $duration ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* מיקסין לצללים */
+@mixin shadow($type: light) {
+  @if $type == light {
+    box-shadow: var(--apple-shadow-light);
+  }
+  @if $type == medium {
+    box-shadow: var(--apple-shadow-medium);
+  }
+  @if $type == heavy {
+    box-shadow: var(--apple-shadow-heavy);
+  }
+}
+
+/* מיקסין לגרדיאנטים */
+@mixin gradient($color1, $color2, $direction: 135deg) {
+  background: linear-gradient($direction, $color1 0%, $color2 100%);
+}
+
+/* מיקסין לטקסט מודגש */
+@mixin text-emphasis($color: var(--logo-orange)) {
+  color: $color;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* מיקסין לכפתורי פעולה */
+@mixin action-button($type: primary) {
+  @include button-base;
+  
+  @if $type == primary {
+    background-color: var(--logo-orange);
+    color: white;
+    border-color: var(--logo-orange);
+    
+    &:hover {
+      background-color: #e68a00;
+      border-color: #e68a00;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(255, 156, 5, 0.3);
+    }
+  }
+  
+  @if $type == secondary {
+    background-color: transparent;
+    color: var(--apple-blue);
+    border-color: var(--apple-blue);
+    
+    &:hover {
+      background-color: var(--apple-blue);
+      color: white;
+    }
+  }
+  
+  @if $type == danger {
+    background-color: var(--color-danger);
+    color: white;
+    border-color: var(--color-danger);
+    
+    &:hover {
+      background-color: #c82333;
+      border-color: #c82333;
+    }
+  }
+}
+
+/* מיקסין לסטטוסים */
+@mixin status-badge($status: open) {
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--apple-radius-small);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  
+  @if $status == open {
+    background-color: color-mix(in srgb, var(--status-open-color) 10%, transparent);
+    color: var(--status-open-color);
+    border: 1px solid color-mix(in srgb, var(--status-open-color) 30%, transparent);
+  }
+  
+  @if $status == closed {
+    background-color: color-mix(in srgb, var(--status-closed-color) 10%, transparent);
+    color: var(--status-closed-color);
+    border: 1px solid color-mix(in srgb, var(--status-closed-color) 30%, transparent);
+  }
+  
+  @if $status == cancelled {
+    background-color: color-mix(in srgb, var(--status-cancelled-color) 10%, transparent);
+    color: var(--status-cancelled-color);
+    border: 1px solid color-mix(in srgb, var(--status-cancelled-color) 30%, transparent);
+  }
+}
+
+
+
+/* 03 - GENERIC (Reset & Base Styles) */
+/**
+ * CSS Reset - איפוס סגנונות ברירת מחדל
+ * 
+ * קובץ זה מאפס את סגנונות ברירת המחדל של הדפדפן
+ * ומוודא התנהגות עקבית בכל הדפדפנים
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 5, 2025
+ */
+
+/* Box-sizing reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Remove default margin and padding */
+* {
+  margin: 0;
+  padding: 0;
+}
+
+/* Remove list styles on ul, ol elements with a list role */
+ul[role='list'],
+ol[role='list'] {
+  list-style: none;
+}
+
+/* Set core root defaults */
+html:focus-within {
+  scroll-behavior: smooth;
+}
+
+/* Set core body defaults */
+body {
+  min-height: 100vh;
+  text-rendering: optimizeSpeed;
+  line-height: 1.5;
+}
+/**
+ * Base Styles - סגנונות בסיס
+ * 
+ * קובץ זה מכיל את הסגנונות הבסיסיים ביותר עבור HTML ו-body
+ * מבוסס על הסגנונות הקיימים ב-apple-theme.css
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 5, 2025
+ */
+
+/* HTML root settings */
+html {
+  direction: rtl;
+  lang: he;
+}
+
+/* Body base styles - מבוסס על apple-theme.css */
+body {
+  background-color: var(--apple-bg-secondary);
+  color: var(--apple-text-primary);
+  margin: 0;
+  padding: 0;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: var(--font-family-primary);
+}
+
+/* 04 - ELEMENTS (HTML Element Styles) */
+/**
+ * כותרות - Headings
+ * 
+ * קובץ זה מכיל את הסגנונות של כל הכותרות במערכת
+ * מבוסס על הסגנונות הקיימים מהמערכת הישנה
+ * 
+ * @version 1.1.0
+ * @lastUpdated January 6, 2025
+ */
+
+/* כל הכותרות */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family-primary);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  color: var(--apple-text-primary);
+  margin-bottom: var(--spacing-md);
+  text-align: right;
+  direction: rtl;
+}
+
+/* גדלי כותרות */
+h1 {
+  font-size: var(--font-size-xxxl);  /* 32px */
+  font-weight: var(--font-weight-bold);
+}
+
+h2 {
+  font-size: var(--font-size-xxl);   /* 24px */
+  font-weight: var(--font-weight-semibold);
+}
+
+h3 {
+  font-size: var(--font-size-xl);    /* 20px */
+  font-weight: var(--font-weight-semibold);
+}
+
+h4 {
+  font-size: var(--font-size-lg);    /* 18px */
+  font-weight: var(--font-weight-medium);
+}
+
+h5 {
+  font-size: var(--font-size-base);  /* 16px */
+  font-weight: var(--font-weight-medium);
+}
+
+h6 {
+  font-size: var(--font-size-sm);    /* 14px */
+  font-weight: var(--font-weight-medium);
+}
+
+/* ===== סגנונות כותרות ספציפיים מהמערכת הישנה ===== */
+
+/* כותרת סקשן */
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--apple-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* כותרת עם איקון */
+.section-title img,
+.table-title img {
+  width: 20px;
+  height: 20px;
+  margin-inline-start: 8px;
+  vertical-align: middle;
+}
+
+/* כותרת עם ספירה */
+.section-count {
+  background: #29a6a8;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-inline-start: 0.5rem;
+}
+/**
+ * קישורים - Links
+ * 
+ * קובץ זה מכיל את הסגנונות של כל הקישורים במערכת
+ * מבוסס על הסגנונות הקיימים ב-styles.css
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 5, 2025
+ */
+
+/* כל הקישורים - מבוסס על הסגנונות הקיימים */
+a,
+.clickable-link,
+strong[onclick] {
+  color: #29a6a8;  /* צבע טורקיז מקורי */
+  text-decoration: none;
+  transition: color 0.2s ease;
+  font-family: var(--font-family-primary);
+  cursor: pointer;
+}
+
+/* Hover state */
+a:hover,
+.clickable-link:hover,
+strong[onclick]:hover {
+  color: #1f8a8c;  /* צבע טורקיז כהה יותר */
+  text-decoration: none;
+}
+
+/* Focus state */
+a:focus,
+.clickable-link:focus {
+  outline: 2px solid rgba(41, 166, 168, 0.5);
+  outline-offset: 2px;
+}
+
+/* Visited state */
+a:visited {
+  color: #29a6a8;  /* שומר על אותו צבע */
+}
+
+/* Active state */
+a:active,
+.clickable-link:active {
+  color: #1f8a8c;
+}
+/**
+ * טפסים בסיסיים - Base Forms
+ * 
+ * קובץ זה מכיל את הסגנונות הבסיסיים של כל שדות הטפסים
+ * מבוסס על הסגנונות הקיימים ב-apple-theme.css
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 5, 2025
+ */
+
+/* Form groups - מבוסס על apple-theme.css */
+.form-group {
+  margin-bottom: var(--apple-spacing-md);
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: var(--apple-spacing-xs);
+  font-weight: 500;
+  color: var(--apple-text-primary);
+  font-size: 15px;
+  text-align: right;
+  direction: rtl;
+}
+
+/* Input fields */
+.form-group input,
+.form-group select,
+.form-group textarea,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
+  width: 100%;
+  padding: var(--apple-spacing-sm) var(--apple-spacing-md);
+  border: 1px solid var(--apple-border);
+  border-radius: var(--apple-radius-medium);
+  font-size: 15px;
+  background-color: var(--apple-bg-primary);
+  color: var(--apple-text-primary);
+  transition: all 0.2s ease;
+  font-family: var(--font-family-primary);
+  direction: rtl;
+  text-align: right;
+}
+
+/* Focus state */
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus,
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--apple-blue);
+  box-shadow: 0 0 0 3px rgba(41, 166, 168, 0.1);
+}
+
+/* מספרים - יישור לשמאל */
+input[type="number"] {
+  direction: ltr;
+  text-align: start;
+}
+
+/* תאריכים - יישור לשמאל */
+input[type="date"] {
+  direction: ltr;
+  text-align: start;
+}
+/**
+ * כפתורים בסיסיים - Base Buttons
+ * 
+ * קובץ זה מכיל את הסגנונות הבסיסיים של כל הכפתורים במערכת
+ * מבוסס על הסגנונות הקיימים ב-styles.css
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 5, 2025
+ */
+
+/* ברירת מחדל לכל הכפתורים - מבוסס על הסגנונות הקיימים */
+button,
+.btn {
+  background-color: white;
+  color: #29a6a8;  /* צבע טורקיז מקורי */
+  border: 1px solid #29a6a8;
+  border-radius: var(--apple-radius-small);
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+  display: inline-flex; /* שינוי ל-flex */
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap; /* מניעת שבירת שורה */
+  width: auto; /* רוחב דינמי */
+  min-width: fit-content; /* רוחב מינימלי לפי התוכן */
+  margin-right: 0.5rem; /* רווח ברירת מחדל בין כפתורים */
+}
+
+/* כפתור אחרון בשורה - ללא רווח מימין */
+button:last-child,
+.btn:last-child,
+.button-row button:last-child,
+.button-row .btn:last-child,
+.filter-buttons-container button:last-child,
+.filter-buttons-container .btn:last-child {
+  margin-right: 0;
+}
+
+/* Hover state לכל הכפתורים */
+button:hover,
+.btn:hover {
+  background-color: #29a6a8;
+  color: white;
+  border-color: #29a6a8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Focus state */
+button:focus,
+.btn:focus {
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(41, 166, 168, 0.25);
+}
+
+/* Active state */
+button:active,
+.btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* Disabled state */
+button:disabled,
+.btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Small buttons */
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  border-radius: calc(var(--apple-radius-small) * 0.75);
+}
+
+/* Large buttons */
+.btn-lg {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border-radius: calc(var(--apple-radius-small) * 1.25);
+}
+
+/* ===== BUTTON ROWS - GENERAL STYLES ===== */
+/* סגנונות כלליים לכל שורות הכפתורים באתר */
+.button-row,
+.btn-group,
+.overview-actions,
+.charts-controls,
+.chart-actions,
+.ticker-help-buttons-container,
+.ticker-type-filter,
+.table-actions,
+.actions-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: nowrap; /* כפתורים תמיד אחד ליד השני */
+  justify-content: flex-end; /* ברירת מחדל - יישור לשמאל (RTL) */
+}
+
+/* כפתורי בקרה מיוחדים - יישור למרכז */
+.control-buttons,
+.system-controls,
+.scheduler-controls,
+.task-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: nowrap; /* כפתורים תמיד אחד ליד השני */
+  justify-content: center; /* יישור למרכז */
+}
+
+/* כפתורי פעולות בטבלה - יישור לשמאל (RTL) */
+.table-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
+  justify-content: flex-end; /* יישור לשמאל (RTL) */
+}
+
+/* כפתורים בכותרת הראשית */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
+  justify-content: flex-end; /* יישור לשמאל (RTL) */
+}
+
+/* כפתורי פעולות בעמודות טבלה - יישור למרכז העמודה */
+td .btn,
+th .btn,
+.actions-cell .btn,
+.task-controls .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  width: auto;
+  min-width: fit-content;
+  margin: 0 0.125rem; /* רווח קטן בין כפתורים */
+}
+
+/* יישור כפתורי פעולות למרכז העמודה */
+.actions-cell,
+td:has(.btn),
+th:has(.btn) {
+  text-align: center;
+}
+
+/* כפתורים ברצף - תמיד אחד ליד השני */
+.btn-group,
+.btn-group-vertical,
+.button-group,
+.sequence-buttons,
+.related-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem; /* רווח קטן יותר בין כפתורים ברצף */
+  flex-wrap: nowrap; /* תמיד אחד ליד השני */
+  white-space: nowrap; /* מניעת שבירת שורה */
+}
+
+/* כפתורים במודלים - גם אחד ליד השני */
+.modal-footer,
+.modal-header .btn-group,
+.card-footer .btn-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: nowrap; /* כפתורים תמיד אחד ליד השני */
+}
+
+/* כפתורים ב-card-header - יישור לשמאל */
+.card-header .btn,
+.card-header .d-flex .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  width: auto;
+  min-width: fit-content;
+  margin: 0;
+}
+
+/* יישור כפתורים ב-card-header לשמאל (RTL) */
+.card-header .d-flex {
+  justify-content: flex-end; /* יישור לשמאל (RTL) */
+}
+
+.button-row .btn,
+.btn-group .btn,
+.overview-actions .btn,
+.charts-controls .btn,
+.chart-actions .btn,
+.ticker-help-buttons-container .btn,
+.ticker-type-filter .btn,
+.table-actions .btn,
+.actions-cell .btn {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.button-row .btn + .btn,
+.btn-group .btn + .btn,
+.overview-actions .btn + .btn,
+.charts-controls .btn + .btn,
+.chart-actions .btn + .btn,
+.ticker-help-buttons-container .btn + .btn,
+.ticker-type-filter .btn + .btn,
+.table-actions .btn + .btn,
+.actions-cell .btn + .btn {
+  margin-left: 0;
+}
+
+/* ===== FILTER BUTTONS IN SECTION HEADER ===== */
+/* סגנונות מיוחדים ל-filter-buttons-container כשהוא נמצא ב-section-header */
+.section-header .filter-buttons-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  justify-content: flex-start; /* ברירת מחדל - יישור לשמאל */
+  margin: 0 1rem;
+}
+
+.section-header .filter-buttons-container .btn {
+  margin: 0;
+}
+
+.section-header .filter-buttons-container .action-separator {
+  width: 1px;
+  height: 20px;
+  background-color: #dee2e6;
+  margin: 0 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .button-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+  
+  .section-header .filter-buttons-container {
+    margin: 0;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+  
+  .section-header .filter-buttons-container .btn {
+    margin-bottom: 0.25rem;
+  }
+}
+
+/* ===== MODAL AND SPECIAL AREAS ===== */
+/* כפתורים במודלים ובאזורים מיוחדים */
+.modal-footer,
+.modal-header,
+.card-header,
+.card-footer,
+.alert-dismissible,
+.dropdown-menu,
+.navbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: flex-start; /* ברירת מחדל - יישור לשמאל */
+}
+
+.modal-footer .btn,
+.modal-header .btn,
+.card-header .btn,
+.card-footer .btn,
+.alert-dismissible .btn,
+.dropdown-menu .btn,
+.navbar-nav .btn {
+  margin: 0;
+}
+
+/* ===== GENERAL BUTTON CONTAINERS ===== */
+/* כל מיכל שמכיל כפתורים */
+[class*="btn-"],
+[class*="button-"],
+[class*="action-"] {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: flex-start; /* ברירת מחדל - יישור לשמאל */
+}
+
+[class*="btn-"] .btn,
+[class*="button-"] .btn,
+[class*="action-"] .btn {
+  margin: 0;
+}
+
+/* ===== CLEAR LOG BUTTON - GENERAL STYLES ===== */
+/* כפתור נקה לוג - הגדרה כללית */
+.btn[onclick*="clearLog"],
+.btn[onclick*="clear"],
+button[onclick*="clearLog"],
+button[onclick*="clear"] {
+  white-space: nowrap; /* טקסט תמיד בשורה אחת */
+  width: auto; /* רוחב לפי תוכן */
+  min-width: fit-content; /* רוחב מינימלי לפי התוכן */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+/* 05 - OBJECTS (Layout & Structure) */
+/**
+ * Layout Objects - אובייקטי פריסה
+ * 
+ * קובץ זה מכיל את מערכת הפריסה הבסיסית
+ * containers, wrappers וmain layout objects
+ * 
+ * @version 1.1.0
+ * @lastUpdated January 6, 2025
+ */
+
+/* Main page layout */
+.page-body {
+  min-height: 100vh;
+  direction: rtl;
+  text-align: right;
+}
+
+/* Content wrapper */
+.content-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--spacing-md);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Dashboard container - מבוסס על index.css */
+.dashboard-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1rem;
+  font-family: var(--font-family-primary);
+}
+
+/* Background wrapper */
+.background-wrapper {
+  background-color: var(--apple-bg-secondary);
+  min-height: 100vh;
+  direction: rtl;
+  text-align: right;
+}
+
+/* Main content container */
+.main-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Container with border */
+.container-with-border {
+  background: var(--apple-bg-elevated);
+  border-radius: var(--apple-radius-large);
+  box-shadow: var(--apple-shadow-light);
+  border: 1px solid var(--apple-border-light);
+  padding: var(--apple-spacing-lg);
+  margin-bottom: var(--apple-spacing-md);
+}
+
+/* ===== סגנונות קונטיינרים מהמערכת הישנה ===== */
+
+/* כותרת סקשן */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--apple-border-light);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+/* רקע ברירת מחדל לכותרות ללא מחלקות דינמיות */
+.section-header:not([class*="entity-"]) {
+  background: #ffffff;
+}
+
+/* כותרות עם שקיפות מוגברת */
+.section-header.transparent {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+/* כותרות עם רקע צבעוני */
+.section-header.colored {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 249, 250, 0.9));
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* גוף סקשן */
+.section-body {
+  background: var(--apple-bg);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.section-body .table {
+  margin: 0;
+  background: var(--apple-bg);
+}
+
+/* אזור עליון */
+.top-section {
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 15px 0 0 0;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.top-section .section-header {
+  margin-bottom: 2rem;
+  padding: 1rem;
+}
+
+.top-section .content-section {
+  padding: 0;
+}
+
+/* אזור תוכן */
+.content-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  border: 1px solid #e8e8e8;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  margin-bottom: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  transition: opacity 0.3s ease;
+}
+
+/* מיכל סקשן */
+.section-container {
+  background: var(--apple-bg-elevated);
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid var(--apple-border-light);
+  box-shadow: var(--apple-shadow-light);
+  margin-bottom: var(--apple-spacing-md);
+}
+
+/* מצב סגור */
+.content-section.collapsed {
+  padding: 20px 0 !important;
+}
+
+.section-body.collapsed {
+  padding: 20px 0 !important;
+}
+
+/* אזור פעולות הכותרת */
+.table-actions {
+  display: flex !important;
+  gap: 0.5rem !important;
+  align-items: center;
+}
+
+/* כפתור רענון */
+.refresh-btn {
+  background: var(--apple-bg-primary);
+  border: 1px solid var(--apple-border);
+  border-radius: var(--apple-radius-small);
+  padding: 0.5rem 1rem;
+  color: var(--apple-text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.refresh-btn:hover {
+  background: var(--apple-gray-1);
+  border-color: var(--apple-border);
+}
+
+/* כפתור פילטר */
+.filter-toggle-btn {
+  background: var(--apple-bg-primary);
+  border: 1px solid var(--apple-border);
+  border-radius: var(--apple-radius-small);
+  padding: 0.5rem;
+  color: var(--apple-text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+}
+
+.filter-toggle-btn:hover {
+  background: var(--apple-gray-1);
+  border-color: var(--apple-border);
+}
+
+/* איקון פעולה */
+.action-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* איקון פילטר */
+.filter-icon {
+  font-size: 1rem;
+  line-height: 1;
+  transition: transform 0.2s ease;
+}
+
+.filter-toggle-btn:hover .filter-icon {
+  transform: scale(1.1);
+}
+/**
+ * Grid System - מערכת גריד
+ * 
+ * קובץ זה מכיל את מערכת הגריד והפריסה בעמודות
+ * מבוסס על הפריסות הקיימות במערכת
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 5, 2025
+ */
+
+/* Two-column layout - מבוסס על preferences */
+.preference-items-grid,
+.two-column-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  align-items: start;
+  padding: 0 20px;
+}
+
+/* Auto-fit grid */
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Stats grid - מבוסס על index.css */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.compact-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Hero stats grid */
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+}
+
+/* Charts grid */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+/* Quick content grid */
+.quick-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+/* Content grid */
+.compact-content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+/* Comprehensive content */
+.comprehensive-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .preference-items-grid,
+  .two-column-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 0 10px;
+  }
+  
+  .compact-content-grid,
+  .charts-content,
+  .comprehensive-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .compact-stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+  
+  .quick-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .hero-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .overview-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 06 - COMPONENTS (UI Components) */
+/**
+ * Bootstrap Overrides - עקיפות Bootstrap
+ * 
+ * קובץ זה מכיל את הסגנונות החסרים של Bootstrap
+ * מבוסס על הסגנונות מהמערכת הישנה
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 6, 2025
+ */
+
+/* ===== סגנונות בסיסיים של Bootstrap ===== */
+
+/* כרטיסים בסגנון אפל - הועבר ל-_cards.css */
+
+/* טופס בסגנון אפל */
+.form-group {
+  margin-bottom: var(--apple-spacing-md);
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: var(--apple-spacing-xs);
+  font-weight: 500;
+  color: var(--apple-text-primary);
+  font-size: 15px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: var(--apple-spacing-sm) var(--apple-spacing-md);
+  border: 1px solid var(--apple-border);
+  border-radius: var(--apple-radius-medium);
+  font-size: 15px;
+  background-color: var(--apple-bg-primary);
+  color: var(--apple-text-primary);
+  transition: all 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--apple-blue);
+  box-shadow: 0 0 0 3px rgba(41, 166, 168, 0.1);
+}
+
+/* ===== סגנונות מודלים ===== */
+
+/* מודל בסגנון אפל - הועבר ל-_modals.css */
+
+/* הגדרות z-index גבוהות לכל המודלים באתר */
+.modal-dialog {
+  z-index: 1000000000 !important;
+}
+
+/* הגדרות מיוחדות למודלים גדולים */
+.modal-dialog.modal-lg {
+  border: 2px solid #6c757d !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.modal-content {
+  z-index: 1000000001 !important;
+  background: var(--apple-bg-elevated);
+  border-radius: 6px;
+  box-shadow: var(--apple-shadow-heavy);
+  border: 1px solid var(--apple-border-light);
+}
+
+.modal-backdrop {
+  z-index: 999999998 !important;
+}
+
+/* הודעות - וידוא שהן מופיעות מעל הכל */
+.toast {
+  z-index: 100000000 !important;
+}
+
+.toast-container {
+  z-index: 100000000 !important;
+}
+
+/* וידוא שכל המודלים מופיעים מעל הכל */
+.modal.show {
+  z-index: 999999999 !important;
+}
+
+.modal.show .modal-dialog {
+  z-index: 1000000000 !important;
+}
+
+.modal.show .modal-content {
+  z-index: 1000000001 !important;
+}
+
+/* וידוא שהרקע לא חוסם את המודלים */
+.modal-backdrop.show {
+  z-index: 999999998 !important;
+}
+
+/* מודלים ספציפיים עם z-index גבוה יותר */
+#addAlertModal,
+#editAlertModal,
+#addExecutionModal,
+#editExecutionModal,
+#deleteExecutionModal,
+#linkedItemsModal,
+#warningModal {
+  z-index: 999999999 !important;
+}
+
+#addAlertModal .modal-dialog,
+#editAlertModal .modal-dialog,
+#addExecutionModal .modal-dialog,
+#editExecutionModal .modal-dialog,
+#deleteExecutionModal .modal-dialog,
+#linkedItemsModal .modal-dialog,
+#warningModal .modal-dialog {
+  z-index: 1000000000 !important;
+}
+
+#addAlertModal .modal-content,
+#editAlertModal .modal-content,
+#addExecutionModal .modal-content,
+#editExecutionModal .modal-content,
+#deleteExecutionModal .modal-content,
+#linkedItemsModal .modal-content,
+#warningModal .modal-content {
+  z-index: 1000000001 !important;
+}
+
+/* ===== סגנונות כפתורים ===== */
+
+/* כפתורי קישור ירוקים */
+.btn-outline-success.link-button {
+  background-color: white !important;
+  border-color: #28a745 !important;
+  color: #28a745 !important;
+}
+
+.btn-outline-success.link-button:hover {
+  background-color: #28a745 !important;
+  color: white !important;
+}
+
+/* כפתורי מחיקה עם מסגרת - מועבר ל-_buttons-advanced.css */
+
+/* כפתורי מחיקה בתוך modals */
+.modal .btn-danger {
+  border: 2px solid #dc3545 !important;
+  background-color: white !important;
+  color: #dc3545 !important;
+  font-size: 0.9rem !important;
+  padding: 0.375rem 0.75rem !important;
+}
+
+.modal .btn-danger:hover {
+  background-color: #dc3545 !important;
+  color: white !important;
+}
+
+/* ===== סגנונות טבלאות ===== */
+
+/* סגנונות לטבלה */
+.table-container {
+  background: var(--apple-bg-elevated);
+  border-radius: var(--apple-radius-medium);
+  border: 1px solid var(--apple-border-light);
+  overflow: hidden;
+  box-shadow: var(--apple-shadow-light);
+}
+
+/* ===== סגנונות פילטרים ===== */
+
+.filter-test-section {
+  background: var(--apple-bg-secondary);
+  border-radius: var(--apple-radius-medium);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border: 1px solid var(--apple-border-light);
+}
+
+.filter-test-section h3 {
+  margin: 0 0 1rem 0;
+  color: var(--apple-text-primary);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.checkbox-group {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--apple-text-secondary);
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--logo-orange);
+}
+
+/* ===== סגנונות מיכלים ===== */
+
+.button-container {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* ===== סגנונות מצב טעינה ===== */
+
+.loading {
+  padding: 2rem;
+  text-align: center;
+  color: var(--apple-text-secondary);
+  font-size: 16px;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--apple-border-light);
+  border-radius: 50%;
+  border-top-color: var(--logo-orange);
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===== סגנונות דפדפן ===== */
+
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  border-top: 1px solid var(--apple-border-light);
+  margin-top: 15px;
+}
+
+.pagination-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: 14px;
+  color: var(--apple-text-secondary);
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.page-size-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.page-size-selector select {
+  padding: 6px 12px;
+  border: 1px solid var(--apple-border-light);
+  border-radius: 6px;
+  font-size: 14px;
+  background: var(--apple-bg-primary);
+  color: var(--apple-text-primary);
+}
+
+.pagination-buttons {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pagination-btn {
+  padding: 8px 12px;
+  border: 1px solid var(--apple-border-light);
+  border-radius: 6px;
+  background: var(--apple-bg-primary);
+  color: var(--apple-text-primary);
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.pagination-btn:hover {
+  background: var(--apple-gray-1);
+  border-color: var(--apple-border);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-btn.active {
+  background: var(--logo-orange);
+  color: white;
+  border-color: var(--logo-orange);
+}
+
+.page-numbers {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.page-number {
+  padding: 8px 12px;
+  border: 1px solid var(--apple-border-light);
+  border-radius: 6px;
+  background: var(--apple-bg-primary);
+  color: var(--apple-text-primary);
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.page-number:hover {
+  background: var(--apple-gray-1);
+  border-color: var(--apple-border);
+}
+
+.page-number.active {
+  background: var(--logo-orange);
+  color: white;
+  border-color: var(--logo-orange);
+}
+
+/* ===== סגנונות ולידציה ===== */
+
+/* וידוא שהודעות שגיאה מופיעות מעל המודול */
+.modal .invalid-feedback {
+  position: relative;
+  z-index: 1060;
+}
+
+/* הודעות שגיאה בתוך המודול */
+.modal-body .invalid-feedback {
+  display: block;
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* שדות עם שגיאה */
+.modal-body .form-control.is-invalid,
+.modal-body .form-select.is-invalid {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+
+
+
+
+/**
+ * כפתורים מתקדמים - Advanced Buttons
+ * 
+ * קובץ זה מכיל את הסגנונות המתקדמים של כפתורים ספציפיים
+ * מבוסס על הסגנונות הקיימים ב-styles.css
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 5, 2025
+ */
+
+/* הגדרה כללית לכפתורים - ברירת מחדל */
+.btn-group-default,
+.actions-default,
+.controls-default {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  justify-content: flex-start; /* משמאל */
+}
+
+.btn-group-default .btn,
+.actions-default .btn,
+.controls-default .btn {
+  margin: 0;
+}
+
+/* סגנון כללי לכפתורים - תמיד בשורה עם רווח */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-inline-end: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* כפתורים בשורה - ללא מעבר שורה */
+.btn-inline {
+  display: inline-flex;
+  margin-inline-end: 0.5rem;
+  margin-bottom: 0;
+}
+
+/* קבוצת כפתורים - תמיד בשורה */
+.btn-group,
+.profile-buttons,
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.btn-group .btn,
+.profile-buttons .btn,
+.button-row .btn {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+/* כפתור מודגש בצבע כתום - לשימוש בכל המערכת */
+.btn-emphasized,
+.btn-primary-emphasized,
+button.btn-emphasized,
+button.btn-primary-emphasized {
+  background-color: white !important;
+  color: #ff9c05 !important;
+  border: 2px solid #ff9c05 !important;
+  border-radius: 6px !important;
+  padding: 0.5rem 1rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-emphasized:hover,
+.btn-primary-emphasized:hover {
+  background-color: #ff9c05 !important;
+  color: white !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px rgba(255, 156, 5, 0.3) !important;
+}
+
+/* כפתורי שמירה עם צבע הלוגו */
+.btn-success[onclick*="save"],
+.btn-success[onclick*="Save"],
+button[onclick*="saveTradeRecord"],
+button[onclick*="saveNewTradeRecord"],
+.btn-success {
+  background-color: white !important;
+  color: #29a6a8 !important;
+  border: 1px solid #29a6a8 !important;
+  border-radius: 8px !important;
+  padding: 0.3rem 0.6rem !important;
+  font-size: 0.7rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-success:hover {
+  background-color: #29a6a8 !important;
+  color: white !important;
+  border-color: #29a6a8 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px rgba(41, 166, 168, 0.3) !important;
+}
+
+/* כפתורי מחיקה */
+.btn-danger {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
+  color: #dc3545 !important;
+  border-color: #dc3545 !important;
+}
+
+.btn-danger:hover {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+  color: white !important;
+  border-color: #dc3545 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 16px rgba(220, 53, 69, 0.3) !important;
+}
+
+/* כפתורי outline */
+.btn-outline-success {
+  border-color: #28a745;
+  color: #28a745;
+  background: white;
+  border-width: 2px;
+  padding: 0.5rem 1rem;
+}
+
+.btn-outline-success:hover {
+  background: #28a745;
+  color: white;
+  border-color: #28a745;
+}
+
+.btn-outline-primary {
+  border-color: var(--logo-orange);
+  color: var(--logo-orange);
+  background: white;
+  border-width: 2px;
+  padding: 0.5rem 1rem;
+}
+
+.btn-outline-primary:hover {
+  background: var(--logo-orange);
+  color: white;
+  border-color: var(--logo-orange);
+}
+
+.btn-outline-danger {
+  border: 2px solid #dc3545 !important;
+  background-color: white !important;
+  color: #dc3545 !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-outline-danger:hover {
+  background-color: #dc3545 !important;
+  color: white !important;
+  border-color: #dc3545 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3) !important;
+}
+
+/* כפתור ביטול לא פעיל */
+.btn-cancel-disabled {
+  border: 1px solid #6c757d !important;
+  background-color: #f8f9fa !important;
+  color: #6c757d !important;
+  cursor: not-allowed !important;
+  opacity: 0.65 !important;
+  transition: none !important;
+}
+
+.btn-cancel-disabled:hover {
+  border: 1px solid #6c757d !important;
+  background-color: #f8f9fa !important;
+  color: #6c757d !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* כפתור סגירה עם X */
+.btn .cancel-icon {
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 1;
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  text-align: center;
+  vertical-align: middle;
+  color: inherit;
+  font-family: Arial, sans-serif;
+}
+
+/* כפתורים בסיסיים Bootstrap */
+.btn-primary {
+  background-color: #007bff !important;
+  color: white !important;
+  border: 1px solid #007bff !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3 !important;
+  border-color: #0056b3 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+}
+
+.btn-warning {
+  background-color: white !important;
+  color: #ff9c05 !important;
+  border: 1px solid #ff9c05 !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-warning:hover {
+  background-color: #ff9c05 !important;
+  color: white !important;
+  border-color: #ff9c05 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3) !important;
+}
+
+.btn-info {
+  background-color: #17a2b8 !important;
+  color: white !important;
+  border: 1px solid #17a2b8 !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-info:hover {
+  background-color: #138496 !important;
+  border-color: #138496 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(23, 162, 184, 0.3) !important;
+}
+
+/* כפתורי secondary */
+.btn-secondary {
+  background: #ffffff !important;
+  color: #29a6a8 !important;
+  border: 1px solid #29a6a8 !important;
+  border-radius: 8px !important;
+  padding: 0.3rem 0.6rem !important;
+  font-size: 0.7rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-secondary:hover {
+  background: #ffffff !important;
+  color: #1f8a8c !important;
+  border-color: #1f8a8c !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* כפתורים קטנים */
+.btn-sm.btn-primary {
+  background-color: #007bff !important;
+  color: white !important;
+  border: 1px solid #007bff !important;
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.75rem !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-sm.btn-primary:hover {
+  background-color: #0056b3 !important;
+  border-color: #0056b3 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+}
+
+.btn-sm.btn-warning {
+  background-color: white !important;
+  color: #ff9c05 !important;
+  border: 1px solid #ff9c05 !important;
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.75rem !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-sm.btn-warning:hover {
+  background-color: #ff9c05 !important;
+  color: white !important;
+  border-color: #ff9c05 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3) !important;
+}
+
+.btn-sm.btn-danger {
+  background-color: white !important;
+  color: #dc3545 !important;
+  border: 1px solid #dc3545 !important;
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.75rem !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-sm.btn-danger:hover {
+  background-color: #dc3545 !important;
+  color: white !important;
+  border-color: #dc3545 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3) !important;
+}
+
+.btn-sm.btn-secondary {
+  background: #ffffff !important;
+  color: #29a6a8 !important;
+  border: 1px solid #29a6a8 !important;
+  border-radius: 8px !important;
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.75rem !important;
+  width: 28px !important;
+  height: 28px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-sm.btn-secondary:hover {
+  background: #ffffff !important;
+  color: #1f8a8c !important;
+  border-color: #1f8a8c !important;
+  transform: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* כפתורי הוספה מיוחדים */
+.add-btn {
+  background: transparent !important;
+  color: #000000 !important;
+  border: 2px solid #29a6a8 !important;
+  box-shadow: none !important;
+  padding: 6px 13px !important;
+  border-radius: 6px !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.add-btn:hover {
+  background-color: #29a6a8 !important;
+  color: white !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(41, 166, 168, 0.3) !important;
+}
+
+/* כפתורי restore/reactivate */
+.restore-button,
+button[onclick*="restore"],
+button[onclick*="reactivate"],
+button[title*="החזר"],
+button[title*="הפעל מחדש"] {
+  border: 1px solid #28a745 !important;
+  background-color: transparent !important;
+  color: #28a745 !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.restore-button:hover,
+button[onclick*="restore"]:hover,
+button[onclick*="reactivate"]:hover,
+button[title*="החזר"]:hover,
+button[title*="הפעל מחדש"]:hover {
+  background-color: #28a745 !important;
+  color: #ffffff !important;
+  border-color: #28a745 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3) !important;
+}
+
+/* כפתורי outline נוספים */
+.btn-success-outline {
+  border: 2px solid #28a745 !important;
+  background-color: white !important;
+  color: #28a745 !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-success-outline:hover {
+  background-color: #28a745 !important;
+  color: white !important;
+  border-color: #28a745 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3) !important;
+}
+
+.btn-danger-outline {
+  border: 2px solid #dc3545 !important;
+  background-color: white !important;
+  color: #dc3545 !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-danger-outline:hover {
+  background-color: #dc3545 !important;
+  color: white !important;
+  border-color: #dc3545 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3) !important;
+}
+
+/* כפתורי secondary במודלים */
+.modal-footer .btn-secondary {
+  background: white !important;
+  border: 2px solid #ff9c05 !important;
+  color: #ff9c05 !important;
+  padding: 9px 18px !important;
+  font-size: 0.825rem !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.modal-footer .btn-secondary:hover {
+  background: #ff9c05 !important;
+  border-color: #ff9c05 !important;
+  color: white !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15) !important;
+}
+
+.modal .btn-secondary,
+.modal .btn-warning {
+  background: white !important;
+  border: 2px solid #ff9c05 !important;
+  color: #ff9c05 !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.modal .btn-secondary:hover,
+.modal .btn-warning:hover {
+  background: #ff9c05 !important;
+  border-color: #ff9c05 !important;
+  color: white !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3) !important;
+}
+
+/* כפתורי secondary מותאמים אישית */
+.btn-secondary-custom,
+button.btn-secondary-custom {
+  background-color: white !important;
+  color: #29a6a8 !important;
+  border: 2px solid #29a6a8 !important;
+  border-radius: 4px !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-secondary-custom:hover,
+button.btn-secondary-custom:hover {
+  background-color: #f8f9fa !important;
+  color: #1f8a8c !important;
+  border-color: #1f8a8c !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(41, 166, 168, 0.2) !important;
+}
+
+/* כפתורי פעולות בטבלאות */
+.actions-cell .btn-sm.btn-secondary {
+  background: #ffffff !important;
+  color: #29a6a8 !important;
+  border: 1px solid #29a6a8 !important;
+  border-radius: 8px !important;
+  padding: 0.3rem !important;
+  width: 28px !important;
+  height: 28px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+}
+
+.actions-cell .btn-sm.btn-secondary:hover {
+  background: #ffffff !important;
+  color: #1f8a8c !important;
+  border-color: #1f8a8c !important;
+  transform: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* כפתורים עם רוחב מינימלי */
+.btn-info, .btn-success, .btn-warning, .btn-danger, .btn-primary, .btn-secondary {
+  min-width: 30px !important;
+}
+/**
+ * טבלאות - Tables
+ * 
+ * קובץ זה מכיל את הסגנונות הבסיסיים של כל הטבלאות במערכת
+ * מבוסס על הסגנונות הקיימים ב-table.css
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 5, 2025
+ */
+
+/* הגדרות כלליות לכל הטבלאות */
+table,
+.table,
+.data-table {
+  width: 100% !important;
+  min-width: 100% !important;
+  table-layout: auto !important;
+  direction: rtl !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  font-family: var(--font-family-primary) !important;
+}
+
+/* כותרות טבלה */
+table th,
+.table th,
+.data-table th {
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  min-width: fit-content !important;
+  max-width: none !important;
+  word-wrap: normal !important;
+  word-break: keep-all !important;
+  hyphens: none !important;
+  text-align: center !important;
+  direction: rtl !important;
+  padding: 1.25rem 1.5rem !important;
+  font-weight: 600 !important;
+  color: var(--apple-text-primary) !important;
+  font-size: 0.95rem !important;
+  background: var(--apple-bg-secondary) !important;
+  border-bottom: 2px solid #f1f3f4 !important;
+  font-family: var(--font-family-primary) !important;
+}
+
+/* תאי טבלה */
+table td,
+.table td,
+.data-table td {
+  padding: 1.25rem 1.5rem !important;
+  text-align: right !important;
+  border-bottom: 2px solid #f1f3f4 !important;
+  font-family: var(--font-family-primary) !important;
+  color: var(--apple-text-primary) !important;
+  font-size: 1rem !important;
+  font-weight: 500 !important;
+  vertical-align: middle !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+}
+
+/* Hover effect לשורות */
+.data-table tbody tr {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative !important;
+}
+
+.data-table tbody tr:hover {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1) !important;
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
+/* עמודת פעולות */
+.actions-cell {
+  width: 140px !important;
+  min-width: 140px !important;
+  max-width: 140px !important;
+  text-align: center !important;
+  vertical-align: top !important;
+  height: auto !important;
+  min-height: 100% !important;
+  display: table-cell !important;
+  white-space: nowrap !important;
+  padding: 8px 4px !important;
+}
+
+.actions-cell .btn {
+  width: 28px !important;
+  height: 28px !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 0.7rem !important;
+  margin: 0 2px !important;
+  vertical-align: middle !important;
+  border-radius: 6px !important;
+}
+
+/* Table container */
+.table-container {
+  background: var(--apple-bg-elevated);
+  border-radius: var(--apple-radius-medium);
+  border: 1px solid var(--apple-border-light);
+  overflow: hidden;
+  box-shadow: var(--apple-shadow-light);
+}
+
+/* Table responsive */
+.table-responsive {
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Data table עם עיצוב מתקדם */
+.data-table {
+  background: #ffffff !important;
+  border-radius: 20px !important;
+  overflow: hidden !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08) !important;
+  border: 2px solid #e9ecef !important;
+}
+
+/* כפתורי מיון */
+.sortable-header,
+.sortable-header-btn {
+  background: transparent !important;
+  border: none !important;
+  color: inherit !important;
+  font-family: inherit !important;
+  font-weight: inherit !important;
+  font-size: inherit !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  padding: 0.5rem !important;
+  border-radius: 10px !important;
+  width: 100% !important;
+  text-align: center !important;
+  position: relative !important;
+  overflow: visible !important;
+  white-space: nowrap !important;
+}
+
+.sortable-header:hover,
+.sortable-header-btn:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* איקוני מיון */
+.sortable-header .sort-icon,
+.sortable-header-btn .sort-icon {
+  font-size: 0.7rem !important;
+  margin-inline-start: 0.3rem !important;
+  opacity: 0.7 !important;
+  transition: opacity 0.3s ease !important;
+  display: inline !important;
+}
+
+.sortable-header:hover .sort-icon,
+.sortable-header-btn:hover .sort-icon {
+  opacity: 1 !important;
+}
+
+.sortable-header.active-sort .sort-icon {
+  opacity: 1 !important;
+  color: #ff9c05 !important;
+  background: rgba(255, 156, 5, 0.1) !important;
+  padding: 2px 4px !important;
+  border-radius: 4px !important;
+  font-weight: bold !important;
+}
+
+/* כותרת טבלה */
+.table-title {
+  font-size: 1.4rem !important;
+  font-weight: 500 !important;
+  color: #495057 !important;
+  font-family: var(--font-family-primary) !important;
+  letter-spacing: -0.01em !important;
+  line-height: 1.2 !important;
+  margin: 0 !important;
+  position: relative !important;
+}
+
+.top-section .table-title {
+  font-size: 1.6rem !important;
+  font-weight: 600 !important;
+}
+
+/* מונה טבלה */
+.table-count {
+  background: linear-gradient(135deg, #29a6a8 0%, #1f8a8c 100%) !important;
+  color: white !important;
+  padding: 0.4rem 0.8rem !important;
+  border-radius: 15px !important;
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  font-family: var(--font-family-primary) !important;
+  display: inline-block !important;
+  box-shadow: 0 2px 8px rgba(41, 166, 168, 0.3) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* פעולות טבלה */
+.table-actions {
+  display: flex !important;
+  gap: 8px !important;
+  align-items: center !important;
+}
+
+/* כותרת עמודת פעולות */
+table th.actions-cell {
+  height: auto !important;
+  min-height: auto !important;
+  max-height: 3rem !important;
+  padding: 0.5rem 0.25rem !important;
+  vertical-align: middle !important;
+  line-height: 1.2 !important;
+}
+
+/* Header לטבלה */
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+/**
+ * כרטיסים - Cards
+ * 
+ * קובץ זה מכיל את הסגנונות של כל הכרטיסים במערכת
+ * מבוסס על הסגנונות הקיימים ב-apple-theme.css
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 5, 2025
+ */
+
+/* כרטיסים בסיסיים - מבוסס על apple-theme.css */
+.card:not(.design-card) {
+  background: var(--apple-bg-elevated);
+  border-radius: var(--apple-radius-large);
+  border: 1px solid var(--apple-border-light);
+  box-shadow: var(--apple-shadow-light);
+  padding: var(--apple-spacing-lg);
+  margin-bottom: var(--apple-spacing-md);
+}
+
+
+/* כרטיסי התראות - מבוסס על index.css */
+.alert-card {
+  background: #ffffff;
+  border: 1px solid #ffc107;
+  padding: 1rem;
+  border-radius: var(--apple-radius-small);
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+
+.alert-card:hover {
+  box-shadow: var(--apple-shadow-medium);
+  transform: translateY(-1px);
+}
+
+.alert-ticker {
+  font-weight: 600;
+  color: var(--apple-blue);
+  margin-bottom: 0.25rem;
+}
+
+.alert-description {
+  font-size: 0.9rem;
+  color: var(--apple-text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.alert-status {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--apple-radius-small);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.alert-status.active {
+  background: var(--apple-green);
+  color: white;
+}
+
+.alert-status.pending {
+  background: var(--apple-orange);
+  color: white;
+}
+
+/* כרטיסי סטטוס - מבוסס על cache-test */
+.status-card {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.status-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* כרטיסי overview - מבוסס על index.css */
+.overview-card {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem;
+  background: #ffffff;
+  border-radius: var(--apple-radius-medium);
+  border: 1px solid var(--apple-border-light);
+  transition: all 0.3s ease;
+}
+
+.overview-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--apple-shadow-medium);
+}
+
+.overview-card.primary {
+  background: #ffffff;
+  border-color: rgba(255, 156, 5, 0.3);
+}
+
+.overview-card.success {
+  background: #ffffff;
+  border-color: rgba(40, 167, 69, 0.3);
+}
+
+.overview-card.info {
+  background: #ffffff;
+  border-color: rgba(0, 123, 255, 0.3);
+}
+
+.overview-card.warning {
+  background: #ffffff;
+  border-color: rgba(255, 193, 7, 0.3);
+}
+
+.overview-card-icon {
+  font-size: 2rem;
+  margin-inline-start: 1rem;
+  opacity: 0.8;
+}
+
+.overview-card-content {
+  flex: 1;
+}
+
+.overview-card-number {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--apple-text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.overview-card-label {
+  font-size: 0.9rem;
+  color: var(--apple-text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.overview-card-change {
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.overview-card-change.positive {
+  color: var(--apple-green);
+}
+
+.overview-card-change.negative {
+  color: var(--apple-red);
+}
+
+/* כרטיסי סטטיסטיקות */
+.compact-stat-card {
+  background: var(--apple-bg-secondary);
+  padding: 1rem;
+  border-radius: var(--apple-radius-medium);
+  border: 1px solid var(--apple-border-light);
+  text-align: center;
+}
+
+.compact-stat-number {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.compact-stat-number.positive {
+  color: var(--apple-green);
+}
+
+.compact-stat-number.negative {
+  color: var(--apple-red);
+}
+
+.compact-stat-label {
+  font-size: 0.9rem;
+  color: var(--apple-text-secondary);
+}
+
+/* כרטיסי גרף */
+.chart-card {
+  background: #ffffff;
+  padding: 1.5rem;
+  border-radius: var(--apple-radius-medium);
+  border: 1px solid var(--apple-border-light);
+}
+
+.chart-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--apple-text-primary);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.chart-container {
+  position: relative;
+  height: 300px;
+  margin-top: 1rem;
+}
+
+/* כרטיסי סטטוס נוספים */
+.stat-card {
+  background: #ffffff;
+  padding: 1.5rem;
+  border-radius: var(--apple-radius-medium);
+  border: 1px solid var(--apple-border-light);
+}
+
+.stat-header {
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--apple-border-light);
+}
+
+.stat-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--apple-text-primary);
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--apple-border-light);
+}
+
+.stat-row:last-child {
+  border-bottom: none;
+}
+
+/* ===== INFO SUMMARY COMPONENT ===== */
+/* סגנונות למידע סיכום */
+.info-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 1.5rem auto; /* מרווח אוטומטי למרכז */
+  padding: 1.5rem;
+  background: #f8f9fa; /* אפון בהיר */
+  border-radius: 12px; /* פינות מעוגלות */
+  border: 1px solid #e9ecef;
+  width: 90%; /* 90% מהקונטיינר שלו */
+  max-width: 100%; /* לא יותר מהקונטיינר */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.info-summary div {
+  font-size: 14px;
+  color: #6c757d; /* טקסט אפון */
+  text-align: center;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.info-summary strong {
+  color: #495057; /* טקסט כהה יותר */
+  font-weight: 600;
+}
+
+/* ===== INFO SUMMARY WITH CARDS ===== */
+/* סגנון נפרד ל-info-summary עם כרטיסים */
+.info-summary:has(.row),
+.info-summary:has(.card) {
+  width: 100%; /* על כל רוחב העמוד */
+  max-width: 100%;
+  margin: 1.5rem 0; /* מרווח רגיל ללא מרכוז */
+  background: transparent; /* רקע שקוף */
+  border: none; /* ללא מסגרת */
+  box-shadow: none; /* ללא צל */
+  padding: 0; /* ללא padding */
+}
+
+/* כרטיסים בתוך info-summary */
+.info-summary .card {
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.info-summary .card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Responsive design for info-summary */
+@media (max-width: 768px) {
+  .info-summary {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .info-summary div {
+    justify-content: flex-start;
+    text-align: right;
+  }
+  
+  /* כרטיסים במובייל */
+  .info-summary .row {
+    margin: 0;
+  }
+  
+  .info-summary .col-md-6,
+  .info-summary .col-lg-4 {
+    margin-bottom: 1rem;
+  }
+}
+/**
+ * מודלים - Modals
+ * 
+ * קובץ זה מכיל את הסגנונות של כל המודלים במערכת
+ * מבוסס על הסגנונות הקיימים ב-apple-theme.css
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 5, 2025
+ */
+
+/* מודל בסיסי - מבוסס על apple-theme.css */
+.modal {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 999999999 !important;
+  direction: rtl;
+}
+
+/* הגדרות z-index גבוהות לכל המודלים באתר */
+.modal-dialog {
+  z-index: 1000000000 !important;
+}
+
+/* הגדרות מיוחדות למודלים גדולים */
+.modal-dialog.modal-lg {
+  border: 2px solid #6c757d !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.modal-content {
+  z-index: 1000000001 !important;
+  background: var(--apple-bg-elevated);
+  border-radius: 6px;
+  box-shadow: var(--apple-shadow-heavy);
+  border: 1px solid var(--apple-border-light);
+  direction: rtl;
+  text-align: right;
+}
+
+.modal-backdrop {
+  z-index: 999999998 !important;
+}
+
+/* הודעות - וידוא שהן מופיעות מעל הכל */
+.toast {
+  z-index: 100000000 !important;
+}
+
+.toast-container {
+  z-index: 100000000 !important;
+}
+
+/* וידוא שכל המודלים מופיעים מעל הכל */
+.modal.show {
+  z-index: 999999999 !important;
+}
+
+.modal.show .modal-dialog {
+  z-index: 1000000000 !important;
+}
+
+.modal.show .modal-content {
+  z-index: 1000000001 !important;
+}
+
+/* וידוא שהרקע לא חוסם את המודלים */
+.modal-backdrop.show {
+  z-index: 999999998 !important;
+}
+
+/* מודלים ספציפיים עם z-index גבוה יותר */
+#addAlertModal,
+#editAlertModal,
+#addExecutionModal,
+#editExecutionModal,
+#deleteExecutionModal,
+#linkedItemsModal,
+#warningModal {
+  z-index: 999999999 !important;
+}
+
+#addAlertModal .modal-dialog,
+#editAlertModal .modal-dialog,
+#addExecutionModal .modal-dialog,
+#editExecutionModal .modal-dialog,
+#deleteExecutionModal .modal-dialog,
+#linkedItemsModal .modal-dialog,
+#warningModal .modal-dialog {
+  z-index: 1000000000 !important;
+}
+
+#addAlertModal .modal-content,
+#editAlertModal .modal-content,
+#addExecutionModal .modal-content,
+#editExecutionModal .modal-content,
+#deleteExecutionModal .modal-content,
+#linkedItemsModal .modal-content,
+#warningModal .modal-content {
+  z-index: 1000000001 !important;
+}
+
+/* מניעת סגירת מודלים בלחיצה על הרקע */
+.modal[data-bs-backdrop="static"] {
+  pointer-events: auto !important;
+}
+
+.modal[data-bs-backdrop="static"] .modal-backdrop {
+  pointer-events: none !important;
+}
+
+.modal[data-bs-backdrop="static"] .modal-content {
+  pointer-events: auto !important;
+}
+
+.modal[data-bs-backdrop="static"] .modal-dialog {
+  pointer-events: auto !important;
+}
+
+.modal[data-bs-backdrop="static"] .modal-header,
+.modal[data-bs-backdrop="static"] .modal-body,
+.modal[data-bs-backdrop="static"] .modal-footer {
+  pointer-events: auto !important;
+}
+
+/* מניעת סגירת מודלים בלחיצה על הרקע - Bootstrap override */
+.modal[data-bs-backdrop="static"] .modal-backdrop.show {
+  pointer-events: none !important;
+}
+
+.modal[data-bs-backdrop="static"].show .modal-backdrop {
+  pointer-events: none !important;
+}
+
+/* הגדרה גלובלית לכל המודלים - מניעת סגירה בלחיצה על הרקע */
+.modal .modal-backdrop {
+  pointer-events: none !important;
+}
+
+.modal .modal-content {
+  pointer-events: auto !important;
+}
+
+.modal .modal-dialog {
+  pointer-events: auto !important;
+}
+
+.modal .modal-header,
+.modal .modal-body,
+.modal .modal-footer {
+  pointer-events: auto !important;
+}
+
+/* מניעת סגירת מודלים בלחיצה על הרקע - הגדרה כללית */
+.modal.show .modal-backdrop {
+  pointer-events: none !important;
+}
+
+.modal.show .modal-content {
+  pointer-events: auto !important;
+}
+
+/* מניעת אנימציה בלחיצה על הרקע */
+.modal[data-bs-backdrop="static"] .modal-backdrop {
+  pointer-events: none !important;
+  opacity: 0.5 !important;
+}
+
+.modal[data-bs-backdrop="static"] .modal-backdrop.show {
+  pointer-events: none !important;
+  opacity: 0.5 !important;
+}
+
+.modal[data-bs-backdrop="static"] .modal-backdrop.fade {
+  pointer-events: none !important;
+  opacity: 0.5 !important;
+}
+
+.modal[data-bs-backdrop="static"] .modal-backdrop.fade.show {
+  pointer-events: none !important;
+  opacity: 0.5 !important;
+}
+
+/* כותרת מודל */
+.modal-header {
+  text-align: right;
+  direction: rtl;
+}
+
+/* תוכן מודל */
+.modal-body {
+  text-align: right;
+  direction: rtl;
+}
+
+/* כפתורי מודל */
+.modal-footer {
+  justify-content: flex-start; /* ימין ב-RTL */
+  direction: rtl;
+}
+
+/* כפתור סגירה - פינה שמאלית עליונה */
+.modal .btn-close {
+  position: absolute;
+  top: 1rem;
+  inset-inline-start: 1rem; /* ימין ב-RTL */
+}
+
+/* כפתורי סגירה במודולים */
+.modal-header .btn-close {
+  opacity: 1;
+  visibility: visible;
+  color: white;
+  filter: brightness(0) invert(1);
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  font-weight: bold;
+  content: none;
+}
+
+/* כפתור סגירה בכותרת רגילה - צבע ירוק */
+.modal-header:not(.modal-header-colored):not(.modal-header-danger) .btn-close {
+  opacity: 1 !important;
+  visibility: visible !important;
+  color: #28a745 !important;
+  filter: none !important;
+  background: none !important;
+  border: none !important;
+  font-size: 1.5rem !important;
+  font-weight: bold !important;
+  content: none !important;
+}
+
+/* וידוא שהודעות שגיאה מופיעות מעל המודול */
+.modal .invalid-feedback {
+  position: relative;
+  z-index: 1060;
+}
+
+/* הודעות שגיאה בתוך המודול */
+.modal-body .invalid-feedback {
+  display: block;
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* שדות עם שגיאה */
+.modal-body .form-control.is-invalid,
+.modal-body .form-select.is-invalid {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+/* כפתורי מחיקה בתוך modals */
+.modal .btn-danger {
+  border: 2px solid #dc3545 !important;
+  background-color: white !important;
+  color: #dc3545 !important;
+  font-size: 0.9rem !important;
+  padding: 0.375rem 0.75rem !important;
+}
+
+.modal .btn-danger:hover {
+  background-color: #dc3545 !important;
+  color: white !important;
+}
+
+/* מודל זהיר */
+#warningModal .table {
+  margin-bottom: 0;
+}
+
+#warningModal .table th {
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+  font-weight: 600;
+}
+
+#warningModal .table td {
+  border-color: #dee2e6;
+  vertical-align: middle;
+}
+/**
+ * מערכת התראות - Notifications
+ * 
+ * קובץ זה מכיל את הסגנונות של מערכת ההתראות
+ * מבוסס על הסגנונות הקיימים ב-notification-system.css
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 5, 2025
+ */
+
+/* קונטיינר התראות */
+.notification-container {
+  position: fixed;
+  top: 20px;
+  inset-inline-end: 20px;
+  right: 20px; /* fallback for older browsers */
+  z-index: 1000000002;
+  max-width: 400px;
+  width: auto;
+  pointer-events: none;
+}
+
+/* התראה בודדת - עיצוב בסיסי */
+.notification {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  transform: translateX(100%);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  direction: rtl;
+  position: relative;
+  width: auto;
+  max-width: 380px;
+}
+
+.notification.show {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.notification.hide {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+.notification-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  width: 24px;
+  text-align: center;
+}
+
+.notification-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-title {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 4px;
+  line-height: 1.3;
+  color: #1a1a1a;
+}
+
+.notification-message {
+  font-size: 13px;
+  line-height: 1.4;
+  color: #666;
+  word-wrap: break-word;
+}
+
+.notification-close {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #999;
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.notification-close:hover {
+  background: #f5f5f5;
+  color: #333;
+}
+
+/* סוגי התראות */
+.notification.success {
+  border-color: #28a745;
+}
+
+.notification.success .notification-icon {
+  color: #28a745;
+}
+
+.notification.error {
+  border-color: #dc3545;
+}
+
+.notification.error .notification-icon {
+  color: #dc3545;
+}
+
+.notification.warning {
+  border-color: #ffc107;
+}
+
+.notification.warning .notification-icon {
+  color: #ffc107;
+}
+
+.notification.info {
+  border-color: #007bff;
+}
+
+.notification.info .notification-icon {
+  color: #007bff;
+}
+
+/* התראות פעילות - לא אייקונים */
+.active-alerts {
+  background: #ffffff;
+  border-radius: var(--apple-radius-large);
+  box-shadow: var(--apple-shadow-light);
+  border: 1px solid var(--apple-border-light);
+  padding: var(--apple-spacing-lg);
+  margin-bottom: var(--apple-spacing-md);
+}
+
+.active-alerts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--apple-border-light);
+}
+
+.active-alerts-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--apple-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.active-alerts-count {
+  background: #ff9c05;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  min-width: 20px;
+  text-align: center;
+}
+
+.active-alert-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.active-alert-item:hover {
+  border-color: #29a6a8;
+  box-shadow: 0 2px 8px rgba(41, 166, 168, 0.1);
+  transform: translateY(-1px);
+}
+
+.active-alert-item:last-child {
+  margin-bottom: 0;
+}
+
+/* צבעי התראות פעילות לפי סוג */
+.active-alert-item.type-account {
+  border-inline-start: 4px solid #1f8a8c;
+  background: rgba(41, 166, 168, 0.02);
+}
+
+.active-alert-item.type-trade {
+  border-inline-start: 4px solid #1e7e34;
+  background: rgba(40, 167, 69, 0.02);
+}
+
+.active-alert-item.type-trade-plan {
+  border-inline-start: 4px solid #e67e00;
+  background: rgba(255, 149, 0, 0.02);
+}
+
+.active-alert-item.type-ticker {
+  border-inline-start: 4px solid #c82333;
+  background: rgba(220, 53, 69, 0.02);
+}
+
+.active-alert-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.active-alert-ticker {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--apple-text-primary);
+  margin-bottom: 2px;
+}
+
+.active-alert-condition {
+  font-size: 12px;
+  color: var(--apple-text-secondary);
+  line-height: 1.3;
+}
+
+.active-alert-time {
+  font-size: 11px;
+  color: var(--apple-text-tertiary);
+  text-align: start;
+  direction: ltr;
+  min-width: fit-content;
+}
+
+/* כפתורי הגדרות - ברירת מחדל */
+.settings-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  justify-content: flex-start; /* משמאל */
+}
+
+.settings-actions .btn {
+  margin: 0;
+}
+
+/* הגדרות עמודות */
+.settings-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.setting-item {
+  margin-bottom: 0.5rem;
+}
+
+/* כפתורי היסטוריה */
+.history-controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.history-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-start; /* משמאל */
+}
+
+.history-actions .btn {
+  margin: 0;
+}
+
+/* כפתורים בכותרת סקשן */
+.section-header-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.section-header-actions .btn {
+  margin: 0;
+}
+
+/* היסטוריית התראות - שורה אחת */
+.notification-line {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.notification-separator {
+  color: var(--apple-text-tertiary);
+  font-weight: 500;
+}
+
+.notification-title {
+  font-weight: 600;
+  color: var(--apple-text-primary);
+}
+
+.notification-message {
+  color: var(--apple-text-secondary);
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-time {
+  color: var(--apple-text-tertiary);
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+/* הגדרות מבוטלות */
+.setting-label input:disabled + .checkmark {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.setting-label input:disabled {
+  cursor: not-allowed;
+}
+
+.setting-label:has(input:disabled) {
+  opacity: 0.6;
+  color: var(--apple-text-tertiary);
+}
+/**
+ * ניווט - Navigation
+ * 
+ * קובץ זה מכיל את הסגנונות הבסיסיים של מערכת הניווט
+ * כללי ולא ספציפי ל-unified-header
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 5, 2025
+ */
+
+/* סגנונות ניווט כלליים */
+.navbar {
+  direction: rtl;
+  background: var(--apple-bg-elevated);
+  border-bottom: 1px solid var(--apple-border-light);
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+
+.navbar-nav {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: var(--spacing-md);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* פריטי תפריט */
+.nav-item {
+  position: relative;
+}
+
+.nav-link {
+  color: var(--apple-text-primary);
+  text-decoration: none;
+  font-weight: 500;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--apple-radius-small);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.nav-link:hover {
+  background: var(--apple-bg-secondary);
+  color: #29a6a8;
+  text-decoration: none;
+}
+
+.nav-link.active {
+  background: rgba(41, 166, 168, 0.1);
+  color: #29a6a8;
+  font-weight: 600;
+}
+
+/* תפריטים נפתחים */
+.dropdown-menu {
+  direction: rtl;
+  text-align: right;
+  background: var(--apple-bg-elevated);
+  border: 1px solid var(--apple-border-light);
+  border-radius: var(--apple-radius-medium);
+  box-shadow: var(--apple-shadow-medium);
+  padding: var(--spacing-sm) 0;
+  min-width: 200px;
+}
+
+.dropdown-item {
+  text-align: right;
+  padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--apple-text-primary);
+  text-decoration: none;
+  display: block;
+  transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background: var(--apple-bg-secondary);
+  color: #29a6a8;
+  text-decoration: none;
+}
+
+/* פירורי לחם */
+.breadcrumb {
+  direction: rtl;
+  background: transparent;
+  padding: 0;
+  margin-bottom: var(--spacing-md);
+}
+
+.breadcrumb-item {
+  color: var(--apple-text-secondary);
+  font-size: 0.9rem;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+  content: "‹";
+  margin-inline-end: var(--spacing-sm);
+  margin-inline-start: var(--spacing-sm);
+  color: var(--apple-text-tertiary);
+}
+
+.breadcrumb-item.active {
+  color: var(--apple-text-primary);
+  font-weight: 500;
+}
+
+.breadcrumb-item a {
+  color: #29a6a8;
+  text-decoration: none;
+}
+
+.breadcrumb-item a:hover {
+  text-decoration: underline;
+}
+
+/* לוגו */
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  text-decoration: none;
+  color: var(--apple-text-primary);
+}
+
+.logo-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--apple-radius-small);
+  background: linear-gradient(135deg, #29a6a8, #1f8a8c);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.logo-text {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--apple-text-primary);
+}
+
+/* תפריט המבורגר למובייל */
+.navbar-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--apple-text-primary);
+  cursor: pointer;
+}
+
+/* רספונסיביות */
+@media (max-width: 768px) {
+  .navbar-nav {
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    inset-inline-end: 0;
+    inset-inline-start: 0;
+    background: var(--apple-bg-elevated);
+    border-top: 1px solid var(--apple-border-light);
+    padding: var(--spacing-md);
+    display: none;
+  }
+  
+  .navbar-nav.show {
+    display: flex;
+  }
+  
+  .navbar-toggle {
+    display: block;
+  }
+  
+  .nav-link {
+    justify-content: flex-start;
+    width: 100%;
+    padding: var(--spacing-md);
+  }
+  
+  .dropdown-menu {
+    position: static;
+    width: 100%;
+    box-shadow: none;
+    border: none;
+    margin-top: var(--spacing-sm);
+  }
+}
+/**
+ * טפסים מתקדמים - Advanced Forms
+ * 
+ * קובץ זה מכיל את הסגנונות המתקדמים של טפסים
+ * כולל צ'קבוקסים, רדיו באטונים וטפסים מיוחדים
+ * מבוסס על הסגנונות הקיימים ב-styles.css ו-RTL guide
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 5, 2025
+ */
+
+/* ===== צ'קבוקסים עם RTL ===== */
+/* הגדרות גלובליות עם Override מוחלט של Bootstrap */
+.form-check,
+div.form-check,
+.modal .form-check,
+body .form-check,
+html .form-check,
+#addTradeModal .form-check,
+.table .form-check,
+.filter-section .form-check,
+.form-check.form-check-inline {
+  display: flex !important;
+  flex-direction: row-reverse !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 0.5rem !important;
+  min-height: auto !important;
+  padding-inline-start: 0 !important;
+  padding-inline-end: 0 !important;
+  margin-bottom: 0 !important;
+  text-align: right !important;
+  direction: rtl !important;
+}
+
+.form-check-input,
+input.form-check-input,
+.modal .form-check-input,
+body .form-check-input,
+html .form-check-input,
+#addTradeModal .form-check-input,
+.table .form-check-input,
+.filter-section .form-check-input,
+.form-check-input[type="checkbox"] {
+  order: 2 !important;
+  margin: 0 !important;
+  float: none !important;
+  margin-inline-start: 0 !important;
+  margin-inline-end: 0 !important;
+}
+
+.form-check-label,
+label.form-check-label,
+.modal .form-check-label,
+body .form-check-label,
+html .form-check-label,
+#addTradeModal .form-check-label,
+.table .form-check-label,
+.filter-section .form-check-label {
+  order: 1 !important;
+  margin: 0 !important;
+  float: none !important;
+  margin-inline-start: 0 !important;
+  margin-inline-end: 0 !important;
+  text-align: right !important;
+  direction: rtl !important;
+  cursor: pointer;
+}
+
+/* ===== רדיו באטונים ===== */
+.radio-group-item {
+  text-align: right;
+  margin-bottom: 10px;
+  direction: rtl;
+}
+
+.radio-group-item input[type="radio"] {
+  margin-inline-start: 10px;
+  margin-inline-end: 0;
+}
+
+.radio-group-item label {
+  margin: 0;
+  cursor: pointer;
+  text-align: right;
+  direction: rtl;
+}
+
+/* ===== שדות קלט מיוחדים ===== */
+/* מספרים - יישור לשמאל */
+input[type="number"] {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: embed;
+}
+
+/* תאריכים - יישור לשמאל */
+input[type="date"] {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: embed;
+}
+
+/* כתובות URL - יישור לשמאל */
+input[type="url"],
+input[type="email"] {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: embed;
+}
+
+/* רשימות נפתחות */
+select {
+  direction: rtl;
+  text-align: right;
+}
+
+select option {
+  direction: rtl;
+  text-align: right;
+}
+
+/* ===== קבוצות טפסים ===== */
+.form-group label {
+  font-family: var(--font-family-primary);
+  direction: rtl;
+  text-align: right;
+}
+
+/* ===== הגדרות מיוחדות ===== */
+.setting-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #0d6efd;
+}
+
+/* ===== קבוצות צ'קבוקסים ===== */
+.checkbox-group {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  direction: rtl;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--apple-text-secondary);
+  direction: rtl;
+  text-align: right;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--logo-orange);
+}
+
+/* ===== ולידציה ===== */
+.form-control.is-invalid,
+.form-select.is-invalid {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.invalid-feedback {
+  display: block;
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  text-align: right;
+  direction: rtl;
+}
+
+/* ===== טפסים במודלים ===== */
+.modal .form-group {
+  margin-bottom: var(--spacing-md);
+}
+
+.modal .form-group label {
+  display: block;
+  margin-bottom: var(--spacing-xs);
+  font-weight: 500;
+  color: var(--apple-text-primary);
+  font-size: 15px;
+  text-align: right;
+  direction: rtl;
+}
+
+.modal .form-group input,
+.modal .form-group select,
+.modal .form-group textarea {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--apple-border);
+  border-radius: var(--apple-radius-medium);
+  font-size: 15px;
+  background-color: var(--apple-bg-primary);
+  color: var(--apple-text-primary);
+  transition: all 0.2s ease;
+  font-family: var(--font-family-primary);
+  direction: rtl;
+  text-align: right;
+}
+
+.modal .form-group input:focus,
+.modal .form-group select:focus,
+.modal .form-group textarea:focus {
+  outline: none;
+  border-color: var(--apple-blue);
+  box-shadow: 0 0 0 3px rgba(41, 166, 168, 0.1);
+}
+
+/* ===== בוחר צבעים ===== */
+.color-preview {
+  width: 40px;
+  height: 30px;
+  border: 1px solid var(--apple-border);
+  border-radius: var(--apple-radius-small);
+  cursor: pointer;
+  display: inline-block;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.color-preview:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* מסגרת לבנה לכל קונטרולי הצבעים */
+input[type="color"] {
+  border: 2px solid white !important;
+  border-radius: 6px !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  width: 50px !important;
+  height: 40px !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+}
+
+input[type="color"]:hover {
+  border-color: #007bff !important;
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2) !important;
+}
+
+/* קונטרול בחירת צבעים מהגיבוי המקומי */
+.color-picker {
+  width: 50%;
+  height: 10px;
+  border: 1px solid #ddd;
+  border-radius: 2px;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* Chrome-style color picker for all browsers */
+input[type="color"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: none;
+  border: 2px solid white !important;
+  border-radius: 6px !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  width: 50px !important;
+  height: 40px !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease;
+}
+
+/* Chrome-style color swatch */
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+  border-radius: 4px;
+}
+
+input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: 4px;
+}
+
+/* Firefox Chrome-style */
+input[type="color"]::-moz-color-swatch {
+  border: none;
+  border-radius: 4px;
+}
+
+/* Hover effect */
+input[type="color"]:hover {
+  border-color: #007bff !important;
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2) !important;
+}
+
+/* Focus effect */
+input[type="color"]:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+/* מחלקת הסתרה */
+.d-none {
+  display: none !important;
+}
+
+/* רוחב 25% */
+.w-25 {
+  width: 25% !important;
+}
+
+/* ===== טפסי חיפוש ===== */
+.search-form {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  direction: rtl;
+}
+
+.search-input {
+  flex: 1;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--apple-border);
+  border-radius: var(--apple-radius-medium);
+  font-size: 14px;
+  direction: rtl;
+  text-align: right;
+}
+
+.search-btn {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--logo-orange);
+  color: white;
+  border: none;
+  border-radius: var(--apple-radius-medium);
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.search-btn:hover {
+  background: #e68a00;
+}
+
+/* ===== רספונסיביות ===== */
+@media (max-width: 768px) {
+  .checkbox-group {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .search-form {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+  
+  .search-input {
+    width: 100%;
+  }
+}
+/**
+ * תגיות סטטוס - Status Badges
+ * 
+ * קובץ זה מכיל את הסגנונות של כל התגיות והבאדג'ים במערכת
+ * מבוסס על הסגנונות הקיימים ב-table.css ו-numeric-value-colors.css
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 5, 2025
+ */
+
+/* ===== תגיות סטטוס בסיסיות ===== */
+.status-badge {
+  padding: 0.5rem 1rem !important;
+  border-radius: 20px !important;
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+  font-family: var(--font-family-primary) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  display: inline-block !important;
+  transition: all 0.3s ease !important;
+}
+
+.status-badge::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: -100% !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent) !important;
+  transition: left 0.5s ease !important;
+}
+
+.status-badge:hover::before {
+  left: 100% !important;
+}
+
+/* סטטוסים בסיסיים - מוגדרים ב-unified.css */
+
+/* ===== תגיות חשיבות ===== */
+.priority-badge {
+  padding: 0.5rem 1rem !important;
+  border-radius: 20px !important;
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+  font-family: var(--font-family-primary) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  display: inline-block !important;
+}
+
+.priority-badge::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: -100% !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent) !important;
+  transition: left 0.5s ease !important;
+}
+
+.priority-badge:hover::before {
+  left: 100% !important;
+}
+
+.priority-badge.priority-high {
+  background: linear-gradient(135deg, rgba(244, 67, 54, 0.2) 0%, rgba(229, 57, 53, 0.2) 100%) !important;
+  color: #d32f2f !important;
+  box-shadow: 0 2px 6px rgba(244, 67, 54, 0.1) !important;
+}
+
+.priority-badge.priority-medium {
+  background: linear-gradient(135deg, rgba(255, 152, 0, 0.2) 0%, rgba(255, 143, 0, 0.2) 100%) !important;
+  color: #f57c00 !important;
+  box-shadow: 0 2px 6px rgba(255, 152, 0, 0.1) !important;
+}
+
+.priority-badge.priority-low {
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.2) 0%, rgba(67, 160, 71, 0.2) 100%) !important;
+  color: #388e3c !important;
+  box-shadow: 0 2px 6px rgba(76, 175, 80, 0.1) !important;
+}
+
+/* ===== ערכים מספריים ===== */
+.numeric-text-positive {
+  color: var(--numeric-positive-medium) !important;
+  font-weight: 600;
+}
+
+.numeric-text-negative {
+  color: var(--numeric-negative-medium) !important;
+  font-weight: 600;
+}
+
+.numeric-text-zero {
+  color: var(--numeric-zero-medium) !important;
+}
+
+.profit-positive {
+  color: var(--numeric-positive-medium) !important;
+  font-weight: 600;
+}
+
+.profit-negative {
+  color: var(--numeric-negative-medium) !important;
+  font-weight: 600;
+}
+
+/* ===== שדות צד (Long/Short) ===== */
+.side-long {
+  color: #6f42c1 !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 6px !important;
+  background: rgba(111, 66, 193, 0.1) !important;
+  display: inline-block !important;
+  transition: all 0.3s ease !important;
+}
+
+.side-long:hover {
+  background: rgba(111, 66, 193, 0.15) !important;
+  transform: translateY(-1px) !important;
+}
+
+.side-short {
+  color: var(--color-danger) !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 6px !important;
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent) !important;
+  display: inline-block !important;
+  transition: all 0.3s ease !important;
+}
+
+.side-short:hover {
+  background: color-mix(in srgb, var(--color-danger) 15%, transparent) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* ===== שדות סוג (Type) ===== */
+.type-swing {
+  color: #17a2b8 !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 6px !important;
+  background: rgba(23, 162, 184, 0.1) !important;
+  display: inline-block !important;
+  transition: all 0.3s ease !important;
+}
+
+.type-investment {
+  color: var(--color-success) !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 6px !important;
+  background: color-mix(in srgb, var(--color-success) 10%, transparent) !important;
+  display: inline-block !important;
+  transition: all 0.3s ease !important;
+}
+
+.type-investment:hover {
+  background: color-mix(in srgb, var(--color-success) 15%, transparent) !important;
+  transform: translateY(-1px) !important;
+}
+
+.type-stock {
+  color: #007bff !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 6px !important;
+  background: rgba(0, 123, 255, 0.1) !important;
+  display: inline-block !important;
+  transition: all 0.3s ease !important;
+}
+
+.type-etf {
+  color: var(--color-success) !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 6px !important;
+  background: color-mix(in srgb, var(--color-success) 10%, transparent) !important;
+  display: inline-block !important;
+  transition: all 0.3s ease !important;
+}
+
+.type-etf:hover {
+  background: color-mix(in srgb, var(--color-success) 15%, transparent) !important;
+  transform: translateY(-1px) !important;
+}
+
+.type-crypto {
+  color: #6f42c1 !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 6px !important;
+  background: rgba(111, 66, 193, 0.1) !important;
+  display: inline-block !important;
+  transition: all 0.3s ease !important;
+}
+
+/* ===== תגיות התראות ===== */
+.triggered-badge {
+  font-weight: 500;
+  font-size: 0.85rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-align: center;
+  min-width: 30px;
+  display: inline-block;
+}
+
+.triggered-badge.triggered-yes {
+  background-color: #e8f5e8;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+.triggered-badge.triggered-no {
+  background-color: #f5f5f5;
+  color: #616161;
+  border: 1px solid #e0e0e0;
+}
+
+.triggered-badge.triggered-new {
+  background-color: #fff3e0;
+  color: #ef6c00;
+  border: 1px solid #ffcc02;
+}
+
+.triggered-badge.triggered-unknown {
+  background-color: #f5f5f5;
+  color: #616161;
+  border: 1px solid #e0e0e0;
+}
+
+/* ===== אייקון טריידים פעילים ===== */
+.active-trades-icon {
+  display: inline-block;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 12px;
+  font-weight: bold;
+  min-width: 20px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== אובייקטים מקושרים ===== */
+.related-object-cell {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  min-height: 40px;
+  box-sizing: border-box;
+  direction: rtl;
+  text-align: right;
+}
+
+/* Related entity styles - now handled by dynamic color system */
+/* Static colors removed to allow dynamic entity colors from preferences */
+
+/* ===== סטטוס דוט ===== */
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-inline-start: 6px;
+}
+
+.status-dot.online {
+  background-color: var(--status-open-color);
+}
+
+.status-dot.offline {
+  background-color: var(--status-closed-color);
+}
+
+.status-dot.pending {
+  background-color: var(--status-pending-color);
+}
+/**
+ * Page Headers - כותרות עמודים
+ * 
+ * קובץ זה מכיל את הסגנונות הספציפיים לכותרות כל עמוד
+ * מבוסס על הסגנונות מהמערכת הישנה
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 6, 2025
+ */
+
+/* ===== סגנונות כותרות עמודים עם צבעים ספציפיים ===== */
+
+/* עמוד מעקב טריידים - כחול */
+.tracking-page .section-header,
+.tracking-page .top-section .section-header {
+  border-bottom: 2px solid var(--entity-trade-color);
+}
+
+/* עמוד חשבונות - ירוק */
+.accounts-page .section-header,
+.accounts-page .top-section .section-header {
+  border-bottom: 2px solid var(--entity-account-color);
+}
+
+/* עמוד תכנון טריידים - כחול כהה */
+.planning-page .section-header,
+.planning-page .top-section .section-header {
+  border-bottom: 2px solid var(--entity-trade-plan-color);
+}
+
+/* עמוד התראות - כתום */
+.alerts-page .section-header,
+.alerts-page .top-section .section-header {
+  border-bottom: 2px solid var(--entity-alert-color);
+}
+
+/* עמוד תזרים מזומנים - ירוק טורקיז */
+.cash-flows-page .section-header,
+.cash-flows-page .top-section .section-header {
+  border-bottom: 2px solid var(--entity-cash-flow-color) !important;
+}
+
+/* עמוד עסקאות - כחול טורקיז */
+.executions-page .section-header,
+.executions-page .top-section .section-header {
+  border-bottom: 2px solid var(--entity-execution-color);
+}
+
+/* עמוד הערות - סגול */
+.notes-page .section-header,
+.notes-page .top-section .section-header {
+  border-bottom: 2px solid var(--entity-note-color);
+}
+
+/* עמוד בסיס נתונים - כחול כהה */
+.db-display-page .section-header,
+.db-display-page .top-section .section-header {
+  border-bottom: 2px solid var(--apple-gray-8, #495057);
+}
+
+/* עמוד טבלאות עזר - אפור */
+.extra-data-page .section-header,
+.extra-data-page .top-section .section-header {
+  border-bottom: 2px solid var(--apple-gray-6, #6c757d);
+}
+
+/* עמוד אילוצים - כתום כהה */
+.constraints-page .section-header,
+.constraints-page .top-section .section-header {
+  border-bottom: 2px solid #fd7e14;
+}
+
+/* עמוד עיצובים - ירוק כהה */
+.designs-page .section-header,
+.designs-page .top-section .section-header {
+  border-bottom: 2px solid #20c997;
+}
+
+/* עמוד מחקר - אפור כהה */
+.research-page .section-header,
+.research-page .top-section .section-header {
+  border-bottom: 2px solid var(--apple-gray-8, #343a40);
+}
+
+/* ===== סגנונות כותרות עם איקונים ===== */
+
+/* התאמה לכותרת הסקשן */
+.section-header .table-title,
+.section-header .section-title,
+.alerts-header h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* התאמה לכותרת עם איקון התראות */
+.section-header .table-title .section-alert-icon,
+.section-header .section-title .section-alert-icon,
+.alerts-header h3 .section-alert-icon {
+  margin: 0;
+}
+
+/* ===== סגנונות איקון התראות בכותרת הסקשן ===== */
+.section-alert-icon {
+  display: inline-flex;
+  align-items: center;
+  margin-inline-end: 20px;
+  margin-inline-start: 0;
+  color: var(--entity-alert-color);
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+}
+
+.section-alert-icon:hover {
+  transform: scale(1.1);
+  color: var(--entity-alert-text);
+}
+
+/* ===== סגנונות איקון בכותרת הקומפוננט ===== */
+.title-bell-icon {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  margin-inline-start: 8px;
+  color: var(--entity-alert-color);
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+}
+
+.title-bell-icon:hover {
+  transform: scale(1.1);
+  color: var(--entity-alert-text);
+}
+
+/* ===== סגנונות אייקון טריידים פעילים ===== */
+.active-trades-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: var(--entity-trade-bg));
+  border: 1px solid var(--entity-trade-border));
+  border-radius: 50%;
+  color: var(--entity-trade-color);
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-inline-start: 8px;
+  transition: all 0.3s ease;
+}
+
+.active-trades-icon:hover {
+  background: var(--entity-trade-color);
+  color: white;
+  transform: scale(1.1);
+}
+
+/* ===== סגנונות איקון טבלה ===== */
+.table-icon {
+  width: 20px;
+  height: 20px;
+  margin-inline-start: 8px;
+  vertical-align: middle;
+}
+
+/* ===== סגנונות כותרות דינמיות ===== */
+.entity-account-main-header {
+  border-bottom: 2px solid var(--entity-account-color) !important;
+}
+
+.entity-trade-main-header {
+  border-bottom: 2px solid var(--entity-trade-color) !important;
+}
+
+.entity-alert-main-header {
+  border-bottom: 2px solid var(--entity-alert-color) !important;
+}
+
+.entity-cash-flow-main-header {
+  border-bottom: 2px solid var(--entity-cash-flow-color) !important;
+}
+
+.entity-note-main-header {
+  border-bottom: 2px solid var(--entity-note-color) !important;
+}
+
+.entity-ticker-main-header {
+  border-bottom: 2px solid var(--entity-ticker-color) !important;
+}
+
+.entity-execution-main-header {
+  border-bottom: 2px solid var(--entity-execution-color) !important;
+}
+
+.entity-trade-plan-main-header {
+  border-bottom: 2px solid var(--entity-trade-plan-color) !important;
+}
+
+
+
+
+
+/* Monitoring Status Styles */
+.monitoring-status {
+    background: var(--color-bg-primary, #ffffff);
+    border: 1px solid var(--color-border-light, #dee2e6);
+    border-radius: var(--spacing-border-radius, 8px);
+    padding: var(--spacing-md, 16px);
+    margin-bottom: var(--spacing-md, 16px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md, 16px);
+}
+
+.status-text {
+    font-weight: var(--typography-font-weight-semibold, 600);
+    font-size: var(--typography-font-size-lg, 18px);
+    color: var(--color-text-primary, #212529);
+}
+
+.last-check {
+    font-size: var(--typography-font-size-sm, 14px);
+    color: var(--color-text-secondary, #6c757d);
+    font-style: italic;
+}
+
+/* Monitoring Controls Styles */
+.monitoring-controls {
+    display: flex;
+    gap: var(--spacing-lg, 24px);
+    align-items: center;
+    margin-bottom: var(--spacing-md, 16px);
+    padding: var(--spacing-md, 16px);
+    background: var(--color-bg-secondary, #f8f9fa);
+    border: 1px solid var(--color-border-light, #dee2e6);
+    border-radius: var(--spacing-border-radius, 8px);
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs, 8px);
+}
+
+.control-group label {
+    font-weight: var(--typography-font-weight-medium, 500);
+    color: var(--color-text-primary, #212529);
+    font-size: var(--typography-font-size-sm, 14px);
+}
+
+.control-group input[type="checkbox"] {
+    width: auto;
+    margin-left: var(--spacing-sm, 12px);
+}
+
+.control-group select {
+    padding: var(--spacing-xs, 8px);
+    border: 1px solid var(--color-border-light, #dee2e6);
+    border-radius: var(--spacing-border-radius-sm, 6px);
+    background: var(--color-bg-primary, #ffffff);
+    font-size: var(--typography-font-size-sm, 14px);
+    color: var(--color-text-primary, #212529);
+}
+
+/* Info Summary Component Styles */
+/* Provides summary information display for various pages */
+
+.info-summary {
+    background: var(--color-bg-secondary, #f8f9fa);
+    border: 1px solid var(--color-border-light, #dee2e6);
+    border-radius: var(--spacing-border-radius, 8px);
+    padding: var(--spacing-md, 16px);
+    margin-bottom: var(--spacing-md, 16px);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm, 12px);
+    font-size: var(--typography-font-size-sm, 14px);
+}
+
+.info-summary > div {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs, 8px);
+    color: var(--color-text-secondary, #6c757d);
+}
+
+.info-summary strong {
+    color: var(--color-text-primary, #212529);
+    font-weight: var(--typography-font-weight-semibold, 600);
+}
+
+/* RTL Support - All Components */
+[dir="rtl"] .info-summary,
+[dir="rtl"] .monitoring-status,
+[dir="rtl"] .monitoring-controls,
+[dir="rtl"] .system-info,
+[dir="rtl"] .info-item,
+[dir="rtl"] .status-details span,
+[dir="rtl"] .log-entry {
+    direction: rtl;
+}
+
+[dir="rtl"] .control-group input[type="checkbox"] {
+    margin-left: 0;
+    margin-right: var(--spacing-sm, 12px);
+}
+
+[dir="rtl"] .status-indicator {
+    direction: ltr;
+}
+
+[dir="rtl"] .log-entry.success {
+    border-left: none;
+    border-right: 4px solid var(--color-success, #28a745);
+}
+
+[dir="rtl"] .log-entry.error {
+    border-left: none;
+    border-right: 4px solid var(--color-error, #dc3545);
+}
+
+[dir="rtl"] .log-entry.warning {
+    border-left: none;
+    border-right: 4px solid var(--color-warning, #ffc107);
+}
+
+[dir="rtl"] .log-entry.info {
+    border-left: none;
+    border-right: 4px solid var(--color-info, #17a2b8);
+}
+
+/* System Info Styles */
+.system-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm, 12px);
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm, 12px);
+    background: var(--color-bg-primary, #ffffff);
+    border: 1px solid var(--color-border-light, #dee2e6);
+    border-radius: var(--spacing-border-radius-sm, 6px);
+    transition: all 0.2s ease;
+}
+
+.info-item:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-color: var(--color-primary, #007bff);
+}
+
+.info-label {
+    font-weight: var(--typography-font-weight-medium, 500);
+    color: var(--color-text-secondary, #6c757d);
+    font-size: var(--typography-font-size-sm, 14px);
+}
+
+.info-value {
+    font-weight: var(--typography-font-weight-semibold, 600);
+    color: var(--color-text-primary, #212529);
+    font-size: var(--typography-font-size-sm, 14px);
+    font-family: var(--typography-font-family-mono, 'Courier New', monospace);
+}
+
+/* Status Indicator Styles */
+.status-value {
+    font-weight: var(--typography-font-weight-bold, 700);
+    font-size: var(--typography-font-size-lg, 18px);
+    padding: var(--spacing-xs, 8px) var(--spacing-sm, 12px);
+    border-radius: var(--spacing-border-radius-sm, 6px);
+    text-align: center;
+    min-width: 60px;
+    transition: all 0.3s ease;
+}
+
+.status-value.success {
+    background: var(--color-success-bg, #d4edda);
+    color: var(--color-success, #155724);
+    border: 1px solid var(--color-success-border, #c3e6cb);
+}
+
+.status-value.error {
+    background: var(--color-error-bg, #f8d7da);
+    color: var(--color-error, #721c24);
+    border: 1px solid var(--color-error-border, #f5c6cb);
+}
+
+.status-value.warning {
+    background: var(--color-warning-bg, #fff3cd);
+    color: var(--color-warning, #856404);
+    border: 1px solid var(--color-warning-border, #ffeaa7);
+}
+
+/* Status Details */
+.status-details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs, 8px);
+    margin-top: var(--spacing-sm, 12px);
+    font-size: var(--typography-font-size-sm, 14px);
+    color: var(--color-text-secondary, #6c757d);
+}
+
+.status-details span {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Card Enhancements */
+.card {
+    border: 1px solid var(--color-border-light, #dee2e6);
+    border-radius: var(--spacing-border-radius, 8px);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    border-color: var(--color-primary-light, #cce7ff);
+}
+
+.card-header {
+    background: var(--color-bg-secondary, #f8f9fa);
+    border-bottom: 1px solid var(--color-border-light, #dee2e6);
+    padding: var(--spacing-md, 16px);
+    border-radius: var(--spacing-border-radius, 8px) var(--spacing-border-radius, 8px) 0 0;
+}
+
+.card-header h5 {
+    margin: 0;
+    font-size: var(--typography-font-size-lg, 18px);
+    font-weight: var(--typography-font-weight-semibold, 600);
+    color: var(--color-text-primary, #212529);
+}
+
+.card-body {
+    padding: var(--spacing-md, 16px);
+}
+
+
+/* Dark Theme Support - All Components */
+@media (prefers-color-scheme: dark) {
+    /* Monitoring Status */
+    .monitoring-status {
+        background: var(--color-bg-primary-dark, #1a202c);
+        border-color: var(--color-border-dark, #4a5568);
+    }
+
+    .status-text {
+        color: var(--color-text-primary-dark, #ffffff);
+    }
+
+    .last-check {
+        color: var(--color-text-secondary-dark, #a0aec0);
+    }
+
+    /* Monitoring Controls */
+    .monitoring-controls {
+        background: var(--color-bg-secondary-dark, #2d3748);
+        border-color: var(--color-border-dark, #4a5568);
+    }
+
+    .control-group label {
+        color: var(--color-text-primary-dark, #ffffff);
+    }
+
+    .control-group select {
+        background: var(--color-bg-primary-dark, #1a202c);
+        border-color: var(--color-border-dark, #4a5568);
+        color: var(--color-text-primary-dark, #ffffff);
+    }
+
+    /* Info Summary */
+    .info-summary {
+        background: var(--color-bg-secondary-dark, #2d3748);
+        border-color: var(--color-border-dark, #4a5568);
+        color: var(--color-text-secondary-dark, #a0aec0);
+    }
+
+    .info-summary strong {
+        color: var(--color-text-primary-dark, #ffffff);
+    }
+
+    /* System Info */
+    .info-item {
+        background: var(--color-bg-primary-dark, #1a202c);
+        border-color: var(--color-border-dark, #4a5568);
+    }
+
+    .info-item:hover {
+        border-color: var(--color-primary-dark, #63b3ed);
+    }
+
+    .info-label {
+        color: var(--color-text-secondary-dark, #a0aec0);
+    }
+
+    .info-value {
+        color: var(--color-text-primary-dark, #ffffff);
+    }
+
+    /* Cards */
+    .card {
+        background: var(--color-bg-primary-dark, #1a202c);
+        border-color: var(--color-border-dark, #4a5568);
+    }
+
+    .card-header {
+        background: var(--color-bg-secondary-dark, #2d3748);
+        border-color: var(--color-border-dark, #4a5568);
+    }
+
+    .card-header h5 {
+        color: var(--color-text-primary-dark, #ffffff);
+    }
+
+    /* Logs */
+    .logs-container {
+        background: var(--color-bg-primary-dark, #1a202c);
+        border-color: var(--color-border-dark, #4a5568);
+    }
+
+    .log-entry:hover {
+        background: var(--color-bg-secondary-dark, #2d3748);
+        border-color: var(--color-border-dark, #4a5568);
+    }
+
+    .log-title {
+        color: var(--color-text-primary-dark, #ffffff);
+    }
+
+    .log-message {
+        color: var(--color-text-secondary-dark, #a0aec0);
+    }
+
+    .log-time {
+        color: var(--color-text-muted-dark, #718096);
+    }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .monitoring-status {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm, 12px);
+    }
+
+    .monitoring-controls {
+        flex-direction: column;
+        gap: var(--spacing-md, 16px);
+        align-items: stretch;
+    }
+
+    .control-group {
+        align-items: flex-start;
+    }
+
+    .info-summary {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .info-summary > div {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-xs, 8px);
+    }
+
+    .status-details span {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-xs, 8px);
+    }
+}
+
+/* Logs Container Styles */
+.logs-container {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid var(--color-border-light, #dee2e6);
+    border-radius: var(--spacing-border-radius, 8px);
+    background: var(--color-bg-primary, #ffffff);
+    padding: var(--spacing-sm, 12px);
+}
+
+.logs-container:empty::before {
+    content: "אין לוגים עדיין...";
+    color: var(--color-text-secondary, #6c757d);
+    font-style: italic;
+    text-align: center;
+    display: block;
+    padding: var(--spacing-md, 16px);
+}
+
+/* Log Entry Styles */
+.log-entry {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-sm, 12px);
+    padding: var(--spacing-sm, 12px);
+    margin-bottom: var(--spacing-xs, 8px);
+    border: 1px solid transparent;
+    border-radius: var(--spacing-border-radius-sm, 6px);
+    transition: all 0.2s ease;
+}
+
+.log-entry:hover {
+    background: var(--color-bg-secondary, #f8f9fa);
+    border-color: var(--color-border-light, #dee2e6);
+}
+
+.log-entry.success {
+    border-left: 4px solid var(--color-success, #28a745);
+}
+
+.log-entry.error {
+    border-left: 4px solid var(--color-error, #dc3545);
+}
+
+.log-entry.warning {
+    border-left: 4px solid var(--color-warning, #ffc107);
+}
+
+.log-entry.info {
+    border-left: 4px solid var(--color-info, #17a2b8);
+}
+
+.log-icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: var(--typography-font-size-lg, 18px);
+}
+
+.log-entry.success .log-icon {
+    background: var(--color-success-bg, #d4edda);
+    color: var(--color-success, #155724);
+}
+
+.log-entry.error .log-icon {
+    background: var(--color-error-bg, #f8d7da);
+    color: var(--color-error, #721c24);
+}
+
+.log-entry.warning .log-icon {
+    background: var(--color-warning-bg, #fff3cd);
+    color: var(--color-warning, #856404);
+}
+
+.log-entry.info .log-icon {
+    background: var(--color-info-bg, #d1ecf1);
+    color: var(--color-info, #0c5460);
+}
+
+.log-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.log-title {
+    font-weight: var(--typography-font-weight-semibold, 600);
+    margin-bottom: var(--spacing-xs, 8px);
+    color: var(--color-text-primary, #212529);
+}
+
+.log-message {
+    color: var(--color-text-secondary, #6c757d);
+    margin-bottom: var(--spacing-xs, 8px);
+    word-wrap: break-word;
+}
+
+.log-time {
+    font-size: var(--typography-font-size-xs, 12px);
+    color: var(--color-text-muted, #868e96);
+    font-style: italic;
+}
+
+/* Toggle Button Styles */
+.filter-toggle-btn {
+    background: none;
+    border: none;
+    color: var(--color-text-secondary, #6c757d);
+    font-size: var(--typography-font-size-lg, 18px);
+    cursor: pointer;
+    padding: var(--spacing-xs, 8px);
+    border-radius: var(--spacing-border-radius-sm, 6px);
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+}
+
+.filter-toggle-btn:hover {
+    background: var(--color-bg-secondary, #f8f9fa);
+    color: var(--color-text-primary, #212529);
+}
+
+.filter-icon {
+    font-size: var(--typography-font-size-lg, 18px);
+    font-weight: bold;
+    transition: transform 0.3s ease;
+    display: inline-block;
+    line-height: 1;
+}
+
+.filter-toggle-btn.collapsed .filter-icon {
+    transform: rotate(180deg);
+}
+
+/* RTL Support for Toggle Buttons */
+[dir="rtl"] .filter-icon {
+    transform: scaleX(-1);
+}
+
+[dir="rtl"] .filter-toggle-btn.collapsed .filter-icon {
+    transform: scaleX(-1) rotate(180deg);
+}
+
+/* Dark theme support for toggle buttons */
+@media (prefers-color-scheme: dark) {
+    .filter-toggle-btn {
+        color: var(--color-text-secondary-dark, #a0aec0);
+    }
+
+    .filter-toggle-btn:hover {
+        background: var(--color-bg-secondary-dark, #2d3748);
+        color: var(--color-text-primary-dark, #ffffff);
+    }
+}
+/**
+ * Entity Colors - צבעי ישויות
+ * 
+ * קובץ זה מכיל סגנונות לשימוש בצבעי ישויות דינמיים
+ * מבוסס על מערכת הצבעים הדינמית
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 5, 2025
+ */
+
+/* ===== סגנונות ישויות ===== */
+
+/* טרייד - Trade */
+.entity-trade {
+  color: var(--entity-trade-color);
+  background-color: color-mix(in srgb, var(--entity-trade-color) 10%, transparent);
+  border-color: var(--entity-trade-border);
+}
+
+.entity-trade-bg {
+  background-color: var(--entity-trade-bg);
+}
+
+.entity-trade-text {
+  color: var(--entity-trade-text);
+}
+
+.entity-trade-border {
+  border-color: var(--entity-trade-border);
+}
+
+/* תוכנית מסחר - Trade Plan */
+.entity-trade-plan {
+  color: var(--entity-trade-plan-color);
+  background-color: color-mix(in srgb, var(--entity-trade-plan-color) 10%, transparent);
+  border-color: var(--entity-trade-plan-border);
+}
+
+.entity-trade-plan-bg {
+  background-color: var(--entity-trade-plan-bg);
+}
+
+.entity-trade-plan-text {
+  color: var(--entity-trade-plan-text);
+}
+
+.entity-trade-plan-border {
+  border-color: var(--entity-trade-plan-border);
+}
+
+/* ביצוע - Execution */
+.entity-execution {
+  color: var(--entity-execution-color);
+  background-color: color-mix(in srgb, var(--entity-execution-color) 10%, transparent);
+  border-color: var(--entity-execution-border);
+}
+
+.entity-execution-bg {
+  background-color: var(--entity-execution-bg);
+}
+
+.entity-execution-text {
+  color: var(--entity-execution-text);
+}
+
+.entity-execution-border {
+  border-color: var(--entity-execution-border);
+}
+
+/* חשבון - Account */
+.entity-account {
+  color: var(--entity-account-color);
+  background-color: color-mix(in srgb, var(--entity-account-color) 10%, transparent);
+  border-color: var(--entity-account-border);
+}
+
+.entity-account-bg {
+  background-color: var(--entity-account-bg);
+}
+
+.entity-account-text {
+  color: var(--entity-account-text);
+}
+
+.entity-account-border {
+  border-color: var(--entity-account-border);
+}
+
+/* תזרים מזומנים - Cash Flow */
+.entity-cash-flow {
+  color: var(--entity-cash-flow-color);
+  background-color: color-mix(in srgb, var(--entity-cash-flow-color) 10%, transparent);
+  border-color: var(--entity-cash-flow-border);
+}
+
+.entity-cash-flow-bg {
+  background-color: var(--entity-cash-flow-bg);
+}
+
+.entity-cash-flow-text {
+  color: var(--entity-cash-flow-text);
+}
+
+.entity-cash-flow-border {
+  border-color: var(--entity-cash-flow-border);
+}
+
+/* טיקר - Ticker */
+.entity-ticker {
+  color: var(--entity-ticker-color);
+  background-color: color-mix(in srgb, var(--entity-ticker-color) 10%, transparent);
+  border-color: var(--entity-ticker-border);
+}
+
+.entity-ticker-bg {
+  background-color: var(--entity-ticker-bg);
+}
+
+.entity-ticker-text {
+  color: var(--entity-ticker-text);
+}
+
+.entity-ticker-border {
+  border-color: var(--entity-ticker-border);
+}
+
+/* התראה - Alert */
+.entity-alert {
+  color: var(--entity-alert-color);
+  background-color: color-mix(in srgb, var(--entity-alert-color) 10%, transparent);
+  border-color: var(--entity-alert-border);
+}
+
+.entity-alert-bg {
+  background-color: var(--entity-alert-bg);
+}
+
+.entity-alert-text {
+  color: var(--entity-alert-text);
+}
+
+.entity-alert-border {
+  border-color: var(--entity-alert-border);
+}
+
+/* הערה - Note */
+.entity-note {
+  color: var(--entity-note-color);
+  background-color: color-mix(in srgb, var(--entity-note-color) 10%, transparent);
+  border-color: var(--entity-note-border);
+}
+
+.entity-note-bg {
+  background-color: var(--entity-note-bg);
+}
+
+.entity-note-text {
+  color: var(--entity-note-text);
+}
+
+.entity-note-border {
+  border-color: var(--entity-note-border);
+}
+
+/* ===== סגנונות סטטוס ===== */
+
+/* סטטוס פתוח - Open */
+.status-open {
+  color: var(--status-open-color);
+  background-color: color-mix(in srgb, var(--status-open-color) 10%, transparent);
+}
+
+.status-open-bg {
+  background-color: color-mix(in srgb, var(--status-open-color) 10%, transparent);
+}
+
+.status-open-text {
+  color: var(--status-open-color);
+}
+
+/* סטטוס סגור - Closed */
+.status-closed {
+  color: var(--status-closed-color);
+  background-color: color-mix(in srgb, var(--status-closed-color) 10%, transparent);
+}
+
+.status-closed-bg {
+  background-color: color-mix(in srgb, var(--status-closed-color) 10%, transparent);
+}
+
+.status-closed-text {
+  color: var(--status-closed-color);
+}
+
+/* סטטוס מבוטל - Cancelled */
+.status-cancelled {
+  color: var(--status-cancelled-color);
+  background-color: color-mix(in srgb, var(--status-cancelled-color) 10%, transparent);
+}
+
+.status-cancelled-bg {
+  background-color: color-mix(in srgb, var(--status-cancelled-color) 10%, transparent);
+}
+
+.status-cancelled-text {
+  color: var(--status-cancelled-color);
+}
+
+/* סטטוס ממתין - Pending */
+.status-pending {
+  color: var(--status-pending-color);
+  background-color: color-mix(in srgb, var(--status-pending-color) 10%, transparent);
+}
+
+.status-pending-bg {
+  background-color: color-mix(in srgb, var(--status-pending-color) 10%, transparent);
+}
+
+.status-pending-text {
+  color: var(--status-pending-color);
+}
+
+/* סטטוס פעיל - Active */
+.status-active {
+  color: var(--status-active-color);
+  background-color: color-mix(in srgb, var(--status-active-color) 10%, transparent);
+}
+
+.status-active-bg {
+  background-color: color-mix(in srgb, var(--status-active-color) 10%, transparent);
+}
+
+.status-active-text {
+  color: var(--status-active-color);
+}
+
+/* סטטוס לא פעיל - Inactive */
+.status-inactive {
+  color: var(--status-inactive-color);
+  background-color: color-mix(in srgb, var(--status-inactive-color) 10%, transparent);
+}
+
+.status-inactive-bg {
+  background-color: color-mix(in srgb, var(--status-inactive-color) 10%, transparent);
+}
+
+.status-inactive-text {
+  color: var(--status-inactive-color);
+}
+
+/* ===== סגנונות סוגי השקעה ===== */
+
+/* סווינג - Swing */
+.type-swing {
+  color: var(--type-swing-color);
+  background-color: color-mix(in srgb, var(--type-swing-color) 10%, transparent);
+}
+
+.type-swing-bg {
+  background-color: color-mix(in srgb, var(--type-swing-color) 10%, transparent);
+}
+
+.type-swing-text {
+  color: var(--type-swing-color);
+}
+
+/* השקעה - Investment */
+.type-investment {
+  color: var(--type-investment-color);
+  background-color: color-mix(in srgb, var(--type-investment-color) 10%, transparent);
+}
+
+.type-investment-bg {
+  background-color: color-mix(in srgb, var(--type-investment-color) 10%, transparent);
+}
+
+.type-investment-text {
+  color: var(--type-investment-color);
+}
+
+/* פסיבי - Passive */
+.type-passive {
+  color: var(--type-passive-color);
+  background-color: color-mix(in srgb, var(--type-passive-color) 10%, transparent);
+}
+
+.type-passive-bg {
+  background-color: color-mix(in srgb, var(--type-passive-color) 10%, transparent);
+}
+
+.type-passive-text {
+  color: var(--type-passive-color);
+}
+
+/* מסחר יומי - Day Trading */
+.type-day-trading {
+  color: var(--type-day-trading-color);
+  background-color: color-mix(in srgb, var(--type-day-trading-color) 10%, transparent);
+}
+
+.type-day-trading-bg {
+  background-color: color-mix(in srgb, var(--type-day-trading-color) 10%, transparent);
+}
+
+.type-day-trading-text {
+  color: var(--type-day-trading-color);
+}
+
+/* סקלפינג - Scalping */
+.type-scalping {
+  color: var(--type-scalping-color);
+  background-color: color-mix(in srgb, var(--type-scalping-color) 10%, transparent);
+}
+
+.type-scalping-bg {
+  background-color: color-mix(in srgb, var(--type-scalping-color) 10%, transparent);
+}
+
+.type-scalping-text {
+  color: var(--type-scalping-color);
+}
+/**
+ * Constraints Monitor Styles
+ * סגנונות למוניטור אילוצים
+ * 
+ * @author TikTrack Development Team
+ * @version 1.0.0
+ * @since 2025-01-15
+ */
+
+/* ===== CONSTRAINTS MONITOR LAYOUT ===== */
+.constraints-monitor-container {
+    padding: 1rem 0;
+}
+
+/* ===== FILTER CONTROLS ===== */
+.filter-controls {
+    background: var(--bs-light);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--bs-border-color);
+}
+
+.filter-controls .form-select,
+.filter-controls .form-control {
+    border-radius: 0.375rem;
+    border: 1px solid var(--bs-border-color);
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.filter-controls .form-select:focus,
+.filter-controls .form-control:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+/* ===== LAYER TOGGLES ===== */
+.layer-toggle {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    margin: 0 0.25rem;
+    background: var(--bs-light);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.layer-toggle:hover {
+    background: var(--bs-primary);
+    color: white;
+    border-color: var(--bs-primary);
+}
+
+.layer-toggle.active {
+    background: var(--bs-primary);
+    color: white;
+    border-color: var(--bs-primary);
+}
+
+/* ===== CONSTRAINT CARDS ===== */
+.constraint-card {
+    background: white;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    transition: all 0.15s ease-in-out;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.constraint-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+.constraint-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+.constraint-name {
+    font-weight: 600;
+    color: var(--bs-dark);
+    font-size: 1rem;
+}
+
+.constraint-type-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-weight: 500;
+}
+
+.table-constraint-count {
+    background: var(--bs-primary);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* ===== CONSTRAINT DETAILS ===== */
+.constraint-details {
+    font-size: 0.875rem;
+    color: var(--bs-secondary);
+}
+
+.constraint-details div {
+    margin-bottom: 0.25rem;
+}
+
+.constraint-details strong {
+    color: var(--bs-dark);
+    font-weight: 600;
+}
+
+/* ===== BADGE STYLES ===== */
+.badge-enum {
+    background-color: var(--bs-primary) !important;
+    color: white !important;
+}
+
+.badge-not-null {
+    background-color: var(--bs-warning) !important;
+    color: var(--bs-dark) !important;
+}
+
+.badge-foreign-key {
+    background-color: var(--bs-info) !important;
+    color: white !important;
+}
+
+.badge-unique {
+    background-color: var(--bs-success) !important;
+    color: white !important;
+}
+
+.badge-range {
+    background-color: var(--bs-secondary) !important;
+    color: white !important;
+}
+
+/* ===== TABLE CONSTRAINTS SECTIONS ===== */
+.table-constraints-section {
+    margin-bottom: 2rem;
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--bs-light);
+    border-radius: 0.5rem 0.5rem 0 0;
+    border: 1px solid var(--bs-border-color);
+    border-bottom: none;
+    font-weight: 600;
+    color: var(--bs-dark);
+}
+
+.table-header span:first-child {
+    font-size: 1.1rem;
+}
+
+/* ===== CONSTRAINT GRID ===== */
+.constraint-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+    background: white;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0 0 0.5rem 0.5rem;
+}
+
+/* ===== CONSTRAINTS TABLE ===== */
+#constraints-table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+#constraints-table th:nth-child(1),
+#constraints-table td:nth-child(1) {
+    width: 18%; /* שם אילוץ */
+}
+
+#constraints-table th:nth-child(2),
+#constraints-table td:nth-child(2) {
+    width: 13%; /* טבלה */
+}
+
+#constraints-table th:nth-child(3),
+#constraints-table td:nth-child(3) {
+    width: 13%; /* עמודה */
+}
+
+#constraints-table th:nth-child(4),
+#constraints-table td:nth-child(4) {
+    width: 10%; /* סוג */
+}
+
+#constraints-table th:nth-child(5),
+#constraints-table td:nth-child(5) {
+    width: 22%; /* הגדרה */
+}
+
+#constraints-table th:nth-child(6),
+#constraints-table td:nth-child(6) {
+    width: 6%; /* פעיל */
+}
+
+#constraints-table th:nth-child(7),
+#constraints-table td:nth-child(7) {
+    width: 18%; /* פעולות */
+}
+
+/* ===== TABLE CELL CONTENT ===== */
+#constraints-table td {
+    vertical-align: middle;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+#constraints-table td:nth-child(5) {
+    font-size: 0.85rem;
+    line-height: 1.3;
+}
+
+#constraints-table .btn-group {
+    display: flex;
+    gap: 2px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+#constraints-table .btn-group .btn {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.7rem;
+    min-width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ===== LOADING SPINNER ===== */
+.loading-spinner {
+    text-align: center;
+    padding: 2rem;
+    color: var(--bs-secondary);
+}
+
+.loading-spinner i {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: var(--bs-primary);
+}
+
+/* ===== MESSAGES ===== */
+.error-message {
+    background: var(--bs-danger);
+    color: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.success-message {
+    background: var(--bs-success);
+    color: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 1400px) {
+    #constraints-table {
+        min-width: 1200px;
+    }
+    
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+@media (max-width: 768px) {
+    .constraint-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .filter-controls {
+        padding: 0.75rem;
+    }
+    
+    .layer-toggle {
+        display: block;
+        margin: 0.25rem 0;
+        text-align: center;
+    }
+    
+    .constraint-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .table-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    #constraints-table {
+        min-width: 1000px;
+    }
+    
+    #constraints-table .btn-group {
+        flex-direction: column;
+        gap: 1px;
+    }
+    
+    #constraints-table .btn-group .btn {
+        min-width: 24px;
+        height: 24px;
+        font-size: 0.6rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .constraint-card {
+        padding: 0.75rem;
+    }
+    
+    .constraint-name {
+        font-size: 0.9rem;
+    }
+    
+    .constraint-details {
+        font-size: 0.8rem;
+    }
+}
+
+/* ===== DARK MODE SUPPORT ===== */
+@media (prefers-color-scheme: dark) {
+    .constraint-card {
+        background: var(--bs-dark);
+        border-color: var(--bs-border-color);
+        color: var(--bs-light);
+    }
+    
+    .constraint-name {
+        color: var(--bs-light);
+    }
+    
+    .constraint-details strong {
+        color: var(--bs-light);
+    }
+    
+    .filter-controls {
+        background: var(--bs-dark);
+        border-color: var(--bs-border-color);
+    }
+    
+    .table-header {
+        background: var(--bs-dark);
+        border-color: var(--bs-border-color);
+        color: var(--bs-light);
+    }
+    
+    .constraint-grid {
+        background: var(--bs-dark);
+        border-color: var(--bs-border-color);
+    }
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.constraint-card {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* ===== ACCESSIBILITY ===== */
+.constraint-card:focus-within {
+    outline: 2px solid var(--bs-primary);
+    outline-offset: 2px;
+}
+
+.layer-toggle:focus {
+    outline: 2px solid var(--bs-primary);
+    outline-offset: 2px;
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+    .filter-controls,
+    .layer-toggle,
+    .btn {
+        display: none !important;
+    }
+    
+    .constraint-card {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #000;
+    }
+    
+    .constraint-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/**
+ * System Management Component Styles
+ * ==================================
+ * 
+ * Styles for the system management dashboard
+ * 
+ * @version 1.0.0
+ * @lastUpdated September 13, 2025
+ */
+
+/* System Management Dashboard */
+.system-management {
+  padding: 1rem;
+}
+
+/* Health Grid */
+.health-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.status-card {
+  background: var(--apple-bg-elevated);
+  border-radius: var(--apple-radius-medium);
+  padding: 1rem;
+  border: 1px solid var(--apple-border-light);
+  box-shadow: var(--apple-shadow-light);
+}
+
+.status-card .card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.status-card .card-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.health-status {
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--apple-radius-small);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.health-status.active {
+  background: var(--apple-green-light);
+  color: var(--apple-green-dark);
+}
+
+.health-status.inactive {
+  background: var(--apple-red-light);
+  color: var(--apple-red-dark);
+}
+
+.health-status.warning {
+  background: var(--apple-orange-light);
+  color: var(--apple-orange-dark);
+}
+
+.health-details {
+  font-size: 0.875rem;
+  color: var(--apple-text-secondary);
+  margin-top: 0.5rem;
+}
+
+/* System Score */
+.system-score {
+  font-size: 1.5rem;
+  font-weight: 700;
+  padding: 0.5rem 1rem;
+  border-radius: var(--apple-radius-medium);
+  text-align: center;
+}
+
+.system-score.excellent {
+  background: var(--apple-green-light);
+  color: var(--apple-green-dark);
+}
+
+.system-score.good {
+  background: var(--apple-blue-light);
+  color: var(--apple-blue-dark);
+}
+
+.system-score.warning {
+  background: var(--apple-orange-light);
+  color: var(--apple-orange-dark);
+}
+
+.system-score.poor {
+  background: var(--apple-red-light);
+  color: var(--apple-red-dark);
+}
+
+.system-score-small {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.system-score-small .score-label {
+  font-size: 0.875rem;
+  color: var(--apple-text-secondary);
+}
+
+.system-score-small .system-score {
+  font-size: 1rem;
+  padding: 0.25rem 0.5rem;
+}
+
+/* Status Grid */
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.5rem;
+}
+
+.status-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background: var(--apple-bg-secondary);
+  border-radius: var(--apple-radius-small);
+}
+
+.status-label {
+  font-size: 0.875rem;
+  color: var(--apple-text-secondary);
+}
+
+.status-value {
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--apple-radius-small);
+}
+
+.status-value.active {
+  background: var(--apple-green-light);
+  color: var(--apple-green-dark);
+}
+
+.status-value.inactive {
+  background: var(--apple-red-light);
+  color: var(--apple-red-dark);
+}
+
+/* Log Entries */
+.log-entry {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  border-radius: var(--apple-radius-small);
+  border-left: 4px solid;
+  background: var(--apple-bg-elevated);
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+  font-size: 0.875rem;
+}
+
+.log-timestamp {
+  color: var(--apple-text-secondary);
+  font-size: 0.75rem;
+  min-width: 80px;
+}
+
+.log-level {
+  font-weight: 600;
+  min-width: 60px;
+  text-align: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--apple-radius-small);
+  font-size: 0.75rem;
+}
+
+.log-message {
+  flex: 1;
+  color: var(--apple-text-primary);
+}
+
+/* Log Level Colors */
+.log-entry.log-info {
+  border-left-color: var(--apple-blue);
+  background: var(--apple-blue-light);
+}
+
+.log-entry.log-info .log-level {
+  background: var(--apple-blue);
+  color: white;
+}
+
+.log-entry.log-success {
+  border-left-color: var(--apple-green);
+  background: var(--apple-green-light);
+}
+
+.log-entry.log-success .log-level {
+  background: var(--apple-green);
+  color: white;
+}
+
+.log-entry.log-warning {
+  border-left-color: var(--apple-orange);
+  background: var(--apple-orange-light);
+}
+
+.log-entry.log-warning .log-level {
+  background: var(--apple-orange);
+  color: white;
+}
+
+.log-entry.log-error {
+  border-left-color: var(--apple-red);
+  background: var(--apple-red-light);
+}
+
+.log-entry.log-error .log-level {
+  background: var(--apple-red);
+  color: white;
+}
+
+/* Alert Items */
+.alert-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  border-radius: var(--apple-radius-small);
+  border-left: 4px solid;
+  background: var(--apple-bg-elevated);
+  font-size: 0.875rem;
+}
+
+.alert-timestamp {
+  color: var(--apple-text-secondary);
+  font-size: 0.75rem;
+  min-width: 80px;
+}
+
+.alert-level {
+  font-weight: 600;
+  min-width: 60px;
+  text-align: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--apple-radius-small);
+  font-size: 0.75rem;
+}
+
+.alert-message {
+  flex: 1;
+  color: var(--apple-text-primary);
+}
+
+/* Alert Level Colors */
+.alert-item.info {
+  border-left-color: var(--apple-blue);
+  background: var(--apple-blue-light);
+}
+
+.alert-item.info .alert-level {
+  background: var(--apple-blue);
+  color: white;
+}
+
+.alert-item.success {
+  border-left-color: var(--apple-green);
+  background: var(--apple-green-light);
+}
+
+.alert-item.success .alert-level {
+  background: var(--apple-green);
+  color: white;
+}
+
+.alert-item.warning {
+  border-left-color: var(--apple-orange);
+  background: var(--apple-orange-light);
+}
+
+.alert-item.warning .alert-level {
+  background: var(--apple-orange);
+  color: white;
+}
+
+.alert-item.error {
+  border-left-color: var(--apple-red);
+  background: var(--apple-red-light);
+}
+
+.alert-item.error .alert-level {
+  background: var(--apple-red);
+  color: white;
+}
+
+/* Performance Metrics */
+.performance-metric {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  background: var(--apple-bg-secondary);
+  border-radius: var(--apple-radius-small);
+}
+
+.metric-label {
+  font-size: 0.875rem;
+  color: var(--apple-text-secondary);
+}
+
+.metric-value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--apple-text-primary);
+}
+
+.metric-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--apple-bg-tertiary);
+  border-radius: var(--apple-radius-small);
+  overflow: hidden;
+  margin-top: 0.25rem;
+}
+
+.metric-bar-fill {
+  height: 100%;
+  border-radius: var(--apple-radius-small);
+  transition: width 0.3s ease;
+}
+
+.metric-bar-fill.low {
+  background: var(--apple-green);
+}
+
+.metric-bar-fill.medium {
+  background: var(--apple-orange);
+}
+
+.metric-bar-fill.high {
+  background: var(--apple-red);
+}
+
+/* Security Status */
+.security-status {
+  padding: 0.5rem 1rem;
+  border-radius: var(--apple-radius-medium);
+  text-align: center;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.security-status.safe {
+  background: var(--apple-green-light);
+  color: var(--apple-green-dark);
+}
+
+.security-status.warning {
+  background: var(--apple-orange-light);
+  color: var(--apple-orange-dark);
+}
+
+.security-status.danger {
+  background: var(--apple-red-light);
+  color: var(--apple-red-dark);
+}
+
+.security-details {
+  font-size: 0.875rem;
+  color: var(--apple-text-secondary);
+  text-align: center;
+}
+
+/* External Data Status */
+.external-data-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  background: var(--apple-bg-secondary);
+  border-radius: var(--apple-radius-small);
+}
+
+.data-source {
+  font-size: 0.875rem;
+  color: var(--apple-text-secondary);
+}
+
+.data-status {
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--apple-radius-small);
+}
+
+.data-status.connected {
+  background: var(--apple-green-light);
+  color: var(--apple-green-dark);
+}
+
+.data-status.disconnected {
+  background: var(--apple-red-light);
+  color: var(--apple-red-dark);
+}
+
+.data-status.pending {
+  background: var(--apple-orange-light);
+  color: var(--apple-orange-dark);
+}
+
+/* Loading State */
+.loading-state {
+  display: none;
+  text-align: center;
+  padding: 2rem;
+  color: var(--apple-text-secondary);
+}
+
+.loading-state.show {
+  display: block;
+}
+
+/* Error State */
+.error-state {
+  display: none;
+  text-align: center;
+  padding: 2rem;
+  color: var(--apple-red);
+  background: var(--apple-red-light);
+  border-radius: var(--apple-radius-medium);
+  margin: 1rem 0;
+}
+
+.error-state.show {
+  display: block;
+}
+
+/* Score Details */
+.score-details {
+  margin-top: 0.5rem;
+}
+
+.score-details-item {
+  padding: 0.25rem 0.5rem;
+  margin: 0.25rem 0;
+  border-radius: var(--apple-radius-small);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.score-details-item.success {
+  background: var(--apple-green-light);
+  color: var(--apple-green-dark);
+}
+
+.score-details-item.warning {
+  background: var(--apple-orange-light);
+  color: var(--apple-orange-dark);
+}
+
+.score-details-item.error {
+  background: var(--apple-red-light);
+  color: var(--apple-red-dark);
+}
+
+/* Backup Information */
+.backup-info {
+  margin-bottom: 1rem;
+}
+
+.backup-info > div {
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--apple-text-secondary);
+}
+
+.backup-info strong {
+  color: var(--apple-text-primary);
+  font-weight: 600;
+}
+
+.backup-schedule,
+.backup-location,
+.backup-size,
+.backup-last {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.backup-schedule::before {
+  content: "📅";
+}
+
+.backup-location::before {
+  content: "📁";
+}
+
+.backup-size::before {
+  content: "📊";
+}
+
+.backup-last::before {
+  content: "🕐";
+}
+
+/* Backup Contents */
+.backup-contents {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: var(--apple-bg-secondary);
+  border-radius: var(--apple-radius-small);
+  border-left: 4px solid var(--apple-blue);
+}
+
+.backup-contents strong {
+  color: var(--apple-text-primary);
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.backup-list {
+  margin: 0;
+  padding-right: 1rem;
+  list-style: none;
+}
+
+.backup-list li {
+  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+  color: var(--apple-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.backup-list li::before {
+  content: "•";
+  color: var(--apple-blue);
+  font-weight: bold;
+  margin-left: 0.5rem;
+}
+
+/* Quick Actions */
+.quick-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.quick-actions .btn {
+  margin: 0;
+}
+
+
+/* 07 - TRUMPS (High Specificity Overrides) */
+/* ========================================================
+   PAGE-SCRIPTS-MATRIX.CSS - September 2025
+   Specific styles for the Scripts Matrix page
+   ======================================================== */
+
+/* Page-specific container styles - using ITCSS variables */
+.page-scripts-matrix-container {
+    /* Max width handled by ITCSS container styles */
+    /* margin: 0 auto; - handled by ITCSS */
+}
+
+/* Table container enhancements */
+.table-container {
+    background-color: var(--color-background-primary);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: var(--spacing-lg);
+    margin-top: var(--spacing-lg);
+    overflow-x: auto;
+}
+
+/* Page title styling */
+.page-title {
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-xl);
+    text-align: center;
+    font-size: var(--typography-h1-size);
+    font-weight: var(--typography-h1-weight);
+}
+
+/* Page subtitle */
+.page-subtitle {
+    color: var(--color-text-muted);
+    text-align: center;
+    font-size: var(--typography-body-sm);
+    margin-bottom: var(--spacing-lg);
+}
+
+/* Table header styling */
+#page-scripts-matrix-table th {
+    background-color: var(--color-primary);
+    color: var(--color-text-on-primary);
+    border: none;
+    font-weight: var(--typography-bold);
+    font-size: var(--typography-body-xs);
+    text-align: center;
+    vertical-align: middle;
+    min-width: 80px;
+    padding: var(--spacing-sm) var(--spacing-xs);
+}
+
+/* Table cell styling */
+#page-scripts-matrix-table td {
+    vertical-align: middle;
+    border: 1px solid var(--color-border);
+    text-align: center;
+    font-size: var(--typography-body-xs);
+    padding: var(--spacing-xs) var(--spacing-xxs);
+}
+
+/* Script name column */
+.script-name {
+    font-weight: var(--typography-bold);
+    color: var(--color-text-primary);
+    text-align: right;
+    padding-right: var(--spacing-sm);
+}
+
+/* Connected cells */
+.connected {
+    background-color: var(--color-success-light);
+    color: var(--color-success-dark);
+    font-weight: var(--typography-bold);
+}
+
+/* Primary scripts row styling */
+.primary-scripts {
+    background-color: var(--color-background-secondary);
+}
+
+/* Utility scripts row styling */
+.utility-scripts {
+    background-color: var(--color-warning-light);
+}
+
+/* Service scripts row styling */
+.service-scripts {
+    background-color: var(--color-info-light);
+}
+
+/* Legend styling */
+.legend {
+    margin-top: var(--spacing-lg);
+    padding: var(--spacing-lg);
+    background-color: var(--color-background-secondary);
+    border-radius: var(--border-radius-md);
+}
+
+.legend h5 {
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-md);
+    font-size: var(--typography-h5-size);
+}
+
+.legend-item {
+    display: inline-block;
+    margin-right: var(--spacing-lg);
+    font-size: var(--typography-body-sm);
+}
+
+.legend-color {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-left: var(--spacing-sm);
+    border-radius: var(--border-radius-sm);
+}
+
+/* Legend color definitions */
+.legend-color.primary-scripts {
+    background-color: var(--color-background-secondary);
+}
+
+.legend-color.utility-scripts {
+    background-color: var(--color-warning-light);
+}
+
+.legend-color.service-scripts {
+    background-color: var(--color-info-light);
+}
+
+.legend-color.connected {
+    background-color: var(--color-success-light);
+}
+
+/* Section styling - Button left, title right */
+.content-section {
+    margin-bottom: var(--spacing-lg);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
+.section-toggle {
+    background-color: var(--color-background-primary);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    font-size: var(--typography-body-sm);
+    flex-shrink: 0;
+}
+
+.section-toggle:hover {
+    background-color: var(--color-primary);
+    color: var(--color-text-on-primary);
+}
+
+.section-title {
+    font-weight: var(--typography-bold);
+    color: var(--color-text-primary);
+    font-size: var(--typography-h5-size);
+}
+
+.section-content {
+    padding: var(--spacing-md);
+    background-color: var(--color-background-primary);
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--color-border);
+}
+
+/* Table styling - Narrow columns, 90-degree headers */
+#page-scripts-matrix-table th {
+    background-color: var(--color-primary);
+    color: var(--color-text-on-primary);
+    border: none;
+    font-weight: var(--typography-bold);
+    font-size: var(--typography-body-xs);
+    text-align: center;
+    vertical-align: middle;
+    min-width: 40px; /* Much narrower */
+    max-width: 60px; /* Limit maximum width */
+    width: 50px; /* Fixed narrow width */
+    padding: var(--spacing-xs) var(--spacing-xxs);
+    /* 90-degree rotation for headers */
+    transform: rotate(-90deg);
+    white-space: nowrap;
+    height: 120px; /* Space for rotated text */
+}
+
+#page-scripts-matrix-table td {
+    vertical-align: middle;
+    border: 1px solid var(--color-border);
+    text-align: center;
+    font-size: var(--typography-body-xs);
+    padding: var(--spacing-xs) var(--spacing-xxs);
+    min-width: 40px;
+    max-width: 60px;
+    width: 50px;
+}
+
+/* First column (script names) - sticky */
+#page-scripts-matrix-table th:first-child,
+#page-scripts-matrix-table td:first-child {
+    position: sticky;
+    left: 0;
+    background-color: var(--color-background-secondary);
+    z-index: 10;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+}
+
+#page-scripts-matrix-table th:first-child {
+    background-color: var(--color-primary);
+    transform: rotate(0deg); /* Don't rotate first column header */
+    height: auto;
+    width: 120px; /* Wider for script names */
+}
+
+/* Override rotation for first column header */
+#page-scripts-matrix-table thead tr:first-child th:first-child {
+    transform: none !important;
+    writing-mode: horizontal-tb;
+}
+
+/* Table container with horizontal scroll */
+.table-container {
+    background-color: var(--color-background-primary);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+    overflow-x: auto;
+    overflow-y: visible;
+}
+
+/* Ensure table takes full width */
+#page-scripts-matrix-table {
+    min-width: 100%;
+    table-layout: fixed; /* Fixed layout for consistent column widths */
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .table-container {
+        padding: var(--spacing-sm);
+    }
+
+    #page-scripts-matrix-table th,
+    #page-scripts-matrix-table td {
+        font-size: var(--typography-body-xxs);
+        padding: var(--spacing-xxs);
+    }
+
+    .legend-item {
+        display: block;
+        margin-bottom: var(--spacing-sm);
+        margin-right: 0;
+    }
+}
+

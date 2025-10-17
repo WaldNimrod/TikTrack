@@ -101,12 +101,8 @@
                         דף הבית - TikTrack
                     </div>
                     <div class="table-actions">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים מדף הבית">
-                            <i class="fas fa-copy"></i> העתק לוג מפורט
-                        </button>
-                        <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר אזור דף הבית">
-                            <span class="filter-icon">▲</span>
-                        </button>
+                        ${window.createCopyButton ? window.createCopyButton('copyDetailedLog()', 'העתק לוג מפורט עם כל הנתונים מדף הבית') : '<button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים מדף הבית"><i class="fas fa-copy"></i> העתק לוג מפורט</button>'}
+                        ${window.createToggleButton ? window.createToggleButton('top', false, 'הצג/הסתר אזור דף הבית') : '<button class="filter-toggle-btn" onclick="toggleSection(\'top\')" title="הצג/הסתר אזור דף הבית"><span class="filter-icon">▲</span></button>'}
                     </div>
                 </div>
 
@@ -136,9 +132,7 @@
                         </div>
                         <div class="table-count" id="dashboardCount">טוען...</div>
                         <div class="table-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('main')" title="הצג/הסתר אזור לוח בקרה">
-                                <span class="filter-icon">▲</span>
-                            </button>
+                            ${window.createToggleButton ? window.createToggleButton('main', false, 'הצג/הסתר אזור לוח בקרה') : '<button class="filter-toggle-btn" onclick="toggleSection(\'main\')" title="הצג/הסתר אזור לוח בקרה"><span class="filter-icon">▲</span></button>'}
                         </div>
                     </div>
 

@@ -1,0 +1,141 @@
+[0;34m[2025-09-28 09:51:33] INFO:[0m Executing: python3 dev_server.py
+[0;34m[2025-09-28 09:51:33] INFO:[0m Server process started with PID: 40992
+[0;34m[2025-09-28 09:51:33] INFO:[0m Waiting for server to start (max 30 seconds)...
+[0;34m[2025-09-28 09:51:34] INFO:[0m Executing: python3 dev_server.py
+[0;34m[2025-09-28 09:51:34] INFO:[0m Server process started with PID: 41168
+[0;34m[2025-09-28 09:51:34] INFO:[0m Waiting for server to start (max 30 seconds)...
+[0;32m[2025-09-28 09:51:34] SUCCESS:[0m Server started successfully after 0 seconds
+[0;34m[2025-09-28 09:51:34] INFO:[0m Performing health checks...
+[0;32m[2025-09-28 09:51:34] SUCCESS:[0m Health check 1: Main page accessible (HTTP 200)
+[0;32m[2025-09-28 09:51:34] SUCCESS:[0m Health check 1: API health endpoint accessible (HTTP 200)
+[1;33m[2025-09-28 09:51:34] WARNING:[0m Health check 1: Database connectivity issue (HTTP 500)
+[0;32m[2025-09-28 09:51:35] SUCCESS:[0m Server started successfully after 2 seconds
+[0;34m[2025-09-28 09:51:35] INFO:[0m Performing health checks...
+[0;32m[2025-09-28 09:51:35] SUCCESS:[0m Health check 1: Main page accessible (HTTP 200)
+[0;32m[2025-09-28 09:51:35] SUCCESS:[0m Health check 1: API health endpoint accessible (HTTP 200)
+[1;33m[2025-09-28 09:51:35] WARNING:[0m Health check 1: Database connectivity issue (HTTP 500)
+[0;32m[2025-09-28 09:51:39] SUCCESS:[0m Health check 2: Main page accessible (HTTP 200)
+[0;32m[2025-09-28 09:51:40] SUCCESS:[0m Health check 2: Main page accessible (HTTP 200)
+[0;32m[2025-09-28 09:51:40] SUCCESS:[0m Health check 2: API health endpoint accessible (HTTP 200)
+[0;32m[2025-09-28 09:51:40] SUCCESS:[0m Health check 2: API health endpoint accessible (HTTP 200)
+[0;32m[2025-09-28 09:51:40] SUCCESS:[0m Health check 2: Database connectivity confirmed (HTTP 200)
+[1;33m[2025-09-28 09:51:40] WARNING:[0m Health check 2: Database connectivity issue (HTTP 500)
+[0;32m[2025-09-28 09:51:45] SUCCESS:[0m Health check 3: Main page accessible (HTTP 200)
+[0;32m[2025-09-28 09:51:45] SUCCESS:[0m Health check 3: API health endpoint accessible (HTTP 200)
+[1;33m[2025-09-28 09:51:45] WARNING:[0m Health check 3: Database connectivity issue (HTTP 500)
+[0;32m[2025-09-28 09:51:45] SUCCESS:[0m Health check 3: Main page accessible (HTTP 200)
+[0;32m[2025-09-28 09:51:45] SUCCESS:[0m Health check 3: API health endpoint accessible (HTTP 200)
+[1;33m[2025-09-28 09:51:45] WARNING:[0m Health check 3: Database connectivity issue (HTTP 500)
+[0;32m[2025-09-28 09:51:50] SUCCESS:[0m Health check 4: Main page accessible (HTTP 200)
+[0;32m[2025-09-28 09:51:50] SUCCESS:[0m Health check 4: API health endpoint accessible (HTTP 200)
+[1;33m[2025-09-28 09:51:50] WARNING:[0m Health check 4: Database connectivity issue (HTTP 500)
+[0;32m[2025-09-28 09:51:50] SUCCESS:[0m Health check 4: Main page accessible (HTTP 200)
+[0;32m[2025-09-28 09:51:50] SUCCESS:[0m Health check 4: API health endpoint accessible (HTTP 200)
+[1;33m[2025-09-28 09:51:50] WARNING:[0m Health check 4: Database connectivity issue (HTTP 500)
+[0;32m[2025-09-28 09:51:55] SUCCESS:[0m Health check 5: Main page accessible (HTTP 200)
+[0;32m[2025-09-28 09:51:55] SUCCESS:[0m Health check 5: API health endpoint accessible (HTTP 200)
+[1;33m[2025-09-28 09:51:55] WARNING:[0m Health check 5: Database connectivity issue (HTTP 500)
+[0;32m[2025-09-28 09:51:55] SUCCESS:[0m Health check 5: Main page accessible (HTTP 200)
+[0;32m[2025-09-28 09:51:55] SUCCESS:[0m Health check 5: API health endpoint accessible (HTTP 200)
+[1;33m[2025-09-28 09:51:55] WARNING:[0m Health check 5: Database connectivity issue (HTTP 500)
+[0;32m[2025-09-28 09:52:00] SUCCESS:[0m Health check 6: Main page accessible (HTTP 200)
+[0;32m[2025-09-28 09:52:00] SUCCESS:[0m Health check 6: API health endpoint accessible (HTTP 200)
+[1;33m[2025-09-28 09:52:00] WARNING:[0m Health check 6: Database connectivity issue (HTTP 500)
+[0;34m[2025-09-28 09:52:00] INFO:[0m Health check summary: 13/18 successful (72%)
+[1;33m[2025-09-28 09:52:00] WARNING:[0m Server has some issues (success rate: 72%)
+[1;33m[2025-09-28 09:52:00] WARNING:[0m Health checks indicate some issues
+[0;34m[2025-09-28 09:52:00] INFO:[0m ⏳ Waiting 3 seconds before retry...
+[0;32m[2025-09-28 09:52:00] SUCCESS:[0m Health check 6: Main page accessible (HTTP 200)
+[0;32m[2025-09-28 09:52:00] SUCCESS:[0m Health check 6: API health endpoint accessible (HTTP 200)
+[1;33m[2025-09-28 09:52:00] WARNING:[0m Health check 6: Database connectivity issue (HTTP 500)
+[0;34m[2025-09-28 09:52:00] INFO:[0m Health check summary: 12/18 successful (66%)
+[1;33m[2025-09-28 09:52:00] WARNING:[0m Server has some issues (success rate: 66%)
+[1;33m[2025-09-28 09:52:00] WARNING:[0m Health checks indicate some issues
+[0;31m[2025-09-28 09:52:00] ERROR:[0m 🚫 Maximum retries reached for health checks. Exiting.
+[0;34m[2025-09-28 09:52:00] INFO:[0m Analyzing logs for errors and issues...
+[1;33m[2025-09-28 09:52:00] WARNING:[0m Found 5 recent errors in logs/errors.log
+[0;34m[2025-09-28 09:52:00] INFO:[0m Recent errors:
+[1;33m[2025-09-28 09:52:00] WARNING:[0m Found 1 startup issues in server_detailed.log
+[0;34m[2025-09-28 09:52:00] INFO:[0m Recent startup issues:
+[1;33m[2025-09-28 09:52:00] WARNING:[0m No route check reports found
+[0;34m[2025-09-28 09:52:00] INFO:[0m Providing troubleshooting tips...
+[0;34m[2025-09-28 09:52:03] INFO:[0m 🔄 Starting retry attempt 2/5
+[0;34m[2025-09-28 09:52:03] INFO:[0m Checking system resources...
+[0;34m[2025-09-28 09:52:03] INFO:[0m Memory usage: 97%
+[1;33m[2025-09-28 09:52:03] WARNING:[0m High memory usage detected (97%)
+[0;34m[2025-09-28 09:52:03] INFO:[0m Disk usage: 62%
+[0;34m[2025-09-28 09:52:03] INFO:[0m Python version: Python 3.9.6
+[0;34m[2025-09-28 09:52:03] INFO:[0m Checking dependencies...
+[0;34m[2025-09-28 09:52:19] INFO:[0m Executing: python3 dev_server.py
+[0;34m[2025-09-28 09:52:19] INFO:[0m Server process started with PID: 42362
+[0;34m[2025-09-28 09:52:19] INFO:[0m Waiting for server to start (max 30 seconds)...
+[0;32m[2025-09-28 09:52:21] SUCCESS:[0m Server started successfully after 2 seconds
+[0;34m[2025-09-28 09:52:21] INFO:[0m Performing health checks...
+[0;32m[2025-09-28 09:52:21] SUCCESS:[0m Health check 1: Main page accessible (HTTP 200)
+[0;32m[2025-09-28 09:52:21] SUCCESS:[0m Health check 1: API health endpoint accessible (HTTP 200)
+[1;33m[2025-09-28 09:52:21] WARNING:[0m Health check 1: Database connectivity issue (HTTP 500)
+[0;32m[2025-09-28 09:52:26] SUCCESS:[0m Health check 2: Main page accessible (HTTP 200)
+[0;32m[2025-09-28 09:52:26] SUCCESS:[0m Health check 2: API health endpoint accessible (HTTP 200)
+[0;32m[2025-09-28 09:52:26] SUCCESS:[0m Health check 2: Database connectivity confirmed (HTTP 200)
+[0;32m[2025-09-28 09:52:31] SUCCESS:[0m Health check 3: Main page accessible (HTTP 200)
+[0;32m[2025-09-28 09:52:31] SUCCESS:[0m Health check 3: API health endpoint accessible (HTTP 200)
+[0;32m[2025-09-28 09:52:31] SUCCESS:[0m Health check 3: Database connectivity confirmed (HTTP 200)
+[0;32m[2025-09-28 09:52:36] SUCCESS:[0m Health check 4: Main page accessible (HTTP 200)
+[0;32m[2025-09-28 09:52:36] SUCCESS:[0m Health check 4: API health endpoint accessible (HTTP 200)
+[0;32m[2025-09-28 09:52:36] SUCCESS:[0m Health check 4: Database connectivity confirmed (HTTP 200)
+[0;32m[2025-09-28 09:52:41] SUCCESS:[0m Health check 5: Main page accessible (HTTP 200)
+[0;32m[2025-09-28 09:52:41] SUCCESS:[0m Health check 5: API health endpoint accessible (HTTP 200)
+[0;32m[2025-09-28 09:52:41] SUCCESS:[0m Health check 5: Database connectivity confirmed (HTTP 200)
+[0;32m[2025-09-28 09:52:46] SUCCESS:[0m Health check 6: Main page accessible (HTTP 200)
+[0;32m[2025-09-28 09:52:46] SUCCESS:[0m Health check 6: API health endpoint accessible (HTTP 200)
+[0;32m[2025-09-28 09:52:46] SUCCESS:[0m Health check 6: Database connectivity confirmed (HTTP 200)
+[0;34m[2025-09-28 09:52:46] INFO:[0m Health check summary: 17/18 successful (94%)
+[0;32m[2025-09-28 09:52:46] SUCCESS:[0m Server is healthy and operational
+[0;32m[2025-09-28 09:52:46] SUCCESS:[0m All health checks passed
+[0;34m[2025-09-28 09:52:46] INFO:[0m 🔍 Checking all available routes...
+[0;34m[2025-09-28 09:52:46] INFO:[0m Testing 23 routes...
+[0;32m[2025-09-28 09:52:46] SUCCESS:[0m ✅ Health Check (GET /api/health) - HTTP 200 (10ms)
+[0;32m[2025-09-28 09:52:46] SUCCESS:[0m ✅ Trading Accounts API (GET /api/trading-accounts/) - HTTP 200 (7ms)
+[0;32m[2025-09-28 09:52:46] SUCCESS:[0m ✅ Trades API (GET /api/trades/) - HTTP 200 (96ms)
+[1;33m[2025-09-28 09:52:46] WARNING:[0m ⚠️ Tickers API (GET /api/tickers/) - HTTP 500 (7ms)
+[0;32m[2025-09-28 09:52:46] SUCCESS:[0m ✅ Trade Plans API (GET /api/trade_plans/) - HTTP 200 (13ms)
+[1;33m[2025-09-28 09:52:46] WARNING:[0m ⚠️ Alerts API (GET /api/alerts/) - HTTP 500 (9ms)
+[0;32m[2025-09-28 09:52:46] SUCCESS:[0m ✅ Cash Flows API (GET /api/cash_flows/) - HTTP 200 (9ms)
+[1;33m[2025-09-28 09:52:46] WARNING:[0m ⚠️ Notes API (GET /api/notes/) - HTTP 500 (7ms)
+[0;32m[2025-09-28 09:52:46] SUCCESS:[0m ✅ Executions API (GET /api/executions/) - HTTP 200 (9ms)
+[1;33m[2025-09-28 09:52:46] WARNING:[0m ⚠️ Currencies API (GET /api/currencies/) - HTTP 500 (8ms)
+[0;32m[2025-09-28 09:52:46] SUCCESS:[0m ✅ Preferences API (GET /api/preferences/) - HTTP 404 (12ms)
+[0;32m[2025-09-28 09:52:46] SUCCESS:[0m ✅ Main Page (GET /) - HTTP 200 (7ms)
+[0;32m[2025-09-28 09:52:46] SUCCESS:[0m ✅ Accounts Page (GET /accounts) - HTTP 200 (8ms)
+[0;32m[2025-09-28 09:52:47] SUCCESS:[0m ✅ Trades Page (GET /trades) - HTTP 200 (10ms)
+[0;32m[2025-09-28 09:52:47] SUCCESS:[0m ✅ Tickers Page (GET /tickers) - HTTP 200 (8ms)
+[0;32m[2025-09-28 09:52:47] SUCCESS:[0m ✅ Planning Page (GET /planning) - HTTP 404 (7ms)
+[0;32m[2025-09-28 09:52:47] SUCCESS:[0m ✅ Alerts Page (GET /alerts) - HTTP 200 (8ms)
+[0;32m[2025-09-28 09:52:47] SUCCESS:[0m ✅ Cash Flows Page (GET /cash_flows) - HTTP 200 (9ms)
+[0;32m[2025-09-28 09:52:47] SUCCESS:[0m ✅ Notes Page (GET /notes) - HTTP 200 (8ms)
+[0;32m[2025-09-28 09:52:47] SUCCESS:[0m ✅ Currencies Page (GET /currencies) - HTTP 404 (7ms)
+[0;32m[2025-09-28 09:52:47] SUCCESS:[0m ✅ Database Page (GET /database) - HTTP 404 (7ms)
+[0;32m[2025-09-28 09:52:47] SUCCESS:[0m ✅ Research Page (GET /research) - HTTP 200 (8ms)
+[0;32m[2025-09-28 09:52:47] SUCCESS:[0m ✅ Designs Page (GET /designs) - HTTP 200 (9ms)
+[0;34m[2025-09-28 09:52:47] INFO:[0m Route check summary: 19/23 successful (82%)
+[1;33m[2025-09-28 09:52:47] WARNING:[0m Failed routes:
+[1;33m[2025-09-28 09:52:47] WARNING:[0m   - Tickers API (GET /api/tickers/) - HTTP 500
+[1;33m[2025-09-28 09:52:47] WARNING:[0m   - Alerts API (GET /api/alerts/) - HTTP 500
+[1;33m[2025-09-28 09:52:47] WARNING:[0m   - Notes API (GET /api/notes/) - HTTP 500
+[1;33m[2025-09-28 09:52:47] WARNING:[0m   - Currencies API (GET /api/currencies/) - HTTP 500
+[0;34m[2025-09-28 09:52:47] INFO:[0m Detailed route report saved to: logs/route_check_20250928_095247.log
+[0;32m[2025-09-28 09:52:47] SUCCESS:[0m Route check passed - 82% of routes are accessible
+[0;32m[2025-09-28 09:52:47] SUCCESS:[0m All route checks passed
+[0;32m[2025-09-28 09:52:47] SUCCESS:[0m ✅ All steps completed successfully on attempt 3
+[0;34m[2025-09-28 09:52:47] INFO:[0m Analyzing logs for errors and issues...
+[1;33m[2025-09-28 09:52:47] WARNING:[0m Found 12 recent errors in logs/errors.log
+[0;34m[2025-09-28 09:52:47] INFO:[0m Recent errors:
+[0;32m[2025-09-28 09:52:47] SUCCESS:[0m No startup issues found in server_detailed.log
+[0;34m[2025-09-28 09:52:47] INFO:[0m Analyzing latest route check report: logs/route_check_20250928_095247.log
+[0;34m[2025-09-28 09:52:47] INFO:[0m Route check results: 19/23 routes successful (82%)
+[0;32m[2025-09-28 09:52:47] SUCCESS:[0m All routes are working properly
+[0;32m[2025-09-28 09:52:47] SUCCESS:[0m === Complete Server Restart Completed Successfully ===
+[0;34m[2025-09-28 09:52:47] INFO:[0m Total startup time: 80 seconds
+[0;34m[2025-09-28 09:52:47] INFO:[0m Total attempts: 3
+[0;34m[2025-09-28 09:52:47] INFO:[0m Server is available at: http://127.0.0.1:8080
+[0;34m[2025-09-28 09:52:47] INFO:[0m Providing troubleshooting tips...

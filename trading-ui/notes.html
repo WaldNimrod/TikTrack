@@ -101,12 +101,8 @@
                         הערות
                     </div>
                     <div class="table-actions">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים וההערות">
-                            <i class="fas fa-copy"></i> העתק לוג מפורט
-                        </button>
-                        <button class="filter-toggle-btn" onclick="toggleSection('top')" title="Show/hide notes area">
-                            <span class="filter-icon">▲</span>
-                        </button>
+                        ${window.createCopyButton ? window.createCopyButton('copyDetailedLog()', 'העתק לוג מפורט עם כל הנתונים וההערות') : '<button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים וההערות"><i class="fas fa-copy"></i> העתק לוג מפורט</button>'}
+                        ${window.createToggleButton ? window.createToggleButton('top', false, 'הצג/הסתר אזור הערות') : '<button class="filter-toggle-btn" onclick="toggleSection(\'top\')" title="Show/hide notes area"><span class="filter-icon">▲</span></button>'}
                     </div>
                 </div>
 
@@ -136,13 +132,8 @@
                         </div>
                         <div class="table-count" id="notesCount">טוען...</div>
                         <div class="table-actions">
-                            <button id="addNoteBtn" class="refresh-btn" onclick="showAddNoteModal()" title="הוסף הערה חדשה">
-                                <img src="images/icons/home.svg" alt="הוסף" class="action-icon">
-                                הוסף
-                            </button>
-                            <button class="filter-toggle-btn" onclick="toggleSection('main')" title="הצג/הסתר אזור ניהול הערות">
-                                <span class="filter-icon">▲</span>
-                            </button>
+                            ${window.createAddButton ? window.createAddButton('notes', 'showAddNoteModal()', 'הוסף הערה חדשה') : '<button id="addNoteBtn" class="refresh-btn" onclick="showAddNoteModal()" title="הוסף הערה חדשה"><img src="images/icons/home.svg" alt="הוסף" class="action-icon"> הוסף</button>'}
+                            ${window.createToggleButton ? window.createToggleButton('main', false, 'הצג/הסתר אזור ניהול הערות') : '<button class="filter-toggle-btn" onclick="toggleSection(\'main\')" title="הצג/הסתר אזור ניהול הערות"><span class="filter-icon">▲</span></button>'}
                         </div>
                     </div>
 
@@ -265,10 +256,8 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-success" onclick="addNote()"
-                            style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">הוסף
-                            הערה</button>
+                        ${window.createFormCancelButton ? window.createFormCancelButton('', 'ביטול') : '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>'}
+                        ${window.createSaveButton ? window.createSaveButton('addNote()', 'הוסף הערה', 'notes') : '<button type="button" class="btn btn-success" onclick="addNote()" style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">הוסף הערה</button>'}
                     </div>
                 </div>
             </div>
@@ -326,10 +315,8 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-success" onclick="updateNote()"
-                            style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">עדכן
-                            הערה</button>
+                        ${window.createFormCancelButton ? window.createFormCancelButton('', 'ביטול') : '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>'}
+                        ${window.createSaveButton ? window.createSaveButton('updateNote()', 'עדכן הערה', 'notes') : '<button type="button" class="btn btn-success" onclick="updateNote()" style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">עדכן הערה</button>'}
                     </div>
                 </div>
             </div>

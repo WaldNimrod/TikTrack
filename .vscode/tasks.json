@@ -1,0 +1,616 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        // ========================================
+        // 🚀 TikTrack Server Management
+        // ========================================
+        {
+            "label": "TT: Start Server",
+            "type": "shell",
+            "command": "cd Backend && python3 app.py",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "rocket",
+                "color": "terminal.ansiGreen"
+            }
+        },
+        {
+            "label": "TT: Start Server (Dev Mode)",
+            "type": "shell",
+            "command": "cd Backend && TIKTRACK_DEV_MODE=true python3 app.py",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "beaker",
+                "color": "terminal.ansiYellow"
+            }
+        },
+        {
+            "label": "TT: Start Server (No Cache)",
+            "type": "shell",
+            "command": "cd Backend && TIKTRACK_CACHE_DISABLED=true python3 app.py",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "debug-disconnect",
+                "color": "terminal.ansiRed"
+            }
+        },
+        {
+            "label": "TT: Stop Server",
+            "type": "shell",
+            "command": "lsof -ti :8080 | xargs kill -9 2>/dev/null || true",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "debug-stop",
+                "color": "terminal.ansiRed"
+            }
+        },
+        {
+            "label": "TT: Restart Server",
+            "type": "shell",
+            "command": "lsof -ti :8080 | xargs kill -9 2>/dev/null || true; sleep 1; cd Backend && python3 app.py",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "refresh",
+                "color": "terminal.ansiCyan"
+            }
+        },
+        {
+            "label": "TT: Clear Cache Full",
+            "type": "shell",
+            "command": "curl -X POST http://localhost:8080/api/cache/clear && rm -rf trading-ui/.cache 2>/dev/null && rm -rf __pycache__ 2>/dev/null && echo '\n✅ Full cache cleared (server + local files)'",
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "flame",
+                "color": "terminal.ansiRed"
+            }
+        },
+        
+        // ========================================
+        // 🧹 TikTrack Cache Management
+        // ========================================
+        {
+            "label": "TT: Clear Cache",
+            "type": "shell",
+            "command": "curl -X POST http://localhost:8080/api/cache/clear && echo '\n✅ Cache cleared successfully'",
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "trash",
+                "color": "terminal.ansiYellow"
+            }
+        },
+        {
+            "label": "TT: Cache Status",
+            "type": "shell",
+            "command": "curl -s http://localhost:8080/api/cache/stats | python3 -m json.tool",
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "info",
+                "color": "terminal.ansiBlue"
+            }
+        },
+        
+        // ========================================
+        // 🏥 TikTrack System Health
+        // ========================================
+        {
+            "label": "TT: System Health",
+            "type": "shell",
+            "command": "curl -s http://localhost:8080/api/system/health | python3 -m json.tool",
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "pulse",
+                "color": "terminal.ansiGreen"
+            }
+        },
+        {
+            "label": "TT: Server Status (New)",
+            "type": "shell",
+            "command": "curl -s http://localhost:8080/api/server/status | python3 -m json.tool",
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "server-process",
+                "color": "terminal.ansiCyan"
+            }
+        },
+        {
+            "label": "TT: System Overview",
+            "type": "shell",
+            "command": "curl -s http://localhost:8080/api/system/overview | python3 -m json.tool",
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "graph",
+                "color": "terminal.ansiBlue"
+            }
+        },
+        {
+            "label": "TT: System Alerts",
+            "type": "shell",
+            "command": "curl -s http://localhost:8080/api/system/alerts | python3 -m json.tool",
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "bell",
+                "color": "terminal.ansiYellow"
+            }
+        },
+        {
+            "label": "TT: Server Status",
+            "type": "shell",
+            "command": "lsof -i :8080 || echo 'Server is not running'",
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "server",
+                "color": "terminal.ansiCyan"
+            }
+        },
+        
+        // ========================================
+        // 📝 TikTrack Logs (Unified System)
+        // ========================================
+        {
+            "label": "TT: View App Logs",
+            "type": "shell",
+            "command": "tail -f Backend/logs/app.log",
+            "group": "none",
+            "isBackground": true,
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "file-text",
+                "color": "terminal.ansiBlue"
+            }
+        },
+        {
+            "label": "TT: View Error Logs",
+            "type": "shell",
+            "command": "tail -f Backend/logs/errors.log",
+            "group": "none",
+            "isBackground": true,
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "error",
+                "color": "terminal.ansiRed"
+            }
+        },
+        {
+            "label": "TT: View Performance Logs",
+            "type": "shell",
+            "command": "tail -f Backend/logs/performance.log",
+            "group": "none",
+            "isBackground": true,
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "graph-line",
+                "color": "terminal.ansiGreen"
+            }
+        },
+        {
+            "label": "TT: View Cache Logs",
+            "type": "shell",
+            "command": "tail -f Backend/logs/cache.log",
+            "group": "none",
+            "isBackground": true,
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "database",
+                "color": "terminal.ansiYellow"
+            }
+        },
+        {
+            "label": "TT: View Database Logs",
+            "type": "shell",
+            "command": "tail -f Backend/logs/database.log",
+            "group": "none",
+            "isBackground": true,
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "server",
+                "color": "terminal.ansiMagenta"
+            }
+        },
+        {
+            "label": "TT: View All Logs (API)",
+            "type": "shell",
+            "command": "curl -s http://localhost:8080/api/logs/raw/app/tail?lines=50 | python3 -m json.tool",
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "cloud",
+                "color": "terminal.ansiCyan"
+            }
+        },
+        
+        // ========================================
+        // 🗄️ TikTrack Database
+        // ========================================
+        {
+            "label": "TT: Database Backup",
+            "type": "shell",
+            "command": "cp Backend/db/simpleTrade_new.db Backend/backups/backup_$(date +%Y%m%d_%H%M%S).db && echo '✅ Backup created successfully'",
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "database",
+                "color": "terminal.ansiMagenta"
+            }
+        },
+        {
+            "label": "TT: Database Status",
+            "type": "shell",
+            "command": "ls -lh Backend/db/simpleTrade_new.db && echo '\n' && sqlite3 Backend/db/simpleTrade_new.db 'SELECT COUNT(*) as ticker_count FROM tickers;'",
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "graph",
+                "color": "terminal.ansiCyan"
+            }
+        },
+        
+        // ========================================
+        // 🌐 TikTrack External Data
+        // ========================================
+        {
+            "label": "TT: External Data Status",
+            "type": "shell",
+            "command": "curl -s http://localhost:8080/api/external-data/status/ | python3 -m json.tool",
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "globe",
+                "color": "terminal.ansiGreen"
+            }
+        },
+        {
+            "label": "TT: Refresh External Data",
+            "type": "shell",
+            "command": "curl -X POST http://localhost:8080/api/external-data/refresh && echo '\n✅ External data refresh initiated'",
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "sync",
+                "color": "terminal.ansiBlue"
+            }
+        },
+        {
+            "label": "TT: Test Yahoo Finance",
+            "type": "shell",
+            "command": "curl -s http://localhost:8080/api/external-data/test/yahoo | python3 -m json.tool",
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "beaker",
+                "color": "terminal.ansiYellow"
+            }
+        },
+        
+        // ========================================
+        // 🔧 TikTrack Dashboards
+        // ========================================
+        {
+            "label": "TT: Open Server Monitor",
+            "type": "shell",
+            "command": "open http://localhost:8080/server-monitor",
+            "group": "none",
+            "presentation": {
+                "reveal": "silent",
+                "panel": "shared",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": false
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "dashboard",
+                "color": "terminal.ansiGreen"
+            }
+        },
+        {
+            "label": "TT: Open System Management",
+            "type": "shell",
+            "command": "open http://localhost:8080/system-management",
+            "group": "none",
+            "presentation": {
+                "reveal": "silent",
+                "panel": "shared",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": false
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "tools",
+                "color": "terminal.ansiBlue"
+            }
+        },
+        
+        // ========================================
+        // 🚀 TikTrack Quick Actions
+        // ========================================
+        {
+            "label": "TT: Quick Start + Monitor",
+            "type": "shell",
+            "command": "cd Backend && python3 app.py & sleep 3 && open http://localhost:8080/server-monitor",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "zap",
+                "color": "terminal.ansiYellow"
+            }
+        },
+        {
+            "label": "TT: Full System Check",
+            "type": "shell",
+            "command": "echo '🔍 Checking Server Status...' && lsof -i :8080 && echo '\n🏥 Checking Health...' && curl -s http://localhost:8080/api/system/health | python3 -m json.tool && echo '\n🧹 Checking Cache...' && curl -s http://localhost:8080/api/cache/stats | python3 -m json.tool && echo '\n📊 Checking Server Status (New)...' && curl -s http://localhost:8080/api/server/status | python3 -m json.tool && echo '\n🌐 Checking External Data...' && curl -s http://localhost:8080/api/external-data/status/ | python3 -m json.tool",
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "checklist",
+                "color": "terminal.ansiGreen"
+            }
+        },
+        {
+            "label": "TT: Advanced System Check",
+            "type": "shell",
+            "command": "echo '🔍 Advanced System Check...' && echo '\n📊 System Overview:' && curl -s http://localhost:8080/api/system/overview | python3 -m json.tool && echo '\n🚨 System Alerts:' && curl -s http://localhost:8080/api/system/alerts | python3 -m json.tool && echo '\n📝 Recent Logs:' && curl -s http://localhost:8080/api/logs/raw/app/tail?lines=10 | python3 -m json.tool",
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "search",
+                "color": "terminal.ansiBlue"
+            }
+        },
+        
+        // ========================================
+        // 🔨 TikTrack Build Tools
+        // ========================================
+        {
+            "label": "TT: Build & Bust Cache",
+            "type": "shell",
+            "command": "./build-tools/cache-buster.sh",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "package",
+                "color": "terminal.ansiMagenta"
+            }
+        }
+    ]
+}

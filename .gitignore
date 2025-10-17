@@ -1,1 +1,26 @@
+# Log files (data only, not code)
+*.log
+logs/
 .logs/
+Backend/logs/
+
+# Backup files (not needed in git)
+*.tar.gz
+*_backup_*
+backup/
+
+# Node modules (if any)
+node_modules/
+
+# IDE files
+.vscode/settings.json
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Database files (too large for git)
+*.db
+*.sqlite
+*.sqlite3

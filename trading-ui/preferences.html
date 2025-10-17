@@ -1055,6 +1055,11 @@
     <script>
         // Make the local copyDetailedLog function available globally for this page only
         window.copyDetailedLog = copyDetailedLog;
+
+        // Unified initialization - UI Standardization Round C
+        if (window.unifiedAppInitializer) {
+            window.unifiedAppInitializer.initialize();
+        }
     </script>
 </body>
 </html>

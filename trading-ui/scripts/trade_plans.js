@@ -1314,21 +1314,34 @@ function updateTradePlansTable(trade_plans) {
             ${sideDisplay}
           </span>
         </td>
-        <td>
+        <td class="quantity-cell">
           <span class="numeric-value-positive" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
-            ${amountDisplay}
+            ${design.quantity || 'לא מוגדר'}
           </span>
         </td>
-        <td class="target-cell"><span class="target-text" style="color: ${window.getTableColors ? window.getTableColors().positive : '#28a745'};">${targetDisplay}</span></td>
-        <td class="stop-cell"><span class="stop-text" style="color: ${window.getTableColors ? window.getTableColors().negative : '#dc3545'};">${stopDisplay}</span></td>
-        <td>
-          <span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
-            ${currentDisplay}
+        <td class="price-cell">
+          <span class="target-text" style="color: ${window.getTableColors ? window.getTableColors().positive : '#28a745'};">
+            ${targetDisplay}
+          </span>
+        </td>
+        <td class="investment-cell">
+          <span class="numeric-value-positive" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
+            ${amountDisplay}
           </span>
         </td>
         <td class="status-cell" data-status="${statusForFilter}">
           <span class="status-${design.status}-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
             ${statusDisplay}
+          </span>
+        </td>
+        <td class="profit-cell">
+          <span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
+            ${currentDisplay}
+          </span>
+        </td>
+        <td class="notes-cell">
+          <span class="text-muted" style="font-size: 0.85em;">
+            ${design.notes || 'אין הערות'}
           </span>
         </td>
         <td class="actions-cell">
@@ -1343,7 +1356,7 @@ function updateTradePlansTable(trade_plans) {
     `;
     } catch (error) {
       console.error(`❌ Error processing design ${index + 1}:`, error);
-      return `<tr><td colspan="10" class="text-center text-danger">שגיאה בעיבוד תכנון ${index + 1}</td></tr>`;
+      return `<tr><td colspan="11" class="text-center text-danger">שגיאה בעיבוד תכנון ${index + 1}</td></tr>`;
     }
   }).join('');
 
@@ -2639,6 +2652,15 @@ function filterTradePlansLocally(data, statuses, types, dateRange, searchTerm) {
 // Initialize trade plans page - integrated with unified system
 window.initializeTradePlansPage = async function() {
   console.log('📋 Trade plans page initialized via unified system');
+
+  // Initialize Cache Manager if not already initialized
+  if (typeof window.UnifiedCacheManager !== 'undefined' && typeof window.UnifiedCacheManager.initialize === 'function') {
+    try {
+      await window.UnifiedCacheManager.initialize();
+    } catch (error) {
+      console.log('⚠️ Cache Manager initialization failed:', error);
+    }
+  }
 
   // Restoring section state
   if (typeof window.restoreAllSectionStates === 'function') {

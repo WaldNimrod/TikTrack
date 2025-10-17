@@ -1,5 +1,0 @@
-./restart-v3/test-robust-solution.sh: line 52: setsid: command not found
-Traceback (most recent call last):
-  File "<string>", line 1, in <module>
-Exception: Test error
-Starting error test...

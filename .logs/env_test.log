@@ -1,5 +1,0 @@
-./restart-v3/test-robust-solution.sh: line 52: setsid: command not found
-  File "<string>", line 1
-    import os; print(f"TEST_VAR: {os.environ.get("TEST_VAR", "not found")}")
-                                                  ^
-SyntaxError: f-string: unmatched '('

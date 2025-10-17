@@ -20754,3 +20754,139 @@ FROM trade_plans LEFT OUTER JOIN trading_accounts AS trading_accounts_1 ON tradi
 2025-10-17 18:27:28,751 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
 2025-10-17 18:27:28,751 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
 2025-10-17 18:27:28,751 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 18:27:28] "GET /api/system/alerts HTTP/1.1" 200 -
+2025-10-17 18:28:25,709 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-17T18:28:25.709716', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/api/system/settings/primaryDataProvider', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-17 18:28:25,710 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-17T18:28:25.709716', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/api/system/settings/primaryDataProvider', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-17 18:28:25,710 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 18:28:25] "[33mGET /api/system/settings/primaryDataProvider HTTP/1.1[0m" 404 -
+2025-10-17 18:28:25,713 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.000s - Success: True
+2025-10-17 18:28:25,714 - cache - INFO - Cache SET: health_check_1760714905 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 18:28:25,714 - cache - INFO - Cache HIT: health_check_1760714905 (Access count: 1)
+2025-10-17 18:28:25,714 - cache - INFO - Cache DELETE: health_check_1760714905 (Was accessed 1 times)
+2025-10-17 18:28:25,714 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.001s - Success: True
+2025-10-17 18:28:25,715 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 18:28:25,715 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 18:28:26,718 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.001s - Success: True
+2025-10-17 18:28:26,718 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.001s
+2025-10-17 18:28:26,721 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.003s - Success: True
+2025-10-17 18:28:26,722 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.001s - Success: True
+2025-10-17 18:28:26,722 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 18:28:26,740 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 18:28:26] "GET /api/system/overview HTTP/1.1" 200 -
+2025-10-17 18:28:26,748 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 18:28:26] "GET /api/system/external-data HTTP/1.1" 200 -
+2025-10-17 18:28:26,748 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 18:28:26] "GET /api/system/backup/list HTTP/1.1" 200 -
+2025-10-17 18:28:26,749 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.003s - Success: True
+2025-10-17 18:28:26,750 - cache - INFO - Cache SET: health_check_1760714906 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 18:28:26,750 - cache - INFO - Cache HIT: health_check_1760714906 (Access count: 1)
+2025-10-17 18:28:26,750 - cache - INFO - Cache DELETE: health_check_1760714906 (Was accessed 1 times)
+2025-10-17 18:28:26,750 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.001s - Success: True
+2025-10-17 18:28:26,752 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.001s - Success: True
+2025-10-17 18:28:26,752 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 18:28:26] "GET /api/system/external-data HTTP/1.1" 200 -
+2025-10-17 18:28:26,752 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 18:28:27,758 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.005s - Success: True
+2025-10-17 18:28:27,758 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.005s
+2025-10-17 18:28:27,760 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.001s - Success: True
+2025-10-17 18:28:27,760 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-17 18:28:27,760 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 18:28:27,760 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 18:28:27] "GET /api/system/alerts HTTP/1.1" 200 -
+2025-10-17 18:28:27,762 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.000s - Success: True
+2025-10-17 18:28:27,762 - cache - INFO - Cache SET: health_check_1760714907 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 18:28:27,762 - cache - INFO - Cache HIT: health_check_1760714907 (Access count: 1)
+2025-10-17 18:28:27,762 - cache - INFO - Cache DELETE: health_check_1760714907 (Was accessed 1 times)
+2025-10-17 18:28:27,762 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-10-17 18:28:27,763 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 18:28:27,763 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 18:28:28,763 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.001s - Success: True
+2025-10-17 18:28:28,764 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.001s
+2025-10-17 18:28:28,765 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.001s - Success: True
+2025-10-17 18:28:28,766 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-17 18:28:28,766 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 18:28:28,766 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 18:28:28] "GET /api/system/alerts HTTP/1.1" 200 -
+2025-10-17 18:29:25,713 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-17T18:29:25.712864', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/api/system/settings/primaryDataProvider', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-17 18:29:25,713 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-17T18:29:25.712864', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/api/system/settings/primaryDataProvider', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-17 18:29:25,714 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 18:29:25] "[33mGET /api/system/settings/primaryDataProvider HTTP/1.1[0m" 404 -
+2025-10-17 18:29:25,719 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+2025-10-17 18:29:25,719 - cache - INFO - Cache SET: health_check_1760714965 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 18:29:25,719 - cache - INFO - Cache HIT: health_check_1760714965 (Access count: 1)
+2025-10-17 18:29:25,719 - cache - INFO - Cache DELETE: health_check_1760714965 (Was accessed 1 times)
+2025-10-17 18:29:25,720 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.001s - Success: True
+2025-10-17 18:29:25,721 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 18:29:25,721 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 18:29:26,725 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.003s - Success: True
+2025-10-17 18:29:26,725 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.003s
+2025-10-17 18:29:26,727 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.002s - Success: True
+2025-10-17 18:29:26,727 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-17 18:29:26,727 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 18:29:26,737 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 18:29:26] "GET /api/system/overview HTTP/1.1" 200 -
+2025-10-17 18:29:26,743 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 18:29:26] "GET /api/system/external-data HTTP/1.1" 200 -
+2025-10-17 18:29:26,743 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 18:29:26] "GET /api/system/backup/list HTTP/1.1" 200 -
+2025-10-17 18:29:26,744 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.002s - Success: True
+2025-10-17 18:29:26,744 - cache - INFO - Cache SET: health_check_1760714966 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 18:29:26,744 - cache - INFO - Cache HIT: health_check_1760714966 (Access count: 1)
+2025-10-17 18:29:26,745 - cache - INFO - Cache DELETE: health_check_1760714966 (Was accessed 1 times)
+2025-10-17 18:29:26,745 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-10-17 18:29:26,745 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 18:29:26,745 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 18:29:26,745 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 18:29:26] "GET /api/system/external-data HTTP/1.1" 200 -
+2025-10-17 18:29:27,749 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.004s - Success: True
+2025-10-17 18:29:27,749 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.004s
+2025-10-17 18:29:27,751 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.002s - Success: True
+2025-10-17 18:29:27,752 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-17 18:29:27,752 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 18:29:27,752 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 18:29:27] "GET /api/system/alerts HTTP/1.1" 200 -
+2025-10-17 18:29:27,755 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.000s - Success: True
+2025-10-17 18:29:27,755 - cache - INFO - Cache SET: health_check_1760714967 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 18:29:27,755 - cache - INFO - Cache HIT: health_check_1760714967 (Access count: 1)
+2025-10-17 18:29:27,755 - cache - INFO - Cache DELETE: health_check_1760714967 (Was accessed 1 times)
+2025-10-17 18:29:27,756 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.001s - Success: True
+2025-10-17 18:29:27,756 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 18:29:27,756 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 18:29:28,762 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.006s - Success: True
+2025-10-17 18:29:28,762 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.006s
+2025-10-17 18:29:28,764 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.002s - Success: True
+2025-10-17 18:29:28,764 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-17 18:29:28,764 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 18:29:28,765 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 18:29:28] "GET /api/system/alerts HTTP/1.1" 200 -
+2025-10-17 18:30:25,711 - utils.rate_limiter - INFO - Rate limiter cleanup: removed 0 empty entries
+2025-10-17 18:30:25,712 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-17T18:30:25.712423', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/api/system/settings/primaryDataProvider', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-17 18:30:25,713 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-17T18:30:25.712423', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/api/system/settings/primaryDataProvider', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-17 18:30:25,713 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 18:30:25] "[33mGET /api/system/settings/primaryDataProvider HTTP/1.1[0m" 404 -
+2025-10-17 18:30:25,718 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+2025-10-17 18:30:25,719 - cache - INFO - Cache SET: health_check_1760715025 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 18:30:25,720 - cache - INFO - Cache HIT: health_check_1760715025 (Access count: 1)
+2025-10-17 18:30:25,720 - cache - INFO - Cache DELETE: health_check_1760715025 (Was accessed 1 times)
+2025-10-17 18:30:25,720 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.001s - Success: True
+2025-10-17 18:30:25,720 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 18:30:25,720 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 18:30:26,726 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.006s - Success: True
+2025-10-17 18:30:26,727 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.006s
+2025-10-17 18:30:26,730 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.003s - Success: True
+2025-10-17 18:30:26,730 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.001s - Success: True
+2025-10-17 18:30:26,731 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 18:30:26,749 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 18:30:26] "GET /api/system/overview HTTP/1.1" 200 -
+2025-10-17 18:30:26,755 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 18:30:26] "GET /api/system/external-data HTTP/1.1" 200 -
+2025-10-17 18:30:26,756 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.002s - Success: True
+2025-10-17 18:30:26,756 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 18:30:26] "GET /api/system/backup/list HTTP/1.1" 200 -
+2025-10-17 18:30:26,757 - cache - INFO - Cache SET: health_check_1760715026 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 18:30:26,757 - cache - INFO - Cache HIT: health_check_1760715026 (Access count: 1)
+2025-10-17 18:30:26,757 - cache - INFO - Cache DELETE: health_check_1760715026 (Was accessed 1 times)
+2025-10-17 18:30:26,757 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-10-17 18:30:26,758 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 18:30:26,758 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 18:30:26,760 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 18:30:26] "GET /api/system/external-data HTTP/1.1" 200 -
+2025-10-17 18:30:27,764 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.006s - Success: True
+2025-10-17 18:30:27,765 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.006s
+2025-10-17 18:30:27,769 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.004s - Success: True
+2025-10-17 18:30:27,771 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.002s - Success: True
+2025-10-17 18:30:27,772 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 18:30:27,772 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 18:30:27] "GET /api/system/alerts HTTP/1.1" 200 -
+2025-10-17 18:30:27,776 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+2025-10-17 18:30:27,777 - cache - INFO - Cache SET: health_check_1760715027 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-17 18:30:27,777 - cache - INFO - Cache HIT: health_check_1760715027 (Access count: 1)
+2025-10-17 18:30:27,777 - cache - INFO - Cache DELETE: health_check_1760715027 (Was accessed 1 times)
+2025-10-17 18:30:27,777 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-10-17 18:30:27,777 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-17 18:30:27,777 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-17 18:30:28,784 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.006s - Success: True
+2025-10-17 18:30:28,784 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.006s
+2025-10-17 18:30:28,788 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.004s - Success: True
+2025-10-17 18:30:28,789 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.001s - Success: True
+2025-10-17 18:30:28,789 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-17 18:30:28,790 - werkzeug - INFO - 127.0.0.1 - - [17/Oct/2025 18:30:28] "GET /api/system/alerts HTTP/1.1" 200 -

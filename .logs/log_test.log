@@ -1,2 +1,0 @@
-./restart-v3/test-robust-solution.sh: line 52: setsid: command not found
-Test message for log writing

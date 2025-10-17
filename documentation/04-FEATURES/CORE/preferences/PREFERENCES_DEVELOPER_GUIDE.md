@@ -15,8 +15,9 @@
 4. [מחיקת preference type](#מחיקת-preference-type)
 5. [הוספת קבוצה חדשה](#הוספת-קבוצה-חדשה)
 6. [סוגי נתונים נתמכים](#סוגי-נתונים-נתמכים)
-7. [Best Practices](#best-practices)
-8. [Troubleshooting](#troubleshooting)
+7. [אינטגרציה עם UnifiedCacheManager](#אינטגרציה-עם-unifiedcachemanager)
+8. [Best Practices](#best-practices)
+9. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -807,6 +808,45 @@ curl -X POST http://localhost:8080/api/preferences/user/single \
 # קבלת כל סוגי ההעדפות (admin)
 curl "http://localhost:8080/api/preferences/admin/types"
 ```
+
+---
+
+## 🔄 אינטגרציה עם UnifiedCacheManager
+
+### סקירה כללית
+
+מערכת ההעדפות משתמשת ב-UnifiedCacheManager לניהול מטמון יעיל וסינכרון עם Backend.
+
+### שימוש במטמון
+
+```javascript
+// קבלת העדפה עם מטמון
+const preference = await window.getPreference('preferenceName');
+
+// שמירת העדפה עם עדכון מטמון
+await window.savePreference('preferenceName', 'value');
+
+// ניקוי מטמון
+await window.clearPreferencesCache();
+```
+
+### CacheSyncManager
+
+המערכת משתמשת ב-CacheSyncManager לסינכרון אוטומטי עם Backend:
+
+```javascript
+// סינכרון אוטומטי אחרי שמירה
+if (window.CacheSyncManager) {
+    await window.CacheSyncManager.invalidate(['preferences', 'user_preferences']);
+}
+```
+
+### יתרונות
+
+- **ביצועים משופרים**: מטמון 4-שכבתי (Memory, localStorage, IndexedDB, Backend)
+- **סינכרון אוטומטי**: עדכונים אוטומטיים בין Frontend ל-Backend
+- **ניהול זיכרון**: אופטימיזציה אוטומטית של זיכרון
+- **עמידות**: fallback אוטומטי במקרה של כשל
 
 ---
 

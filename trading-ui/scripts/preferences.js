@@ -11,53 +11,7 @@
 
 // ===== GLOBAL PREFERENCES SYSTEM =====
 
-// Global preferences cache - Updated to use Unified Cache Manager
-window.preferencesCache = {
-    data: {},
-    timestamp: null,
-    ttl: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
-    isValid: function() {
-        if (!this.timestamp) return false;
-        return (Date.now() - this.timestamp) < this.ttl;
-    },
-    set: async function(data) {
-        this.data = data;
-        this.timestamp = Date.now();
-        
-        // שמירה במטמון מאוחד
-        if (window.UnifiedCacheManager) {
-            await window.UnifiedCacheManager.save('user-preferences', data, {
-                syncToBackend: true
-            });
-        }
-    },
-    get: async function() {
-        if (this.isValid()) return this.data;
-        
-        // טעינה ממטמון מאוחד
-        if (window.UnifiedCacheManager) {
-            const cachedData = await window.UnifiedCacheManager.get('user-preferences', {
-                fallback: () => this.data
-            });
-            if (cachedData) {
-                this.data = cachedData;
-                this.timestamp = Date.now();
-                return cachedData;
-            }
-        }
-        
-        return null;
-    },
-    clear: async function() {
-        this.data = {};
-        this.timestamp = null;
-        
-        // ניקוי ממטמון מאוחד
-        if (window.UnifiedCacheManager) {
-            await window.UnifiedCacheManager.remove('user-preferences');
-        }
-    }
-};
+// Global preferences cache - Now using UnifiedCacheManager directly
 
 // ===== PAGINATION PREFERENCES =====
 
@@ -118,10 +72,12 @@ window.getPreference = async function(preferenceName, userId = null, profileId =
         console.log(`🔍 Getting preference: ${preferenceName} for user: ${userId}`);
         
         // בדיקת מטמון
-        const cached = await window.preferencesCache.get();
-        if (cached && cached[preferenceName] !== undefined) {
-            console.log(`✅ Cache hit for ${preferenceName}:`, cached[preferenceName]);
-            return cached[preferenceName];
+        if (window.UnifiedCacheManager) {
+            const cached = await window.UnifiedCacheManager.get('user-preferences');
+            if (cached && cached[preferenceName] !== undefined) {
+                console.log(`✅ Cache hit for ${preferenceName}:`, cached[preferenceName]);
+                return cached[preferenceName];
+            }
         }
         
         // שאילתה לשרת
@@ -138,10 +94,13 @@ window.getPreference = async function(preferenceName, userId = null, profileId =
             console.log(`✅ Retrieved ${preferenceName}:`, value);
             
             // עדכון מטמון רק אם זמין
-            if (cached && window.preferencesCache) {
-                cached[preferenceName] = value;
+            if (window.UnifiedCacheManager) {
                 try {
-                    await window.preferencesCache.set(cached);
+                    const cached = await window.UnifiedCacheManager.get('user-preferences') || {};
+                    cached[preferenceName] = value;
+                    await window.UnifiedCacheManager.save('user-preferences', cached, {
+                        syncToBackend: true
+                    });
                 } catch (cacheError) {
                     console.warn('⚠️ Could not update preferences cache:', cacheError.message);
                 }
@@ -173,10 +132,12 @@ window.getGroupPreferences = async function(groupName, userId = 1, profileId = n
         console.log(`🔍 Getting group preferences: ${groupName}`);
         
         // בדיקת מטמון
-        const cached = await window.preferencesCache.get();
-        if (cached && cached[`group_${groupName}`]) {
-            console.log(`✅ Cache hit for group ${groupName}`);
-            return cached[`group_${groupName}`];
+        if (window.UnifiedCacheManager) {
+            const cached = await window.UnifiedCacheManager.get('user-preferences');
+            if (cached && cached[`group_${groupName}`]) {
+                console.log(`✅ Cache hit for group ${groupName}`);
+                return cached[`group_${groupName}`];
+            }
         }
         
         // שאילתה לשרת
@@ -193,9 +154,16 @@ window.getGroupPreferences = async function(groupName, userId = 1, profileId = n
             console.log(`✅ Retrieved group ${groupName}:`, preferences);
             
             // עדכון מטמון
-            if (cached) {
-                cached[`group_${groupName}`] = preferences;
-                await window.preferencesCache.set(cached);
+            if (window.UnifiedCacheManager) {
+                try {
+                    const cached = await window.UnifiedCacheManager.get('user-preferences') || {};
+                    cached[`group_${groupName}`] = preferences;
+                    await window.UnifiedCacheManager.save('user-preferences', cached, {
+                        syncToBackend: true
+                    });
+                } catch (cacheError) {
+                    console.warn('⚠️ Could not update preferences cache:', cacheError.message);
+                }
             }
             
             return {
@@ -236,7 +204,10 @@ window.getPreferencesByNames = async function(preferenceNames, userId = null, pr
         console.log(`🔍 Getting multiple preferences:`, preferenceNames, `for user: ${userId}`);
         
         // בדיקת מטמון
-        const cached = await window.preferencesCache.get();
+        let cached = null;
+        if (window.UnifiedCacheManager) {
+            cached = await window.UnifiedCacheManager.get('user-preferences');
+        }
         const missingFromCache = preferenceNames.filter(name => !cached || cached[name] === undefined);
         
         if (missingFromCache.length === 0 && cached) {
@@ -267,9 +238,16 @@ window.getPreferencesByNames = async function(preferenceNames, userId = null, pr
             console.log(`✅ Retrieved multiple preferences:`, preferences);
             
             // עדכון מטמון
-            if (cached) {
-                Object.assign(cached, preferences);
-                await window.preferencesCache.set(cached);
+            if (window.UnifiedCacheManager) {
+                try {
+                    const cached = await window.UnifiedCacheManager.get('user-preferences') || {};
+                    Object.assign(cached, preferences);
+                    await window.UnifiedCacheManager.save('user-preferences', cached, {
+                        syncToBackend: true
+                    });
+                } catch (cacheError) {
+                    console.warn('⚠️ Could not update preferences cache:', cacheError.message);
+                }
             }
             
             return preferences;
@@ -293,10 +271,12 @@ window.getAllUserPreferences = async function(userId = 1, profileId = null) {
         console.log(`🔍 Getting all user preferences for user ${userId}, profile: ${profileId || 'active'}`);
         
         // בדיקת מטמון - רק אם לא ביקשנו טעינה מחדש
-        const cached = await window.preferencesCache.get();
-        if (cached && Object.keys(cached).length > 0) {
-            console.log(`✅ All preferences found in cache`);
-            return cached;
+        if (window.UnifiedCacheManager) {
+            const cached = await window.UnifiedCacheManager.get('user-preferences');
+            if (cached && Object.keys(cached).length > 0) {
+                console.log(`✅ All preferences found in cache`);
+                return cached;
+            }
         }
         
         console.log(`🔄 Cache is empty, fetching fresh data from server...`);
@@ -319,7 +299,15 @@ window.getAllUserPreferences = async function(userId = 1, profileId = null) {
             console.log(`📂 Server returned profile_id: ${serverProfileId}`);
 
             // עדכון מטמון
-            await window.preferencesCache.set(preferences);
+            if (window.UnifiedCacheManager) {
+                try {
+                    await window.UnifiedCacheManager.save('user-preferences', preferences, {
+                        syncToBackend: true
+                    });
+                } catch (cacheError) {
+                    console.warn('⚠️ Could not update preferences cache:', cacheError.message);
+                }
+            }
             
             // אם השרת החזיר profile_id, נשתמש בו
             if (serverProfileId && !profileId) {
@@ -392,9 +380,26 @@ window.savePreference = async function(preferenceName, value, userId = 1, profil
             console.log(`✅ Saved preference: ${preferenceName}`);
             
             // עדכון מטמון
-            const cached = await window.preferencesCache.get() || {};
-            cached[preferenceName] = value;
-            await window.preferencesCache.set(cached);
+            if (window.UnifiedCacheManager) {
+                try {
+                    const cached = await window.UnifiedCacheManager.get('user-preferences') || {};
+                    cached[preferenceName] = value;
+                    await window.UnifiedCacheManager.save('user-preferences', cached, {
+                        syncToBackend: true
+                    });
+                } catch (cacheError) {
+                    console.warn('⚠️ Could not update preferences cache:', cacheError.message);
+                }
+            }
+            
+            // סינכרון עם Backend Cache
+            if (window.CacheSyncManager) {
+                try {
+                    await window.CacheSyncManager.invalidate(['preferences', 'user_preferences']);
+                } catch (syncError) {
+                    console.warn('⚠️ Could not sync cache with backend:', syncError.message);
+                }
+            }
             
             return true;
       } else {
@@ -436,7 +441,22 @@ window.savePreferences = async function(preferences, userId = 1, profileId = nul
                 console.log(`✅ Saved multiple preferences:`, result);
                 
                 // עדכון מטמון - נקה מטמון כדי לטעון מחדש מהשרת
-                await window.preferencesCache.clear();
+                if (window.UnifiedCacheManager) {
+                    try {
+                        await window.UnifiedCacheManager.remove('user-preferences');
+                    } catch (cacheError) {
+                        console.warn('⚠️ Could not clear preferences cache:', cacheError.message);
+                    }
+                }
+                
+                // סינכרון עם Backend Cache
+                if (window.CacheSyncManager) {
+                    try {
+                        await window.CacheSyncManager.invalidate(['preferences', 'user_preferences']);
+                    } catch (syncError) {
+                        console.warn('⚠️ Could not sync cache with backend:', syncError.message);
+                    }
+                }
                 
                 return true;
       } else {
@@ -485,7 +505,13 @@ window.getUserProfiles = async function(userId = 1) {
  */
 window.clearPreferencesCache = async function() {
     console.log(`🗑️ Clearing preferences cache`);
-    await window.preferencesCache.clear();
+    if (window.UnifiedCacheManager) {
+        try {
+            await window.UnifiedCacheManager.remove('user-preferences');
+        } catch (cacheError) {
+            console.warn('⚠️ Could not clear preferences cache:', cacheError.message);
+        }
+    }
 };
 
 /**
@@ -548,9 +574,13 @@ window.loadPreferences = async function(userId = 1, profileId = null) {
         console.log(`📂 Loading preferences from system... (user: ${userId}, profile: ${profileId})`);
         
         // Clear cache to ensure fresh data
-        if (window.preferencesCache && window.preferencesCache.clear) {
+        if (window.UnifiedCacheManager) {
             console.log('🗑️ Clearing preferences cache before loading...');
-            await window.preferencesCache.clear();
+            try {
+                await window.UnifiedCacheManager.remove('user-preferences');
+            } catch (cacheError) {
+                console.warn('⚠️ Could not clear preferences cache:', cacheError.message);
+            }
         }
         
         // אם לא צוין profileId, נטען את הפרופיל הפעיל
@@ -1018,7 +1048,13 @@ window.switchProfile = async function(profileId) {
             const result = await response.json();
             if (result.success || result.data) {
                 // נקה מטמון וטען מחדש
-                await window.preferencesCache.clear();
+                if (window.UnifiedCacheManager) {
+                    try {
+                        await window.UnifiedCacheManager.remove('user-preferences');
+                    } catch (cacheError) {
+                        console.warn('⚠️ Could not clear preferences cache:', cacheError.message);
+                    }
+                }
                 // Preferences will be reloaded by the calling function
                 
                 console.log('✅ Profile switched successfully');
@@ -1134,8 +1170,12 @@ window.saveAsActiveProfile = async function() {
                     
                     // Step 2: Clear all caches using global cache clearing system
                     console.log('🗑️ Clearing all caches using global system...');
-                    if (window.preferencesCache && window.preferencesCache.clear) {
-                        await window.preferencesCache.clear();
+                    if (window.UnifiedCacheManager) {
+                        try {
+                            await window.UnifiedCacheManager.remove('user-preferences');
+                        } catch (cacheError) {
+                            console.warn('⚠️ Could not clear preferences cache:', cacheError.message);
+                        }
                     }
                     
                     // Clear other system caches if available
@@ -1143,23 +1183,10 @@ window.saveAsActiveProfile = async function() {
                         window.clearGlobalCache('preferences', 'full');
                     }
                     
-                    // Clear localStorage and IndexedDB for preferences
-                    try {
-                        // Clear localStorage items related to preferences
-                        const keysToRemove = [];
-                        for (let i = 0; i < localStorage.length; i++) {
-                            const key = localStorage.key(i);
-                            if (key && (key.includes('preferences') || key.includes('profile'))) {
-                                keysToRemove.push(key);
-                            }
-                        }
-                        keysToRemove.forEach(key => localStorage.removeItem(key));
-                        console.log(`🗑️ Cleared ${keysToRemove.length} localStorage items related to preferences`);
-                        
-                        // Clear unified cache system if available
-                        if (window.UnifiedCacheManager) {
-                            try {
-                                await window.UnifiedCacheManager.clear('preferences');
+                    // Clear unified cache system for preferences
+                    if (window.UnifiedCacheManager) {
+                        try {
+                            await window.UnifiedCacheManager.clear('preferences');
                                 console.log('🗑️ Cleared unified cache preferences');
                             } catch (error) {
                                 console.warn('⚠️ Could not clear unified cache preferences:', error);
@@ -1173,9 +1200,13 @@ window.saveAsActiveProfile = async function() {
                     console.log('🔄 Reloading all data from database for new active profile...');
                     
                     // Clear preferences cache before loading to ensure fresh data
-                    if (window.preferencesCache && window.preferencesCache.clear) {
-                        await window.preferencesCache.clear();
-                        console.log('🗑️ Cleared preferences cache before reload');
+                    if (window.UnifiedCacheManager) {
+                        try {
+                            await window.UnifiedCacheManager.remove('user-preferences');
+                            console.log('🗑️ Cleared preferences cache before reload');
+                        } catch (cacheError) {
+                            console.warn('⚠️ Could not clear preferences cache:', cacheError.message);
+                        }
                     }
                     
                     await window.loadPreferences();
@@ -1449,9 +1480,14 @@ async function copyDetailedLog() {
         }
         
         // Cache Status - שיפור שלי
-        if (window.preferencesCache) {
-            log.push(`Cache תקין: ${window.preferencesCache.isValid() ? 'כן' : 'לא'}`);
-            log.push(`Cache size: ${Object.keys(window.preferencesCache.data || {}).length} פריטים`);
+        if (window.UnifiedCacheManager) {
+            try {
+                const cached = await window.UnifiedCacheManager.get('user-preferences');
+                log.push(`Cache תקין: ${cached ? 'כן' : 'לא'}`);
+                log.push(`Cache size: ${cached ? Object.keys(cached).length : 0} פריטים`);
+            } catch (error) {
+                log.push(`Cache: שגיאה בבדיקה - ${error.message}`);
+            }
         }
         log.push('');
         
@@ -1541,9 +1577,11 @@ window.copyPreferencesDetailedLog = async function() {
         // קבלת מספר העדפות
         let preferencesCount = 'לא זמין';
         try {
-            const cached = await window.preferencesCache.get();
-            if (cached) {
-                preferencesCount = Object.keys(cached).length;
+            if (window.UnifiedCacheManager) {
+                const cached = await window.UnifiedCacheManager.get('user-preferences');
+                if (cached) {
+                    preferencesCount = Object.keys(cached).length;
+                }
             }
         } catch (error) {
             console.warn('Error getting preferences count:', error);
@@ -1599,7 +1637,7 @@ ${activePreferences.slice(0, 20).join('\n')}${activePreferences.length > 20 ? '\
 
 🔧 מידע טכני:
   - מערכת העדפות: פעילה
-  - Cache: ${window.preferencesCache.isValid() ? 'תקין' : 'לא תקין'}
+  - Cache: ${window.UnifiedCacheManager ? 'זמין' : 'לא זמין'}
   - שירות: ${typeof window.preferencesService !== 'undefined' ? 'זמין' : 'זמין (מקומי)'}
 
 📝 הערות:

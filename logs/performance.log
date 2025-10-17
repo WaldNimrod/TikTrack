@@ -2696,3 +2696,208 @@
 2025-10-18 01:04:20,319 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:04:20] "POST /api/preferences/user/single HTTP/1.1" 200 -
 2025-10-18 01:04:21,344 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:04:21] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -
 2025-10-18 01:04:55,373 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:04:55] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -
+2025-10-18 01:05:35,609 - root - INFO - 🚀 Starting TikTrack server...
+2025-10-18 01:05:35,609 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
+2025-10-18 01:05:35,609 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-10-18 01:05:35,609 - root - INFO - 📦 Flask version: 2.3.3
+2025-10-18 01:05:35,609 - root - INFO - 🗄️ Initializing database...
+2025-10-18 01:05:35,609 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-10-18 01:05:35,614 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.004s
+2025-10-18 01:05:35,614 - root - INFO - ✅ Database initialized successfully
+2025-10-18 01:05:36,619 - utils.performance_monitor - INFO - System metrics: CPU: 25.4%, Memory: 63.5%, Disk: 3.5%
+2025-10-18 01:05:36,619 - root - INFO - ✅ Database initialized successfully
+2025-10-18 01:05:36,619 - root - INFO - ✅ Server initialization completed
+2025-10-18 01:05:36,656 - root - INFO - 🚀 Starting background task scheduler...
+2025-10-18 01:05:36,657 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-10-18 01:05:36,657 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-10-18 01:05:36,657 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-10-18 01:05:36,657 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-10-18 01:05:36,657 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-10-18 01:05:36,657 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-10-18 01:05:36,657 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-10-18 01:05:36,657 - services.background_tasks - INFO - Background task scheduler started
+2025-10-18 01:05:36,657 - root - INFO - ✅ Background task scheduler started successfully
+2025-10-18 01:05:36,657 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:ca45cab5774c7689ad0e8d762dd4cfb8
+2025-10-18 01:05:36,684 - cache - INFO - Cache SET: services.system_settings_service.get_setting:ca45cab5774c7689ad0e8d762dd4cfb8 (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-18 01:05:36,684 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-10-18 01:05:36,685 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-10-18 01:05:36,687 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-10-18 01:05:36,696 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:8080
+2025-10-18 01:05:36,696 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-18 01:05:40,915 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:05:40] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -
+2025-10-18 01:05:44,456 - services.constraint_service - INFO - Retrieved 16 constraints for table preference_types
+2025-10-18 01:05:44,458 - services.preferences_service - INFO - Cache invalidated for user 1, profile 3
+2025-10-18 01:05:44,459 - services.preferences_service - INFO - Saved preference notification_mode for user 1
+2025-10-18 01:05:44,459 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:05:44] "POST /api/preferences/user/single HTTP/1.1" 200 -
+2025-10-18 01:05:47,189 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:05:47] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -
+2025-10-18 01:05:55,024 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:05:55] "GET /api/preferences/user?user_id=1&use_cache=false HTTP/1.1" 200 -
+2025-10-18 01:07:56,158 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:07:56] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -
+2025-10-18 01:08:02,632 - services.constraint_service - INFO - Retrieved 16 constraints for table preference_types
+2025-10-18 01:08:02,636 - services.preferences_service - INFO - Cache invalidated for user 1, profile 3
+2025-10-18 01:08:02,636 - services.preferences_service - INFO - Saved preference notification_mode for user 1
+2025-10-18 01:08:02,636 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:08:02] "POST /api/preferences/user/single HTTP/1.1" 200 -
+2025-10-18 01:08:03,649 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:08:03] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -
+2025-10-18 01:08:03,659 - services.constraint_service - INFO - Retrieved 16 constraints for table preference_types
+2025-10-18 01:08:03,661 - services.preferences_service - INFO - Cache invalidated for user 1, profile 3
+2025-10-18 01:08:03,661 - services.preferences_service - INFO - Saved preference notification_mode for user 1
+2025-10-18 01:08:03,661 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:08:03] "POST /api/preferences/user/single HTTP/1.1" 200 -
+2025-10-18 01:08:04,679 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:08:04] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -
+2025-10-18 01:08:04,688 - services.constraint_service - INFO - Retrieved 16 constraints for table preference_types
+2025-10-18 01:08:04,690 - services.preferences_service - INFO - Cache invalidated for user 1, profile 3
+2025-10-18 01:08:04,691 - services.preferences_service - INFO - Saved preference notification_mode for user 1
+2025-10-18 01:08:04,691 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:08:04] "POST /api/preferences/user/single HTTP/1.1" 200 -
+2025-10-18 01:08:05,708 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:08:05] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -
+2025-10-18 01:08:05,717 - services.constraint_service - INFO - Retrieved 16 constraints for table preference_types
+2025-10-18 01:08:05,719 - services.preferences_service - INFO - Cache invalidated for user 1, profile 3
+2025-10-18 01:08:05,719 - services.preferences_service - INFO - Saved preference notification_mode for user 1
+2025-10-18 01:08:05,719 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:08:05] "POST /api/preferences/user/single HTTP/1.1" 200 -
+2025-10-18 01:08:06,735 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:08:06] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -
+2025-10-18 01:08:19,292 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:08:19] "GET /api/preferences/user?user_id=1&use_cache=false HTTP/1.1" 200 -
+2025-10-18 01:08:37,798 - services.constraint_service - INFO - Retrieved 16 constraints for table preference_types
+2025-10-18 01:08:37,800 - services.preferences_service - INFO - Cache invalidated for user 1, profile 3
+2025-10-18 01:08:37,800 - services.preferences_service - INFO - Saved preference notification_mode for user 1
+2025-10-18 01:08:37,801 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:08:37] "POST /api/preferences/user/single HTTP/1.1" 200 -
+2025-10-18 01:08:41,840 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:08:41] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -
+2025-10-18 01:08:59,663 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:08:59] "GET /api/preferences/user?user_id=1&use_cache=false HTTP/1.1" 200 -
+2025-10-18 01:09:04,395 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:09:04] "GET /api/preferences/user?user_id=1&use_cache=false HTTP/1.1" 200 -
+2025-10-18 01:09:12,702 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:09:12] "GET /api/preferences/user?user_id=1&use_cache=false HTTP/1.1" 200 -
+2025-10-18 01:12:09,878 - utils.rate_limiter - INFO - Rate limiter cleanup: removed 0 empty entries
+2025-10-18 01:12:09,879 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:09] "GET /api/preferences/user/check-updates?user_id=1 HTTP/1.1" 200 -
+2025-10-18 01:12:14,455 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "GET /preferences.html HTTP/1.1" 200 -
+2025-10-18 01:12:14,489 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "GET /scripts/header-system.js HTTP/1.1" 200 -
+2025-10-18 01:12:14,493 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "[36mGET /styles-new/01-settings/_colors-dynamic.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 01:12:14,495 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "[36mGET /styles-new/01-settings/_variables.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 01:12:14,538 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "[36mGET /styles-new/01-settings/_spacing.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 01:12:14,539 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "[36mGET /styles-new/01-settings/_colors-semantic.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 01:12:14,562 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "[36mGET /styles-new/01-settings/_typography.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 01:12:14,589 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "[36mGET /styles-new/02-tools/_functions.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 01:12:14,590 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "[36mGET /styles-new/02-tools/_mixins.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 01:12:14,590 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "[36mGET /styles-new/02-tools/_utilities.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 01:12:14,590 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "[36mGET /styles-new/01-settings/_rtl-logical.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 01:12:14,610 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "[36mGET /styles-new/03-generic/_reset.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 01:12:14,626 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "[36mGET /styles-new/04-elements/_links.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 01:12:14,626 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "[36mGET /styles-new/04-elements/_headings.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 01:12:14,630 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "[36mGET /styles-new/04-elements/_forms-base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 01:12:14,631 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "[36mGET /styles-new/05-objects/_grid.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 01:12:14,640 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "[36mGET /styles-new/06-components/_cards.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 01:12:14,647 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "[36mGET /styles-new/06-components/_tables.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 01:12:14,651 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "[36mGET /styles-new/03-generic/_base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 01:12:14,730 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "[36mGET /styles-new/06-components/_notifications.css?v=20250923_fixed_colors_v2 HTTP/1.1[0m" 304 -
+2025-10-18 01:12:14,731 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "[36mGET /styles-new/06-components/_modals.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 01:12:14,731 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "[36mGET /styles-new/06-components/_buttons-advanced.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 01:12:14,733 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "[36mGET /styles-new/06-components/_navigation.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 01:12:14,735 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "[36mGET /styles-new/06-components/_forms-advanced.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 01:12:14,736 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "[36mGET /styles-new/06-components/_badges-status.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 01:12:14,736 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-18T01:12:14.656687', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/styles-new/07-trumps/preferences-page.css?v=1.0.0', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 162, in styles_new_files\n    response = send_from_directory(UI_DIR / "styles-new", filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-18 01:12:14,737 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "[36mGET /styles-new/06-components/_entity-colors.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 01:12:14,738 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "[36mGET /styles-new/08-themes/_light.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 01:12:14,738 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "[36mGET /styles-new/04-elements/_buttons-base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 01:12:14,738 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "[36mGET /styles-new/05-objects/_layout.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 01:12:14,738 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-18T01:12:14.656687', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/styles-new/07-trumps/preferences-page.css?v=1.0.0', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 162, in styles_new_files\n    response = send_from_directory(UI_DIR / "styles-new", filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-18 01:12:14,743 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "[36mGET /styles-new/09-utilities/_utilities.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 01:12:14,744 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "[36mGET /styles-new/header-styles.css?v=v6.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 01:12:14,745 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "[33mGET /styles-new/07-trumps/preferences-page.css?v=1.0.0 HTTP/1.1[0m" 404 -
+2025-10-18 01:12:14,747 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "GET /scripts/data-utils.js HTTP/1.1" 200 -
+2025-10-18 01:12:14,747 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "GET /scripts/ui-utils.js HTTP/1.1" 200 -
+2025-10-18 01:12:14,747 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "GET /scripts/global-favicon.js HTTP/1.1" 200 -
+2025-10-18 01:12:14,749 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "GET /scripts/notification-system.js HTTP/1.1" 200 -
+2025-10-18 01:12:14,750 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "GET /scripts/system-management.js HTTP/1.1" 200 -
+2025-10-18 01:12:14,753 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "GET /scripts/global-notification-collector.js HTTP/1.1" 200 -
+2025-10-18 01:12:14,754 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "GET /scripts/notification-category-detector.js HTTP/1.1" 200 -
+2025-10-18 01:12:14,758 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "GET /scripts/tables.js HTTP/1.1" 200 -
+2025-10-18 01:12:14,808 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "GET /scripts/preferences.js HTTP/1.1" 200 -
+2025-10-18 01:12:14,815 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "GET /scripts/page-initialization-configs.js HTTP/1.1" 200 -
+2025-10-18 01:12:14,819 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "GET /scripts/unified-app-initializer.js HTTP/1.1" 200 -
+2025-10-18 01:12:14,819 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:14] "GET /scripts/page-utils.js HTTP/1.1" 200 -
+2025-10-18 01:12:15,945 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:15] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -
+2025-10-18 01:12:17,357 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:17] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -
+2025-10-18 01:12:18,831 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:18] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -
+2025-10-18 01:12:26,832 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:26] "GET /preferences.html HTTP/1.1" 200 -
+2025-10-18 01:12:36,518 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:36] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -
+2025-10-18 01:12:36,528 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:36] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -
+2025-10-18 01:12:49,028 - root - INFO - 🚀 Starting TikTrack server...
+2025-10-18 01:12:49,028 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
+2025-10-18 01:12:49,028 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-10-18 01:12:49,028 - root - INFO - 📦 Flask version: 2.3.3
+2025-10-18 01:12:49,028 - root - INFO - 🗄️ Initializing database...
+2025-10-18 01:12:49,028 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-10-18 01:12:49,032 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.004s
+2025-10-18 01:12:49,032 - root - INFO - ✅ Database initialized successfully
+2025-10-18 01:12:50,038 - utils.performance_monitor - INFO - System metrics: CPU: 25.3%, Memory: 63.4%, Disk: 3.5%
+2025-10-18 01:12:50,038 - root - INFO - ✅ Database initialized successfully
+2025-10-18 01:12:50,038 - root - INFO - ✅ Server initialization completed
+2025-10-18 01:12:50,073 - root - INFO - 🚀 Starting background task scheduler...
+2025-10-18 01:12:50,073 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-10-18 01:12:50,073 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-10-18 01:12:50,073 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-10-18 01:12:50,073 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-10-18 01:12:50,073 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-10-18 01:12:50,073 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-10-18 01:12:50,073 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-10-18 01:12:50,074 - services.background_tasks - INFO - Background task scheduler started
+2025-10-18 01:12:50,074 - root - INFO - ✅ Background task scheduler started successfully
+2025-10-18 01:12:50,074 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:708cd0895ea7857cd388ed0976728685
+2025-10-18 01:12:50,097 - cache - INFO - Cache SET: services.system_settings_service.get_setting:708cd0895ea7857cd388ed0976728685 (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-18 01:12:50,097 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-10-18 01:12:50,098 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-10-18 01:12:50,098 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-10-18 01:12:50,108 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:8080
+2025-10-18 01:12:50,108 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-18 01:12:54,723 - services.preferences_service - ERROR - Error getting all preferences for user 1: Incorrect number of bindings supplied. The current statement uses 2, and there are 4 supplied.
+2025-10-18 01:12:54,724 - routes.api.preferences - ERROR - Error getting user preferences: Incorrect number of bindings supplied. The current statement uses 2, and there are 4 supplied.
+2025-10-18 01:12:54,724 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:12:54] "[35m[1mGET /api/preferences/user?user_id=1 HTTP/1.1[0m" 500 -
+2025-10-18 01:13:11,560 - root - INFO - 🚀 Starting TikTrack server...
+2025-10-18 01:13:11,560 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
+2025-10-18 01:13:11,561 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-10-18 01:13:11,561 - root - INFO - 📦 Flask version: 2.3.3
+2025-10-18 01:13:11,561 - root - INFO - 🗄️ Initializing database...
+2025-10-18 01:13:11,561 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-10-18 01:13:11,565 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.004s
+2025-10-18 01:13:11,565 - root - INFO - ✅ Database initialized successfully
+2025-10-18 01:13:12,570 - utils.performance_monitor - INFO - System metrics: CPU: 22.5%, Memory: 63.5%, Disk: 3.5%
+2025-10-18 01:13:12,570 - root - INFO - ✅ Database initialized successfully
+2025-10-18 01:13:12,571 - root - INFO - ✅ Server initialization completed
+2025-10-18 01:13:12,604 - root - INFO - 🚀 Starting background task scheduler...
+2025-10-18 01:13:12,605 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-10-18 01:13:12,605 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-10-18 01:13:12,605 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-10-18 01:13:12,605 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-10-18 01:13:12,605 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-10-18 01:13:12,605 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-10-18 01:13:12,605 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-10-18 01:13:12,605 - services.background_tasks - INFO - Background task scheduler started
+2025-10-18 01:13:12,605 - root - INFO - ✅ Background task scheduler started successfully
+2025-10-18 01:13:12,605 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:6989a6ad572163b8a5d92cea6e85e186
+2025-10-18 01:13:12,628 - cache - INFO - Cache SET: services.system_settings_service.get_setting:6989a6ad572163b8a5d92cea6e85e186 (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-18 01:13:12,628 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-10-18 01:13:12,629 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-10-18 01:13:12,629 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-10-18 01:13:12,639 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:8080
+2025-10-18 01:13:12,639 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-18 01:13:18,668 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:13:18] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -
+2025-10-18 01:13:28,240 - services.constraint_service - INFO - Retrieved 16 constraints for table preference_types
+2025-10-18 01:13:28,243 - services.preferences_service - INFO - Cache invalidated for user 1, profile 3
+2025-10-18 01:13:28,244 - services.preferences_service - INFO - Saved preference notification_mode for user 1
+2025-10-18 01:13:28,244 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:13:28] "POST /api/preferences/user/single HTTP/1.1" 200 -
+2025-10-18 01:13:29,261 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:13:29] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -
+2025-10-18 01:13:29,270 - services.constraint_service - INFO - Retrieved 16 constraints for table preference_types
+2025-10-18 01:13:29,272 - services.preferences_service - INFO - Cache invalidated for user 1, profile 3
+2025-10-18 01:13:29,272 - services.preferences_service - INFO - Saved preference notification_mode for user 1
+2025-10-18 01:13:29,272 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:13:29] "POST /api/preferences/user/single HTTP/1.1" 200 -
+2025-10-18 01:13:30,288 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:13:30] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -
+2025-10-18 01:13:30,298 - services.constraint_service - INFO - Retrieved 16 constraints for table preference_types
+2025-10-18 01:13:30,300 - services.preferences_service - INFO - Cache invalidated for user 1, profile 3
+2025-10-18 01:13:30,300 - services.preferences_service - INFO - Saved preference notification_mode for user 1
+2025-10-18 01:13:30,300 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:13:30] "POST /api/preferences/user/single HTTP/1.1" 200 -
+2025-10-18 01:13:31,319 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:13:31] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -
+2025-10-18 01:13:31,331 - services.constraint_service - INFO - Retrieved 16 constraints for table preference_types
+2025-10-18 01:13:31,333 - services.preferences_service - INFO - Cache invalidated for user 1, profile 3
+2025-10-18 01:13:31,333 - services.preferences_service - INFO - Saved preference notification_mode for user 1
+2025-10-18 01:13:31,333 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:13:31] "POST /api/preferences/user/single HTTP/1.1" 200 -
+2025-10-18 01:13:32,358 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:13:32] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -

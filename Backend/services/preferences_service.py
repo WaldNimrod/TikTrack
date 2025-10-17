@@ -313,6 +313,8 @@ class PreferencesService:
                 FROM user_preferences_v3 upv3
                 JOIN preference_types pt ON upv3.preference_id = pt.id
                 WHERE upv3.user_id = ? AND upv3.profile_id = ? AND pt.preference_name = ?
+                ORDER BY upv3.id DESC
+                LIMIT 1
             ''', (user_id, profile_id, preference_name))
             
             result = cursor.fetchone()
@@ -495,8 +497,12 @@ class PreferencesService:
                        pg.group_name
                 FROM preference_types pt
                 JOIN preference_groups pg ON pt.group_id = pg.id
-                LEFT JOIN user_preferences_v3 upv3 ON pt.id = upv3.preference_id 
-                    AND upv3.user_id = ? AND upv3.profile_id = ?
+                LEFT JOIN (
+                    SELECT preference_id, saved_value, 
+                           ROW_NUMBER() OVER (PARTITION BY preference_id ORDER BY id DESC) as rn
+                    FROM user_preferences_v3 
+                    WHERE user_id = ? AND profile_id = ?
+                ) upv3 ON pt.id = upv3.preference_id AND upv3.rn = 1
                 WHERE pt.is_active = TRUE
                 ORDER BY pg.group_name, pt.preference_name
             ''', (user_id, profile_id))

@@ -5661,3 +5661,713 @@
 2025-10-18 02:45:03,931 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:45:03] "GET /api/trading-accounts/ HTTP/1.1" 200 -
 2025-10-18 02:48:11,702 - cache - INFO - Cache DELETE: get_all_cash_flows_99914b932bd37a50b983c5e7c90ae93b (Was accessed 0 times)
 2025-10-18 02:48:11,703 - cache - INFO - Cache DELETE: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Was accessed 0 times)
+2025-10-18 02:49:44,382 - utils.rate_limiter - INFO - Rate limiter cleanup: removed 0 empty entries
+2025-10-18 02:49:44,383 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "[36mGET /trades HTTP/1.1[0m" 304 -
+2025-10-18 02:49:44,400 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "[36mGET /styles-new/01-settings/_variables.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:49:44,402 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "[36mGET /styles-new/01-settings/_colors-dynamic.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:49:44,405 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "[36mGET /styles-new/01-settings/_spacing.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:49:44,405 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "[36mGET /styles-new/01-settings/_colors-semantic.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:49:44,408 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "[36mGET /styles-new/01-settings/_typography.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:49:44,409 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "[36mGET /styles-new/02-tools/_functions.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:49:44,409 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "[36mGET /styles-new/02-tools/_mixins.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:49:44,409 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "[36mGET /styles-new/01-settings/_rtl-logical.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:49:44,411 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "[36mGET /styles-new/03-generic/_reset.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:49:44,414 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "[36mGET /styles-new/02-tools/_utilities.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:49:44,415 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "[36mGET /styles-new/03-generic/_base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:49:44,416 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "[36mGET /styles-new/04-elements/_headings.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:49:44,417 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "[36mGET /styles-new/04-elements/_links.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:49:44,420 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "[36mGET /styles-new/04-elements/_forms-base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:49:44,422 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "[36mGET /styles-new/04-elements/_buttons-base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:49:44,424 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "[36mGET /styles-new/05-objects/_grid.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:49:44,426 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "[36mGET /styles-new/05-objects/_layout.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:49:44,426 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "[36mGET /styles-new/06-components/_tables.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:49:44,427 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "[36mGET /styles-new/06-components/_buttons-advanced.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:49:44,428 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "[36mGET /styles-new/06-components/_modals.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:49:44,428 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "[36mGET /styles-new/06-components/_cards.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:49:44,430 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "[36mGET /styles-new/06-components/_notifications.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:49:44,431 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "[36mGET /styles-new/06-components/_navigation.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:49:44,432 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "[36mGET /styles-new/06-components/_forms-advanced.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:49:44,436 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "[36mGET /styles-new/06-components/_entity-colors.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:49:44,436 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "[36mGET /styles-new/06-components/_badges-status.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:49:44,438 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "[36mGET /styles-new/08-themes/_light.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:49:44,438 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "[36mGET /styles-new/header-styles.css?v=v6.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:49:44,440 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "GET /scripts/page-initialization-configs.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:49:44,441 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "GET /scripts/unified-app-initializer.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:49:44,442 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "GET /scripts/global-favicon.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:49:44,445 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "GET /scripts/notification-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:49:44,446 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "GET /scripts/translation-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:49:44,446 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "GET /scripts/cache-sync-manager.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:49:44,447 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "GET /scripts/unified-cache-manager.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:49:44,448 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "GET /scripts/memory-optimizer.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:49:44,450 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "GET /scripts/ui-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:49:44,450 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "GET /scripts/cache-policy-manager.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:49:44,453 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "GET /scripts/color-scheme-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:49:44,453 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "GET /scripts/header-system.js?v=v6.0.0 HTTP/1.1" 200 -
+2025-10-18 02:49:44,455 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "GET /scripts/data-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:49:44,456 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "GET /scripts/date-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:49:44,457 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "GET /scripts/button-icons.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:49:44,458 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "GET /scripts/tables.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:49:44,462 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "GET /scripts/page-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:49:44,463 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "GET /scripts/preferences.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:49:44,463 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "GET /scripts/table-mappings.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:49:44,464 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "GET /scripts/notification-category-detector.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:49:44,464 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "GET /scripts/global-notification-collector.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:49:44,464 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "GET /scripts/system-management.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:49:44,469 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "GET /scripts/error-handlers.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:49:44,470 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "GET /scripts/validation-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:49:44,471 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "GET /scripts/linked-items.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:49:44,473 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "GET /scripts/entity-details-modal.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:49:44,475 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "GET /scripts/trades.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:49:44,487 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:44] "GET /api/preferences/user HTTP/1.1" 200 -
+2025-10-18 02:49:45,201 - utils.rate_limiter - INFO - Rate limiter cleanup: removed 0 empty entries
+2025-10-18 02:49:45,202 - routes.api.base_entity.trading_accounts - INFO - Getting all trading_accounts records
+2025-10-18 02:49:45,203 - cache - INFO - Cache MISS: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b
+2025-10-18 02:49:45,205 - cache - INFO - Cache SET: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 2908 chars)
+2025-10-18 02:49:45,206 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:49:45] "GET /api/trading-accounts/ HTTP/1.1" 200 -
+2025-10-18 02:50:38,173 - services.trade_service - INFO - Loading trades with joinedload for account and ticker
+2025-10-18 02:50:38,173 - services.trade_service - INFO - Loaded 13 trades
+2025-10-18 02:50:38,173 - services.trade_service - INFO - First trade ID: 1
+2025-10-18 02:50:38,174 - services.trade_service - INFO - First trade trading_account_id: 1
+2025-10-18 02:50:38,174 - services.trade_service - INFO - First trade ticker_id: 1
+2025-10-18 02:50:38,174 - services.trade_service - INFO - First trade has account attribute: True
+2025-10-18 02:50:38,174 - services.trade_service - INFO - First trade account object: <TradingAccount(name='חשבון מעודכן', currency_id='1', status='open')>
+2025-10-18 02:50:38,174 - services.trade_service - INFO - First trade has ticker attribute: True
+2025-10-18 02:50:38,174 - services.trade_service - INFO - First trade ticker object: <Ticker(symbol='AAPL', name='Apple Inc. - UPDATED', type='stock')>
+2025-10-18 02:50:38,175 - services.trade_service - INFO - First trade account name: חשבון מעודכן
+2025-10-18 02:50:38,175 - services.trade_service - INFO - First trade ticker symbol: AAPL
+2025-10-18 02:50:38,175 - models.trade - INFO - Trade 1: Using loaded account name: חשבון מעודכן
+2025-10-18 02:50:38,175 - models.trade - INFO - Trade 1: Using loaded ticker symbol: AAPL
+2025-10-18 02:50:38,175 - models.trade - INFO - Trade 1 to_dict result: {'id': 1, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'cancelled', 'investment_type': 'swing', 'side': 'Long', 'notes': 'קנייה של Apple', 'opened_at': '2025-08-15 03:51:43', 'closed_at': '2025-08-21 12:36:00', 'created_at': '2025-08-15 03:51:43', 'total_pl': 2500.0, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': '2025-08-31 14:28:23', 'cancel_reason': 'בוטל על ידי המשתמש'}
+2025-10-18 02:50:38,187 - models.trade - INFO - Trade 2: Using loaded account name: חשבון טכנולוגיה
+2025-10-18 02:50:38,187 - models.trade - INFO - Trade 2: Using loaded ticker symbol: GOOGL
+2025-10-18 02:50:38,187 - models.trade - INFO - Trade 2 to_dict result: {'id': 2, 'trading_account_id': 2, 'ticker_id': 2, 'trade_plan_id': 14, 'status': 'closed', 'investment_type': 'investment', 'side': 'Long', 'notes': 'טרייד מוצלח ב-Google', 'opened_at': '2025-08-15 03:51:43', 'closed_at': '2025-08-10 06:51:43', 'created_at': '2025-08-15 03:51:43', 'total_pl': 1500.0, 'account_name': 'חשבון טכנולוגיה', 'ticker_symbol': 'GOOGL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-18 02:50:38,201 - models.trade - INFO - Trade 3: Using loaded account name: חשבון ETF
+2025-10-18 02:50:38,201 - models.trade - INFO - Trade 3: Using loaded ticker symbol: SPY
+2025-10-18 02:50:38,201 - models.trade - INFO - Trade 3 to_dict result: {'id': 3, 'trading_account_id': 3, 'ticker_id': 9, 'trade_plan_id': 2, 'status': 'cancelled', 'investment_type': 'passive', 'side': 'Long', 'notes': 'השקעה ב-ETF', 'opened_at': '2025-08-15 03:51:43', 'closed_at': None, 'created_at': '2025-08-15 03:51:43', 'total_pl': 800.0, 'account_name': 'חשבון ETF', 'ticker_symbol': 'SPY', 'cancelled_at': '2025-08-22 06:50:57', 'cancel_reason': 'בדיקת ביטול'}
+2025-10-18 02:50:38,204 - models.trade - INFO - Trade 4: Using loaded account name: חשבון מעודכן
+2025-10-18 02:50:38,204 - models.trade - INFO - Trade 4: Using loaded ticker symbol: AAPL
+2025-10-18 02:50:38,204 - models.trade - INFO - Trade 4 to_dict result: {'id': 4, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'cancelled', 'investment_type': 'swing', 'side': 'Long', 'notes': None, 'opened_at': '2025-08-26 00:13:21', 'closed_at': None, 'created_at': '2025-08-26 00:13:21', 'total_pl': None, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': '2025-08-31 14:30:08', 'cancel_reason': 'בוטל על ידי המשתמש'}
+2025-10-18 02:50:38,212 - models.trade - INFO - Trade 5: Using loaded account name: חשבון ETF
+2025-10-18 02:50:38,212 - models.trade - INFO - Trade 5: Using loaded ticker symbol: AAPL
+2025-10-18 02:50:38,212 - models.trade - INFO - Trade 5 to_dict result: {'id': 5, 'trading_account_id': 3, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': 'גכעגעג', 'opened_at': '2025-08-30 22:02:00', 'closed_at': None, 'created_at': '2025-08-30 22:02:00', 'total_pl': 0.0, 'account_name': 'חשבון ETF', 'ticker_symbol': 'AAPL', 'cancelled_at': '2025-08-31 14:32:32', 'cancel_reason': 'test'}
+2025-10-18 02:50:38,219 - models.trade - INFO - Trade 6: Using loaded account name: חשבון טכנולוגיה
+2025-10-18 02:50:38,220 - models.trade - INFO - Trade 6: Using loaded ticker symbol: GOOGL
+2025-10-18 02:50:38,220 - models.trade - INFO - Trade 6 to_dict result: {'id': 6, 'trading_account_id': 2, 'ticker_id': 2, 'trade_plan_id': 1, 'status': 'open', 'investment_type': 'investment', 'side': 'Long', 'notes': '', 'opened_at': '2025-08-31 16:57:00', 'closed_at': None, 'created_at': '2025-08-31 16:57:00', 'total_pl': 0.0, 'account_name': 'חשבון טכנולוגיה', 'ticker_symbol': 'GOOGL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-18 02:50:38,232 - models.trade - INFO - Trade 7: Using loaded account name: חשבון טכנולוגיה
+2025-10-18 02:50:38,232 - models.trade - INFO - Trade 7: Using loaded ticker symbol: AMZN
+2025-10-18 02:50:38,232 - models.trade - INFO - Trade 7 to_dict result: {'id': 7, 'trading_account_id': 2, 'ticker_id': 6, 'trade_plan_id': 9, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': None, 'opened_at': '2025-08-31 17:38:00', 'closed_at': None, 'created_at': '2025-08-31 17:38:00', 'total_pl': 0.0, 'account_name': 'חשבון טכנולוגיה', 'ticker_symbol': 'AMZN', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-18 02:50:38,245 - models.trade - INFO - Trade 8: Using loaded account name: חשבון מעודכן
+2025-10-18 02:50:38,245 - models.trade - INFO - Trade 8: Using loaded ticker symbol: AAPL
+2025-10-18 02:50:38,245 - models.trade - INFO - Trade 8 to_dict result: {'id': 8, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'closed', 'investment_type': 'investment', 'side': 'Long', 'notes': None, 'opened_at': '2025-09-01 23:51:48', 'closed_at': '2025-09-02 00:36:20', 'created_at': '2025-09-01 23:51:48', 'total_pl': None, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-18 02:50:38,253 - models.trade - INFO - Trade 9: Using loaded account name: חשבון מעודכן
+2025-10-18 02:50:38,253 - models.trade - INFO - Trade 9: Using loaded ticker symbol: GOOGL
+2025-10-18 02:50:38,253 - models.trade - INFO - Trade 9 to_dict result: {'id': 9, 'trading_account_id': 1, 'ticker_id': 2, 'trade_plan_id': 14, 'status': 'closed', 'investment_type': 'investment', 'side': 'Long', 'notes': None, 'opened_at': '2025-09-02 00:41:51', 'closed_at': '2025-09-02 00:42:08', 'created_at': '2025-09-02 00:41:51', 'total_pl': None, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'GOOGL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-18 02:50:38,265 - models.trade - INFO - Trade 10: Using loaded account name: חשבון מעודכן
+2025-10-18 02:50:38,266 - models.trade - INFO - Trade 10: Using loaded ticker symbol: TSLA
+2025-10-18 02:50:38,266 - models.trade - INFO - Trade 10 to_dict result: {'id': 10, 'trading_account_id': 1, 'ticker_id': 4, 'trade_plan_id': 1, 'status': 'open', 'investment_type': 'investment', 'side': 'Long', 'notes': None, 'opened_at': '2025-09-02 00:56:03', 'closed_at': None, 'created_at': '2025-09-02 00:56:03', 'total_pl': None, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'TSLA', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-18 02:50:38,277 - models.trade - INFO - Trade 11: Using loaded account name: חשבון מעודכן
+2025-10-18 02:50:38,277 - models.trade - INFO - Trade 11: Using loaded ticker symbol: AAPL
+2025-10-18 02:50:38,277 - models.trade - INFO - Trade 11 to_dict result: {'id': 11, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': None, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': 'Test trade', 'opened_at': '2025-10-06 21:05:06', 'closed_at': None, 'created_at': '2025-10-06 21:05:06', 'total_pl': 0.0, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-18 02:50:38,285 - models.trade - INFO - Trade 18: Using loaded account name: חשבון מעודכן
+2025-10-18 02:50:38,285 - models.trade - INFO - Trade 18: Using loaded ticker symbol: AAPL
+2025-10-18 02:50:38,286 - models.trade - INFO - Trade 18 to_dict result: {'id': 18, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': None, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': 'Test trade for CRUD testing', 'opened_at': '2025-10-07 16:13:43', 'closed_at': None, 'created_at': '2025-10-07 16:13:43', 'total_pl': 0.0, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-18 02:50:38,294 - models.trade - INFO - Trade 19: Using loaded account name: חשבון מעודכן
+2025-10-18 02:50:38,294 - models.trade - INFO - Trade 19: Using loaded ticker symbol: AAPL
+2025-10-18 02:50:38,295 - models.trade - INFO - Trade 19 to_dict result: {'id': 19, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': None, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': None, 'opened_at': '2025-10-17 12:36:57', 'closed_at': None, 'created_at': '2025-10-17 12:36:57', 'total_pl': 0.0, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-18 02:50:38,303 - routes.api.trades - INFO - First trade data: {'id': 1, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'cancelled', 'investment_type': 'swing', 'side': 'Long', 'notes': 'קנייה של Apple', 'opened_at': '2025-08-15 03:51:43', 'closed_at': '2025-08-21 12:36:00', 'created_at': '2025-08-15 03:51:43', 'total_pl': 2500.0, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': '2025-08-31 14:28:23', 'cancel_reason': 'בוטל על ידי המשתמש', 'current_price': 252.29, 'daily_change': 1.9559506971105287, 'change_amount': 4.840000000000003}
+2025-10-18 02:50:38,303 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:50:38] "GET /api/trades/ HTTP/1.1" 200 -
+2025-10-18 02:51:14,325 - services.data_refresh_scheduler - INFO - Refreshing 4 active tickers during off-hours
+2025-10-18 02:51:14,327 - services.data_refresh_scheduler - INFO - Group refresh started: active_trades/off_hours - 4 tickers (ID: 33548)
+2025-10-18 02:51:14,327 - services.data_refresh_scheduler - INFO - Refreshing batch of 4 tickers: AAPL, GOOGL, AMZN, TSLA
+2025-10-18 02:51:14,327 - services.external_data.yahoo_finance_adapter - INFO - Processing 4 symbols in 1 batches
+2025-10-18 02:51:14,803 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-10-18 02:51:14,803 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Current price: $252.29
+2025-10-18 02:51:14,803 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Calculated change_amount = 252.29 - 247.45 = 4.840000000000003
+2025-10-18 02:51:14,803 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Calculated change_pct = (4.840000000000003 / 247.45) * 100 = 1.96%
+2025-10-18 02:51:14,804 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: volume = 48839918
+2025-10-18 02:51:14,804 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Final quote data - price: $252.29, change_pct: 1.96%, change_amount: $4.84
+2025-10-18 02:51:14,804 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AAPL
+2025-10-18 02:51:14,804 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AAPL (ID: 1) - proceeding to cache quote
+2025-10-18 02:51:14,804 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AAPL = $252.29 (USD)
+2025-10-18 02:51:14,804 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 1: List argument must consist only of tuples or dictionaries
+2025-10-18 02:51:14,804 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AAPL
+2025-10-18 02:51:14,805 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AAPL: $252.29
+2025-10-18 02:51:14,929 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-10-18 02:51:14,930 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Current price: $253.3
+2025-10-18 02:51:14,930 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Calculated change_amount = 253.3 - 251.46 = 1.8400000000000034
+2025-10-18 02:51:14,930 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Calculated change_pct = (1.8400000000000034 / 251.46) * 100 = 0.73%
+2025-10-18 02:51:14,930 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: volume = 29564548
+2025-10-18 02:51:14,930 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Final quote data - price: $253.3, change_pct: 0.73%, change_amount: $1.84
+2025-10-18 02:51:14,930 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: GOOGL
+2025-10-18 02:51:14,930 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker GOOGL (ID: 2) - proceeding to cache quote
+2025-10-18 02:51:14,930 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: GOOGL = $253.3 (USD)
+2025-10-18 02:51:14,931 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 2: List argument must consist only of tuples or dictionaries
+2025-10-18 02:51:14,931 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for GOOGL
+2025-10-18 02:51:14,931 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for GOOGL: $253.3
+2025-10-18 02:51:15,051 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-10-18 02:51:15,052 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Current price: $213.04
+2025-10-18 02:51:15,052 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Calculated change_amount = 213.04 - 214.47 = -1.4300000000000068
+2025-10-18 02:51:15,052 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Calculated change_pct = (-1.4300000000000068 / 214.47) * 100 = -0.67%
+2025-10-18 02:51:15,052 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: volume = 43119976
+2025-10-18 02:51:15,052 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Final quote data - price: $213.04, change_pct: -0.67%, change_amount: $-1.43
+2025-10-18 02:51:15,052 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AMZN
+2025-10-18 02:51:15,052 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AMZN (ID: 6) - proceeding to cache quote
+2025-10-18 02:51:15,052 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AMZN = $213.04 (USD)
+2025-10-18 02:51:15,052 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 6: List argument must consist only of tuples or dictionaries
+2025-10-18 02:51:15,053 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AMZN
+2025-10-18 02:51:15,053 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AMZN: $213.04
+2025-10-18 02:51:15,172 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-10-18 02:51:15,172 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Current price: $439.31
+2025-10-18 02:51:15,172 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Calculated change_amount = 439.31 - 428.75 = 10.560000000000002
+2025-10-18 02:51:15,172 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Calculated change_pct = (10.560000000000002 / 428.75) * 100 = 2.46%
+2025-10-18 02:51:15,172 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: volume = 87848438
+2025-10-18 02:51:15,172 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Final quote data - price: $439.31, change_pct: 2.46%, change_amount: $10.56
+2025-10-18 02:51:15,172 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: TSLA
+2025-10-18 02:51:15,172 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker TSLA (ID: 4) - proceeding to cache quote
+2025-10-18 02:51:15,173 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: TSLA = $439.31 (USD)
+2025-10-18 02:51:15,173 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 4: List argument must consist only of tuples or dictionaries
+2025-10-18 02:51:15,173 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for TSLA
+2025-10-18 02:51:15,173 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for TSLA: $439.31
+2025-10-18 02:51:15,173 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AAPL
+2025-10-18 02:51:15,174 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AAPL (ID: 1) - proceeding to cache quote
+2025-10-18 02:51:15,174 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AAPL = $252.29 (USD)
+2025-10-18 02:51:15,174 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 1: List argument must consist only of tuples or dictionaries
+2025-10-18 02:51:15,174 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AAPL
+2025-10-18 02:51:15,174 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AAPL: $252.29
+2025-10-18 02:51:15,174 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: GOOGL
+2025-10-18 02:51:15,175 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker GOOGL (ID: 2) - proceeding to cache quote
+2025-10-18 02:51:15,175 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: GOOGL = $253.3 (USD)
+2025-10-18 02:51:15,175 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 2: List argument must consist only of tuples or dictionaries
+2025-10-18 02:51:15,175 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for GOOGL
+2025-10-18 02:51:15,176 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for GOOGL: $253.3
+2025-10-18 02:51:15,176 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AMZN
+2025-10-18 02:51:15,176 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AMZN (ID: 6) - proceeding to cache quote
+2025-10-18 02:51:15,177 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AMZN = $213.04 (USD)
+2025-10-18 02:51:15,177 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 6: List argument must consist only of tuples or dictionaries
+2025-10-18 02:51:15,177 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AMZN
+2025-10-18 02:51:15,178 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AMZN: $213.04
+2025-10-18 02:51:15,178 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: TSLA
+2025-10-18 02:51:15,178 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker TSLA (ID: 4) - proceeding to cache quote
+2025-10-18 02:51:15,178 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: TSLA = $439.31 (USD)
+2025-10-18 02:51:15,179 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 4: List argument must consist only of tuples or dictionaries
+2025-10-18 02:51:15,179 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for TSLA
+2025-10-18 02:51:15,179 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for TSLA: $439.31
+2025-10-18 02:51:15,181 - services.external_data.yahoo_finance_adapter - INFO - Updated provider yahoo_finance health: True
+2025-10-18 02:51:15,190 - services.data_refresh_scheduler - INFO - Batch refresh completed: 4 successful, 0 failed
+2025-10-18 02:51:15,191 - services.data_refresh_scheduler - INFO - Group refresh completed: ID 33548 - 4 successful, 0 failed
+2025-10-18 02:51:47,497 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "[36mGET /trades HTTP/1.1[0m" 304 -
+2025-10-18 02:51:47,518 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "[36mGET /styles-new/01-settings/_variables.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:47,522 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "[36mGET /styles-new/01-settings/_colors-semantic.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:47,523 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "[36mGET /styles-new/01-settings/_colors-dynamic.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:47,524 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "[36mGET /styles-new/01-settings/_typography.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:47,525 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "[36mGET /styles-new/01-settings/_spacing.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:47,525 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "[36mGET /styles-new/01-settings/_rtl-logical.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:47,530 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "[36mGET /styles-new/02-tools/_mixins.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:47,532 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "[36mGET /styles-new/02-tools/_functions.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:47,534 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "[36mGET /styles-new/02-tools/_utilities.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:47,537 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "[36mGET /styles-new/03-generic/_reset.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:47,538 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "[36mGET /styles-new/04-elements/_headings.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:47,539 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "[36mGET /styles-new/03-generic/_base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:47,541 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "[36mGET /styles-new/04-elements/_forms-base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:47,542 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "[36mGET /styles-new/04-elements/_buttons-base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:47,544 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "[36mGET /styles-new/04-elements/_links.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:47,546 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "[36mGET /styles-new/05-objects/_grid.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:47,546 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "[36mGET /styles-new/05-objects/_layout.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:47,547 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "[36mGET /styles-new/06-components/_tables.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:47,548 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "[36mGET /styles-new/06-components/_buttons-advanced.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:47,550 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "[36mGET /styles-new/06-components/_cards.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:47,552 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "[36mGET /styles-new/06-components/_notifications.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:47,554 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "[36mGET /styles-new/06-components/_modals.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:47,555 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "[36mGET /styles-new/06-components/_navigation.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:47,556 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "[36mGET /styles-new/06-components/_forms-advanced.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:47,556 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "[36mGET /styles-new/06-components/_badges-status.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:47,558 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "[36mGET /styles-new/08-themes/_light.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:47,559 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "[36mGET /styles-new/06-components/_entity-colors.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:47,561 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "[36mGET /styles-new/header-styles.css?v=v6.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:47,564 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /scripts/page-initialization-configs.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:47,565 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /scripts/global-favicon.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:47,565 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /scripts/unified-app-initializer.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:47,568 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /scripts/translation-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:47,572 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /scripts/cache-sync-manager.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:47,572 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /scripts/notification-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:47,579 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /scripts/unified-cache-manager.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:47,580 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /scripts/memory-optimizer.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:47,580 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /scripts/cache-policy-manager.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:47,582 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /scripts/ui-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:47,585 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /scripts/color-scheme-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:47,591 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /scripts/data-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:47,591 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /scripts/header-system.js?v=v6.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:47,594 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /scripts/date-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:47,596 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /scripts/button-icons.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:47,597 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /scripts/tables.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:47,599 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /scripts/page-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:47,600 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /scripts/table-mappings.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:47,603 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /scripts/preferences.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:47,605 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /scripts/notification-category-detector.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:47,606 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /scripts/global-notification-collector.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:47,609 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /scripts/system-management.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:47,612 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /scripts/linked-items.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:47,612 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /scripts/error-handlers.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:47,613 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /scripts/validation-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:47,613 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /scripts/entity-details-modal.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:47,614 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /scripts/trades.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:47,626 - services.trade_service - INFO - Loading trades with joinedload for account and ticker
+2025-10-18 02:51:47,627 - services.trade_service - INFO - Loaded 13 trades
+2025-10-18 02:51:47,627 - services.trade_service - INFO - First trade ID: 1
+2025-10-18 02:51:47,627 - services.trade_service - INFO - First trade trading_account_id: 1
+2025-10-18 02:51:47,628 - services.trade_service - INFO - First trade ticker_id: 1
+2025-10-18 02:51:47,628 - services.trade_service - INFO - First trade has account attribute: True
+2025-10-18 02:51:47,628 - services.trade_service - INFO - First trade account object: <TradingAccount(name='חשבון מעודכן', currency_id='1', status='open')>
+2025-10-18 02:51:47,628 - services.trade_service - INFO - First trade has ticker attribute: True
+2025-10-18 02:51:47,628 - services.trade_service - INFO - First trade ticker object: <Ticker(symbol='AAPL', name='Apple Inc. - UPDATED', type='stock')>
+2025-10-18 02:51:47,628 - services.trade_service - INFO - First trade account name: חשבון מעודכן
+2025-10-18 02:51:47,628 - services.trade_service - INFO - First trade ticker symbol: AAPL
+2025-10-18 02:51:47,629 - models.trade - INFO - Trade 1: Using loaded account name: חשבון מעודכן
+2025-10-18 02:51:47,629 - models.trade - INFO - Trade 1: Using loaded ticker symbol: AAPL
+2025-10-18 02:51:47,629 - models.trade - INFO - Trade 1 to_dict result: {'id': 1, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'cancelled', 'investment_type': 'swing', 'side': 'Long', 'notes': 'קנייה של Apple', 'opened_at': '2025-08-15 03:51:43', 'closed_at': '2025-08-21 12:36:00', 'created_at': '2025-08-15 03:51:43', 'total_pl': 2500.0, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': '2025-08-31 14:28:23', 'cancel_reason': 'בוטל על ידי המשתמש'}
+2025-10-18 02:51:47,637 - models.trade - INFO - Trade 2: Using loaded account name: חשבון טכנולוגיה
+2025-10-18 02:51:47,637 - models.trade - INFO - Trade 2: Using loaded ticker symbol: GOOGL
+2025-10-18 02:51:47,637 - models.trade - INFO - Trade 2 to_dict result: {'id': 2, 'trading_account_id': 2, 'ticker_id': 2, 'trade_plan_id': 14, 'status': 'closed', 'investment_type': 'investment', 'side': 'Long', 'notes': 'טרייד מוצלח ב-Google', 'opened_at': '2025-08-15 03:51:43', 'closed_at': '2025-08-10 06:51:43', 'created_at': '2025-08-15 03:51:43', 'total_pl': 1500.0, 'account_name': 'חשבון טכנולוגיה', 'ticker_symbol': 'GOOGL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-18 02:51:47,651 - models.trade - INFO - Trade 3: Using loaded account name: חשבון ETF
+2025-10-18 02:51:47,651 - models.trade - INFO - Trade 3: Using loaded ticker symbol: SPY
+2025-10-18 02:51:47,651 - models.trade - INFO - Trade 3 to_dict result: {'id': 3, 'trading_account_id': 3, 'ticker_id': 9, 'trade_plan_id': 2, 'status': 'cancelled', 'investment_type': 'passive', 'side': 'Long', 'notes': 'השקעה ב-ETF', 'opened_at': '2025-08-15 03:51:43', 'closed_at': None, 'created_at': '2025-08-15 03:51:43', 'total_pl': 800.0, 'account_name': 'חשבון ETF', 'ticker_symbol': 'SPY', 'cancelled_at': '2025-08-22 06:50:57', 'cancel_reason': 'בדיקת ביטול'}
+2025-10-18 02:51:47,654 - models.trade - INFO - Trade 4: Using loaded account name: חשבון מעודכן
+2025-10-18 02:51:47,654 - models.trade - INFO - Trade 4: Using loaded ticker symbol: AAPL
+2025-10-18 02:51:47,654 - models.trade - INFO - Trade 4 to_dict result: {'id': 4, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'cancelled', 'investment_type': 'swing', 'side': 'Long', 'notes': None, 'opened_at': '2025-08-26 00:13:21', 'closed_at': None, 'created_at': '2025-08-26 00:13:21', 'total_pl': None, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': '2025-08-31 14:30:08', 'cancel_reason': 'בוטל על ידי המשתמש'}
+2025-10-18 02:51:47,662 - models.trade - INFO - Trade 5: Using loaded account name: חשבון ETF
+2025-10-18 02:51:47,662 - models.trade - INFO - Trade 5: Using loaded ticker symbol: AAPL
+2025-10-18 02:51:47,662 - models.trade - INFO - Trade 5 to_dict result: {'id': 5, 'trading_account_id': 3, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': 'גכעגעג', 'opened_at': '2025-08-30 22:02:00', 'closed_at': None, 'created_at': '2025-08-30 22:02:00', 'total_pl': 0.0, 'account_name': 'חשבון ETF', 'ticker_symbol': 'AAPL', 'cancelled_at': '2025-08-31 14:32:32', 'cancel_reason': 'test'}
+2025-10-18 02:51:47,670 - models.trade - INFO - Trade 6: Using loaded account name: חשבון טכנולוגיה
+2025-10-18 02:51:47,670 - models.trade - INFO - Trade 6: Using loaded ticker symbol: GOOGL
+2025-10-18 02:51:47,670 - models.trade - INFO - Trade 6 to_dict result: {'id': 6, 'trading_account_id': 2, 'ticker_id': 2, 'trade_plan_id': 1, 'status': 'open', 'investment_type': 'investment', 'side': 'Long', 'notes': '', 'opened_at': '2025-08-31 16:57:00', 'closed_at': None, 'created_at': '2025-08-31 16:57:00', 'total_pl': 0.0, 'account_name': 'חשבון טכנולוגיה', 'ticker_symbol': 'GOOGL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-18 02:51:47,683 - models.trade - INFO - Trade 7: Using loaded account name: חשבון טכנולוגיה
+2025-10-18 02:51:47,683 - models.trade - INFO - Trade 7: Using loaded ticker symbol: AMZN
+2025-10-18 02:51:47,683 - models.trade - INFO - Trade 7 to_dict result: {'id': 7, 'trading_account_id': 2, 'ticker_id': 6, 'trade_plan_id': 9, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': None, 'opened_at': '2025-08-31 17:38:00', 'closed_at': None, 'created_at': '2025-08-31 17:38:00', 'total_pl': 0.0, 'account_name': 'חשבון טכנולוגיה', 'ticker_symbol': 'AMZN', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-18 02:51:47,697 - models.trade - INFO - Trade 8: Using loaded account name: חשבון מעודכן
+2025-10-18 02:51:47,698 - models.trade - INFO - Trade 8: Using loaded ticker symbol: AAPL
+2025-10-18 02:51:47,698 - models.trade - INFO - Trade 8 to_dict result: {'id': 8, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'closed', 'investment_type': 'investment', 'side': 'Long', 'notes': None, 'opened_at': '2025-09-01 23:51:48', 'closed_at': '2025-09-02 00:36:20', 'created_at': '2025-09-01 23:51:48', 'total_pl': None, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-18 02:51:47,714 - models.trade - INFO - Trade 9: Using loaded account name: חשבון מעודכן
+2025-10-18 02:51:47,715 - models.trade - INFO - Trade 9: Using loaded ticker symbol: GOOGL
+2025-10-18 02:51:47,715 - models.trade - INFO - Trade 9 to_dict result: {'id': 9, 'trading_account_id': 1, 'ticker_id': 2, 'trade_plan_id': 14, 'status': 'closed', 'investment_type': 'investment', 'side': 'Long', 'notes': None, 'opened_at': '2025-09-02 00:41:51', 'closed_at': '2025-09-02 00:42:08', 'created_at': '2025-09-02 00:41:51', 'total_pl': None, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'GOOGL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-18 02:51:47,731 - models.trade - INFO - Trade 10: Using loaded account name: חשבון מעודכן
+2025-10-18 02:51:47,731 - models.trade - INFO - Trade 10: Using loaded ticker symbol: TSLA
+2025-10-18 02:51:47,731 - models.trade - INFO - Trade 10 to_dict result: {'id': 10, 'trading_account_id': 1, 'ticker_id': 4, 'trade_plan_id': 1, 'status': 'open', 'investment_type': 'investment', 'side': 'Long', 'notes': None, 'opened_at': '2025-09-02 00:56:03', 'closed_at': None, 'created_at': '2025-09-02 00:56:03', 'total_pl': None, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'TSLA', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-18 02:51:47,741 - models.trade - INFO - Trade 11: Using loaded account name: חשבון מעודכן
+2025-10-18 02:51:47,742 - models.trade - INFO - Trade 11: Using loaded ticker symbol: AAPL
+2025-10-18 02:51:47,742 - models.trade - INFO - Trade 11 to_dict result: {'id': 11, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': None, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': 'Test trade', 'opened_at': '2025-10-06 21:05:06', 'closed_at': None, 'created_at': '2025-10-06 21:05:06', 'total_pl': 0.0, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-18 02:51:47,750 - models.trade - INFO - Trade 18: Using loaded account name: חשבון מעודכן
+2025-10-18 02:51:47,750 - models.trade - INFO - Trade 18: Using loaded ticker symbol: AAPL
+2025-10-18 02:51:47,750 - models.trade - INFO - Trade 18 to_dict result: {'id': 18, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': None, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': 'Test trade for CRUD testing', 'opened_at': '2025-10-07 16:13:43', 'closed_at': None, 'created_at': '2025-10-07 16:13:43', 'total_pl': 0.0, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-18 02:51:47,758 - models.trade - INFO - Trade 19: Using loaded account name: חשבון מעודכן
+2025-10-18 02:51:47,758 - models.trade - INFO - Trade 19: Using loaded ticker symbol: AAPL
+2025-10-18 02:51:47,758 - models.trade - INFO - Trade 19 to_dict result: {'id': 19, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': None, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': None, 'opened_at': '2025-10-17 12:36:57', 'closed_at': None, 'created_at': '2025-10-17 12:36:57', 'total_pl': 0.0, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-18 02:51:47,766 - routes.api.trades - INFO - First trade data: {'id': 1, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'cancelled', 'investment_type': 'swing', 'side': 'Long', 'notes': 'קנייה של Apple', 'opened_at': '2025-08-15 03:51:43', 'closed_at': '2025-08-21 12:36:00', 'created_at': '2025-08-15 03:51:43', 'total_pl': 2500.0, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': '2025-08-31 14:28:23', 'cancel_reason': 'בוטל על ידי המשתמש', 'current_price': 252.29, 'daily_change': 1.9559506971105287, 'change_amount': 4.840000000000003}
+2025-10-18 02:51:47,767 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /api/trades/ HTTP/1.1" 200 -
+2025-10-18 02:51:47,771 - routes.api.base_entity.trade_plans - INFO - Getting trade_plans record with ID: 4
+2025-10-18 02:51:47,772 - models.trade_plan - INFO - Trade plan 4: Using loaded ticker relationship
+2025-10-18 02:51:47,772 - models.trade_plan - INFO - Trade plan 4: Using loaded account relationship
+2025-10-18 02:51:47,772 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /api/trade_plans/4 HTTP/1.1" 200 -
+2025-10-18 02:51:47,774 - routes.api.base_entity.trade_plans - INFO - Getting trade_plans record with ID: 14
+2025-10-18 02:51:47,775 - models.trade_plan - INFO - Trade plan 14: Using loaded ticker relationship
+2025-10-18 02:51:47,775 - models.trade_plan - INFO - Trade plan 14: Using loaded account relationship
+2025-10-18 02:51:47,775 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /api/trade_plans/14 HTTP/1.1" 200 -
+2025-10-18 02:51:47,777 - routes.api.base_entity.trade_plans - INFO - Getting trade_plans record with ID: 2
+2025-10-18 02:51:47,779 - models.trade_plan - INFO - Trade plan 2: Using loaded ticker relationship
+2025-10-18 02:51:47,779 - models.trade_plan - INFO - Trade plan 2: Using loaded account relationship
+2025-10-18 02:51:47,779 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /api/trade_plans/2 HTTP/1.1" 200 -
+2025-10-18 02:51:47,793 - routes.api.base_entity.trade_plans - INFO - Getting trade_plans record with ID: 1
+2025-10-18 02:51:47,795 - models.trade_plan - INFO - Trade plan 1: Using loaded ticker relationship
+2025-10-18 02:51:47,795 - models.trade_plan - INFO - Trade plan 1: Using loaded account relationship
+2025-10-18 02:51:47,796 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /api/trade_plans/1 HTTP/1.1" 200 -
+2025-10-18 02:51:47,798 - routes.api.base_entity.trade_plans - INFO - Getting trade_plans record with ID: 9
+2025-10-18 02:51:47,799 - models.trade_plan - INFO - Trade plan 9: Using loaded ticker relationship
+2025-10-18 02:51:47,799 - models.trade_plan - INFO - Trade plan 9: Using loaded account relationship
+2025-10-18 02:51:47,799 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:47] "GET /api/trade_plans/9 HTTP/1.1" 200 -
+2025-10-18 02:51:48,337 - routes.api.base_entity.trading_accounts - INFO - Getting all trading_accounts records
+2025-10-18 02:51:48,337 - cache - INFO - Cache EXPIRED: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Age: 123.1s)
+2025-10-18 02:51:48,338 - cache - INFO - Cache DELETE: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Was accessed 0 times)
+2025-10-18 02:51:48,340 - cache - INFO - Cache SET: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 2908 chars)
+2025-10-18 02:51:48,341 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:48] "GET /api/trading-accounts/ HTTP/1.1" 200 -
+2025-10-18 02:51:55,353 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "GET /trade_plans HTTP/1.1" 200 -
+2025-10-18 02:51:55,369 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "[36mGET /styles-new/01-settings/_variables.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:55,374 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "[36mGET /styles-new/01-settings/_colors-dynamic.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:55,375 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "[36mGET /styles-new/01-settings/_colors-semantic.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:55,375 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "[36mGET /styles-new/01-settings/_rtl-logical.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:55,377 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "[36mGET /styles-new/01-settings/_spacing.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:55,380 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "[36mGET /styles-new/01-settings/_typography.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:55,383 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "[36mGET /styles-new/02-tools/_functions.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:55,387 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "[36mGET /styles-new/02-tools/_utilities.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:55,390 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "[36mGET /styles-new/03-generic/_reset.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:55,390 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "[36mGET /styles-new/02-tools/_mixins.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:55,391 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "[36mGET /styles-new/03-generic/_base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:55,392 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "[36mGET /styles-new/04-elements/_headings.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:55,397 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "[36mGET /styles-new/04-elements/_links.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:55,397 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "[36mGET /styles-new/04-elements/_forms-base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:55,398 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "[36mGET /styles-new/04-elements/_buttons-base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:55,399 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "[36mGET /styles-new/05-objects/_layout.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:55,402 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "[36mGET /styles-new/06-components/_buttons-advanced.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:55,403 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "[36mGET /styles-new/05-objects/_grid.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:55,405 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "[36mGET /styles-new/06-components/_tables.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:55,406 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "[36mGET /styles-new/06-components/_cards.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:55,410 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "[36mGET /styles-new/06-components/_modals.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:55,411 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "[36mGET /styles-new/06-components/_navigation.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:55,411 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "[36mGET /styles-new/06-components/_notifications.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:55,413 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "[36mGET /styles-new/06-components/_forms-advanced.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:55,413 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "[36mGET /styles-new/06-components/_badges-status.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:55,414 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "[36mGET /styles-new/06-components/_entity-colors.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:55,416 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "[36mGET /styles-new/08-themes/_light.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:55,418 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "[36mGET /styles-new/header-styles.css?v=v6.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:51:55,421 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "GET /scripts/page-initialization-configs.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:55,421 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "GET /scripts/unified-app-initializer.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:55,423 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "GET /scripts/global-favicon.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:55,424 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "GET /scripts/translation-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:55,425 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "GET /scripts/notification-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:55,429 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "GET /scripts/cache-sync-manager.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:55,430 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "GET /scripts/cache-policy-manager.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:55,430 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "GET /scripts/unified-cache-manager.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:55,431 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "GET /scripts/memory-optimizer.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:55,439 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "GET /scripts/color-scheme-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:55,439 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "GET /scripts/ui-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:55,439 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "GET /scripts/header-system.js?v=v6.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:55,440 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "GET /scripts/data-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:55,441 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "GET /scripts/button-icons.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:55,441 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "GET /scripts/date-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:55,447 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "GET /scripts/tables.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:55,449 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "GET /scripts/table-mappings.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:55,450 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "GET /scripts/page-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:55,451 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "GET /scripts/notification-category-detector.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:55,452 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "GET /scripts/preferences.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:55,453 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "GET /scripts/global-notification-collector.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:55,454 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "GET /scripts/system-management.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:55,456 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "GET /scripts/error-handlers.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:55,456 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-18T02:51:55.456252', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/scripts/global-confirm-replacement.js?v=1.0.0', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 175, in scripts_files\n    response = send_from_directory(UI_DIR / "scripts", filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-18 02:51:55,457 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-18T02:51:55.457186', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/scripts/section-state-persistence.js?v=1.0.0', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 175, in scripts_files\n    response = send_from_directory(UI_DIR / "scripts", filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-18 02:51:55,459 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-18T02:51:55.456252', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/scripts/global-confirm-replacement.js?v=1.0.0', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 175, in scripts_files\n    response = send_from_directory(UI_DIR / "scripts", filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-18 02:51:55,460 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "GET /scripts/linked-items.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:55,461 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-18T02:51:55.457186', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/scripts/section-state-persistence.js?v=1.0.0', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 175, in scripts_files\n    response = send_from_directory(UI_DIR / "scripts", filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-18 02:51:55,462 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "GET /scripts/entity-details-modal.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:55,462 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "[33mGET /scripts/global-confirm-replacement.js?v=1.0.0 HTTP/1.1[0m" 404 -
+2025-10-18 02:51:55,462 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "GET /scripts/trade_plans.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:51:55,464 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "[33mGET /scripts/section-state-persistence.js?v=1.0.0 HTTP/1.1[0m" 404 -
+2025-10-18 02:51:55,545 - routes.api.base_entity.trade_plans - INFO - Getting all trade_plans records
+2025-10-18 02:51:55,545 - cache - INFO - Cache MISS: get_all_trade_plans_99914b932bd37a50b983c5e7c90ae93b
+2025-10-18 02:51:55,545 - services.trade_plan_service - INFO - Loading trade plans with joinedload for ticker and account
+2025-10-18 02:51:55,547 - services.trade_plan_service - INFO - Loaded 21 trade plans
+2025-10-18 02:51:55,548 - services.trade_plan_service - INFO - First plan ticker: <Ticker(symbol='TSLA', name='Tesla Inc.', type='stock')>
+2025-10-18 02:51:55,548 - services.trade_plan_service - INFO - First plan account: <TradingAccount(name='חשבון מעודכן', currency_id='1', status='open')>
+2025-10-18 02:51:55,549 - models.trade_plan - INFO - Trade plan 1: Using loaded ticker relationship
+2025-10-18 02:51:55,549 - models.trade_plan - INFO - Trade plan 1: Using loaded account relationship
+2025-10-18 02:51:55,549 - models.trade_plan - INFO - Trade plan 2: Using loaded ticker relationship
+2025-10-18 02:51:55,549 - models.trade_plan - INFO - Trade plan 2: Using loaded account relationship
+2025-10-18 02:51:55,549 - models.trade_plan - INFO - Trade plan 3: Using loaded ticker relationship
+2025-10-18 02:51:55,549 - models.trade_plan - INFO - Trade plan 3: Using loaded account relationship
+2025-10-18 02:51:55,549 - models.trade_plan - INFO - Trade plan 4: Using loaded ticker relationship
+2025-10-18 02:51:55,549 - models.trade_plan - INFO - Trade plan 4: Using loaded account relationship
+2025-10-18 02:51:55,550 - models.trade_plan - INFO - Trade plan 5: Using loaded ticker relationship
+2025-10-18 02:51:55,550 - models.trade_plan - INFO - Trade plan 5: Using loaded account relationship
+2025-10-18 02:51:55,550 - models.trade_plan - INFO - Trade plan 6: Using loaded ticker relationship
+2025-10-18 02:51:55,550 - models.trade_plan - INFO - Trade plan 6: Using loaded account relationship
+2025-10-18 02:51:55,550 - models.trade_plan - INFO - Trade plan 7: Using loaded ticker relationship
+2025-10-18 02:51:55,550 - models.trade_plan - INFO - Trade plan 7: Using loaded account relationship
+2025-10-18 02:51:55,550 - models.trade_plan - INFO - Trade plan 8: Using loaded ticker relationship
+2025-10-18 02:51:55,550 - models.trade_plan - INFO - Trade plan 8: Using loaded account relationship
+2025-10-18 02:51:55,551 - models.trade_plan - INFO - Trade plan 9: Using loaded ticker relationship
+2025-10-18 02:51:55,551 - models.trade_plan - INFO - Trade plan 9: Using loaded account relationship
+2025-10-18 02:51:55,551 - models.trade_plan - INFO - Trade plan 10: Using loaded ticker relationship
+2025-10-18 02:51:55,551 - models.trade_plan - INFO - Trade plan 10: Using loaded account relationship
+2025-10-18 02:51:55,551 - models.trade_plan - INFO - Trade plan 11: Using loaded ticker relationship
+2025-10-18 02:51:55,552 - models.trade_plan - INFO - Trade plan 11: Using loaded account relationship
+2025-10-18 02:51:55,552 - models.trade_plan - INFO - Trade plan 12: Using loaded ticker relationship
+2025-10-18 02:51:55,552 - models.trade_plan - INFO - Trade plan 12: Using loaded account relationship
+2025-10-18 02:51:55,552 - models.trade_plan - INFO - Trade plan 14: Using loaded ticker relationship
+2025-10-18 02:51:55,552 - models.trade_plan - INFO - Trade plan 14: Using loaded account relationship
+2025-10-18 02:51:55,552 - models.trade_plan - INFO - Trade plan 15: Using loaded ticker relationship
+2025-10-18 02:51:55,552 - models.trade_plan - INFO - Trade plan 15: Using loaded account relationship
+2025-10-18 02:51:55,553 - models.trade_plan - INFO - Trade plan 20: Using loaded ticker relationship
+2025-10-18 02:51:55,553 - models.trade_plan - INFO - Trade plan 20: Using loaded account relationship
+2025-10-18 02:51:55,553 - models.trade_plan - INFO - Trade plan 21: Using loaded ticker relationship
+2025-10-18 02:51:55,553 - models.trade_plan - INFO - Trade plan 21: Using loaded account relationship
+2025-10-18 02:51:55,553 - models.trade_plan - INFO - Trade plan 22: Using loaded ticker relationship
+2025-10-18 02:51:55,553 - models.trade_plan - INFO - Trade plan 22: Using loaded account relationship
+2025-10-18 02:51:55,553 - models.trade_plan - INFO - Trade plan 23: Using loaded ticker relationship
+2025-10-18 02:51:55,553 - models.trade_plan - INFO - Trade plan 23: Using loaded account relationship
+2025-10-18 02:51:55,553 - models.trade_plan - INFO - Trade plan 24: Using loaded ticker relationship
+2025-10-18 02:51:55,554 - models.trade_plan - INFO - Trade plan 24: Using loaded account relationship
+2025-10-18 02:51:55,554 - models.trade_plan - INFO - Trade plan 25: Using loaded ticker relationship
+2025-10-18 02:51:55,554 - models.trade_plan - INFO - Trade plan 25: Using loaded account relationship
+2025-10-18 02:51:55,554 - models.trade_plan - INFO - Trade plan 27: Using loaded ticker relationship
+2025-10-18 02:51:55,554 - models.trade_plan - INFO - Trade plan 27: Using loaded account relationship
+2025-10-18 02:51:55,554 - cache - INFO - Cache SET: get_all_trade_plans_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 10867 chars)
+2025-10-18 02:51:55,555 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:55] "GET /api/trade_plans/ HTTP/1.1" 200 -
+2025-10-18 02:51:56,184 - routes.api.base_entity.trading_accounts - INFO - Getting all trading_accounts records
+2025-10-18 02:51:56,185 - cache - INFO - Cache HIT: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Access count: 1)
+2025-10-18 02:51:56,185 - routes.api.base_entity.trading_accounts - INFO - Cache hit for trading_accounts get_all
+2025-10-18 02:51:56,186 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:51:56] "GET /api/trading-accounts/ HTTP/1.1" 200 -
+2025-10-18 02:52:00,270 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "GET /alerts HTTP/1.1" 200 -
+2025-10-18 02:52:00,295 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "[36mGET /styles-new/01-settings/_variables.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:00,300 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "[36mGET /styles-new/01-settings/_colors-semantic.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:00,304 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "[36mGET /styles-new/01-settings/_spacing.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:00,305 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "[36mGET /styles-new/01-settings/_colors-dynamic.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:00,305 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "[36mGET /styles-new/01-settings/_typography.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:00,308 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "[36mGET /styles-new/01-settings/_rtl-logical.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:00,308 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "[36mGET /styles-new/02-tools/_mixins.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:00,310 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "[36mGET /styles-new/02-tools/_functions.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:00,312 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "[36mGET /styles-new/02-tools/_utilities.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:00,314 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "[36mGET /styles-new/03-generic/_base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:00,316 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "[36mGET /styles-new/03-generic/_reset.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:00,318 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "[36mGET /styles-new/04-elements/_headings.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:00,320 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "[36mGET /styles-new/04-elements/_forms-base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:00,321 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "[36mGET /styles-new/04-elements/_links.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:00,323 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "[36mGET /styles-new/04-elements/_buttons-base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:00,324 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "[36mGET /styles-new/05-objects/_layout.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:00,325 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "[36mGET /styles-new/05-objects/_grid.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:00,326 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "[36mGET /styles-new/06-components/_buttons-advanced.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:00,330 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "[36mGET /styles-new/06-components/_tables.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:00,330 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "[36mGET /styles-new/06-components/_cards.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:00,330 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "[36mGET /styles-new/06-components/_modals.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:00,331 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "[36mGET /styles-new/06-components/_notifications.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:00,333 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "[36mGET /styles-new/06-components/_navigation.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:00,333 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "[36mGET /styles-new/06-components/_forms-advanced.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:00,333 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "[36mGET /styles-new/06-components/_badges-status.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:00,335 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-18T02:52:00.334347', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/styles-new/07-pages/_alerts.css?v=1.0.0', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 162, in styles_new_files\n    response = send_from_directory(UI_DIR / "styles-new", filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-18 02:52:00,335 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "[36mGET /styles-new/06-components/_entity-colors.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:00,336 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "[36mGET /styles-new/08-themes/_light.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:00,337 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "[36mGET /styles-new/header-styles.css?v=v6.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:00,338 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-18T02:52:00.334347', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/styles-new/07-pages/_alerts.css?v=1.0.0', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 162, in styles_new_files\n    response = send_from_directory(UI_DIR / "styles-new", filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-18 02:52:00,338 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-18T02:52:00.338011', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/images/icons/accounts.svg', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 188, in images_files\n    return send_from_directory(UI_DIR / "images", filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-18 02:52:00,340 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "GET /images/icons/tickers.svg HTTP/1.1" 200 -
+2025-10-18 02:52:00,340 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "GET /scripts/unified-app-initializer.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:00,340 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "GET /scripts/page-initialization-configs.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:00,340 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "[33mGET /styles-new/07-pages/_alerts.css?v=1.0.0 HTTP/1.1[0m" 404 -
+2025-10-18 02:52:00,341 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-18T02:52:00.338011', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/images/icons/accounts.svg', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 188, in images_files\n    return send_from_directory(UI_DIR / "images", filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-18 02:52:00,341 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "GET /scripts/global-favicon.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:00,343 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "GET /scripts/translation-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:00,345 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "[33mGET /images/icons/accounts.svg HTTP/1.1[0m" 404 -
+2025-10-18 02:52:00,348 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "GET /scripts/notification-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:00,351 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "GET /scripts/cache-sync-manager.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:00,353 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "GET /scripts/unified-cache-manager.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:00,353 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "GET /scripts/cache-policy-manager.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:00,356 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "GET /scripts/color-scheme-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:00,357 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "GET /scripts/ui-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:00,358 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "GET /scripts/memory-optimizer.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:00,362 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "GET /scripts/header-system.js?v=v6.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:00,365 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "GET /scripts/data-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:00,368 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "GET /scripts/date-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:00,368 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "GET /scripts/button-icons.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:00,371 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "GET /scripts/tables.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:00,371 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "GET /scripts/table-mappings.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:00,372 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "GET /scripts/page-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:00,373 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "GET /scripts/preferences.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:00,377 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "GET /scripts/notification-category-detector.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:00,379 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "GET /scripts/global-notification-collector.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:00,379 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "GET /scripts/system-management.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:00,380 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "GET /scripts/alerts.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:00,389 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:00] "GET /api/preferences/user/single?preference_name=notifications_business_enabled&user_id=1 HTTP/1.1" 200 -
+2025-10-18 02:52:01,096 - routes.api.base_entity.trading_accounts - INFO - Getting all trading_accounts records
+2025-10-18 02:52:01,096 - cache - INFO - Cache HIT: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Access count: 2)
+2025-10-18 02:52:01,097 - routes.api.base_entity.trading_accounts - INFO - Cache hit for trading_accounts get_all
+2025-10-18 02:52:01,098 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:01] "GET /api/trading-accounts/ HTTP/1.1" 200 -
+2025-10-18 02:52:09,699 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "[36mGET /styles-new/01-settings/_variables.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:09,703 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "[36mGET /styles-new/01-settings/_colors-dynamic.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:09,704 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "[36mGET /styles-new/01-settings/_colors-semantic.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:09,705 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "[36mGET /styles-new/01-settings/_rtl-logical.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:09,706 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "[36mGET /styles-new/01-settings/_spacing.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:09,707 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "[36mGET /styles-new/01-settings/_typography.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:09,708 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "[36mGET /styles-new/02-tools/_mixins.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:09,711 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "[36mGET /styles-new/02-tools/_utilities.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:09,714 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "[36mGET /styles-new/02-tools/_functions.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:09,718 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "[36mGET /styles-new/04-elements/_headings.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:09,719 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "[36mGET /styles-new/03-generic/_reset.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:09,725 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "[36mGET /styles-new/04-elements/_forms-base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:09,728 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "[36mGET /styles-new/03-generic/_base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:09,729 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "[36mGET /styles-new/04-elements/_buttons-base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:09,730 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "[36mGET /styles-new/04-elements/_links.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:09,732 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "[36mGET /styles-new/05-objects/_layout.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:09,734 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "[36mGET /styles-new/06-components/_tables.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:09,734 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "[36mGET /styles-new/06-components/_buttons-advanced.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:09,735 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "[36mGET /styles-new/05-objects/_grid.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:09,736 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "[36mGET /styles-new/06-components/_cards.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:09,738 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "[36mGET /styles-new/06-components/_modals.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:09,738 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "[36mGET /styles-new/06-components/_notifications.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:09,740 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "[36mGET /styles-new/06-components/_navigation.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:09,740 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "[36mGET /styles-new/06-components/_badges-status.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:09,740 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "[36mGET /styles-new/06-components/_forms-advanced.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:09,742 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "[36mGET /styles-new/06-components/_entity-colors.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:09,744 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "[36mGET /styles-new/08-themes/_light.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:09,744 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "[36mGET /styles-new/header-styles.css?v=v6.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:09,746 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "GET /scripts/page-initialization-configs.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:09,746 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "GET /scripts/unified-app-initializer.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:09,748 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "GET /scripts/global-favicon.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:09,748 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "GET /scripts/translation-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:09,750 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "GET /scripts/cache-sync-manager.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:09,753 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "GET /scripts/notification-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:09,755 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "GET /scripts/memory-optimizer.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:09,755 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "GET /scripts/cache-policy-manager.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:09,761 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "GET /scripts/unified-cache-manager.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:09,762 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "GET /scripts/ui-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:09,763 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "GET /scripts/color-scheme-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:09,767 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "GET /scripts/header-system.js?v=v6.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:09,769 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "GET /scripts/data-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:09,770 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "GET /scripts/date-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:09,770 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "GET /scripts/button-icons.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:09,776 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "GET /scripts/tables.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:09,778 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "GET /scripts/table-mappings.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:09,780 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "GET /scripts/preferences.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:09,780 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "GET /scripts/page-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:09,784 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "GET /scripts/notification-category-detector.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:09,785 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "GET /scripts/global-notification-collector.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:09,788 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "GET /scripts/system-management.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:09,789 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "GET /scripts/error-handlers.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:09,791 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-18T02:52:09.789749', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/scripts/global-confirm-replacement.js?v=1.0.0', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 175, in scripts_files\n    response = send_from_directory(UI_DIR / "scripts", filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-18 02:52:09,792 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "GET /scripts/linked-items.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:09,792 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-18T02:52:09.790568', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/scripts/section-state-persistence.js?v=1.0.0', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 175, in scripts_files\n    response = send_from_directory(UI_DIR / "scripts", filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-18 02:52:09,795 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "GET /scripts/trade_plans.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:09,794 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "GET /scripts/entity-details-modal.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:09,796 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-18T02:52:09.789749', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/scripts/global-confirm-replacement.js?v=1.0.0', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 175, in scripts_files\n    response = send_from_directory(UI_DIR / "scripts", filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-18 02:52:09,798 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "[33mGET /scripts/global-confirm-replacement.js?v=1.0.0 HTTP/1.1[0m" 404 -
+2025-10-18 02:52:09,796 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-18T02:52:09.790568', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/scripts/section-state-persistence.js?v=1.0.0', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 175, in scripts_files\n    response = send_from_directory(UI_DIR / "scripts", filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-18 02:52:09,801 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:09] "[33mGET /scripts/section-state-persistence.js?v=1.0.0 HTTP/1.1[0m" 404 -
+2025-10-18 02:52:10,522 - routes.api.base_entity.trading_accounts - INFO - Getting all trading_accounts records
+2025-10-18 02:52:10,522 - cache - INFO - Cache HIT: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Access count: 3)
+2025-10-18 02:52:10,523 - routes.api.base_entity.trading_accounts - INFO - Cache hit for trading_accounts get_all
+2025-10-18 02:52:10,524 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:10] "GET /api/trading-accounts/ HTTP/1.1" 200 -
+2025-10-18 02:52:19,920 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:19] "GET /preferences HTTP/1.1" 200 -
+2025-10-18 02:52:19,948 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:19] "[36mGET /styles-new/02-tools/_mixins.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:19,950 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:19] "[36mGET /styles-new/02-tools/_functions.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:19,955 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:19] "[36mGET /styles-new/02-tools/_utilities.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:19,956 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:19] "[36mGET /styles-new/04-elements/_headings.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:19,956 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:19] "[36mGET /styles-new/04-elements/_links.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:19,956 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:19] "[36mGET /styles-new/04-elements/_buttons-base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:19,957 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:19] "[36mGET /styles-new/04-elements/_forms-base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:19,958 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:19] "[36mGET /styles-new/06-components/_entity-colors.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:19,965 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:19] "[36mGET /styles-new/header-styles.css?v=v6.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:19,966 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:19] "GET /scripts/global-favicon.js HTTP/1.1" 200 -
+2025-10-18 02:52:19,967 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:19] "GET /scripts/ui-utils.js HTTP/1.1" 200 -
+2025-10-18 02:52:19,970 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:19] "GET /scripts/data-utils.js HTTP/1.1" 200 -
+2025-10-18 02:52:19,970 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:19] "GET /scripts/notification-system.js HTTP/1.1" 200 -
+2025-10-18 02:52:19,972 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:19] "GET /scripts/system-management.js HTTP/1.1" 200 -
+2025-10-18 02:52:19,972 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:19] "GET /scripts/notification-category-detector.js HTTP/1.1" 200 -
+2025-10-18 02:52:19,973 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:19] "GET /scripts/global-notification-collector.js HTTP/1.1" 200 -
+2025-10-18 02:52:19,981 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:19] "GET /scripts/page-utils.js HTTP/1.1" 200 -
+2025-10-18 02:52:19,984 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:19] "GET /scripts/unified-cache-manager.js HTTP/1.1" 200 -
+2025-10-18 02:52:19,985 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:19] "GET /scripts/tables.js HTTP/1.1" 200 -
+2025-10-18 02:52:19,990 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:19] "GET /scripts/cache-sync-manager.js HTTP/1.1" 200 -
+2025-10-18 02:52:19,991 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:19] "GET /scripts/cache-policy-manager.js HTTP/1.1" 200 -
+2025-10-18 02:52:19,992 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:19] "GET /scripts/preferences.js HTTP/1.1" 200 -
+2025-10-18 02:52:19,992 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:19] "GET /scripts/memory-optimizer.js HTTP/1.1" 200 -
+2025-10-18 02:52:19,993 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:19] "GET /scripts/header-system.js?v=v6.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:19,995 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:19] "GET /scripts/page-initialization-configs.js HTTP/1.1" 200 -
+2025-10-18 02:52:19,998 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:19] "GET /scripts/unified-app-initializer.js HTTP/1.1" 200 -
+2025-10-18 02:52:20,757 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:20] "GET /api/preferences/health HTTP/1.1" 200 -
+2025-10-18 02:52:20,779 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:20] "GET /api/preferences/profiles?user_id=1 HTTP/1.1" 200 -
+2025-10-18 02:52:20,780 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:20] "GET /api/preferences/groups HTTP/1.1" 200 -
+2025-10-18 02:52:20,848 - routes.api.base_entity.trading_accounts - INFO - Getting all trading_accounts records
+2025-10-18 02:52:20,849 - cache - INFO - Cache HIT: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Access count: 4)
+2025-10-18 02:52:20,849 - routes.api.base_entity.trading_accounts - INFO - Cache hit for trading_accounts get_all
+2025-10-18 02:52:20,850 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:20] "GET /api/trading-accounts/ HTTP/1.1" 200 -
+2025-10-18 02:52:34,713 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:34] "[36mGET /preferences HTTP/1.1[0m" 304 -
+2025-10-18 02:52:34,729 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:34] "[36mGET /styles-new/02-tools/_mixins.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:34,731 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:34] "[36mGET /styles-new/02-tools/_utilities.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:34,731 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:34] "[36mGET /styles-new/02-tools/_functions.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:34,732 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:34] "[36mGET /styles-new/04-elements/_headings.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:34,733 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:34] "[36mGET /styles-new/04-elements/_links.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:34,734 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:34] "[36mGET /styles-new/04-elements/_forms-base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:34,735 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:34] "[36mGET /styles-new/04-elements/_buttons-base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:34,736 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:34] "[36mGET /styles-new/06-components/_entity-colors.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:34,736 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:34] "[36mGET /styles-new/header-styles.css?v=v6.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:34,738 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:34] "GET /scripts/ui-utils.js HTTP/1.1" 200 -
+2025-10-18 02:52:34,738 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:34] "GET /scripts/global-favicon.js HTTP/1.1" 200 -
+2025-10-18 02:52:34,739 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:34] "GET /scripts/notification-system.js HTTP/1.1" 200 -
+2025-10-18 02:52:34,739 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:34] "GET /scripts/data-utils.js HTTP/1.1" 200 -
+2025-10-18 02:52:34,742 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:34] "GET /scripts/system-management.js HTTP/1.1" 200 -
+2025-10-18 02:52:34,742 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:34] "GET /scripts/notification-category-detector.js HTTP/1.1" 200 -
+2025-10-18 02:52:34,744 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:34] "GET /scripts/tables.js HTTP/1.1" 200 -
+2025-10-18 02:52:34,745 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:34] "GET /scripts/global-notification-collector.js HTTP/1.1" 200 -
+2025-10-18 02:52:34,746 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:34] "GET /scripts/page-utils.js HTTP/1.1" 200 -
+2025-10-18 02:52:34,746 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:34] "GET /scripts/unified-cache-manager.js HTTP/1.1" 200 -
+2025-10-18 02:52:34,747 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:34] "GET /scripts/cache-sync-manager.js HTTP/1.1" 200 -
+2025-10-18 02:52:34,750 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:34] "GET /scripts/cache-policy-manager.js HTTP/1.1" 200 -
+2025-10-18 02:52:34,752 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:34] "GET /scripts/preferences.js HTTP/1.1" 200 -
+2025-10-18 02:52:34,754 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:34] "GET /scripts/memory-optimizer.js HTTP/1.1" 200 -
+2025-10-18 02:52:34,756 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:34] "GET /scripts/header-system.js?v=v6.0.0 HTTP/1.1" 200 -
+2025-10-18 02:52:34,757 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:34] "GET /scripts/page-initialization-configs.js HTTP/1.1" 200 -
+2025-10-18 02:52:34,758 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:34] "GET /scripts/unified-app-initializer.js HTTP/1.1" 200 -
+2025-10-18 02:52:35,471 - routes.api.base_entity.trading_accounts - INFO - Getting all trading_accounts records
+2025-10-18 02:52:35,471 - cache - INFO - Cache HIT: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Access count: 5)
+2025-10-18 02:52:35,471 - routes.api.base_entity.trading_accounts - INFO - Cache hit for trading_accounts get_all
+2025-10-18 02:52:35,472 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:35] "GET /api/trading-accounts/ HTTP/1.1" 200 -
+2025-10-18 02:52:46,768 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:46] "[36mGET /styles-new/02-tools/_mixins.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:46,769 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:46] "[36mGET /styles-new/02-tools/_utilities.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:46,770 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:46] "[36mGET /styles-new/04-elements/_headings.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:46,770 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:46] "[36mGET /styles-new/02-tools/_functions.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:46,771 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:46] "[36mGET /styles-new/04-elements/_links.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:46,772 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:46] "[36mGET /styles-new/04-elements/_forms-base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:46,779 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:46] "[36mGET /styles-new/04-elements/_buttons-base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:46,781 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:46] "[36mGET /styles-new/06-components/_entity-colors.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:52:46,782 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:52:46] "[36mGET /styles-new/header-styles.css?v=v6.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:53:04,552 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "[36mGET /styles-new/01-settings/_variables.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:53:04,559 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "[36mGET /styles-new/01-settings/_colors-semantic.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:53:04,561 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "[36mGET /styles-new/01-settings/_colors-dynamic.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:53:04,562 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "[36mGET /styles-new/01-settings/_spacing.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:53:04,565 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "[36mGET /styles-new/01-settings/_typography.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:53:04,570 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "[36mGET /styles-new/01-settings/_rtl-logical.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:53:04,576 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "[36mGET /styles-new/02-tools/_functions.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:53:04,576 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "[36mGET /styles-new/02-tools/_mixins.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:53:04,579 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "[36mGET /styles-new/03-generic/_reset.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:53:04,580 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "[36mGET /styles-new/02-tools/_utilities.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:53:04,584 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "[36mGET /styles-new/03-generic/_base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:53:04,585 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "[36mGET /styles-new/04-elements/_headings.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:53:04,587 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "[36mGET /styles-new/04-elements/_links.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:53:04,587 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "[36mGET /styles-new/04-elements/_forms-base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:53:04,590 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "[36mGET /styles-new/04-elements/_buttons-base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:53:04,591 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "[36mGET /styles-new/05-objects/_layout.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:53:04,591 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "[36mGET /styles-new/05-objects/_grid.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:53:04,592 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "[36mGET /styles-new/06-components/_buttons-advanced.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:53:04,592 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "[36mGET /styles-new/06-components/_tables.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:53:04,592 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "[36mGET /styles-new/06-components/_cards.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:53:04,595 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "[36mGET /styles-new/06-components/_modals.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:53:04,599 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "[36mGET /styles-new/06-components/_forms-advanced.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:53:04,600 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "[36mGET /styles-new/06-components/_notifications.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:53:04,600 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "[36mGET /styles-new/06-components/_navigation.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:53:04,601 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "[36mGET /styles-new/06-components/_badges-status.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:53:04,605 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "[36mGET /styles-new/06-components/_entity-colors.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:53:04,606 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "[36mGET /styles-new/08-themes/_light.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:53:04,606 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "[36mGET /styles-new/header-styles.css?v=v6.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 02:53:04,606 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "GET /scripts/page-initialization-configs.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:53:04,607 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "GET /scripts/unified-app-initializer.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:53:04,610 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "GET /scripts/global-favicon.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:53:04,610 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "GET /scripts/notification-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:53:04,612 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "GET /scripts/translation-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:53:04,614 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "GET /scripts/cache-sync-manager.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:53:04,618 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "GET /scripts/unified-cache-manager.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:53:04,625 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "GET /scripts/cache-policy-manager.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:53:04,627 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "GET /scripts/memory-optimizer.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:53:04,627 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "GET /scripts/ui-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:53:04,633 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "GET /scripts/header-system.js?v=v6.0.0 HTTP/1.1" 200 -
+2025-10-18 02:53:04,634 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "GET /scripts/color-scheme-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:53:04,635 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "GET /scripts/data-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:53:04,636 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "GET /scripts/date-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:53:04,636 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "GET /scripts/button-icons.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:53:04,640 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "GET /scripts/tables.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:53:04,642 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "GET /scripts/table-mappings.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:53:04,644 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "GET /scripts/page-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:53:04,644 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "GET /scripts/notification-category-detector.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:53:04,645 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "GET /scripts/preferences.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:53:04,648 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "GET /scripts/global-notification-collector.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:53:04,650 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "GET /scripts/system-management.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:53:04,653 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "GET /scripts/error-handlers.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:53:04,654 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-18T02:53:04.653069', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/scripts/section-state-persistence.js?v=1.0.0', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 175, in scripts_files\n    response = send_from_directory(UI_DIR / "scripts", filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-18 02:53:04,655 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-18T02:53:04.653183', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/scripts/global-confirm-replacement.js?v=1.0.0', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 175, in scripts_files\n    response = send_from_directory(UI_DIR / "scripts", filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-18 02:53:04,655 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "GET /scripts/linked-items.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:53:04,657 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "GET /scripts/entity-details-modal.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:53:04,656 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-18T02:53:04.653069', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/scripts/section-state-persistence.js?v=1.0.0', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 175, in scripts_files\n    response = send_from_directory(UI_DIR / "scripts", filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-18 02:53:04,658 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "GET /scripts/trade_plans.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-18 02:53:04,656 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-18T02:53:04.653183', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/scripts/global-confirm-replacement.js?v=1.0.0', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 175, in scripts_files\n    response = send_from_directory(UI_DIR / "scripts", filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-18 02:53:04,661 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "[33mGET /scripts/section-state-persistence.js?v=1.0.0 HTTP/1.1[0m" 404 -
+2025-10-18 02:53:04,662 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:04] "[33mGET /scripts/global-confirm-replacement.js?v=1.0.0 HTTP/1.1[0m" 404 -
+2025-10-18 02:53:05,401 - routes.api.base_entity.trading_accounts - INFO - Getting all trading_accounts records
+2025-10-18 02:53:05,401 - cache - INFO - Cache EXPIRED: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Age: 77.1s)
+2025-10-18 02:53:05,401 - cache - INFO - Cache DELETE: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Was accessed 5 times)
+2025-10-18 02:53:05,402 - cache - INFO - Cache SET: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 2908 chars)
+2025-10-18 02:53:05,402 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 02:53:05] "GET /api/trading-accounts/ HTTP/1.1" 200 -
+2025-10-18 02:53:11,712 - cache - INFO - Cache DELETE: get_all_trade_plans_99914b932bd37a50b983c5e7c90ae93b (Was accessed 0 times)

@@ -151,10 +151,10 @@
                             </button>
                             
                             <!-- כפתורי עריכה ומחיקה נסתרים (לזיהוי בבדיקות) -->
-                            <button id="editTradeBtn" class="refresh-btn d-none" onclick="editTradeRecord('')" title="ערוך טרייד נבחר">
+                            <button id="editTradeBtn" class="btn btn-secondary d-none" onclick="editTradeRecord('')" title="ערוך טרייד נבחר">
                                 <img src="images/icons/trades.svg" alt="ערוך" class="action-icon" style="width: 16px; height: 16px;"> ערוך
                             </button>
-                            <button id="deleteTradeBtn" class="refresh-btn d-none" onclick="deleteTradeRecord('')" title="מחק טרייד נבחר">
+                            <button id="deleteTradeBtn" class="btn btn-danger d-none" onclick="deleteTradeRecord('')" title="מחק טרייד נבחר">
                                 <img src="images/icons/trades.svg" alt="מחק" class="action-icon" style="width: 16px; height: 16px;"> מחק
                             </button>
 
@@ -283,7 +283,7 @@
         <div class="modal fade" id="editTradeModal" tabindex="-1" aria-labelledby="editTradeModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
             <div class="modal-dialog modal-lg" style="max-width: 800px; margin: 1.75rem auto;">
                 <div class="modal-content">
-                    <div class="modal-header" style="background-color: #ff9c05; color: white;">
+                    <div class="modal-header" style="background-color: var(--warning-color, #ff9c05); color: white;">
                         <h5 class="modal-title" id="editTradeModalLabel" style="order: 1;">עריכת טרייד</h5>
                         <div style="order: 2;">
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -292,16 +292,16 @@
 
                     <!-- שורת מידע ואיקונים מתחת לכותרת -->
                     <div class="d-flex justify-content-between align-items-center p-2"
-                        style="background-color: #f8f9fa; border-bottom: 1px solid #dee2e6;">
+                        style="background-color: var(--light-bg-color, #f8f9fa); border-bottom: 1px solid var(--border-color, #dee2e6);">
                         <!-- מידע טיקר, מחיר ושינוי יומי -->
                         <div class="d-flex gap-4 align-items-center">
                             <div class="d-flex align-items-center">
                                 <span class="text-muted me-2" style="font-size: 14px;">טיקר:</span>
-                                <span id="modalTickerSymbol" class="fw-bold" style="font-size: 16px; color: #333;">-</span>
+                                <span id="modalTickerSymbol" class="fw-bold" style="font-size: 16px; color: var(--text-color, #333);">-</span>
                             </div>
                             <div class="d-flex align-items-center">
                                 <span class="text-muted me-2" style="font-size: 14px;">מחיר:</span>
-                                <span id="modalCurrentPrice" class="fw-bold" style="font-size: 16px; color: #333;">-</span>
+                                <span id="modalCurrentPrice" class="fw-bold" style="font-size: 16px; color: var(--text-color, #333);">-</span>
                             </div>
                             <div class="d-flex align-items-center">
                                 <span class="text-muted me-2" style="font-size: 14px;">שינוי:</span>

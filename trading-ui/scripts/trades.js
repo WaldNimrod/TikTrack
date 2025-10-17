@@ -427,10 +427,10 @@ function updateTradesTable(trades) {
       <td>${trade.notes || ''}</td>
       <td class="actions-cell">
         <div class="d-flex gap-1 justify-content-center align-items-center" style="flex-wrap: nowrap;">
-          ${createLinkButton(`viewLinkedItemsForTrade(${trade.id})`)}
-          ${createEditButton(`editTradeRecord('${trade.id}')`)}
-          ${createCancelButton('trade', trade.id, trade.status, 'sm')}
-          ${createDeleteButton(`deleteTradeRecord('${trade.id}')`)}
+          ${createButton('LINK', `viewLinkedItemsForTrade(${trade.id})`)}
+          ${createButton('EDIT', `editTradeRecord('${trade.id}')`)}
+          ${createButton('CANCEL', `window.cancelTrade(${trade.id})`)}
+          ${createButton('DELETE', `deleteTradeRecord('${trade.id}')`)}
         </div>
       </td>
     </tr>
@@ -587,7 +587,7 @@ async function cancelTradeRecord(tradeId) {
     } else {
       // console.error('Error canceling trade:', error);
     }
-    window.showErrorNotification('שגיאה', error.message);
+    window.showErrorNotification('שגיאה', error.message, 6000, 'system');
   }
 }
 
@@ -613,7 +613,7 @@ async function checkLinkedItemsAndCancel(tradeId) {
     } else {
       // console.error('Error checking linked items:', error);
     }
-    window.showErrorNotification('שגיאה', error.message);
+    window.showErrorNotification('שגיאה', error.message, 6000, 'system');
   }
 }
 
@@ -656,7 +656,7 @@ async function performTradeCancellation(tradeId) {
     } else {
       // console.error('Error canceling trade:', error);
     }
-    window.showErrorNotification('שגיאה', error.message);
+    window.showErrorNotification('שגיאה', error.message, 6000, 'system');
   }
 }
 
@@ -723,7 +723,7 @@ async function deleteTradeRecord(tradeId) {
     } else {
       // console.error('Error deleting trade:', error);
     }
-    window.showErrorNotification('שגיאה', error.message);
+    window.showErrorNotification('שגיאה', error.message, 6000, 'system');
   }
 }
 
@@ -765,7 +765,7 @@ async function performTradeDeletion(tradeId) {
     } else {
       // console.error('Error deleting trade:', error);
     }
-    window.showErrorNotification('שגיאה', error.message);
+    window.showErrorNotification('שגיאה', error.message, 6000, 'system');
   }
 }
 
@@ -1248,7 +1248,7 @@ async function saveEditTradeData() {
     } else {
       // console.error('Error updating trade:', error);
     }
-    window.showErrorNotification('שגיאה', error.message);
+    window.showErrorNotification('שגיאה', error.message, 6000, 'system');
   }
 }
 
@@ -2057,8 +2057,8 @@ window.initializeTradesPage = async function() {
     }
   }
 
-  // טעינת נתוני טריידים (נטען על ידי UnifiedAppInitializer)
-  // loadTradesData();
+  // טעינת נתוני טריידים
+  await loadTradesData();
 };
 
 // Fallback for direct access (backward compatibility)
@@ -3274,6 +3274,17 @@ function generateDetailedLog() {
                     hasMainContent: !!document.querySelector('.main-content'),
                     hasTopSection: !!document.querySelector('.top-section'),
                     hasContentSection: !!document.querySelector('.content-section')
+                },
+                elements: {
+                    totalElements: document.querySelectorAll('*').length,
+                    visibleElements: document.querySelectorAll(':not([style*="display: none"]):not(.d-none)').length,
+                    hiddenElements: document.querySelectorAll('[style*="display: none"], .d-none').length
+                },
+                styling: {
+                    hasBootstrap: !!document.querySelector('link[href*="bootstrap"]'),
+                    hasCustomCSS: !!document.querySelector('link[href*="styles-new"]'),
+                    hasFontAwesome: !!document.querySelector('link[href*="font-awesome"]'),
+                    hasBootstrapIcons: !!document.querySelector('link[href*="bootstrap-icons"]')
                 }
             }
         };

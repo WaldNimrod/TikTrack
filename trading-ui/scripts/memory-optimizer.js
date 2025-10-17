@@ -91,13 +91,13 @@ class MemoryOptimizer {
             this.initialized = true;
             console.log('✅ Memory Optimizer initialized successfully');
             
-            // הודעת הצלחה
-            if (window.notificationSystem) {
-                window.notificationSystem.showNotification(
-                    'מערכת אופטימיזציה זיכרון אותחלה בהצלחה',
-                    'success'
-                );
-            }
+            // הודעת הצלחה - מועברת להודעה סופית
+            // if (window.notificationSystem) {
+            //     window.notificationSystem.showNotification(
+            //         'מערכת אופטימיזציה זיכרון אותחלה בהצלחה',
+            //         'success'
+            //     );
+            // }
             
             return true;
         } catch (error) {

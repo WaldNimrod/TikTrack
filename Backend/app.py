@@ -1711,6 +1711,103 @@ def save_file():
             "timestamp": datetime.now().isoformat()
         }), 500
 
+@app.route("/api/system/settings/<setting_key>", methods=["GET"])
+@rate_limit_api(requests_per_minute=60)
+def get_system_setting(setting_key):
+    """Get system setting by key"""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Get setting value
+        cursor.execute("""
+            SELECT s.value, t.data_type, t.description, t.default_value
+            FROM system_settings s
+            JOIN system_setting_types t ON s.type_id = t.id
+            WHERE t.key = ? AND t.is_active = 1
+        """, (setting_key,))
+        
+        result = cursor.fetchone()
+        conn.close()
+        
+        if result:
+            value, data_type, description, default_value = result
+            return jsonify({
+                "success": True,
+                "data": {
+                    "key": setting_key,
+                    "value": value,
+                    "data_type": data_type,
+                    "description": description,
+                    "default_value": default_value
+                },
+                "timestamp": datetime.now().isoformat()
+            }), 200
+        else:
+            return jsonify({
+                "success": False,
+                "error": f"System setting not found: {setting_key}",
+                "timestamp": datetime.now().isoformat()
+            }), 404
+            
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
+@app.route("/api/system/settings/<setting_key>", methods=["POST"])
+@rate_limit_api(requests_per_minute=30)
+def update_system_setting(setting_key):
+    """Update system setting by key"""
+    try:
+        data = request.get_json()
+        if not data or 'value' not in data:
+            return jsonify({
+                "success": False,
+                "error": "Missing value in request"
+            }), 400
+        
+        new_value = data['value']
+        updated_by = data.get('updated_by', 'system')
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Update setting value
+        cursor.execute("""
+            UPDATE system_settings 
+            SET value = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE type_id = (
+                SELECT id FROM system_setting_types 
+                WHERE key = ? AND is_active = 1
+            )
+        """, (new_value, updated_by, setting_key))
+        
+        if cursor.rowcount > 0:
+            conn.commit()
+            conn.close()
+            return jsonify({
+                "success": True,
+                "message": f"System setting {setting_key} updated successfully",
+                "timestamp": datetime.now().isoformat()
+            }), 200
+        else:
+            conn.close()
+            return jsonify({
+                "success": False,
+                "error": f"System setting not found: {setting_key}",
+                "timestamp": datetime.now().isoformat()
+            }), 404
+            
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
 if __name__ == "__main__":
     # 🎯 **Flask Development Server**
     # ✅ **Configuration:** Standard Flask server (SocketIO removed due to compatibility issues)

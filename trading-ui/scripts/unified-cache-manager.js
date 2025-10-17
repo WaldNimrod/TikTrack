@@ -102,13 +102,13 @@ class UnifiedCacheManager {
             this.initialized = true;
             console.log('✅ Unified Cache Manager initialized successfully');
             
-            // הודעת הצלחה
-            if (window.notificationSystem) {
-                window.notificationSystem.showNotification(
-                    'מערכת מטמון מאוחדת אותחלה בהצלחה',
-                    'success'
-                );
-            }
+            // הודעת הצלחה - מועברת להודעה סופית
+            // if (window.notificationSystem) {
+            //     window.notificationSystem.showNotification(
+            //         'מערכת מטמון מאוחדת אותחלה בהצלחה',
+            //         'success'
+            //     );
+            // }
             
             return true;
         } catch (error) {

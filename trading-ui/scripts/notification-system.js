@@ -1029,12 +1029,14 @@ async function updateGlobalNotificationStats() {
   try {
     let history = [];
     
-    // טעינת היסטוריה מ-UnifiedIndexedDB
-    if (window.UnifiedIndexedDB && window.UnifiedIndexedDB.isInitialized) {
+    // טעינת היסטוריה מ-UnifiedCacheManager
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
       try {
-        history = await window.UnifiedIndexedDB.getNotificationHistory();
+        history = await window.UnifiedCacheManager.get('notification_history', {
+          fallback: () => []
+        });
       } catch (error) {
-        console.warn('שגיאה בטעינה מ-IndexedDB, עובר ל-localStorage:', error.message);
+        console.warn('שגיאה בטעינה מ-UnifiedCacheManager, עובר ל-localStorage:', error.message);
         history = [];
       }
     } else {
@@ -1053,6 +1055,11 @@ async function updateGlobalNotificationStats() {
       } catch (e) {
         console.warn('שגיאה בטעינת היסטוריה מ-localStorage:', e);
       }
+    }
+
+    // וידוא ש-history הוא מערך
+    if (!Array.isArray(history)) {
+      history = [];
     }
 
     const stats = {
@@ -1099,9 +1106,11 @@ async function updateGlobalNotificationStats() {
  */
 async function loadGlobalNotificationHistory() {
   try {
-    // טעינה מ-UnifiedIndexedDB
-    if (window.UnifiedIndexedDB && window.UnifiedIndexedDB.isInitialized) {
-      const history = await window.UnifiedIndexedDB.getAll('notificationHistory');
+    // טעינה מ-UnifiedCacheManager
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+      const history = await window.UnifiedCacheManager.get('notification_history', {
+        fallback: () => []
+      });
       if (history && history.length > 0) {
         return history;
       }
@@ -1127,9 +1136,11 @@ async function loadGlobalNotificationHistory() {
  */
 async function loadGlobalNotificationStats() {
   try {
-    // טעינה מ-UnifiedIndexedDB
-    if (window.UnifiedIndexedDB && window.UnifiedIndexedDB.isInitialized) {
-      const stats = await window.UnifiedIndexedDB.getNotificationStats();
+    // טעינה מ-UnifiedCacheManager
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+      const stats = await window.UnifiedCacheManager.get('notification_stats', {
+        fallback: () => null
+      });
       if (stats) {
         return stats;
       }

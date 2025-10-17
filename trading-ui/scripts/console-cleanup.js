@@ -21,14 +21,14 @@ function clearConsole() {
     window.manualClearConsole();
     console.log('✅ ניקוי console בוצע בהצלחה');
     if (typeof window.showNotification === 'function') {
-      window.showNotification('ניקוי console בוצע בהצלחה', 'success', 'ניקוי זיכרון', 2000, 'system');
+      // window.showNotification('ניקוי console בוצע בהצלחה', 'success', 'ניקוי זיכרון', 2000, 'system');
     } else {
       console.log('🔔 הודעת הצלחה: ניקוי console בוצע בהצלחה');
     }
   } else {
     console.log('⚠️ מערכת ניקוי console לא זמינה');
     if (typeof window.showNotification === 'function') {
-      window.showNotification('מערכת ניקוי console לא זמינה', 'warning', 'ניקוי זיכרון', 3000, 'system');
+      // window.showNotification('מערכת ניקוי console לא זמינה', 'warning', 'ניקוי זיכרון', 3000, 'system');
     } else {
       console.log('🔔 הודעת אזהרה: מערכת ניקוי console לא זמינה');
     }
@@ -187,17 +187,17 @@ document.addEventListener('DOMContentLoaded', function() {
   setTimeout(() => {
     isPageInitializing = false; // סיימנו את טעינת הדף
     if (typeof window.showNotification === 'function') {
-      window.showNotification('הדגל למניעת ניקוי console שוחרר - מערכת מובנית פעילה', 'success', 'ניקוי זיכרון', 3000, 'system');
+      // window.showNotification('הדגל למניעת ניקוי console שוחרר - מערכת מובנית פעילה', 'success', 'ניקוי זיכרון', 3000, 'system');
     }
 
     // בדוק אם יש מערכת מובנית לניקוי console
     if (window.manualClearConsole) {
       if (typeof window.showNotification === 'function') {
-        window.showNotification('מערכת מובנית לניקוי console זמינה', 'info', 'ניקוי זיכרון', 2000, 'system');
+        // window.showNotification('מערכת מובנית לניקוי console זמינה', 'info', 'ניקוי זיכרון', 2000, 'system');
       }
     } else {
       if (typeof window.showNotification === 'function') {
-        window.showNotification('מערכת מובנית לניקוי console לא זמינה - ניקוי ידני בלבד', 'warning', 'ניקוי זיכרון', 4000, 'system');
+        // window.showNotification('מערכת מובנית לניקוי console לא זמינה - ניקוי ידני בלבד', 'warning', 'ניקוי זיכרון', 4000, 'system');
       }
     }
   }, 5000); // הגדלתי ל-5 שניות כדי לוודא שכל הסקריפטים נטענו

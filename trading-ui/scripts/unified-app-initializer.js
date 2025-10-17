@@ -369,13 +369,13 @@ class UnifiedAppInitializer {
      * Initialize Unified Cache System
      */
     async initializeCacheSystem() {
-        console.log('🔧 Initializing Unified Cache System...');
+        // console.log('🔧 Initializing Unified Cache System...');
         
         // Initialize UnifiedCacheManager with timeout
         if (typeof window.UnifiedCacheManager !== 'undefined') {
             try {
                 if (!window.UnifiedCacheManager.initialized) {
-                    console.log('🔧 Initializing UnifiedCacheManager...');
+                    // console.log('🔧 Initializing UnifiedCacheManager...');
                     
                     // Add timeout to prevent hanging
                     const initPromise = window.UnifiedCacheManager.initialize();
@@ -465,7 +465,7 @@ class UnifiedAppInitializer {
             console.log('⚠️ MemoryOptimizer not available');
         }
         
-        // Initialize registered core systems
+        // Initialize registered core systems (only if not already initialized)
         if (window.UnifiedInitializationSystem) {
             await window.UnifiedInitializationSystem.initializeCoreSystems();
         }
@@ -588,7 +588,7 @@ class UnifiedAppInitializer {
         
         // Show success notification
         if (typeof window.showNotification === 'function') {
-            window.showNotification('✅ Application initialized successfully', 'success');
+            window.showNotification('✅ Application initialized successfully', 'success', 'business');
         }
     }
 
@@ -697,12 +697,30 @@ window.UnifiedInitializationSystem = {
     },
     
     async initializeCoreSystems() {
-        console.log('🔧 Initializing registered core systems...');
+        // console.log('🔧 Initializing registered core systems...');
         for (const [name, initFunction] of this.coreSystems) {
             try {
-                console.log(`🔧 Initializing ${name}...`);
+                // בדיקה שהמערכת לא מאותחלת כבר
+                if (name === 'UnifiedCacheManager' && window.UnifiedCacheManager?.initialized) {
+                    // console.log(`✅ ${name} already initialized, skipping...`);
+                    continue;
+                }
+                if (name === 'CacheSyncManager' && window.CacheSyncManager?.initialized) {
+                    // console.log(`✅ ${name} already initialized, skipping...`);
+                    continue;
+                }
+                if (name === 'CachePolicyManager' && window.CachePolicyManager?.initialized) {
+                    // console.log(`✅ ${name} already initialized, skipping...`);
+                    continue;
+                }
+                if (name === 'MemoryOptimizer' && window.MemoryOptimizer?.initialized) {
+                    // console.log(`✅ ${name} already initialized, skipping...`);
+                    continue;
+                }
+                
+                // console.log(`🔧 Initializing ${name}...`);
                 await initFunction();
-                console.log(`✅ ${name} initialized successfully`);
+                // console.log(`✅ ${name} initialized successfully`);
             } catch (error) {
                 console.error(`❌ Failed to initialize ${name}:`, error);
             }

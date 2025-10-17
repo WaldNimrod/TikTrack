@@ -305,14 +305,14 @@ async function refreshAllCharts() {
         ]);
         
         if (window.showNotification) {
-            window.showNotification('success', 'כל הגרפים רוענו בהצלחה');
+            window.showNotification('כל הגרפים רוענו בהצלחה', 'success', 'business');
         }
         
         console.log('✅ All charts refreshed successfully');
     } catch (error) {
         console.error('❌ Error refreshing charts:', error);
         if (window.showNotification) {
-            window.showNotification('error', 'שגיאה ברענון הגרפים');
+            window.showNotification('שגיאה ברענון הגרפים', 'error', 'business');
         }
     }
 }
@@ -340,14 +340,14 @@ async function refreshChart(chartId) {
         }
         
         if (window.showNotification) {
-            window.showNotification('success', `גרף ${chartId} רוענן בהצלחה`);
+            window.showNotification(`גרף ${chartId} רוענן בהצלחה`, 'success', 'business');
         }
         
         console.log(`✅ Chart ${chartId} refreshed successfully`);
     } catch (error) {
         console.error(`❌ Error refreshing chart ${chartId}:`, error);
         if (window.showNotification) {
-            window.showNotification('error', `שגיאה ברענון גרף ${chartId}`);
+            window.showNotification(`שגיאה ברענון גרף ${chartId}`, 'error', 'business');
         }
     }
 }
@@ -364,14 +364,14 @@ async function exportChart(chartId) {
             });
         } else {
             console.warn('⚠️ Chart export system not available');
-            if (window.showNotification) {
-                window.showNotification('info', 'מערכת ייצוא הגרפים לא זמינה');
-            }
+            // if (window.showNotification) {
+            //     window.showNotification('מערכת ייצוא הגרפים לא זמינה', 'info', 'system');
+            // }
         }
     } catch (error) {
         console.error(`❌ Error exporting chart ${chartId}:`, error);
         if (window.showNotification) {
-            window.showNotification('error', `שגיאה בייצוא גרף ${chartId}`);
+            window.showNotification(`שגיאה בייצוא גרף ${chartId}`, 'error', 'business');
         }
     }
 }
@@ -389,14 +389,14 @@ async function exportAllCharts() {
             });
         } else {
             console.warn('⚠️ Chart export system not available');
-            if (window.showNotification) {
-                window.showNotification('info', 'מערכת ייצוא הגרפים לא זמינה');
-            }
+            // if (window.showNotification) {
+            //     window.showNotification('מערכת ייצוא הגרפים לא זמינה', 'info', 'system');
+            // }
         }
     } catch (error) {
         console.error('❌ Error exporting all charts:', error);
         if (window.showNotification) {
-            window.showNotification('error', 'שגיאה בייצוא כל הגרפים');
+            window.showNotification('שגיאה בייצוא כל הגרפים', 'error', 'business');
         }
     }
 }

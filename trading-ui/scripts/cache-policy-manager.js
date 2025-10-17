@@ -205,13 +205,13 @@ class CachePolicyManager {
             this.initialized = true;
             console.log('✅ Cache Policy Manager initialized successfully');
             
-            // הודעת הצלחה
-            if (window.notificationSystem) {
-                window.notificationSystem.showNotification(
-                    'מערכת מדיניות מטמון אותחלה בהצלחה',
-                    'success'
-                );
-            }
+            // הודעת הצלחה - מועברת להודעה סופית
+            // if (window.notificationSystem) {
+            //     window.notificationSystem.showNotification(
+            //         'מערכת מדיניות מטמון אותחלה בהצלחה',
+            //         'success'
+            //     );
+            // }
             
             return true;
         } catch (error) {

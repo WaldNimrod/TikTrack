@@ -176,3 +176,4 @@ ${window.createButton ? window.createButton(...) : '...'}
 **גרסה:** 1.0  
 **סטטוס:** 🔧 בעבודה פעילה
 
+

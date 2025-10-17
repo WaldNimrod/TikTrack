@@ -220,7 +220,7 @@
                 <div class="modal-content">
                     <div class="modal-header modal-header-colored">
                         <h5 class="modal-title" id="addPreferenceModalLabel">הוספת העדפה חדשה</h5>
-                        ${window.createCloseButton ? window.createCloseButton('', 'סגור') : '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'}
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <form id="addPreferenceForm">
@@ -275,7 +275,7 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        ${window.createFormCancelButton ? window.createFormCancelButton('', 'ביטול') : '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>'}
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
                         <button type="button" class="btn btn-success" onclick="addPreference()"
                             style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">הוסף
                             העדפה</button>
@@ -291,7 +291,7 @@
                 <div class="modal-content">
                     <div class="modal-header modal-header-colored">
                         <h5 class="modal-title" id="editPreferenceModalLabel">עריכת העדפה</h5>
-                        ${window.createCloseButton ? window.createCloseButton('', 'סגור') : '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'}
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <form id="editPreferenceForm">
@@ -344,7 +344,7 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        ${window.createFormCancelButton ? window.createFormCancelButton('', 'ביטול') : '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>'}
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
                         <button type="button" class="btn btn-success" onclick="updatePreference()"
                             style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">עדכן
                             העדפה</button>

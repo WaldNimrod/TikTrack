@@ -155,6 +155,13 @@ class UnifiedCacheManager {
             const result = await this.layers[layer].save(key, preparedData, policy);
             
             // עדכון סטטיסטיקות
+            if (!this.stats) {
+                this.stats = {
+                    operations: { save: 0, get: 0, remove: 0, clear: 0 },
+                    layers: { memory: { entries: 0, size: 0 }, localStorage: { entries: 0, size: 0 }, indexedDB: { entries: 0, size: 0 }, backend: { entries: 0, size: 0 } },
+                    performance: { avgResponseTime: 0, totalRequests: 0, successfulRequests: 0 }
+                };
+            }
             this.stats.operations.save++;
             this.stats.layers[layer].entries++;
             
@@ -532,6 +539,29 @@ class UnifiedCacheManager {
      */
     async updateStats() {
         try {
+            // אתחול stats אם לא מאותחל
+            if (!this.stats) {
+                this.stats = {
+                    operations: {
+                        save: 0,
+                        get: 0,
+                        remove: 0,
+                        clear: 0
+                    },
+                    layers: {
+                        memory: { entries: 0, size: 0 },
+                        localStorage: { entries: 0, size: 0 },
+                        indexedDB: { entries: 0, size: 0 },
+                        backend: { entries: 0, size: 0 }
+                    },
+                    performance: {
+                        avgResponseTime: 0,
+                        totalRequests: 0,
+                        successfulRequests: 0
+                    }
+                };
+            }
+            
             for (const [layerName, layer] of Object.entries(this.layers)) {
                 if (layer && layer.getStats) {
                     const layerStats = await layer.getStats();
@@ -863,12 +893,8 @@ class BackendCacheLayer {
 
     getStats() {
         return {
-            initialized: this.initialized,
             entries: this.cache.size,
-            size: 0, // לא ניתן לחשב בקליינט
-            layers: this.stats.layers,
-            operations: this.stats.operations,
-            performance: this.stats.performance
+            size: 0 // לא ניתן לחשב בקליינט
         };
     }
 

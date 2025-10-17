@@ -1961,15 +1961,14 @@ class SystemManagement {
     try {
       console.log(`💾 Saving primary data provider: ${provider}`);
       
-      const response = await fetch('/api/preferences/user/preference', {
+      const response = await fetch('/api/system/settings/primaryDataProvider', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          preference_name: 'primaryDataProvider',
           value: provider,
-          user_id: 1
+          updated_by: 'user'
         })
       });
       
@@ -2002,7 +2001,7 @@ class SystemManagement {
     try {
       console.log('📡 Loading primary data provider...');
       
-      const response = await fetch('/api/preferences/user/preference?name=primaryDataProvider&user_id=1');
+      const response = await fetch('/api/system/settings/primaryDataProvider');
       
       if (response.ok) {
         const result = await response.json();

@@ -1061,42 +1061,6 @@
     <script src="scripts/unified-app-initializer.js"></script>
 
     <!-- 🔓 TEMPLATE ZONE 6 - Page-Specific Scripts (ADD NEW SCRIPTS HERE) -->
-    <!-- Fallback initialization if unified system fails -->
-    <script>
-        // Fallback initialization for preferences page
-        document.addEventListener('DOMContentLoaded', async function() {
-            // Wait a bit for all scripts to load
-            setTimeout(async () => {
-                try {
-                    console.log('🔄 Fallback initialization for preferences page...');
-                    
-                    // Load preferences if not already loaded
-                    if (typeof window.loadAllPreferences === 'function') {
-                        await window.loadAllPreferences();
-                    }
-                    
-                    // Default colors are now loaded automatically by loadAllPreferences
-                    
-                    // Profiles are now loaded automatically by loadAllPreferences
-                    
-                    // Add profile selection event listener (UI only)
-                    const profileSelect = document.getElementById('profileSelect');
-                    if (profileSelect) {
-                        // Only log the selection change, don't perform any actions
-                        profileSelect.addEventListener('change', function() {
-                            const selectedProfile = this.value;
-                            console.log(`📋 Profile selection changed to: ${selectedProfile} (UI only, no server action)`);
-                        });
-                        console.log('✅ Added profile selection listener (UI only)');
-                    }
-                    
-                    console.log('✅ Fallback initialization completed');
-            } catch (error) {
-                    console.error('❌ Fallback initialization failed:', error);
-                }
-            }, 500);
-        });
-    </script>
     
     <!-- Local copyDetailedLog function for preferences page -->
     <script>

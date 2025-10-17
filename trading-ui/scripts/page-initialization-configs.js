@@ -53,8 +53,10 @@ const PAGE_CONFIGS = {
             async (pageConfig) => {
                 console.log('⚙️ Initializing Preferences...');
                 
-                // Load all preferences
-                if (typeof window.loadAllPreferences === 'function') {
+                // טעינת מערכת העדפות
+                if (typeof window.initializePreferences === 'function') {
+                    await window.initializePreferences();
+                } else if (typeof window.loadAllPreferences === 'function') {
                     await window.loadAllPreferences();
                 }
                 

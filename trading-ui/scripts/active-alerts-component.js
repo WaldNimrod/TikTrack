@@ -1221,12 +1221,12 @@ window.addEventListener('load', () => {
 });
 
 // האזנה לשינויים בדף (כמו פתיחה/סגירה של סקשנים)
-window.addEventListener('DOMContentLoaded', () => {
-  // עדכון איקונים אחרי טעינת הדף
-  setTimeout(() => {
-    window.updateAllAlertIcons();
-  }, 500);
-});
+// window.addEventListener('DOMContentLoaded', () => {
+//   // עדכון איקונים אחרי טעינת הדף
+//   setTimeout(() => {
+//     window.updateAllAlertIcons();
+//   }, 500);
+// });
 
 // האזנה לשינויים ב-URL (ניווט בין עמודים)
 let currentUrl = window.location.href;

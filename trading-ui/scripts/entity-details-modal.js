@@ -852,17 +852,17 @@ function editTicker(tickerId) {
 /**
  * Auto-initialize when DOM is ready - אתחול אוטומטי כשה-DOM מוכן
  */
-document.addEventListener('DOMContentLoaded', () => {
-    try {
-        // אתחול המחלקה הראשית
+// document.addEventListener('DOMContentLoaded', () => {
+//     try {
+//         // אתחול המחלקה הראשית
         new EntityDetailsModal();
         
         console.info('Entity Details Modal system loaded and ready');
         
-    } catch (error) {
-        console.error('Error auto-initializing EntityDetailsModal:', error);
-    }
-});
+//     } catch (error) {
+//         console.error('Error auto-initializing EntityDetailsModal:', error);
+//     }
+// });
 
 // ===== FUNCTION INDEX =====
 /*

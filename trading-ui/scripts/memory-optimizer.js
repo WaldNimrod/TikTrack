@@ -75,7 +75,7 @@ class MemoryOptimizer {
      */
     async initialize() {
         try {
-            console.log('🔄 Initializing Memory Optimizer...');
+            // console.log('🔄 Initializing Memory Optimizer...');
             
             // טעינת הגדרות מ-localStorage
             await this.loadSettings();
@@ -89,7 +89,7 @@ class MemoryOptimizer {
             await this.checkMemoryUsage();
             
             this.initialized = true;
-            console.log('✅ Memory Optimizer initialized successfully');
+            // console.log('✅ Memory Optimizer initialized successfully');
             
             // הודעת הצלחה - מועברת להודעה סופית
             // if (window.notificationSystem) {
@@ -677,7 +677,7 @@ class MemoryOptimizer {
             await this.checkMemoryUsage();
         }, this.cleanupIntervalMs);
         
-        console.log('🔄 Auto cleanup started');
+            // console.log('🔄 Auto cleanup started');
     }
 
     /**

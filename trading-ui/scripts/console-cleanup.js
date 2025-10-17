@@ -157,10 +157,11 @@ function saveConsoleSettings(settings) {
   localStorage.setItem('consoleSettings', JSON.stringify(settings));
 }
 
+// הוסר - המערכת המאוחדת מטפלת באתחול
 // אתחול אוטומטי - מעודכן למערכת המובנית
-document.addEventListener('DOMContentLoaded', function() {
-  // הוספת פונקציות ל-global scope
-  window.clearConsole = clearConsole;
+// document.addEventListener('DOMContentLoaded', function() {
+//   // הוספת פונקציות ל-global scope
+//   window.clearConsole = clearConsole;
   window.suppressConsoleMessages = suppressConsoleMessages;
   window.enableConsoleMessages = enableConsoleMessages;
   window.autoClearConsole = autoClearConsole;
@@ -201,5 +202,5 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
   }, 5000); // הגדלתי ל-5 שניות כדי לוודא שכל הסקריפטים נטענו
-});
+// });
 

@@ -552,9 +552,10 @@ window.showPreferencesAdmin = function() {
 
 // ===== AUTO-INITIALIZATION =====
 
+// הוסר - המערכת המאוחדת מטפלת באתחול
 // אתחול אוטומטי כשהדף נטען
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('📄 DOM loaded, preferences admin interface ready');
+// document.addEventListener('DOMContentLoaded', function() {
+//     console.log('📄 DOM loaded, preferences admin interface ready');
     
     // הוספת כפתור לממשק הניהול (אם לא קיים)
     setTimeout(() => {
@@ -573,4 +574,4 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     }, 1000);
-});
+// });

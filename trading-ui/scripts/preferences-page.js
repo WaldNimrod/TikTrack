@@ -503,7 +503,7 @@ async function saveAllPreferences() {
                 // Clear cache manually to ensure fresh data
                 if (window.preferencesCache && window.preferencesCache.clear) {
                     console.log('🗑️ Clearing preferences cache manually...');
-                    window.preferencesCache.clear();
+                    await window.preferencesCache.clear();
                 }
                 
                 // Reload preferences to update form

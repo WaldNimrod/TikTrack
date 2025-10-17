@@ -285,10 +285,11 @@ window.exportLocalFunctionsReport = exportLocalFunctionsReport;
 window.refreshLocalFunctionsAnalysis = refreshLocalFunctionsAnalysis;
 
 // Initialize error tracking when script loads
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializeErrorTracking);
-} else {
-  initializeErrorTracking();
+// if (document.readyState === 'loading') {
+//   document.addEventListener('DOMContentLoaded', initializeErrorTracking);
+// } else {
+//   initializeErrorTracking();
+// }
 }
 
 console.log('✅ js-map-utils.js loaded successfully');

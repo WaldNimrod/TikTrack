@@ -1902,10 +1902,11 @@ window.restoreTradingAccountsSectionState = restoreTradingAccountsSectionState;
 
 // פונקציות נוספות לטבלת החשבונות - הוסרו כדי למנוע התנגשות
 
+// הוסר - המערכת המאוחדת מטפלת באתחול
 // אתחול הדף
-document.addEventListener('DOMContentLoaded', function () {
-  console.log('🚀🚀🚀 DOMContentLoaded התחיל 🚀🚀🚀');
-  console.log('📍 נתיב הדף:', window.location.pathname);
+// document.addEventListener('DOMContentLoaded', function () {
+//   console.log('🚀🚀🚀 DOMContentLoaded התחיל 🚀🚀🚀');
+//   console.log('📍 נתיב הדף:', window.location.pathname);
   
   // טעינת מטבעות
   console.log('💰 טעינת מטבעות...');
@@ -1940,7 +1941,7 @@ document.addEventListener('DOMContentLoaded', function () {
   } else {
     console.log('📍 לא נמצאים בדף החשבונות - דילוג על טעינת נתונים');
   }
-});
+// });
 
 /**
  * ביטול חשבון מסחר עם בדיקת פריטים מקושרים

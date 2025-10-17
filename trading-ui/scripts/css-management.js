@@ -2052,14 +2052,14 @@ window.executeDeleteFromFile = executeDeleteFromFile;
 // window.toggleSection export removed - using global version from ui-utils.js
 
 // Initialize on page load
-document.addEventListener('DOMContentLoaded', function() {
-    initializeCssManagement();
+// document.addEventListener('DOMContentLoaded', function() {
+//     initializeCssManagement();
     
-    // עדכון אוטומטי כל 30 שניות
-    setInterval(() => {
-        refreshCssStats();
-    }, 30000);
-});
+//     // עדכון אוטומטי כל 30 שניות
+//     setInterval(() => {
+//         refreshCssStats();
+//     }, 30000);
+// });
 
 // Error handling
 window.addEventListener('error', (e) => {

@@ -80,7 +80,7 @@ class UnifiedCacheManager {
      */
     async initialize() {
         try {
-            console.log('🔄 Initializing Unified Cache Manager...');
+            // console.log('🔄 Initializing Unified Cache Manager...');
             
             // אתחול IndexedDB
             if (window.indexedDB) {
@@ -100,7 +100,7 @@ class UnifiedCacheManager {
             await this.updateStats();
             
             this.initialized = true;
-            console.log('✅ Unified Cache Manager initialized successfully');
+            // console.log('✅ Unified Cache Manager initialized successfully');
             
             // הודעת הצלחה - מועברת להודעה סופית
             // if (window.notificationSystem) {
@@ -173,7 +173,7 @@ class UnifiedCacheManager {
             const responseTime = performance.now() - startTime;
             this.updatePerformanceStats(responseTime, true);
             
-            console.log(`✅ Saved ${key} to ${layer} layer (${responseTime.toFixed(2)}ms)`);
+                // console.log(`✅ Saved ${key} to ${layer} layer (${responseTime.toFixed(2)}ms)`);
             return result;
             
         } catch (error) {
@@ -212,7 +212,7 @@ class UnifiedCacheManager {
                         const responseTime = performance.now() - startTime;
                         this.updatePerformanceStats(responseTime, true);
                         
-                        console.log(`✅ Retrieved ${key} from ${layer} layer (${responseTime.toFixed(2)}ms)`);
+                        // console.log(`✅ Retrieved ${key} from ${layer} layer (${responseTime.toFixed(2)}ms)`);
                         return data;
                     }
                 }
@@ -588,7 +588,7 @@ class MemoryLayer {
 
     async initialize() {
         this.cache.clear();
-        console.log('✅ Memory Layer initialized');
+                // console.log('✅ Memory Layer initialized');
     }
 
     async save(key, data, policy) {
@@ -626,7 +626,7 @@ class LocalStorageLayer {
     }
 
     async initialize() {
-        console.log('✅ LocalStorage Layer initialized');
+                // console.log('✅ LocalStorage Layer initialized');
     }
 
     async save(key, data, policy) {
@@ -719,7 +719,7 @@ class IndexedDBLayer {
                 
                 request.onsuccess = () => {
                     this.db = request.result;
-                    console.log('✅ IndexedDB Layer initialized');
+                    // console.log('✅ IndexedDB Layer initialized');
                     resolve(true);
                 };
                 
@@ -837,7 +837,7 @@ class BackendCacheLayer {
 
     async initialize() {
         this.cache.clear();
-        console.log('✅ Backend Cache Layer initialized');
+                // console.log('✅ Backend Cache Layer initialized');
     }
 
     async save(key, data, policy) {

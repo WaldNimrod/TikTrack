@@ -1351,9 +1351,9 @@ async function initializeCashFlowsPage() {
 }
 
 // הפעלת אתחול כשהדף נטען
-document.addEventListener('DOMContentLoaded', function () {
-  initializeCashFlowsPage();
-});
+// document.addEventListener('DOMContentLoaded', function () {
+//   initializeCashFlowsPage();
+// });
 
 // ייצוא פונקציות גלובליות
 // פונקציות לא בשימוש - הוסרו

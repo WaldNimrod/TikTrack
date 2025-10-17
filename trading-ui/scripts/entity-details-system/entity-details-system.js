@@ -302,8 +302,8 @@ class EntityDetailsSystem {
 window.EntityDetailsSystem = new EntityDetailsSystem();
 
 // אתחול אוטומטי כשהדף נטען
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('🎯 Entity Details System - מוכן לשימוש');
-});
+// document.addEventListener('DOMContentLoaded', () => {
+//     console.log('🎯 Entity Details System - מוכן לשימוש');
+// });
 
 console.log('🎯 Entity Details System - נטען בהצלחה');

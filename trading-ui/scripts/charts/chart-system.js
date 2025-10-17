@@ -139,7 +139,7 @@ class ChartSystem {
             createdAt: new Date()
         });
 
-        console.log(`✅ Chart '${config.id}' created successfully`);
+        // console.log(`✅ Chart '${config.id}' created successfully`);
         return chart;
     }
 

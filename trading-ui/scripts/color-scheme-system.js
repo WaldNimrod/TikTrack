@@ -1802,7 +1802,7 @@ function updateCSSVariablesFromPreferences(preferences) {
       document.documentElement.style.setProperty('--entity-note-border', `rgba(${hexToRgb(preferences.entityNoteColor)?.r || 196}, ${hexToRgb(preferences.entityNoteColor)?.g || 188}, ${hexToRgb(preferences.entityNoteColor)?.b || 0}, 0.3)`);
     }
 
-    console.log('✅ CSS Variables עודכנו בהצלחה');
+    // console.log('✅ CSS Variables עודכנו בהצלחה');
     // console.log('🎨 צבעים מעודכנים:', {
     //   primary: preferences.primaryColor,
     //   secondary: preferences.secondaryColor,
@@ -1817,7 +1817,7 @@ function updateCSSVariablesFromPreferences(preferences) {
       window.dispatchEvent(new CustomEvent('colorPreferencesUpdated'));
     }
     
-    console.log('✅ CSS Variables updated and chart theme notified');
+    // console.log('✅ CSS Variables updated and chart theme notified');
   } catch (error) {
     console.error('❌ שגיאה בעדכון CSS Variables:', error);
   }
@@ -1830,7 +1830,7 @@ function updateCSSVariablesFromPreferences(preferences) {
  */
 async function loadColorPreferences() {
   try {
-    console.log('🎨 טוען הגדרות צבע מהעדפות...');
+    // console.log('🎨 טוען הגדרות צבע מהעדפות...');
 
     // נסה ראשית מערכת העדפות
     try {
@@ -1839,7 +1839,7 @@ async function loadColorPreferences() {
         const newData = await newResponse.json();
         if (newData.success && newData.data.preferences) {
           const prefs = newData.data.preferences;
-          console.log('🚀 Using preferences color settings');
+          // console.log('🚀 Using preferences color settings');
           
           // עדכון מערכת הצבעים מהעדפות
           if (prefs.colorScheme) {
@@ -1875,7 +1875,7 @@ async function loadColorPreferences() {
             }
           }
           
-          console.log('🎨 ✅ הגדרות צבע נטענו בהצלחה');
+          // console.log('🎨 ✅ הגדרות צבע נטענו בהצלחה');
           return true;
         }
       }
@@ -2110,19 +2110,20 @@ function getSubHeaderOpacityHex() {
 // ===== INITIALIZATION =====
 // אתחול המערכת
 
+// הוסר - המערכת המאוחדת מטפלת באתחול
 // טעינת הגדרות צבע בטעינת הדף
-document.addEventListener('DOMContentLoaded', () => {
-  console.log('🎨 מאתחל מערכת צבעים...');
+// document.addEventListener('DOMContentLoaded', () => {
+//     // console.log('🎨 מאתחל מערכת צבעים...');
   
   // יצירת CSS דינמי לסטטוסים מיד
-  console.log('🎨 יוצר CSS דינמי לסטטוסים...');
+  // console.log('🎨 יוצר CSS דינמי לסטטוסים...');
   generateAndApplyStatusCSS();
   
   // נסה לטעון העדפות, אבל אם זה נכשל, המשך עם ברירות מחדל
   loadColorPreferences().then(() => {
-    console.log('✅ העדפות נטענו בהצלחה');
+    // console.log('✅ העדפות נטענו בהצלחה');
   }).catch(error => {
-    console.warn('⚠️ לא ניתן לטעון צבעי ישויות מההעדפות, משתמש בברירות מחדל:', error);
+    // console.warn('⚠️ לא ניתן לטעון צבעי ישויות מההעדפות, משתמש בברירות מחדל:', error);
   });
   
   // אחרי טעינת ההעדפות, עדכן את הכותרות עם הצבעים החדשים
@@ -2154,7 +2155,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   }
-});
+// });
 
 // ===== COLOR SCHEME MANAGEMENT FUNCTIONS =====
 // פונקציות ניהול סכמות צבעים
@@ -2205,7 +2206,7 @@ function applyColorScheme(schemeName = 'light', customColors = null) {
       detail: { scheme: schemeName, customColors }
     }));
     
-    console.log(`✅ Color scheme ${schemeName} applied successfully`);
+    // console.log(`✅ Color scheme ${schemeName} applied successfully`);
     
   } catch (error) {
     console.error('❌ Error applying color scheme:', error);
@@ -2533,7 +2534,7 @@ window.colorSchemeSystem = {
  * טען צבעים דינמיים מהעדפות
  */
 async function loadDynamicColors() {
-  console.log('🎨 Loading dynamic colors...');
+    // console.log('🎨 Loading dynamic colors...');
   try {
     // Load color scheme from preferences
     if (typeof window.loadColorScheme === 'function') {
@@ -2545,7 +2546,7 @@ async function loadDynamicColors() {
       window.applyColorScheme();
     }
     
-    console.log('✅ Dynamic colors loaded successfully');
+    // console.log('✅ Dynamic colors loaded successfully');
     return true;
   } catch (error) {
     console.error('❌ Error loading dynamic colors:', error);
@@ -2556,7 +2557,8 @@ async function loadDynamicColors() {
 // Export functions
 window.loadDynamicColors = loadDynamicColors;
 
+// הוסר - המערכת המאוחדת מטפלת באתחול
 // Auto-load on DOM ready
-document.addEventListener('DOMContentLoaded', loadDynamicColors);
+// document.addEventListener('DOMContentLoaded', loadDynamicColors);
 
 // Color Scheme System loaded successfully

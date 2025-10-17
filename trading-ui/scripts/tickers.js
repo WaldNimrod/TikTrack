@@ -2039,10 +2039,11 @@ async function loadColorsAndApplyToHeaders() {
   }
 }
 
+// הוסר - המערכת המאוחדת מטפלת באתחול
 // אתחול הדף
-document.addEventListener('DOMContentLoaded', function () {
-  // שחזור מצב הסגירה
-  restoreTickersSectionState();
+// document.addEventListener('DOMContentLoaded', function () {
+//   // שחזור מצב הסגירה
+//   restoreTickersSectionState();
 
   // טעינת צבעים מההעדפות לפני יישום על הכותרות
   loadColorsAndApplyToHeaders();
@@ -2059,7 +2060,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // טעינת נתוני טיקרים
   loadTickersData();
-});
+// });
 
 // אתחול נוסף כשהדף נטען לחלוטין
 window.addEventListener('load', function () {

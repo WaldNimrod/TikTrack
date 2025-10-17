@@ -2769,9 +2769,10 @@ class PageScriptsMatrixSystem {
     }
 }
 
+// הוסר - המערכת המאוחדת מטפלת באתחול
 // Initialize system when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('📄 Page Scripts Matrix page loaded');
+// document.addEventListener('DOMContentLoaded', function() {
+//     console.log('📄 Page Scripts Matrix page loaded');
     
     // Initialize the system
     window.pageScriptsMatrix = new PageScriptsMatrixSystem();
@@ -2813,7 +2814,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     console.log('✅ Page Scripts Matrix system ready');
-});
+// });
 
 // Also try to initialize when window loads (fallback)
 window.addEventListener('load', function() {

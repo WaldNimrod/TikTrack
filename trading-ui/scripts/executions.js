@@ -2103,8 +2103,10 @@ function restoreSortState() {
 // הגדרת הפונקציה כגלובלית
 // window.sortTable export removed - using global version from tables.js
 
-// אתחול הדף
-document.addEventListener('DOMContentLoaded', function () {
+// Initialize executions page - integrated with unified system
+window.initializeExecutionsPage = async function() {
+  console.log('⚡ Executions page initialized via unified system');
+  
   // הגדרת מודלים שלא נסגרים בלחיצה על הרקע
   setupModalConfigurations();
 
@@ -2133,7 +2135,15 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log('🔄 Auto-refreshing executions data...');
     loadExecutionsData();
   }, 30000);
-});
+};
+
+// Fallback for direct access (backward compatibility)
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', window.initializeExecutionsPage);
+} else {
+  // DOM already loaded, initialize immediately
+  window.initializeExecutionsPage();
+}
 
 /**
  * הגדרת תצורות מודלים
@@ -2797,8 +2807,9 @@ window.resetExecutionsFilters = window.resetExecutionsFilters || function() {};
 // אתחול וולידציה
 // ========================================
 
+// הוסר - המערכת המאוחדת מטפלת באתחול
 // אתחול הדף
-document.addEventListener('DOMContentLoaded', function () {
+// document.addEventListener('DOMContentLoaded', function () {
   // DOM Content Loaded - checking notification functions
   // window.showSuccessNotification
   // window.showErrorNotification
@@ -2879,7 +2890,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Executions page initialized successfully
-});
+// });
 
 // בדיקה שהפונקציות נטענו בהצלחה
 // console.log('✅ Execution functions loaded:', {
@@ -3593,24 +3604,25 @@ window.addNewPlan = addNewPlan;
 window.addNewTrade = addNewTrade;
 window.addNewTicker = addNewTicker;
 
+// הוסר - המערכת המאוחדת מטפלת באתחול
 // Modal event listeners for form reset
-document.addEventListener('DOMContentLoaded', function() {
-  // Add execution modal - reset form when hidden
-  const addExecutionModal = document.getElementById('addExecutionModal');
-  if (addExecutionModal) {
-    addExecutionModal.addEventListener('hidden.bs.modal', function() {
-      resetAddExecutionForm();
-    });
-  }
+// document.addEventListener('DOMContentLoaded', function() {
+//   // Add execution modal - reset form when hidden
+//   const addExecutionModal = document.getElementById('addExecutionModal');
+//   if (addExecutionModal) {
+//     addExecutionModal.addEventListener('hidden.bs.modal', function() {
+//       resetAddExecutionForm();
+//     });
+//   }
 
-  // Edit execution modal - reset form when hidden
-  const editExecutionModal = document.getElementById('editExecutionModal');
-  if (editExecutionModal) {
-    editExecutionModal.addEventListener('hidden.bs.modal', function() {
-      resetEditExecutionForm();
-    });
-  }
-});
+//   // Edit execution modal - reset form when hidden
+//   const editExecutionModal = document.getElementById('editExecutionModal');
+//   if (editExecutionModal) {
+//     editExecutionModal.addEventListener('hidden.bs.modal', function() {
+//       resetEditExecutionForm();
+//     });
+//   }
+// });
 
 /**
  * Generate detailed log for Executions

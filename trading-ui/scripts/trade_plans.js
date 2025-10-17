@@ -2636,8 +2636,9 @@ function filterTradePlansLocally(data, statuses, types, dateRange, searchTerm) {
 
 // Global functions are now properly defined in main.js
 
-// Initialization
-document.addEventListener('DOMContentLoaded', function () {
+// Initialize trade plans page - integrated with unified system
+window.initializeTradePlansPage = async function() {
+  console.log('📋 Trade plans page initialized via unified system');
 
   // Restoring section state
   if (typeof window.restoreAllSectionStates === 'function') {
@@ -2667,7 +2668,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // שחזור מצב סידור
   restoreSortState();
-});
+};
+
+// Fallback for direct access (backward compatibility)
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', window.initializeTradePlansPage);
+} else {
+  // DOM already loaded, initialize immediately
+  window.initializeTradePlansPage();
+}
 
 // updateGridFromComponent is already defined at the beginning of the file
 
@@ -3224,15 +3233,16 @@ async function copyDetailedLog() {
     }
 }
 
+// הוסר - המערכת המאוחדת מטפלת באתחול
 // קריאה ב-DOMContentLoaded
-document.addEventListener('DOMContentLoaded', function() {
-  if (window.location.pathname.includes('/trade_plans')) {
-    setTimeout(() => {
-      if (typeof loadTradePlansData === 'function') {
-        loadTradePlansData();
-      } else {
-        handleFunctionNotFound('loadTradePlansData', 'פונקציית טעינת נתוני תכנונים לא נמצאה ב-DOMContentLoaded');
-      }
-    }, 500);
-  }
-});
+// document.addEventListener('DOMContentLoaded', function() {
+//   if (window.location.pathname.includes('/trade_plans')) {
+//     setTimeout(() => {
+//       if (typeof loadTradePlansData === 'function') {
+//         loadTradePlansData();
+//       } else {
+//         handleFunctionNotFound('loadTradePlansData', 'פונקציית טעינת נתוני תכנונים לא נמצאה ב-DOMContentLoaded');
+//       }
+//     }, 500);
+//   }
+// });

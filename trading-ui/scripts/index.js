@@ -69,7 +69,7 @@ function quickAction(actionType) {
 // Chart Management Functions
 async function createTradesStatusChart() {
     try {
-        console.log('📊 Creating trades status chart...');
+        // console.log('📊 Creating trades status chart...');
         
         if (!window.ChartSystem || !window.TradesAdapter) {
             console.warn('⚠️ Chart system or trades adapter not available');
@@ -99,7 +99,7 @@ async function createTradesStatusChart() {
             }
         });
         
-        console.log('✅ Trades status chart created successfully');
+        // console.log('✅ Trades status chart created successfully');
     } catch (error) {
         console.error('❌ Error creating trades status chart:', error);
     }
@@ -107,7 +107,7 @@ async function createTradesStatusChart() {
 
 async function createPerformanceChart() {
     try {
-        console.log('📈 Creating performance chart...');
+        // console.log('📈 Creating performance chart...');
         
         if (!window.ChartSystem || !window.TradesAdapter) {
             console.warn('⚠️ Chart system or trades adapter not available');
@@ -139,7 +139,7 @@ async function createPerformanceChart() {
             }
         });
         
-        console.log('✅ Performance chart created successfully');
+        // console.log('✅ Performance chart created successfully');
     } catch (error) {
         console.error('❌ Error creating performance chart:', error);
     }
@@ -147,7 +147,7 @@ async function createPerformanceChart() {
 
 async function createAccountChart() {
     try {
-        console.log('🏦 Creating account chart...');
+        // console.log('🏦 Creating account chart...');
         
         if (!window.ChartSystem || !window.TradesAdapter) {
             console.warn('⚠️ Chart system or trades adapter not available');
@@ -179,7 +179,7 @@ async function createAccountChart() {
             }
         });
         
-        console.log('✅ Account chart created successfully');
+        // console.log('✅ Account chart created successfully');
     } catch (error) {
         console.error('❌ Error creating account chart:', error);
     }
@@ -187,7 +187,7 @@ async function createAccountChart() {
 
 async function createMixedChart() {
     try {
-        console.log('🔀 Creating mixed chart...');
+        // console.log('🔀 Creating mixed chart...');
         
         if (!window.ChartSystem || !window.TradesAdapter) {
             console.warn('⚠️ Chart system or trades adapter not available');
@@ -222,7 +222,7 @@ async function createMixedChart() {
             }
         });
         
-        console.log('✅ Mixed chart created successfully');
+        // console.log('✅ Mixed chart created successfully');
     } catch (error) {
         console.error('❌ Error creating mixed chart:', error);
     }
@@ -294,7 +294,7 @@ function createMixedChartData(rawData, stats) {
 
 // Chart Management Functions
 async function refreshAllCharts() {
-    console.log('🔄 Refreshing all charts...');
+    // console.log('🔄 Refreshing all charts...');
     
     try {
         await Promise.all([
@@ -308,7 +308,7 @@ async function refreshAllCharts() {
             window.showNotification('כל הגרפים רוענו בהצלחה', 'success', 'business');
         }
         
-        console.log('✅ All charts refreshed successfully');
+        // console.log('✅ All charts refreshed successfully');
     } catch (error) {
         console.error('❌ Error refreshing charts:', error);
         if (window.showNotification) {
@@ -401,9 +401,9 @@ async function exportAllCharts() {
     }
 }
 
-// Event listener for DOM content loaded
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🏠 Index page initialized');
+// Initialize index page - integrated with unified system
+window.initializeIndexPage = async function() {
+    console.log('🏠 Index page initialized via unified system');
     
     // Initialize overview data
     refreshOverview();
@@ -421,10 +421,18 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize charts after a short delay to ensure all systems are loaded
     setTimeout(async () => {
-        console.log('📊 Initializing home page charts...');
+        // console.log('📊 Initializing home page charts...');
         await refreshAllCharts();
     }, 1000);
-});
+};
+
+// Fallback for direct access (backward compatibility)
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', window.initializeIndexPage);
+} else {
+    // DOM already loaded, initialize immediately
+    window.initializeIndexPage();
+}
 
 // Export functions to global scope
 window.switchTableTab = switchTableTab;

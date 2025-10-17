@@ -89,12 +89,13 @@ function autoSetFavicon() {
     setPageSpecificFavicon(pageType);
 }
 
+// הוסר - המערכת המאוחדת מטפלת באתחול
 // Auto-set favicon when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', autoSetFavicon);
-} else {
-    autoSetFavicon();
-}
+// if (document.readyState === 'loading') {
+//     document.addEventListener('DOMContentLoaded', autoSetFavicon);
+// } else {
+//     autoSetFavicon();
+// }
 
 /**
  * Set favicon (alias for setGlobalFavicon)

@@ -1007,19 +1007,19 @@ class HeaderSystem {
         
         // עדכון UI של פילטר הסוג
         if (window.filterSystem.currentFilters.type && window.filterSystem.currentFilters.type.length > 0) {
-          console.log('🔧 Updating type filter UI with:', window.filterSystem.currentFilters.type);
+          // console.log('🔧 Updating type filter UI with:', window.filterSystem.currentFilters.type);
           HeaderSystem.updateFilterUI('type', window.filterSystem.currentFilters.type);
         }
         
         // עדכון UI של פילטר החשבון
         if (window.filterSystem.currentFilters.account && window.filterSystem.currentFilters.account.length > 0) {
-          console.log('🔧 Updating account filter UI with:', window.filterSystem.currentFilters.account);
+          // console.log('🔧 Updating account filter UI with:', window.filterSystem.currentFilters.account);
           HeaderSystem.updateFilterUI('account', window.filterSystem.currentFilters.account);
         }
         
         // עדכון UI של פילטר התאריכים
         if (window.filterSystem.currentFilters.dateRange) {
-          console.log('🔧 Updating date range filter UI with:', window.filterSystem.currentFilters.dateRange);
+          // console.log('🔧 Updating date range filter UI with:', window.filterSystem.currentFilters.dateRange);
           HeaderSystem.updateFilterUI('dateRange', window.filterSystem.currentFilters.dateRange);
         }
       }
@@ -1027,7 +1027,7 @@ class HeaderSystem {
   }
   
   static updateFilterUI(filterType, selectedValues) {
-    console.log(`🔧 Updating ${filterType} filter UI with:`, selectedValues);
+    // console.log(`🔧 Updating ${filterType} filter UI with:`, selectedValues);
     
     if (filterType === 'status') {
       // ביטול כל הבחירות
@@ -1098,7 +1098,7 @@ class HeaderSystem {
       const item = document.querySelector(`#dateRangeFilterMenu .date-range-filter-item[data-value="${selectedValues}"]`);
       if (item) {
         item.classList.add('selected');
-        console.log(`🔧 Selected date range item: ${selectedValues}`);
+        // console.log(`🔧 Selected date range item: ${selectedValues}`);
       }
       
       // עדכון הטקסט
@@ -1868,42 +1868,43 @@ window.HeaderSystem = {
   }
 };
 
+// הוסר - המערכת המאוחדת מטפלת באתחול
 // Initialize the header system
-document.addEventListener('DOMContentLoaded', function() {
-  // console.log('🔧 DOMContentLoaded - checking filter functions:');
-  console.log('selectStatusOption:', typeof window.selectStatusOption);
-  console.log('updateStatusFilterText:', typeof window.updateStatusFilterText);
-  console.log('applyStatusFilter:', typeof window.applyStatusFilter);
-  
-  if (typeof window.HeaderSystemClass === 'function') {
-    window.headerSystem = new window.HeaderSystemClass();
-    if (typeof window.headerSystem.init === 'function') {
-      window.headerSystem.init();
-    }
-    
-    // יצירת מערכת הפילטרים
-    if (typeof window.HeaderSystemClass.createFilterSystem === 'function') {
-      window.HeaderSystemClass.createFilterSystem();
-      
-      // טעינת מצב שמור אחרי שמערכת הפילטרים נוצרה
-      setTimeout(() => {
-        if (typeof window.HeaderSystemClass.loadSavedState === 'function') {
-          window.HeaderSystemClass.loadSavedState();
-        }
-      }, 200);
-    }
-    
-    // בדיקה נוספת אחרי האתחול
-    setTimeout(() => {
-      // console.log('🔧 After init - checking filter functions again:');
-      console.log('selectStatusOption:', typeof window.selectStatusOption);
-      console.log('updateStatusFilterText:', typeof window.updateStatusFilterText);
-      console.log('applyStatusFilter:', typeof window.applyStatusFilter);
-    }, 100);
-  } else {
-    console.error('❌ HeaderSystem class not found');
-  }
-});
+// document.addEventListener('DOMContentLoaded', function() {
+//   // console.log('🔧 DOMContentLoaded - checking filter functions:');
+//   console.log('selectStatusOption:', typeof window.selectStatusOption);
+//   console.log('updateStatusFilterText:', typeof window.updateStatusFilterText);
+//   console.log('applyStatusFilter:', typeof window.applyStatusFilter);
+//   
+//   if (typeof window.HeaderSystemClass === 'function') {
+//     window.headerSystem = new window.HeaderSystemClass();
+//     if (typeof window.headerSystem.init === 'function') {
+//       window.headerSystem.init();
+//     }
+//     
+//     // יצירת מערכת הפילטרים
+//     if (typeof window.HeaderSystemClass.createFilterSystem === 'function') {
+//       window.HeaderSystemClass.createFilterSystem();
+//       
+//       // טעינת מצב שמור אחרי שמערכת הפילטרים נוצרה
+//       setTimeout(() => {
+//         if (typeof window.HeaderSystemClass.loadSavedState === 'function') {
+//           window.HeaderSystemClass.loadSavedState();
+//         }
+//       }, 200);
+//     }
+//     
+//     // בדיקה נוספת אחרי האתחול
+//     setTimeout(() => {
+//       // console.log('🔧 After init - checking filter functions again:');
+//       console.log('selectStatusOption:', typeof window.selectStatusOption);
+//       console.log('updateStatusFilterText:', typeof window.updateStatusFilterText);
+//       console.log('applyStatusFilter:', typeof window.applyStatusFilter);
+//     }, 100);
+//   } else {
+//     console.error('❌ HeaderSystem class not found');
+//   }
+// });
 
 // Update Toggle Buttons Function - עדכון מצב הכפתורים
 window.updateToggleButtons = function() {
@@ -2168,7 +2169,7 @@ window.clearUnifiedCacheDeep = async function(event) {
             
             // ניקוי cache של העדפות אם קיים
             if (window.preferencesCache && typeof window.preferencesCache.clear === 'function') {
-                window.preferencesCache.clear();
+                await window.preferencesCache.clear();
                 console.log('✅ ניקוי preferences cache הושלם');
             }
             

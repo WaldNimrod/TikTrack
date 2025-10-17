@@ -24328,3 +24328,412 @@ FROM trade_plans LEFT OUTER JOIN trading_accounts AS trading_accounts_1 ON tradi
 2025-10-17 19:16:51,850 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
 2025-10-17 19:16:51,851 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
 2025-10-17 19:16:51,851 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-10-18 00:50:03,154 - root - INFO - 🚀 Starting TikTrack server...
+2025-10-18 00:50:03,155 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend
+2025-10-18 00:50:03,155 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-10-18 00:50:03,155 - root - INFO - 📦 Flask version: 2.3.3
+2025-10-18 00:50:03,155 - root - INFO - 🗄️ Initializing database...
+2025-10-18 00:50:03,155 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-10-18 00:50:03,158 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.003s
+2025-10-18 00:50:03,158 - root - INFO - ✅ Database initialized successfully
+2025-10-18 00:50:04,163 - utils.performance_monitor - INFO - System metrics: CPU: 36.9%, Memory: 63.3%, Disk: 3.5%
+2025-10-18 00:50:04,164 - root - INFO - ✅ Database initialized successfully
+2025-10-18 00:50:04,164 - root - INFO - ✅ Server initialization completed
+2025-10-18 00:50:04,201 - root - INFO - 🚀 Starting background task scheduler...
+2025-10-18 00:50:04,201 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-10-18 00:50:04,201 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-10-18 00:50:04,201 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-10-18 00:50:04,201 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-10-18 00:50:04,201 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-10-18 00:50:04,201 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-10-18 00:50:04,201 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-10-18 00:50:04,201 - services.background_tasks - INFO - Background task scheduler started
+2025-10-18 00:50:04,202 - root - INFO - ✅ Background task scheduler started successfully
+2025-10-18 00:50:04,202 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:a727eca0bd5a9f7f653d73bdcc884d6f
+2025-10-18 00:50:04,224 - cache - INFO - Cache SET: services.system_settings_service.get_setting:a727eca0bd5a9f7f653d73bdcc884d6f (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-18 00:50:04,224 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-10-18 00:50:04,225 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-10-18 00:50:04,225 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-10-18 00:50:04,234 - services.data_refresh_scheduler - INFO - Refreshing 4 active tickers during off-hours
+2025-10-18 00:50:04,238 - services.data_refresh_scheduler - ERROR - Error logging group refresh start: (sqlite3.DatabaseError) database disk image is malformed
+[SQL: INSERT INTO data_refresh_logs (provider_id, operation_type, category, time_period, ticker_count, successful_count, failed_count, message, symbols_requested, symbols_successful, symbols_failed, start_time, end_time, total_duration_ms, status, error_message, error_code, rate_limit_remaining, rate_limit_reset_time, cache_hit_count, cache_miss_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id, created_at]
+[parameters: (1, 'group_refresh', 'active_trades', 'off_hours', 4, None, None, "Started refreshing 4 tickers in category 'active_trades' during 'off_hours'", 4, 0, 0, '2025-10-18 00:50:04.236702', None, None, 'started', None, None, None, None, 0, 0)]
+(Background on this error at: https://sqlalche.me/e/20/4xp6)
+2025-10-18 00:50:04,239 - services.data_refresh_scheduler - ERROR - Error refreshing batch: This Session's transaction has been rolled back due to a previous exception during flush. To begin a new transaction with this Session, first issue Session.rollback(). Original exception was: (sqlite3.DatabaseError) database disk image is malformed
+[SQL: INSERT INTO data_refresh_logs (provider_id, operation_type, category, time_period, ticker_count, successful_count, failed_count, message, symbols_requested, symbols_successful, symbols_failed, start_time, end_time, total_duration_ms, status, error_message, error_code, rate_limit_remaining, rate_limit_reset_time, cache_hit_count, cache_miss_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id, created_at]
+[parameters: (1, 'group_refresh', 'active_trades', 'off_hours', 4, None, None, "Started refreshing 4 tickers in category 'active_trades' during 'off_hours'", 4, 0, 0, '2025-10-18 00:50:04.236702', None, None, 'started', None, None, None, None, 0, 0)]
+(Background on this error at: https://sqlalche.me/e/20/4xp6) (Background on this error at: https://sqlalche.me/e/20/7s2a)
+2025-10-18 00:50:29,601 - root - INFO - 🚀 Starting TikTrack server...
+2025-10-18 00:50:29,601 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend
+2025-10-18 00:50:29,601 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-10-18 00:50:29,601 - root - INFO - 📦 Flask version: 2.3.3
+2025-10-18 00:50:29,601 - root - INFO - 🗄️ Initializing database...
+2025-10-18 00:50:29,601 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-10-18 00:50:29,605 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.003s
+2025-10-18 00:50:29,605 - root - INFO - ✅ Database initialized successfully
+2025-10-18 00:50:30,609 - utils.performance_monitor - INFO - System metrics: CPU: 20.9%, Memory: 63.5%, Disk: 3.5%
+2025-10-18 00:50:30,610 - root - INFO - ✅ Database initialized successfully
+2025-10-18 00:50:30,610 - root - INFO - ✅ Server initialization completed
+2025-10-18 00:50:30,646 - root - INFO - 🚀 Starting background task scheduler...
+2025-10-18 00:50:30,646 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-10-18 00:50:30,646 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-10-18 00:50:30,646 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-10-18 00:50:30,646 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-10-18 00:50:30,646 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-10-18 00:50:30,646 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-10-18 00:50:30,646 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-10-18 00:50:30,647 - services.background_tasks - INFO - Background task scheduler started
+2025-10-18 00:50:30,647 - root - INFO - ✅ Background task scheduler started successfully
+2025-10-18 00:50:30,647 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:a94bca3daadf2acc3ff6d9cabe60b881
+2025-10-18 00:50:30,669 - cache - INFO - Cache SET: services.system_settings_service.get_setting:a94bca3daadf2acc3ff6d9cabe60b881 (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-18 00:50:30,670 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-10-18 00:50:30,671 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-10-18 00:50:30,671 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-10-18 00:50:30,678 - services.data_refresh_scheduler - INFO - Refreshing 4 active tickers during off-hours
+2025-10-18 00:50:30,682 - services.data_refresh_scheduler - ERROR - Error logging group refresh start: (sqlite3.DatabaseError) database disk image is malformed
+[SQL: INSERT INTO data_refresh_logs (provider_id, operation_type, category, time_period, ticker_count, successful_count, failed_count, message, symbols_requested, symbols_successful, symbols_failed, start_time, end_time, total_duration_ms, status, error_message, error_code, rate_limit_remaining, rate_limit_reset_time, cache_hit_count, cache_miss_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id, created_at]
+[parameters: (1, 'group_refresh', 'active_trades', 'off_hours', 4, None, None, "Started refreshing 4 tickers in category 'active_trades' during 'off_hours'", 4, 0, 0, '2025-10-18 00:50:30.680748', None, None, 'started', None, None, None, None, 0, 0)]
+(Background on this error at: https://sqlalche.me/e/20/4xp6)
+2025-10-18 00:50:30,684 - services.data_refresh_scheduler - ERROR - Error refreshing batch: This Session's transaction has been rolled back due to a previous exception during flush. To begin a new transaction with this Session, first issue Session.rollback(). Original exception was: (sqlite3.DatabaseError) database disk image is malformed
+[SQL: INSERT INTO data_refresh_logs (provider_id, operation_type, category, time_period, ticker_count, successful_count, failed_count, message, symbols_requested, symbols_successful, symbols_failed, start_time, end_time, total_duration_ms, status, error_message, error_code, rate_limit_remaining, rate_limit_reset_time, cache_hit_count, cache_miss_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id, created_at]
+[parameters: (1, 'group_refresh', 'active_trades', 'off_hours', 4, None, None, "Started refreshing 4 tickers in category 'active_trades' during 'off_hours'", 4, 0, 0, '2025-10-18 00:50:30.680748', None, None, 'started', None, None, None, None, 0, 0)]
+(Background on this error at: https://sqlalche.me/e/20/4xp6) (Background on this error at: https://sqlalche.me/e/20/7s2a)
+2025-10-18 00:50:36,325 - root - INFO - 🚀 Starting TikTrack server...
+2025-10-18 00:50:36,325 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend
+2025-10-18 00:50:36,325 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-10-18 00:50:36,325 - root - INFO - 📦 Flask version: 2.3.3
+2025-10-18 00:50:36,325 - root - INFO - 🗄️ Initializing database...
+2025-10-18 00:50:36,326 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-10-18 00:50:36,332 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.006s
+2025-10-18 00:50:36,332 - root - INFO - ✅ Database initialized successfully
+2025-10-18 00:50:37,337 - utils.performance_monitor - INFO - System metrics: CPU: 26.1%, Memory: 63.3%, Disk: 3.5%
+2025-10-18 00:50:37,338 - root - INFO - ✅ Database initialized successfully
+2025-10-18 00:50:37,338 - root - INFO - ✅ Server initialization completed
+2025-10-18 00:50:37,378 - root - INFO - 🚀 Starting background task scheduler...
+2025-10-18 00:50:37,379 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-10-18 00:50:37,379 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-10-18 00:50:37,379 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-10-18 00:50:37,379 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-10-18 00:50:37,380 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-10-18 00:50:37,380 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-10-18 00:50:37,380 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-10-18 00:50:37,380 - services.background_tasks - INFO - Background task scheduler started
+2025-10-18 00:50:37,380 - root - INFO - ✅ Background task scheduler started successfully
+2025-10-18 00:50:37,381 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:90c048a782f29f38986685c12e6df0af
+2025-10-18 00:50:37,410 - cache - INFO - Cache SET: services.system_settings_service.get_setting:90c048a782f29f38986685c12e6df0af (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-18 00:50:37,411 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-10-18 00:50:37,412 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-10-18 00:50:37,414 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-10-18 00:50:37,418 - services.data_refresh_scheduler - INFO - Refreshing 4 active tickers during off-hours
+2025-10-18 00:50:37,427 - services.data_refresh_scheduler - INFO - Group refresh started: active_trades/off_hours - 4 tickers (ID: 33544)
+2025-10-18 00:50:37,449 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: yahoo_finance - Yahoo Finance
+2025-10-18 00:50:37,449 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-10-18 00:50:37,450 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-10-18 00:50:37,451 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:8080
+2025-10-18 00:50:37,451 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-18 00:50:37,452 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: America/New_York
+2025-10-18 00:50:37,452 - services.data_refresh_scheduler - INFO - Refreshing batch of 4 tickers: AAPL, GOOGL, AMZN, TSLA
+2025-10-18 00:50:37,452 - services.external_data.yahoo_finance_adapter - INFO - Processing 4 symbols in 1 batches
+2025-10-18 00:50:38,236 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-10-18 00:50:38,237 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Current price: $252.29
+2025-10-18 00:50:38,237 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Calculated change_amount = 252.29 - 247.45 = 4.840000000000003
+2025-10-18 00:50:38,237 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Calculated change_pct = (4.840000000000003 / 247.45) * 100 = 1.96%
+2025-10-18 00:50:38,237 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: volume = 48839918
+2025-10-18 00:50:38,237 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Final quote data - price: $252.29, change_pct: 1.96%, change_amount: $4.84
+2025-10-18 00:50:38,237 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AAPL
+2025-10-18 00:50:38,238 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AAPL (ID: 1) - proceeding to cache quote
+2025-10-18 00:50:38,238 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AAPL = $252.29 (USD)
+2025-10-18 00:50:38,238 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 1: List argument must consist only of tuples or dictionaries
+2025-10-18 00:50:38,239 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AAPL
+2025-10-18 00:50:38,240 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AAPL: $252.29
+2025-10-18 00:50:38,413 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-10-18 00:50:38,413 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Current price: $253.3
+2025-10-18 00:50:38,413 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Calculated change_amount = 253.3 - 251.46 = 1.8400000000000034
+2025-10-18 00:50:38,413 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Calculated change_pct = (1.8400000000000034 / 251.46) * 100 = 0.73%
+2025-10-18 00:50:38,413 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: volume = 29564548
+2025-10-18 00:50:38,413 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Final quote data - price: $253.3, change_pct: 0.73%, change_amount: $1.84
+2025-10-18 00:50:38,413 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: GOOGL
+2025-10-18 00:50:38,414 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker GOOGL (ID: 2) - proceeding to cache quote
+2025-10-18 00:50:38,414 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: GOOGL = $253.3 (USD)
+2025-10-18 00:50:38,414 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 2: List argument must consist only of tuples or dictionaries
+2025-10-18 00:50:38,414 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for GOOGL
+2025-10-18 00:50:38,415 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for GOOGL: $253.3
+2025-10-18 00:50:38,589 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-10-18 00:50:38,590 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Current price: $213.04
+2025-10-18 00:50:38,590 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Calculated change_amount = 213.04 - 214.47 = -1.4300000000000068
+2025-10-18 00:50:38,590 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Calculated change_pct = (-1.4300000000000068 / 214.47) * 100 = -0.67%
+2025-10-18 00:50:38,590 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: volume = 43119976
+2025-10-18 00:50:38,590 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Final quote data - price: $213.04, change_pct: -0.67%, change_amount: $-1.43
+2025-10-18 00:50:38,590 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AMZN
+2025-10-18 00:50:38,590 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AMZN (ID: 6) - proceeding to cache quote
+2025-10-18 00:50:38,591 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AMZN = $213.04 (USD)
+2025-10-18 00:50:38,591 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 6: List argument must consist only of tuples or dictionaries
+2025-10-18 00:50:38,591 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AMZN
+2025-10-18 00:50:38,591 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AMZN: $213.04
+2025-10-18 00:50:38,767 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-10-18 00:50:38,768 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Current price: $439.31
+2025-10-18 00:50:38,768 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Calculated change_amount = 439.31 - 428.75 = 10.560000000000002
+2025-10-18 00:50:38,768 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Calculated change_pct = (10.560000000000002 / 428.75) * 100 = 2.46%
+2025-10-18 00:50:38,768 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: volume = 87848438
+2025-10-18 00:50:38,768 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Final quote data - price: $439.31, change_pct: 2.46%, change_amount: $10.56
+2025-10-18 00:50:38,768 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: TSLA
+2025-10-18 00:50:38,769 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker TSLA (ID: 4) - proceeding to cache quote
+2025-10-18 00:50:38,769 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: TSLA = $439.31 (USD)
+2025-10-18 00:50:38,769 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 4: List argument must consist only of tuples or dictionaries
+2025-10-18 00:50:38,769 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for TSLA
+2025-10-18 00:50:38,770 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for TSLA: $439.31
+2025-10-18 00:50:38,770 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AAPL
+2025-10-18 00:50:38,771 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AAPL (ID: 1) - proceeding to cache quote
+2025-10-18 00:50:38,771 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AAPL = $252.29 (USD)
+2025-10-18 00:50:38,771 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 1: List argument must consist only of tuples or dictionaries
+2025-10-18 00:50:38,772 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AAPL
+2025-10-18 00:50:38,772 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AAPL: $252.29
+2025-10-18 00:50:38,773 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: GOOGL
+2025-10-18 00:50:38,773 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker GOOGL (ID: 2) - proceeding to cache quote
+2025-10-18 00:50:38,774 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: GOOGL = $253.3 (USD)
+2025-10-18 00:50:38,774 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 2: List argument must consist only of tuples or dictionaries
+2025-10-18 00:50:38,774 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for GOOGL
+2025-10-18 00:50:38,775 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for GOOGL: $253.3
+2025-10-18 00:50:38,775 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AMZN
+2025-10-18 00:50:38,776 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AMZN (ID: 6) - proceeding to cache quote
+2025-10-18 00:50:38,776 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AMZN = $213.04 (USD)
+2025-10-18 00:50:38,777 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 6: List argument must consist only of tuples or dictionaries
+2025-10-18 00:50:38,777 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AMZN
+2025-10-18 00:50:38,778 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AMZN: $213.04
+2025-10-18 00:50:38,778 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: TSLA
+2025-10-18 00:50:38,779 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker TSLA (ID: 4) - proceeding to cache quote
+2025-10-18 00:50:38,779 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: TSLA = $439.31 (USD)
+2025-10-18 00:50:38,779 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 4: List argument must consist only of tuples or dictionaries
+2025-10-18 00:50:38,779 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for TSLA
+2025-10-18 00:50:38,779 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for TSLA: $439.31
+2025-10-18 00:50:38,782 - services.external_data.yahoo_finance_adapter - INFO - Updated provider yahoo_finance health: True
+2025-10-18 00:50:38,788 - services.data_refresh_scheduler - INFO - Batch refresh completed: 4 successful, 0 failed
+2025-10-18 00:50:38,789 - services.data_refresh_scheduler - INFO - Group refresh completed: ID 33544 - 4 successful, 0 failed
+2025-10-18 00:50:44,390 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:50:44] "[35m[1mGET /api/preferences/user/check-updates?user_id=1 HTTP/1.1[0m" 500 -
+2025-10-18 00:50:46,410 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:50:46] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -
+2025-10-18 00:51:06,585 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:51:06] "[35m[1mGET /api/preferences/user/check-updates?user_id=1 HTTP/1.1[0m" 500 -
+2025-10-18 00:51:36,585 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:51:36] "[35m[1mGET /api/preferences/user/check-updates?user_id=1 HTTP/1.1[0m" 500 -
+2025-10-18 00:52:06,133 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:52:06] "[35m[1mGET /api/preferences/user/check-updates?user_id=1 HTTP/1.1[0m" 500 -
+2025-10-18 00:53:36,150 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:53:36] "GET /api/preferences/health HTTP/1.1" 200 -
+2025-10-18 00:53:39,110 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:53:39] "[35m[1mGET /api/preferences/user/check-updates?user_id=1 HTTP/1.1[0m" 500 -
+2025-10-18 00:53:54,055 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:53:54] "[35m[1mGET /api/preferences/user/check-updates?user_id=1 HTTP/1.1[0m" 500 -
+2025-10-18 00:54:00,079 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:00] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -
+2025-10-18 00:54:08,873 - root - INFO - 🚀 Starting TikTrack server...
+2025-10-18 00:54:08,874 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend
+2025-10-18 00:54:08,874 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-10-18 00:54:08,874 - root - INFO - 📦 Flask version: 2.3.3
+2025-10-18 00:54:08,874 - root - INFO - 🗄️ Initializing database...
+2025-10-18 00:54:08,874 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-10-18 00:54:08,877 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.003s
+2025-10-18 00:54:08,877 - root - INFO - ✅ Database initialized successfully
+2025-10-18 00:54:09,883 - utils.performance_monitor - INFO - System metrics: CPU: 19.1%, Memory: 63.2%, Disk: 3.5%
+2025-10-18 00:54:09,885 - root - INFO - ✅ Database initialized successfully
+2025-10-18 00:54:09,885 - root - INFO - ✅ Server initialization completed
+2025-10-18 00:54:10,005 - root - INFO - 🚀 Starting background task scheduler...
+2025-10-18 00:54:10,005 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-10-18 00:54:10,005 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-10-18 00:54:10,006 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-10-18 00:54:10,006 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-10-18 00:54:10,006 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-10-18 00:54:10,007 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-10-18 00:54:10,008 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-10-18 00:54:10,010 - services.background_tasks - INFO - Background task scheduler started
+2025-10-18 00:54:10,011 - root - INFO - ✅ Background task scheduler started successfully
+2025-10-18 00:54:10,012 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:8d5f3aac7745581e40abfc4be9e67563
+2025-10-18 00:54:10,088 - cache - INFO - Cache SET: services.system_settings_service.get_setting:8d5f3aac7745581e40abfc4be9e67563 (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-18 00:54:10,088 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-10-18 00:54:10,089 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-10-18 00:54:10,089 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-10-18 00:54:15,371 - root - INFO - 🚀 Starting TikTrack server...
+2025-10-18 00:54:15,372 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend
+2025-10-18 00:54:15,372 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-10-18 00:54:15,372 - root - INFO - 📦 Flask version: 2.3.3
+2025-10-18 00:54:15,372 - root - INFO - 🗄️ Initializing database...
+2025-10-18 00:54:15,372 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-10-18 00:54:15,377 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.005s
+2025-10-18 00:54:15,377 - root - INFO - ✅ Database initialized successfully
+2025-10-18 00:54:16,383 - utils.performance_monitor - INFO - System metrics: CPU: 30.5%, Memory: 63.4%, Disk: 3.5%
+2025-10-18 00:54:16,383 - root - INFO - ✅ Database initialized successfully
+2025-10-18 00:54:16,383 - root - INFO - ✅ Server initialization completed
+2025-10-18 00:54:16,420 - root - INFO - 🚀 Starting background task scheduler...
+2025-10-18 00:54:16,421 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-10-18 00:54:16,421 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-10-18 00:54:16,421 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-10-18 00:54:16,421 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-10-18 00:54:16,421 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-10-18 00:54:16,421 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-10-18 00:54:16,421 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-10-18 00:54:16,421 - services.background_tasks - INFO - Background task scheduler started
+2025-10-18 00:54:16,421 - root - INFO - ✅ Background task scheduler started successfully
+2025-10-18 00:54:16,422 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:9b9e3fe6efbbbacb1e976ff4b370175e
+2025-10-18 00:54:16,450 - cache - INFO - Cache SET: services.system_settings_service.get_setting:9b9e3fe6efbbbacb1e976ff4b370175e (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-18 00:54:16,450 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-10-18 00:54:16,451 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-10-18 00:54:16,451 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-10-18 00:54:16,464 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:8080
+2025-10-18 00:54:16,464 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-18 00:54:22,409 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:22] "GET /api/preferences/user/check-updates?user_id=1 HTTP/1.1" 200 -
+2025-10-18 00:54:31,121 - root - INFO - 🚀 Starting TikTrack server...
+2025-10-18 00:54:31,121 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend
+2025-10-18 00:54:31,121 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-10-18 00:54:31,121 - root - INFO - 📦 Flask version: 2.3.3
+2025-10-18 00:54:31,121 - root - INFO - 🗄️ Initializing database...
+2025-10-18 00:54:31,121 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-10-18 00:54:31,126 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.005s
+2025-10-18 00:54:31,127 - root - INFO - ✅ Database initialized successfully
+2025-10-18 00:54:32,132 - utils.performance_monitor - INFO - System metrics: CPU: 41.2%, Memory: 63.3%, Disk: 3.5%
+2025-10-18 00:54:32,132 - root - INFO - ✅ Database initialized successfully
+2025-10-18 00:54:32,132 - root - INFO - ✅ Server initialization completed
+2025-10-18 00:54:32,168 - root - INFO - 🚀 Starting background task scheduler...
+2025-10-18 00:54:32,169 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-10-18 00:54:32,169 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-10-18 00:54:32,169 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-10-18 00:54:32,169 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-10-18 00:54:32,169 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-10-18 00:54:32,169 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-10-18 00:54:32,169 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-10-18 00:54:32,169 - services.background_tasks - INFO - Background task scheduler started
+2025-10-18 00:54:32,169 - root - INFO - ✅ Background task scheduler started successfully
+2025-10-18 00:54:32,169 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:d99dab4772372b276fd6982c4a906480
+2025-10-18 00:54:32,196 - cache - INFO - Cache SET: services.system_settings_service.get_setting:d99dab4772372b276fd6982c4a906480 (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-18 00:54:32,197 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-10-18 00:54:32,198 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-10-18 00:54:32,200 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-10-18 00:54:32,210 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:8080
+2025-10-18 00:54:32,210 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-18 00:54:37,966 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:37] "GET /preferences HTTP/1.1" 200 -
+2025-10-18 00:54:37,982 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:37] "GET /scripts/header-system.js HTTP/1.1" 200 -
+2025-10-18 00:54:37,984 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:37] "[36mGET /styles-new/01-settings/_variables.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 00:54:37,984 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:37] "[36mGET /styles-new/01-settings/_colors-dynamic.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 00:54:37,986 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:37] "[36mGET /styles-new/01-settings/_colors-semantic.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 00:54:37,990 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:37] "[36mGET /styles-new/01-settings/_spacing.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 00:54:37,991 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:37] "[36mGET /styles-new/01-settings/_typography.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 00:54:37,998 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:37] "[36mGET /styles-new/03-generic/_reset.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 00:54:38,000 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "[36mGET /styles-new/03-generic/_base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 00:54:38,002 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "[36mGET /styles-new/04-elements/_links.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 00:54:38,002 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "[36mGET /styles-new/01-settings/_rtl-logical.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 00:54:38,003 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "[36mGET /styles-new/04-elements/_forms-base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 00:54:38,006 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "[36mGET /styles-new/04-elements/_headings.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 00:54:38,008 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "[36mGET /styles-new/05-objects/_grid.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 00:54:38,012 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "[36mGET /styles-new/06-components/_cards.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 00:54:38,012 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "[36mGET /styles-new/06-components/_tables.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 00:54:38,013 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "[36mGET /styles-new/06-components/_buttons-advanced.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 00:54:38,015 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "[36mGET /styles-new/06-components/_notifications.css?v=20250923_fixed_colors_v2 HTTP/1.1[0m" 304 -
+2025-10-18 00:54:38,015 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "[36mGET /styles-new/06-components/_modals.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 00:54:38,016 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "[36mGET /styles-new/06-components/_navigation.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 00:54:38,017 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "[36mGET /styles-new/04-elements/_buttons-base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 00:54:38,019 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "[36mGET /styles-new/05-objects/_layout.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 00:54:38,019 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "[36mGET /styles-new/06-components/_forms-advanced.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 00:54:38,020 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "[36mGET /styles-new/06-components/_badges-status.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 00:54:38,021 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "[36mGET /styles-new/06-components/_entity-colors.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 00:54:38,022 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "[36mGET /styles-new/header-styles.css?v=v6.0.0 HTTP/1.1[0m" 304 -
+2025-10-18 00:54:38,023 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "GET /scripts/global-favicon.js HTTP/1.1" 200 -
+2025-10-18 00:54:38,024 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "GET /scripts/ui-utils.js HTTP/1.1" 200 -
+2025-10-18 00:54:38,025 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "GET /scripts/data-utils.js HTTP/1.1" 200 -
+2025-10-18 00:54:38,025 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "GET /scripts/system-management.js HTTP/1.1" 200 -
+2025-10-18 00:54:38,026 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "GET /scripts/notification-system.js HTTP/1.1" 200 -
+2025-10-18 00:54:38,027 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "GET /scripts/notification-category-detector.js HTTP/1.1" 200 -
+2025-10-18 00:54:38,029 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "GET /scripts/global-notification-collector.js HTTP/1.1" 200 -
+2025-10-18 00:54:38,031 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "GET /scripts/tables.js HTTP/1.1" 200 -
+2025-10-18 00:54:38,033 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "GET /scripts/page-utils.js HTTP/1.1" 200 -
+2025-10-18 00:54:38,034 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "GET /scripts/page-initialization-configs.js HTTP/1.1" 200 -
+2025-10-18 00:54:38,034 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "GET /scripts/preferences.js HTTP/1.1" 200 -
+2025-10-18 00:54:38,034 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "GET /scripts/unified-app-initializer.js HTTP/1.1" 200 -
+2025-10-18 00:54:38,562 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -
+2025-10-18 00:54:38,571 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "GET /api/preferences/profiles?user_id=1 HTTP/1.1" 200 -
+2025-10-18 00:54:38,582 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:54:38] "GET /api/preferences/groups HTTP/1.1" 200 -
+2025-10-18 00:58:10,315 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:58:10] "GET / HTTP/1.1" 200 -
+2025-10-18 00:58:14,041 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:58:14] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -
+2025-10-18 00:58:18,624 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:58:18] "[31m[1mPOST /api/preferences/user HTTP/1.1[0m" 400 -
+2025-10-18 00:58:22,029 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:58:22] "[31m[1mPOST /api/preferences/user HTTP/1.1[0m" 400 -
+2025-10-18 00:58:30,413 - services.constraint_service - INFO - Retrieved 16 constraints for table preference_types
+2025-10-18 00:58:30,416 - services.preferences_service - ERROR - Error saving preference notification_mode for user 1: table user_preferences_v3 has no column named updated_at
+2025-10-18 00:58:30,416 - routes.api.preferences - ERROR - Error saving single preference: table user_preferences_v3 has no column named updated_at
+2025-10-18 00:58:30,416 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:58:30] "[35m[1mPOST /api/preferences/user/single HTTP/1.1[0m" 500 -
+2025-10-18 00:58:59,097 - services.constraint_service - INFO - Retrieved 16 constraints for table preference_types
+2025-10-18 00:58:59,100 - services.preferences_service - ERROR - Error saving preference notification_mode for user 1: table user_preferences_v3 has no column named updated_at
+2025-10-18 00:58:59,100 - routes.api.preferences - ERROR - Error saving single preference: table user_preferences_v3 has no column named updated_at
+2025-10-18 00:58:59,101 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:58:59] "[35m[1mPOST /api/preferences/user/single HTTP/1.1[0m" 500 -
+2025-10-18 00:59:01,710 - services.constraint_service - INFO - Retrieved 16 constraints for table preference_types
+2025-10-18 00:59:01,711 - services.preferences_service - ERROR - Error saving preference notification_mode for user 1: table user_preferences_v3 has no column named updated_at
+2025-10-18 00:59:01,712 - routes.api.preferences - ERROR - Error saving single preference: table user_preferences_v3 has no column named updated_at
+2025-10-18 00:59:01,712 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:59:01] "[35m[1mPOST /api/preferences/user/single HTTP/1.1[0m" 500 -
+2025-10-18 00:59:38,352 - utils.rate_limiter - INFO - Rate limiter cleanup: removed 0 empty entries
+2025-10-18 00:59:38,353 - services.constraint_service - INFO - Retrieved 16 constraints for table preference_types
+2025-10-18 00:59:38,355 - services.preferences_service - ERROR - Error saving preference notification_mode for user 1: table user_preferences_v3 has no column named updated_at
+2025-10-18 00:59:38,355 - routes.api.preferences - ERROR - Error saving single preference: table user_preferences_v3 has no column named updated_at
+2025-10-18 00:59:38,355 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:59:38] "[35m[1mPOST /api/preferences/user/single HTTP/1.1[0m" 500 -
+2025-10-18 00:59:42,991 - services.constraint_service - INFO - Retrieved 16 constraints for table preference_types
+2025-10-18 00:59:42,994 - services.preferences_service - ERROR - Error saving preference notification_mode for user 1: table user_preferences_v3 has no column named updated_at
+2025-10-18 00:59:42,994 - routes.api.preferences - ERROR - Error saving single preference: table user_preferences_v3 has no column named updated_at
+2025-10-18 00:59:42,995 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 00:59:42] "[35m[1mPOST /api/preferences/user/single HTTP/1.1[0m" 500 -
+2025-10-18 01:03:16,373 - root - INFO - 🚀 Starting TikTrack server...
+2025-10-18 01:03:16,373 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend
+2025-10-18 01:03:16,373 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-10-18 01:03:16,373 - root - INFO - 📦 Flask version: 2.3.3
+2025-10-18 01:03:16,373 - root - INFO - 🗄️ Initializing database...
+2025-10-18 01:03:16,373 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-10-18 01:03:16,377 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.004s
+2025-10-18 01:03:16,377 - root - INFO - ✅ Database initialized successfully
+2025-10-18 01:03:17,383 - utils.performance_monitor - INFO - System metrics: CPU: 15.8%, Memory: 63.5%, Disk: 3.5%
+2025-10-18 01:03:17,383 - root - INFO - ✅ Database initialized successfully
+2025-10-18 01:03:17,383 - root - INFO - ✅ Server initialization completed
+2025-10-18 01:03:17,424 - root - INFO - 🚀 Starting background task scheduler...
+2025-10-18 01:03:17,425 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-10-18 01:03:17,425 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-10-18 01:03:17,425 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-10-18 01:03:17,425 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-10-18 01:03:17,425 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-10-18 01:03:17,425 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-10-18 01:03:17,425 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-10-18 01:03:17,425 - services.background_tasks - INFO - Background task scheduler started
+2025-10-18 01:03:17,425 - root - INFO - ✅ Background task scheduler started successfully
+2025-10-18 01:03:17,425 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:0751815baffcd607bc2899aee0efbf34
+2025-10-18 01:03:17,449 - cache - INFO - Cache SET: services.system_settings_service.get_setting:0751815baffcd607bc2899aee0efbf34 (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-18 01:03:17,449 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-10-18 01:03:17,450 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-10-18 01:03:17,450 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-10-18 01:03:17,462 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:8080
+2025-10-18 01:03:17,462 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-18 01:03:42,720 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:03:42] "GET / HTTP/1.1" 200 -
+2025-10-18 01:03:45,849 - services.constraint_service - INFO - Retrieved 16 constraints for table preference_types
+2025-10-18 01:03:45,851 - services.preferences_service - INFO - Cache invalidated for user 1, profile 3
+2025-10-18 01:03:45,851 - services.preferences_service - INFO - Saved preference notification_mode for user 1
+2025-10-18 01:03:45,852 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:03:45] "POST /api/preferences/user/single HTTP/1.1" 200 -
+2025-10-18 01:03:48,268 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:03:48] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -
+2025-10-18 01:03:51,780 - services.constraint_service - INFO - Retrieved 16 constraints for table preference_types
+2025-10-18 01:03:51,782 - services.preferences_service - INFO - Cache invalidated for user 1, profile 3
+2025-10-18 01:03:51,782 - services.preferences_service - INFO - Saved preference notification_mode for user 1
+2025-10-18 01:03:51,782 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:03:51] "POST /api/preferences/user/single HTTP/1.1" 200 -
+2025-10-18 01:03:51,793 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:03:51] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -
+2025-10-18 01:03:51,802 - services.constraint_service - INFO - Retrieved 16 constraints for table preference_types
+2025-10-18 01:03:51,804 - services.preferences_service - INFO - Cache invalidated for user 1, profile 3
+2025-10-18 01:03:51,804 - services.preferences_service - INFO - Saved preference notification_mode for user 1
+2025-10-18 01:03:51,804 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:03:51] "POST /api/preferences/user/single HTTP/1.1" 200 -
+2025-10-18 01:03:51,814 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:03:51] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -
+2025-10-18 01:03:51,824 - services.constraint_service - INFO - Retrieved 16 constraints for table preference_types
+2025-10-18 01:03:51,825 - services.preferences_service - INFO - Cache invalidated for user 1, profile 3
+2025-10-18 01:03:51,825 - services.preferences_service - INFO - Saved preference notification_mode for user 1
+2025-10-18 01:03:51,826 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:03:51] "POST /api/preferences/user/single HTTP/1.1" 200 -
+2025-10-18 01:03:51,836 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:03:51] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -
+2025-10-18 01:03:51,846 - services.constraint_service - INFO - Retrieved 16 constraints for table preference_types
+2025-10-18 01:03:51,847 - services.preferences_service - INFO - Cache invalidated for user 1, profile 3
+2025-10-18 01:03:51,847 - services.preferences_service - INFO - Saved preference notification_mode for user 1
+2025-10-18 01:03:51,848 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:03:51] "POST /api/preferences/user/single HTTP/1.1" 200 -
+2025-10-18 01:03:51,857 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:03:51] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -
+2025-10-18 01:03:54,956 - services.constraint_service - INFO - Retrieved 16 constraints for table preference_types
+2025-10-18 01:03:54,959 - services.preferences_service - INFO - Cache invalidated for user 1, profile 3
+2025-10-18 01:03:54,959 - services.preferences_service - INFO - Saved preference notification_mode for user 1
+2025-10-18 01:03:54,959 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:03:54] "POST /api/preferences/user/single HTTP/1.1" 200 -
+2025-10-18 01:03:57,167 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:03:57] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -

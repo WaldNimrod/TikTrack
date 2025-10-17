@@ -29,11 +29,12 @@ let testResults = {
     systemStats: {}
 };
 
+// הוסר - המערכת המאוחדת מטפלת באתחול
 // Initialize testing system
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('🧪 Initializing Header System Testing...');
-    initializeTestingSystem();
-});
+// document.addEventListener('DOMContentLoaded', () => {
+//     console.log('🧪 Initializing Header System Testing...');
+//     initializeTestingSystem();
+// });
 
 /**
  * Initialize Testing System
@@ -517,9 +518,10 @@ function loadActionButtons() {
 /**
  * אתחול העמוד
  */
-document.addEventListener('DOMContentLoaded', function() {
-    log('עמוד בדיקת ראש הדף נטען');
-    updateQuickStats();
+// הוסר - המערכת המאוחדת מטפלת באתחול
+// document.addEventListener('DOMContentLoaded', function() {
+//     log('עמוד בדיקת ראש הדף נטען');
+//     updateQuickStats();
     
     // טעינת נתונים אמיתיים מבסיס הנתונים
     loadRealData();
@@ -530,7 +532,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('🔧 Timeout triggered, calling loadActionButtons...');
         loadActionButtons();
     }, 100);
-});
+// });
 
 // ===== DATA LOADING FUNCTIONS =====
 

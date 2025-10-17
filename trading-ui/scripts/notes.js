@@ -1442,9 +1442,10 @@ window.setupNoteValidationEvents = setupNoteValidationEvents;
 window.updateRadioButtons = updateRadioButtons;
 window.populateSelect = populateSelect;
 
+// הוסר - המערכת המאוחדת מטפלת באתחול
 // אתחול הדף
-document.addEventListener('DOMContentLoaded', function () {
-  console.log('🚀🚀🚀 notes.js - DOMContentLoaded התחיל 🚀🚀🚀');
+// document.addEventListener('DOMContentLoaded', function () {
+//   console.log('🚀🚀🚀 notes.js - DOMContentLoaded התחיל 🚀🚀🚀');
   
   // בדיקת זמינות מערכות
   console.log('🔍 בדיקת זמינות מערכות:');
@@ -1490,7 +1491,7 @@ document.addEventListener('DOMContentLoaded', function () {
   restoreSortState();
 
   console.log('✅ notes.js - DOMContentLoaded הושלם');
-});
+// });
 
 // פונקציה להגדרת אירועי ולידציה
 function setupNoteValidationEvents() {

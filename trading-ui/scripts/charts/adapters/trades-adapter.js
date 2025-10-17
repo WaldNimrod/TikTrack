@@ -43,7 +43,7 @@ class TradesAdapter {
                 timestamp: now
             });
             
-            console.log(`📊 Fetched ${data.data?.length || 0} trades from API`);
+            // console.log(`📊 Fetched ${data.data?.length || 0} trades from API`);
             return data;
         } catch (error) {
             console.error('❌ Error fetching trades data:', error);

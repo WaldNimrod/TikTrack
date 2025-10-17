@@ -3,8 +3,8 @@
  * Handles content injection into locked template sections
  */
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('=== Dynamic Colors Display Page Loaded ===');
+// document.addEventListener('DOMContentLoaded', function() {
+//     console.log('=== Dynamic Colors Display Page Loaded ===');
 
     // Initialize color scheme system
     if (window.generateNumericValueCSS) {
@@ -21,9 +21,9 @@ document.addEventListener('DOMContentLoaded', function() {
     injectSection3Content();
     injectSection4Content();
 
-    // Initialize section toggle functionality
-    initializeSectionToggles();
-});
+//     // Initialize section toggle functionality
+//     initializeSectionToggles();
+// });
 
 /**
  * Inject content into Section 1 (Dynamic Colors - Numeric Values)

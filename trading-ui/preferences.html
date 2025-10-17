@@ -6,27 +6,22 @@
     <!-- Favicon will be set by global-favicon.js -->
     <title>העדפות - TikTrack</title>
     
-    <!-- 
-    ===== CORRECTED PREFERENCES PAGE =====
-    
-    This page has been corrected to follow the proper architecture:
-    1. Complete ITCSS implementation
-    2. All base package systems included
-    3. Correct loading order
-    4. Scripts moved to body (removed from head)
-    
-    ======================================
-    -->
     
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Bootstrap CSS - Must load first -->
+    <!-- Bootstrap CSS - חייב להיות קודם -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
-    <!-- ITCSS Architecture - Complete Implementation -->
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- 01-settings - Variables and Settings -->
+    <!-- Header System Script -->
+    <script src="scripts/header-system.js"></script>
+    
+    <!-- TikTrack CSS - Unified CSS (No @import) -->
+    <!-- CSS Files - אחרי Bootstrap כדי לדרוס אותו -->
+    <!-- 🔄 MAJOR ARCHITECTURE CHANGE - September 2025: Individual <link> tags instead of @import -->
     <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=1.0.0">
@@ -38,44 +33,34 @@
     <link rel="stylesheet" href="styles-new/02-tools/_mixins.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/02-tools/_functions.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/02-tools/_utilities.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/02-tools/_rtl-helpers.css?v=1.0.0">
     
     <!-- 03-generic - Reset and Normalization -->
     <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=1.0.0">
-    
-    <!-- 04-elements - Basic HTML Elements -->
     <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=1.0.0">
-    
-    <!-- 05-objects - Layout Structures -->
     <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=1.0.0">
-    
-    <!-- 06-components - UI Components -->
     <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=20250923_fixed_colors_v2">
     <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=1.0.0">
     
-    <!-- 07-pages - Page-specific Styles -->
-    <link rel="stylesheet" href="styles-new/07-pages/_preferences.css?v=1.0.0">
+    <!-- 07-trumps - Page-specific Styles -->
+    <link rel="stylesheet" href="styles-new/07-trumps/preferences-page.css?v=1.0.0">
     
     <!-- 08-themes - Themes -->
     <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=1.0.0">
     
     <!-- 09-utilities - Utility Classes -->
-    <link rel="stylesheet" href="styles-new/09-utilities/_spacing.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/09-utilities/_text.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/09-utilities/_display.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/09-utilities/_responsive.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/09-utilities/_utilities.css?v=1.0.0">
     
     <!-- External Libraries -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
@@ -83,146 +68,348 @@
     
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">
-    
-    <!-- Notification Modes Styles -->
-    <style>
-        .notification-mode-option {
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 10px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .notification-mode-option:hover {
-            border-color: #29a6a8;
-            background-color: #f8f9fa;
-        }
-        
-        .notification-mode-option input[type="radio"]:checked + label {
-            color: #29a6a8;
-        }
-        
-        .notification-mode-option:has(input[type="radio"]:checked) {
-            border-color: #29a6a8;
-            background-color: #e8f4f4;
-        }
-        
-        .mode-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-        
-        .mode-icon {
-            font-size: 1.2em;
-            margin-left: 8px;
-        }
-        
-        .mode-description {
-            font-size: 0.9em;
-            color: #6c757d;
-            line-height: 1.4;
-        }
-        
-        .mode-status {
-            padding: 15px;
-            border-radius: 8px;
-            background-color: #f8f9fa;
-            border: 1px solid #e9ecef;
-        }
-        
-        .status-indicator {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        
-        .status-icon {
-            font-size: 1.3em;
-            margin-left: 10px;
-        }
-        
-        .status-text {
-            font-weight: 600;
-            font-size: 1.1em;
-        }
-        
-        .status-description {
-            font-size: 0.9em;
-            color: #6c757d;
-            line-height: 1.4;
-        }
-        
-        .notification-modes-container .form-check-label {
-            cursor: pointer;
-            width: 100%;
-        }
-        
-        .notification-modes-container .form-check-input {
-            margin-top: 0.25em;
-        }
-    </style>
 </head>
-
 <body class="preferences-page">
-    <!-- Header System - Created automatically by header-system.js -->
+    <!-- 🔒 LOCKED TEMPLATE ZONE 1 - Header & Navigation (DO NOT MODIFY) -->
     <div id="unified-header"></div>
     
-    <!-- Page Content -->
+    <!-- 🔒 LOCKED TEMPLATE ZONE 2 - Background Wrapper (DO NOT MODIFY) -->
     <div class="background-wrapper">
         <div class="page-body">
-            <!-- Preferences area - top-Section -->
+            <!-- 🔒 LOCKED TEMPLATE ZONE 3 - Main Content Container (DO NOT MODIFY) -->
+            <div class="main-content">
+        <!-- UI Content Section Top Start-->
             <div class="top-section" data-section="top">
-                <!-- Main header -->
                 <div class="section-header">
-                    <div class="table-title">
-                        <img src="images/icons/preferences.svg" alt="העדפות" class="section-icon">
-                        העדפות
-                    </div>
-                    <div class="table-actions">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל ההעדפות וההגדרות">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2><i class="bi bi-gear-fill"></i> העדפות</h2>
+                <div class="section-header-controls">
+                    <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט">
                             <i class="fas fa-copy"></i> העתק לוג מפורט
                         </button>
-                        <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר אזור העדפות">
-                            <span class="filter-icon">▲</span>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="window.toggleSection('infoSummary')" id="toggleInfoBtn">
+                        <i class="bi bi-chevron-down"></i>
+          </button>
+                    <button class="btn btn-success btn-sm" onclick="window.saveAllPreferences()" id="saveAllBtn">
+                        <i class="bi bi-save"></i> שמור הכל
+            </button>
+                    <button class="btn btn-warning btn-sm" onclick="window.resetToDefaults()" id="resetBtn">
+                        <i class="bi bi-arrow-clockwise"></i> איפוס
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="window.toggleAllSections()" id="toggleAllBtn">
+                        <i class="bi bi-arrows-expand"></i> פתח/סגור הכל
                         </button>
                 </div>
       </div>
+        </div>
+      </div>
+            <div class="section-body" id="infoSummary">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-2">
+                                <div class="text-center">
+                                    <small class="text-muted">פרופיל פעיל</small>
+                                    <div id="activeProfileInfo" class="fw-bold">ברירת מחדל</div>
+        </div>
+        </div>
+                            <div class="col-md-2">
+                                <div class="text-center">
+                                    <small class="text-muted">מספר העדפות</small>
+                                    <div id="preferencesCount" class="fw-bold">טוען...</div>
+        </div>
+      </div>
+                            <div class="col-md-2">
+                                <div class="text-center">
+                                    <small class="text-muted">מספר פרופילים</small>
+                                    <div id="profilesCount" class="fw-bold">טוען...</div>
+          </div>
+          </div>
+                            <div class="col-md-2">
+                                <div class="text-center">
+                                    <small class="text-muted">מספר קבוצות</small>
+                                    <div id="groupsCount" class="fw-bold">טוען...</div>
+        </div>
+      </div>
+                            <div class="col-md-2">
+                                <div class="text-center">
+                                    <small class="text-muted">סטטוס מערכת</small>
+                                    <div id="systemStatus" class="text-success fw-bold">פעיל</div>
+          </div>
+        </div>
+                            <div class="col-md-2">
+                                <div class="text-center">
+                                    <small class="text-muted">גרסת מערכת</small>
+                                    <div id="systemVersion" class="fw-bold">3.0</div>
+      </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        <!-- UI Content Section Top End -->  
+      
 
-                <!-- Alert cards -->
+      <!-- UI Content Section 1 Start-->
+      <div class="content-section" id="section1">
+        <div class="section-header">
+            <h2>👤 ניהול פרופילים</h2>
+            <button class="filter-toggle-btn" onclick="window.toggleSection('section1')" title="הצג/הסתר סקשן">
+                <span class="section-toggle-icon">▼</span>
+            </button>
+        </div>
                 <div class="section-body">
-                    <active-alerts></active-alerts>
-
-                    <!-- Data summary -->
-                    <div class="info-summary" id="summaryStats">
-                        <div>פרופיל נוכחי: <strong id="currentProfile">ברירת מחדל</strong></div>
-                        <div>העדפות נשמרו: <strong id="savedPreferences">0</strong></div>
-                        <div>הגדרות פעילות: <strong id="activeSettings">0</strong></div>
-                        <div>עדכון אחרון: <strong id="lastPreferenceUpdate">-</strong></div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label" id="activeProfileInfo">פרופיל נוכחי</label>
+                            <select id="profileSelect" class="form-select">
+                                <option>ברירת מחדל</option>
+                    </select>
+                  </div>
+                  </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">שם פרופיל חדש</label>
+                            <input type="text" id="newProfileName" class="form-control" placeholder="הכנס שם פרופיל">
+                </div>
+              </div>
+            </div>
+                <div class="row">
+                  <div class="col-12">
+                        <div class="profile-buttons d-flex flex-wrap gap-2">
+                            <button class="btn btn-primary" onclick="window.saveAsActiveProfile()">
+                                <i class="bi bi-save"></i> שמור כפרופיל פעיל
+                            </button>
+                            <button class="btn btn-danger" onclick="window.deleteProfile()">
+                                <i class="bi bi-trash"></i> מחק
+                            </button>
                   </div>
                 </div>
-            </div> <!-- End top-section -->
-
-            <!-- Main content -->
-            <div class="main-content">
-                <!-- Notification Modes Section -->
-                <div class="content-section" id="notification-modes">
-                    <!-- Notification Modes header -->
-                    <div class="section-header">
-                        <div class="table-title">
-                            <img src="images/icons/notifications.svg" alt="מצבי עבודה להתראות" class="section-icon">
-                            מצבי עבודה להתראות
+              </div>
+            </div>
+          </div>
+        <!-- UI Content Section 1 End -->   
+      
+        <!-- UI Content Section 2 Start-->
+      <div class="content-section" id="section2">
+        <div class="section-header">
+            <h2>🏦 הגדרות בסיסיות</h2>
+            <button class="filter-toggle-btn" onclick="window.toggleSection('section2')" title="הצג/הסתר סקשן">
+                <span class="section-toggle-icon">▼</span>
+            </button>
+                  </div>
+        <div class="section-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">מטבע ראשי</label>
+                            <select id="primaryCurrency" class="form-select control-narrow" onchange="validateCurrency(this)">
+                                <option value="USD - דולר ארה"ב">USD - דולר ארה"ב</option>
+                                <option value="EUR - יורו">EUR - יורו</option>
+                                <option value="GBP - לירה שטרלינג">GBP - לירה שטרלינג</option>
+                                <option value="ILS - שקל חדש">ILS - שקל חדש</option>
+                    </select>
+                            <small class="text-muted">כרגע נתמך רק דולר ארה"ב</small>
+                </div>
+                        <div class="mb-3">
+                            <label class="form-label">מטבע משני <span class="text-muted">(עתידי)</span></label>
+                            <select id="secondaryCurrency" class="form-select control-narrow" disabled>
+                                <option value="USD - דולר ארה"ב">USD - דולר ארה"ב</option>
+                                <option value="EUR - יורו">EUR - יורו</option>
+                                <option value="GBP - לירה שטרלינג">GBP - לירה שטרלינג</option>
+                                <option value="ILS - שקל חדש">ILS - שקל חדש</option>
+                    </select>
+                  </div>
+                </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">אזור זמן</label>
+                            <select id="timezone" class="form-select">
+                                <option value="Asia/Jerusalem">Asia/Jerusalem</option>
+                                <option value="America/New_York">America/New_York</option>
+                                <option value="Europe/London">Europe/London</option>
+                                <option value="Asia/Tokyo">Asia/Tokyo</option>
+                </select>
+              </div>
+                        <div class="mb-3">
+                            <label class="form-label">שפה <span class="text-muted">(עתידי)</span></label>
+                            <select id="language" class="form-select control-narrow" disabled>
+                                <option value="עברית">עברית</option>
+                                <option value="English">English</option>
+                                <option value="العربية">العربية</option>
+                </select>
+              </div>
+                        <div class="mb-3">
+                            <label class="form-label">ערכת נושא <span class="text-muted">(עתידי)</span>:</label>
+                            <select id="theme" class="form-select control-narrow" disabled>
+                                <option value="light">בהיר</option>
+                                <!-- Dark mode removed - light mode only -->
+                                <option value="auto" disabled>אוטומטי (לא זמין)</option>
+                    </select>
+                  </div>
+                        <div class="mb-3">
+                            <label class="form-label">מצב קומפקטי <span class="text-muted">(עתידי)</span>:</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="compactMode" disabled>
+                                <label class="form-check-label" for="compactMode">
+                                    הפעל מצב קומפקטי
+                                </label>
+                  </div>
+                </div>
+                        <div class="mb-3">
+                            <label class="form-label">הצג אנימציות <span class="text-muted">(עתידי)</span>:</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="showAnimations" checked disabled>
+                                <label class="form-check-label" for="showAnimations">
+                                    הפעל אנימציות
+                                </label>
+              </div>
+            </div>
+                        <div class="mb-3">
+                            <label class="form-label">גודל עמוד בטבלה <span class="text-muted">(עתידי)</span>:</label>
+                            <select id="tablePageSize" class="form-select control-narrow" disabled>
+                                <option value="10">10</option>
+                                <option value="25" selected>25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+              </div>
                         </div>
-                        <div class="table-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('notification-modes')" title="הצג/הסתר אזור מצבי עבודה">
-                                <span class="filter-icon">▲</span>
+                  </div>
+                    </div>
+                  </div>
+                </div>
+        <!-- UI Content Section 2 End--> 
+      
+        <!-- UI Content Section 3 Start-->
+      <div class="content-section" id="section3">
+                    <div class="section-header">
+            <h2>📈 הגדרות מסחר</h2>
+            <button class="filter-toggle-btn" onclick="window.toggleSection('section3')" title="הצג/הסתר סקשן">
+                <span class="section-toggle-icon">▼</span>
+            </button>
+                        </div>
+        <div class="section-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>הגדרות בסיסיות</h5>
+                        <div class="mb-3">
+                            <label class="form-label">Stop Loss ברירת מחדל (%)</label>
+                            <input type="number" id="defaultStopLoss" class="form-control control-narrow" 
+                                   step="0.1" min="0" max="100">
+            </div>
+                        <div class="mb-3">
+                            <label class="form-label">Target Price ברירת מחדל (%)</label>
+                            <input type="number" id="defaultTargetPrice" class="form-control control-narrow" 
+                                   step="0.1" min="0" max="1000">
+                </div>
+                        <div class="mb-3">
+                            <label class="form-label">עמלה ברירת מחדל ($)</label>
+                            <input type="number" id="defaultCommission" class="form-control control-narrow" 
+                                   step="0.01" min="0">
+                </div>
+                </div>
+                    <div class="col-md-6">
+                        <h5>ניהול סיכונים <span class="text-muted">(עתידי)</span></h5>
+                        <div class="mb-3">
+                            <label class="form-label">סיכון מקסימלי לחשבון (%)</label>
+                            <input type="number" id="maxAccountRisk" class="form-control control-narrow" 
+                                   step="0.1" min="0" max="100" disabled>
+              </div>
+                        <div class="mb-3">
+                            <label class="form-label">סיכון מקסימלי לטריד (%)</label>
+                            <input type="number" id="maxTradeRisk" class="form-control control-narrow" 
+                                   step="0.1" min="0" max="100" disabled>
+            </div>
+                        <div class="mb-3">
+                            <label class="form-label">גודל פוזיציה מקסימלי (%)</label>
+                            <input type="number" id="maxPositionSize" class="form-control control-narrow" 
+                                   step="0.1" min="0" max="100" disabled>
+          </div>
+            </div>
+                  </div>
+                </div>
+                  </div>
+        <!-- UI Content Section 3 End--> 
+      
+        <!-- UI Content Section 4 Start-->
+      <div class="content-section" id="section4">
+        <div class="section-header">
+            <h2>🔍 פילטרים ברירת מחדל</h2>
+            <button class="filter-toggle-btn" onclick="window.toggleSection('section4')" title="הצג/הסתר סקשן">
+                <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
+        <div class="section-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>פילטרים בסיסיים</h5>
+                        <div class="mb-3">
+                            <label class="form-label">סטטוס ברירת מחדל</label>
+                            <select id="defaultStatusFilter" class="form-select control-narrow">
+                                <option value="הכל">הכל</option>
+                                <option value="פתוח" selected>פתוח</option>
+                                <option value="סגור">סגור</option>
+                                <option value="מבוטל">מבוטל</option>
+                    </select>
                     </div>
-
-                    <!-- Notification Modes body -->
+                        <div class="mb-3">
+                            <label class="form-label">סוג ברירת מחדל</label>
+                            <select id="defaultTypeFilter" class="form-select control-narrow">
+                                <option value="הכל">הכל</option>
+                                <option value="Swing" selected>Swing</option>
+                                <option value="השקעה">השקעה</option>
+                                <option value="פסיבי">פסיבי</option>
+                    </select>
+                  </div>
+                        <div class="mb-3">
+                            <label class="form-label">טווח תאריכים</label>
+                            <select id="defaultDateRangeFilter" class="form-select">
+                                <option value="היום">היום</option>
+                                <option value="אתמול">אתמול</option>
+                                <option value="השבוע">השבוע</option>
+                                <option value="השבוע שעבר">השבוע שעבר</option>
+                                <option value="החודש">החודש</option>
+                                <option value="החודש שעבר">החודש שעבר</option>
+                                <option value="השנה">השנה</option>
+                                <option value="השנה שעברה">השנה שעברה</option>
+                                <option value="7 ימים אחרונים">7 ימים אחרונים</option>
+                                <option value="30 ימים אחרונים">30 ימים אחרונים</option>
+                                <option value="90 ימים אחרונים">90 ימים אחרונים</option>
+                                <option value="הכל">הכל</option>
+                                <option value="מותאם אישית">מותאם אישית</option>
+                    </select>
+                  </div>
+                </div>
+                    <div class="col-md-6">
+                        <h5>פילטרים נוספים</h5>
+                        <div class="mb-3">
+                            <label class="form-label">חיפוש ברירת מחדל</label>
+                            <input type="text" id="defaultSearchFilter" class="form-control" 
+                                   placeholder="טקסט חיפוש ברירת מחדל">
+              </div>
+                        <div class="mb-3">
+                            <label class="form-label">חשבון ברירת מחדל</label>
+                            <select id="defaultAccountFilter" class="form-select">
+                                <option value="כל החשבונות">כל החשבונות</option>
+                                <option value="חשבון ראשי">חשבון ראשי</option>
+                    </select>
+                  </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+        <!-- UI Content Section 4 End--> 
+      
+        <!-- Notification Modes Section -->
+      <div class="content-section" id="section5">
+        <div class="section-header">
+            <h2>🔔 מצבי עבודה להתראות</h2>
+            <button class="filter-toggle-btn" onclick="window.toggleSection('section5')" title="הצג/הסתר סקשן">
+                <span class="section-toggle-icon">▼</span>
+            </button>
+        </div>
                     <div class="section-body">
                         <div class="row">
                             <div class="col-md-8">
@@ -237,69 +424,83 @@
                                         </p>
                                         
                                         <!-- Notification Mode Selection -->
-                                        <div class="notification-modes-container">
                                             <div class="row">
                                                 <!-- Debug Mode -->
                                                 <div class="col-md-6 mb-3">
-                                                    <div class="form-check notification-mode-option" data-mode="debug">
+                                    <div class="card border-secondary">
+                                        <div class="card-body">
+                                            <div class="form-check">
                                                         <input class="form-check-input" type="radio" name="notificationMode" id="modeDebug" value="debug">
                                                         <label class="form-check-label" for="modeDebug">
-                                                            <div class="mode-header">
-                                                                <i class="fas fa-bug mode-icon" style="color: #6c757d;"></i>
+                                                    <div class="d-flex align-items-center mb-2">
+                                                        <i class="fas fa-bug text-muted me-2"></i>
                                                                 <strong>מצב דיבג</strong>
                                                             </div>
-                                                            <div class="mode-description">
+                                                    <small class="text-muted">
                                                                 הצגת כל ההתראות המפורטות כולל הודעות משניות
-                                                            </div>
+                                                    </small>
                                                         </label>
+                                            </div>
+                                        </div>
                                                     </div>
                                                 </div>
 
                                                 <!-- Development Mode -->
                                                 <div class="col-md-6 mb-3">
-                                                    <div class="form-check notification-mode-option" data-mode="development">
+                                    <div class="card border-secondary">
+                                        <div class="card-body">
+                                            <div class="form-check">
                                                         <input class="form-check-input" type="radio" name="notificationMode" id="modeDevelopment" value="development">
                                                         <label class="form-check-label" for="modeDevelopment">
-                                                            <div class="mode-header">
-                                                                <i class="fas fa-code mode-icon" style="color: #6f42c1;"></i>
+                                                    <div class="d-flex align-items-center mb-2">
+                                                        <i class="fas fa-code text-primary me-2"></i>
                                                                 <strong>מצב פיתוח</strong>
                                                             </div>
-                                                            <div class="mode-description">
+                                                    <small class="text-muted">
                                                                 הצגת הודעות מרכזיות בלבד
-                                                            </div>
+                                                    </small>
                                                         </label>
+                                            </div>
+                                        </div>
                                                     </div>
                                                 </div>
 
                                                 <!-- Work Mode -->
                                                 <div class="col-md-6 mb-3">
-                                                    <div class="form-check notification-mode-option" data-mode="work">
+                                    <div class="card border-success">
+                                        <div class="card-body">
+                                            <div class="form-check">
                                                         <input class="form-check-input" type="radio" name="notificationMode" id="modeWork" value="work" checked>
                                                         <label class="form-check-label" for="modeWork">
-                                                            <div class="mode-header">
-                                                                <i class="fas fa-briefcase mode-icon" style="color: #28a745;"></i>
+                                                    <div class="d-flex align-items-center mb-2">
+                                                        <i class="fas fa-briefcase text-success me-2"></i>
                                                                 <strong>מצב עבודה</strong>
                                                             </div>
-                                                            <div class="mode-description">
+                                                    <small class="text-muted">
                                                                 הצגת הודעות שגיאה והודעות שהם תוצאה של פעולות ותהליכים שהמשתמש הריץ
-                                                            </div>
+                                                    </small>
                                                         </label>
+                                            </div>
+                                        </div>
                                                     </div>
                                                 </div>
 
                                                 <!-- Silent Mode -->
                                                 <div class="col-md-6 mb-3">
-                                                    <div class="form-check notification-mode-option" data-mode="silent">
+                                    <div class="card border-secondary">
+                                        <div class="card-body">
+                                            <div class="form-check">
                                                         <input class="form-check-input" type="radio" name="notificationMode" id="modeSilent" value="silent">
                                                         <label class="form-check-label" for="modeSilent">
-                                                            <div class="mode-header">
-                                                                <i class="fas fa-volume-mute mode-icon" style="color: #dc3545;"></i>
+                                                    <div class="d-flex align-items-center mb-2">
+                                                        <i class="fas fa-volume-mute text-danger me-2"></i>
                                                                 <strong>מצב מושתק</strong>
                                                             </div>
-                                                            <div class="mode-description">
+                                                    <small class="text-muted">
                                                                 הצגת הודעות שגיאה בלבד
-                                                            </div>
+                                                    </small>
                                                         </label>
+                                            </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -328,442 +529,579 @@
                                             <i class="fas fa-info-circle me-2"></i>
                                             מצב נוכחי
                                         </h6>
-                                        <div id="currentModeStatus" class="mode-status">
-                                            <div class="status-indicator">
-                                                <i class="fas fa-briefcase status-icon" style="color: #28a745;"></i>
-                                                <span class="status-text">מצב עבודה</span>
+                            <div id="currentModeStatus" class="p-3 bg-light rounded">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-briefcase text-success me-2"></i>
+                                    <span class="fw-bold">מצב עבודה</span>
                                             </div>
-                                            <div class="status-description">
+                                <small class="text-muted">
                                                 מצב ברירת מחדל - מאזן בין מידע לרעש
-                                            </div>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- קטגוריות התראות ולוגים -->
+                <div class="col-md-12 mt-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="fas fa-list me-2"></i>
+                                קטגוריות התראות ולוגים
+                            </h6>
+                            <p class="card-text text-muted">
+                                הגדר אילו סוגי התראות ולוגים יוצגו במערכת
+                            </p>
+                            
+                            <div class="notification-categories-section">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6 class="text-primary mb-2">התראות מערכת:</h6>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="notifications_development_enabled" checked>
+                                            <label class="form-check-label" for="notifications_development_enabled">
+                                                התראות פיתוח
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="notifications_system_enabled" checked>
+                                            <label class="form-check-label" for="notifications_system_enabled">
+                                                התראות מערכת
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="notifications_business_enabled" checked>
+                                            <label class="form-check-label" for="notifications_business_enabled">
+                                                התראות עסקיות
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="notifications_general_enabled" checked>
+                                            <label class="form-check-label" for="notifications_general_enabled">
+                                                התראות כלליות
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="notifications_performance_enabled">
+                                            <label class="form-check-label" for="notifications_performance_enabled">
+                                                התראות ביצועים
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="notifications_ui_enabled" checked>
+                                            <label class="form-check-label" for="notifications_ui_enabled">
+                                                התראות ממשק משתמש
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <h6 class="text-success mb-2">לוגים לקונסול:</h6>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="console_logs_development_enabled">
+                                            <label class="form-check-label" for="console_logs_development_enabled">
+                                                לוגי פיתוח
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="console_logs_system_enabled" checked>
+                                            <label class="form-check-label" for="console_logs_system_enabled">
+                                                לוגי מערכת
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="console_logs_business_enabled" checked>
+                                            <label class="form-check-label" for="console_logs_business_enabled">
+                                                לוגי עסקיים
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="console_logs_performance_enabled">
+                                            <label class="form-check-label" for="console_logs_performance_enabled">
+                                                לוגי ביצועים
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="console_logs_ui_enabled" checked>
+                                            <label class="form-check-label" for="console_logs_ui_enabled">
+                                                לוגי ממשק משתמש
+                                            </label>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div> <!-- End notification-modes section -->
+                </div>
+            </div>
+        </div>
+      </div> <!-- End notification modes section -->
 
-                <!-- Preferences management area - content-section -->
-                <div class="content-section" id="main">
-                    <!-- Preferences header -->
+        <!-- UI Content Section 6 Start-->
+      <div class="content-section" id="section6">
         <div class="section-header">
-                        <div class="table-title">
-                            <img src="images/icons/preferences.svg" alt="ניהול העדפות" class="section-icon">
-                            ניהול העדפות
-                        </div>
-                        <div class="table-count" id="preferencesCount">טוען...</div>
-                        <div class="table-actions">
-                            <button id="addPreferenceBtn" class="refresh-btn" onclick="showAddPreferenceModal()" title="הוסף העדפה חדשה">
-                                <img src="images/icons/preferences.svg" alt="הוסף" class="action-icon">
-                                הוסף
-                            </button>
-                            <button class="filter-toggle-btn" onclick="toggleSection('main')" title="הצג/הסתר אזור ניהול העדפות">
-                                <span class="filter-icon">▲</span>
+            <h2>🎨 צבעים</h2>
+            <button class="filter-toggle-btn" onclick="window.toggleSection('section6')" title="הצג/הסתר סקשן">
+                <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
-                    </div>
-
-                    <!-- Preferences table -->
                     <div class="section-body">
-                        <div class="table-responsive" id="preferencesContainer">
-                            <table class="table" id="preferencesTable" data-table-type="preferences">
-                                <thead>
-                                    <tr>
-                                        <th class="col-name">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                שם העדפה <span class="sort-icon">↕</span>
-                </button>
-                                        </th>
-                                        <th class="col-value">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                ערך <span class="sort-icon">↕</span>
-                </button>
-                                        </th>
-                                        <th class="col-type">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                סוג <span class="sort-icon">↕</span>
-                </button>
-                                        </th>
-                                        <th class="col-description">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                תיאור <span class="sort-icon">↕</span>
-                </button>
-                                        </th>
-                                        <th class="col-created">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                נוצר ב <span class="sort-icon">↕</span>
-                </button>
-                                        </th>
-                                        <th class="col-actions actions-cell actions-3-btn">
-                                            פעולות
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td colspan="6" class="loading">טוען העדפות...</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                <!-- Basic System Colors -->
+                <div class="row">
+                    <div class="col-12">
+                        <h5>צבעי מערכת בסיסיים</h5>
+                        <small class="text-muted">צבעי הממשק הכלליים</small>
                         </div>
                     </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 w-25">צבע ראשי:</label>
+                            <input type="color" id="primaryColor" class="form-control form-control-color color-picker" data-color-key="primaryColor">
+                </div>
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 w-25">צבע משני:</label>
+                            <input type="color" id="secondaryColor" class="form-control form-control-color color-picker" data-color-key="secondaryColor">
+                  </div>
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 w-25">הצלחה:</label>
+                            <input type="color" id="successColor" class="form-control form-control-color color-picker" data-color-key="successColor">
+                </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 w-25">אזהרה:</label>
+                            <input type="color" id="warningColor" class="form-control form-control-color color-picker" data-color-key="warningColor">
+                  </div>
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 w-25">סכנה:</label>
+                            <input type="color" id="dangerColor" class="form-control form-control-color color-picker" data-color-key="dangerColor">
+                  </div>
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 w-25">מידע:</label>
+                            <input type="color" id="infoColor" class="form-control form-control-color color-picker" data-color-key="infoColor">
                 </div>
             </div>
         </div>
 
-        <!-- Bottom page spacing -->
-        <div style="height: 3rem;"></div>
-
-        <!-- Notification system -->
-        <div class="notification-container" id="notificationContainer"></div>
-
-        <!-- Toast container for notifications -->
-        <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1000000002;"></div>
-
-        <!-- Add Preference Modal -->
-        <div class="modal fade" id="addPreferenceModal" tabindex="-1" aria-labelledby="addPreferenceModalLabel" aria-hidden="true"
-            data-bs-backdrop="true" data-bs-keyboard="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header modal-header-colored">
-                        <h5 class="modal-title" id="addPreferenceModalLabel">הוספת העדפה חדשה</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="section-divider"></div>
+                
+                <!-- Entity Colors -->
+                <div class="row">
+                    <div class="col-12">
+                        <h5>צבעי ישויות</h5>
+                        <small class="text-muted">כל ישות כוללת 3 וריאנטים: רגיל, בהיר (רקע), כהה (טקסט)</small>
                     </div>
-                    <div class="modal-body">
-                        <form id="addPreferenceForm">
+                  </div>
                             <div class="row">
                                 <div class="col-md-6">
+                        <!-- Trade Plans -->
                                     <div class="mb-3">
-                                        <label for="preferenceName" class="form-label">שם ההעדפה</label>
-                                        <input type="text" class="form-control" id="preferenceName" placeholder="שם ההעדפה" required>
+                            <label class="form-label">תכנוני טריידים:</label>
+                            <div class="d-flex gap-2 align-items-center">
+                                <label class="form-label mb-0">רגיל:</label>
+                                <input type="color" id="entityTradePlanColor" class="form-control form-control-color color-picker" data-color-key="entityTradePlanColor">
+                                <label class="form-label mb-0">בהיר:</label>
+                                <input type="color" id="entityTradePlanColorLight" class="form-control form-control-color color-picker" data-color-key="entityTradePlanColorLight">
+                                <label class="form-label mb-0">כהה:</label>
+                                <input type="color" id="entityTradePlanColorDark" class="form-control form-control-color color-picker" data-color-key="entityTradePlanColorDark">
             </div>
         </div>
-                                <div class="col-md-6">
+                        <!-- Trades -->
                                     <div class="mb-3">
-                                        <label for="preferenceValue" class="form-label">ערך</label>
-                                        <input type="text" class="form-control" id="preferenceValue" placeholder="ערך ההעדפה" required>
+                            <label class="form-label">טריידים:</label>
+                            <div class="d-flex gap-2 align-items-center">
+                                <label class="form-label mb-0">רגיל:</label>
+                                <input type="color" id="entityTradeColor" class="form-control form-control-color color-picker" data-color-key="entityTradeColor">
+                                <label class="form-label mb-0">בהיר:</label>
+                                <input type="color" id="entityTradeColorLight" class="form-control form-control-color color-picker" data-color-key="entityTradeColorLight">
+                                <label class="form-label mb-0">כהה:</label>
+                                <input type="color" id="entityTradeColorDark" class="form-control form-control-color color-picker" data-color-key="entityTradeColorDark">
                                     </div>
               </div>
-                  </div>
-                <div class="row">
-                    <div class="col-md-6">
+                        <!-- Alerts -->
                         <div class="mb-3">
-                                        <label for="preferenceType" class="form-label">סוג העדפה</label>
-                                        <select class="form-select" id="preferenceType" required>
-                                            <option value="">בחר סוג</option>
-                                            <option value="boolean">בוליאני (כן/לא)</option>
-                                            <option value="string">מחרוזת</option>
-                                            <option value="number">מספר</option>
-                                            <option value="color">צבע</option>
-                                        </select>
+                            <label class="form-label">התראות:</label>
+                            <div class="d-flex gap-2 align-items-center">
+                                <label class="form-label mb-0">רגיל:</label>
+                                <input type="color" id="entityAlertColor" class="form-control form-control-color color-picker" data-color-key="entityAlertColor">
+                                <label class="form-label mb-0">בהיר:</label>
+                                <input type="color" id="entityAlertColorLight" class="form-control form-control-color color-picker" data-color-key="entityAlertColorLight">
+                                <label class="form-label mb-0">כהה:</label>
+                                <input type="color" id="entityAlertColorDark" class="form-control form-control-color color-picker" data-color-key="entityAlertColorDark">
+                  </div>
+              </div>
+                        <!-- Notes -->
+                        <div class="mb-3">
+                            <label class="form-label">הערות:</label>
+                            <div class="d-flex gap-2 align-items-center">
+                                <label class="form-label mb-0">רגיל:</label>
+                                <input type="color" id="entityNoteColor" class="form-control form-control-color color-picker" data-color-key="entityNoteColor">
+                                <label class="form-label mb-0">בהיר:</label>
+                                <input type="color" id="entityNoteColorLight" class="form-control form-control-color color-picker" data-color-key="entityNoteColorLight">
+                                <label class="form-label mb-0">כהה:</label>
+                                <input type="color" id="entityNoteColorDark" class="form-control form-control-color color-picker" data-color-key="entityNoteColorDark">
+            </div>
               </div>
         </div>
                     <div class="col-md-6">
+                        <!-- Accounts -->
           <div class="mb-3">
-                                        <label for="preferenceCategory" class="form-label">קטגוריה</label>
-                                        <select class="form-select" id="preferenceCategory">
-                                            <option value="">בחר קטגוריה</option>
-                                            <option value="ui">ממשק משתמש</option>
-                                            <option value="trading">מסחר</option>
-                                            <option value="notifications">התראות</option>
-                                            <option value="display">תצוגה</option>
-                                        </select>
+                            <label class="form-label">חשבונות מסחר:</label>
+                            <div class="d-flex gap-2 align-items-center">
+                                <label class="form-label mb-0">רגיל:</label>
+                                <input type="color" id="entityTradingAccountColor" class="form-control form-control-color color-picker" data-color-key="entityTradingAccountColor">
+                                <label class="form-label mb-0">בהיר:</label>
+                                <input type="color" id="entityTradingAccountColorLight" class="form-control form-control-color color-picker" data-color-key="entityTradingAccountColorLight">
+                                <label class="form-label mb-0">כהה:</label>
+                                <input type="color" id="entityTradingAccountColorDark" class="form-control form-control-color color-picker" data-color-key="entityTradingAccountColorDark">
             </div>
           </div>
-      </div>
-                            <div class="row">
-                                <div class="col-md-12">
+                        <!-- Tickers -->
           <div class="mb-3">
-                                        <label for="preferenceDescription" class="form-label">תיאור ההעדפה</label>
-                                        <textarea class="form-control" id="preferenceDescription" rows="3" placeholder="תיאור ההעדפה..."></textarea>
-              </div>
-                  </div>
-              </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-success" onclick="addPreference()"
-                            style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">הוסף
-                            העדפה</button>
-                    </div>
-                  </div>
-            </div>
+                            <label class="form-label">טיקרים:</label>
+                            <div class="d-flex gap-2 align-items-center">
+                                <label class="form-label mb-0">רגיל:</label>
+                                <input type="color" id="entityTickerColor" class="form-control form-control-color color-picker" data-color-key="entityTickerColor">
+                                <label class="form-label mb-0">בהיר:</label>
+                                <input type="color" id="entityTickerColorLight" class="form-control form-control-color color-picker" data-color-key="entityTickerColorLight">
+                                <label class="form-label mb-0">כהה:</label>
+                                <input type="color" id="entityTickerColorDark" class="form-control form-control-color color-picker" data-color-key="entityTickerColorDark">
+      </div>
+          </div>
+                        <!-- Executions -->
+          <div class="mb-3">
+                            <label class="form-label">ביצועים:</label>
+                            <div class="d-flex gap-2 align-items-center">
+                                <label class="form-label mb-0">רגיל:</label>
+                                <input type="color" id="entityExecutionColor" class="form-control form-control-color color-picker" data-color-key="entityExecutionColor">
+                                <label class="form-label mb-0">בהיר:</label>
+                                <input type="color" id="entityExecutionColorLight" class="form-control form-control-color color-picker" data-color-key="entityExecutionColorLight">
+                                <label class="form-label mb-0">כהה:</label>
+                                <input type="color" id="entityExecutionColorDark" class="form-control form-control-color color-picker" data-color-key="entityExecutionColorDark">
+      </div>
         </div>
-
-        <!-- Edit Preference Modal -->
-        <div class="modal fade" id="editPreferenceModal" tabindex="-1" aria-labelledby="editPreferenceModalLabel" aria-hidden="true"
-            data-bs-backdrop="true" data-bs-keyboard="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header modal-header-colored">
-                        <h5 class="modal-title" id="editPreferenceModalLabel">עריכת העדפה</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <!-- Cash Flows -->
+          <div class="mb-3">
+                            <label class="form-label">תזרימי מזומנים:</label>
+                            <div class="d-flex gap-2 align-items-center">
+                                <label class="form-label mb-0">רגיל:</label>
+                                <input type="color" id="entityCashFlowColor" class="form-control form-control-color color-picker" data-color-key="entityCashFlowColor">
+                                <label class="form-label mb-0">בהיר:</label>
+                                <input type="color" id="entityCashFlowColorLight" class="form-control form-control-color color-picker" data-color-key="entityCashFlowColorLight">
+                                <label class="form-label mb-0">כהה:</label>
+                                <input type="color" id="entityCashFlowColorDark" class="form-control form-control-color color-picker" data-color-key="entityCashFlowColorDark">
+              </div>
+                  </div>
                     </div>
-                    <div class="modal-body">
-                        <form id="editPreferenceForm">
-                <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="editPreferenceName" class="form-label">שם ההעדפה</label>
-                                        <input type="text" class="form-control" id="editPreferenceName" required>
-                        </div>
+                  </div>
                     </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="editPreferenceValue" class="form-label">ערך</label>
-                                        <input type="text" class="form-control" id="editPreferenceValue" required>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="editPreferenceType" class="form-label">סוג העדפה</label>
-                                        <select class="form-select" id="editPreferenceType" required>
-                                            <option value="boolean">בוליאני (כן/לא)</option>
-                                            <option value="string">מחרוזת</option>
-                                            <option value="number">מספר</option>
-                                            <option value="color">צבע</option>
-                        </select>
-                    </div>
-                    </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="editPreferenceCategory" class="form-label">קטגוריה</label>
-                                        <select class="form-select" id="editPreferenceCategory">
-                                            <option value="ui">ממשק משתמש</option>
-                                            <option value="trading">מסחר</option>
-                                            <option value="notifications">התראות</option>
-                                            <option value="display">תצוגה</option>
-                        </select>
-                    </div>
-                </div>
-                        </div>
+                  </div>
+        <!-- UI Content Section 5 End--> 
+      
+        <!-- UI Content Section 6 Start-->
+      <div class="content-section" id="section7">
+        <div class="section-header">
+            <h2>📊 צבעי ערכים מספריים</h2>
+            <button class="filter-toggle-btn" onclick="window.toggleSection('section7')" title="הצג/הסתר סקשן">
+                <span class="section-toggle-icon">▼</span>
+            </button>
+        </div>
+        <div class="section-body">
                             <div class="row">
-                                <div class="col-md-12">
-                                    <div class="mb-3">
-                                        <label for="editPreferenceDescription" class="form-label">תיאור ההעדפה</label>
-                                        <textarea class="form-control" id="editPreferenceDescription" rows="3"></textarea>
-                        </div>
+                    <div class="col-12">
+                        <h5>צבעי ערכים מספריים</h5>
+                        <small class="text-muted">צבעים לערכים חיוביים, שליליים ונייטרליים</small>
+              </div>
+                  </div>
+                <div class="row">
+                    <div class="col-md-4">
+          <div class="mb-3">
+                            <label class="form-label">ערכים חיוביים:</label>
+                            <div class="d-flex gap-2 align-items-center">
+                                <label class="form-label mb-0">רגיל:</label>
+                                <input type="color" id="valuePositiveColor" class="form-control form-control-color color-picker" data-color-key="valuePositiveColor">
+                                <label class="form-label mb-0">בהיר:</label>
+                                <input type="color" id="valuePositiveColorLight" class="form-control form-control-color color-picker" data-color-key="valuePositiveColorLight">
+                                <label class="form-label mb-0">כהה:</label>
+                                <input type="color" id="valuePositiveColorDark" class="form-control form-control-color color-picker" data-color-key="valuePositiveColorDark">
+              </div>
+                  </div>
+              </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">ערכים שליליים:</label>
+                            <div class="d-flex gap-2 align-items-center">
+                                <label class="form-label mb-0">רגיל:</label>
+                                <input type="color" id="valueNegativeColor" class="form-control form-control-color color-picker" data-color-key="valueNegativeColor">
+                                <label class="form-label mb-0">בהיר:</label>
+                                <input type="color" id="valueNegativeColorLight" class="form-control form-control-color color-picker" data-color-key="valueNegativeColorLight">
+                                <label class="form-label mb-0">כהה:</label>
+                                <input type="color" id="valueNegativeColorDark" class="form-control form-control-color color-picker" data-color-key="valueNegativeColorDark">
                     </div>
-                        </div>
-                        </form>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-success" onclick="updatePreference()"
-                            style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">עדכן
-                            העדפה</button>
-                    </div>
-                </div>
+                  </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">ערכים נייטרליים:</label>
+                            <div class="d-flex gap-2 align-items-center">
+                                <label class="form-label mb-0">רגיל:</label>
+                                <input type="color" id="valueNeutralColor" class="form-control form-control-color color-picker" data-color-key="valueNeutralColor">
+                                <label class="form-label mb-0">בהיר:</label>
+                                <input type="color" id="valueNeutralColorLight" class="form-control form-control-color color-picker" data-color-key="valueNeutralColorLight">
+                                <label class="form-label mb-0">כהה:</label>
+                                <input type="color" id="valueNeutralColorDark" class="form-control form-control-color color-picker" data-color-key="valueNeutralColorDark">
             </div>
         </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- UI Content Section 6 End--> 
+      
+        <!-- UI Content Section 8 Start-->
+      <div class="content-section" id="section8">
+        <div class="section-header">
+            <h2>📊 הגדרות גרפים</h2>
+            <button class="filter-toggle-btn" onclick="window.toggleSection('section8')" title="הצג/הסתר סקשן">
+                <span class="section-toggle-icon">▼</span>
+            </button>
+                    </div>
+        <div class="section-body">
+                <div class="row">
+                    <div class="col-12">
+                        <h5>צבעי גרפים</h5>
+                        <small class="text-muted">צבעים מיוחדים למערכת הגרפים</small>
+              </div>
+                    </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 w-25">צבע ראשי לגרפים:</label>
+                            <input type="color" id="chartPrimaryColor" class="form-control form-control-color color-picker" data-color-key="chartPrimaryColor">
+                  </div>
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 w-25">צבע רקע גרפים:</label>
+                            <input type="color" id="chartBackgroundColor" class="form-control form-control-color color-picker" data-color-key="chartBackgroundColor">
+                  </div>
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 w-25">צבע טקסט גרפים:</label>
+                            <input type="color" id="chartTextColor" class="form-control form-control-color color-picker" data-color-key="chartTextColor">
+                  </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 w-25">צבע רשת גרפים:</label>
+                            <input type="color" id="chartGridColor" class="form-control form-control-color color-picker" data-color-key="chartGridColor">
+                  </div>
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 w-25">צבע גבול גרפים:</label>
+                            <input type="color" id="chartBorderColor" class="form-control form-control-color color-picker" data-color-key="chartBorderColor">
+                  </div>
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 w-25">צבע נקודות גרפים:</label>
+                            <input type="color" id="chartPointColor" class="form-control form-control-color color-picker" data-color-key="chartPointColor">
+                  </div>
+              </div>
+            </div>
+            
+                <div class="section-divider"></div>
+                
+                <!-- Chart Settings -->
+                <div class="row">
+                    <div class="col-12">
+                        <h5>הגדרות גרפים</h5>
+                        <small class="text-muted">הגדרות כלליות למערכת הגרפים</small>
+              </div>
+                  </div>
+                <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                            <label class="form-label">ריענון אוטומטי:</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="chartAutoRefresh" checked>
+                                <label class="form-check-label" for="chartAutoRefresh">
+                                    הפעל ריענון אוטומטי של גרפים
+                                </label>
+                  </div>
+                </div>
+                        <div class="mb-3">
+                            <label class="form-label">מרווח ריענון (שניות):</label>
+                            <select id="chartRefreshInterval" class="form-select control-narrow">
+                                <option value="30">30 שניות</option>
+                                <option value="60" selected>1 דקה</option>
+                                <option value="300">5 דקות</option>
+                                <option value="600">10 דקות</option>
+                                <option value="1800">30 דקות</option>
+                </select>
+              </div>
+                        <div class="mb-3">
+                            <label class="form-label">איכות גרפים:</label>
+                            <select id="chartQuality" class="form-select control-narrow">
+                                <option value="low">נמוכה (מהיר)</option>
+                                <option value="medium" selected>בינונית</option>
+                                <option value="high">גבוהה (איטי)</option>
+                </select>
+                        </div>
+                    </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                            <label class="form-label">אנימציות גרפים:</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="chartAnimations" checked>
+                                <label class="form-check-label" for="chartAnimations">
+                                    הפעל אנימציות בגרפים
+                                </label>
+                        </div>
+                    </div>
+                        <div class="mb-3">
+                            <label class="form-label">מצב אינטראקטיבי:</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="chartInteractive" checked>
+                                <label class="form-check-label" for="chartInteractive">
+                                    הפעל מצב אינטראקטיבי
+                                </label>
+                  </div>
+                </div>
+                        <div class="mb-3">
+                            <label class="form-label">הצג כלי עזר:</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="chartShowTooltips" checked>
+                                <label class="form-check-label" for="chartShowTooltips">
+                                    הצג כלי עזר (tooltips)
+                                </label>
+                  </div>
+                </div>
+                    </div>
+                  </div>
+                </div>
+            
+                <div class="section-divider"></div>
+                
+                <!-- Export Settings -->
+                <div class="row">
+                    <div class="col-12">
+                        <h5>הגדרות ייצוא</h5>
+                        <small class="text-muted">הגדרות ברירת מחדל לייצוא גרפים</small>
+              </div>
+                </div>
+                <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                            <label class="form-label">פורמט ברירת מחדל:</label>
+                            <select id="chartExportFormat" class="form-select control-narrow">
+                                <option value="png" selected>PNG</option>
+                                <option value="jpg">JPG</option>
+                                <option value="pdf">PDF</option>
+                                <option value="svg">SVG</option>
+                </select>
+              </div>
+                        <div class="mb-3">
+                            <label class="form-label">איכות ברירת מחדל:</label>
+                            <select id="chartExportQuality" class="form-select control-narrow">
+                                <option value="low">נמוכה</option>
+                                <option value="medium" selected>בינונית</option>
+                                <option value="high">גבוהה</option>
+                                <option value="ultra">אולטרה</option>
+                        </select>
+                    </div>
+                    </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                            <label class="form-label">רזולוציה ברירת מחדל:</label>
+                            <select id="chartExportResolution" class="form-select control-narrow">
+                                <option value="1x" selected>1x (רגיל)</option>
+                                <option value="2x">2x (רזולוציה גבוהה)</option>
+                                <option value="3x">3x (רזולוציה גבוהה מאוד)</option>
+                        </select>
+                    </div>
+                        <div class="mb-3">
+                            <label class="form-label">כולל רקע:</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="chartExportBackground" checked>
+                                <label class="form-check-label" for="chartExportBackground">
+                                    כלול רקע בייצוא
+                                </label>
+                </div>
+                        </div>
+                        </div>
+                    </div>
+                        </div>
+                    </div>
+                    </div>
+        <!-- UI Content Section 7 End--> 
+      
+            </div>
+            <!-- 🔒 LOCKED TEMPLATE ZONE 4 - End Main Content Container (DO NOT MODIFY) -->
+        </div>
+        <!-- 🔒 LOCKED TEMPLATE ZONE 5 - End Page Body (DO NOT MODIFY) -->
     </div>
+    <!-- 🔒 LOCKED TEMPLATE ZONE 6 - End Background Wrapper (DO NOT MODIFY) --> 
+  
+    <!-- 🔄 NEW UNIFIED INITIALIZATION SYSTEM -->
+    <!-- Core Systems -->
+    <script src="scripts/global-favicon.js"></script>
+    <script src="scripts/ui-utils.js"></script>
+    <script src="scripts/data-utils.js"></script>
+    <script src="scripts/notification-system.js"></script>
+    <script src="scripts/system-management.js"></script>
+    <script src="scripts/notification-category-detector.js"></script>
+    <script src="scripts/global-notification-collector.js"></script>
+    <script src="scripts/tables.js"></script>
+    <script src="scripts/page-utils.js"></script>
     
-    <!-- Bootstrap JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="scripts/preferences.js"></script>
     
-    <!-- ===== BASE PACKAGE SYSTEMS - CORRECT LOADING ORDER ===== -->
+    <!-- Real-time Notifications System -->
+    <!-- WebSocket disabled - using polling fallback -->
     
-    <!-- Stage 1: Initialization Systems (Must be first) -->
-    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script>
-    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script>
-    
-    <!-- Stage 2: Core Base Systems -->
-    <script src="scripts/global-favicon.js?v=1.0.0"></script>
-    <script src="scripts/translation-utils.js?v=1.0.0"></script>
-    
-    <!-- Stage 3: UI Base Systems -->
-    <script src="scripts/notification-system.js?v=1.0.0"></script>
-    
-    <!-- Stage 4: Cache and Refresh Systems -->
-    <script src="scripts/cache-sync-manager.js?v=1.0.0"></script>
-    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script>
-    <script src="scripts/cache-policy-manager.js?v=1.0.0"></script>
-    <script src="scripts/memory-optimizer.js?v=1.0.0"></script>
-    
-    <!-- Stage 5: Advanced UI Systems (Always required) -->
-    <script src="scripts/ui-utils.js?v=1.0.0"></script>
-    <script src="scripts/color-scheme-system.js?v=1.0.0"></script>
-    <script src="scripts/header-system.js?v=v6.0.0"></script>
-    
-    <!-- Stage 6: Data and Utility Systems -->
-    <script src="scripts/data-utils.js?v=1.0.0"></script>
-    <script src="scripts/date-utils.js?v=1.0.0"></script>
-    <script src="scripts/button-icons.js?v=1.0.0"></script>
-    <script src="scripts/tables.js?v=1.0.0"></script>
-    <script src="scripts/table-mappings.js?v=1.0.0"></script>
-    <script src="scripts/page-utils.js?v=1.0.0"></script>
-    
-    <!-- Stage 7: Additional Systems (As needed) -->
-    <script src="scripts/preferences.js?v=1.0.0"></script>
-    <script src="scripts/notification-category-detector.js?v=1.0.0"></script>
-    <script src="scripts/global-notification-collector.js?v=1.0.0"></script>
-    <script src="scripts/system-management.js?v=1.0.0"></script>
-    <script src="scripts/realtime-notifications-client.js?v=1.0.0"></script>
-    <script src="scripts/error-handlers.js?v=1.0.0"></script>
-    <script src="scripts/preferences.js?v=1.0.0"></script>
-    
-    <!-- Stage 8: Page-specific Script -->
-    <script src="scripts/preferences.js?v=1.0.0"></script>
+    <!-- New Unified Initialization System -->
+    <script src="scripts/page-initialization-configs.js"></script>
+    <script src="scripts/unified-app-initializer.js"></script>
+
+    <!-- 🔓 TEMPLATE ZONE 6 - Page-Specific Scripts (ADD NEW SCRIPTS HERE) -->
+    <!-- Fallback initialization if unified system fails -->
+    <script>
+        // Fallback initialization for preferences page
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Wait a bit for all scripts to load
+            setTimeout(async () => {
+                try {
+                    console.log('🔄 Fallback initialization for preferences page...');
+                    
+                    // Load preferences if not already loaded
+                    if (typeof window.loadAllPreferences === 'function') {
+                        await window.loadAllPreferences();
+                    }
+                    
+                    // Default colors are now loaded automatically by loadAllPreferences
+                    
+                    // Profiles are now loaded automatically by loadAllPreferences
+                    
+                    // Add profile selection event listener (UI only)
+                    const profileSelect = document.getElementById('profileSelect');
+                    if (profileSelect) {
+                        // Only log the selection change, don't perform any actions
+                        profileSelect.addEventListener('change', function() {
+                            const selectedProfile = this.value;
+                            console.log(`📋 Profile selection changed to: ${selectedProfile} (UI only, no server action)`);
+                        });
+                        console.log('✅ Added profile selection listener (UI only)');
+                    }
+                    
+                    console.log('✅ Fallback initialization completed');
+            } catch (error) {
+                    console.error('❌ Fallback initialization failed:', error);
+                }
+            }, 500);
+        });
+    </script>
     
     <!-- Local copyDetailedLog function for preferences page -->
     <script>
         // Make the local copyDetailedLog function available globally for this page only
         window.copyDetailedLog = copyDetailedLog;
-    </script>
-
-    <!-- Notification Modes Functions -->
-    <script>
-        // מצבי עבודה למערכת התראות
-        const NOTIFICATION_MODES = {
-            debug: {
-                name: 'debug',
-                title: 'מצב דיבג',
-                description: 'הצגת כל ההתראות המפורטות כולל הודעות משניות',
-                icon: 'fas fa-bug',
-                color: '#6c757d'
-            },
-            development: {
-                name: 'development', 
-                title: 'מצב פיתוח',
-                description: 'הצגת הודעות מרכזיות בלבד',
-                icon: 'fas fa-code',
-                color: '#6f42c1'
-            },
-            work: {
-                name: 'work',
-                title: 'מצב עבודה', 
-                description: 'הצגת הודעות שגיאה והודעות שהם תוצאה של פעולות ותהליכים שהמשתמש הריץ',
-                icon: 'fas fa-briefcase',
-                color: '#28a745'
-            },
-            silent: {
-                name: 'silent',
-                title: 'מצב מושתק',
-                description: 'הצגת הודעות שגיאה בלבד',
-                icon: 'fas fa-volume-mute',
-                color: '#dc3545'
-            }
-        };
-
-        /**
-         * טען מצב עבודה נוכחי
-         */
-        async function loadNotificationMode() {
-            try {
-                const currentMode = await window.getPreference('notification_mode', 1, null);
-                const mode = currentMode || 'work'; // ברירת מחדל: מצב עבודה
-                
-                // עדכן את הרדיו בוטון
-                const radioButton = document.getElementById(`mode${mode.charAt(0).toUpperCase() + mode.slice(1)}`);
-                if (radioButton) {
-                    radioButton.checked = true;
-                }
-                
-                // עדכן את התצוגה הנוכחית
-                updateCurrentModeStatus(mode);
-                
-                console.log(`🔍 Loaded notification mode: ${mode}`);
-            } catch (error) {
-                console.warn('Failed to load notification mode:', error);
-                // ברירת מחדל: מצב עבודה
-                document.getElementById('modeWork').checked = true;
-                updateCurrentModeStatus('work');
-            }
-        }
-
-        /**
-         * עדכן תצוגת מצב נוכחי
-         */
-        function updateCurrentModeStatus(mode) {
-            const modeData = NOTIFICATION_MODES[mode];
-            if (!modeData) return;
-            
-            const statusElement = document.getElementById('currentModeStatus');
-            if (statusElement) {
-                statusElement.innerHTML = `
-                    <div class="status-indicator">
-                        <i class="${modeData.icon} status-icon" style="color: ${modeData.color};"></i>
-                        <span class="status-text">${modeData.title}</span>
-                    </div>
-                    <div class="status-description">
-                        ${modeData.description}
-                    </div>
-                `;
-            }
-        }
-
-        /**
-         * שמור מצב עבודה
-         */
-        async function saveNotificationMode() {
-            try {
-                const selectedMode = document.querySelector('input[name="notificationMode"]:checked');
-                if (!selectedMode) {
-                    await showErrorNotification('שגיאה', 'אנא בחר מצב עבודה');
-                    return;
-                }
-                
-                const mode = selectedMode.value;
-                await window.savePreference('notification_mode', mode, 1, null);
-                
-                // עדכן תצוגה
-                updateCurrentModeStatus(mode);
-                
-                await showSuccessNotification('הצלחה', `מצב העבודה נשמר: ${NOTIFICATION_MODES[mode].title}`, 3000, 'system', { userInitiated: true });
-                
-                console.log(`🔍 Saved notification mode: ${mode}`);
-            } catch (error) {
-                console.error('Failed to save notification mode:', error);
-                await showErrorNotification('שגיאה', 'נכשל בשמירת מצב העבודה');
-            }
-        }
-
-        /**
-         * בדוק מצב עבודה נוכחי
-         */
-        async function testNotificationMode() {
-            try {
-                const selectedMode = document.querySelector('input[name="notificationMode"]:checked');
-                if (!selectedMode) {
-                    await showErrorNotification('שגיאה', 'אנא בחר מצב עבודה');
-                    return;
-                }
-                
-                const mode = selectedMode.value;
-                const modeData = NOTIFICATION_MODES[mode];
-                
-                // הצג הודעות בדיקה לכל סוג
-                await showInfoNotification('בדיקת מצב', `מצב נוכחי: ${modeData.title}`, 2000, 'system');
-                await showSuccessNotification('בדיקת הצלחה', 'הודעת הצלחה לבדיקה', 2000, 'business');
-                await showWarningNotification('בדיקת אזהרה', 'הודעת אזהרה לבדיקה', 2000, 'system');
-                await showErrorNotification('בדיקת שגיאה', 'הודעת שגיאה לבדיקה', 2000, 'system');
-                
-                console.log(`🔍 Tested notification mode: ${mode}`);
-            } catch (error) {
-                console.error('Failed to test notification mode:', error);
-                await showErrorNotification('שגיאה', 'נכשל בבדיקת מצב העבודה');
-            }
-        }
-
-        // טען מצב עבודה כשהדף נטען
-        document.addEventListener('DOMContentLoaded', function() {
-            // המתן קצת שהמערכות יטענו
-            setTimeout(loadNotificationMode, 1000);
-        });
     </script>
 </body>
 </html>

@@ -554,8 +554,8 @@ class PreferencesService:
             
             cursor.execute('''
                 INSERT OR REPLACE INTO user_preferences_v3 
-                (user_id, profile_id, preference_id, saved_value, updated_at)
-                VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+                (user_id, profile_id, preference_id, saved_value)
+                VALUES (?, ?, ?, ?)
             ''', (user_id, profile_id, preference_id, string_value))
             
             conn.commit()
@@ -602,8 +602,8 @@ class PreferencesService:
                     # שמירה לבסיס הנתונים
                     cursor.execute('''
                         INSERT OR REPLACE INTO user_preferences_v3 
-                        (user_id, profile_id, preference_id, saved_value, updated_at)
-                        VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+                        (user_id, profile_id, preference_id, saved_value)
+                        VALUES (?, ?, ?, ?)
                     ''', (user_id, profile_id, preference_id, string_value))
                 except Exception as e:
                     logger.warning(f"Failed to save preference {preference_name}: {e}")

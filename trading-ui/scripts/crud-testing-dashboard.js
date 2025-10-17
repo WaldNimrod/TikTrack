@@ -643,8 +643,8 @@ async function copyDetailedLog() {
 // window.toggleSection export removed - using global version from ui-utils.js
 
 // אתחול
-document.addEventListener('DOMContentLoaded', () => {
-  console.log('🚀 טעינת דף CRUD Testing Dashboard...');
+// document.addEventListener('DOMContentLoaded', () => {
+//   console.log('🚀 טעינת דף CRUD Testing Dashboard...');
   
   // אתחול HeaderSystem
   if (window.headerSystem && !window.headerSystem.isInitialized) {
@@ -652,11 +652,11 @@ document.addEventListener('DOMContentLoaded', () => {
     window.headerSystem.init();
   }
   
-  // יצירת מופע CRUD Testing Dashboard
-  window.crudTestingDashboard = new CRUDTestingDashboard();
-  
-  console.log('✅ דף CRUD Testing Dashboard נטען בהצלחה');
-});
+//   // יצירת מופע CRUD Testing Dashboard
+//   window.crudTestingDashboard = new CRUDTestingDashboard();
+//   
+//   console.log('✅ דף CRUD Testing Dashboard נטען בהצלחה');
+// });
 
 /**
  * Generate detailed log for CRUD Testing Dashboard

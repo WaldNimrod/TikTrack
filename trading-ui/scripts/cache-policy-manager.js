@@ -189,7 +189,7 @@ class CachePolicyManager {
      */
     async initialize() {
         try {
-            console.log('🔄 Initializing Cache Policy Manager...');
+            // console.log('🔄 Initializing Cache Policy Manager...');
             
             // טעינת מדיניות ברירת מחדל
             for (const [key, policy] of Object.entries(this.defaultPolicies)) {
@@ -203,7 +203,7 @@ class CachePolicyManager {
             await this.validateAllPolicies();
             
             this.initialized = true;
-            console.log('✅ Cache Policy Manager initialized successfully');
+            // console.log('✅ Cache Policy Manager initialized successfully');
             
             // הודעת הצלחה - מועברת להודעה סופית
             // if (window.notificationSystem) {
@@ -720,7 +720,7 @@ class CachePolicyManager {
             }
         }
         
-        console.log(`✅ Policy validation: ${validCount} valid, ${invalidCount} invalid`);
+        // console.log(`✅ Policy validation: ${validCount} valid, ${invalidCount} invalid`);
         
         if (invalidCount > 0) {
             this.addAlert('error', `${invalidCount} policies are invalid`);

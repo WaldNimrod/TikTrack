@@ -283,8 +283,8 @@ async function initializeCurrenciesPage() {
 // ========================================
 
 // אתחול הדף
-document.addEventListener('DOMContentLoaded', function () {
-  // === DOM CONTENT LOADED (CURRENCIES) ===
+// document.addEventListener('DOMContentLoaded', function () {
+//   // === DOM CONTENT LOADED (CURRENCIES) ===
 
   // שחזור מצב הסקשנים
   if (typeof window.restoreCurrenciesSectionState === 'function') {
@@ -300,8 +300,8 @@ document.addEventListener('DOMContentLoaded', function () {
     handleFunctionNotFound('loadCurrenciesData', 'פונקציית טעינת נתוני מטבעות לא נמצאה');
   }
 
-  // Currencies page initialization completed
-});
+//   // Currencies page initialization completed
+// });
 
 // ייצוא פונקציות גלובליות
 window.openCurrencyDetails = openCurrencyDetails;

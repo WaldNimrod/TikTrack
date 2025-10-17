@@ -593,12 +593,12 @@ class CacheSyncManager {
      */
     async initialize() {
         if (this.initialized) {
-            console.log('✅ CacheSyncManager already initialized');
+            // console.log('✅ CacheSyncManager already initialized');
             return;
         }
 
         try {
-            console.log('🔄 Initializing CacheSyncManager...');
+            // console.log('🔄 Initializing CacheSyncManager...');
             
             // Initialize sync queue
             this.syncQueue = [];
@@ -608,7 +608,7 @@ class CacheSyncManager {
             this.startQueueProcessor();
             
             this.initialized = true;
-            console.log('✅ CacheSyncManager initialized successfully');
+            // console.log('✅ CacheSyncManager initialized successfully');
             
         } catch (error) {
             console.error('❌ Failed to initialize CacheSyncManager:', error);

@@ -2199,8 +2199,8 @@ function restoreAlertsSectionState() {
 // toggleSection function removed - using global version from ui-utils.js
 
   // אתחול הדף
-document.addEventListener('DOMContentLoaded', function () {
-  console.log('🚀 אתחול דף התראות...');
+// document.addEventListener('DOMContentLoaded', function () {
+//   console.log('🚀 אתחול דף התראות...');
 
   // שחזור מצב הסקשנים
   restoreAlertsSectionState();
@@ -2225,8 +2225,8 @@ document.addEventListener('DOMContentLoaded', function () {
     window.loadSortState('alerts');
   }
   
-  console.log('✅ דף התראות אותחל בהצלחה');
-});
+//   console.log('✅ דף התראות אותחל בהצלחה');
+// });
 
 // אתחול הדף - גרסה שנייה (מוסרת)
 // document.addEventListener('DOMContentLoaded', function () {

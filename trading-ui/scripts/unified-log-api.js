@@ -468,9 +468,10 @@ window.getAvailableLogTypes = function() {
 /**
  * Initialize API when unified system is ready
  */
-document.addEventListener('DOMContentLoaded', async function() {
-    // Wait for unified initialization system
-    if (window.UnifiedAppInitializer) {
+// הוסר - המערכת המאוחדת מטפלת באתחול
+// document.addEventListener('DOMContentLoaded', async function() {
+//     // Wait for unified initialization system
+//     if (window.UnifiedAppInitializer) {
         // API will be initialized when needed
         console.log('📊 UnifiedLogAPI ready for initialization');
     } else {
@@ -481,7 +482,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             console.warn('⚠️ Failed to initialize UnifiedLogAPI:', error);
         }
     }
-});
+// });
 
 // Export for module systems
 if (typeof module !== 'undefined' && module.exports) {

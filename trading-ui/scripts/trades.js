@@ -1977,8 +1977,10 @@ function getCurrentPosition(_tradeId) {
 // אתחול וולידציה
 // ========================================
 
-// אתחול הדף
-document.addEventListener('DOMContentLoaded', function () {
+// Initialize trades page - integrated with unified system
+window.initializeTradesPage = async function() {
+  console.log('📊 Trades page initialized via unified system');
+  
   // שחזור מצב הסגירה
   if (typeof window.restoreAllSectionStates === 'function') {
     window.restoreAllSectionStates();
@@ -2057,8 +2059,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // טעינת נתוני טריידים
   loadTradesData();
+};
 
-});
+// Fallback for direct access (backward compatibility)
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', window.initializeTradesPage);
+} else {
+  // DOM already loaded, initialize immediately
+  window.initializeTradesPage();
+}
 
 // ========================================
 // ייצוא פונקציות לגלובל
@@ -2468,29 +2477,30 @@ function setupSortEventListeners() {
   });
 }
 
+// הוסר - המערכת המאוחדת מטפלת באתחול
 // קריאה לטעינת נתונים כשהדף נטען
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', function () {
-    // הוספת event listeners
-    setupSortEventListeners();
-    setTimeout(() => {
-      if (typeof window.loadTradesData === 'function') {
-        window.loadTradesData();
-      }
-    }, 1000);
-  });
-} else {
-  // הדף כבר נטען
-  // טעינת מצב הסידור השמור
-  loadTradesSortState();
-  // הוספת event listeners
-  setupSortEventListeners();
-  setTimeout(() => {
-    if (typeof window.loadTradesData === 'function') {
-      window.loadTradesData();
-    }
-  }, 1000);
-}
+// if (document.readyState === 'loading') {
+//   document.addEventListener('DOMContentLoaded', function () {
+//     // הוספת event listeners
+//     setupSortEventListeners();
+//     setTimeout(() => {
+//       if (typeof window.loadTradesData === 'function') {
+//         window.loadTradesData();
+//       }
+//     }, 1000);
+//   });
+// } else {
+//   // הדף כבר נטען
+//   // טעינת מצב הסידור השמור
+//   loadTradesSortState();
+//   // הוספת event listeners
+//   setupSortEventListeners();
+//   setTimeout(() => {
+//     if (typeof window.loadTradesData === 'function') {
+//       window.loadTradesData();
+//     }
+//   }, 1000);
+// }
 
 /**
  * בדיקת התאמת תוכנית טרייד לטרייד

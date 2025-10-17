@@ -749,9 +749,9 @@ async function copyDetailedLog() {
 }
 
 // Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('➕ Database display page DOM loaded');
-  initDatabaseDisplay();
-});
+// document.addEventListener('DOMContentLoaded', function() {
+//   console.log('➕ Database display page DOM loaded');
+//   initDatabaseDisplay();
+// });
 
 // console.log('✅ DB Display script loaded successfully');

@@ -600,15 +600,15 @@ try {
   console.log('Available methods:', Object.getOwnPropertyNames(window.functionsTabsSystem));
   
   // Initialize when DOM is ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      console.log('🔄 Initializing FunctionsTabsSystem on DOM ready...');
-      window.functionsTabsSystem.init();
-    });
-  } else {
-    console.log('🔄 Initializing FunctionsTabsSystem immediately...');
-    window.functionsTabsSystem.init();
-  }
+  // if (document.readyState === 'loading') {
+  //   document.addEventListener('DOMContentLoaded', () => {
+  //     console.log('🔄 Initializing FunctionsTabsSystem on DOM ready...');
+  //     window.functionsTabsSystem.init();
+//     });
+//   } else {
+//     console.log('🔄 Initializing FunctionsTabsSystem immediately...');
+//     window.functionsTabsSystem.init();
+//   }
 } catch (error) {
   console.error('❌ Failed to create FunctionsTabsSystem:', error);
 }
@@ -640,14 +640,14 @@ function switchTab(tabName) {
 }
 
 // Add click handlers to tab buttons
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const tabName = this.getAttribute('data-tab');
-            switchTab(tabName);
-        });
-    });
-});
+// document.addEventListener('DOMContentLoaded', function() {
+//     document.querySelectorAll('.tab-btn').forEach(btn => {
+//         btn.addEventListener('click', function() {
+//             const tabName = this.getAttribute('data-tab');
+//             switchTab(tabName);
+//         });
+//     });
+// });
 
 window.switchTab = switchTab;
 

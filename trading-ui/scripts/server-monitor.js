@@ -1469,9 +1469,10 @@ class ServerMonitor {
   }
 }
 
+// הוסר - המערכת המאוחדת מטפלת באתחול
 // אתחול המערכת כשהדף נטען
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('🎯 DOM loaded, initializing ServerMonitor...');
+// document.addEventListener('DOMContentLoaded', function() {
+//   console.log('🎯 DOM loaded, initializing ServerMonitor...');
   
   // יצירת instance גלובלי
   window.serverMonitor = new ServerMonitor();
@@ -1480,7 +1481,7 @@ document.addEventListener('DOMContentLoaded', function() {
   setupMonitoringEventListeners();
   
   console.log('✅ ServerMonitor initialized successfully');
-});
+// });
 
 // יצירת instance גלובלי מיד
 window.serverMonitor = new ServerMonitor();

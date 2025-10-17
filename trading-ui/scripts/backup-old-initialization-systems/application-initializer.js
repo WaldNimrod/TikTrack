@@ -300,7 +300,7 @@ window.appInitializer.registerStageFunction('core', async (pageConfig) => {
     
     // Initialize preferences system
     if (typeof window.preferencesCache !== 'undefined') {
-        window.preferencesCache.clear();
+        await window.preferencesCache.clear();
     }
     
     // Initialize favicon system

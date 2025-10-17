@@ -366,9 +366,18 @@ function getNotificationIcon(type) {
  */
 async function shouldShowNotification(category, type = 'info', userInitiated = false, message = '', title = '', functionName = '') {
   try {
-    // בדוק קודם את מצב העבודה החדש
-    if (typeof window.getPreference === 'function') {
-      const notificationMode = await window.getPreference('notification_mode', 1, null);
+    // בדוק קודם את מצב העבודה החדש - עם שימוש במטמון הקיים
+    if (typeof window.preferencesCache !== 'undefined' && typeof window.getPreference === 'function') {
+      // נסה לקבל מהמטמון תחילה
+      let notificationMode = null;
+      const cached = await window.preferencesCache.get();
+      if (cached && cached.notification_mode !== undefined) {
+        notificationMode = cached.notification_mode;
+      } else {
+        // אם לא במטמון, קרא מהשרת ועדכן מטמון
+        notificationMode = await window.getPreference('notification_mode', 1, null);
+      }
+      
       const mode = notificationMode || 'work'; // ברירת מחדל: מצב עבודה
       
       if (window.DEBUG_MODE) {
@@ -1489,7 +1498,7 @@ window.NotificationSystem = {
     migrate: window.migrateNotifications,
     isMigrationNeeded: window.isMigrationNeeded,
     initialize: function() {
-        console.log('🚀 NotificationSystem.initialize called');
+        // console.log('🚀 NotificationSystem.initialize called');
         // Initialize notification system if needed
         // if (window.notificationSystemTester) {
         //     window.notificationSystemTester.runAllTests();

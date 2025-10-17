@@ -1189,10 +1189,11 @@ async function initializeBackgroundTasks() {
 }
 
 // Initialize when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializeBackgroundTasks);
-} else {
-  initializeBackgroundTasks();
+// if (document.readyState === 'loading') {
+//   document.addEventListener('DOMContentLoaded', initializeBackgroundTasks);
+// } else {
+//   initializeBackgroundTasks();
+// }
 }
 
 // Global functions for onclick handlers - Background Tasks specific

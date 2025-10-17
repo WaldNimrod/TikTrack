@@ -349,9 +349,10 @@ function toggleMonitoring() {
     }
 }
 
+// הוסר - המערכת המאוחדת מטפלת באתחול
 // DOM Content Loaded
-document.addEventListener('DOMContentLoaded', async function() {
-    console.log('🔍 Linter Realtime Monitor DOM loaded');
+// document.addEventListener('DOMContentLoaded', async function() {
+//     console.log('🔍 Linter Realtime Monitor DOM loaded');
     
     try {
         // Initialize linter system
@@ -368,7 +369,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     } catch (error) {
         console.error('❌ Failed to initialize Linter Realtime Monitor:', error);
     }
-});
+// });
 
 // ========================================
 // Load Existing File Mapping

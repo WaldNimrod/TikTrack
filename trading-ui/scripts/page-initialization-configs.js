@@ -22,16 +22,22 @@ const PAGE_CONFIGS = {
         customInitializers: [
             // Dashboard-specific initialization
             async (pageConfig) => {
-                console.log('📊 Initializing Dashboard...');
+                // console.log('📊 Initializing Dashboard...');
                 
-                // Initialize charts if available
-                if (typeof window.initializeCharts === 'function') {
-                    await window.initializeCharts();
-                }
-                
-                // Load dashboard data
-                if (typeof window.loadDashboardData === 'function') {
-                    await window.loadDashboardData();
+                // Use the new unified initialization function
+                if (typeof window.initializeIndexPage === 'function') {
+                    await window.initializeIndexPage();
+                } else {
+                    // Fallback to old method
+                    // Initialize charts if available
+                    if (typeof window.initializeCharts === 'function') {
+                        await window.initializeCharts();
+                    }
+                    
+                    // Load dashboard data
+                    if (typeof window.loadDashboardData === 'function') {
+                        await window.loadDashboardData();
+                    }
                 }
             }
         ]
@@ -75,14 +81,19 @@ const PAGE_CONFIGS = {
             async (pageConfig) => {
                 console.log('📈 Initializing Trades...');
                 
-                // Load trades data
-                if (typeof window.loadTradesData === 'function') {
-                    await window.loadTradesData();
-                }
-                
-                // Setup trade-specific handlers
-                if (typeof window.setupTradeHandlers === 'function') {
-                    window.setupTradeHandlers();
+                // Use the new unified initialization function
+                if (typeof window.initializeTradesPage === 'function') {
+                    await window.initializeTradesPage();
+                } else {
+                    // Fallback to old method
+                    if (typeof window.loadTradesData === 'function') {
+                        await window.loadTradesData();
+                    }
+                    
+                    // Setup trade-specific handlers
+                    if (typeof window.setupTradeHandlers === 'function') {
+                        window.setupTradeHandlers();
+                    }
                 }
             }
         ]
@@ -99,6 +110,28 @@ const PAGE_CONFIGS = {
                 
                 if (typeof window.loadExecutionsData === 'function') {
                     await window.loadExecutionsData();
+                }
+            }
+        ]
+    },
+    
+    'trade_plans': {
+        name: 'Trade Plans',
+        requiresFilters: true,
+        requiresValidation: true,
+        requiresTables: true,
+        customInitializers: [
+            async (pageConfig) => {
+                console.log('📋 Initializing Trade Plans...');
+                
+                // Use the new unified initialization function
+                if (typeof window.initializeTradePlansPage === 'function') {
+                    await window.initializeTradePlansPage();
+                } else {
+                    // Fallback to old method
+                    if (typeof window.loadTradePlansData === 'function') {
+                        await window.loadTradePlansData();
+                    }
                 }
             }
         ]

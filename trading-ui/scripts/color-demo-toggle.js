@@ -89,10 +89,10 @@ function initializeColorDemoShortcuts() {
 }
 
 // Auto-initialize shortcuts
-document.addEventListener('DOMContentLoaded', function() {
-  initializeColorDemoShortcuts();
-  console.log('🎨 מערכת דמו צבעים מוכנה - לחץ Ctrl+Shift+D להצגה/הסתרה');
-});
+// document.addEventListener('DOMContentLoaded', function() {
+//   initializeColorDemoShortcuts();
+// //   console.log('🎨 מערכת דמו צבעים מוכנה - לחץ Ctrl+Shift+D להצגה/הסתרה');
+// });
 
 // Export functions
 window.toggleColorDemo = toggleColorDemo;

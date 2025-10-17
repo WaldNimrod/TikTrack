@@ -967,14 +967,14 @@ window.restoreAllSectionStates = function () {
  * UPDATED: Now uses page-specific localStorage keys consistently
  */
 window.restoreSectionStates = function () {
-  console.log(`🔧 restoreSectionStates called`);
+  // console.log(`🔧 restoreSectionStates called`);
   
   // Restore top section state with page-specific key
   const pageName = getCurrentPageName();
-  console.log(`🔧 restoreSectionStates called for page: "${pageName}"`);
+  // console.log(`🔧 restoreSectionStates called for page: "${pageName}"`);
   
   const topSectionHidden = localStorage.getItem(`${pageName}_top-section_collapsed`) === 'true';
-  console.log(`💾 Retrieved top section state for page "${pageName}": collapsed=${topSectionHidden}`);
+  // console.log(`💾 Retrieved top section state for page "${pageName}": collapsed=${topSectionHidden}`);
   
   const topSection = document.querySelector('.top-section .section-body, .top-section .section-content');
   const topToggleBtn = document.querySelector('.top-section button[onclick*="toggleSection"]');
@@ -985,12 +985,12 @@ window.restoreSectionStates = function () {
     topSection.classList.add('collapsed');
     topSection.style.display = 'none';
     if (topIcon) { topIcon.textContent = '▼'; }
-    console.log(`✅ Top section RESTORED to COLLAPSED`);
+      // console.log(`✅ Top section RESTORED to COLLAPSED`);
   } else if (topSection) {
     topSection.classList.remove('collapsed');
     topSection.style.display = 'block';
     if (topIcon) { topIcon.textContent = '▲'; }
-    console.log(`✅ Top section RESTORED to EXPANDED`);
+    // console.log(`✅ Top section RESTORED to EXPANDED`);
   }
 
   // Restore main section states
@@ -1003,7 +1003,7 @@ window.restoreSectionStates = function () {
     const sectionId = section.getAttribute('data-section') || section.id || `section-${index}`;
     if (sectionId) {
       const sectionHidden = localStorage.getItem(`${pageName}_${sectionId}_SectionHidden`) === 'true';
-      console.log(`💾 Retrieved state for section "${sectionId}" on page "${pageName}": hidden=${sectionHidden}`);
+      // console.log(`💾 Retrieved state for section "${sectionId}" on page "${pageName}": hidden=${sectionHidden}`);
       
       const sectionBody = section.querySelector('.section-body, .section-content');
       const toggleBtn = section.querySelector('button[onclick*="toggleSection"]');
@@ -1028,7 +1028,7 @@ window.restoreSectionStates = function () {
     }
   });
   
-  console.log(`✅ restoreSectionStates completed - restored ${restoredCount}/${sections.length} sections`);
+  // console.log(`✅ restoreSectionStates completed - restored ${restoredCount}/${sections.length} sections`);
 };
 
 // ===== ACTION BUTTONS SYSTEM =====
@@ -1234,9 +1234,10 @@ window.cancelTicker = cancelTicker;
 window.restoreTicker = restoreTicker;
 window.deleteTicker = deleteTicker;
 
+// הוסר - המערכת המאוחדת מטפלת באתחול
 // Initialize modal backdrop and restore section states when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-  initializeModalBackdrop();
+// document.addEventListener('DOMContentLoaded', () => {
+//   initializeModalBackdrop();
   
   // Restore section states after a short delay to ensure all elements are loaded
   setTimeout(() => {
@@ -1244,7 +1245,7 @@ document.addEventListener('DOMContentLoaded', () => {
       window.restoreSectionStates();
     }
   }, 100);
-});
+// });
 
 // ===== SECTION TOGGLE FUNCTIONS =====
 // These functions handle opening/closing sections across all pages
@@ -1443,13 +1444,13 @@ function toggleAllSections() {
  * UPDATED: Now uses page-specific localStorage keys
  */
 function loadSectionStates() {
-  console.log(`🔧 loadSectionStates called`);
+  // console.log(`🔧 loadSectionStates called`);
   
   const pageName = getCurrentPageName();
-  console.log(`🔧 loadSectionStates called for page: "${pageName}"`);
+  // console.log(`🔧 loadSectionStates called for page: "${pageName}"`);
   
   const sections = document.querySelectorAll('.content-section, .top-section');
-  console.log(`🔍 Found ${sections.length} sections to load states for`);
+  // console.log(`🔍 Found ${sections.length} sections to load states for`);
   
   let restoredCount = 0;
   
@@ -1458,7 +1459,7 @@ function loadSectionStates() {
     const storageKey = `${pageName}_${sectionId}_SectionHidden`;
     const isCollapsed = localStorage.getItem(storageKey) === 'true';
     
-    console.log(`💾 Retrieved state for "${sectionId}" on page "${pageName}": hidden=${isCollapsed}`);
+    // console.log(`💾 Retrieved state for "${sectionId}" on page "${pageName}": hidden=${isCollapsed}`);
     
     const sectionBody = section.querySelector('.section-body, .section-content');
     const toggleIcon = section.querySelector('.section-toggle-icon, .filter-icon');
@@ -1468,19 +1469,19 @@ function loadSectionStates() {
       section.classList.add('collapsed');
       section.classList.remove('expanded');
       if (toggleIcon) toggleIcon.textContent = '▶';
-      console.log(`✅ Section "${sectionId}" RESTORED to COLLAPSED`);
+        // console.log(`✅ Section "${sectionId}" RESTORED to COLLAPSED`);
       restoredCount++;
     } else if (sectionBody) {
       sectionBody.style.display = 'block';
       section.classList.remove('collapsed');
       section.classList.add('expanded');
       if (toggleIcon) toggleIcon.textContent = '▼';
-      console.log(`✅ Section "${sectionId}" RESTORED to EXPANDED`);
+        // console.log(`✅ Section "${sectionId}" RESTORED to EXPANDED`);
       restoredCount++;
     }
   });
   
-  console.log(`✅ loadSectionStates completed - restored ${restoredCount}/${sections.length} sections`);
+  // console.log(`✅ loadSectionStates completed - restored ${restoredCount}/${sections.length} sections`);
 }
 
 // Export functions to global scope
@@ -1492,7 +1493,8 @@ window.toggleAllSectionsGlobal = window.toggleAllSections;
 window.toggleTopSection = toggleTopSection;
 window.loadSectionStates = loadSectionStates;
 
+// הוסר - המערכת המאוחדת מטפלת באתחול
 // Load section states when DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
-  loadSectionStates();
-});
+// document.addEventListener('DOMContentLoaded', function() {
+//   loadSectionStates();
+// });

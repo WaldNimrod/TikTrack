@@ -1027,7 +1027,7 @@ class SystemManagement {
     this.showLoadingState();
 
     try {
-      console.log('📊 Loading system data...');
+      // console.log('📊 Loading system data...');
       
       // Load primary data provider
       await SystemManagement.loadPrimaryDataProvider();
@@ -1039,7 +1039,7 @@ class SystemManagement {
       if (overviewData.status === 'success') {
         this.currentData = overviewData.data;
         this.updateDashboard(overviewData.data);
-        console.log('✅ System data loaded successfully');
+        // console.log('✅ System data loaded successfully');
       } else {
         throw new Error(overviewData.message || 'Failed to load system data');
       }
@@ -1673,7 +1673,7 @@ class SystemManagement {
           lastBackupDateElement.textContent = 'לא נמצא';
         }
         
-        console.log('⚠️ No backups found');
+        // console.log('⚠️ No backups found');
       }
     } catch (error) {
       console.error('❌ Error updating backup status:', error);
@@ -1999,7 +1999,7 @@ class SystemManagement {
    */
   static async loadPrimaryDataProvider() {
     try {
-      console.log('📡 Loading primary data provider...');
+      // console.log('📡 Loading primary data provider...');
       
       const response = await fetch('/api/system/settings/primaryDataProvider');
       
@@ -2226,10 +2226,11 @@ async function copyDetailedLog() {
     }
 }
 
+// הוסר - המערכת המאוחדת מטפלת באתחול
 // Initialize dashboard when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-  window.systemManagement = new SystemManagement();
-  window.systemManagement.init();
+// document.addEventListener('DOMContentLoaded', () => {
+//   window.systemManagement = new SystemManagement();
+//   window.systemManagement.init();
   
   // Make functions globally available (only if not already defined by page-specific script)
   window.refreshSystemData = SystemManagement.refreshSystemData;
@@ -2241,7 +2242,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.checkDependencies = SystemManagement.checkDependencies;
   // window.toggleAllSections export removed - using global version from ui-utils.js
   // window.toggleSection export removed - using global version from ui-utils.js
-});
+// });
 
 // ========================================
 // Cursor Tasks Integration Functions

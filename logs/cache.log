@@ -23076,3 +23076,115 @@ AssertionError: write() before start_response
 2025-10-17 19:47:39,758 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
 2025-10-17 19:47:39,759 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
 2025-10-17 19:47:39,759 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-10-18 01:03:37,561 - root - INFO - 🚀 Starting TikTrack server...
+2025-10-18 01:03:37,562 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
+2025-10-18 01:03:37,562 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-10-18 01:03:37,562 - root - INFO - 📦 Flask version: 2.3.3
+2025-10-18 01:03:37,562 - root - INFO - 🗄️ Initializing database...
+2025-10-18 01:03:37,562 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-10-18 01:03:37,565 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.003s
+2025-10-18 01:03:37,566 - root - INFO - ✅ Database initialized successfully
+2025-10-18 01:03:38,571 - utils.performance_monitor - INFO - System metrics: CPU: 15.0%, Memory: 63.4%, Disk: 3.5%
+2025-10-18 01:03:38,571 - root - INFO - ✅ Database initialized successfully
+2025-10-18 01:03:38,571 - root - INFO - ✅ Server initialization completed
+2025-10-18 01:03:38,607 - root - INFO - 🚀 Starting background task scheduler...
+2025-10-18 01:03:38,608 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-10-18 01:03:38,608 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-10-18 01:03:38,608 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-10-18 01:03:38,608 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-10-18 01:03:38,608 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-10-18 01:03:38,608 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-10-18 01:03:38,608 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-10-18 01:03:38,608 - services.background_tasks - INFO - Background task scheduler started
+2025-10-18 01:03:38,609 - root - INFO - ✅ Background task scheduler started successfully
+2025-10-18 01:03:38,609 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:f284a7fdc33aa7e1657d50257ff7c3e0
+2025-10-18 01:03:38,609 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:f284a7fdc33aa7e1657d50257ff7c3e0
+2025-10-18 01:03:38,632 - cache - INFO - Cache SET: services.system_settings_service.get_setting:f284a7fdc33aa7e1657d50257ff7c3e0 (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-18 01:03:38,632 - cache - INFO - Cache SET: services.system_settings_service.get_setting:f284a7fdc33aa7e1657d50257ff7c3e0 (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-18 01:03:38,632 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-10-18 01:03:38,633 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-10-18 01:03:38,633 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-10-18 01:04:02,340 - root - INFO - 🚀 Starting TikTrack server...
+2025-10-18 01:04:02,340 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
+2025-10-18 01:04:02,341 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-10-18 01:04:02,341 - root - INFO - 📦 Flask version: 2.3.3
+2025-10-18 01:04:02,341 - root - INFO - 🗄️ Initializing database...
+2025-10-18 01:04:02,341 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-10-18 01:04:02,344 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.003s
+2025-10-18 01:04:02,344 - root - INFO - ✅ Database initialized successfully
+2025-10-18 01:04:03,350 - utils.performance_monitor - INFO - System metrics: CPU: 12.6%, Memory: 63.5%, Disk: 3.5%
+2025-10-18 01:04:03,350 - root - INFO - ✅ Database initialized successfully
+2025-10-18 01:04:03,350 - root - INFO - ✅ Server initialization completed
+2025-10-18 01:04:03,398 - root - INFO - 🚀 Starting background task scheduler...
+2025-10-18 01:04:03,398 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-10-18 01:04:03,398 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-10-18 01:04:03,398 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-10-18 01:04:03,398 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-10-18 01:04:03,398 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-10-18 01:04:03,398 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-10-18 01:04:03,398 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-10-18 01:04:03,399 - services.background_tasks - INFO - Background task scheduler started
+2025-10-18 01:04:03,399 - root - INFO - ✅ Background task scheduler started successfully
+2025-10-18 01:04:03,399 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:7557378a36a7223a0449276ad081ed1b
+2025-10-18 01:04:03,399 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:7557378a36a7223a0449276ad081ed1b
+2025-10-18 01:04:03,422 - cache - INFO - Cache SET: services.system_settings_service.get_setting:7557378a36a7223a0449276ad081ed1b (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-18 01:04:03,422 - cache - INFO - Cache SET: services.system_settings_service.get_setting:7557378a36a7223a0449276ad081ed1b (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-18 01:04:03,422 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-10-18 01:04:03,424 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-10-18 01:04:03,425 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-10-18 01:04:08,795 - root - INFO - 🚀 Starting TikTrack server...
+2025-10-18 01:04:08,795 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
+2025-10-18 01:04:08,795 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-10-18 01:04:08,795 - root - INFO - 📦 Flask version: 2.3.3
+2025-10-18 01:04:08,795 - root - INFO - 🗄️ Initializing database...
+2025-10-18 01:04:08,795 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-10-18 01:04:08,800 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.004s
+2025-10-18 01:04:08,800 - root - INFO - ✅ Database initialized successfully
+2025-10-18 01:04:09,805 - utils.performance_monitor - INFO - System metrics: CPU: 17.4%, Memory: 63.3%, Disk: 3.5%
+2025-10-18 01:04:09,806 - root - INFO - ✅ Database initialized successfully
+2025-10-18 01:04:09,806 - root - INFO - ✅ Server initialization completed
+2025-10-18 01:04:09,843 - root - INFO - 🚀 Starting background task scheduler...
+2025-10-18 01:04:09,843 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-10-18 01:04:09,843 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-10-18 01:04:09,843 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-10-18 01:04:09,843 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-10-18 01:04:09,843 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-10-18 01:04:09,843 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-10-18 01:04:09,843 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-10-18 01:04:09,844 - services.background_tasks - INFO - Background task scheduler started
+2025-10-18 01:04:09,844 - root - INFO - ✅ Background task scheduler started successfully
+2025-10-18 01:04:09,844 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:e89fa8522ac78d7f8c8dd3970fbf7676
+2025-10-18 01:04:09,844 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:e89fa8522ac78d7f8c8dd3970fbf7676
+2025-10-18 01:04:09,867 - cache - INFO - Cache SET: services.system_settings_service.get_setting:e89fa8522ac78d7f8c8dd3970fbf7676 (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-18 01:04:09,867 - cache - INFO - Cache SET: services.system_settings_service.get_setting:e89fa8522ac78d7f8c8dd3970fbf7676 (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-18 01:04:09,868 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-10-18 01:04:09,868 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-10-18 01:04:09,868 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-10-18 01:04:09,881 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:8080
+2025-10-18 01:04:09,881 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-18 01:04:13,484 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:04:13] "GET / HTTP/1.1" 200 -
+2025-10-18 01:04:17,188 - services.constraint_service - INFO - Retrieved 16 constraints for table preference_types
+2025-10-18 01:04:17,190 - services.preferences_service - INFO - Cache invalidated for user 1, profile 3
+2025-10-18 01:04:17,190 - services.preferences_service - INFO - Saved preference notification_mode for user 1
+2025-10-18 01:04:17,191 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:04:17] "POST /api/preferences/user/single HTTP/1.1" 200 -
+2025-10-18 01:04:18,216 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:04:18] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -
+2025-10-18 01:04:18,230 - services.constraint_service - INFO - Retrieved 16 constraints for table preference_types
+2025-10-18 01:04:18,232 - services.preferences_service - INFO - Cache invalidated for user 1, profile 3
+2025-10-18 01:04:18,232 - services.preferences_service - INFO - Saved preference notification_mode for user 1
+2025-10-18 01:04:18,233 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:04:18] "POST /api/preferences/user/single HTTP/1.1" 200 -
+2025-10-18 01:04:19,257 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:04:19] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -
+2025-10-18 01:04:19,271 - services.constraint_service - INFO - Retrieved 16 constraints for table preference_types
+2025-10-18 01:04:19,274 - services.preferences_service - INFO - Cache invalidated for user 1, profile 3
+2025-10-18 01:04:19,274 - services.preferences_service - INFO - Saved preference notification_mode for user 1
+2025-10-18 01:04:19,274 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:04:19] "POST /api/preferences/user/single HTTP/1.1" 200 -
+2025-10-18 01:04:20,301 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:04:20] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -
+2025-10-18 01:04:20,317 - services.constraint_service - INFO - Retrieved 16 constraints for table preference_types
+2025-10-18 01:04:20,319 - services.preferences_service - INFO - Cache invalidated for user 1, profile 3
+2025-10-18 01:04:20,319 - services.preferences_service - INFO - Saved preference notification_mode for user 1
+2025-10-18 01:04:20,319 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:04:20] "POST /api/preferences/user/single HTTP/1.1" 200 -
+2025-10-18 01:04:21,344 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:04:21] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -
+2025-10-18 01:04:55,373 - werkzeug - INFO - 127.0.0.1 - - [18/Oct/2025 01:04:55] "GET /api/preferences/user?user_id=1 HTTP/1.1" 200 -

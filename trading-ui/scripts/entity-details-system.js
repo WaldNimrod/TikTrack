@@ -15,9 +15,9 @@ import './entity-details-system/base-entity-module.js';
 import './entity-details-system/ticker-details-module.js';
 
 // אתחול המערכת כשהדף נטען
-document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        console.log('🎯 Entity Details System - מתחיל אתחול...');
+// document.addEventListener('DOMContentLoaded', async () => {
+//     try {
+//         console.log('🎯 Entity Details System - מתחיל אתחול...');
         
         // בדיקה שהמערכת המרכזית קיימת
         if (!window.EntityDetailsSystem) {
@@ -51,10 +51,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         console.log('🔗 פונקציה openTickerDetails זמינה גלובלית');
         
-    } catch (error) {
-        console.error('❌ שגיאה באתחול Entity Details System:', error);
-        console.error('❌ פרטי השגיאה:', error.stack);
-    }
-});
+//     } catch (error) {
+//         console.error('❌ שגיאה באתחול Entity Details System:', error);
+//         console.error('❌ פרטי השגיאה:', error.stack);
+//     }
+// });
 
 console.log('🎯 Entity Details System - נטען בהצלחה');

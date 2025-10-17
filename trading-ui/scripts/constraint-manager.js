@@ -611,9 +611,9 @@ window.showAddConstraintModal = function () {
 };
 
 // Initialize constraint manager when page loads
-document.addEventListener('DOMContentLoaded', () => {
-  constraintManager = new ConstraintManager();
-});
+// document.addEventListener('DOMContentLoaded', () => {
+//   constraintManager = new ConstraintManager();
+// });
 
 // Global function for selecting constraint
 window.selectConstraint = function (constraintId) {

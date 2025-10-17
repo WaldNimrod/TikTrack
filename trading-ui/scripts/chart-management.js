@@ -890,8 +890,8 @@ function updateStatusDisplay() {
 }
 
 // Event listener for DOM content loaded
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('📊 Chart Management page initialized');
+// document.addEventListener('DOMContentLoaded', function() {
+//     console.log('📊 Chart Management page initialized');
     
     // Check color system
     if (window.getColorPreferences) {
@@ -952,9 +952,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (autoRefreshCheckbox && autoRefreshCheckbox.checked) {
                 await toggleAutoRefresh(true);
             }
-        }
-    })();
-});
+//         }
+//     })();
+// });
 
 // Export functions to global scope
 // window.toggleSection export removed - using global version from ui-utils.js

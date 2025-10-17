@@ -118,7 +118,7 @@ window.getPreference = async function(preferenceName, userId = null, profileId =
         console.log(`🔍 Getting preference: ${preferenceName} for user: ${userId}`);
         
         // בדיקת מטמון
-        const cached = window.preferencesCache.get();
+        const cached = await window.preferencesCache.get();
         if (cached && cached[preferenceName] !== undefined) {
             console.log(`✅ Cache hit for ${preferenceName}:`, cached[preferenceName]);
             return cached[preferenceName];
@@ -173,7 +173,7 @@ window.getGroupPreferences = async function(groupName, userId = 1, profileId = n
         console.log(`🔍 Getting group preferences: ${groupName}`);
         
         // בדיקת מטמון
-        const cached = window.preferencesCache.get();
+        const cached = await window.preferencesCache.get();
         if (cached && cached[`group_${groupName}`]) {
             console.log(`✅ Cache hit for group ${groupName}`);
             return cached[`group_${groupName}`];
@@ -195,7 +195,7 @@ window.getGroupPreferences = async function(groupName, userId = 1, profileId = n
             // עדכון מטמון
             if (cached) {
                 cached[`group_${groupName}`] = preferences;
-                window.preferencesCache.set(cached);
+                await window.preferencesCache.set(cached);
             }
             
             return {
@@ -236,7 +236,7 @@ window.getPreferencesByNames = async function(preferenceNames, userId = null, pr
         console.log(`🔍 Getting multiple preferences:`, preferenceNames, `for user: ${userId}`);
         
         // בדיקת מטמון
-        const cached = window.preferencesCache.get();
+        const cached = await window.preferencesCache.get();
         const missingFromCache = preferenceNames.filter(name => !cached || cached[name] === undefined);
         
         if (missingFromCache.length === 0 && cached) {
@@ -269,7 +269,7 @@ window.getPreferencesByNames = async function(preferenceNames, userId = null, pr
             // עדכון מטמון
             if (cached) {
                 Object.assign(cached, preferences);
-                window.preferencesCache.set(cached);
+                await window.preferencesCache.set(cached);
             }
             
             return preferences;
@@ -293,7 +293,7 @@ window.getAllUserPreferences = async function(userId = 1, profileId = null) {
         console.log(`🔍 Getting all user preferences for user ${userId}, profile: ${profileId || 'active'}`);
         
         // בדיקת מטמון - רק אם לא ביקשנו טעינה מחדש
-        const cached = window.preferencesCache.get();
+        const cached = await window.preferencesCache.get();
         if (cached && Object.keys(cached).length > 0) {
             console.log(`✅ All preferences found in cache`);
             return cached;
@@ -319,7 +319,7 @@ window.getAllUserPreferences = async function(userId = 1, profileId = null) {
             console.log(`📂 Server returned profile_id: ${serverProfileId}`);
 
             // עדכון מטמון
-            window.preferencesCache.set(preferences);
+            await window.preferencesCache.set(preferences);
             
             // אם השרת החזיר profile_id, נשתמש בו
             if (serverProfileId && !profileId) {
@@ -392,9 +392,9 @@ window.savePreference = async function(preferenceName, value, userId = 1, profil
             console.log(`✅ Saved preference: ${preferenceName}`);
             
             // עדכון מטמון
-            const cached = window.preferencesCache.get() || {};
+            const cached = await window.preferencesCache.get() || {};
             cached[preferenceName] = value;
-            window.preferencesCache.set(cached);
+            await window.preferencesCache.set(cached);
             
             return true;
       } else {
@@ -436,7 +436,7 @@ window.savePreferences = async function(preferences, userId = 1, profileId = nul
                 console.log(`✅ Saved multiple preferences:`, result);
                 
                 // עדכון מטמון - נקה מטמון כדי לטעון מחדש מהשרת
-                window.preferencesCache.clear();
+                await window.preferencesCache.clear();
                 
                 return true;
       } else {
@@ -483,9 +483,9 @@ window.getUserProfiles = async function(userId = 1) {
 /**
  * מחיקת מטמון העדפות
  */
-window.clearPreferencesCache = function() {
+window.clearPreferencesCache = async function() {
     console.log(`🗑️ Clearing preferences cache`);
-    window.preferencesCache.clear();
+    await window.preferencesCache.clear();
 };
 
 /**
@@ -550,7 +550,7 @@ window.loadPreferences = async function(userId = 1, profileId = null) {
         // Clear cache to ensure fresh data
         if (window.preferencesCache && window.preferencesCache.clear) {
             console.log('🗑️ Clearing preferences cache before loading...');
-            window.preferencesCache.clear();
+            await window.preferencesCache.clear();
         }
         
         // אם לא צוין profileId, נטען את הפרופיל הפעיל
@@ -716,12 +716,88 @@ window.initializePreferences = async function() {
       
         // טעינת העדפות ראשונית
         await window.loadAllPreferences();
+        
+        // התחלת מערכת polling אוטומטית
+        window.startPreferencesPolling();
       
         console.log('✅ Preferences System initialized successfully');
       return true;
     } catch (error) {
         console.error('❌ Error initializing Preferences System:', error);
       return false;
+    }
+};
+
+// ===== POLLING SYSTEM =====
+
+/**
+ * מערכת polling אוטומטית להעדפות
+ * מתחברת לשרת כל 30 שניות לעדכון אוטומטי
+ */
+window.preferencesPollingInterval = null;
+window.preferencesPollingEnabled = true;
+
+window.startPreferencesPolling = function() {
+    try {
+        console.log('🔄 Starting preferences polling system...');
+        
+        // עצירת polling קיים אם קיים
+        window.stopPreferencesPolling();
+        
+        // הגדרת polling כל 30 שניות
+        window.preferencesPollingInterval = setInterval(async () => {
+            if (!window.preferencesPollingEnabled) {
+                return;
+            }
+            
+            try {
+                console.log('🔄 Polling preferences for updates...');
+                
+                // בדיקה אם יש עדכונים חדשים
+                const hasUpdates = await window.checkForPreferencesUpdates();
+                
+                if (hasUpdates) {
+                    console.log('📥 New preferences updates found, refreshing...');
+                    await window.loadAllPreferences();
+                }
+                
+            } catch (error) {
+                console.error('❌ Error during preferences polling:', error);
+                // לא עוצרים את ה-polling בגלל שגיאה אחת
+            }
+        }, 30000); // 30 שניות
+        
+        console.log('✅ Preferences polling started (30s interval)');
+        
+    } catch (error) {
+        console.error('❌ Error starting preferences polling:', error);
+    }
+};
+
+window.stopPreferencesPolling = function() {
+    if (window.preferencesPollingInterval) {
+        clearInterval(window.preferencesPollingInterval);
+        window.preferencesPollingInterval = null;
+        console.log('⏹️ Preferences polling stopped');
+    }
+};
+
+window.checkForPreferencesUpdates = async function() {
+    try {
+        // בדיקה פשוטה - האם יש שינויים בהעדפות
+        // נשתמש ב-API של preferences עם timestamp
+        const response = await fetch('/api/preferences/user/check-updates?user_id=1');
+        
+        if (response.ok) {
+            const data = await response.json();
+            return data.hasUpdates || false;
+        }
+        
+        return false;
+        
+    } catch (error) {
+        console.error('❌ Error checking for preferences updates:', error);
+        return false;
     }
 };
 
@@ -942,7 +1018,7 @@ window.switchProfile = async function(profileId) {
             const result = await response.json();
             if (result.success || result.data) {
                 // נקה מטמון וטען מחדש
-                window.preferencesCache.clear();
+                await window.preferencesCache.clear();
                 // Preferences will be reloaded by the calling function
                 
                 console.log('✅ Profile switched successfully');
@@ -1059,7 +1135,7 @@ window.saveAsActiveProfile = async function() {
                     // Step 2: Clear all caches using global cache clearing system
                     console.log('🗑️ Clearing all caches using global system...');
                     if (window.preferencesCache && window.preferencesCache.clear) {
-                        window.preferencesCache.clear();
+                        await window.preferencesCache.clear();
                     }
                     
                     // Clear other system caches if available
@@ -1098,7 +1174,7 @@ window.saveAsActiveProfile = async function() {
                     
                     // Clear preferences cache before loading to ensure fresh data
                     if (window.preferencesCache && window.preferencesCache.clear) {
-                        window.preferencesCache.clear();
+                        await window.preferencesCache.clear();
                         console.log('🗑️ Cleared preferences cache before reload');
                     }
                     
@@ -1465,7 +1541,7 @@ window.copyPreferencesDetailedLog = async function() {
         // קבלת מספר העדפות
         let preferencesCount = 'לא זמין';
         try {
-            const cached = window.preferencesCache.get();
+            const cached = await window.preferencesCache.get();
             if (cached) {
                 preferencesCount = Object.keys(cached).length;
             }
@@ -1557,6 +1633,169 @@ ${activePreferences.slice(0, 20).join('\n')}${activePreferences.length > 20 ? '\
 };
 
 /**
+ * שמירת מצב העבודה של ההתראות
+ */
+window.saveNotificationMode = async function() {
+    try {
+        const selectedMode = document.querySelector('input[name="notificationMode"]:checked');
+        if (!selectedMode) {
+            window.showNotification('בחר מצב עבודה', 'warning');
+            return;
+        }
+        
+        const mode = selectedMode.value;
+        console.log(`💾 שמירת מצב עבודה: ${mode}`);
+        
+        // שמירה בבסיס הנתונים
+        const response = await fetch('/api/preferences/user/single', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                user_id: 1,
+                preference_name: 'notification_mode',
+                value: mode
+            })
+        });
+        
+        if (response.ok) {
+            window.showNotification(`מצב העבודה נשמר: ${getModeDisplayName(mode)}`, 'success');
+            updateCurrentModeStatus(mode);
+        } else {
+            throw new Error('שגיאה בשמירה');
+        }
+    } catch (error) {
+        console.error('❌ שגיאה בשמירת מצב עבודה:', error);
+        window.showNotification('שגיאה בשמירת מצב העבודה', 'error');
+    }
+};
+
+/**
+ * בדיקת מצב העבודה הנוכחי
+ */
+window.testNotificationMode = async function() {
+    try {
+        const response = await fetch('/api/preferences/user/single?preference_name=notification_mode&user_id=1');
+        const data = await response.json();
+        
+        if (data.success) {
+            const currentMode = data.data?.value || 'work';
+            window.showNotification(`מצב נוכחי: ${getModeDisplayName(currentMode)}`, 'info');
+            updateCurrentModeStatus(currentMode);
+        } else {
+            window.showNotification('לא ניתן לטעון מצב נוכחי', 'warning');
+        }
+    } catch (error) {
+        console.error('❌ שגיאה בבדיקת מצב נוכחי:', error);
+        window.showNotification('שגיאה בבדיקת מצב נוכחי', 'error');
+    }
+};
+
+/**
+ * קבלת שם תצוגה למצב
+ */
+function getModeDisplayName(mode) {
+    const modeNames = {
+        'debug': 'מצב דיבג',
+        'development': 'מצב פיתוח', 
+        'work': 'מצב עבודה',
+        'silent': 'מצב מושתק'
+    };
+    return modeNames[mode] || mode;
+}
+
+/**
+ * עדכון תצוגת המצב הנוכחי
+ */
+function updateCurrentModeStatus(mode) {
+    const statusContainer = document.getElementById('currentModeStatus');
+    if (!statusContainer) return;
+    
+    const iconClass = {
+        'debug': 'fas fa-bug',
+        'development': 'fas fa-code',
+        'work': 'fas fa-briefcase', 
+        'silent': 'fas fa-volume-mute'
+    }[mode] || 'fas fa-question';
+    
+    const iconColor = {
+        'debug': 'text-muted',
+        'development': 'text-primary',
+        'work': 'text-success',
+        'silent': 'text-danger'
+    }[mode] || 'text-muted';
+    
+    statusContainer.innerHTML = `
+        <div class="d-flex align-items-center mb-2">
+            <i class="${iconClass} ${iconColor} me-2"></i>
+            <span class="fw-bold">${getModeDisplayName(mode)}</span>
+        </div>
+        <small class="text-muted">
+            ${getModeDescription(mode)}
+        </small>
+    `;
+}
+
+/**
+ * קבלת תיאור למצב
+ */
+function getModeDescription(mode) {
+    const descriptions = {
+        'debug': 'הצגת כל ההתראות המפורטות כולל הודעות משניות',
+        'development': 'הצגת הודעות מרכזיות בלבד',
+        'work': 'מצב ברירת מחדל - מאזן בין מידע לרעש',
+        'silent': 'הצגת הודעות שגיאה בלבד'
+    };
+    return descriptions[mode] || 'מצב לא ידוע';
+}
+
+/**
+ * מילוי טבלת ההעדפות
+ * @param {Object} preferences - נתוני ההעדפות
+ */
+window.populatePreferencesTable = function(preferences) {
+    try {
+        const tbody = document.querySelector('#preferencesTable tbody');
+        if (!tbody) {
+            console.error('❌ Preferences table tbody not found');
+            return;
+        }
+        
+        // Clear loading message
+        tbody.innerHTML = '';
+        
+        // Convert preferences object to array and sort by key
+        const preferencesArray = Object.entries(preferences).sort((a, b) => a[0].localeCompare(b[0]));
+        
+        // Add row for each preference
+        preferencesArray.forEach(([key, value]) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="col-name">${key}</td>
+                <td class="col-value">${typeof value === 'boolean' ? (value ? 'כן' : 'לא') : value}</td>
+                <td class="col-type">${typeof value}</td>
+                <td class="col-description">-</td>
+                <td class="col-created">-</td>
+                <td class="col-actions actions-cell">
+                    <button class="action-btn btn-edit" onclick="editPreference('${key}')" title="ערוך">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn btn-delete" onclick="deletePreference('${key}')" title="מחק">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+        
+        console.log(`✅ Populated ${preferencesArray.length} preferences in table`);
+    } catch (error) {
+        console.error('❌ Error populating preferences table:', error);
+    }
+};
+
+/**
  * מילוי טפסי ההעדפות עם נתונים
  * @param {Object} preferences - נתוני ההעדפות
  */
@@ -1564,6 +1803,18 @@ window.populatePreferencesForm = async function(preferences) {
     try {
         console.log('📝 Populating preferences form...');
         console.log('📝 Preferences received:', Object.keys(preferences).length, 'items');
+        
+        // Populate preferences table
+        window.populatePreferencesTable(preferences);
+        
+        // Load notification mode
+        if (preferences.notification_mode) {
+            const modeRadio = document.getElementById(`mode${preferences.notification_mode.charAt(0).toUpperCase() + preferences.notification_mode.slice(1)}`);
+            if (modeRadio) {
+                modeRadio.checked = true;
+                updateCurrentModeStatus(preferences.notification_mode);
+            }
+        }
         
         // Basic settings
         if (preferences.primaryCurrency) {
@@ -1576,18 +1827,6 @@ window.populatePreferencesForm = async function(preferences) {
             if (timezoneSelect) timezoneSelect.value = preferences.timezone;
         }
         
-        // Notification settings
-        const notificationSettings = [
-            'enableNotifications', 'notificationPopup', 'notificationSound',
-            'notifyOnTradeExecuted', 'notifyOnStopLoss'
-        ];
-        
-        notificationSettings.forEach(setting => {
-            const element = document.getElementById(setting);
-            if (element && preferences[setting] !== undefined) {
-                element.checked = preferences[setting];
-            }
-        });
         
         // Notification categories
         const categorySettings = [
@@ -1908,72 +2147,6 @@ window.loadDefaultColors = function() {
     }
 };
 
-/**
- * רענון נתוני ניהול
- */
-window.refreshAdminData = async function() {
-    try {
-        console.log('🔄 Refreshing admin data...');
-        
-        // רענון נתוני משתמשים
-        const usersResponse = await fetch('/api/users');
-        if (usersResponse.ok) {
-            const users = await usersResponse.json();
-            const userSelect = document.getElementById('admin-user-select');
-            if (userSelect && users.data) {
-                userSelect.innerHTML = '';
-                users.data.forEach(user => {
-                    const option = document.createElement('option');
-                    option.value = user.id;
-                    option.textContent = user.name || user.username || `משתמש ${user.id}`;
-                    if (user.id === 1) option.selected = true;
-                    userSelect.appendChild(option);
-                });
-            }
-        }
-        
-        // רענון נתוני פרופילים
-        const profiles = await window.getUserProfiles();
-        const profileSelect = document.getElementById('admin-profile-select');
-        if (profileSelect && profiles) {
-            profileSelect.innerHTML = '<option value="">כל הפרופילים</option>';
-            profiles.forEach(profile => {
-                const option = document.createElement('option');
-                option.value = profile.name;
-                option.textContent = profile.name;
-                profileSelect.appendChild(option);
-            });
-        }
-        
-        // רענון נתוני קבוצות
-        const groupsResponse = await fetch('/api/preferences/groups');
-        if (groupsResponse.ok) {
-            const groups = await groupsResponse.json();
-            const groupSelect = document.getElementById('admin-group-select');
-            if (groupSelect && groups.data) {
-                groupSelect.innerHTML = '<option value="">כל הקבוצות</option>';
-                groups.data.forEach(group => {
-                    const option = document.createElement('option');
-                    option.value = group.name;
-                    option.textContent = group.name;
-                    groupSelect.appendChild(option);
-                });
-            }
-        }
-        
-        if (typeof window.showSuccessNotification === 'function') {
-            window.showSuccessNotification('הצלחה', 'נתוני הניהול רועננו בהצלחה');
-        }
-        
-        return true;
-    } catch (error) {
-        console.error('❌ Error refreshing admin data:', error);
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'שגיאה ברענון נתוני הניהול: ' + error.message);
-        }
-        return false;
-    }
-};
 
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
@@ -1998,8 +2171,12 @@ if (typeof module !== 'undefined' && module.exports) {
         updatePreferencesCounters: window.updatePreferencesCounters,
         saveAsActiveProfile: window.saveAsActiveProfile,
         deleteProfile: window.deleteProfile,
-        refreshAdminData: window.refreshAdminData,
+        saveNotificationMode: window.saveNotificationMode,
+        testNotificationMode: window.testNotificationMode,
         loadDefaultColors: window.loadDefaultColors,
-        collectFormData: window.collectFormData
+        collectFormData: window.collectFormData,
+        startPreferencesPolling: window.startPreferencesPolling,
+        stopPreferencesPolling: window.stopPreferencesPolling,
+        checkForPreferencesUpdates: window.checkForPreferencesUpdates
     };
 }

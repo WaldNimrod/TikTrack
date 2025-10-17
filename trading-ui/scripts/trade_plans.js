@@ -51,7 +51,7 @@ function executeTradePlan(planId) {
         
         // הודעת הצלחה
         if (typeof window.showSuccessNotification === 'function') {
-          window.showSuccessNotification('תוכנית מסחר בוצעה בהצלחה');
+          window.showSuccessNotification('תוכנית מסחר בוצעה בהצלחה', '', 4000, 'business');
         } else if (typeof window.showNotification === 'function') {
           window.showNotification('תוכנית מסחר בוצעה בהצלחה', 'success');
         }
@@ -59,7 +59,7 @@ function executeTradePlan(planId) {
       .catch(error => {
         console.error('שגיאה בביצוע תוכנית מסחר:', error);
         if (typeof window.showErrorNotification === 'function') {
-          window.showErrorNotification('שגיאה בביצוע תוכנית מסחר', error.message);
+          window.showErrorNotification('שגיאה בביצוע תוכנית מסחר', error.message, 6000, 'system');
         } else if (typeof window.showNotification === 'function') {
           window.showNotification('שגיאה בביצוע תוכנית מסחר', 'error');
         }
@@ -69,7 +69,7 @@ function executeTradePlan(planId) {
   } catch (error) {
     console.error('שגיאה בביצוע תוכנית מסחר:', error);
     if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בביצוע תוכנית מסחר', error.message);
+      window.showErrorNotification('שגיאה בביצוע תוכנית מסחר', error.message, 6000, 'system');
     } else if (typeof window.showNotification === 'function') {
       window.showNotification('שגיאה בביצוע תוכנית מסחר', 'error');
     }
@@ -123,7 +123,7 @@ function copyTradePlan(planId) {
       
       // הודעת הצלחה
       if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification('תוכנית מסחר הועתקה בהצלחה');
+        window.showSuccessNotification('תוכנית מסחר הועתקה בהצלחה', '', 4000, 'business');
       } else if (typeof window.showNotification === 'function') {
         window.showNotification('תוכנית מסחר הועתקה בהצלחה', 'success');
       }
@@ -131,7 +131,7 @@ function copyTradePlan(planId) {
     .catch(error => {
       console.error('שגיאה בהעתקת תוכנית מסחר:', error);
       if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification('שגיאה בהעתקת תוכנית מסחר', error.message);
+        window.showErrorNotification('שגיאה בהעתקת תוכנית מסחר', error.message, 6000, 'system');
       } else if (typeof window.showNotification === 'function') {
         window.showNotification('שגיאה בהעתקת תוכנית מסחר', 'error');
       }
@@ -1345,12 +1345,10 @@ function updateTradePlansTable(trade_plans) {
           </span>
         </td>
         <td class="actions-cell">
-          <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTradePlan(${design.id})" title="צפה באלמנטים מקושרים">
-            🔗
-          </button>
-          ${createEditButton(`window.openEditTradePlanModal(${design.id})`)}
-          ${createCancelButton('trade_plan', design.id, design.status, 'sm')}
-          ${createDeleteButton(`window.openDeleteTradePlanModal(${design.id})`)}
+          ${createButton('LINK', `viewLinkedItemsForTradePlan(${design.id})`)}
+          ${createButton('EDIT', `window.openEditTradePlanModal(${design.id})`)}
+          ${createButton('CANCEL', `window.cancelTradePlan(${design.id})`)}
+          ${createButton('DELETE', `window.openDeleteTradePlanModal(${design.id})`)}
         </td>
       </tr>
     `;

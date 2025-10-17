@@ -64,17 +64,12 @@
     <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=1.0.0">
     
-    <!-- 07-pages - Page-specific Styles -->
-    <link rel="stylesheet" href="styles-new/07-pages/_trades.css?v=1.0.0">
+    <!-- 07-pages - Page-specific Styles (file not found, removed) -->
     
     <!-- 08-themes - Themes -->
     <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=1.0.0">
     
-    <!-- 09-utilities - Utility Classes -->
-    <link rel="stylesheet" href="styles-new/09-utilities/_spacing.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/09-utilities/_text.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/09-utilities/_display.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/09-utilities/_responsive.css?v=1.0.0">
+    <!-- 09-utilities - Utility Classes (files not found, removed) -->
     
     <!-- External Libraries -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
@@ -402,18 +397,18 @@
                             <div>
                                 <button type="button" class="btn btn-info me-2" onclick="addImportantNote()">
                                     <img src="images/icons/home.svg" alt="יש לי עוד משהו חשוב" class="btn-icon" style="width: 16px; height: 16px;"> יש לי עוד משהו חשוב
-                                </button>
-                                <button type="button" class="btn btn-warning" onclick="addReminder()">
+                            </button>
+                            <button type="button" class="btn btn-warning" onclick="addReminder()">
                                     <img src="images/icons/alerts.svg" alt="תזכיר לי כש..." class="btn-icon" style="width: 16px; height: 16px;"> תזכיר לי כש...
-                                </button>
-                            </div>
+                            </button>
+                        </div>
 
                             <!-- כפתורים בצד ימין -->
                             <div>
                                 <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">ביטול</button>
                                 <button type="button" class="btn btn-success" onclick="saveNewTradeRecord()">
-                                    שמור
-                                </button>
+                                שמור
+                            </button>
                             </div>
                         </div>
                     </div>
@@ -492,11 +487,12 @@
     <script src="scripts/error-handlers.js?v=1.0.0"></script>
     <script src="scripts/validation-utils.js?v=1.0.0"></script>
     
+    <!-- Stage 7.5: Missing General Systems -->
+    <script src="scripts/linked-items.js?v=1.0.0"></script>
+    <script src="scripts/entity-details-modal.js?v=1.0.0"></script>
+    
     <!-- Stage 8: Trades Modules -->
-    <script src="scripts/trades/trades-data.js?v=1.0.0"></script>
-    <script src="scripts/trades/trades-business.js?v=1.0.0"></script>
-    <script src="scripts/trades/trades-ui.js?v=1.0.0"></script>
-    <script src="scripts/trades/trades-main.js?v=1.0.0"></script>
+    <script src="scripts/trades.js?v=1.0.0"></script>
     
     <!-- Local copyDetailedLog function for trades page -->
     <script>

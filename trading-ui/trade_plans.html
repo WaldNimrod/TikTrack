@@ -96,7 +96,7 @@
                         תכנון טריידים והשקעות
                     </div>
                     <div class="table-actions">
-                        <button class="refresh-btn"
+                        <button class="btn btn-success"
                             onclick="if (typeof window.openAddTradePlanModal === 'function') { window.openAddTradePlanModal(); }"
                             title="הוסף תכנון חדש">
                             <img src="images/icons/trade_plans.svg" alt="הוסף" class="action-icon">
@@ -139,7 +139,7 @@
                         </div>
                         <div class="table-count" id="trade_plansCount">טוען...</div>
                         <div style="display: flex; gap: 8px; align-items: center;">
-                            <button id="addTradePlanBtn" class="refresh-btn"
+                            <button id="addTradePlanBtn" class="btn btn-success"
                                 onclick="if (typeof window.showAddTradePlanModal === 'function') { window.showAddTradePlanModal(); }"
                                 title="הוסף תכנון חדש">
                                 <img src="images/icons/trade_plans.svg" alt="הוסף" class="action-icon"
@@ -324,8 +324,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-success" onclick="addTradePlan()"
-                            style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">הוסף
+                        <button type="button" class="btn btn-success" onclick="addTradePlan()">הוסף
                             תכנון</button>
                     </div>
                 </div>
@@ -403,8 +402,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-success" onclick="updateTradePlan()"
-                            style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">עדכן
+                        <button type="button" class="btn btn-success" onclick="updateTradePlan()">עדכן
                             תכנון</button>
                     </div>
                 </div>
@@ -453,6 +451,12 @@
     <script src="scripts/global-notification-collector.js?v=1.0.0"></script>
     <script src="scripts/system-management.js?v=1.0.0"></script>
     <script src="scripts/error-handlers.js?v=1.0.0"></script>
+    
+    <!-- Stage 7.5: Missing General Systems -->
+    <script src="scripts/global-confirm-replacement.js?v=1.0.0"></script>
+    <script src="scripts/section-state-persistence.js?v=1.0.0"></script>
+    <script src="scripts/linked-items.js?v=1.0.0"></script>
+    <script src="scripts/entity-details-modal.js?v=1.0.0"></script>
     
     <!-- Stage 8: Trade Plans Modules -->
     <script src="scripts/trade_plans.js?v=1.0.0"></script>

@@ -1981,10 +1981,10 @@ function getCurrentPosition(_tradeId) {
 window.initializeTradesPage = async function() {
   console.log('📊 Trades page initialized via unified system');
   
-  // שחזור מצב הסגירה
-  if (typeof window.restoreAllSectionStates === 'function') {
-    window.restoreAllSectionStates();
-  }
+  // שחזור מצב הסגירה (נטען על ידי UnifiedAppInitializer)
+  // if (typeof window.restoreAllSectionStates === 'function') {
+  //   window.restoreAllSectionStates();
+  // }
 
   // יישום צבעי ישות על כותרות
   if (window.applyEntityColorsToHeaders) {
@@ -2041,10 +2041,10 @@ window.initializeTradesPage = async function() {
     window.initializeValidation('editTradeForm', editTradeValidationRules);
   }
 
-  // שמירת סטטוס סקשנים
-  if (typeof window.restoreAllSectionStates === 'function') {
-    window.restoreAllSectionStates();
-  }
+  // שמירת סטטוס סקשנים (נטען על ידי UnifiedAppInitializer)
+  // if (typeof window.restoreAllSectionStates === 'function') {
+  //   window.restoreAllSectionStates();
+  // }
 
   // שחזור מצב הסקשנים הספציפי לדף הטריידים
   if (typeof window.restoreAllSectionStates === 'function') {
@@ -2057,8 +2057,8 @@ window.initializeTradesPage = async function() {
     }
   }
 
-  // טעינת נתוני טריידים
-  loadTradesData();
+  // טעינת נתוני טריידים (נטען על ידי UnifiedAppInitializer)
+  // loadTradesData();
 };
 
 // Fallback for direct access (backward compatibility)
@@ -3165,7 +3165,13 @@ function generateDetailedLog() {
                 totalTrades: document.getElementById('totalTrades')?.textContent || 'לא נמצא',
                 openTrades: document.getElementById('openTrades')?.textContent || 'לא נמצא',
                 closedTrades: document.getElementById('closedTrades')?.textContent || 'לא נמצא',
-                totalPL: document.getElementById('totalPL')?.textContent || 'לא נמצא'
+                totalPL: document.getElementById('totalPL')?.textContent || 'לא נמצא',
+                actualData: {
+                    totalTradesCount: window.tradesData ? window.tradesData.length : 0,
+                    openTradesCount: window.tradesData ? window.tradesData.filter(t => t.status === 'open').length : 0,
+                    closedTradesCount: window.tradesData ? window.tradesData.filter(t => t.status === 'closed').length : 0,
+                    cancelledTradesCount: window.tradesData ? window.tradesData.filter(t => t.status === 'cancelled').length : 0
+                }
             },
             sections: {
                 topSection: {
@@ -3173,13 +3179,26 @@ function generateDetailedLog() {
                     visible: !document.querySelector('.top-section')?.classList.contains('d-none'),
                     alertsCount: document.querySelectorAll('.alert-card').length,
                     summaryStats: document.getElementById('summaryStats')?.textContent || 'לא נמצא',
-                    colorDemoVisible: !document.getElementById('tradesColorDemo')?.style.display === 'none'
+                    colorDemoVisible: !document.getElementById('tradesColorDemo')?.style.display === 'none',
+                    actualContent: {
+                        hasHeader: !!document.querySelector('.top-section .section-header'),
+                        hasStats: !!document.querySelector('.top-section .summary-stats'),
+                        hasFilters: !!document.querySelector('.top-section .filters'),
+                        hasButtons: !!document.querySelector('.top-section .action-buttons')
+                    }
                 },
                 contentSection: {
                     title: 'הטריידים שלי',
                     visible: !document.querySelector('.content-section')?.classList.contains('d-none'),
                     tableRows: document.querySelectorAll('#tradesTable tbody tr').length,
-                    tableData: document.querySelector('#tradesContainer')?.textContent?.substring(0, 300) || 'לא נמצא'
+                    tableData: document.querySelector('#tradesContainer')?.textContent?.substring(0, 300) || 'לא נמצא',
+                    actualContent: {
+                        hasTable: !!document.querySelector('#tradesTable'),
+                        hasTableBody: !!document.querySelector('#tradesTable tbody'),
+                        hasTableHead: !!document.querySelector('#tradesTable thead'),
+                        hasFilters: !!document.querySelector('.content-section .filters'),
+                        hasPagination: !!document.querySelector('.content-section .pagination')
+                    }
                 }
             },
             tableData: {
@@ -3187,7 +3206,25 @@ function generateDetailedLog() {
                 headers: Array.from(document.querySelectorAll('#tradesTable thead th')).map(th => th.textContent?.trim()),
                 sortableColumns: document.querySelectorAll('.sortable-header').length,
                 hasData: document.querySelectorAll('#tradesTable tbody tr').length > 0,
-                selectedRows: document.querySelectorAll('#tradesTable tbody tr.selected').length
+                selectedRows: document.querySelectorAll('#tradesTable tbody tr.selected').length,
+                actualTradesData: window.tradesData ? window.tradesData.map(trade => ({
+                    id: trade.id,
+                    ticker: trade.ticker_symbol || trade.ticker_id,
+                    status: trade.status,
+                    type: trade.investment_type,
+                    side: trade.side,
+                    currentPrice: trade.current_price,
+                    dailyChange: trade.daily_change,
+                    totalPL: trade.total_pl,
+                    created: trade.created_at,
+                    closed: trade.closed_at || trade.cancelled_at
+                })) : [],
+                tableStructure: {
+                    hasTbody: !!document.querySelector('#tradesTable tbody'),
+                    hasThead: !!document.querySelector('#tradesTable thead'),
+                    tbodyRowCount: document.querySelectorAll('#tradesTable tbody tr').length,
+                    theadColCount: document.querySelectorAll('#tradesTable thead th').length
+                }
             },
             modals: {
                 addModal: document.getElementById('addTradeModal') ? 'זמין' : 'לא זמין',
@@ -3212,6 +3249,32 @@ function generateDetailedLog() {
                 errors: [],
                 warnings: [],
                 logs: []
+            },
+            systems: {
+                unifiedCacheManager: typeof window.UnifiedCacheManager === 'object' ? 'זמין' : 'לא זמין',
+                headerSystem: typeof window.HeaderSystem === 'object' ? 'זמין' : 'לא זמין',
+                notificationSystem: typeof window.showNotification === 'function' ? 'זמין' : 'לא זמין',
+                colorSchemeSystem: typeof window.applyEntityColorsToHeaders === 'function' ? 'זמין' : 'לא זמין',
+                translationSystem: typeof window.translateTradeType === 'function' ? 'זמין' : 'לא זמין',
+                buttonSystem: typeof window.createEditButton === 'function' ? 'זמין' : 'לא זמין',
+                linkedItemsSystem: typeof window.viewLinkedItemsForTrade === 'function' ? 'זמין' : 'לא זמין',
+                preferencesSystem: typeof window.getPreference === 'function' ? 'זמין' : 'לא זמין',
+                validationSystem: typeof window.initializeValidation === 'function' ? 'זמין' : 'לא זמין',
+                tableSystem: typeof window.sortTableData === 'function' ? 'זמין' : 'לא זמין'
+            },
+            ui: {
+                headerVisible: !!document.getElementById('unified-header'),
+                headerHeight: document.getElementById('unified-header')?.offsetHeight || 0,
+                mainContentVisible: !!document.querySelector('.main-content'),
+                backgroundWrapperVisible: !!document.querySelector('.background-wrapper'),
+                pageBodyVisible: !!document.querySelector('.page-body'),
+                pageStructure: {
+                    hasBackgroundWrapper: !!document.querySelector('.background-wrapper'),
+                    hasPageBody: !!document.querySelector('.page-body'),
+                    hasMainContent: !!document.querySelector('.main-content'),
+                    hasTopSection: !!document.querySelector('.top-section'),
+                    hasContentSection: !!document.querySelector('.content-section')
+                }
             }
         };
 

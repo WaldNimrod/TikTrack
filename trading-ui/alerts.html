@@ -39,7 +39,6 @@
     <link rel="stylesheet" href="styles-new/02-tools/_mixins.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/02-tools/_functions.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/02-tools/_utilities.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/02-tools/_rtl-helpers.css?v=1.0.0">
     
     <!-- 03-generic - Reset and Normalization -->
     <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=1.0.0">
@@ -100,7 +99,7 @@
                         <h2>🔔 התראות - סקירה כללית</h2>
                         <div class="section-actions">
                             <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט"><i class="fas fa-copy"></i> העתק לוג מפורט</button>
-                            <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר סקשן">
+                            <button class="btn btn-outline-warning" onclick="toggleSection('top')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -154,7 +153,7 @@
                             
                             <span style="margin: 0 10px; color: #666;">|</span>
                         </div>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
+                        <button class="btn btn-outline-warning" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
@@ -464,7 +463,6 @@
     <script src="scripts/notification-category-detector.js?v=1.0.0"></script>
     <script src="scripts/global-notification-collector.js?v=1.0.0"></script>
     <script src="scripts/system-management.js?v=1.0.0"></script>
-    <script src="scripts/realtime-notifications-client.js?v=1.0.0"></script>
     
     <!-- Stage 8: Page-specific Script -->
     <script src="scripts/alerts.js?v=1.0.0"></script>
@@ -473,6 +471,11 @@
     <script>
         // Make the local copyDetailedLog function available globally for this page only
         window.copyDetailedLog = copyDetailedLog;
+        
+        // Unified initialization - UI Standardization Round C
+        if (window.unifiedAppInitializer) {
+            window.unifiedAppInitializer.initialize();
+        }
     </script>
 </body>
 </html>

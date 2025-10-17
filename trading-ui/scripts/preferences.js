@@ -1187,13 +1187,10 @@ window.saveAsActiveProfile = async function() {
                     if (window.UnifiedCacheManager) {
                         try {
                             await window.UnifiedCacheManager.clear('preferences');
-                                console.log('🗑️ Cleared unified cache preferences');
-                            } catch (error) {
-                                console.warn('⚠️ Could not clear unified cache preferences:', error);
-                            }
+                            console.log('🗑️ Cleared unified cache preferences');
+                        } catch (error) {
+                            console.warn('⚠️ Could not clear unified cache preferences:', error);
                         }
-                    } catch (error) {
-                        console.warn('⚠️ Error clearing additional caches:', error);
                     }
                     
                     // Step 3: Reload all data from database according to new active profile
@@ -1765,13 +1762,13 @@ function updateCurrentModeStatus(mode) {
     }[mode] || 'text-muted';
     
     statusContainer.innerHTML = `
-        <div class="d-flex align-items-center mb-2">
+        <div class="d-flex align-items-center">
             <i class="${iconClass} ${iconColor} me-2"></i>
-            <span class="fw-bold">${getModeDisplayName(mode)}</span>
+            <div>
+                <span class="fw-bold">${getModeDisplayName(mode)}</span>
+                <br><small class="text-muted">${getModeDescription(mode)}</small>
+            </div>
         </div>
-        <small class="text-muted">
-            ${getModeDescription(mode)}
-        </small>
     `;
 }
 
@@ -1788,50 +1785,6 @@ function getModeDescription(mode) {
     return descriptions[mode] || 'מצב לא ידוע';
 }
 
-/**
- * מילוי טבלת ההעדפות
- * @param {Object} preferences - נתוני ההעדפות
- */
-window.populatePreferencesTable = function(preferences) {
-    try {
-        const tbody = document.querySelector('#preferencesTable tbody');
-        if (!tbody) {
-            console.error('❌ Preferences table tbody not found');
-            return;
-        }
-        
-        // Clear loading message
-        tbody.innerHTML = '';
-        
-        // Convert preferences object to array and sort by key
-        const preferencesArray = Object.entries(preferences).sort((a, b) => a[0].localeCompare(b[0]));
-        
-        // Add row for each preference
-        preferencesArray.forEach(([key, value]) => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td class="col-name">${key}</td>
-                <td class="col-value">${typeof value === 'boolean' ? (value ? 'כן' : 'לא') : value}</td>
-                <td class="col-type">${typeof value}</td>
-                <td class="col-description">-</td>
-                <td class="col-created">-</td>
-                <td class="col-actions actions-cell">
-                    <button class="action-btn btn-edit" onclick="editPreference('${key}')" title="ערוך">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="action-btn btn-delete" onclick="deletePreference('${key}')" title="מחק">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </td>
-            `;
-            tbody.appendChild(row);
-        });
-        
-        console.log(`✅ Populated ${preferencesArray.length} preferences in table`);
-    } catch (error) {
-        console.error('❌ Error populating preferences table:', error);
-    }
-};
 
 /**
  * מילוי טפסי ההעדפות עם נתונים
@@ -1842,8 +1795,7 @@ window.populatePreferencesForm = async function(preferences) {
         console.log('📝 Populating preferences form...');
         console.log('📝 Preferences received:', Object.keys(preferences).length, 'items');
         
-        // Populate preferences table
-        window.populatePreferencesTable(preferences);
+        // Preferences are populated directly in form fields (no table needed)
         
         // Load notification mode
         if (preferences.notification_mode) {

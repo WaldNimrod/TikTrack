@@ -522,6 +522,16 @@ class UnifiedAppInitializer {
             await window.NotificationSystem.initialize();
         }
         
+        // Initialize header system
+        if (this.availableSystems.has('header') && typeof window.HeaderSystem !== 'undefined') {
+            await window.HeaderSystem.initialize();
+        }
+        
+        // Initialize UI systems
+        if (this.availableSystems.has('uiUtils') && typeof window.initializeUIUtils === 'function') {
+            await window.initializeUIUtils();
+        }
+        
         // Initialize page-specific systems
         if (config.requiresFilters && this.availableSystems.has('pageFilters')) {
             await window.initializePageFilters(config.name);

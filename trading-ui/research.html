@@ -38,7 +38,6 @@
     <link rel="stylesheet" href="styles-new/02-tools/_mixins.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/02-tools/_functions.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/02-tools/_utilities.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/02-tools/_rtl-helpers.css?v=1.0.0">
     
     <!-- 03-generic - Reset and Normalization -->
     <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=1.0.0">
@@ -96,7 +95,7 @@
             <div class="top-section" data-section="top">
                 <div class="section-header">
                     <h2>🔍 תחקיר שוק - סקירה כללית</h2>
-                    <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר סקשן">
+                    <button class="btn btn-outline-warning" onclick="toggleSection('top')" title="הצג/הסתר סקשן">
                         <span class="filter-arrow">▼</span>
                     </button>
                 </div>
@@ -322,7 +321,6 @@
     <script src="scripts/notification-category-detector.js?v=1.0.0"></script>
     <script src="scripts/global-notification-collector.js?v=1.0.0"></script>
     <script src="scripts/system-management.js?v=1.0.0"></script>
-    <script src="scripts/realtime-notifications-client.js?v=1.0.0"></script>
     <script src="scripts/error-handlers.js?v=1.0.0"></script>
     
     <!-- Stage 8: Page-specific Script -->
@@ -330,8 +328,13 @@
     
     <!-- Local copyDetailedLog function for research page -->
     <script>
-        // Make the local copyDetailedLog function available globally for this page only
+        // Make the local copyDetailedLog function available globally for this page only                                                                        
         window.copyDetailedLog = copyDetailedLog;
+        
+        // Unified initialization - UI Standardization Round C
+        if (window.unifiedAppInitializer) {
+            window.unifiedAppInitializer.initialize();
+        }
     </script>
 </body>
 </html>

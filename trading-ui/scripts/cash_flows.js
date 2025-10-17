@@ -44,17 +44,17 @@ function loadCashFlowsData() {
       
       // הודעת הצלחה
       if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification('נתוני תזרימי מזומנים נטענו בהצלחה');
+        window.showSuccessNotification('נתוני תזרימי מזומנים נטענו בהצלחה', '', 4000, 'business');
       } else if (typeof window.showNotification === 'function') {
-        window.showSuccessNotification('נתוני תזרימי מזומנים נטענו בהצלחה');
+        window.showSuccessNotification('נתוני תזרימי מזומנים נטענו בהצלחה', '', 4000, 'business');
       }
     })
     .catch(error => {
       console.error('שגיאה בטעינת נתוני תזרימי מזומנים:', error);
       if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification('שגיאה בטעינת נתוני תזרימי מזומנים', error.message);
+        window.showErrorNotification('שגיאה בטעינת נתוני תזרימי מזומנים', error.message, 6000, 'system');
       } else if (typeof window.showNotification === 'function') {
-        window.showErrorNotification('שגיאה בטעינת נתוני תזרימי מזומנים');
+        window.showErrorNotification('שגיאה בטעינת נתוני תזרימי מזומנים', '', 6000, 'system');
       }
     });
     
@@ -78,9 +78,9 @@ function calculateBalance() {
     
     if (!window.cashFlowsData || window.cashFlowsData.length === 0) {
       if (typeof window.showWarningNotification === 'function') {
-        window.showWarningNotification('אין נתוני תזרימי מזומנים', 'לא ניתן לחשב יתרה ללא נתונים');
+        window.showWarningNotification('אין נתוני תזרימי מזומנים', 'לא ניתן לחשב יתרה ללא נתונים', 5000, 'ui');
       } else if (typeof window.showNotification === 'function') {
-        window.showWarningNotification('אין נתוני תזרימי מזומנים');
+        window.showWarningNotification('אין נתוני תזרימי מזומנים', '', 5000, 'ui');
       }
       return;
     }
@@ -610,7 +610,7 @@ async function deleteCashFlow(id) {
     // מציאת התזרים
     const cashFlow = window.cashFlowsData ? window.cashFlowsData.find(cf => cf.id === id) : null;
     if (!cashFlow) {
-      window.showErrorNotification('שגיאה', 'תזרים המזומנים לא נמצא');
+      window.showErrorNotification('שגיאה', 'תזרים המזומנים לא נמצא', 6000, 'system');
       return;
     }
 
@@ -658,7 +658,7 @@ async function deleteCashFlow(id) {
 
     if (result.status === 'success') {
       // הצגת הודעת הצלחה
-      window.showSuccessNotification('הצלחה', 'תזרים המזומנים נמחק בהצלחה');
+      window.showSuccessNotification('הצלחה', 'תזרים המזומנים נמחק בהצלחה', 4000, 'business');
 
       // טעינה מחדש של הנתונים
       await loadCashFlows();
@@ -667,7 +667,7 @@ async function deleteCashFlow(id) {
     }
   } catch {
     // console.error('❌ Delete error:', error);
-    window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת תזרים המזומנים');
+    window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת תזרים המזומנים', 6000, 'system');
   }
 }
 
@@ -1804,7 +1804,7 @@ async function saveCashFlow() {
       modal.hide();
 
       // הצגת הודעת הצלחה
-      window.showSuccessNotification('הצלחה', 'תזרים המזומנים נשמר בהצלחה');
+      window.showSuccessNotification('הצלחה', 'תזרים המזומנים נשמר בהצלחה', 4000, 'business');
 
       // טעינה מחדש של הנתונים
       await loadCashFlows();
@@ -1915,7 +1915,7 @@ async function updateCashFlow() {
       modal.hide();
 
       // הצגת הודעת הצלחה
-      window.showSuccessNotification('הצלחה', 'תזרים המזומנים נעדכן בהצלחה');
+      window.showSuccessNotification('הצלחה', 'תזרים המזומנים נעדכן בהצלחה', 4000, 'business');
 
       // טעינה מחדש של הנתונים
       await loadCashFlows();

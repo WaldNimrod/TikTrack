@@ -60,9 +60,9 @@ function uploadFile(noteId) {
         
         // הודעת הצלחה
         if (typeof window.showSuccessNotification === 'function') {
-          window.showSuccessNotification('קובץ הועלה בהצלחה');
+          window.showSuccessNotification('קובץ הועלה בהצלחה', '', 4000, 'business');
         } else if (typeof window.showNotification === 'function') {
-          window.showSuccessNotification('קובץ הועלה בהצלחה');
+          window.showSuccessNotification('קובץ הועלה בהצלחה', '', 4000, 'business');
         }
       })
       .catch(error => {

@@ -2300,16 +2300,16 @@ async function loadUserPreferences() {
     }
     
     // Fallback אחרון - קובץ JSON מקומי (legacy)
-    const response = await fetch('/api/preferences/user');
-    if (response.ok) {
-      const preferences = await response.json();
-      console.log('🔄 Using local JSON preferences (legacy)');
-      return preferences.user || preferences.defaults;
+    try {
+      const response = await fetch('/api/preferences/user');
+      if (response.ok) {
+        const preferences = await response.json();
+        console.log('🔄 Using local JSON preferences (legacy)');
+        return preferences.user || preferences.defaults;
+      }
+    } catch (error) {
+      console.error('❌ Error loading preferences:', error);
     }
-    
-  } catch (error) {
-    handleDataLoadError(error, 'העדפות משתמש');
-  }
   
   // ברירת מחדל
   console.log('🔄 Using default preferences');
@@ -2711,16 +2711,8 @@ window.loadPlanningData = function () {
 };
 
 window.setupSortableHeaders = function () {
-  // הפונקציה כבר מוגדרת ב-main.js
-  if (typeof window.setupSortableHeadersGlobal === 'function') {
-    window.setupSortableHeadersGlobal('planning');
-  } else {
-    if (typeof window.showNotification === 'function') {
-      window.showNotification('setupSortableHeadersGlobal not found - using local function', 'warning');
-    }
-    // שימוש בפונקציה מקומית אם הגלובלית לא קיימת
-    setupSortableHeadersLocal();
-  }
+  // שימוש בפונקציה מקומית
+  setupSortableHeadersLocal();
 };
 
 function setupSortableHeadersLocal() {
@@ -3100,13 +3092,8 @@ if (window.location.pathname.includes('/trade_plans')) {
 }
 
 // קריאה ישירה לפונקציה - למקרה שהקוד למעלה לא רץ
-if (typeof loadTradePlansData === 'function') {
-  setTimeout(() => {
-    loadTradePlansData();
-  }, 1000);
-} else {
-  handleFunctionNotFound('loadTradePlansData', 'פונקציית טעינת נתוני תכנונים לא נמצאה בסוף הקובץ');
-}
+// Data loading is handled by the unified initialization system
+// No need for duplicate loading here
 
 // Detailed Log Functions for Trade Plans Page
 function generateDetailedLog() {

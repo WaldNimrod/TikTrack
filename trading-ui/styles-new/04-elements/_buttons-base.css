@@ -12,8 +12,8 @@
 button,
 .btn {
   background-color: white;
-  color: #29a6a8;  /* צבע טורקיז מקורי */
-  border: 1px solid #29a6a8;
+  color: var(--primary-color, #29a6a8);  /* צבע דינמי */
+  border: 1px solid var(--primary-color, #29a6a8);
   border-radius: var(--apple-radius-small);
   padding: 0.375rem 0.75rem;
   font-size: 0.875rem;
@@ -47,9 +47,9 @@ button:last-child,
 /* Hover state לכל הכפתורים */
 button:hover,
 .btn:hover {
-  background-color: #29a6a8;
+  background-color: var(--primary-color, #29a6a8);
   color: white;
-  border-color: #29a6a8;
+  border-color: var(--primary-color, #29a6a8);
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }

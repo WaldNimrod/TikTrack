@@ -17,7 +17,7 @@ function loadResearchData() {
     
     // Simulate loading data
     setTimeout(() => {
-        showSuccessNotification('נתוני התחקיר נטענו בהצלחה');
+        showSuccessNotification('נתוני התחקיר נטענו בהצלחה', '', 4000, 'business');
     }, 1000);
 }
 
@@ -32,7 +32,7 @@ function analyzeMarketTrends() {
     showInfoNotification('מנתח מגמות שוק...');
     // Simulate analysis
     setTimeout(() => {
-        showSuccessNotification('ניתוח מגמות הושלם');
+        showSuccessNotification('ניתוח מגמות הושלם', '', 4000, 'business');
     }, 2000);
 }
 
@@ -40,7 +40,7 @@ function compareTickers() {
     showInfoNotification('משווה טיקרים...');
     // Simulate comparison
     setTimeout(() => {
-        showSuccessNotification('השוואת טיקרים הושלמה');
+        showSuccessNotification('השוואת טיקרים הושלמה', '', 4000, 'business');
     }, 1500);
 }
 
@@ -48,7 +48,7 @@ function technicalAnalysis() {
     showInfoNotification('מבצע ניתוח טכני...');
     // Simulate analysis
     setTimeout(() => {
-        showSuccessNotification('ניתוח טכני הושלם');
+        showSuccessNotification('ניתוח טכני הושלם', '', 4000, 'business');
     }, 2500);
 }
 

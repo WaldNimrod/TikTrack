@@ -134,7 +134,7 @@ async function copyDetailedLog() {
             await navigator.clipboard.writeText(detailedLog);
             
             if (typeof window.showSuccessNotification === 'function') {
-                window.showSuccessNotification('לוג מפורט הועתק ללוח', 'הלוג מכיל את כל מה שרואה המשתמש בעמוד');
+                window.showSuccessNotification('לוג מפורט הועתק ללוח', 'הלוג מכיל את כל מה שרואה המשתמש בעמוד', 4000, 'development');
             } else if (typeof window.showNotification === 'function') {
                 window.showNotification('לוג מפורט הועתק ללוח', 'success');
             } else {

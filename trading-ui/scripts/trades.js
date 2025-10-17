@@ -501,7 +501,7 @@ function editTradeRecord(tradeId) {
     } else {
       // console.error('trade not found');
     }
-    window.showErrorNotification('שגיאה', 'טרייד לא נמצא');
+    window.showErrorNotification('שגיאה', 'טרייד לא נמצא', 6000, 'system');
   }
 }
 
@@ -2987,9 +2987,9 @@ async function reactivateTrade(tradeId) {
       // Fallback למערכת הישנה
       // הצגת הודעת הצלחה
       if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification('טרייד הופעל מחדש בהצלחה!');
+        window.showSuccessNotification('טרייד הופעל מחדש בהצלחה!', '', 4000, 'business');
       } else if (typeof window.showNotification === 'function') {
-        window.showSuccessNotification('טרייד הופעל מחדש בהצלחה!');
+        window.showSuccessNotification('טרייד הופעל מחדש בהצלחה!', '', 4000, 'business');
       }
     }
 

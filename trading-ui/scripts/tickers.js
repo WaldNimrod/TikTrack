@@ -508,7 +508,7 @@ function showEditTickerModal(id) {
   const ticker = tickersData.find(t => t.id === id);
   if (!ticker) {
     if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה', 'טיקר לא נמצא');
+      window.showErrorNotification('שגיאה', 'טיקר לא נמצא', 6000, 'system');
     }
     return;
   }
@@ -578,7 +578,7 @@ function showDeleteTickerModal(id) {
   const ticker = (window.tickersData || []).find(t => t.id === id);
   if (!ticker) {
     if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה', 'טיקר לא נמצא');
+      window.showErrorNotification('שגיאה', 'טיקר לא נמצא', 6000, 'system');
     }
     return;
   }
@@ -1250,7 +1250,7 @@ async function performCancelTicker(id) {
   const ticker = (window.tickersData || []).find(t => t.id === id);
   if (!ticker) {
     if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה', 'טיקר לא נמצא');
+      window.showErrorNotification('שגיאה', 'טיקר לא נמצא', 6000, 'system');
     }
     return;
   }

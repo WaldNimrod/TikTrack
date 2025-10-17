@@ -1571,7 +1571,7 @@ async function saveAlert() {
         // Fallback למערכת הישנה
         // הצגת הודעה
         if (window.showSuccessNotification) {
-          window.showSuccessNotification('הצלחה', 'התראה נשמרה בהצלחה!');
+          window.showSuccessNotification('הצלחה', 'התראה נשמרה בהצלחה!', 4000, 'business');
         }
 
         // רענון הנתונים
@@ -2010,7 +2010,7 @@ async function updateAlert() {
         // Fallback למערכת הישנה
         // הצגת הודעה
         if (window.showSuccessNotification) {
-          window.showSuccessNotification('הצלחה', 'התראה עודכנה בהצלחה!');
+          window.showSuccessNotification('הצלחה', 'התראה עודכנה בהצלחה!', 4000, 'business');
         }
 
         // רענון הנתונים
@@ -2080,7 +2080,7 @@ async function confirmDeleteAlert(alertId) {
     if (response.ok && result.status === 'success') {
       // console.log('✅ התראה נמחקה בהצלחה');
       if (window.showSuccessNotification) {
-        window.showSuccessNotification('הצלחה', 'התראה נמחקה בהצלחה!');
+        window.showSuccessNotification('הצלחה', 'התראה נמחקה בהצלחה!', 4000, 'business');
       }
       loadAlertsData();
       

@@ -1655,12 +1655,11 @@ async function loadModalData() {
             .then(response => response.json())
             .then(plan => {
               // מילוי הטופס בנתוני התוכנית
-              document.getElementById('addTicker').value = plan.ticker_id;
-              document.getElementById('addType').value = plan.investment_type;
-              document.getElementById('addSide').value = plan.side;
-              document.getElementById('addQuantity').value = plan.planned_amount;
-              document.getElementById('addPrice').value = plan.stop_price || '';
-              document.getElementById('addAccount').value = plan.account_id;
+              if (plan.ticker_id) document.getElementById('addTicker').value = plan.ticker_id;
+              if (plan.side) document.getElementById('addType').value = plan.side;
+              if (plan.planned_amount) document.getElementById('addQuantity').value = plan.planned_amount;
+              if (plan.stop_price) document.getElementById('addPrice').value = plan.stop_price;
+              if (plan.account_id) document.getElementById('addAccount').value = plan.account_id;
               
               // עדכון נתוני הטיקר
               updateTickerFromTradePlan(plan.ticker_id);

@@ -314,9 +314,7 @@
                                 </button>
                             </div>
                             <div class="col-md-3">
-                                <button class="btn btn-info w-100 mb-3" onclick="refreshStatus()">
-                                    🔄 רענן סטטוס
-                                </button>
+                                <button data-button-type="REFRESH" data-onclick="refreshData()" data-classes="refresh-btn" data-text="רענן" data-attributes="title=\"רענן\""></button>
                             </div>
                             <div class="col-md-3">
                                 <button class="btn btn-secondary w-100 mb-3" onclick="clearLogs()">
@@ -462,9 +460,7 @@
                                             <button class="btn btn-sm btn-primary" onclick="testAllEndpoints()">
                                                 🧪 בדוק הכל
                                             </button>
-                                            <button class="btn btn-sm btn-secondary" onclick="refreshEndpointStatus()">
-                                                🔄 רענן
-                                            </button>
+                                            <button data-button-type="REFRESH" data-onclick="refreshData()" data-classes="refresh-btn" data-text="רענן" data-attributes="title=\"רענן\""></button>
                                         </div>
                                     </div>
                                     <div class="card-body">

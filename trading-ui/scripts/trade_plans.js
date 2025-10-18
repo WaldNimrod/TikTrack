@@ -337,7 +337,7 @@ async function loadTickerInfo(tickerId) {
   }
 }
 
-function displayTickerInfo(ticker) {
+async function displayTickerInfo(ticker) {
   const tickerInfo = document.getElementById('tickerInfo');
   const tickerPrice = document.getElementById('tickerPrice');
   const tickerChange = document.getElementById('tickerChange');
@@ -345,7 +345,8 @@ function displayTickerInfo(ticker) {
   
   if (tickerInfo && tickerPrice && tickerChange && tickerVolume) {
     // Format price
-    tickerPrice.textContent = `$${parseFloat(ticker.current_price || 0).toFixed(2)}`;
+    const currentPrice = parseFloat(ticker.current_price || 0);
+    tickerPrice.textContent = `$${currentPrice.toFixed(2)}`;
     
     // Format change with color
     const change = parseFloat(ticker.daily_change || 0);
@@ -360,6 +361,9 @@ function displayTickerInfo(ticker) {
     
     // Show ticker info
     tickerInfo.style.display = 'block';
+    
+    // Update form fields with calculated values
+    await updateFormFieldsWithTickerData(ticker, currentPrice);
   }
 }
 
@@ -367,6 +371,67 @@ function hideTickerInfo() {
   const tickerInfo = document.getElementById('tickerInfo');
   if (tickerInfo) {
     tickerInfo.style.display = 'none';
+  }
+}
+
+/**
+ * Update form fields with calculated values based on ticker data and user preferences
+ */
+async function updateFormFieldsWithTickerData(ticker, currentPrice) {
+  try {
+    console.log('🔄 Updating form fields with ticker data:', ticker.symbol, 'Price:', currentPrice);
+    
+    // Get user preferences for default percentages
+    let defaultStopLoss = 2.5; // Default fallback
+    let defaultTargetPrice = 5.0; // Default fallback
+    
+    try {
+      if (typeof window.getPreference === 'function') {
+        const stopLossPref = await window.getPreference('defaultStopLoss');
+        const targetPricePref = await window.getPreference('defaultTargetPrice');
+        
+        if (stopLossPref !== null && stopLossPref !== undefined) {
+          defaultStopLoss = parseFloat(stopLossPref);
+        }
+        if (targetPricePref !== null && targetPricePref !== undefined) {
+          defaultTargetPrice = parseFloat(targetPricePref);
+        }
+        
+        console.log('✅ User preferences loaded:', { defaultStopLoss, defaultTargetPrice });
+      }
+    } catch (error) {
+      console.warn('⚠️ Could not load user preferences, using defaults:', error);
+    }
+    
+    // Update entry price (current price)
+    const priceInput = document.getElementById('price');
+    if (priceInput) {
+      priceInput.value = currentPrice.toFixed(2);
+      console.log('✅ Updated entry price:', currentPrice.toFixed(2));
+    }
+    
+    // Calculate and update target price and percentage
+    const targetPriceInput = document.getElementById('targetPrice');
+    const targetPercentageInput = document.getElementById('targetPercentage');
+    if (targetPriceInput && targetPercentageInput) {
+      const targetPrice = currentPrice * (1 + defaultTargetPrice / 100);
+      targetPriceInput.value = targetPrice.toFixed(2);
+      targetPercentageInput.value = defaultTargetPrice.toFixed(2);
+      console.log('✅ Updated target price:', targetPrice.toFixed(2), `(${defaultTargetPrice}% above entry)`);
+    }
+    
+    // Calculate and update stop loss price and percentage
+    const stopPriceInput = document.getElementById('stopPrice');
+    const stopPercentageInput = document.getElementById('stopPercentage');
+    if (stopPriceInput && stopPercentageInput) {
+      const stopPrice = currentPrice * (1 - defaultStopLoss / 100);
+      stopPriceInput.value = stopPrice.toFixed(2);
+      stopPercentageInput.value = defaultStopLoss.toFixed(2);
+      console.log('✅ Updated stop price:', stopPrice.toFixed(2), `(${defaultStopLoss}% below entry)`);
+    }
+    
+  } catch (error) {
+    console.error('❌ Error updating form fields with ticker data:', error);
   }
 }
 
@@ -406,7 +471,7 @@ async function loadEditTickerInfo(tickerId) {
   }
 }
 
-function displayEditTickerInfo(ticker) {
+async function displayEditTickerInfo(ticker) {
   const tickerInfo = document.getElementById('editTickerInfo');
   const tickerPrice = document.getElementById('editTickerPrice');
   const tickerChange = document.getElementById('editTickerChange');
@@ -414,7 +479,8 @@ function displayEditTickerInfo(ticker) {
   
   if (tickerInfo && tickerPrice && tickerChange && tickerVolume) {
     // Format price
-    tickerPrice.textContent = `$${parseFloat(ticker.current_price || 0).toFixed(2)}`;
+    const currentPrice = parseFloat(ticker.current_price || 0);
+    tickerPrice.textContent = `$${currentPrice.toFixed(2)}`;
     
     // Format change with color
     const change = parseFloat(ticker.daily_change || 0);
@@ -429,6 +495,9 @@ function displayEditTickerInfo(ticker) {
     
     // Show ticker info
     tickerInfo.style.display = 'block';
+    
+    // Update edit form fields with calculated values
+    await updateEditFormFieldsWithTickerData(ticker, currentPrice);
   }
 }
 
@@ -436,6 +505,71 @@ function hideEditTickerInfo() {
   const tickerInfo = document.getElementById('editTickerInfo');
   if (tickerInfo) {
     tickerInfo.style.display = 'none';
+  }
+}
+
+/**
+ * Update edit form fields with calculated values based on ticker data and user preferences
+ */
+async function updateEditFormFieldsWithTickerData(ticker, currentPrice) {
+  try {
+    console.log('🔄 Updating edit form fields with ticker data:', ticker.symbol, 'Price:', currentPrice);
+    
+    // Get user preferences for default percentages
+    let defaultStopLoss = 2.5; // Default fallback
+    let defaultTargetPrice = 5.0; // Default fallback
+    
+    try {
+      if (typeof window.getPreference === 'function') {
+        const stopLossPref = await window.getPreference('defaultStopLoss');
+        const targetPricePref = await window.getPreference('defaultTargetPrice');
+        
+        if (stopLossPref !== null && stopLossPref !== undefined) {
+          defaultStopLoss = parseFloat(stopLossPref);
+        }
+        if (targetPricePref !== null && targetPricePref !== undefined) {
+          defaultTargetPrice = parseFloat(targetPricePref);
+        }
+        
+        console.log('✅ User preferences loaded for edit:', { defaultStopLoss, defaultTargetPrice });
+      }
+    } catch (error) {
+      console.warn('⚠️ Could not load user preferences for edit, using defaults:', error);
+    }
+    
+    // Update entry price (current price) - only if field is empty
+    const editPriceInput = document.getElementById('editPrice');
+    if (editPriceInput && (!editPriceInput.value || editPriceInput.value === '')) {
+      editPriceInput.value = currentPrice.toFixed(2);
+      console.log('✅ Updated edit entry price:', currentPrice.toFixed(2));
+    }
+    
+    // Calculate and update target price and percentage - only if fields are empty
+    const editTargetPriceInput = document.getElementById('editTargetPrice');
+    const editTargetPercentageInput = document.getElementById('editTargetPercentage');
+    if (editTargetPriceInput && editTargetPercentageInput && 
+        (!editTargetPriceInput.value || editTargetPriceInput.value === '') &&
+        (!editTargetPercentageInput.value || editTargetPercentageInput.value === '')) {
+      const targetPrice = currentPrice * (1 + defaultTargetPrice / 100);
+      editTargetPriceInput.value = targetPrice.toFixed(2);
+      editTargetPercentageInput.value = defaultTargetPrice.toFixed(2);
+      console.log('✅ Updated edit target price:', targetPrice.toFixed(2), `(${defaultTargetPrice}% above entry)`);
+    }
+    
+    // Calculate and update stop loss price and percentage - only if fields are empty
+    const editStopPriceInput = document.getElementById('editStopPrice');
+    const editStopPercentageInput = document.getElementById('editStopPercentage');
+    if (editStopPriceInput && editStopPercentageInput && 
+        (!editStopPriceInput.value || editStopPriceInput.value === '') &&
+        (!editStopPercentageInput.value || editStopPercentageInput.value === '')) {
+      const stopPrice = currentPrice * (1 - defaultStopLoss / 100);
+      editStopPriceInput.value = stopPrice.toFixed(2);
+      editStopPercentageInput.value = defaultStopLoss.toFixed(2);
+      console.log('✅ Updated edit stop price:', stopPrice.toFixed(2), `(${defaultStopLoss}% below entry)`);
+    }
+    
+  } catch (error) {
+    console.error('❌ Error updating edit form fields with ticker data:', error);
   }
 }
 
@@ -1197,6 +1331,8 @@ window.cancelTradePlan = cancelTradePlan;
 window.deleteTradePlan = deleteTradePlan;
 window.viewLinkedItemsForTradePlan = viewLinkedItemsForTradePlan;
 window.reactivateTradePlan = reactivateTradePlan;
+window.setupPriceCalculation = setupPriceCalculation;
+window.setupEditPriceCalculation = setupEditPriceCalculation;
 
 window.updateEditTickerInfo = updateEditTickerInfo;
 window.updateEditSharesFromAmount = updateEditSharesFromAmount;
@@ -1840,6 +1976,14 @@ async function showAddTradePlanModal() {
       modal.show();
       console.log('✅ showAddTradePlanModal: Modal show() called');
       
+      // Setup price calculation functionality
+      setTimeout(() => {
+        if (typeof window.setupPriceCalculation === 'function') {
+          window.setupPriceCalculation();
+          console.log('✅ showAddTradePlanModal: Price calculation setup completed');
+        }
+      }, 100);
+      
       // Check ticker input value after modal is shown
       setTimeout(() => {
         const tickerInputAfterModal = document.getElementById('ticker');
@@ -2017,9 +2161,25 @@ async function showAddTradePlanModal() {
     if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
       const modal = new bootstrap.Modal(editModalElement);
       modal.show();
+      
+      // Setup edit price calculation functionality
+      setTimeout(() => {
+        if (typeof window.setupEditPriceCalculation === 'function') {
+          window.setupEditPriceCalculation();
+          console.log('✅ openEditTradePlanModal: Edit price calculation setup completed');
+        }
+      }, 100);
     } else {
       editModalElement.style.display = 'block';
       editModalElement.classList.add('show');
+      
+      // Setup edit price calculation functionality
+      setTimeout(() => {
+        if (typeof window.setupEditPriceCalculation === 'function') {
+          window.setupEditPriceCalculation();
+          console.log('✅ openEditTradePlanModal: Edit price calculation setup completed');
+        }
+      }, 100);
     }
   }
 }
@@ -3049,6 +3209,114 @@ window.initializeTradePlansPage = async function() {
 // }
 
 // updateGridFromComponent is already defined at the beginning of the file
+
+// Price calculation functions
+function setupPriceCalculation() {
+  // Target price calculation - when price changes, update percentage
+  const targetPriceInput = document.getElementById('targetPrice');
+  const targetPercentageInput = document.getElementById('targetPercentage');
+  const entryPriceInput = document.getElementById('price');
+  
+  if (targetPriceInput && targetPercentageInput && entryPriceInput) {
+    targetPriceInput.addEventListener('input', function() {
+      const entryPrice = parseFloat(entryPriceInput.value) || 0;
+      const targetPrice = parseFloat(this.value) || 0;
+      if (entryPrice > 0 && targetPrice > 0) {
+        const percentage = ((targetPrice - entryPrice) / entryPrice) * 100;
+        targetPercentageInput.value = percentage.toFixed(2);
+      }
+    });
+    
+    // Target percentage calculation - when percentage changes, update price
+    targetPercentageInput.addEventListener('input', function() {
+      const entryPrice = parseFloat(entryPriceInput.value) || 0;
+      const percentage = parseFloat(this.value) || 0;
+      if (entryPrice > 0) {
+        const targetPrice = entryPrice * (1 + percentage / 100);
+        targetPriceInput.value = targetPrice.toFixed(2);
+      }
+    });
+  }
+  
+  // Stop price calculation - when price changes, update percentage
+  const stopPriceInput = document.getElementById('stopPrice');
+  const stopPercentageInput = document.getElementById('stopPercentage');
+  
+  if (stopPriceInput && stopPercentageInput && entryPriceInput) {
+    stopPriceInput.addEventListener('input', function() {
+      const entryPrice = parseFloat(entryPriceInput.value) || 0;
+      const stopPrice = parseFloat(this.value) || 0;
+      if (entryPrice > 0 && stopPrice > 0) {
+        const percentage = ((entryPrice - stopPrice) / entryPrice) * 100;
+        stopPercentageInput.value = percentage.toFixed(2);
+      }
+    });
+    
+    // Stop percentage calculation - when percentage changes, update price
+    stopPercentageInput.addEventListener('input', function() {
+      const entryPrice = parseFloat(entryPriceInput.value) || 0;
+      const percentage = parseFloat(this.value) || 0;
+      if (entryPrice > 0) {
+        const stopPrice = entryPrice * (1 - percentage / 100);
+        stopPriceInput.value = stopPrice.toFixed(2);
+      }
+    });
+  }
+}
+
+// Edit form price calculation functions
+function setupEditPriceCalculation() {
+  // Edit target price calculation - when price changes, update percentage
+  const editTargetPriceInput = document.getElementById('editTargetPrice');
+  const editTargetPercentageInput = document.getElementById('editTargetPercentage');
+  const editEntryPriceInput = document.getElementById('editPrice');
+  
+  if (editTargetPriceInput && editTargetPercentageInput && editEntryPriceInput) {
+    editTargetPriceInput.addEventListener('input', function() {
+      const entryPrice = parseFloat(editEntryPriceInput.value) || 0;
+      const targetPrice = parseFloat(this.value) || 0;
+      if (entryPrice > 0 && targetPrice > 0) {
+        const percentage = ((targetPrice - entryPrice) / entryPrice) * 100;
+        editTargetPercentageInput.value = percentage.toFixed(2);
+      }
+    });
+    
+    // Edit target percentage calculation - when percentage changes, update price
+    editTargetPercentageInput.addEventListener('input', function() {
+      const entryPrice = parseFloat(editEntryPriceInput.value) || 0;
+      const percentage = parseFloat(this.value) || 0;
+      if (entryPrice > 0) {
+        const targetPrice = entryPrice * (1 + percentage / 100);
+        editTargetPriceInput.value = targetPrice.toFixed(2);
+      }
+    });
+  }
+  
+  // Edit stop price calculation - when price changes, update percentage
+  const editStopPriceInput = document.getElementById('editStopPrice');
+  const editStopPercentageInput = document.getElementById('editStopPercentage');
+  
+  if (editStopPriceInput && editStopPercentageInput && editEntryPriceInput) {
+    editStopPriceInput.addEventListener('input', function() {
+      const entryPrice = parseFloat(editEntryPriceInput.value) || 0;
+      const stopPrice = parseFloat(this.value) || 0;
+      if (entryPrice > 0 && stopPrice > 0) {
+        const percentage = ((entryPrice - stopPrice) / entryPrice) * 100;
+        editStopPercentageInput.value = percentage.toFixed(2);
+      }
+    });
+    
+    // Edit stop percentage calculation - when percentage changes, update price
+    editStopPercentageInput.addEventListener('input', function() {
+      const entryPrice = parseFloat(editEntryPriceInput.value) || 0;
+      const percentage = parseFloat(this.value) || 0;
+      if (entryPrice > 0) {
+        const stopPrice = entryPrice * (1 - percentage / 100);
+        editStopPriceInput.value = stopPrice.toFixed(2);
+      }
+    });
+  }
+}
 
 // Adding functions to global scope
 window.loadTradePlansData = loadTradePlansData;

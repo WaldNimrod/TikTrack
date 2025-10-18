@@ -947,10 +947,10 @@ async function loadEditTradeModalData(trade) {
         const editTradeId = document.getElementById('editTradeId');
         if (editTradeId) {editTradeId.value = trade.id;}
 
-        const editTradeType = document.getElementById('editTradeType');
+        const editTradeType = document.getElementById('editType');
         if (editTradeType) {editTradeType.value = trade.investment_type || '';}
 
-        const editTradeSide = document.getElementById('editTradeSide');
+        const editTradeSide = document.getElementById('editSide');
         if (editTradeSide) {editTradeSide.value = trade.side || '';}
 
         const editTradeAccountId = document.getElementById('editTradeAccountId');
@@ -1129,8 +1129,8 @@ async function saveEditTradeData() {
     // איסוף נתונים מהטופס
     const formData = {
       id: document.getElementById('editTradeId').value,
-      investment_type: document.getElementById('editTradeType').value,
-      side: document.getElementById('editTradeSide').value,
+      investment_type: document.getElementById('editType').value,
+      side: document.getElementById('editSide').value,
       account_id: document.getElementById('editTradeAccountId').value,
       trade_plan_id: document.getElementById('editTradeTradePlanId').value || null,
       notes: document.getElementById('editTradeNotes').value,
@@ -1482,8 +1482,8 @@ async function saveNewTradeRecord() {
   const accountElement = document.getElementById('addTradeAccountId');
   const tickerElement = document.getElementById('addTradeTickerId');
   const tradePlanElement = document.getElementById('addTradeTradePlanId');
-  const typeElement = document.getElementById('addTradeType');
-  const sideElement = document.getElementById('addTradeSide');
+  const typeElement = document.getElementById('addType');
+  const sideElement = document.getElementById('addType');
   const openedAtElement = document.getElementById('addTradeOpenedAt');
   const closedAtElement = document.getElementById('addTradeClosedAt');
   const notesElement = document.getElementById('addTradeNotes');

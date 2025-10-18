@@ -307,8 +307,8 @@
                                         <label for="addType" class="form-label">סוג</label>
                                         <select class="form-select" id="addType" required>
                                             <option value="">בחר סוג</option>
-                                            <option value="buy">קנייה</option>
-                                            <option value="sell">מכירה</option>
+                                            <option value="Long">Long</option>
+                                            <option value="Short">Short</option>
                                         </select>
                                     </div>
                                 </div>
@@ -347,7 +347,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-success" onclick="addTrade()">הוסף טרייד</button>
+                        <button type="button" class="btn btn-success" onclick="saveNewTradeRecord()">הוסף טרייד</button>
                     </div>
                 </div>
             </div>
@@ -418,8 +418,8 @@
                                     <div class="mb-3">
                                         <label for="editType" class="form-label">סוג</label>
                                         <select class="form-select" id="editType" required>
-                                            <option value="buy">קנייה</option>
-                                            <option value="sell">מכירה</option>
+                                            <option value="Long">Long</option>
+                                            <option value="Short">Short</option>
                                         </select>
                                     </div>
                                 </div>
@@ -427,8 +427,8 @@
                                     <div class="mb-3">
                                         <label for="editSide" class="form-label">צד</label>
                                         <select class="form-select" id="editSide" required>
-                                            <option value="long">Long</option>
-                                            <option value="short">Short</option>
+                                            <option value="Long">Long</option>
+                                            <option value="Short">Short</option>
                                         </select>
                                     </div>
                                 </div>

@@ -26,6 +26,32 @@
   z-index: 1000000002;
 }
 
+/* סגנון Toast להעתקה */
+.toast-notification-style {
+  position: fixed !important;
+  top: 20px !important;
+  right: 20px !important;
+  background: #28a745 !important;
+  color: white !important;
+  padding: 10px 20px !important;
+  border-radius: 5px !important;
+  z-index: 9999 !important;
+  font-size: 14px !important;
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3) !important;
+  animation: slideInRight 0.3s ease-out !important;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
 /* התראה בודדת - עיצוב בסיסי */
 .notification {
   background: #ffffff !important;

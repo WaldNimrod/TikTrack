@@ -1101,4 +1101,970 @@ if (window.UnifiedInitializationSystem) {
     });
 }
 
+// ===== COMPLETE CACHE CLEARING SYSTEM =====
+
+/**
+ * Complete cache clearing process - clears all layers and provides detailed feedback
+ * @param {Object} options - Options for clearing
+ * @returns {Promise<Object>} Result with success status and details
+ */
+UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
+    try {
+        console.log('🔄 Starting complete cache clearing process...');
+        
+        const clearedLayers = [];
+        const errors = [];
+        
+        // 1. Clear Unified Cache Manager (all layers)
+        try {
+            await this.clear('all');
+            clearedLayers.push('Unified Cache (all layers)');
+            console.log('✅ Unified Cache cleared successfully');
+        } catch (error) {
+            console.error('❌ Error clearing Unified Cache:', error);
+            errors.push(`Unified Cache: ${error.message}`);
+        }
+        
+        // 2. Clear localStorage
+        try {
+            localStorage.clear();
+            clearedLayers.push('localStorage');
+            console.log('✅ localStorage cleared successfully');
+        } catch (error) {
+            console.error('❌ Error clearing localStorage:', error);
+            errors.push(`localStorage: ${error.message}`);
+        }
+        
+        // 3. Clear sessionStorage
+        try {
+            sessionStorage.clear();
+            clearedLayers.push('sessionStorage');
+            console.log('✅ sessionStorage cleared successfully');
+        } catch (error) {
+            console.error('❌ Error clearing sessionStorage:', error);
+            errors.push(`sessionStorage: ${error.message}`);
+        }
+        
+        // 4. Clear IndexedDB CACHE ONLY (NOT HISTORICAL DATA)
+        if ('indexedDB' in window) {
+            try {
+                // Only clear cache-related databases, NOT historical data
+                const cacheOnlyDatabases = ['unified-cache', 'tiktrack-cache']; // Only cache databases
+                const historicalDatabases = ['tiktrack-data', 'notifications-history', 'file-mappings', 'linter-results', 'js-analysis']; // Historical data - DO NOT DELETE
+                
+                console.log('🔄 Clearing IndexedDB cache only (preserving historical data)...');
+                
+                // Clear only cache databases
+                for (const dbName of cacheOnlyDatabases) {
+                    try {
+                        await new Promise((resolve) => {
+                            const openReq = indexedDB.open(dbName);
+                            openReq.onsuccess = () => {
+                                const db = openReq.result;
+                                
+                                // Check if database has any object stores
+                                if (db.objectStoreNames.length === 0) {
+                                    console.log(`ℹ️ Database ${dbName} has no object stores, skipping`);
+                                    db.close();
+                                    resolve();
+                                    return;
+                                }
+                                
+                                const transaction = db.transaction(db.objectStoreNames, 'readwrite');
+                                
+                                // Clear all object stores in cache databases only
+                                for (let i = 0; i < db.objectStoreNames.length; i++) {
+                                    const storeName = db.objectStoreNames[i];
+                                    const store = transaction.objectStore(storeName);
+                                    const clearReq = store.clear();
+                                    clearReq.onsuccess = () => {
+                                        console.log(`✅ Cleared cache object store: ${dbName}.${storeName}`);
+                                    };
+                                    clearReq.onerror = () => {
+                                        console.warn(`⚠️ Failed to clear cache object store: ${dbName}.${storeName}`, clearReq.error);
+                                    };
+                                }
+                                
+                                transaction.oncomplete = () => {
+                                    db.close();
+                                    resolve();
+                                };
+                                transaction.onerror = () => {
+                                    console.warn(`⚠️ Transaction failed for cache database ${dbName}`, transaction.error);
+                                    db.close();
+                                    resolve();
+                                };
+                            };
+                            openReq.onerror = () => {
+                                console.warn(`⚠️ Could not open cache database: ${dbName}`, openReq.error);
+                                resolve();
+                            };
+                        });
+                    } catch (error) {
+                        console.warn(`⚠️ Error clearing cache data from ${dbName}:`, error);
+                    }
+                }
+                
+                // Log preserved historical databases
+                console.log(`✅ Preserved historical data in IndexedDB: ${historicalDatabases.join(', ')}`);
+                
+                clearedLayers.push('IndexedDB Cache (historical data preserved)');
+            } catch (error) {
+                console.error('❌ Error clearing IndexedDB cache:', error);
+                errors.push(`IndexedDB Cache: ${error.message}`);
+            }
+        }
+        
+        // 5. Clear Browser Cache
+        if ('caches' in window) {
+            try {
+                const cacheNames = await caches.keys();
+                await Promise.all(
+                    cacheNames.map(cacheName => caches.delete(cacheName))
+                );
+                clearedLayers.push('Browser Cache');
+                console.log('✅ Browser Cache cleared successfully');
+            } catch (error) {
+                console.error('❌ Error clearing Browser Cache:', error);
+                errors.push(`Browser Cache: ${error.message}`);
+            }
+        }
+        
+        // 6. Clear specific cache keys
+        const cacheKeys = [
+            'user-preferences', 'ui-state', 'filter-state', 'notifications-history',
+            'file-mappings', 'linter-results', 'js-analysis', 'market-data',
+            'trade-data', 'dashboard-data'
+        ];
+        
+        try {
+            cacheKeys.forEach(key => {
+                localStorage.removeItem(key);
+                sessionStorage.removeItem(key);
+            });
+            clearedLayers.push('Specific Cache Keys');
+            console.log('✅ Specific cache keys cleared successfully');
+        } catch (error) {
+            console.error('❌ Error clearing specific cache keys:', error);
+            errors.push(`Cache Keys: ${error.message}`);
+        }
+        
+        // 7. Garbage Collection
+        if (window.gc && typeof window.gc === 'function') {
+            try {
+                window.gc();
+                clearedLayers.push('Garbage Collection');
+                console.log('✅ Garbage Collection executed successfully');
+            } catch (error) {
+                console.warn('⚠️ Garbage Collection failed:', error);
+            }
+        }
+        
+        // 8. Clear notification cache
+        if (window.notificationCache && typeof window.notificationCache.clear === 'function') {
+            try {
+                window.notificationCache.clear();
+                clearedLayers.push('Notification Cache');
+                console.log('✅ Notification Cache cleared successfully');
+            } catch (error) {
+                console.warn('⚠️ Notification Cache clear failed:', error);
+            }
+        }
+        
+        // 9. Clear preferences cache
+        if (window.preferencesCache && typeof window.preferencesCache.clear === 'function') {
+            try {
+                await window.preferencesCache.clear();
+                clearedLayers.push('Preferences Cache');
+                console.log('✅ Preferences Cache cleared successfully');
+            } catch (error) {
+                console.warn('⚠️ Preferences Cache clear failed:', error);
+            }
+        }
+        
+        // 10. Refresh data from backend database
+        try {
+            console.log('🔄 Refreshing data from backend database...');
+            await this.refreshDataFromBackend();
+            clearedLayers.push('Data Refresh from Backend');
+            console.log('✅ Data refreshed from backend successfully');
+        } catch (error) {
+            console.warn('⚠️ Failed to refresh data from backend:', error);
+            errors.push(`Data Refresh: ${error.message}`);
+        }
+        
+        // Update stats after clearing
+        await this.updateStats();
+        
+        console.log('✅ Complete cache clearing process finished');
+        return { success: true, clearedLayers, errors };
+        
+    } catch (error) {
+        console.error('❌ Complete cache clearing process failed:', error);
+        return { success: false, error: error.message };
+    }
+};
+
+/**
+ * Quick cache clearing for development - simple notification and auto-refresh
+ * @param {Object} options - Options for clearing
+ * @returns {Promise<Object>} Result with success status
+ */
+UnifiedCacheManager.prototype.clearAllCacheQuick = async function(options = {}) {
+    try {
+        console.log('🧹 Quick cache clearing for development...');
+        
+        const result = await this.clearAllCache(options);
+        
+        if (result.success) {
+            // Show simple success notification
+            if (typeof window.showNotification === 'function') {
+                window.showNotification(
+                    'ניקוי מטמון הושלם בהצלחה',
+                    'success',
+                    'ניקוי מטמון',
+                    3000,
+                    'development'
+                );
+            }
+            
+            // Auto-refresh after 1.5 seconds
+            if (options.autoRefresh !== false) {
+                setTimeout(() => {
+                    window.location.reload(true);
+                }, 1500);
+            }
+            
+            console.log('✅ Quick cache clearing completed - auto-refresh in 1.5 seconds');
+        }
+        
+        return result;
+        
+    } catch (error) {
+        console.error('❌ Quick cache clearing failed:', error);
+        
+        if (typeof window.showNotification === 'function') {
+            window.showNotification(
+                `שגיאה בניקוי מטמון: ${error.message}`,
+                'error',
+                'שגיאה',
+                5000,
+                'development'
+            );
+        }
+        
+        return { success: false, error: error.message };
+    }
+};
+
+/**
+ * Detailed cache clearing with comprehensive feedback
+ * @param {Object} options - Options for clearing
+ * @returns {Promise<Object>} Result with success status and detailed feedback
+ */
+UnifiedCacheManager.prototype.clearAllCacheDetailed = async function(options = {}) {
+    try {
+        console.log('🔄 Starting detailed cache clearing process...');
+        
+        const result = await this.clearAllCache(options);
+        
+        if (result.success) {
+            // Prepare detailed result message
+            let resultMessage = '';
+            if (result.clearedLayers.length > 0) {
+                resultMessage = `ניקוי מטמון הושלם בהצלחה!\n\nנוקו שכבות:\n• ${result.clearedLayers.join('\n• ')}`;
+            }
+            
+            if (result.errors.length > 0) {
+                resultMessage += `\n\nשגיאות:\n• ${result.errors.join('\n• ')}`;
+            }
+            
+            // Show detailed success notification
+            if (typeof window.showNotification === 'function') {
+                window.showNotification(
+                    resultMessage || 'ניקוי מטמון הושלם',
+                    'success',
+                    'ניקוי מטמון מלא',
+                    10000,
+                    'system'
+                );
+            }
+        } else {
+            // Show error notification
+            if (typeof window.showNotification === 'function') {
+                window.showNotification(
+                    `שגיאה בניקוי מטמון: ${result.error}`,
+                    'error',
+                    'שגיאה',
+                    8000,
+                    'system'
+                );
+            }
+        }
+        
+        return result;
+        
+    } catch (error) {
+        console.error('❌ Detailed cache clearing failed:', error);
+        
+        if (typeof window.showNotification === 'function') {
+            window.showNotification(
+                `שגיאה בניקוי מטמון: ${error.message}`,
+                'error',
+                'שגיאה',
+                8000,
+                'system'
+            );
+        }
+        
+        return { success: false, error: error.message };
+    }
+};
+
+/**
+ * Complete cache verification process - scan, clear, and verify
+ * @param {Object} options - Options for the process
+ * @returns {Promise<Object>} Complete verification report
+ */
+UnifiedCacheManager.prototype.verifyCacheSystem = async function(options = {}) {
+    try {
+        console.log('🔍 Starting complete cache verification process...');
+        
+        const report = {
+            timestamp: new Date().toISOString(),
+            phases: {
+                preScan: null,
+                clearing: null,
+                postScan: null,
+                verification: null
+            },
+            summary: {
+                totalKeysBefore: 0,
+                totalKeysAfter: 0,
+                clearedKeys: 0,
+                verificationPassed: false,
+                errors: []
+            }
+        };
+        
+        // Phase 1: Pre-clearing scan
+        console.log('📊 Phase 1: Scanning cache layers before clearing...');
+        report.phases.preScan = await this.scanAllCacheLayers();
+        report.summary.totalKeysBefore = this.countTotalKeys(report.phases.preScan);
+        
+        // Phase 2: Clear all cache
+        console.log('🧹 Phase 2: Clearing all cache layers...');
+        const clearResult = await this.clearAllCache(options);
+        report.phases.clearing = clearResult;
+        
+        // Phase 3: Post-clearing scan
+        console.log('📊 Phase 3: Scanning cache layers after clearing...');
+        report.phases.postScan = await this.scanAllCacheLayers();
+        report.summary.totalKeysAfter = this.countTotalKeys(report.phases.postScan);
+        report.summary.clearedKeys = report.summary.totalKeysBefore - report.summary.totalKeysAfter;
+        
+        // Phase 4: Verification and test data insertion
+        console.log('✅ Phase 4: Verifying cache system functionality...');
+        report.phases.verification = await this.verifyCacheFunctionality();
+        report.summary.verificationPassed = report.phases.verification.success;
+        
+        // Update stats
+        await this.updateStats();
+        
+        console.log('✅ Complete cache verification process finished');
+        return report;
+        
+    } catch (error) {
+        console.error('❌ Cache verification process failed:', error);
+        return {
+            timestamp: new Date().toISOString(),
+            success: false,
+            error: error.message,
+            summary: { verificationPassed: false, errors: [error.message] }
+        };
+    }
+};
+
+/**
+ * Scan all cache layers and return detailed information
+ * @returns {Promise<Object>} Detailed scan results
+ */
+UnifiedCacheManager.prototype.scanAllCacheLayers = async function() {
+    const scanResults = {
+        memory: { keys: [], count: 0, size: 0 },
+        localStorage: { keys: [], count: 0, size: 0 },
+        sessionStorage: { keys: [], count: 0, size: 0 },
+        indexedDB: { databases: [], count: 0, size: 0 },
+        browserCache: { caches: [], count: 0, size: 0 },
+        specificKeys: { keys: [], count: 0, size: 0 }
+    };
+    
+    try {
+        // Scan memory cache
+        if (this.memoryCache) {
+            scanResults.memory.keys = Object.keys(this.memoryCache);
+            scanResults.memory.count = scanResults.memory.keys.length;
+            scanResults.memory.size = JSON.stringify(this.memoryCache).length;
+        }
+        
+        // Scan localStorage
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key) {
+                scanResults.localStorage.keys.push(key);
+                scanResults.localStorage.size += localStorage.getItem(key).length;
+            }
+        }
+        scanResults.localStorage.count = scanResults.localStorage.keys.length;
+        
+        // Scan sessionStorage
+        for (let i = 0; i < sessionStorage.length; i++) {
+            const key = sessionStorage.key(i);
+            if (key) {
+                scanResults.sessionStorage.keys.push(key);
+                scanResults.sessionStorage.size += sessionStorage.getItem(key).length;
+            }
+        }
+        scanResults.sessionStorage.count = scanResults.sessionStorage.keys.length;
+        
+        // Scan IndexedDB - separate cache and historical data
+        if ('indexedDB' in window) {
+            const cacheDatabases = ['unified-cache', 'tiktrack-cache']; // Cache only
+            const historicalDatabases = ['tiktrack-data', 'notifications-history', 'file-mappings', 'linter-results', 'js-analysis']; // Historical data
+            
+            // Scan cache databases
+            for (const dbName of cacheDatabases) {
+                try {
+                    const dbInfo = await new Promise((resolve) => {
+                        const req = indexedDB.open(dbName);
+                        req.onsuccess = () => {
+                            const db = req.result;
+                            let hasData = false;
+                            let totalSize = 0;
+                            
+                            // Check if database has any data
+                            if (db.objectStoreNames.length > 0) {
+                                const transaction = db.transaction(db.objectStoreNames, 'readonly');
+                                let completedStores = 0;
+                                
+                                for (let i = 0; i < db.objectStoreNames.length; i++) {
+                                    const storeName = db.objectStoreNames[i];
+                                    const store = transaction.objectStore(storeName);
+                                    const countReq = store.count();
+                                    
+                                    countReq.onsuccess = () => {
+                                        if (countReq.result > 0) {
+                                            hasData = true;
+                                            totalSize += countReq.result;
+                                        }
+                                        completedStores++;
+                                        
+                                        if (completedStores === db.objectStoreNames.length) {
+                                            db.close();
+                                            resolve({ exists: true, hasData, totalSize, type: 'cache' });
+                                        }
+                                    };
+                                    
+                                    countReq.onerror = () => {
+                                        completedStores++;
+                                        if (completedStores === db.objectStoreNames.length) {
+                                            db.close();
+                                            resolve({ exists: true, hasData: false, totalSize: 0, type: 'cache' });
+                                        }
+                                    };
+                                }
+                            } else {
+                                db.close();
+                                resolve({ exists: true, hasData: false, totalSize: 0, type: 'cache' });
+                            }
+                        };
+                        req.onerror = () => resolve({ exists: false, hasData: false, totalSize: 0, type: 'cache' });
+                    });
+                    
+                    if (dbInfo.exists && dbInfo.hasData) {
+                        scanResults.indexedDB.databases.push(`[CACHE] ${dbName} (${dbInfo.totalSize} entries)`);
+                        scanResults.indexedDB.count++;
+                        scanResults.indexedDB.size += dbInfo.totalSize;
+                    }
+                } catch (error) {
+                    console.warn(`⚠️ Error checking IndexedDB cache ${dbName}:`, error);
+                }
+            }
+            
+            // Scan historical databases (for reporting only - not cleared)
+            for (const dbName of historicalDatabases) {
+                try {
+                    const dbInfo = await new Promise((resolve) => {
+                        const req = indexedDB.open(dbName);
+                        req.onsuccess = () => {
+                            const db = req.result;
+                            let hasData = false;
+                            let totalSize = 0;
+                            
+                            // Check if database has any data
+                            if (db.objectStoreNames.length > 0) {
+                                const transaction = db.transaction(db.objectStoreNames, 'readonly');
+                                let completedStores = 0;
+                                
+                                for (let i = 0; i < db.objectStoreNames.length; i++) {
+                                    const storeName = db.objectStoreNames[i];
+                                    const store = transaction.objectStore(storeName);
+                                    const countReq = store.count();
+                                    
+                                    countReq.onsuccess = () => {
+                                        if (countReq.result > 0) {
+                                            hasData = true;
+                                            totalSize += countReq.result;
+                                        }
+                                        completedStores++;
+                                        
+                                        if (completedStores === db.objectStoreNames.length) {
+                                            db.close();
+                                            resolve({ exists: true, hasData, totalSize, type: 'historical' });
+                                        }
+                                    };
+                                    
+                                    countReq.onerror = () => {
+                                        completedStores++;
+                                        if (completedStores === db.objectStoreNames.length) {
+                                            db.close();
+                                            resolve({ exists: true, hasData: false, totalSize: 0, type: 'historical' });
+                                        }
+                                    };
+                                }
+                            } else {
+                                db.close();
+                                resolve({ exists: true, hasData: false, totalSize: 0, type: 'historical' });
+                            }
+                        };
+                        req.onerror = () => resolve({ exists: false, hasData: false, totalSize: 0, type: 'historical' });
+                    });
+                    
+                    if (dbInfo.exists && dbInfo.hasData) {
+                        scanResults.indexedDB.databases.push(`[HISTORICAL] ${dbName} (${dbInfo.totalSize} entries) - PRESERVED`);
+                        scanResults.indexedDB.count++;
+                        scanResults.indexedDB.size += dbInfo.totalSize;
+                    }
+                } catch (error) {
+                    console.warn(`⚠️ Error checking IndexedDB historical ${dbName}:`, error);
+                }
+            }
+        }
+        
+        // Scan Browser Cache
+        if ('caches' in window) {
+            try {
+                const cacheNames = await caches.keys();
+                scanResults.browserCache.caches = cacheNames;
+                scanResults.browserCache.count = cacheNames.length;
+            } catch (error) {
+                console.warn('⚠️ Error scanning browser cache:', error);
+            }
+        }
+        
+        // Scan specific cache keys
+        const cacheKeys = [
+            'user-preferences', 'ui-state', 'filter-state', 'notifications-history',
+            'file-mappings', 'linter-results', 'js-analysis', 'market-data',
+            'trade-data', 'dashboard-data'
+        ];
+        
+        for (const key of cacheKeys) {
+            if (localStorage.getItem(key) || sessionStorage.getItem(key)) {
+                scanResults.specificKeys.keys.push(key);
+                scanResults.specificKeys.count++;
+            }
+        }
+        
+    } catch (error) {
+        console.error('❌ Error during cache scan:', error);
+    }
+    
+    return scanResults;
+};
+
+/**
+ * Count total keys across all layers
+ * @param {Object} scanResults - Results from scanAllCacheLayers
+ * @returns {number} Total key count
+ */
+UnifiedCacheManager.prototype.countTotalKeys = function(scanResults) {
+    return scanResults.memory.count +
+           scanResults.localStorage.count +
+           scanResults.sessionStorage.count +
+           scanResults.indexedDB.count +
+           scanResults.browserCache.count +
+           scanResults.specificKeys.count;
+};
+
+/**
+ * Verify cache system functionality by testing read/write operations
+ * @returns {Promise<Object>} Verification results
+ */
+UnifiedCacheManager.prototype.verifyCacheFunctionality = async function() {
+    const testResults = {
+        success: true,
+        tests: [],
+        errors: []
+    };
+    
+    try {
+        // Test 1: Memory cache
+        const testKey1 = 'cache-verification-test-memory';
+        const testValue1 = { timestamp: Date.now(), test: 'memory-cache' };
+        
+        try {
+            await this.save(testKey1, testValue1, { layer: 'memory' });
+            const retrieved1 = await this.get(testKey1);
+            if (retrieved1 && retrieved1.test === 'memory-cache') {
+                testResults.tests.push({ name: 'Memory Cache', status: 'PASS' });
+            } else {
+                testResults.tests.push({ name: 'Memory Cache', status: 'FAIL', error: 'Retrieved value mismatch' });
+                testResults.success = false;
+            }
+            await this.remove(testKey1);
+        } catch (error) {
+            testResults.tests.push({ name: 'Memory Cache', status: 'FAIL', error: error.message });
+            testResults.success = false;
+        }
+        
+        // Test 2: localStorage
+        const testKey2 = 'cache-verification-test-localStorage';
+        const testValue2 = { timestamp: Date.now(), test: 'localStorage' };
+        
+        try {
+            await this.save(testKey2, testValue2, { layer: 'localStorage' });
+            const retrieved2 = await this.get(testKey2);
+            if (retrieved2 && retrieved2.test === 'localStorage') {
+                testResults.tests.push({ name: 'localStorage', status: 'PASS' });
+            } else {
+                testResults.tests.push({ name: 'localStorage', status: 'FAIL', error: 'Retrieved value mismatch' });
+                testResults.success = false;
+            }
+            await this.remove(testKey2);
+        } catch (error) {
+            testResults.tests.push({ name: 'localStorage', status: 'FAIL', error: error.message });
+            testResults.success = false;
+        }
+        
+        // Test 3: IndexedDB (if available)
+        if (this.layers.indexedDB && this.layers.indexedDB.initialized) {
+            const testKey3 = 'cache-verification-test-indexedDB';
+            const testValue3 = { timestamp: Date.now(), test: 'indexedDB' };
+            
+            try {
+                await this.save(testKey3, testValue3, { layer: 'indexedDB' });
+                const retrieved3 = await this.get(testKey3);
+                if (retrieved3 && retrieved3.test === 'indexedDB') {
+                    testResults.tests.push({ name: 'IndexedDB', status: 'PASS' });
+                } else {
+                    testResults.tests.push({ name: 'IndexedDB', status: 'FAIL', error: 'Retrieved value mismatch' });
+                    testResults.success = false;
+                }
+                await this.remove(testKey3);
+            } catch (error) {
+                testResults.tests.push({ name: 'IndexedDB', status: 'FAIL', error: error.message });
+                testResults.success = false;
+            }
+        } else {
+            testResults.tests.push({ name: 'IndexedDB', status: 'SKIP', error: 'IndexedDB not available or not initialized' });
+        }
+        
+        // Test 4: Backend cache (if available)
+        if (this.layers.backend && this.layers.backend.initialized) {
+            const testKey4 = 'cache-verification-test-backend';
+            const testValue4 = { timestamp: Date.now(), test: 'backend' };
+            
+            try {
+                await this.save(testKey4, testValue4, { layer: 'backend' });
+                const retrieved4 = await this.get(testKey4);
+                if (retrieved4 && retrieved4.test === 'backend') {
+                    testResults.tests.push({ name: 'Backend Cache', status: 'PASS' });
+                } else {
+                    testResults.tests.push({ name: 'Backend Cache', status: 'FAIL', error: 'Retrieved value mismatch' });
+                    testResults.success = false;
+                }
+                await this.remove(testKey4);
+            } catch (error) {
+                testResults.tests.push({ name: 'Backend Cache', status: 'FAIL', error: error.message });
+                testResults.success = false;
+            }
+        }
+        
+        // Test 5: Layer selection logic
+        try {
+            const testKey5 = 'cache-verification-test-auto-layer';
+            const testValue5 = { timestamp: Date.now(), test: 'auto-layer', data: 'x'.repeat(1000) }; // >1KB to test layer selection
+            
+            await this.save(testKey5, testValue5); // Let system choose layer
+            const retrieved5 = await this.get(testKey5);
+            if (retrieved5 && retrieved5.test === 'auto-layer') {
+                testResults.tests.push({ name: 'Auto Layer Selection', status: 'PASS' });
+            } else {
+                testResults.tests.push({ name: 'Auto Layer Selection', status: 'FAIL', error: 'Auto layer selection failed' });
+                testResults.success = false;
+            }
+            await this.remove(testKey5);
+        } catch (error) {
+            testResults.tests.push({ name: 'Auto Layer Selection', status: 'FAIL', error: error.message });
+            testResults.success = false;
+        }
+        
+    } catch (error) {
+        testResults.success = false;
+        testResults.errors.push(error.message);
+        console.error('❌ Cache functionality verification failed:', error);
+    }
+    
+    return testResults;
+};
+
+/**
+ * Refresh data from backend database for all systems
+ * @returns {Promise<Object>} Refresh results
+ */
+UnifiedCacheManager.prototype.refreshDataFromBackend = async function() {
+    const refreshResults = {
+        success: true,
+        refreshedSystems: [],
+        errors: []
+    };
+    
+    try {
+        console.log('🔄 Starting data refresh from backend database...');
+        
+        // 1. Refresh trading data
+        try {
+            await this.refreshTradingData();
+            refreshResults.refreshedSystems.push('Trading Data');
+            console.log('✅ Trading data refreshed');
+        } catch (error) {
+            console.warn('⚠️ Failed to refresh trading data:', error);
+            refreshResults.errors.push(`Trading Data: ${error.message}`);
+        }
+        
+        // 2. Refresh market data
+        try {
+            await this.refreshMarketData();
+            refreshResults.refreshedSystems.push('Market Data');
+            console.log('✅ Market data refreshed');
+        } catch (error) {
+            console.warn('⚠️ Failed to refresh market data:', error);
+            refreshResults.errors.push(`Market Data: ${error.message}`);
+        }
+        
+        // 3. Refresh user preferences
+        try {
+            await this.refreshUserPreferences();
+            refreshResults.refreshedSystems.push('User Preferences');
+            console.log('✅ User preferences refreshed');
+        } catch (error) {
+            console.warn('⚠️ Failed to refresh user preferences:', error);
+            refreshResults.errors.push(`User Preferences: ${error.message}`);
+        }
+        
+        // 4. Refresh UI state
+        try {
+            await this.refreshUIState();
+            refreshResults.refreshedSystems.push('UI State');
+            console.log('✅ UI state refreshed');
+        } catch (error) {
+            console.warn('⚠️ Failed to refresh UI state:', error);
+            refreshResults.errors.push(`UI State: ${error.message}`);
+        }
+        
+        // 5. Refresh notifications
+        try {
+            await this.refreshNotifications();
+            refreshResults.refreshedSystems.push('Notifications');
+            console.log('✅ Notifications refreshed');
+        } catch (error) {
+            console.warn('⚠️ Failed to refresh notifications:', error);
+            refreshResults.errors.push(`Notifications: ${error.message}`);
+        }
+        
+        if (refreshResults.errors.length > 0) {
+            refreshResults.success = false;
+        }
+        
+        console.log('✅ Data refresh from backend completed');
+        return refreshResults;
+        
+    } catch (error) {
+        console.error('❌ Data refresh from backend failed:', error);
+        return {
+            success: false,
+            refreshedSystems: [],
+            errors: [error.message]
+        };
+    }
+};
+
+/**
+ * Refresh trading data from backend
+ */
+UnifiedCacheManager.prototype.refreshTradingData = async function() {
+    try {
+        // Clear trading-related cache keys
+        const tradingKeys = ['trade-data', 'trades', 'executions', 'trade_plans'];
+        tradingKeys.forEach(key => {
+            this.remove(key);
+        });
+        
+        // Trigger data reload by dispatching custom events
+        if (typeof window.dispatchEvent === 'function') {
+            window.dispatchEvent(new CustomEvent('tiktrack:refresh-trading-data', {
+                detail: { source: 'cache-clear' }
+            }));
+        }
+        
+        // If specific systems are available, refresh them
+        if (typeof window.refreshTradingData === 'function') {
+            await window.refreshTradingData();
+        }
+        
+    } catch (error) {
+        console.warn('⚠️ Error refreshing trading data:', error);
+        throw error;
+    }
+};
+
+/**
+ * Refresh market data from backend
+ */
+UnifiedCacheManager.prototype.refreshMarketData = async function() {
+    try {
+        // Clear market-related cache keys
+        const marketKeys = ['market-data', 'tickers', 'quotes'];
+        marketKeys.forEach(key => {
+            this.remove(key);
+        });
+        
+        // Trigger data reload
+        if (typeof window.dispatchEvent === 'function') {
+            window.dispatchEvent(new CustomEvent('tiktrack:refresh-market-data', {
+                detail: { source: 'cache-clear' }
+            }));
+        }
+        
+        // If specific systems are available, refresh them
+        if (typeof window.refreshMarketData === 'function') {
+            await window.refreshMarketData();
+        }
+        
+    } catch (error) {
+        console.warn('⚠️ Error refreshing market data:', error);
+        throw error;
+    }
+};
+
+/**
+ * Refresh user preferences from backend
+ */
+UnifiedCacheManager.prototype.refreshUserPreferences = async function() {
+    try {
+        // Clear preferences cache
+        this.remove('user-preferences');
+        
+        // Trigger preferences reload
+        if (typeof window.dispatchEvent === 'function') {
+            window.dispatchEvent(new CustomEvent('tiktrack:refresh-preferences', {
+                detail: { source: 'cache-clear' }
+            }));
+        }
+        
+        // If preferences system is available, refresh it
+        if (typeof window.refreshUserPreferences === 'function') {
+            await window.refreshUserPreferences();
+        }
+        
+    } catch (error) {
+        console.warn('⚠️ Error refreshing user preferences:', error);
+        throw error;
+    }
+};
+
+/**
+ * Refresh UI state from backend
+ */
+UnifiedCacheManager.prototype.refreshUIState = async function() {
+    try {
+        // Clear UI state cache
+        this.remove('ui-state');
+        this.remove('filter-state');
+        
+        // Trigger UI state reload
+        if (typeof window.dispatchEvent === 'function') {
+            window.dispatchEvent(new CustomEvent('tiktrack:refresh-ui-state', {
+                detail: { source: 'cache-clear' }
+            }));
+        }
+        
+        // If UI state system is available, refresh it
+        if (typeof window.refreshUIState === 'function') {
+            await window.refreshUIState();
+        }
+        
+    } catch (error) {
+        console.warn('⚠️ Error refreshing UI state:', error);
+        throw error;
+    }
+};
+
+/**
+ * Refresh notifications from backend
+ */
+UnifiedCacheManager.prototype.refreshNotifications = async function() {
+    try {
+        // Clear notifications cache
+        this.remove('notifications-history');
+        
+        // Trigger notifications reload
+        if (typeof window.dispatchEvent === 'function') {
+            window.dispatchEvent(new CustomEvent('tiktrack:refresh-notifications', {
+                detail: { source: 'cache-clear' }
+            }));
+        }
+        
+        // If notifications system is available, refresh it
+        if (typeof window.refreshNotifications === 'function') {
+            await window.refreshNotifications();
+        }
+        
+    } catch (error) {
+        console.warn('⚠️ Error refreshing notifications:', error);
+        throw error;
+    }
+};
+
+// ===== GLOBAL FUNCTION EXPORTS =====
+
+// Export functions to global scope for backward compatibility
+window.clearAllUnifiedCache = async function(options = {}) {
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+        return await window.UnifiedCacheManager.clearAllCacheDetailed(options);
+    } else {
+        console.warn('⚠️ UnifiedCacheManager not initialized');
+        return { success: false, error: 'UnifiedCacheManager not initialized' };
+    }
+};
+
+window.clearAllUnifiedCacheQuick = async function(options = {}) {
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+        return await window.UnifiedCacheManager.clearAllCacheQuick(options);
+    } else {
+        console.warn('⚠️ UnifiedCacheManager not initialized');
+        return { success: false, error: 'UnifiedCacheManager not initialized' };
+    }
+};
+
+window.verifyCacheSystem = async function(options = {}) {
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+        return await window.UnifiedCacheManager.verifyCacheSystem(options);
+    } else {
+        console.warn('⚠️ UnifiedCacheManager not initialized');
+        return { success: false, error: 'UnifiedCacheManager not initialized' };
+    }
+};
+
 console.log('📦 Unified Cache Manager loaded');

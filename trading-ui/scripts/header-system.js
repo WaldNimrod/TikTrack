@@ -2084,6 +2084,7 @@ window.clearStaticFilesCache = async function(event) {
 
 /**
  * ניקוי זיכרון מלא ועמוק - תפריט משנה
+ * משתמש באותו תהליך כמו בעמוד בדיקת המטמון אבל עם הודעה פשוטה וריענון אוטומטי
  */
 window.clearUnifiedCacheDeep = async function(event) {
     if (event) {
@@ -2093,111 +2094,34 @@ window.clearUnifiedCacheDeep = async function(event) {
     console.log('🧠 ניקוי זיכרון מלא ועמוק...');
     
     try {
-        // ניקוי מלא של כל שכבות המטמון המאוחד
-        if (window.UnifiedCacheManager) {
-            await window.UnifiedCacheManager.clear('all');
-            console.log('✅ ניקוי מלא של Unified Cache הושלם');
-        }
-        
-        // ניקוי localStorage מלא
-        localStorage.clear();
-        console.log('✅ ניקוי localStorage מלא הושלם');
-        
-        // ניקוי sessionStorage
-        sessionStorage.clear();
-        console.log('✅ ניקוי sessionStorage הושלם');
-        
-        // ניקוי IndexedDB אם זמין - גישה פשוטה יותר
-        if ('indexedDB' in window) {
-            try {
-                // ניקוי מסדי נתונים ידועים
-                const knownDatabases = ['unified-cache', 'tiktrack-cache', 'tiktrack-data'];
-                
-                await Promise.all(
-                    knownDatabases.map(dbName => {
-                        return new Promise((resolve, reject) => {
-                            const deleteReq = indexedDB.deleteDatabase(dbName);
-                            deleteReq.onsuccess = () => {
-                                console.log(`✅ ניקוי IndexedDB: ${dbName}`);
-                                resolve();
-                            };
-                            deleteReq.onerror = () => {
-                                console.warn(`⚠️ ניקוי IndexedDB נכשל: ${dbName}`, deleteReq.error);
-                                resolve(); // ממשיכים גם אם נכשל
-                            };
-                            deleteReq.onblocked = () => {
-                                console.warn(`⚠️ IndexedDB חסום: ${dbName}`);
-                                resolve(); // ממשיכים גם אם חסום
-                            };
-                        });
-                    })
+        // השתמש בפונקציה המהירה של מערכת המטמון המאוחדת
+        if (typeof window.clearAllUnifiedCacheQuick === 'function') {
+            const result = await window.clearAllUnifiedCacheQuick();
+            
+            if (result.success) {
+                console.log('✅ ניקוי זיכרון מלא ועמוק הושלם בהצלחה - ריענון אוטומטי בעוד 1.5 שניות');
+            } else {
+                throw new Error(result.error || 'ניקוי מטמון נכשל');
+            }
+        } else {
+            // fallback לניקוי בסיסי אם הפונקציה לא זמינה
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            if (typeof window.showNotification === 'function') {
+                window.showNotification(
+                    'ניקוי מטמון בסיסי הושלם',
+                    'success',
+                    'ניקוי מטמון',
+                    3000,
+                    'development'
                 );
-                console.log('✅ ניקוי IndexedDB הושלם');
-            } catch (idbError) {
-                console.warn('⚠️ ניקוי IndexedDB נכשל:', idbError);
-            }
-        }
-        
-        // ניקוי cache של הדפדפן
-        if ('caches' in window) {
-            const cacheNames = await caches.keys();
-            await Promise.all(
-                cacheNames.map(cacheName => caches.delete(cacheName))
-            );
-            console.log('✅ ניקוי cache דפדפן מלא הושלם');
-        }
-        
-        // ניקוי memory leaks אפשריים
-        if (window.gc && typeof window.gc === 'function') {
-            window.gc();
-            console.log('✅ Garbage collection הופעל');
-        }
-        
-        // ניקוי נוסף של אובייקטים גלובליים
-        try {
-            // ניקוי cache של fetch אם קיים
-            if (window.fetch && window.fetch.cache) {
-                window.fetch.cache.clear();
-                console.log('✅ ניקוי fetch cache הושלם');
             }
             
-            // ניקוי cache של מערכת ההתראות אם קיים
-            if (window.notificationCache && typeof window.notificationCache.clear === 'function') {
-                window.notificationCache.clear();
-                console.log('✅ ניקוי notification cache הושלם');
-            }
-            
-            // ניקוי cache של העדפות אם קיים
-            if (window.preferencesCache && typeof window.preferencesCache.clear === 'function') {
-                await window.preferencesCache.clear();
-                console.log('✅ ניקוי preferences cache הושלם');
-            }
-            
-        } catch (cleanupError) {
-            console.warn('⚠️ שגיאה בניקוי נוסף:', cleanupError);
+            setTimeout(() => {
+                window.location.reload(true);
+            }, 1500);
         }
-        
-        // הודעה מפורטת על מה שנוקה
-        const cleanedItems = [
-            'Unified Cache (כל השכבות)',
-            'localStorage',
-            'sessionStorage', 
-            'IndexedDB',
-            'Browser Cache',
-            'Garbage Collection'
-        ];
-        
-        if (typeof window.showNotification === 'function') {
-            window.showNotification(
-                `ניקוי עמוק הושלם: ${cleanedItems.join(', ')}`, 
-                'success', 
-                'ניקוי עמוק', 
-                7000, 
-                'development'
-            );
-        }
-        
-        console.log('✅ ניקוי זיכרון מלא ועמוק הושלם בהצלחה');
         
     } catch (error) {
         console.error('❌ שגיאה בניקוי זיכרון עמוק:', error);

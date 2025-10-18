@@ -44,6 +44,12 @@ class RealtimeNotificationsClient {
 
   init() {
     try {
+      // Check if WebSocket notifications are disabled
+      if (window.disableWebSocketNotifications === true) {
+        console.log('🔌 WebSocket notifications disabled by configuration');
+        return;
+      }
+      
       // Check if Socket.IO is available
       if (typeof io === 'undefined') {
         // console.warn('Socket.IO not available, loading from CDN...');

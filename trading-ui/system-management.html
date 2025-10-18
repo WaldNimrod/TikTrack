@@ -88,22 +88,22 @@
                     <div class="section-header">
                         <h2>🔧 מנהל מערכת</h2>
                         <div class="header-actions">
-                            <button class="btn btn-sm btn-outline-success" id="quickRestartSystemBtn" title="איתחול מהיר של השרת">
+                            <button data-button-type="TOGGLE" data-classes="btn btn-sm btn-outline-success" data-attributes="id='quickRestartSystemBtn' title='איתחול מהיר של השרת'">
                                 <i class="fas fa-redo"></i> איתחול מהיר
                             </button>
-                            <button class="btn btn-sm btn-outline-warning" id="changeModeSystemBtn" title="שינוי מצב מטמון">
+                            <button data-button-type="TOGGLE" data-classes="btn btn-sm btn-outline-warning" data-attributes="id='changeModeSystemBtn' title='שינוי מצב מטמון'">
                                 <i class="fas fa-cogs"></i> מצב מטמון
                             </button>
-                            <button class="btn btn-sm btn-outline-info" id="openServerMonitorBtn" title="פתח דשבורד ניטור שרת">
+                            <button data-button-type="VIEW" data-classes="btn btn-sm btn-outline-info" data-attributes="id='openServerMonitorBtn' title='פתח דשבורד ניטור שרת'">
                                 <i class="fas fa-desktop"></i> ניטור שרת
                             </button>
-                            <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
+                            <button data-button-type="COPY" data-onclick="copyDetailedLog()" data-classes="btn btn-sm btn-outline-secondary" data-attributes="title='העתק לוג מפורט עם כל הנתונים והסטטוס'">
                                 <i class="fas fa-copy"></i> העתק לוג מפורט
                             </button>
-                            <button class="btn btn-sm btn-outline-primary" onclick="refreshSystemData()" title="רענן נתוני מערכת">
+                            <button data-button-type="REFRESH" data-onclick="refreshSystemData()" data-classes="btn btn-sm btn-outline-primary" data-attributes="title='רענן נתוני מערכת'">
                                 <i class="fas fa-sync-alt"></i> רענן
                             </button>
-                            <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
+                            <button data-button-type="TOGGLE" data-onclick="toggleAllSections()" data-classes="filter-toggle-btn" data-attributes="title='הצג/הסתר כל הסקשנים'">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -172,76 +172,10 @@
                                         
                                         <!-- כפתורי פעולה מהירה -->
                                         <div class="quick-actions">
-                                            <button class="btn btn-primary btn-sm" onclick="refreshSystemData()">
+                                            <button data-button-type="REFRESH" data-onclick="refreshSystemData()" data-classes="btn btn-primary btn-sm">
                                                 🔄 רענן נתונים
                                             </button>
-                                            <button class="btn btn-success btn-sm" onclick="runSystemCheck()">
-                                                🔍 בדיקת מערכת
-                                            </button>
-                                            <button class="btn btn-info btn-sm" onclick="clearCache()">
-                                                🗑️ נקה מטמון
-                                            </button>
-                                            <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()">
-                                                <i class="fas fa-copy"></i> העתק לוג מפורט
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- ביצועי מערכת - Info Summary נוף -->
-                        <h4 class="section-subtitle">📈 ביצועי מערכת</h4>
-                        <div class="info-summary performance-overview" id="performanceSummary">
-                            <div class="summary-item">
-                                <span class="summary-label">💻 מעבד:</span>
-                                <span class="summary-value" id="cpuUsage">טוען...</span>
-                            </div>
-                            <div class="summary-item">
-                                <span class="summary-label">🧠 זיכרון:</span>
-                                <span class="summary-value" id="memoryUsage">טוען...</span>
-                            </div>
-                            <div class="summary-item">
-                                <span class="summary-label">💾 אחסון:</span>
-                                <span class="summary-value" id="diskUsage">טוען...</span>
-                            </div>
-                            <div class="summary-item">
-                                <span class="summary-label">🌐 רשת:</span>
-                                <span class="summary-value" id="networkStatus">טוען...</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- UI Content Section Top End -->  
-
-                <!-- UI Content Section Cursor Tasks Start-->
-                <div class="content-section" id="cursorTasksSystemSection">
-                    <div class="section-header">
-                        <h2>🎮 Cursor Tasks Integration</h2>
-                        <div class="section-actions">
-                            <button class="btn btn-sm btn-outline-primary" id="openAllDashboardsSystemBtn" title="פתח כל הדשבורדים">
-                                <i class="fas fa-external-link-alt"></i> כל הדשבורדים
-                            </button>
-                        </div>
-                        <button class="filter-toggle-btn" onclick="toggleSection('cursorTasksSystemSection')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
-                    </div>
-                    <div class="section-body">
-                        <!-- Cursor Tasks Integration -->
-                        <div class="row g-4">
-                            <div class="col-md-4">
-                                <div class="card h-100">
-                                    <div class="card-header">
-                                        <h5 class="card-title mb-0">
-                                            <i class="fas fa-rocket text-success"></i> פעולות מהירות
-                                        </h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="d-grid gap-2">
-                                            <button class="btn btn-success" id="quickStartSystemBtn">
-                                                <i class="fas fa-play"></i> התחלה מהירה
-                                            </button>
+                                            <button data-button-type="PLAY" data-classes="btn btn-success" data-text="התחלה"></button>
                                             <button class="btn btn-warning" id="quickRestartSystemBtn2">
                                                 <i class="fas fa-redo"></i> איתחול מהיר
                                             </button>
@@ -787,6 +721,10 @@
     
     <!-- Unified Log System -->
     <!-- Socket.IO for Real-time Notifications -->
+    <script>
+        // Disable WebSocket notifications for system management page
+        window.disableWebSocketNotifications = true;
+    </script>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script src="scripts/realtime-notifications-client.js"></script>
     

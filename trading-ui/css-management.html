@@ -76,10 +76,10 @@
                     <div class="section-header">
                         <h2>🎨 ניהול CSS</h2>
                         <div class="header-actions">
-                            <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט">
+                            <button data-button-type="COPY" data-onclick="copyDetailedLog()" data-classes="btn btn-sm btn-outline-secondary" data-attributes="title='העתק לוג מפורט'">
                                 <i class="fas fa-copy"></i> העתק לוג מפורט
                             </button>
-                            <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
+                            <button data-button-type="TOGGLE" data-onclick="toggleAllSections()" data-classes="filter-toggle-btn" data-attributes="title='הצג/הסתר כל הסקשנים'">
                                 ${createToggleButton("toggleSection('top')", "הצג/הסתר סקשן")}
                             </button>
                         </div>
@@ -100,7 +100,7 @@
                 <div class="content-section" id="section1">
                     <div class="section-header">
                         <h2>📊 סטטיסטיקות CSS</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
+                        <button data-button-type="TOGGLE" data-onclick="toggleSection('section1')" data-classes="filter-toggle-btn" data-attributes="title='הצג/הסתר סקשן'">
                             ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
                         </button>
                     </div>
@@ -148,7 +148,7 @@
                 <div class="content-section" id="section2">
                     <div class="section-header">
                         <h2>🎯 ניהול שכבות</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
+                        <button data-button-type="TOGGLE" data-onclick="toggleSection('section2')" data-classes="filter-toggle-btn" data-attributes="title='הצג/הסתר סקשן'">
                             ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
                         </button>
                     </div>
@@ -202,7 +202,7 @@
                     <div class="section-header">
                         <h2>📁 קבצי CSS</h2>
                         <div class="header-actions">
-                            <button class="btn btn-sm btn-outline-success" onclick="loadCssFilesList()" title="רענן רשימת קבצים">
+                            <button data-button-type="REFRESH" data-onclick="loadCssFilesList()" data-classes="btn btn-sm btn-outline-success" data-attributes="title='רענן רשימת קבצים'">
                                 <i class="fas fa-sync"></i> רענן
                             </button>
                             <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">

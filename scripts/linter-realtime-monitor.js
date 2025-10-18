@@ -3968,7 +3968,7 @@ function clearFiltersBtn() {
 window.addLogEntry = addLogEntry;
 window.getSelectedFileTypes = getSelectedFileTypes;
 window.scanJavaScriptFiles = scanJavaScriptFiles;
-window.copyDetailedLog = copyDetailedLog;
+// window.copyDetailedLog export removed - using local function only
 window.discoverProjectFiles = discoverProjectFiles;
 window.startFileScan = startFileScan;
 window.startMonitoring = startMonitoring;

@@ -1,0 +1,112 @@
+/* 
+ * Color Variables for Dynamic Button System
+ * משתני צבע למערכת כפתורים דינמית
+ */
+
+:root {
+    /* Action Button Colors - כפתורי פעולה */
+    --color-action-edit: #6c757d;      /* Gray for edit */
+    --color-action-delete: #dc3545;    /* Red for delete */
+    --color-action-add: #28a745;       /* Green for add */
+    --color-action-save: #28a745;      /* Green for save */
+    --color-action-cancel: #6c757d;    /* Gray for cancel */
+    --color-action-link: #17a2b8;      /* Cyan for link */
+    --color-action-close: #6c757d;     /* Gray for close */
+    --color-action-refresh: #6c757d;   /* Gray for refresh */
+    --color-action-export: #007bff;    /* Blue for export */
+    --color-action-import: #28a745;    /* Green for import */
+    --color-action-search: #17a2b8;    /* Cyan for search */
+    --color-action-filter: #6c757d;    /* Gray for filter */
+    --color-action-sort: #6c757d;      /* Gray for sort */
+    --color-action-toggle: #ffc107;    /* Yellow for toggle */
+    --color-action-copy: #6c757d;      /* Gray for copy */
+    --color-action-reactivate: #28a745; /* Green for reactivate */
+    
+    /* Button Variants - וריאציות כפתורים */
+    --button-height-small: 28px;
+    --button-height-normal: 32px;
+    --button-height-large: 36px;
+    
+    --button-padding-small: 4px 8px;
+    --button-padding-normal: 6px 12px;
+    --button-padding-large: 8px 16px;
+    
+    --button-font-size-small: 12px;
+    --button-font-size-normal: 14px;
+    --button-font-size-large: 16px;
+    
+    --button-icon-size-small: 14px;
+    --button-icon-size-normal: 16px;
+    --button-icon-size-large: 18px;
+}
+
+/* Dynamic Button Classes - מחלקות כפתורים דינמיות */
+.btn-dynamic-edit {
+    background-color: var(--color-action-edit);
+    border-color: var(--color-action-edit);
+    color: white;
+}
+
+.btn-dynamic-delete {
+    background-color: var(--color-action-delete);
+    border-color: var(--color-action-delete);
+    color: white;
+}
+
+.btn-dynamic-add {
+    background-color: var(--color-action-add);
+    border-color: var(--color-action-add);
+    color: white;
+}
+
+.btn-dynamic-save {
+    background-color: var(--color-action-save);
+    border-color: var(--color-action-save);
+    color: white;
+}
+
+.btn-dynamic-cancel {
+    background-color: var(--color-action-cancel);
+    border-color: var(--color-action-cancel);
+    color: white;
+}
+
+.btn-dynamic-link {
+    background-color: var(--color-action-link);
+    border-color: var(--color-action-link);
+    color: white;
+}
+
+/* Button Size Variants - וריאציות גודל */
+.btn-small {
+    height: var(--button-height-small);
+    padding: var(--button-padding-small);
+    font-size: var(--button-font-size-small);
+}
+
+.btn-small i,
+.btn-small .icon {
+    font-size: var(--button-icon-size-small);
+}
+
+.btn-normal {
+    height: var(--button-height-normal);
+    padding: var(--button-padding-normal);
+    font-size: var(--button-font-size-normal);
+}
+
+.btn-normal i,
+.btn-normal .icon {
+    font-size: var(--button-icon-size-normal);
+}
+
+.btn-large {
+    height: var(--button-height-large);
+    padding: var(--button-padding-large);
+    font-size: var(--button-font-size-large);
+}
+
+.btn-large i,
+.btn-large .icon {
+    font-size: var(--button-icon-size-large);
+}

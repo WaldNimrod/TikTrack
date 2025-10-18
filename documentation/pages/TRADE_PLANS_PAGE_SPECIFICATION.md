@@ -1,12 +1,15 @@
 # אפיון עמוד Trade Plans
 **תאריך יצירה:** 18 אוקטובר 2025  
-**גרסה:** 2.0.6  
+**תאריך עדכון:** 19 אוקטובר 2025  
+**גרסה:** 3.0.0  
 **מפתח:** AI Assistant  
 
 ---
 
 ## תקציר
 עמוד Trade Plans הוא עמוד מרכזי במערכת TikTrack המאפשר ניהול תכנוני מסחר. העמוד מספק ממשק מקיף ליצירה, עריכה, מחיקה וניהול תכנוני מסחר עם אינטגרציה מלאה למערכות הכלליות של המערכת.
+
+**חדש בגרסה 3.0.0:** הוספת מערכת תנאים מתקדמת המאפשרת הגדרת תנאים מותאמים אישית לתכניות מסחר עם 6 שיטות מסחר שונות (ממוצעים נעים, נפח, תמיכה והתנגדות, קווי מגמה, מבנים טכניים, פיבונצי).
 
 ---
 
@@ -17,11 +20,16 @@
 trading-ui/
 ├── trade_plans.html          # מבנה ה-HTML הראשי
 ├── scripts/
-│   └── trade_plans.js        # לוגיקת העמוד והפונקציונליות
+│   ├── trade_plans.js        # לוגיקת העמוד והפונקציונליות
+│   └── conditions/           # מערכת התנאים
+│       ├── conditions-translations.js
+│       ├── condition-validator.js
+│       └── condition-builder.js
 └── styles-new/               # עיצוב ITCSS
     ├── 05-objects/_layout.css
     ├── 06-components/_buttons-advanced.css
-    └── 06-components/_linked-items.css
+    ├── 06-components/_linked-items.css
+    └── 06-components/_conditions-system.css
 ```
 
 ### 2. מבנה HTML
@@ -112,6 +120,11 @@ trading-ui/
 - **תיעוד:** `documentation/02-ARCHITECTURE/FRONTEND/ERROR_HANDLING_SYSTEM.md`
 - **פונקציונליות:** טיפול אחיד בשגיאות, logging
 
+#### מערכת התנאים (חדש בגרסה 3.0.0)
+- **קובץ:** `scripts/conditions/condition-builder.js`
+- **תיעוד:** `documentation/02-ARCHITECTURE/FRONTEND/CONDITIONS_SYSTEM.md`
+- **פונקציונליות:** בניית תנאים מותאמים אישית, בחירת שיטות מסחר, הגדרת פרמטרים
+
 ---
 
 ## מבנה הנתונים
@@ -132,6 +145,45 @@ class TradePlan(db.Model):
     status = Column(String(20), default='open', nullable=False)  # open/closed/cancelled
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships
+    conditions = relationship("PlanCondition", back_populates="trade_plan", cascade="all, delete-orphan")
+```
+
+### 2. TradingMethod Model (Backend) - חדש בגרסה 3.0.0
+```python
+class TradingMethod(db.Model):
+    __tablename__ = "trading_methods"
+    id = Column(Integer, primary_key=True)
+    name_en = Column(String(100), unique=True, nullable=False)
+    name_he = Column(String(100), unique=True, nullable=False)
+    description_en = Column(Text, nullable=True)
+    description_he = Column(Text, nullable=True)
+    method_key = Column(String(50), unique=True, nullable=False)
+    is_active = Column(Boolean, default=True, nullable=False)
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    
+    # Relationships
+    parameters = relationship("MethodParameter", back_populates="method", cascade="all, delete-orphan")
+    plan_conditions = relationship("PlanCondition", back_populates="method")
+```
+
+### 3. PlanCondition Model (Backend) - חדש בגרסה 3.0.0
+```python
+class PlanCondition(db.Model):
+    __tablename__ = "plan_conditions"
+    id = Column(Integer, primary_key=True)
+    trade_plan_id = Column(Integer, ForeignKey('trade_plans.id'), nullable=False)
+    method_id = Column(Integer, ForeignKey('trading_methods.id'), nullable=False)
+    condition_group = Column(Integer, default=0, nullable=False)
+    parameters_json = Column(Text, nullable=False)
+    logical_operator = Column(String(10), default='NONE', nullable=False)
+    is_active = Column(Boolean, default=True, nullable=False)
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    
+    # Relationships
+    trade_plan = relationship("TradePlan", back_populates="conditions")
+    method = relationship("TradingMethod", back_populates="plan_conditions")
 ```
 
 ### 2. מבנה ה-JSON API
@@ -186,6 +238,27 @@ function updateTradePlansTable(trade_plans) {
 - **מחיקה:** `openDeleteTradePlanModal(id)`
 - **ביטול:** `cancelTradePlan(id)`
 
+### 4. מערכת התנאים (חדש בגרסה 3.0.0)
+```javascript
+// אתחול מערכת התנאים
+function initializeTradePlanConditionsSystem() {
+    // הגדרת מאזינים למודלים
+    // אתחול ConditionBuilder
+}
+
+// אתחול תנאים למודל ספציפי
+function initializeTradePlanConditions(mode, planId) {
+    // יצירת ConditionBuilder חדש
+    // טעינת תנאים קיימים (במצב edit)
+}
+
+// ניקוי מערכת התנאים
+function cleanupTradePlanConditions(mode) {
+    // שחרור זיכרון
+    // ניקוי מאזינים
+}
+```
+
 ### 4. ולידציה
 ```javascript
 const validationRules = {
@@ -229,6 +302,29 @@ const validationRules = {
 
 ### 4. DELETE /api/trade_plans/{id}
 - **תיאור:** מחיקת תכנון
+- **תגובה:** הודעת הצלחה
+
+### 5. GET /api/trading_methods/ (חדש בגרסה 3.0.0)
+- **תיאור:** קבלת רשימת שיטות מסחר זמינות
+- **תגובה:** רשימה של TradingMethod objects
+
+### 6. GET /api/plan_conditions?plan_id={id} (חדש בגרסה 3.0.0)
+- **תיאור:** קבלת תנאים של תכנון ספציפי
+- **פרמטרים:** `plan_id` - ID של התכנון
+- **תגובה:** רשימה של PlanCondition objects
+
+### 7. POST /api/plan_conditions/ (חדש בגרסה 3.0.0)
+- **תיאור:** יצירת תנאי חדש לתכנון
+- **body:** PlanCondition object
+- **תגובה:** PlanCondition object שנוצר
+
+### 8. PUT /api/plan_conditions/{id} (חדש בגרסה 3.0.0)
+- **תיאור:** עדכון תנאי קיים
+- **body:** PlanCondition object
+- **תגובה:** PlanCondition object מעודכן
+
+### 9. DELETE /api/plan_conditions/{id} (חדש בגרסה 3.0.0)
+- **תיאור:** מחיקת תנאי
 - **תגובה:** הודעת הצלחה
 
 ---
@@ -303,15 +399,23 @@ const validationRules = {
 - `scripts/linked-items.js`
 - `scripts/entity-details-modal.js`
 - `scripts/error-handlers.js`
+- `scripts/conditions/conditions-translations.js` (חדש בגרסה 3.0.0)
+- `scripts/conditions/condition-validator.js` (חדש בגרסה 3.0.0)
+- `scripts/conditions/condition-builder.js` (חדש בגרסה 3.0.0)
 
 ### קבצי CSS נדרשים:
 - `styles-new/05-objects/_layout.css`
 - `styles-new/06-components/_buttons-advanced.css`
 - `styles-new/06-components/_linked-items.css`
+- `styles-new/06-components/_conditions-system.css` (חדש בגרסה 3.0.0)
 
 ### קבצי Backend נדרשים:
 - `Backend/models/trade_plan.py`
 - `Backend/routes/api/trade_plans.py`
+- `Backend/models/trading_method.py` (חדש בגרסה 3.0.0)
+- `Backend/models/plan_condition.py` (חדש בגרסה 3.0.0)
+- `Backend/routes/api/trading_methods.py` (חדש בגרסה 3.0.0)
+- `Backend/routes/api/plan_conditions.py` (חדש בגרסה 3.0.0)
 
 ---
 
@@ -322,6 +426,9 @@ const validationRules = {
 3. **Cache:** הנתונים נשמרים ב-cache גלובלי (`window.tradePlansData`)
 4. **Real-time:** העמוד תומך בעדכונים בזמן אמת דרך מערכת הריענון המרכזית
 5. **Accessibility:** העמוד תומך בנגישות עם ARIA labels ותמיכה במקלדת
+6. **מערכת התנאים:** התנאים מאותחלים אוטומטית דרך המערכת המאוחדת (`unified-app-initializer.js`)
+7. **שיטות מסחר:** המערכת תומכת ב-6 שיטות מסחר: ממוצעים נעים, נפח, תמיכה והתנגדות, קווי מגמה, מבנים טכניים, פיבונצי
+8. **אינטגרציה עם התראות:** תנאים יכולים ליצור התראות אוטומטיות דרך מסך ההתראות
 
 ---
 

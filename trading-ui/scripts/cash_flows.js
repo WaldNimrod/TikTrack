@@ -915,8 +915,8 @@ async function renderCashFlowsTable() {
 
   cashFlowsData.forEach(cashFlow => {
     const row = document.createElement('tr');
-    // קבלת שם החשבון מ-trading_account_id
-    const accountName = getAccountNameById(cashFlow.trading_account_id) || `חשבון ${cashFlow.trading_account_id}`;
+    // קבלת שם החשבון - קודם ננסה מהשרת, אחר כך fallback
+    const accountName = cashFlow.account_name || getAccountNameById(cashFlow.trading_account_id) || `חשבון ${cashFlow.trading_account_id}`;
 
     // הצגת רק סמל המטבע
     const currencyDisplay = cashFlow.currency_symbol || '$';
@@ -2524,7 +2524,7 @@ window.confirmDeleteCashFlow = confirmDeleteCashFlow;
 
 // פונקציות לוג וניפוי שגיאות
 window.generateDetailedLog = generateDetailedLog;
-window.copyDetailedLog = copyDetailedLog;
+// window.copyDetailedLog export removed - using local function only
 
 // פונקציות טיפול בשגיאות מתקדמות
 window.handleApiError = handleApiError;

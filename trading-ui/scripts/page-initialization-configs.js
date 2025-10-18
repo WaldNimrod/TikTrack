@@ -92,6 +92,16 @@ const PAGE_CONFIGS = {
                         await window.loadTradesData();
                     }
                 }
+            },
+            async (pageConfig) => {
+                console.log('🔧 Initializing Trades Conditions System...');
+                
+                // Initialize conditions system for trades
+                if (typeof window.initializeTradeConditionsSystem === 'function') {
+                    window.initializeTradeConditionsSystem();
+                } else {
+                    console.warn('⚠️ Trades conditions system not available');
+                }
             }
         ]
     },
@@ -130,6 +140,16 @@ const PAGE_CONFIGS = {
                         await window.loadTradePlansData();
                     }
                 }
+            },
+            async (pageConfig) => {
+                console.log('🔧 Initializing Trade Plans Conditions System...');
+                
+                // Initialize conditions system for trade plans
+                if (typeof window.initializeTradePlanConditionsSystem === 'function') {
+                    window.initializeTradePlanConditionsSystem();
+                } else {
+                    console.warn('⚠️ Trade plans conditions system not available');
+                }
             }
         ]
     },
@@ -151,6 +171,16 @@ const PAGE_CONFIGS = {
                 // if (typeof window.setupAlertHandlers === 'function') {
                 //     window.setupAlertHandlers();
                 // }
+            },
+            async (pageConfig) => {
+                console.log('🔧 Initializing Alerts Conditions Integration...');
+                
+                // Initialize conditions integration for alerts
+                if (typeof window.initializeAlertModalTabs === 'function') {
+                    window.initializeAlertModalTabs();
+                } else {
+                    console.warn('⚠️ Alert modal tabs system not available');
+                }
             }
         ]
     },

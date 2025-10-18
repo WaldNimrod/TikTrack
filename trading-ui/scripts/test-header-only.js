@@ -821,7 +821,7 @@ function generateDetailedLog() {
 }
 
 // הוספת הפונקציה ל-window object
-window.copyDetailedLog = copyDetailedLog;
+// window.copyDetailedLog export removed - using local function only
 
 // פונקציה לפתיחה וסגירה של הסקשן העליון
 function toggleTopSection() {
@@ -885,7 +885,7 @@ async function copyDetailedLog() {
 }
 
 // Export functions
-window.copyDetailedLog = copyDetailedLog;
+// window.copyDetailedLog export removed - using local function only
 // window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 window.registerTablesWithFilterSystem = registerTablesWithFilterSystem;
 

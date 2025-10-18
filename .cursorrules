@@ -1,0 +1,22 @@
+# Cursor Rules for TikTrack Project
+
+## Documentation Rule - CRITICAL
+**כל הדוקומנטציה שלנו נמצאת תחת תקיית documentation/ בלבד - אין ליצור קבצי דוקומנטציה מחוץ לה.**
+
+This is a fundamental rule that ALL future chats must follow. Any documentation files (.md, .txt, .html documentation) must be created ONLY within the documentation/ directory.
+
+## Project Structure
+- All documentation: `documentation/` directory only
+- Code files: `Backend/`, `trading-ui/`, `scripts/`
+- Archive files: `archive/`, `backup/`
+
+## Key Systems
+- Unified Cache System: 4 layers (memory, localStorage, IndexedDB, backend)
+- Unified Initialization System: 5 stages
+- Conditions System: 6 trading methods
+- Total Systems: 97 systems (all documented)
+
+## Important Files
+- Main Index: `documentation/INDEX.md`
+- Pages List: `documentation/PAGES_LIST.md`
+- Working Rules: `documentation/DOCUMENTATION_WORKING_RULES.md`

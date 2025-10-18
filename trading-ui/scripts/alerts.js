@@ -2796,3 +2796,282 @@ async function copyDetailedLog() {
         }
     }
 }
+
+// ===== CONDITIONS INTEGRATION FUNCTIONS =====
+
+/**
+ * Load conditions from source type (trade_plan or trade)
+ */
+function loadConditionsFromSource() {
+    const sourceType = document.getElementById('conditionSourceType').value;
+    const sourceIdSelect = document.getElementById('conditionSourceId');
+    
+    if (!sourceType) {
+        sourceIdSelect.disabled = true;
+        sourceIdSelect.innerHTML = '<option value="">בחר קודם מקור</option>';
+        return;
+    }
+    
+    // Load items based on source type
+    if (sourceType === 'trade_plan') {
+        loadTradePlansForConditions();
+    } else if (sourceType === 'trade') {
+        loadTradesForConditions();
+    }
+}
+
+/**
+ * Load trade plans for conditions selection
+ */
+async function loadTradePlansForConditions() {
+    try {
+        const response = await fetch('/api/trade_plans');
+        if (!response.ok) throw new Error('Failed to load trade plans');
+        
+        const tradePlans = await response.json();
+        const sourceIdSelect = document.getElementById('conditionSourceId');
+        
+        sourceIdSelect.innerHTML = '<option value="">בחר תכנית מסחר</option>';
+        tradePlans.forEach(plan => {
+            const option = document.createElement('option');
+            option.value = plan.id;
+            option.textContent = `${plan.name} (${plan.ticker})`;
+            sourceIdSelect.appendChild(option);
+        });
+        
+        sourceIdSelect.disabled = false;
+        
+    } catch (error) {
+        console.error('Error loading trade plans:', error);
+        showErrorNotification('שגיאה בטעינת תכניות מסחר');
+    }
+}
+
+/**
+ * Load trades for conditions selection
+ */
+async function loadTradesForConditions() {
+    try {
+        const response = await fetch('/api/trades');
+        if (!response.ok) throw new Error('Failed to load trades');
+        
+        const trades = await response.json();
+        const sourceIdSelect = document.getElementById('conditionSourceId');
+        
+        sourceIdSelect.innerHTML = '<option value="">בחר טרייד</option>';
+        trades.forEach(trade => {
+            const option = document.createElement('option');
+            option.value = trade.id;
+            option.textContent = `${trade.ticker} - ${trade.type} (${trade.status})`;
+            sourceIdSelect.appendChild(option);
+        });
+        
+        sourceIdSelect.disabled = false;
+        
+    } catch (error) {
+        console.error('Error loading trades:', error);
+        showErrorNotification('שגיאה בטעינת טריידים');
+    }
+}
+
+/**
+ * Load conditions from selected item
+ */
+async function loadConditionsFromItem() {
+    const sourceType = document.getElementById('conditionSourceType').value;
+    const sourceId = document.getElementById('conditionSourceId').value;
+    
+    if (!sourceType || !sourceId) {
+        document.getElementById('availableConditionsList').innerHTML = 
+            '<div class="text-muted text-center py-3">בחר מקור ופריט כדי לראות תנאים זמינים</div>';
+        return;
+    }
+    
+    try {
+        let endpoint;
+        if (sourceType === 'trade_plan') {
+            endpoint = `/api/plan_conditions?plan_id=${sourceId}`;
+        } else if (sourceType === 'trade') {
+            endpoint = `/api/trade_conditions?trade_id=${sourceId}`;
+        }
+        
+        const response = await fetch(endpoint);
+        if (!response.ok) throw new Error('Failed to load conditions');
+        
+        const conditions = await response.json();
+        displayAvailableConditions(conditions, sourceType);
+        
+    } catch (error) {
+        console.error('Error loading conditions:', error);
+        showErrorNotification('שגיאה בטעינת תנאים');
+    }
+}
+
+/**
+ * Display available conditions for selection
+ */
+function displayAvailableConditions(conditions, sourceType) {
+    const container = document.getElementById('availableConditionsList');
+    
+    if (!conditions || conditions.length === 0) {
+        container.innerHTML = '<div class="text-muted text-center py-3">אין תנאים זמינים לפריט זה</div>';
+        return;
+    }
+    
+    let html = '<div class="row">';
+    conditions.forEach(condition => {
+        html += `
+            <div class="col-md-6 mb-3">
+                <div class="card condition-card" data-condition-id="${condition.id}" data-source-type="${sourceType}">
+                    <div class="card-body">
+                        <h6 class="card-title">${condition.method_name || 'תנאי לא ידוע'}</h6>
+                        <p class="card-text small text-muted">${condition.parameters_json || 'אין פרמטרים'}</p>
+                        <button class="btn btn-sm btn-primary" onclick="selectConditionForAlert(${condition.id}, '${sourceType}')">
+                            בחר תנאי זה
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    html += '</div>';
+    
+    container.innerHTML = html;
+}
+
+/**
+ * Select condition for alert creation
+ */
+function selectConditionForAlert(conditionId, sourceType) {
+    // Store selected condition
+    window.selectedConditionForAlert = {
+        id: conditionId,
+        sourceType: sourceType
+    };
+    
+    // Show alert configuration section
+    document.getElementById('alertConfigSection').style.display = 'block';
+    
+    // Scroll to configuration section
+    document.getElementById('alertConfigSection').scrollIntoView({ behavior: 'smooth' });
+    
+    // Highlight selected condition
+    document.querySelectorAll('.condition-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    document.querySelector(`[data-condition-id="${conditionId}"]`).classList.add('selected');
+    
+    showSuccessNotification('תנאי נבחר בהצלחה. הגדר את פרטי ההתראה למטה.');
+}
+
+/**
+ * Create alert from selected condition
+ */
+async function createAlertFromCondition() {
+    if (!window.selectedConditionForAlert) {
+        showErrorNotification('אנא בחר תנאי קודם');
+        return;
+    }
+    
+    const message = document.getElementById('alertMessageFromCondition').value;
+    const state = document.getElementById('alertStateFromCondition').value;
+    
+    if (!message) {
+        showErrorNotification('אנא הזן הודעת התראה');
+        return;
+    }
+    
+    try {
+        const alertData = {
+            condition_id: window.selectedConditionForAlert.id,
+            condition_type: window.selectedConditionForAlert.sourceType,
+            message: message,
+            state: state,
+            auto_created: false
+        };
+        
+        const response = await fetch('/api/alerts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(alertData)
+        });
+        
+        if (!response.ok) throw new Error('Failed to create alert');
+        
+        const newAlert = await response.json();
+        
+        showSuccessNotification('התראה נוצרה בהצלחה מתנאי קיים');
+        
+        // Close modal and refresh alerts list
+        const modal = bootstrap.Modal.getInstance(document.getElementById('addAlertModal'));
+        modal.hide();
+        
+        // Refresh alerts data
+        if (typeof loadAlertsData === 'function') {
+            loadAlertsData();
+        }
+        
+    } catch (error) {
+        console.error('Error creating alert from condition:', error);
+        showErrorNotification('שגיאה ביצירת התראה מתנאי');
+    }
+}
+
+// Export functions to global scope
+window.loadConditionsFromSource = loadConditionsFromSource;
+window.loadConditionsFromItem = loadConditionsFromItem;
+window.selectConditionForAlert = selectConditionForAlert;
+window.createAlertFromCondition = createAlertFromCondition;
+window.initializeAlertModalTabs = initializeAlertModalTabs;
+window.updateModalButtons = updateModalButtons;
+
+// ===== TAB MANAGEMENT =====
+
+/**
+ * Initialize tab management for add alert modal
+ */
+function initializeAlertModalTabs() {
+    const addAlertModal = document.getElementById('addAlertModal');
+    if (!addAlertModal) return;
+    
+    // Add event listeners for tab changes
+    const tabButtons = addAlertModal.querySelectorAll('[data-bs-toggle="tab"]');
+    tabButtons.forEach(button => {
+        button.addEventListener('shown.bs.tab', function(event) {
+            const targetTab = event.target.getAttribute('data-bs-target');
+            updateModalButtons(targetTab);
+        });
+    });
+}
+
+/**
+ * Update modal buttons based on active tab
+ */
+function updateModalButtons(activeTab) {
+    const addAlertBtn = document.querySelector('button[onclick="addAlert()"]');
+    const createFromConditionBtn = document.getElementById('createFromConditionBtn');
+    
+    if (activeTab === '#add-manual-pane') {
+        // Manual alert tab
+        if (addAlertBtn) addAlertBtn.style.display = 'inline-block';
+        if (createFromConditionBtn) createFromConditionBtn.style.display = 'none';
+    } else if (activeTab === '#add-from-condition-pane') {
+        // From condition tab
+        if (addAlertBtn) addAlertBtn.style.display = 'none';
+        if (createFromConditionBtn) createFromConditionBtn.style.display = 'inline-block';
+    }
+}
+
+// Initialize tab management when modal is shown
+document.addEventListener('DOMContentLoaded', function() {
+    const addAlertModal = document.getElementById('addAlertModal');
+    if (addAlertModal) {
+        addAlertModal.addEventListener('shown.bs.modal', function() {
+            initializeAlertModalTabs();
+            // Set default tab to manual
+            updateModalButtons('#add-manual-pane');
+        });
+    }
+});

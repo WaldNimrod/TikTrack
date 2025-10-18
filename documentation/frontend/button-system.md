@@ -2,12 +2,30 @@
 
 ## סקירה כללית
 
-מערכת הכפתורים המרוכזת של TikTrack מספקת פתרון אחיד ויעיל לניהול כל כפתורי הפעולה במערכת. המערכת כוללת שתי שכבות:
+מערכת הכפתורים המרוכזת של TikTrack מספקת פתרון אחיד ויעיל לניהול כל כפתורי הפעולה במערכת. המערכת כוללת:
 
 1. **מערכת בסיסית** - `scripts/button-icons.js` - כפתורים בודדים
-2. **מערכת מתקדמת** - `scripts/ui-utils.js` - כפתורי פעולות לטבלאות דינמיות
+2. **מערכת מתקדמת** - `scripts/button-system-init.js` - כפתורי פעולות לטבלאות דינמיות
+3. **מערכת וריאציות** - תמיכה בשלוש וריאציות תצוגה
+4. **מערכת צבעים דינמית** - משתני CSS להתאמה אישית
 
 המערכת מבטיחה עקביות, תחזוקה קלה וביצועים טובים.
+
+## תכונות חדשות
+
+### משתני צבע דינמיים
+כל כפתור משתמש במשתנה CSS דינמי שניתן להתאים אישית:
+- `--color-action-edit` - צבע כפתור עריכה
+- `--color-action-delete` - צבע כפתור מחיקה
+- `--color-action-add` - צבע כפתור הוספה
+- `--color-action-save` - צבע כפתור שמירה
+- ועוד...
+
+### וריאציות תצוגה
+כל כפתור תומך בשלוש וריאציות:
+- **קטן** - רק איקון
+- **רגיל** - רק טקסט
+- **מלא** - איקון + טקסט
 
 ## ארכיטקטורה
 
@@ -17,9 +35,101 @@
 - **טעינה**: נטען בכל העמודים לפני הסקריפטים הספציפיים
 
 ### מערכת מתקדמת - כפתורי פעולות לטבלאות
-- **מיקום**: `trading-ui/scripts/ui-utils.js`
+- **מיקום**: `trading-ui/scripts/button-system-init.js`
 - **תפקיד**: ניהול כפתורי פעולות לטבלאות דינמיות
-- **פונקציות**: `generateActionButtons`, `loadTableActionButtons`
+- **פונקציות**: `AdvancedButtonSystem`, `initializeButtons`
+
+### מערכת משתני צבע
+- **מיקום**: `trading-ui/styles-new/01-settings/_color-variables.css`
+- **תפקיד**: הגדרת משתני CSS דינמיים לכל סוג כפתור
+- **תכונות**: התאמה אישית של צבעים, גודל, ופדינג
+
+## שימוש במערכת החדשה
+
+### יצירת כפתור בסיסי
+```html
+<button data-button-type="EDIT" data-onclick="editRecord()"></button>
+```
+
+### יצירת כפתור עם וריאציה ספציפית
+```html
+<!-- וריאציה קטנה - רק איקון -->
+<button data-button-type="EDIT" data-variant="small" data-onclick="editRecord()"></button>
+
+<!-- וריאציה רגילה - רק טקסט -->
+<button data-button-type="EDIT" data-variant="normal" data-onclick="editRecord()"></button>
+
+<!-- וריאציה מלאה - איקון + טקסט (ברירת מחדל) -->
+<button data-button-type="EDIT" data-variant="full" data-onclick="editRecord()"></button>
+```
+
+### יצירת כפתור עם מחלקות נוספות
+```html
+<button data-button-type="EDIT" data-classes="btn-sm btn-outline" data-onclick="editRecord()"></button>
+```
+
+### יצירת כפתור עם תכונות נוספות
+```html
+<button data-button-type="EDIT" data-attributes="data-bs-toggle='modal' data-bs-target='#editModal'" data-onclick="editRecord()"></button>
+```
+
+## משתני צבע דינמיים
+
+כל כפתור משתמש במשתנה CSS דינמי שניתן להתאים אישית:
+
+```css
+:root {
+    /* כפתורי פעולה */
+    --color-action-edit: #6c757d;      /* אפור לעריכה */
+    --color-action-delete: #dc3545;    /* אדום למחיקה */
+    --color-action-add: #28a745;       /* ירוק להוספה */
+    --color-action-save: #28a745;      /* ירוק לשמירה */
+    --color-action-cancel: #6c757d;    /* אפור לביטול */
+    --color-action-link: #17a2b8;      /* כחול לקישור */
+    --color-action-close: #6c757d;     /* אפור לסגירה */
+    --color-action-refresh: #6c757d;   /* אפור לרענון */
+    --color-action-export: #007bff;    /* כחול לייצוא */
+    --color-action-import: #28a745;    /* ירוק לייבוא */
+    --color-action-search: #17a2b8;    /* כחול לחיפוש */
+    --color-action-filter: #6c757d;    /* אפור לסינון */
+    --color-action-sort: #6c757d;      /* אפור למיון */
+    --color-action-toggle: #ffc107;    /* צהוב להחלפה */
+    --color-action-copy: #6c757d;      /* אפור להעתקה */
+    --color-action-reactivate: #28a745; /* ירוק להפעלה מחדש */
+}
+```
+
+### התאמה אישית של צבעים
+```css
+/* התאמה אישית למשתמש */
+:root {
+    --color-action-edit: #your-custom-color;
+    --color-action-delete: #your-custom-color;
+    /* ... */
+}
+```
+
+## עמוד הדוגמאות
+
+### עמוד עיצובים - `designs.html`
+עמוד הדוגמאות מספק:
+- **טבלה מפורטת** עם כל הכפתורים הזמינים
+- **דוגמאות פעילות** לכל כפתור
+- **קוד לשילוב** - HTML ישן וחדש
+- **וריאציות תצוגה** - קטן, רגיל, מלא
+- **משתני צבע** לכל כפתור
+- **לוג מפורט** לאבחון בעיות
+
+### גישה לעמוד
+```
+http://127.0.0.1:8080/designs
+```
+
+### תכונות העמוד
+- **חיפוש כפתורים** - פילטר מהיר
+- **סטטיסטיקות** - מספר כפתורים לפי קטגוריה
+- **העתקת קוד** - העתקה מהירה לקליפבורד
+- **דוגמאות וריאציות** - הצגת כל הוריאציות
 
 ### מערכת איקונים מרכזית
 ```javascript

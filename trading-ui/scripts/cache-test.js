@@ -2803,7 +2803,7 @@ function displayVerificationReport(report) {
 window.clearAllUnifiedCache = clearAllUnifiedCache;
 window.optimizeUnifiedCache = optimizeUnifiedCache;
 window.syncWithServer = syncWithServer;
-window.copyDetailedLog = copyDetailedLog;
+// window.copyDetailedLog export removed - using local function only
 window.runCompleteCacheVerification = runCompleteCacheVerification;
 
 // End of cache-test.js

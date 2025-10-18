@@ -22,10 +22,23 @@ class CashFlowService:
         self.model = CashFlow
     
     def get_all(self, db: Session, filters=None):
-        return db.query(CashFlow).options(
+        cash_flows = db.query(CashFlow).options(
             joinedload(CashFlow.account),
             joinedload(CashFlow.currency)
         ).all()
+        
+        # Enhance data with account and currency names
+        enhanced_flows = []
+        for cf in cash_flows:
+            cf_dict = cf.to_dict()
+            if cf.account:
+                cf_dict['account_name'] = cf.account.name
+            if cf.currency:
+                cf_dict['currency_symbol'] = cf.currency.symbol
+                cf_dict['currency_name'] = cf.currency.name
+            enhanced_flows.append(cf_dict)
+        
+        return enhanced_flows
     
     def get_by_id(self, db: Session, cash_flow_id: int):
         return db.query(CashFlow).options(

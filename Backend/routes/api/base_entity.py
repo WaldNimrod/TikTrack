@@ -80,15 +80,17 @@ class BaseEntityAPI:
                     records = self.service_class.get_all(db, filters)
                 else:
                     records = self.service_class.get_all(db)
+                
+                # If service returns enhanced data (dicts), use it directly
+                if records and isinstance(records[0], dict):
+                    data = records
+                else:
+                    # Convert to dict format
+                    data = [record.to_dict() if hasattr(record, 'to_dict') else record for record in records]
             else:
                 # Fallback to direct query if service doesn't have get_all
                 records = db.query(self.service_class.model).all()
-            
-            # Convert to dict format
-            if records:
                 data = [record.to_dict() if hasattr(record, 'to_dict') else record for record in records]
-            else:
-                data = []
             
             # Cache the result
             response = self._success_response(data, f"Retrieved {len(data)} {self.entity_name} records")

@@ -3195,6 +3195,126 @@ function filterTradePlansLocally(data, statuses, types, dateRange, searchTerm) {
 
 // Global functions are now properly defined in main.js
 
+// Export conditions system functions to global scope
+window.initializeTradePlanConditionsSystem = initializeTradePlanConditionsSystem;
+window.setupTradePlanModalListeners = setupTradePlanModalListeners;
+window.initializeTradePlanConditions = initializeTradePlanConditions;
+window.cleanupTradePlanConditions = cleanupTradePlanConditions;
+window.getCurrentEditPlanId = getCurrentEditPlanId;
+
+/**
+ * Initialize conditions system for trade plans
+ * Integrated with unified initialization system
+ */
+function initializeTradePlanConditionsSystem() {
+    try {
+        console.log('🔧 Initializing trade plans conditions system...');
+        
+        // Setup modal event listeners for automatic conditions initialization
+        setupTradePlanModalListeners();
+        
+        console.log('✅ Trade plans conditions system initialized');
+        
+    } catch (error) {
+        console.error('❌ Failed to initialize trade plans conditions system:', error);
+    }
+}
+
+/**
+ * Setup modal event listeners for trade plans
+ */
+function setupTradePlanModalListeners() {
+    // Add Trade Plan Modal
+    const addModal = document.getElementById('addTradePlanModal');
+    if (addModal) {
+        addModal.addEventListener('shown.bs.modal', () => {
+            initializeTradePlanConditions('add');
+        });
+        
+        addModal.addEventListener('hidden.bs.modal', () => {
+            cleanupTradePlanConditions('add');
+        });
+    }
+    
+    // Edit Trade Plan Modal
+    const editModal = document.getElementById('editTradePlanModal');
+    if (editModal) {
+        editModal.addEventListener('shown.bs.modal', () => {
+            // Get the current plan ID from the modal
+            const planId = getCurrentEditPlanId();
+            initializeTradePlanConditions('edit', planId);
+        });
+        
+        editModal.addEventListener('hidden.bs.modal', () => {
+            cleanupTradePlanConditions('edit');
+        });
+    }
+}
+
+/**
+ * Initialize conditions for trade plan
+ * @param {string} mode - 'add' or 'edit'
+ * @param {number|string} planId - Plan ID (or 'new' for new plans)
+ */
+function initializeTradePlanConditions(mode, planId = null) {
+    try {
+        console.log(`🔧 Initializing trade plan conditions for ${mode} mode, planId: ${planId}`);
+        
+        // Check if ConditionBuilder is available
+        if (typeof ConditionBuilder === 'undefined') {
+            console.warn('⚠️ ConditionBuilder not available, skipping conditions initialization');
+            return false;
+        }
+        
+        const containerId = `${mode}PlanConditionBuilder`;
+        const actualPlanId = planId || 'new';
+        
+        // Create new ConditionBuilder
+        const conditionBuilder = new ConditionBuilder('plan', actualPlanId, containerId);
+        
+        // Store in global scope for access by other functions
+        const globalKey = `${mode}PlanConditionBuilder`;
+        window[globalKey] = conditionBuilder;
+        
+        console.log(`✅ Trade plan conditions initialized for ${mode} mode`);
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Failed to initialize trade plan conditions:', error);
+        return false;
+    }
+}
+
+/**
+ * Cleanup conditions for trade plan
+ * @param {string} mode - 'add' or 'edit'
+ */
+function cleanupTradePlanConditions(mode) {
+    try {
+        const globalKey = `${mode}PlanConditionBuilder`;
+        if (window[globalKey]) {
+            // Clean up if builder has cleanup method
+            if (typeof window[globalKey].cleanup === 'function') {
+                window[globalKey].cleanup();
+            }
+            delete window[globalKey];
+            console.log(`✅ Trade plan conditions cleaned up for ${mode} mode`);
+        }
+    } catch (error) {
+        console.error('❌ Failed to cleanup trade plan conditions:', error);
+    }
+}
+
+/**
+ * Get current edit plan ID from modal
+ * @returns {number|null} Plan ID or null
+ */
+function getCurrentEditPlanId() {
+    // This should be implemented based on how the edit modal stores the current plan ID
+    // For now, return null - this should be updated based on the actual implementation
+    return null;
+}
+
 // Initialize trade plans page - integrated with unified system
 window.initializeTradePlansPage = async function() {
   console.log('📋 Trade plans page initialized via unified system');
@@ -3207,6 +3327,8 @@ window.initializeTradePlansPage = async function() {
       console.log('⚠️ Cache Manager initialization failed:', error);
     }
   }
+
+  // מערכת התנאים מאותחלת אוטומטית דרך המערכת המאוחדת
 
   // Restoring section state
   if (typeof window.restoreAllSectionStates === 'function') {

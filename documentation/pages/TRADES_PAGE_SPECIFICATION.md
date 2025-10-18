@@ -1,12 +1,15 @@
 # אפיון עמוד Trades
 **תאריך יצירה:** 18 אוקטובר 2025  
-**גרסה:** 2.0.6  
+**תאריך עדכון:** 19 אוקטובר 2025  
+**גרסה:** 3.0.0  
 **מפתח:** AI Assistant  
 
 ---
 
 ## תקציר
 עמוד Trades הוא עמוד מרכזי במערכת TikTrack המאפשר ניהול טריידים פעילים וסגורים. העמוד מספק ממשק מקיף ליצירה, עריכה, מחיקה וניהול טריידים עם אינטגרציה מלאה למערכות הכלליות של המערכת.
+
+**חדש בגרסה 3.0.0:** הוספת מערכת תנאים מתקדמת המאפשרת הגדרת תנאים מותאמים אישית לטריידים עם אפשרות לרשת תנאים מתכניות מסחר או ליצור תנאים ייחודיים לטרייד.
 
 ---
 
@@ -17,11 +20,16 @@
 trading-ui/
 ├── trades.html               # מבנה ה-HTML הראשי
 ├── scripts/
-│   └── trades.js            # לוגיקת העמוד והפונקציונליות
+│   ├── trades.js            # לוגיקת העמוד והפונקציונליות
+│   └── conditions/          # מערכת התנאים
+│       ├── conditions-translations.js
+│       ├── condition-validator.js
+│       └── condition-builder.js
 └── styles-new/              # עיצוב ITCSS
     ├── 05-objects/_layout.css
     ├── 06-components/_buttons-advanced.css
-    └── 06-components/_linked-items.css
+    ├── 06-components/_linked-items.css
+    └── 06-components/_conditions-system.css
 ```
 
 ### 2. מבנה HTML
@@ -112,6 +120,11 @@ trading-ui/
 - **תיעוד:** `documentation/02-ARCHITECTURE/FRONTEND/ERROR_HANDLING_SYSTEM.md`
 - **פונקציונליות:** טיפול אחיד בשגיאות, logging
 
+#### מערכת התנאים (חדש בגרסה 3.0.0)
+- **קובץ:** `scripts/conditions/condition-builder.js`
+- **תיעוד:** `documentation/02-ARCHITECTURE/FRONTEND/CONDITIONS_SYSTEM.md`
+- **פונקציונליות:** בניית תנאים מותאמים אישית, בחירת שיטות מסחר, הגדרת פרמטרים, רשת תנאים מתכניות מסחר
+
 ---
 
 ## מבנה הנתונים
@@ -128,6 +141,29 @@ class Trade(db.Model):
     notes = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships
+    conditions = relationship("TradeCondition", back_populates="trade", cascade="all, delete-orphan")
+```
+
+### 2. TradeCondition Model (Backend) - חדש בגרסה 3.0.0
+```python
+class TradeCondition(db.Model):
+    __tablename__ = "trade_conditions"
+    id = Column(Integer, primary_key=True)
+    trade_id = Column(Integer, ForeignKey('trades.id'), nullable=False)
+    method_id = Column(Integer, ForeignKey('trading_methods.id'), nullable=False)
+    inherited_from_plan_condition_id = Column(Integer, ForeignKey('plan_conditions.id'), nullable=True)
+    condition_group = Column(Integer, default=0, nullable=False)
+    parameters_json = Column(Text, nullable=False)
+    logical_operator = Column(String(10), default='NONE', nullable=False)
+    is_active = Column(Boolean, default=True, nullable=False)
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    
+    # Relationships
+    trade = relationship("Trade", back_populates="conditions")
+    method = relationship("TradingMethod", back_populates="trade_conditions")
+    inherited_from_plan_condition = relationship("PlanCondition", back_populates="inherited_trade_conditions")
 ```
 
 ### 2. מבנה ה-JSON API
@@ -177,6 +213,28 @@ function updateTradesTable(trades) {
 - **עריכה:** `showEditTradeModal(id)`
 - **מחיקה:** `deleteTradeRecord(id)`
 
+### 4. מערכת התנאים (חדש בגרסה 3.0.0)
+```javascript
+// אתחול מערכת התנאים
+function initializeTradeConditionsSystem() {
+    // הגדרת מאזינים למודלים
+    // אתחול ConditionBuilder
+}
+
+// אתחול תנאים למודל ספציפי
+function initializeTradeConditions(mode, tradeId) {
+    // יצירת ConditionBuilder חדש
+    // טעינת תנאים קיימים (במצב edit)
+    // רשת תנאים מתכנית מסחר (אם קיימת)
+}
+
+// ניקוי מערכת התנאים
+function cleanupTradeConditions(mode) {
+    // שחרור זיכרון
+    // ניקוי מאזינים
+}
+```
+
 ### 4. ולידציה
 ```javascript
 const validationRules = {
@@ -225,6 +283,25 @@ const validationRules = {
 
 ### 4. DELETE /api/trades/{id}
 - **תיאור:** מחיקת טרייד
+- **תגובה:** הודעת הצלחה
+
+### 5. GET /api/trade_conditions?trade_id={id} (חדש בגרסה 3.0.0)
+- **תיאור:** קבלת תנאים של טרייד ספציפי
+- **פרמטרים:** `trade_id` - ID של הטרייד
+- **תגובה:** רשימה של TradeCondition objects
+
+### 6. POST /api/trade_conditions/ (חדש בגרסה 3.0.0)
+- **תיאור:** יצירת תנאי חדש לטרייד
+- **body:** TradeCondition object
+- **תגובה:** TradeCondition object שנוצר
+
+### 7. PUT /api/trade_conditions/{id} (חדש בגרסה 3.0.0)
+- **תיאור:** עדכון תנאי קיים
+- **body:** TradeCondition object
+- **תגובה:** TradeCondition object מעודכן
+
+### 8. DELETE /api/trade_conditions/{id} (חדש בגרסה 3.0.0)
+- **תיאור:** מחיקת תנאי
 - **תגובה:** הודעת הצלחה
 
 ---
@@ -298,15 +375,23 @@ const validationRules = {
 - `scripts/linked-items.js`
 - `scripts/entity-details-modal.js`
 - `scripts/error-handlers.js`
+- `scripts/conditions/conditions-translations.js` (חדש בגרסה 3.0.0)
+- `scripts/conditions/condition-validator.js` (חדש בגרסה 3.0.0)
+- `scripts/conditions/condition-builder.js` (חדש בגרסה 3.0.0)
 
 ### קבצי CSS נדרשים:
 - `styles-new/05-objects/_layout.css`
 - `styles-new/06-components/_buttons-advanced.css`
 - `styles-new/06-components/_linked-items.css`
+- `styles-new/06-components/_conditions-system.css` (חדש בגרסה 3.0.0)
 
 ### קבצי Backend נדרשים:
 - `Backend/models/trade.py`
 - `Backend/routes/api/trades.py`
+- `Backend/models/trading_method.py` (חדש בגרסה 3.0.0)
+- `Backend/models/plan_condition.py` (חדש בגרסה 3.0.0)
+- `Backend/routes/api/trading_methods.py` (חדש בגרסה 3.0.0)
+- `Backend/routes/api/trade_conditions.py` (חדש בגרסה 3.0.0)
 
 ---
 
@@ -335,6 +420,10 @@ const validationRules = {
 3. **Cache:** הנתונים נשמרים ב-cache גלובלי (`window.tradesData`)
 4. **Real-time:** העמוד תומך בעדכונים בזמן אמת דרך מערכת הריענון המרכזית
 5. **Accessibility:** העמוד תומך בנגישות עם ARIA labels ותמיכה במקלדת
+6. **מערכת התנאים:** התנאים מאותחלים אוטומטית דרך המערכת המאוחדת (`unified-app-initializer.js`)
+7. **רשת תנאים:** טריידים יכולים לרשת תנאים מתכניות מסחר או ליצור תנאים ייחודיים
+8. **שיטות מסחר:** המערכת תומכת ב-6 שיטות מסחר: ממוצעים נעים, נפח, תמיכה והתנגדות, קווי מגמה, מבנים טכניים, פיבונצי
+9. **אינטגרציה עם התראות:** תנאים יכולים ליצור התראות אוטומטיות דרך מסך ההתראות
 
 ---
 

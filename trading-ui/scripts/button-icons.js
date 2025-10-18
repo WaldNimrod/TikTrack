@@ -37,7 +37,8 @@ const BUTTON_ICONS = {
   READ: '✓',
   CHECK: '✓',
   TOGGLE: '▼',
-  SORT: '↕️'
+  SORT: '↕️',
+  COPY: '📋'
 };
 
 const BUTTON_TEXTS = {
@@ -66,7 +67,8 @@ const BUTTON_TEXTS = {
   READ: 'קראתי',
   CHECK: 'סמן',
   TOGGLE: 'הצג/הסתר',
-  SORT: 'מיון'
+  SORT: 'מיון',
+  COPY: 'העתק'
 };
 
 /**
@@ -81,7 +83,7 @@ function getButtonClass(type) {
     CANCEL: 'btn-secondary',
     LINK: 'btn-info',
     ADD: 'btn-success',
-    SAVE: 'btn-primary',
+    SAVE: 'btn-success',
     CLOSE: 'btn-secondary',
     REFRESH: 'btn-outline-secondary',
     EXPORT: 'btn-outline-primary',
@@ -99,7 +101,8 @@ function getButtonClass(type) {
     PLAY: 'btn-success',
     STOP: 'btn-danger',
     TOGGLE: 'btn-outline-warning',
-    SORT: 'btn-link'
+    SORT: 'btn-link',
+    COPY: 'btn-outline-secondary'
   };
   return classMap[type.toUpperCase()] || 'btn-secondary';
 }

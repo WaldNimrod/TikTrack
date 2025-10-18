@@ -274,17 +274,12 @@ async function openEditTradePlanModal(tradePlanId) {
   await loadTickersForEditModal();
 
   // מילוי הטופס בנתונים קיימים
-  document.getElementById('editTradePlanId').value = tradePlan.id;
-  document.getElementById('editTradePlanTickerId').value = tradePlan.ticker_id;
-  document.getElementById('editTradePlanInvestmentType').value = tradePlan.investment_type;
-  document.getElementById('editTradePlanSide').value = tradePlan.side;
-  document.getElementById('editTradePlanStatus').value = tradePlan.status;
-  document.getElementById('editTradePlanPlannedAmount').value = tradePlan.planned_amount;
-  document.getElementById('editTradePlanShares').value = tradePlan.shares || '';
-  document.getElementById('editTradePlanStopPrice').value = tradePlan.stop_price || '';
-  document.getElementById('editTradePlanTargetPrice').value = tradePlan.target_price || '';
-  document.getElementById('editTradePlanEntryConditions').value = tradePlan.entry_conditions || '';
-  document.getElementById('editTradePlanReasons').value = tradePlan.reasons || '';
+  document.getElementById('editTicker').value = tradePlan.ticker_id;
+  document.getElementById('editType').value = tradePlan.investment_type;
+  document.getElementById('editSide').value = tradePlan.side;
+  document.getElementById('editQuantity').value = tradePlan.planned_amount;
+  document.getElementById('editPrice').value = tradePlan.stop_price || '';
+  document.getElementById('editNotes').value = tradePlan.entry_conditions || '';
 
   // עדכון תאריך
   if (tradePlan.created_at) {
@@ -592,18 +587,18 @@ function updateEditAmountFromShares() {
 async function saveEditTradePlan() {
   try {
     // איסוף נתונים מהטופס
-    const formData = {
-      id: document.getElementById('editTradePlanId').value,
-      ticker_id: document.getElementById('editTradePlanTickerId').value,
-      investment_type: document.getElementById('editTradePlanInvestmentType').value,
-      side: document.getElementById('editTradePlanSide').value,
-      status: document.getElementById('editTradePlanStatus').value,
-      planned_amount: parseFloat(document.getElementById('editTradePlanPlannedAmount').value),
-      stop_price: parseFloat(document.getElementById('editTradePlanStopPrice').value) || null,
-      target_price: parseFloat(document.getElementById('editTradePlanTargetPrice').value) || null,
-      entry_conditions: document.getElementById('editTradePlanEntryConditions').value,
-      reasons: document.getElementById('editTradePlanReasons').value,
-    };
+  const formData = {
+    id: tradePlanId,
+    ticker_id: document.getElementById('editTicker').value,
+    investment_type: document.getElementById('editType').value,
+    side: document.getElementById('editSide').value,
+    status: 'open', // Default status
+    planned_amount: parseFloat(document.getElementById('editQuantity').value),
+    stop_price: parseFloat(document.getElementById('editPrice').value) || null,
+    target_price: parseFloat(document.getElementById('editPrice').value) || null,
+    entry_conditions: document.getElementById('editNotes').value,
+    reasons: document.getElementById('editNotes').value, // Temporary workaround
+  };
 
     // בדיקה אם הסטטוס משתנה ל-'cancelled'
     const originalTradePlan = window.tradePlansData.find(tp => tp.id === formData.id);

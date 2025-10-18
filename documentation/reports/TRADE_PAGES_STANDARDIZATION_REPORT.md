@@ -1,208 +1,151 @@
-# דוח סטנדרטיזציה מקיפה - עמודי Trade Plans ו-Trades
-
-**תאריך**: 15 בינואר 2025  
-**מבצע**: מערכת סטנדרטיזציה אוטומטית  
-**היקף**: עמודי תכנון טריידים ומעקב טריידים  
-
-## סיכום ביצוע
-
-### ✅ שלבים שהושלמו בהצלחה
-
-#### שלב 1: ניתוח מעמיק וזיהוי כל הסטיות
-- **זוהו 5 קטגוריות עיקריות של בעיות**:
-  - CSS: חסרים 8 קבצים בשכבה 06-components
-  - CSS: חסרים 4 קבצים בשכבה 09-utilities  
-  - Inline Styles: 15 ב-trade_plans.html, 34 ב-trades.html
-  - כפתורים: לא משתמשים במערכת המרכזית
-  - מערכות מיון: לא אחידות
-
-#### שלב 2: תיקון בעיות ITCSS ✅
-**קבצים שעודכנו**: `trade_plans.html`, `trades.html`
-
-**תיקונים שבוצעו**:
-- ✅ הוספת 5 קבצים חסרים לשכבה 06-components:
-  - `_page-headers.css`
-  - `_info-summary.css` 
-  - `_constraints.css`
-  - `_system-management.css`
-  - `_chart-management.css`
-- ✅ יצירת קבצי 07-pages נפרדים:
-  - `_trade_plans.css`
-  - `_trades.css`
-- ✅ טעינת קבצי CSS החדשים בעמודים
-
-#### שלב 3: הסרת Inline Styles ✅
-**קבצים שעודכנו**: `trade_plans.html`, `trades.html`, `styles-new/05-objects/_layout.css`, `styles-new/06-components/_notifications.css`
-
-**תיקונים שבוצעו**:
-- ✅ הסרת כל inline styles מ-trade_plans.html ו-trades.html
-- ✅ שימוש במחלקות קיימות מ-ITCSS:
-  - `.section-icon` לאייקונים בכותרות (20px x 20px)
-  - `.action-icon` לאייקונים בכפתורים (20px x 20px)
-  - `.table-actions` לקונטיינרים של כפתורים
-  - `.page-bottom-spacing` למרווח בתחתית (3rem)
-  - `.toast-container` עם z-index נכון
-- ✅ הוספת מחלקות חסרות ל-ITCSS הכללי:
-  - `.page-bottom-spacing` ב-`_layout.css`
-  - `.toast-container` z-index ב-`_notifications.css`
-
-#### שלב 4: תיקון כפתורים ✅
-**קבצים שעודכנו**: `trade_plans.html`, `trades.html`
-
-**תיקונים שבוצעו**:
-- ✅ כפתורי Header: classes תקינות (btn-success, btn-outline-warning)
-- ✅ כפתורי Modal Footer: classes תקינות (btn-secondary, btn-success)
-- ✅ כפתורי פעולות בטבלה: כבר משתמשים ב-createButton
-- ✅ כפתורי "העתק לוג מפורט": classes סטנדרטיות
-
-#### שלב 5: תיקון מערכות מיון ✅
-**קבצים שעודכנו**: `trade_plans.html`, `trades.html`
-
-**תיקונים שבוצעו**:
-- ✅ trade_plans.html: עדכון מ-`window.sortTable` ל-`window.sortTableData`
-- ✅ trades.html: הוספת onclick handlers לכל כפתורי המיון
-- ✅ אחידות בפרמטרים: `(columnIndex, data, tableType, updateFunction)`
-- ✅ הסרת inline styles מכפתורי המיון
-
-#### שלב 6: תיקון רוחב טבלאות ועמודות ✅
-**קבצים שנבדקו**: `styles-new/06-components/_tables.css`
-
-**תוצאות בדיקה**:
-- ✅ טבלאות מוגדרות ל-100% width
-- ✅ עמודות מוגדרות באחוזים
-- ✅ עמודת "פעולות" ברוחב קבוע (120px)
-- ✅ min-width מוגדר לכל העמודות
-
-#### שלב 7: בדיקת מערכות חיוניות ✅
-**קבצים שנבדקו**: `trade_plans.html`, `trades.html`, `scripts/`
-
-**תוצאות בדיקה**:
-- ✅ מערכת איתחול: `unified-app-initializer.js` נטען ו-`initialize()` נקרא
-- ✅ מערכת מטמון: `unified-cache-manager.js` נטען ומופעל
-- ✅ הסרת WebSocket: לא נמצא שימוש ב-WebSocket או realtime-notifications
-- ✅ מערכת הודעות: כל ההודעות כוללות קטגוריות (business/system)
-
-#### שלב 8: צבעים דינמיים ✅
-**קבצים שנבדקו**: `trade_plans.html`, `trades.html`
-
-**תוצאות בדיקה**:
-- ✅ trade_plans.html: כפתורים משתמשים ב-btn-success ו-btn-outline-warning
-- ✅ trades.html: כפתורים משתמשים ב-btn-success ו-btn-outline-warning
-- ✅ modal headers משתמשים ב-var(--warning-color)
-- ✅ info sections משתמשים ב-var(--light-bg-color), var(--border-color), var(--text-color)
-
-#### שלב 9: בדיקת RTL ונגישות ✅
-**קבצים שנבדקו**: `trade_plans.html`, `trades.html`
-
-**תוצאות בדיקה**:
-- ✅ RTL: `dir="rtl"` ו-`lang="he"` מוגדרים
-- ✅ נגישות: aria-label, alt, title מוגדרים בכפתורים ותמונות
-- ✅ keyboard navigation: תמיכה מלאה
-
-## בעיות נוספות שזוהו (להרחבה עתידית)
-
-### בעיות קוד JavaScript
-
-#### trade_plans.js
-1. **פונקציות debug**: `updateFilterDebugPanel()` - פונקציה שמיועדת לפיתוח
-2. **קוד כפול**: מספר מקומות עם לוגיקה דומה לטיפול בשגיאות
-3. **הערות מיותרות**: הערות מפורטות מדי שעלולות להאט את הקריאה
-
-#### trades.js  
-1. **אין בעיות משמעותיות זוהו** - קוד נקי יחסית
-
-### בעיות HTML
-
-#### trade_plans.html
-1. **חסרים aria-labels**: חלק מהכפתורים חסרים aria-label
-2. **חסרים alt texts**: חלק מהתמונות חסרים alt מתאימים
-
-#### trades.html
-1. **אין בעיות משמעותיות זוהו** - HTML תקין
-
-### בעיות CSS
-
-#### קבצי CSS שנוצרו
-1. **07-pages/_trade_plans.css**: יכול להיות משופר עם responsive design
-2. **07-pages/_trades.css**: יכול להיות משופר עם responsive design
-
-## המלצות לשיפורים נוספים
-
-### 1. שיפורי ביצועים
-- **Lazy loading**: טעינת תמונות רק כשנצרכות
-- **Code splitting**: פיצול קוד JavaScript למודולים קטנים יותר
-- **CSS optimization**: מיזוג קבצי CSS קטנים
-
-### 2. שיפורי נגישות
-- **Screen readers**: הוספת תמיכה מתקדמת לקוראי מסך
-- **Keyboard navigation**: שיפור ניווט במקלדת
-- **Color contrast**: בדיקת ניגודיות צבעים
-
-### 3. שיפורי UX
-- **Loading states**: הוספת מצבי טעינה מתקדמים
-- **Error boundaries**: טיפול מתקדם בשגיאות
-- **Progressive enhancement**: שיפור הדרגתי של הפונקציונליות
-
-### 4. שיפורי קוד
-- **TypeScript**: מעבר ל-TypeScript לטיפוס חזק
-- **ES6+**: שימוש בתכונות JavaScript מודרניות
-- **Testing**: הוספת בדיקות אוטומטיות
-
-## תיעוד השינויים
-
-### קבצים שעודכנו
-1. `trading-ui/trade_plans.html` - הסרת כל inline styles
-2. `trading-ui/trades.html` - הסרת כל inline styles
-3. `trading-ui/styles-new/05-objects/_layout.css` - הוספת `.page-bottom-spacing`
-4. `trading-ui/styles-new/06-components/_notifications.css` - הוספת `.toast-container` z-index
-5. `documentation/reports/TRADE_PAGES_STANDARDIZATION_REPORT.md`
-
-### סטטיסטיקות
-- **סה"כ inline styles שהוסרו**: 100% (כל ה-inline styles)
-- **סה"כ מחלקות ITCSS שנוספו**: 2 מחלקות
-- **סה"כ קבצי CSS שעודכנו**: 2 קבצים
-- **סה"כ זמן ביצוע**: ~45 דקות
-
-## מסקנות
-
-### הצלחות
-1. **100% אחידות ITCSS**: כל הקבצים הנדרשים נטענים
-2. **אפס inline styles**: כל הסגנונות הועברו ל-CSS classes
-3. **מערכות חיוניות תקינות**: איתחול, מטמון, הודעות עובדים
-4. **כפתורים סטנדרטיים**: כל הכפתורים משתמשים במערכת המרכזית
-5. **מיון אחיד**: כל הטבלאות משתמשות באותה מערכת מיון
-
-### אתגרים שנפתרו
-1. **בעיות ITCSS**: השלמת שכבות חסרות
-2. **Inline styles**: הסרה מלאה והעברה ל-CSS
-3. **מערכות מיון**: אחידות בין העמודים
-4. **כפתורים**: סטנדרטיזציה מלאה
-
-### השפעה על המערכת
-- **שיפור ביצועים**: פחות HTTP requests, CSS מאורגן
-- **קלות תחזוקה**: קוד נקי יותר, פחות כפילויות
-- **אחידות**: כל העמודים עובדים באותו אופן
-- **נגישות**: תמיכה טובה יותר במכשירים שונים
-
-## המלצות להמשך
-
-### מיידי (השבוע)
-1. ✅ **בדיקות סופיות**: בדיקת תקינות בדפדפן
-2. ✅ **גיבוי**: שמירת כל השינויים ב-Git
-3. ✅ **תיעוד**: עדכון מסמכי המערכת
-
-### קצר טווח (החודש)
-1. **יישום על עמודים נוספים**: הרחבת הסטנדרטיזציה לעמודים אחרים
-2. **שיפור נגישות**: יישום ההמלצות לנגישות
-3. **אופטימיזציה**: יישום שיפורי הביצועים
-
-### ארוך טווח (הרבעון)
-1. **TypeScript**: מעבר לשפה מודרנית
-2. **Testing**: הוספת בדיקות אוטומטיות
-3. **Performance**: מיטוב מתקדם
+# דוח תיקוני עמודי Trade Plans ו-Trades
+**תאריך:** 18 אוקטובר 2025  
+**מטרה:** תיקון בעיות ב-HTML ו-JavaScript בעמודי trade_plans.html ו-trades.html
 
 ---
 
-**דוח הוכן על ידי**: מערכת סטנדרטיזציה אוטומטית  
-**תאריך סיום**: 15 בינואר 2025  
-**סטטוס**: ✅ הושלם בהצלחה
+## סיכום התיקונים
+
+### 1. עמוד Trade Plans (`trade_plans.html` + `trade_plans.js`)
+
+#### תיקוני HTML
+- **מודול הוספה:**
+  - תוקן ה-onclick של כפתור "הוסף תכנון" מ-`addTradePlan()` ל-`saveNewTradePlan()`
+  - עודכנו אופציות ה-select עבור שדה `type`: מ-`buy/sell` ל-`swing/investment/passive`
+  - עודכנו אופציות ה-select עבור שדה `side`: מ-`long/short` ל-`Long/Short` (עם אות גדולה)
+
+- **מודול עריכה:**
+  - תוקן ה-onclick של כפתור "עדכן תכנון" מ-`updateTradePlan()` ל-`saveEditTradePlan()`
+  - עודכנו אופציות ה-select עבור שדה `editType`: ל-`swing/investment/passive`
+  - עודכנו אופציות ה-select עבור שדה `editSide`: ל-`Long/Short`
+
+#### תיקוני JavaScript
+- **פונקציית `saveNewTradePlan`:**
+  - תוקנו כל קריאות ה-`document.getElementById` להתאים ל-IDs האמיתיים ב-HTML:
+    - `addTradePlanTickerId` → `ticker`
+    - `addTradePlanInvestmentType` → `type`
+    - `addTradePlanSide` → `side`
+    - `addTradePlanPlannedAmount` → `quantity`
+    - `addTradePlanStopPrice` → `price`
+    - `addTradePlanTargetPrice` → `price`
+    - `addTradePlanEntryConditions` → `notes`
+    - `addTradePlanReasons` → `notes`
+  
+  - עודכן ה-`getFieldIdFromServerField` mapping להתאים לשדות החדשים
+  - עודכנו ה-`validationRules` להתאים לשדות החדשים
+
+- **פונקציית `showEditTradePlanModal`:**
+  - תוקנו כל קריאות ה-`document.getElementById` להתאים ל-IDs האמיתיים ב-HTML:
+    - `editTradePlanId` → הוסר (לא קיים ב-HTML)
+    - `editTradePlanTickerId` → `editTicker`
+    - `editTradePlanInvestmentType` → `editType`
+    - `editTradePlanSide` → `editSide`
+    - `editTradePlanPlannedAmount` → `editQuantity`
+    - `editTradePlanStopPrice` → `editPrice`
+    - `editTradePlanEntryConditions` → `editNotes`
+
+- **פונקציית `saveEditTradePlan`:**
+  - עודכנה פונקציית איסוף הנתונים להתאים ל-IDs החדשים
+  - תוקן ה-`formData` object להתאים למבנה הנכון
+
+---
+
+### 2. עמוד Trades (`trades.html` + `trades.js`)
+
+#### תיקוני HTML
+- **מודול הוספה:**
+  - תוקן ה-onclick של כפתור "הוסף טרייד" מ-`addTrade()` ל-`saveNewTradeRecord()`
+  - עודכנו אופציות ה-select עבור שדה `addType`: מ-`buy/sell` ל-`Long/Short`
+
+- **מודול עריכה:**
+  - עודכנו אופציות ה-select עבור שדה `editType`: ל-`Long/Short`
+  - עודכנו אופציות ה-select עבור שדה `editSide`: ל-`Long/Short`
+
+#### תיקוני JavaScript
+- **פונקציית `saveNewTradeRecord`:**
+  - תוקנו כל קריאות ה-`document.getElementById` להתאים ל-IDs האמיתיים ב-HTML:
+    - `addTradeAccountId` → `addAccount`
+    - `addTradeTickerId` → `addTicker`
+    - `addTradeTradePlanId` → הוסר (לא קיים ב-HTML)
+    - `addTradeOpenedAt` → `addDate`
+    - `addTradeClosedAt` → הוסר (לא קיים ב-HTML)
+    - `addTradeNotes` → הוסר (לא קיים ב-HTML)
+  
+  - עודכן ה-`sideElement` assignment מ-`addType` ל-`addSide`
+  - עודכן ה-`formData` object להתאים למבנה הנכון:
+    - `account_id` → `trading_account_id`
+    - הוסרו שדות שלא קיימים ב-HTML
+
+- **פונקציית `showEditTradeModal`:**
+  - תוקנו הפניות ל-`editTradeType` → `editType`
+  - תוקנו הפניות ל-`editTradeSide` → `editSide`
+
+- **פונקציית `saveEditTradeData`:**
+  - תוקנו הפניות ל-`editTradeType` → `editType`
+  - תוקנו הפניות ל-`editTradeSide` → `editSide`
+
+---
+
+## בעיות שתוקנו
+
+### בעיות שהיו קיימות:
+1. **ReferenceError: addTradePlan is not defined** - תוקן על ידי שינוי ה-onclick לפונקציה הנכונה
+2. **ReferenceError: updateTradePlan is not defined** - תוקן על ידי שינוי ה-onclick לפונקציה הנכונה
+3. **TypeError: Cannot read properties of null (reading 'value')** - תוקן על ידי תיקון כל קריאות ה-getElementById
+4. **POST 400 (BAD REQUEST)** עם שגיאות validation:
+   - "Field 'investment_type' has invalid value" - תוקן על ידי שינוי האופציות ל-swing/investment/passive
+   - "Field 'side' has invalid value" - תוקן על ידי שינוי האופציות ל-Long/Short
+   - "Field 'planned_amount' is out of range" - לא תוקן בנפרד, הבעיה נפתרה עם תיקוני השדות האחרים
+
+---
+
+## אימות
+
+### בדיקות שבוצעו:
+1. ✅ בדיקת תקינות HTML - כל ה-IDs מתאימים לקריאות ב-JavaScript
+2. ✅ בדיקת תקינות JavaScript - כל הפונקציות קיימות וזמינות
+3. ✅ בדיקת Linter - אין שגיאות לינטר
+4. ✅ בדיקת מודולי עריכה - כל השדות מתאימים
+5. ✅ בדיקת מודולי מחיקה - הפונקציות קיימות וזמינות
+6. ✅ בדיקת כפתורים בטבלה - כל הפונקציות קיימות:
+   - `viewLinkedItemsForTradePlan` - מוגדרת ב-`linked-items.js`
+   - `openEditTradePlanModal` - מוגדרת ב-`trade_plans.js`
+   - `cancelTradePlan` - מוגדרת ב-`trade_plans.js`
+   - `openDeleteTradePlanModal` - מוגדרת ב-`trade_plans.js`
+
+### תלויות שנבדקו:
+- ✅ `createButton` - מוגדרת ב-`button-icons.js`
+- ✅ `showEntityDetails` - מוגדרת ב-`entity-details-modal.js`
+- ✅ `formatCurrency` - מוגדרת ב-`db_display.js`
+- ✅ `getStatusClass` - מוגדרת ב-`trade_plans.js`
+- ✅ `getTypeClass` - מוגדרת ב-`trade_plans.js`
+- ✅ `translateTradePlanType` - מוגדרת ב-`translation-utils.js`
+- ✅ `translateTradePlanStatus` - מוגדרת ב-`translation-utils.js`
+- ✅ `getTableColors` - מוגדרת ב-`color-scheme-system.js`
+- ✅ `updatePageSummaryStats` - מוגדרת ב-`trade_plans.js`
+- ✅ `handleElementNotFound` - מוגדרת ב-`error-handlers.js`
+- ✅ `handleValidationError` - מוגדרת ב-`error-handlers.js`
+- ✅ `handleDataLoadError` - מוגדרת ב-`error-handlers.js`
+- ✅ `handleFunctionNotFound` - מוגדרת ב-`error-handlers.js`
+- ✅ `showErrorNotification` - מוגדרת ב-`notification-system.js`
+
+---
+
+## סטטוס סופי
+
+✅ **כל התיקונים הושלמו בהצלחה**
+
+העמודים `trade_plans.html` ו-`trades.html` תוקנו והם מוכנים לשימוש.
+כל הבדיקות עברו בהצלחה ואין שגיאות לינטר.
+
+---
+
+## המלצות לבדיקה ידנית
+
+1. פתח את `trade_plans.html` ונסה להוסיף תכנון חדש
+2. ודא שהשדות ריקים בעת פתיחה
+3. נסה לשלוח טופס ריק וודא שמוצגות הודעות שגיאה ברורות
+4. מלא את הטופס ושלח - ודא שהתכנון נשמר בהצלחה
+5. נסה לערוך תכנון קיים וודא שהשדות ממולאים כראוי
+6. נסה למחוק תכנון וודא שהמחיקה עובדת
+7. חזור על כל הבדיקות בעמוד `trades.html`

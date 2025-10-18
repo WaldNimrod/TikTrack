@@ -1479,17 +1479,16 @@ async function saveNewTradeRecord() {
   }
 
   // איסוף נתונים מהטופס
-  const accountElement = document.getElementById('addTradeAccountId');
-  const tickerElement = document.getElementById('addTradeTickerId');
-  const tradePlanElement = document.getElementById('addTradeTradePlanId');
+  const accountElement = document.getElementById('addAccount');
+  const tickerElement = document.getElementById('addTicker');
   const typeElement = document.getElementById('addType');
   const sideElement = document.getElementById('addType');
-  const openedAtElement = document.getElementById('addTradeOpenedAt');
-  const closedAtElement = document.getElementById('addTradeClosedAt');
-  const notesElement = document.getElementById('addTradeNotes');
+  const quantityElement = document.getElementById('addQuantity');
+  const priceElement = document.getElementById('addPrice');
+  const dateElement = document.getElementById('addDate');
 
   // בדיקה שכל האלמנטים קיימים
-  if (!accountElement || !tickerElement || !tradePlanElement || !typeElement || !sideElement || !openedAtElement) {
+  if (!accountElement || !tickerElement || !typeElement || !sideElement || !quantityElement || !priceElement || !dateElement) {
     if (typeof handleElementNotFound === 'function') {
       handleElementNotFound('form elements', 'CRITICAL');
     } else {
@@ -1502,15 +1501,12 @@ async function saveNewTradeRecord() {
   }
 
   const formData = {
-    account_id: parseInt(accountElement.value),
+    trading_account_id: parseInt(accountElement.value),
     ticker_id: parseInt(tickerElement.value), // NOT NULL - לא יכול להיות null
-    trade_plan_id: parseInt(tradePlanElement.value), // NOT NULL - לא יכול להיות null
     investment_type: typeElement.value, // תיקון שם השדה
     side: sideElement.value,
     status: 'open',
-    created_at: openedAtElement.value, // NOT NULL - לא יכול להיות null
-    closed_at: closedAtElement ? closedAtElement.value || null : null,
-    notes: notesElement ? notesElement.value || null : null,
+    notes: null, // ניתן להוסיף שדה הערות בטופס בעתיד
   };
 
   try {

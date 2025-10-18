@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="he" dir="rtl" class="trades-page">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -63,20 +63,26 @@
     <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_page-headers.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_info-summary.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_constraints.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_system-management.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_chart-management.css?v=1.0.0">
     
     <!-- 07-pages - Page-specific Styles (file not found, removed) -->
     
     <!-- 08-themes - Themes -->
     <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=1.0.0">
     
-    <!-- 09-utilities - Utility Classes (files not found, removed) -->
+    <!-- 09-utilities - Utility Classes -->
+    <link rel="stylesheet" href="styles-new/09-utilities/_utilities.css?v=1.0.0">
     
     <!-- External Libraries -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=1.0.0">
 </head>
 
 <body class="trades-page">
@@ -91,7 +97,7 @@
                 <!-- כותרת מעקב טריידים -->
                 <div class="section-header entity-trade-main-header">
                     <div class="table-title">
-                        <img src="images/icons/trades.svg" alt="מעקב טריידים" style="width: 40px; height: 40px; margin-left: 8px; vertical-align: middle;">
+                        <img src="images/icons/trades.svg" alt="מעקב טריידים">
                         מעקב טריידים
                     </div>
                     <div class="table-actions">
@@ -107,7 +113,7 @@
                 <!-- כרטיסיות התראות -->
                 <div class="section-body">
                     <!-- Color Scheme Demo for Trades -->
-                    <div id="tradesColorDemo" class="mb-3" style="display: none;">
+                    <div id="tradesColorDemo" class="mb-3">
                         <div class="d-flex gap-2 mb-2">
                             <span class="entity-trade-badge">טרייד פעיל</span>
                             <span class="entity-account-badge">Interactive Brokers</span>
@@ -141,21 +147,21 @@
                     <!-- כותרת הטריידים שלי -->
                     <div class="section-header entity-trade-main-header">
                         <div class="table-title">
-                            <img src="images/icons/trades.svg" alt="הטריידים שלי" style="width: 40px; height: 40px; margin-left: 8px; vertical-align: middle;">
+                            <img src="images/icons/trades.svg" alt="הטריידים שלי">
                             הטריידים שלי
                         </div>
                         <div class="table-count" id="tradesCount">טוען...</div>
                         <div class="table-actions">
                             <button id="addTradeBtn" class="btn btn-success" onclick="showAddTradeModal()" title="הוסף טרייד חדש">
-                                <img src="images/icons/trades.svg" alt="הוסף" class="action-icon" style="width: 16px; height: 16px;"> הוסף
+                                <img src="images/icons/trades.svg" alt="הוסף" class="action-icon"> הוסף
                             </button>
                             
                             <!-- כפתורי עריכה ומחיקה נסתרים (לזיהוי בבדיקות) -->
                             <button id="editTradeBtn" class="btn btn-secondary d-none" onclick="editTradeRecord('')" title="ערוך טרייד נבחר">
-                                <img src="images/icons/trades.svg" alt="ערוך" class="action-icon" style="width: 16px; height: 16px;"> ערוך
+                                <img src="images/icons/trades.svg" alt="ערוך" class="action-icon"> ערוך
                             </button>
                             <button id="deleteTradeBtn" class="btn btn-danger d-none" onclick="deleteTradeRecord('')" title="מחק טרייד נבחר">
-                                <img src="images/icons/trades.svg" alt="מחק" class="action-icon" style="width: 16px; height: 16px;"> מחק
+                                <img src="images/icons/trades.svg" alt="מחק" class="action-icon"> מחק
                             </button>
 
                             <div class="action-separator"></div>
@@ -174,84 +180,84 @@
                                         <th class="col-ticker">
                                             <button class="btn btn-link sortable-header"
                                                 data-sort-column="0"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(0, window.tradesData || [], 'trades', window.updateTradesTable); }"
                                                 טיקר <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-price">
                                             <button class="btn btn-link sortable-header"
                                                 data-sort-column="1"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, window.tradesData || [], 'trades', window.updateTradesTable); }"
                                                 מחיר נוכחי <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-change">
                                             <button class="btn btn-link sortable-header"
                                                 data-sort-column="2"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(2, window.tradesData || [], 'trades', window.updateTradesTable); }"
                                                 שינוי % <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-status">
                                             <button class="btn btn-link sortable-header"
                                                 data-sort-column="3"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(3, window.tradesData || [], 'trades', window.updateTradesTable); }"
                                                 סטטוס <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-type">
                                             <button class="btn btn-link sortable-header"
                                                 data-sort-column="4"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(4, window.tradesData || [], 'trades', window.updateTradesTable); }"
                                                 סוג <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-side">
                                             <button class="btn btn-link sortable-header"
                                                 data-sort-column="5"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(5, window.tradesData || [], 'trades', window.updateTradesTable); }"
                                                 צד <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-plan">
                                             <button class="btn btn-link sortable-header"
                                                 data-sort-column="6"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(6, window.tradesData || [], 'trades', window.updateTradesTable); }"
                                                 תוכנית <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-pnl">
                                             <button class="btn btn-link sortable-header"
                                                 data-sort-column="7"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(7, window.tradesData || [], 'trades', window.updateTradesTable); }"
                                                 רווח/הפסד <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-created">
                                             <button class="btn btn-link sortable-header"
                                                 data-sort-column="8"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(8, window.tradesData || [], 'trades', window.updateTradesTable); }"
                                                 נוצר ב <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-closed">
                                             <button class="btn btn-link sortable-header"
                                                 data-sort-column="9"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(9, window.tradesData || [], 'trades', window.updateTradesTable); }"
                                                 נסגר ב <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-account">
                                             <button class="btn btn-link sortable-header"
                                                 data-sort-column="10"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(10, window.tradesData || [], 'trades', window.updateTradesTable); }"
                                                 חשבון <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-notes">
                                             <button class="btn btn-link sortable-header"
                                                 data-sort-column="11"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(11, window.tradesData || [], 'trades', window.updateTradesTable); }"
                                                 הערות <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
@@ -277,35 +283,100 @@
         </div> <!-- סוף page-body -->
 
         <!-- מרווח בתחתית הדף -->
-        <div style="height: 3rem;"></div>
+        <div class="page-bottom-spacing"></div>
+
+        <!-- מודל הוספת טרייד -->
+        <div class="modal fade" id="addTradeModal" tabindex="-1" aria-labelledby="addTradeModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-colored">
+                        <h5 class="modal-title" id="addTradeModalLabel">הוספת טרייד חדש</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addTradeForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="addTicker" class="form-label">טיקר</label>
+                                        <input type="text" class="form-control" id="addTicker" placeholder="AAPL" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="addType" class="form-label">סוג</label>
+                                        <select class="form-select" id="addType" required>
+                                            <option value="">בחר סוג</option>
+                                            <option value="buy">קנייה</option>
+                                            <option value="sell">מכירה</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="addQuantity" class="form-label">כמות</label>
+                                        <input type="number" class="form-control" id="addQuantity" placeholder="100" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="addPrice" class="form-label">מחיר</label>
+                                        <input type="number" class="form-control" id="addPrice" step="0.01" placeholder="150.00" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="addDate" class="form-label">תאריך</label>
+                                        <input type="date" class="form-control" id="addDate" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="addAccount" class="form-label">חשבון</label>
+                                        <select class="form-select" id="addAccount" required>
+                                            <option value="">בחר חשבון</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                        <button type="button" class="btn btn-success" onclick="addTrade()">הוסף טרייד</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- מודל עריכת טרייד -->
         <div class="modal fade" id="editTradeModal" tabindex="-1" aria-labelledby="editTradeModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
-            <div class="modal-dialog modal-lg" style="max-width: 800px; margin: 1.75rem auto;">
+            <div class="modal-dialog modal-lg">
                 <div class="modal-content">
-                    <div class="modal-header" style="background-color: var(--warning-color, #ff9c05); color: white;">
-                        <h5 class="modal-title" id="editTradeModalLabel" style="order: 1;">עריכת טרייד</h5>
-                        <div style="order: 2;">
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
+                    <div class="modal-header modal-header-colored">
+                        <h5 class="modal-title" id="editTradeModalLabel">עריכת טרייד</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
 
                     <!-- שורת מידע ואיקונים מתחת לכותרת -->
-                    <div class="d-flex justify-content-between align-items-center p-2"
-                        style="background-color: var(--light-bg-color, #f8f9fa); border-bottom: 1px solid var(--border-color, #dee2e6);">
+                    <div class="d-flex justify-content-between align-items-center p-2 modal-info-section">
                         <!-- מידע טיקר, מחיר ושינוי יומי -->
                         <div class="d-flex gap-4 align-items-center">
                             <div class="d-flex align-items-center">
-                                <span class="text-muted me-2" style="font-size: 14px;">טיקר:</span>
-                                <span id="modalTickerSymbol" class="fw-bold" style="font-size: 16px; color: var(--text-color, #333);">-</span>
+                                <span class="text-muted me-2 info-label">טיקר:</span>
+                                <span id="modalTickerSymbol" class="fw-bold info-value">-</span>
                             </div>
                             <div class="d-flex align-items-center">
-                                <span class="text-muted me-2" style="font-size: 14px;">מחיר:</span>
-                                <span id="modalCurrentPrice" class="fw-bold" style="font-size: 16px; color: var(--text-color, #333);">-</span>
+                                <span class="text-muted me-2 info-label">מחיר:</span>
+                                <span id="modalCurrentPrice" class="fw-bold info-value">-</span>
                             </div>
                             <div class="d-flex align-items-center">
-                                <span class="text-muted me-2" style="font-size: 14px;">שינוי:</span>
-                                <span id="modalPriceChange" class="fw-bold" style="font-size: 16px;">-</span>
+                                <span class="text-muted me-2 info-label">שינוי:</span>
+                                <span id="modalPriceChange" class="fw-bold info-value">-</span>
                             </div>
                         </div>
 
@@ -396,10 +467,10 @@
                             <!-- כפתורים בצד שמאל -->
                             <div>
                                 <button type="button" class="btn btn-info me-2" onclick="addImportantNote()">
-                                    <img src="images/icons/home.svg" alt="יש לי עוד משהו חשוב" class="btn-icon" style="width: 16px; height: 16px;"> יש לי עוד משהו חשוב
+                                    <img src="images/icons/home.svg" alt="יש לי עוד משהו חשוב" class="btn-icon"> יש לי עוד משהו חשוב
                             </button>
                             <button type="button" class="btn btn-warning" onclick="addReminder()">
-                                    <img src="images/icons/alerts.svg" alt="תזכיר לי כש..." class="btn-icon" style="width: 16px; height: 16px;"> תזכיר לי כש...
+                                    <img src="images/icons/alerts.svg" alt="תזכיר לי כש..." class="btn-icon"> תזכיר לי כש...
                             </button>
                         </div>
 
@@ -435,13 +506,13 @@
         </div>
 
         <!-- Bottom page spacing -->
-        <div style="height: 3rem;"></div>
+        <div class="page-bottom-spacing"></div>
 
         <!-- Notification system -->
         <div class="notification-container" id="notificationContainer"></div>
 
         <!-- Toast container for notifications -->
-        <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1000000002;"></div>
+        <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
     </div> <!-- End background-wrapper -->
     
     <!-- Bootstrap JavaScript -->

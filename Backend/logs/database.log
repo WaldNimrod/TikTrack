@@ -24791,3 +24791,57 @@ FROM trade_plans LEFT OUTER JOIN trading_accounts AS trading_accounts_1 ON tradi
 2025-10-18 01:12:04,732 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
 2025-10-18 01:12:04,733 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
 2025-10-18 01:12:04,733 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-10-18 12:52:56,476 - root - INFO - 🚀 Starting TikTrack server...
+2025-10-18 12:52:56,477 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend
+2025-10-18 12:52:56,477 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-10-18 12:52:56,477 - root - INFO - 📦 Flask version: 2.3.3
+2025-10-18 12:52:56,477 - root - INFO - 🗄️ Initializing database...
+2025-10-18 12:52:56,477 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-10-18 12:52:56,481 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.004s
+2025-10-18 12:52:56,481 - root - INFO - ✅ Database initialized successfully
+2025-10-18 12:52:57,487 - utils.performance_monitor - INFO - System metrics: CPU: 16.3%, Memory: 63.0%, Disk: 3.5%
+2025-10-18 12:52:57,487 - root - INFO - ✅ Database initialized successfully
+2025-10-18 12:52:57,487 - root - INFO - ✅ Server initialization completed
+2025-10-18 12:52:57,526 - root - INFO - 🚀 Starting background task scheduler...
+2025-10-18 12:52:57,527 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-10-18 12:52:57,527 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-10-18 12:52:57,527 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-10-18 12:52:57,527 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-10-18 12:52:57,527 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-10-18 12:52:57,527 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-10-18 12:52:57,527 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-10-18 12:52:57,527 - services.background_tasks - INFO - Background task scheduler started
+2025-10-18 12:52:57,527 - root - INFO - ✅ Background task scheduler started successfully
+2025-10-18 12:52:57,528 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:206c6c8dcad4ecfe5b1b0ae1c6798ee1
+2025-10-18 12:52:57,551 - cache - INFO - Cache SET: services.system_settings_service.get_setting:206c6c8dcad4ecfe5b1b0ae1c6798ee1 (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-18 12:52:57,552 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-10-18 12:52:57,553 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-10-18 12:52:57,554 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-10-18 12:56:48,496 - root - INFO - 🚀 Starting TikTrack server...
+2025-10-18 12:56:48,497 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend
+2025-10-18 12:56:48,497 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-10-18 12:56:48,497 - root - INFO - 📦 Flask version: 2.3.3
+2025-10-18 12:56:48,497 - root - INFO - 🗄️ Initializing database...
+2025-10-18 12:56:48,497 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-10-18 12:56:48,501 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.004s
+2025-10-18 12:56:48,501 - root - INFO - ✅ Database initialized successfully
+2025-10-18 12:56:49,504 - utils.performance_monitor - INFO - System metrics: CPU: 26.2%, Memory: 62.9%, Disk: 3.5%
+2025-10-18 12:56:49,504 - root - INFO - ✅ Database initialized successfully
+2025-10-18 12:56:49,504 - root - INFO - ✅ Server initialization completed
+2025-10-18 12:56:49,542 - root - INFO - 🚀 Starting background task scheduler...
+2025-10-18 12:56:49,542 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-10-18 12:56:49,542 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-10-18 12:56:49,543 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-10-18 12:56:49,543 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-10-18 12:56:49,543 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-10-18 12:56:49,543 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-10-18 12:56:49,543 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-10-18 12:56:49,543 - services.background_tasks - INFO - Background task scheduler started
+2025-10-18 12:56:49,543 - root - INFO - ✅ Background task scheduler started successfully
+2025-10-18 12:56:49,543 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:0a67000012337ce03a1ffce1b33768fa
+2025-10-18 12:56:49,566 - cache - INFO - Cache SET: services.system_settings_service.get_setting:0a67000012337ce03a1ffce1b33768fa (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-18 12:56:49,566 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-10-18 12:56:49,567 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-10-18 12:56:49,569 - root - INFO - ✅ External data refresh scheduler started successfully

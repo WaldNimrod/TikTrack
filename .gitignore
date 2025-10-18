@@ -11,6 +11,7 @@ backup/
 
 # Node modules (if any)
 node_modules/
+**/node_modules/
 
 # IDE files
 .vscode/settings.json
@@ -22,5 +23,22 @@ Thumbs.db
 
 # Database files (too large for git)
 *.db
+*.db-shm
+*.db-wal
 *.sqlite
 *.sqlite3
+
+# Temporary and cache files
+*.tmp
+*.temp
+*.cache
+*.swp
+*.swo
+*~
+
+# Additional log patterns
+*.log.*
+logs/*.log.*
+
+# Archive directories (keep local but don't backup)
+archive/

@@ -21,6 +21,11 @@
   color: initial !important; /* Reset any inherited color */
 }
 
+/* קונטיינר Toast */
+.toast-container {
+  z-index: 1000000002;
+}
+
 /* התראה בודדת - עיצוב בסיסי */
 .notification {
   background: #ffffff !important;

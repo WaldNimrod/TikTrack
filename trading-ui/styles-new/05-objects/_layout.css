@@ -300,6 +300,11 @@
   align-items: center;
 }
 
+/* מרווח בתחתית העמוד */
+.page-bottom-spacing {
+  height: 3rem;
+}
+
 /* כפתור רענון */
 .refresh-btn {
   background: var(--apple-bg-primary);

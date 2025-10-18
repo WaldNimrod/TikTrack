@@ -12,10 +12,10 @@
  * Set favicon for the current page
  * מגדיר favicon לעמוד הנוכחי
  * 
- * @param {string} iconPath - Path to the icon file (default: 'favicon.ico')
- * @param {string} iconType - MIME type of the icon (default: 'image/svg+xml')
+ * @param {string} iconPath - Path to the icon file (default: 'images/icons/favicon.ico')
+ * @param {string} iconType - MIME type of the icon (default: 'image/x-icon')
  */
-function setGlobalFavicon(iconPath = 'favicon.ico', iconType = 'image/svg+xml') {
+function setGlobalFavicon(iconPath = 'images/icons/favicon.ico', iconType = 'image/x-icon') {
     try {
         // Remove existing favicon links
         const existingFavicons = document.querySelectorAll('link[rel*="icon"]');
@@ -49,7 +49,7 @@ function setGlobalFavicon(iconPath = 'favicon.ico', iconType = 'image/svg+xml') 
  */
 function setPageSpecificFavicon(pageType = 'home') {
     const iconMap = {
-        'home': 'favicon.ico',
+        'home': 'images/icons/favicon.ico',
         'linter': 'images/icons/development.svg',
         'js-map': 'images/icons/development.svg',
         'accounts': 'images/icons/accounts.svg',
@@ -59,7 +59,7 @@ function setPageSpecificFavicon(pageType = 'home') {
         'db-display': 'images/icons/db_display.svg'
     };
     
-    const iconPath = iconMap[pageType] || 'favicon.ico';
+    const iconPath = iconMap[pageType] || 'images/icons/favicon.ico';
     const iconType = iconPath.endsWith('.svg') ? 'image/svg+xml' : 'image/x-icon';
     
     setGlobalFavicon(iconPath, iconType);
@@ -104,7 +104,7 @@ function autoSetFavicon() {
  * @param {string} iconPath - Path to the icon file
  * @param {string} iconType - MIME type of the icon
  */
-function setFavicon(iconPath = 'favicon.ico', iconType = 'image/svg+xml') {
+function setFavicon(iconPath = 'images/icons/favicon.ico', iconType = 'image/x-icon') {
     return setGlobalFavicon(iconPath, iconType);
 }
 
@@ -117,7 +117,7 @@ function setFavicon(iconPath = 'favicon.ico', iconType = 'image/svg+xml') {
 function updateFaviconBasedOnStatus(status = 'online') {
     const statusIcons = {
         'online': {
-            path: 'favicon.ico',
+            path: 'images/icons/favicon.ico',
             type: 'image/x-icon'
         },
         'offline': {

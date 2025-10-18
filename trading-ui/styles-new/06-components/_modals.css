@@ -46,11 +46,11 @@
 
 /* הודעות - וידוא שהן מופיעות מעל הכל */
 .toast {
-  z-index: 100000000 ;
+  z-index: 1000000002 ;
 }
 
 .toast-container {
-  z-index: 100000000 ;
+  z-index: 1000000002 ;
 }
 
 /* וידוא שכל המודלים מופיעים מעל הכל */
@@ -78,7 +78,21 @@
 #editExecutionModal,
 #deleteExecutionModal,
 #linkedItemsModal,
-#warningModal {
+#warningModal,
+#addAccountModal,
+#editAccountModal,
+#addTradeModal,
+#editTradeModal,
+#addTradePlanModal,
+#editTradePlanModal,
+#addCashFlowModal,
+#editCashFlowModal,
+#addNoteModal,
+#editNoteModal,
+#addTickerModal,
+#editTickerModal,
+#loadingModal,
+#log-test-modal {
   z-index: 999999999 ;
 }
 
@@ -88,7 +102,21 @@
 #editExecutionModal .modal-dialog,
 #deleteExecutionModal .modal-dialog,
 #linkedItemsModal .modal-dialog,
-#warningModal .modal-dialog {
+#warningModal .modal-dialog,
+#addAccountModal .modal-dialog,
+#editAccountModal .modal-dialog,
+#addTradeModal .modal-dialog,
+#editTradeModal .modal-dialog,
+#addTradePlanModal .modal-dialog,
+#editTradePlanModal .modal-dialog,
+#addCashFlowModal .modal-dialog,
+#editCashFlowModal .modal-dialog,
+#addNoteModal .modal-dialog,
+#editNoteModal .modal-dialog,
+#addTickerModal .modal-dialog,
+#editTickerModal .modal-dialog,
+#loadingModal .modal-dialog,
+#log-test-modal .modal-dialog {
   z-index: 1000000000 ;
 }
 
@@ -98,7 +126,21 @@
 #editExecutionModal .modal-content,
 #deleteExecutionModal .modal-content,
 #linkedItemsModal .modal-content,
-#warningModal .modal-content {
+#warningModal .modal-content,
+#addAccountModal .modal-content,
+#editAccountModal .modal-content,
+#addTradeModal .modal-content,
+#editTradeModal .modal-content,
+#addTradePlanModal .modal-content,
+#editTradePlanModal .modal-content,
+#addCashFlowModal .modal-content,
+#editCashFlowModal .modal-content,
+#addNoteModal .modal-content,
+#editNoteModal .modal-content,
+#addTickerModal .modal-content,
+#editTickerModal .modal-content,
+#loadingModal .modal-content,
+#log-test-modal .modal-content {
   z-index: 1000000001 ;
 }
 
@@ -201,6 +243,7 @@
   direction: rtl;
 }
 
+
 /* כפתור סגירה - פינה שמאלית עליונה */
 .modal .btn-close {
   position: absolute;
@@ -232,6 +275,70 @@
   font-size: 1.5rem ;
   font-weight: bold ;
   content: none ;
+}
+
+/* כותרת מודל צבעונית - רקע צבע ראשי */
+.modal-header-colored {
+  background-color: var(--primary-color, #29a6a8);
+  color: white;
+  border-bottom: 1px solid var(--primary-color, #29a6a8);
+}
+
+.modal-header-colored .modal-title {
+  color: white;
+}
+
+.modal-header-colored .btn-close {
+  color: white;
+  filter: brightness(0) invert(1);
+}
+
+/* כותרת מודל סכנה - רקע אדום */
+.modal-header-danger {
+  background-color: var(--danger-color, #dc3545);
+  color: white;
+  border-bottom: 1px solid var(--danger-color, #dc3545);
+}
+
+.modal-header-danger .modal-title {
+  color: white;
+}
+
+.modal-header-danger .btn-close {
+  color: white;
+  filter: brightness(0) invert(1);
+}
+
+/* כותרת מודל אזהרה - רקע כתום */
+.modal-header-warning {
+  background-color: var(--warning-color, #ffc107);
+  color: white;
+  border-bottom: 1px solid var(--warning-color, #ffc107);
+}
+
+.modal-header-warning .modal-title {
+  color: white;
+}
+
+.modal-header-warning .btn-close {
+  color: white;
+  filter: brightness(0) invert(1);
+}
+
+/* כותרת מודל הצלחה - רקע ירוק */
+.modal-header-success {
+  background-color: var(--success-color, #28a745);
+  color: white;
+  border-bottom: 1px solid var(--success-color, #28a745);
+}
+
+.modal-header-success .modal-title {
+  color: white;
+}
+
+.modal-header-success .btn-close {
+  color: white;
+  filter: brightness(0) invert(1);
 }
 
 /* וידוא שהודעות שגיאה מופיעות מעל המודול */

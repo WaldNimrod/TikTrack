@@ -254,7 +254,7 @@ function openAddTradePlanModal() {
   const mm = String(today.getMonth() + 1).padStart(2, '0');
   const dd = String(today.getDate()).padStart(2, '0');
   const todayStr = `${yyyy}-${mm}-${dd}`;
-  const dateInput = document.getElementById('addTradePlanDate');
+  const dateInput = document.getElementById('notes');
   if (dateInput) {dateInput.value = todayStr;}
 
   modal.show();
@@ -1473,56 +1473,92 @@ function updatePageSummaryStats() {
 /**
  * הצגת מודל הוספת תכנון
  */
-function showAddTradePlanModal() {
+async function showAddTradePlanModal() {
+  console.log('🚀 showAddTradePlanModal: Starting modal preparation...');
+  console.log('🔍 showAddTradePlanModal: Checking if modal is already open...');
+  
+  // Check if modal is already open
+  const existingModal = document.querySelector('#addTradePlanModal.show');
+  if (existingModal) {
+    console.log('⚠️ showAddTradePlanModal: Modal already open, closing first...');
+    const modal = bootstrap.Modal.getInstance(existingModal);
+    if (modal) modal.hide();
+  }
+  
   // Clearing the form completely
   const form = document.getElementById('addTradePlanForm');
   if (form) {
+    console.log('✅ showAddTradePlanModal: Form found, starting reset...');
     form.reset();
 
     // Clear all form fields manually to ensure complete reset
     const allInputs = form.querySelectorAll('input, select, textarea');
+    console.log(`🔧 showAddTradePlanModal: Clearing ${allInputs.length} form inputs...`);
     allInputs.forEach(input => {
+      // Clear all inputs except date (which will be set later)
       if (input.type !== 'date') {
+        console.log(`🔧 Clearing input: ${input.id || input.name || input.type} (old value: "${input.value}")`);
         input.value = '';
-        input.classList.remove('is-valid', 'is-invalid');
       }
+      // Remove validation classes
+      input.classList.remove('is-valid', 'is-invalid');
+      // Remove any disabled state
+      input.disabled = false;
+      // Remove any required attribute that was added
+      input.removeAttribute('required');
     });
 
     // Clear any validation messages
     const validationMessages = form.querySelectorAll('.invalid-feedback');
     validationMessages.forEach(msg => msg.remove());
+
+    // Clear any ticker display information
+    const tickerDisplay = document.getElementById('selectedTickerDisplay');
+    const priceDisplay = document.getElementById('currentPriceDisplay');
+    const changeDisplay = document.getElementById('dailyChangeDisplay');
+    
+    if (tickerDisplay) tickerDisplay.textContent = 'לא נבחר';
+    if (priceDisplay) priceDisplay.textContent = '-';
+    if (changeDisplay) {
+      changeDisplay.textContent = '-';
+      changeDisplay.style.color = '#6c757d';
+    }
   }
 
-  // Set default values for required fields
-  const investmentTypeSelect = document.getElementById('addTradePlanInvestmentType');
+  // Set default values for required fields AFTER clearing
+  const investmentTypeSelect = document.getElementById('type');
   if (investmentTypeSelect) {
     investmentTypeSelect.value = 'swing'; // Default investment type
   }
 
-  const sideSelect = document.getElementById('addTradePlanSide');
+  const sideSelect = document.getElementById('side');
   if (sideSelect) {
     sideSelect.value = 'Long'; // Default side
   }
 
-  const plannedAmountInput = document.getElementById('addTradePlanPlannedAmount');
+  const plannedAmountInput = document.getElementById('quantity');
   if (plannedAmountInput) {
     plannedAmountInput.value = '1000'; // Default planned amount
   }
 
-  // Setting today's date
-  const today = new Date().toISOString().split('T')[0];
-  const dateInput = document.getElementById('addTradePlanDate');
-  if (dateInput) {
-    dateInput.value = today;
-  }
-
-  // Loading tickers from server
+  // Loading tickers from server FIRST
+  console.log('🔄 showAddTradePlanModal: Loading tickers from server...');
   if (typeof window.tickerService?.loadTickersForTradePlan === 'function') {
-    window.tickerService.loadTickersForTradePlan();
+    console.log('✅ showAddTradePlanModal: tickerService.loadTickersForTradePlan found, calling...');
+    await window.tickerService.loadTickersForTradePlan();
+    console.log('✅ showAddTradePlanModal: tickerService.loadTickersForTradePlan completed');
   } else {
+    console.log('❌ showAddTradePlanModal: tickerService.loadTickersForTradePlan not available');
     if (typeof window.showNotification === 'function') {
       window.showNotification('tickerService.loadTickersForTradePlan not available', 'warning');
     }
+  }
+
+  // Setting today's date AFTER loading tickers
+  const today = new Date().toISOString().split('T')[0];
+  const dateInput = document.getElementById('notes');
+  if (dateInput) {
+    dateInput.value = today;
   }
 
   // Clear any existing validation errors
@@ -1530,15 +1566,54 @@ function showAddTradePlanModal() {
     window.clearValidation('addTradePlanForm');
   }
 
+  // Ensure ticker select is reset to default AFTER loading tickers
+  console.log('🔄 showAddTradePlanModal: Resetting ticker select...');
+  const tickerSelect = document.getElementById('ticker');
+  if (tickerSelect) {
+    console.log(`🔧 showAddTradePlanModal: Ticker input found, current value: "${tickerSelect.value}"`);
+    console.log(`🔧 showAddTradePlanModal: Ticker input type: ${tickerSelect.type}`);
+    tickerSelect.value = '';
+    console.log(`🔧 showAddTradePlanModal: Ticker input reset, new value: "${tickerSelect.value}"`);
+    // Trigger change event to ensure any dependent fields are updated
+    tickerSelect.dispatchEvent(new Event('change'));
+    console.log('✅ showAddTradePlanModal: Ticker input change event triggered');
+  } else {
+    console.log('❌ showAddTradePlanModal: Ticker input not found');
+  }
+
+  // Wait a moment for the DOM to update, then display the modal
+  console.log('⏳ showAddTradePlanModal: Waiting 100ms before showing modal...');
+  setTimeout(() => {
+    console.log('🔄 showAddTradePlanModal: Timeout completed, showing modal...');
+    const addModalElement = document.getElementById('addTradePlanModal');
+    if (addModalElement) {
+      console.log('✅ showAddTradePlanModal: Modal element found, creating Bootstrap modal...');
+      const modal = new bootstrap.Modal(addModalElement);
+      console.log('🎬 showAddTradePlanModal: Showing modal...');
+      modal.show();
+      console.log('✅ showAddTradePlanModal: Modal show() called');
+      
+      // Check ticker input value after modal is shown
+      setTimeout(() => {
+        const tickerInputAfterModal = document.getElementById('ticker');
+        if (tickerInputAfterModal) {
+          console.log(`🔍 showAddTradePlanModal: Ticker input value after modal shown: "${tickerInputAfterModal.value}"`);
+        }
+      }, 200);
+    } else {
+      console.log('❌ showAddTradePlanModal: Modal element not found');
+    }
+  }, 100);
+
   // Initialize real-time validation for the form
   if (typeof window.initializeValidation === 'function') {
     const validationRules = {
-      'addTradePlanTickerId': {
+      'ticker': {
         required: true,
         type: 'select',
         message: 'יש לבחור טיקר',
       },
-      'addTradePlanInvestmentType': {
+      'type': {
         required: true,
         type: 'select',
         message: 'יש לבחור סוג השקעה',
@@ -1550,7 +1625,7 @@ function showAddTradePlanModal() {
           return true;
         },
       },
-      'addTradePlanSide': {
+      'side': {
         required: true,
         type: 'select',
         message: 'יש לבחור צד',
@@ -1562,7 +1637,7 @@ function showAddTradePlanModal() {
           return true;
         },
       },
-      'addTradePlanPlannedAmount': {
+      'quantity': {
         required: true,
         type: 'number',
         min: 0.01,
@@ -1579,7 +1654,7 @@ function showAddTradePlanModal() {
           return true;
         },
       },
-      'addTradePlanStopPrice': {
+      'price': {
         type: 'number',
         min: 0.01,
         max: 999999999,
@@ -1596,7 +1671,7 @@ function showAddTradePlanModal() {
           return true;
         },
       },
-      'addTradePlanTargetPrice': {
+      'notes': {
         type: 'number',
         min: 0.01,
         max: 999999999,
@@ -1613,7 +1688,7 @@ function showAddTradePlanModal() {
           return true;
         },
       },
-      'addTradePlanEntryConditions': {
+      'notes': {
         type: 'text',
         maxLength: 500,
         customValidation: value => {
@@ -1623,7 +1698,7 @@ function showAddTradePlanModal() {
           return true;
         },
       },
-      'addTradePlanReasons': {
+      'notes': {
         type: 'text',
         maxLength: 500,
         customValidation: value => {
@@ -1648,14 +1723,14 @@ function showAddTradePlanModal() {
 
   // השבתת כל השדות עד לבחירת טיקר
   const fieldsToDisable = [
-    'addTradePlanInvestmentType',
-    'addTradePlanSide',
-    'addTradePlanPlannedAmount',
-    'addTradePlanShares',
-    'addTradePlanStopPrice',
-    'addTradePlanTargetPrice',
-    'addTradePlanEntryConditions',
-    'addTradePlanReasons',
+    'type',
+    'side',
+    'quantity',
+    'quantity',
+    'price',
+    'notes',
+    'notes',
+    'notes',
   ];
 
   fieldsToDisable.forEach(fieldId => {
@@ -1690,14 +1765,14 @@ function showAddTradePlanModal() {
   }
 
   // Displaying the modal
-  const modalElement = document.getElementById('addTradePlanModal');
-  if (modalElement) {
+  const editModalElement = document.getElementById('addTradePlanModal');
+  if (editModalElement) {
     if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-      const modal = new bootstrap.Modal(modalElement);
+      const modal = new bootstrap.Modal(editModalElement);
       modal.show();
     } else {
-      modalElement.style.display = 'block';
-      modalElement.classList.add('show');
+      editModalElement.style.display = 'block';
+      editModalElement.classList.add('show');
     }
   }
 }
@@ -1718,11 +1793,11 @@ async function saveNewTradePlan() {
 
   // Define validation rules
   const validationRules = {
-    'addTradePlanTickerId': {
+    'ticker': {
       required: true,
       message: 'יש לבחור טיקר',
     },
-    'addTradePlanInvestmentType': {
+    'type': {
       required: true,
       message: 'יש לבחור סוג השקעה',
       customValidation: value => {
@@ -1733,7 +1808,7 @@ async function saveNewTradePlan() {
         return true;
       },
     },
-    'addTradePlanSide': {
+    'side': {
       required: true,
       message: 'יש לבחור צד',
       customValidation: value => {
@@ -1744,7 +1819,7 @@ async function saveNewTradePlan() {
         return true;
       },
     },
-    'addTradePlanPlannedAmount': {
+    'quantity': {
       required: true,
       message: 'יש להזין סכום מתוכנן',
       min: 0.01,
@@ -1760,7 +1835,7 @@ async function saveNewTradePlan() {
         return true;
       },
     },
-    'addTradePlanStopPrice': {
+    'price': {
       min: 0.01,
       max: 999999999,
       customValidation: value => {
@@ -1776,7 +1851,7 @@ async function saveNewTradePlan() {
         return true;
       },
     },
-    'addTradePlanTargetPrice': {
+    'notes': {
       min: 0.01,
       max: 999999999,
       customValidation: value => {
@@ -1792,7 +1867,7 @@ async function saveNewTradePlan() {
         return true;
       },
     },
-    'addTradePlanEntryConditions': {
+    'notes': {
       maxLength: 500,
       customValidation: value => {
         if (value && value.length > 500) {
@@ -1801,7 +1876,7 @@ async function saveNewTradePlan() {
         return true;
       },
     },
-    'addTradePlanReasons': {
+    'notes': {
       maxLength: 500,
       customValidation: value => {
         if (value && value.length > 500) {
@@ -1830,10 +1905,10 @@ async function saveNewTradePlan() {
     }
   } else {
     // Fallback validation if global system is not available
-    const tickerId = document.getElementById('addTradePlanTickerId').value;
-    const investmentType = document.getElementById('addTradePlanInvestmentType').value;
-    const side = document.getElementById('addTradePlanSide').value;
-    const plannedAmount = document.getElementById('addTradePlanPlannedAmount').value;
+    const tickerId = document.getElementById('ticker').value;
+    const investmentType = document.getElementById('type').value;
+    const side = document.getElementById('side').value;
+    const plannedAmount = document.getElementById('quantity').value;
 
     if (!tickerId || !investmentType || !side || !plannedAmount) {
       if (typeof window.showErrorNotification === 'function') {
@@ -1844,12 +1919,12 @@ async function saveNewTradePlan() {
   }
 
   // Get form values with proper validation
-  const tickerIdValue = document.getElementById('addTradePlanTickerId').value;
-  const investmentTypeValue = document.getElementById('addTradePlanInvestmentType').value;
-  const sideValue = document.getElementById('addTradePlanSide').value;
-  const plannedAmountValue = document.getElementById('addTradePlanPlannedAmount').value;
-  const stopPriceValue = document.getElementById('addTradePlanStopPrice').value;
-  const targetPriceValue = document.getElementById('addTradePlanTargetPrice').value;
+  const tickerIdValue = document.getElementById('ticker').value;
+  const investmentTypeValue = document.getElementById('type').value;
+  const sideValue = document.getElementById('side').value;
+  const plannedAmountValue = document.getElementById('quantity').value;
+  const stopPriceValue = document.getElementById('price').value;
+  const targetPriceValue = document.getElementById('price').value;
 
   // Form values before processing
 
@@ -1861,8 +1936,8 @@ async function saveNewTradePlan() {
     planned_amount: plannedAmountValue && plannedAmountValue !== '' ? parseFloat(plannedAmountValue) : 0,
     stop_price: stopPriceValue && stopPriceValue !== '' ? parseFloat(stopPriceValue) : null,
     target_price: targetPriceValue && targetPriceValue !== '' ? parseFloat(targetPriceValue) : null,
-    entry_conditions: document.getElementById('addTradePlanEntryConditions').value || '',
-    reasons: document.getElementById('addTradePlanReasons').value || '',
+    entry_conditions: document.getElementById('notes').value || '',
+    reasons: document.getElementById('notes').value || '',
     status: 'open', // Default to open status
   };
 
@@ -1871,25 +1946,25 @@ async function saveNewTradePlan() {
   // Additional validation before sending - רק אם המערכת הגלובלית לא זמינה
   if (typeof window.validateForm !== 'function') {
     if (!formData.ticker_id) {
-      showFieldError('addTradePlanTickerId', 'יש לבחור טיקר');
+      showFieldError('ticker', 'יש לבחור טיקר');
       showErrorNotification('שגיאה בטופס', 'יש לבחור טיקר');
       return;
     }
 
     if (!formData.investment_type || formData.investment_type === '') {
-      showFieldError('addTradePlanInvestmentType', 'יש לבחור סוג השקעה');
+      showFieldError('type', 'יש לבחור סוג השקעה');
       showErrorNotification('שגיאה בטופס', 'יש לבחור סוג השקעה');
       return;
     }
 
     if (!formData.side || formData.side === '') {
-      showFieldError('addTradePlanSide', 'יש לבחור צד');
+      showFieldError('side', 'יש לבחור צד');
       showErrorNotification('שגיאה בטופס', 'יש לבחור צד');
       return;
     }
 
     if (!formData.planned_amount || formData.planned_amount <= 0) {
-      showFieldError('addTradePlanPlannedAmount', 'סכום מתוכנן חייב להיות גדול מ-0');
+      showFieldError('quantity', 'סכום מתוכנן חייב להיות גדול מ-0');
       showErrorNotification('שגיאה בטופס', 'סכום מתוכנן חייב להיות גדול מ-0');
       return;
     }
@@ -1923,19 +1998,31 @@ async function saveNewTradePlan() {
 
           // Parse the error message to identify specific field issues
           if (errorMessage.includes('investment_type')) {
-            showFieldError('addTradePlanInvestmentType', 'יש לבחור סוג השקעה תקין');
+            if (typeof window.showFieldError === 'function') {
+              window.showFieldError('type', 'יש לבחור סוג השקעה תקין');
+            }
           }
           if (errorMessage.includes('side')) {
-            showFieldError('addTradePlanSide', 'יש לבחור צד תקין (Long או Short)');
+            if (typeof window.showFieldError === 'function') {
+              window.showFieldError('side', 'יש לבחור צד תקין (Long או Short)');
+            }
           }
           if (errorMessage.includes('planned_amount')) {
-            showFieldError('addTradePlanPlannedAmount', 'סכום מתוכנן חייב להיות גדול מ-0');
+            if (typeof window.showFieldError === 'function') {
+              window.showFieldError('quantity', 'סכום מתוכנן חייב להיות גדול מ-0');
+            }
           }
-          if (errorMessage.includes('ticker_id')) {
-            showFieldError('addTradePlanTickerId', 'יש לבחור טיקר');
+          if (errorMessage.includes('ticker_id') || errorMessage.includes('כבר קיים') || errorMessage.includes('already exists')) {
+            if (typeof window.showFieldError === 'function') {
+              window.showFieldError('ticker', errorMessage.includes('כבר קיים') || errorMessage.includes('already exists') ? 'תכנון לטיקר זה כבר קיים במערכת' : 'יש לבחור טיקר');
+            }
           }
 
-          showErrorNotification('שגיאה בטופס', 'יש לתקן את השגיאות בטופס לפני השמירה');
+          if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בשמירת תכנון', errorMessage);
+          } else if (typeof window.showNotification === 'function') {
+            window.showNotification(errorMessage, 'error');
+          }
           return;
         }
       } catch (e) {
@@ -1970,12 +2057,12 @@ async function saveNewTradePlan() {
  */
 function getFieldIdFromServerField(serverField) {
   const fieldMapping = {
-    'ticker_id': 'addTradePlanTickerId',
-    'investment_type': 'addTradePlanInvestmentType',
-    'side': 'addTradePlanSide',
-    'planned_amount': 'addTradePlanPlannedAmount',
-    'stop_price': 'addTradePlanStopPrice',
-    'target_price': 'addTradePlanTargetPrice',
+    'ticker_id': 'ticker',
+    'investment_type': 'type',
+    'side': 'side',
+    'planned_amount': 'quantity',
+    'stop_price': 'price',
+    'target_price': 'notes',
   };
   return fieldMapping[serverField] || null;
 }
@@ -2690,13 +2777,13 @@ window.initializeTradePlansPage = async function() {
   restoreSortState();
 };
 
-// Fallback for direct access (backward compatibility)
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', window.initializeTradePlansPage);
-} else {
-  // DOM already loaded, initialize immediately
-  window.initializeTradePlansPage();
-}
+// Fallback removed - using unified initialization system only
+// if (document.readyState === 'loading') {
+//   document.addEventListener('DOMContentLoaded', window.initializeTradePlansPage);
+// } else {
+//   // DOM already loaded, initialize immediately
+//   window.initializeTradePlansPage();
+// }
 
 // updateGridFromComponent is already defined at the beginning of the file
 
@@ -2875,20 +2962,20 @@ function addReminder() {
  * עדכון מידע טיקר
  */
 function updateTickerInfo() {
-  const tickerSelect = document.getElementById('addTradePlanTickerId');
+  const tickerSelect = document.getElementById('ticker');
   const tickerDisplay = document.getElementById('selectedTickerDisplay');
   const priceDisplay = document.getElementById('currentPriceDisplay');
   const changeDisplay = document.getElementById('dailyChangeDisplay');
-  const stopPriceInput = document.getElementById('addTradePlanStopPrice');
-  const targetPriceInput = document.getElementById('addTradePlanTargetPrice');
+  const stopPriceInput = document.getElementById('price');
+  const targetPriceInput = document.getElementById('notes');
 
   // קבלת כל השדות שצריכים להיות מופעלים/מושבתים
-  const investmentTypeSelect = document.getElementById('addTradePlanInvestmentType');
-  const sideSelect = document.getElementById('addTradePlanSide');
-  const amountInput = document.getElementById('addTradePlanPlannedAmount');
-  const sharesInput = document.getElementById('addTradePlanShares');
-  const entryConditionsTextarea = document.getElementById('addTradePlanEntryConditions');
-  const reasonsTextarea = document.getElementById('addTradePlanReasons');
+  const investmentTypeSelect = document.getElementById('type');
+  const sideSelect = document.getElementById('side');
+  const amountInput = document.getElementById('quantity');
+  const sharesInput = document.getElementById('quantity');
+  const entryConditionsTextarea = document.getElementById('notes');
+  const reasonsTextarea = document.getElementById('notes');
 
   if (tickerSelect.value) {
     const selectedOption = tickerSelect.options[tickerSelect.selectedIndex];
@@ -2974,8 +3061,8 @@ function updateTickerInfo() {
  * עדכון מחירי עצירה ויעד ברירת מחדל
  */
 function updateDefaultPrices(currentPrice) {
-  const stopPriceInput = document.getElementById('addTradePlanStopPrice');
-  const targetPriceInput = document.getElementById('addTradePlanTargetPrice');
+  const stopPriceInput = document.getElementById('price');
+  const targetPriceInput = document.getElementById('notes');
 
   // שימוש בפונקציה הכללית
   const prices = calculateDefaultPrices(currentPrice);
@@ -2994,8 +3081,8 @@ function updateDefaultPrices(currentPrice) {
  */
 function updateSharesFromAmount() {
 
-  const amountInput = document.getElementById('addTradePlanPlannedAmount');
-  const sharesInput = document.getElementById('addTradePlanShares');
+  const amountInput = document.getElementById('quantity');
+  const sharesInput = document.getElementById('quantity');
   const priceDisplay = document.getElementById('currentPriceDisplay');
 
   if (amountInput && sharesInput && priceDisplay) {
@@ -3028,8 +3115,8 @@ function updateSharesFromAmount() {
  * עדכון סכום ממספר מניות
  */
 function updateAmountFromShares() {
-  const sharesInput = document.getElementById('addTradePlanShares');
-  const amountInput = document.getElementById('addTradePlanPlannedAmount');
+  const sharesInput = document.getElementById('quantity');
+  const amountInput = document.getElementById('quantity');
   const priceDisplay = document.getElementById('currentPriceDisplay');
 
   if (sharesInput && amountInput && priceDisplay) {

@@ -1982,9 +1982,6 @@ window.initializeTradesPage = async function() {
   console.log('📊 Trades page initialized via unified system');
   
   // שחזור מצב הסגירה (נטען על ידי UnifiedAppInitializer)
-  // if (typeof window.restoreAllSectionStates === 'function') {
-  //   window.restoreAllSectionStates();
-  // }
 
   // יישום צבעי ישות על כותרות
   if (window.applyEntityColorsToHeaders) {
@@ -2041,33 +2038,19 @@ window.initializeTradesPage = async function() {
     window.initializeValidation('editTradeForm', editTradeValidationRules);
   }
 
-  // שמירת סטטוס סקשנים (נטען על ידי UnifiedAppInitializer)
-  // if (typeof window.restoreAllSectionStates === 'function') {
-  //   window.restoreAllSectionStates();
-  // }
-
-  // שחזור מצב הסקשנים הספציפי לדף הטריידים
-  if (typeof window.restoreAllSectionStates === 'function') {
-    window.restoreAllSectionStates();
-  } else {
-    if (typeof handleFunctionNotFound === 'function') {
-      handleFunctionNotFound('restoreAllSectionStates');
-    } else {
-      // console.warn('restoreAllSectionStates function not found');
-    }
-  }
+  // שחזור מצב הסקשנים (נטען על ידי UnifiedAppInitializer)
 
   // טעינת נתוני טריידים
   await loadTradesData();
 };
 
-// Fallback for direct access (backward compatibility)
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', window.initializeTradesPage);
-} else {
-  // DOM already loaded, initialize immediately
-  window.initializeTradesPage();
-}
+// Fallback removed - using unified initialization system only
+// if (document.readyState === 'loading') {
+//   document.addEventListener('DOMContentLoaded', window.initializeTradesPage);
+// } else {
+//   // DOM already loaded, initialize immediately
+//   window.initializeTradesPage();
+// }
 
 // ========================================
 // ייצוא פונקציות לגלובל

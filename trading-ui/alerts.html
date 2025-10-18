@@ -64,7 +64,11 @@
     <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=1.0.0">
-    
+    <link rel="stylesheet" href="styles-new/06-components/_page-headers.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_info-summary.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_constraints.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_system-management.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_chart-management.css?v=1.0.0">    
     <!-- 07-pages - Page-specific Styles -->
     <link rel="stylesheet" href="styles-new/07-pages/_alerts.css?v=1.0.0">
     
@@ -82,7 +86,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=1.0.0">
 </head>
 
 <body class="alerts-page">
@@ -98,8 +102,8 @@
                     <div class="section-header">
                         <h2>🔔 התראות - סקירה כללית</h2>
                         <div class="section-actions">
-                            <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט"><i class="fas fa-copy"></i> העתק לוג מפורט</button>
-                            <button class="btn btn-outline-warning" onclick="toggleSection('top')" title="הצג/הסתר סקשן">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט" aria-label="העתק לוג מפורט"><i class="fas fa-copy"></i> העתק לוג מפורט</button>
+                            <button class="btn btn-outline-warning" onclick="toggleSection('top')" title="הצג/הסתר סקשן" aria-label="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -237,7 +241,7 @@
         <div class="notification-container" id="notificationContainer"></div>
 
         <!-- Toast container for notifications -->
-        <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1000000002;"></div>
+        <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
 
         <!-- Add Alert Modal -->
         <div class="modal fade" id="addAlertModal" tabindex="-1" aria-labelledby="addAlertModalLabel" aria-hidden="true"
@@ -344,7 +348,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-success" onclick="addAlert()" style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">הוסף התראה</button>
+                        <button type="button" class="btn btn-success" onclick="addAlert()">הוסף התראה</button>
                     </div>
                 </div>
             </div>
@@ -416,7 +420,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-success" onclick="updateAlert()" style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">עדכן התראה</button>
+                        <button type="button" class="btn btn-success" onclick="updateAlert()">עדכן התראה</button>
                     </div>
                 </div>
             </div>

@@ -65,10 +65,10 @@ const PAGE_CONFIGS = {
                     window.loadDefaultColors();
                 }
                 
-                // Setup preference change handlers
-                if (typeof window.setupPreferenceHandlers === 'function') {
-                    window.setupPreferenceHandlers();
-                }
+                // Setup preference change handlers (function not implemented yet)
+                // if (typeof window.setupPreferenceHandlers === 'function') {
+                //     window.setupPreferenceHandlers();
+                // }
             }
         ]
     },
@@ -90,11 +90,6 @@ const PAGE_CONFIGS = {
                     // Fallback to old method
                     if (typeof window.loadTradesData === 'function') {
                         await window.loadTradesData();
-                    }
-                    
-                    // Setup trade-specific handlers
-                    if (typeof window.setupTradeHandlers === 'function') {
-                        window.setupTradeHandlers();
                     }
                 }
             }
@@ -152,9 +147,10 @@ const PAGE_CONFIGS = {
                     await window.loadAlertsData();
                 }
                 
-                if (typeof window.setupAlertHandlers === 'function') {
-                    window.setupAlertHandlers();
-                }
+                // Setup alert-specific handlers (function not implemented yet)
+                // if (typeof window.setupAlertHandlers === 'function') {
+                //     window.setupAlertHandlers();
+                // }
             }
         ]
     },

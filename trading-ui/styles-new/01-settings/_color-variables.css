@@ -4,23 +4,23 @@
  */
 
 :root {
-    /* Action Button Colors - כפתורי פעולה */
-    --color-action-edit: #6c757d;      /* Gray for edit */
-    --color-action-delete: #dc3545;    /* Red for delete */
-    --color-action-add: #28a745;       /* Green for add */
-    --color-action-save: #28a745;      /* Green for save */
-    --color-action-cancel: #6c757d;    /* Gray for cancel */
-    --color-action-link: #17a2b8;      /* Cyan for link */
-    --color-action-close: #6c757d;     /* Gray for close */
-    --color-action-refresh: #6c757d;   /* Gray for refresh */
-    --color-action-export: #007bff;    /* Blue for export */
-    --color-action-import: #28a745;    /* Green for import */
-    --color-action-search: #17a2b8;    /* Cyan for search */
-    --color-action-filter: #6c757d;    /* Gray for filter */
-    --color-action-sort: #6c757d;      /* Gray for sort */
-    --color-action-toggle: #ffc107;    /* Yellow for toggle */
-    --color-action-copy: #6c757d;      /* Gray for copy */
-    --color-action-reactivate: #28a745; /* Green for reactivate */
+    /* Action Button Colors - כפתורי פעולה (מחוברים למשתני העדפות) */
+    --color-action-edit: var(--secondary-color);      /* Edit buttons */
+    --color-action-delete: var(--danger-color);       /* Delete buttons */
+    --color-action-add: var(--success-color);         /* Add buttons */
+    --color-action-save: var(--success-color);        /* Save buttons */
+    --color-action-cancel: var(--secondary-color);    /* Cancel buttons */
+    --color-action-link: var(--info-color);           /* Link buttons */
+    --color-action-close: var(--secondary-color);     /* Close buttons */
+    --color-action-refresh: var(--secondary-color);   /* Refresh buttons */
+    --color-action-export: var(--primary-color);      /* Export buttons */
+    --color-action-import: var(--success-color);      /* Import buttons */
+    --color-action-search: var(--info-color);         /* Search buttons */
+    --color-action-filter: var(--secondary-color);    /* Filter buttons */
+    --color-action-sort: var(--secondary-color);      /* Sort buttons */
+    --color-action-toggle: var(--warning-color);      /* Toggle buttons */
+    --color-action-copy: var(--secondary-color);      /* Copy buttons */
+    --color-action-reactivate: var(--success-color);  /* Reactivate buttons */
     
     /* Button Variants - וריאציות כפתורים */
     --button-height-small: 28px;
@@ -40,42 +40,10 @@
     --button-icon-size-large: 18px;
 }
 
-/* Dynamic Button Classes - מחלקות כפתורים דינמיות */
-.btn-dynamic-edit {
-    background-color: var(--color-action-edit);
-    border-color: var(--color-action-edit);
-    color: white;
-}
-
-.btn-dynamic-delete {
-    background-color: var(--color-action-delete);
-    border-color: var(--color-action-delete);
-    color: white;
-}
-
-.btn-dynamic-add {
-    background-color: var(--color-action-add);
-    border-color: var(--color-action-add);
-    color: white;
-}
-
-.btn-dynamic-save {
-    background-color: var(--color-action-save);
-    border-color: var(--color-action-save);
-    color: white;
-}
-
-.btn-dynamic-cancel {
-    background-color: var(--color-action-cancel);
-    border-color: var(--color-action-cancel);
-    color: white;
-}
-
-.btn-dynamic-link {
-    background-color: var(--color-action-link);
-    border-color: var(--color-action-link);
-    color: white;
-}
+/* 
+ * Dynamic Button Classes removed - moved to bootstrap-overrides.css
+ * מחלקות כפתורים דינמיות הועברו לקובץ bootstrap-overrides
+ */
 
 /* Button Size Variants - וריאציות גודל */
 .btn-small {

@@ -515,7 +515,7 @@ function createLinkedItemsModalContent(data, itemType, itemId, mode = 'view') {
 
   content += `
       <div class="modal-footer">
-        ${createCloseButton()}
+        <button data-button-type="CLOSE" data-attributes="data-bs-dismiss='modal' type='button'"></button>
         <button type="button" class="btn btn-primary" onclick="exportLinkedItemsData('${itemType}', ${itemId})">
           📤 ייצוא נתונים
         </button>

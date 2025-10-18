@@ -1,0 +1,359 @@
+/* ==========================================================================
+   CONDITIONS SYSTEM - Component Styles
+   ========================================================================== */
+
+/* Condition Builder Container */
+.condition-builder {
+    padding: 1rem;
+    border: 1px solid var(--border-color, #dee2e6);
+    border-radius: 0.375rem;
+    background-color: var(--bg-color, #ffffff);
+    margin-bottom: 1rem;
+}
+
+.conditions-tab-content {
+    padding: 1rem 0;
+}
+
+/* Method Selector */
+.method-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.method-card {
+    border: 1px solid var(--border-color, #dee2e6);
+    border-radius: 0.375rem;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: var(--bg-color, #ffffff);
+}
+
+.method-card:hover {
+    border-color: var(--primary-color, #0d6efd);
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.method-card.selected {
+    border-color: var(--primary-color, #0d6efd);
+    background-color: var(--primary-bg, #e7f1ff);
+}
+
+.method-card .method-icon {
+    font-size: 1.5rem;
+    color: var(--primary-color, #0d6efd);
+    margin-bottom: 0.5rem;
+}
+
+.method-card .method-name {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.method-card .method-description {
+    font-size: 0.875rem;
+    color: var(--text-muted, #6c757d);
+}
+
+/* Parameter Form */
+.parameter-form {
+    background-color: var(--bg-light, #f8f9fa);
+    border: 1px solid var(--border-color, #dee2e6);
+    border-radius: 0.375rem;
+    padding: 1.5rem;
+    margin-top: 1rem;
+}
+
+.parameter-form .form-label {
+    font-weight: 600;
+    color: var(--text-color, #212529);
+}
+
+.parameter-form .form-control,
+.parameter-form .form-select {
+    border: 1px solid var(--border-color, #dee2e6);
+    border-radius: 0.375rem;
+}
+
+.parameter-form .form-control:focus,
+.parameter-form .form-select:focus {
+    border-color: var(--primary-color, #0d6efd);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Conditions List */
+.conditions-list {
+    margin-bottom: 1.5rem;
+}
+
+.condition-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color, #dee2e6);
+    border-radius: 0.375rem;
+    margin-bottom: 0.5rem;
+    background-color: var(--bg-color, #ffffff);
+}
+
+.condition-item .condition-info {
+    flex: 1;
+}
+
+.condition-item .condition-method {
+    font-weight: 600;
+    color: var(--text-color, #212529);
+}
+
+.condition-item .condition-parameters {
+    font-size: 0.875rem;
+    color: var(--text-muted, #6c757d);
+    margin-top: 0.25rem;
+}
+
+.condition-item .condition-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.condition-item .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+}
+
+/* Logical Operators */
+.logical-operator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0.5rem 0;
+}
+
+.logical-operator .operator-badge {
+    background-color: var(--secondary-color, #6c757d);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.logical-operator .operator-badge.and {
+    background-color: var(--success-color, #198754);
+}
+
+.logical-operator .operator-badge.or {
+    background-color: var(--warning-color, #ffc107);
+    color: var(--text-color, #212529);
+}
+
+/* Condition Groups */
+.condition-group {
+    border: 2px dashed var(--border-color, #dee2e6);
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background-color: var(--bg-light, #f8f9fa);
+}
+
+.condition-group .group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.condition-group .group-title {
+    font-weight: 600;
+    color: var(--text-color, #212529);
+}
+
+.condition-group .group-operator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Action Buttons */
+.condition-actions-bar {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color, #dee2e6);
+}
+
+.condition-actions-bar .btn {
+    flex: 1;
+}
+
+/* Method Categories */
+.method-category {
+    margin-bottom: 2rem;
+}
+
+.method-category .category-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-color, #212529);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--primary-color, #0d6efd);
+}
+
+/* Parameter Types */
+.parameter-type-number .form-control {
+    text-align: right;
+}
+
+.parameter-type-percentage .input-group-text {
+    background-color: var(--bg-light, #f8f9fa);
+    border-color: var(--border-color, #dee2e6);
+}
+
+.parameter-type-boolean .form-check {
+    margin-bottom: 0;
+}
+
+.parameter-type-dropdown .form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e");
+}
+
+/* Validation States */
+.parameter-form .is-invalid {
+    border-color: var(--danger-color, #dc3545);
+}
+
+.parameter-form .is-valid {
+    border-color: var(--success-color, #198754);
+}
+
+.parameter-form .invalid-feedback {
+    display: block;
+    color: var(--danger-color, #dc3545);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.parameter-form .valid-feedback {
+    display: block;
+    color: var(--success-color, #198754);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Loading States */
+.condition-builder.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.condition-builder.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 2rem;
+    height: 2rem;
+    margin: -1rem 0 0 -1rem;
+    border: 2px solid var(--border-color, #dee2e6);
+    border-top-color: var(--primary-color, #0d6efd);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .method-selector {
+        grid-template-columns: 1fr;
+    }
+    
+    .condition-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .condition-item .condition-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    
+    .condition-actions-bar {
+        flex-direction: column;
+    }
+    
+    .condition-actions-bar .btn {
+        flex: none;
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .condition-builder {
+        background-color: var(--bg-dark, #212529);
+        border-color: var(--border-dark, #495057);
+    }
+    
+    .method-card {
+        background-color: var(--bg-dark, #212529);
+        border-color: var(--border-dark, #495057);
+    }
+    
+    .method-card:hover {
+        border-color: var(--primary-color, #0d6efd);
+    }
+    
+    .parameter-form {
+        background-color: var(--bg-dark-light, #343a40);
+        border-color: var(--border-dark, #495057);
+    }
+    
+    .condition-item {
+        background-color: var(--bg-dark, #212529);
+        border-color: var(--border-dark, #495057);
+    }
+    
+    .condition-group {
+        background-color: var(--bg-dark-light, #343a40);
+        border-color: var(--border-dark, #495057);
+    }
+}
+
+/* Accessibility */
+.condition-builder *:focus {
+    outline: 2px solid var(--primary-color, #0d6efd);
+    outline-offset: 2px;
+}
+
+.method-card:focus-within {
+    border-color: var(--primary-color, #0d6efd);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Print Styles */
+@media print {
+    .condition-builder {
+        border: 1px solid #000;
+        background-color: #fff;
+    }
+    
+    .condition-actions-bar {
+        display: none;
+    }
+    
+    .method-card {
+        border: 1px solid #000;
+        background-color: #fff;
+    }
+}

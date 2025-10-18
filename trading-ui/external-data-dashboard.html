@@ -89,7 +89,7 @@
                                 <i class="fas fa-copy"></i> העתק לוג מפורט
                             </button>
                             <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
-                                ${createToggleButton("toggleSection('top')", "הצג/הסתר סקשן")}
+                                <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
                     </div>
@@ -185,7 +185,7 @@
                     <div class="section-header">
                         <h2>🔗 ספקי נתונים</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
-                            ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
+                            <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
                     <div class="section-body">
@@ -205,7 +205,7 @@
                                             <label class="form-label">עדכון אחרון:</label>
                                             <span id="yahoo-last-update">טוען...</span>
                                         </div>
-                                        ${createButton('REFRESH', 'refreshProviders()', '', '')}
+                                        <button class="btn btn-primary" onclick="refreshProviders()">רענן נתונים</button>
                                     </div>
                                 </div>
                             </div>
@@ -224,7 +224,7 @@
                                             <label class="form-label">עדכון אחרון:</label>
                                             <span id="alpha-last-update">טוען...</span>
                                         </div>
-                                        ${createButton('REFRESH', 'refreshProviders()', 'btn-secondary', '')}
+                                        <button class="btn btn-secondary" onclick="refreshProviders()">רענן נתונים</button>
                                     </div>
                                 </div>
                             </div>
@@ -239,7 +239,7 @@
                     <div class="section-header">
                         <h2>🔧 כלי פיתוח מתקדמים</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
-                            ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
+                            <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
                     <div class="section-body">
@@ -286,7 +286,9 @@
                                         <h6 class="card-title mb-0">📋 ניהול נתונים</h6>
                                     </div>
                                     <div class="card-body">
-                                        ${createButton('REFRESH', 'testAllProviders()', 'btn-outline-success w-100 mb-2', '')}
+                                        <button class="btn btn-outline-success w-100 mb-2" onclick="testAllProviders()">
+                                            <i class="fas fa-sync"></i> רענן כל הנתונים
+                                        </button>
                                         <button class="btn btn-outline-info w-100 mb-2" onclick="exportData()">
                                             <i class="fas fa-download"></i> ייצא נתונים
                                         </button>
@@ -324,13 +326,15 @@
                     <div class="section-header">
                         <h2>📈 ניתוח ביצועים ומגמות</h2>
                         <div class="section-actions">
-                            ${createButton('REFRESH', 'refreshPerformanceCharts()', 'btn-sm btn-outline-primary', '')}
+                            <button class="btn btn-sm btn-outline-primary" onclick="refreshPerformanceCharts()">
+                                <i class="fas fa-sync-alt"></i> רענן גרפים
+                            </button>
                             <button class="btn btn-sm btn-outline-secondary" onclick="exportPerformanceData()">
                                 <i class="fas fa-download"></i> ייצא נתונים
                             </button>
                         </div>
                         <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
-                            ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
+                            <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
                     <div class="section-body">
@@ -429,7 +433,7 @@
                     <div class="section-header">
                         <h2>📊 לוג נתונים חיצוניים</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
-                            ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
+                            <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
                     <div class="section-body">

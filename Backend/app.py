@@ -230,6 +230,15 @@ app.register_blueprint(status_bp)
 
 app.register_blueprint(pages_bp)
 
+# Register Conditions System blueprints
+from routes.api.trading_methods import trading_methods_bp
+from routes.api.plan_conditions import plan_conditions_bp
+from routes.api.trade_conditions import trade_conditions_bp
+
+app.register_blueprint(trading_methods_bp)
+app.register_blueprint(plan_conditions_bp)
+app.register_blueprint(trade_conditions_bp)
+
 # Debug logging endpoint
 @app.route('/api/debug/log', methods=['POST'])
 def debug_log():

@@ -677,10 +677,10 @@ function updateAlertsTable(alerts) {
           <td data-date="${alert.created_at}"><span class="date-text">${createdAt}</span></td>
           <td class="actions-cell" data-entity-id="${alert.id}" data-status="${alert.status || ''}">
             <div class="btn-group btn-group-sm actions-btn-group" role="group">
-              ${createLinkButton(`viewLinkedItemsForAlert(${alert.id})`)}
-              ${createEditButton(`editAlert(${alert.id})`)}
-              ${createCancelButton('alert', alert.id, alert.status)}
-              ${createDeleteButton(`deleteAlert(${alert.id})`)}
+              <button data-button-type="LINK" data-onclick="viewLinkedItemsForAlert(${alert.id})"></button>
+              <button data-button-type="EDIT" data-onclick="editAlert(${alert.id})"></button>
+              <button data-button-type="${alert.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL'}" data-onclick="window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert && window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert(${alert.id})" data-classes="${alert.status === 'cancelled' ? 'btn-success' : 'btn-danger'} btn-sm" data-attributes="data-item-type='alert' data-item-id='${alert.id}'"></button>
+              <button data-button-type="DELETE" data-onclick="deleteAlert(${alert.id})"></button>
             </div>
           </td>
         </tr>

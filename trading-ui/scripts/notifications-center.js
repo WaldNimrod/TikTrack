@@ -1980,7 +1980,7 @@ async function exportAllLogs() {
                         </div>
                     </div>
                     <div class="modal-footer">
-                        ${createCloseButton()}
+                        <button data-button-type="CLOSE" data-attributes="data-bs-dismiss='modal' type='button'"></button>
                     </div>
                 </div>
             </div>

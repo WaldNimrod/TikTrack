@@ -11,6 +11,8 @@ from .currency import Currency
 from .user import User
 from .preferences import PreferenceGroup, PreferenceType, PreferenceProfile, UserPreference
 from .external_data import ExternalDataProvider, MarketDataQuote, DataRefreshLog, IntradayDataSlot
+from .trading_method import TradingMethod, MethodParameter
+from .plan_condition import PlanCondition, TradeCondition, ConditionAlertMapping
 
 __all__ = [
     'BaseModel',
@@ -32,6 +34,11 @@ __all__ = [
     'ExternalDataProvider',
     'MarketDataQuote',
     'DataRefreshLog',
-    'IntradayDataSlot'
+    'IntradayDataSlot',
+    'TradingMethod',
+    'MethodParameter',
+    'PlanCondition',
+    'TradeCondition',
+    'ConditionAlertMapping'
 ]
 from .trading_account import TradingAccount

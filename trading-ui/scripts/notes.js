@@ -329,7 +329,7 @@ async function loadNotesData() {
               <div style="padding: 20px;">
                 <h5>📝 אין הערות</h5>
                 <p>לא נמצאו הערות במערכת</p>
-                ${createButton('ADD', 'openNoteDetails()', 'btn-sm')}
+                <button data-button-type="ADD" data-onclick="openNoteDetails()" data-classes="btn-sm"></button>
               </div>
             </td>
           </tr>

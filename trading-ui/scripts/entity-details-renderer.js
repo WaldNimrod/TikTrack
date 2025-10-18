@@ -653,10 +653,8 @@ class EntityDetailsRenderer {
                     <td>${statusBadge}</td>
                     <td><small>${this.formatDateTime(item.created_at || item.updated_at)}</small></td>
                     <td>
-                        ${window.createLinkButton ? window.createLinkButton(`window.showEntityDetails('${item.type}', ${item.id})`) : 
-                            `<button class="btn btn-sm btn-info" onclick="window.showEntityDetails('${item.type}', ${item.id})" title="צפה בפרטים"><i class="fas fa-eye"></i></button>`}
-                        ${window.createEditButton ? window.createEditButton(`window.editTicker(${item.id})`) : 
-                            `<button class="btn btn-sm btn-secondary" onclick="window.editTicker(${item.id})" title="ערוך"><i class="fas fa-edit"></i></button>`}
+                        <button data-button-type="LINK" data-onclick="window.showEntityDetails('${item.type}', ${item.id})" data-classes="btn-sm"></button>
+                        <button data-button-type="EDIT" data-onclick="window.editTicker(${item.id})" data-classes="btn-sm"></button>
                         ${this.getActionButtonForType(item.type, item.id, item.status)}
                     </td>
                 </tr>
@@ -832,9 +830,26 @@ class EntityDetailsRenderer {
         
         if (cancelableTypes.includes(type)) {
             // כפתור ביטול/שיחזור - שימוש בפונקציה הגלובלית בדיוק
-            if (window.createCancelButton) {
-                return window.createCancelButton(type, id, status);
-            } else {
+            // יצירת כפתור ביטול/שיחזור עם המערכת החדשה
+            const isCancelled = status === 'cancelled' || status === 'canceled';
+            const buttonType = isCancelled ? 'REACTIVATE' : 'CANCEL';
+            const buttonClass = isCancelled ? 'btn-success' : 'btn-danger';
+            const title = isCancelled ? 'הפעל מחדש' : 'בטל';
+            
+            // יצירת onclick function
+            let onclick = '';
+            if (id) {
+                if (isCancelled) {
+                    const reactivateFunc = `window.reactivate${type.charAt(0).toUpperCase() + type.slice(1)}`;
+                    onclick = `${reactivateFunc} && ${reactivateFunc}(${id})`;
+                } else {
+                    const cancelFunc = `window.cancel${type.charAt(0).toUpperCase() + type.slice(1)}`;
+                    onclick = `${cancelFunc} && ${cancelFunc}(${id})`;
+                }
+            }
+            
+            return `<button data-button-type="${buttonType}" data-onclick="${onclick}" data-classes="${buttonClass} btn-sm" data-attributes="data-item-type='${type}' data-item-id='${id}' title='${title}'"></button>`;
+        } else {
                 // Fallback זהה בדיוק לפונקציה הגלובלית
                 const isCancelled = status === 'cancelled' || status === 'canceled';
                 const buttonClass = isCancelled ? 'btn-success' : 'btn-danger';
@@ -896,13 +911,7 @@ class EntityDetailsRenderer {
             }
         } else {
             // כפתור מחיקה לכל השאר
-            if (window.createDeleteButtonByType) {
-                return window.createDeleteButtonByType(type, id);
-            } else if (window.createDeleteButton) {
-                return window.createDeleteButton(`if (typeof showNotification === 'function') { showNotification('מחיקה לא זמינה', 'warning'); } else { alert('מחיקה לא זמינה'); }`);
-            } else {
-                return createDeleteButton(`if (typeof showNotification === 'function') { showNotification('מחיקה לא זמינה', 'warning'); } else { alert('מחיקה לא זמינה'); }`);
-            }
+            return `<button data-button-type="DELETE" data-onclick="if (typeof showNotification === 'function') { showNotification('מחיקה לא זמינה', 'warning'); } else { alert('מחיקה לא זמינה'); }" data-classes="btn-sm"></button>`;
         }
     }
 

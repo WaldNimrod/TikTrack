@@ -562,8 +562,8 @@ function showAddConstraintModal() {
                         </form>
                     </div>
                     <div class="modal-footer">
-                        ${createButton('CANCEL', 'data-bs-dismiss="modal"', '', 'type="button"')}
-                        ${createButton('SAVE', 'handleModalAddConstraint()', '', 'type="button"')}
+                        <button data-button-type="CANCEL" data-attributes="data-bs-dismiss='modal' type='button'"></button>
+                        <button data-button-type="SAVE" data-onclick="handleModalAddConstraint()" data-attributes="type='button'"></button>
                     </div>
                 </div>
             </div>

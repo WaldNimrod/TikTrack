@@ -69,6 +69,17 @@ color: var(--numeric-negative-medium) ;
   font-weight: 600;
 }
 
+.side-long {
+color: var(--color-success) ;
+  font-weight: 600 ;
+  font-size: 0.9rem ;
+  padding: 0.25rem 0.5rem ;
+  border-radius: 6px ;
+  background: color-mix(in srgb, var(--color-success) 10%, transparent) ;
+  display: inline-block ;
+  transition: all 0.3s ease ;
+}
+
 .side-long:hover {
 background: rgba(111, 66, 193, 0.15) ;
   transform: translateY(-1px) ;

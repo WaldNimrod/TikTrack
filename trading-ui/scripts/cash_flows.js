@@ -958,11 +958,9 @@ async function renderCashFlowsTable() {
     window.translateCashFlowSource(cashFlow.source) :
     cashFlow.source}</td>
             <td class="col-actions actions-cell actions-3-btn">
-              ${createLinkButton(
-    `window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})`,
-  )}
-              ${createEditButton(`showEditCashFlowModal(${cashFlow.id})`)}
-              ${createDeleteButton(`deleteCashFlow(${cashFlow.id})`)}
+              <button data-button-type="LINK" data-onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})"></button>
+              <button data-button-type="EDIT" data-onclick="showEditCashFlowModal(${cashFlow.id})"></button>
+              <button data-button-type="DELETE" data-onclick="deleteCashFlow(${cashFlow.id})"></button>
 
             </td>
         `;

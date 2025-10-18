@@ -1,9 +1,10 @@
 # מדריך מערכת הכפתורים המרכזית
 ## Button System Developer Guide
 
-**גרסה:** 2.0.0  
-**תאריך:** 16 בינואר 2025  
-**מחבר:** TikTrack Development Team
+**גרסה:** 3.0.0  
+**תאריך:** 18 באוקטובר 2025  
+**מחבר:** TikTrack Development Team  
+**סטטוס:** מערכת חדשה בלבד - המערכת הישנה הוסרה לחלוטין
 
 ---
 
@@ -26,11 +27,12 @@
 מערכת הכפתורים המרכזית של TikTrack היא פתרון מקיף ליצירה וניהול כפתורים באתר. המערכת מספקת:
 
 - **27 סוגי כפתורים** מוגדרים מראש
-- **ארכיטקטורה דו-שכבתית**: תאימות לאחור + מערכת חדשה מבוססת data attributes
-- **אתחול אוטומטי** של כפתורים
+- **ארכיטקטורה מודרנית**: מערכת מבוססת data-attributes בלבד
+- **אתחול אוטומטי** של כפתורים עם MutationObserver
 - **נגישות מלאה** עם aria-labels ו-title attributes
-- **ביצועים מיטביים** עם cache ו-MutationObserver
+- **ביצועים מיטביים** עם cache, batch processing ו-debouncing
 - **תמיכה דינמית** בכפתורים שנוספים בזמן ריצה
+- **ללא כפילות קוד** - מערכת אחת אחידה בלבד
 
 ### יתרונות המערכת
 
@@ -47,26 +49,31 @@
 ### מבנה המערכת
 
 ```
-button-icons.js          # מערכת בסיסית (תאימות לאחור)
+button-icons.js          # מידע בסיסי בלבד
 ├── BUTTON_ICONS         # מפת איקונים
 ├── BUTTON_TEXTS         # מפת טקסטים
-├── getButtonClass()     # פונקציה לקבלת CSS class
-└── createButton()       # פונקציות יצירה בסיסיות
+└── getButtonClass()     # פונקציה לקבלת CSS class
 
-button-system-init.js    # מערכת מתקדמת (data attributes)
+button-system-init.js    # המערכת המרכזית (data-attributes)
 ├── AdvancedButtonSystem # מחלקה ראשית
 ├── ButtonSystemLogger   # מערכת לוגים
 ├── ButtonSystemCache    # מערכת cache
 └── MutationObserver     # מעקב אחר שינויים דינמיים
+
+button-helpers.js        # פונקציות עזר (אופציונלי)
+├── createCancelButtonHelper      # עזר לכפתור ביטול/הפעלה
+├── createDeleteButtonByTypeHelper # עזר לכפתור מחיקה לפי סוג
+└── createEditButtonHelper        # עזרים נוספים
 ```
 
 ### עקרונות עיצוב
 
-1. **תאימות לאחור** - כל הקוד הקיים ממשיך לעבוד
-2. **אתחול אוטומטי** - כפתורים נוצרים אוטומטית
-3. **ביצועים מיטביים** - cache ו-batch processing
-4. **נגישות מלאה** - תמיכה ב-screen readers
-5. **גמישות** - תמיכה בהתאמות אישיות
+1. **סטנדרטיזציה מלאה** - מערכת אחת אחידה ב כל האתר
+2. **data-attributes בלבד** - HTML מוצהר, JavaScript מעבד
+3. **אתחול אוטומטי** - כפתורים נוצרים אוטומטית עם MutationObserver
+4. **ביצועים מיטביים** - cache, batch processing ו-debouncing
+5. **נגישות מלאה** - תמיכה ב-screen readers
+6. **גמישות** - תמיכה בהתאמות אישיות
 
 ---
 
@@ -82,14 +89,7 @@ button-system-init.js    # מערכת מתקדמת (data attributes)
 
 ### 2. הגדרת כפתורים
 
-#### שיטה ישנה (תאימות לאחור)
-```html
-<button class="btn btn-primary" onclick="saveData()">
-    💾 שמור
-</button>
-```
-
-#### שיטה חדשה (מומלצת)
+**שיטה יחידה - data-attributes:**
 ```html
 <button data-button-type="SAVE" 
         data-onclick="saveData()" 
@@ -97,6 +97,9 @@ button-system-init.js    # מערכת מתקדמת (data attributes)
         data-text="שמור">
 </button>
 ```
+
+**הערה:** המערכת הישנה (createButton, createEditButton וכו') הוסרה לחלוטין.  
+השתמש ב-data-attributes בלבד, הן ב-HTML סטטי והן בתוכן דינמי שנוצר ב-JavaScript.
 
 ### 3. אתחול ידני (אופציונלי)
 

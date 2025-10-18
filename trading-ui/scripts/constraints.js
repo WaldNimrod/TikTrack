@@ -669,7 +669,7 @@ window.viewConstraint = function(constraintName) {
                         </div>
                     </div>
                     <div class="modal-footer">
-                        ${createCloseButton()}
+                        <button data-button-type="CLOSE" data-attributes="data-bs-dismiss='modal' type='button'"></button>
                         <button type="button" class="btn btn-primary" onclick="window.editConstraint('${constraint.constraint_name}')" data-bs-dismiss="modal">
                             <i class="fas fa-edit"></i> ערוך
                         </button>
@@ -793,7 +793,7 @@ function showValidationModal(constraint, isAll) {
                         </div>
                     </div>
                     <div class="modal-footer">
-                        ${createCloseButton()}
+                        <button data-button-type="CLOSE" data-attributes="data-bs-dismiss='modal' type='button'"></button>
                         <button type="button" class="btn btn-primary" onclick="exportValidationReport()">
                             <i class="fas fa-download"></i> ייצא דוח
                         </button>

@@ -128,7 +128,7 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
                         ${message.replace(/\n/g, '<br>')}
                     </div>
                     <div class="modal-footer" style="justify-content: flex-end; direction: rtl;">
-                        ${createButton('CANCEL', 'data-bs-dismiss="modal"', 'ms-2', 'type="button"')}
+                        <button data-button-type="CANCEL" data-attributes="data-bs-dismiss='modal' type='button'" data-classes="ms-2"></button>
                         <button type="button" class="btn btn-${color} confirm-btn">אישור</button>
                     </div>
                 </div>

@@ -100,7 +100,81 @@
                             <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
                                 <i class="fas fa-copy"></i> העתק לוג מפורט
                             </button>
-                            <button data-button-type="REFRESH" data-onclick="refreshData()" data-classes="refresh-btn" data-text="רענן" data-attributes="title=\"רענן\""></button>
+                            <button class="btn btn-sm btn-outline-primary" onclick="refreshSystemData()" title="רענן נתוני מערכת">
+                                <i class="fas fa-sync-alt"></i> רענן
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- בריאות מערכת - Info Summary -->
+                        <div class="info-summary" id="healthSummary">
+                            <div class="summary-item">
+                                <span class="summary-label">🏥 בריאות מערכת:</span>
+                                <span class="summary-value" id="overallHealthStatus">טוען...</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">📊 ציון כללי:</span>
+                                <span class="summary-value" id="systemScore">טוען...</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">⏱️ זמן תגובה:</span>
+                                <span class="summary-value" id="responseTime">טוען...</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">🔄 זמן פעילות:</span>
+                                <span class="summary-value" id="uptime">טוען...</span>
+                            </div>
+                        </div>
+                        
+                        <!-- תוכן בשתי עמודות -->
+                        <div class="row">
+                            <!-- עמודה שמאלית - סטטוס מהיר -->
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3>📊 סטטוס מהיר</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="status-grid">
+                                            <div class="status-item">
+                                                <span class="status-label">שרת:</span>
+                                                <span class="status-value active" id="serverHealthStats">פעיל</span>
+                                            </div>
+                                            <div class="status-item">
+                                                <span class="status-label">בסיס נתונים:</span>
+                                                <span class="status-value active" id="databaseHealthStats">מחובר</span>
+                                            </div>
+                                            <div class="status-item">
+                                                <span class="status-label">מטמון:</span>
+                                                <span class="status-value active" id="cacheHealthStats">בריא</span>
+                                            </div>
+                                            <div class="status-item">
+                                                <span class="status-label">רשת:</span>
+                                                <span class="status-value active" id="networkHealthStats">יציב</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- עמודה ימנית - התראות ופעולות מהירות -->
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3>🚨 התראות פעילות</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- קומפוננט התראות פעילות -->
+                                        <active-alerts></active-alerts>
+                                        
+                                        <!-- כפתורי פעולה מהירה -->
+                                        <div class="quick-actions">
+                                            <button class="btn btn-primary btn-sm" onclick="refreshSystemData()">
+                                                🔄 רענן נתונים
+                                            </button>
                                             <button class="btn btn-success btn-sm" onclick="runSystemCheck()">
                                                 🔍 בדיקת מערכת
                                             </button>
@@ -150,7 +224,7 @@
                             </button>
                         </div>
                         <button class="filter-toggle-btn" onclick="toggleSection('cursorTasksSystemSection')" title="הצג/הסתר סקשן">
-                            ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
+                            <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
                     <div class="section-body">
@@ -269,7 +343,7 @@
                     <div class="section-header">
                         <h2>📊 סקירה כללית</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
-                            ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
+                            <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
                     <div class="section-body">
@@ -292,7 +366,7 @@
                                 <i class="fas fa-external-link-alt"></i> ניהול מתקדם
                             </a>
                             <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
-                                ${createToggleButton("toggleSection('top')", "הצג/הסתר סקשן")}
+                                <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
                     </div>
@@ -345,7 +419,7 @@
                                 <i class="fas fa-external-link-alt"></i> מרכז התראות
                             </a>
                             <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
-                                ${createToggleButton("toggleSection('top')", "הצג/הסתר סקשן")}
+                                <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
                     </div>
@@ -394,7 +468,7 @@
                     <div class="section-header entity-test-sub-header">
                         <h2>🔒 אבטחה</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
-                            ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
+                            <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
                     <div class="section-body">
@@ -469,7 +543,7 @@
                     <div class="section-header entity-test-sub-header">
                         <h2>📋 לוגים וניטור</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section5')" title="הצג/הסתר סקשן">
-                            ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
+                            <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
                     <div class="section-body">
@@ -526,7 +600,7 @@
                     <div class="section-header entity-test-sub-header">
                         <h2>💾 גיבויים ושחזור</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section6')" title="הצג/הסתר סקשן">
-                            ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
+                            <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
                     <div class="section-body">
@@ -625,7 +699,7 @@
                     <div class="section-header entity-test-sub-header">
                         <h2>📊 מערכת לוגים מאוחדת</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section8')" title="הצג/הסתר סקשן">
-                            ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
+                            <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
                     <div class="section-body">

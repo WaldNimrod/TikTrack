@@ -406,10 +406,10 @@ function updateTradingAccountsTable(trading_accounts) {
       </td>
       <td>${account.notes || '-'}</td>
       <td class="actions-cell">
-        ${createLinkButton(`window.showLinkedItemsModal && window.showLinkedItemsModal(linkedItemsData, 'tradingAccount', ${account.id})`)}
-        ${createEditButton(`showEditTradingAccountModalById(${account.id})`)}
-        ${createCancelButton('account', account.id, account.status)}
-        ${createDeleteButton(`deleteTradingAccountWithLinkedItemsCheck(${account.id}, '${account.name || 'Unknown'}')`)}
+        <button data-button-type="LINK" data-onclick="window.showLinkedItemsModal && window.showLinkedItemsModal(linkedItemsData, 'tradingAccount', ${account.id})"></button>
+        <button data-button-type="EDIT" data-onclick="showEditTradingAccountModalById(${account.id})"></button>
+        <button data-button-type="${account.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL'}" data-onclick="window.${account.status === 'cancelled' ? 'reactivate' : 'cancel'}Account && window.${account.status === 'cancelled' ? 'reactivate' : 'cancel'}Account(${account.id})" data-classes="${account.status === 'cancelled' ? 'btn-success' : 'btn-danger'} btn-sm" data-attributes="data-item-type='account' data-item-id='${account.id}'"></button>
+        <button data-button-type="DELETE" data-onclick="deleteTradingAccountWithLinkedItemsCheck(${account.id}, '${account.name || 'Unknown'}')"></button>
       </td>
     </tr>
   `;}).join('');
@@ -755,8 +755,8 @@ function createTradingAccountModal(mode, tradingAccount = null) {
           </form>
         </div>
         <div class="modal-footer">
-          ${createButton('CANCEL', 'data-bs-dismiss="modal"', '', 'type="button"')}
-          ${createButton('SAVE', `saveTradingAccount('${mode}', ${account ? account.id : 'null'})`, '', 'type="button"')}
+          <button data-button-type="CANCEL" data-attributes="data-bs-dismiss='modal' type='button'"></button>
+          <button data-button-type="SAVE" data-onclick="saveTradingAccount('${mode}', ${account ? account.id : 'null'})" data-attributes="type='button'"></button>
         </div>
       </div>
     </div>

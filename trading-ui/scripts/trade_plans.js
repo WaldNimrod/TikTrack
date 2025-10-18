@@ -410,24 +410,43 @@ async function updateFormFieldsWithTickerData(ticker, currentPrice) {
       console.log('✅ Updated entry price:', currentPrice.toFixed(2));
     }
     
-    // Calculate and update target price and percentage
+    // Calculate and update target price and percentage based on side
     const targetPriceInput = document.getElementById('targetPrice');
     const targetPercentageInput = document.getElementById('targetPercentage');
-    if (targetPriceInput && targetPercentageInput) {
-      const targetPrice = currentPrice * (1 + defaultTargetPrice / 100);
+    const sideInput = document.getElementById('side');
+    if (targetPriceInput && targetPercentageInput && sideInput) {
+      const side = sideInput.value || 'Long';
+      let targetPrice;
+      if (side === 'Short') {
+        // For Short: target price should be lower than entry price
+        targetPrice = currentPrice * (1 - defaultTargetPrice / 100);
+        console.log('✅ Updated target price (Short):', targetPrice.toFixed(2), `(${defaultTargetPrice}% below entry)`);
+      } else {
+        // For Long: target price should be higher than entry price
+        targetPrice = currentPrice * (1 + defaultTargetPrice / 100);
+        console.log('✅ Updated target price (Long):', targetPrice.toFixed(2), `(${defaultTargetPrice}% above entry)`);
+      }
       targetPriceInput.value = targetPrice.toFixed(2);
       targetPercentageInput.value = defaultTargetPrice.toFixed(2);
-      console.log('✅ Updated target price:', targetPrice.toFixed(2), `(${defaultTargetPrice}% above entry)`);
     }
     
-    // Calculate and update stop loss price and percentage
+    // Calculate and update stop loss price and percentage based on side
     const stopPriceInput = document.getElementById('stopPrice');
     const stopPercentageInput = document.getElementById('stopPercentage');
-    if (stopPriceInput && stopPercentageInput) {
-      const stopPrice = currentPrice * (1 - defaultStopLoss / 100);
+    if (stopPriceInput && stopPercentageInput && sideInput) {
+      const side = sideInput.value || 'Long';
+      let stopPrice;
+      if (side === 'Short') {
+        // For Short: stop price should be higher than entry price (stop loss)
+        stopPrice = currentPrice * (1 + defaultStopLoss / 100);
+        console.log('✅ Updated stop price (Short):', stopPrice.toFixed(2), `(${defaultStopLoss}% above entry)`);
+      } else {
+        // For Long: stop price should be lower than entry price (stop loss)
+        stopPrice = currentPrice * (1 - defaultStopLoss / 100);
+        console.log('✅ Updated stop price (Long):', stopPrice.toFixed(2), `(${defaultStopLoss}% below entry)`);
+      }
       stopPriceInput.value = stopPrice.toFixed(2);
       stopPercentageInput.value = defaultStopLoss.toFixed(2);
-      console.log('✅ Updated stop price:', stopPrice.toFixed(2), `(${defaultStopLoss}% below entry)`);
     }
     
   } catch (error) {
@@ -544,28 +563,47 @@ async function updateEditFormFieldsWithTickerData(ticker, currentPrice) {
       console.log('✅ Updated edit entry price:', currentPrice.toFixed(2));
     }
     
-    // Calculate and update target price and percentage - only if fields are empty
+    // Calculate and update target price and percentage based on side - only if fields are empty
     const editTargetPriceInput = document.getElementById('editTargetPrice');
     const editTargetPercentageInput = document.getElementById('editTargetPercentage');
-    if (editTargetPriceInput && editTargetPercentageInput && 
+    const editSideInput = document.getElementById('editSide');
+    if (editTargetPriceInput && editTargetPercentageInput && editSideInput && 
         (!editTargetPriceInput.value || editTargetPriceInput.value === '') &&
         (!editTargetPercentageInput.value || editTargetPercentageInput.value === '')) {
-      const targetPrice = currentPrice * (1 + defaultTargetPrice / 100);
+      const side = editSideInput.value || 'Long';
+      let targetPrice;
+      if (side === 'Short') {
+        // For Short: target price should be lower than entry price
+        targetPrice = currentPrice * (1 - defaultTargetPrice / 100);
+        console.log('✅ Updated edit target price (Short):', targetPrice.toFixed(2), `(${defaultTargetPrice}% below entry)`);
+      } else {
+        // For Long: target price should be higher than entry price
+        targetPrice = currentPrice * (1 + defaultTargetPrice / 100);
+        console.log('✅ Updated edit target price (Long):', targetPrice.toFixed(2), `(${defaultTargetPrice}% above entry)`);
+      }
       editTargetPriceInput.value = targetPrice.toFixed(2);
       editTargetPercentageInput.value = defaultTargetPrice.toFixed(2);
-      console.log('✅ Updated edit target price:', targetPrice.toFixed(2), `(${defaultTargetPrice}% above entry)`);
     }
     
-    // Calculate and update stop loss price and percentage - only if fields are empty
+    // Calculate and update stop loss price and percentage based on side - only if fields are empty
     const editStopPriceInput = document.getElementById('editStopPrice');
     const editStopPercentageInput = document.getElementById('editStopPercentage');
-    if (editStopPriceInput && editStopPercentageInput && 
+    if (editStopPriceInput && editStopPercentageInput && editSideInput && 
         (!editStopPriceInput.value || editStopPriceInput.value === '') &&
         (!editStopPercentageInput.value || editStopPercentageInput.value === '')) {
-      const stopPrice = currentPrice * (1 - defaultStopLoss / 100);
+      const side = editSideInput.value || 'Long';
+      let stopPrice;
+      if (side === 'Short') {
+        // For Short: stop price should be higher than entry price (stop loss)
+        stopPrice = currentPrice * (1 + defaultStopLoss / 100);
+        console.log('✅ Updated edit stop price (Short):', stopPrice.toFixed(2), `(${defaultStopLoss}% above entry)`);
+      } else {
+        // For Long: stop price should be lower than entry price (stop loss)
+        stopPrice = currentPrice * (1 - defaultStopLoss / 100);
+        console.log('✅ Updated edit stop price (Long):', stopPrice.toFixed(2), `(${defaultStopLoss}% below entry)`);
+      }
       editStopPriceInput.value = stopPrice.toFixed(2);
       editStopPercentageInput.value = defaultStopLoss.toFixed(2);
-      console.log('✅ Updated edit stop price:', stopPrice.toFixed(2), `(${defaultStopLoss}% below entry)`);
     }
     
   } catch (error) {
@@ -1648,7 +1686,7 @@ function updateTradePlansTable(trade_plans) {
 
     // Displaying ticker symbol or name with Entity Details link
     const tickerDisplay = design.ticker ? design.ticker.symbol || design.ticker.name || 'לא מוגדר' : 'לא מוגדר';
-    const tickerLink = design.id ? createLinkButton(`showEntityDetails('trade_plan', ${design.id})`) : '';
+    const tickerLink = design.id ? `<button class="btn btn-sm btn-info" onclick="if (typeof window.showEntityDetails === 'function') { window.showEntityDetails('trade_plan', ${design.id}); }" title="קישור">🔗</button>` : '';
 
     // שמירת הערכים המקוריים באנגלית לפילטר
     const typeForFilter = design.investment_type || '';
@@ -1706,10 +1744,10 @@ function updateTradePlansTable(trade_plans) {
           </span>
         </td>
         <td class="actions-cell">
-          ${createButton('LINK', `viewLinkedItemsForTradePlan(${design.id})`)}
-          ${createButton('EDIT', `window.openEditTradePlanModal(${design.id})`)}
-          ${createButton('CANCEL', `window.cancelTradePlan(${design.id})`)}
-          ${createButton('DELETE', `window.openDeleteTradePlanModal(${design.id})`)}
+          <button class="btn btn-sm btn-info" onclick="if (typeof window.viewLinkedItemsForTradePlan === 'function') { window.viewLinkedItemsForTradePlan(${design.id}); }" title="קישור">🔗</button>
+          <button class="btn btn-sm btn-secondary" onclick="if (typeof window.openEditTradePlanModal === 'function') { window.openEditTradePlanModal(${design.id}); }" title="ערוך">✏️</button>
+          <button class="btn btn-sm btn-warning" onclick="if (typeof window.cancelTradePlan === 'function') { window.cancelTradePlan(${design.id}); }" title="בטל">❌</button>
+          <button class="btn btn-sm btn-danger" onclick="if (typeof window.openDeleteTradePlanModal === 'function') { window.openDeleteTradePlanModal(${design.id}); }" title="מחק">🗑️</button>
         </td>
       </tr>
     `;
@@ -3216,13 +3254,23 @@ function setupPriceCalculation() {
   const targetPriceInput = document.getElementById('targetPrice');
   const targetPercentageInput = document.getElementById('targetPercentage');
   const entryPriceInput = document.getElementById('price');
+  const sideInput = document.getElementById('side');
   
-  if (targetPriceInput && targetPercentageInput && entryPriceInput) {
+  if (targetPriceInput && targetPercentageInput && entryPriceInput && sideInput) {
     targetPriceInput.addEventListener('input', function() {
       const entryPrice = parseFloat(entryPriceInput.value) || 0;
       const targetPrice = parseFloat(this.value) || 0;
+      const side = sideInput.value;
+      
       if (entryPrice > 0 && targetPrice > 0) {
-        const percentage = ((targetPrice - entryPrice) / entryPrice) * 100;
+        let percentage;
+        if (side === 'Short') {
+          // For Short: target price should be lower than entry price
+          percentage = ((entryPrice - targetPrice) / entryPrice) * 100;
+        } else {
+          // For Long: target price should be higher than entry price
+          percentage = ((targetPrice - entryPrice) / entryPrice) * 100;
+        }
         targetPercentageInput.value = percentage.toFixed(2);
       }
     });
@@ -3231,8 +3279,17 @@ function setupPriceCalculation() {
     targetPercentageInput.addEventListener('input', function() {
       const entryPrice = parseFloat(entryPriceInput.value) || 0;
       const percentage = parseFloat(this.value) || 0;
+      const side = sideInput.value;
+      
       if (entryPrice > 0) {
-        const targetPrice = entryPrice * (1 + percentage / 100);
+        let targetPrice;
+        if (side === 'Short') {
+          // For Short: target price = entry * (1 - percentage/100)
+          targetPrice = entryPrice * (1 - percentage / 100);
+        } else {
+          // For Long: target price = entry * (1 + percentage/100)
+          targetPrice = entryPrice * (1 + percentage / 100);
+        }
         targetPriceInput.value = targetPrice.toFixed(2);
       }
     });
@@ -3242,12 +3299,21 @@ function setupPriceCalculation() {
   const stopPriceInput = document.getElementById('stopPrice');
   const stopPercentageInput = document.getElementById('stopPercentage');
   
-  if (stopPriceInput && stopPercentageInput && entryPriceInput) {
+  if (stopPriceInput && stopPercentageInput && entryPriceInput && sideInput) {
     stopPriceInput.addEventListener('input', function() {
       const entryPrice = parseFloat(entryPriceInput.value) || 0;
       const stopPrice = parseFloat(this.value) || 0;
+      const side = sideInput.value;
+      
       if (entryPrice > 0 && stopPrice > 0) {
-        const percentage = ((entryPrice - stopPrice) / entryPrice) * 100;
+        let percentage;
+        if (side === 'Short') {
+          // For Short: stop price should be higher than entry price (stop loss)
+          percentage = ((stopPrice - entryPrice) / entryPrice) * 100;
+        } else {
+          // For Long: stop price should be lower than entry price (stop loss)
+          percentage = ((entryPrice - stopPrice) / entryPrice) * 100;
+        }
         stopPercentageInput.value = percentage.toFixed(2);
       }
     });
@@ -3256,12 +3322,53 @@ function setupPriceCalculation() {
     stopPercentageInput.addEventListener('input', function() {
       const entryPrice = parseFloat(entryPriceInput.value) || 0;
       const percentage = parseFloat(this.value) || 0;
+      const side = sideInput.value;
+      
       if (entryPrice > 0) {
-        const stopPrice = entryPrice * (1 - percentage / 100);
+        let stopPrice;
+        if (side === 'Short') {
+          // For Short: stop price = entry * (1 + percentage/100)
+          stopPrice = entryPrice * (1 + percentage / 100);
+        } else {
+          // For Long: stop price = entry * (1 - percentage/100)
+          stopPrice = entryPrice * (1 - percentage / 100);
+        }
         stopPriceInput.value = stopPrice.toFixed(2);
       }
     });
   }
+  
+  // Add event listener for side change to recalculate prices
+  sideInput.addEventListener('change', function() {
+    const entryPrice = parseFloat(entryPriceInput.value) || 0;
+    const side = this.value;
+    
+    if (entryPrice > 0) {
+      // Recalculate target price based on current percentage
+      const targetPercentage = parseFloat(targetPercentageInput.value) || 0;
+      if (targetPercentage > 0) {
+        let targetPrice;
+        if (side === 'Short') {
+          targetPrice = entryPrice * (1 - targetPercentage / 100);
+        } else {
+          targetPrice = entryPrice * (1 + targetPercentage / 100);
+        }
+        targetPriceInput.value = targetPrice.toFixed(2);
+      }
+      
+      // Recalculate stop price based on current percentage
+      const stopPercentage = parseFloat(stopPercentageInput.value) || 0;
+      if (stopPercentage > 0) {
+        let stopPrice;
+        if (side === 'Short') {
+          stopPrice = entryPrice * (1 + stopPercentage / 100);
+        } else {
+          stopPrice = entryPrice * (1 - stopPercentage / 100);
+        }
+        stopPriceInput.value = stopPrice.toFixed(2);
+      }
+    }
+  });
 }
 
 // Edit form price calculation functions
@@ -3270,13 +3377,23 @@ function setupEditPriceCalculation() {
   const editTargetPriceInput = document.getElementById('editTargetPrice');
   const editTargetPercentageInput = document.getElementById('editTargetPercentage');
   const editEntryPriceInput = document.getElementById('editPrice');
+  const editSideInput = document.getElementById('editSide');
   
-  if (editTargetPriceInput && editTargetPercentageInput && editEntryPriceInput) {
+  if (editTargetPriceInput && editTargetPercentageInput && editEntryPriceInput && editSideInput) {
     editTargetPriceInput.addEventListener('input', function() {
       const entryPrice = parseFloat(editEntryPriceInput.value) || 0;
       const targetPrice = parseFloat(this.value) || 0;
+      const side = editSideInput.value;
+      
       if (entryPrice > 0 && targetPrice > 0) {
-        const percentage = ((targetPrice - entryPrice) / entryPrice) * 100;
+        let percentage;
+        if (side === 'Short') {
+          // For Short: target price should be lower than entry price
+          percentage = ((entryPrice - targetPrice) / entryPrice) * 100;
+        } else {
+          // For Long: target price should be higher than entry price
+          percentage = ((targetPrice - entryPrice) / entryPrice) * 100;
+        }
         editTargetPercentageInput.value = percentage.toFixed(2);
       }
     });
@@ -3285,8 +3402,17 @@ function setupEditPriceCalculation() {
     editTargetPercentageInput.addEventListener('input', function() {
       const entryPrice = parseFloat(editEntryPriceInput.value) || 0;
       const percentage = parseFloat(this.value) || 0;
+      const side = editSideInput.value;
+      
       if (entryPrice > 0) {
-        const targetPrice = entryPrice * (1 + percentage / 100);
+        let targetPrice;
+        if (side === 'Short') {
+          // For Short: target price = entry * (1 - percentage/100)
+          targetPrice = entryPrice * (1 - percentage / 100);
+        } else {
+          // For Long: target price = entry * (1 + percentage/100)
+          targetPrice = entryPrice * (1 + percentage / 100);
+        }
         editTargetPriceInput.value = targetPrice.toFixed(2);
       }
     });
@@ -3296,12 +3422,21 @@ function setupEditPriceCalculation() {
   const editStopPriceInput = document.getElementById('editStopPrice');
   const editStopPercentageInput = document.getElementById('editStopPercentage');
   
-  if (editStopPriceInput && editStopPercentageInput && editEntryPriceInput) {
+  if (editStopPriceInput && editStopPercentageInput && editEntryPriceInput && editSideInput) {
     editStopPriceInput.addEventListener('input', function() {
       const entryPrice = parseFloat(editEntryPriceInput.value) || 0;
       const stopPrice = parseFloat(this.value) || 0;
+      const side = editSideInput.value;
+      
       if (entryPrice > 0 && stopPrice > 0) {
-        const percentage = ((entryPrice - stopPrice) / entryPrice) * 100;
+        let percentage;
+        if (side === 'Short') {
+          // For Short: stop price should be higher than entry price (stop loss)
+          percentage = ((stopPrice - entryPrice) / entryPrice) * 100;
+        } else {
+          // For Long: stop price should be lower than entry price (stop loss)
+          percentage = ((entryPrice - stopPrice) / entryPrice) * 100;
+        }
         editStopPercentageInput.value = percentage.toFixed(2);
       }
     });
@@ -3310,12 +3445,53 @@ function setupEditPriceCalculation() {
     editStopPercentageInput.addEventListener('input', function() {
       const entryPrice = parseFloat(editEntryPriceInput.value) || 0;
       const percentage = parseFloat(this.value) || 0;
+      const side = editSideInput.value;
+      
       if (entryPrice > 0) {
-        const stopPrice = entryPrice * (1 - percentage / 100);
+        let stopPrice;
+        if (side === 'Short') {
+          // For Short: stop price = entry * (1 + percentage/100)
+          stopPrice = entryPrice * (1 + percentage / 100);
+        } else {
+          // For Long: stop price = entry * (1 - percentage/100)
+          stopPrice = entryPrice * (1 - percentage / 100);
+        }
         editStopPriceInput.value = stopPrice.toFixed(2);
       }
     });
   }
+  
+  // Add event listener for side change to recalculate prices in edit form
+  editSideInput.addEventListener('change', function() {
+    const entryPrice = parseFloat(editEntryPriceInput.value) || 0;
+    const side = this.value;
+    
+    if (entryPrice > 0) {
+      // Recalculate target price based on current percentage
+      const targetPercentage = parseFloat(editTargetPercentageInput.value) || 0;
+      if (targetPercentage > 0) {
+        let targetPrice;
+        if (side === 'Short') {
+          targetPrice = entryPrice * (1 - targetPercentage / 100);
+        } else {
+          targetPrice = entryPrice * (1 + targetPercentage / 100);
+        }
+        editTargetPriceInput.value = targetPrice.toFixed(2);
+      }
+      
+      // Recalculate stop price based on current percentage
+      const stopPercentage = parseFloat(editStopPercentageInput.value) || 0;
+      if (stopPercentage > 0) {
+        let stopPrice;
+        if (side === 'Short') {
+          stopPrice = entryPrice * (1 + stopPercentage / 100);
+        } else {
+          stopPrice = entryPrice * (1 - stopPercentage / 100);
+        }
+        editStopPriceInput.value = stopPrice.toFixed(2);
+      }
+    }
+  });
 }
 
 // Adding functions to global scope

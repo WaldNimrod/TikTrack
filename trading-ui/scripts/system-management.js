@@ -890,7 +890,7 @@ class SystemManagement {
             </div>
           </div>
           <div class="modal-footer">
-            ${createCloseButton()}
+            <button data-button-type="CLOSE" data-attributes="data-bs-dismiss='modal' type='button'"></button>
             <button type="button" class="btn btn-primary" onclick="SystemManagement.copyCheckResultsToClipboard()">
               📋 העתק תוצאות
             </button>

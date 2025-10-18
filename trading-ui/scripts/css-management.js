@@ -160,7 +160,7 @@ async function editCssFile(filename) {
                         <h2>עורך CSS - ${filename}</h2>
                         <textarea style="width:100%;height:400px;font-family:monospace;">${content}</textarea>
                         <br><br>
-                        ${createButton('SAVE', 'saveCssFile()')}
+                        <button data-button-type="SAVE" data-onclick="saveCssFile()"></button>
                         <button onclick="window.close()">סגור</button>
                     </body>
                     </html>
@@ -268,7 +268,7 @@ function showCssViewerModal(filename, content) {
                         <pre class="bg-light p-3 mb-0" style="white-space: pre-wrap; font-family: monospace; max-height: 70vh; overflow-y: auto;">${content}</pre>
                     </div>
                     <div class="modal-footer">
-                        ${createCloseButton()}
+                        <button data-button-type="CLOSE" data-attributes="data-bs-dismiss='modal' type='button'"></button>
                         <button type="button" class="btn btn-primary" onclick="editCssFile('${filename}')">
                             <i class="fas fa-edit"></i> ערוך
                         </button>
@@ -322,7 +322,7 @@ function showDeleteConfirmationModal(filename) {
                         <p class="text-danger">פעולה זו לא ניתנת לביטול!</p>
                     </div>
                     <div class="modal-footer">
-                        ${createButton('CANCEL', 'data-bs-dismiss="modal"', '', 'type="button"')}
+                        <button data-button-type="CANCEL" data-attributes="data-bs-dismiss='modal' type='button'"></button>
                         <button type="button" class="btn btn-danger" onclick="confirmDeleteCssFile('${filename}')">
                             <i class="fas fa-trash"></i> מחק
                         </button>
@@ -660,7 +660,7 @@ function showUnusedCssRemovalModal(cleanupResults) {
                         </div>
                     </div>
                     <div class="modal-footer">
-                        ${createButton('CANCEL', 'data-bs-dismiss="modal"', '', 'type="button"')}
+                        <button data-button-type="CANCEL" data-attributes="data-bs-dismiss='modal' type='button'"></button>
                         <button type="button" class="btn btn-danger" onclick="executeUnusedCssRemoval()">
                             <i class="fas fa-trash"></i> הסר נבחרים
                         </button>
@@ -1088,7 +1088,7 @@ function showBackupDialog(actionCallback) {
                         <small class="text-muted">הגיבוי יכלול את כל קבצי ה-CSS הנוכחיים עם חותמת זמן</small>
                     </div>
                     <div class="modal-footer">
-                        ${createButton('CANCEL', 'data-bs-dismiss="modal"', '', 'type="button"')}
+                        <button data-button-type="CANCEL" data-attributes="data-bs-dismiss='modal' type='button'"></button>
                         <button type="button" class="btn btn-primary" onclick="proceedWithBackup()">
                             <i class="fas fa-play"></i> המשך
                         </button>
@@ -1260,7 +1260,7 @@ function showDuplicateCleanupModal(duplicates) {
                         </div>
                     </div>
                     <div class="modal-footer">
-                        ${createButton('CANCEL', 'data-bs-dismiss="modal"', '', 'type="button"')}
+                        <button data-button-type="CANCEL" data-attributes="data-bs-dismiss='modal' type='button'"></button>
                         <button type="button" class="btn btn-primary" onclick="executeDuplicateCleanup()">
                             <i class="fas fa-merge"></i> בצע איחוד
                         </button>
@@ -1384,7 +1384,7 @@ function showSpecificDuplicateCleanupModal(selector, duplicate) {
                         </div>
                     </div>
                     <div class="modal-footer">
-                        ${createButton('CANCEL', 'data-bs-dismiss="modal"', '', 'type="button"')}
+                        <button data-button-type="CANCEL" data-attributes="data-bs-dismiss='modal' type='button'"></button>
                         <button type="button" class="btn btn-primary" onclick="executeSpecificDuplicateCleanup('${selector}')">
                             <i class="fas fa-merge"></i> בצע איחוד
                         </button>
@@ -1506,7 +1506,7 @@ function showDeleteFileSelectionModal(selector, duplicate) {
                         </div>
                     </div>
                     <div class="modal-footer">
-                        ${createButton('CANCEL', 'data-bs-dismiss="modal"', '', 'type="button"')}
+                        <button data-button-type="CANCEL" data-attributes="data-bs-dismiss='modal' type='button'"></button>
                         <button type="button" class="btn btn-danger" onclick="executeDeleteFromFile('${selector}')">
                             <i class="fas fa-trash"></i> מחק מהקובץ
                         </button>
@@ -1802,7 +1802,7 @@ function showAddCssFileModal() {
                         </div>
                     </div>
                     <div class="modal-footer">
-                        ${createButton('CANCEL', 'data-bs-dismiss="modal"', '', 'type="button"')}
+                        <button data-button-type="CANCEL" data-attributes="data-bs-dismiss='modal' type='button'"></button>
                         <button type="button" class="btn btn-primary" onclick="createNewCssFileFromModal()">
                             <i class="fas fa-plus"></i> צור קובץ
                         </button>

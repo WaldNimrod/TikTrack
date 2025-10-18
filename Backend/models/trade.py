@@ -31,6 +31,7 @@ class Trade(BaseModel):
     ticker = relationship("Ticker")
     trade_plan = relationship("TradePlan", back_populates="trades")
     executions = relationship("Execution", back_populates="trade")
+    conditions = relationship("TradeCondition", back_populates="trade", cascade="all, delete-orphan")
     # Notes relationship removed - notes now use related_type and related_id
     
     def to_dict(self) -> Dict[str, Any]:

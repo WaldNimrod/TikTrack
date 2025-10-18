@@ -374,8 +374,8 @@ window.editAdminPreference = function(preferenceName) {
                     </div>
                 </div>
                 <div class="modal-footer">
-                    ${createButton('CANCEL', 'data-bs-dismiss="modal"', '', 'type="button"')}
-                    ${createButton('SAVE', `window.saveEditedPreference('${preferenceName}')`, '', 'type="button"')}
+                    <button data-button-type="CANCEL" data-attributes="data-bs-dismiss='modal' type='button'"></button>
+                    <button data-button-type="SAVE" data-onclick="window.saveEditedPreference('${preferenceName}')" data-attributes="type='button'"></button>
                 </div>
             </div>
         </div>

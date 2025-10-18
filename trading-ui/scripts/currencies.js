@@ -227,8 +227,8 @@ function renderCurrenciesTable() {
             <td>${parseFloat(currency.usd_rate).toFixed(6)}</td>
             <td>${formatDateTime(currency.created_at)}</td>
             <td>
-                ${createEditButton(`editCurrency(${currency.id})`)}
-                ${createDeleteButton(`deleteCurrency(${currency.id})`)}
+                <button data-button-type="EDIT" data-onclick="editCurrency(${currency.id})"></button>
+                <button data-button-type="DELETE" data-onclick="deleteCurrency(${currency.id})"></button>
             </td>
         `;
     tbody.appendChild(row);

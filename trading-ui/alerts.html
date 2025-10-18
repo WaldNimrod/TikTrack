@@ -69,8 +69,6 @@
     <link rel="stylesheet" href="styles-new/06-components/_constraints.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_system-management.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_chart-management.css?v=1.0.0">    
-    <!-- 07-pages - Page-specific Styles -->
-    <link rel="stylesheet" href="styles-new/07-pages/_alerts.css?v=1.0.0">
     
     <!-- 08-themes - Themes -->
     <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=1.0.0">
@@ -102,10 +100,8 @@
                     <div class="section-header">
                         <h2>🔔 התראות - סקירה כללית</h2>
                         <div class="section-actions">
-                            <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט" aria-label="העתק לוג מפורט"><i class="fas fa-copy"></i> העתק לוג מפורט</button>
-                            <button class="btn btn-outline-warning" onclick="toggleSection('top')" title="הצג/הסתר סקשן" aria-label="הצג/הסתר סקשן">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
+                            ${createButton('EXPORT', 'copyDetailedLog()', 'btn-sm btn-outline-secondary', 'title="העתק לוג מפורט" aria-label="העתק לוג מפורט"')}
+                            ${createToggleButton("toggleSection('top')", "הצג/הסתר סקשן")}
                         </div>
                     </div>
                     <div class="section-body">
@@ -141,25 +137,23 @@
                     <div class="section-header entity-test-sub-header">
                         <h2>📋 ניהול התראות</h2>
                         <div class="filter-buttons-container button-row">
-                            <button class="btn btn-sm active" onclick="filterAlertsByRelatedObjectType('all')" data-type="all" title="הצג הכל" style="background-color: white; color: #28a745; border-color: #28a745;">הכל</button>
-                            <button class="btn btn-sm btn-outline-primary" onclick="filterAlertsByRelatedObjectType('account')" data-type="account" title="חשבונות" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                            ${createButton("FILTER", "filterAlertsByRelatedObjectType('all')", "btn-sm active", "data-type="all" title="הצג הכל" style="background-color: white; color: #28a745; border-color: #28a745;"")}
+                            ${createButton("FILTER", "filterAlertsByRelatedObjectType('account')", "btn-sm btn-outline-primary", "data-type="account" title="חשבונות" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;"")}
                                 <img src="images/icons/accounts.svg" alt="חשבונות" style="width: 14px; height: 14px;">
                             </button>
-                            <button class="btn btn-sm btn-outline-primary" onclick="filterAlertsByRelatedObjectType('trade')" data-type="trade" title="טריידים" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                            ${createButton("FILTER", "filterAlertsByRelatedObjectType('trade')", "btn-sm btn-outline-primary", "data-type="trade" title="טריידים" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;"")}
                                 <img src="images/icons/trades.svg" alt="טריידים" style="width: 14px; height: 14px;">
                             </button>
-                            <button class="btn btn-sm btn-outline-primary" onclick="filterAlertsByRelatedObjectType('trade_plan')" data-type="trade_plan" title="תוכניות" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                            ${createButton("FILTER", "filterAlertsByRelatedObjectType('trade_plan')", "btn-sm btn-outline-primary", "data-type="trade_plan" title="תוכניות" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;"")}
                                 <img src="images/icons/trade_plans.svg" alt="תוכניות" style="width: 14px; height: 14px;">
                             </button>
-                            <button class="btn btn-sm btn-outline-primary" onclick="filterAlertsByRelatedObjectType('ticker')" data-type="ticker" title="טיקרים" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                            ${createButton("FILTER", "filterAlertsByRelatedObjectType('ticker')", "btn-sm btn-outline-primary", "data-type="ticker" title="טיקרים" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;"")}
                                 <img src="images/icons/tickers.svg" alt="טיקרים" style="width: 14px; height: 14px;">
                             </button>
                             
                             <span style="margin: 0 10px; color: #666;">|</span>
                         </div>
-                        <button class="btn btn-outline-warning" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
+                        ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
                     </div>
                     <div class="section-body">
                         <!-- Alerts table -->
@@ -168,53 +162,25 @@
                                 <thead>
                                     <tr>
                                         <th class="col-ticker">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(0, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
-                                                טיקר <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTableData === 'function') { window.sortTableData(0, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;"", "טיקר")}
                                         </th>
                                         <th class="col-condition">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(1, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
-                                                תנאי <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTableData(1, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;"", "תנאי")}
                                         </th>
                                         <th class="col-status">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(2, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
-                                                סטטוס <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTableData(2, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;"", "סטטוס")}
                                         </th>
                                         <th class="col-triggered">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(3, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
-                                                הופעל <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTableData(3, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;"", "הופעל")}
                                         </th>
                                         <th class="col-linked">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(4, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
-                                                קשור ל: <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTableData(4, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;"", "קשור ל:")}
                                         </th>
                                         <th class="col-message">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(5, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
-                                                הודעה <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTableData(5, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;"", "הודעה")}
                                         </th>
                                         <th class="col-created">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(6, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
-                                                נוצר ב: <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTableData(6, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;"", "נוצר ב:")}
                                         </th>
                                         <th class="col-actions actions-cell actions-3-btn">
                                             פעולות
@@ -250,7 +216,7 @@
                 <div class="modal-content">
                     <div class="modal-header modal-header-colored">
                         <h5 class="modal-title" id="addAlertModalLabel">הוספת התראה</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        ${createCloseButton("aria-label="Close"")}
                     </div>
                     <div class="modal-body">
                         <form id="addAlertForm">
@@ -347,8 +313,8 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-success" onclick="addAlert()">הוסף התראה</button>
+                        ${createButton('CANCEL', 'data-bs-dismiss="modal"', '', 'type="button"')}
+                        ${createButton('SAVE', 'addAlert()', '', 'type="button"')}
                     </div>
                 </div>
             </div>
@@ -361,7 +327,7 @@
                 <div class="modal-content">
                     <div class="modal-header modal-header-colored">
                         <h5 class="modal-title" id="editAlertModalLabel">עריכת התראה</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        ${createCloseButton("aria-label="Close"")}
                     </div>
                     <div class="modal-body">
                         <form id="editAlertForm">
@@ -419,8 +385,8 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-success" onclick="updateAlert()">עדכן התראה</button>
+                        ${createButton('CANCEL', 'data-bs-dismiss="modal"', '', 'type="button"')}
+                        ${createButton('SAVE', 'updateAlert()', '', 'type="button"')}
                     </div>
                 </div>
             </div>

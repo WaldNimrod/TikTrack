@@ -97,34 +97,21 @@
                 <!-- כותרת מעקב טריידים -->
                 <div class="section-header entity-trade-main-header">
                     <div class="table-title">
-                        <img src="images/icons/trades.svg" alt="מעקב טריידים">
+                        <img src="images/icons/trades.svg" alt="מעקב טריידים" class="section-icon">
                         מעקב טריידים
                     </div>
                     <div class="table-actions">
                         <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והטריידים">
-                            <i class="fas fa-copy"></i> העתק לוג מפורט
+                            📤 העתק לוג מפורט
                         </button>
                         <button class="btn btn-outline-warning" onclick="toggleSection('top')" title="הצג/הסתר אזור מעקב טריידים">
-                            <span class="filter-icon">▲</span>
+                            ▼ הצג/הסתר
                         </button>
                     </div>
                 </div>
 
                 <!-- כרטיסיות התראות -->
                 <div class="section-body">
-                    <!-- Color Scheme Demo for Trades -->
-                    <div id="tradesColorDemo" class="mb-3">
-                        <div class="d-flex gap-2 mb-2">
-                            <span class="entity-trade-badge">טרייד פעיל</span>
-                            <span class="entity-account-badge">Interactive Brokers</span>
-                            <div class="entity-trade-border p-2 border rounded">
-                                <small>עמלה: <span class="numeric-text-negative">-$5.00</span></small>
-                            </div>
-                        </div>
-                        <div class="alert alert-info">
-                            <small>🎨 דמונסטרציה למערכת הצבעים הדינמית - מתעדכנת אוטומטית לפי סוג הישות</small>
-                        </div>
-                    </div>
                     
                     <!-- ווב קומפוננט של התראות פעילות -->
                     <active-alerts></active-alerts>
@@ -147,26 +134,26 @@
                     <!-- כותרת הטריידים שלי -->
                     <div class="section-header entity-trade-main-header">
                         <div class="table-title">
-                            <img src="images/icons/trades.svg" alt="הטריידים שלי">
+                            <img src="images/icons/trades.svg" alt="הטריידים שלי" class="section-icon">
                             הטריידים שלי
                         </div>
                         <div class="table-count" id="tradesCount">טוען...</div>
                         <div class="table-actions">
                             <button id="addTradeBtn" class="btn btn-success" onclick="showAddTradeModal()" title="הוסף טרייד חדש">
-                                <img src="images/icons/trades.svg" alt="הוסף" class="action-icon"> הוסף
+                                ➕ הוסף
                             </button>
                             
                             <!-- כפתורי עריכה ומחיקה נסתרים (לזיהוי בבדיקות) -->
                             <button id="editTradeBtn" class="btn btn-secondary d-none" onclick="editTradeRecord('')" title="ערוך טרייד נבחר">
-                                <img src="images/icons/trades.svg" alt="ערוך" class="action-icon"> ערוך
+                                ✏️ ערוך
                             </button>
                             <button id="deleteTradeBtn" class="btn btn-danger d-none" onclick="deleteTradeRecord('')" title="מחק טרייד נבחר">
-                                <img src="images/icons/trades.svg" alt="מחק" class="action-icon"> מחק
+                                🗑️ מחק
                             </button>
 
                             <div class="action-separator"></div>
-                            <button class="btn btn-outline-warning" onclick="toggleSection('main')" title="הצג/הסתר אזור הטריידים שלי">
-                                <span class="filter-icon">▲</span>
+                            <button class="btn btn-outline-warning" onclick="toggleSection('top')" title="הצג/הסתר אזור הטריידים שלי">
+                                ▼ הצג/הסתר
                             </button>
                         </div>
                     </div>
@@ -178,88 +165,40 @@
                                 <thead>
                                     <tr>
                                         <th class="col-ticker">
-                                            <button class="btn btn-link sortable-header"
-                                                data-sort-column="0"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(0, window.tradesData || [], 'trades', window.updateTradesTable); }"
-                                                טיקר <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTable(0); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;"", "טיקר")}
                                         </th>
                                         <th class="col-price">
-                                            <button class="btn btn-link sortable-header"
-                                                data-sort-column="1"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, window.tradesData || [], 'trades', window.updateTradesTable); }"
-                                                מחיר נוכחי <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTable(1); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;"", "מחיר נוכחי")}
                                         </th>
                                         <th class="col-change">
-                                            <button class="btn btn-link sortable-header"
-                                                data-sort-column="2"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(2, window.tradesData || [], 'trades', window.updateTradesTable); }"
-                                                שינוי % <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTable(2); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;"", "שינוי %")}
                                         </th>
                                         <th class="col-status">
-                                            <button class="btn btn-link sortable-header"
-                                                data-sort-column="3"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(3, window.tradesData || [], 'trades', window.updateTradesTable); }"
-                                                סטטוס <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTable(3); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;"", "סטטוס")}
                                         </th>
                                         <th class="col-type">
-                                            <button class="btn btn-link sortable-header"
-                                                data-sort-column="4"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(4, window.tradesData || [], 'trades', window.updateTradesTable); }"
-                                                סוג <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTable(4); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;"", "סוג")}
                                         </th>
                                         <th class="col-side">
-                                            <button class="btn btn-link sortable-header"
-                                                data-sort-column="5"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(5, window.tradesData || [], 'trades', window.updateTradesTable); }"
-                                                צד <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTable(5); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;"", "צד")}
                                         </th>
                                         <th class="col-plan">
-                                            <button class="btn btn-link sortable-header"
-                                                data-sort-column="6"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(6, window.tradesData || [], 'trades', window.updateTradesTable); }"
-                                                תוכנית <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTable(6); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;"", "תוכנית")}
                                         </th>
                                         <th class="col-pnl">
-                                            <button class="btn btn-link sortable-header"
-                                                data-sort-column="7"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(7, window.tradesData || [], 'trades', window.updateTradesTable); }"
-                                                רווח/הפסד <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTable(7); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;"", "רווח/הפסד")}
                                         </th>
                                         <th class="col-created">
-                                            <button class="btn btn-link sortable-header"
-                                                data-sort-column="8"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(8, window.tradesData || [], 'trades', window.updateTradesTable); }"
-                                                נוצר ב <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTable(8); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;"", "נוצר ב")}
                                         </th>
                                         <th class="col-closed">
-                                            <button class="btn btn-link sortable-header"
-                                                data-sort-column="9"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(9, window.tradesData || [], 'trades', window.updateTradesTable); }"
-                                                נסגר ב <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTable(9); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;"", "נסגר ב")}
                                         </th>
                                         <th class="col-account">
-                                            <button class="btn btn-link sortable-header"
-                                                data-sort-column="10"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(10, window.tradesData || [], 'trades', window.updateTradesTable); }"
-                                                חשבון <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTable(10); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;"", "חשבון")}
                                         </th>
                                         <th class="col-notes">
-                                            <button class="btn btn-link sortable-header"
-                                                data-sort-column="11"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(11, window.tradesData || [], 'trades', window.updateTradesTable); }"
-                                                הערות <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTable(11); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;"", "הערות")}
                                         </th>
                                         <th class="col-actions actions-cell actions-3-btn">
                                             פעולות
@@ -291,15 +230,28 @@
                 <div class="modal-content">
                     <div class="modal-header modal-header-colored">
                         <h5 class="modal-title" id="addTradeModalLabel">הוספת טרייד חדש</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        ${createCloseButton("aria-label="Close"")}
                     </div>
                     <div class="modal-body">
                         <form id="addTradeForm">
                             <div class="row">
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <label for="addTradePlan" class="form-label">תוכנית מסחר (אופציונלי)</label>
+                                        <select class="form-select" id="addTradePlan">
+                                            <option value="">בחר תוכנית מסחר</option>
+                                        </select>
+                                        <small class="form-text text-muted">בחירת תוכנית תמלא אוטומטית את פרטי הטרייד</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="addTicker" class="form-label">טיקר</label>
-                                        <input type="text" class="form-control" id="addTicker" placeholder="AAPL" required>
+                                        <select class="form-select" id="addTicker" required>
+                                            <option value="">בחר טיקר</option>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -346,8 +298,8 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-success" onclick="saveNewTradeRecord()">הוסף טרייד</button>
+                        ${createButton("CANCEL", "data-bs-dismiss=\"modal\"", "", "")}
+                        ${createButton("SAVE", "saveNewTradeRecord()", "", "")}
                     </div>
                 </div>
             </div>
@@ -359,7 +311,7 @@
                 <div class="modal-content">
                     <div class="modal-header modal-header-colored">
                         <h5 class="modal-title" id="editTradeModalLabel">עריכת טרייד</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        ${createCloseButton("aria-label="Close"")}
                     </div>
 
                     <!-- שורת מידע ואיקונים מתחת לכותרת -->
@@ -382,14 +334,14 @@
 
                         <!-- איקונים לפעולות נוספות -->
                         <div class="d-flex gap-2">
-                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="openLinkedItemsModal('trade', '')" title="הצג פריטים מקושרים">
-                                <i class="fas fa-link"></i>
+                            ${createLinkButton("openLinkedItemsModal('trade', '')", "btn-outline-primary btn-sm", "title="הצג פריטים מקושרים"")}
+                                <i class="fas fa-link"></i> פריטים מקושרים
                             </button>
-                            <button type="button" class="btn btn-outline-info btn-sm" onclick="addImportantNote()" title="הוסף הערה חשובה">
-                                <i class="fas fa-sticky-note"></i>
+                            ${createButton("ADD", "addImportantNote()", "btn-outline-info btn-sm", "title="הוסף הערה חשובה"")}
+                                <i class="fas fa-plus"></i> הערה חשובה
                             </button>
-                            <button type="button" class="btn btn-outline-warning btn-sm" onclick="addReminder()" title="הוסף תזכורת">
-                                <i class="fas fa-bell"></i>
+                            ${createButton("ADD", "addReminder()", "btn-outline-warning btn-sm", "title="הוסף תזכורת"")}
+                                <i class="fas fa-plus"></i> תזכורת
                             </button>
                         </div>
                     </div>
@@ -466,20 +418,18 @@
                         <div class="d-flex justify-content-between w-100">
                             <!-- כפתורים בצד שמאל -->
                             <div>
-                                <button type="button" class="btn btn-info me-2" onclick="addImportantNote()">
-                                    <img src="images/icons/home.svg" alt="יש לי עוד משהו חשוב" class="btn-icon"> יש לי עוד משהו חשוב
-                            </button>
-                            <button type="button" class="btn btn-warning" onclick="addReminder()">
-                                    <img src="images/icons/alerts.svg" alt="תזכיר לי כש..." class="btn-icon"> תזכיר לי כש...
-                            </button>
+                                ${createButton("ADD", "addImportantNote()", "btn-info me-2", "")}
+                                    <i class="fas fa-plus"></i> הערה חשובה
+                                </button>
+                                ${createButton("ADD", "addReminder()", "btn-warning", "")}
+                                    <i class="fas fa-plus"></i> תזכורת
+                                </button>
                         </div>
 
                             <!-- כפתורים בצד ימין -->
                             <div>
-                                <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">ביטול</button>
-                                <button type="button" class="btn btn-success" onclick="saveNewTradeRecord()">
-                                שמור
-                            </button>
+                                ${createButton("CANCEL", "data-bs-dismiss=\"modal\"", "me-2", "")}
+                                ${createButton("SAVE", "saveNewTradeRecord()", "", "")}
                             </div>
                         </div>
                     </div>
@@ -493,13 +443,13 @@
                 <div class="modal-content">
                     <div class="modal-header modal-header-colored">
                         <h5 class="modal-title" id="linkedItemsModalLabel">פרטים מקושרים</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        ${createCloseButton("aria-label="Close"")}
                     </div>
                     <div class="modal-body" id="linkedItemsModalBody">
                         <!-- תוכן המודל יוכנס כאן דינמית -->
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
+                        ${createButton("CANCEL", "data-bs-dismiss=\"modal\"", "", "")}
                     </div>
                 </div>
             </div>

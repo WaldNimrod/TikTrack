@@ -71,8 +71,6 @@
     <link rel="stylesheet" href="styles-new/06-components/_system-management.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_chart-management.css?v=1.0.0">
     
-    <!-- 07-pages - Page-specific Styles -->
-    <link rel="stylesheet" href="styles-new/07-pages/_db_display.css?v=1.0.0">
     
     <!-- 08-themes - Themes -->
     <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=1.0.0">
@@ -104,12 +102,8 @@
                         בסיס נתונים
                     </div>
                     <div class="table-actions">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים מבסיס הנתונים">
-                            <i class="fas fa-copy"></i> העתק לוג מפורט
-                        </button>
-                        <button class="btn btn-outline-warning" onclick="toggleSection('top')" title="הצג/הסתר אזור בסיס נתונים">
-                            <span class="filter-icon">▲</span>
-                        </button>
+                        ${createButton('EXPORT', 'copyDetailedLog()', 'btn-sm btn-outline-secondary', 'title="העתק לוג מפורט עם כל הנתונים מבסיס הנתונים"')}
+                        ${createToggleButton("toggleSection('top')", "הצג/הסתר אזור בסיס נתונים")}
                     </div>
                 </div>
 
@@ -139,9 +133,7 @@
                         </div>
                         <div class="table-count" id="dbCount">טוען...</div>
                         <div class="table-actions">
-                            <button class="btn btn-outline-warning" onclick="toggleSection('main')" title="הצג/הסתר אזור ניהול בסיס נתונים">
-                                <span class="filter-icon">▲</span>
-                            </button>
+                            ${createToggleButton("toggleSection('main')", "הצג/הסתר אזור ניהול בסיס נתונים")}
                         </div>
                     </div>
 
@@ -152,32 +144,16 @@
                                 <thead>
                                     <tr>
                                         <th class="col-name">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                שם טבלה <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTable(0); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;"", "שם טבלה")}
                                         </th>
                                         <th class="col-records">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                מספר רשומות <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTable(1); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;"", "מספר רשומות")}
                                         </th>
                                         <th class="col-size">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                גודל <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTable(2); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;"", "גודל")}
                                         </th>
                                         <th class="col-updated">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                עדכון אחרון <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTable(3); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;"", "עדכון אחרון")}
                                         </th>
                                         <th class="col-actions actions-cell actions-3-btn">
                                             פעולות

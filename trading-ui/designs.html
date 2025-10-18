@@ -65,8 +65,6 @@
     <link rel="stylesheet" href="styles-new/06-components/_system-management.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_chart-management.css?v=1.0.0">
     
-    <!-- 07-pages - Page-specific Styles -->
-    <link rel="stylesheet" href="styles-new/07-pages/_designs.css?v=1.0.0">
     
     <!-- 08-themes - Themes -->
     <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=1.0.0">
@@ -108,12 +106,8 @@
                         <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
                         <h2>🏠 עמוד עיצובים - כותרת סקשן עליון</h2>
                         <div class="header-actions">
-                            <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
-                                <i class="fas fa-copy"></i> העתק לוג מפורט
-                            </button>
-                            <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר סקשן">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
+                            ${createButton('EXPORT', 'copyDetailedLog()', 'btn-sm btn-outline-secondary', 'title="העתק לוג מפורט עם כל הנתונים והסטטוס"')}
+                            ${createToggleButton("toggleAllSections()", "הצג/הסתר סקשן", "filter-toggle-btn")}
                         </div>
                     </div>
                     <div class="section-body">
@@ -128,9 +122,7 @@
                     <div class="section-header">
                         <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
                         <h2>📊 ביצועים - כותרת סקשן 1</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
+                        ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן", "filter-toggle-btn")}
                     </div>
                     <div class="section-body">
                         <!-- כאן נכנס התוכן של גוף הסקשן -->
@@ -144,9 +136,7 @@
                     <div class="section-header">
                         <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
                         <h2>🎨 עיצוב וסגנונות - כותרת סקשן 2</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
+                        ${createToggleButton("toggleSection('section2')", "הצג/הסתר סקשן", "filter-toggle-btn")}
                     </div>
                     <div class="section-body">
                         <!-- כאן נכנס התוכן של גוף הסקשן -->
@@ -160,9 +150,7 @@
                     <div class="section-header">
                         <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
                         <h2>📋 רכיבי ממשק - כותרת סקשן 3</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
+                        ${createToggleButton("toggleSection('section3')", "הצג/הסתר סקשן", "filter-toggle-btn")}
                     </div>
                     <div class="section-body">
                         <!-- כאן נכנס התוכן של גוף הסקשן -->

@@ -390,19 +390,26 @@ async function loadTickersForTradePlan() {
     // Loaded active tickers
 
     // עדכון רשימת הטיקרים
-    console.log('🔄 tickerService.loadTickersForTradePlan: Updating ticker input...');
-    const tickerInput = document.getElementById('ticker');
-    if (tickerInput) {
-      console.log(`🔧 tickerService.loadTickersForTradePlan: Ticker input found, current value: "${tickerInput.value}"`);
-      console.log(`🔧 tickerService.loadTickersForTradePlan: Ticker input type: ${tickerInput.type}`);
+    console.log('🔄 tickerService.loadTickersForTradePlan: Updating ticker select...');
+    const tickerSelect = document.getElementById('ticker');
+    if (tickerSelect) {
+      console.log(`🔧 tickerService.loadTickersForTradePlan: Ticker select found, current value: "${tickerSelect.value}"`);
       
-      // This is a text input, not a select - just clear it
-      console.log(`🔧 tickerService.loadTickersForTradePlan: Clearing text input...`);
-      tickerInput.value = '';
-      console.log(`✅ tickerService.loadTickersForTradePlan: Ticker input cleared`);
+      // Clear existing options except the first one
+      tickerSelect.innerHTML = '<option value="">בחר טיקר</option>';
+      
+      // Add ticker options
+      activeTickers.forEach(ticker => {
+        const option = document.createElement('option');
+        option.value = ticker.id;
+        option.textContent = `${ticker.symbol} - ${ticker.name || ticker.symbol}`;
+        tickerSelect.appendChild(option);
+      });
+      
+      console.log(`✅ tickerService.loadTickersForTradePlan: Added ${activeTickers.length} ticker options`);
 
     } else {
-      console.log('❌ tickerService.loadTickersForTradePlan: Ticker input not found');
+      console.log('❌ tickerService.loadTickersForTradePlan: Ticker select not found');
     }
 
   } catch {

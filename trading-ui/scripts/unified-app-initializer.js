@@ -68,7 +68,7 @@ class UnifiedAppInitializer {
             await this.executeInitialization(config);
             
             // Stage 4: Finalize
-            await this.finalizeInitialization();
+            await this.finalizeInitialization(config);
             
             this.performanceMetrics.endTime = Date.now();
             this.performanceMetrics.totalTime = this.performanceMetrics.endTime - this.performanceMetrics.startTime;
@@ -215,7 +215,7 @@ class UnifiedAppInitializer {
     /**
      * Stage 4: Finalize initialization
      */
-    async finalizeInitialization() {
+    async finalizeInitialization(config) {
         // console.log('🎯 Stage 4: Finalizing...');
         const stageStart = Date.now();
         
@@ -235,7 +235,7 @@ class UnifiedAppInitializer {
             }
             if (typeof initializer === 'function') {
                 try {
-                    await initializer();
+                    await initializer(config);
                     if (window.DEBUG_MODE) {
                         console.log(`✅ Custom initializer ${i + 1} completed successfully`);
                     }

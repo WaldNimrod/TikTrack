@@ -70,8 +70,6 @@
     <link rel="stylesheet" href="styles-new/06-components/_system-management.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_chart-management.css?v=1.0.0">
     
-    <!-- 07-pages - Page-specific Styles -->
-    <link rel="stylesheet" href="styles-new/07-pages/_trading_accounts.css?v=1.0.0">
     
     <!-- 08-themes - Themes -->
     <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=1.0.0">
@@ -103,8 +101,8 @@
                         חשבונות מסחר
                     </div>
                     <div class="table-actions">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט"><i class="fas fa-copy"></i> העתק לוג מפורט</button>
-                        <button class="btn btn-outline-warning" onclick="toggleSection('top')" title="הצג/הסתר"><span class="filter-icon">▲</span></button>
+                        ${createButton('EXPORT', 'copyDetailedLog()', 'btn-sm btn-outline-secondary', 'title="העתק לוג מפורט"')}
+                        ${createToggleButton("toggleSection('top')", "הצג/הסתר")}
                     </div>
                 </div>
 
@@ -134,8 +132,8 @@
                         </div>
                         <div class="table-count" id="accountsCount">טוען...</div>
                         <div class="table-actions">
-                            <button class="btn btn-success" onclick="showAddModal()" title="הוסף"><img src="images/icons/add.svg" alt="הוסף" class="action-icon"> הוסף</button>
-                            <button class="btn btn-outline-warning" onclick="toggleSection('top')" title="הצג/הסתר"><span class="filter-icon">▲</span></button>
+                            ${createButton('ADD', 'showAddModal()', 'btn-success', 'title="הוסף"')}
+                            ${createToggleButton("toggleSection('top')", "הצג/הסתר")}
                         </div>
                     </div>
 
@@ -146,46 +144,22 @@
                                 <thead>
                                     <tr>
                                         <th class="col-name">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                שם החשבון <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTable(0); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;"", "שם החשבון")}
                                         </th>
                                         <th class="col-type">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                סוג <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTable(1); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;"", "סוג")}
                                         </th>
                                         <th class="col-currency">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                מטבע <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTable(2); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;"", "מטבע")}
                                         </th>
                                         <th class="col-balance">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                יתרה <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTable(3); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;"", "יתרה")}
                                         </th>
                                         <th class="col-status">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                סטטוס <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTable(4); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;"", "סטטוס")}
                                         </th>
                                         <th class="col-created">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                נוצר ב <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTable(5); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;"", "נוצר ב")}
                                         </th>
                                         <th class="col-actions actions-cell actions-3-btn">
                                             פעולות
@@ -220,7 +194,7 @@
                 <div class="modal-content">
                     <div class="modal-header modal-header-colored">
                         <h5 class="modal-title" id="addAccountModalLabel">הוספת חשבון מסחר חדש</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        ${createCloseButton("aria-label="Close"")}
                     </div>
                     <div class="modal-body">
                         <form id="addAccountForm">
@@ -274,8 +248,8 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-success" onclick="addAccount()">הוסף חשבון</button>
+                        ${createButton('CANCEL', 'data-bs-dismiss="modal"', '', 'type="button"')}
+                        ${createButton('SAVE', 'addAccount()', '', 'type="button"')}
                     </div>
                 </div>
             </div>
@@ -288,7 +262,7 @@
                 <div class="modal-content">
                     <div class="modal-header modal-header-colored">
                         <h5 class="modal-title" id="editAccountModalLabel">עריכת חשבון מסחר</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        ${createCloseButton("aria-label="Close"")}
                     </div>
                     <div class="modal-body">
                         <form id="editAccountForm">
@@ -340,8 +314,8 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-success" onclick="updateAccount()">עדכן חשבון</button>
+                        ${createButton('CANCEL', 'data-bs-dismiss="modal"', '', 'type="button"')}
+                        ${createButton('SAVE', 'updateAccount()', '', 'type="button"')}
                     </div>
                 </div>
             </div>

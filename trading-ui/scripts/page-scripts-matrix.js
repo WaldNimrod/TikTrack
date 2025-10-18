@@ -476,7 +476,7 @@ class PageScriptsMatrixSystem {
                                     </div>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
+                                    ${createCloseButton()}
                                     <button type="button" class="btn btn-primary" onclick="pageScriptsMatrix.downloadFile('${filename}')">הורד קובץ</button>
                                 </div>
                             </div>
@@ -514,7 +514,7 @@ class PageScriptsMatrixSystem {
                                     <p class="text-warning">לא ניתן לטעון תוכן הקובץ</p>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
+                                    ${createCloseButton()}
                                 </div>
                             </div>
                         </div>
@@ -611,7 +611,7 @@ class PageScriptsMatrixSystem {
                                 <textarea class="form-control" rows="20" readonly>${reportText}</textarea>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
+                                ${createCloseButton()}
                                 <button type="button" class="btn btn-primary" onclick="this.previousElementSibling.select(); document.execCommand('copy');">העתק</button>
                             </div>
                         </div>
@@ -2128,7 +2128,7 @@ class PageScriptsMatrixSystem {
                             <pre class="bg-light p-3" style="max-height: 400px; overflow-y: auto;">${graphText}</pre>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
+                            ${createCloseButton()}
                             <button type="button" class="btn btn-primary" onclick="pageScriptsMatrix.copyDependencyGraph()">העתק</button>
                         </div>
                     </div>

@@ -103,7 +103,7 @@
                                 <i class="fas fa-copy"></i> העתק לוג מפורט
                             </button>
                             <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
-                                <span class="section-toggle-icon">▼</span>
+                                ${createToggleButton("toggleSection('top')", "הצג/הסתר סקשן")}
                             </button>
                         </div>
                     </div>
@@ -126,7 +126,7 @@
                     <div class="section-header">
                         <h2>📊 מצב המערכת</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('systemStatus')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
+                            ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
                         </button>
                     </div>
                     <div class="section-body">
@@ -200,7 +200,7 @@
                     <div class="section-header">
                         <h2>📋 רשימת משימות</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('tasksList')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
+                            ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
                         </button>
                     </div>
                     <div class="section-body">
@@ -242,7 +242,7 @@
                     <div class="section-header">
                         <h2>📋 לוג משימות ברקע</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('backgroundTasksLog')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
+                            ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
                         </button>
                     </div>
                     <div class="section-body">

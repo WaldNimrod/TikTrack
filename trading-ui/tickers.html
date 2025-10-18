@@ -69,8 +69,6 @@
     <link rel="stylesheet" href="styles-new/06-components/_system-management.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_chart-management.css?v=1.0.0">
     
-    <!-- 07-pages - Page-specific Styles -->
-    <link rel="stylesheet" href="styles-new/07-pages/_tickers.css?v=1.0.0">
     
     <!-- 08-themes - Themes -->
     <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=1.0.0">
@@ -102,12 +100,12 @@
                         טיקרים
                     </div>
                     <div class="table-actions">
-                        <button class="refresh-btn" onclick="refreshData()" title="רענן" aria-label="רענן"><span class="action-icon">🔄</span> רענן</button>
+                        ${createButton('REFRESH', 'refreshData()', 'refresh-btn', 'title="רענן" aria-label="רענן"')}
                         <div class="action-separator"></div>
-                        <button class="btn btn-success" onclick="showAddModal()" title="הוסף" aria-label="הוסף"><img src="images/icons/add.svg" alt="הוסף" class="action-icon"> הוסף</button>
+                        ${createButton('ADD', 'showAddModal()', 'btn-success', 'title="הוסף" aria-label="הוסף"')}
                         <div class="action-separator"></div>
-                        <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט" aria-label="העתק לוג מפורט"><i class="fas fa-copy"></i> העתק לוג מפורט</button>
-                        <button class="btn btn-outline-warning" onclick="toggleSection('top')" title="הצג/הסתר" aria-label="הצג/הסתר"><span class="filter-icon">▲</span></button>
+                        ${createButton('EXPORT', 'copyDetailedLog()', 'btn-sm btn-outline-secondary', 'title="העתק לוג מפורט" aria-label="העתק לוג מפורט"')}
+                        ${createToggleButton("toggleSection('top')", "הצג/הסתר")}
                     </div>
                 </div>
 
@@ -137,7 +135,7 @@
                         </div>
                         <div class="table-count" id="tickersCount">טוען...</div>
                         <div class="table-actions">
-                            <button class="btn btn-outline-warning" onclick="toggleSection('top')" title="הצג/הסתר" aria-label="הצג/הסתר"><span class="filter-icon">▲</span></button>
+                            ${createToggleButton("toggleSection('top')", "הצג/הסתר")}
                         </div>
                     </div>
 
@@ -148,46 +146,22 @@
                                 <thead>
                                     <tr>
                                         <th class="col-name">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                שם הטיקר <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTable(0); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;"", "שם הטיקר")}
                                         </th>
                                         <th class="col-price">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                מחיר נוכחי <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTable(1); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;"", "מחיר נוכחי")}
                                         </th>
                                         <th class="col-change">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                שינוי יומי <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTable(2); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;"", "שינוי יומי")}
                                         </th>
                                         <th class="col-volume">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                נפח <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTable(3); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;"", "נפח")}
                                         </th>
                                         <th class="col-status">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                סטטוס <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTable(4); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;"", "סטטוס")}
                                         </th>
                                         <th class="col-updated">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                עודכן ב <span class="sort-icon">↕</span>
-                                            </button>
+                                            ${createSortButton("if (typeof window.sortTable === 'function') { window.sortTable(5); }", "sortable-header", "style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;"", "עודכן ב")}
                                         </th>
                                         <th class="col-actions actions-cell actions-3-btn">
                                             פעולות
@@ -222,7 +196,7 @@
                 <div class="modal-content">
                     <div class="modal-header modal-header-colored">
                         <h5 class="modal-title" id="addTickerModalLabel">הוספת טיקר חדש</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        ${createCloseButton("aria-label="Close"")}
                     </div>
                     <div class="modal-body">
                         <form id="addTickerForm">
@@ -278,8 +252,8 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-success" onclick="saveForm()" aria-label="שמור טיקר">שמור</button>
+                        ${createButton('CANCEL', 'data-bs-dismiss="modal"', '', 'type="button"')}
+                        ${createButton('SAVE', 'saveForm()', '', 'type="button" aria-label="שמור טיקר"')}
                     </div>
                 </div>
             </div>
@@ -292,7 +266,7 @@
                 <div class="modal-content">
                     <div class="modal-header modal-header-colored">
                         <h5 class="modal-title" id="editTickerModalLabel">עריכת טיקר</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        ${createCloseButton("aria-label="Close"")}
                     </div>
                     <div class="modal-body">
                         <form id="editTickerForm">
@@ -346,8 +320,8 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-success" onclick="saveForm()" aria-label="שמור טיקר">שמור</button>
+                        ${createButton('CANCEL', 'data-bs-dismiss="modal"', '', 'type="button"')}
+                        ${createButton('SAVE', 'saveForm()', '', 'type="button" aria-label="שמור טיקר"')}
                     </div>
                 </div>
             </div>

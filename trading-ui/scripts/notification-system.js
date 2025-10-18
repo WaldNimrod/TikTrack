@@ -1524,7 +1524,7 @@ window.showDetailedNotification = async function(title, message, type = 'info', 
               <div style="white-space: pre-line; font-family: monospace; font-size: 0.9em;">${message}</div>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
+              ${createCloseButton()}
               <button type="button" class="btn btn-primary" onclick="copyToClipboard('${message.replace(/'/g, "\\'")}')">העתק</button>
             </div>
           </div>

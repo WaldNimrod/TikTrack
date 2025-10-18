@@ -29,6 +29,9 @@ const BUTTON_ICONS = {
   STOP: '⏹️',
   READ: '✓',
   CHECK: '✓',
+  TOGGLE: '▼',
+  CLOSE: '✖️',
+  SORT: '↕️',
 };
 
 // טקסטים לכפתורים (לנגישות)
@@ -57,6 +60,9 @@ const BUTTON_TEXTS = {
   STOP: 'עצור',
   READ: 'קראתי',
   CHECK: 'סמן',
+  TOGGLE: 'הצג/הסתר',
+  CLOSE: 'סגור',
+  SORT: 'מיון',
 };
 
 // פונקציה ליצירת כפתור עם איקון
@@ -93,6 +99,9 @@ function getButtonClass(type) {
     PAUSE: 'btn-warning',
     PLAY: 'btn-success',
     STOP: 'btn-danger',
+    TOGGLE: 'btn-outline-warning',
+    CLOSE: 'btn-secondary',
+    SORT: 'btn-link',
   };
 
   return classMap[type.toUpperCase()] || 'btn-secondary';
@@ -191,6 +200,25 @@ function createCancelButton(itemType, itemId, status = 'open', size = 'sm', addi
          `<span class="cancel-icon">${icon}</span></button>`;
 }
 
+// פונקציה ליצירת כפתור toggle לסקשנים
+function createToggleButton(onClick, title = 'הצג/הסתר', additionalClasses = '') {
+  return createButton('TOGGLE', onClick, additionalClasses, `title="${title}"`);
+}
+
+// פונקציה ליצירת כפתור סגירה למודלים
+function createCloseButton(additionalClasses = '') {
+  return createButton('CLOSE', 'data-bs-dismiss="modal"', additionalClasses, 'type="button"');
+}
+
+// פונקציה ליצירת כפתור מיון בטבלאות
+function createSortButton(onClick, additionalClasses = 'sortable-header', additionalAttributes = '', text = '') {
+  const icon = BUTTON_ICONS.SORT;
+  const buttonClass = getButtonClass('SORT');
+  
+  return `<button class="btn ${buttonClass} ${additionalClasses}" onclick="${onClick}" ${additionalAttributes}>` +
+         `${text} ${icon}</button>`;
+}
+
 // פונקציה ליצירת כפתור מחיקה עם itemType (גיבוי לפונקציה המקורית)
 function createDeleteButtonByType(itemType, itemId, size = 'sm', additionalClasses = '') {
   const buttonClass = 'btn-danger';
@@ -243,4 +271,7 @@ window.createDeleteButton = createDeleteButton;
 window.createLinkButton = createLinkButton;
 window.createCancelButton = createCancelButton;
 window.createDeleteButtonByType = createDeleteButtonByType;
+window.createToggleButton = createToggleButton;
+window.createCloseButton = createCloseButton;
+window.createSortButton = createSortButton;
 window.getButtonClass = getButtonClass;

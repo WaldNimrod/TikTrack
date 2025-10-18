@@ -227,8 +227,8 @@ function renderCurrenciesTable() {
             <td>${parseFloat(currency.usd_rate).toFixed(6)}</td>
             <td>${formatDateTime(currency.created_at)}</td>
             <td>
-                <button class="btn btn-sm btn-secondary" onclick="editCurrency(${currency.id})" title="ערוך">✏️</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteCurrency(${currency.id})" title="מחק">X</button>
+                ${createEditButton(`editCurrency(${currency.id})`)}
+                ${createDeleteButton(`deleteCurrency(${currency.id})`)}
             </td>
         `;
     tbody.appendChild(row);

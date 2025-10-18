@@ -103,12 +103,8 @@
                         דף הבית - TikTrack
                     </div>
                     <div class="table-actions">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים מדף הבית">
-                            <i class="fas fa-copy"></i> העתק לוג מפורט
-                        </button>
-                        <button class="btn btn-outline-warning" onclick="toggleSection('top')" title="הצג/הסתר אזור דף הבית">
-                            <span class="filter-icon">▲</span>
-                        </button>
+                        ${createButton('EXPORT', 'copyDetailedLog()', 'btn-sm btn-outline-secondary', 'title="העתק לוג מפורט עם כל הנתונים מדף הבית"')}
+                        ${createToggleButton("toggleSection('top')", "הצג/הסתר אזור דף הבית")}
                     </div>
                 </div>
 
@@ -138,9 +134,7 @@
                         </div>
                         <div class="table-count" id="dashboardCount">טוען...</div>
                         <div class="table-actions">
-                            <button class="btn btn-outline-warning" onclick="toggleSection('main')" title="הצג/הסתר אזור לוח בקרה">
-                                <span class="filter-icon">▲</span>
-                            </button>
+                            ${createToggleButton("toggleSection('main')", "הצג/הסתר אזור לוח בקרה")}
                         </div>
                     </div>
 

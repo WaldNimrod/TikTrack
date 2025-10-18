@@ -175,7 +175,7 @@ class EntityDetailsSystem {
                             <div class="entity-actions">
                                 <!-- כפתורי פעולה ייחודיים לכל ישות -->
                             </div>
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
+                            ${createCloseButton()}
                         </div>
                     </div>
                 </div>

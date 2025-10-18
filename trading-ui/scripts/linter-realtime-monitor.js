@@ -2475,7 +2475,7 @@ function showSuggestionsModal() {
     modalContent += `
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
+                        ${createCloseButton()}
                         <button type="button" class="btn btn-primary" onclick="exportSuggestions()">ייצא רשימה</button>
                     </div>
                 </div>
@@ -2594,7 +2594,7 @@ function showCriticalErrorsModal() {
     modalContent += `
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
+                        ${createCloseButton()}
                         <button type="button" class="btn btn-danger" onclick="exportCriticalErrors()">ייצא דוח</button>
                     </div>
                 </div>

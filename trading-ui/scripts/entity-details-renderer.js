@@ -901,7 +901,7 @@ class EntityDetailsRenderer {
             } else if (window.createDeleteButton) {
                 return window.createDeleteButton(`if (typeof showNotification === 'function') { showNotification('מחיקה לא זמינה', 'warning'); } else { alert('מחיקה לא זמינה'); }`);
             } else {
-                return `<button class="btn btn-sm btn-danger" onclick="if (typeof showNotification === 'function') { showNotification('מחיקה לא זמינה', 'warning'); } else { alert('מחיקה לא זמינה'); }" title="מחק">🗑️</button>`;
+                return createDeleteButton(`if (typeof showNotification === 'function') { showNotification('מחיקה לא זמינה', 'warning'); } else { alert('מחיקה לא זמינה'); }`);
             }
         }
     }

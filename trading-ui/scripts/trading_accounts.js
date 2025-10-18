@@ -406,21 +406,10 @@ function updateTradingAccountsTable(trading_accounts) {
       </td>
       <td>${account.notes || '-'}</td>
       <td class="actions-cell">
-        <button class="btn btn-sm btn-info" 
-          onclick="window.showLinkedItemsModal && window.showLinkedItemsModal(linkedItemsData, 'tradingAccount', ${account.id})" 
-          title="צפה באלמנטים מקושרים">
-          🔗
-        </button>
-        <button class="btn btn-sm btn-secondary" onclick="showEditTradingAccountModalById(${account.id})" title="ערוך חשבון">
-          ✏️
-        </button>
-        ${account.status === 'cancelled' ?
-    `<button class="btn btn-sm btn-outline-success" onclick="restoreTradingAccount(${account.id}, '${account.name || 'Unknown'}')" title="החזר חשבון"><span class="reactivate-icon">✓</span></button>` :
-    `<button class="btn btn-sm btn-warning" onclick="cancelTradingAccountWithLinkedItemsCheck(${account.id}, '${account.name || 'Unknown'}')" title="בטל חשבון">❌</button>`
-}
-        <button class="btn btn-sm btn-danger" onclick="deleteTradingAccountWithLinkedItemsCheck(${account.id}, '${account.name || 'Unknown'}')" title="מחק חשבון">
-          🗑️
-        </button>
+        ${createLinkButton(`window.showLinkedItemsModal && window.showLinkedItemsModal(linkedItemsData, 'tradingAccount', ${account.id})`)}
+        ${createEditButton(`showEditTradingAccountModalById(${account.id})`)}
+        ${createCancelButton('account', account.id, account.status)}
+        ${createDeleteButton(`deleteTradingAccountWithLinkedItemsCheck(${account.id}, '${account.name || 'Unknown'}')`)}
       </td>
     </tr>
   `;}).join('');
@@ -766,10 +755,8 @@ function createTradingAccountModal(mode, tradingAccount = null) {
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-          <button type="button" class="btn btn-primary" onclick="saveTradingAccount('${mode}', ${account ? account.id : 'null'})">
-            ${buttonText}
-          </button>
+          ${createButton('CANCEL', 'data-bs-dismiss="modal"', '', 'type="button"')}
+          ${createButton('SAVE', `saveTradingAccount('${mode}', ${account ? account.id : 'null'})`, '', 'type="button"')}
         </div>
       </div>
     </div>

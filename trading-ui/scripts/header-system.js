@@ -637,10 +637,11 @@ class HeaderSystem {
       .header-filters {
         background: rgba(255,255,255,0.95);
         padding: 13px 20px 5px 20px;
-        border-top: 1px solid rgba(255,255,255,0.2);
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
         display: block; /* פתוח כברירת מחדל */
         max-width: 1400px;
         margin: 0 auto;
+        width: 100%;
       }
 
       .filters-container {
@@ -650,6 +651,7 @@ class HeaderSystem {
         gap: 20px;
         align-items: center;
         flex-wrap: wrap;
+        padding: 0 1rem;
       }
 
       .filter-group {
@@ -919,6 +921,8 @@ class HeaderSystem {
         .filters-container {
           flex-direction: column;
           align-items: stretch;
+          padding: 0 15px;
+          gap: 15px;
         }
 
         .filter-group {

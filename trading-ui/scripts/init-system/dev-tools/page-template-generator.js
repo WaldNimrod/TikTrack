@@ -1,0 +1,375 @@
+/**
+ * Page Template Generator
+ * יצירת תבניות עמודים חדשים
+ */
+class PageTemplateGenerator {
+  /**
+   * Generate HTML for new page
+   */
+  generate(pageName, packages = ['base']) {
+    const config = {
+      name: pageName,
+      packages: packages,
+      title: this.generateTitle(pageName),
+      icon: this.generateIcon(pageName)
+    };
+    
+    const html = this.buildHTML(config);
+    return html;
+  }
+  
+  /**
+   * Build HTML structure
+   */
+  buildHTML(config) {
+    const scriptsHTML = this.generateScriptTags(config.packages);
+    
+    return `<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${config.title} - TikTrack</title>
+    
+    <!-- TikTrack ITCSS Master Styles -->
+    <link rel="stylesheet" href="styles-new/master.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">
+    
+    <!-- External Libraries -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body class="${config.name}-page">
+    <!-- Header System -->
+    <div id="unified-header"></div>
+    
+    <!-- Page Content -->
+    <div class="background-wrapper">
+        <div class="page-body">
+            <div class="main-content">
+                <div class="content-section" id="main">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/${config.icon}" alt="${config.title}" class="section-icon">
+                            ${config.title}
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- תוכן העמוד כאן -->
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            עמוד ${config.title} נוצר אוטומטית. הוסף כאן את התוכן הנדרש.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Initialization System -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script>
+    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script>
+    
+${scriptsHTML}
+    
+    <!-- Page-specific Script -->
+    <script src="scripts/${config.name}.js?v=1.0.0"></script>
+</body>
+</html>`;
+  }
+  
+  /**
+   * Generate script tags for packages
+   */
+  generateScriptTags(packages) {
+    let html = '';
+    
+    if (window.PACKAGE_MANIFEST) {
+      packages.forEach(pkgName => {
+        const pkg = window.PACKAGE_MANIFEST[pkgName];
+        if (!pkg) {
+          html += `    <!-- ⚠️ Package ${pkgName} not found in manifest -->\n`;
+          return;
+        }
+        
+        html += `    <!-- ${pkg.name} -->\n`;
+        pkg.scripts.forEach(script => {
+          html += `    <script src="scripts/${script.file}?v=1.0.0"></script>\n`;
+        });
+        html += '\n';
+      });
+    } else {
+      html += '    <!-- ⚠️ PACKAGE_MANIFEST not available -->\n';
+    }
+    
+    return html;
+  }
+  
+  /**
+   * Generate page title
+   */
+  generateTitle(pageName) {
+    const titles = {
+      'trades': 'מעקב טריידים',
+      'alerts': 'התראות',
+      'preferences': 'העדפות',
+      'executions': 'ביצועי עסקאות',
+      'trading_accounts': 'חשבונות מסחר',
+      'cash_flows': 'תזרימי מזומנים',
+      'tickers': 'טיקרים',
+      'notes': 'הערות',
+      'research': 'מחקר',
+      'trade_plans': 'תכנוני עסקאות',
+      'system-management': 'ניהול מערכת',
+      'external-data-dashboard': 'נתונים חיצוניים',
+      'notifications-center': 'מרכז התראות',
+      'db_display': 'תצוגת מסד נתונים',
+      'linter-realtime-monitor': 'מעקב Linter',
+      'crud-testing-dashboard': 'בדיקות CRUD',
+      'cache-test': 'בדיקת Cache',
+      'conditions-test': 'בדיקת תנאים'
+    };
+    
+    return titles[pageName] || this.capitalizeFirst(pageName);
+  }
+  
+  /**
+   * Generate page icon
+   */
+  generateIcon(pageName) {
+    const icons = {
+      'trades': 'chart-line.svg',
+      'alerts': 'bell.svg',
+      'preferences': 'cog.svg',
+      'executions': 'bolt.svg',
+      'trading_accounts': 'university.svg',
+      'cash_flows': 'money-bill-wave.svg',
+      'tickers': 'chart-bar.svg',
+      'notes': 'sticky-note.svg',
+      'research': 'search.svg',
+      'trade_plans': 'clipboard-list.svg',
+      'system-management': 'server.svg',
+      'external-data-dashboard': 'globe.svg',
+      'notifications-center': 'inbox.svg',
+      'db_display': 'database.svg',
+      'linter-realtime-monitor': 'bug.svg',
+      'crud-testing-dashboard': 'flask.svg',
+      'cache-test': 'memory.svg',
+      'conditions-test': 'check-circle.svg'
+    };
+    
+    return icons[pageName] || 'file.svg';
+  }
+  
+  /**
+   * Capitalize first letter
+   */
+  capitalizeFirst(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+  
+  /**
+   * Generate PAGE_CONFIGS entry
+   */
+  generateConfig(pageName, packages) {
+    const title = this.generateTitle(pageName);
+    const pageType = this.determinePageType(pageName);
+    
+    return `  '${pageName}': {
+    name: '${title}',
+    packages: ${JSON.stringify(packages)},
+    requiredGlobals: [
+      'NotificationSystem',
+      'DataUtils'
+    ],
+    description: 'עמוד ${title}',
+    lastModified: '${new Date().toISOString().split('T')[0]}',
+    pageType: '${pageType}',
+    preloadAssets: ['${pageName}-data'],
+    cacheStrategy: 'aggressive',
+    requiresFilters: ${this.requiresFilters(pageName)},
+    requiresValidation: ${this.requiresValidation(pageName)},
+    requiresTables: ${this.requiresTables(pageName)},
+    customInitializers: [
+      async (pageConfig) => {
+        console.log('🔧 Initializing ${title}...');
+        
+        if (typeof window.load${this.capitalizeFirst(pageName)}Data === 'function') {
+          await window.load${this.capitalizeFirst(pageName)}Data();
+        }
+      }
+    ]
+  }`;
+  }
+  
+  /**
+   * Determine page type
+   */
+  determinePageType(pageName) {
+    const crudPages = ['trades', 'alerts', 'executions', 'trading_accounts', 'cash_flows', 'tickers', 'notes', 'trade_plans'];
+    const adminPages = ['system-management', 'external-data-dashboard', 'linter-realtime-monitor', 'crud-testing-dashboard'];
+    const settingsPages = ['preferences'];
+    
+    if (crudPages.includes(pageName)) return 'crud';
+    if (adminPages.includes(pageName)) return 'admin';
+    if (settingsPages.includes(pageName)) return 'settings';
+    
+    return 'standard';
+  }
+  
+  /**
+   * Check if page requires filters
+   */
+  requiresFilters(pageName) {
+    const filterPages = ['trades', 'alerts', 'executions', 'trading_accounts', 'cash_flows', 'tickers', 'research', 'trade_plans'];
+    return filterPages.includes(pageName);
+  }
+  
+  /**
+   * Check if page requires validation
+   */
+  requiresValidation(pageName) {
+    const validationPages = ['trades', 'alerts', 'trading_accounts', 'notes', 'trade_plans', 'crud-testing-dashboard'];
+    return validationPages.includes(pageName);
+  }
+  
+  /**
+   * Check if page requires tables
+   */
+  requiresTables(pageName) {
+    const tablePages = ['trades', 'alerts', 'executions', 'trading_accounts', 'cash_flows', 'tickers', 'trade_plans', 'external-data-dashboard', 'crud-testing-dashboard'];
+    return tablePages.includes(pageName);
+  }
+  
+  /**
+   * Generate JavaScript file template
+   */
+  generateJavaScriptTemplate(pageName) {
+    const title = this.generateTitle(pageName);
+    const capitalizedName = this.capitalizeFirst(pageName);
+    
+    return `/**
+ * ${title} - TikTrack
+ * ===================
+ *
+ * עמוד ${title} - נוצר אוטומטית
+ *
+ * @version 1.0.0
+ * @created ${new Date().toISOString().split('T')[0]}
+ * @author TikTrack Development Team
+ */
+
+// ===== PAGE INITIALIZATION =====
+
+/**
+ * Initialize ${title} page
+ */
+async function initialize${capitalizedName}Page() {
+    console.log('🔧 Initializing ${title} page...');
+    
+    try {
+        // Load page data
+        await load${capitalizedName}Data();
+        
+        // Setup page-specific functionality
+        setup${capitalizedName}Handlers();
+        
+        console.log('✅ ${title} page initialized successfully');
+    } catch (error) {
+        console.error('❌ Failed to initialize ${title} page:', error);
+        if (typeof window.showNotification === 'function') {
+            window.showNotification('שגיאה באתחול עמוד ${title}', 'error');
+        }
+    }
+}
+
+/**
+ * Load ${title} data
+ */
+async function load${capitalizedName}Data() {
+    console.log('📊 Loading ${title} data...');
+    
+    try {
+        // TODO: Implement data loading logic
+        // Example:
+        // const response = await fetch('/api/${pageName}');
+        // const data = await response.json();
+        // display${capitalizedName}Data(data);
+        
+        console.log('✅ ${title} data loaded');
+    } catch (error) {
+        console.error('❌ Failed to load ${title} data:', error);
+        throw error;
+    }
+}
+
+/**
+ * Setup ${title} event handlers
+ */
+function setup${capitalizedName}Handlers() {
+    console.log('🔧 Setting up ${title} handlers...');
+    
+    // TODO: Implement event handlers
+    // Example:
+    // document.getElementById('add-${pageName}')?.addEventListener('click', handleAdd${capitalizedName});
+    // document.getElementById('edit-${pageName}')?.addEventListener('click', handleEdit${capitalizedName});
+    
+    console.log('✅ ${title} handlers setup complete');
+}
+
+// ===== GLOBAL EXPORTS =====
+
+window.initialize${capitalizedName}Page = initialize${capitalizedName}Page;
+window.load${capitalizedName}Data = load${capitalizedName}Data;
+window.setup${capitalizedName}Handlers = setup${capitalizedName}Handlers;
+
+// Auto-initialize if page is loaded directly
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initialize${capitalizedName}Page);
+} else {
+    initialize${capitalizedName}Page();
+}`;
+  }
+  
+  /**
+   * Copy to clipboard
+   */
+  async copyToClipboard(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      console.log('✅ הועתק ללוח');
+      if (typeof window.showNotification === 'function') {
+        window.showNotification('הועתק ללוח', 'success');
+      }
+    } catch (error) {
+      console.error('❌ Failed to copy to clipboard:', error);
+      if (typeof window.showNotification === 'function') {
+        window.showNotification('שגיאה בהעתקה ללוח', 'error');
+      }
+    }
+  }
+  
+  /**
+   * Generate complete page package
+   */
+  generateCompletePage(pageName, packages = ['base']) {
+    return {
+      html: this.generate(pageName, packages),
+      config: this.generateConfig(pageName, packages),
+      javascript: this.generateJavaScriptTemplate(pageName),
+      metadata: {
+        name: pageName,
+        title: this.generateTitle(pageName),
+        packages: packages,
+        pageType: this.determinePageType(pageName),
+        created: new Date().toISOString()
+      }
+    };
+  }
+}
+
+window.PageTemplateGenerator = PageTemplateGenerator;

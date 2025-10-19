@@ -1731,6 +1731,10 @@ window.saveAllPreferences = async () => {
 
 // Get user profiles
 window.getUserProfiles = async (userId = null) => {
+    if (!window.PreferencesSystem || !window.PreferencesSystem.profiles) {
+        console.log('⚠️ PreferencesSystem not yet initialized, returning empty profiles');
+        return [];
+    }
     return await window.PreferencesSystem.profiles.loadProfiles(userId);
 };
 
@@ -1828,6 +1832,10 @@ window.copyDetailedLog = async () => {
 
 // Additional legacy compatibility functions
 window.loadProfilesToDropdown = async () => {
+    if (!window.PreferencesSystem || !window.PreferencesSystem.profiles) {
+        console.log('⚠️ PreferencesSystem not yet initialized, skipping profiles load');
+        return;
+    }
     return await window.PreferencesSystem.profiles.loadProfiles();
 };
 

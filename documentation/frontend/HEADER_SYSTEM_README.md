@@ -5,6 +5,8 @@ The TikTrack Header System is a comprehensive navigation and filtering solution 
 
 **🎉 UNIFIED SYSTEM (October 2024)**: The header and filter systems have been completely unified into a single, efficient system that provides both navigation and filtering capabilities in one place.
 
+**🔧 LAYOUT FIXES (October 2025)**: Header filters layout issues have been resolved - filters now display in separate row below header with proper spacing and full width utilization.
+
 ## File Location
 - **Main File**: `trading-ui/scripts/header-system.js` (UNIFIED SYSTEM)
 - **Version**: 6.0 (October 2024)

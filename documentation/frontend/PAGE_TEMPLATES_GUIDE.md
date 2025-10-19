@@ -26,6 +26,21 @@ Page Templates מספקות תבניות מוכנות מראש לסוגי עמו
 - **עקביות:** מבנה ITCSS אחיד בכל העמודים
 - **פיתוח מהיר:** הוספת קובץ CSS חדש משפיעה מיד על כל האתר
 
+### 🔧 תיקוני Header Filters (אוקטובר 2025)
+
+**בעיות שטופלו:**
+1. **פילטרים בשורות נפרדות** - `header-top` ו-`header-filters` כעת בשורות נפרדות
+2. **רוחב מלא** - כל אלמנט תופס 100% מהרוחב של הקונטיינר שלו
+3. **גובה מלא** - `header-filters` תופס 100% מהגובה ללא ריווחים
+4. **אין ריווח מהצדדים** - `filters-container` ללא padding מהצדדים
+
+**שינויים טכניים:**
+- הוספת `display: flex` ו-`flex-direction: column` ל-`.header-content`
+- הסרת כל ה-padding וה-margin מ-`.header-filters`
+- הוספת `height: 100%` ל-`.header-filters` ו-`.filters-container`
+- הסרת `padding` מהצדדים ב-`.filters-container`
+- שימוש ב-`flex-wrap: nowrap` לפילטרים בשורה אחת
+
 ### 🎯 מטרות המערכת
 
 1. **סטנדרטיזציה** - תבניות אחידות לכל סוג עמוד

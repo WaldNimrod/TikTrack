@@ -4,6 +4,35 @@
 **🌐 גישה**: `http://localhost:8080/css-management`  
 **📍 בתפריט**: פעולות מערכת → מנהל CSS וארכיטקטורה
 
+## 🔧 תיקוני Header Filters Layout (אוקטובר 2025)
+
+### בעיות שטופלו:
+- ✅ פילטרים כעת מופיעים בשורה נפרדת מתחת לכותרת
+- ✅ ניצול מלא של הרוחב והגובה (100%)
+- ✅ הסרת ריווחים מיותרים מהצדדים
+- ✅ עיצוב נקי וקומפקטי
+
+### מחלקות CSS רלוונטיות:
+```css
+.header-content {
+  display: flex;
+  flex-direction: column; /* שורות נפרדות */
+}
+
+.header-filters {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.filters-container {
+  padding: 0; /* אין ריווח מהצדדים */
+  height: 100%;
+  flex-wrap: nowrap; /* פילטרים בשורה אחת */
+}
+```
+
 ## הוספת עמוד חדש
 
 ### 1. CSS לקופי הפן

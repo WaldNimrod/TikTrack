@@ -16,6 +16,28 @@ const PAGE_CONFIGS = {
     // Main Pages
     'index': {
         name: 'Dashboard',
+        
+        // ← NEW: חבילות נדרשות
+        packages: ['base', 'crud', 'charts'],
+        
+        // ← NEW: בדיקות תקינות
+        requiredGlobals: [
+            'NotificationSystem',
+            'DataUtils',
+            'window.loadDashboardData',
+            'window.initializeCharts'
+        ],
+        
+        // ← NEW: מטאדאטה
+        description: 'דשבורד ראשי - כולל גרפים, סטטיסטיקות ונתונים כלליים',
+        lastModified: '2025-10-19',
+        pageType: 'dashboard',
+        
+        // ← NEW: אופטימיזציה
+        preloadAssets: ['dashboard-data'],
+        cacheStrategy: 'aggressive',
+        
+        // קיים
         requiresFilters: true,
         requiresValidation: false,
         requiresTables: true,
@@ -45,6 +67,27 @@ const PAGE_CONFIGS = {
     
     'preferences': {
         name: 'Preferences',
+        
+        // ← NEW: חבילות נדרשות
+        packages: ['base', 'preferences', 'validation'],
+        
+        // ← NEW: בדיקות תקינות
+        requiredGlobals: [
+            'NotificationSystem',
+            'window.initializePreferences',
+            'window.loadAllPreferences'
+        ],
+        
+        // ← NEW: מטאדאטה
+        description: 'עמוד העדפות משתמש - הגדרות מערכת וצבעים',
+        lastModified: '2025-10-19',
+        pageType: 'settings',
+        
+        // ← NEW: אופטימיזציה
+        preloadAssets: ['preferences-data'],
+        cacheStrategy: 'persistent',
+        
+        // קיים
         requiresFilters: false,
         requiresValidation: true,
         requiresTables: false,
@@ -76,6 +119,29 @@ const PAGE_CONFIGS = {
     // Trading Pages
     'trades': {
         name: 'Trades',
+        
+        // ← NEW: חבילות נדרשות
+        packages: ['base', 'crud', 'filters', 'advanced-notifications'],
+        
+        // ← NEW: בדיקות תקינות
+        requiredGlobals: [
+            'NotificationSystem',
+            'DataUtils',
+            'window.loadTradesData',
+            'window.setupSortableHeaders',
+            'window.initializeTradeConditionsSystem'
+        ],
+        
+        // ← NEW: מטאדאטה
+        description: 'עמוד מעקב טריידים - כולל טבלאות, פילטרים, התראות ותנאים',
+        lastModified: '2025-10-19',
+        pageType: 'crud',
+        
+        // ← NEW: אופטימיזציה
+        preloadAssets: ['trades-data'],
+        cacheStrategy: 'aggressive',
+        
+        // קיים
         requiresFilters: true,
         requiresValidation: true,
         requiresTables: true,
@@ -108,6 +174,27 @@ const PAGE_CONFIGS = {
     
     'executions': {
         name: 'Executions',
+        
+        // ← NEW: חבילות נדרשות
+        packages: ['base', 'crud', 'filters'],
+        
+        // ← NEW: בדיקות תקינות
+        requiredGlobals: [
+            'NotificationSystem',
+            'DataUtils',
+            'window.loadExecutionsData'
+        ],
+        
+        // ← NEW: מטאדאטה
+        description: 'מעקב ביצועי עסקאות - היסטוריית עסקאות שבוצעו',
+        lastModified: '2025-10-19',
+        pageType: 'crud',
+        
+        // ← NEW: אופטימיזציה
+        preloadAssets: ['executions-data'],
+        cacheStrategy: 'aggressive',
+        
+        // קיים
         requiresFilters: true,
         requiresValidation: false,
         requiresTables: true,
@@ -156,6 +243,28 @@ const PAGE_CONFIGS = {
     
     'alerts': {
         name: 'Alerts',
+        
+        // ← NEW: חבילות נדרשות
+        packages: ['base', 'crud', 'filters', 'advanced-notifications'],
+        
+        // ← NEW: בדיקות תקינות
+        requiredGlobals: [
+            'NotificationSystem',
+            'DataUtils',
+            'window.loadAlertsData',
+            'window.initializeAlertModalTabs'
+        ],
+        
+        // ← NEW: מטאדאטה
+        description: 'מערכת התראות עסקיות - ניהול תנאי שוק והתראות',
+        lastModified: '2025-10-19',
+        pageType: 'crud',
+        
+        // ← NEW: אופטימיזציה
+        preloadAssets: ['alerts-data'],
+        cacheStrategy: 'aggressive',
+        
+        // קיים
         requiresFilters: true,
         requiresValidation: true,
         requiresTables: true,
@@ -226,6 +335,28 @@ const PAGE_CONFIGS = {
     // Account Management
     'trading_accounts': {
         name: 'Trading Accounts',
+        
+        // ← NEW: חבילות נדרשות
+        packages: ['base', 'crud', 'filters', 'validation'],
+        
+        // ← NEW: בדיקות תקינות
+        requiredGlobals: [
+            'NotificationSystem',
+            'DataUtils',
+            'window.loadTradingAccountsDataForTradingAccountsPage',
+            'window.loadAccountsData'
+        ],
+        
+        // ← NEW: מטאדאטה
+        description: 'ניהול חשבונות מסחר - הוספה, עריכה ומעקב חשבונות',
+        lastModified: '2025-10-19',
+        pageType: 'crud',
+        
+        // ← NEW: אופטימיזציה
+        preloadAssets: ['accounts-data'],
+        cacheStrategy: 'aggressive',
+        
+        // קיים
         requiresFilters: true,
         requiresValidation: true,
         requiresTables: true,
@@ -268,6 +399,28 @@ const PAGE_CONFIGS = {
     // Data Management
     'tickers': {
         name: 'Tickers',
+        
+        // ← NEW: חבילות נדרשות
+        packages: ['base', 'crud', 'filters', 'external-data'],
+        
+        // ← NEW: בדיקות תקינות
+        requiredGlobals: [
+            'NotificationSystem',
+            'DataUtils',
+            'window.loadTickersData',
+            'window.YahooFinanceService'
+        ],
+        
+        // ← NEW: מטאדאטה
+        description: 'ניהול טיקרים - מעקב מחירים ונתונים פיננסיים',
+        lastModified: '2025-10-19',
+        pageType: 'crud',
+        
+        // ← NEW: אופטימיזציה
+        preloadAssets: ['tickers-data'],
+        cacheStrategy: 'aggressive',
+        
+        // קיים
         requiresFilters: true,
         requiresValidation: false,
         requiresTables: true,
@@ -301,6 +454,27 @@ const PAGE_CONFIGS = {
     // Development Tools
     'system-management': {
         name: 'System Management',
+        
+        // ← NEW: חבילות נדרשות
+        packages: ['base', 'system-management', 'dev-tools'],
+        
+        // ← NEW: בדיקות תקינות
+        requiredGlobals: [
+            'NotificationSystem',
+            'window.loadSystemInfo',
+            'window.UnifiedLogAPI'
+        ],
+        
+        // ← NEW: מטאדאטה
+        description: 'כלי ניהול מערכת - מעקב ביצועים, לוגים וסטטיסטיקות',
+        lastModified: '2025-10-19',
+        pageType: 'admin',
+        
+        // ← NEW: אופטימיזציה
+        preloadAssets: ['system-info'],
+        cacheStrategy: 'minimal',
+        
+        // קיים
         requiresFilters: false,
         requiresValidation: false,
         requiresTables: false,
@@ -364,6 +538,28 @@ const PAGE_CONFIGS = {
     
     'external-data-dashboard': {
         name: 'External Data',
+        
+        // ← NEW: חבילות נדרשות
+        packages: ['base', 'external-data', 'system-management'],
+        
+        // ← NEW: בדיקות תקינות
+        requiredGlobals: [
+            'NotificationSystem',
+            'window.loadExternalData',
+            'window.ExternalDataDashboard',
+            'window.UnifiedLogAPI'
+        ],
+        
+        // ← NEW: מטאדאטה
+        description: 'דשבורד נתונים חיצוניים - Yahoo Finance וספקי נתונים אחרים',
+        lastModified: '2025-10-19',
+        pageType: 'dashboard',
+        
+        // ← NEW: אופטימיזציה
+        preloadAssets: ['external-data'],
+        cacheStrategy: 'aggressive',
+        
+        // קיים
         requiresFilters: false,
         requiresValidation: false,
         requiresTables: true,

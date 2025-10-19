@@ -465,3 +465,6 @@ window.dataUtils = {
   filterDataBySearch,
 };
 
+// Alias for compatibility with package manifest
+window.DataUtils = window.dataUtils;
+

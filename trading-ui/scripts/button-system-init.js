@@ -471,6 +471,7 @@ class AdvancedButtonSystem {
 
 // Global instances and functions
 window.advancedButtonSystem = new AdvancedButtonSystem();
+window.ButtonSystem = window.advancedButtonSystem; // Alias for compatibility
 
 window.initializeButtons = () => {
     window.advancedButtonSystem.initializeButtons();

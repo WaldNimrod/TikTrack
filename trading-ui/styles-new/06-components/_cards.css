@@ -515,3 +515,37 @@
     margin-bottom: 1rem;
   }
 }
+
+/* ===== סגנונות אייקונים לפי צבעים דינאמיים ===== */
+
+.section-icon.success {
+  color: var(--success-color);
+}
+
+.section-icon.info {
+  color: var(--info-color);
+}
+
+.section-icon.danger {
+  color: var(--danger-color);
+}
+
+.section-icon.warning {
+  color: var(--warning-color);
+}
+
+.section-icon.primary {
+  color: var(--primary-color);
+}
+
+.section-icon.gold {
+  color: #ffd700; /* Gold - נשאר קבוע */
+}
+
+.section-icon.teal {
+  color: #20c997; /* Teal - נשאר קבוע */
+}
+
+.section-icon.purple {
+  color: #6f42c1; /* Purple - נשאר קבוע */
+}

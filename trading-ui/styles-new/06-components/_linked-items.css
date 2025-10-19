@@ -62,9 +62,9 @@
 .linked-items-container .linked-item-row .badge { margin: 0 4px; }
 
 /* Colored start-border per entity type using logical property */
-.linked-items-container .linked-item-row.trade { border-inline-start: 4px solid var(--entity-trade); }
-.linked-items-container .linked-item-row.account { border-inline-start: 4px solid var(--entity-account); }
-.linked-items-container .linked-item-row.ticker { border-inline-start: 4px solid var(--entity-ticker); }
+.linked-items-container .linked-item-row.trade { border-inline-start: 4px solid var(--entity-trade-color); }
+.linked-items-container .linked-item-row.account { border-inline-start: 4px solid var(--entity-account-color); }
+.linked-items-container .linked-item-row.ticker { border-inline-start: 4px solid var(--entity-ticker-color); }
 .linked-items-container .linked-item-row.alert { border-inline-start: 4px solid var(--entity-alert); }
 .linked-items-container .linked-item-row.cash_flow { border-inline-start: 4px solid var(--entity-cash-flow-color); }
 .linked-items-container .linked-item-row.note { border-inline-start: 4px solid var(--entity-note); }
@@ -72,25 +72,28 @@
 .linked-items-container .linked-item-row.execution { border-inline-start: 4px solid var(--entity-execution); }
 
 /* Modal header colored by entity type */
-.modal-header.entity-trade { background-color: var(--entity-trade); color: #fff; }
-.modal-header.entity-ticker { background-color: var(--entity-ticker); color: #fff; }
-.modal-header.entity-account { background-color: var(--entity-account); color: #fff; }
-.modal-header.entity-alert { background-color: var(--entity-alert); color: #fff; }
-.modal-header.entity-cash_flow, .modal-header.entity-cash-flow { background-color: var(--entity-cash-flow-color); color: #fff; }
-.modal-header.entity-note { background-color: var(--entity-note); color: #fff; }
-.modal-header.entity-trade_plan, .modal-header.entity-trade-plan { background-color: var(--entity-trade-plan-color); color: #fff; }
-.modal-header.entity-execution { background-color: var(--entity-execution); color: #fff; }
+.modal-header.entity-trade { background-color: var(--entity-trade-bg); color: var(--entity-trade-text); }
+.modal-header.entity-ticker { background-color: var(--entity-ticker-bg); color: var(--entity-ticker-text); }
+.modal-header.entity-account { background-color: var(--entity-account-bg); color: var(--entity-account-text); }
+.modal-header.entity-alert { background-color: var(--entity-alert-bg); color: var(--entity-alert-text); }
+.modal-header.entity-cash_flow, .modal-header.entity-cash-flow { background-color: var(--entity-cash-flow-bg); color: var(--entity-cash-flow-text); }
+.modal-header.entity-note { background-color: var(--entity-note-bg); color: var(--entity-note-text); }
+.modal-header.entity-trade_plan, .modal-header.entity-trade-plan { background-color: var(--entity-trade-plan-bg); color: var(--entity-trade-plan-text); }
+.modal-header.entity-execution { background-color: var(--entity-execution-bg); color: var(--entity-execution-text); }
 
-.modal-header .btn-close-custom { 
-  position: absolute; 
-  left: 15px; top: 50%; transform: translateY(-50%);
-  background-color: #ffffff; 
-  border: 1px solid #fc5a06; /* orange border */
-  color: #fc5a06; /* orange X */
-  border-radius: 6px; 
-  padding: 6px 12px; 
-  font-weight: bold; 
+/* Header actions (export/close) inherit entity text color */
+#linkedItemsModal .modal-header .export-btn {
+  border-color: currentColor;
+  color: currentColor;
+  background-color: transparent;
 }
+
+/* כפתור סגירה במודול linked-items - משתמש בהגדרות הסטנדרטיות */
+
+/* Footer alignment: end of line (left in RTL) */
+#linkedItemsModal .modal-footer { justify-content: flex-end; }
+
+/* כפתור סגירה מותאם אישית - הוסר לטובת הסטנדרט */
 
 /* Related object badge (used inside tables) */
 .linked-object-badge {

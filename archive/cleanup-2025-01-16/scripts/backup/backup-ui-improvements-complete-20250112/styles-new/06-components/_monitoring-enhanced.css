@@ -1,0 +1,144 @@
+
+
+/* MIME Type: text/css */
+/**
+ * Enhanced Monitoring Interface - Development Focus
+ * ניטור משופר - מיקוד פיתוח
+ * 
+ * This file contains styles for the enhanced monitoring interface
+ * that provides clear visual feedback for development purposes.
+ */
+
+/* Enhanced Monitoring Status */
+.monitoring-status-enhanced {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.status-indicator-large {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.status-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    transition: all 0.3s ease;
+}
+
+.status-circle.active {
+    background-color: #28a745;
+    color: white;
+    animation: pulse 2s infinite;
+}
+
+.status-circle.paused {
+    background-color: #ffc107;
+    color: white;
+}
+
+.status-circle.stopped {
+    background-color: #dc3545;
+    color: white;
+}
+
+.status-circle.initializing {
+    background-color: #6c757d;
+    color: white;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.status-text-large h4 {
+    margin: 0;
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
+.status-text-large p {
+    margin: 5px 0 0 0;
+    font-size: 0.9em;
+}
+
+.monitoring-controls {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+/* System Status Traffic Light */
+.system-status-traffic-light {
+    background: #e9ecef;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.traffic-light-item {
+    text-align: center;
+    padding: 10px;
+}
+
+.light {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin: 0 auto 10px;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.light.green {
+    background-color: #28a745;
+    animation: pulse 2s infinite;
+}
+
+.light.yellow {
+    background-color: #ffc107;
+}
+
+.light.red {
+    background-color: #dc3545;
+    animation: blink 1s infinite;
+}
+
+.light.gray {
+    background-color: #6c757d;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0.3; }
+}
+
+.light-label {
+    font-weight: bold;
+    font-size: 0.9em;
+    margin-bottom: 5px;
+}
+
+.light-status {
+    font-size: 0.8em;
+    color: #6c757d;
+}
+

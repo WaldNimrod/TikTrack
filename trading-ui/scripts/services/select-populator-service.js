@@ -413,9 +413,291 @@ class SelectPopulatorService {
     }
 }
 
+// ===== RELATED OBJECTS HANDLER - משולב מתוך related-objects-handler.js =====
+
+/**
+ * מילוי select עם נתונים - פונקציה עזר מקומית
+ */
+function populateSelect(selectId, data, field, prefix = '') {
+  const select = document.getElementById(selectId);
+  if (!select) {
+    console.warn(`Select element not found: ${selectId}`);
+    return;
+  }
+
+  select.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
+
+  if (!data || data.length === 0) {
+    const option = document.createElement('option');
+    option.value = '';
+    option.textContent = 'אין רשומות זמינות';
+    option.disabled = true;
+    select.appendChild(option);
+    return;
+  }
+
+  data.forEach(item => {
+    const option = document.createElement('option');
+    option.value = item.id;
+    
+    let displayText = '';
+    if (prefix === 'חשבון') {
+      const name = item.name || item.account_name || 'לא מוגדר';
+      const currency = item.currency || 'ILS';
+      displayText = `${name} (${currency})`;
+    } else if (prefix === 'טרייד') {
+      const symbol = item.symbol || item.ticker_symbol || item.ticker?.symbol || 'לא מוגדר';
+      const side = item.side || 'לא מוגדר';
+      const investmentType = item.investment_type || 'לא מוגדר';
+      const date = item.created_at || item.date;
+      const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
+      displayText = `${symbol} | ${side} | ${investmentType} | ${formattedDate}`;
+    } else if (prefix === 'תכנון') {
+      const symbol = item.symbol || item.ticker_symbol || item.ticker?.symbol || 'לא מוגדר';
+      const side = item.side || 'לא מוגדר';
+      const investmentType = item.investment_type || 'לא מוגדר';
+      const date = item.created_at || item.date;
+      const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
+      displayText = `${symbol} | ${side} | ${investmentType} | ${formattedDate}`;
+    } else {
+      displayText = item[field] || item.symbol || 'לא מוגדר';
+    }
+
+    option.textContent = displayText;
+    select.appendChild(option);
+  });
+}
+
+/**
+ * סינון טיקרים לפי סוג השיוך
+ * @param {number} relationType - סוג השיוך (1=חשבון, 2=טרייד, 3=תכנון, 4=טיקר)
+ * @returns {Array} מערך טיקרים מסוננים
+ */
+function getFilteredTickers(relationType) {
+  const allTickers = window.tickersData || [];
+  
+  if (relationType === 2) {
+    // עבור טרייד - רק טיקרים שיש להם טריידים פתוחים או סגורים
+    const tradesWithStatus = (window.tradesData || []).filter(trade => 
+      trade.status === 'open' || trade.status === 'closed' || 
+      trade.is_open === true || trade.is_closed === true
+    );
+    
+    const tickerIds = new Set(tradesWithStatus.map(trade => 
+      trade.ticker_id || trade.ticker?.id || trade.ticker
+    ));
+    
+    return allTickers.filter(ticker => tickerIds.has(ticker.id));
+    
+  } else if (relationType === 3) {
+    // עבור תוכנית - רק טיקרים שיש להם תכנונים פתוחים או סגורים
+    const plansWithStatus = (window.tradePlansData || []).filter(plan => 
+      plan.status === 'open' || plan.status === 'closed' ||
+      plan.is_open === true || plan.is_closed === true
+    );
+    
+    const tickerIds = new Set(plansWithStatus.map(plan => 
+      plan.ticker_id || plan.ticker?.id || plan.ticker
+    ));
+    
+    return allTickers.filter(ticker => tickerIds.has(ticker.id));
+    
+  } else if (relationType === 4) {
+    // עבור טיקר - כל הטיקרים
+    return allTickers;
+  }
+  
+  return [];
+}
+
+/**
+ * מילוי רשימת אובייקטים לפי סוג השיוך (משותף לתראות והערות)
+ * @param {number} relationTypeId - מזהה סוג השיוך
+ * @param {string} selectedTicker - טיקר נבחר לסינון (אופציונלי)
+ * @param {string} selectElementId - ID של אלמנט הבחירה
+ */
+function populateRelatedObjects(relationTypeId, selectedTicker = null, selectElementId) {
+  const selectElement = document.getElementById(selectElementId);
+  if (!selectElement) {return;}
+
+  // ניקוי הרשימה
+  selectElement.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
+
+  // מילוי לפי סוג השיוך עם סינון לפי טיקר
+  switch (relationTypeId) {
+  case 1: // חשבון - רק חשבונות פתוחים
+    let accountsData = (window.accountsData || []).filter(account => 
+      account.status === 'open' || account.status === 'active' || account.is_active === true
+    );
+    // מיון א-ב לפי שם החשבון
+    accountsData.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'he'));
+    populateSelect(selectElementId, accountsData, 'name', 'חשבון');
+    break;
+
+  case 2: // טרייד - רק טריידים פתוחים וסגורים
+    let tradesData = (window.tradesData || []).filter(trade => 
+      trade.status === 'open' || trade.status === 'closed' || 
+      trade.is_open === true || trade.is_closed === true
+    );
+    
+    if (selectedTicker) {
+      tradesData = tradesData.filter(trade => 
+        trade.symbol === selectedTicker || 
+        trade.ticker_symbol === selectedTicker ||
+        trade.ticker?.symbol === selectedTicker ||
+        trade.ticker_id === parseInt(selectedTicker)
+      );
+    }
+    
+    // מיון א-ב לפי סימבול
+    tradesData.sort((a, b) => (a.symbol || '').localeCompare(b.symbol || '', 'he'));
+    populateSelect(selectElementId, tradesData, 'symbol', 'טרייד');
+    break;
+
+  case 3: // תכנון טרייד - רק תכנונים פתוחים וסגורים
+    let tradePlansData = (window.tradePlansData || []).filter(plan => 
+      plan.status === 'open' || plan.status === 'closed' ||
+      plan.is_open === true || plan.is_closed === true
+    );
+    
+    if (selectedTicker) {
+      tradePlansData = tradePlansData.filter(plan => 
+        plan.symbol === selectedTicker || 
+        plan.ticker_symbol === selectedTicker ||
+        plan.ticker?.symbol === selectedTicker ||
+        plan.ticker_id === parseInt(selectedTicker)
+      );
+    }
+    
+    // מיון א-ב לפי סימבול
+    tradePlansData.sort((a, b) => (a.symbol || '').localeCompare(b.symbol || '', 'he'));
+    populateSelect(selectElementId, tradePlansData, 'symbol', 'תכנון');
+    break;
+
+  case 4: // טיקר
+    // עבור טיקר - הטיקר הוא הבחירה עצמה, לא נמלא את אלמנט הקישור
+    selectElement.innerHTML = '<option value="">לא רלוונטי עבור טיקר</option>';
+    break;
+  }
+}
+
+/**
+ * טיפול בשינוי סוג שיוך (משותף לתראות והערות)
+ * @param {HTMLSelectElement} selectElement - אלמנט הבחירה שנבחר
+ * @param {Object} config - קונפיגורציה: {tickerId, relationId, tickerSelectId, relatedSelectId}
+ */
+function handleRelationTypeChange(selectElement, config) {
+  const relationType = parseInt(selectElement.value);
+  const tickerSelect = document.getElementById(config.tickerSelectId);
+  const relatedObjectSelect = document.getElementById(config.relatedSelectId);
+  
+  // 1. סוג שיוך - תמיד פעיל (אין צורך לשנות)
+  
+  // 2. טיקר - פעיל רק עבור טיקר(4)/תוכנית(3)/טרייד(2)
+  if (tickerSelect) {
+    if (relationType === 4) {
+      // עבור טיקר - הטיקר הוא הבחירה של האובייקט לשיוך
+      tickerSelect.disabled = false;
+      tickerSelect.classList.remove('disabled-field');
+      tickerSelect.required = true;
+      
+      // מילוי טיקרים מסוננים ומיון
+      const filteredTickers = getFilteredTickers(relationType);
+      filteredTickers.sort((a, b) => (a.symbol || '').localeCompare(b.symbol || '', 'he'));
+      populateSelect(config.tickerSelectId, filteredTickers, 'symbol', '');
+      
+      // השבתת אלמנט לקישור עבור טיקר
+      if (relatedObjectSelect) {
+        relatedObjectSelect.disabled = true;
+        relatedObjectSelect.classList.add('disabled-field');
+        relatedObjectSelect.required = false;
+        relatedObjectSelect.innerHTML = '<option value="">לא רלוונטי עבור טיקר</option>';
+      }
+    } else if (relationType === 3 || relationType === 2) {
+      // עבור תוכנית/טרייד - הטיקר משמש כפילטר
+      tickerSelect.disabled = false;
+      tickerSelect.classList.remove('disabled-field');
+      tickerSelect.required = false; // לא חובה כי זה רק פילטר
+      
+      // מילוי טיקרים מסוננים ומיון
+      const filteredTickers = getFilteredTickers(relationType);
+      filteredTickers.sort((a, b) => (a.symbol || '').localeCompare(b.symbol || '', 'he'));
+      populateSelect(config.tickerSelectId, filteredTickers, 'symbol', '');
+      
+      // הפעלת אלמנט לקישור
+      if (relatedObjectSelect) {
+        relatedObjectSelect.disabled = false;
+        relatedObjectSelect.classList.remove('disabled-field');
+        relatedObjectSelect.required = true;
+      }
+    } else if (relationType === 1) {
+      // עבור חשבון - הטיקר לא פעיל
+      tickerSelect.disabled = true;
+      tickerSelect.classList.add('disabled-field');
+      tickerSelect.required = false;
+      tickerSelect.value = '';
+      
+      // הפעלת אלמנט לקישור
+      if (relatedObjectSelect) {
+        relatedObjectSelect.disabled = false;
+        relatedObjectSelect.classList.remove('disabled-field');
+        relatedObjectSelect.required = true;
+      }
+    } else {
+      // אין בחירה - השבתת הכל
+      tickerSelect.disabled = true;
+      tickerSelect.classList.add('disabled-field');
+      tickerSelect.required = false;
+      tickerSelect.value = '';
+      
+      if (relatedObjectSelect) {
+        relatedObjectSelect.disabled = true;
+        relatedObjectSelect.classList.add('disabled-field');
+        relatedObjectSelect.required = false;
+        relatedObjectSelect.innerHTML = '<option value="">בחר קודם סוג התראה</option>';
+      }
+    }
+  }
+  
+  // 3. אלמנט לקישור - פעיל עבור חשבון(1)/תוכנית(3)/טרייד(2), לא פעיל עבור טיקר(4)
+  if (relationType && relationType !== 4) {
+    const selectedTicker = tickerSelect ? tickerSelect.value : null;
+    populateRelatedObjects(relationType, selectedTicker, config.relatedSelectId);
+  }
+}
+
+/**
+ * טיפול בבחירת טיקר (משותף לתראות והערות)
+ * @param {HTMLSelectElement} tickerSelect - אלמנט בחירת הטיקר
+ * @param {Object} config - קונפיגורציה: {relationTypeId, onTickerChangeCallback}
+ */
+function handleTickerChange(tickerSelect, config) {
+  const relationTypeSelect = document.getElementById(config.relationTypeId);
+  const relationType = relationTypeSelect ? parseInt(relationTypeSelect.value) : null;
+  
+  if (relationType === 2 || relationType === 3) {
+    // טיקר משמש כפילטר עבור תוכנית וטרייד
+    const selectedTicker = tickerSelect.value;
+    if (config.onTickerChangeCallback) {
+      config.onTickerChangeCallback(relationType, selectedTicker);
+    }
+  } else if (relationType === 4) {
+    // עבור טיקר - הטיקר הוא הבחירה עצמה
+    if (config.onTickerChangeCallback) {
+      config.onTickerChangeCallback(relationType, tickerSelect.value);
+    }
+  }
+}
+
 // ===== EXPORT TO GLOBAL SCOPE =====
 
 window.SelectPopulatorService = SelectPopulatorService;
+
+// ייצוא פונקציות לטיפול באובייקטים מקושרים
+window.getFilteredTickers = getFilteredTickers;
+window.populateRelatedObjects = populateRelatedObjects;
+window.handleRelationTypeChange = handleRelationTypeChange;
+window.handleTickerChange = handleTickerChange;
 
 // Shortcuts למתודות נפוצות
 window.populateTickersSelect = (selectId, options) => SelectPopulatorService.populateTickersSelect(selectId, options);
@@ -423,5 +705,64 @@ window.populateAccountsSelect = (selectId, options) => SelectPopulatorService.po
 window.populateCurrenciesSelect = (selectId, options) => SelectPopulatorService.populateCurrenciesSelect(selectId, options);
 window.populateTradePlansSelect = (selectId, options) => SelectPopulatorService.populateTradePlansSelect(selectId, options);
 window.populateGenericSelect = (selectId, endpoint, config) => SelectPopulatorService.populateGenericSelect(selectId, endpoint, config);
+
+// ===== ALERT CONDITION POPULATOR =====
+
+/**
+ * מילוי select boxes לתנאי התראות
+ */
+class AlertConditionPopulator {
+    
+    static populateAttributeSelect(selectId, selectedValue = null) {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+        
+        select.innerHTML = '<option value="">בחר מאפיין</option>';
+        
+        const attributes = [
+            { value: 'price', label: 'מחיר' },
+            { value: 'change', label: 'שינוי' },
+            { value: 'volume', label: 'נפח' },
+            { value: 'ma', label: 'ממוצע נע' }
+        ];
+        
+        attributes.forEach(attr => {
+            const option = document.createElement('option');
+            option.value = attr.value;
+            option.textContent = attr.label;
+            if (selectedValue === attr.value) option.selected = true;
+            select.appendChild(option);
+        });
+    }
+    
+    static populateOperatorSelect(selectId, selectedValue = null) {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+        
+        select.innerHTML = '<option value="">בחר אופרטור</option>';
+        
+        const operators = [
+            { value: 'more_than', label: 'יותר מ' },
+            { value: 'less_than', label: 'פחות מ' },
+            { value: 'equals', label: 'שווה ל' },
+            { value: 'change', label: 'שינוי' },
+            { value: 'change_up', label: 'שינוי למעלה' },
+            { value: 'change_down', label: 'שינוי למטה' },
+            { value: 'cross', label: 'חוצה' },
+            { value: 'cross_up', label: 'חוצה למעלה' },
+            { value: 'cross_down', label: 'חוצה למטה' }
+        ];
+        
+        operators.forEach(op => {
+            const option = document.createElement('option');
+            option.value = op.value;
+            option.textContent = op.label;
+            if (selectedValue === op.value) option.selected = true;
+            select.appendChild(option);
+        });
+    }
+}
+
+window.AlertConditionPopulator = AlertConditionPopulator;
 
 

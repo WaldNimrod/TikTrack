@@ -124,42 +124,29 @@ class ActiveAlertsComponent extends HTMLElement {
           <h3 id="alertsTitle">🔔 התראות פעילות</h3>
           
           <!-- מפתח צבעים בכותרת מצד שמאל -->
-          <div class="alerts-color-legend-header" 
-               style="display: flex; gap: 8px; align-items: center; margin-bottom: 0px;">
+          <div class="alerts-color-legend-header">
             <div class="legend-item">
-              <div class="legend-color" 
-                   style="background-color: #ffffff; border-left: 4px solid #c82333; 
-                          padding: 4px 8px; border-radius: 4px; display: inline-flex; align-items: center; 
-                          gap: 6px; min-width: 80px;">
-                <img src="images/icons/tickers.svg" alt="טיקר" style="width: 14px; height: 14px;">
-                <span style="color: #c82333; font-size: 0.8rem; font-weight: 500;">טיקר</span>
+              <div class="legend-color-danger">
+                <img src="images/icons/tickers.svg" alt="טיקר">
+                <span>טיקר</span>
               </div>
             </div>
             <div class="legend-item">
-              <div class="legend-color" 
-                   style="background-color: #ffffff; border-left: 4px solid #e67e00; 
-                          padding: 4px 8px; border-radius: 4px; display: inline-flex; align-items: center; 
-                          gap: 6px; min-width: 80px;">
-                <img src="images/icons/trade_plans.svg" alt="תוכנית" style="width: 14px; height: 14px;">
-                <span style="color: #e67e00; font-size: 0.8rem; font-weight: 500;">תוכנית</span>
+              <div class="legend-color-warning">
+                <img src="images/icons/trade_plans.svg" alt="תוכנית">
+                <span>תוכנית</span>
               </div>
             </div>
             <div class="legend-item">
-              <div class="legend-color" 
-                   style="background-color: rgba(40, 167, 69, 0.1); border-left: 4px solid #1e7e34; 
-                          padding: 4px 8px; border-radius: 4px; display: inline-flex; align-items: center; 
-                          gap: 6px; min-width: 80px;">
-                <img src="images/icons/trades.svg" alt="טרייד" style="width: 14px; height: 14px;">
-                <span style="color: #1e7e34; font-size: 0.8rem; font-weight: 500;">טרייד</span>
+              <div class="legend-color-success">
+                <img src="images/icons/trades.svg" alt="טרייד">
+                <span>טרייד</span>
               </div>
             </div>
             <div class="legend-item">
-              <div class="legend-color" 
-                   style="background-color: rgba(41, 166, 168, 0.1); border-left: 4px solid #1f8a8c; 
-                          padding: 4px 8px; border-radius: 4px; display: inline-flex; align-items: center; 
-                          gap: 6px; min-width: 80px;">
-                <img src="images/icons/accounts.svg" alt="חשבון" style="width: 14px; height: 14px;">
-                <span style="color: #1f8a8c; font-size: 0.8rem; font-weight: 500;">חשבון</span>
+              <div class="legend-color-primary">
+                <img src="images/icons/accounts.svg" alt="חשבון">
+                <span>חשבון</span>
               </div>
             </div>
           </div>

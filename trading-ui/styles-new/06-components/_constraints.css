@@ -125,28 +125,28 @@
 
 /* ===== BADGE STYLES ===== */
 .badge-enum {
-    background-color: var(--bs-primary) !important;
-    color: white !important;
+    background-color: var(--bs-primary) ;
+    color: white ;
 }
 
 .badge-not-null {
-    background-color: var(--bs-warning) !important;
-    color: #343a40 !important;
+    background-color: var(--bs-warning) ;
+    color: #343a40 ;
 }
 
 .badge-foreign-key {
-    background-color: var(--bs-info) !important;
-    color: white !important;
+    background-color: var(--bs-info) ;
+    color: white ;
 }
 
 .badge-unique {
-    background-color: var(--bs-success) !important;
-    color: white !important;
+    background-color: var(--bs-success) ;
+    color: white ;
 }
 
 .badge-range {
-    background-color: var(--bs-secondary) !important;
-    color: white !important;
+    background-color: var(--bs-secondary) ;
+    color: white ;
 }
 
 /* ===== TABLE CONSTRAINTS SECTIONS ===== */
@@ -386,7 +386,7 @@
     .filter-controls,
     .layer-toggle,
     .btn {
-        display: none !important;
+        display: none ;
     }
     
     .constraint-card {

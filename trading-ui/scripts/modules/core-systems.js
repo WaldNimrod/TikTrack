@@ -430,11 +430,6 @@ class UnifiedAppInitializer {
         // Load page-specific configuration from page-initialization-configs.js
         let pageConfig = null;
         // Debug info only in verbose mode
-        if (window.DEBUG_MODE) {
-            console.log('🔍 Checking pageInitializationConfigs:', typeof window.pageInitializationConfigs);
-            console.log('🔍 Available configs:', window.pageInitializationConfigs ? Object.keys(window.pageInitializationConfigs) : 'undefined');
-            console.log('🔍 Looking for config:', this.pageInfo.name);
-        }
         
         if (typeof window.pageInitializationConfigs !== 'undefined' && 
             window.pageInitializationConfigs[this.pageInfo.name]) {
@@ -442,15 +437,11 @@ class UnifiedAppInitializer {
             console.log(`📋 Loaded page config for ${this.pageInfo.name}:`, pageConfig);
         } else {
             console.log(`⚠️ No page config found for ${this.pageInfo.name}`);
-            console.log('🔍 Available configs:', window.pageInitializationConfigs ? Object.keys(window.pageInitializationConfigs) : 'undefined');
         }
         
         // Store custom initializers from page config
         if (pageConfig?.customInitializers) {
             this.customInitializers = pageConfig.customInitializers;
-            if (window.DEBUG_MODE) {
-                console.log('🔧 Loaded custom initializers from page config:', this.customInitializers.length);
-            }
         }
         
         const config = {
@@ -543,7 +534,7 @@ class UnifiedAppInitializer {
     async manualInitialization(config) {
         console.log('🔧 Manual initialization fallback...');
         
-        // Initialize Header + Notifications in parallel (both independent of cache)
+        // Initialize Header + Notifications + Actions Menu System in parallel (all independent of cache)
         console.log('🎯 Initializing UI Systems in parallel...');
         await Promise.all([
             // Header System - has localStorage fallback, doesn't need cache
@@ -561,6 +552,22 @@ class UnifiedAppInitializer {
                 if (this.availableSystems.has('notification') && typeof window.NotificationSystem !== 'undefined') {
                     console.log('🔔 Initializing Notification System...');
                     await window.NotificationSystem.initialize();
+                }
+            })(),
+            
+            // Actions Menu System - required for table action menus
+            (async () => {
+                if (typeof window.ActionsMenuSystem !== 'undefined') {
+                    console.log('🎯 Initializing Actions Menu System...');
+                    // Initialize ActionsMenuSystem instance if not already initialized
+                    if (!window.actionsMenuSystemInstance) {
+                        window.actionsMenuSystemInstance = new window.ActionsMenuSystem();
+                        console.log('✅ Actions Menu System instance created');
+                    } else {
+                        console.log('✅ Actions Menu System already initialized');
+                    }
+                } else {
+                    console.warn('⚠️ ActionsMenuSystem not available');
                 }
             })()
         ]);
@@ -743,6 +750,7 @@ class UnifiedAppInitializer {
         // UI Systems
         if (typeof window.toggleSection === 'function') systems.add('uiUtils');
         if (typeof window.showNotification === 'function') systems.add('notifications');
+        if (typeof window.ActionsMenuSystem !== 'undefined') systems.add('actionsMenu');
         
         return systems;
     }
@@ -760,7 +768,7 @@ class UnifiedAppInitializer {
      */
     determinePageType(pageName) {
         if (['trades', 'executions', 'alerts'].includes(pageName)) return 'trading';
-        if (['system-management', 'crud-testing-dashboard', 'linter-realtime-monitor', 'cache-test'].includes(pageName)) return 'development';
+        if (['system-management', 'crud-testing-dashboard', 'linter-realtime-monitor', 'cache-management'].includes(pageName)) return 'development';
         if (['preferences'].includes(pageName)) return 'preferences';
         if (['index'].includes(pageName)) return 'dashboard';
         return 'general';
@@ -1703,58 +1711,14 @@ async function loadLinkedItemsData(itemType, itemId) {
  * @returns {HTMLElement} Notification container element
  */
 function createNotificationContainer() {
-  console.log('🔧 createNotificationContainer נקרא');
   let container = document.getElementById('notification-container');
-  console.log('🔍 קונטיינר קיים?', !!container);
 
   if (!container) {
-    console.log('🔧 יוצר קונטיינר חדש...');
     container = document.createElement('div');
     container.id = 'notification-container';
     container.className = 'notification-container';
     document.body.appendChild(container);
-    console.log('✅ קונטיינר נוצר ונוסף ל-DOM');
-    
-    // בדיקת סגנונות מחושבים
-    const computedStyle = window.getComputedStyle(container);
-    console.log('🔍 סגנונות מחושבים לקונטיינר:');
-    console.log('  position:', computedStyle.position);
-    console.log('  top:', computedStyle.top);
-    console.log('  right:', computedStyle.right);
-    console.log('  z-index:', computedStyle.zIndex);
-    console.log('  max-width:', computedStyle.maxWidth);
-    
-    // בדיקת טעינת CSS
-    console.log('🔍 בדיקת טעינת CSS:');
-    const styleSheets = Array.from(document.styleSheets);
-    const headerCss = styleSheets.find(sheet => 
-      sheet.href && sheet.href.includes('header-styles.css')
-    );
-    console.log('  header-styles.css נטען?', !!headerCss);
-    if (headerCss) {
-      console.log('  header-styles.css URL:', headerCss.href);
-    }
-    
-    // בדיקת סגנונות notification-container
-    const notificationStyles = Array.from(styleSheets).map(sheet => {
-      try {
-        const rules = Array.from(sheet.cssRules || sheet.rules || []);
-        return rules.filter(rule => 
-          rule.selectorText && rule.selectorText.includes('notification-container')
-        );
-      } catch (e) {
-        return [];
-      }
-    }).flat();
-    console.log('  סגנונות notification-container נמצאו:', notificationStyles.length);
-    notificationStyles.forEach(rule => {
-      console.log('    כלל:', rule.selectorText);
-    });
-  } else {
-    console.log('✅ קונטיינר קיים');
   }
-
-  console.log('🔍 קונטיינר סופי:', container);
   return container;
 }
 
@@ -2310,6 +2274,176 @@ function showFinalSuccessModal(successInfo) {
   }
 }
 
+/**
+ * Show final success notification with reload option
+ * NOTIFICATION SYSTEM - Shows success modal and allows user to choose reload
+ */
+async function showFinalSuccessNotificationWithReload(title, message, details = {}, category = 'system') {
+  console.log('🎉 Final success notification with reload option:', { title, message, details, category });
+  
+  // Collect detailed success information
+  const successInfo = {
+    title,
+    message,
+    details,
+    category,
+    timestamp: new Date().toISOString(),
+    type: 'critical-success-with-reload',
+    id: generateNotificationId()
+  };
+  
+  // Add browser and system information (same as regular function)
+  successInfo.browser = {
+    userAgent: navigator.userAgent,
+    language: navigator.language,
+    platform: navigator.platform,
+    cookieEnabled: navigator.cookieEnabled,
+    onLine: navigator.onLine
+  };
+  
+  successInfo.system = {
+    screenWidth: screen.width,
+    screenHeight: screen.height,
+    colorDepth: screen.colorDepth,
+    pixelDepth: screen.pixelDepth,
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+  };
+  
+  // Add performance information if available
+  if (performance.memory) {
+    successInfo.performance = {
+      usedJSHeapSize: performance.memory.usedJSHeapSize,
+      totalJSHeapSize: performance.memory.totalJSHeapSize,
+      jsHeapSizeLimit: performance.memory.jsHeapSizeLimit
+    };
+  }
+  
+  // Save to history
+  saveNotificationToGlobalHistory('success', title, message, category);
+  
+  // Show modal with reload option
+  showFinalSuccessModalWithReload(successInfo);
+  
+  return successInfo;
+}
+
+/**
+ * Show final success modal with reload button
+ */
+function showFinalSuccessModalWithReload(successInfo) {
+  console.log('🔍 showFinalSuccessModalWithReload called:', { successInfo });
+  
+  // Create modal HTML with reload button
+  const modalHtml = `
+    <div class="modal fade" id="finalSuccessModalWithReload" tabindex="-1" aria-labelledby="finalSuccessModalWithReloadLabel">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header modal-header-success text-white d-flex justify-content-between align-items-center" style="direction: rtl;">
+            <h4 class="modal-title fw-bold" id="finalSuccessModalWithReloadLabel">
+              <i class="fas fa-check-circle"></i> ${successInfo.title}
+            </h4>
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-sm btn-light" id="finalSuccessModal-copy-btn" title="העתק פרטים ללוח">
+                <i class="fas fa-copy"></i> העתק
+              </button>
+              <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal" title="סגור">
+                <i class="fas fa-times"></i> סגור
+              </button>
+            </div>
+          </div>
+          <div class="modal-body">
+            <div class="alert alert-success" role="alert">
+              <h6 class="alert-heading">
+                <i class="fas fa-check-circle"></i> ${successInfo.message.replace(/🔄.*$/m, '')}
+              </h6>
+              <hr>
+              <p class="mb-2">
+                <strong>זמן:</strong> ${new Date(successInfo.timestamp).toLocaleString('he-IL')}<br>
+                <strong>קטגוריה:</strong> ${successInfo.category}<br>
+                <strong>מזהה:</strong> ${successInfo.id}
+              </p>
+              <div class="alert alert-warning mt-2">
+                <i class="fas fa-exclamation-triangle"></i> <strong>חשוב:</strong> כדי לראות את תוצאות הולידציה ולבצע רענון מלא של המטמון, לחץ על "רענן עכשיו".
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6">
+                <h6><i class="fas fa-info-circle text-success"></i> פרטי הצלחה:</h6>
+                <pre class="bg-light p-2 rounded" style="font-size: 0.8rem; max-height: 200px; overflow-y: auto;">${JSON.stringify(successInfo.details, null, 2)}</pre>
+              </div>
+              <div class="col-md-6">
+                <h6><i class="fas fa-desktop text-success"></i> מידע מערכת:</h6>
+                <pre class="bg-light p-2 rounded" style="font-size: 0.8rem; max-height: 200px; overflow-y: auto;">${JSON.stringify({
+                  browser: successInfo.browser,
+                  system: successInfo.system,
+                  performance: successInfo.performance
+                }, null, 2)}</pre>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer" style="justify-content: space-between; direction: rtl;">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              <i class="fas fa-times"></i> סגור בלי רענון
+            </button>
+            <button type="button" class="btn btn-primary" id="finalSuccessModal-reload-btn">
+              <i class="fas fa-sync-alt"></i> רענן עכשיו
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Use the unified helper function to create and show modal
+  const modal = window.createAndShowModal(modalHtml, 'finalSuccessModalWithReload');
+  
+  // Store success info globally for copying
+  window.currentSuccessInfo = successInfo;
+  
+  // Add copy button functionality
+  const copyButton = document.getElementById('finalSuccessModal-copy-btn');
+  if (copyButton) {
+    copyButton.addEventListener('click', () => {
+      copySuccessDetails();
+    });
+  }
+  
+  // Add reload button functionality
+  const reloadButton = document.getElementById('finalSuccessModal-reload-btn');
+  if (reloadButton) {
+    reloadButton.addEventListener('click', async () => {
+      console.log('🔄 User requested reload after cache clearing');
+      
+      // Close modal first
+      const modalInstance = bootstrap.Modal.getInstance(modal);
+      if (modalInstance) {
+        modalInstance.hide();
+      }
+      
+      // Wait a moment for modal to close, then reload
+      setTimeout(async () => {
+        if (window.pendingCacheReload) {
+          try {
+            // Reload fresh data from all cleared layers
+            await reloadClearedCacheData(window.pendingCacheReload.level, window.pendingCacheReload.results);
+            
+            // Perform reload with cache busting
+            window.location.href = window.location.href + (window.location.href.includes('?') ? '&' : '?') + '_cb=' + Date.now();
+          } catch (error) {
+            console.error('❌ Error during user-initiated reload:', error);
+            // Fallback reload
+            window.location.reload();
+          }
+        } else {
+          // Fallback if no pending reload data
+          window.location.href = window.location.href + (window.location.href.includes('?') ? '&' : '?') + '_cb=' + Date.now();
+        }
+      }, 300);
+    });
+  }
+}
+
 async function showCriticalErrorModal(errorInfo, detailedMessage) {
   console.log('🔍 showCriticalErrorModal called:', { errorInfo, detailedMessage });
   
@@ -2797,12 +2931,23 @@ async function saveNotificationToGlobalHistory(type, title, message, category = 
       console.debug('⚠️ Cache system not initialized - skipping notification history save');
     }
 
-    // Fallback ל-localStorage במקרה של בעיה
+    // Fallback דרך UnifiedCacheManager - כלל 44
     try {
       let globalHistory = [];
-      const savedHistory = localStorage.getItem('tiktrack_global_notifications_history');
-      if (savedHistory) {
-        globalHistory = JSON.parse(savedHistory);
+      if (window.UnifiedCacheManager?.isInitialized()) {
+        try {
+          const savedHistory = await window.UnifiedCacheManager.get('tiktrack_global_notifications_history', {
+            layer: 'localStorage'
+          });
+          if (savedHistory) {
+            globalHistory = savedHistory;
+          }
+        } catch (cacheErr) {
+          console.warn('שגיאה בטעינה מ-UnifiedCacheManager:', cacheErr);
+        }
+      } else {
+        console.warn('UnifiedCacheManager לא זמין - לא ניתן לשמור היסטוריית התראות');
+        return;
       }
 
       globalHistory.unshift(notification);
@@ -2810,9 +2955,12 @@ async function saveNotificationToGlobalHistory(type, title, message, category = 
         globalHistory = globalHistory.slice(0, 100);
       }
 
-      localStorage.setItem('tiktrack_global_notifications_history', JSON.stringify(globalHistory));
+      await window.UnifiedCacheManager.save('tiktrack_global_notifications_history', globalHistory, {
+        layer: 'localStorage',
+        ttl: null
+      });
     } catch (e) {
-      console.warn('שגיאה בשמירת fallback ל-localStorage:', e);
+      console.error('שגיאה בשמירת היסטוריית התראות (כלל 44 violation prevented):', e);
     }
 
     // עדכון סטטיסטיקות גלובליות
@@ -2849,12 +2997,18 @@ async function updateGlobalNotificationStats() {
     // Fallback ל-localStorage
     if (history.length === 0) {
       try {
-        const savedHistory = localStorage.getItem('tiktrack_global_notifications_history');
-        if (savedHistory) {
-          history = JSON.parse(savedHistory);
+        if (window.UnifiedCacheManager?.isInitialized()) {
+          const savedHistory = await window.UnifiedCacheManager.get('tiktrack_global_notifications_history', {
+            layer: 'localStorage'
+          });
+          if (savedHistory) {
+            history = savedHistory;
+          }
+        } else {
+          console.warn('UnifiedCacheManager לא זמין - לא ניתן לטעון היסטוריית התראות');
         }
       } catch (e) {
-        console.warn('שגיאה בטעינת היסטוריה מ-localStorage:', e);
+        console.warn('שגיאה בטעינת היסטוריה דרך UnifiedCacheManager:', e);
       }
     }
 
@@ -2884,11 +3038,18 @@ async function updateGlobalNotificationStats() {
       console.debug('⚠️ Cache system not initialized - skipping notification stats save');
     }
 
-    // Fallback ל-localStorage
+    // Fallback דרך UnifiedCacheManager - כלל 44
     try {
-    localStorage.setItem('tiktrack_global_notifications_stats', JSON.stringify(stats));
+      if (window.UnifiedCacheManager?.isInitialized()) {
+        await window.UnifiedCacheManager.save('tiktrack_global_notifications_stats', stats, {
+          layer: 'localStorage',
+          ttl: 24 * 60 * 60 * 1000 // 24 hours
+        });
+      } else {
+        console.warn('UnifiedCacheManager לא זמין - לא ניתן לשמור סטטיסטיקות התראות');
+      }
     } catch (e) {
-      console.warn('שגיאה בשמירת סטטיסטיקות ל-localStorage:', e);
+      console.error('שגיאה בשמירת סטטיסטיקות דרך UnifiedCacheManager (כלל 44 violation prevented):', e);
     }
   } catch (error) {
     console.warn('שגיאה בעדכון סטטיסטיקות גלובליות:', error);
@@ -2914,9 +3075,21 @@ async function loadGlobalNotificationHistory() {
       // console.log('UnifiedIndexedDB לא מאותחל עדיין, מדלג על טעינת היסטוריה');
     }
     
-    // Fallback ל-localStorage
-    const savedHistory = localStorage.getItem('tiktrack_global_notifications_history');
-    return savedHistory ? JSON.parse(savedHistory) : [];
+    // Fallback דרך UnifiedCacheManager - כלל 44
+    if (window.UnifiedCacheManager?.isInitialized()) {
+      try {
+        const savedHistory = await window.UnifiedCacheManager.get('tiktrack_global_notifications_history', {
+          layer: 'localStorage'
+        });
+        return savedHistory ? savedHistory : [];
+      } catch (cacheErr) {
+        console.warn('שגיאה בטעינה דרך UnifiedCacheManager:', cacheErr);
+        return [];
+      }
+    } else {
+      console.warn('UnifiedCacheManager לא זמין - לא ניתן לטעון היסטוריית התראות');
+      return [];
+    }
   } catch (error) {
     console.warn('שגיאה בטעינת היסטוריית התראות גלובלית:', error);
     return [];
@@ -2942,10 +3115,20 @@ async function loadGlobalNotificationStats() {
       console.log('UnifiedIndexedDB לא מאותחל עדיין, מדלג על טעינת סטטיסטיקות');
     }
     
-    // Fallback ל-localStorage
-    const savedStats = localStorage.getItem('tiktrack_global_notifications_stats');
-    if (savedStats) {
-      return JSON.parse(savedStats);
+    // Fallback דרך UnifiedCacheManager - כלל 44
+    if (window.UnifiedCacheManager?.isInitialized()) {
+      try {
+        const savedStats = await window.UnifiedCacheManager.get('tiktrack_global_notifications_stats', {
+          layer: 'localStorage'
+        });
+        if (savedStats) {
+          return savedStats;
+        }
+      } catch (cacheErr) {
+        console.warn('שגיאה בטעינה דרך UnifiedCacheManager:', cacheErr);
+      }
+    } else {
+      console.warn('UnifiedCacheManager לא זמין - לא ניתן לטעון סטטיסטיקות התראות');
     }
   } catch (error) {
     console.warn('שגיאה בטעינת סטטיסטיקות גלובליות:', error);
@@ -3035,6 +3218,7 @@ window.markAlertAsRead = markAlertAsRead;
 window.showNotification = showNotification;
 window.showSuccessNotification = showSuccessNotification;
 window.showFinalSuccessNotification = showFinalSuccessNotification;
+window.showFinalSuccessNotificationWithReload = showFinalSuccessNotificationWithReload;
 window.showErrorNotification = showErrorNotification;
 window.showSimpleErrorNotification = showSimpleErrorNotification;
 window.showCriticalErrorNotification = showCriticalErrorNotification;
@@ -3141,7 +3325,7 @@ window.showDetailedNotification = async function(title, message, type = 'info', 
           <div class="modal-content">
             <div class="modal-header bg-${type === 'error' ? 'danger' : type === 'warning' ? 'warning' : type === 'success' ? 'success' : 'info'} text-white">
               <h5 class="modal-title" id="${modalId}Label">${title}</h5>
-              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+              ${window.createCloseButton ? window.createCloseButton('', 'Close') : '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'}
             </div>
             <div class="modal-body">
               <div style="white-space: pre-line; font-family: monospace; font-size: 0.9em;">${message}</div>
@@ -4006,18 +4190,18 @@ const PAGE_CONFIGS = {
         ]
     },
     
-    'cache-test': {
-        name: 'Cache Test',
+    'cache-management': {
+        name: 'Cache Management',
         requiresFilters: true,
         requiresValidation: false,
         requiresTables: false,
         customInitializers: [
             async (pageConfig) => {
-                console.log('🧪 Initializing Cache Test Page via UnifiedAppInitializer...');
+                console.log('⚙️ Initializing Cache Management Page via UnifiedAppInitializer...');
                 
-                // Initialize Cache Test Page if not already initialized
-                if (!window.cacheTestPage) {
-                    console.log('🚀 Creating Cache Test Page instance...');
+                // Initialize Cache Management Page if not already initialized
+                if (!window.cacheManagementPage) {
+                    console.log('🚀 Creating Cache Management Page instance...');
                     
                     // Wait for DOM to be ready
                     if (document.readyState === 'loading') {
@@ -4026,23 +4210,23 @@ const PAGE_CONFIGS = {
                         });
                     }
                     
-                    // Create and initialize Cache Test Page
-                    if (typeof CacheTestPage !== 'undefined') {
-                        window.cacheTestPage = new CacheTestPage();
-                        window.cacheTestPage.init();
-                        console.log('✅ Cache Test Page initialized via UnifiedAppInitializer');
+                    // Create and initialize Cache Management Page
+                    if (typeof CacheManagementPage !== 'undefined') {
+                        window.cacheManagementPage = new CacheManagementPage();
+                        window.cacheManagementPage.init();
+                        console.log('✅ Cache Management Page initialized via UnifiedAppInitializer');
                     } else {
-                        console.error('❌ CacheTestPage class not available');
+                        console.error('❌ CacheManagementPage class not available');
                     }
                 } else {
-                    console.log('✅ Cache Test Page already initialized');
+                    console.log('✅ Cache Management Page already initialized');
                 }
                 
                 // Ensure cache systems are ready
                 if (typeof window.initializeAllCacheSystems === 'function') {
                     try {
                         await window.initializeAllCacheSystems(true); // isInitialLoad = true
-                        console.log('✅ Cache systems initialized for Cache Test Page');
+                        console.log('✅ Cache systems initialized for Cache Management Page');
                     } catch (error) {
                         console.error('❌ Failed to initialize cache systems:', error);
                     }

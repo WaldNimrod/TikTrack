@@ -489,14 +489,8 @@ class PreferencesManager {
                 }
             }
             
-            // Fallback to localStorage
-            const stored = localStorage.getItem(key);
-            if (stored) {
-                console.log(`✅ Cache hit (localStorage): ${key}`);
-                return JSON.parse(stored);
-            }
-            
-            console.log(`❌ Cache miss: ${key}`);
+            // UnifiedCacheManager לא זמין - כלל 44 violation prevented
+            console.error(`UnifiedCacheManager לא זמין - לא ניתן לטעון מ-cache (כלל 44 violation prevented): ${key}`);
             return null;
             
         } catch (error) {
@@ -521,9 +515,8 @@ class PreferencesManager {
                 return;
             }
             
-            // Fallback to localStorage
-            localStorage.setItem(key, JSON.stringify(data));
-            console.log(`✅ Saved to cache (localStorage): ${key}`);
+            // UnifiedCacheManager לא זמין - כלל 44 violation prevented
+            console.error(`UnifiedCacheManager לא זמין - לא ניתן לשמור ל-cache (כלל 44 violation prevented): ${key}`);
             
         } catch (error) {
             console.warn('⚠️ Cache save error:', error);

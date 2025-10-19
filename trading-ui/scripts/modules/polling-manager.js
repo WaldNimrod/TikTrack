@@ -197,7 +197,7 @@ class PollingManager {
                 'db_extradata': null,
                 
                 // כלי פיתוח
-                'cache-test': window.cacheTestPage?.loadCacheData,
+                'cache-management': window.cacheManagementPage?.loadCacheData,
                 'system-management': null,
                 'server-monitor': null,
                 'background-tasks': null,

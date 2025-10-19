@@ -57,6 +57,36 @@ def get_trading_account(trading_account_id: int):
     response, status_code = base_api.get_by_id(db, trading_account_id)
     return jsonify(response), status_code
 
+@trading_accounts_bp.route('/by-name/<account_name>', methods=['GET'])
+@api_endpoint(cache_ttl=120, rate_limit=60)
+@handle_database_session()
+def get_trading_account_by_name(account_name: str):
+    """Get trading account by name"""
+    try:
+        db: Session = g.db
+        trading_account = TradingAccountService.get_by_name(db, account_name)
+        
+        if not trading_account:
+            return jsonify({
+                "status": "error",
+                "error": {"message": f"Trading account with name '{account_name}' not found"},
+                "version": "1.0"
+            }), 404
+        
+        return jsonify({
+            "status": "success",
+            "data": trading_account.to_dict(),
+            "message": "Trading account retrieved successfully",
+            "version": "1.0"
+        })
+    except Exception as e:
+        logger.error(f"Error getting trading account by name {account_name}: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": "Failed to retrieve trading account"},
+            "version": "1.0"
+        }), 500
+
 @trading_accounts_bp.route('/', methods=['POST'])
 def create_trading_account():
     """Create new trading account"""

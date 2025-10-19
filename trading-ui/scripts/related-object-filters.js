@@ -1,24 +1,23 @@
 /**
  * ========================================
- * פילטרים לפי סוג אובייקט מקושר
+ * מערכת פילטרים לפי סוג אובייקט מקושר - מערכת כללית
  * ========================================
  *
- * ⚠️  חשוב: זהו חלק ממערכת האובייקטים המקושרים (linked-items.js)
+ * מערכת פילטרים מרכזית לסינון פריטים לפי סוג האובייקט המקושר
+ * תומכת בכל היישויות עם שדה `related_type_id` וכפתורי פילטור עם `data-type`
  * 
- * קובץ זה מכיל פונקציות פילטר לפי סוג אובייקט מקושר
- * שניתן להשתמש בהן בעמודי התראות והודעות
- * בנוסף לפילטר הראשי של המערכת
- *
+ * 🎯 מטרה: פילטור אחיד לפי סוג אובייקט מקושר בכל העמודים
+ * 📍 בשימוש: alerts.html, notes.html, וכל עמוד אחר שזקוק לסינון
  * 🔗 קשור למערכת: linked-items.js (מערכת האובייקטים המקושרים)
- * 📍 בשימוש: עמודי התראות (alerts.html) והודעות (notes.html)
- * 🎯 מטרה: פילטור התראות/הודעות לפי סוג האובייקט המקושר
  *
- * חשוב: לא לגעת בפונקציונאליות הפילטר הראשי!
- * זהו פילטר נוסף שמפעיל פילטור ספציפי לפי סוג אובייקט מקושר
+ * כללים לשימוש:
+ * 1. בעמוד HTML: הוסף כפתורי פילטור עם `data-type` attribute
+ * 2. בקוד JS: קרא ל-`createRelatedObjectFilter(entityName, dataVar, updateFunction, itemName)`
+ * 3. הפילטרים יתאתחלו אוטומטית ויצרו פונקציות גלובליות
  *
  * File: trading-ui/scripts/related-object-filters.js
- * Version: 1.0
- * Last Updated: September 1, 2025
+ * Version: 2.0
+ * Last Updated: October 15, 2025
  *
  * מחבר: TikTrack Development Team
  * ========================================
@@ -108,12 +107,12 @@ function filterAlertsByRelatedObjectType(type) {
 }
 
 /**
- * פילטר הודעות לפי סוג אובייקט מקושר
+ * פילטר הערות לפי סוג אובייקט מקושר
  * @param {string} type - סוג האובייקט
  */
 function filterNotesByRelatedObjectType(type) {
   if (typeof window.notesData === 'undefined') {
-    // נתוני הודעות לא זמינים
+    // נתוני הערות לא זמינים
     return;
   }
 
@@ -122,11 +121,84 @@ function filterNotesByRelatedObjectType(type) {
     window.notesData,
     window.updateNotesTable,
     '.table-count',
-    'הודעות',
+    'הערות',
   );
 }
+
+/**
+ * יצירת מערכת פילטרים לכל יישות - פונקציה כללית
+ * @param {string} entityName - שם היישות (לדוגמה: 'alerts', 'notes')
+ * @param {string} dataVarName - שם משתנה הנתונים הגלובלי (לדוגמה: 'alertsData')
+ * @param {string} updateFunctionName - שם פונקציית עדכון הטבלה (לדוגמה: 'updateAlertsTable')
+ * @param {string} itemName - שם הפריטים בעברית (לדוגמה: 'התראות', 'הערות')
+ * @param {string} countSelector - סלקטור לאלמנט ספירה (אופציונלי)
+ */
+function createRelatedObjectFilter(entityName, dataVarName, updateFunctionName, itemName, countSelector = '.table-count') {
+  // יצירת שם פונקציה לפי התקן
+  const filterFunctionName = `filter${entityName.charAt(0).toUpperCase() + entityName.slice(1)}ByRelatedObjectType`;
+  
+  // הגדרת הפונקציה באופן דינמי
+  window[filterFunctionName] = function(type) {
+    if (typeof window[dataVarName] === 'undefined') {
+      console.warn(`⚠️ נתוני ${itemName} לא זמינים לסינון`);
+      return;
+    }
+
+    return filterByRelatedObjectType(
+      type,
+      window[dataVarName],
+      window[updateFunctionName],
+      countSelector,
+      itemName
+    );
+  };
+
+  console.log(`✅ נוצר פילטר לפי סוג אובייקט מקושר עבור ${itemName}: ${filterFunctionName}`);
+  return window[filterFunctionName];
+}
+
+/**
+ * אתחול אוטומטי של פילטרים לכל היישויות הבסיסיות
+ * פונקציה זו מופעלת אוטומטית כאשר הקובץ נטען
+ */
+function initializeRelatedObjectFilters() {
+  // הגדרת תצורות הפילטרים לכל יישות
+  const filterConfigs = [
+    {
+      entityName: 'alerts',
+      dataVarName: 'alertsData',
+      updateFunctionName: 'updateAlertsTable',
+      itemName: 'התראות'
+    },
+    {
+      entityName: 'notes',
+      dataVarName: 'notesData', 
+      updateFunctionName: 'updateNotesTable',
+      itemName: 'הערות'
+    }
+    // נוכל להוסיף עוד יישויות כאן בקלות בעתיד
+  ];
+
+  // יצירת פילטרים לכל ההגדרות
+  filterConfigs.forEach(config => {
+    createRelatedObjectFilter(
+      config.entityName,
+      config.dataVarName,
+      config.updateFunctionName,
+      config.itemName
+    );
+  });
+
+  console.log('🚀 מערכת הפילטרים לפי סוג אובייקט מקושר אותחלה');
+}
+
+// אתחול דרך UnifiedAppInitializer - כלל 43
+// DOMContentLoaded listener הוסר לטובת מערכת האתחול המאוחדת
+window.initializeRelatedObjectFilters = initializeRelatedObjectFilters;
 
 // ייצוא הפונקציות לגלובל
 window.filterByRelatedObjectType = filterByRelatedObjectType;
 window.filterAlertsByRelatedObjectType = filterAlertsByRelatedObjectType;
 window.filterNotesByRelatedObjectType = filterNotesByRelatedObjectType;
+window.createRelatedObjectFilter = createRelatedObjectFilter;
+window.initializeRelatedObjectFilters = initializeRelatedObjectFilters;

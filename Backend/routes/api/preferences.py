@@ -386,12 +386,25 @@ def get_multiple_preferences() -> Any:
             }), 400
         
         # קבלת העדפות מרובות
+        logger.info(f"API: Getting preferences for user {user_id}, profile {profile_id}, use_cache={use_cache}")
         preferences = preferences_service.get_preferences_by_names(
             user_id=user_id,
             preference_names=preference_names,
             profile_id=profile_id,
             use_cache=use_cache
         )
+        logger.info(f"API: Got preferences: {preferences}")
+        
+        # קבלת הפרופיל שנבחר בפועל (אם לא צוין, יחזיר את הפרופיל הפעיל)
+        if profile_id is None:
+            try:
+                active_profile_info = preferences_service.get_active_profile_info(user_id)
+                actual_profile_id = active_profile_info['profile_id']
+            except Exception as e:
+                logger.warning(f"Could not get active profile for user {user_id}: {e}")
+                actual_profile_id = None
+        else:
+            actual_profile_id = profile_id
         
         return jsonify({
             "success": True,
@@ -400,7 +413,8 @@ def get_multiple_preferences() -> Any:
                 "preference_names": preference_names,
                 "preferences": preferences,
                 "count": len(preferences),
-                "profile_id": profile_id
+                "profile_id": profile_id,
+                "actual_profile_id": actual_profile_id
             },
             "timestamp": datetime.now().isoformat()
         }), 200

@@ -292,6 +292,22 @@
   - `saveHeaderState()`
   - `saveLinterScanningResults()`
 
+### **Select Populator Service** 🔵 **חבילת CRUD** ✅ **הורחב ינואר 2025**
+- **קובץ:** `scripts/services/select-populator-service.js`
+- **תיאור:** מערכת מרכזית למילוי select boxes ואובייקטים מקושרים
+- **דוקומנטציה:** [SELECT_POPULATOR_SERVICE.md](SELECT_POPULATOR_SERVICE.md)
+- **שינויים:** הורחב עם פונקציות לטיפול באובייקטים מקושרים
+- **פונקציות עיקריות:**
+  - `SelectPopulatorService.populateTickersSelect()`
+  - `SelectPopulatorService.populateAccountsSelect()`
+  - `SelectPopulatorService.populateCurrenciesSelect()`
+  - `SelectPopulatorService.populateTradePlansSelect()`
+  - **פונקציות חדשות לטיפול באובייקטים מקושרים:**
+    - `getFilteredTickers()` - סינון טיקרים לפי סוג השיוך
+    - `populateRelatedObjects()` - מילוי אובייקטים מקושרים עם סינון ומיון
+    - `handleRelationTypeChange()` - טיפול בשינוי סוג שיוך
+    - `handleTickerChange()` - טיפול בבחירת טיקר
+
 ---
 
 ## ⚙️ **מערכות העדפות והגדרות**
@@ -318,15 +334,21 @@
 - **תיאור:** ניהול מערכת כללי
 - **דוקומנטציה:** [JAVASCRIPT_ARCHITECTURE.md](JAVASCRIPT_ARCHITECTURE.md#system-management)
 
-### **Cache Management System** 🟢 **חבילת בסיס**
-- **קובץ:** `cache-management.js`
-- **תיאור:** מערכת ניהול מטמון
-- **דוקומנטציה:** [ADVANCED_CACHE_SYSTEM_GUIDE.md](../development/ADVANCED_CACHE_SYSTEM_GUIDE.md)
+### **Cache Management System** 🟢 **חבילת בסיס** ✅ **עודכן אוקטובר 2025**
+- **קובץ:** `modules/cache-module.js`
+- **תיאור:** מערכת ניהול מטמון משופרת עם ולידציה ודוחות
+- **דוקומנטציה:** [CACHE_IMPLEMENTATION_GUIDE.md](CACHE_IMPLEMENTATION_GUIDE.md)
 - **פונקציות עיקריות:**
-  - `clearAllCache()`
-  - `clearDevelopmentCache()`
-  - `clearCacheBeforeCRUD()`
-  - `clearExpiredCache()`
+  - `clearAllCache()` - 4 רמות ניקוי (Light/Medium/Full/Nuclear)
+  - `validateCacheClearing()` - ולידציה אוטומטית אחרי ניקוי
+  - `collectCacheStats()` - איסוף סטטיסטיקות מטמון
+  - `copyCacheReportToClipboard()` - העתקת דוחות ללוח
+
+#### **מערכות משנה חדשות:**
+- **Dynamic Service Cache Clearing** - סריקה אוטומטית של window objects
+- **Comprehensive ORPHAN_KEYS Inventory** - 6 קטגוריות (state, preferences, auth, testing, notifications, app)
+- **Post-Clear Validation System** - בדיקה מקיפה אחרי ניקוי
+- **Detailed Reporting System** - דוחות מפורטים עם JSON export
 
 ---
 
@@ -790,12 +812,13 @@
 - **🗓️ חבילת תאריכים וזמן:** לא נדרש
 - **🌐 חבילת נתונים חיצוניים:** לא נדרש
 
-#### **בדיקת Cache** (`/cache-test`) - בדיקת מטמון
-- **🟢 חבילת בסיס:** מלא (כל המערכות)
+#### **ניהול מטמון** (`/cache-management`) - ניהול מרכזי למערכת מטמון (15 אוקטובר 2025)
+- **🟢 חבילת בסיס:** מלא (כל המערכות) + מערכת מטמון מאוחדת
 - **🔵 חבילת CRUD:** לא נדרש
 - **🔍 חבילת פילטרים:** לא נדרש
 - **📈 חבילת גרפים ותצוגה:** לא נדרש
-- **🔔 חבילת התראות מתקדמות:** לא נדרש
+- **🔔 חבילת התראות מתקדמות:** מלא (הודעות הצלחה/שגיאה מפורטות)
+- **📋 חבילת ניטור ולוגים:** מלא (UnifiedLogManager integration)
 - **🎨 חבילת ממשק משתמש מתקדם:** מלא (כותרת + תפריט + צבעים)
 - **⚙️ חבילת העדפות והגדרות:** לא נדרש
 - **📁 חבילת קבצים ומיפוי:** לא נדרש

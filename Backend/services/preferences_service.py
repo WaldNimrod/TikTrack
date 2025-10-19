@@ -443,17 +443,53 @@ class PreferencesService:
             # קבלת פרופיל פעיל אם לא צוין
             if profile_id is None:
                 profile_id = self._get_active_profile_id(user_id)
+                logger.info(f"Using active profile {profile_id} for user {user_id}")
+            else:
+                logger.info(f"Using specified profile {profile_id} for user {user_id}")
             
             preferences = {}
             
-            for preference_name in preference_names:
-                try:
-                    preferences[preference_name] = self.get_preference(
-                        user_id, preference_name, profile_id, use_cache
-                    )
-                except ValueError as e:
-                    logger.warning(f"Preference {preference_name} not found: {e}")
-                    preferences[preference_name] = None
+            if not use_cache:
+                # עקיפת מטמון - קריאה ישירה לבסיס הנתונים
+                logger.info(f"Bypassing cache for user {user_id}, profile {profile_id}")
+                conn = sqlite3.connect(self.db_path)
+                cursor = conn.cursor()
+                
+                # בניית שאילתה לכל ההעדפות בבת אחת
+                placeholders = ','.join(['?' for _ in preference_names])
+                query = f'''
+                    SELECT pt.preference_name, up.saved_value, pt.data_type, pt.default_value
+                    FROM preference_types pt
+                    LEFT JOIN user_preferences up ON pt.id = up.preference_id 
+                        AND up.user_id = ? AND up.profile_id = ?
+                    WHERE pt.preference_name IN ({placeholders})
+                '''
+                cursor.execute(query, [user_id, profile_id] + preference_names)
+                results = cursor.fetchall()
+                conn.close()
+                
+                # בניית מילון תוצאות
+                result_dict = {pref_name: None for pref_name in preference_names}
+                for preference_name, saved_value, data_type, default_value in results:
+                    if saved_value is not None:
+                        value = self._convert_value(saved_value, data_type)
+                    else:
+                        value = self._convert_value(default_value, data_type)
+                    result_dict[preference_name] = value
+                
+                preferences = result_dict
+                logger.info(f"Direct DB result for user {user_id}, profile {profile_id}: {preferences}")
+                
+            else:
+                # שימוש בcache - הקוד הקיים
+                for preference_name in preference_names:
+                    try:
+                        preferences[preference_name] = self.get_preference(
+                            user_id, preference_name, profile_id, use_cache
+                        )
+                    except ValueError as e:
+                        logger.warning(f"Preference {preference_name} not found: {e}")
+                        preferences[preference_name] = None
             
             logger.debug(f"Retrieved {len(preferences)} preferences by names")
             return preferences

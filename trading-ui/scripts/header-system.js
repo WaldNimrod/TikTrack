@@ -639,10 +639,12 @@ class HeaderSystem {
       /* Filter Styles */
       .header-filters {
         background: rgba(255,255,255,0.95);
-        padding: 13px 20px 5px 20px;
+        padding: 0;
+        margin: 0;
         border-top: 1px solid rgba(0, 0, 0, 0.05);
         display: block; /* פתוח כברירת מחדל */
         width: 100%;
+        height: 100%;
         box-sizing: border-box;
       }
 
@@ -654,7 +656,7 @@ class HeaderSystem {
         align-items: center;
         flex-wrap: nowrap;
         padding: 0 1rem;
-        margin-top: 10px;
+        height: 100%;
         overflow-x: auto;
       }
 

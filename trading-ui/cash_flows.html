@@ -332,7 +332,7 @@
     <script src="scripts/ui-utils.js?v=1.0.0"></script>
     <script src="scripts/color-scheme-system.js?v=1.0.0"></script>
     <script src="scripts/button-system-init.js?v=1.0.0"></script>
-    <script src="scripts/modules/actions-menu-system.js?v=1.0.0"></script>
+    <script src="scripts/modules/actions-menu-system.js?v=1.0.1"></script>
     <script src="scripts/header-system.js?v=v6.0.0"></script>
     
     <!-- Stage 6: Data and Utility Systems -->
@@ -362,6 +362,22 @@
         if (window.unifiedAppInitializer) {
             window.unifiedAppInitializer.initialize();
         }
+        
+        // Manual ActionsMenuSystem initialization for cash_flows page
+        setTimeout(() => {
+            if (window.ActionsMenuSystem && !window.actionsMenuSystem) {
+                console.log('🔧 Manual ActionsMenuSystem initialization for cash_flows page');
+                window.actionsMenuSystem = new window.ActionsMenuSystem();
+            }
+            
+            // Ensure createActionsMenu function is available
+            if (!window.createActionsMenu && window.actionsMenuSystem) {
+                window.createActionsMenu = function(buttons) {
+                    return window.actionsMenuSystem.createActionsMenu(buttons);
+                };
+                console.log('🔧 Manual createActionsMenu function created for cash_flows page');
+            }
+        }, 100);
     </script>
 </body>
 </html>

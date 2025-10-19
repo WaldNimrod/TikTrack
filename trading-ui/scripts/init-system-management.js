@@ -639,6 +639,127 @@ function showPerformance() {
 }
 
 /**
+ * Run standardization analysis
+ */
+function runStandardizationAnalysis() {
+    const resultsContainer = document.getElementById('toolsResults');
+    
+    try {
+        if (!window.PageStandardizer) {
+            resultsContainer.innerHTML = `
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    PageStandardizer לא זמין
+                </div>
+            `;
+            return;
+        }
+        
+        const standardizer = new window.PageStandardizer();
+        const results = standardizer.analyzeAllPages();
+        
+        let html = `
+            <div class="standardization-report">
+                <h4><i class="fas fa-cogs"></i> דוח סטנדרטיזציה</h4>
+                <div class="report-summary mb-3">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title">${results.length}</h5>
+                                    <p class="card-text">סה"כ עמודים</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title">${results.filter(r => window.PAGE_CONFIGS?.[r.pageName]).length}</h5>
+                                    <p class="card-text">עם קונפיג</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title">${(results.reduce((sum, r) => sum + r.scriptCount, 0) / results.length).toFixed(1)}</h5>
+                                    <p class="card-text">סקריפטים ממוצע</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title">${results.reduce((sum, r) => sum + r.scriptCount, 0)}</h5>
+                                    <p class="card-text">סה"כ סקריפטים</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="pages-analysis">
+                    <h5>ניתוח עמודים:</h5>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-striped">
+                            <thead>
+                                <tr>
+                                    <th>עמוד</th>
+                                    <th>חבילות</th>
+                                    <th>סקריפטים</th>
+                                    <th>סטטוס</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+        `;
+        
+        results.forEach(result => {
+            const hasConfig = !!window.PAGE_CONFIGS?.[result.pageName];
+            const status = hasConfig ? '✅ מוגדר' : '❌ חסר';
+            const statusClass = hasConfig ? 'text-success' : 'text-danger';
+            
+            html += `
+                <tr>
+                    <td><code>${result.pageName}</code></td>
+                    <td>${result.packages.join(', ')}</td>
+                    <td>${result.scriptCount}</td>
+                    <td class="${statusClass}">${status}</td>
+                </tr>
+            `;
+        });
+        
+        html += `
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="recommendations mt-3">
+                    <h5>המלצות:</h5>
+                    <ul class="list-group">
+                        <li class="list-group-item">✅ עדכן HTML files להשתמש בטעינת סקריפטים סטנדרטית</li>
+                        <li class="list-group-item">🗑️ הסר סקריפטים כפולים ומיותרים</li>
+                        <li class="list-group-item">🔧 וודא שכל העמודים משתמשים ב-unified-app-initializer</li>
+                        <li class="list-group-item">🧪 בדוק כל עמוד אחרי סטנדרטיזציה</li>
+                    </ul>
+                </div>
+            </div>
+        `;
+        
+        resultsContainer.innerHTML = html;
+        
+    } catch (error) {
+        console.error('❌ Failed to run standardization analysis:', error);
+        resultsContainer.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle"></i>
+                שגיאה בניתוח סטנדרטיזציה: ${error.message}
+            </div>
+        `;
+    }
+}
+
+/**
  * Show package stats
  */
 function showPackageStats() {

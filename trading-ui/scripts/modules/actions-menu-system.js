@@ -285,7 +285,17 @@ class ActionsMenuSystem {
                 title = '';
             }
             
-            return `<button data-button-type="${buttonType}" data-variant="${variant}" data-onclick="${onclick}" data-text="${text}" title="${title}"></button>`;
+            // Get icon based on button type
+            let icon = '';
+            switch(buttonType) {
+                case 'LINK': icon = '🔗'; break;
+                case 'EDIT': icon = '✏️'; break;
+                case 'DELETE': icon = '🗑️'; break;
+                case 'VIEW': icon = '👁️'; break;
+                default: icon = '⚙️'; break;
+            }
+            
+            return `<button class="btn btn-sm" onclick="${onclick}" title="${title}">${icon} ${text}</button>`;
         }).join('');
         
         return `
@@ -402,7 +412,5 @@ window.createActionsMenu = function(buttons) {
 window.ActionsMenuSystem = ActionsMenuSystem;
 
 // יצירת instance גלובלי אחרי שהקלאס מוגדר - רק אם עדיין לא קיים
-if (!window.actionsMenuSystem) {
-    window.actionsMenuSystem = new ActionsMenuSystem();
-}
+// הוסר האתחול האוטומטי - יטופל על ידי מערכת האיתחול המרכזית
 

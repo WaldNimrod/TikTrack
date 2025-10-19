@@ -649,15 +649,17 @@ class HeaderSystem {
         margin: 0 auto;
         display: flex;
         gap: 20px;
-        align-items: center;
+        align-items: flex-start;
         flex-wrap: wrap;
         padding: 0 1rem;
+        margin-top: 10px;
       }
 
       .filter-group {
         display: flex;
         align-items: center;
         gap: 10px;
+        margin-bottom: 8px;
       }
 
       .filter-toggle {
@@ -923,6 +925,7 @@ class HeaderSystem {
           align-items: stretch;
           padding: 0 15px;
           gap: 15px;
+          margin-top: 15px;
         }
 
         .filter-group {

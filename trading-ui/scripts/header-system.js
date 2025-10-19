@@ -648,32 +648,35 @@ class HeaderSystem {
         max-width: var(--container-xl, 1400px);
         margin: 0 auto;
         display: flex;
-        gap: 20px;
-        align-items: flex-start;
-        flex-wrap: wrap;
+        gap: 15px;
+        align-items: center;
+        flex-wrap: nowrap;
         padding: 0 1rem;
         margin-top: 10px;
+        overflow-x: auto;
       }
 
       .filter-group {
         display: flex;
         align-items: center;
-        gap: 10px;
-        margin-bottom: 8px;
+        gap: 8px;
+        flex-shrink: 0;
+        white-space: nowrap;
       }
 
       .filter-toggle {
         background: white;
         border: 2px solid #e0e0e0;
         border-radius: 8px;
-        padding: 5px 15px;
+        padding: 4px 12px;
         cursor: pointer;
         transition: all 0.3s ease;
         display: flex;
         align-items: center;
-        gap: 8px;
-        min-width: 150px;
+        gap: 6px;
+        min-width: 120px;
         justify-content: space-between;
+        font-size: 0.9em;
       }
 
       .filter-toggle:hover {

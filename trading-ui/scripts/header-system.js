@@ -645,7 +645,7 @@ class HeaderSystem {
       }
 
       .filters-container {
-        max-width: 1400px;
+        max-width: var(--container-xl, 1400px);
         margin: 0 auto;
         display: flex;
         gap: 20px;

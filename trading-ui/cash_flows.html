@@ -157,7 +157,7 @@
                 <div class="modal-content">
                     <div class="modal-header modal-header-colored">
                         <h5 class="modal-title" id="addCashFlowModalLabel">הוספת תזרים מזומנים חדש</h5>
-                        ${createCloseButton("aria-label="Close"")}
+                        <button data-button-type="CLOSE" data-entity-type="cash_flow" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
                     </div>
                     <div class="modal-body">
                         <form id="addCashFlowForm">
@@ -222,8 +222,8 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-primary" onclick="saveForm()">שמור</button>
+                        <button data-button-type="CANCEL" data-onclick="data-bs-dismiss='modal'" data-text="ביטול" title="ביטול"></button>
+                        <button data-button-type="SAVE" data-entity-type="cash_flow" data-onclick="saveForm()" data-text="שמור" title="שמור תזרים מזומנים"></button>
                     </div>
                 </div>
             </div>
@@ -236,7 +236,7 @@
                 <div class="modal-content">
                     <div class="modal-header modal-header-colored">
                         <h5 class="modal-title" id="editCashFlowModalLabel">עריכת תזרים מזומנים</h5>
-                        ${createCloseButton("aria-label="Close"")}
+                        <button data-button-type="CLOSE" data-entity-type="cash_flow" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
                     </div>
                     <div class="modal-body">
                         <form id="editCashFlowForm">
@@ -298,8 +298,8 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-primary" onclick="saveForm()">שמור</button>
+                        <button data-button-type="CANCEL" data-onclick="data-bs-dismiss='modal'" data-text="ביטול" title="ביטול"></button>
+                        <button data-button-type="SAVE" data-entity-type="cash_flow" data-onclick="saveForm()" data-text="שמור" title="שמור תזרים מזומנים"></button>
                     </div>
                 </div>
             </div>

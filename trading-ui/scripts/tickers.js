@@ -1700,11 +1700,11 @@ function updateTickersSummaryStats(tickers) {
     // בדיקה אם האלמנטים קיימים בדף הנוכחי
     const totalTickersElement = document.getElementById('totalTickers');
     const activeTickersElement = document.getElementById('activeTickers');
-    const latestUpdateElement = document.getElementById('latestUpdate');
-    const oldestUpdateElement = document.getElementById('oldestUpdate');
+    const averagePriceElement = document.getElementById('averagePrice');
+    const dailyChangeElement = document.getElementById('dailyChange');
 
     // אם האלמנטים לא קיימים, הפונקציה לא רלוונטית לדף זה
-    if (!totalTickersElement || !activeTickersElement || !latestUpdateElement || !oldestUpdateElement) {
+    if (!totalTickersElement || !activeTickersElement || !averagePriceElement || !dailyChangeElement) {
       return;
     }
 
@@ -1712,21 +1712,34 @@ function updateTickersSummaryStats(tickers) {
       // אם אין נתונים, אפס את כל השדות
       totalTickersElement.textContent = '0';
       activeTickersElement.textContent = '0';
-      latestUpdateElement.textContent = 'אין נתונים';
-      oldestUpdateElement.textContent = 'אין נתונים';
+      averagePriceElement.textContent = '$0';
+      dailyChangeElement.textContent = '0%';
       return;
     }
 
     // חישוב סטטיסטיקות
     const totalTickers = tickers.length;
     
-    // ספירת טיקרים לפי סטטוס
-    const openTickers = tickers.filter(ticker => ticker.status === 'open').length;
-    const closedTickers = tickers.filter(ticker => ticker.status === 'closed').length;
-    const cancelledTickers = tickers.filter(ticker => ticker.status === 'cancelled').length;
+    // ספירת טיקרים פעילים (פתוחים)
+    const activeTickers = tickers.filter(ticker => ticker.status === 'open').length;
     
-    // סה"כ טיקרים עם טרייד
-    const tickersWithTrades = tickers.filter(ticker => ticker.active_trades).length;
+    // חישוב מחיר ממוצע
+    const validPrices = tickers
+      .map(ticker => ticker.current_price)
+      .filter(price => price && price !== 'N/A' && !isNaN(parseFloat(price)))
+      .map(price => parseFloat(price));
+    
+    const averagePrice = validPrices.length > 0 ? 
+      validPrices.reduce((sum, price) => sum + price, 0) / validPrices.length : 0;
+    
+    // חישוב שינוי יומי ממוצע
+    const validChanges = tickers
+      .map(ticker => ticker.change_percent)
+      .filter(change => change && change !== 'N/A' && !isNaN(parseFloat(change)))
+      .map(change => parseFloat(change));
+    
+    const averageChange = validChanges.length > 0 ? 
+      validChanges.reduce((sum, change) => sum + change, 0) / validChanges.length : 0;
 
     // חישוב תאריכי עדכון נתונים חיצוניים
     const validExternalDates = tickers
@@ -1750,10 +1763,10 @@ function updateTickersSummaryStats(tickers) {
     }
 
     // עדכון השדות ב-HTML
-    totalTickersElement.textContent = `${totalTickers} (פתוח: ${openTickers}, סגור: ${closedTickers}, מבוטל: ${cancelledTickers})`;
-    activeTickersElement.textContent = tickersWithTrades;
-    latestUpdateElement.textContent = latestUpdate;
-    oldestUpdateElement.textContent = oldestUpdate;
+    totalTickersElement.textContent = totalTickers;
+    activeTickersElement.textContent = activeTickers;
+    averagePriceElement.textContent = `$${averagePrice.toFixed(2)}`;
+    dailyChangeElement.textContent = `${averageChange >= 0 ? '+' : ''}${averageChange.toFixed(2)}%`;
 
 
   } catch (error) {
@@ -1837,6 +1850,9 @@ function updateTickersTable(tickers) {
                             <strong>${ticker.symbol || 'N/A'}</strong>
                         </span>
                     </td>
+                    <td title="${formattedPrice !== 'N/A' ? `מחיר נוכחי: ${formattedPrice}` : 'אין נתוני מחיר'}" style="color: ${changeColor}; font-weight: bold; text-align: center; direction: ltr;">${formattedPrice}</td>
+                    <td title="${changeDisplay !== 'N/A' ? `שינוי יומי: ${changeDisplay}` : 'אין נתוני שינוי'}" style="color: ${changeColor}; font-weight: bold; text-align: center; direction: ltr;">${changeDisplay}</td>
+                    <td title="${volume !== 'N/A' ? `נפח: ${volume}` : 'אין נתוני נפח'}" style="text-align: center; direction: ltr;">${volume}</td>
                     <td title="${statusLabel}">
                         <span style="background-color: ${statusStyle.backgroundColor}; 
                                      color: ${statusStyle.color}; 
@@ -1849,14 +1865,7 @@ function updateTickersTable(tickers) {
                             ${statusLabel}
                         </span>
                     </td>
-                    <td title="${ticker.active_trades ? 'יש טריידים פעילים' : 'אין טריידים פעילים'}" style="text-align: center;">
-                        <span class="btn btn-sm ${ticker.active_trades ? 'btn-success' : 'btn-danger'}" 
-                              style="min-width: 30px; width: 30px; height: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: bold;">
-                            ${ticker.active_trades ? '✓' : '✗'}
-                        </span>
-                    </td>
-                    <td title="${formattedPrice !== 'N/A' ? `מחיר נוכחי: ${formattedPrice}` : 'אין נתוני מחיר'}" style="color: ${changeColor}; font-weight: bold; text-align: center; direction: ltr;">${formattedPrice}</td>
-                    <td title="${changeDisplay !== 'N/A' ? `שינוי יומי: ${changeDisplay}` : 'אין נתוני שינוי'}" style="color: ${changeColor}; font-weight: bold; text-align: center; direction: ltr;">${changeDisplay}</td>
+                    <td title="${updatedAtDisplay !== 'N/A' ? `עודכן ב: ${updatedAtDisplay}` : 'אין נתוני עדכון'}" style="text-align: center;">${updatedAtDisplay}</td>
                     <td title="${typeLabel}">
                         <span style="background-color: ${typeStyle.backgroundColor}; 
                                      color: ${typeStyle.color}; 

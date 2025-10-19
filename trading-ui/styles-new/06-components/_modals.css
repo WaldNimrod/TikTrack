@@ -362,19 +362,7 @@
   box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
 }
 
-/* כפתורי מחיקה בתוך modals */
-.modal .btn-danger {
-  border: 2px solid #dc3545 ;
-  background-color: white ;
-  color: #dc3545 ;
-  font-size: 0.9rem ;
-  padding: 0.375rem 0.75rem ;
-}
-
-.modal .btn-danger:hover {
-  background-color: #dc3545 ;
-  color: white ;
-}
+/* כפתורי מחיקה בתוך modals - הוסרו, מוגדרים ב-_bootstrap-overrides.css */
 
 /* מודל זהיר */
 #warningModal .table {

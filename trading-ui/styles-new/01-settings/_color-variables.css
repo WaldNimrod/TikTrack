@@ -5,13 +5,13 @@
 
 :root {
     /* Action Button Colors - כפתורי פעולה (מחוברים למשתני העדפות) */
-    --color-action-edit: var(--secondary-color);      /* Edit buttons */
+    --color-action-edit: var(--primary-color);        /* Edit buttons */
     --color-action-delete: var(--danger-color);       /* Delete buttons */
-    --color-action-add: var(--success-color);         /* Add buttons */
-    --color-action-save: var(--success-color);        /* Save buttons */
-    --color-action-cancel: var(--secondary-color);    /* Cancel buttons */
+    --color-action-add: var(--primary-color);         /* Add buttons */
+    --color-action-save: var(--secondary-color);      /* Save buttons */
+    --color-action-cancel: var(--warning-color);      /* Cancel buttons */
     --color-action-link: var(--info-color);           /* Link buttons */
-    --color-action-close: var(--secondary-color);     /* Close buttons */
+    --color-action-close: var(--warning-color);       /* Close buttons */
     --color-action-refresh: var(--secondary-color);   /* Refresh buttons */
     --color-action-export: var(--primary-color);      /* Export buttons */
     --color-action-import: var(--success-color);      /* Import buttons */
@@ -22,22 +22,50 @@
     --color-action-copy: var(--secondary-color);      /* Copy buttons */
     --color-action-reactivate: var(--success-color);  /* Reactivate buttons */
     
+    /* Entity Button Colors - כפתורי ישויות */
+    --color-action-view: var(--info-color);           /* View buttons */
+    --color-action-duplicate: var(--primary-color);   /* Duplicate buttons */
+    --color-action-archive: var(--warning-color);     /* Archive buttons */
+    --color-action-restore: var(--success-color);     /* Restore buttons */
+    --color-action-approve: var(--primary-color);     /* Approve buttons */
+    --color-action-reject: var(--danger-color);       /* Reject buttons */
+    --color-action-pause: var(--warning-color);       /* Pause buttons */
+    --color-action-play: var(--success-color);        /* Play buttons */
+    --color-action-stop: var(--danger-color);         /* Stop buttons */
+    --color-action-read: var(--info-color);           /* Read buttons */
+    --color-action-check: var(--secondary-color);     /* Check buttons */
+    
+    /* Dynamic Entity Colors - משתנים דינמיים לישויות */
+    --current-entity-color: var(--primary-color); /* Default fallback */
+    --current-entity-hover: var(--primary-hover); /* Default fallback */
+
     /* Button Variants - וריאציות כפתורים */
     --button-height-small: 28px;
     --button-height-normal: 32px;
     --button-height-large: 36px;
-    
+
     --button-padding-small: 4px 8px;
     --button-padding-normal: 6px 12px;
     --button-padding-large: 8px 16px;
-    
+
     --button-font-size-small: 12px;
     --button-font-size-normal: 14px;
     --button-font-size-large: 16px;
-    
+
     --button-icon-size-small: 14px;
     --button-icon-size-normal: 16px;
     --button-icon-size-large: 18px;
+
+    /* Button Size Variants - Extended - וריאציות גודל מורחבות */
+    --button-height-xlarge: calc(var(--button-height-large) * 1.2); /* 43.2px */
+    --button-padding-xlarge: calc(var(--button-padding-large) * 1.2);
+    --button-font-size-xlarge: calc(var(--button-font-size-large) * 1.2); /* ~19px */
+    --button-icon-size-xlarge: calc(var(--button-icon-size-large) * 1.2);
+
+    /* Negative Variant Colors - וריאציות נגטיב */
+    --button-negative-bg: var(--text-color, #333);
+    --button-negative-text: white;
+    --button-negative-hover-bg: var(--text-muted, #666);
 }
 
 /* 

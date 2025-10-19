@@ -112,38 +112,11 @@
             }
         }
         
-        &.btn-success {
-            background: var(--apple-blue);
-            border-color: var(--apple-blue);
-            color: white;
-            
-            &:hover {
-                background: var(--apple-blue-dark);
-                border-color: var(--apple-blue-dark);
-            }
-        }
+        /* &.btn-success - הוסר, מוגדר ב-_bootstrap-overrides.css */
         
-        &.btn-info {
-            background: var(--apple-gray-6);
-            border-color: var(--apple-gray-6);
-            color: white;
-            
-            &:hover {
-                background: var(--apple-gray-7);
-                border-color: var(--apple-gray-7);
-            }
-        }
+        /* &.btn-info - הוסר, מוגדר ב-_bootstrap-overrides.css */
         
-        &.btn-warning {
-            background: var(--logo-orange);
-            border-color: var(--logo-orange);
-            color: white;
-            
-            &:hover {
-                background: #e68900;
-                border-color: #e68900;
-            }
-        }
+        /* &.btn-warning - הוסר, מוגדר ב-_bootstrap-overrides.css */
     }
 }
 

@@ -103,6 +103,12 @@ const BUTTON_SYSTEM_DEMO = {
             icon: '🔗',
             text: 'קישור',
             class: 'btn-info',
+            colorVariable: '--color-action-link',
+            variants: {
+                small: { icon: '🔗', text: '' },
+                normal: { icon: '', text: 'קישור' },
+                full: { icon: '🔗', text: 'קישור' }
+            },
             oldHtml: '<button class="btn btn-info" onclick="openLink()"><i class="fas fa-link"></i> קישור</button>',
             newHtml: '<button data-button-type="LINK" data-onclick="openLink()" data-classes="btn-info" data-text="קישור"></button>',
             jsCode: 'createLinkButton(\'openLink()\')'
@@ -115,6 +121,12 @@ const BUTTON_SYSTEM_DEMO = {
             icon: '🔄',
             text: 'רענן',
             class: 'btn-outline-secondary',
+            colorVariable: '--color-action-refresh',
+            variants: {
+                small: { icon: '🔄', text: '' },
+                normal: { icon: '', text: 'רענן' },
+                full: { icon: '🔄', text: 'רענן' }
+            },
             oldHtml: '<button class="btn btn-outline-secondary" onclick="refreshData()"><i class="fas fa-sync-alt"></i> רענן</button>',
             newHtml: '<button data-button-type="REFRESH" data-onclick="refreshData()" data-classes="btn-outline-secondary" data-text="רענן"></button>',
             jsCode: 'createButton(\'REFRESH\', \'refreshData()\')'
@@ -127,6 +139,12 @@ const BUTTON_SYSTEM_DEMO = {
             icon: '📤',
             text: 'ייצא',
             class: 'btn-outline-primary',
+            colorVariable: '--color-action-export',
+            variants: {
+                small: { icon: '📤', text: '' },
+                normal: { icon: '', text: 'ייצא' },
+                full: { icon: '📤', text: 'ייצא' }
+            },
             oldHtml: '<button class="btn btn-outline-primary" onclick="exportData()"><i class="fas fa-download"></i> ייצא</button>',
             newHtml: '<button data-button-type="EXPORT" data-onclick="exportData()" data-classes="btn-outline-primary" data-text="ייצא"></button>',
             jsCode: 'createButton(\'EXPORT\', \'exportData()\')'
@@ -139,6 +157,12 @@ const BUTTON_SYSTEM_DEMO = {
             icon: '📥',
             text: 'ייבא',
             class: 'btn-outline-success',
+            colorVariable: '--color-action-import',
+            variants: {
+                small: { icon: '📥', text: '' },
+                normal: { icon: '', text: 'ייבא' },
+                full: { icon: '📥', text: 'ייבא' }
+            },
             oldHtml: '<button class="btn btn-outline-success" onclick="importData()"><i class="fas fa-upload"></i> ייבא</button>',
             newHtml: '<button data-button-type="IMPORT" data-onclick="importData()" data-classes="btn-outline-success" data-text="ייבא"></button>',
             jsCode: 'createButton(\'IMPORT\', \'importData()\')'
@@ -151,6 +175,12 @@ const BUTTON_SYSTEM_DEMO = {
             icon: '🔍',
             text: 'חיפוש',
             class: 'btn-outline-info',
+            colorVariable: '--color-action-search',
+            variants: {
+                small: { icon: '🔍', text: '' },
+                normal: { icon: '', text: 'חיפוש' },
+                full: { icon: '🔍', text: 'חיפוש' }
+            },
             oldHtml: '<button class="btn btn-outline-info" onclick="searchData()"><i class="fas fa-search"></i> חיפוש</button>',
             newHtml: '<button data-button-type="SEARCH" data-onclick="searchData()" data-classes="btn-outline-info" data-text="חיפוש"></button>',
             jsCode: 'createButton(\'SEARCH\', \'searchData()\')'
@@ -163,6 +193,12 @@ const BUTTON_SYSTEM_DEMO = {
             icon: '🔧',
             text: 'פילטר',
             class: 'btn-outline-warning',
+            colorVariable: '--color-action-filter',
+            variants: {
+                small: { icon: '🔧', text: '' },
+                normal: { icon: '', text: 'פילטר' },
+                full: { icon: '🔧', text: 'פילטר' }
+            },
             oldHtml: '<button class="btn btn-outline-warning" onclick="filterData()"><i class="fas fa-filter"></i> פילטר</button>',
             newHtml: '<button data-button-type="FILTER" data-onclick="filterData()" data-classes="btn-outline-warning" data-text="פילטר"></button>',
             jsCode: 'createButton(\'FILTER\', \'filterData()\')'
@@ -175,6 +211,12 @@ const BUTTON_SYSTEM_DEMO = {
             icon: '👁️',
             text: 'צפה',
             class: 'btn-outline-info',
+            colorVariable: '--color-action-view',
+            variants: {
+                small: { icon: '👁️', text: '' },
+                normal: { icon: '', text: 'צפה' },
+                full: { icon: '👁️', text: 'צפה' }
+            },
             oldHtml: '<button class="btn btn-outline-info" onclick="viewDetails()"><i class="fas fa-eye"></i> צפה</button>',
             newHtml: '<button data-button-type="VIEW" data-onclick="viewDetails()" data-classes="btn-outline-info" data-text="צפה"></button>',
             jsCode: 'createButton(\'VIEW\', \'viewDetails()\')'
@@ -403,6 +445,24 @@ function getColorName(cssClass) {
     return colorMap[cssClass] || cssClass;
 }
 
+function getColorVariable(cssClass) {
+    const variableMap = {
+        'btn-secondary': '--secondary-color',
+        'btn-danger': '--danger-color',
+        'btn-success': '--success-color',
+        'btn-primary': '--primary-color',
+        'btn-info': '--info-color',
+        'btn-warning': '--warning-color',
+        'btn-outline-secondary': '--secondary-color',
+        'btn-outline-primary': '--primary-color',
+        'btn-outline-success': '--success-color',
+        'btn-outline-danger': '--danger-color',
+        'btn-outline-info': '--info-color',
+        'btn-outline-warning': '--warning-color'
+    };
+    return variableMap[cssClass] || '--secondary-color';
+}
+
 /**
  * Initialize button variants demo
  */
@@ -439,7 +499,7 @@ function initializeButtonVariantsDemo() {
 /**
  * Create a button variant
  */
-function createVariantButton(button, variant) {
+function createVariantButton(button, variant, size = 'normal', style = 'default', entityType = null) {
     const btn = document.createElement('button');
     btn.className = `btn ${button.class}`;
     btn.style.fontSize = '12px';
@@ -447,7 +507,29 @@ function createVariantButton(button, variant) {
     btn.style.height = '28px';
     btn.style.marginRight = '4px';
     
-    const variantData = button.variants?.[variant] || { icon: button.icon, text: button.text };
+    // Set data attributes for new system
+    btn.setAttribute('data-button-type', button.type);
+    btn.setAttribute('data-variant', variant);
+    if (size !== 'normal') btn.setAttribute('data-size', size);
+    if (style !== 'default') btn.setAttribute('data-style', style);
+    if (entityType) btn.setAttribute('data-entity-type', entityType);
+    
+    // Auto-generate variant data for all buttons
+    let variantData;
+    switch (variant) {
+        case 'small':
+            variantData = { icon: button.icon || '', text: '' };
+            break;
+        case 'normal':
+            variantData = { icon: '', text: button.text || '' };
+            break;
+        case 'full':
+            variantData = { icon: button.icon || '', text: button.text || '' };
+            break;
+        default:
+            variantData = { icon: button.icon || '', text: button.text || '' };
+    }
+    
     btn.innerHTML = `${variantData.icon} ${variantData.text}`.trim();
     
     btn.onclick = () => {
@@ -494,9 +576,36 @@ function createButtonRow(button, index) {
     const fullButton = createVariantButton(button, 'full');
     fullContainer.appendChild(fullButton);
     
+    // XLarge variant
+    const xlargeContainer = document.createElement('div');
+    xlargeContainer.className = 'mb-2';
+    xlargeContainer.innerHTML = '<small class="text-muted">גדול מאוד:</small>';
+    const xlargeButton = createVariantButton(button, 'full', 'xlarge');
+    xlargeContainer.appendChild(xlargeButton);
+    
+    // Negative variant
+    const negativeContainer = document.createElement('div');
+    negativeContainer.className = 'mb-2';
+    negativeContainer.innerHTML = '<small class="text-muted">נגטיב:</small>';
+    const negativeButton = createVariantButton(button, 'full', 'normal', 'negative');
+    negativeContainer.appendChild(negativeButton);
+    
+    // Entity variant (if supported)
+    if (['CLOSE', 'ADD', 'LINK', 'SAVE'].includes(button.type)) {
+        const entityContainer = document.createElement('div');
+        entityContainer.className = 'mb-2';
+        entityContainer.innerHTML = '<small class="text-muted">ישות:</small>';
+        const entityButton = createVariantButton(button, 'full', 'normal', 'default', 'trade_plan');
+        entityContainer.appendChild(entityButton);
+        
+        variantsContainer.appendChild(entityContainer);
+    }
+    
     variantsContainer.appendChild(smallContainer);
     variantsContainer.appendChild(normalContainer);
     variantsContainer.appendChild(fullContainer);
+    variantsContainer.appendChild(xlargeContainer);
+    variantsContainer.appendChild(negativeContainer);
     liveExampleCell.appendChild(variantsContainer);
     
     // Name cell
@@ -514,6 +623,7 @@ function createButtonRow(button, index) {
     colorVariableCell.innerHTML = `
         <div><strong>${colorName}</strong></div>
         <code style="font-size: 10px;">${colorVariable}</code>
+        <div><small class="text-muted">תומך בישויות: ${['CLOSE', 'ADD', 'LINK', 'SAVE'].includes(button.type) ? 'כן' : 'לא'}</small></div>
     `;
     
     // Old HTML cell
@@ -530,12 +640,32 @@ function createButtonRow(button, index) {
     newCode.className = 'small';
     newHtmlCell.appendChild(newCode);
     
+    // Add examples for new variants
+    const variantsExamples = document.createElement('div');
+    variantsExamples.innerHTML = `
+        <small class="text-muted">דוגמאות נוספות:</small><br>
+        <code style="font-size: 9px;">data-size="xlarge"</code><br>
+        <code style="font-size: 9px;">data-style="negative"</code><br>
+        <code style="font-size: 9px;">data-entity-type="trade_plan"</code>
+    `;
+    newHtmlCell.appendChild(variantsExamples);
+    
     // JavaScript code cell
     const jsCodeCell = document.createElement('td');
     const jsCode = document.createElement('code');
     jsCode.textContent = button.jsCode;
     jsCode.className = 'small';
     jsCodeCell.appendChild(jsCode);
+    
+    // Add examples for new variants
+    const jsVariantsExamples = document.createElement('div');
+    jsVariantsExamples.innerHTML = `
+        <small class="text-muted">דוגמאות נוספות:</small><br>
+        <code style="font-size: 9px;">addDynamicButton(container, '${button.type}', 'onClick()', '', 'data-size="xlarge"')</code><br>
+        <code style="font-size: 9px;">addDynamicButton(container, '${button.type}', 'onClick()', '', 'data-style="negative"')</code><br>
+        <code style="font-size: 9px;">addDynamicButton(container, '${button.type}', 'onClick()', '', 'data-entity-type="trade_plan"')</code>
+    `;
+    jsCodeCell.appendChild(jsVariantsExamples);
     
     // Actions cell
     const actionsCell = document.createElement('td');
@@ -545,6 +675,27 @@ function createButtonRow(button, index) {
     copyButton.onclick = () => copyToClipboard(button.newHtml);
     actionsCell.appendChild(copyButton);
     
+    // Add copy buttons for new variants
+    const copyXLargeButton = document.createElement('button');
+    copyXLargeButton.className = 'btn btn-sm btn-outline-secondary';
+    copyXLargeButton.innerHTML = '📋 XLarge';
+    copyXLargeButton.onclick = () => copyToClipboard(button.newHtml.replace('>', ' data-size="xlarge">'));
+    actionsCell.appendChild(copyXLargeButton);
+    
+    const copyNegativeButton = document.createElement('button');
+    copyNegativeButton.className = 'btn btn-sm btn-outline-secondary';
+    copyNegativeButton.innerHTML = '📋 נגטיב';
+    copyNegativeButton.onclick = () => copyToClipboard(button.newHtml.replace('>', ' data-style="negative">'));
+    actionsCell.appendChild(copyNegativeButton);
+    
+    if (['CLOSE', 'ADD', 'LINK', 'SAVE'].includes(button.type)) {
+        const copyEntityButton = document.createElement('button');
+        copyEntityButton.className = 'btn btn-sm btn-outline-secondary';
+        copyEntityButton.innerHTML = '📋 ישות';
+        copyEntityButton.onclick = () => copyToClipboard(button.newHtml.replace('>', ' data-entity-type="trade_plan">'));
+        actionsCell.appendChild(copyEntityButton);
+    }
+    
     row.appendChild(liveExampleCell);
     row.appendChild(nameCell);
     row.appendChild(descriptionCell);
@@ -553,6 +704,9 @@ function createButtonRow(button, index) {
     row.appendChild(newHtmlCell);
     row.appendChild(jsCodeCell);
     row.appendChild(actionsCell);
+    
+    // Add row to table
+    document.getElementById('buttonTableBody').appendChild(row);
     
     return row;
 }

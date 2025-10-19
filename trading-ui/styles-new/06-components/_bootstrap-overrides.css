@@ -8,6 +8,442 @@
  * @lastUpdated January 6, 2025
  */
 
+/* ===== Bootstrap Button Overrides with Dynamic Colors ===== */
+
+/* Primary Buttons - Outline Style */
+.btn-primary {
+    background-color: white;
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+.btn-primary:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+/* Dynamic Button Colors - כפתורים עם צבעים דינמיים */
+.btn[data-button-type="EDIT"] {
+    border-color: var(--color-action-edit);
+    color: var(--color-action-edit);
+}
+.btn[data-button-type="EDIT"]:hover {
+    background-color: var(--color-action-edit);
+    color: white;
+}
+
+.btn[data-button-type="DELETE"] {
+    border-color: var(--color-action-delete);
+    color: var(--color-action-delete);
+}
+.btn[data-button-type="DELETE"]:hover {
+    background-color: var(--color-action-delete);
+    color: white;
+}
+
+.btn[data-button-type="ADD"] {
+    border-color: var(--color-action-add);
+    color: var(--color-action-add);
+}
+.btn[data-button-type="ADD"]:hover {
+    background-color: var(--color-action-add);
+    color: white;
+}
+
+.btn[data-button-type="SAVE"] {
+    border-color: var(--color-action-save);
+    color: var(--color-action-save);
+}
+.btn[data-button-type="SAVE"]:hover {
+    background-color: var(--color-action-save);
+    color: white;
+}
+
+.btn[data-button-type="CANCEL"] {
+    border-color: var(--color-action-cancel);
+    color: var(--color-action-cancel);
+}
+.btn[data-button-type="CANCEL"]:hover {
+    background-color: var(--color-action-cancel);
+    color: white;
+}
+
+.btn[data-button-type="LINK"] {
+    border-color: var(--color-action-link);
+    color: var(--color-action-link);
+}
+.btn[data-button-type="LINK"]:hover {
+    background-color: var(--color-action-link);
+    color: white;
+}
+
+.btn[data-button-type="CLOSE"] {
+    border-color: var(--color-action-close);
+    color: var(--color-action-close);
+}
+.btn[data-button-type="CLOSE"]:hover {
+    background-color: var(--color-action-close);
+    color: white;
+}
+
+.btn[data-button-type="REFRESH"] {
+    border-color: var(--color-action-refresh);
+    color: var(--color-action-refresh);
+}
+.btn[data-button-type="REFRESH"]:hover {
+    background-color: var(--color-action-refresh);
+    color: white;
+}
+
+.btn[data-button-type="EXPORT"] {
+    border-color: var(--color-action-export);
+    color: var(--color-action-export);
+}
+.btn[data-button-type="EXPORT"]:hover {
+    background-color: var(--color-action-export);
+    color: white;
+}
+
+.btn[data-button-type="IMPORT"] {
+    border-color: var(--color-action-import);
+    color: var(--color-action-import);
+}
+.btn[data-button-type="IMPORT"]:hover {
+    background-color: var(--color-action-import);
+    color: white;
+}
+
+.btn[data-button-type="SEARCH"] {
+    border-color: var(--color-action-search);
+    color: var(--color-action-search);
+}
+.btn[data-button-type="SEARCH"]:hover {
+    background-color: var(--color-action-search);
+    color: white;
+}
+
+.btn[data-button-type="FILTER"] {
+    border-color: var(--color-action-filter);
+    color: var(--color-action-filter);
+}
+.btn[data-button-type="FILTER"]:hover {
+    background-color: var(--color-action-filter);
+    color: white;
+}
+
+.btn[data-button-type="SORT"] {
+    border-color: var(--color-action-sort);
+    color: var(--color-action-sort);
+}
+.btn[data-button-type="SORT"]:hover {
+    background-color: var(--color-action-sort);
+    color: white;
+}
+
+.btn[data-button-type="TOGGLE"] {
+    border-color: var(--color-action-toggle);
+    color: var(--color-action-toggle);
+}
+.btn[data-button-type="TOGGLE"]:hover {
+    background-color: var(--color-action-toggle);
+    color: white;
+}
+
+.btn[data-button-type="COPY"] {
+    border-color: var(--color-action-copy);
+    color: var(--color-action-copy);
+}
+.btn[data-button-type="COPY"]:hover {
+    background-color: var(--color-action-copy);
+    color: white;
+}
+
+.btn[data-button-type="REACTIVATE"] {
+    border-color: var(--color-action-reactivate);
+    color: var(--color-action-reactivate);
+}
+.btn[data-button-type="REACTIVATE"]:hover {
+    background-color: var(--color-action-reactivate);
+    color: white;
+}
+
+.btn[data-button-type="VIEW"] {
+    border-color: var(--color-action-view);
+    color: var(--color-action-view);
+}
+.btn[data-button-type="VIEW"]:hover {
+    background-color: var(--color-action-view);
+    color: white;
+}
+
+.btn[data-button-type="DUPLICATE"] {
+    border-color: var(--color-action-duplicate);
+    color: var(--color-action-duplicate);
+}
+.btn[data-button-type="DUPLICATE"]:hover {
+    background-color: var(--color-action-duplicate);
+    color: white;
+}
+
+.btn[data-button-type="ARCHIVE"] {
+    border-color: var(--color-action-archive);
+    color: var(--color-action-archive);
+}
+.btn[data-button-type="ARCHIVE"]:hover {
+    background-color: var(--color-action-archive);
+    color: white;
+}
+
+.btn[data-button-type="RESTORE"] {
+    border-color: var(--color-action-restore);
+    color: var(--color-action-restore);
+}
+.btn[data-button-type="RESTORE"]:hover {
+    background-color: var(--color-action-restore);
+    color: white;
+}
+
+.btn[data-button-type="APPROVE"] {
+    border-color: var(--color-action-approve);
+    color: var(--color-action-approve);
+}
+.btn[data-button-type="APPROVE"]:hover {
+    background-color: var(--color-action-approve);
+    color: white;
+}
+
+.btn[data-button-type="REJECT"] {
+    border-color: var(--color-action-reject);
+    color: var(--color-action-reject);
+}
+.btn[data-button-type="REJECT"]:hover {
+    background-color: var(--color-action-reject);
+    color: white;
+}
+
+.btn[data-button-type="PAUSE"] {
+    border-color: var(--color-action-pause);
+    color: var(--color-action-pause);
+}
+.btn[data-button-type="PAUSE"]:hover {
+    background-color: var(--color-action-pause);
+    color: white;
+}
+
+.btn[data-button-type="PLAY"] {
+    border-color: var(--color-action-play);
+    color: var(--color-action-play);
+}
+.btn[data-button-type="PLAY"]:hover {
+    background-color: var(--color-action-play);
+    color: white;
+}
+
+.btn[data-button-type="STOP"] {
+    border-color: var(--color-action-stop);
+    color: var(--color-action-stop);
+}
+.btn[data-button-type="STOP"]:hover {
+    background-color: var(--color-action-stop);
+    color: white;
+}
+
+.btn[data-button-type="READ"] {
+    border-color: var(--color-action-read);
+    color: var(--color-action-read);
+}
+.btn[data-button-type="READ"]:hover {
+    background-color: var(--color-action-read);
+    color: white;
+}
+
+.btn[data-button-type="CHECK"] {
+    border-color: var(--color-action-check);
+    color: var(--color-action-check);
+}
+.btn[data-button-type="CHECK"]:hover {
+    background-color: var(--color-action-check);
+    color: white;
+}
+
+/* Entity-Based Button Colors - תמיכה בכל הישויות */
+.btn[data-entity-type] {
+    border-color: var(--current-entity-color) !important;
+    color: var(--current-entity-color) !important;
+    background-color: white !important;
+}
+
+.btn[data-entity-type]:hover {
+    background-color: var(--current-entity-hover) !important;
+    border-color: var(--current-entity-hover) !important;
+    color: white !important;
+}
+
+/* Size Variant: XLarge - וריאנט גדול יותר ב-20% */
+.btn[data-size="xlarge"] {
+    height: var(--button-height-xlarge) !important;
+    padding: var(--button-padding-xlarge) !important;
+    font-size: var(--button-font-size-xlarge) !important;
+}
+
+.btn[data-size="xlarge"] i,
+.btn[data-size="xlarge"] .icon {
+    font-size: var(--button-icon-size-xlarge) !important;
+}
+
+/* Negative Variant - וריאנט נגטיב */
+.btn[data-style="negative"] {
+    background-color: var(--button-negative-bg) !important;
+    border-color: var(--button-negative-bg) !important;
+    color: var(--button-negative-text) !important;
+}
+
+.btn[data-style="negative"]:hover {
+    background-color: var(--button-negative-hover-bg) !important;
+    border-color: var(--button-negative-hover-bg) !important;
+    color: var(--button-negative-text) !important;
+}
+
+/* Negative + Entity - שילוב נגטיב עם ישות */
+.btn[data-style="negative"][data-entity-type] {
+    background-color: var(--current-entity-color) !important;
+    border-color: var(--current-entity-color) !important;
+    color: white !important;
+}
+
+.btn[data-style="negative"][data-entity-type]:hover {
+    background-color: var(--current-entity-hover) !important;
+    border-color: var(--current-entity-hover) !important;
+    color: white !important;
+}
+
+/* Success Buttons - Outline Style */
+.btn-success {
+    background-color: white;
+    border-color: var(--success-color);
+    color: var(--success-color);
+}
+.btn-success:hover {
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+    color: white;
+}
+
+/* Danger Buttons - Outline Style */
+.btn-danger {
+    background-color: white;
+    border-color: var(--danger-color);
+    color: var(--danger-color);
+}
+.btn-danger:hover {
+    background-color: var(--danger-color);
+    border-color: var(--danger-color);
+    color: white;
+}
+
+/* Secondary Buttons - Outline Style */
+.btn-secondary {
+    background-color: white;
+    border-color: var(--secondary-color);
+    color: var(--secondary-color);
+}
+.btn-secondary:hover {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+    color: white;
+}
+
+/* Warning Buttons - Outline Style */
+.btn-warning {
+    background-color: white;
+    border-color: var(--warning-color);
+    color: var(--warning-color);
+}
+.btn-warning:hover {
+    background-color: var(--warning-color);
+    border-color: var(--warning-color);
+    color: var(--text-color);
+}
+
+/* Info Buttons - Outline Style */
+.btn-info {
+    background-color: white;
+    border-color: var(--info-color);
+    color: var(--info-color);
+}
+.btn-info:hover {
+    background-color: var(--info-color);
+    border-color: var(--info-color);
+    color: white;
+}
+
+/* Outline Variants */
+.btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+    background-color: transparent;
+}
+.btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.btn-outline-success {
+    color: var(--success-color);
+    border-color: var(--success-color);
+    background-color: transparent;
+}
+.btn-outline-success:hover {
+    background-color: var(--success-color);
+    color: white;
+    border-color: var(--success-color);
+}
+
+.btn-outline-danger {
+    color: var(--danger-color);
+    border-color: var(--danger-color);
+    background-color: transparent;
+}
+.btn-outline-danger:hover {
+    background-color: var(--danger-color);
+    color: white;
+    border-color: var(--danger-color);
+}
+
+.btn-outline-secondary {
+    color: var(--secondary-color);
+    border-color: var(--secondary-color);
+    background-color: transparent;
+}
+.btn-outline-secondary:hover {
+    background-color: var(--secondary-color);
+    color: white;
+    border-color: var(--secondary-color);
+}
+
+.btn-outline-warning {
+    color: var(--warning-color);
+    border-color: var(--warning-color);
+    background-color: transparent;
+}
+.btn-outline-warning:hover {
+    background-color: var(--warning-color);
+    color: var(--text-color);
+    border-color: var(--warning-color);
+}
+
+.btn-outline-info {
+    color: var(--info-color);
+    border-color: var(--info-color);
+    background-color: transparent;
+}
+.btn-outline-info:hover {
+    background-color: var(--info-color);
+    color: white;
+    border-color: var(--info-color);
+}
+
 /* ===== סגנונות בסיסיים של Bootstrap ===== */
 
 /* כרטיסים בסגנון אפל - הועבר ל-_cards.css */

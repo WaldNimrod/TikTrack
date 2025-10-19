@@ -107,6 +107,27 @@ function getButtonClass(type) {
   return classMap[type.toUpperCase()] || 'btn-secondary';
 }
 
+// Buttons that support entity color variants
+window.ENTITY_VARIANT_BUTTONS = ['CLOSE', 'ADD', 'LINK', 'SAVE'];
+
+window.supportsEntityVariant = function(buttonType) {
+    return window.ENTITY_VARIANT_BUTTONS.includes(buttonType.toUpperCase());
+};
+
+// Size variants
+window.BUTTON_SIZES = {
+    SMALL: 'small',
+    NORMAL: 'normal',
+    LARGE: 'large',
+    XLARGE: 'xlarge'
+};
+
+// Style variants
+window.BUTTON_STYLES = {
+    DEFAULT: 'default',
+    NEGATIVE: 'negative'
+};
+
 // ייצוא לגלובל עבור המערכת החדשה
 window.BUTTON_ICONS = BUTTON_ICONS;
 window.BUTTON_TEXTS = BUTTON_TEXTS;

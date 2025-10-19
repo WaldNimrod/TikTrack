@@ -52,7 +52,7 @@
 <div class="top-section planning-page">
 <div class="section-header">
 <div class="table-title">
-<img src="images/icons/trade_plans.svg" alt="תכנון טריידים והשקעות" class="section-icon"> תכנון טריידים והשקעות </div>
+<img src="images/icons/trade_plans.svg" alt="תכנון טריידים והשקעות" class="section-icon" style="width: 28px; height: 28px;"> תכנון טריידים והשקעות </div>
 <div class="table-actions">
 <button data-button-type="SAVE" data-classes="btn btn-primary" data-text="שמור"></button>
 <i class="fas fa-download">
@@ -83,7 +83,7 @@
 <div class="content-section planning-page" id="main">
 <div class="section-header">
 <div class="table-title">
-<img src="images/icons/trade_plans.svg" alt="התכנונים שלי" class="section-icon"> התכנונים שלי </div>
+<img src="images/icons/trade_plans.svg" alt="התכנונים שלי" class="section-icon" style="width: 28px; height: 28px;"> התכנונים שלי </div>
 <div class="table-count" id="trade_plansCount">טוען...</div>
 <div class="table-actions">
 <button data-button-type="ADD" data-onclick="if (typeof window.showAddTradePlanModal === 'function') { window.showAddTradePlanModal(); }" data-classes="btn btn-success" data-attributes="type='button' id='addTradePlanBtn' title='הוסף תכנון חדש'">
@@ -115,34 +115,34 @@
 <thead>
 <tr>
 <th class="col-ticker">
-<button data-button-type="SORT" data-onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(0, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }" data-classes="btn btn-link sortable-header" data-attributes="style='border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;'" data-text=" טיקר "></button>
+<button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(0, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">טיקר <span class="sort-icon">↕</span></button>
 </th>
 <th class="col-date">
-<button data-button-type="SORT" data-onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }" data-classes="btn btn-link sortable-header" data-attributes="style='border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;'" data-text=" תאריך "></button>
+<button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">תאריך <span class="sort-icon">↕</span></button>
 </th>
 <th class="col-type">
-<button data-button-type="SORT" data-onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(2, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }" data-classes="btn btn-link sortable-header" data-attributes="style='border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;'" data-text=" סוג "></button>
+<button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(2, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">סוג <span class="sort-icon">↕</span></button>
 </th>
 <th class="col-side">
-<button data-button-type="SORT" data-onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(3, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }" data-classes="btn btn-link sortable-header" data-attributes="style='border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;'" data-text=" צד "></button>
+<button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(3, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">צד <span class="sort-icon">↕</span></button>
 </th>
 <th class="col-quantity">
-<button data-button-type="SORT" data-onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(4, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }" data-classes="btn btn-link sortable-header" data-attributes="style='border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;'" data-text=" כמות "></button>
+<button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(4, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">כמות <span class="sort-icon">↕</span></button>
 </th>
 <th class="col-price">
-<button data-button-type="SORT" data-onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(5, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }" data-classes="btn btn-link sortable-header" data-attributes="style='border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;'" data-text=" מחיר "></button>
+<button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(5, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">מחיר <span class="sort-icon">↕</span></button>
 </th>
 <th class="col-investment">
-<button data-button-type="SORT" data-onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(6, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }" data-classes="btn btn-link sortable-header" data-attributes="style='border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;'" data-text=" השקעה "></button>
+<button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(6, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">השקעה <span class="sort-icon">↕</span></button>
 </th>
 <th class="col-status">
-<button data-button-type="SORT" data-onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(7, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }" data-classes="btn btn-link sortable-header" data-attributes="style='border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;'" data-text=" סטטוס "></button>
+<button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(7, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">סטטוס <span class="sort-icon">↕</span></button>
 </th>
 <th class="col-profit">
-<button data-button-type="SORT" data-onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(8, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }" data-classes="btn btn-link sortable-header" data-attributes="style='border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;'" data-text=" רווח "></button>
+<button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(8, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">רווח <span class="sort-icon">↕</span></button>
 </th>
 <th class="col-notes">
-<button data-button-type="SORT" data-onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(9, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }" data-classes="btn btn-link sortable-header" data-attributes="style='border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;'" data-text=" הערות "></button>
+<button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(9, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">הערות <span class="sort-icon">↕</span></button>
 </th>
 <th class="col-actions actions-cell actions-3-btn"> פעולות </th>
 </tr>
@@ -169,19 +169,19 @@
 <div class="modal-content">
 <div class="modal-header modal-header-colored">
 <h5 class="modal-title" id="addTradePlanModalLabel">הוספת תכנון חדש</h5>
-<button data-button-type="CLOSE" data-attributes="type=\"button\" class=\"btn-close\" data-bs-dismiss=\"modal\"">
+<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
 </button>
 </div>
 <div class="modal-body">
 <!-- Navigation tabs -->
 <ul class="nav nav-tabs" id="addTradePlanTabs" role="tablist">
     <li class="nav-item" role="presentation">
-        <button data-button-type="TOGGLE" data-classes="nav-link active" data-attributes="id='add-basic-tab' data-bs-toggle='tab' data-bs-target='#add-basic-pane' type='button' role='tab'">
+        <button class="nav-link active" id="add-basic-tab" data-bs-toggle="tab" data-bs-target="#add-basic-pane" type="button" role="tab">
             <i class="fa fa-info-circle me-2"></i>פרטים בסיסיים
         </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button data-button-type="TOGGLE" data-classes="nav-link" data-attributes="id='add-conditions-tab' data-bs-toggle='tab' data-bs-target='#add-conditions-pane' type='button' role='tab'">
+        <button class="nav-link" id="add-conditions-tab" data-bs-toggle="tab" data-bs-target="#add-conditions-pane" type="button" role="tab">
             <i class="fa fa-chart-line me-2"></i>סיבות ותנאים
         </button>
     </li>
@@ -352,7 +352,7 @@
 <div class="modal-content">
 <div class="modal-header modal-header-colored">
 <h5 class="modal-title" id="editTradePlanModalLabel">עריכת תכנון</h5>
-<button data-button-type="CLOSE" data-attributes="type=\"button\" class=\"btn-close\" data-bs-dismiss=\"modal\"">
+<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
 </button>
 </div>
 <div class="modal-body">

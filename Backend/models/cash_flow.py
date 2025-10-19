@@ -32,5 +32,19 @@ class CashFlow(BaseModel):
                 result[c.name] = value.strftime('%Y-%m-%d') if value else None
             else:
                 result[c.name] = value
+        
+        # Use loaded relationships if available
+        if hasattr(self, 'account') and self.account:
+            result["account_name"] = self.account.name
+        else:
+            result["account_name"] = f'TradingAccount_{self.trading_account_id}' if self.trading_account_id else 'Unknown TradingAccount'
+        
+        if hasattr(self, 'currency') and self.currency:
+            result["currency_symbol"] = self.currency.symbol
+            result["currency_name"] = self.currency.name
+        else:
+            result["currency_symbol"] = 'USD'
+            result["currency_name"] = 'US Dollar'
+            
         return result
 

@@ -15,11 +15,138 @@
 
 ### משתני צבע דינמיים
 כל כפתור משתמש במשתנה CSS דינמי שניתן להתאים אישית:
-- `--color-action-edit` - צבע כפתור עריכה
-- `--color-action-delete` - צבע כפתור מחיקה
-- `--color-action-add` - צבע כפתור הוספה
-- `--color-action-save` - צבע כפתור שמירה
+- `--color-action-edit` - צבע כפתור עריכה (מחובר ל-`--secondary-color`)
+- `--color-action-delete` - צבע כפתור מחיקה (מחובר ל-`--danger-color`)
+- `--color-action-add` - צבע כפתור הוספה (מחובר ל-`--success-color`)
+- `--color-action-save` - צבע כפתור שמירה (מחובר ל-`--success-color`)
 - ועוד...
+
+המשתנים מחוברים למערכת העדפות המשתמש דרך `color-scheme-system.js`.
+
+## וריאנטים מתקדמים
+
+### וריאנטים של גודל
+המערכת תומכת ב-4 גדלים שונים:
+- `small` - גודל קטן (28px)
+- `normal` - גודל רגיל (32px) 
+- `large` - גודל גדול (36px)
+- `xlarge` - גודל גדול מאוד (43.2px - גדול ב-20%)
+
+```html
+<button data-button-type="ADD" data-size="xlarge" data-text="הוסף"></button>
+```
+
+### וריאנטים של סגנון
+המערכת תומכת ב-2 סגנונות:
+- `default` - סגנון רגיל (רקע לבן, מסגרת צבעונית)
+- `negative` - סגנון נגטיב (רקע כהה, טקסט לבן)
+
+```html
+<button data-button-type="ADD" data-style="negative" data-text="הוסף"></button>
+```
+
+### וריאנטים של צבעי ישויות
+כפתורים מסוימים יכולים לקבל צבעים בהתאם לסוג הישות שהם משויכים אליה:
+
+```html
+<button data-button-type="ADD" data-entity-type="trade_plan" data-text="הוסף"></button>
+```
+
+**כפתורים התומכים בוריאנטים של ישויות:**
+- `CLOSE` - סגירה
+- `ADD` - הוספה
+- `LINK` - קישור
+- `SAVE` - שמירה
+
+**ישויות נתמכות:**
+- `trade_plan` - תכנוני השקעה
+- `trade` - טריידים
+- `alert` - התראות
+- `note` - הערות
+- `trading_account` - חשבונות מסחר
+- `ticker` - טיקרים
+- `execution` - עסקאות
+- `cash_flow` - תזרים מזומנים
+
+### שילוב וריאנטים
+ניתן לשלב את כל הוריאנטים יחד:
+
+```html
+<button data-button-type="ADD" data-size="xlarge" data-style="negative" 
+        data-entity-type="trade_plan" data-text="הוסף"></button>
+```
+
+## דוגמאות מתקדמות
+
+### JavaScript עם וריאנטים
+```javascript
+// כפתור גדול
+addDynamicButton(container, 'ADD', 'onClick()', '', 'data-size="xlarge"', 'הוסף');
+
+// כפתור נגטיב
+addDynamicButton(container, 'ADD', 'onClick()', '', 'data-style="negative"', 'הוסף');
+
+// כפתור עם צבע ישות
+addDynamicButton(container, 'ADD', 'onClick()', '', 'data-entity-type="trade_plan"', 'הוסף');
+
+// כפתור עם כל הוריאנטים
+addDynamicButton(container, 'ADD', 'onClick()', '', 
+                 'data-size="xlarge" data-style="negative" data-entity-type="trade_plan"', 
+                 'הוסף');
+```
+
+### דריסות Bootstrap עם משתנים דינמיים
+המערכת דורסת את מחלקות Bootstrap הבסיסיות עם משתני צבע דינמיים. כל הכפתורים מוגדרים בסגנון outline (רקע לבן, מסגרת וטקסט בצבע):
+
+```css
+/* Primary Buttons - Outline Style */
+.btn-primary {
+    background-color: white;
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+.btn-primary:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+/* Success Buttons - Outline Style */
+.btn-success {
+    background-color: white;
+    border-color: var(--success-color);
+    color: var(--success-color);
+}
+.btn-success:hover {
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+    color: white;
+}
+
+/* Danger Buttons - Outline Style */
+.btn-danger {
+    background-color: white;
+    border-color: var(--danger-color);
+    color: var(--danger-color);
+}
+.btn-danger:hover {
+    background-color: var(--danger-color);
+    border-color: var(--danger-color);
+    color: white;
+}
+
+/* Outline Variants - Same as above */
+.btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+    background-color: transparent;
+}
+.btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+```
 
 ### וריאציות תצוגה
 כל כפתור תומך בשלוש וריאציות:

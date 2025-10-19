@@ -9,68 +9,69 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <!-- Bootstrap CSS - Must load first -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"><link rel="stylesheet" href="styles-new/master.css?v=1.0.0">
+    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">    
     <!-- ITCSS Architecture - Complete Implementation -->
     
     <!-- 01-settings - Variables and Settings -->
-    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/01-settings/_color-variables.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/01-settings/_breakpoints.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=1.0.0">
+    
+    
+    
+    
+    
+    
+    
+    
     
     <!-- 02-tools - Functions and Mixins -->
-    <link rel="stylesheet" href="styles-new/02-tools/_mixins.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/02-tools/_functions.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/02-tools/_utilities.css?v=1.0.0">
+    
+    
+    
     
     <!-- 03-generic - Reset and Normalization -->
-    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=1.0.0">
+    
+    
     
     <!-- 04-elements - Basic HTML Elements -->
-    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=1.0.0">
+    
+    
+    
+    
     
     <!-- 05-objects - Layout Structures -->
-    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=1.0.0">
+    
+    
     
     <!-- 06-components - UI Components -->
-    <link rel="stylesheet" href="styles-new/06-components/_bootstrap-overrides.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/06-components/_page-headers.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/06-components/_info-summary.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/06-components/_constraints.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/06-components/_system-management.css?v=1.0.0">
-    <link rel="stylesheet" href="styles-new/06-components/_chart-management.css?v=1.0.0">
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     <!-- 08-themes - Themes -->
-    <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=1.0.0">
+    
     
     <!-- 09-utilities - Utility Classes -->
-    <link rel="stylesheet" href="styles-new/09-utilities/_utilities.css?v=1.0.0">
+    
     
     <!-- External Libraries -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Header Styles - Separate CSS file -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">
+    
     
     <!-- Entity Colors Table Styles -->
     <style>
@@ -119,7 +120,7 @@
                             <button data-button-type="COPY" data-onclick="copyButtonSystemDetailedLog()" data-classes="btn-sm" data-text="העתק לוג מפורט" data-attributes="title='העתק לוג מפורט עם כל הנתונים והכפתורים'"></button>
                             <button data-button-type="SEARCH" data-onclick="checkButtonColors()" data-classes="btn-sm" data-text="בדוק צבעים" data-attributes="title='בדוק צבעי כל הכפתורים'"></button>
                             <button data-button-type="REACTIVATE" data-onclick="fixButtonColors()" data-classes="btn-sm" data-text="תקן צבעים" data-attributes="title='תקן אוטומטית בעיות צבעים'"></button>
-                            <button data-button-type="TOGGLE" data-onclick="toggleAllSections()" data-classes="btn filter-toggle-btn" data-attributes="title='הצג/הסתר סקשן'">▼ הצג/הסתר סקשן</button>
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleAllSections()" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
                         </div>
                     </div>
                     <div class="section-body">

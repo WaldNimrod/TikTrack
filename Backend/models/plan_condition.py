@@ -51,7 +51,11 @@ class PlanCondition(BaseModel):
         
         # Add parsed parameters
         try:
-            result['parameters'] = json.loads(self.parameters_json) if self.parameters_json else {}
+            if isinstance(self.parameters_json, str):
+                result['parameters'] = json.loads(self.parameters_json) if self.parameters_json else {}
+            else:
+                # If it's already a dict, use it directly
+                result['parameters'] = self.parameters_json if self.parameters_json else {}
         except json.JSONDecodeError:
             result['parameters'] = {}
         
@@ -71,7 +75,11 @@ class PlanCondition(BaseModel):
     def get_parameters(self) -> Dict[str, Any]:
         """Get parsed parameters as dictionary"""
         try:
-            return json.loads(self.parameters_json) if self.parameters_json else {}
+            if isinstance(self.parameters_json, str):
+                return json.loads(self.parameters_json) if self.parameters_json else {}
+            else:
+                # If it's already a dict, use it directly
+                return self.parameters_json if self.parameters_json else {}
         except json.JSONDecodeError:
             return {}
     
@@ -169,7 +177,11 @@ class TradeCondition(BaseModel):
         
         # Add parsed parameters
         try:
-            result['parameters'] = json.loads(self.parameters_json) if self.parameters_json else {}
+            if isinstance(self.parameters_json, str):
+                result['parameters'] = json.loads(self.parameters_json) if self.parameters_json else {}
+            else:
+                # If it's already a dict, use it directly
+                result['parameters'] = self.parameters_json if self.parameters_json else {}
         except json.JSONDecodeError:
             result['parameters'] = {}
         
@@ -192,7 +204,11 @@ class TradeCondition(BaseModel):
     def get_parameters(self) -> Dict[str, Any]:
         """Get parsed parameters as dictionary"""
         try:
-            return json.loads(self.parameters_json) if self.parameters_json else {}
+            if isinstance(self.parameters_json, str):
+                return json.loads(self.parameters_json) if self.parameters_json else {}
+            else:
+                # If it's already a dict, use it directly
+                return self.parameters_json if self.parameters_json else {}
         except json.JSONDecodeError:
             return {}
     

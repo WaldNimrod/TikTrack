@@ -168,8 +168,14 @@ class ConditionsValidationService:
         # Validate JSON format
         if 'parameters_json' in data and data['parameters_json']:
             try:
-                json.loads(data['parameters_json'])
-            except json.JSONDecodeError:
+                if isinstance(data['parameters_json'], str):
+                    json.loads(data['parameters_json'])
+                elif isinstance(data['parameters_json'], dict):
+                    # If it's already a dict, validate it's serializable
+                    json.dumps(data['parameters_json'])
+                else:
+                    errors['parameters_json'] = "parameters_json must be a string or dictionary"
+            except (json.JSONDecodeError, TypeError):
                 errors['parameters_json'] = "Invalid JSON format"
         
         # Validate against constraints
@@ -202,11 +208,14 @@ class ConditionsValidationService:
                 # Validate parameters against method definition
                 if 'parameters_json' in data and data['parameters_json']:
                     try:
-                        parameters = json.loads(data['parameters_json'])
+                        if isinstance(data['parameters_json'], str):
+                            parameters = json.loads(data['parameters_json'])
+                        else:
+                            parameters = data['parameters_json']
                         param_errors = self._validate_parameters_against_method(method, parameters)
                         if param_errors:
                             errors['parameters_json'] = param_errors
-                    except json.JSONDecodeError:
+                    except (json.JSONDecodeError, TypeError):
                         pass  # Already handled above
         
         # Validate entity ID exists

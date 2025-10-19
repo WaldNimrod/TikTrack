@@ -101,36 +101,44 @@ class AdvancedButtonSystem {
     // Entity color mapping
     static ENTITY_COLOR_MAP = {
         'trade_plan': { 
-            color: 'entityTradePlanColor', 
-            hover: 'entityTradePlanColorDark' 
+            color: 'entity-trade-plan-color', 
+            hover: 'entity-trade-plan-color' 
         },
         'trade': { 
-            color: 'entityTradeColor', 
-            hover: 'entityTradeColorDark' 
+            color: 'entity-trade-color', 
+            hover: 'entity-trade-color' 
         },
         'alert': { 
-            color: 'entityAlertColor', 
-            hover: 'entityAlertColorDark' 
+            color: 'entity-alert-color', 
+            hover: 'entity-alert-color' 
         },
         'note': { 
-            color: 'entityNoteColor', 
-            hover: 'entityNoteColorDark' 
+            color: 'entity-note-color', 
+            hover: 'entity-note-color' 
         },
-        'trading_account': { 
-            color: 'entityTradingAccountColor', 
-            hover: 'entityTradingAccountColorDark' 
+        'account': { 
+            color: 'entity-trading-account-color', 
+            hover: 'entity-trading-account-color' 
         },
         'ticker': { 
-            color: 'entityTickerColor', 
-            hover: 'entityTickerColorDark' 
+            color: 'entity-ticker-color', 
+            hover: 'entity-ticker-color' 
         },
         'execution': { 
-            color: 'entityExecutionColor', 
-            hover: 'entityExecutionColorDark' 
+            color: 'entity-execution-color', 
+            hover: 'entity-execution-color' 
         },
         'cash_flow': { 
-            color: 'entityCashFlowColor', 
-            hover: 'entityCashFlowColorDark' 
+            color: 'entity-cash-flow-color', 
+            hover: 'entity-cash-flow-color' 
+        },
+        'chart': { 
+            color: 'entity-trade-color', 
+            hover: 'entity-trade-color' 
+        },
+        'reminder': { 
+            color: 'entity-note-color', 
+            hover: 'entity-note-color' 
         }
     };
 
@@ -478,6 +486,19 @@ window.updateButton = (buttonId, type, onClick, classes = '', attributes = '', t
 
 window.getButtonSystemStats = () => {
     return window.advancedButtonSystem.getStats();
+};
+
+// Initialize Button System function
+window.initializeButtonSystem = async () => {
+    try {
+        console.log('🔘 Button System: Initializing...');
+        await window.advancedButtonSystem.initialize();
+        console.log('🔘 Button System: Initialized successfully');
+        return true;
+    } catch (error) {
+        console.error('🔘 Button System: Initialization failed:', error);
+        return false;
+    }
 };
 
 // DOM ready handler

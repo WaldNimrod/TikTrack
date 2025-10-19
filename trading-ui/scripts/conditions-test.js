@@ -56,6 +56,7 @@ class ConditionsTestManager {
                 method: 'PUT',
                 testData: {
                     id: null, // Will be set dynamically
+                    method_id: 1,
                     parameters_json: {
                         ma_period: 100,
                         ma_type: 'EMA'
@@ -74,12 +75,14 @@ class ConditionsTestManager {
             'create-alert': {
                 name: 'יצירת התראה מתנאי',
                 description: 'יצירת התראה מתנאי קיים',
-                apiEndpoint: '/api/alerts/from_condition',
+                apiEndpoint: '/api/alerts',
                 method: 'POST',
                 testData: {
-                    condition_id: null, // Will be set dynamically
-                    alert_type: 'notification',
-                    message: 'Test alert from condition'
+                    related_id: null, // Will be set dynamically (condition ID)
+                    message: 'Test alert from condition',
+                    condition_attribute: 'price',
+                    condition_operator: 'more_than',
+                    condition_number: '0'
                 }
             },
             'inheritance-test': {
@@ -273,32 +276,72 @@ class ConditionsTestManager {
             }
             
             if (testId === 'edit-condition' || testId === 'delete-condition') {
-                // Get condition ID from previous test
+                // Get condition ID from previous test or create a new one
                 const createResult = this.testResults['create-condition'];
                 if (createResult && createResult.data && createResult.data.id) {
                     testData.id = createResult.data.id;
                 } else {
-                    throw new Error('לא נמצא ID של תנאי לעריכה/מחיקה');
+                    // Create a new condition first
+                    await this.logWithUnifiedSystem('info', '🔧 Creating condition for edit/delete test...', 'development');
+                    const createTest = this.tests['create-condition'];
+                    const createTestData = { ...createTest.testData };
+                    
+                    // Setup trade plan ID if needed
+                    if (createTest.requiresSetup && createTest.setupFunction === 'getTradePlanId') {
+                        const tradePlanId = await this.getTradePlanId();
+                        createTestData.trade_plan_id = tradePlanId;
+                    }
+                    
+                    const createResponse = await this.makeApiCall(createTest.apiEndpoint, createTest.method, createTestData);
+                    if (createResponse && createResponse.data && createResponse.data.id) {
+                        testData.id = createResponse.data.id;
+                        await this.logWithUnifiedSystem('info', `🔧 Created condition with ID: ${testData.id}`, 'development');
+                    } else {
+                        throw new Error('לא הצלחנו ליצור תנאי לעריכה/מחיקה');
+                    }
                 }
             }
 
             if (testId === 'create-alert') {
-                // Get condition ID from previous test
-                const createResult = this.testResults['create-condition'];
-                if (createResult && createResult.data && createResult.data.id) {
-                    testData.condition_id = createResult.data.id;
-                } else {
-                    throw new Error('לא נמצא ID של תנאי ליצירת התראה');
+               // Get condition ID from previous test or create a new one
+               const createResult = this.testResults['create-condition'];
+               if (createResult && createResult.data && createResult.data.id) {
+                   testData.related_id = createResult.data.id;
+               } else {
+                    // Create a new condition first
+                    await this.logWithUnifiedSystem('info', '🔧 Creating condition for alert test...', 'development');
+                    const createTest = this.tests['create-condition'];
+                    const createTestData = { ...createTest.testData };
+                    
+                    // Setup trade plan ID if needed
+                    if (createTest.requiresSetup && createTest.setupFunction === 'getTradePlanId') {
+                        const tradePlanId = await this.getTradePlanId();
+                        createTestData.trade_plan_id = tradePlanId;
+                    }
+                    
+                   const createResponse = await this.makeApiCall(createTest.apiEndpoint, createTest.method, createTestData);
+                   if (createResponse && createResponse.data && createResponse.data.id) {
+                       testData.related_id = createResponse.data.id;
+                       await this.logWithUnifiedSystem('info', `🔧 Created condition with ID: ${testData.related_id}`, 'development');
+                   } else {
+                       throw new Error('לא הצלחנו ליצור תנאי ליצירת התראה');
+                   }
                 }
             }
 
+            // Build final endpoint with ID if needed
+            let finalEndpoint = test.apiEndpoint;
+            if ((testId === 'edit-condition' || testId === 'delete-condition') && testData.id) {
+                finalEndpoint = `${test.apiEndpoint}/${testData.id}`;
+            }
+
             // Make API call
-            await this.logWithUnifiedSystem('info', `📡 API Call: ${test.method} ${test.apiEndpoint}`, 'development');
+            await this.logWithUnifiedSystem('info', `📡 API Call: ${test.method} ${finalEndpoint}`, 'development');
             if (testData && Object.keys(testData).length > 0) {
                 await this.logWithUnifiedSystem('info', `📝 Test Data:`, 'development', testData);
             }
 
-            const response = await this.makeApiCall(test.apiEndpoint, test.method, testData, test.queryParams);
+            const response = await this.makeApiCall(finalEndpoint, test.method, testData, test.queryParams);
             
             // Calculate duration
             this.testResults[testId].endTime = Date.now();

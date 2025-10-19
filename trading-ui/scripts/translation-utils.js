@@ -880,3 +880,8 @@ function getConditionOperatorOptions() {
     { value: 'equals', label: 'שווה' },
   ];
 }
+
+// ===== GLOBAL EXPORT =====
+
+// Export main translation function
+window.translateStatus = translateAccountStatus;

@@ -386,8 +386,9 @@ class ActionsMenuSystem {
         const triggerRect = trigger.getBoundingClientRect();
         
         // מיקום התפריט מימין לכפתור (לכיוון מרכז הטבלה)
-        popup.style.top = `${triggerRect.top}px`;
-        popup.style.left = `${triggerRect.right + 8}px`;
+        // מיקום קרוב מאוד לכפתור ועוד יותר גבוה
+        popup.style.top = `${triggerRect.top - 12}px`; // 12px יותר גבוה (במקום 8px)
+        popup.style.left = `${triggerRect.right - 2}px`; // 2px חופף לכפתור (במקום 1px)
     }
 
     /**

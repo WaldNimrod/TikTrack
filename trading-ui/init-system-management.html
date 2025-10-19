@@ -8,6 +8,87 @@
     <link rel="stylesheet" href="styles-new/master.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        .pages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .page-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .page-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .page-header {
+            background: #f8f9fa;
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-header h5 {
+            margin: 0;
+            color: #333;
+        }
+        
+        .page-id {
+            background: #26baac;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-family: monospace;
+        }
+        
+        .page-body {
+            padding: 15px;
+        }
+        
+        .page-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        
+        .info-item strong {
+            color: #26baac;
+            min-width: 120px;
+        }
+        
+        .mapping-summary {
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            .pages-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+        }
+    </style>
 </head>
 
 <body class="init-system-page">
@@ -29,6 +110,21 @@
                             <div class="status-loading">
                                 <i class="fas fa-spinner fa-spin"></i>
                                 טוען סטטוס מערכת...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- מיפוי עמודים -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2>🗺️ מיפוי עמודים במערכת</h2>
+                    </div>
+                    <div class="section-body">
+                        <div id="pagesMapping" class="pages-mapping">
+                            <div class="text-center">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                טוען מיפוי עמודים...
                             </div>
                         </div>
                     </div>

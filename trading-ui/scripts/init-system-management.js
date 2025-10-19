@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         // Load initial data
         await loadSystemStatus();
         await loadPackagesList();
+        await loadPagesMapping();
         await loadPerformanceReport();
         loadPackagesCheckboxes();
         
@@ -106,6 +107,100 @@ async function loadSystemStatus() {
             <div class="alert alert-danger">
                 <i class="fas fa-exclamation-triangle"></i>
                 שגיאה בטעינת סטטוס מערכת: ${error.message}
+            </div>
+        `;
+    }
+}
+
+/**
+ * Load pages mapping
+ */
+async function loadPagesMapping() {
+    const mappingContainer = document.getElementById('pagesMapping');
+    
+    try {
+        if (!window.PAGE_CONFIGS) {
+            mappingContainer.innerHTML = `
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    PAGE_CONFIGS לא זמין
+                </div>
+            `;
+            return;
+        }
+        
+        const pages = Object.entries(window.PAGE_CONFIGS);
+        let mappingHTML = `
+            <div class="pages-grid">
+        `;
+        
+        pages.forEach(([pageId, config]) => {
+            const packagesList = config.packages?.map(pkg => {
+                const pkgInfo = window.PACKAGE_MANIFEST?.[pkg];
+                return pkgInfo ? `${pkgInfo.name} (${pkg})` : pkg;
+            }).join(', ') || 'אין חבילות';
+            
+            const globalsList = config.requiredGlobals?.join(', ') || 'אין globals';
+            
+            mappingHTML += `
+                <div class="page-card">
+                    <div class="page-header">
+                        <h5>${config.name || pageId}</h5>
+                        <span class="page-id">${pageId}</span>
+                    </div>
+                    <div class="page-body">
+                        <div class="page-info">
+                            <div class="info-item">
+                                <strong>תיאור:</strong> ${config.description || 'ללא תיאור'}
+                            </div>
+                            <div class="info-item">
+                                <strong>סוג עמוד:</strong> ${config.pageType || 'standard'}
+                            </div>
+                            <div class="info-item">
+                                <strong>חבילות:</strong> ${packagesList}
+                            </div>
+                            <div class="info-item">
+                                <strong>Globals נדרשים:</strong> ${globalsList}
+                            </div>
+                            <div class="info-item">
+                                <strong>דורש פילטרים:</strong> ${config.requiresFilters ? 'כן' : 'לא'}
+                            </div>
+                            <div class="info-item">
+                                <strong>דורש ולידציה:</strong> ${config.requiresValidation ? 'כן' : 'לא'}
+                            </div>
+                            <div class="info-item">
+                                <strong>דורש טבלאות:</strong> ${config.requiresTables ? 'כן' : 'לא'}
+                            </div>
+                            <div class="info-item">
+                                <strong>אתחולים מותאמים:</strong> ${config.customInitializers?.length || 0}
+                            </div>
+                            <div class="info-item">
+                                <strong>עודכן לאחרונה:</strong> ${config.lastModified || 'לא ידוע'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        mappingHTML += `
+            </div>
+            <div class="mapping-summary mt-3">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    סה"כ <strong>${pages.length}</strong> עמודים מוגדרים במערכת
+                </div>
+            </div>
+        `;
+        
+        mappingContainer.innerHTML = mappingHTML;
+        
+    } catch (error) {
+        console.error('❌ Failed to load pages mapping:', error);
+        mappingContainer.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle"></i>
+                שגיאה בטעינת מיפוי עמודים: ${error.message}
             </div>
         `;
     }

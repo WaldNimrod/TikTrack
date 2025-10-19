@@ -362,20 +362,6 @@
         if (window.unifiedAppInitializer) {
             window.unifiedAppInitializer.initialize();
         }
-        
-        // Manual ActionsMenuSystem initialization for testing
-        if (window.ActionsMenuSystem && !window.actionsMenuSystem) {
-            console.log('🔧 Manual ActionsMenuSystem initialization for cash_flows page');
-            window.actionsMenuSystem = new window.ActionsMenuSystem();
-        }
-        
-        // Ensure createActionsMenu function is available
-        if (!window.createActionsMenu && window.actionsMenuSystem) {
-            window.createActionsMenu = function(buttons) {
-                return window.actionsMenuSystem.createActionsMenu(buttons);
-            };
-            console.log('🔧 Manual createActionsMenu function created for cash_flows page');
-        }
     </script>
 </body>
 </html>

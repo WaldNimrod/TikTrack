@@ -381,6 +381,8 @@ window.createActionsMenu = function(buttons) {
 // DOMContentLoaded listener הוסר לטובת מערכת האתחול המאוחדת
 window.ActionsMenuSystem = ActionsMenuSystem;
 
-// יצירת instance גלובלי אחרי שהקלאס מוגדר
-window.actionsMenuSystem = new ActionsMenuSystem();
+// יצירת instance גלובלי אחרי שהקלאס מוגדר - רק אם עדיין לא קיים
+if (!window.actionsMenuSystem) {
+    window.actionsMenuSystem = new ActionsMenuSystem();
+}
 

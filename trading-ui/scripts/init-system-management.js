@@ -730,8 +730,8 @@ function escapeHtml(text) {
  * Show notification
  */
 function showNotification(message, type = 'info') {
-    if (typeof window.showNotification === 'function') {
-        window.showNotification(message, type);
+    if (typeof window.NotificationSystem !== 'undefined' && window.NotificationSystem.showNotification) {
+        window.NotificationSystem.showNotification(message, type);
     } else {
         console.log(`${type.toUpperCase()}: ${message}`);
     }

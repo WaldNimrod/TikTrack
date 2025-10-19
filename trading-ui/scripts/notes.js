@@ -662,6 +662,11 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
         <td data-date='${note.created_at}'>${date}</td>
         <td>${attachmentDisplay}</td>
         <td class='actions-cell' onclick='event.stopPropagation();'>
+          ${window.createActionsMenu ? window.createActionsMenu([
+            { type: 'LINK', onclick: `window.showLinkedItemsModal && window.showLinkedItemsModal([], "note", ${note.id})`, title: 'צפה בפריטים מקושרים' },
+            { type: 'EDIT', onclick: `editNote("${note.id}")`, title: 'ערוך הערה' },
+            { type: 'DELETE', onclick: `deleteNote("${note.id}")`, title: 'מחק הערה' }
+          ]) : `
           <button data-button-type="LINK" data-variant="small" 
             data-onclick='window.showLinkedItemsModal && window.showLinkedItemsModal([], "note", ${note.id})' 
             data-text="" title='צפה בפריטים מקושרים'>
@@ -674,6 +679,7 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
             data-onclick='deleteNote("${note.id}")' 
             data-text="" title='מחק הערה'>
           </button>
+          `}
         </td>
       </tr>
     `;

@@ -79,9 +79,15 @@ function updateChartsList() {
                     </div>
                 </div>
                 <div class="chart-actions">
+                    ${window.createActionsMenu ? window.createActionsMenu([
+                      { type: 'REFRESH', onclick: `refreshChart(${index})`, title: 'רענן' },
+                      { type: 'EXPORT', onclick: `exportChart(${index})`, title: 'ייצא' },
+                      { type: 'DELETE', onclick: `destroyChart(${index})`, title: 'מחק' }
+                    ]) : `
                     <button data-button-type="REFRESH" data-variant="small" data-onclick="refreshChart(${index})" data-text="" title="רענן"></button>
                     <button data-button-type="EXPORT" data-variant="small" data-onclick="exportChart(${index})" data-text="" title="ייצא"></button>
                     <button data-button-type="DELETE" data-variant="small" data-onclick="destroyChart(${index})" data-text="" title="מחק"></button>
+                    `}
                 </div>
             </div>
         `;

@@ -538,6 +538,12 @@ class UnifiedAppInitializer {
             await window.initializeButtonSystem();
         }
         
+        // Initialize Actions Menu System (Table Actions)
+        if (typeof window.actionsMenuSystem !== 'undefined') {
+            // Actions Menu System is already initialized when loaded
+            console.log('✅ Actions Menu System ready');
+        }
+        
         // Initialize page-specific systems
         if (config.requiresFilters && this.availableSystems.has('pageFilters')) {
             await window.initializePageFilters(config.name);

@@ -607,3 +607,148 @@ def create_bulk_trade_conditions():
             'error': str(e),
             'timestamp': datetime.now().isoformat()
         }), 500
+
+@trade_conditions_bp.route('/<int:condition_id>/evaluate', methods=['POST'])
+def evaluate_condition(condition_id):
+    """Evaluate a single trade condition"""
+    try:
+        # Get database session
+        db_session = next(get_db())
+        
+        try:
+            # Get condition with relationships
+            condition = db_session.query(TradeCondition).filter(
+                TradeCondition.id == condition_id
+            ).first()
+            
+            if not condition:
+                return jsonify({
+                    'status': 'error',
+                    'message': f'Trade condition with ID {condition_id} not found',
+                    'error_code': 'CONDITION_NOT_FOUND'
+                }), 404
+            
+            # Import and use ConditionEvaluator
+            from services.condition_evaluator import ConditionEvaluator
+            evaluator = ConditionEvaluator(db_session)
+            
+            # Evaluate condition
+            result = evaluator.evaluate_condition(condition)
+            
+            return jsonify({
+                'status': 'success',
+                'data': result,
+                'message': 'Condition evaluated successfully',
+                'timestamp': datetime.now().isoformat()
+            }), 200
+            
+        except Exception as e:
+            raise e
+        finally:
+            db_session.close()
+            
+    except Exception as e:
+        logger.error(f"Error evaluating condition {condition_id}: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': f'Error evaluating condition: {str(e)}',
+            'error_code': 'EVALUATION_ERROR'
+        }), 500
+
+@trade_conditions_bp.route('/evaluate-all', methods=['POST'])
+def evaluate_all_conditions():
+    """Evaluate all active trade conditions"""
+    try:
+        # Get database session
+        db_session = next(get_db())
+        
+        try:
+            # Import and use ConditionEvaluator
+            from services.condition_evaluator import ConditionEvaluator
+            evaluator = ConditionEvaluator(db_session)
+            
+            # Evaluate all active conditions
+            results = evaluator.evaluate_all_active_conditions()
+            
+            # Filter only trade conditions
+            trade_results = [r for r in results if r.get('condition_type') == 'trade']
+            
+            return jsonify({
+                'status': 'success',
+                'data': trade_results,
+                'count': len(trade_results),
+                'message': f'{len(trade_results)} trade conditions evaluated',
+                'timestamp': datetime.now().isoformat()
+            }), 200
+            
+        except Exception as e:
+            raise e
+        finally:
+            db_session.close()
+            
+    except Exception as e:
+        logger.error(f"Error evaluating all conditions: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': f'Error evaluating all conditions: {str(e)}',
+            'error_code': 'EVALUATION_ERROR'
+        }), 500
+
+@trade_conditions_bp.route('/<int:condition_id>/evaluation-history', methods=['GET'])
+def get_evaluation_history(condition_id):
+    """Get evaluation history for a condition (from alerts)"""
+    try:
+        # Get database session
+        db_session = next(get_db())
+        
+        try:
+            # Check if condition exists
+            condition = db_session.query(TradeCondition).filter(
+                TradeCondition.id == condition_id
+            ).first()
+            
+            if not condition:
+                return jsonify({
+                    'status': 'error',
+                    'message': f'Trade condition with ID {condition_id} not found',
+                    'error_code': 'CONDITION_NOT_FOUND'
+                }), 404
+            
+            # Get alerts related to this condition
+            from models.alert import Alert
+            alerts = db_session.query(Alert).filter(
+                Alert.related_id == condition_id
+            ).order_by(Alert.triggered_at.desc()).limit(50).all()
+            
+            # Convert to evaluation history format
+            history = []
+            for alert in alerts:
+                if alert.triggered_at:  # Only include triggered alerts
+                    history.append({
+                        'evaluation_time': alert.triggered_at.isoformat(),
+                        'condition_met': True,
+                        'alert_id': alert.id,
+                        'message': alert.message,
+                        'price': float(alert.condition_number) if alert.condition_number else 0
+                    })
+            
+            return jsonify({
+                'status': 'success',
+                'data': history,
+                'count': len(history),
+                'message': f'Found {len(history)} evaluation records',
+                'timestamp': datetime.now().isoformat()
+            }), 200
+            
+        except Exception as e:
+            raise e
+        finally:
+            db_session.close()
+            
+    except Exception as e:
+        logger.error(f"Error getting evaluation history for condition {condition_id}: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': f'Error getting evaluation history: {str(e)}',
+            'error_code': 'HISTORY_ERROR'
+        }), 500

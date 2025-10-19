@@ -199,8 +199,13 @@ class ConditionBuilder {
                     <div class="condition-operator">${this.getTranslation(`conditions.logical.${condition.logical_operator.toLowerCase()}`)}</div>
                 </div>
                 <div class="condition-actions">
+                    ${window.createActionsMenu ? window.createActionsMenu([
+                      { type: 'EDIT', onclick: `editCondition(${index})`, title: 'ערוך' },
+                      { type: 'DELETE', onclick: `deleteCondition(${index})`, title: 'מחק' }
+                    ]) : `
                     <button data-button-type="EDIT" data-variant="small" data-index="${index}" data-text="" title="ערוך"></button>
                     <button data-button-type="DELETE" data-variant="small" data-index="${index}" data-text="" title="מחק"></button>
+                    `}
                 </div>
             </div>
         `).join('');

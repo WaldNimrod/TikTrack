@@ -24,8 +24,11 @@ from typing import Dict, Any, List, Optional, Tuple
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, desc, func
 
-from models.plan_condition import PlanCondition
-from models.trade_condition import TradeCondition
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
+
+from models.plan_condition import PlanCondition, TradeCondition
 from models.external_data import MarketDataQuote
 from models.trading_method import TradingMethod
 from models.ticker import Ticker

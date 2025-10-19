@@ -264,7 +264,12 @@ function createActionsHTML(row, tableType) {
     return '<span class="text-muted">-</span>';
   }
 
-  return `
+  const buttons = [
+    { type: 'EDIT', onclick: `editRecord('${tableType}', ${recordId})`, title: 'ערוך' },
+    { type: 'DELETE', onclick: `deleteRecord('${tableType}', ${recordId})`, title: 'מחק' }
+  ];
+  
+  return window.createActionsMenu ? window.createActionsMenu(buttons) : `
     <div class="action-buttons">
       <button data-button-type="EDIT" data-variant="small" data-onclick="editRecord('${tableType}', ${recordId})" data-text="" title="ערוך"></button>
       <button data-button-type="DELETE" data-variant="small" data-onclick="deleteRecord('${tableType}', ${recordId})" data-text="" title="מחק"></button>

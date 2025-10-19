@@ -1883,6 +1883,11 @@ function updateTickersTable(tickers) {
                         ${ticker.yahoo_updated_at ? getTimeDuration(ticker.yahoo_updated_at) : 'N/A'}
                     </td>
                     <td class="actions-cell">
+                        ${window.createActionsMenu ? window.createActionsMenu([
+                          { type: 'LINK', onclick: `viewLinkedItemsForTicker(${ticker.id})`, title: 'פריטים מקושרים' },
+                          { type: 'EDIT', onclick: `editTicker(${ticker.id})`, title: 'ערוך' },
+                          { type: ticker.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `window.${ticker.status === 'cancelled' ? 'reactivate' : 'cancel'}Ticker(${ticker.id})`, title: ticker.status === 'cancelled' ? 'הפעל מחדש טיקר' : 'בטל טיקר' }
+                        ]) : `
                         <div class="btn-group btn-group-sm" role="group">
                             <button data-button-type="LINK" data-variant="small" 
                                     data-onclick="viewLinkedItemsForTicker(${ticker.id})" 
@@ -1899,6 +1904,7 @@ function updateTickersTable(tickers) {
              data-text="" title="בטל טיקר"></button>`
                             }
                         </div>
+                        `}
                     </td>
                 </tr>
             `;

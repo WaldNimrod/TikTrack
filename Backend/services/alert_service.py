@@ -11,6 +11,10 @@ logger = logging.getLogger(__name__)
 class AlertService:
     """Service for managing alerts"""
     
+    def __init__(self, db: Session):
+        """Initialize AlertService with database session"""
+        self.db = db
+    
     @staticmethod
     def get_all(db: Session) -> List[Alert]:
         """Get all alerts"""
@@ -79,6 +83,10 @@ class AlertService:
             db.rollback()
             logger.error(f"שגיאה ביצירת התראה: {e}")
             raise
+    
+    def create_alert(self, alert_data: Dict[str, Any]) -> Alert:
+        """Create a new alert (instance method for compatibility with condition evaluation)"""
+        return self.create(self.db, alert_data)
     
     @staticmethod
     def update(db: Session, alert_id: int, alert_data: Dict[str, Any]) -> Alert:

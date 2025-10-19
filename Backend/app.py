@@ -248,6 +248,14 @@ def debug_log():
         app.logger.info(f"DEBUG: {data['message']}")
     return jsonify({"status": "ok"})
 
+# Register condition evaluation task
+try:
+    from services.condition_evaluation_task import register_condition_evaluation_task
+    register_condition_evaluation_task(background_task_manager)
+    logger.info("✅ Condition evaluation task registered successfully")
+except Exception as e:
+    logger.error(f"❌ Failed to register condition evaluation task: {e}")
+
 # Start background task scheduler automatically
 try:
     logger.info("🚀 Starting background task scheduler...")
@@ -1849,13 +1857,13 @@ if __name__ == "__main__":
     # - Notification system works without WebSockets
     
     print("🚀 Starting TikTrack Server...")
-    print("📡 Server running on port 8080")
+    print("📡 Server running on port 5000")
     print("✅ All systems operational")
     
     # Run with standard Flask
     app.run(
         host='127.0.0.1',
-        port=8080,
+        port=5000,
         debug=DEVELOPMENT_MODE,
         use_reloader=False  # Disable auto-reload to prevent issues
     )

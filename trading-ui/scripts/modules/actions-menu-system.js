@@ -221,6 +221,14 @@ window.debugActionsMenuOverflow = () => {
 
 console.log('✅ ActionsMenuSystem: debugActionsMenu מוגדרת וזמינה');
 
+// יצירת instance גלובלי
+window.actionsMenuSystem = new ActionsMenuSystem();
+
+// פונקציה גלובלית ליצירת תפריט פעולות
+window.createActionsMenu = function(buttons) {
+    return window.actionsMenuSystem.createActionsMenu(buttons);
+};
+
 class ActionsMenuSystem {
     constructor() {
         this.init();
@@ -235,6 +243,7 @@ class ActionsMenuSystem {
         (window.consoleCleanup?.debug || console.log)('   → CSS-based hover (no JavaScript delays)');
         (window.consoleCleanup?.debug || console.log)('   → RTL aware positioning');
         (window.consoleCleanup?.debug || console.log)('   → Supports 2-5 buttons dynamically');
+        (window.consoleCleanup?.debug || console.log)('   → Integrated with new button system');
         
         // מערכת פשוטה - הכל נעשה ב-CSS עם :hover
         // ה-JavaScript רק למקרים מיוחדים (אם צריך positioning דינמי)
@@ -247,6 +256,34 @@ class ActionsMenuSystem {
         this.initAccessibility();
         this.attachLinkedItemsDebugLogger();
         this.attachZIndexDebugLogger();
+    }
+
+    /**
+     * Convert regular action buttons to dropdown menu
+     * @param {HTMLElement} actionsCell - The actions cell containing buttons
+     * @returns {string} - HTML for the dropdown menu
+     */
+    createActionsMenu(buttons) {
+        if (!buttons || buttons.length === 0) return '';
+        
+        const menuButtons = buttons.map(button => {
+            const buttonType = button.getAttribute('data-button-type') || 'BUTTON';
+            const variant = button.getAttribute('data-variant') || 'small';
+            const onclick = button.getAttribute('data-onclick') || '';
+            const text = button.getAttribute('data-text') || '';
+            const title = button.getAttribute('title') || '';
+            
+            return `<button data-button-type="${buttonType}" data-variant="${variant}" data-onclick="${onclick}" data-text="${text}" title="${title}"></button>`;
+        }).join('');
+        
+        return `
+            <div class="actions-menu-wrapper">
+                <button class="btn-icon actions-trigger" title="פעולות">⋮</button>
+                <div class="actions-menu-popup">
+                    ${menuButtons}
+                </div>
+            </div>
+        `;
     }
     
     /**

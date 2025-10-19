@@ -111,6 +111,24 @@ class ConditionsTestManager {
                         ma_type: 'SMA'
                     }
                 }
+            },
+            'evaluate-single': {
+                name: 'הערכת תנאי יחיד',
+                description: 'הערכת תנאי בודד מול נתוני שוק',
+                apiEndpoint: '/api/plan-conditions/1/evaluate',
+                method: 'POST'
+            },
+            'evaluate-all': {
+                name: 'הערכת כל התנאים',
+                description: 'הערכת כל התנאים הפעילים במערכת',
+                apiEndpoint: '/api/plan-conditions/evaluate-all',
+                method: 'POST'
+            },
+            'alert-auto-generation': {
+                name: 'יצירת התראות אוטומטית',
+                description: 'בדיקת יצירת התראות אוטומטית מתנאים',
+                apiEndpoint: '/api/plan-conditions/1/evaluate',
+                method: 'POST'
             }
         };
     }
@@ -305,13 +323,16 @@ class ConditionsTestManager {
         
         // Get test number based on testId
         const testNumbers = {
-            'load-methods': '1',
+            'load-methods': '1', 
             'create-condition': '2', 
             'read-conditions': '3',
             'edit-condition': '4',
             'delete-condition': '5',
             'create-alert': '6',
-            'inheritance-test': '7'
+            'inheritance-test': '7',
+            'evaluate-single': '8',
+            'evaluate-all': '9',
+            'alert-auto-generation': '10'
         };
         
         const testNumber = testNumbers[testId] || '1';
@@ -407,7 +428,50 @@ class ConditionsTestManager {
                 await this.logWithUnifiedSystem('info', `📝 Test Data:`, 'development', testData);
             }
 
-            const response = await this.makeApiCall(finalEndpoint, test.method, testData, test.queryParams);
+            // Special handling for evaluation tests
+            let response;
+            if (testId === 'evaluate-single') {
+                await this.logWithUnifiedSystem('info', `🔍 Evaluating single condition (ID: 1)...`, 'development');
+                response = await this.makeApiCall(finalEndpoint, test.method, testData, test.queryParams);
+                
+                if (response.data) {
+                    const evalResult = response.data;
+                    await this.logWithUnifiedSystem('info', `📊 Evaluation Result:`, 'development', {
+                        condition_met: evalResult.met,
+                        method: evalResult.method_name,
+                        current_price: evalResult.current_price,
+                        details: evalResult.details
+                    });
+                }
+            } else if (testId === 'evaluate-all') {
+                await this.logWithUnifiedSystem('info', `🔍 Evaluating all active conditions...`, 'development');
+                response = await this.makeApiCall(finalEndpoint, test.method, testData, test.queryParams);
+                
+                if (response.data) {
+                    const results = response.data;
+                    const metCount = results.filter(r => r.met).length;
+                    await this.logWithUnifiedSystem('info', `📊 Bulk Evaluation Results:`, 'development', {
+                        total_conditions: results.length,
+                        conditions_met: metCount,
+                        conditions_not_met: results.length - metCount
+                    });
+                }
+            } else if (testId === 'alert-auto-generation') {
+                await this.logWithUnifiedSystem('info', `🔍 Testing alert auto-generation...`, 'development');
+                response = await this.makeApiCall(finalEndpoint, test.method, testData, test.queryParams);
+                
+                if (response.data) {
+                    const evalResult = response.data;
+                    await this.logWithUnifiedSystem('info', `📊 Alert Generation Test:`, 'development', {
+                        condition_met: evalResult.met,
+                        method: evalResult.method_name,
+                        current_price: evalResult.current_price,
+                        alert_should_be_created: evalResult.met
+                    });
+                }
+            } else {
+                response = await this.makeApiCall(finalEndpoint, test.method, testData, test.queryParams);
+            }
             
             // Calculate duration
             this.testResults[testId].endTime = Date.now();
@@ -540,7 +604,10 @@ class ConditionsTestManager {
             'edit-condition': 4,
             'delete-condition': 5,
             'create-alert': 6,
-            'inheritance-test': 7
+            'inheritance-test': 7,
+            'evaluate-single': 8,
+            'evaluate-all': 9,
+            'alert-auto-generation': 10
         };
         return testNumbers[testId] || '?';
     }
@@ -954,6 +1021,17 @@ class ConditionsUIManager {
             refreshBtn.addEventListener('click', () => this.loadConditions());
         }
 
+        // Evaluation controls
+        const evaluateAllBtn = document.getElementById('evaluateAllBtn');
+        if (evaluateAllBtn) {
+            evaluateAllBtn.addEventListener('click', () => this.evaluateAllConditions());
+        }
+
+        const refreshEvaluationsBtn = document.getElementById('refreshEvaluationsBtn');
+        if (refreshEvaluationsBtn) {
+            refreshEvaluationsBtn.addEventListener('click', () => this.refreshEvaluations());
+        }
+
         // Form buttons
         const saveBtn = document.getElementById('saveConditionBtn');
         if (saveBtn) {
@@ -1361,6 +1439,152 @@ class ConditionsUIManager {
             console.error('❌ Failed to create alert:', error);
             alert('שגיאה ביצירת התראה');
         }
+    }
+
+    /**
+     * Evaluate all conditions in the UI demo
+     */
+    async evaluateAllConditions() {
+        try {
+            await this.logWithUnifiedSystem('info', '🔍 Starting bulk evaluation of all conditions...', 'development');
+            
+            const response = await this.makeApiCall('/api/plan-conditions/evaluate-all', 'POST');
+            
+            if (response.data) {
+                const results = response.data;
+                const metCount = results.filter(r => r.met).length;
+                
+                await this.logWithUnifiedSystem('info', `📊 Bulk evaluation completed:`, 'development', {
+                    total_conditions: results.length,
+                    conditions_met: metCount,
+                    conditions_not_met: results.length - metCount
+                });
+                
+                // Update the conditions list with evaluation results
+                this.updateConditionsWithEvaluations(results);
+                
+                // Show notification
+                if (window.showNotificationSmart) {
+                    window.showNotificationSmart(`הערכה הושלמה: ${metCount}/${results.length} תנאים התקיימו`, 'success');
+                }
+            }
+        } catch (error) {
+            console.error('❌ Failed to evaluate all conditions:', error);
+            await this.logWithUnifiedSystem('error', `❌ Failed to evaluate all conditions: ${error.message}`, 'system');
+        }
+    }
+
+    /**
+     * Refresh evaluations for all conditions
+     */
+    async refreshEvaluations() {
+        try {
+            await this.logWithUnifiedSystem('info', '🔄 Refreshing condition evaluations...', 'development');
+            
+            // Reload conditions to get fresh evaluation data
+            await this.loadConditions();
+            
+            if (window.showNotificationSmart) {
+                window.showNotificationSmart('הערכות התנאים רוענו', 'info');
+            }
+        } catch (error) {
+            console.error('❌ Failed to refresh evaluations:', error);
+            await this.logWithUnifiedSystem('error', `❌ Failed to refresh evaluations: ${error.message}`, 'system');
+        }
+    }
+
+    /**
+     * Update conditions list with evaluation results
+     */
+    updateConditionsWithEvaluations(evaluationResults) {
+        const conditionsListBody = document.getElementById('conditionsListBody');
+        if (!conditionsListBody) return;
+
+        // Create a map of condition_id to evaluation result
+        const evaluationMap = {};
+        evaluationResults.forEach(result => {
+            evaluationMap[result.condition_id] = result;
+        });
+
+        // Update each condition item with evaluation status
+        const conditionItems = conditionsListBody.querySelectorAll('.condition-item');
+        conditionItems.forEach(item => {
+            const conditionId = item.dataset.conditionId;
+            const evaluation = evaluationMap[conditionId];
+            
+            if (evaluation) {
+                // Add evaluation status indicator
+                let statusIndicator = item.querySelector('.evaluation-status');
+                if (!statusIndicator) {
+                    statusIndicator = document.createElement('div');
+                    statusIndicator.className = 'evaluation-status';
+                    item.appendChild(statusIndicator);
+                }
+                
+                statusIndicator.innerHTML = `
+                    <div class="evaluation-result ${evaluation.met ? 'met' : 'not-met'}">
+                        <i class="fas fa-${evaluation.met ? 'check-circle text-success' : 'times-circle text-danger'}"></i>
+                        <span>${evaluation.met ? 'התקיים' : 'לא התקיים'}</span>
+                        <small>${evaluation.current_price ? `מחיר: ${evaluation.current_price}` : ''}</small>
+                    </div>
+                `;
+            }
+        });
+    }
+
+    /**
+     * Evaluate a single condition
+     */
+    async evaluateSingleCondition(conditionId) {
+        try {
+            await this.logWithUnifiedSystem('info', `🔍 Evaluating condition ${conditionId}...`, 'development');
+            
+            const response = await this.makeApiCall(`/api/plan-conditions/${conditionId}/evaluate`, 'POST');
+            
+            if (response.data) {
+                const result = response.data;
+                await this.logWithUnifiedSystem('info', `📊 Condition ${conditionId} evaluation:`, 'development', {
+                    condition_met: result.met,
+                    method: result.method_name,
+                    current_price: result.current_price,
+                    details: result.details
+                });
+                
+                // Update the specific condition item
+                this.updateSingleConditionEvaluation(conditionId, result);
+                
+                return result;
+            }
+        } catch (error) {
+            console.error(`❌ Failed to evaluate condition ${conditionId}:`, error);
+            await this.logWithUnifiedSystem('error', `❌ Failed to evaluate condition ${conditionId}: ${error.message}`, 'system');
+        }
+    }
+
+    /**
+     * Update a single condition with evaluation result
+     */
+    updateSingleConditionEvaluation(conditionId, evaluation) {
+        const conditionItem = document.querySelector(`[data-condition-id="${conditionId}"]`);
+        if (!conditionItem) return;
+
+        let statusIndicator = conditionItem.querySelector('.evaluation-status');
+        if (!statusIndicator) {
+            statusIndicator = document.createElement('div');
+            statusIndicator.className = 'evaluation-status';
+            conditionItem.appendChild(statusIndicator);
+        }
+        
+        statusIndicator.innerHTML = `
+            <div class="evaluation-result ${evaluation.met ? 'met' : 'not-met'}">
+                <i class="fas fa-${evaluation.met ? 'check-circle text-success' : 'times-circle text-danger'}"></i>
+                <span>${evaluation.met ? 'התקיים' : 'לא התקיים'}</span>
+                <small>${evaluation.current_price ? `מחיר: ${evaluation.current_price}` : ''}</small>
+                <button class="btn btn-xs btn-outline-primary" onclick="window.conditionsTestManager.evaluateSingleCondition(${conditionId})">
+                    <i class="fas fa-sync"></i>
+                </button>
+            </div>
+        `;
     }
 }
 

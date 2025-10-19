@@ -25,6 +25,7 @@ class PlanCondition(BaseModel):
     
     # Status
     is_active = Column(Boolean, default=True, nullable=False)
+    auto_generate_alerts = Column(Boolean, default=True, nullable=False)
     
     # Timestamps
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
@@ -45,6 +46,7 @@ class PlanCondition(BaseModel):
             'parameters_json': self.parameters_json,
             'logical_operator': self.logical_operator,
             'is_active': self.is_active,
+            'auto_generate_alerts': self.auto_generate_alerts,
             'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S') if self.created_at else None,
             'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S') if self.updated_at else None
         }
@@ -150,6 +152,7 @@ class TradeCondition(BaseModel):
     
     # Status
     is_active = Column(Boolean, default=True, nullable=False)
+    auto_generate_alerts = Column(Boolean, default=True, nullable=False)
     
     # Timestamps
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
@@ -171,6 +174,7 @@ class TradeCondition(BaseModel):
             'parameters_json': self.parameters_json,
             'logical_operator': self.logical_operator,
             'is_active': self.is_active,
+            'auto_generate_alerts': self.auto_generate_alerts,
             'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S') if self.created_at else None,
             'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S') if self.updated_at else None
         }

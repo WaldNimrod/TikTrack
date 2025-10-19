@@ -257,6 +257,54 @@
                                 <span class="test-duration" id="duration-7"></span>
                             </div>
                         </div>
+
+                        <!-- Test 8: Evaluate Single Condition -->
+                        <div class="test-item" data-test="evaluate-single">
+                            <div class="test-item-header">
+                                <span class="test-number">8</span>
+                                <span class="test-name">הערכת תנאי יחיד</span>
+                                <span class="test-status" id="status-8">⚪</span>
+                            </div>
+                            <div class="test-item-controls">
+                                <button class="btn btn-sm btn-primary run-test-btn" data-test="evaluate-single">
+                                    <i class="fas fa-play"></i>
+                                    Run Test
+                                </button>
+                                <span class="test-duration" id="duration-8"></span>
+                            </div>
+                        </div>
+
+                        <!-- Test 9: Evaluate All Conditions -->
+                        <div class="test-item" data-test="evaluate-all">
+                            <div class="test-item-header">
+                                <span class="test-number">9</span>
+                                <span class="test-name">הערכת כל התנאים</span>
+                                <span class="test-status" id="status-9">⚪</span>
+                            </div>
+                            <div class="test-item-controls">
+                                <button class="btn btn-sm btn-primary run-test-btn" data-test="evaluate-all">
+                                    <i class="fas fa-play"></i>
+                                    Run Test
+                                </button>
+                                <span class="test-duration" id="duration-9"></span>
+                            </div>
+                        </div>
+
+                        <!-- Test 10: Alert Auto-Generation -->
+                        <div class="test-item" data-test="alert-auto-generation">
+                            <div class="test-item-header">
+                                <span class="test-number">10</span>
+                                <span class="test-name">יצירת התראות אוטומטית</span>
+                                <span class="test-status" id="status-10">⚪</span>
+                            </div>
+                            <div class="test-item-controls">
+                                <button class="btn btn-sm btn-primary run-test-btn" data-test="alert-auto-generation">
+                                    <i class="fas fa-play"></i>
+                                    Run Test
+                                </button>
+                                <span class="test-duration" id="duration-10"></span>
+                            </div>
+                        </div>
                     </div>
 
                     </div>
@@ -377,6 +425,16 @@
                             <div class="conditions-list" id="conditionsList">
                                 <div class="conditions-list-header">
                                     <h4>רשימת תנאים</h4>
+                                    <div class="evaluation-controls">
+                                        <button class="btn btn-sm btn-info" id="evaluateAllBtn">
+                                            <i class="fas fa-calculator"></i>
+                                            הערך הכל
+                                        </button>
+                                        <button class="btn btn-sm btn-warning" id="refreshEvaluationsBtn">
+                                            <i class="fas fa-sync"></i>
+                                            רענן הערכות
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="conditions-list-body" id="conditionsListBody">
                                     <div class="text-center p-3 text-muted">
@@ -462,6 +520,7 @@
     <script src="scripts/date-utils.js?v=1.0.0"></script>
     <script src="scripts/button-icons.min.js?v=1.0.0"></script>
     <script src="scripts/button-system-init.js"></script>
+    <script src="scripts/modules/actions-menu-system.js?v=1.0.0"></script>
     <script src="scripts/tables.js?v=1.0.0"></script>
     <script src="scripts/table-mappings.js?v=1.0.0"></script>
     <script src="scripts/page-utils.js?v=1.0.0"></script>
@@ -501,6 +560,14 @@
             padding: 15px;
             border-bottom: 1px solid #dee2e6;
             background: #f8f9fa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .evaluation-controls {
+            display: flex;
+            gap: 8px;
         }
 
         .conditions-list-header h4 {
@@ -522,11 +589,42 @@
             border-radius: 4px;
             background: #fff;
             transition: all 0.2s;
+            position: relative;
         }
 
         .condition-item:hover {
             border-color: #29a6a8;
             box-shadow: 0 2px 4px rgba(41, 166, 168, 0.1);
+        }
+
+        .evaluation-status {
+            margin-top: 8px;
+        }
+
+        .evaluation-result {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .evaluation-result.met {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .evaluation-result.not-met {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .evaluation-result small {
+            font-size: 10px;
+            opacity: 0.8;
         }
 
         .condition-item-header {

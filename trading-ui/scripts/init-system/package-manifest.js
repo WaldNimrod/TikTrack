@@ -101,6 +101,12 @@ const PACKAGE_MANIFEST = {
         globalCheck: 'window.HeaderSystem',
         description: 'מערכת header',
         required: true
+      },
+      {
+        file: 'preferences.js',
+        globalCheck: 'window.getCurrentPreference',
+        description: 'מערכת העדפות',
+        required: true
       }
     ],
     estimatedSize: '~280KB',

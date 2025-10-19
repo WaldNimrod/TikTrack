@@ -412,5 +412,8 @@ window.createActionsMenu = function(buttons) {
 window.ActionsMenuSystem = ActionsMenuSystem;
 
 // יצירת instance גלובלי אחרי שהקלאס מוגדר - רק אם עדיין לא קיים
-// הוסר האתחול האוטומטי - יטופל על ידי מערכת האיתחול המרכזית
+if (!window.actionsMenuSystem) {
+    window.actionsMenuSystem = new ActionsMenuSystem();
+    console.log('🔧 ActionsMenuSystem: Instance created and ready');
+}
 

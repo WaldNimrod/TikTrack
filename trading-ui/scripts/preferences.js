@@ -2170,3 +2170,6 @@ if (typeof module !== 'undefined' && module.exports) {
         checkForPreferencesUpdates: window.checkForPreferencesUpdates
     };
 }
+
+// Alias for compatibility with package manifest
+window.getCurrentPreference = window.getPreference;

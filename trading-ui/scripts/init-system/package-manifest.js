@@ -79,6 +79,12 @@ const PACKAGE_MANIFEST = {
         required: true
       },
       {
+        file: 'button-icons.js',
+        globalCheck: 'window.BUTTON_ICONS',
+        description: 'מערכת איקונים וכפתורים',
+        required: true
+      },
+      {
         file: 'button-system-init.js',
         globalCheck: 'window.ButtonSystem',
         description: 'מערכת כפתורים',

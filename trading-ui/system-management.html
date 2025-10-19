@@ -274,8 +274,8 @@
                 </div>
                 <!-- UI Content Section Cursor Tasks End-->
 
-                <!-- UI Content Section 1 Start-->
-                <div class="content-section" id="section1">
+                <!-- Section 1: Dashboard Overview -->
+                <div class="content-section" id="sm-dashboard">
                     <div class="section-header">
                         <h2>📊 סקירה כללית</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
@@ -293,8 +293,8 @@
                 </div>
                 <!-- UI Content Section 1 End -->  
 
-                <!-- UI Content Section 2 Start-->
-                <div class="content-section" id="section2">
+                <!-- Section 2: Server Management -->
+                <div class="content-section" id="sm-server">
                     <div class="section-header">
                         <h2>🌐 נתונים חיצוניים</h2>
                         <div class="header-actions">
@@ -347,7 +347,8 @@
                 <!-- UI Content Section 3 End--> 
 
                 <!-- UI Content Section 4 Start-->
-                <div class="content-section" id="section3">
+                <!-- Section 3: Cache Management -->
+                <div class="content-section" id="sm-cache">
                     <div class="section-header entity-test-sub-header">
                         <h2>🚨 התראות מערכת</h2>
                         <div class="header-actions">
@@ -400,7 +401,8 @@
                 <!-- UI Content Section 4 End--> 
 
                 <!-- UI Content Section 5 Start-->
-                <div class="content-section" id="section4">
+                <!-- Section 4: External Data -->
+                <div class="content-section" id="sm-external-data">
                     <div class="section-header entity-test-sub-header">
                         <h2>🔒 אבטחה</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
@@ -475,7 +477,8 @@
                 <!-- UI Content Section 5 End--> 
 
                 <!-- UI Content Section 6 Start-->
-                <div class="content-section" id="section5">
+                <!-- Section 5: Database -->
+                <div class="content-section" id="sm-database">
                     <div class="section-header entity-test-sub-header">
                         <h2>📋 לוגים וניטור</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section5')" title="הצג/הסתר סקשן">
@@ -530,7 +533,8 @@
                 <!-- UI Content Section 6 End--> 
 
                 <!-- UI Content Section 7 Start-->
-                <div class="content-section" id="section6">
+                <!-- Section 6: Alerts -->
+                <div class="content-section" id="sm-alerts">
                     <div class="section-header entity-test-sub-header">
                         <h2>💾 גיבויים ושחזור</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section6')" title="הצג/הסתר סקשן">
@@ -629,7 +633,8 @@
                 <!-- UI Content Section 7 End--> 
 
                 <!-- UI Content Section 7 Start - Initialization System Monitoring -->
-                <div class="content-section" id="section7">
+                <!-- Section 7: Background Tasks -->
+                <div class="content-section" id="sm-background-tasks">
                     <div class="section-header entity-test-sub-header">
                         <h2>🚀 מערכת אתחול חכמה - ניטור ופיתוח</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section7')" title="הצג/הסתר סקשן">
@@ -863,24 +868,7 @@
     <!-- Core System Scripts -->
     <!-- 🔄 NEW UNIFIED INITIALIZATION SYSTEM -->
     
-    <!-- System Management Core Scripts -->
-    <script src="scripts/system-management/core/sm-base.js"></script>
-    <script src="scripts/system-management/core/sm-error-handler.js"></script>
-    <script src="scripts/system-management/core/sm-ui-components.js"></script>
-    
-    <!-- System Management Sections -->
-    <script src="scripts/system-management/sections/sm-section-dashboard.js"></script>
-    <script src="scripts/system-management/sections/sm-section-server.js"></script>
-    <script src="scripts/system-management/sections/sm-section-cache.js"></script>
-    <script src="scripts/system-management/sections/sm-section-external-data.js"></script>
-    <script src="scripts/system-management/sections/sm-section-database.js"></script>
-    <script src="scripts/system-management/sections/sm-section-alerts.js"></script>
-    <script src="scripts/system-management/sections/sm-section-background-tasks.js"></script>
-    <script src="scripts/system-management/sections/sm-section-operations.js"></script>
-    <script src="scripts/system-management/sections/sm-section-performance.js"></script>
-    
-    <!-- System Management Main Orchestrator -->
-    <script src="scripts/system-management/system-management-main.js"></script>
+    <!-- System Management Scripts - Loaded via Unified System -->
     
     <!-- Core Systems -->
     <script src="scripts/global-favicon.js"></script>
@@ -918,22 +906,11 @@
     <script src="scripts/unified-log-api.js"></script>
     
     <!-- New Unified Initialization System -->
+    <script src="scripts/init-system/package-manifest.js"></script>
     <script src="scripts/page-initialization-configs.js"></script>
     <script src="scripts/unified-app-initializer.js"></script>
     
-    <!-- Smart Initialization System Components -->
-    <script src="scripts/init-package-registry.js"></script>
-    <script src="scripts/init-dependency-graph.js"></script>
-    <script src="scripts/init-page-templates.js"></script>
-    <script src="scripts/init-feedback-system.js"></script>
-    <script src="scripts/smart-app-initializer.js"></script>
-    <script src="scripts/smart-script-loader.js"></script>
-    <script src="scripts/smart-page-configs.js"></script>
-    <script src="scripts/init-performance-optimizer.js"></script>
-    <script src="scripts/init-advanced-cache.js"></script>
-    <script src="scripts/init-testing-system.js"></script>
-    <script src="scripts/init-validator.js"></script>
-    <script src="scripts/init-cli.js"></script>
+    <!-- Smart Initialization System Components - Removed missing scripts -->
 
     <!-- 🔓 TEMPLATE ZONE 6 - Page-Specific Scripts (ADD NEW SCRIPTS HERE) -->
     <!-- No manual DOMContentLoaded listener needed - handled by unified system -->

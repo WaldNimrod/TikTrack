@@ -472,16 +472,16 @@ window.getAvailableLogTypes = function() {
 // document.addEventListener('DOMContentLoaded', async function() {
 //     // Wait for unified initialization system
 //     if (window.UnifiedAppInitializer) {
-        // API will be initialized when needed
-        console.log('📊 UnifiedLogAPI ready for initialization');
-    } else {
-        // Fallback initialization
-        try {
-            await window.UnifiedLogAPI.initialize();
-        } catch (error) {
-            console.warn('⚠️ Failed to initialize UnifiedLogAPI:', error);
-        }
-    }
+//         // API will be initialized when needed
+//         console.log('📊 UnifiedLogAPI ready for initialization');
+//     } else {
+//         // Fallback initialization
+//         try {
+//             await window.UnifiedLogAPI.initialize();
+//         } catch (error) {
+//             console.warn('⚠️ Failed to initialize UnifiedLogAPI:', error);
+//         }
+//     }
 // });
 
 // Export for module systems

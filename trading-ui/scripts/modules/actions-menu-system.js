@@ -295,7 +295,7 @@ class ActionsMenuSystem {
                 default: icon = '⚙️'; break;
             }
             
-            return `<button class="btn btn-sm" data-button-type="${buttonType}" onclick="${onclick}" title="${title}">${icon} ${text}</button>`;
+            return `<button class="btn" data-variant="small" data-button-type="${buttonType}" onclick="${onclick}" title="${title}">${icon}</button>`;
         }).join('');
         
         return `

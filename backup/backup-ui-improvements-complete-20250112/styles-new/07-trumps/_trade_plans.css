@@ -1,0 +1,25 @@
+
+/* MIME Type: text/css */
+/**
+ * Trade Plans - Page-specific Column Widths
+ * 
+ * @version 1.0.0
+ * @created January 12, 2025
+ * @purpose Column width definitions for trade_plans table (10 columns)
+ */
+
+/* ===== Trade Plans Table Column Widths ===== */
+
+.trade-plans-table .col-ticker { width: 10%; min-width: 80px; }     /* 1. טיקר */
+.trade-plans-table .col-price { width: 8%; min-width: 70px; }       /* 2. מחיר */
+.trade-plans-table .col-date { width: 10%; min-width: 90px; }       /* 3. תאריך */
+.trade-plans-table .col-type { width: 8%; min-width: 70px; }        /* 4. סוג */
+.trade-plans-table .col-side { width: 7%; min-width: 60px; }        /* 5. צד */
+.trade-plans-table .col-quantity { width: 9%; min-width: 75px; }    /* 6. כמות */
+.trade-plans-table .col-amount { width: 10%; min-width: 85px; }     /* 7. השקעה */
+.trade-plans-table .col-status { width: 8%; min-width: 70px; }      /* 8. סטטוס */
+.trade-plans-table .col-risk-reward { width: 18%; min-width: 150px; } /* 9. סיכוי/סיכון */
+.trade-plans-table .col-actions { width: 12%; min-width: 145px; }   /* 10. פעולות */
+
+/* Total: 100% */
+

@@ -1,0 +1,7 @@
+{
+  "version": "migration_20251013_120000",
+  "name": "entity_relation_types_bridge_view_and_triggers",
+  "sql_up": "\n-- Create bridge VIEW to provide new generic name without breaking existing FKs\nCREATE VIEW IF NOT EXISTS entity_relation_types AS\nSELECT id, note_relation_type AS relation_type, created_at\nFROM note_relation_types;\n\n-- INSERT trigger to redirect writes to base table\nCREATE TRIGGER IF NOT EXISTS trg_entity_relation_types_insert\nINSTEAD OF INSERT ON entity_relation_types\nBEGIN\n  INSERT INTO note_relation_types (note_relation_type, created_at)\n  VALUES (NEW.relation_type, COALESCE(NEW.created_at, datetime('now')));\nEND;\n\n-- UPDATE trigger to redirect writes to base table\nCREATE TRIGGER IF NOT EXISTS trg_entity_relation_types_update\nINSTEAD OF UPDATE ON entity_relation_types\nBEGIN\n  UPDATE note_relation_types\n  SET note_relation_type = NEW.relation_type\n  WHERE id = OLD.id;\nEND;\n\n-- DELETE trigger to redirect writes to base table\nCREATE TRIGGER IF NOT EXISTS trg_entity_relation_types_delete\nINSTEAD OF DELETE ON entity_relation_types\nBEGIN\n  DELETE FROM note_relation_types\n  WHERE id = OLD.id;\nEND;\n",
+  "sql_down": "\nDROP TRIGGER IF EXISTS trg_entity_relation_types_delete;\nDROP TRIGGER IF EXISTS trg_entity_relation_types_update;\nDROP TRIGGER IF EXISTS trg_entity_relation_types_insert;\nDROP VIEW IF EXISTS entity_relation_types;\n"
+}
+

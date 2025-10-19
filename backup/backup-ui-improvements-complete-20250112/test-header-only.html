@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>בדיקת מערכת ראש הדף - TikTrack</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    
+    <!-- ITCSS Architecture - Individual Files -->
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=20251011">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=20251011">
+    
+    <!-- Header Styles -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.1">
+    <link rel="stylesheet" href="styles-new/06-components/_page-headers.css?v=20251011">
+    
+</head>
+
+<body class="test-header-only">
+    <!-- Header System - Created automatically by header-system.js -->
+    <div id="unified-header"></div>
+    
+    <!-- Page Content -->
+    <div class="background-wrapper">
+        <div class="page-body">
+            <div class="main-content">
+                
+                <!-- ===== CONTENT SECTIONS START ===== -->
+                
+                <!-- Top Section Start -->
+                <div class="top-section" id="topSection" data-section="top">
+                    <div class="section-header">
+                        <h1>🔧 בדיקת מערכת ראש הדף</h1>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="window.toggleSection('top')" title="הצג/הסתר סקשן">
+                                <span class="filter-icon">▲</span>
+                        </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="row g-3">
+                            <!-- Card 1: Filter System -->
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header bg-primary text-white">
+                                        <h5 class="mb-0">🔍 מערכת פילטרים</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="mb-2"><strong>סטטוס:</strong> <span id="filterSystemStatus">טוען...</span></p>
+                                        <p class="mb-0"><strong>טבלאות:</strong> <span id="registeredTablesCount">0</span></p>
+                                        <hr>
+                                        <small class="text-muted">שנה פילטרים בראש הדף ובדוק שהטבלאות מגיבות</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card 2: Tables Info -->
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header bg-success text-white">
+                                        <h5 class="mb-0">📊 טבלאות</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="mb-2"><strong>תכנוני טריידים:</strong> <span id="tradePlansRows">0</span> שורות</p>
+                                        <p class="mb-0"><strong>ביצועים:</strong> <span id="executionsRows">0</span> שורות</p>
+                                        <hr>
+                                        <small class="text-muted">שורות גלויות / סה"כ</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                            <!-- Card 3: Performance -->
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header bg-info text-white">
+                                        <h5 class="mb-0">⚡ ביצועים</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="mb-2"><strong>זמן טעינה:</strong> <span id="loadTime">טוען...</span></p>
+                                        <p class="mb-0"><strong>Header נטען:</strong> <span id="headerLoadTime">~150ms</span></p>
+                                        <hr>
+                                        <small class="text-muted">מדידת זמני אתחול</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Top Section End -->
+
+                <!-- UI Content Section 1 Start -->
+                <div class="content-section" id="section1" data-section="trade-plans">
+                    <div class="section-header entity-test-sub-header">
+                        <h2>📋 תכנוני טריידים</h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="window.toggleSection('section1')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-responsive" id="tradePlansContainer">
+                            <table id="tradePlansTable" class="data-table" data-table-type="trade_plans">
+                                                <thead>
+                                                    <tr>
+                                        <th class="col-ticker">טיקר</th>
+                                        <th class="col-date">תאריך</th>
+                                        <th class="col-type">סוג</th>
+                                        <th class="col-side">צד</th>
+                                        <th class="col-quantity">כמות</th>
+                                        <th class="col-price">מחיר</th>
+                                        <th class="col-investment">השקעה</th>
+                                        <th class="col-status">סטטוס</th>
+                                        <th class="col-profit">רווח</th>
+                                        <th class="col-account">חשבון</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tradePlansTableBody">
+                                    <!-- Data loaded via JavaScript -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 1 End -->   
+
+                <!-- UI Content Section 2 Start -->
+                <div class="content-section" id="section2" data-section="executions">
+                    <div class="section-header entity-test-sub-header">
+                        <h2>📊 ביצועים</h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="window.toggleSection('section2')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-responsive" id="executionsContainer">
+                            <table id="executionsTable" class="data-table" data-table-type="executions">
+                                <thead>
+                                    <tr>
+                                        <th class="col-ticker">טיקר</th>
+                                        <th class="col-action">פעולה</th>
+                                        <th class="col-account">חשבון</th>
+                                        <th class="col-quantity">כמות</th>
+                                        <th class="col-price">מחיר</th>
+                                        <th class="col-pnl">P&L</th>
+                                        <th class="col-execution-date">תאריך ביצוע</th>
+                                        <th class="col-source">מקור</th>
+                                        <th class="col-status">סטטוס</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="executionsTableBody">
+                                    <!-- Data loaded via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 2 End -->
+
+                <!-- ===== CONTENT SECTIONS END ===== -->
+
+            </div>
+            <!-- ===== END MAIN CONTENT ===== -->
+        </div>
+        <!-- ===== END PAGE BODY ===== -->
+    </div>
+    <!-- ===== END BACKGROUND WRAPPER ===== -->
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- ===== STATIC LOADING SYSTEM - Template 3: Development Pages ===== -->
+    
+    <!-- Stage 1: Core Modules (8) - ALWAYS REQUIRED -->
+    <script src="scripts/modules/core-systems.js?v=20251011"></script>
+    <script src="scripts/modules/ui-basic.js?v=20251011"></script>
+    <script src="scripts/modules/data-basic.js?v=20251011"></script>
+    <script src="scripts/modules/ui-advanced.js?v=20251011"></script>
+    <script src="scripts/modules/data-advanced.js?v=20251011"></script>
+    <script src="scripts/modules/business-module.js?v=20251011"></script>
+    <script src="scripts/modules/communication-module.js?v=20251011"></script>
+    <script src="scripts/modules/cache-module.js?v=20251011"></script>
+    
+    <!-- Stage 2: Core Utilities (3) - ALWAYS REQUIRED -->
+    <script src="scripts/global-favicon.js?v=20251011"></script>
+    <script src="scripts/page-utils.js?v=20251011"></script>
+    <script src="scripts/header-system.js?v=v6.0.1"></script>
+    
+    <!-- Stage 3: Service Systems - Translation and Rendering -->
+    <script src="scripts/services/data-collection-service.js?v=1.0.0"></script>
+    <script src="scripts/services/field-renderer-service.js?v=1.0.0"></script>
+    <script src="scripts/services/select-populator-service.js?v=1.0.0"></script>
+    
+    <!-- Stage 5: Page-Specific Script -->
+    <script src="scripts/test-header-only.js?v=4.0.0"></script>
+
+</body>
+</html>

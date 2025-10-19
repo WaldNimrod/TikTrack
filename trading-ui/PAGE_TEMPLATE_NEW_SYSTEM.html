@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Favicon will be set by global-favicon.js -->
+    <title>[PAGE_TITLE] - TikTrack</title>
+    
+    <!-- 
+    ===== IMPORTANT DEVELOPMENT RULES =====
+    
+    CSS RULES:
+    - Only external CSS files are used, following the system's CSS architecture
+    - NO inline styles or styles within the page are allowed in this system
+    - All styling must be defined in external stylesheets according to ITCSS methodology
+    
+    JAVASCRIPT RULES:
+    - All functions are located in external files
+    - NO functions are allowed within the page
+    - All system functions use shared global functions located in dedicated files
+    - Page-specific functions should be centralized only in the page's dedicated script file
+    
+    ======================================
+    -->
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=2fba6e8_20251013_051239" rel="stylesheet" crossorigin="anonymous">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css?v=2fba6e8_20251013_051239">
+    
+    <!-- CSS Files - אחרי Bootstrap כדי לדרוס אותו -->
+    <!-- ITCSS Architecture - Individual Files (September 2025) -->
+    <!-- 🔄 MAJOR ARCHITECTURE CHANGE - September 2025: Individual <link> tags instead of @import -->
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=2fba6e8_20251013_051239">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=2fba6e8_20251013_051239">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=2fba6e8_20251013_051239">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=2fba6e8_20251013_051239">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=2fba6e8_20251013_051239">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=2fba6e8_20251013_051239">
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=2fba6e8_20251013_051239">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=2fba6e8_20251013_051239">
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=2fba6e8_20251013_051239">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=2fba6e8_20251013_051239">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=2fba6e8_20251013_051239">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=2fba6e8_20251013_051239">
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=2fba6e8_20251013_051239">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=2fba6e8_20251013_051239">
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=2fba6e8_20251013_051239">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=2fba6e8_20251013_051239">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=2fba6e8_20251013_051239">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=2fba6e8_20251013_051239">
+    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=2fba6e8_20251013_051239">
+    <link rel="stylesheet" href="styles-new/06-components/_unified-log-display.css?v=2fba6e8_20251013_051239">
+    <link rel="stylesheet" href="styles-new/06-components/_pagination-system.css?v=2fba6e8_20251013_051239">
+    <link rel="stylesheet" href="styles-new/06-components/_system-management.css?v=2fba6e8_20251013_051239">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=2fba6e8_20251013_051239">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=2fba6e8_20251013_051239">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=2fba6e8_20251013_051239">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=2fba6e8_20251013_051239">
+    
+    <!-- Page Headers - Development pages with white background -->
+    <link rel="stylesheet" href="styles-new/06-components/_page-headers.css?v=2fba6e8_20251013_051239">
+    
+    <!-- Dynamic Color System Scripts -->
+    
+</head>
+
+<body>
+    <div class="background-wrapper">
+        <!-- 🔒 LOCKED TEMPLATE ZONE 1 - Header & Navigation (DO NOT MODIFY) -->
+        <div id="unified-header"></div>
+
+        <!-- 🔒 LOCKED TEMPLATE ZONE 2 - Main Content Container (DO NOT MODIFY) -->
+        <div class="page-body">
+            <!-- Main content limited in width -->
+            <div class="main-content">
+                <!-- 🔓 TEMPLATE ZONE 3 - Page Content (EDITABLE) -->
+                <!-- UI Content Section Top Start-->
+                <div class="top-section" data-section="top">
+                    <div class="section-header">
+                        <h1>[PAGE_TITLE]</h1>
+                        <div class="header-actions">
+                            <button class="btn btn-sm btn-outline-primary" onclick="[ACTION_FUNCTION]()">
+                                <i class="fas fa-sync-alt"></i> רענן
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר סקשן">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- Page content goes here -->
+                        <p>תוכן העמוד יכנס כאן...</p>
+                    </div>
+                </div>
+                <!-- UI Content Section Top End -->
+                
+                <!-- Additional sections can be added here -->
+                
+                <!-- 🔓 TEMPLATE ZONE 4 - End of Page Content (EDITABLE) -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js?v=2fba6e8_20251013_051239"></script>
+
+    <!-- מערכת כללית חדשה - 8 מודולים מאוחדים -->
+    
+    <!-- Load the new general systems architecture -->
+    <script src="scripts/modules/core-systems.js?v=2fba6e8_20251013_051239"></script>
+    <script src="scripts/modules/ui-basic.js?v=2fba6e8_20251013_051239"></script>
+    <script src="scripts/modules/data-basic.js?v=2fba6e8_20251013_051239"></script>
+    <script src="scripts/modules/ui-advanced.js?v=2fba6e8_20251013_051239"></script>
+    <script src="scripts/modules/data-advanced.js?v=2fba6e8_20251013_051239"></script>
+    <script src="scripts/modules/business-module.js?v=2fba6e8_20251013_051239"></script>
+    <script src="scripts/modules/communication-module.js?v=2fba6e8_20251013_051239"></script>
+    
+    <!-- Polling System for Cache Auto-Invalidation (Option B-Lite) -->
+    <script src="scripts/modules/polling-manager.js?v=2fba6e8_20251013_051239"></script>
+    <script src="scripts/modules/localstorage-sync.js?v=2fba6e8_20251013_051239"></script>
+    
+    <script src="scripts/modules/cache-module.js?v=2fba6e8_20251013_051239"></script>
+    
+    <!-- Page Initialization Configurations -->
+    <script src="scripts/page-initialization-configs.js?v=2fba6e8_20251013_051239"></script>
+    
+    <!-- Global Systems -->
+    <script src="scripts/global-favicon.js?v=2fba6e8_20251013_051239"></script>
+    <script src="scripts/translation-utils.js?v=2fba6e8_20251013_051239"></script>
+    <script src="scripts/header-system.js?v=2fba6e8_20251013_051239"></script>
+    <script src="scripts/date-utils.js?v=2fba6e8_20251013_051239"></script>
+    <script src="scripts/button-icons.js?v=2fba6e8_20251013_051239"></script>
+    <!-- Preferences System v2 (must load before services using getPreference) -->
+    <script src="scripts/preferences-core.js?v=2fba6e8_20251013_051239"></script>
+    <script src="scripts/page-utils.js?v=2fba6e8_20251013_051239"></script>
+    <script src="scripts/notification-category-detector.js?v=2fba6e8_20251013_051239"></script>
+    <script src="scripts/global-notification-collector.js?v=2fba6e8_20251013_051239"></script>
+    <script src="scripts/entity-details-modal.js?v=2fba6e8_20251013_051239"></script>
+    <script src="scripts/warning-system.js?v=2fba6e8_20251013_051239"></script>
+    
+    <!-- Page-specific Script -->
+    <script src="scripts/[PAGE_NAME].js?v=2fba6e8_20251013_051239"></script>
+
+    <!-- 🔓 TEMPLATE ZONE 5 - Page-Specific Scripts (ADD NEW SCRIPTS HERE) -->
+    <!-- No manual DOMContentLoaded listener needed - handled by unified system -->
+</body>
+</html>

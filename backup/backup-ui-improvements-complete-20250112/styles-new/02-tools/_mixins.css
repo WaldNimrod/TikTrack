@@ -1,0 +1,197 @@
+
+
+/* MIME Type: text/css */
+/**
+ * Mixins - מיקסינים
+ * 
+ * קובץ זה מכיל מיקסינים (mixins) לשימוש חוזר במערכת
+ * מבוסס על דפוסי עיצוב נפוצים במערכת TikTrack
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 6, 2025
+ */
+
+/* ===== מיקסינים בסיסיים ===== */
+
+/* מיקסין לכפתורים */
+@mixin button-base {
+  display: inline-block;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  border: 1px solid transparent;
+  border-radius: var(--apple-radius-small);
+  transition: all 0.2s ease;
+}
+
+/* מיקסין לכרטיסים */
+@mixin card-base {
+  background: var(--apple-bg-primary);
+  border: 1px solid var(--apple-border-light);
+  border-radius: var(--apple-radius-medium);
+  box-shadow: var(--apple-shadow-light);
+  padding: var(--apple-spacing-lg);
+  margin-bottom: var(--apple-spacing-md);
+}
+
+/* מיקסין לטבלאות */
+@mixin table-base {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-family: var(--font-family-primary);
+  direction: rtl;
+}
+
+/* מיקסין למודלים */
+@mixin modal-base {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000000000;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* מיקסין להתראות */
+@mixin notification-base {
+  background: var(--apple-bg-primary);
+  border: 1px solid var(--apple-border-light);
+  border-radius: var(--apple-radius-medium);
+  padding: var(--apple-spacing-md);
+  box-shadow: var(--apple-shadow-medium);
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--apple-spacing-sm);
+}
+
+/* ===== מיקסינים מתקדמים ===== */
+
+/* מיקסין לרספונסיביות */
+@mixin responsive($breakpoint) {
+  @if $breakpoint == mobile {
+    @media (max-width: 768px) { @content; }
+  }
+  @if $breakpoint == tablet {
+    @media (max-width: 1024px) { @content; }
+  }
+  @if $breakpoint == desktop {
+    @media (min-width: 1025px) { @content; }
+  }
+}
+
+/* מיקסין לאנימציות */
+@mixin fade-in($duration: 0.3s) {
+  opacity: 0;
+  animation: fadeIn $duration ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* מיקסין לצללים */
+@mixin shadow($type: light) {
+  @if $type == light {
+    box-shadow: var(--apple-shadow-light);
+  }
+  @if $type == medium {
+    box-shadow: var(--apple-shadow-medium);
+  }
+  @if $type == heavy {
+    box-shadow: var(--apple-shadow-heavy);
+  }
+}
+
+/* מיקסין לגרדיאנטים */
+@mixin gradient($color1, $color2, $direction: 135deg) {
+  background: linear-gradient($direction, $color1 0%, $color2 100%);
+}
+
+/* מיקסין לטקסט מודגש */
+@mixin text-emphasis($color: var(--logo-orange)) {
+  color: $color;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* מיקסין לכפתורי פעולה */
+@mixin action-button($type: primary) {
+  @include button-base;
+  
+  @if $type == primary {
+    background-color: var(--logo-orange);
+    color: white;
+    border-color: var(--logo-orange);
+    
+    &:hover {
+      background-color: #e68a00;
+      border-color: #e68a00;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(255, 156, 5, 0.3);
+    }
+  }
+  
+  @if $type == secondary {
+    background-color: transparent;
+    color: var(--apple-blue);
+    border-color: var(--apple-blue);
+    
+    &:hover {
+      background-color: var(--apple-blue);
+      color: white;
+    }
+  }
+  
+  @if $type == danger {
+    background-color: var(--color-danger);
+    color: white;
+    border-color: var(--color-danger);
+    
+    &:hover {
+      background-color: #c82333;
+      border-color: #c82333;
+    }
+  }
+}
+
+/* מיקסין לסטטוסים */
+@mixin status-badge($status: open) {
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--apple-radius-small);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  
+  @if $status == open {
+    background-color: color-mix(in srgb, var(--status-open-color) 10%, transparent);
+    color: var(--status-open-color);
+    border: 1px solid color-mix(in srgb, var(--status-open-color) 30%, transparent);
+  }
+  
+  @if $status == closed {
+    background-color: color-mix(in srgb, var(--status-closed-color) 10%, transparent);
+    color: var(--status-closed-color);
+    border: 1px solid color-mix(in srgb, var(--status-closed-color) 30%, transparent);
+  }
+  
+  @if $status == cancelled {
+    background-color: color-mix(in srgb, var(--status-cancelled-color) 10%, transparent);
+    color: var(--status-cancelled-color);
+    border: 1px solid color-mix(in srgb, var(--status-cancelled-color) 30%, transparent);
+  }
+}
+

@@ -1,0 +1,86 @@
+/* MIME Type: text/css */
+/**
+ * Executions Page - Column Widths
+ * 
+ * קובץ זה מכיל רוחבי עמודות ספציפיים לעמוד העסקאות
+ * 
+ * @version 1.0.0
+ * @lastUpdated October 13, 2025
+ * @page executions.html
+ * @note Exception to "no 07-trumps for regular pages" rule
+ *       Executions page has 9 columns requiring custom width definitions
+ */
+
+/* ===== Executions Table - 9 Columns Layout ===== */
+
+.data-table.executions-table .col-ticker,
+.data-table[data-table-type="executions"] .col-ticker {
+    width: 10%;
+    min-width: 80px;
+}
+
+.data-table.executions-table .col-action,
+.data-table[data-table-type="executions"] .col-action {
+    width: 8%;
+    min-width: 70px;
+}
+
+.data-table.executions-table .col-account,
+.data-table[data-table-type="executions"] .col-account {
+    width: 12%;
+    min-width: 100px;
+}
+
+.data-table.executions-table .col-quantity,
+.data-table[data-table-type="executions"] .col-quantity {
+    width: 8%;
+    min-width: 70px;
+}
+
+.data-table.executions-table .col-price,
+.data-table[data-table-type="executions"] .col-price {
+    width: 9%;
+    min-width: 80px;
+}
+
+.data-table.executions-table .col-pnl,
+.data-table[data-table-type="executions"] .col-pnl {
+    width: 9%;
+    min-width: 80px;
+}
+
+.data-table.executions-table .col-execution-date,
+.data-table[data-table-type="executions"] .col-execution-date {
+    width: 10%;
+    min-width: 90px;
+}
+
+.data-table.executions-table .col-source,
+.data-table[data-table-type="executions"] .col-source {
+    width: 8%;
+    min-width: 70px;
+}
+
+.data-table.executions-table .col-actions,
+.data-table[data-table-type="executions"] .col-actions {
+    width: var(--col-actions-percent) !important;
+    min-width: var(--col-actions-min-width) !important;
+    max-width: var(--col-actions-max-width) !important;
+}
+
+/* ===== Responsive Behavior ===== */
+
+@media (max-width: 1400px) {
+    .data-table.executions-table .col-account,
+    .data-table[data-table-type="executions"] .col-account {
+        width: 10%;
+    }
+}
+
+@media (max-width: 1200px) {
+    .data-table.executions-table,
+    .data-table[data-table-type="executions"] {
+        min-width: 1100px;
+    }
+}
+

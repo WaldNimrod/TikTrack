@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Favicon will be set by global-favicon.js -->
+    <title>תזרימי מזומנים - TikTrack</title>
+    
+    <!-- 
+    ===== CORRECTED CASH_FLOWS PAGE =====
+    
+    This page has been corrected to follow the proper architecture:
+    1. Complete ITCSS implementation
+    2. All base package systems included
+    3. Correct loading order
+    4. Scripts moved to body
+    
+    ======================================
+    -->
+    
+    
+    <!-- Bootstrap CSS - Must load first -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    
+    <!-- ITCSS Architecture - Individual Files (September 2025) -->
+    
+    <!-- 01-settings - Variables and Settings -->
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=20251010">
+    
+    <!-- 02-tools - Functions and Mixins -->
+    <link rel="stylesheet" href="styles-new/02-tools/_mixins.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/02-tools/_functions.css?v=20251010">
+    
+    <!-- 03-generic - Reset and Normalization -->
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=20251010">
+    
+    <!-- 04-elements - Basic HTML Elements -->
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=20251010">
+    
+    <!-- 05-objects - Layout Structures -->
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=20251010">
+    
+    <!-- 06-components - UI Components -->
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=20250111">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=20251010">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=20251010">
+    
+    <!-- 07-trumps - Page-specific Styles -->
+    <!-- No page-specific styles for cash_flows -->
+    
+    <!-- 08-themes - Themes -->
+    <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=20251010">
+    
+    <!-- 09-utilities - Utility Classes -->
+    <link rel="stylesheet" href="styles-new/09-utilities/_utilities.css?v=20251010">
+    
+    <!-- External Libraries -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.1">
+    
+    <!-- Page Headers - Entity-specific header colors -->
+    <link rel="stylesheet" href="styles-new/06-components/_page-headers.css?v=20251010">
+</head>
+
+<body class="cash-flows-page">
+    <!-- Header System - Created automatically by header-system.js -->
+    <div id="unified-header"></div>
+    
+    <!-- Page Content -->
+    <div class="background-wrapper">
+        <div class="page-body">
+            <!-- Cash flows area - top-Section -->
+            <div class="top-section" data-section="top">
+                <!-- Main header -->
+                <div class="section-header">
+                    <h1>
+                        <img src="images/icons/cash_flows.svg" alt="תזרימי מזומנים" class="section-icon">
+                        תזרימי מזומנים
+                    </h1>
+                    <div class="header-actions">
+                        <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים ותזרימי המזומנים">
+                            <i class="fas fa-copy"></i> העתק לוג מפורט
+                        </button>
+                        <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר אזור תזרימי מזומנים">
+                            <span class="filter-icon">▲</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Alert cards -->
+                <div class="section-body">
+                    <active-alerts></active-alerts>
+
+                    <!-- Data summary -->
+                    <div class="info-summary" id="summaryStats">
+                        <div>סה"כ תזרימים: <strong id="totalCashFlows">0</strong></div>
+                        <div>סה"כ הפקדות: <strong id="totalDeposits">$0</strong></div>
+                        <div>סה"כ משיכות: <strong id="totalWithdrawals">$0</strong></div>
+                        <div>יתרה נוכחית: <strong id="currentBalance">$0</strong></div>
+                    </div>
+                </div>
+            </div> <!-- End top-section -->
+
+            <!-- Main content -->
+            <div class="main-content">
+                <!-- Cash flows management area - content-section -->
+                <div class="content-section" id="main" data-section="main">
+                    <!-- Cash flows header -->
+                    <div class="section-header">
+                        <h2>
+                            <img src="images/icons/cash_flows.svg" alt="ניהול תזרימי מזומנים" class="section-icon">
+                            ניהול תזרימי מזומנים
+                            <span class="table-count" id="cashFlowsCount">טוען...</span>
+                        </h2>
+                        <div class="header-actions">
+                            <button id="addCashFlowBtn" class="refresh-btn" onclick="showAddCashFlowModal()" title="הוסף תזרים מזומנים חדש">
+                                <img src="images/icons/cash_flows.svg" alt="הוסף" class="action-icon">
+                                הוסף
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleSection('main')" title="הצג/הסתר אזור ניהול תזרימי מזומנים">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Cash flows table -->
+                    <div class="section-body">
+                        <div class="table-responsive" id="cashFlowsContainer">
+                            <table class="data-table" id="cashFlowsTable" data-table-type="cash_flows">
+                                <thead>
+                                    <tr>
+                                        <th class="col-account">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(0, cashFlowsData, 'cash_flows', updateCashFlowsTable); }">
+                                                חשבון <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-type">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, cashFlowsData, 'cash_flows', updateCashFlowsTable); }"
+
+                                                סוג <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-amount">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(2, cashFlowsData, 'cash_flows', updateCashFlowsTable); }"
+
+                                                סכום <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-date">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(3, cashFlowsData, 'cash_flows', updateCashFlowsTable); }"
+
+                                                תאריך <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-description">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(4, cashFlowsData, 'cash_flows', updateCashFlowsTable); }"
+
+                                                תיאור <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-source">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(5, cashFlowsData, 'cash_flows', updateCashFlowsTable); }"
+
+                                                מקור <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-actions actions-cell actions-3-btn">
+                                            פעולות
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="7" class="loading">טוען תזרימי מזומנים...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom page spacing -->
+        <div class="page-bottom-spacing"></div>
+
+        <!-- Notification system -->
+        <div class="notification-container" id="notificationContainer"></div>
+
+        <!-- Toast container for notifications -->
+        <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+        <!-- Add Cash Flow Modal -->
+        <div class="modal fade" id="addCashFlowModal" tabindex="-1" aria-labelledby="addCashFlowModalLabel" aria-hidden="true"
+            data-bs-backdrop="true" data-bs-keyboard="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content entity-cash-flow">
+                    <div class="modal-header entity-header entity-cash-flow">
+                        <h4 class="modal-title entity-title">הוספת תזרים מזומנים חדש</h4>
+                        <button type="button" class="btn-close btn-close-end" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addCashFlowForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="cashFlowType" class="form-label entity-label">סוג תזרים</label>
+                                        <select class="form-select" id="cashFlowType" required>
+                                            <option value="">בחר סוג תזרים</option>
+                                            <option value="deposit" selected>הפקדה</option>
+                                            <option value="withdrawal">משיכה</option>
+                                            <option value="transfer">העברה</option>
+                                            <option value="fee">עמלה</option>
+                                            <option value="dividend">דיבידנד</option>
+                                            <option value="interest">ריבית</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="cashFlowAmount" class="form-label entity-label">סכום</label>
+                                        <input type="number" class="form-control" id="cashFlowAmount" step="0.01" min="0" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="cashFlowCurrency" class="form-label entity-label">מטבע</label>
+                                        <select class="form-select" id="cashFlowCurrencyId" required>
+                                            <option value="">בחר מטבע</option>
+                                            <option value="1">דולר אמריקאי (USD)</option>
+                                            <option value="2">אירו (EUR)</option>
+                                            <option value="3">לירה שטרלינג (GBP)</option>
+                                            <option value="4">שקל ישראלי (ILS)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="cashFlowAccount" class="form-label entity-label">חשבון מסחר</label>
+                                        <select class="form-select" id="cashFlowAccountId" required>
+                                            <option value="">בחר חשבון</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="cashFlowDate" class="form-label entity-label">תאריך תזרים</label>
+                                        <input type="datetime-local" class="form-control" id="cashFlowDate" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="cashFlowDescription" class="form-label entity-label">תיאור</label>
+                                        <input type="text" class="form-control" id="cashFlowDescription" placeholder="תיאור התזרים">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="cashFlowUsdRate" class="form-label entity-label">שער דולר</label>
+                                        <input type="number" class="form-control" id="cashFlowUsdRate" step="0.000001" min="0" value="1.000000" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="cashFlowSource" class="form-label entity-label">מקור</label>
+                                        <select class="form-select" id="cashFlowSource">
+                                            <option value="manual" selected>ידני</option>
+                                            <option value="file_import">יבוא קובץ</option>
+                                            <option value="direct_import">יבוא ישיר</option>
+                                            <option value="api">API</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer modal-footer-end">
+                        <button type="button" class="btn btn-entity btn-entity-cash-flow" onclick="saveCashFlow()">הוסף תזרים</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Cash Flow Modal -->
+        <div class="modal fade" id="editCashFlowModal" tabindex="-1" aria-labelledby="editCashFlowModalLabel" aria-hidden="true"
+            data-bs-backdrop="true" data-bs-keyboard="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content entity-cash-flow">
+                    <div class="modal-header entity-header entity-cash-flow">
+                        <h4 class="modal-title entity-title">עריכת תזרים מזומנים</h4>
+                        <button type="button" class="btn-close btn-close-end" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editCashFlowForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editCashFlowType" class="form-label entity-label">סוג תזרים</label>
+                                        <select class="form-select" id="editCashFlowType" required>
+                                            <option value="deposit">הפקדה</option>
+                                            <option value="withdrawal">משיכה</option>
+                                            <option value="transfer">העברה</option>
+                                            <option value="fee">עמלה</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editCashFlowAmount" class="form-label entity-label">סכום</label>
+                                        <input type="number" class="form-control" id="editCashFlowAmount" step="0.01" min="0" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editCashFlowCurrency" class="form-label entity-label">מטבע</label>
+                                        <select class="form-select" id="editCashFlowCurrencyId" required>
+                                            <option value="1">דולר אמריקאי (USD)</option>
+                                            <option value="2">אירו (EUR)</option>
+                                            <option value="3">לירה שטרלינג (GBP)</option>
+                                            <option value="4">שקל ישראלי (ILS)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editCashFlowAccount" class="form-label entity-label">חשבון מסחר</label>
+                                        <select class="form-select" id="editCashFlowAccountId" required>
+                                            <option value="">בחר חשבון</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editCashFlowDate" class="form-label entity-label">תאריך תזרים</label>
+                                        <input type="datetime-local" class="form-control" id="editCashFlowDate" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editCashFlowDescription" class="form-label entity-label">תיאור</label>
+                                        <input type="text" class="form-control" id="editCashFlowDescription">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editCashFlowUsdRate" class="form-label entity-label">שער דולר</label>
+                                        <input type="number" class="form-control" id="editCashFlowUsdRate" step="0.000001" min="0" value="1.000000" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editCashFlowSource" class="form-label entity-label">מקור</label>
+                                        <select class="form-select" id="editCashFlowSource">
+                                            <option value="manual">ידני</option>
+                                            <option value="file_import">יבוא קובץ</option>
+                                            <option value="direct_import">יבוא ישיר</option>
+                                            <option value="api">API</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer modal-footer-end">
+                        <button type="button" class="btn btn-entity btn-entity-cash-flow" onclick="updateCashFlow()">עדכן תזרים</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- ===== STATIC LOADING SYSTEM - Template 1: Trading Pages ===== -->
+    
+    <!-- Stage 1: Core Modules (8) - ALWAYS REQUIRED -->
+    <script src="scripts/modules/core-systems.js?v=20251010"></script>
+    <script src="scripts/modules/ui-basic.js?v=20251010"></script>
+    <script src="scripts/modules/data-basic.js?v=20251010"></script>
+    <script src="scripts/modules/ui-advanced.js?v=20251010"></script>
+    <script src="scripts/modules/data-advanced.js?v=20251010"></script>
+    <script src="scripts/modules/business-module.js?v=20251010"></script>
+    <script src="scripts/modules/communication-module.js?v=20251010"></script>
+    <script src="scripts/modules/cache-module.js?v=20251010"></script>
+    
+    <!-- Stage 2: Core Utilities (3) - ALWAYS REQUIRED -->
+    <script src="scripts/global-favicon.js?v=20251010"></script>
+    <script src="scripts/page-utils.js?v=20251010"></script>
+    <script src="scripts/header-system.js?v=v6.0.0"></script>
+    
+    <!-- Stage 3: Common Utilities - ALL for Trading Pages -->
+    <script src="scripts/translation-utils.js?v=20251010"></script>
+    <script src="scripts/date-utils.js?v=20251010"></script>
+    <script src="scripts/linked-items.js?v=20251010"></script>
+    <script src="scripts/warning-system.js?v=20251010"></script>
+    
+    <!-- Stage 4: Services - ALL for Trading Pages -->
+    <script src="scripts/services/data-collection-service.js?v=1.0.0"></script>
+    <script src="scripts/services/field-renderer-service.js?v=1.0.0"></script>
+    <script src="scripts/services/select-populator-service.js?v=1.0.0"></script>
+    <script src="scripts/services/crud-response-handler.js?v=2.0.0"></script>
+    <script src="scripts/services/default-value-setter.js?v=1.0.0"></script>
+    <script src="scripts/services/statistics-calculator.js?v=1.0.0"></script>
+    
+    <!-- Stage 5: Page Script - REQUIRED -->
+    <script src="scripts/cash_flows.js?v=20251010"></script>
+    
+</body>
+</html>

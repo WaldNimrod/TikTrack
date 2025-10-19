@@ -156,8 +156,18 @@ class UnifiedAppInitializer {
             requiresTables: pageConfig?.requiresTables ?? this.pageInfo.requirements.tables,
             requiresCharts: this.pageInfo.requirements.charts,
             customInitializers: this.customInitializers,
-            availableSystems: Array.from(this.availableSystems)
+            availableSystems: Array.from(this.availableSystems),
+            // ← NEW: חבילות ומטאדאטה
+            packages: pageConfig?.packages || [],
+            requiredGlobals: pageConfig?.requiredGlobals || [],
+            description: pageConfig?.description || '',
+            pageType: pageConfig?.pageType || 'standard',
+            preloadAssets: pageConfig?.preloadAssets || [],
+            cacheStrategy: pageConfig?.cacheStrategy || 'standard'
         };
+        
+        // שמור את הקונפיג למעקב ביצועים
+        this.pageConfig = config;
         
         this.performanceMetrics.stageTimes.prepare = Date.now() - stageStart;
         // console.log('✅ Stage 2 Complete:', config);
@@ -169,11 +179,21 @@ class UnifiedAppInitializer {
      * Stage 3: Execute initialization
      */
     async executeInitialization(config) {
-        // console.log('🚀 Stage 3: Executing initialization...');
+        console.log('🎯 Stage 3: Executing initialization...');
         const stageStart = Date.now();
         
-        // Initialize IndexedDB first (blocking) to prevent race conditions
-        await this.initializeCacheSystem();
+        try {
+            // ← NEW: לוג חבילות
+            this.logPackageLoading(config.packages);
+            
+            // ← NEW: ולידציה
+            const validation = this.validateRequiredSystems(config);
+            if (!validation.valid) {
+                throw new Error('System validation failed');
+            }
+            
+            // Initialize IndexedDB first (blocking) to prevent race conditions
+            await this.initializeCacheSystem();
         
         // Wait longer for cache system to be fully ready
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -249,6 +269,11 @@ class UnifiedAppInitializer {
         }
         
         this.performanceMetrics.stageTimes.finalize = Date.now() - stageStart;
+        
+        // ← NEW: מדידת ביצועים
+        this.trackLoadTimes();
+        this.logSystemStatus();
+        
         // console.log('✅ Stage 4 Complete');
     }
 
@@ -645,6 +670,227 @@ class UnifiedAppInitializer {
         };
         this.errorHandlers = [];
         this.customInitializers = [];
+        this.pageConfig = null;
+    }
+
+    /**
+     * Validate Required Systems
+     * בדיקת תקינות מערכות נדרשות
+     */
+    validateRequiredSystems(config) {
+        const errors = [];
+        const warnings = [];
+        const missing = [];
+        
+        // בדיקה 1: חבילות מוגדרות
+        if (config.packages) {
+            for (const pkgName of config.packages) {
+                const pkg = window.PACKAGE_MANIFEST?.[pkgName];
+                if (!pkg) {
+                    errors.push(`חבילה לא מוגדרת: ${pkgName}`);
+                    continue;
+                }
+                
+                // בדיקה 2: סקריפטים נטענו
+                for (const script of pkg.scripts) {
+                    if (script.required && script.globalCheck) {
+                        if (!this.checkGlobalExists(script.globalCheck)) {
+                            missing.push({
+                                package: pkgName,
+                                script: script.file,
+                                global: script.globalCheck,
+                                description: script.description
+                            });
+                        }
+                    }
+                }
+            }
+        }
+        
+        // בדיקה 3: תלויות
+        if (config.packages) {
+            for (const pkgName of config.packages) {
+                const pkg = window.PACKAGE_MANIFEST?.[pkgName];
+                if (pkg && pkg.dependencies) {
+                    for (const dep of pkg.dependencies) {
+                        if (!config.packages.includes(dep)) {
+                            errors.push(`חסרה תלות: ${pkgName} דורש ${dep}`);
+                        }
+                    }
+                }
+            }
+        }
+        
+        // בדיקה 4: requiredGlobals מהקונפיג
+        if (config.requiredGlobals) {
+            for (const globalName of config.requiredGlobals) {
+                if (!this.checkGlobalExists(globalName)) {
+                    warnings.push(`Global חסר: ${globalName}`);
+                }
+            }
+        }
+        
+        // דיווח
+        const result = {
+            valid: errors.length === 0 && missing.length === 0,
+            errors: errors,
+            missing: missing,
+            warnings: warnings
+        };
+        
+        if (!result.valid) {
+            this.showCriticalError(result);
+        } else if (warnings.length > 0) {
+            console.warn('⚠️ אזהרות אתחול:', warnings);
+        }
+        
+        return result;
+    }
+
+    /**
+     * Check if global exists
+     */
+    checkGlobalExists(globalPath) {
+        try {
+            const parts = globalPath.replace('window.', '').split('.');
+            let obj = window;
+            for (const part of parts) {
+                if (obj[part] === undefined) {
+                    return false;
+                }
+                obj = obj[part];
+            }
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    /**
+     * Show Critical Error
+     */
+    showCriticalError(validationResult) {
+        console.group('🔴 שגיאה קריטית באתחול');
+        
+        if (validationResult.errors.length > 0) {
+            console.error('שגיאות:', validationResult.errors);
+        }
+        
+        if (validationResult.missing.length > 0) {
+            console.error('סקריפטים חסרים:');
+            validationResult.missing.forEach(m => {
+                console.error(`  ❌ ${m.script}`);
+                console.error(`     חבילה: ${m.package}`);
+                console.error(`     Global: ${m.global}`);
+                console.error(`     תיאור: ${m.description}`);
+                console.error(`     פתרון: הוסף <script src="scripts/${m.script}"></script>`);
+            });
+        }
+        
+        console.groupEnd();
+        
+        // הצג גם על המסך
+        if (typeof window.showNotification === 'function') {
+            const msg = `שגיאה קריטית: ${validationResult.missing.length} סקריפטים חסרים. בדוק console`;
+            window.showNotification(msg, 'error');
+        }
+    }
+
+    /**
+     * Log Package Loading
+     */
+    logPackageLoading(packages) {
+        if (!packages || packages.length === 0) return;
+        
+        console.group('📦 טוען חבילות:');
+        packages.forEach(pkgName => {
+            const pkg = window.PACKAGE_MANIFEST?.[pkgName];
+            if (pkg) {
+                console.log(`  ✓ ${pkg.name} (${pkg.scripts.length} סקריפטים, ~${pkg.initTime})`);
+            } else {
+                console.warn(`  ⚠️ ${pkgName} (לא מוגדר)`);
+            }
+        });
+        console.groupEnd();
+    }
+
+    /**
+     * Log System Status
+     */
+    logSystemStatus() {
+        console.group('📊 סטטוס מערכות');
+        console.log(`  ⏱️ זמן אתחול: ${this.performanceMetrics.totalTime}ms`);
+        console.log(`  📦 חבילות: ${this.pageConfig?.packages?.length || 0}`);
+        console.log(`  ✅ מערכות זמינות: ${this.availableSystems.size}`);
+        console.groupEnd();
+    }
+
+    /**
+     * Track Load Times
+     */
+    trackLoadTimes() {
+        const metrics = {
+            timestamp: new Date().toISOString(),
+            pageName: this.pageInfo.name,
+            totalTime: this.performanceMetrics.totalTime,
+            stages: this.performanceMetrics.stageTimes,
+            packages: this.pageConfig?.packages,
+            memoryUsage: performance.memory ? {
+                used: performance.memory.usedJSHeapSize,
+                total: performance.memory.totalJSHeapSize
+            } : null
+        };
+        
+        // שמירה ל-localStorage
+        try {
+            const key = `init_metrics_${this.pageInfo.name}`;
+            const history = JSON.parse(localStorage.getItem(key) || '[]');
+            history.push(metrics);
+            
+            // שמור רק 10 אחרונים
+            if (history.length > 10) {
+                history.shift();
+            }
+            
+            localStorage.setItem(key, JSON.stringify(history));
+        } catch (e) {
+            console.warn('Failed to save metrics:', e);
+        }
+        
+        return metrics;
+    }
+
+    /**
+     * Get Performance Report
+     */
+    getPerformanceReport() {
+        const report = {
+            current: this.trackLoadTimes(),
+            average: null,
+            trend: null
+        };
+        
+        // חישוב ממוצע
+        try {
+            const key = `init_metrics_${this.pageInfo.name}`;
+            const history = JSON.parse(localStorage.getItem(key) || '[]');
+            
+            if (history.length > 0) {
+                const sum = history.reduce((acc, m) => acc + m.totalTime, 0);
+                report.average = Math.round(sum / history.length);
+                
+                // טרנד (משתפר/מידרדר)
+                if (history.length >= 2) {
+                    const recent = history.slice(-3).reduce((acc, m) => acc + m.totalTime, 0) / 3;
+                    const older = history.slice(0, 3).reduce((acc, m) => acc + m.totalTime, 0) / 3;
+                    report.trend = recent < older ? 'improving' : 'degrading';
+                }
+            }
+        } catch (e) {
+            console.warn('Failed to calculate report:', e);
+        }
+        
+        return report;
     }
 }
 

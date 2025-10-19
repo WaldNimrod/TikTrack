@@ -394,6 +394,97 @@ class ActionsMenuSystem {
         }, true);
         
         console.log('✅ Actions Menu Debug Logger הותקן. הרץ debugActionsMenu() כדי לבדוק');
+        
+        // קוד קונסולה לבדיקת z-index וחתיכה
+        window.debugActionsMenuZIndex = () => {
+            console.log('🔍 בדיקת z-index וחתיכה של התפריט...');
+            
+            const allWrappers = document.querySelectorAll('.actions-menu-wrapper');
+            console.log(`מצאתי ${allWrappers.length} actions menu wrappers`);
+            
+            allWrappers.forEach((wrapper, index) => {
+                const popup = wrapper.querySelector('.actions-menu-popup');
+                const actionsCell = wrapper.closest('.actions-cell');
+                const tableRow = wrapper.closest('tr');
+                const table = wrapper.closest('table');
+                
+                if (!popup || !actionsCell || !tableRow || !table) return;
+                
+                console.log(`\n=== Actions Menu ${index + 1} ===`);
+                
+                // בדיקת z-index
+                const popupStyle = window.getComputedStyle(popup);
+                const cellStyle = window.getComputedStyle(actionsCell);
+                const rowStyle = window.getComputedStyle(tableRow);
+                const tableStyle = window.getComputedStyle(table);
+                
+                console.log('Z-Index Values:');
+                console.log(`  Popup: ${popupStyle.zIndex} (${popupStyle.position})`);
+                console.log(`  Actions Cell: ${cellStyle.zIndex} (${cellStyle.position})`);
+                console.log(`  Table Row: ${rowStyle.zIndex} (${rowStyle.position})`);
+                console.log(`  Table: ${tableStyle.zIndex} (${tableStyle.position})`);
+                
+                // בדיקת overflow
+                console.log('Overflow Values:');
+                console.log(`  Actions Cell: ${cellStyle.overflow}`);
+                console.log(`  Table Row: ${rowStyle.overflow}`);
+                console.log(`  Table: ${tableStyle.overflow}`);
+                
+                // בדיקת stacking context
+                const stackingContexts = [];
+                let element = popup;
+                while (element && element !== document.body) {
+                    const style = window.getComputedStyle(element);
+                    if (style.position !== 'static' || style.zIndex !== 'auto' || 
+                        style.opacity !== '1' || style.transform !== 'none' ||
+                        style.filter !== 'none' || style.willChange !== 'auto') {
+                        stackingContexts.push({
+                            element: element.tagName + (element.className ? '.' + element.className.split(' ').join('.') : ''),
+                            position: style.position,
+                            zIndex: style.zIndex,
+                            opacity: style.opacity,
+                            transform: style.transform,
+                            filter: style.filter,
+                            willChange: style.willChange
+                        });
+                    }
+                    element = element.parentElement;
+                }
+                
+                console.log('Stacking Contexts:');
+                stackingContexts.forEach((ctx, i) => {
+                    console.log(`  ${i + 1}. ${ctx.element}:`, ctx);
+                });
+                
+                // בדיקת מיקום ונראות
+                const popupRect = popup.getBoundingClientRect();
+                const cellRect = actionsCell.getBoundingClientRect();
+                const rowRect = tableRow.getBoundingClientRect();
+                
+                console.log('Position & Visibility:');
+                console.log(`  Popup: x=${popupRect.x}, y=${popupRect.y}, w=${popupRect.width}, h=${popupRect.height}`);
+                console.log(`  Actions Cell: x=${cellRect.x}, y=${cellRect.y}, w=${cellRect.width}, h=${cellRect.height}`);
+                console.log(`  Table Row: x=${rowRect.x}, y=${rowRect.y}, w=${rowRect.width}, h=${rowRect.height}`);
+                
+                // בדיקה אם התפריט חתוך
+                const isClipped = popupRect.top < rowRect.top || 
+                                 popupRect.bottom > rowRect.bottom ||
+                                 popupRect.left < rowRect.left || 
+                                 popupRect.right > rowRect.right;
+                
+                console.log(`  Is Popup Clipped: ${isClipped ? '❌ YES' : '✅ NO'}`);
+                
+                if (isClipped) {
+                    console.log('🔍 Clipping Analysis:');
+                    if (popupRect.top < rowRect.top) console.log('  - Clipped from top');
+                    if (popupRect.bottom > rowRect.bottom) console.log('  - Clipped from bottom');
+                    if (popupRect.left < rowRect.left) console.log('  - Clipped from left');
+                    if (popupRect.right > rowRect.right) console.log('  - Clipped from right');
+                }
+            });
+        };
+        
+        console.log('🔧 קוד debugActionsMenuZIndex() הותקן. הרץ debugActionsMenuZIndex() כדי לבדוק z-index וחתיכה');
     }
 }
 

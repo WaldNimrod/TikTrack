@@ -429,7 +429,7 @@ table td,
   visibility: hidden;
   transform: translateX(10px);
   transition: all 0.3s ease;
-  z-index: 1000;
+  z-index: 9999;
   list-style: none;
   margin: 0;
 }
@@ -439,6 +439,12 @@ table td,
   opacity: 1;
   visibility: visible;
   transform: translateX(0);
+  transition-delay: 0s;
+}
+
+/* עיכוב בסגירת התפריט */
+.actions-menu-wrapper:not(:hover) .actions-menu-popup {
+  transition-delay: 0.2s;
 }
 
 /* כפתורים בתוך התפריט */

@@ -372,6 +372,9 @@
         // Make the local copyDetailedLog function available globally for this page only                                                                        
         window.copyDetailedLog = copyDetailedLog;
         
+        // Enable debug mode for troubleshooting
+        window.DEBUG_MODE = true;
+        
         // Unified initialization - UI Standardization Round C
         if (window.unifiedAppInitializer) {
             window.unifiedAppInitializer.initialize();

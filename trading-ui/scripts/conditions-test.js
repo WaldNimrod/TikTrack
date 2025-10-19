@@ -5,7 +5,14 @@
  * עמוד בדיקה מקיף למערכת התנאים והסיבות
  * משתמש במערכת הלוגים המאוחדת הקיימת
  * 
- * @version 1.0.0
+ * Now uses modular architecture with separate components:
+ * - conditions-translations.js
+ * - conditions-validator.js
+ * - conditions-crud-manager.js
+ * - conditions-form-generator.js
+ * - conditions-initializer.js
+ * 
+ * @version 2.0.0
  * @lastUpdated October 2025
  * @author TikTrack Development Team
  */
@@ -17,6 +24,13 @@ class ConditionsTestManager {
         this.logEntries = [];
         this.testStartTime = null;
         this.currentTest = null;
+        
+        // Modular components
+        this.conditionsSystem = null;
+        this.translator = null;
+        this.validator = null;
+        this.crudManager = null;
+        this.formGenerator = null;
         
         // Test configurations
         this.tests = {
@@ -116,6 +130,12 @@ class ConditionsTestManager {
             console.log('🔧 Starting initialization...');
             await this.logWithUnifiedSystem('info', 'מערכת בדיקת תנאים מאותחלת...', 'development');
             
+            // Wait for conditions system to be ready
+            await this.waitForConditionsSystem();
+            
+            // Initialize modular components
+            this.initializeModularComponents();
+            
             // Setup event listeners
             console.log('🔧 Setting up event listeners...');
             this.setupEventListeners();
@@ -132,6 +152,48 @@ class ConditionsTestManager {
             console.error('🔧 Initialization error:', error);
             await this.logWithUnifiedSystem('error', `שגיאה באתחול: ${error.message}`, 'system');
             throw error;
+        }
+    }
+    
+    /**
+     * Wait for conditions system to be ready
+     * המתנה למערכת התנאים להיות מוכנה
+     */
+    async waitForConditionsSystem() {
+        let attempts = 0;
+        const maxAttempts = 50; // 5 seconds max
+        
+        while (attempts < maxAttempts) {
+            if (window.conditionsSystem && window.conditionsSystem.initializer) {
+                const status = window.conditionsSystem.initializer.getStatus();
+                if (status.isInitialized) {
+                    console.log('✅ Conditions system is ready');
+                    return;
+                }
+            }
+            
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
+        }
+        
+        throw new Error('Conditions system not ready after 5 seconds');
+    }
+    
+    /**
+     * Initialize modular components
+     * אתחול רכיבים מודולריים
+     */
+    initializeModularComponents() {
+        if (window.conditionsSystem) {
+            this.conditionsSystem = window.conditionsSystem;
+            this.translator = this.conditionsSystem.translations;
+            this.validator = this.conditionsSystem.validator;
+            this.crudManager = this.conditionsSystem.crudManager;
+            this.formGenerator = this.conditionsSystem.formGenerator;
+            
+            console.log('✅ Modular components initialized');
+        } else {
+            throw new Error('Conditions system not available');
         }
     }
 
@@ -733,8 +795,420 @@ class ConditionsTestManager {
     }
 }
 
+/**
+ * Conditions UI Manager - Demo Interface
+ * =====================================
+ * 
+ * מנהל ממשק לדוגמה לניהול תנאים
+ * מציג רשימת תנאים וטופס יצירה/עריכה
+ */
+class ConditionsUIManager {
+    constructor() {
+        this.methods = [];
+        this.conditions = [];
+        this.currentCondition = null;
+        this.currentTradePlanId = 1; // Default to plan 1 for demo
+    }
+
+    async initialize() {
+        console.log('🎨 Initializing Conditions UI Manager...');
+        
+        // Setup event listeners
+        this.setupEventListeners();
+        
+        // Load methods
+        await this.loadMethods();
+        
+        // Load conditions
+        await this.loadConditions();
+        
+        console.log('✅ Conditions UI Manager initialized');
+    }
+
+    setupEventListeners() {
+        // Add condition button
+        const addBtn = document.getElementById('addConditionBtn');
+        if (addBtn) {
+            addBtn.addEventListener('click', () => this.showForm());
+        }
+
+        // Refresh button
+        const refreshBtn = document.getElementById('refreshConditionsBtn');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => this.loadConditions());
+        }
+
+        // Form buttons
+        const saveBtn = document.getElementById('saveConditionBtn');
+        if (saveBtn) {
+            saveBtn.addEventListener('click', () => this.saveCondition());
+        }
+
+        const cancelBtn = document.getElementById('cancelFormBtn');
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', () => this.hideForm());
+        }
+
+        const closeBtn = document.getElementById('closeFormBtn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => this.hideForm());
+        }
+
+        // Method select change
+        const methodSelect = document.getElementById('methodSelect');
+        if (methodSelect) {
+            methodSelect.addEventListener('change', (e) => this.onMethodChange(e.target.value));
+        }
+    }
+
+    async loadMethods() {
+        try {
+            const response = await fetch('/api/trading-methods/');
+            const result = await response.json();
+            
+            if (result.status === 'success') {
+                this.methods = result.data;
+                this.populateMethodsSelect();
+                console.log(`✅ Loaded ${this.methods.length} methods`);
+            }
+        } catch (error) {
+            console.error('❌ Failed to load methods:', error);
+        }
+    }
+
+    populateMethodsSelect() {
+        const select = document.getElementById('methodSelect');
+        if (!select) return;
+
+        select.innerHTML = '<option value="">בחר שיטה...</option>';
+        this.methods.forEach(method => {
+            const option = document.createElement('option');
+            option.value = method.id;
+            option.textContent = `${method.name_he} (${method.name_en})`;
+            option.dataset.method = JSON.stringify(method);
+            select.appendChild(option);
+        });
+    }
+
+    onMethodChange(methodId) {
+        if (!methodId) {
+            document.getElementById('parametersContainer').innerHTML = '';
+            return;
+        }
+
+        const method = this.methods.find(m => m.id == methodId);
+        if (!method) return;
+
+        this.renderParameters(method);
+    }
+
+    renderParameters(method) {
+        const container = document.getElementById('parametersContainer');
+        if (!container) return;
+
+        container.innerHTML = '<h5 class="mb-3">פרמטרים</h5>';
+
+        method.parameters.forEach(param => {
+            const div = document.createElement('div');
+            div.className = 'mb-3';
+
+            const label = document.createElement('label');
+            label.className = 'form-label';
+            label.textContent = `${param.parameter_name_he} (${param.parameter_name_en})`;
+            if (param.is_required) {
+                label.innerHTML += ' <span class="text-danger">*</span>';
+            }
+
+            let input;
+            if (param.parameter_type === 'dropdown') {
+                input = document.createElement('select');
+                input.className = 'form-select';
+                const options = param.validation_rule ? param.validation_rule.split(',') : [];
+                options.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt;
+                    option.textContent = opt;
+                    input.appendChild(option);
+                });
+            } else {
+                input = document.createElement('input');
+                input.className = 'form-control';
+                input.type = param.parameter_type === 'boolean' ? 'checkbox' : 
+                            param.parameter_type === 'number' || param.parameter_type === 'period' ? 'number' : 'text';
+                
+                if (param.min_value) input.min = param.min_value;
+                if (param.max_value) input.max = param.max_value;
+                if (param.default_value) input.value = param.default_value;
+            }
+
+            input.id = `param_${param.parameter_key}`;
+            input.dataset.key = param.parameter_key;
+            input.dataset.type = param.parameter_type;
+
+            const help = document.createElement('small');
+            help.className = 'form-text text-muted';
+            help.textContent = param.help_text_he || param.help_text_en;
+
+            div.appendChild(label);
+            div.appendChild(input);
+            div.appendChild(help);
+            container.appendChild(div);
+        });
+    }
+
+    async loadConditions() {
+        try {
+            const listBody = document.getElementById('conditionsListBody');
+            if (!listBody) return;
+
+            listBody.innerHTML = '<div class="text-center p-3 text-muted"><i class="fas fa-spinner fa-spin"></i> טוען תנאים...</div>';
+
+            const response = await fetch(`/api/plan-conditions/trade-plans/${this.currentTradePlanId}/conditions`);
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                this.conditions = result.data;
+                this.renderConditions();
+                console.log(`✅ Loaded ${this.conditions.length} conditions`);
+            }
+        } catch (error) {
+            console.error('❌ Failed to load conditions:', error);
+            const listBody = document.getElementById('conditionsListBody');
+            if (listBody) {
+                listBody.innerHTML = '<div class="text-center p-3 text-danger">❌ שגיאה בטעינת תנאים</div>';
+            }
+        }
+    }
+
+    renderConditions() {
+        const listBody = document.getElementById('conditionsListBody');
+        if (!listBody) return;
+
+        if (this.conditions.length === 0) {
+            listBody.innerHTML = '<div class="text-center p-3 text-muted">אין תנאים להצגה</div>';
+            return;
+        }
+
+        listBody.innerHTML = '';
+        this.conditions.forEach(condition => {
+            const item = this.createConditionItem(condition);
+            listBody.appendChild(item);
+        });
+    }
+
+    createConditionItem(condition) {
+        const div = document.createElement('div');
+        div.className = 'condition-item';
+        div.dataset.id = condition.id;
+
+        const header = document.createElement('div');
+        header.className = 'condition-item-header';
+
+        const methodName = document.createElement('div');
+        methodName.className = 'condition-method-name';
+        methodName.textContent = condition.method ? condition.method.name_he : 'שיטה לא ידועה';
+
+        const status = document.createElement('span');
+        status.className = `condition-status ${condition.is_active ? 'active' : 'inactive'}`;
+        status.textContent = condition.is_active ? 'פעיל' : 'לא פעיל';
+
+        header.appendChild(methodName);
+        header.appendChild(status);
+
+        const params = document.createElement('div');
+        params.className = 'condition-parameters';
+        const paramsObj = typeof condition.parameters === 'string' ? 
+            JSON.parse(condition.parameters) : condition.parameters;
+        params.textContent = `פרמטרים: ${JSON.stringify(paramsObj)}`;
+
+        const actions = document.createElement('div');
+        actions.className = 'condition-actions';
+
+        const editBtn = document.createElement('button');
+        editBtn.className = 'btn btn-sm btn-primary';
+        editBtn.innerHTML = '<i class="fas fa-edit"></i> עריכה';
+        editBtn.onclick = () => this.editCondition(condition);
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn btn-sm btn-danger';
+        deleteBtn.innerHTML = '<i class="fas fa-trash"></i> מחיקה';
+        deleteBtn.onclick = () => this.deleteCondition(condition.id);
+
+        const alertBtn = document.createElement('button');
+        alertBtn.className = 'btn btn-sm btn-warning';
+        alertBtn.innerHTML = '<i class="fas fa-bell"></i> התראה';
+        alertBtn.onclick = () => this.createAlertFromCondition(condition);
+
+        actions.appendChild(editBtn);
+        actions.appendChild(deleteBtn);
+        actions.appendChild(alertBtn);
+
+        div.appendChild(header);
+        div.appendChild(params);
+        div.appendChild(actions);
+
+        return div;
+    }
+
+    showForm(condition = null) {
+        this.currentCondition = condition;
+        const form = document.getElementById('conditionForm');
+        const title = document.getElementById('formTitle');
+        
+        if (form) {
+            form.style.display = 'block';
+            title.textContent = condition ? 'עריכת תנאי' : 'תנאי חדש';
+
+            if (condition) {
+                // Populate form with condition data
+                document.getElementById('methodSelect').value = condition.method_id;
+                this.onMethodChange(condition.method_id);
+                
+                // Populate parameters
+                setTimeout(() => {
+                    const params = typeof condition.parameters === 'string' ? 
+                        JSON.parse(condition.parameters) : condition.parameters;
+                    Object.keys(params).forEach(key => {
+                        const input = document.getElementById(`param_${key}`);
+                        if (input) input.value = params[key];
+                    });
+                }, 100);
+
+                document.getElementById('logicalOperator').value = condition.logical_operator || 'NONE';
+                document.getElementById('conditionGroup').value = condition.condition_group || 0;
+                document.getElementById('isActive').checked = condition.is_active !== false;
+            } else {
+                // Reset form
+                document.getElementById('methodSelect').value = '';
+                document.getElementById('parametersContainer').innerHTML = '';
+                document.getElementById('logicalOperator').value = 'NONE';
+                document.getElementById('conditionGroup').value = 0;
+                document.getElementById('isActive').checked = true;
+            }
+        }
+    }
+
+    hideForm() {
+        const form = document.getElementById('conditionForm');
+        if (form) {
+            form.style.display = 'none';
+        }
+        this.currentCondition = null;
+    }
+
+    async saveCondition() {
+        try {
+            const methodId = document.getElementById('methodSelect').value;
+            if (!methodId) {
+                alert('יש לבחור שיטת מסחר');
+                return;
+            }
+
+            // Collect parameters
+            const parameters = {};
+            const paramInputs = document.querySelectorAll('[data-key]');
+            paramInputs.forEach(input => {
+                const key = input.dataset.key;
+                parameters[key] = input.value;
+            });
+
+            const data = {
+                method_id: parseInt(methodId),
+                parameters_json: parameters,
+                logical_operator: document.getElementById('logicalOperator').value,
+                condition_group: parseInt(document.getElementById('conditionGroup').value),
+                is_active: document.getElementById('isActive').checked
+            };
+
+            let response;
+            if (this.currentCondition) {
+                // Update
+                response = await fetch(`/api/plan-conditions/${this.currentCondition.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+            } else {
+                // Create
+                response = await fetch(`/api/plan-conditions/trade-plans/${this.currentTradePlanId}/conditions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+            }
+
+            const result = await response.json();
+            if (result.status === 'success') {
+                console.log('✅ Condition saved successfully');
+                this.hideForm();
+                await this.loadConditions();
+            } else {
+                alert('שגיאה בשמירת התנאי');
+            }
+        } catch (error) {
+            console.error('❌ Failed to save condition:', error);
+            alert('שגיאה בשמירת התנאי');
+        }
+    }
+
+    editCondition(condition) {
+        this.showForm(condition);
+    }
+
+    async deleteCondition(conditionId) {
+        if (!confirm('האם למחוק את התנאי?')) return;
+
+        try {
+            const response = await fetch(`/api/plan-conditions/${conditionId}`, {
+                method: 'DELETE'
+            });
+
+            const result = await response.json();
+            if (result.status === 'success') {
+                console.log('✅ Condition deleted successfully');
+                await this.loadConditions();
+            } else {
+                alert('שגיאה במחיקת התנאי');
+            }
+        } catch (error) {
+            console.error('❌ Failed to delete condition:', error);
+            alert('שגיאה במחיקת התנאי');
+        }
+    }
+
+    async createAlertFromCondition(condition) {
+        try {
+            const data = {
+                related_id: condition.id,
+                message: `התראה מתנאי: ${condition.method ? condition.method.name_he : 'תנאי'}`,
+                condition_attribute: 'price',
+                condition_operator: 'more_than',
+                condition_number: '0'
+            };
+
+            const response = await fetch('/api/alerts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+            if (result.status === 'success') {
+                alert('התראה נוצרה בהצלחה!');
+                console.log('✅ Alert created successfully');
+            } else {
+                alert('שגיאה ביצירת התראה');
+            }
+        } catch (error) {
+            console.error('❌ Failed to create alert:', error);
+            alert('שגיאה ביצירת התראה');
+        }
+    }
+}
+
 // Global instance
 let conditionsTestManager;
+let conditionsUIManager;
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', async () => {
@@ -745,6 +1219,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Don't auto-initialize - let the unified system handle it
         window.conditionsTestManager = conditionsTestManager;
         console.log('🔧 conditionsTestManager assigned to window');
+        
+        // Also create UI manager
+        conditionsUIManager = new ConditionsUIManager();
+        await conditionsUIManager.initialize();
+        window.conditionsUIManager = conditionsUIManager;
+        console.log('🔧 conditionsUIManager created and initialized');
     } catch (error) {
         console.error('🔧 Failed to create conditions test manager:', error);
     }
@@ -752,3 +1232,4 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Export for global access
 window.conditionsTestManager = conditionsTestManager;
+window.conditionsUIManager = conditionsUIManager;

@@ -180,6 +180,9 @@ class ConditionsValidationService:
         
         # Validate against constraints
         for field, value in data.items():
+            # Skip parameters_json - it's validated separately above
+            if field == 'parameters_json':
+                continue
             if value is not None:
                 is_valid, msg = self.constraint_service.validate_field_value(
                     table_name, field, value

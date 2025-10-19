@@ -177,7 +177,7 @@
                 <div class="modal-content">
                     <div class="modal-header modal-header-colored">
                         <h5 class="modal-title" id="addExecutionModalLabel">הוספת עסקה חדשה</h5>
-                        ${createCloseButton("aria-label="Close"")}
+                        <button data-button-type="CLOSE" data-entity-type="execution" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
                     </div>
                     <div class="modal-body">
                         <form id="addExecutionForm">
@@ -240,8 +240,8 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        ${createButton('CANCEL', 'data-bs-dismiss="modal"', '', 'type="button"')}
-                        ${createButton('SAVE', 'addExecution()', '', 'type="button"')}
+                        <button data-button-type="CANCEL" data-onclick="data-bs-dismiss='modal'" data-text="ביטול" title="ביטול"></button>
+                        <button data-button-type="SAVE" data-entity-type="execution" data-onclick="addExecution()" data-text="שמור" title="שמור ביצוע"></button>
                     </div>
                 </div>
             </div>
@@ -254,7 +254,7 @@
                 <div class="modal-content">
                     <div class="modal-header modal-header-colored">
                         <h5 class="modal-title" id="editExecutionModalLabel">עריכת עסקה</h5>
-                        ${createCloseButton("aria-label="Close"")}
+                        <button data-button-type="CLOSE" data-entity-type="execution" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
                     </div>
                     <div class="modal-body">
                         <form id="editExecutionForm">
@@ -314,8 +314,8 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        ${createButton('CANCEL', 'data-bs-dismiss="modal"', '', 'type="button"')}
-                        ${createButton('SAVE', 'updateExecution()', '', 'type="button"')}
+                        <button data-button-type="CANCEL" data-onclick="data-bs-dismiss='modal'" data-text="ביטול" title="ביטול"></button>
+                        <button data-button-type="SAVE" data-entity-type="execution" data-onclick="updateExecution()" data-text="שמור" title="עדכן ביצוע"></button>
                     </div>
                 </div>
             </div>

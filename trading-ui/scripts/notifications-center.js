@@ -571,7 +571,7 @@ class NotificationsCenter {
     popup.innerHTML = `
       <div class="popup-header">
         <span class="popup-title">${notification.title}</span>
-        <button class="popup-close" onclick="this.parentElement.parentElement.remove()">×</button>
+        <button data-button-type="CLOSE" data-size="small" data-variant="small" data-onclick="this.parentElement.parentElement.remove()" data-text="" title="סגור popup" aria-label="סגור">×</button>
       </div>
       <div class="popup-message">${notification.message}</div>
     `;
@@ -1963,24 +1963,21 @@ async function exportAllLogs() {
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">ייצוא כל הלוגים</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        <button data-button-type="CLOSE" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
                     </div>
                     <div class="modal-body">
                         <p>בחר פורמט ייצוא:</p>
                         <div class="d-grid gap-2">
-                            <button class="btn export-btn" data-format="csv">
-                                <i class="fas fa-file-csv"></i> ייצוא CSV
+                            <button data-button-type="EXPORT" data-format="csv" data-text="ייצוא CSV" title="ייצוא ל-CSV">
                             </button>
-                            <button class="btn export-btn" data-format="json">
-                                <i class="fas fa-file-code"></i> ייצוא JSON
+                            <button data-button-type="EXPORT" data-format="json" data-text="ייצוא JSON" title="ייצוא ל-JSON">
                             </button>
-                            <button class="btn export-btn" data-format="clipboard">
-                                <i class="fas fa-clipboard"></i> העתקה ללוח
+                            <button data-button-type="COPY" data-format="clipboard" data-text="העתקה ללוח" title="העתקה ללוח">
                             </button>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button data-button-type="CLOSE" data-attributes="data-bs-dismiss='modal' type='button'"></button>
+                        <button data-button-type="CANCEL" data-onclick="data-bs-dismiss='modal'" data-text="ביטול" title="ביטול"></button>
                     </div>
                 </div>
             </div>

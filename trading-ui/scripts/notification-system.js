@@ -994,11 +994,9 @@ async function showDetailsModal(title, content, options = {}) {
         <div class="modal-content">
           <div class="modal-header text-white d-flex justify-content-between align-items-center" style="direction: rtl; background-color: ${window.getEntityColor ? window.getEntityColor('trade') || '#007bff' : '#007bff'};">
             <div class="d-flex gap-2">
-              <button type="button" class="btn btn-sm" id="${modalId}-copy-btn" title="העתק ללוח">
-                <i class="fas fa-copy"></i> העתק
+              <button data-button-type="COPY" id="${modalId}-copy-btn" data-text="העתק" title="העתק ללוח">
               </button>
-              <button type="button" class="btn btn-sm" id="${modalId}-close-btn" title="סגור">
-                X
+              <button data-button-type="CLOSE" id="${modalId}-close-btn" data-text="סגור" title="סגור">
               </button>
             </div>
             <h4 class="modal-title" id="${modalId}-label">${title}</h4>
@@ -1009,7 +1007,7 @@ async function showDetailsModal(title, content, options = {}) {
             </div>
           </div>
           <div class="modal-footer" style="justify-content: flex-end; direction: rtl;">
-            <button type="button" class="btn" id="${modalId}-footer-close">סגור</button>
+            <button data-button-type="CANCEL" id="${modalId}-footer-close" data-text="סגור" title="סגור"></button>
           </div>
         </div>
       </div>
@@ -1518,14 +1516,14 @@ window.showDetailedNotification = async function(title, message, type = 'info', 
           <div class="modal-content">
             <div class="modal-header bg-${type === 'error' ? 'danger' : type === 'warning' ? 'warning' : type === 'success' ? 'success' : 'info'} text-white">
               <h5 class="modal-title" id="${modalId}Label">${title}</h5>
-              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button data-button-type="CLOSE" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
             </div>
             <div class="modal-body">
               <div style="white-space: pre-line; font-family: monospace; font-size: 0.9em;">${message}</div>
             </div>
             <div class="modal-footer">
-              <button data-button-type="CLOSE" data-attributes="data-bs-dismiss='modal' type='button'"></button>
-              <button type="button" class="btn" onclick="copyToClipboard('${message.replace(/'/g, "\\'")}')">העתק</button>
+              <button data-button-type="CANCEL" data-onclick="data-bs-dismiss='modal'" data-text="ביטול" title="ביטול"></button>
+              <button data-button-type="COPY" data-onclick="copyToClipboard('${message.replace(/'/g, "\\'")}')" data-text="העתק" title="העתק ללוח"></button>
             </div>
           </div>
         </div>

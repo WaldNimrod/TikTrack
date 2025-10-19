@@ -64,7 +64,7 @@
                         טיקרים
                     </div>
                     <div class="table-actions">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט" aria-label="העתק לוג מפורט"><i class="fas fa-file-export"></i></button>
+                        <button data-button-type="COPY" data-variant="full" data-onclick="copyDetailedLog()" data-text="העתק לוג מפורט" title="העתק לוג מפורט"></button>
                         <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר"></button>
                     </div>
                 </div>
@@ -167,7 +167,7 @@
                 <div class="modal-content">
                     <div class="modal-header modal-header-colored">
                         <h5 class="modal-title" id="addTickerModalLabel">הוספת טיקר חדש</h5>
-                        ${createCloseButton("aria-label="Close"")}
+                        <button data-button-type="CLOSE" data-entity-type="ticker" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
                     </div>
                     <div class="modal-body">
                         <form id="addTickerForm">
@@ -223,8 +223,8 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        ${createButton('CANCEL', 'data-bs-dismiss="modal"', '', 'type="button"')}
-                        ${createButton('SAVE', 'saveForm()', '', 'type="button" aria-label="שמור טיקר"')}
+                        <button data-button-type="CANCEL" data-onclick="data-bs-dismiss='modal'" data-text="ביטול" title="ביטול"></button>
+                        <button data-button-type="SAVE" data-entity-type="ticker" data-onclick="saveForm()" data-text="שמור" title="שמור טיקר"></button>
                     </div>
                 </div>
             </div>
@@ -237,7 +237,7 @@
                 <div class="modal-content">
                     <div class="modal-header modal-header-colored">
                         <h5 class="modal-title" id="editTickerModalLabel">עריכת טיקר</h5>
-                        ${createCloseButton("aria-label="Close"")}
+                        <button data-button-type="CLOSE" data-entity-type="ticker" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
                     </div>
                     <div class="modal-body">
                         <form id="editTickerForm">
@@ -291,8 +291,8 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        ${createButton('CANCEL', 'data-bs-dismiss="modal"', '', 'type="button"')}
-                        ${createButton('SAVE', 'saveForm()', '', 'type="button" aria-label="שמור טיקר"')}
+                        <button data-button-type="CANCEL" data-onclick="data-bs-dismiss='modal'" data-text="ביטול" title="ביטול"></button>
+                        <button data-button-type="SAVE" data-entity-type="ticker" data-onclick="saveForm()" data-text="שמור" title="שמור טיקר"></button>
                     </div>
                 </div>
             </div>

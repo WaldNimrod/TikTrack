@@ -290,6 +290,89 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Content Section 3 - Conditions UI Demo -->
+                <div class="content-section" id="conditions-ui-demo">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/development.svg" alt="ממשק תנאים לדוגמה" class="section-icon">
+                            ממשק תנאים לדוגמה - Conditions UI Demo
+                        </div>
+                        <div class="table-actions">
+                            <button class="btn btn-sm btn-success" id="addConditionBtn">
+                                <i class="fas fa-plus"></i>
+                                תנאי חדש
+                            </button>
+                            <button class="btn btn-sm btn-primary" id="refreshConditionsBtn">
+                                <i class="fas fa-sync"></i>
+                                רענון
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="conditions-ui-container">
+                            <!-- Conditions List -->
+                            <div class="conditions-list" id="conditionsList">
+                                <div class="conditions-list-header">
+                                    <h4>רשימת תנאים</h4>
+                                </div>
+                                <div class="conditions-list-body" id="conditionsListBody">
+                                    <div class="text-center p-3 text-muted">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                        טוען תנאים...
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Condition Form -->
+                            <div class="condition-form" id="conditionForm" style="display: none;">
+                                <div class="condition-form-header">
+                                    <h4 id="formTitle">תנאי חדש</h4>
+                                    <button class="btn btn-sm btn-secondary" id="closeFormBtn">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="condition-form-body">
+                                    <div class="mb-3">
+                                        <label for="methodSelect" class="form-label">שיטת מסחר</label>
+                                        <select class="form-select" id="methodSelect">
+                                            <option value="">בחר שיטה...</option>
+                                        </select>
+                                    </div>
+                                    <div id="parametersContainer"></div>
+                                    <div class="mb-3">
+                                        <label for="logicalOperator" class="form-label">אופרטור לוגי</label>
+                                        <select class="form-select" id="logicalOperator">
+                                            <option value="NONE">ללא</option>
+                                            <option value="AND">AND</option>
+                                            <option value="OR">OR</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="conditionGroup" class="form-label">קבוצה</label>
+                                        <input type="number" class="form-control" id="conditionGroup" value="0" min="0">
+                                    </div>
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" id="isActive" checked>
+                                        <label class="form-check-label" for="isActive">
+                                            פעיל
+                                        </label>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-primary" id="saveConditionBtn">
+                                            <i class="fas fa-save"></i>
+                                            שמירה
+                                        </button>
+                                        <button class="btn btn-secondary" id="cancelFormBtn">
+                                            <i class="fas fa-times"></i>
+                                            ביטול
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -326,8 +409,137 @@
     <script src="scripts/system-management.js?v=1.0.0"></script>
     <script src="scripts/error-handlers.js?v=1.0.0"></script>
     
+    <!-- Conditions System Scripts -->
+    <script src="scripts/conditions/conditions-translations.js?v=1.0.0"></script>
+    <script src="scripts/conditions/conditions-validator.js?v=1.0.0"></script>
+    <script src="scripts/conditions/conditions-crud-manager.js?v=1.0.0"></script>
+    <script src="scripts/conditions/conditions-form-generator.js?v=1.0.0"></script>
+    <script src="scripts/conditions/conditions-initializer.js?v=1.0.0"></script>
+    
     <!-- Page-specific Scripts -->
     <script src="scripts/conditions-test.js?v=1.0.0"></script>
+    
+    <!-- Conditions UI Demo Styles -->
+    <style>
+        /* Conditions UI Demo Styles */
+        .conditions-ui-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            min-height: 400px;
+        }
+
+        .conditions-list {
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            background: #fff;
+        }
+
+        .conditions-list-header {
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+            background: #f8f9fa;
+        }
+
+        .conditions-list-header h4 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .conditions-list-body {
+            padding: 15px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .condition-item {
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            background: #fff;
+            transition: all 0.2s;
+        }
+
+        .condition-item:hover {
+            border-color: #29a6a8;
+            box-shadow: 0 2px 4px rgba(41, 166, 168, 0.1);
+        }
+
+        .condition-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .condition-method-name {
+            font-weight: 600;
+            color: #212529;
+        }
+
+        .condition-status {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .condition-status.active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .condition-status.inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .condition-parameters {
+            font-size: 13px;
+            color: #6c757d;
+            margin-bottom: 8px;
+        }
+
+        .condition-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .condition-form {
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            background: #fff;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .condition-form-header {
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+            background: #f8f9fa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .condition-form-header h4 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .condition-form-body {
+            padding: 20px;
+        }
+
+        @media (max-width: 992px) {
+            .conditions-ui-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
     
     <!-- Initialize the page -->
     <script>

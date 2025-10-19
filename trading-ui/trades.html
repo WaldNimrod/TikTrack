@@ -46,9 +46,7 @@
                         מעקב טריידים
                     </div>
                     <div class="table-actions">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והטריידים">
-                            📤 העתק לוג מפורט
-                        </button>
+                        <button data-button-type="COPY" data-variant="full" data-onclick="copyDetailedLog()" data-text="העתק לוג מפורט" title="העתק לוג מפורט עם כל הנתונים והטריידים"></button>
                         <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר" title="הצג/הסתר אזור מעקב טריידים"></button>
                     </div>
                 </div>
@@ -171,7 +169,7 @@
                 <div class="modal-content">
                     <div class="modal-header modal-header-colored">
                         <h5 class="modal-title" id="addTradeModalLabel">הוספת טרייד חדש</h5>
-                        ${createCloseButton("aria-label="Close"")}
+                        <button data-button-type="CLOSE" data-entity-type="trade" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
                     </div>
                     <div class="modal-body">
                         <form id="addTradeForm">
@@ -239,8 +237,8 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        ${createButton("CANCEL", "data-bs-dismiss=\"modal\"", "", "")}
-                        ${createButton("SAVE", "saveNewTradeRecord()", "", "")}
+                        <button data-button-type="CANCEL" data-onclick="data-bs-dismiss='modal'" data-text="ביטול" title="ביטול"></button>
+                        <button data-button-type="SAVE" data-entity-type="trade" data-onclick="saveNewTradeRecord()" data-text="שמור" title="שמור טרייד"></button>
                     </div>
                 </div>
             </div>
@@ -252,7 +250,7 @@
                 <div class="modal-content">
                     <div class="modal-header modal-header-colored">
                         <h5 class="modal-title" id="editTradeModalLabel">עריכת טרייד</h5>
-                        ${createCloseButton("aria-label="Close"")}
+                        <button data-button-type="CLOSE" data-entity-type="trade" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
                     </div>
 
                     <!-- שורת מידע ואיקונים מתחת לכותרת -->
@@ -384,13 +382,13 @@
                 <div class="modal-content">
                     <div class="modal-header modal-header-colored">
                         <h5 class="modal-title" id="linkedItemsModalLabel">פרטים מקושרים</h5>
-                        ${createCloseButton("aria-label="Close"")}
+                        <button data-button-type="CLOSE" data-entity-type="trade" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
                     </div>
                     <div class="modal-body" id="linkedItemsModalBody">
                         <!-- תוכן המודל יוכנס כאן דינמית -->
                     </div>
                     <div class="modal-footer">
-                        ${createButton("CANCEL", "data-bs-dismiss=\"modal\"", "", "")}
+                        <button data-button-type="CANCEL" data-onclick="data-bs-dismiss='modal'" data-text="ביטול" title="ביטול"></button>
                     </div>
                 </div>
             </div>

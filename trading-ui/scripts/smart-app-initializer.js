@@ -43,6 +43,11 @@ class SmartAppInitializer {
      */
     async initialize() {
         try {
+            // Start performance monitoring
+            if (window.InitPerformanceOptimizer) {
+                window.InitPerformanceOptimizer.startMonitoring();
+            }
+            
             this.initializationStartTime = Date.now();
             this.initializationStatus = 'IN_PROGRESS';
             
@@ -70,10 +75,22 @@ class SmartAppInitializer {
             this.initializationStatus = 'COMPLETED';
             this.isInitialized = true;
             
+            // Stop performance monitoring and apply optimizations
+            if (window.InitPerformanceOptimizer) {
+                window.InitPerformanceOptimizer.stopMonitoring();
+                await window.InitPerformanceOptimizer.applyOptimizations();
+            }
+            
             return true;
         } catch (error) {
             this.initializationStatus = 'FAILED';
             this.handleError(error);
+            
+            // Stop performance monitoring on error
+            if (window.InitPerformanceOptimizer) {
+                window.InitPerformanceOptimizer.stopMonitoring();
+            }
+            
             return false;
         }
     }
@@ -641,10 +658,35 @@ class SmartAppInitializer {
      * טעינת סקריפט בודד
      */
     async loadScript(scriptPath) {
+        // Try to load from cache first
+        if (window.InitAdvancedCache) {
+            const cachedScript = await window.InitAdvancedCache.get(`script:${scriptPath}`);
+            if (cachedScript) {
+                // Execute cached script
+                const script = document.createElement('script');
+                script.textContent = cachedScript;
+                document.head.appendChild(script);
+                return script;
+            }
+        }
+        
+        // Load from network if not in cache
         return new Promise((resolve, reject) => {
             const script = document.createElement('script');
             script.src = scriptPath;
-            script.onload = () => resolve(script);
+            script.onload = async () => {
+                // Cache the script content for future use
+                if (window.InitAdvancedCache) {
+                    try {
+                        const response = await fetch(scriptPath);
+                        const content = await response.text();
+                        await window.InitAdvancedCache.set(`script:${scriptPath}`, content);
+                    } catch (error) {
+                        console.warn('Failed to cache script:', scriptPath, error);
+                    }
+                }
+                resolve(script);
+            };
             script.onerror = () => reject(new Error(`Failed to load script: ${scriptPath}`));
             document.head.appendChild(script);
         });
@@ -675,9 +717,16 @@ class SmartAppInitializer {
      */
     async initializeCacheSystem() {
         try {
+            // Initialize Advanced Cache System
+            if (window.InitAdvancedCache) {
+                await window.InitAdvancedCache.warmCache();
+                this.logSuccess('AdvancedCacheSystem', 'מערכת מטמון מתקדמת אותחלה בהצלחה');
+            }
+            
+            // Initialize Unified Cache Manager for backward compatibility
             if (window.UnifiedCacheManager) {
                 await window.UnifiedCacheManager.initialize();
-                this.logSuccess('CacheSystem', 'מערכת מטמון אותחלה בהצלחה');
+                this.logSuccess('UnifiedCacheSystem', 'מערכת מטמון מאוחדת אותחלה בהצלחה');
             }
         } catch (error) {
             this.logError('INITIALIZATION', 'ERROR', 'כשל באתחול מערכת מטמון', {
@@ -778,6 +827,12 @@ class SmartAppInitializer {
      */
     updateMonitoringDashboard() {
         if (window.SystemManagement && window.SystemManagement.updateInitializationStatus) {
+            const performanceMetrics = window.InitPerformanceOptimizer ? 
+                window.InitPerformanceOptimizer.getMetrics() : null;
+            
+            const cacheStats = window.InitAdvancedCache ? 
+                window.InitAdvancedCache.getStats() : null;
+            
             window.SystemManagement.updateInitializationStatus({
                 status: this.initializationStatus,
                 phase: this.currentPhase,
@@ -786,7 +841,9 @@ class SmartAppInitializer {
                 systems: this.resolvedSystems.length,
                 scripts: this.loadedScripts.length,
                 errors: this.initializationErrors.length,
-                warnings: this.initializationWarnings.length
+                warnings: this.initializationWarnings.length,
+                performance: performanceMetrics,
+                cache: cacheStats
             });
         }
     }

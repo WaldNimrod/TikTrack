@@ -94,32 +94,23 @@
                         <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
                         <h2>🔔 מרכז התראות</h2>
                         <div class="header-actions">
-                            <button class="btn btn-sm btn-outline-primary" onclick="copyNotificationsToClipboard()" title="העתק לוג התראות ללוח">
-                                <i class="fas fa-copy"></i> העתק ללוח
+                            <button data-button-type="COPY" data-onclick="copyNotificationsToClipboard()" data-text="העתק ללוח" title="העתק לוג התראות ללוח">
                             </button>
-                            <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט ללוח">
-                                <i class="fas fa-copy"></i> העתק לוג מפורט
+                            <button data-button-type="COPY" data-onclick="copyDetailedLog()" data-text="העתק לוג מפורט" title="העתק לוג מפורט ללוח">
                             </button>
-                            <button class="btn btn-sm btn-success" onclick="testSuccessNotification()" title="בדיקת הודעת הצלחה">
-                                <i class="fas fa-check"></i> הצלחה
+                            <button data-button-type="CHECK" data-onclick="testSuccessNotification()" data-text="הצלחה" title="בדיקת הודעת הצלחה">
                             </button>
-                            <button class="btn btn-sm btn-danger" onclick="testErrorNotification()" title="בדיקת הודעת שגיאה">
-                                <i class="fas fa-times"></i> שגיאה
+                            <button data-button-type="REJECT" data-onclick="testErrorNotification()" data-text="שגיאה" title="בדיקת הודעת שגיאה">
                             </button>
-                            <button class="btn btn-sm btn-warning" onclick="testWarningNotification()" title="בדיקת הודעת אזהרה">
-                                <i class="fas fa-exclamation-triangle"></i> אזהרה
+                            <button data-button-type="PAUSE" data-onclick="testWarningNotification()" data-text="אזהרה" title="בדיקת הודעת אזהרה">
                             </button>
-                            <button class="btn btn-sm btn-info" onclick="testInfoNotification()" title="בדיקת הודעת מידע">
-                                <i class="fas fa-info"></i> מידע
+                            <button data-button-type="VIEW" data-onclick="testInfoNotification()" data-text="מידע" title="בדיקת הודעת מידע">
                             </button>
-                            <button class="btn btn-sm btn-outline-primary" onclick="testConfirmationDialog()" title="בדיקת הודעת אישור">
-                                <i class="fas fa-question-circle"></i> אישור
+                            <button data-button-type="APPROVE" data-onclick="testConfirmationDialog()" data-text="אישור" title="בדיקת הודעת אישור">
                             </button>
-                            <button class="btn btn-sm btn-outline-secondary" onclick="testDetailsModal()" title="בדיקת מודל פרטים">
-                                <i class="fas fa-list-alt"></i> פרטים
+                            <button data-button-type="VIEW" data-onclick="testDetailsModal()" data-text="פרטים" title="בדיקת מודל פרטים">
                             </button>
-                            <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר סקשן">
-                                ${createToggleButton("toggleSection('top')", "הצג/הסתר סקשן")}
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר" title="הצג/הסתר סקשן">
                             </button>
                         </div>
                     </div>
@@ -198,8 +189,7 @@
                 <div class="content-section" id="notification-modes-testing">
                     <div class="section-header">
                         <h2>🔧 בדיקת מצבי עבודה</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('notification-modes-testing')" title="הצג/הסתר סקשן">
-                            ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
+                        <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('notification-modes-testing')" data-text="הצג/הסתר" title="הצג/הסתר סקשן">
                         </button>
                     </div>
                     <div class="section-body">
@@ -220,27 +210,19 @@
                                         <!-- Mode Testing Buttons -->
                                         <div class="row mb-4">
                                             <div class="col-md-6 mb-3">
-                                                <button class="btn btn-outline-secondary w-100" onclick="testNotificationMode('debug')">
-                                                    <i class="fas fa-bug me-2"></i>
-                                                    בדוק מצב דיבג
+                                                <button data-button-type="VIEW" data-onclick="testNotificationMode('debug')" data-text="בדוק מצב דיבג" title="בדיקת מצב Debug">
                                                 </button>
                                             </div>
                                             <div class="col-md-6 mb-3">
-                                                <button class="btn btn-outline-primary w-100" onclick="testNotificationMode('development')">
-                                                    <i class="fas fa-code me-2"></i>
-                                                    בדוק מצב פיתוח
+                                                <button data-button-type="VIEW" data-onclick="testNotificationMode('development')" data-text="בדוק מצב פיתוח" title="בדיקת מצב Development">
                                                 </button>
                                             </div>
                                             <div class="col-md-6 mb-3">
-                                                <button class="btn btn-outline-success w-100" onclick="testNotificationMode('work')">
-                                                    <i class="fas fa-briefcase me-2"></i>
-                                                    בדוק מצב עבודה
+                                                <button data-button-type="PLAY" data-onclick="testNotificationMode('work')" data-text="בדוק מצב עבודה" title="בדיקת מצב Work">
                                                 </button>
                                             </div>
                                             <div class="col-md-6 mb-3">
-                                                <button class="btn btn-outline-danger w-100" onclick="testNotificationMode('silent')">
-                                                    <i class="fas fa-volume-mute me-2"></i>
-                                                    בדוק מצב מושתק
+                                                <button data-button-type="STOP" data-onclick="testNotificationMode('silent')" data-text="בדוק מצב מושתק" title="בדיקת מצב Silent">
                                                 </button>
                                             </div>
                                         </div>
@@ -248,9 +230,7 @@
                                         <!-- Full Test Button -->
                                         <div class="row mb-4">
                                             <div class="col-12">
-                                                <button class="btn btn-primary w-100" onclick="runFullNotificationModeTest()">
-                                                    <i class="fas fa-play me-2"></i>
-                                                    הרץ בדיקה מלאה לכל המצבים
+                                                <button data-button-type="PLAY" data-onclick="runFullNotificationModeTest()" data-text="הרץ בדיקה מלאה לכל המצבים" title="הרץ בדיקה מלאה לכל מצבי העבודה">
                                                 </button>
                                             </div>
                                         </div>
@@ -319,8 +299,7 @@
                 <div class="content-section" id="section1">
                     <div class="section-header">
                         <h2>📊 סקירה כללית</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
-                            ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
+                        <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('section1')" data-text="הצג/הסתר" title="הצג/הסתר סקשן">
                         </button>
                     </div>
                     <div class="section-body">
@@ -368,8 +347,7 @@
                         <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
                         <h2>📜 היסטוריית התראות</h2>
                         <div class="section-header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
-                                ${createToggleButton("toggleSection('top')", "הצג/הסתר סקשן")}
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('section2')" data-text="הצג/הסתר" title="הצג/הסתר סקשן">
                             </button>
                         </div>
                     </div>

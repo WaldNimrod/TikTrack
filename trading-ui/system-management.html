@@ -627,6 +627,160 @@
                 </div>
                 <!-- UI Content Section 7 End--> 
 
+                <!-- UI Content Section 7 Start - Initialization System Monitoring -->
+                <div class="content-section" id="section7">
+                    <div class="section-header entity-test-sub-header">
+                        <h2>🚀 מערכת אתחול חכמה - ניטור ופיתוח</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section7')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <!-- Initialization System Status -->
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <div class="summary-card">
+                                    <div class="summary-label">סטטוס כללי</div>
+                                    <div class="summary-value text-success" id="initSystemStatus">פעיל</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="summary-card">
+                                    <div class="summary-label">חבילות נטענו</div>
+                                    <div class="summary-value text-info" id="loadedPackagesCount">0</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="summary-card">
+                                    <div class="summary-label">זמן אתחול</div>
+                                    <div class="summary-value text-warning" id="initTimeMs">0ms</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="summary-card">
+                                    <div class="summary-label">שלב נוכחי</div>
+                                    <div class="summary-value text-primary" id="currentPhase">-</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Testing System Status -->
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <div class="summary-card">
+                                    <div class="summary-label">מערכת בדיקות</div>
+                                    <div class="summary-value text-success" id="testingSystemStatus">פעיל</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="summary-card">
+                                    <div class="summary-label">תוצאות בדיקות</div>
+                                    <div class="summary-value text-warning" id="testResultsCount">0/0</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="summary-card">
+                                    <div class="summary-label">כיסוי בדיקות</div>
+                                    <div class="summary-value text-success" id="testCoveragePercent">0%</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="summary-card">
+                                    <div class="summary-label">בדיקה אחרונה</div>
+                                    <div class="summary-value text-info" id="lastTestRunTime">-</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-primary" onclick="runComprehensiveTesting()">
+                                        <i class="fas fa-play"></i> הרץ בדיקות מקיפות
+                                    </button>
+                                    <button type="button" class="btn btn-info" onclick="validateTestingSystem()">
+                                        <i class="fas fa-check-circle"></i> ולידציה
+                                    </button>
+                                    <button type="button" class="btn btn-success" onclick="refreshInitializationData()">
+                                        <i class="fas fa-sync"></i> רענן נתונים
+                                    </button>
+                                    <button type="button" class="btn btn-warning" onclick="updateTestingSystemStatus()">
+                                        <i class="fas fa-chart-line"></i> עדכן סטטוס
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Performance Metrics -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <h5>📈 מדדי ביצועים</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>מדד</th>
+                                                <th>ערך נוכחי</th>
+                                                <th>ממוצע</th>
+                                                <th>מינימום</th>
+                                                <th>מקסימום</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="performanceMetricsTable">
+                                            <tr>
+                                                <td>זמן טעינת סקריפטים</td>
+                                                <td id="scriptLoadTime">-</td>
+                                                <td id="scriptLoadAvg">-</td>
+                                                <td id="scriptLoadMin">-</td>
+                                                <td id="scriptLoadMax">-</td>
+                                            </tr>
+                                            <tr>
+                                                <td>זמן אתחול מערכות</td>
+                                                <td id="systemInitTime">-</td>
+                                                <td id="systemInitAvg">-</td>
+                                                <td id="systemInitMin">-</td>
+                                                <td id="systemInitMax">-</td>
+                                            </tr>
+                                            <tr>
+                                                <td>זמן טעינת קאש</td>
+                                                <td id="cacheLoadTime">-</td>
+                                                <td id="cacheLoadAvg">-</td>
+                                                <td id="cacheLoadMin">-</td>
+                                                <td id="cacheLoadMax">-</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- System Components Status -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <h5>🔧 סטטוס רכיבי מערכת</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>רכיב</th>
+                                                <th>סטטוס</th>
+                                                <th>גרסה</th>
+                                                <th>זמן טעינה</th>
+                                                <th>תלויות</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="systemComponentsTable">
+                                            <!-- Will be populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 7 End - Initialization System Monitoring -->
+
                 <!-- UI Content Section 8 Start - Unified Log System -->
                 <div class="content-section" id="section8">
                     <div class="section-header entity-test-sub-header">
@@ -714,6 +868,9 @@
     <script src="scripts/data-utils.js"></script>
     <script src="scripts/notification-system.js"></script>
     <script src="scripts/system-management.js"></script>
+    
+    <!-- Test Runner for Smart Initialization System -->
+    <script src="scripts/test-runner.js?v=1.0.0"></script>
     <script src="scripts/notification-category-detector.js"></script>
     <script src="scripts/global-notification-collector.js"></script>
     <script src="scripts/tables.js"></script>
@@ -739,6 +896,20 @@
     <!-- New Unified Initialization System -->
     <script src="scripts/page-initialization-configs.js"></script>
     <script src="scripts/unified-app-initializer.js"></script>
+    
+    <!-- Smart Initialization System Components -->
+    <script src="scripts/init-package-registry.js"></script>
+    <script src="scripts/init-dependency-graph.js"></script>
+    <script src="scripts/init-page-templates.js"></script>
+    <script src="scripts/init-feedback-system.js"></script>
+    <script src="scripts/smart-app-initializer.js"></script>
+    <script src="scripts/smart-script-loader.js"></script>
+    <script src="scripts/smart-page-configs.js"></script>
+    <script src="scripts/init-performance-optimizer.js"></script>
+    <script src="scripts/init-advanced-cache.js"></script>
+    <script src="scripts/init-testing-system.js"></script>
+    <script src="scripts/init-validator.js"></script>
+    <script src="scripts/init-cli.js"></script>
 
     <!-- 🔓 TEMPLATE ZONE 6 - Page-Specific Scripts (ADD NEW SCRIPTS HERE) -->
     <!-- No manual DOMContentLoaded listener needed - handled by unified system -->
@@ -862,7 +1033,7 @@
                                         <i class="fas fa-vial text-primary me-2"></i>
                                         תוצאות בדיקת כל סוגי הלוגים
                                     </h5>
-                                    <button type="button" class="btn-close" onclick="document.getElementById('log-test-modal').remove()"></button>
+                                    <button data-button-type="CLOSE" data-size="large" data-variant="small" data-onclick="document.getElementById('log-test-modal').remove()" data-text="" title="סגור מודל" aria-label="סגור"></button>
                                 </div>
                                 <div class="modal-body">
                                     <div class="row mb-3">

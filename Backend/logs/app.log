@@ -101,3 +101,13 @@
 2025-10-19 22:48:46,817 - services.external_data.yahoo_finance_adapter - INFO - Updated provider yahoo_finance health: True
 2025-10-19 22:48:46,820 - services.data_refresh_scheduler - INFO - Batch refresh completed: 4 successful, 0 failed
 2025-10-19 22:48:46,821 - services.data_refresh_scheduler - INFO - Group refresh completed: ID 33628 - 4 successful, 0 failed
+2025-10-19 23:17:47,945 - services.background_tasks - INFO - Starting background task: collect_metrics
+2025-10-19 23:17:48,953 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.006s - Success: True
+2025-10-19 23:17:48,954 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.006s
+2025-10-19 23:17:48,966 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.013s - Success: True
+2025-10-19 23:17:48,968 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.001s - Success: True
+2025-10-19 23:17:48,968 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-19 23:17:48,968 - services.background_tasks - INFO - Metrics collection completed
+2025-10-19 23:17:48,968 - utils.performance_monitor - INFO - Performance: collect_metrics - Duration: 1.021s - Success: True
+2025-10-19 23:17:48,968 - utils.performance_monitor - WARNING - Slow operation detected: collect_metrics - Duration: 1.021s
+2025-10-19 23:17:48,968 - services.background_tasks - INFO - Background task 'collect_metrics' completed successfully in 1023ms

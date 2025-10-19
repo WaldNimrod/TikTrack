@@ -175,14 +175,15 @@ function renderPendingExecutionRow(execution) {
             <td>${tickerBadge}</td>
             <td>${execution.account_name || '-'}</td>
             <td class="actions-cell">
-                <div class="actions-menu-container">
-                    <button class="btn-icon actions-trigger" onclick="toggleActionsMenu(this, event)" title="פעולות">⋮</button>
-                    <div class="actions-menu">
-                        <button data-button-type="EDIT" data-variant="small" data-onclick="editExecutionFromWidget(${execution.id})" data-text="ערוך" title="ערוך עסקה"></button>
-                        <button data-button-type="DELETE" data-variant="small" data-onclick="deleteExecutionFromWidget(${execution.id})" data-text="מחק" title="מחק עסקה"></button>
-                        <button data-button-type="LINK" data-variant="small" data-onclick="goToExecutionsPage(${execution.id})" data-text="פתח בדף עסקאות" title="עבור לדף עסקאות"></button>
-                    </div>
-                </div>
+                ${window.createActionsMenu ? window.createActionsMenu([
+                    { type: 'EDIT', onclick: `editExecutionFromWidget(${execution.id})`, text: 'ערוך', title: 'ערוך עסקה' },
+                    { type: 'DELETE', onclick: `deleteExecutionFromWidget(${execution.id})`, text: 'מחק', title: 'מחק עסקה' },
+                    { type: 'LINK', onclick: `goToExecutionsPage(${execution.id})`, text: 'פתח בדף עסקאות', title: 'עבור לדף עסקאות' }
+                ]) : `
+                <button class="btn btn-sm" onclick="editExecutionFromWidget(${execution.id})" title="ערוך עסקה">✏️ ערוך</button>
+                <button class="btn btn-sm" onclick="deleteExecutionFromWidget(${execution.id})" title="מחק עסקה">🗑️ מחק</button>
+                <button class="btn btn-sm" onclick="goToExecutionsPage(${execution.id})" title="עבור לדף עסקאות">🔗 פתח בדף עסקאות</button>
+                `}
             </td>
         </tr>
     `;
@@ -243,36 +244,8 @@ function refreshPendingExecutionsWidget() {
 // Helper Functions
 // ========================================
 
-/**
- * פונקציה להחלפת תפריט פעולות (תואמת למערכת הקיימת)
- */
-function toggleActionsMenu(button, event) {
-    if (event) {
-        event.stopPropagation();
-    }
-    
-    // סגירת כל התפריטים הפתוחים
-    document.querySelectorAll('.actions-menu.show').forEach(menu => {
-        if (menu !== button.nextElementSibling) {
-            menu.classList.remove('show');
-        }
-    });
-    
-    // החלפת תפריט נוכחי
-    const menu = button.nextElementSibling;
-    if (menu) {
-        menu.classList.toggle('show');
-    }
-}
-
-// סגירת תפריטים בלחיצה חיצונית
-document.addEventListener('click', (event) => {
-    if (!event.target.closest('.actions-menu-container')) {
-        document.querySelectorAll('.actions-menu.show').forEach(menu => {
-            menu.classList.remove('show');
-        });
-    }
-});
+// הפונקציות הישנות של toggleActionsMenu הוסרו
+// המערכת החדשה משתמשת ב-CSS hover בלבד
 
 // ========================================
 // Global Exports

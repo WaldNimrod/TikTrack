@@ -378,6 +378,136 @@ table td,
   border-radius: 6px;
 }
 
+/* ===== Actions Menu System - תפריט פעולות נפתח ===== */
+
+/* Wrapper לתפריט הפעולות */
+.actions-menu-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+}
+
+/* כפתור הטריגר (⋮) */
+.actions-trigger {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-size: 16px;
+  line-height: 1;
+  border: 1px solid #e9ecef;
+  background: #fff;
+  color: #495057;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.actions-trigger:hover {
+  background: #e9ecef;
+  border-color: #adb5bd;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* התפריט הנפתח */
+.actions-menu-popup {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 120px;
+  padding: 0.5rem 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  list-style: none;
+  margin: 0;
+}
+
+/* הצגת התפריט ב-hover */
+.actions-menu-wrapper:hover .actions-menu-popup {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* כפתורים בתוך התפריט */
+.actions-menu-popup .btn {
+  width: 100%;
+  height: auto;
+  padding: 0.5rem 1rem;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: #495057;
+  text-align: right;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.actions-menu-popup .btn:hover {
+  background: #f8f9fa;
+  color: #007bff;
+  transform: none;
+  box-shadow: none;
+}
+
+/* RTL Support */
+[dir="rtl"] .actions-menu-popup {
+  right: auto;
+  left: 0;
+}
+
+[dir="rtl"] .actions-menu-popup .btn {
+  text-align: left;
+  justify-content: flex-end;
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .actions-menu-popup {
+    background: #2d3748;
+    border-color: #4a5568;
+    color: #e2e8f0;
+  }
+  
+  .actions-menu-popup .btn {
+    color: #e2e8f0;
+  }
+  
+  .actions-menu-popup .btn:hover {
+    background: #4a5568;
+    color: #63b3ed;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .actions-menu-popup {
+    min-width: 100px;
+    font-size: 12px;
+  }
+  
+  .actions-menu-popup .btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 12px;
+  }
+}
+
 /* Table container */
 .table-container {
   background: var(--apple-bg-elevated);

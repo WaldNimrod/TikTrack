@@ -195,7 +195,9 @@ const PAGE_CONFIGS = {
             async (pageConfig) => {
                 console.log('🏦 Initializing Trading Accounts...');
                 
-                if (typeof window.loadAccountsData === 'function') {
+                if (typeof window.loadTradingAccountsDataForTradingAccountsPage === 'function') {
+                    await window.loadTradingAccountsDataForTradingAccountsPage();
+                } else if (typeof window.loadAccountsData === 'function') {
                     await window.loadAccountsData();
                 }
             }

@@ -655,7 +655,7 @@ class HeaderSystem {
         gap: 15px;
         align-items: center;
         flex-wrap: nowrap;
-        padding: 0 1rem;
+        padding: 0;
         height: 100%;
         overflow-x: auto;
       }

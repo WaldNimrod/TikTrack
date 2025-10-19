@@ -449,12 +449,7 @@ tr:has(.actions-cell) {
   transition-delay: 0.2s;
 }
 
-/* כפתורים בתוך התפריט - השתמש במערכת הכפתורים המרכזית */
-.actions-menu-popup .btn {
-  /* השתמש במערכת הכפתורים המרכזית - אין סגנונות מיוחדים */
-  margin: 0.125rem 0;
-  width: 100%;
-}
+/* כפתורים בתוך התפריט - השתמש במערכת הכפתורים המרכזית בלבד */
 
 /* RTL Support */
 [dir="rtl"] .actions-menu-popup {
@@ -464,10 +459,7 @@ tr:has(.actions-cell) {
   margin-right: 0;
 }
 
-[dir="rtl"] .actions-menu-popup .btn {
-  text-align: left;
-  justify-content: flex-end;
-}
+/* כפתורים בתפריט - השתמש במערכת המרכזית */
 
 /* Dark Mode Support */
 @media (prefers-color-scheme: dark) {
@@ -477,14 +469,7 @@ tr:has(.actions-cell) {
     color: #e2e8f0;
   }
   
-  .actions-menu-popup .btn {
-    color: #e2e8f0;
-  }
-  
-  .actions-menu-popup .btn:hover {
-    background: #4a5568;
-    color: #63b3ed;
-  }
+  /* כפתורים בתפריט - השתמש במערכת המרכזית */
 }
 
 /* Responsive */
@@ -494,10 +479,7 @@ tr:has(.actions-cell) {
     font-size: 12px;
   }
   
-  .actions-menu-popup .btn {
-    padding: 0.4rem 0.8rem;
-    font-size: 12px;
-  }
+  /* כפתורים בתפריט - השתמש במערכת המרכזית */
 }
 
 /* Table container */

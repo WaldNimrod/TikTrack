@@ -103,11 +103,17 @@ def create_trade_condition(trade_id):
                 return jsonify(validation_result), 400
             
             # Create condition
+            # Convert parameters_json to string if it's a dict
+            parameters_json = data['parameters_json']
+            if isinstance(parameters_json, dict):
+                import json
+                parameters_json = json.dumps(parameters_json, ensure_ascii=False)
+            
             condition = TradeCondition(
                 trade_id=trade_id,
                 method_id=data['method_id'],
                 condition_group=data.get('condition_group', 0),
-                parameters_json=data['parameters_json'],
+                parameters_json=parameters_json,
                 logical_operator=data.get('logical_operator', 'NONE'),
                 inherited_from_plan_condition_id=data.get('inherited_from_plan_condition_id'),
                 is_active=data.get('is_active', True)
@@ -217,9 +223,15 @@ def update_trade_condition(condition_id):
                 return jsonify(validation_result), 400
             
             # Update condition
+            # Convert parameters_json to string if it's a dict
+            parameters_json = data['parameters_json']
+            if isinstance(parameters_json, dict):
+                import json
+                parameters_json = json.dumps(parameters_json, ensure_ascii=False)
+            
             condition.method_id = data['method_id']
             condition.condition_group = data.get('condition_group', condition.condition_group)
-            condition.parameters_json = data['parameters_json']
+            condition.parameters_json = parameters_json
             condition.logical_operator = data.get('logical_operator', condition.logical_operator)
             condition.inherited_from_plan_condition_id = data.get('inherited_from_plan_condition_id', condition.inherited_from_plan_condition_id)
             condition.is_active = data.get('is_active', condition.is_active)
@@ -547,11 +559,17 @@ def create_bulk_trade_conditions():
             for condition_data in conditions_data:
                 condition_data['trade_id'] = trade_id
                 
+                # Convert parameters_json to string if it's a dict
+                parameters_json = condition_data['parameters_json']
+                if isinstance(parameters_json, dict):
+                    import json
+                    parameters_json = json.dumps(parameters_json, ensure_ascii=False)
+                
                 condition = TradeCondition(
                     trade_id=trade_id,
                     method_id=condition_data['method_id'],
                     condition_group=condition_data.get('condition_group', 0),
-                    parameters_json=condition_data['parameters_json'],
+                    parameters_json=parameters_json,
                     logical_operator=condition_data.get('logical_operator', 'NONE'),
                     inherited_from_plan_condition_id=condition_data.get('inherited_from_plan_condition_id'),
                     is_active=condition_data.get('is_active', True)

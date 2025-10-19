@@ -150,7 +150,7 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
 
   // הגדרת אירועי כפתורים
   const confirmBtn = modal.querySelector('.confirm-btn');
-  const cancelBtn = modal.querySelector('.btn-secondary');
+  const cancelBtn = modal.querySelector('.btn');
 
   // פונקציה לסגירת המודל
   const closeModal = () => {

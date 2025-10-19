@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl" class="conditions-test-page">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Favicon will be set by global-favicon.js -->
+    <title>מערכת בדיקת תנאים - TikTrack</title>
+    
+    <!-- 
+    ===== CONDITIONS TEST PAGE =====
+    
+    This page follows the proper TikTrack architecture:
+    1. Complete ITCSS implementation
+    2. All base package systems included
+    3. Correct loading order
+    4. Unified initialization system
+    5. Standard page structure
+    
+    ======================================
+    -->
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap CSS - Must load first -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- ITCSS Architecture - Complete Implementation -->
+    
+    <!-- 01-settings - Variables and Settings -->
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=1.0.0">
+    
+    <!-- 02-tools - Functions and Mixins -->
+    <link rel="stylesheet" href="styles-new/02-tools/_mixins.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/02-tools/_functions.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/02-tools/_utilities.css?v=1.0.0">
+    
+    <!-- 03-generic - Reset and Normalization -->
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=1.0.0">
+    
+    <!-- 04-elements - Basic HTML Elements -->
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=1.0.0">
+    
+    <!-- 05-objects - Layout Structures -->
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=1.0.0">
+    
+    <!-- 06-components - UI Components -->
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_page-headers.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_info-summary.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_constraints.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_system-management.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_chart-management.css?v=1.0.0">
+    
+    <!-- 07-pages - Page-specific Styles -->
+    <link rel="stylesheet" href="styles-new/07-pages/_conditions-test.css?v=1.0.0">
+    
+    <!-- 08-themes - Themes -->
+    <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=1.0.0">
+    
+    <!-- 09-utilities - Utility Classes -->
+    <link rel="stylesheet" href="styles-new/09-utilities/_utilities.css?v=1.0.0">
+
+    <!-- Header Styles - Separate from ITCSS -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=1.0.0">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="conditions-test-page">
+    <!-- Unified Header -->
+    <div id="unified-header"></div>
+    
+    <!-- Background Wrapper -->
+    <div class="background-wrapper">
+        <!-- Page Body -->
+        <div class="page-body">
+            <!-- Top Section -->
+            <div class="top-section" data-section="top">
+                <div class="section-header">
+                    <div class="table-title">
+                        <img src="images/icons/development.svg" alt="בדיקת תנאים" class="section-icon">
+                        מערכת בדיקת תנאים - Conditions
+                    </div>
+                    <div class="table-actions">
+                        <button class="btn btn-success" id="runAllTestsBtn">
+                            <i class="fas fa-play-circle"></i>
+                            Run All Tests
+                        </button>
+                        <button class="btn btn-secondary" id="clearLogsBtn">
+                            <i class="fas fa-trash"></i>
+                            Clear Logs
+                        </button>
+                        <button class="btn btn-primary" id="copyLogBtn">
+                            <i class="fas fa-copy"></i>
+                            Copy Log
+                        </button>
+                        <button class="btn btn-warning" id="resetAllBtn">
+                            <i class="fas fa-redo"></i>
+                            Reset All
+                        </button>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <div class="info-summary" id="testSummary">
+                        <div>סה"כ בדיקות: <strong id="totalTests">7</strong></div>
+                        <div>הצלחות: <strong id="passedTests">0</strong></div>
+                        <div>כשלונות: <strong id="failedTests">0</strong></div>
+                        <div>זמן ביצוע: <strong id="totalDuration">0s</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Content Section 1 - Test Controls -->
+                <div class="content-section" id="test-controls">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/development.svg" alt="שלבי בדיקה" class="section-icon">
+                            שלבי בדיקה
+                        </div>
+                        <div class="table-count" id="testCount">7 בדיקות</div>
+                    </div>
+                    <div class="section-body">
+                        
+                        <!-- Test 1: Load Methods -->
+                        <div class="test-item" data-test="load-methods">
+                            <div class="test-item-header">
+                                <span class="test-number">1</span>
+                                <span class="test-name">טעינת שיטות מסחר</span>
+                                <span class="test-status" id="status-1">⚪</span>
+                            </div>
+                            <div class="test-item-controls">
+                                <button class="btn btn-sm btn-primary run-test-btn" data-test="load-methods">
+                                    <i class="fas fa-play"></i>
+                                    Run Test
+                                </button>
+                                <span class="test-duration" id="duration-1"></span>
+                            </div>
+                        </div>
+
+                        <!-- Test 2: Create Condition -->
+                        <div class="test-item" data-test="create-condition">
+                            <div class="test-item-header">
+                                <span class="test-number">2</span>
+                                <span class="test-name">יצירת תנאי חדש</span>
+                                <span class="test-status" id="status-2">⚪</span>
+                            </div>
+                            <div class="test-item-controls">
+                                <button class="btn btn-sm btn-primary run-test-btn" data-test="create-condition">
+                                    <i class="fas fa-play"></i>
+                                    Run Test
+                                </button>
+                                <span class="test-duration" id="duration-2"></span>
+                            </div>
+                        </div>
+
+                        <!-- Test 3: Read Conditions -->
+                        <div class="test-item" data-test="read-conditions">
+                            <div class="test-item-header">
+                                <span class="test-number">3</span>
+                                <span class="test-name">קריאת תנאים קיימים</span>
+                                <span class="test-status" id="status-3">⚪</span>
+                            </div>
+                            <div class="test-item-controls">
+                                <button class="btn btn-sm btn-primary run-test-btn" data-test="read-conditions">
+                                    <i class="fas fa-play"></i>
+                                    Run Test
+                                </button>
+                                <span class="test-duration" id="duration-3"></span>
+                            </div>
+                        </div>
+
+                        <!-- Test 4: Edit Condition -->
+                        <div class="test-item" data-test="edit-condition">
+                            <div class="test-item-header">
+                                <span class="test-number">4</span>
+                                <span class="test-name">עריכת תנאי</span>
+                                <span class="test-status" id="status-4">⚪</span>
+                            </div>
+                            <div class="test-item-controls">
+                                <button class="btn btn-sm btn-primary run-test-btn" data-test="edit-condition">
+                                    <i class="fas fa-play"></i>
+                                    Run Test
+                                </button>
+                                <span class="test-duration" id="duration-4"></span>
+                            </div>
+                        </div>
+
+                        <!-- Test 5: Delete Condition -->
+                        <div class="test-item" data-test="delete-condition">
+                            <div class="test-item-header">
+                                <span class="test-number">5</span>
+                                <span class="test-name">מחיקת תנאי</span>
+                                <span class="test-status" id="status-5">⚪</span>
+                            </div>
+                            <div class="test-item-controls">
+                                <button class="btn btn-sm btn-primary run-test-btn" data-test="delete-condition">
+                                    <i class="fas fa-play"></i>
+                                    Run Test
+                                </button>
+                                <span class="test-duration" id="duration-5"></span>
+                            </div>
+                        </div>
+
+                        <!-- Test 6: Create Alert -->
+                        <div class="test-item" data-test="create-alert">
+                            <div class="test-item-header">
+                                <span class="test-number">6</span>
+                                <span class="test-name">יצירת התראה מתנאי</span>
+                                <span class="test-status" id="status-6">⚪</span>
+                            </div>
+                            <div class="test-item-controls">
+                                <button class="btn btn-sm btn-primary run-test-btn" data-test="create-alert">
+                                    <i class="fas fa-play"></i>
+                                    Run Test
+                                </button>
+                                <span class="test-duration" id="duration-6"></span>
+                            </div>
+                        </div>
+
+                        <!-- Test 7: Inheritance Test -->
+                        <div class="test-item" data-test="inheritance-test">
+                            <div class="test-item-header">
+                                <span class="test-number">7</span>
+                                <span class="test-name">בדיקת ירושה (Trade מ-Trade Plan)</span>
+                                <span class="test-status" id="status-7">⚪</span>
+                            </div>
+                            <div class="test-item-controls">
+                                <button class="btn btn-sm btn-primary run-test-btn" data-test="inheritance-test">
+                                    <i class="fas fa-play"></i>
+                                    Run Test
+                                </button>
+                                <span class="test-duration" id="duration-7"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    </div>
+                </div>
+
+                <!-- Content Section 2 - Log Display -->
+                <div class="content-section" id="log-display">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/development.svg" alt="Log Output" class="section-icon">
+                            Log Output
+                        </div>
+                        <div class="table-actions">
+                            <button class="btn btn-sm btn-secondary" id="copyFormattedBtn">
+                                <i class="fas fa-code"></i>
+                                Copy Formatted
+                            </button>
+                            <button class="btn btn-sm btn-secondary" id="copyRawBtn">
+                                <i class="fas fa-file-text"></i>
+                                Copy Raw
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="log-content" id="logContent">
+                            <div class="log-entry info">
+                                <span class="log-timestamp">[2025-10-19 15:30:45]</span>
+                                <span class="log-level">INFO:</span>
+                                <span class="log-message">מערכת בדיקת תנאים מוכנה לשימוש</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer" class="notification-container"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- TikTrack Base Package Scripts -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script>
+    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script>
+    <script src="scripts/global-favicon.js?v=1.0.0"></script>
+    <script src="scripts/translation-utils.js?v=1.0.0"></script>
+    <script src="scripts/notification-system.js?v=1.0.0"></script>
+    <script src="scripts/cache-sync-manager.js?v=1.0.0"></script>
+    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script>
+    <script src="scripts/cache-policy-manager.js?v=1.0.0"></script>
+    <script src="scripts/memory-optimizer.js?v=1.0.0"></script>
+    <script src="scripts/ui-utils.js?v=1.0.0"></script>
+    <script src="scripts/color-scheme-system.js?v=1.0.0"></script>
+    <script src="scripts/header-system.js?v=v6.0.0"></script>
+    <script src="scripts/data-utils.js?v=1.0.0"></script>
+    <script src="scripts/date-utils.js?v=1.0.0"></script>
+    <script src="scripts/button-icons.min.js?v=1.0.0"></script>
+    <script src="scripts/button-system-init.js"></script>
+    <script src="scripts/tables.js?v=1.0.0"></script>
+    <script src="scripts/table-mappings.js?v=1.0.0"></script>
+    <script src="scripts/page-utils.js?v=1.0.0"></script>
+    <script src="scripts/preferences.js?v=1.0.0"></script>
+    <script src="scripts/notification-category-detector.js?v=1.0.0"></script>
+    <script src="scripts/global-notification-collector.js?v=1.0.0"></script>
+    <script src="scripts/system-management.js?v=1.0.0"></script>
+    <script src="scripts/error-handlers.js?v=1.0.0"></script>
+    
+    <!-- Page-specific Scripts -->
+    <script src="scripts/conditions-test.js?v=1.0.0"></script>
+    
+    <!-- Initialize the page -->
+    <script>
+        // Configuration is already defined in page-initialization-configs.js
+        
+        // Initialize conditions test page
+        async function initializeConditionsTestPage() {
+            console.log('🔧 initializeConditionsTestPage() called');
+            try {
+                if (window.conditionsTestManager) {
+                    console.log('🔧 conditionsTestManager found, initializing...');
+                    await window.conditionsTestManager.initialize();
+                } else {
+                    console.log('🔧 conditionsTestManager not found!');
+                }
+            } catch (error) {
+                console.error('🔧 Failed to initialize conditions test page:', error);
+            }
+        }
+        
+        // Make function globally available
+        window.initializeConditionsTestPage = initializeConditionsTestPage;
+        
+        // Unified initialization - UI Standardization Round C
+        if (window.unifiedAppInitializer) {
+            window.unifiedAppInitializer.initialize();
+        }
+    </script>
+</body>
+</html>

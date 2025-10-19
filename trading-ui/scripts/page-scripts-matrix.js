@@ -376,7 +376,7 @@ class PageScriptsMatrixSystem {
             primaryScripts.forEach(script => {
                 html += `<span class="badge bg-primary d-flex align-items-center gap-1">
                     ${script}
-                    <button class="btn btn-sm btn-outline-light p-0" style="width: 16px; height: 16px; font-size: 10px;" onclick="pageScriptsMatrix.viewFileDetails('${script}')" title="פרטים">i</button>
+                    <button class="btn btn-sm p-0" style="width: 16px; height: 16px; font-size: 10px;" onclick="pageScriptsMatrix.viewFileDetails('${script}')" title="פרטים">i</button>
                 </span>`;
             });
             html += '</div></div>';
@@ -386,7 +386,7 @@ class PageScriptsMatrixSystem {
         utilityScripts.forEach(script => {
             html += `<span class="badge bg-info d-flex align-items-center gap-1">
                 ${script}
-                <button class="btn btn-sm btn-outline-light p-0" style="width: 16px; height: 16px; font-size: 10px;" onclick="pageScriptsMatrix.viewFileDetails('${script}')" title="פרטים">i</button>
+                <button class="btn btn-sm p-0" style="width: 16px; height: 16px; font-size: 10px;" onclick="pageScriptsMatrix.viewFileDetails('${script}')" title="פרטים">i</button>
             </span>`;
         });
         html += '</div></div>';
@@ -396,7 +396,7 @@ class PageScriptsMatrixSystem {
         serviceScripts.forEach(script => {
             html += `<span class="badge bg-success d-flex align-items-center gap-1">
                 ${script}
-                <button class="btn btn-sm btn-outline-light p-0" style="width: 16px; height: 16px; font-size: 10px;" onclick="pageScriptsMatrix.viewFileDetails('${script}')" title="פרטים">i</button>
+                <button class="btn btn-sm p-0" style="width: 16px; height: 16px; font-size: 10px;" onclick="pageScriptsMatrix.viewFileDetails('${script}')" title="פרטים">i</button>
             </span>`;
         });
         html += '</div></div>';
@@ -406,7 +406,7 @@ class PageScriptsMatrixSystem {
         otherScripts.forEach(script => {
             html += `<span class="badge bg-secondary d-flex align-items-center gap-1">
                 ${script}
-                <button class="btn btn-sm btn-outline-light p-0" style="width: 16px; height: 16px; font-size: 10px;" onclick="pageScriptsMatrix.viewFileDetails('${script}')" title="פרטים">i</button>
+                <button class="btn btn-sm p-0" style="width: 16px; height: 16px; font-size: 10px;" onclick="pageScriptsMatrix.viewFileDetails('${script}')" title="פרטים">i</button>
             </span>`;
         });
         html += '</div></div>';
@@ -424,7 +424,7 @@ class PageScriptsMatrixSystem {
                     </div>
                     <div class="mt-2">
                         <strong>סך הכל: ${files.length} קבצי JavaScript</strong>
-                        <button class="btn btn-sm btn-success ms-2" onclick="pageScriptsMatrix.refreshFilesList()">
+                        <button class="btn btn-sm ms-2" onclick="pageScriptsMatrix.refreshFilesList()">
                             <i class="fas fa-sync-alt"></i> רענן רשימה
                         </button>
                     </div>
@@ -477,7 +477,7 @@ class PageScriptsMatrixSystem {
                                 </div>
                                 <div class="modal-footer">
                                     <button data-button-type="CLOSE" data-attributes="data-bs-dismiss='modal' type='button'"></button>
-                                    <button type="button" class="btn btn-primary" onclick="pageScriptsMatrix.downloadFile('${filename}')">הורד קובץ</button>
+                                    <button type="button" class="btn" onclick="pageScriptsMatrix.downloadFile('${filename}')">הורד קובץ</button>
                                 </div>
                             </div>
                         </div>
@@ -612,7 +612,7 @@ class PageScriptsMatrixSystem {
                             </div>
                             <div class="modal-footer">
                                 <button data-button-type="CLOSE" data-attributes="data-bs-dismiss='modal' type='button'"></button>
-                                <button type="button" class="btn btn-primary" onclick="this.previousElementSibling.select(); document.execCommand('copy');">העתק</button>
+                                <button type="button" class="btn" onclick="this.previousElementSibling.select(); document.execCommand('copy');">העתק</button>
                             </div>
                         </div>
                     </div>
@@ -667,10 +667,10 @@ class PageScriptsMatrixSystem {
                 <h5>ניתוח תלויות</h5>
                 <p>מערכת ניתוח התלויות תזהה קשרים בין קבצי JavaScript ותציג אותם בצורה ויזואלית.</p>
                 <div class="mt-3">
-                    <button class="btn btn-primary" onclick="pageScriptsMatrix.analyzeDependencies()" id="analyzeDepsBtn">
+                    <button class="btn" onclick="pageScriptsMatrix.analyzeDependencies()" id="analyzeDepsBtn">
                         הפעל ניתוח תלויות
                     </button>
-                    <button class="btn btn-secondary ms-2" onclick="pageScriptsMatrix.viewDependencyGraph()" id="viewGraphBtn" style="display: none;">
+                    <button class="btn ms-2" onclick="pageScriptsMatrix.viewDependencyGraph()" id="viewGraphBtn" style="display: none;">
                         הצג גרף תלויות
                     </button>
                 </div>
@@ -787,7 +787,7 @@ class PageScriptsMatrixSystem {
                                 <li><strong>עדכון אחרון:</strong> ${realStats.lastUpdate}</li>
                                 <li><strong>קבצים פעילים:</strong> ${realStats.activeFiles}</li>
                             </ul>
-                            <button class="btn btn-sm btn-outline-primary" onclick="pageScriptsMatrix.refreshSystemStats()">
+                            <button class="btn btn-sm" onclick="pageScriptsMatrix.refreshSystemStats()">
                                 <i class="fas fa-sync-alt"></i> רענן סטטיסטיקות
                             </button>
                         </div>
@@ -978,13 +978,13 @@ class PageScriptsMatrixSystem {
                 <div class="col-md-6">
                     <h5>פעולות ניהול</h5>
                     <div class="d-grid gap-2">
-                        <button class="btn btn-primary" onclick="pageScriptsMatrix.backupData()">
+                        <button class="btn" onclick="pageScriptsMatrix.backupData()">
                             יצירת גיבוי
                         </button>
-                        <button class="btn btn-warning" onclick="pageScriptsMatrix.cleanupOldData()">
+                        <button class="btn" onclick="pageScriptsMatrix.cleanupOldData()">
                             ניקוי נתונים ישנים
                         </button>
-                        <button class="btn btn-info" onclick="pageScriptsMatrix.optimizeStorage()">
+                        <button class="btn" onclick="pageScriptsMatrix.optimizeStorage()">
                             אופטימיזציה
                         </button>
                     </div>
@@ -999,7 +999,7 @@ class PageScriptsMatrixSystem {
                 <div class="alert alert-danger">
                     <h5>שגיאה בטעינת נתוני אחסון</h5>
                     <p>${error.message}</p>
-                    <button class="btn btn-primary" onclick="pageScriptsMatrix.renderStorageManagement()">נסה שוב</button>
+                    <button class="btn" onclick="pageScriptsMatrix.renderStorageManagement()">נסה שוב</button>
                 </div>
             `;
         }
@@ -1017,10 +1017,10 @@ class PageScriptsMatrixSystem {
                 <h5>בדיקת ארכיטקטורה</h5>
                 <p>מערכת בדיקת הארכיטקטורה מוודאת שהקוד עומד בכללי הפרויקט.</p>
                 <div class="mt-3">
-                    <button class="btn btn-success" onclick="pageScriptsMatrix.runArchitectureCheck()" id="archCheckBtn">
+                    <button class="btn" onclick="pageScriptsMatrix.runArchitectureCheck()" id="archCheckBtn">
                         הפעל בדיקת ארכיטקטורה
                     </button>
-                    <button class="btn btn-secondary ms-2" onclick="pageScriptsMatrix.viewArchitectureReport()" id="viewArchReportBtn" style="display: none;">
+                    <button class="btn ms-2" onclick="pageScriptsMatrix.viewArchitectureReport()" id="viewArchReportBtn" style="display: none;">
                         הצג דוח ארכיטקטורה
                     </button>
                 </div>
@@ -1092,7 +1092,7 @@ class PageScriptsMatrixSystem {
                 <div class="col-md-6">
                     <h5>מידע סנכרון</h5>
                     <p><strong>סנכרון אחרון:</strong> ${status.lastSync}</p>
-                    <button class="btn btn-primary" onclick="pageScriptsMatrix.syncWithSystems()">
+                    <button class="btn" onclick="pageScriptsMatrix.syncWithSystems()">
                         סנכרן עם מערכות
                     </button>
                 </div>
@@ -1201,10 +1201,10 @@ class PageScriptsMatrixSystem {
                     <div class="col-md-6"><strong>זמן יצירה:</strong> ${new Date().toLocaleString('he-IL')}</div>
                 </div>
                 <div class="mt-3">
-                    <button class="btn btn-primary btn-sm" onclick="pageScriptsMatrix.downloadBackup('${backupFilename}')">
+                    <button class="btn btn-sm" onclick="pageScriptsMatrix.downloadBackup('${backupFilename}')">
                         <i class="fas fa-download"></i> הורד גיבוי
                     </button>
-                    <button class="btn btn-outline-primary btn-sm ms-2" onclick="pageScriptsMatrix.copyBackupInfo('${backupFilename}')">
+                    <button class="btn btn-sm ms-2" onclick="pageScriptsMatrix.copyBackupInfo('${backupFilename}')">
                         <i class="fas fa-copy"></i> העתק פרטים
                     </button>
                 </div>
@@ -1373,9 +1373,9 @@ class PageScriptsMatrixSystem {
                                 <p>${message}</p>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="window.confirmDialogResult = 'cancel'">${cancelAction}</button>
-                                <button type="button" class="btn btn-warning" data-bs-dismiss="modal" onclick="window.confirmDialogResult = 'cleanup'">${secondaryAction}</button>
-                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="window.confirmDialogResult = 'backup'">${primaryAction}</button>
+                                <button type="button" class="btn" data-bs-dismiss="modal" onclick="window.confirmDialogResult = 'cancel'">${cancelAction}</button>
+                                <button type="button" class="btn" data-bs-dismiss="modal" onclick="window.confirmDialogResult = 'cleanup'">${secondaryAction}</button>
+                                <button type="button" class="btn" data-bs-dismiss="modal" onclick="window.confirmDialogResult = 'backup'">${primaryAction}</button>
                             </div>
                         </div>
                     </div>
@@ -1592,9 +1592,9 @@ class PageScriptsMatrixSystem {
                         <pre style="white-space: pre-wrap; font-size: 12px; max-height: 400px; overflow-y: auto;">${logText}</pre>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" onclick="document.getElementById('logModal').remove()">סגור</button>
-                        <button type="button" class="btn btn-primary" onclick="pageScriptsMatrix.copyToClipboard('${logText.replace(/'/g, "\\'")}')">העתק שוב</button>
-                        <button type="button" class="btn btn-success" onclick="pageScriptsMatrix.downloadLog('${logText.replace(/'/g, "\\'")}')">הורד כקובץ</button>
+                        <button type="button" class="btn" onclick="document.getElementById('logModal').remove()">סגור</button>
+                        <button type="button" class="btn" onclick="pageScriptsMatrix.copyToClipboard('${logText.replace(/'/g, "\\'")}')">העתק שוב</button>
+                        <button type="button" class="btn" onclick="pageScriptsMatrix.downloadLog('${logText.replace(/'/g, "\\'")}')">הורד כקובץ</button>
                     </div>
                 </div>
             </div>
@@ -2129,7 +2129,7 @@ class PageScriptsMatrixSystem {
                         </div>
                         <div class="modal-footer">
                             <button data-button-type="CLOSE" data-attributes="data-bs-dismiss='modal' type='button'"></button>
-                            <button type="button" class="btn btn-primary" onclick="pageScriptsMatrix.copyDependencyGraph()">העתק</button>
+                            <button type="button" class="btn" onclick="pageScriptsMatrix.copyDependencyGraph()">העתק</button>
                         </div>
                     </div>
                 </div>
@@ -2556,7 +2556,7 @@ class PageScriptsMatrixSystem {
         
         let html = `
             <div class="mb-3">
-                <button class="btn btn-primary" onclick="pageScriptsMatrix.copyArchitectureReport()">
+                <button class="btn" onclick="pageScriptsMatrix.copyArchitectureReport()">
                     <i class="fas fa-copy"></i> העתק דוח ארכיטקטורה
                 </button>
             </div>

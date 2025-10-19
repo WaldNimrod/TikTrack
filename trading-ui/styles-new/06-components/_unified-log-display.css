@@ -90,27 +90,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         
-        &.btn-outline-primary {
-            color: var(--apple-blue);
-            border-color: var(--apple-blue);
-            background: white;
-            
-            &:hover {
-                background: var(--apple-blue);
-                color: white;
-            }
-        }
-        
-        &.btn-outline-secondary {
-            color: var(--apple-gray-7);
-            border-color: var(--apple-gray-4);
-            background: white;
-            
-            &:hover {
-                background: var(--apple-gray-2);
-                color: var(--apple-gray-11);
-            }
-        }
+        /* Bootstrap button classes - הוסר, מוגדר ב-data-button-type */
         
         /* &.btn-success - הוסר, מוגדר ב-_bootstrap-overrides.css */
         

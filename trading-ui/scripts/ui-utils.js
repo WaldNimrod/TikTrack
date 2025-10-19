@@ -1057,7 +1057,7 @@ function generateActionButtons(entityId, entityType, status, detailsFunction, li
   // Details button
   if (showDetails) {
     buttonsHtml += `
-      <button class="btn btn-sm btn-outline-success" onclick="${detailsFunction}('${entityType}', ${entityId})" title="פרטים">
+      <button class="btn btn-sm" onclick="${detailsFunction}('${entityType}', ${entityId})" title="פרטים">
         👁️
       </button>`;
   }
@@ -1065,7 +1065,7 @@ function generateActionButtons(entityId, entityType, status, detailsFunction, li
   // Linked items button
   if (showLinked) {
     buttonsHtml += `
-      <button class="btn btn-sm btn-outline-success" onclick="${linkedFunction}('${entityType}', ${entityId})" title="אובייקטים מקושרים">
+      <button class="btn btn-sm" onclick="${linkedFunction}('${entityType}', ${entityId})" title="אובייקטים מקושרים">
         🔗
       </button>`;
   }
@@ -1073,7 +1073,7 @@ function generateActionButtons(entityId, entityType, status, detailsFunction, li
   // Edit button
   if (showEdit) {
     buttonsHtml += `
-      <button class="btn btn-sm btn-outline-warning" onclick="${editFunction}('${entityType}', ${entityId})" title="ערוך">
+      <button class="btn btn-sm" onclick="${editFunction}('${entityType}', ${entityId})" title="ערוך">
         ✏️
       </button>`;
   }
@@ -1081,7 +1081,7 @@ function generateActionButtons(entityId, entityType, status, detailsFunction, li
   // Cancel/Restore button
   if (showCancel) {
     const isCancelled = status === 'בוטל' || status === 'סגור';
-    const buttonClass = isCancelled ? 'btn-outline-success' : 'btn-outline-danger';
+    const buttonClass = 'btn';
     const buttonTitle = isCancelled ? 'שיחזר' : 'בטל';
     const buttonIcon = isCancelled ? '↻' : '❌';
     const buttonFunction = isCancelled ? restoreFunction : cancelFunction;
@@ -1095,7 +1095,7 @@ function generateActionButtons(entityId, entityType, status, detailsFunction, li
   // Delete button
   if (showDelete) {
     buttonsHtml += `
-      <button class="btn btn-sm btn-outline-danger" onclick="${deleteFunction}('${entityType}', ${entityId})" title="מחק" style="font-size: 0.8em;">
+      <button class="btn btn-sm" onclick="${deleteFunction}('${entityType}', ${entityId})" title="מחק" style="font-size: 0.8em;">
         🗑️
       </button>`;
   }

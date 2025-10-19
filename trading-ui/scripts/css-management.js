@@ -269,7 +269,7 @@ function showCssViewerModal(filename, content) {
                     </div>
                     <div class="modal-footer">
                         <button data-button-type="CLOSE" data-attributes="data-bs-dismiss='modal' type='button'"></button>
-                        <button type="button" class="btn btn-primary" onclick="editCssFile('${filename}')">
+                        <button type="button" class="btn" onclick="editCssFile('${filename}')">
                             <i class="fas fa-edit"></i> ערוך
                         </button>
                     </div>
@@ -323,7 +323,7 @@ function showDeleteConfirmationModal(filename) {
                     </div>
                     <div class="modal-footer">
                         <button data-button-type="CANCEL" data-attributes="data-bs-dismiss='modal' type='button'"></button>
-                        <button type="button" class="btn btn-danger" onclick="confirmDeleteCssFile('${filename}')">
+                        <button type="button" class="btn" onclick="confirmDeleteCssFile('${filename}')">
                             <i class="fas fa-trash"></i> מחק
                         </button>
                     </div>
@@ -500,10 +500,10 @@ function displaySearchResults(results, searchTerm) {
                     <div class="card-body">
                         <pre class="mb-2" style="background: #f8f9fa; padding: 10px; border-radius: 4px;">${result.content}</pre>
                         <div class="btn-group btn-group-sm">
-                            <button class="btn btn-outline-primary btn-sm" onclick="viewCssFile('${result.file}')">
+                            <button class="btn btn-sm" onclick="viewCssFile('${result.file}')">
                                 <i class="fas fa-eye"></i> צפה
                             </button>
-                            <button class="btn btn-outline-success btn-sm" onclick="editCssFile('${result.file}')">
+                            <button class="btn btn-sm" onclick="editCssFile('${result.file}')">
                                 <i class="fas fa-edit"></i> ערוך
                             </button>
                         </div>
@@ -530,7 +530,7 @@ function createSearchResultsContainer() {
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">🔍 תוצאות חיפוש</h5>
-                    <button class="btn btn-sm btn-outline-secondary" onclick="clearSearchResults()">
+                    <button class="btn btn-sm" onclick="clearSearchResults()">
                         סגור
                     </button>
                 </div>
@@ -661,7 +661,7 @@ function showUnusedCssRemovalModal(cleanupResults) {
                     </div>
                     <div class="modal-footer">
                         <button data-button-type="CANCEL" data-attributes="data-bs-dismiss='modal' type='button'"></button>
-                        <button type="button" class="btn btn-danger" onclick="executeUnusedCssRemoval()">
+                        <button type="button" class="btn" onclick="executeUnusedCssRemoval()">
                             <i class="fas fa-trash"></i> הסר נבחרים
                         </button>
                     </div>
@@ -878,7 +878,7 @@ async function detectCssDuplicatesAPI() {
         // כל הכפילויות הזמינות
         const allDuplicates = [
             {
-                selector: '.btn-primary',
+                selector: '.btn',
                 files: ['_buttons-base.css', '_buttons-advanced.css'],
                 lines: [15, 23],
                 conflict: true
@@ -982,7 +982,7 @@ function displayDuplicateResults(results) {
             html += `
                 <div class="alert alert-warning">
                     <strong>⚠️ נמצאו ${results.duplicates.length} כפילויות:</strong>
-                    <button class="btn btn-sm btn-outline-secondary ms-2" onclick="resetAllDuplicates()">
+                    <button class="btn btn-sm ms-2" onclick="resetAllDuplicates()">
                         <i class="fas fa-refresh"></i> איפוס
                     </button>
                 </div>
@@ -1005,10 +1005,10 @@ function displayDuplicateResults(results) {
                         <td>${duplicate.files.join(', ')}</td>
                         <td>
                             <div class="d-flex gap-1">
-                                <button class="btn btn-sm btn-outline-primary" onclick="showSpecificDuplicateCleanupModal('${duplicate.selector}', {files: [${duplicate.files.map(f => `'${f}'`).join(', ')}]})">
+                                <button class="btn btn-sm" onclick="showSpecificDuplicateCleanupModal('${duplicate.selector}', {files: [${duplicate.files.map(f => `'${f}'`).join(', ')}]})">
                                     <i class="fas fa-merge"></i> איחוד
                                 </button>
-                            <button class="btn btn-sm btn-outline-danger" onclick="removeSpecificDuplicate('${duplicate.selector}')">
+                            <button class="btn btn-sm" onclick="removeSpecificDuplicate('${duplicate.selector}')">
                                 <i class="fas fa-trash"></i> מחק
                             </button>
                             </div>
@@ -1048,7 +1048,7 @@ function createDuplicateResultsContainer() {
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">🔍 תוצאות כפילויות</h5>
-                    <button class="btn btn-sm btn-outline-secondary" onclick="clearDuplicateResults()">
+                    <button class="btn btn-sm" onclick="clearDuplicateResults()">
                         סגור
                     </button>
                 </div>
@@ -1089,7 +1089,7 @@ function showBackupDialog(actionCallback) {
                     </div>
                     <div class="modal-footer">
                         <button data-button-type="CANCEL" data-attributes="data-bs-dismiss='modal' type='button'"></button>
-                        <button type="button" class="btn btn-primary" onclick="proceedWithBackup()">
+                        <button type="button" class="btn" onclick="proceedWithBackup()">
                             <i class="fas fa-play"></i> המשך
                         </button>
                     </div>
@@ -1261,7 +1261,7 @@ function showDuplicateCleanupModal(duplicates) {
                     </div>
                     <div class="modal-footer">
                         <button data-button-type="CANCEL" data-attributes="data-bs-dismiss='modal' type='button'"></button>
-                        <button type="button" class="btn btn-primary" onclick="executeDuplicateCleanup()">
+                        <button type="button" class="btn" onclick="executeDuplicateCleanup()">
                             <i class="fas fa-merge"></i> בצע איחוד
                         </button>
                     </div>
@@ -1385,7 +1385,7 @@ function showSpecificDuplicateCleanupModal(selector, duplicate) {
                     </div>
                     <div class="modal-footer">
                         <button data-button-type="CANCEL" data-attributes="data-bs-dismiss='modal' type='button'"></button>
-                        <button type="button" class="btn btn-primary" onclick="executeSpecificDuplicateCleanup('${selector}')">
+                        <button type="button" class="btn" onclick="executeSpecificDuplicateCleanup('${selector}')">
                             <i class="fas fa-merge"></i> בצע איחוד
                         </button>
                     </div>
@@ -1507,7 +1507,7 @@ function showDeleteFileSelectionModal(selector, duplicate) {
                     </div>
                     <div class="modal-footer">
                         <button data-button-type="CANCEL" data-attributes="data-bs-dismiss='modal' type='button'"></button>
-                        <button type="button" class="btn btn-danger" onclick="executeDeleteFromFile('${selector}')">
+                        <button type="button" class="btn" onclick="executeDeleteFromFile('${selector}')">
                             <i class="fas fa-trash"></i> מחק מהקובץ
                         </button>
                     </div>
@@ -1755,7 +1755,7 @@ function createComplianceResultsContainer() {
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">🏗️ תוצאות תאימות ITCSS</h5>
-                    <button class="btn btn-sm btn-outline-secondary" onclick="clearComplianceResults()">
+                    <button class="btn btn-sm" onclick="clearComplianceResults()">
                         סגור
                     </button>
                 </div>
@@ -1803,7 +1803,7 @@ function showAddCssFileModal() {
                     </div>
                     <div class="modal-footer">
                         <button data-button-type="CANCEL" data-attributes="data-bs-dismiss='modal' type='button'"></button>
-                        <button type="button" class="btn btn-primary" onclick="createNewCssFileFromModal()">
+                        <button type="button" class="btn" onclick="createNewCssFileFromModal()">
                             <i class="fas fa-plus"></i> צור קובץ
                         </button>
                     </div>
@@ -1970,13 +1970,13 @@ function displayCssFilesTable(files) {
             <td>${file.lastModified}</td>
             <td>
                 <div class="btn-group btn-group-sm">
-                    <button class="btn btn-outline-primary btn-sm" onclick="viewCssFile('${file.path}')" title="צפה בקובץ">
+                    <button class="btn btn-sm" onclick="viewCssFile('${file.path}')" title="צפה בקובץ">
                         <i class="fas fa-eye"></i> צפה
                     </button>
-                    <button class="btn btn-outline-warning btn-sm" onclick="editCssFile('${file.path}')" title="ערוך קובץ">
+                    <button class="btn btn-sm" onclick="editCssFile('${file.path}')" title="ערוך קובץ">
                         <i class="fas fa-edit"></i> ערוך
                     </button>
-                    <button class="btn btn-outline-danger btn-sm" onclick="confirmDeleteCssFile('${file.path}')" title="מחק קובץ">
+                    <button class="btn btn-sm" onclick="confirmDeleteCssFile('${file.path}')" title="מחק קובץ">
                         <i class="fas fa-trash"></i> מחק
                     </button>
                 </div>

@@ -281,10 +281,10 @@ window.displayAdminPreferences = function(preferencesData) {
                 <code>${pref.info.default_value || 'none'}</code>
             </td>
             <td>
-                <button class="btn btn-sm btn-outline-primary" onclick="window.editAdminPreference('${pref.name}')">
+                <button class="btn btn-sm" onclick="window.editAdminPreference('${pref.name}')">
                     <i class="bi bi-pencil"></i>
                 </button>
-                <button class="btn btn-sm btn-outline-danger" onclick="window.resetAdminPreference('${pref.name}')">
+                <button class="btn btn-sm" onclick="window.resetAdminPreference('${pref.name}')">
                     <i class="bi bi-arrow-clockwise"></i>
                 </button>
             </td>
@@ -563,7 +563,7 @@ window.showPreferencesAdmin = function() {
         if (!existingButton) {
             const button = document.createElement('button');
             button.id = 'show-admin-button';
-            button.className = 'btn btn-outline-secondary btn-sm';
+            button.className = 'btn btn-sm';
             button.innerHTML = '<i class="bi bi-gear-fill"></i> ממשק ניהול';
             button.onclick = window.showPreferencesAdmin;
             

@@ -218,15 +218,7 @@
   transform: translateY(-1px);
 }
 
-.announcement-banner .btn-outline-light {
-  border-color: rgba(255, 255, 255, 0.5);
-  color: white;
-}
-
-.announcement-banner .btn-outline-light:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: white;
-}
+/* .announcement-banner .btn-outline-light - הוסר, מוגדר ב-_bootstrap-overrides.css */
 
 /* ===== סגנונות כפתורים מרכזיים ===== */
 

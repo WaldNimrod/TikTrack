@@ -1412,7 +1412,7 @@ class ServerMonitor {
             <div class="modal-body">
               <div class="d-grid gap-2">
                 ${modes.map(mode => `
-                  <button class="btn btn-outline-primary" onclick="serverMonitor.executeCacheMode('${mode.value}'); bootstrap.Modal.getInstance(document.getElementById('modeSelectorModal')).hide();">
+                  <button class="btn" onclick="serverMonitor.executeCacheMode('${mode.value}'); bootstrap.Modal.getInstance(document.getElementById('modeSelectorModal')).hide();">
                     <i class="${mode.icon}"></i> ${mode.label}
                   </button>
                 `).join('')}

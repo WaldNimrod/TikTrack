@@ -78,33 +78,33 @@ const BUTTON_TEXTS = {
  */
 function getButtonClass(type) {
   const classMap = {
-    EDIT: 'btn-secondary',
-    DELETE: 'btn-danger',
-    CANCEL: 'btn-secondary',
-    LINK: 'btn-info',
-    ADD: 'btn-success',
-    SAVE: 'btn-success',
-    CLOSE: 'btn-secondary',
-    REFRESH: 'btn-outline-secondary',
-    EXPORT: 'btn-outline-primary',
-    IMPORT: 'btn-outline-success',
-    SEARCH: 'btn-outline-info',
-    FILTER: 'btn-outline-warning',
-    VIEW: 'btn-outline-info',
-    DUPLICATE: 'btn-outline-secondary',
-    ARCHIVE: 'btn-outline-warning',
-    RESTORE: 'btn-outline-success',
-    REACTIVATE: 'btn-success',
-    APPROVE: 'btn-success',
-    REJECT: 'btn-danger',
-    PAUSE: 'btn-warning',
-    PLAY: 'btn-success',
-    STOP: 'btn-danger',
-    TOGGLE: 'btn-outline-warning',
-    SORT: 'btn-link',
-    COPY: 'btn-outline-secondary'
+    EDIT: 'btn',
+    DELETE: 'btn',
+    CANCEL: 'btn',
+    LINK: 'btn',
+    ADD: 'btn',
+    SAVE: 'btn',
+    CLOSE: 'btn',
+    REFRESH: 'btn',
+    EXPORT: 'btn',
+    IMPORT: 'btn',
+    SEARCH: 'btn',
+    FILTER: 'btn',
+    VIEW: 'btn',
+    DUPLICATE: 'btn',
+    ARCHIVE: 'btn',
+    RESTORE: 'btn',
+    REACTIVATE: 'btn',
+    APPROVE: 'btn',
+    REJECT: 'btn',
+    PAUSE: 'btn',
+    PLAY: 'btn',
+    STOP: 'btn',
+    TOGGLE: 'btn',
+    SORT: 'btn',
+    COPY: 'btn'
   };
-  return classMap[type.toUpperCase()] || 'btn-secondary';
+  return classMap[type.toUpperCase()] || 'btn';
 }
 
 // Buttons that support entity color variants

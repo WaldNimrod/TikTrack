@@ -105,9 +105,7 @@
                             <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים וההתראות">
                                 <i class="fas fa-copy"></i> העתק לוג מפורט
                             </button>
-                            <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר סקשן">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
                         </div>
                     </div>
                     <div class="section-body">
@@ -143,15 +141,13 @@
                     <div class="section-header entity-test-sub-header">
                         <h2>📋 ניהול התראות</h2>
                         <div class="filter-buttons-container button-row">
-                            <button class="btn btn-success" onclick="showAddAlertModal()" title="הוסף התראה חדשה" style="margin-left: 10px;">
-                                <i class="fas fa-plus"></i> הוסף התראה
-                            </button>
+                            <button data-button-type="ADD" data-entity-type="alert" data-variant="full" data-onclick="showAddAlertModal()" data-text="הוסף התראה" title="הוסף התראה חדשה" style="margin-left: 10px;"></button>
                             <div class="action-separator"></div>
                             <button class="btn btn-sm active" onclick="filterAlertsByRelatedObjectType('all')" data-type="all" title="הצג הכל" style="background-color: white; color: #28a745; border-color: #28a745;">
                                 הכל
                             </button>
                             <button class="btn btn-sm btn-outline-primary" onclick="filterAlertsByRelatedObjectType('account')" data-type="account" title="חשבונות" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
-                                <img src="images/icons/accounts.svg" alt="חשבונות" style="width: 14px; height: 14px;">
+                                <img src="images/icons/trading_accounts.svg" alt="חשבונות מסחר" style="width: 14px; height: 14px;">
                             </button>
                             <button class="btn btn-sm btn-outline-primary" onclick="filterAlertsByRelatedObjectType('trade')" data-type="trade" title="טריידים" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
                                 <img src="images/icons/trades.svg" alt="טריידים" style="width: 14px; height: 14px;">
@@ -165,9 +161,7 @@
                             
                             <span style="margin: 0 10px; color: #666;">|</span>
                         </div>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
+                        <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('section1')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
                     </div>
                     <div class="section-body">
                         <!-- Alerts table -->
@@ -542,14 +536,11 @@
     
     <!-- Stage 2: Core Base Systems -->
     <script src="scripts/global-favicon.js?v=1.0.0"></script>
-    <script src="scripts/translation-system.js?v=1.0.0"></script>
-    <script src="scripts/page-state-management.js?v=1.0.0"></script>
-    <script src="scripts/section-state-persistence.js?v=1.0.0"></script>
+    <script src="scripts/translation-utils.js?v=1.0.0"></script>
     
     <!-- Stage 3: UI Base Systems -->
-    <script src="scripts/modal-management.js?v=1.0.0"></script>
+    <script src="scripts/ui-utils.js?v=1.0.0"></script>
     <script src="scripts/notification-system.js?v=1.0.0"></script>
-    <script src="scripts/confirm-replacement.js?v=1.0.0"></script>
     
     <!-- Stage 4: Cache and Refresh Systems -->
     <script src="scripts/cache-sync-manager.js?v=1.0.0"></script>
@@ -560,18 +551,24 @@
     <!-- Stage 5: Advanced UI Systems (Always required) -->
     <script src="scripts/ui-utils.js?v=1.0.0"></script>
     <script src="scripts/color-scheme-system.js?v=1.0.0"></script>
+    <script src="scripts/button-system-init.js?v=1.0.0"></script>
     <script src="scripts/header-system.js?v=v6.0.0"></script>
     
     <!-- Stage 6: Data and Utility Systems -->
     <script src="scripts/data-utils.js?v=1.0.0"></script>
     <script src="scripts/tables.js?v=1.0.0"></script>
-    <script src="scripts/table-mapping.js?v=1.0.0"></script>
+    <script src="scripts/table-mappings.js?v=1.0.0"></script>
     <script src="scripts/page-utils.js?v=1.0.0"></script>
     
     <!-- Stage 7: Additional Systems (As needed) -->
     <script src="scripts/notification-category-detector.js?v=1.0.0"></script>
     <script src="scripts/global-notification-collector.js?v=1.0.0"></script>
     <script src="scripts/system-management.js?v=1.0.0"></script>
+    <!-- Disable WebSocket notifications -->
+    <script>
+        window.disableWebSocketNotifications = true;
+    </script>
+    
     <script src="scripts/realtime-notifications-client.js?v=1.0.0"></script>
     
     <!-- Stage 8: Page-specific Script -->

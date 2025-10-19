@@ -274,7 +274,7 @@ class ConstraintManager {
                 </div>
                 ${enumValuesHtml}
                 <div class="text-center">
-                    <button type="button" class="btn btn-danger" 
+                    <button type="button" class="btn" 
                             onclick="constraintManager.deleteConstraint(${constraint.id})">
                         <i class="fas fa-trash"></i> מחק אילוץ
                     </button>
@@ -591,7 +591,7 @@ window.addEnumValue = function () {
             <input type="text" class="form-control" placeholder="ערך" name="enum-value">
             <input type="text" class="form-control" placeholder="שם תצוגה" name="enum-display">
             <input type="number" class="form-control" placeholder="סדר" name="enum-sort" value="1">
-            <button type="button" class="btn btn-sm btn-danger" onclick="removeEnumValue(this)">
+            <button type="button" class="btn btn-sm" onclick="removeEnumValue(this)">
                 <i class="fas fa-trash"></i>
             </button>
         `;

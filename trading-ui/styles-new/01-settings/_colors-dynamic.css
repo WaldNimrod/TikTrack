@@ -86,11 +86,11 @@
   --entity-execution-text: #138496;
   --entity-execution-border: rgba(23, 162, 184, 0.3);
   
-  /* חשבון - Account */
-  --entity-account-color: #28a745;
-  --entity-account-bg: rgba(40, 167, 69, 0.1);
-  --entity-account-text: #1e7e34;
-  --entity-account-border: rgba(40, 167, 69, 0.3);
+  /* חשבון מסחר - Trading Account */
+  --entity-trading-account-color: #28a745;
+  --entity-trading-account-bg: rgba(40, 167, 69, 0.1);
+  --entity-trading-account-text: #1e7e34;
+  --entity-trading-account-border: rgba(40, 167, 69, 0.3);
   
   /* תזרים מזומנים - Cash Flow */
   --entity-cash-flow-color: #20c997;

@@ -116,10 +116,10 @@ class ConditionBuilder {
                 </div>
                 
                 <div class="condition-actions-bar">
-                    <button type="button" class="btn btn-primary" id="saveConditionsBtn">
+                    <button type="button" class="btn" id="saveConditionsBtn">
                         <i class="fas fa-save me-2"></i>${this.getTranslation('conditions.save_condition')}
                     </button>
-                    <button type="button" class="btn btn-secondary" id="testConditionsBtn">
+                    <button type="button" class="btn" id="testConditionsBtn">
                         <i class="fas fa-play me-2"></i>${this.getTranslation('conditions.actions.test_condition')}
                     </button>
                 </div>
@@ -171,10 +171,10 @@ class ConditionBuilder {
                         <!-- Parameter fields will be loaded here -->
                     </div>
                     <div class="parameter-actions">
-                        <button type="button" class="btn btn-primary" id="addConditionBtn">
+                        <button type="button" class="btn" id="addConditionBtn">
                             <i class="fas fa-plus me-2"></i>${this.getTranslation('conditions.add_condition')}
                         </button>
-                        <button type="button" class="btn btn-secondary" id="cancelParameterBtn">
+                        <button type="button" class="btn" id="cancelParameterBtn">
                             ${this.getTranslation('conditions.cancel')}
                         </button>
                     </div>
@@ -199,10 +199,10 @@ class ConditionBuilder {
                     <div class="condition-operator">${this.getTranslation(`conditions.logical.${condition.logical_operator.toLowerCase()}`)}</div>
                 </div>
                 <div class="condition-actions">
-                    <button type="button" class="btn btn-sm btn-outline-primary edit-condition-btn" data-index="${index}">
+                    <button type="button" class="btn btn-sm edit-condition-btn" data-index="${index}">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button type="button" class="btn btn-sm btn-outline-danger delete-condition-btn" data-index="${index}">
+                    <button type="button" class="btn btn-sm delete-condition-btn" data-index="${index}">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>

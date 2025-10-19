@@ -102,11 +102,17 @@ def create_plan_condition(plan_id):
                 return jsonify(validation_result), 400
             
             # Create condition
+            # Convert parameters_json to string if it's a dict
+            parameters_json = data['parameters_json']
+            if isinstance(parameters_json, dict):
+                import json
+                parameters_json = json.dumps(parameters_json, ensure_ascii=False)
+            
             condition = PlanCondition(
                 trade_plan_id=plan_id,
                 method_id=data['method_id'],
                 condition_group=data.get('condition_group', 0),
-                parameters_json=data['parameters_json'],
+                parameters_json=parameters_json,
                 logical_operator=data.get('logical_operator', 'NONE'),
                 is_active=data.get('is_active', True)
             )
@@ -215,9 +221,15 @@ def update_plan_condition(condition_id):
                 return jsonify(validation_result), 400
             
             # Update condition
+            # Convert parameters_json to string if it's a dict
+            parameters_json = data['parameters_json']
+            if isinstance(parameters_json, dict):
+                import json
+                parameters_json = json.dumps(parameters_json, ensure_ascii=False)
+            
             condition.method_id = data['method_id']
             condition.condition_group = data.get('condition_group', condition.condition_group)
-            condition.parameters_json = data['parameters_json']
+            condition.parameters_json = parameters_json
             condition.logical_operator = data.get('logical_operator', condition.logical_operator)
             condition.is_active = data.get('is_active', condition.is_active)
             
@@ -445,11 +457,17 @@ def create_bulk_plan_conditions():
             for condition_data in conditions_data:
                 condition_data['trade_plan_id'] = plan_id
                 
+                # Convert parameters_json to string if it's a dict
+                parameters_json = condition_data['parameters_json']
+                if isinstance(parameters_json, dict):
+                    import json
+                    parameters_json = json.dumps(parameters_json, ensure_ascii=False)
+                
                 condition = PlanCondition(
                     trade_plan_id=plan_id,
                     method_id=condition_data['method_id'],
                     condition_group=condition_data.get('condition_group', 0),
-                    parameters_json=condition_data['parameters_json'],
+                    parameters_json=parameters_json,
                     logical_operator=condition_data.get('logical_operator', 'NONE'),
                     is_active=condition_data.get('is_active', True)
                 )

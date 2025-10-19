@@ -129,10 +129,15 @@ class UnifiedAppInitializer {
         if (typeof window.pageInitializationConfigs !== 'undefined' && 
             window.pageInitializationConfigs[this.pageInfo.name]) {
             pageConfig = window.pageInitializationConfigs[this.pageInfo.name];
-            // console.log(`📋 Loaded page config for ${this.pageInfo.name}:`, pageConfig);
+            console.log(`📋 Loaded page config for ${this.pageInfo.name}:`, pageConfig);
+        } else if (typeof window.PAGE_CONFIGS !== 'undefined' && 
+                   window.PAGE_CONFIGS[this.pageInfo.name]) {
+            pageConfig = window.PAGE_CONFIGS[this.pageInfo.name];
+            console.log(`📋 Loaded page config from PAGE_CONFIGS for ${this.pageInfo.name}:`, pageConfig);
         } else {
-            // console.log(`⚠️ No page config found for ${this.pageInfo.name}`);
-            // console.log('🔍 Available configs:', window.pageInitializationConfigs ? Object.keys(window.pageInitializationConfigs) : 'undefined');
+            console.log(`⚠️ No page config found for ${this.pageInfo.name}`);
+            console.log('🔍 Available configs in pageInitializationConfigs:', window.pageInitializationConfigs ? Object.keys(window.pageInitializationConfigs) : 'undefined');
+            console.log('🔍 Available configs in PAGE_CONFIGS:', window.PAGE_CONFIGS ? Object.keys(window.PAGE_CONFIGS) : 'undefined');
         }
         
         // Store custom initializers from page config
@@ -225,14 +230,10 @@ class UnifiedAppInitializer {
         }
         
         // Execute custom finalizers
-        if (window.DEBUG_MODE) {
-            console.log('🔧 Executing custom initializers:', this.customInitializers.length);
-        }
+        console.log('🔧 Executing custom initializers:', this.customInitializers.length);
         for (let i = 0; i < this.customInitializers.length; i++) {
             const initializer = this.customInitializers[i];
-            if (window.DEBUG_MODE) {
-                console.log(`🔧 Executing custom initializer ${i + 1}/${this.customInitializers.length}:`, typeof initializer);
-            }
+            console.log(`🔧 Executing custom initializer ${i + 1}/${this.customInitializers.length}:`, typeof initializer);
             if (typeof initializer === 'function') {
                 try {
                     await initializer(config);
@@ -259,7 +260,7 @@ class UnifiedAppInitializer {
         const filename = path.split('/').pop() || 'index';
         const pageName = filename.replace('.html', '');
         
-        // console.log('🔍 Page detection:', { path, filename, pageName });
+        console.log('🔍 Page detection:', { path, filename, pageName });
         
         const pageInfo = {
             name: pageName,
@@ -318,7 +319,7 @@ class UnifiedAppInitializer {
      */
     determinePageType(pageName) {
         if (['trades', 'executions', 'alerts'].includes(pageName)) return 'trading';
-        if (['system-management', 'crud-testing-dashboard', 'linter-realtime-monitor', 'cache-test'].includes(pageName)) return 'development';
+        if (['system-management', 'crud-testing-dashboard', 'linter-realtime-monitor', 'cache-test', 'conditions-test'].includes(pageName)) return 'development';
         if (['preferences'].includes(pageName)) return 'preferences';
         if (['index'].includes(pageName)) return 'dashboard';
         return 'general';
@@ -532,6 +533,11 @@ class UnifiedAppInitializer {
             await window.initializeUIUtils();
         }
         
+        // Initialize Button System (Core UI System)
+        if (typeof window.initializeButtonSystem === 'function') {
+            await window.initializeButtonSystem();
+        }
+        
         // Initialize page-specific systems
         if (config.requiresFilters && this.availableSystems.has('pageFilters')) {
             await window.initializePageFilters(config.name);
@@ -641,9 +647,12 @@ class UnifiedAppInitializer {
 window.UnifiedAppInitializer = UnifiedAppInitializer;
 window.unifiedAppInit = new UnifiedAppInitializer();
 
+console.log('🔧 UnifiedAppInitializer created:', window.unifiedAppInit);
+
 // ===== GLOBAL EXPORT =====
 
 window.initializeUnifiedApp = async function() {
+    console.log('🔧 initializeUnifiedApp called');
     return await window.unifiedAppInit.initialize();
 };
 
@@ -655,16 +664,16 @@ window.getUnifiedAppStatus = function() {
 
 // Single DOMContentLoaded listener - replaces all others
 document.addEventListener('DOMContentLoaded', async () => {
-        // console.log('🎯 DOM Content Loaded - Starting Unified App Initialization');
-    // console.log('🔍 Current URL:', window.location.href);
-    // console.log('🔍 Current pathname:', window.location.pathname);
+        console.log('🎯 DOM Content Loaded - Starting Unified App Initialization');
+    console.log('🔍 Current URL:', window.location.href);
+    console.log('🔍 Current pathname:', window.location.pathname);
     
     try {
         // Small delay to ensure all scripts are loaded
         setTimeout(async () => {
-            // console.log('🚀 About to call initializeUnifiedApp...');
+            console.log('🚀 About to call initializeUnifiedApp...');
             await window.initializeUnifiedApp();
-            // console.log('✅ initializeUnifiedApp completed');
+            console.log('✅ initializeUnifiedApp completed');
         }, 100);
         
     } catch (error) {

@@ -1968,13 +1968,13 @@ async function exportAllLogs() {
                     <div class="modal-body">
                         <p>בחר פורמט ייצוא:</p>
                         <div class="d-grid gap-2">
-                            <button class="btn btn-success export-btn" data-format="csv">
+                            <button class="btn export-btn" data-format="csv">
                                 <i class="fas fa-file-csv"></i> ייצוא CSV
                             </button>
-                            <button class="btn btn-info export-btn" data-format="json">
+                            <button class="btn export-btn" data-format="json">
                                 <i class="fas fa-file-code"></i> ייצוא JSON
                             </button>
-                            <button class="btn btn-warning export-btn" data-format="clipboard">
+                            <button class="btn export-btn" data-format="clipboard">
                                 <i class="fas fa-clipboard"></i> העתקה ללוח
                             </button>
                         </div>

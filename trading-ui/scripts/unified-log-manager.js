@@ -1254,11 +1254,11 @@ class UnifiedLogManager {
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" onclick="window.cacheEmptyDialogChoice = 'no'; document.getElementById('cache-empty-dialog').remove();">
+                                <button type="button" class="btn" onclick="window.cacheEmptyDialogChoice = 'no'; document.getElementById('cache-empty-dialog').remove();">
                                     <i class="bi bi-x-circle me-2"></i>
                                     לא עכשיו
                                 </button>
-                                <button type="button" class="btn btn-primary" onclick="window.cacheEmptyDialogChoice = 'yes'; document.getElementById('cache-empty-dialog').remove(); window.UnifiedLogManager.triggerAutomaticDataRefresh();">
+                                <button type="button" class="btn" onclick="window.cacheEmptyDialogChoice = 'yes'; document.getElementById('cache-empty-dialog').remove(); window.UnifiedLogManager.triggerAutomaticDataRefresh();">
                                     <i class="bi bi-arrow-clockwise me-2"></i>
                                     כן, עדכן עכשיו
                                 </button>

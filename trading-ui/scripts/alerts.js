@@ -1,5 +1,62 @@
 // alerts.js loaded successfully - removed debug log
 
+// ייצוא מוקדם של הפונקציה למניעת שגיאות
+window.loadAlertsData = window.loadAlertsData || function() {
+  // loadAlertsData not yet defined, using placeholder
+  console.log('⚠️ loadAlertsData placeholder called');
+};
+
+// הגדרת הפונקציה המלאה מיד אחרי ה-placeholder
+window.loadAlertsData = async function() {
+  console.log('🚀🚀🚀 loadAlertsData התחיל 🚀🚀🚀');
+
+  try {
+    // קריאה לשרת לקבלת נתוני התראות
+    console.log('📡 קריאה לשרת לקבלת נתוני התראות...');
+    const response = await fetch('/api/alerts/');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('📊 נתונים שהתקבלו מהשרת:', data);
+
+    // שמירת הנתונים במשתנה גלובלי
+    window.alertsData = data.data || data;
+    console.log('💾 נתונים נשמרו ב-window.alertsData:', window.alertsData.length, 'התראות');
+
+    // עדכון הטבלה
+    if (typeof window.updateAlertsTable === 'function') {
+      console.log('📊 מעדכן את טבלת ההתראות');
+      window.updateAlertsTable(window.alertsData);
+    } else {
+      console.warn('⚠️ updateAlertsTable לא זמין');
+    }
+
+    // עדכון סטטיסטיקות
+    if (typeof window.updateAlertsSummary === 'function') {
+      console.log('📈 מעדכן את סטטיסטיקות ההתראות');
+      window.updateAlertsSummary(window.alertsData);
+    } else {
+      console.warn('⚠️ updateAlertsSummary לא זמין');
+    }
+
+    console.log('✅ loadAlertsData הושלם בהצלחה');
+
+  } catch (error) {
+    console.error('❌ שגיאה ב-loadAlertsData:', error);
+    
+    // הצגת הודעת שגיאה למשתמש
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בטעינת נתוני ההתראות', error.message);
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('שגיאה בטעינת נתוני ההתראות', 'error');
+    } else {
+      alert('שגיאה בטעינת נתוני ההתראות: ' + error.message);
+    }
+  }
+};
+
 /**
  * ========================================
  * דף ההתראות - Alerts Page
@@ -186,9 +243,17 @@ async function loadAlertsData() {
       alertsData = getDemoAlertsData();
       updateAlertsTable(alertsData);
       
+      // עדכון סטטיסטיקות
+      if (typeof updateAlertsSummary === 'function') {
+        updateAlertsSummary(alertsData);
+      }
+      
       // רענון כפוי של הטבלה
       setTimeout(() => {
         updateAlertsTable(alertsData);
+        if (typeof updateAlertsSummary === 'function') {
+          updateAlertsSummary(alertsData);
+        }
       }, 100);
       
       return alertsData;
@@ -216,8 +281,13 @@ async function loadAlertsData() {
 
     console.log('📊 נתונים מעובדים:', alertsData.length, 'התראות');
     
-    // עדכון הטבלה
-    updateAlertsTable(alertsData);
+      // עדכון הטבלה
+      updateAlertsTable(alertsData);
+      
+      // עדכון סטטיסטיקות
+      if (typeof updateAlertsSummary === 'function') {
+        updateAlertsSummary(alertsData);
+      }
     
 
     return alertsData;
@@ -227,6 +297,11 @@ async function loadAlertsData() {
     // שימוש בנתוני דמו במקרה של שגיאה
     alertsData = getDemoAlertsData();
     updateAlertsTable(alertsData);
+    
+    // עדכון סטטיסטיקות
+    if (typeof updateAlertsSummary === 'function') {
+      updateAlertsSummary(alertsData);
+    }
     
     // הצגת הודעת שגיאה
     if (window.showErrorNotification) {
@@ -396,7 +471,7 @@ function updateAlertsTable(alerts) {
   const loadAdditionalData = async () => {
     try {
       const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
-        fetch('/api/accounts/').then(r => r.json()).catch(() => ({ data: [] })),
+        fetch('/api/trading-accounts/').then(r => r.json()).catch(() => ({ data: [] })),
         fetch('/api/trades/').then(r => r.json()).catch(() => ({ data: [] })),
         fetch('/api/trade_plans/').then(r => r.json()).catch(() => ({ data: [] })),
         fetch('/api/tickers/').then(r => r.json()).catch(() => ({ data: [] })),
@@ -677,10 +752,18 @@ function updateAlertsTable(alerts) {
           <td data-date="${alert.created_at}"><span class="date-text">${createdAt}</span></td>
           <td class="actions-cell" data-entity-id="${alert.id}" data-status="${alert.status || ''}">
             <div class="btn-group btn-group-sm actions-btn-group" role="group">
-              <button data-button-type="LINK" data-onclick="viewLinkedItemsForAlert(${alert.id})"></button>
-              <button data-button-type="EDIT" data-onclick="editAlert(${alert.id})"></button>
-              <button data-button-type="${alert.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL'}" data-onclick="window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert && window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert(${alert.id})" data-classes="${alert.status === 'cancelled' ? 'btn-success' : 'btn-danger'} btn-sm" data-attributes="data-item-type='alert' data-item-id='${alert.id}'"></button>
-              <button data-button-type="DELETE" data-onclick="deleteAlert(${alert.id})"></button>
+              <button class="btn btn-sm" onclick="viewLinkedItemsForAlert(${alert.id})" title="צפה בפריטים מקושרים">
+                🔗
+              </button>
+              <button class="btn btn-sm" onclick="editAlert(${alert.id})" title="ערוך התראה">
+                ✏️
+              </button>
+              <button class="btn btn-sm" onclick="window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert && window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert(${alert.id})" title="${alert.status === 'cancelled' ? 'הפעל מחדש' : 'בטל'}">
+                ${alert.status === 'cancelled' ? '🔄' : '⏸️'}
+              </button>
+              <button class="btn btn-sm" onclick="deleteAlert(${alert.id})" title="מחק התראה">
+                🗑️
+              </button>
             </div>
           </td>
         </tr>
@@ -1042,7 +1125,6 @@ function populateSelect(selectId, data, field, prefix = '') {
   });
 
   // console.log('🔧 populateSelect completed for:', selectId, 'with', data.length, 'items');
-}
 }
 
 
@@ -2239,8 +2321,9 @@ if (window.location.pathname.includes('/alerts')) {
 // פונקציה גלובלית לעדכון הטבלה - הועברה ל-header-system.js
 
 // הוספת הפונקציות לגלובל
-window.loadAlertsData = loadAlertsData;
+// window.loadAlertsData כבר מוגדר בתחילת הקובץ
 window.updateAlertsTable = updateAlertsTable;
+window.updateAlertsSummary = updateAlertsSummary;
 window.filterAlertsLocally = filterAlertsLocally;
 
 /**
@@ -2256,14 +2339,14 @@ function filterAlertsByRelatedObjectType(type) {
   buttons.forEach(btn => {
     if (btn.getAttribute('data-type') === type) {
       btn.classList.add('active');
-      btn.classList.remove('btn-outline-primary');
+      btn.classList.remove('btn');
       const colors = window.getTableColors ? window.getTableColors() : { positive: '#28a745' };
       btn.style.backgroundColor = 'white';
       btn.style.color = colors.positive;
       btn.style.borderColor = colors.positive;
     } else {
       btn.classList.remove('active');
-      btn.classList.add('btn-outline-primary');
+      btn.classList.add('btn');
       btn.style.backgroundColor = '';
       btn.style.color = '';
       btn.style.borderColor = '';
@@ -2541,6 +2624,11 @@ function toggleAlert(alertId) {
       // רענון הטבלה
       updateAlertsTable(alertsData);
       
+      // עדכון סטטיסטיקות
+      if (typeof updateAlertsSummary === 'function') {
+        updateAlertsSummary(alertsData);
+      }
+      
       // הודעת הצלחה
       const statusText = newIsActive ? 'הופעלה' : 'כובתה';
       if (typeof window.showSuccessNotification === 'function') {
@@ -2761,11 +2849,66 @@ function generateDetailedLog() {
 // window.toggleSection removed - using global version from ui-utils.js
 // window.toggleSection export removed - using global version from ui-utils.js
 window.filterAlertsByRelatedObjectType = filterAlertsByRelatedObjectType;
-window.loadAlertsData = loadAlertsData;
+// window.loadAlertsData כבר מוגדר בשורה 2241
 window.updateAlertsTable = updateAlertsTable;
+window.updateAlertsSummary = updateAlertsSummary;
+
+/**
+ * עדכון סטטיסטיקות ההתראות
+ * @param {Array} alerts - מערך התראות
+ */
+function updateAlertsSummary(alerts) {
+  console.log('📊 מעדכן סטטיסטיקות התראות:', alerts ? alerts.length : 0, 'התראות');
+  
+  if (!alerts || !Array.isArray(alerts)) {
+    console.warn('⚠️ alerts parameter is not available or not an array');
+    return;
+  }
+
+  // חישוב סטטיסטיקות
+  const totalAlerts = alerts.length;
+  const activeAlerts = alerts.filter(alert => alert.status === 'open').length;
+  const newAlerts = alerts.filter(alert => alert.is_triggered === 'new').length;
+  
+  // התראות היום
+  const today = new Date().toDateString();
+  const todayAlerts = alerts.filter(alert => {
+    if (!alert.created_at) return false;
+    return new Date(alert.created_at).toDateString() === today;
+  }).length;
+  
+  // התראות השבוע
+  const weekAgo = new Date();
+  weekAgo.setDate(weekAgo.getDate() - 7);
+  const weekAlerts = alerts.filter(alert => {
+    if (!alert.created_at) return false;
+    return new Date(alert.created_at) >= weekAgo;
+  }).length;
+
+  // עדכון האלמנטים
+  const totalElement = document.getElementById('totalAlerts');
+  const activeElement = document.getElementById('activeAlerts');
+  const newElement = document.getElementById('newAlerts');
+  const todayElement = document.getElementById('todayAlerts');
+  const weekElement = document.getElementById('weekAlerts');
+
+  if (totalElement) totalElement.textContent = totalAlerts;
+  if (activeElement) activeElement.textContent = activeAlerts;
+  if (newElement) newElement.textContent = newAlerts;
+  if (todayElement) todayElement.textContent = todayAlerts;
+  if (weekElement) weekElement.textContent = weekAlerts;
+
+  console.log('✅ סטטיסטיקות התראות עודכנו:', {
+    total: totalAlerts,
+    active: activeAlerts,
+    new: newAlerts,
+    today: todayAlerts,
+    week: weekAlerts
+  });
+}
 window.showAddAlertModal = showAddAlertModal;
 window.editAlert = editAlert;
-window.deleteAlert = deleteAlert;
+// window.deleteAlert לא מוגדר - צריך ליצור את הפונקציה
 // window.copyDetailedLog export removed - using global version from system-management.js
 // window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 
@@ -2926,7 +3069,7 @@ function displayAvailableConditions(conditions, sourceType) {
                     <div class="card-body">
                         <h6 class="card-title">${condition.method_name || 'תנאי לא ידוע'}</h6>
                         <p class="card-text small text-muted">${condition.parameters_json || 'אין פרמטרים'}</p>
-                        <button class="btn btn-sm btn-primary" onclick="selectConditionForAlert(${condition.id}, '${sourceType}')">
+                        <button class="btn btn-sm" onclick="selectConditionForAlert(${condition.id}, '${sourceType}')">
                             בחר תנאי זה
                         </button>
                     </div>

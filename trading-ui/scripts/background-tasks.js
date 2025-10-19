@@ -346,16 +346,16 @@ const uiManager = {
                 <td>${utils.formatSuccessRate(task.success_rate)}</td>
                 <td>
                     <div class="action-buttons">
-                        <button class="btn btn-sm btn-success" onclick="executeTask('${task.name}')" ${!task.enabled ? 'disabled' : ''} title="הפעל משימה">
+                        <button class="btn btn-sm" onclick="executeTask('${task.name}')" ${!task.enabled ? 'disabled' : ''} title="הפעל משימה">
                             ▶️
                         </button>
-                        <button class="btn btn-sm btn-warning" onclick="toggleTask('${task.name}')" title="${task.enabled ? 'כבה משימה' : 'הפעל משימה'}">
+                        <button class="btn btn-sm" onclick="toggleTask('${task.name}')" title="${task.enabled ? 'כבה משימה' : 'הפעל משימה'}">
                             ${task.enabled ? '⏸️' : '▶️'}
                         </button>
-                        <button class="btn btn-sm btn-danger" onclick="stopTask('${task.name}')" ${!task.enabled ? 'disabled' : ''} title="עצור משימה">
+                        <button class="btn btn-sm" onclick="stopTask('${task.name}')" ${!task.enabled ? 'disabled' : ''} title="עצור משימה">
                             ⏹️
                         </button>
-                        <button class="btn btn-sm btn-primary" onclick="showTaskDetails('${task.name}')" title="פרטי משימה">
+                        <button class="btn btn-sm" onclick="showTaskDetails('${task.name}')" title="פרטי משימה">
                             ℹ️
                         </button>
                     </div>

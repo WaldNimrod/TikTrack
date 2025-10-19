@@ -994,10 +994,10 @@ async function showDetailsModal(title, content, options = {}) {
         <div class="modal-content">
           <div class="modal-header text-white d-flex justify-content-between align-items-center" style="direction: rtl; background-color: ${window.getEntityColor ? window.getEntityColor('trade') || '#007bff' : '#007bff'};">
             <div class="d-flex gap-2">
-              <button type="button" class="btn btn-sm btn-outline-light" id="${modalId}-copy-btn" title="העתק ללוח">
+              <button type="button" class="btn btn-sm" id="${modalId}-copy-btn" title="העתק ללוח">
                 <i class="fas fa-copy"></i> העתק
               </button>
-              <button type="button" class="btn btn-sm btn-outline-light" id="${modalId}-close-btn" title="סגור">
+              <button type="button" class="btn btn-sm" id="${modalId}-close-btn" title="סגור">
                 X
               </button>
             </div>
@@ -1009,7 +1009,7 @@ async function showDetailsModal(title, content, options = {}) {
             </div>
           </div>
           <div class="modal-footer" style="justify-content: flex-end; direction: rtl;">
-            <button type="button" class="btn btn-secondary" id="${modalId}-footer-close">סגור</button>
+            <button type="button" class="btn" id="${modalId}-footer-close">סגור</button>
           </div>
         </div>
       </div>
@@ -1525,7 +1525,7 @@ window.showDetailedNotification = async function(title, message, type = 'info', 
             </div>
             <div class="modal-footer">
               <button data-button-type="CLOSE" data-attributes="data-bs-dismiss='modal' type='button'"></button>
-              <button type="button" class="btn btn-primary" onclick="copyToClipboard('${message.replace(/'/g, "\\'")}')">העתק</button>
+              <button type="button" class="btn" onclick="copyToClipboard('${message.replace(/'/g, "\\'")}')">העתק</button>
             </div>
           </div>
         </div>

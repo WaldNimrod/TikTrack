@@ -56,7 +56,7 @@
 <div class="table-actions">
 <button class="btn btn-primary">שמור</button>
 <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט"><i class="fas fa-download"></i> העתק לוג מפורט</button>
-<button class="btn btn-outline-warning" onclick="toggleSection('top')"><i class="fas fa-chevron-up"></i> הצג/הסתר</button>
+<button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר"></button>
 <span class="filter-icon">▲</span>
 </button>
 </div>
@@ -85,8 +85,8 @@
 <img src="images/icons/trade_plans.svg" alt="התכנונים שלי" class="section-icon" style="width: 28px; height: 28px;"> התכנונים שלי </div>
 <div class="table-count" id="trade_plansCount">טוען...</div>
 <div class="table-actions">
-<button class="btn btn-success" onclick="if (typeof window.showAddTradePlanModal === 'function') { window.showAddTradePlanModal(); }" type="button" id="addTradePlanBtn" title="הוסף תכנון חדש"><i class="fas fa-plus"></i> הוסף תכנון חדש</button>
-<button class="btn btn-outline-secondary" onclick="toggleSection('top')" type="button" title="הצג/הסתר אזור תכנון טריידים"><span class="filter-icon">▲</span></button>
+<button data-button-type="ADD" data-entity-type="trade_plan" data-variant="full" data-onclick="if (typeof window.showAddTradePlanModal === 'function') { window.showAddTradePlanModal(); }" data-text="הוסף תכנון חדש" type="button" id="addTradePlanBtn" title="הוסף תכנון חדש"></button>
+<button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר" type="button" title="הצג/הסתר אזור תכנון טריידים"></button>
 </div>
 <div class="filter-buttons-container button-row" style="margin-top: 10px;">
 <button class="btn btn-sm active" onclick="filterTradePlansByType('all')" type="button" data-type="all" title="הצג הכל" style="background-color: white; color: #28a745; border-color: #28a745;">הצג הכל</button>
@@ -538,6 +538,8 @@
 <script src="scripts/ui-utils.js?v=1.0.0">
 </script>
 <script src="scripts/color-scheme-system.js?v=1.0.0">
+</script>
+<script src="scripts/button-system-init.js?v=1.0.0">
 </script>
 <script src="scripts/header-system.js?v=v6.0.0">
 </script>

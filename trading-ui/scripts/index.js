@@ -409,12 +409,12 @@ window.initializeIndexPage = async function() {
     refreshOverview();
     
     // Setup action buttons
-    const refreshButton = document.querySelector('.btn-primary');
+    const refreshButton = document.querySelector('.btn');
     if (refreshButton) {
         refreshButton.addEventListener('click', refreshOverview);
     }
     
-    const exportButton = document.querySelector('.btn-secondary');
+    const exportButton = document.querySelector('.btn');
     if (exportButton) {
         exportButton.addEventListener('click', exportOverview);
     }

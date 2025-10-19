@@ -185,6 +185,44 @@ const PAGE_CONFIGS = {
         ]
     },
     
+    'conditions_test': {
+        name: 'Conditions Test',
+        requiresFilters: false,
+        requiresValidation: false,
+        requiresTables: false,
+        customInitializers: [
+            async (pageConfig) => {
+                console.log('🔧 Initializing Conditions Test Page...');
+                
+                // Initialize conditions test page
+                if (typeof window.initializeConditionsTestPage === 'function') {
+                    await window.initializeConditionsTestPage();
+                } else {
+                    console.log('🔧 initializeConditionsTestPage function not found!');
+                }
+            }
+        ]
+    },
+    
+    'conditions-test': {
+        name: 'Conditions Test',
+        requiresFilters: false,
+        requiresValidation: false,
+        requiresTables: false,
+        customInitializers: [
+            async (pageConfig) => {
+                console.log('🔧 Initializing Conditions Test Page...');
+                
+                // Initialize conditions test page
+                if (typeof window.initializeConditionsTestPage === 'function') {
+                    await window.initializeConditionsTestPage();
+                } else {
+                    console.log('🔧 initializeConditionsTestPage function not found!');
+                }
+            }
+        ]
+    },
+    
     // Account Management
     'trading_accounts': {
         name: 'Trading Accounts',

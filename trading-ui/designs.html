@@ -71,9 +71,39 @@
     
     <!-- Header Styles - Separate CSS file -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">
+    
+    <!-- Entity Colors Table Styles -->
+    <style>
+        .entity-colors-table {
+            margin-top: 1rem;
+        }
+        
+        .entity-colors-table th {
+            text-align: center;
+            background-color: var(--card-bg, #f8f9fa);
+            border-bottom: 2px solid var(--border-color, #dee2e6);
+            font-weight: 600;
+        }
+        
+        .entity-colors-table td {
+            text-align: center;
+            vertical-align: middle;
+            padding: 0.75rem;
+        }
+        
+        .entity-colors-table td:first-child {
+            text-align: right;
+            font-weight: 500;
+        }
+        
+        .entity-colors-table button {
+            margin: 0;
+            min-width: 80px;
+        }
+    </style>
 </head>
 
-<body class="designs-page">
+<body class="designs-page" data-entity-type="ticker">
     <!-- Header System - Created automatically by header-system.js -->
     <div id="unified-header"></div>
     
@@ -86,9 +116,9 @@
                     <div class="section-header">
                         <h1>🔘 מערכת הכפתורים המרכזית</h1>
                         <div class="section-actions">
-                            <button data-button-type="COPY" data-onclick="copyButtonSystemDetailedLog()" data-classes="btn-sm btn-outline-secondary" data-text="העתק לוג מפורט" data-attributes="title='העתק לוג מפורט עם כל הנתונים והכפתורים'">
-                                <i class="fas fa-copy"></i> העתק לוג מפורט
-                            </button>
+                            <button data-button-type="COPY" data-onclick="copyButtonSystemDetailedLog()" data-classes="btn-sm" data-text="העתק לוג מפורט" data-attributes="title='העתק לוג מפורט עם כל הנתונים והכפתורים'"></button>
+                            <button data-button-type="SEARCH" data-onclick="checkButtonColors()" data-classes="btn-sm" data-text="בדוק צבעים" data-attributes="title='בדוק צבעי כל הכפתורים'"></button>
+                            <button data-button-type="REACTIVATE" data-onclick="fixButtonColors()" data-classes="btn-sm" data-text="תקן צבעים" data-attributes="title='תקן אוטומטית בעיות צבעים'"></button>
                             <button data-button-type="TOGGLE" data-onclick="toggleAllSections()" data-classes="btn filter-toggle-btn" data-attributes="title='הצג/הסתר סקשן'">▼ הצג/הסתר סקשן</button>
                         </div>
                     </div>
@@ -187,7 +217,7 @@
                     </div>
                     </div>
                 </div>
-                <!-- UI Content Section 1 End -->
+                <!-- UI Content Section 1 End -->   
 
                 <!-- UI Content Section 2 Start - וריאנטים מורחבים -->
                 <div class="content-section" id="section2">
@@ -207,23 +237,65 @@
                         <div class="mb-3">
                             <button data-button-type="ADD" data-text="רגיל"></button>
                             <button data-button-type="ADD" data-style="negative" data-text="נגטיב"></button>
-                        </div>
+                    </div>
                         
-                        <h5>צבעי ישויות</h5>
-                        <div class="mb-3">
-                            <button data-button-type="ADD" data-entity-type="trade_plan" data-text="תכנית"></button>
-                            <button data-button-type="ADD" data-entity-type="trade" data-text="טרייד"></button>
-                            <button data-button-type="ADD" data-entity-type="alert" data-text="התראה"></button>
-                        </div>
-                        
-                        <h5>שילובים</h5>
-                        <div class="mb-3">
-                            <button data-button-type="ADD" data-size="xlarge" data-style="negative" 
-                                    data-entity-type="trade_plan" data-text="גדול + נגטיב + ישות"></button>
-                        </div>
                     </div>
                 </div>
                 <!-- UI Content Section 2 End -->
+
+                <!-- UI Content Section 3 - Entity Colors Demo -->
+                <div class="ui-content-section">
+                    <div class="section-header">
+                        <h4>צבעי ישויות</h4>
+                        <p>השוואת כפתורים מרכזיים בצבעי ישות שונים</p>
+                    </div>
+                    <div class="section-content">
+                        <div class="table-responsive">
+                            <table class="table table-striped entity-colors-table">
+                                <thead>
+                                    <tr>
+                                        <th>כפתור</th>
+                                        <th>טיקרים</th>
+                                        <th>טריידים</th>
+                                        <th>תכניות</th>
+                                        <th>התראות</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>הוספה</strong></td>
+                                        <td><button data-button-type="ADD" data-entity-type="ticker" data-style="negative" data-size="large" data-variant="full" data-text="הוסף"></button></td>
+                                        <td><button data-button-type="ADD" data-entity-type="trade" data-style="negative" data-size="large" data-variant="full" data-text="הוסף"></button></td>
+                                        <td><button data-button-type="ADD" data-entity-type="trade_plan" data-style="negative" data-size="large" data-variant="full" data-text="הוסף"></button></td>
+                                        <td><button data-button-type="ADD" data-entity-type="alert" data-style="negative" data-size="large" data-variant="full" data-text="הוסף"></button></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>סגירה</strong></td>
+                                        <td><button data-button-type="CLOSE" data-entity-type="ticker" data-style="negative" data-size="large" data-variant="full" data-text="סגור"></button></td>
+                                        <td><button data-button-type="CLOSE" data-entity-type="trade" data-style="negative" data-size="large" data-variant="full" data-text="סגור"></button></td>
+                                        <td><button data-button-type="CLOSE" data-entity-type="trade_plan" data-style="negative" data-size="large" data-variant="full" data-text="סגור"></button></td>
+                                        <td><button data-button-type="CLOSE" data-entity-type="alert" data-style="negative" data-size="large" data-variant="full" data-text="סגור"></button></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>קישור</strong></td>
+                                        <td><button data-button-type="LINK" data-entity-type="ticker" data-style="negative" data-size="large" data-variant="full" data-text="קישור"></button></td>
+                                        <td><button data-button-type="LINK" data-entity-type="trade" data-style="negative" data-size="large" data-variant="full" data-text="קישור"></button></td>
+                                        <td><button data-button-type="LINK" data-entity-type="trade_plan" data-style="negative" data-size="large" data-variant="full" data-text="קישור"></button></td>
+                                        <td><button data-button-type="LINK" data-entity-type="alert" data-style="negative" data-size="large" data-variant="full" data-text="קישור"></button></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>שמירה</strong></td>
+                                        <td><button data-button-type="SAVE" data-entity-type="ticker" data-style="negative" data-size="large" data-variant="full" data-text="שמור"></button></td>
+                                        <td><button data-button-type="SAVE" data-entity-type="trade" data-style="negative" data-size="large" data-variant="full" data-text="שמור"></button></td>
+                                        <td><button data-button-type="SAVE" data-entity-type="trade_plan" data-style="negative" data-size="large" data-variant="full" data-text="שמור"></button></td>
+                                        <td><button data-button-type="SAVE" data-entity-type="alert" data-style="negative" data-size="large" data-variant="full" data-text="שמור"></button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 3 End -->
             </div>
         </div>
         <div class="page-bottom-spacing"></div>
@@ -367,6 +439,40 @@
     <script src="scripts/button-icons.min.js?v=1.0.0"></script>
     <script src="scripts/button-system-init.js"></script>
     <script src="scripts/button-system-demo-core.js"></script>
+    <script src="scripts/button-color-checker.js"></script>
+    
+    <!-- Set entity colors for demo page -->
+    <script>
+        // הגדרת צבעי ישויות לכל הכפתורים בעמוד הבדיקה
+        document.addEventListener('DOMContentLoaded', function() {
+            // הגדרת משתני CSS לצבעי ישויות
+            const root = document.documentElement;
+            
+            // הגדרת צבעי טיקרים כברירת מחדל
+            root.style.setProperty('--current-entity-color', 'var(--entity-ticker-color)');
+            root.style.setProperty('--current-entity-hover', 'var(--entity-ticker-text)');
+            
+            // הגדרת צבעי ישויות ספציפיים לכל כפתור
+            setTimeout(() => {
+                const entityButtons = document.querySelectorAll('button[data-entity-type]');
+                entityButtons.forEach(button => {
+                    const entityType = button.getAttribute('data-entity-type');
+                    const buttonType = button.getAttribute('data-button-type');
+                    if (entityType) {
+                        // הגדרת צבעי הישות הספציפית
+                        // תיקון לשמות המשתנים - trade_plan במקום trade-plan
+                        const entityColorVar = entityType === 'trade_plan' ? '--entity-trade-plan-color' : `--entity-${entityType}-color`;
+                        const entityHoverVar = entityType === 'trade_plan' ? '--entity-trade-plan-text' : `--entity-${entityType}-text`;
+                        
+                        button.style.setProperty('--current-entity-color', `var(${entityColorVar})`);
+                        button.style.setProperty('--current-entity-hover', `var(${entityHoverVar})`);
+                        console.log(`🔧 כפתור ${buttonType} עם ישות ${entityType}: ${getComputedStyle(button).getPropertyValue('--current-entity-color')}`);
+                    }
+                });
+                console.log(`✅ הוגדרו צבעי ישויות ל-${entityButtons.length} כפתורים`);
+            }, 1000);
+        });
+    </script>
     
     <script src="scripts/tables.js?v=1.0.0"></script>
     <script src="scripts/table-mappings.js?v=1.0.0"></script>

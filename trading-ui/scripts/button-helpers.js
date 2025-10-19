@@ -18,7 +18,7 @@
 function createCancelButtonHelper(container, itemType, itemId, status = 'open', size = 'sm', additionalClasses = '') {
     const isCancelled = status === 'cancelled' || status === 'canceled';
     const type = isCancelled ? 'REACTIVATE' : 'CANCEL';
-    const buttonClass = isCancelled ? 'btn-success' : 'btn-danger';
+    const buttonClass = 'btn';
     const buttonSize = isCancelled ? '' : size;
     const title = isCancelled ? 'הפעל מחדש' : 'בטל';
     
@@ -117,7 +117,7 @@ function createCancelButtonHelper(container, itemType, itemId, status = 'open', 
  * @param {string} additionalClasses - classes נוספים
  */
 function createDeleteButtonByTypeHelper(container, itemType, itemId, size = 'sm', additionalClasses = '') {
-    const buttonClass = 'btn-danger';
+    const buttonClass = 'btn';
     const title = 'מחק';
     
     // יצירת onclick function
@@ -180,7 +180,7 @@ function createDeleteButtonByTypeHelper(container, itemType, itemId, size = 'sm'
  * @param {string} additionalClasses - classes נוספים
  */
 function createEditButtonHelper(container, onClick, additionalClasses = '') {
-    const classes = `btn-secondary btn-sm ${additionalClasses}`.trim();
+    const classes = `btn btn-sm ${additionalClasses}`.trim();
     
     if (window.addDynamicButton) {
         window.addDynamicButton(container, 'EDIT', onClick, classes, '', '', `edit-btn-${Date.now()}`);
@@ -200,7 +200,7 @@ function createEditButtonHelper(container, onClick, additionalClasses = '') {
  * @param {string} additionalClasses - classes נוספים
  */
 function createDeleteButtonHelper(container, onClick, additionalClasses = '') {
-    const classes = `btn-danger btn-sm ${additionalClasses}`.trim();
+    const classes = `btn btn-sm ${additionalClasses}`.trim();
     
     if (window.addDynamicButton) {
         window.addDynamicButton(container, 'DELETE', onClick, classes, '', '', `delete-btn-${Date.now()}`);
@@ -220,7 +220,7 @@ function createDeleteButtonHelper(container, onClick, additionalClasses = '') {
  * @param {string} additionalClasses - classes נוספים
  */
 function createLinkButtonHelper(container, onClick, additionalClasses = '') {
-    const classes = `btn-info btn-sm ${additionalClasses}`.trim();
+    const classes = `btn btn-sm ${additionalClasses}`.trim();
     
     if (window.addDynamicButton) {
         window.addDynamicButton(container, 'LINK', onClick, classes, '', '', `link-btn-${Date.now()}`);
@@ -239,7 +239,7 @@ function createLinkButtonHelper(container, onClick, additionalClasses = '') {
  * @param {string} additionalClasses - classes נוספים
  */
 function createCloseButtonHelper(container, additionalClasses = '') {
-    const classes = `btn-secondary ${additionalClasses}`.trim();
+    const classes = `btn ${additionalClasses}`.trim();
     const attributes = 'data-bs-dismiss="modal" type="button"';
     
     if (window.addDynamicButton) {
@@ -284,7 +284,7 @@ function createSortButtonHelper(container, onClick, additionalClasses = 'sortabl
  * @param {string} additionalClasses - classes נוספים
  */
 function createToggleButtonHelper(container, onClick, title = 'הצג/הסתר', additionalClasses = '') {
-    const classes = `btn-outline-warning ${additionalClasses}`.trim();
+    const classes = `btn ${additionalClasses}`.trim();
     
     if (window.addDynamicButton) {
         window.addDynamicButton(container, 'TOGGLE', onClick, classes, `title="${title}"`, '', `toggle-btn-${Date.now()}`);

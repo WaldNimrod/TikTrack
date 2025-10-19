@@ -419,16 +419,16 @@ class ConstraintsMonitor {
                     </td>
                     <td>
                         <div class="btn-group btn-group-sm" role="group">
-                            <button type="button" class="btn btn-outline-primary" onclick="window.viewConstraint('${constraint.constraint_name}')" title="צפה בפרטים">
+                            <button type="button" class="btn" onclick="window.viewConstraint('${constraint.constraint_name}')" title="צפה בפרטים">
                                 <i class="fas fa-eye"></i>
                             </button>
-                            <button type="button" class="btn btn-outline-success" onclick="window.validateConstraint('${constraint.constraint_name}')" title="בדוק אילוץ">
+                            <button type="button" class="btn" onclick="window.validateConstraint('${constraint.constraint_name}')" title="בדוק אילוץ">
                                 <i class="fas fa-check-circle"></i>
                             </button>
-                            <button type="button" class="btn btn-outline-info" onclick="window.editConstraint('${constraint.constraint_name}')" title="ערוך">
+                            <button type="button" class="btn" onclick="window.editConstraint('${constraint.constraint_name}')" title="ערוך">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button type="button" class="btn btn-outline-warning" onclick="window.toggleConstraint('${constraint.constraint_name}')" title="${constraint.is_active ? 'השבת' : 'הפעל'}">
+                            <button type="button" class="btn" onclick="window.toggleConstraint('${constraint.constraint_name}')" title="${constraint.is_active ? 'השבת' : 'הפעל'}">
                                 <i class="fas fa-${constraint.is_active ? 'pause' : 'play'}"></i>
                             </button>
                         </div>
@@ -670,7 +670,7 @@ window.viewConstraint = function(constraintName) {
                     </div>
                     <div class="modal-footer">
                         <button data-button-type="CLOSE" data-attributes="data-bs-dismiss='modal' type='button'"></button>
-                        <button type="button" class="btn btn-primary" onclick="window.editConstraint('${constraint.constraint_name}')" data-bs-dismiss="modal">
+                        <button type="button" class="btn" onclick="window.editConstraint('${constraint.constraint_name}')" data-bs-dismiss="modal">
                             <i class="fas fa-edit"></i> ערוך
                         </button>
                     </div>
@@ -794,7 +794,7 @@ function showValidationModal(constraint, isAll) {
                     </div>
                     <div class="modal-footer">
                         <button data-button-type="CLOSE" data-attributes="data-bs-dismiss='modal' type='button'"></button>
-                        <button type="button" class="btn btn-primary" onclick="exportValidationReport()">
+                        <button type="button" class="btn" onclick="exportValidationReport()">
                             <i class="fas fa-download"></i> ייצא דוח
                         </button>
                     </div>

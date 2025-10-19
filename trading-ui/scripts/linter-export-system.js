@@ -442,7 +442,7 @@ function updateVersionList(newVersionId = null) {
                 <span class="version-id">${version.id}</span>
                 <span class="version-date">${new Date(version.timestamp).toLocaleString('he-IL')}</span>
                 <span class="version-points">${version.data.length} נקודות</span>
-                <button onclick="restoreVersionSnapshot('${version.id}')" class="btn btn-sm btn-primary">שחזר</button>
+                <button onclick="restoreVersionSnapshot('${version.id}')" class="btn btn-sm">שחזר</button>
                 <button data-button-type="DELETE" data-onclick="deleteVersionSnapshot('${version.id}')"></button>
             </div>
         `).join('');

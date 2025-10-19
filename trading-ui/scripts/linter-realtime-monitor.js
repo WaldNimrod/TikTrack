@@ -2476,7 +2476,7 @@ function showSuggestionsModal() {
                     </div>
                     <div class="modal-footer">
                         <button data-button-type="CLOSE" data-attributes="data-bs-dismiss='modal' type='button'"></button>
-                        <button type="button" class="btn btn-primary" onclick="exportSuggestions()">ייצא רשימה</button>
+                        <button type="button" class="btn" onclick="exportSuggestions()">ייצא רשימה</button>
                     </div>
                 </div>
             </div>
@@ -2595,7 +2595,7 @@ function showCriticalErrorsModal() {
                     </div>
                     <div class="modal-footer">
                         <button data-button-type="CLOSE" data-attributes="data-bs-dismiss='modal' type='button'"></button>
-                        <button type="button" class="btn btn-danger" onclick="exportCriticalErrors()">ייצא דוח</button>
+                        <button type="button" class="btn" onclick="exportCriticalErrors()">ייצא דוח</button>
                     </div>
                 </div>
             </div>

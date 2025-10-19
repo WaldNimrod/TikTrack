@@ -40,14 +40,14 @@ function filterByRelatedObjectType(type, data, updateFunction, countSelector, it
   buttons.forEach(btn => {
     if (btn.getAttribute('data-type') === type) {
       btn.classList.add('active');
-      btn.classList.remove('btn-outline-primary');
+      btn.classList.remove('btn');
       btn.style.backgroundColor = 'white';
       const colors = window.getTableColors ? window.getTableColors() : { positive: '#28a745' };
       btn.style.color = colors.positive;
       btn.style.borderColor = colors.positive;
     } else {
       btn.classList.remove('active');
-      btn.classList.add('btn-outline-primary');
+      btn.classList.add('btn');
       btn.style.backgroundColor = '';
       btn.style.color = '';
       btn.style.borderColor = '';

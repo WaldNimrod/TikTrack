@@ -12,7 +12,7 @@ const BUTTON_SYSTEM_DEMO = {
             category: 'פעולות',
             icon: '✏️',
             text: 'ערוך',
-            class: 'btn-secondary',
+            class: 'btn',
             colorVariable: '--color-action-edit',
             variants: {
                 small: { icon: '✏️', text: '' },
@@ -30,7 +30,7 @@ const BUTTON_SYSTEM_DEMO = {
             category: 'פעולות',
             icon: '🗑️',
             text: 'מחק',
-            class: 'btn-danger',
+            class: 'btn',
             colorVariable: '--color-action-delete',
             variants: {
                 small: { icon: '🗑️', text: '' },
@@ -48,7 +48,7 @@ const BUTTON_SYSTEM_DEMO = {
             category: 'פעולות',
             icon: '➕',
             text: 'הוסף',
-            class: 'btn-success',
+            class: 'btn',
             colorVariable: '--color-action-add',
             variants: {
                 small: { icon: '➕', text: '' },
@@ -66,7 +66,7 @@ const BUTTON_SYSTEM_DEMO = {
             category: 'פעולות',
             icon: '💾',
             text: 'שמור',
-            class: 'btn-success',
+            class: 'btn',
             colorVariable: '--color-action-save',
             variants: {
                 small: { icon: '💾', text: '' },
@@ -84,7 +84,7 @@ const BUTTON_SYSTEM_DEMO = {
             category: 'פעולות',
             icon: '❌',
             text: 'ביטול',
-            class: 'btn-secondary',
+            class: 'btn',
             colorVariable: '--color-action-cancel',
             variants: {
                 small: { icon: '❌', text: '' },
@@ -102,7 +102,7 @@ const BUTTON_SYSTEM_DEMO = {
             category: 'ניווט',
             icon: '🔗',
             text: 'קישור',
-            class: 'btn-info',
+            class: 'btn',
             colorVariable: '--color-action-link',
             variants: {
                 small: { icon: '🔗', text: '' },
@@ -120,7 +120,7 @@ const BUTTON_SYSTEM_DEMO = {
             category: 'פעולות',
             icon: '🔄',
             text: 'רענן',
-            class: 'btn-outline-secondary',
+            class: 'btn',
             colorVariable: '--color-action-refresh',
             variants: {
                 small: { icon: '🔄', text: '' },
@@ -138,7 +138,7 @@ const BUTTON_SYSTEM_DEMO = {
             category: 'פעולות',
             icon: '📤',
             text: 'ייצא',
-            class: 'btn-outline-primary',
+            class: 'btn',
             colorVariable: '--color-action-export',
             variants: {
                 small: { icon: '📤', text: '' },
@@ -156,7 +156,7 @@ const BUTTON_SYSTEM_DEMO = {
             category: 'פעולות',
             icon: '📥',
             text: 'ייבא',
-            class: 'btn-outline-success',
+            class: 'btn',
             colorVariable: '--color-action-import',
             variants: {
                 small: { icon: '📥', text: '' },
@@ -174,7 +174,7 @@ const BUTTON_SYSTEM_DEMO = {
             category: 'פעולות',
             icon: '🔍',
             text: 'חיפוש',
-            class: 'btn-outline-info',
+            class: 'btn',
             colorVariable: '--color-action-search',
             variants: {
                 small: { icon: '🔍', text: '' },
@@ -192,7 +192,7 @@ const BUTTON_SYSTEM_DEMO = {
             category: 'פעולות',
             icon: '🔧',
             text: 'פילטר',
-            class: 'btn-outline-warning',
+            class: 'btn',
             colorVariable: '--color-action-filter',
             variants: {
                 small: { icon: '🔧', text: '' },
@@ -210,7 +210,7 @@ const BUTTON_SYSTEM_DEMO = {
             category: 'פעולות',
             icon: '👁️',
             text: 'צפה',
-            class: 'btn-outline-info',
+            class: 'btn',
             colorVariable: '--color-action-view',
             variants: {
                 small: { icon: '👁️', text: '' },
@@ -228,7 +228,7 @@ const BUTTON_SYSTEM_DEMO = {
             category: 'ניווט',
             icon: '▼',
             text: 'הצג/הסתר',
-            class: 'btn-outline-warning',
+            class: 'btn',
             oldHtml: '<button class="btn btn-outline-warning" onclick="toggleSection()">▼ הצג/הסתר</button>',
             newHtml: '<button data-button-type="TOGGLE" data-onclick="toggleSection()" data-classes="btn-outline-warning" data-text="הצג/הסתר"></button>',
             jsCode: 'createToggleButton(\'toggleSection()\')'
@@ -240,7 +240,7 @@ const BUTTON_SYSTEM_DEMO = {
             category: 'ניווט',
             icon: '✖️',
             text: 'סגור',
-            class: 'btn-secondary',
+            class: 'btn',
             oldHtml: '<button type="button" class="btn-close" data-bs-dismiss="modal"></button>',
             newHtml: '<button data-button-type="CLOSE" data-attributes="type=\'button\' class=\'btn-close\' data-bs-dismiss=\'modal\'"></button>',
             jsCode: 'createCloseButton()'
@@ -264,7 +264,7 @@ const BUTTON_SYSTEM_DEMO = {
             category: 'פעולות',
             icon: '📋',
             text: 'שכפל',
-            class: 'btn-outline-secondary',
+            class: 'btn',
             oldHtml: '<button class="btn btn-outline-secondary" onclick="duplicateRecord()"><i class="fas fa-copy"></i> שכפל</button>',
             newHtml: '<button data-button-type="DUPLICATE" data-onclick="duplicateRecord()" data-classes="btn-outline-secondary" data-text="שכפל"></button>',
             jsCode: 'createButton(\'DUPLICATE\', \'duplicateRecord()\')'
@@ -276,7 +276,7 @@ const BUTTON_SYSTEM_DEMO = {
             category: 'פעולות',
             icon: '📦',
             text: 'ארכב',
-            class: 'btn-outline-warning',
+            class: 'btn',
             oldHtml: '<button class="btn btn-outline-warning" onclick="archiveRecord()"><i class="fas fa-archive"></i> ארכב</button>',
             newHtml: '<button data-button-type="ARCHIVE" data-onclick="archiveRecord()" data-classes="btn-outline-warning" data-text="ארכב"></button>',
             jsCode: 'createButton(\'ARCHIVE\', \'archiveRecord()\')'
@@ -288,7 +288,7 @@ const BUTTON_SYSTEM_DEMO = {
             category: 'פעולות',
             icon: '📤',
             text: 'שחזר',
-            class: 'btn-outline-success',
+            class: 'btn',
             oldHtml: '<button class="btn btn-outline-success" onclick="restoreRecord()"><i class="fas fa-undo"></i> שחזר</button>',
             newHtml: '<button data-button-type="RESTORE" data-onclick="restoreRecord()" data-classes="btn-outline-success" data-text="שחזר"></button>',
             jsCode: 'createButton(\'RESTORE\', \'restoreRecord()\')'
@@ -300,7 +300,7 @@ const BUTTON_SYSTEM_DEMO = {
             category: 'פעולות',
             icon: '✅',
             text: 'אשר',
-            class: 'btn-success',
+            class: 'btn',
             oldHtml: '<button class="btn btn-success" onclick="approveRecord()"><i class="fas fa-check"></i> אשר</button>',
             newHtml: '<button data-button-type="APPROVE" data-onclick="approveRecord()" data-classes="btn-success" data-text="אשר"></button>',
             jsCode: 'createButton(\'APPROVE\', \'approveRecord()\')'
@@ -312,7 +312,7 @@ const BUTTON_SYSTEM_DEMO = {
             category: 'פעולות',
             icon: '❌',
             text: 'דחה',
-            class: 'btn-danger',
+            class: 'btn',
             oldHtml: '<button class="btn btn-danger" onclick="rejectRecord()"><i class="fas fa-times"></i> דחה</button>',
             newHtml: '<button data-button-type="REJECT" data-onclick="rejectRecord()" data-classes="btn-danger" data-text="דחה"></button>',
             jsCode: 'createButton(\'REJECT\', \'rejectRecord()\')'
@@ -324,7 +324,7 @@ const BUTTON_SYSTEM_DEMO = {
             category: 'פעולות',
             icon: '⏸️',
             text: 'השהה',
-            class: 'btn-warning',
+            class: 'btn',
             oldHtml: '<button class="btn btn-warning" onclick="pauseRecord()"><i class="fas fa-pause"></i> השהה</button>',
             newHtml: '<button data-button-type="PAUSE" data-onclick="pauseRecord()" data-classes="btn-warning" data-text="השהה"></button>',
             jsCode: 'createButton(\'PAUSE\', \'pauseRecord()\')'
@@ -336,7 +336,7 @@ const BUTTON_SYSTEM_DEMO = {
             category: 'פעולות',
             icon: '▶️',
             text: 'הפעל',
-            class: 'btn-success',
+            class: 'btn',
             oldHtml: '<button class="btn btn-success" onclick="playRecord()"><i class="fas fa-play"></i> הפעל</button>',
             newHtml: '<button data-button-type="PLAY" data-onclick="playRecord()" data-classes="btn-success" data-text="הפעל"></button>',
             jsCode: 'createButton(\'PLAY\', \'playRecord()\')'
@@ -348,7 +348,7 @@ const BUTTON_SYSTEM_DEMO = {
             category: 'פעולות',
             icon: '⏹️',
             text: 'עצור',
-            class: 'btn-danger',
+            class: 'btn',
             oldHtml: '<button class="btn btn-danger" onclick="stopRecord()"><i class="fas fa-stop"></i> עצור</button>',
             newHtml: '<button data-button-type="STOP" data-onclick="stopRecord()" data-classes="btn-danger" data-text="עצור"></button>',
             jsCode: 'createButton(\'STOP\', \'stopRecord()\')'
@@ -360,7 +360,7 @@ const BUTTON_SYSTEM_DEMO = {
             category: 'פעולות',
             icon: '✓',
             text: 'קראתי',
-            class: 'btn-outline-success',
+            class: 'btn',
             oldHtml: '<button class="btn btn-outline-success" onclick="markAsRead()"><i class="fas fa-check"></i> קראתי</button>',
             newHtml: '<button data-button-type="READ" data-onclick="markAsRead()" data-classes="btn-outline-success" data-text="קראתי"></button>',
             jsCode: 'createButton(\'READ\', \'markAsRead()\')'
@@ -372,7 +372,7 @@ const BUTTON_SYSTEM_DEMO = {
             category: 'פעולות',
             icon: '✓',
             text: 'סמן',
-            class: 'btn-outline-success',
+            class: 'btn',
             oldHtml: '<button class="btn btn-outline-success" onclick="checkRecord()"><i class="fas fa-check"></i> סמן</button>',
             newHtml: '<button data-button-type="CHECK" data-onclick="checkRecord()" data-classes="btn-outline-success" data-text="סמן"></button>',
             jsCode: 'createButton(\'CHECK\', \'checkRecord()\')'
@@ -384,7 +384,7 @@ const BUTTON_SYSTEM_DEMO = {
             category: 'פעולות',
             icon: '📋',
             text: 'העתק',
-            class: 'btn-outline-secondary',
+            class: 'btn',
             oldHtml: '<button class="btn btn-outline-secondary" onclick="copyData()"><i class="fas fa-copy"></i> העתק</button>',
             newHtml: '<button data-button-type="COPY" data-onclick="copyData()" data-classes="btn-outline-secondary" data-text="העתק"></button>',
             jsCode: 'createButton(\'COPY\', \'copyData()\')'
@@ -396,7 +396,7 @@ const BUTTON_SYSTEM_DEMO = {
             category: 'פעולות',
             icon: '🔄',
             text: 'הפעל מחדש',
-            class: 'btn-success',
+            class: 'btn',
             oldHtml: '<button class="btn btn-success" onclick="reactivateItem()"><i class="fas fa-redo"></i> הפעל מחדש</button>',
             newHtml: '<button data-button-type="REACTIVATE" data-onclick="reactivateItem()" data-classes="btn-success" data-text="הפעל מחדש"></button>',
             jsCode: 'createButton(\'REACTIVATE\', \'reactivateItem()\')'
@@ -429,36 +429,14 @@ function loadButtonTable() {
  */
 function getColorName(cssClass) {
     const colorMap = {
-        'btn-secondary': 'אפור',
-        'btn-danger': 'אדום',
-        'btn-success': 'ירוק',
-        'btn-primary': 'כחול',
-        'btn-info': 'כחול בהיר',
-        'btn-warning': 'צהוב',
-        'btn-outline-secondary': 'אפור מסגרת',
-        'btn-outline-primary': 'כחול מסגרת',
-        'btn-outline-success': 'ירוק מסגרת',
-        'btn-outline-danger': 'אדום מסגרת',
-        'btn-outline-info': 'כחול בהיר מסגרת',
-        'btn-outline-warning': 'צהוב מסגרת'
+        'btn': 'כפתור בסיסי'
     };
     return colorMap[cssClass] || cssClass;
 }
 
 function getColorVariable(cssClass) {
     const variableMap = {
-        'btn-secondary': '--secondary-color',
-        'btn-danger': '--danger-color',
-        'btn-success': '--success-color',
-        'btn-primary': '--primary-color',
-        'btn-info': '--info-color',
-        'btn-warning': '--warning-color',
-        'btn-outline-secondary': '--secondary-color',
-        'btn-outline-primary': '--primary-color',
-        'btn-outline-success': '--success-color',
-        'btn-outline-danger': '--danger-color',
-        'btn-outline-info': '--info-color',
-        'btn-outline-warning': '--warning-color'
+        'btn': '--primary-color'
     };
     return variableMap[cssClass] || '--secondary-color';
 }
@@ -640,10 +618,19 @@ function createButtonRow(button, index) {
     const colorVariableCell = document.createElement('td');
     const colorName = getColorName(button.class);
     const colorVariable = button.colorVariable || 'לא מוגדר';
+    
+    // Get the actual color value from CSS variable
+    const actualColor = getComputedStyle(document.documentElement).getPropertyValue(colorVariable).trim() || '#666666';
+    
     colorVariableCell.innerHTML = `
-        <div><strong>${colorName}</strong></div>
-        <code style="font-size: 10px;">${colorVariable}</code>
-        <div><small class="text-muted">תומך בישויות: ${['CLOSE', 'ADD', 'LINK', 'SAVE'].includes(button.type) ? 'כן' : 'לא'}</small></div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="width: 20px; height: 20px; border-radius: 4px; border: 1px solid #ccc; background-color: ${actualColor};"></div>
+            <div>
+                <div><strong>${colorName}</strong></div>
+                <code style="font-size: 10px;">${colorVariable}</code>
+                <div><small class="text-muted">תומך בישויות: ${['CLOSE', 'ADD', 'LINK', 'SAVE'].includes(button.type) ? 'כן' : 'לא'}</small></div>
+            </div>
+        </div>
     `;
     
     // Create hidden cells for code columns (for developers)

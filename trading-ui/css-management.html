@@ -79,9 +79,7 @@
                             <button data-button-type="COPY" data-onclick="copyDetailedLog()" data-classes="btn btn-sm btn-outline-secondary" data-attributes="title='העתק לוג מפורט'">
                                 <i class="fas fa-copy"></i> העתק לוג מפורט
                             </button>
-                            <button data-button-type="TOGGLE" data-onclick="toggleAllSections()" data-classes="filter-toggle-btn" data-attributes="title='הצג/הסתר כל הסקשנים'">
-                                ${createToggleButton("toggleSection('top')", "הצג/הסתר סקשן")}
-                            </button>
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleAllSections()" data-text="הצג/הסתר" title="הצג/הסתר כל הסקשנים"></button>
                         </div>
                     </div>
                     <div class="section-body">
@@ -100,9 +98,7 @@
                 <div class="content-section" id="section1">
                     <div class="section-header">
                         <h2>📊 סטטיסטיקות CSS</h2>
-                        <button data-button-type="TOGGLE" data-onclick="toggleSection('section1')" data-classes="filter-toggle-btn" data-attributes="title='הצג/הסתר סקשן'">
-                            ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
-                        </button>
+                        <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('section1')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
                     </div>
                     <div class="section-body">
                         <!-- כאן נכנס התוכן של גוף הסקשן -->
@@ -148,9 +144,7 @@
                 <div class="content-section" id="section2">
                     <div class="section-header">
                         <h2>🎯 ניהול שכבות</h2>
-                        <button data-button-type="TOGGLE" data-onclick="toggleSection('section2')" data-classes="filter-toggle-btn" data-attributes="title='הצג/הסתר סקשן'">
-                            ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
-                        </button>
+                        <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('section2')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
                     </div>
                     <div class="section-body">
                         <!-- כאן נכנס התוכן של גוף הסקשן -->
@@ -333,6 +327,7 @@
     <!-- Core Systems -->
     <script src="scripts/global-favicon.js"></script>
     <script src="scripts/ui-utils.js"></script>
+    <script src="scripts/button-system-init.js?v=1.0.0"></script>
     <script src="scripts/data-utils.js"></script>
     <script src="scripts/notification-system.js"></script>
     <script src="scripts/system-management.js"></script>

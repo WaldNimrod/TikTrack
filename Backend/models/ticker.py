@@ -73,7 +73,7 @@ class Ticker(BaseModel):
                          cascade="all, delete-orphan")
     trade_plans = relationship("TradePlan", back_populates="ticker", 
                               cascade="all, delete-orphan")
-    alerts = relationship("Alert", back_populates="ticker")
+    # alerts = relationship("Alert", back_populates="ticker")  # Removed - not in database
     notes = relationship("Note", 
                         primaryjoin="and_(Ticker.id == Note.related_id, Note.related_type_id == 4)",
                         foreign_keys="Note.related_id",

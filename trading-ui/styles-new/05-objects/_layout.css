@@ -425,18 +425,7 @@
   content: none;
 }
 
-/* תיקון לכפתורי Bootstrap ספציפיים */
-.container-fluid .main-content .btn-success,
-.container-fluid .main-content .btn-primary,
-.container-fluid .main-content .btn-info,
-.container-fluid .main-content .btn-warning,
-.container-fluid .main-content .btn-secondary,
-.container-fluid .main-content .btn-outline-primary,
-.container-fluid .main-content .btn-outline-warning,
-.container-fluid .main-content .btn-outline-secondary {
-  border-width: 1px;
-  box-sizing: border-box;
-}
+/* תיקון לכפתורי Bootstrap ספציפיים - הוסר, מוגדר ב-data-button-type */
 
 /* תיקון לכפתורים קטנים */
 .container-fluid .main-content .btn-sm {

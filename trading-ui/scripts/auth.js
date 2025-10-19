@@ -304,7 +304,7 @@ function createLogoutButton(containerId) {
   if (!container) {return;}
 
   container.innerHTML = `
-    <button class="btn btn-outline-danger" onclick="logout()">
+    <button class="btn" onclick="logout()">
       🚪 התנתק
     </button>
   `;

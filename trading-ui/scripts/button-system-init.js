@@ -12,7 +12,7 @@ const BUTTON_SYSTEM_CONFIG = {
     fallback: {
         enabled: true,
         showErrors: true,
-        defaultButtonClass: 'btn-secondary'
+        defaultButtonClass: 'btn'
     }
 };
 
@@ -239,7 +239,7 @@ class AdvancedButtonSystem {
 
     initializeButtons() {
         this.logger.info('Starting button initialization...');
-        const buttonElements = document.querySelectorAll('[data-button-type]');
+        const buttonElements = document.querySelectorAll('[data-button-type]:not([data-button-processed])');
         const totalButtons = buttonElements.length;
         this.logger.info(`Found ${totalButtons} buttons to process`);
 

@@ -104,9 +104,7 @@
                         <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והטריידים">
                             📤 העתק לוג מפורט
                         </button>
-                        <button class="btn btn-outline-warning" onclick="toggleSection('top')" title="הצג/הסתר אזור מעקב טריידים">
-                            ▼ הצג/הסתר
-                        </button>
+                        <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר" title="הצג/הסתר אזור מעקב טריידים"></button>
                     </div>
                 </div>
 
@@ -139,9 +137,7 @@
                         </div>
                         <div class="table-count" id="tradesCount">טוען...</div>
                         <div class="table-actions">
-                            <button id="addTradeBtn" class="btn btn-success" onclick="showAddTradeModal()" title="הוסף טרייד חדש">
-                                ➕ הוסף
-                            </button>
+                            <button data-button-type="ADD" data-entity-type="trade" data-variant="full" data-onclick="showAddTradeModal()" data-text="הוסף טרייד" title="הוסף טרייד חדש"></button>
                             
                             <!-- כפתורי עריכה ומחיקה נסתרים (לזיהוי בבדיקות) -->
                             <button id="editTradeBtn" class="btn btn-secondary d-none" onclick="editTradeRecord('')" title="ערוך טרייד נבחר">
@@ -152,8 +148,8 @@
                             </button>
 
                             <div class="action-separator"></div>
-                            <button class="btn btn-outline-warning" onclick="toggleSection('top')" title="הצג/הסתר אזור הטריידים שלי">
-                                ▼ הצג/הסתר
+                            <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר אזור הטריידים שלי">
+                                <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
                     </div>
@@ -490,6 +486,7 @@
     <!-- Stage 5: Advanced UI Systems (Always required) -->
     <script src="scripts/ui-utils.js?v=1.0.0"></script>
     <script src="scripts/color-scheme-system.js?v=1.0.0"></script>
+    <script src="scripts/button-system-init.js?v=1.0.0"></script>
     <script src="scripts/header-system.js?v=v6.0.0"></script>
     
     <!-- Stage 6: Data and Utility Systems -->

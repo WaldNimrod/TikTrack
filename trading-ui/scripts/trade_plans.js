@@ -1686,7 +1686,7 @@ function updateTradePlansTable(trade_plans) {
 
     // Displaying ticker symbol or name with Entity Details link
     const tickerDisplay = design.ticker ? design.ticker.symbol || design.ticker.name || 'לא מוגדר' : 'לא מוגדר';
-    const tickerLink = design.id ? `<button class="btn btn-sm btn-info" onclick="if (typeof window.showEntityDetails === 'function') { window.showEntityDetails('trade_plan', ${design.id}); }" title="קישור">🔗</button>` : '';
+    const tickerLink = design.id ? `<button class="btn btn-sm" onclick="if (typeof window.showEntityDetails === 'function') { window.showEntityDetails('trade_plan', ${design.id}); }" title="קישור">🔗</button>` : '';
 
     // שמירת הערכים המקוריים באנגלית לפילטר
     const typeForFilter = design.investment_type || '';
@@ -1744,10 +1744,10 @@ function updateTradePlansTable(trade_plans) {
           </span>
         </td>
         <td class="actions-cell">
-          <button class="btn btn-sm btn-info" onclick="if (typeof window.viewLinkedItemsForTradePlan === 'function') { window.viewLinkedItemsForTradePlan(${design.id}); }" title="קישור">🔗</button>
-          <button class="btn btn-sm btn-secondary" onclick="if (typeof window.openEditTradePlanModal === 'function') { window.openEditTradePlanModal(${design.id}); }" title="ערוך">✏️</button>
-          <button class="btn btn-sm btn-warning" onclick="if (typeof window.cancelTradePlan === 'function') { window.cancelTradePlan(${design.id}); }" title="בטל">❌</button>
-          <button class="btn btn-sm btn-danger" onclick="if (typeof window.openDeleteTradePlanModal === 'function') { window.openDeleteTradePlanModal(${design.id}); }" title="מחק">🗑️</button>
+          <button class="btn btn-sm" onclick="if (typeof window.viewLinkedItemsForTradePlan === 'function') { window.viewLinkedItemsForTradePlan(${design.id}); }" title="קישור">🔗</button>
+          <button class="btn btn-sm" onclick="if (typeof window.openEditTradePlanModal === 'function') { window.openEditTradePlanModal(${design.id}); }" title="ערוך">✏️</button>
+          <button class="btn btn-sm" onclick="if (typeof window.cancelTradePlan === 'function') { window.cancelTradePlan(${design.id}); }" title="בטל">❌</button>
+          <button class="btn btn-sm" onclick="if (typeof window.openDeleteTradePlanModal === 'function') { window.openDeleteTradePlanModal(${design.id}); }" title="מחק">🗑️</button>
         </td>
       </tr>
     `;
@@ -4187,7 +4187,7 @@ function filterTradePlansByType(type) {
       btn.style.color = colors.positive;
       btn.style.borderColor = colors.positive;
     } else {
-      btn.classList.add('btn-outline-primary');
+      btn.classList.add('btn');
     }
   });
 
@@ -4195,7 +4195,7 @@ function filterTradePlansByType(type) {
   const currentButton = document.querySelector(`[data-type="${type}"]`);
   if (currentButton) {
     currentButton.classList.add('active');
-    currentButton.classList.remove('btn-outline-primary');
+    currentButton.classList.remove('btn');
     const colors = window.getTableColors ? window.getTableColors() : { positive: '#28a745' };
     currentButton.style.backgroundColor = 'white';
     currentButton.style.color = colors.positive;

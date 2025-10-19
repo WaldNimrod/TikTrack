@@ -644,10 +644,10 @@ class ExternalDataDashboard {
                     </div>
                 </div>
                 <div class="provider-actions">
-                    <button class="btn btn-sm btn-primary" onclick="testProvider('${provider.id}')">
+                    <button class="btn btn-sm" onclick="testProvider('${provider.id}')">
                         🧪 בדוק
                     </button>
-                    <button class="btn btn-sm btn-secondary" onclick="toggleProvider('${provider.id}')">
+                    <button class="btn btn-sm" onclick="toggleProvider('${provider.id}')">
                         ${provider.is_active ? '⏸️ השבת' : '▶️ הפעל'}
                     </button>
                 </div>

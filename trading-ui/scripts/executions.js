@@ -1456,7 +1456,7 @@ function displayLinkedItems(linkedItems) {
                         ${linkedItems.trades.map(trade => `
                             <li>
                                 טרייד #${trade.id} - חשבון: ${trade.account_name || 'לא זמין'} - סטטוס: ${trade.status}
-                                <button class="btn btn-sm btn-outline-primary ms-2" onclick="goToTrade(${trade.id})">
+                                <button class="btn btn-sm ms-2" onclick="goToTrade(${trade.id})">
                                     עבור לטרייד
                                 </button>
                             </li>
@@ -1495,7 +1495,7 @@ function displayLinkedItems(linkedItems) {
                                         <td><span class="badge bg-info">${plan.status}</span></td>
                                         <td>${formatDate(plan.created_at)}</td>
                                         <td>
-                                            <button class="btn btn-sm btn-outline-primary" 
+                                            <button class="btn btn-sm" 
                                               onclick="goToPlan(${plan.id})">
                                                 עבור לתכנון
                                             </button>
@@ -1545,7 +1545,7 @@ function displayLinkedItems(linkedItems) {
     alert.status
 }</span></td>
                                         <td>
-                                            <button class="btn btn-sm btn-outline-primary" 
+                                            <button class="btn btn-sm" 
                                               onclick="goToAlert(${alert.id})">
                                                 עבור להתראה
                                             </button>
@@ -1589,7 +1589,7 @@ function displayLinkedItems(linkedItems) {
 }</td>
                                         <td>${formatDate(note.created_at)}</td>
                                         <td>
-                                            <button class="btn btn-sm btn-outline-primary" 
+                                            <button class="btn btn-sm" 
                                               onclick="goToNote(${note.id})">
                                                 עבור להערה
                                             </button>
@@ -1820,7 +1820,7 @@ async function updateExecutionsTableMain(executions) {
                            <strong style="cursor: pointer; color: ${positiveColor};" 
                              onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('ticker', ${ticker ? ticker.id : 'null'}, 'view'); } else { console.log('Entity details modal not available'); }" 
                              title="פתח פרטי סימבול">${symbol}</strong>
-                           <button class="btn btn-sm btn-info" 
+                           <button class="btn btn-sm" 
                              onclick="console.log('🔗 [LINKED ITEMS] לחיצה על כפתור מקושרים עבור טיקר:', ${ticker ? ticker.id : 'null'}); if(window.loadLinkedItemsData) { window.loadLinkedItemsData('ticker', ${ticker ? ticker.id : 'null'}).then(data => { console.log('🔗 [LINKED ITEMS] נתונים נטענו:', data); if(data) { console.log('🔗 [LINKED ITEMS] מציג מודל עם נתונים'); window.showLinkedItemsModal(data, 'ticker', ${ticker ? ticker.id : 'null'}, 'view'); } else { console.log('❌ [LINKED ITEMS] אין נתונים להצגה'); } }); } else { console.log('❌ [LINKED ITEMS] loadLinkedItemsData לא זמין'); }" 
                              title="פריטים מקושרים לטיקר">🔗</button>
                        </div>
@@ -1840,13 +1840,13 @@ async function updateExecutionsTableMain(executions) {
                 <td data-date="${execution.date || execution.execution_date}">${execution.date || execution.execution_date ? new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL') : '-'}</td>
                 <td style="text-align: left; direction: ltr;">${execution.source || '-'}</td>
                 <td class="actions-cell">
-                    <button class="btn btn-sm btn-info" 
+                    <button class="btn btn-sm" 
                       onclick="console.log('🔗 [LINKED ITEMS] לחיצה על כפתור מקושרים עבור עסקה:', ${execution.id}); if(window.loadLinkedItemsData) { window.loadLinkedItemsData('execution', ${execution.id}).then(data => { console.log('🔗 [LINKED ITEMS] נתונים נטענו:', data); if(data) { console.log('🔗 [LINKED ITEMS] מציג מודל עם נתונים'); window.showLinkedItemsModal(data, 'execution', ${execution.id}, 'view'); } else { console.log('❌ [LINKED ITEMS] אין נתונים להצגה'); } }); } else { console.log('❌ [LINKED ITEMS] loadLinkedItemsData לא זמין'); }" 
                       title="פריטים מקושרים">🔗</button>
-                    <button class="btn btn-sm btn-secondary" 
+                    <button class="btn btn-sm" 
                       onclick="editExecution(${execution.id})" 
                       title="ערוך">✏️</button>
-                    <button class="btn btn-sm btn-danger" 
+                    <button class="btn btn-sm" 
                       onclick="deleteExecution(${execution.id})" 
                       title="מחק">🗑️</button>
                 </td>
@@ -3330,13 +3330,13 @@ function updateTickersSummaryTable(tickers = null) {
             <td>${ticker.totalTrades} (${ticker.activeTrades} פעיל, ${ticker.closedTrades} סגור)</td>
             <td>${creationDate}</td>
             <td class="actions-cell">
-                <button class="btn btn-sm btn-outline-primary" 
+                <button class="btn btn-sm" 
                   onclick="viewTickerDetails(${ticker.id})" 
                   title="צפה בפרטים">
                     <img src="images/icons/tickers.svg" alt="צפה" 
                       class="action-icon" style="width: 14px; height: 14px;">
                 </button>
-                <button class="btn btn-sm btn-outline-success" 
+                <button class="btn btn-sm" 
                   onclick="addExecutionForTicker(${ticker.id})" 
                   title="הוסף עסקה">
                     <img src="images/icons/executions.svg" alt="הוסף" 

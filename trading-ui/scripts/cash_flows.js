@@ -933,7 +933,7 @@ async function renderCashFlowsTable() {
             row.innerHTML = `
             <td class="col-account ticker-cell">
                 <div style="display: flex; align-items: center; gap: 8px;">
-                    <button class="btn btn-sm btn-outline-info" 
+                    <button class="btn btn-sm" 
                       onclick="showEntityDetails('cash_flow', ${cashFlow.id})" 
                       title="פרטי תזרים" 
                       style="background-color: white; font-size: 0.8em;">
@@ -958,9 +958,9 @@ async function renderCashFlowsTable() {
     window.translateCashFlowSource(cashFlow.source) :
     cashFlow.source}</td>
             <td class="col-actions actions-cell actions-3-btn">
-              <button class="btn btn-sm btn-info" onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})" title="צפה בפריטים מקושרים">🔗</button>
-              <button class="btn btn-sm btn-secondary" onclick="showEditCashFlowModal(${cashFlow.id})" title="ערוך תזרים">✏️</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteCashFlow(${cashFlow.id})" title="מחק תזרים">🗑️</button>
+              <button class="btn btn-sm" onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})" title="צפה בפריטים מקושרים">🔗</button>
+              <button class="btn btn-sm" onclick="showEditCashFlowModal(${cashFlow.id})" title="ערוך תזרים">✏️</button>
+              <button class="btn btn-sm" onclick="deleteCashFlow(${cashFlow.id})" title="מחק תזרים">🗑️</button>
 
             </td>
         `;

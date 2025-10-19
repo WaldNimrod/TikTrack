@@ -103,9 +103,7 @@
                             <button data-button-type="REFRESH" data-onclick="refreshSystemData()" data-classes="btn btn-sm btn-outline-primary" data-attributes="title='רענן נתוני מערכת'">
                                 <i class="fas fa-sync-alt"></i> רענן
                             </button>
-                            <button data-button-type="TOGGLE" data-onclick="toggleAllSections()" data-classes="filter-toggle-btn" data-attributes="title='הצג/הסתר כל הסקשנים'">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleAllSections()" data-text="הצג/הסתר" title="הצג/הסתר כל הסקשנים"></button>
                         </div>
                     </div>
                     <div class="section-body">
@@ -711,6 +709,7 @@
     <!-- Core Systems -->
     <script src="scripts/global-favicon.js"></script>
     <script src="scripts/ui-utils.js"></script>
+    <script src="scripts/button-system-init.js?v=1.0.0"></script>
     <script src="scripts/data-utils.js"></script>
     <script src="scripts/notification-system.js"></script>
     <script src="scripts/system-management.js"></script>

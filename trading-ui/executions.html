@@ -101,7 +101,7 @@
                     </div>
                     <div class="table-actions">
                         <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט"><i class="fas fa-file-export"></i></button>
-                        <button class="btn btn-outline-warning" onclick="toggleSection('top')"><i class="fas fa-chevron-up"></i> הצג/הסתר</button>
+                        <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר"></button>
                     </div>
                 </div>
 
@@ -131,8 +131,8 @@
                         </div>
                         <div class="table-count" id="executionsCount">טוען...</div>
                         <div class="table-actions">
-                            <button class="btn btn-success" id="addExecutionBtn" onclick="openExecutionDetails()" title="הוסף עסקה חדשה"><i class="fas fa-plus"></i> הוסף</button>
-                            <button class="btn btn-outline-warning" onclick="toggleSection('main')"><i class="fas fa-chevron-up"></i> הצג/הסתר</button>
+                            <button data-button-type="ADD" data-entity-type="execution" data-variant="full" data-onclick="openExecutionDetails()" data-text="הוסף" id="addExecutionBtn" title="הוסף עסקה חדשה"></button>
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('main')" data-text="הצג/הסתר"></button>
                         </div>
                     </div>
 
@@ -383,6 +383,7 @@
     <!-- Stage 5: Advanced UI Systems (Always required) -->
     <script src="scripts/ui-utils.js?v=1.0.0"></script>
     <script src="scripts/color-scheme-system.js?v=1.0.0"></script>
+    <script src="scripts/button-system-init.js?v=1.0.0"></script>
     <script src="scripts/header-system.js?v=v6.0.0"></script>
     
     <!-- Stage 6: Data and Utility Systems -->

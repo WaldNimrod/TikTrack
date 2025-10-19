@@ -408,7 +408,7 @@ function updateTradesTable(trades) {
       <td class="ticker-cell">
         <div class="d-flex align-items-center gap-2">
           <strong><a href="#" onclick="editTradeRecord('${trade.id}')" class="ticker-link">${trade.ticker_symbol || getTickerSymbol(trade.ticker_id) || 'טיקר לא ידוע'}</a></strong>
-          <button class="btn btn-sm btn-outline-secondary" onclick="viewTickerDetails('${trade.ticker_id}')" title="פרטי טיקר" style="padding: 2px 6px; font-size: 12px;">
+          <button class="btn btn-sm" onclick="viewTickerDetails('${trade.ticker_id}')" title="פרטי טיקר" style="padding: 2px 6px; font-size: 12px;">
             🔗
           </button>
         </div>
@@ -436,10 +436,10 @@ function updateTradesTable(trades) {
       <td>${trade.notes || ''}</td>
       <td class="actions-cell">
         <div class="d-flex gap-1 justify-content-center align-items-center" style="flex-wrap: nowrap;">
-          <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTrade(${trade.id})" title="הצג פריטים מקושרים">🔗</button>
-          <button class="btn btn-sm btn-secondary" onclick="editTradeRecord('${trade.id}')" title="ערוך טרייד">✏️</button>
-          <button class="btn btn-sm btn-warning" onclick="window.cancelTrade(${trade.id})" title="בטל טרייד">❌</button>
-          <button class="btn btn-sm btn-danger" onclick="deleteTradeRecord('${trade.id}')" title="מחק טרייד">🗑️</button>
+          <button class="btn btn-sm" onclick="viewLinkedItemsForTrade(${trade.id})" title="הצג פריטים מקושרים">🔗</button>
+          <button class="btn btn-sm" onclick="editTradeRecord('${trade.id}')" title="ערוך טרייד">✏️</button>
+          <button class="btn btn-sm" onclick="window.cancelTrade(${trade.id})" title="בטל טרייד">❌</button>
+          <button class="btn btn-sm" onclick="deleteTradeRecord('${trade.id}')" title="מחק טרייד">🗑️</button>
         </div>
       </td>
     </tr>

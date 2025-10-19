@@ -1884,17 +1884,17 @@ function updateTickersTable(tickers) {
                     </td>
                     <td class="actions-cell">
                         <div class="btn-group btn-group-sm" role="group">
-                            <button class="btn btn-outline-info" 
+                            <button class="btn" 
                                     onclick="viewLinkedItemsForTicker(${ticker.id})" 
                                     title="פריטים מקושרים">🔗</button>
-                            <button class="btn btn-outline-secondary" 
+                            <button class="btn" 
                                     onclick="editTicker(${ticker.id})" 
                                     title="ערוך">✏️</button>
                             ${ticker.status === 'cancelled' ?
-    `<button class="btn btn-outline-success" 
+    `<button class="btn" 
              onclick="window.reactivateTicker(${ticker.id})" 
              title="הפעל מחדש טיקר"><span class="reactivate-icon">✓</span></button>` :
-    `<button class="btn btn-outline-danger" 
+    `<button class="btn" 
              onclick="window.cancelTicker(${ticker.id})" 
              title="בטל טיקר"><span class="cancel-icon">X</span></button>`
 }
@@ -2196,13 +2196,13 @@ function filterTickersByType(type) {
       btn.classList.add('active');
       if (btnType === 'all') {
         // כפתור איפוס - עיצוב מיוחד
-        btn.classList.remove('btn-outline-primary');
+        btn.classList.remove('btn');
         btn.style.backgroundColor = 'white';
         btn.style.color = '#28a745';
         btn.style.borderColor = '#28a745';
       } else {
         // כפתורים רגילים
-        btn.classList.remove('btn-outline-primary');
+        btn.classList.remove('btn');
         btn.style.backgroundColor = 'white';
         btn.style.color = '#28a745';
         btn.style.borderColor = '#28a745';
@@ -2217,7 +2217,7 @@ function filterTickersByType(type) {
         btn.style.borderColor = '';
       } else {
         // כפתורים רגילים
-        btn.classList.add('btn-outline-primary');
+        btn.classList.add('btn');
         btn.style.backgroundColor = '';
         btn.style.color = '';
         btn.style.borderColor = '';

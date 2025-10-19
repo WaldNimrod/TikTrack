@@ -561,13 +561,13 @@ class EntityDetailsRenderer {
             <div class="entity-action-buttons border-top pt-3">
                 <h6 class="mb-3">פעולות מהירות</h6>
                 <div class="d-flex gap-2 flex-wrap">
-                    <button class="btn btn-primary btn-sm" onclick="window.editTicker(${entityId})">
+                    <button class="btn btn-sm" onclick="window.editTicker(${entityId})">
                         <i class="fas fa-edit me-1"></i>עריכה
                     </button>
-                    <button class="btn btn-secondary btn-sm" onclick="window.entityDetailsModal.showLinkedItems('${entityType}', ${entityId})">
+                    <button class="btn btn-sm" onclick="window.entityDetailsModal.showLinkedItems('${entityType}', ${entityId})">
                         <i class="fas fa-link me-1"></i>פריטים מקושרים
                     </button>
-                    <button class="btn btn-warning btn-sm" onclick="window.entityDetailsModal.exportEntity('${entityType}', ${entityId})">
+                    <button class="btn btn-sm" onclick="window.entityDetailsModal.exportEntity('${entityType}', ${entityId})">
                         <i class="fas fa-download me-1"></i>ייצוא
                     </button>
                 </div>
@@ -610,7 +610,7 @@ class EntityDetailsRenderer {
                     <div class="text-muted text-center py-4">
                         <i class="fas fa-link fa-2x mb-3"></i>
                         <p>אין פריטים מקושרים</p>
-                        <button class="btn btn-outline-primary btn-sm mt-2" onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'ticker', window.currentEntityId || 'null')">
+                        <button class="btn btn-sm mt-2" onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'ticker', window.currentEntityId || 'null')">
                             <i class="fas fa-search me-1"></i>חפש פריטים מקושרים
                         </button>
                     </div>
@@ -666,7 +666,7 @@ class EntityDetailsRenderer {
                     </table>
                 </div>
                 <div class="text-center mt-3">
-                    <button class="btn btn-outline-primary" onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'ticker', window.currentEntityId || 'null')">
+                    <button class="btn" onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'ticker', window.currentEntityId || 'null')">
                         <i class="fas fa-search me-1"></i>פריטים מקושרים מלאים
                     </button>
                 </div>
@@ -833,7 +833,7 @@ class EntityDetailsRenderer {
             // יצירת כפתור ביטול/שיחזור עם המערכת החדשה
             const isCancelled = status === 'cancelled' || status === 'canceled';
             const buttonType = isCancelled ? 'REACTIVATE' : 'CANCEL';
-            const buttonClass = isCancelled ? 'btn-success' : 'btn-danger';
+            const buttonClass = 'btn';
             const title = isCancelled ? 'הפעל מחדש' : 'בטל';
             
             // יצירת onclick function
@@ -852,7 +852,7 @@ class EntityDetailsRenderer {
         } else {
                 // Fallback זהה בדיוק לפונקציה הגלובלית
                 const isCancelled = status === 'cancelled' || status === 'canceled';
-                const buttonClass = isCancelled ? 'btn-success' : 'btn-danger';
+                const buttonClass = 'btn';
                 const title = isCancelled ? 'הפעל מחדש' : 'בטל';
                 const icon = isCancelled ? '✓' : 'X';
                 

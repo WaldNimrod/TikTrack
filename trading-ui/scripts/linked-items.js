@@ -516,7 +516,7 @@ function createLinkedItemsModalContent(data, itemType, itemId, mode = 'view') {
   content += `
       <div class="modal-footer">
         <button data-button-type="CLOSE" data-attributes="data-bs-dismiss='modal' type='button'"></button>
-        <button type="button" class="btn btn-primary" onclick="exportLinkedItemsData('${itemType}', ${itemId})">
+        <button type="button" class="btn" onclick="exportLinkedItemsData('${itemType}', ${itemId})">
           📤 ייצוא נתונים
         </button>
       </div>
@@ -562,18 +562,18 @@ function createLinkedItemsList(items, mode = 'view') {
           ${mode === 'warningBlock' ? '' : `
           <div class="linked-item-actions">
             <div class="btn-group btn-group-sm" role="group">
-              <button class="btn btn-outline-primary" 
+              <button class="btn" 
                       onclick="viewItemDetails('${item.type}', ${item.id})" 
                       title="צפה בפרטים">
                 👁️
               </button>
-              <button class="btn btn-outline-secondary" onclick="editItem('${item.type}', ${item.id})" title="ערוך">
+              <button class="btn" onclick="editItem('${item.type}', ${item.id})" title="ערוך">
                 ✏️
               </button>
-              <button class="btn btn-outline-info" onclick="openItemPage('${item.type}', ${item.id})" title="פתח דף">
+              <button class="btn" onclick="openItemPage('${item.type}', ${item.id})" title="פתח דף">
                 🔗
               </button>
-              <button class="btn btn-outline-danger" onclick="deleteItem('${item.type}', ${item.id})" title="מחק">
+              <button class="btn" onclick="deleteItem('${item.type}', ${item.id})" title="מחק">
                 🗑️
               </button>
             </div>

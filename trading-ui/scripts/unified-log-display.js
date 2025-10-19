@@ -497,10 +497,10 @@ class UnifiedLogDisplay {
             <td class="category-cell">${categoryDisplay}</td>
             <td class="page-cell">${pageDisplay}</td>
             <td class="actions-cell">
-                <button class="btn btn-action btn-primary view-details-btn" title="פרטים">
+                <button class="btn btn-action view-details-btn" title="פרטים">
                     <i class="fas fa-eye"></i>
                 </button>
-                <button class="btn btn-action btn-secondary copy-btn" title="העתקה">
+                <button class="btn btn-action copy-btn" title="העתקה">
                     <i class="fas fa-copy"></i>
                 </button>
             </td>
@@ -563,7 +563,7 @@ class UnifiedLogDisplay {
             
             // Check for CSS conflicts
             const testBtn = document.createElement('button');
-            testBtn.className = 'btn btn-action btn-info';
+            testBtn.className = 'btn btn-action';
             testBtn.innerHTML = '<i class="fas fa-info"></i>';
             testBtn.style.position = 'absolute';
             testBtn.style.top = '-1000px';
@@ -1304,7 +1304,7 @@ window.debugActionButtons = function() {
     // Check for CSS conflicts
     console.log('🎨 Checking CSS conflicts...');
     const testBtn = document.createElement('button');
-    testBtn.className = 'btn btn-action btn-info';
+    testBtn.className = 'btn btn-action';
     testBtn.innerHTML = '<i class="fas fa-info"></i>';
     testBtn.style.position = 'absolute';
     testBtn.style.top = '-1000px';

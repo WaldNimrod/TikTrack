@@ -266,10 +266,10 @@ function createActionsHTML(row, tableType) {
 
   return `
     <div class="action-buttons">
-      <button class="btn btn-sm btn-outline-primary" onclick="editRecord('${tableType}', ${recordId})" title="ערוך">
+      <button class="btn btn-sm" onclick="editRecord('${tableType}', ${recordId})" title="ערוך">
         <i class="fas fa-edit"></i>
       </button>
-      <button class="btn btn-sm btn-outline-danger" onclick="deleteRecord('${tableType}', ${recordId})" title="מחק">
+      <button class="btn btn-sm" onclick="deleteRecord('${tableType}', ${recordId})" title="מחק">
         <i class="fas fa-trash"></i>
       </button>
     </div>

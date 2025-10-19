@@ -1,5 +1,68 @@
 // ===== קובץ JavaScript פשוט לדף הערות =====
 
+// ייצוא מוקדם של הפונקציה למניעת שגיאות
+window.loadNotesData = window.loadNotesData || function() {
+  // loadNotesData not yet defined, using placeholder
+  console.log('⚠️ loadNotesData placeholder called');
+};
+
+// הגדרת הפונקציה המלאה מיד אחרי ה-placeholder
+window.loadNotesData = async function() {
+  console.log('🚀🚀🚀 loadNotesData התחיל 🚀🚀🚀');
+
+  try {
+    // קריאה לשרת לקבלת נתוני הערות
+    console.log('📡 קריאה לשרת לקבלת נתוני הערות...');
+    const response = await fetch('/api/notes/');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('📊 נתונים שהתקבלו מהשרת:', data);
+
+    // שמירת הנתונים במשתנה גלובלי
+    window.notesData = data.data || data;
+    console.log('💾 נתונים נשמרו ב-window.notesData:', window.notesData.length, 'הערות');
+
+    // עדכון הטבלה
+    if (typeof window.updateNotesTable === 'function') {
+      console.log('📊 מעדכן את טבלת הערות');
+      window.updateNotesTable(window.notesData);
+    } else {
+      console.warn('⚠️ updateNotesTable לא זמין');
+    }
+
+    // עדכון סטטיסטיקות
+    if (typeof window.updateNotesSummary === 'function') {
+      console.log('📈 מעדכן את סטטיסטיקות הערות');
+      window.updateNotesSummary(window.notesData);
+    } else {
+      console.warn('⚠️ updateNotesSummary לא זמין');
+    }
+
+    // עדכון מונה הטבלה
+    const countElement = document.getElementById('notesCount');
+    if (countElement) {
+      countElement.textContent = `${window.notesData.length} הערות`;
+    }
+
+    console.log('✅ loadNotesData הושלם בהצלחה');
+
+  } catch (error) {
+    console.error('❌ שגיאה ב-loadNotesData:', error);
+    
+    // הצגת הודעת שגיאה למשתמש
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בטעינת נתוני הערות', error.message);
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('שגיאה בטעינת נתוני הערות', 'error');
+    } else {
+      alert('שגיאה בטעינת נתוני הערות: ' + error.message);
+    }
+  }
+};
+
 /**
  * הוספת הערה חדשה
  * פותח מודל להוספת הערה חדשה
@@ -392,7 +455,7 @@ async function loadNotesData() {
               <h5>❌ שגיאה בטעינת נתונים</h5>
               <p>לא ניתן לטעון נתונים מהשרת</p>
               <p class="small text-muted">${error.message}</p>
-              <button class="btn btn-sm btn-primary" onclick="loadNotesData()">נסה שוב</button>
+              <button class="btn btn-sm" onclick="loadNotesData()">נסה שוב</button>
             </div>
           </td>
         </tr>
@@ -423,11 +486,11 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
   if (!notes || notes.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="7" class="text-center text-muted">
+        <td colspan="6" class="text-center text-muted">
           <div style="padding: 20px;">
             <h5>📝 אין הערות</h5>
             <p>לא נמצאו הערות במערכת</p>
-            <button class="btn btn-sm btn-primary" onclick="openNoteDetails()">הוסף הערה ראשונה</button>
+            <button class="btn btn-sm" onclick="openNoteDetails()">הוסף הערה ראשונה</button>
           </div>
         </td>
       </tr>
@@ -588,7 +651,7 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
 
     return `
       <tr onclick='viewNote(${note.id})' style='cursor: pointer;'>
-        <td class='ticker-cell'><span class='symbol-text'>${note.title || '-'}</span></td>
+        <td class='ticker-cell'><span class='symbol-text'>${symbolDisplay || '-'}</span></td>
         <td>${contentDisplay}</td>
         <td style='padding: 0;' data-type='${typeForFilter}'>
           <div class='related-object-cell ${relatedClass}' 
@@ -599,17 +662,17 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
         <td data-date='${note.created_at}'>${date}</td>
         <td>${attachmentDisplay}</td>
         <td class='actions-cell' onclick='event.stopPropagation();'>
-          <button class='btn btn-sm btn-info' 
+          <button class='btn btn-sm' 
             onclick='window.showLinkedItemsModal && window.showLinkedItemsModal([], "note", ${note.id})' 
             title='צפה בפריטים מקושרים'>
             🔗
           </button>
-          <button class='btn btn-sm btn-secondary' 
+          <button class='btn btn-sm' 
             onclick='editNote("${note.id}")' 
             title='ערוך הערה'>
             ✏️
           </button>
-          <button class='btn btn-sm btn-danger' 
+          <button class='btn btn-sm' 
             onclick='deleteNote("${note.id}")' 
             title='מחק הערה'>
             🗑️
@@ -1425,7 +1488,7 @@ function clearNoteValidationErrors() {
 //   }
 // }
 
-window.loadNotesData = loadNotesData;
+// window.loadNotesData כבר מוגדר בתחילת הקובץ
 window.updateNotesTable = updateNotesTable;
 window.updateNotesSummary = updateNotesSummary;
 window.updateGridFromComponent = updateGridFromComponent;
@@ -1443,55 +1506,7 @@ window.updateRadioButtons = updateRadioButtons;
 window.populateSelect = populateSelect;
 
 // הוסר - המערכת המאוחדת מטפלת באתחול
-// אתחול הדף
-// document.addEventListener('DOMContentLoaded', function () {
-//   console.log('🚀🚀🚀 notes.js - DOMContentLoaded התחיל 🚀🚀🚀');
-  
-  // בדיקת זמינות מערכות
-  console.log('🔍 בדיקת זמינות מערכות:');
-  console.log('  - showSuccessNotification:', typeof window.showSuccessNotification);
-  console.log('  - loadNotesData:', typeof window.loadNotesData);
-  console.log('  - updateNotesTable:', typeof window.updateNotesTable);
-  
-  // בדיקה שהמערכת זמינה
-  if (typeof window.showSuccessNotification !== 'function') {
-    console.warn('⚠️ showSuccessNotification לא זמינה - ממתין...');
-    // נסה שוב אחרי 2 שניות
-    setTimeout(() => {
-      console.log('🔄 ניסיון שני לטעינת נתונים...');
-      if (typeof window.showSuccessNotification === 'function') {
-        console.log('✅ showSuccessNotification זמינה עכשיו - מתחיל טעינת נתונים');
-        loadNotesData();
-      } else {
-        console.error('❌ showSuccessNotification עדיין לא זמינה');
-      }
-    }, 2000);
-    return;
-  }
 
-  console.log('✅ כל המערכות זמינות - מתחיל אתחול');
-
-  // שחזור מצב הסגירה
-  if (typeof window.restoreAllSectionStates === 'function') {
-    console.log('🔄 שחזור מצב סגירה - מערכת גלובלית');
-    window.restoreAllSectionStates();
-  } else {
-    console.log('🔄 שחזור מצב סגירה - מערכת מקומית');
-    restoreNotesSectionState();
-  }
-
-  // טעינת נתונים
-  console.log('📡 טעינת נתוני הערות...');
-  loadNotesData();
-
-  // הוספת ולידציה בזמן אמת
-  setupNoteValidationEvents();
-
-  // שחזור מצב סידור
-  restoreSortState();
-
-  console.log('✅ notes.js - DOMContentLoaded הושלם');
-// });
 
 // פונקציה להגדרת אירועי ולידציה
 function setupNoteValidationEvents() {
@@ -1614,10 +1629,10 @@ function setupNoteValidationEvents() {
         const actionsElement = document.getElementById('attachmentActions');
         if (actionsElement) {
           actionsElement.innerHTML = `
-            <button type="button" class="btn btn-sm btn-outline-success" disabled>
+            <button type="button" class="btn btn-sm" disabled>
               ✅ קובץ נבחר
             </button>
-            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearSelectedFile()">
+            <button type="button" class="btn btn-sm" onclick="clearSelectedFile()">
               ❌ בטל בחירה
             </button>
           `;
@@ -1895,7 +1910,7 @@ function filterNotesByType(type) {
       btn.style.color = colors.positive;
       btn.style.borderColor = colors.positive;
     } else {
-      btn.classList.add('btn-outline-primary');
+      btn.classList.add('btn');
     }
   });
 
@@ -1907,7 +1922,7 @@ function filterNotesByType(type) {
       activeButton.style.color = colors.positive;
       activeButton.style.borderColor = colors.positive;
     } else {
-      activeButton.classList.remove('btn-outline-primary');
+      activeButton.classList.remove('btn');
       activeButton.classList.add('active');
     }
   }
@@ -2000,7 +2015,7 @@ async function loadNoteForViewing(noteId) {
       }
 
       attachmentElement.innerHTML = `
-        <a href="/api/notes/files/${fileName}" target="_blank" class="btn btn-sm btn-outline-primary">
+        <a href="/api/notes/files/${fileName}" target="_blank" class="btn btn-sm">
           ${fileIcon} ${fileName}
         </a>
       `;
@@ -2075,7 +2090,7 @@ function displayCurrentAttachment(attachment) {
         <span>${fileName}</span>
         <a href="/api/notes/files/${fileName}" 
            target="_blank" 
-           class="btn btn-sm btn-outline-primary" 
+           class="btn btn-sm" 
            style="margin-right: auto;">
           👁️ צפה
         </a>
@@ -2304,7 +2319,7 @@ function generateDetailedLog() {
 window.deleteNote = deleteNote;
 window.filterNotesByRelatedObjectType = filterNotesByRelatedObjectType;
 window.formatText = formatText;
-window.loadNotesData = loadNotesData;
+// window.loadNotesData כבר מוגדר בתחילת הקובץ
 window.addNote = addNote;
 window.uploadFile = uploadFile;
 window.removeCurrentAttachment = removeCurrentAttachment;

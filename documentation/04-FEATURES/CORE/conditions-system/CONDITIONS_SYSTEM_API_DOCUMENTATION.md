@@ -1,6 +1,7 @@
 # תיעוד API - מערכת התנאים
 **תאריך יצירה:** 19 אוקטובר 2025  
-**גרסה:** 1.0.0  
+**תאריך עדכון:** 19 אוקטובר 2025  
+**גרסה:** 1.1.0  
 **מפתח:** AI Assistant  
 
 ---
@@ -164,6 +165,101 @@ const methods = await response.json();
 }
 ```
 
+### POST /api/plan-conditions/{id}/evaluate
+הערכת תנאי יחיד מול נתוני שוק נוכחיים.
+
+**פרמטרים:**
+- `id` (path, integer): ID של התנאי להערכה
+
+**תגובה:**
+```json
+{
+  "status": "success",
+  "data": {
+    "condition_id": 1,
+    "condition_type": "plan",
+    "met": true,
+    "evaluation_time": "2025-10-19T22:04:06.611167+00:00",
+    "method_id": 1,
+    "method_name": "Moving Averages",
+    "ticker_id": 4,
+    "current_price": 439.31,
+    "details": {
+      "comparison_type": "above",
+      "current_price": 439.31,
+      "ma_period": 50,
+      "ma_type": "SMA",
+      "ma_value": 439.31000000000023,
+      "price_vs_ma": -2.2737367544323206e-13,
+      "price_vs_ma_pct": -5.175699971392227e-14
+    }
+  },
+  "message": "Condition evaluated successfully"
+}
+```
+
+### POST /api/plan-conditions/evaluate-all
+הערכת כל התנאים הפעילים במערכת.
+
+**תגובה:**
+```json
+{
+  "status": "success",
+  "data": [
+    {
+      "condition_id": 2,
+      "condition_type": "plan",
+      "met": false,
+      "evaluation_time": "2025-10-19T19:04:06.611167+00:00",
+      "method_id": 2,
+      "method_name": "Volume Analysis",
+      "ticker_id": 4,
+      "current_price": 439.31,
+      "details": {
+        "avg_volume": 88293380.0,
+        "comparison_type": "above",
+        "current_volume": 89331578,
+        "threshold_volume": 132440070.0,
+        "volume_multiplier": 1.5,
+        "volume_period": 20,
+        "volume_vs_avg": 1038198.0,
+        "volume_vs_avg_pct": 1.175850329888832
+      }
+    }
+  ],
+  "count": 14,
+  "message": "14 plan conditions evaluated"
+}
+```
+
+### GET /api/plan-conditions/{id}/evaluation-history
+קבלת היסטוריית הערכות של תנאי ספציפי (מתוך התראות שנוצרו).
+
+**פרמטרים:**
+- `id` (path, integer): ID של התנאי
+- `limit` (optional, integer): מספר התוצאות המקסימלי (ברירת מחדל: 50)
+
+**תגובה:**
+```json
+{
+  "status": "success",
+  "data": [
+    {
+      "id": 42,
+      "alert_type": "condition_met",
+      "message": "Condition met: Moving Averages - Price above SMA(50)",
+      "related_id": 1,
+      "related_type_id": 1,
+      "triggered_at": "2025-10-19T22:04:06.611167+00:00",
+      "is_read": false,
+      "created_at": "2025-10-19T22:04:06.611167+00:00"
+    }
+  ],
+  "count": 1,
+  "message": "Evaluation history retrieved successfully"
+}
+```
+
 ---
 
 ## Trade Conditions API
@@ -214,6 +310,100 @@ const methods = await response.json();
 
 ### DELETE /api/trade_conditions/{id}
 מחיקת תנאי טרייד.
+
+### POST /api/trade-conditions/{id}/evaluate
+הערכת תנאי טרייד יחיד מול נתוני שוק נוכחיים.
+
+**פרמטרים:**
+- `id` (path, integer): ID של התנאי להערכה
+
+**תגובה:**
+```json
+{
+  "status": "success",
+  "data": {
+    "condition_id": 1,
+    "condition_type": "trade",
+    "met": true,
+    "evaluation_time": "2025-10-19T22:04:06.611167+00:00",
+    "method_id": 1,
+    "method_name": "Moving Averages",
+    "ticker_id": 4,
+    "current_price": 439.31,
+    "details": {
+      "comparison_type": "above",
+      "current_price": 439.31,
+      "ma_period": 50,
+      "ma_type": "SMA",
+      "ma_value": 439.31000000000023,
+      "price_vs_ma": -2.2737367544323206e-13,
+      "price_vs_ma_pct": -5.175699971392227e-14
+    }
+  },
+  "message": "Condition evaluated successfully"
+}
+```
+
+### POST /api/trade-conditions/evaluate-all
+הערכת כל התנאים הפעילים של טריידים במערכת.
+
+**תגובה:**
+```json
+{
+  "status": "success",
+  "data": [
+    {
+      "condition_id": 1,
+      "condition_type": "trade",
+      "met": false,
+      "evaluation_time": "2025-10-19T19:04:06.611167+00:00",
+      "method_id": 1,
+      "method_name": "Moving Averages",
+      "ticker_id": 4,
+      "current_price": 439.31,
+      "details": {
+        "comparison_type": "above",
+        "current_price": 439.31,
+        "ma_period": 50,
+        "ma_type": "SMA",
+        "ma_value": 439.31000000000023,
+        "price_vs_ma": -2.2737367544323206e-13,
+        "price_vs_ma_pct": -5.175699971392227e-14
+      }
+    }
+  ],
+  "count": 5,
+  "message": "5 trade conditions evaluated"
+}
+```
+
+### GET /api/trade-conditions/{id}/evaluation-history
+קבלת היסטוריית הערכות של תנאי טרייד ספציפי (מתוך התראות שנוצרו).
+
+**פרמטרים:**
+- `id` (path, integer): ID של התנאי
+- `limit` (optional, integer): מספר התוצאות המקסימלי (ברירת מחדל: 50)
+
+**תגובה:**
+```json
+{
+  "status": "success",
+  "data": [
+    {
+      "id": 43,
+      "alert_type": "condition_met",
+      "message": "Trade condition met: Moving Averages - Price above SMA(50)",
+      "related_id": 1,
+      "related_type_id": 2,
+      "triggered_at": "2025-10-19T22:04:06.611167+00:00",
+      "is_read": false,
+      "created_at": "2025-10-19T22:04:06.611167+00:00"
+    }
+  ],
+  "count": 1,
+  "message": "Evaluation history retrieved successfully"
+}
+```
 
 ---
 

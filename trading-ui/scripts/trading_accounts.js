@@ -183,7 +183,7 @@ async function loadTradingAccountsFromServer() {
       console.log('📊 כל החשבונות המסחר:', allTradingAccounts.length, 'חשבונות');
 
       // סינון רק חשבונות בסטטוס open
-      const openTradingAccounts = allTradingAccounts.filter(tradingAccount => account.status === 'open');
+      const openTradingAccounts = allTradingAccounts.filter(tradingAccount => tradingAccount.status === 'open');
       console.log('📊 חשבונות מסחר פתוחים:', openTradingAccounts.length, 'חשבונות');
       
       window.trading_accountsData = openTradingAccounts;
@@ -229,7 +229,7 @@ async function loadAllTradingAccountsFromServer() {
       const allTradingAccounts = responseData.data || responseData;
 
       // סינון רק חשבונות בסטטוס open
-      const openTradingAccounts = allTradingAccounts.filter(tradingAccount => account.status === 'open');
+      const openTradingAccounts = allTradingAccounts.filter(tradingAccount => tradingAccount.status === 'open');
 
       // שמירת החשבונות הפתוחים במשתנה גלובלי
       window.allTradingAccountsData = openTradingAccounts;
@@ -444,12 +444,12 @@ function updateTradingAccountsSummary(trading_accounts) {
 
   // חישוב סיכומים
   const totalAccounts = trading_accounts.length;
-  const activeAccounts = trading_accounts.filter(account => account.status === 'open').length;
-  const openAccounts = trading_accounts.filter(account => account.status === 'open').length;
+  const activeAccounts = trading_accounts.filter(tradingAccount => tradingAccount.status === 'open').length;
+  const openAccounts = trading_accounts.filter(tradingAccount => tradingAccount.status === 'open').length;
   
   // חישוב סה"כ יתרה
-  const totalBalance = trading_accounts.reduce((sum, account) => {
-    const balance = parseFloat(account.balance) || 0;
+  const totalBalance = trading_accounts.reduce((sum, tradingAccount) => {
+    const balance = parseFloat(tradingAccount.balance) || 0;
     return sum + balance;
   }, 0);
 
@@ -614,9 +614,9 @@ window.updateTradingAccountFilterMenuDirectly = function (trading_accounts) {
     trading_accounts.forEach(tradingAccount => {
       const tradingAccountItem = document.createElement('div');
       tradingAccountItem.className = 'trading-account-filter-item';
-      tradingAccountItem.setAttribute('data-account', account.id || account.name);
+      tradingAccountItem.setAttribute('data-account', tradingAccount.id || tradingAccount.name);
       tradingAccountItem.innerHTML = `
-        <span class="option-text">${account.name || account.account_name || 'Unknown'}</span>
+        <span class="option-text">${tradingAccount.name || tradingAccount.account_name || 'Unknown'}</span>
         <span class="check-mark">✓</span>
       `;
       tradingAccountMenu.appendChild(tradingAccountItem);
@@ -746,7 +746,7 @@ function createTradingAccountModal(mode, tradingAccount = null) {
                 <div class="mb-3">
                   <label for="accountName" class="form-label">שם החשבון *</label>
                   <input type="text" class="form-control" id="accountName" name="name" required 
-                         value="${account ? account.name : ''}" placeholder="הכנס שם חשבון (לפחות 3 תווים)" minlength="3" maxlength="18">
+                         value="${tradingAccount ? tradingAccount.name : ''}" placeholder="הכנס שם חשבון (לפחות 3 תווים)" minlength="3" maxlength="18">
                   <div class="invalid-feedback" id="nameError"></div>
                 </div>
               </div>
@@ -767,8 +767,8 @@ function createTradingAccountModal(mode, tradingAccount = null) {
                 <div class="mb-3">
                   <label for="accountStatus" class="form-label">סטטוס</label>
                   <select class="form-select" id="accountStatus" name="status">
-                    <option value="open" ${account && account.status === 'open' ? 'selected' : ''}>פתוח</option>
-                    <option value="closed" ${account && account.status === 'closed' ? 'selected' : ''}>סגור</option>
+                    <option value="open" ${tradingAccount && tradingAccount.status === 'open' ? 'selected' : ''}>פתוח</option>
+                    <option value="closed" ${tradingAccount && tradingAccount.status === 'closed' ? 'selected' : ''}>סגור</option>
                   </select>
                 </div>
               </div>
@@ -776,7 +776,7 @@ function createTradingAccountModal(mode, tradingAccount = null) {
                 <div class="mb-3">
                   <label for="accountCashBalance" class="form-label">יתרת מזומן</label>
                   <input type="number" class="form-control" id="accountCashBalance" name="cash_balance" 
-                         value="${account ? account.cash_balance || 0 : 0}" placeholder="0" step="0.01" min="0">
+                         value="${tradingAccount ? tradingAccount.cash_balance || 0 : 0}" placeholder="0" step="0.01" min="0">
                   <div class="invalid-feedback" id="cashBalanceError"></div>
                 </div>
               </div>
@@ -785,13 +785,13 @@ function createTradingAccountModal(mode, tradingAccount = null) {
             <div class="mb-3">
               <label for="accountNotes" class="form-label">הערות</label>
               <textarea class="form-control" id="accountNotes" name="notes" rows="3" 
-                        placeholder="הכנס הערות על החשבון">${account ? account.notes || '' : ''}</textarea>
+                        placeholder="הכנס הערות על החשבון">${tradingAccount ? tradingAccount.notes || '' : ''}</textarea>
             </div>
           </form>
         </div>
         <div class="modal-footer">
           <button data-button-type="CANCEL" data-attributes="data-bs-dismiss='modal' type='button'"></button>
-          <button data-button-type="SAVE" data-onclick="saveTradingAccount('${mode}', ${account ? account.id : 'null'})" data-attributes="type='button'"></button>
+          <button data-button-type="SAVE" data-onclick="saveTradingAccount('${mode}', ${tradingAccount ? tradingAccount.id : 'null'})" data-attributes="type='button'"></button>
         </div>
       </div>
     </div>
@@ -1782,7 +1782,7 @@ function filterTradingAccountsLocally(trading_accounts, selectedStatuses, select
   if (selectedStatuses && selectedStatuses.length > 0 && !selectedStatuses.includes('all')) {
     filteredAccounts = filteredAccounts.filter(tradingAccount => {
       let itemStatus;
-      if (account.status === 'closed') {
+      if (tradingAccount.status === 'closed') {
         itemStatus = 'סגור';
       } else {
         itemStatus = 'פתוח';
@@ -1796,7 +1796,7 @@ function filterTradingAccountsLocally(trading_accounts, selectedStatuses, select
   if (selectedTypes && selectedTypes.length > 0 && !selectedTypes.includes('all')) {
     filteredAccounts = filteredAccounts.filter(tradingAccount => {
       let typeDisplay;
-      switch (account.type || account.account_type) {
+      switch (tradingAccount.type || tradingAccount.account_type) {
       case 'swing':
         typeDisplay = 'סווינג';
         break;
@@ -1807,7 +1807,7 @@ function filterTradingAccountsLocally(trading_accounts, selectedStatuses, select
         typeDisplay = 'פאסיבי';
         break;
       default:
-        typeDisplay = account.type || account.account_type;
+        typeDisplay = tradingAccount.type || tradingAccount.account_type;
       }
       const isMatch = selectedTypes.includes(typeDisplay);
       return isMatch;
@@ -1817,9 +1817,9 @@ function filterTradingAccountsLocally(trading_accounts, selectedStatuses, select
   // פילטר לפי תאריכים
   if (startDate && endDate) {
     filteredAccounts = filteredAccounts.filter(tradingAccount => {
-      if (!account.created_at) {return false;}
+      if (!tradingAccount.created_at) {return false;}
 
-      const accountDate = new Date(account.created_at);
+      const accountDate = new Date(tradingAccount.created_at);
       const start = new Date(startDate);
       const end = new Date(endDate);
 
@@ -1837,9 +1837,9 @@ function filterTradingAccountsLocally(trading_accounts, selectedStatuses, select
     const searchLower = searchTerm.toLowerCase();
 
     filteredAccounts = filteredAccounts.filter(tradingAccount => {
-      const nameMatch = (account.name || '').toLowerCase().includes(searchLower);
-      const typeMatch = (account.type || account.account_type || '').toLowerCase().includes(searchLower);
-      const statusMatch = (account.status || '').toLowerCase().includes(searchLower);
+      const nameMatch = (tradingAccount.name || '').toLowerCase().includes(searchLower);
+      const typeMatch = (tradingAccount.type || tradingAccount.account_type || '').toLowerCase().includes(searchLower);
+      const statusMatch = (tradingAccount.status || '').toLowerCase().includes(searchLower);
 
       const isMatch = nameMatch || typeMatch || statusMatch;
       return isMatch;
@@ -1882,9 +1882,9 @@ function updateTradingAccountFilterMenu(trading_accounts) {
     trading_accounts.forEach(tradingAccount => {
       const tradingAccountItem = document.createElement('div');
       tradingAccountItem.className = 'trading-account-filter-item';
-      tradingAccountItem.setAttribute('data-account', account.id || account.name);
+      tradingAccountItem.setAttribute('data-account', tradingAccount.id || tradingAccount.name);
       tradingAccountItem.innerHTML = `
-        <span class="option-text">${account.name || account.account_name || 'Unknown'}</span>
+        <span class="option-text">${tradingAccount.name || tradingAccount.account_name || 'Unknown'}</span>
         <span class="check-mark">✓</span>
       `;
       tradingAccountMenu.appendChild(tradingAccountItem);
@@ -1979,7 +1979,7 @@ async function cancelTradingAccountWithLinkedItemsCheck(tradingAccountId, _accou
       if (response.ok) {
         const tradingAccountData = await response.json();
         const tradingAccount = tradingAccountData.data;
-        accountDetails = `\n\nפרטי החשבון:\n• שם: ${account.name || 'לא מוגדר'}\n• סטטוס: ${account.status || 'לא מוגדר'}\n• יתרה: ${account.cash_balance || '0'}`;
+        accountDetails = `\n\nפרטי החשבון:\n• שם: ${tradingAccount.name || 'לא מוגדר'}\n• סטטוס: ${tradingAccount.status || 'לא מוגדר'}\n• יתרה: ${tradingAccount.cash_balance || '0'}`;
       }
     } catch {
       // console.warn('לא ניתן לטעון פרטי חשבון:', error);
@@ -2039,7 +2039,7 @@ async function deleteTradingAccountWithLinkedItemsCheck(tradingAccountId, _accou
       if (response.ok) {
         const tradingAccountData = await response.json();
         const tradingAccount = tradingAccountData.data;
-        accountDetails = `\n\nפרטי החשבון:\n• שם: ${account.name || 'לא מוגדר'}\n• סטטוס: ${account.status || 'לא מוגדר'}\n• יתרה: ${account.cash_balance || '0'}`;
+        accountDetails = `\n\nפרטי החשבון:\n• שם: ${tradingAccount.name || 'לא מוגדר'}\n• סטטוס: ${tradingAccount.status || 'לא מוגדר'}\n• יתרה: ${tradingAccount.cash_balance || '0'}`;
       }
     } catch {
       // console.warn('לא ניתן לטעון פרטי חשבון:', error);
@@ -2525,7 +2525,7 @@ function getTradingAccountName(tradingAccountId) {
   if (window.trading_accountsData) {
     const tradingAccount = window.trading_accountsData.find(a => a.id === tradingAccountId);
     if (tradingAccount) {
-      return account.name;
+      return tradingAccount.name;
     }
   }
   return `חשבון ${tradingAccountId}`;
@@ -2612,17 +2612,17 @@ function viewTradingAccountDetails(tradingAccountId) {
         <h5>פרטי חשבון</h5>
         <div class="row">
           <div class="col-md-6">
-            <p><strong>שם החשבון:</strong> ${account.name || 'לא ידוע'}</p>
-            <p><strong>סוג:</strong> ${account.type || 'לא ידוע'}</p>
-            <p><strong>מטבע:</strong> ${account.currency || 'לא ידוע'}</p>
+            <p><strong>שם החשבון:</strong> ${tradingAccount.name || 'לא ידוע'}</p>
+            <p><strong>סוג:</strong> ${tradingAccount.type || 'לא ידוע'}</p>
+            <p><strong>מטבע:</strong> ${tradingAccount.currency || 'לא ידוע'}</p>
           </div>
           <div class="col-md-6">
-            <p><strong>יתרה:</strong> ${account.balance || '0'}</p>
-            <p><strong>סטטוס:</strong> ${account.status || 'פעיל'}</p>
-            <p><strong>תאריך יצירה:</strong> ${account.created_at || 'לא ידוע'}</p>
+            <p><strong>יתרה:</strong> ${tradingAccount.balance || '0'}</p>
+            <p><strong>סטטוס:</strong> ${tradingAccount.status || 'פעיל'}</p>
+            <p><strong>תאריך יצירה:</strong> ${tradingAccount.created_at || 'לא ידוע'}</p>
           </div>
         </div>
-        ${account.description ? `<p><strong>תיאור:</strong> ${account.description}</p>` : ''}
+        ${tradingAccount.description ? `<p><strong>תיאור:</strong> ${tradingAccount.description}</p>` : ''}
       </div>
     `;
     
@@ -2632,13 +2632,13 @@ function viewTradingAccountDetails(tradingAccountId) {
     } else {
       // fallback - הצגה בחלון alert
       alert(`פרטי חשבון:\n\n` +
-        `שם: ${account.name || 'לא ידוע'}\n` +
-        `סוג: ${account.type || 'לא ידוע'}\n` +
-        `מטבע: ${account.currency || 'לא ידוע'}\n` +
-        `יתרה: ${account.balance || '0'}\n` +
-        `סטטוס: ${account.status || 'פעיל'}\n` +
-        `תאריך יצירה: ${account.created_at || 'לא ידוע'}` +
-        (account.description ? `\nתיאור: ${account.description}` : ''));
+        `שם: ${tradingAccount.name || 'לא ידוע'}\n` +
+        `סוג: ${tradingAccount.type || 'לא ידוע'}\n` +
+        `מטבע: ${tradingAccount.currency || 'לא ידוע'}\n` +
+        `יתרה: ${tradingAccount.balance || '0'}\n` +
+        `סטטוס: ${tradingAccount.status || 'פעיל'}\n` +
+        `תאריך יצירה: ${tradingAccount.created_at || 'לא ידוע'}` +
+        (tradingAccount.description ? `\nתיאור: ${tradingAccount.description}` : ''));
     }
     
   } catch (error) {

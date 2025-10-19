@@ -100,9 +100,21 @@ const PACKAGE_MANIFEST = {
         required: true
       },
       {
+        file: 'date-utils.js',
+        globalCheck: 'window.formatDate',
+        description: 'כלי עזר תאריכים',
+        required: true
+      },
+      {
         file: 'pagination-system.js',
         globalCheck: 'window.PaginationSystem',
         description: 'מערכת עימוד',
+        required: false
+      },
+      {
+        file: 'modules/actions-menu-system.js',
+        globalCheck: 'window.createActionsMenu',
+        description: 'מערכת תפריט פעולות נפתח',
         required: false
       }
     ],

@@ -382,6 +382,18 @@ const PAGE_CONFIGS = {
     
     'cash_flows': {
         name: 'Cash Flows',
+        packages: ['base', 'crud'],
+        requiredGlobals: [
+            'NotificationSystem',
+            'DataUtils',
+            'window.loadCashFlowsData',
+            'window.formatDate'
+        ],
+        description: 'ניהול תזרימי מזומנים - הכנסות והוצאות',
+        lastModified: '2025-10-19',
+        pageType: 'data-management',
+        preloadAssets: ['cash-flows-data'],
+        cacheStrategy: 'standard',
         requiresFilters: true,
         requiresValidation: false,
         requiresTables: true,

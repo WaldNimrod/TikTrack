@@ -259,11 +259,31 @@ class ActionsMenuSystem {
         if (!buttons || buttons.length === 0) return '';
         
         const menuButtons = buttons.map(button => {
-            const buttonType = button.getAttribute('data-button-type') || 'BUTTON';
-            const variant = button.getAttribute('data-variant') || 'small';
-            const onclick = button.getAttribute('data-onclick') || '';
-            const text = button.getAttribute('data-text') || '';
-            const title = button.getAttribute('title') || '';
+            // Handle both DOM elements and objects
+            let buttonType, variant, onclick, text, title;
+            
+            if (button.getAttribute && typeof button.getAttribute === 'function') {
+                // DOM element
+                buttonType = button.getAttribute('data-button-type') || 'BUTTON';
+                variant = button.getAttribute('data-variant') || 'small';
+                onclick = button.getAttribute('data-onclick') || '';
+                text = button.getAttribute('data-text') || '';
+                title = button.getAttribute('title') || '';
+            } else if (typeof button === 'object') {
+                // Object with properties
+                buttonType = button.type || 'BUTTON';
+                variant = button.variant || 'small';
+                onclick = button.onclick || '';
+                text = button.text || '';
+                title = button.title || '';
+            } else {
+                // Fallback
+                buttonType = 'BUTTON';
+                variant = 'small';
+                onclick = '';
+                text = '';
+                title = '';
+            }
             
             return `<button data-button-type="${buttonType}" data-variant="${variant}" data-onclick="${onclick}" data-text="${text}" title="${title}"></button>`;
         }).join('');

@@ -421,26 +421,29 @@ tr:has(.actions-cell) {
 /* התפריט הנפתח */
 .actions-menu-popup {
   position: fixed;
-  background: white;
-  border: 1px solid #e5e5e5;
+  background: white !important; /* רקע לבן - דורס כל דריסה */
+  border: 1px solid var(--entity-primary-color, #26baac) !important; /* מסגרת בצבע הישות - דורס כל דריסה */
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   min-width: 120px;
-  padding: 0.5rem 0;
+  padding: 0.75rem; /* יותר רווח */
   opacity: 0;
   visibility: hidden;
-  transform: translateX(10px);
-  transition: all 0.3s ease;
+  transform: none; /* הסר את ה-slide animation */
+  transition: opacity 0.3s ease, visibility 0.3s ease; /* רק fade animation */
   z-index: 9999;
   list-style: none;
   margin: 0;
+  display: flex;
+  flex-direction: row; /* כפתורים אחד ליד השני */
+  align-items: center; /* מרכז את הכפתורים */
+  gap: 0.5rem; /* רווח בין הכפתורים */
 }
 
 /* הצגת התפריט ב-hover */
 .actions-menu-wrapper:hover .actions-menu-popup {
   opacity: 1;
   visibility: visible;
-  transform: translateX(0);
   transition-delay: 0s;
 }
 
@@ -464,9 +467,9 @@ tr:has(.actions-cell) {
 /* Dark Mode Support */
 @media (prefers-color-scheme: dark) {
   .actions-menu-popup {
-    background: #2d3748;
-    border-color: #4a5568;
-    color: #e2e8f0;
+    background: white !important; /* דורס dark mode - רקע לבן */
+    border: 1px solid var(--entity-primary-color, #26baac) !important; /* דורס dark mode - מסגרת בצבע הישות */
+    color: #333; /* טקסט כהה על רקע לבן */
   }
   
   /* כפתורים בתפריט - השתמש במערכת המרכזית */

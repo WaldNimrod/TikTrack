@@ -123,19 +123,20 @@ class UnifiedAppInitializer {
         if (window.DEBUG_MODE) {
             console.log('🔍 Checking pageInitializationConfigs:', typeof window.pageInitializationConfigs);
             console.log('🔍 Available configs:', window.pageInitializationConfigs ? Object.keys(window.pageInitializationConfigs) : 'undefined');
-            console.log('🔍 Looking for config:', this.pageInfo.name);
+            const pageName = this.pageInfo?.name || 'unknown';
+            console.log('🔍 Looking for config:', pageName);
         }
         
         if (typeof window.pageInitializationConfigs !== 'undefined' && 
-            window.pageInitializationConfigs[this.pageInfo.name]) {
+            window.pageInitializationConfigs[this.pageInfo?.name]) {
             pageConfig = window.pageInitializationConfigs[this.pageInfo.name];
             console.log(`📋 Loaded page config for ${this.pageInfo.name}:`, pageConfig);
         } else if (typeof window.PAGE_CONFIGS !== 'undefined' && 
-                   window.PAGE_CONFIGS[this.pageInfo.name]) {
+                   window.PAGE_CONFIGS[this.pageInfo?.name]) {
             pageConfig = window.PAGE_CONFIGS[this.pageInfo.name];
             console.log(`📋 Loaded page config from PAGE_CONFIGS for ${this.pageInfo.name}:`, pageConfig);
         } else {
-            console.log(`⚠️ No page config found for ${this.pageInfo.name}`);
+            console.log(`⚠️ No page config found for ${this.pageInfo?.name || 'unknown'}`);
             console.log('🔍 Available configs in pageInitializationConfigs:', window.pageInitializationConfigs ? Object.keys(window.pageInitializationConfigs) : 'undefined');
             console.log('🔍 Available configs in PAGE_CONFIGS:', window.PAGE_CONFIGS ? Object.keys(window.PAGE_CONFIGS) : 'undefined');
         }
@@ -149,8 +150,8 @@ class UnifiedAppInitializer {
         }
         
         const config = {
-            name: this.pageInfo.name,
-            type: this.pageInfo.type,
+            name: this.pageInfo?.name || 'unknown',
+            type: this.pageInfo?.type || 'standard',
             requiresFilters: pageConfig?.requiresFilters ?? this.pageInfo.requirements.filters,
             requiresValidation: pageConfig?.requiresValidation ?? this.pageInfo.requirements.validation,
             requiresTables: pageConfig?.requiresTables ?? this.pageInfo.requirements.tables,
@@ -848,7 +849,8 @@ class UnifiedAppInitializer {
         
         // שמירה ל-localStorage
         try {
-            const key = `init_metrics_${this.pageInfo.name}`;
+            const pageName = this.pageInfo?.name || 'unknown';
+            const key = `init_metrics_${pageName}`;
             const history = JSON.parse(localStorage.getItem(key) || '[]');
             history.push(metrics);
             

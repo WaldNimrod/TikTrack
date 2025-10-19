@@ -194,47 +194,52 @@ class UnifiedAppInitializer {
             
             // Initialize IndexedDB first (blocking) to prevent race conditions
             await this.initializeCacheSystem();
-        
-        // Wait longer for cache system to be fully ready
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // Verify cache system is ready with detailed logging
-        // console.log('🔍 Verifying cache system readiness...');
-        // console.log('UnifiedCacheManager available:', !!window.UnifiedCacheManager);
-        // console.log('CacheSyncManager available:', !!window.CacheSyncManager);
-        // console.log('MemoryOptimizer available:', !!window.MemoryOptimizer);
-        
-        if (window.UnifiedCacheManager) {
-            // console.log('UnifiedCacheManager initialized:', window.UnifiedCacheManager.initialized);
+            
+            // Wait longer for cache system to be fully ready
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // Verify cache system is ready with detailed logging
+            // console.log('🔍 Verifying cache system readiness...');
+            // console.log('UnifiedCacheManager available:', !!window.UnifiedCacheManager);
+            // console.log('CacheSyncManager available:', !!window.CacheSyncManager);
+            // console.log('MemoryOptimizer available:', !!window.MemoryOptimizer);
+            
+            if (window.UnifiedCacheManager) {
+                // console.log('UnifiedCacheManager initialized:', window.UnifiedCacheManager.initialized);
+            }
+            if (window.CacheSyncManager) {
+                // console.log('CacheSyncManager initialized:', window.CacheSyncManager.initialized);
+            }
+            if (window.MemoryOptimizer) {
+                // console.log('MemoryOptimizer initialized:', window.MemoryOptimizer.initialized);
+            }
+            
+            // Set global flag for other systems
+            window.cacheSystemReady = window.UnifiedCacheManager && window.UnifiedCacheManager.initialized;
+            
+            if (window.cacheSystemReady) {
+                // console.log('✅ Cache system verified as ready');
+            } else {
+                // console.log('⚠️ Cache system not ready, using fallback mode');
+            }
+            
+            // Use the application initializer if available
+            if (typeof window.initializeApplication === 'function') {
+                // console.log('🔧 Using application initializer with config:', config);
+                await window.initializeApplication(config);
+            } else {
+                // console.log('⚠️ Application initializer not found, using manual initialization');
+                // Fallback to manual initialization
+                await this.manualInitialization(config);
+            }
+            
+        } catch (error) {
+            console.error('❌ Error in executeInitialization:', error);
+            throw error;
+        } finally {
+            this.performanceMetrics.stageTimes.execute = Date.now() - stageStart;
+            // console.log('✅ Stage 3 Complete');
         }
-        if (window.CacheSyncManager) {
-            // console.log('CacheSyncManager initialized:', window.CacheSyncManager.initialized);
-        }
-        if (window.MemoryOptimizer) {
-            // console.log('MemoryOptimizer initialized:', window.MemoryOptimizer.initialized);
-        }
-        
-        // Set global flag for other systems
-        window.cacheSystemReady = window.UnifiedCacheManager && window.UnifiedCacheManager.initialized;
-        
-        if (window.cacheSystemReady) {
-            // console.log('✅ Cache system verified as ready');
-        } else {
-            // console.log('⚠️ Cache system not ready, using fallback mode');
-        }
-        
-        // Use the application initializer if available
-        if (typeof window.initializeApplication === 'function') {
-            // console.log('🔧 Using application initializer with config:', config);
-            await window.initializeApplication(config);
-        } else {
-            // console.log('⚠️ Application initializer not found, using manual initialization');
-            // Fallback to manual initialization
-            await this.manualInitialization(config);
-        }
-        
-        this.performanceMetrics.stageTimes.execute = Date.now() - stageStart;
-        // console.log('✅ Stage 3 Complete');
     }
 
     /**

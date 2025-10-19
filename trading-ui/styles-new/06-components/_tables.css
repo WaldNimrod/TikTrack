@@ -257,7 +257,7 @@ table,
   border-collapse: separate;
   border-spacing: 0;
   font-family: var(--font-family-primary);
-  overflow-x: hidden; /* מונע גלילה אופקית */
+  overflow: visible; /* מאפשר לתפריט להופיע מחוץ לטבלה */
 }
 
 /* כותרות טבלה */
@@ -327,6 +327,11 @@ table td,
   display: table-cell;
   white-space: nowrap;
   padding: 4px 2px;
+  overflow: visible;
+}
+
+/* וידוא שהשורה לא חותכת את התפריט */
+tr:has(.actions-cell) {
   overflow: visible;
 }
 
@@ -522,7 +527,7 @@ table td,
   background: var(--apple-bg-elevated);
   border-radius: var(--apple-radius-medium);
   border: 1px solid var(--apple-border-light);
-  overflow: hidden;
+  overflow: visible; /* מאפשר לתפריט להופיע מחוץ לקונטיינר */
   box-shadow: var(--apple-shadow-light);
 }
 
@@ -530,7 +535,7 @@ table td,
 .table-responsive {
   width: 100%;
   max-width: 100%;
-  overflow-x: hidden;
+  overflow: visible; /* מאפשר לתפריט להופיע מחוץ לקונטיינר */
   -webkit-overflow-scrolling: touch;
   display: block; /* מאפשר לטבלה להתאים לרוחב */
 }

@@ -416,8 +416,9 @@ table td,
 /* התפריט הנפתח */
 .actions-menu-popup {
   position: absolute;
-  top: 100%;
-  right: 0;
+  top: 0;
+  right: 100%;
+  margin-right: 8px;
   background: white;
   border: 1px solid #e5e5e5;
   border-radius: 8px;
@@ -426,7 +427,7 @@ table td,
   padding: 0.5rem 0;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-10px);
+  transform: translateX(10px);
   transition: all 0.3s ease;
   z-index: 1000;
   list-style: none;
@@ -437,7 +438,7 @@ table td,
 .actions-menu-wrapper:hover .actions-menu-popup {
   opacity: 1;
   visibility: visible;
-  transform: translateY(0);
+  transform: translateX(0);
 }
 
 /* כפתורים בתוך התפריט */

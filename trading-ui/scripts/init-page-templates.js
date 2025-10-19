@@ -492,6 +492,7 @@ class PageTemplates {
 // Create global instance
 window.PageTemplates = PageTemplates;
 window.pageTemplates = new PageTemplates();
+window.PAGE_TEMPLATES = window.pageTemplates.templates;
 
 // Export for module systems
 if (typeof module !== 'undefined' && module.exports) {

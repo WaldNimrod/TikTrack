@@ -359,6 +359,18 @@ class SmartAppInitializer {
     }
 
     /**
+     * קביעת סוג עמוד
+     */
+    determinePageType(pageName) {
+        if (pageName.includes('smart')) return 'smart';
+        if (pageName.includes('test') || pageName.includes('debug')) return 'testing';
+        if (pageName.includes('preferences') || pageName.includes('settings')) return 'settings';
+        if (pageName.includes('trades') || pageName.includes('alerts')) return 'trading';
+        if (pageName.includes('dashboard') || pageName.includes('index')) return 'dashboard';
+        return 'standard';
+    }
+
+    /**
      * זיהוי מערכות זמינות
      */
     detectAvailableSystems() {

@@ -323,28 +323,32 @@
          * Test: Package Registry Available
          */
         testPackageRegistryAvailable() {
-            return !!(window.SYSTEM_PACKAGES && Object.keys(window.SYSTEM_PACKAGES).length > 0);
+            return !!(window.SYSTEM_PACKAGES && Object.keys(window.SYSTEM_PACKAGES).length > 0) ||
+                   !!(window.packageRegistry && window.packageRegistry.packages);
         }
 
         /**
          * Test: Dependency Graph Available
          */
         testDependencyGraphAvailable() {
-            return !!(window.SYSTEM_DEPENDENCIES && Object.keys(window.SYSTEM_DEPENDENCIES).length > 0);
+            return !!(window.SYSTEM_DEPENDENCIES && Object.keys(window.SYSTEM_DEPENDENCIES).length > 0) ||
+                   !!(window.systemDependencyGraph && window.systemDependencyGraph.dependencies);
         }
 
         /**
          * Test: Page Templates Available
          */
         testPageTemplatesAvailable() {
-            return !!(window.PAGE_TEMPLATES && Object.keys(window.PAGE_TEMPLATES).length > 0);
+            return !!(window.PAGE_TEMPLATES && Object.keys(window.PAGE_TEMPLATES).length > 0) ||
+                   !!(window.pageTemplates && window.pageTemplates.templates);
         }
 
         /**
          * Test: Feedback System Available
          */
         testFeedbackSystemAvailable() {
-            return !!(window.InitializationFeedback && typeof window.InitializationFeedback.showSuccess === 'function');
+            return !!(window.enhancedFeedbackSystem && window.enhancedFeedbackSystem.isInitialized) ||
+                   !!(window.InitializationFeedback && typeof window.InitializationFeedback.showSuccess === 'function');
         }
 
         /**

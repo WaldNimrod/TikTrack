@@ -668,6 +668,7 @@ class SystemDependencyGraph {
 // Create global instance
 window.SystemDependencyGraph = SystemDependencyGraph;
 window.systemDependencyGraph = new SystemDependencyGraph();
+window.SYSTEM_DEPENDENCIES = window.systemDependencyGraph.dependencies;
 
 // Export for module systems
 if (typeof module !== 'undefined' && module.exports) {

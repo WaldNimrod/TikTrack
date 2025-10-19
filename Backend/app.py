@@ -1642,6 +1642,12 @@ def clear_indexeddb():
 
 # ===== END INDEXEDDB MANAGEMENT ENDPOINTS =====
 
+# Route for favicon
+@app.route('/favicon.ico')
+def favicon():
+    """Serve favicon from trading-ui/images/icons/"""
+    return send_from_directory(os.path.join(UI_DIR, 'images', 'icons'), 'favicon.ico')
+
 # Route for serving HTML files from trading-ui directory
 @app.route('/trading-ui/<path:filename>')
 def serve_ui_files(filename):

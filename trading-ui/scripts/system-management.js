@@ -2882,35 +2882,29 @@ SystemManagement.getModeColor = function(mode) {
    * Validate testing system
    * ולידציה של מערכת הבדיקות
    */
-  SystemManagement.validateTestingSystem = function() {
-    console.log('🔍 Validating testing system...');
-    
-    const validationResults = {
-      testingSystem: !!window.InitTestingSystem,
-      performanceOptimizer: !!window.InitPerformanceOptimizer,
-      advancedCache: !!window.InitAdvancedCache,
-      smartInitializer: !!window.SmartAppInitializer,
-      packageRegistry: !!window.SYSTEM_PACKAGES,
-      dependencyGraph: !!window.SYSTEM_DEPENDENCIES
-    };
-    
-    const passed = Object.values(validationResults).filter(Boolean).length;
-    const total = Object.keys(validationResults).length;
-    
-    const message = `ולידציה הושלמה: ${passed}/${total} מערכות בדיקה פעילות`;
-    const type = passed === total ? 'success' : 'warning';
-    
-    SystemManagement.showNotification(message, type);
-    
-    // Update status in dashboard
-    const statusElement = document.getElementById('testingSystemStatus');
-    if (statusElement) {
-      statusElement.textContent = passed === total ? 'בריא' : 'אזהרה';
-      statusElement.className = passed === total ? 'summary-value text-success' : 'summary-value text-warning';
+  SystemManagement.validateTestingSystem = async function() {
+    try {
+      SystemManagement.showNotification('🔍 מבצע ולידציה של מערכת הבדיקות...', 'info');
+      
+      if (window.InitValidator) {
+        const results = await window.InitValidator.runComprehensiveValidation();
+        
+        if (results.success) {
+          SystemManagement.showNotification('✅ מערכת הבדיקות תקינה', 'success');
+        } else {
+          SystemManagement.showNotification(`⚠️ נמצאו ${results.errors.length} בעיות`, 'warning');
+        }
+        
+        return results;
+      } else {
+        throw new Error('מערכת הולידציה לא זמינה');
+      }
+    } catch (error) {
+      SystemManagement.showNotification(`❌ שגיאה בוולידציה: ${error.message}`, 'error');
+      throw error;
     }
-    
-    return validationResults;
   };
+
 
 // Cleanup on page unload
 window.addEventListener('beforeunload', () => {

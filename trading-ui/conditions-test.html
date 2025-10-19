@@ -262,7 +262,69 @@
                     </div>
                 </div>
 
-                <!-- Content Section 2 - Log Display -->
+                <!-- Content Section 2 - Quick Stats & Links -->
+                <div class="content-section" id="quick-stats">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/development.svg" alt="סטטיסטיקות מהירות" class="section-icon">
+                            סטטיסטיקות מהירות וקישורים
+                        </div>
+                        <div class="table-actions">
+                            <button class="btn btn-sm btn-info" id="refreshStatsBtn">
+                                <i class="fas fa-sync-alt"></i>
+                                רענן
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="quick-stats-container">
+                            <!-- Quick Stats -->
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <div class="stat-label">טריידים פעילים</div>
+                                    <div class="stat-value" id="activeTradesCount">טוען...</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">תנאים פעילים</div>
+                                    <div class="stat-value" id="activeConditionsCount">טוען...</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">שיטות מסחר</div>
+                                    <div class="stat-value" id="tradingMethodsCount">טוען...</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">תכניות מסחר</div>
+                                    <div class="stat-value" id="tradePlansCount">טוען...</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Quick Links -->
+                            <div class="quick-links">
+                                <h5>קישורים מהירים:</h5>
+                                <div class="links-grid">
+                                    <a href="trade_plans.html" class="quick-link">
+                                        <i class="fas fa-chart-line"></i>
+                                        תכניות מסחר
+                                    </a>
+                                    <a href="trades.html" class="quick-link">
+                                        <i class="fas fa-exchange-alt"></i>
+                                        טריידים
+                                    </a>
+                                    <a href="alerts.html" class="quick-link">
+                                        <i class="fas fa-bell"></i>
+                                        התראות
+                                    </a>
+                                    <a href="index.html" class="quick-link">
+                                        <i class="fas fa-home"></i>
+                                        דף הבית
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Section 3 - Log Display -->
                 <div class="content-section" id="log-display">
                     <div class="section-header">
                         <div class="table-title">
@@ -538,6 +600,87 @@
             .conditions-ui-container {
                 grid-template-columns: 1fr;
             }
+        }
+
+        /* Quick Stats Styles */
+        .quick-stats-container {
+            padding: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-item {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .stat-item:hover {
+            border-color: #29a6a8;
+            box-shadow: 0 2px 8px rgba(41, 166, 168, 0.1);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #6c757d;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #29a6a8;
+        }
+
+        .quick-links {
+            border-top: 1px solid #dee2e6;
+            padding-top: 20px;
+        }
+
+        .quick-links h5 {
+            margin-bottom: 15px;
+            color: #495057;
+            font-weight: 600;
+        }
+
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        .quick-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 15px;
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #495057;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .quick-link:hover {
+            background: #29a6a8;
+            color: white;
+            border-color: #29a6a8;
+            text-decoration: none;
+        }
+
+        .quick-link i {
+            font-size: 16px;
         }
     </style>
     

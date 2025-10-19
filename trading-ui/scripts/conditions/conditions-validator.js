@@ -404,3 +404,4 @@ window.conditionsValidator = new ConditionsValidator();
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = ConditionsValidator;
 }
+

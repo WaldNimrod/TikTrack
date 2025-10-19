@@ -143,7 +143,7 @@
                 { name: 'SYSTEM_PACKAGES', object: window.SYSTEM_PACKAGES },
                 { name: 'SYSTEM_DEPENDENCIES', object: window.SYSTEM_DEPENDENCIES },
                 { name: 'PAGE_TEMPLATES', object: window.PAGE_TEMPLATES },
-                { name: 'InitializationFeedback', object: window.InitializationFeedback },
+                { name: 'InitializationFeedback', object: window.enhancedFeedbackSystem },
                 { name: 'SmartAppInitializer', object: window.SmartAppInitializer },
                 { name: 'SmartScriptLoader', object: window.SmartScriptLoader },
                 { name: 'InitPerformanceOptimizer', object: window.InitPerformanceOptimizer },

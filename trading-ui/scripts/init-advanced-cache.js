@@ -561,7 +561,9 @@
             try {
                 const cache = await caches.open(this.cacheLayers.serviceWorker);
                 const response = new Response(JSON.stringify(data));
-                await cache.put(key, response);
+                // Convert key to valid URL for Service Worker cache
+                const cacheKey = key.startsWith('http') ? key : `cache://${key}`;
+                await cache.put(cacheKey, response);
             } catch (error) {
                 console.warn('Service Worker set error:', error);
             }
@@ -635,54 +637,39 @@
          * Compress data
          */
         async _compressData(data) {
-            if (!this.compressionWorker) {
+            try {
+                // Use LZString if available
+                if (typeof window.LZString !== 'undefined') {
+                    return window.LZString.compress(JSON.stringify(data));
+                }
                 // Fallback to simple compression
                 return btoa(JSON.stringify(data));
+            } catch (error) {
+                console.warn('Compression failed, using plain data:', error);
+                return JSON.stringify(data);
             }
-            
-            return new Promise((resolve, reject) => {
-                const timeout = setTimeout(() => {
-                    reject(new Error('Compression timeout'));
-                }, 5000);
-                
-                this.compressionWorker.onmessage = (e) => {
-                    clearTimeout(timeout);
-                    if (e.data.success) {
-                        resolve(e.data.data);
-                    } else {
-                        reject(new Error(e.data.error));
-                    }
-                };
-                
-                this.compressionWorker.postMessage({ data, type: 'compress' });
-            });
         }
 
         /**
          * Decompress data
          */
         async _decompressData(data) {
-            if (!this.compressionWorker) {
+            try {
+                // Use LZString if available
+                if (typeof window.LZString !== 'undefined') {
+                    const decompressed = window.LZString.decompress(data);
+                    return JSON.parse(decompressed);
+                }
                 // Fallback to simple decompression
                 return JSON.parse(atob(data));
+            } catch (error) {
+                console.warn('Decompression failed, trying plain parse:', error);
+                try {
+                    return JSON.parse(data);
+                } catch (e) {
+                    return data;
+                }
             }
-            
-            return new Promise((resolve, reject) => {
-                const timeout = setTimeout(() => {
-                    reject(new Error('Decompression timeout'));
-                }, 5000);
-                
-                this.compressionWorker.onmessage = (e) => {
-                    clearTimeout(timeout);
-                    if (e.data.success) {
-                        resolve(e.data.data);
-                    } else {
-                        reject(new Error(e.data.error));
-                    }
-                };
-                
-                this.compressionWorker.postMessage({ data, type: 'decompress' });
-            });
         }
 
         /**

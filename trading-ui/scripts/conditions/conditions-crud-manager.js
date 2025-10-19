@@ -497,3 +497,4 @@ window.conditionsCRUDManager = new ConditionsCRUDManager();
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = ConditionsCRUDManager;
 }
+

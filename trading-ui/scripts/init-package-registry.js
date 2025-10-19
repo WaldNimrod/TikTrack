@@ -492,6 +492,7 @@ class PackageRegistry {
 // Create global instance
 window.PackageRegistry = PackageRegistry;
 window.packageRegistry = new PackageRegistry();
+window.SYSTEM_PACKAGES = window.packageRegistry.packages;
 
 // Export for module systems
 if (typeof module !== 'undefined' && module.exports) {

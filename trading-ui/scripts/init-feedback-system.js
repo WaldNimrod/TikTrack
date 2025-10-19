@@ -109,15 +109,42 @@ class EnhancedFeedbackSystem {
         try {
             this.initializationStartTime = Date.now();
             
-            // בדיקת זמינות מערכת ההתראות
-            if (typeof window.showNotification === 'function') {
-                this.isInitialized = true;
-                this.initializationEndTime = Date.now();
-                this.logSuccess('EnhancedFeedbackSystem', 'מערכת המשוב אותחלה בהצלחה');
-                return true;
-            } else {
-                throw new Error('מערכת ההתראות לא זמינה');
+            // יצירת מערכת התראות פשוטה אם לא קיימת
+            if (typeof window.showNotification !== 'function') {
+                window.showNotification = (message, type = 'info') => {
+                    const typeStr = typeof type === 'string' ? type : 'info';
+                    console.log(`[${typeStr.toUpperCase()}] ${message}`);
+                    
+                    // יצירת התראה ויזואלית פשוטה
+                    const notification = document.createElement('div');
+                    notification.style.cssText = `
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        background: ${typeStr === 'error' ? '#dc3545' : typeStr === 'success' ? '#28a745' : typeStr === 'warning' ? '#ffc107' : '#17a2b8'};
+                        color: white;
+                        padding: 15px 20px;
+                        border-radius: 5px;
+                        z-index: 10000;
+                        max-width: 300px;
+                        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                    `;
+                    notification.textContent = message;
+                    document.body.appendChild(notification);
+                    
+                    // הסרה אוטומטית אחרי 5 שניות
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 5000);
+                };
             }
+            
+            this.isInitialized = true;
+            this.initializationEndTime = Date.now();
+            this.logSuccess('EnhancedFeedbackSystem', 'מערכת המשוב אותחלה בהצלחה');
+            return true;
         } catch (error) {
             console.error('שגיאה באתחול מערכת המשוב:', error);
             return false;
@@ -214,12 +241,8 @@ class EnhancedFeedbackSystem {
 
         // הצגת הודעה
         try {
-            window.showNotification(notificationMessage, {
-                type: this.getNotificationType(errorEntry.severity),
-                duration: this.getNotificationDuration(errorEntry.severity),
-                persistent: errorEntry.severity === 'CRITICAL',
-                actions: this.getNotificationActions(errorEntry)
-            });
+            const notificationType = this.getNotificationType(errorEntry.severity);
+            window.showNotification(notificationMessage, notificationType);
         } catch (error) {
             console.error('שגיאה בהצגת הודעה:', error);
         }

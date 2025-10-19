@@ -140,6 +140,10 @@ class ConditionsTestManager {
             console.log('🔧 Setting up event listeners...');
             this.setupEventListeners();
             
+            // Setup quick stats
+            console.log('🔧 Setting up quick stats...');
+            this.setupQuickStats();
+            
             // Initialize test results
             console.log('🔧 Initializing test results...');
             this.initializeTestResults();
@@ -792,6 +796,63 @@ class ConditionsTestManager {
         if (passedTestsEl) passedTestsEl.textContent = stats.passed;
         if (failedTestsEl) failedTestsEl.textContent = stats.failed;
         if (totalDurationEl) totalDurationEl.textContent = `${stats.duration}s`;
+    }
+
+    /**
+     * Load quick statistics for the dashboard
+     */
+    async loadQuickStats() {
+        try {
+            this.logWithUnifiedSystem('📊 Loading quick statistics...', 'info', 'ui');
+
+            // Load active trades count
+            const tradesResponse = await this.makeApiCall('/api/trades/', 'GET');
+            const activeTrades = tradesResponse.data ? tradesResponse.data.filter(trade => trade.status === 'open').length : 0;
+            document.getElementById('activeTradesCount').textContent = activeTrades;
+
+            // Load active conditions count
+            const conditionsResponse = await this.makeApiCall('/api/plan-conditions/trade-plans/1/conditions', 'GET');
+            const activeConditions = conditionsResponse.data ? conditionsResponse.data.filter(condition => condition.is_active).length : 0;
+            document.getElementById('activeConditionsCount').textContent = activeConditions;
+
+            // Load trading methods count
+            const methodsResponse = await this.makeApiCall('/api/trading-methods/', 'GET');
+            const methodsCount = methodsResponse.data ? methodsResponse.data.length : 0;
+            document.getElementById('tradingMethodsCount').textContent = methodsCount;
+
+            // Load trade plans count
+            const plansResponse = await this.makeApiCall('/api/trade_plans/', 'GET');
+            const plansCount = plansResponse.data ? plansResponse.data.length : 0;
+            document.getElementById('tradePlansCount').textContent = plansCount;
+
+            this.logWithUnifiedSystem('✅ Quick statistics loaded successfully', 'success', 'ui');
+
+        } catch (error) {
+            console.error('❌ Failed to load quick stats:', error);
+            this.logWithUnifiedSystem(`❌ Failed to load quick stats: ${error.message}`, 'error', 'system');
+            
+            // Set error values
+            document.getElementById('activeTradesCount').textContent = 'שגיאה';
+            document.getElementById('activeConditionsCount').textContent = 'שגיאה';
+            document.getElementById('tradingMethodsCount').textContent = 'שגיאה';
+            document.getElementById('tradePlansCount').textContent = 'שגיאה';
+        }
+    }
+
+    /**
+     * Setup quick stats functionality
+     */
+    setupQuickStats() {
+        // Load stats on initialization
+        this.loadQuickStats();
+
+        // Setup refresh button
+        const refreshBtn = document.getElementById('refreshStatsBtn');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => {
+                this.loadQuickStats();
+            });
+        }
     }
 }
 

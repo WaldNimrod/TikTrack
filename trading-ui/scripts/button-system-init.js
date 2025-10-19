@@ -492,7 +492,8 @@ window.getButtonSystemStats = () => {
 window.initializeButtonSystem = async () => {
     try {
         console.log('🔘 Button System: Initializing...');
-        await window.advancedButtonSystem.initialize();
+        // The system is already initialized in constructor, just ensure buttons are processed
+        window.advancedButtonSystem.initializeButtons();
         console.log('🔘 Button System: Initialized successfully');
         return true;
     } catch (error) {

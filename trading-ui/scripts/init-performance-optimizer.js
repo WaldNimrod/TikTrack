@@ -235,11 +235,13 @@
         _monitorDOMChanges() {
             if (!this.performanceObserver) return;
             
-            this.performanceObserver.observe(document.body, {
-                childList: true,
-                subtree: true,
-                attributes: true
-            });
+            try {
+                this.performanceObserver.observe({
+                    entryTypes: ['measure', 'navigation', 'resource']
+                });
+            } catch (error) {
+                console.warn('PerformanceObserver not supported:', error);
+            }
         }
 
         /**

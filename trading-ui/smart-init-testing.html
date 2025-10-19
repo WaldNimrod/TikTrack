@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>בדיקות מערכת אתחול חכמה - TikTrack</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom Styles -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+        
+        .test-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            margin-bottom: 1.5rem;
+        }
+        
+        .test-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .test-card .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            border: none;
+        }
+        
+        .status-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-left: 10px;
+        }
+        
+        .status-success { background-color: #28a745; }
+        .status-warning { background-color: #ffc107; }
+        .status-danger { background-color: #dc3545; }
+        .status-info { background-color: #17a2b8; }
+        
+        .metric-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .btn-test {
+            border-radius: 25px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-test:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .log-container {
+            background: #1e1e1e;
+            color: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .log-entry {
+            margin-bottom: 0.5rem;
+            padding: 0.25rem 0;
+        }
+        
+        .log-success { color: #28a745; }
+        .log-warning { color: #ffc107; }
+        .log-error { color: #dc3545; }
+        .log-info { color: #17a2b8; }
+        
+        .progress-container {
+            background: white;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .system-status {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            border-left: 4px solid #dee2e6;
+        }
+        
+        .system-status.success { border-left-color: #28a745; }
+        .system-status.warning { border-left-color: #ffc107; }
+        .system-status.danger { border-left-color: #dc3545; }
+        
+        .page-link {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: #e9ecef;
+            border-radius: 20px;
+            text-decoration: none;
+            color: #495057;
+            margin: 0.25rem;
+            transition: all 0.3s ease;
+        }
+        
+        .page-link:hover {
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1><i class="fas fa-rocket"></i> בדיקות מערכת אתחול חכמה</h1>
+                    <p class="mb-0">Smart Initialization System Testing Dashboard</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="metric-card">
+                        <div class="metric-value text-success" id="overallStatus">טוען...</div>
+                        <div class="metric-label">סטטוס כללי</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Quick Actions -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card test-card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-bolt"></i> פעולות מהירות</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3 mb-2">
+                                <button class="btn btn-primary btn-test w-100" onclick="runQuickTests()">
+                                    <i class="fas fa-play"></i> בדיקות מהירות
+                                </button>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <button class="btn btn-success btn-test w-100" onclick="runComprehensiveTests()">
+                                    <i class="fas fa-cogs"></i> בדיקות מקיפות
+                                </button>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <button class="btn btn-info btn-test w-100" onclick="validateSystem()">
+                                    <i class="fas fa-check-circle"></i> ולידציה
+                                </button>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <button class="btn btn-warning btn-test w-100" onclick="clearLogs()">
+                                    <i class="fas fa-trash"></i> נקה לוגים
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Status -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card test-card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-heartbeat"></i> סטטוס מערכות</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="systemStatusList">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card test-card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-chart-line"></i> מדדי ביצועים</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="metric-card">
+                                    <div class="metric-value text-primary" id="initTime">0ms</div>
+                                    <div class="metric-label">זמן אתחול</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="metric-card">
+                                    <div class="metric-value text-success" id="loadedPackages">0</div>
+                                    <div class="metric-label">חבילות נטענו</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-6">
+                                <div class="metric-card">
+                                    <div class="metric-value text-info" id="testResults">0/0</div>
+                                    <div class="metric-label">תוצאות בדיקות</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="metric-card">
+                                    <div class="metric-value text-warning" id="successRate">0%</div>
+                                    <div class="metric-label">שיעור הצלחה</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Progress -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card test-card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-tasks"></i> התקדמות בדיקות</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="progress-container">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>בדיקות מערכת</span>
+                                <span id="testProgress">0/0</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" id="testProgressBar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div id="currentTest" class="text-muted">מוכן לבדיקות...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Smart Pages Testing -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card test-card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-file-code"></i> בדיקת עמודים חכמים</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">לחץ על עמוד לבדיקה מהירה:</p>
+                        <div id="smartPagesList">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Backward Compatibility Testing -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card test-card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-history"></i> בדיקת תאימות לאחור</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">בדיקת עמודים ישנים:</p>
+                        <div id="oldPagesList">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Logs -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card test-card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-terminal"></i> לוג בדיקות</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="log-container" id="testLogs">
+                            <div class="log-entry log-info">🚀 מערכת בדיקות מוכנה</div>
+                            <div class="log-entry log-info">📋 לחץ על "בדיקות מהירות" להתחיל</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Smart Initialization System Components -->
+    <script src="scripts/lz-string.min.js?v=3.0.0"></script>
+    <script src="scripts/init-package-registry.js?v=3.0.0"></script>
+    <script src="scripts/init-dependency-graph.js?v=3.0.0"></script>
+    <script src="scripts/init-page-templates.js?v=3.0.0"></script>
+    <script src="scripts/init-feedback-system.js?v=3.0.0"></script>
+    <script src="scripts/smart-app-initializer.js?v=3.0.0"></script>
+    <script src="scripts/smart-script-loader.js?v=3.0.0"></script>
+    <script src="scripts/smart-page-configs.js?v=3.0.0"></script>
+    <script src="scripts/init-performance-optimizer.js?v=3.0.0"></script>
+    <script src="scripts/init-advanced-cache.js?v=3.0.0"></script>
+    <script src="scripts/init-testing-system.js?v=3.0.0"></script>
+    <script src="scripts/init-validator.js?v=3.0.0"></script>
+    <script src="scripts/init-cli.js?v=3.0.0"></script>
+    <script src="scripts/test-runner.js?v=3.0.0"></script>
+    
+    <!-- Testing Dashboard Script -->
+    <script>
+        /**
+         * Smart Initialization Testing Dashboard
+         * דשבורד בדיקות מערכת אתחול חכמה
+         */
+        
+        class TestingDashboard {
+            constructor() {
+                this.testResults = {
+                    total: 0,
+                    passed: 0,
+                    failed: 0,
+                    warnings: 0
+                };
+                this.isRunning = false;
+                this.init();
+            }
+            
+            init() {
+                this.log('🚀 אתחול דשבורד בדיקות...', 'info');
+                this.updateSystemStatus();
+                this.populatePagesList();
+                this.updateMetrics();
+                
+                // Auto-refresh every 5 seconds
+                setInterval(() => {
+                    if (!this.isRunning) {
+                        this.updateSystemStatus();
+                        this.updateMetrics();
+                    }
+                }, 5000);
+            }
+            
+            log(message, type = 'info') {
+                const logContainer = document.getElementById('testLogs');
+                const timestamp = new Date().toLocaleTimeString('he-IL');
+                const logEntry = document.createElement('div');
+                logEntry.className = `log-entry log-${type}`;
+                logEntry.innerHTML = `[${timestamp}] ${message}`;
+                logContainer.appendChild(logEntry);
+                logContainer.scrollTop = logContainer.scrollHeight;
+            }
+            
+            updateSystemStatus() {
+                const statusList = document.getElementById('systemStatusList');
+                const systems = [
+                    { name: 'Package Registry', check: () => typeof window.SYSTEM_PACKAGES !== 'undefined' },
+                    { name: 'Dependency Graph', check: () => typeof window.SYSTEM_DEPENDENCIES !== 'undefined' },
+                    { name: 'Page Templates', check: () => typeof window.PAGE_TEMPLATES !== 'undefined' },
+                    { name: 'Smart App Initializer', check: () => typeof window.SmartAppInitializer !== 'undefined' },
+                    { name: 'Smart Script Loader', check: () => typeof window.SmartScriptLoader !== 'undefined' },
+                    { name: 'Smart Page Configs', check: () => typeof window.SmartPageConfigs !== 'undefined' },
+                    { name: 'Performance Optimizer', check: () => typeof window.InitPerformanceOptimizer !== 'undefined' },
+                    { name: 'Advanced Cache', check: () => typeof window.InitAdvancedCache !== 'undefined' },
+                    { name: 'Testing System', check: () => typeof window.InitTestingSystem !== 'undefined' },
+                    { name: 'Validator', check: () => typeof window.InitValidator !== 'undefined' },
+                    { name: 'CLI', check: () => typeof window.InitCLI !== 'undefined' },
+                    { name: 'Test Runner', check: () => typeof window.TestRunner !== 'undefined' }
+                ];
+                
+                statusList.innerHTML = '';
+                systems.forEach(system => {
+                    const isAvailable = system.check();
+                    const statusDiv = document.createElement('div');
+                    statusDiv.className = `system-status ${isAvailable ? 'success' : 'danger'}`;
+                    statusDiv.innerHTML = `
+                        <span>${system.name}</span>
+                        <span class="status-indicator ${isAvailable ? 'status-success' : 'status-danger'}"></span>
+                    `;
+                    statusList.appendChild(statusDiv);
+                });
+            }
+            
+            populatePagesList() {
+                const smartPages = [
+                    { name: 'Preferences Smart', url: 'preferences-smart.html' },
+                    { name: 'Trades Smart', url: 'trades-smart.html' },
+                    { name: 'Alerts Smart', url: 'alerts-smart.html' },
+                    { name: 'Index Smart', url: 'index-smart.html' },
+                    { name: 'CRUD Testing Dashboard Smart', url: 'crud-testing-dashboard-smart.html' }
+                ];
+                
+                const oldPages = [
+                    { name: 'Preferences', url: 'preferences.html' },
+                    { name: 'Trades', url: 'trades.html' },
+                    { name: 'Alerts', url: 'alerts.html' },
+                    { name: 'Index', url: 'index.html' }
+                ];
+                
+                const smartPagesList = document.getElementById('smartPagesList');
+                const oldPagesList = document.getElementById('oldPagesList');
+                
+                smartPages.forEach(page => {
+                    const link = document.createElement('a');
+                    link.href = page.url;
+                    link.className = 'page-link';
+                    link.textContent = page.name;
+                    link.target = '_blank';
+                    smartPagesList.appendChild(link);
+                });
+                
+                oldPages.forEach(page => {
+                    const link = document.createElement('a');
+                    link.href = page.url;
+                    link.className = 'page-link';
+                    link.textContent = page.name;
+                    link.target = '_blank';
+                    oldPagesList.appendChild(link);
+                });
+            }
+            
+            updateMetrics() {
+                // Update initialization time
+                if (window.InitPerformanceOptimizer) {
+                    const metrics = window.InitPerformanceOptimizer.getMetrics();
+                    document.getElementById('initTime').textContent = `${metrics.totalTime || 0}ms`;
+                }
+                
+                // Update loaded packages
+                if (window.SYSTEM_PACKAGES) {
+                    const packageCount = Object.keys(window.SYSTEM_PACKAGES).length;
+                    document.getElementById('loadedPackages').textContent = packageCount;
+                }
+                
+                // Update test results
+                document.getElementById('testResults').textContent = `${this.testResults.passed}/${this.testResults.total}`;
+                
+                // Update success rate
+                const successRate = this.testResults.total > 0 ? 
+                    Math.round((this.testResults.passed / this.testResults.total) * 100) : 0;
+                document.getElementById('successRate').textContent = `${successRate}%`;
+                
+                // Update overall status
+                const overallStatus = document.getElementById('overallStatus');
+                if (successRate >= 90) {
+                    overallStatus.textContent = 'מעולה';
+                    overallStatus.className = 'metric-value text-success';
+                } else if (successRate >= 70) {
+                    overallStatus.textContent = 'טוב';
+                    overallStatus.className = 'metric-value text-warning';
+                } else if (successRate > 0) {
+                    overallStatus.textContent = 'בעיות';
+                    overallStatus.className = 'metric-value text-danger';
+                } else {
+                    overallStatus.textContent = 'לא נבדק';
+                    overallStatus.className = 'metric-value text-info';
+                }
+            }
+            
+            updateProgress(current, total, currentTest = '') {
+                const progress = total > 0 ? Math.round((current / total) * 100) : 0;
+                document.getElementById('testProgress').textContent = `${current}/${total}`;
+                document.getElementById('testProgressBar').style.width = `${progress}%`;
+                document.getElementById('currentTest').textContent = currentTest || 'מוכן לבדיקות...';
+            }
+            
+            async runQuickTests() {
+                if (this.isRunning) return;
+                
+                this.isRunning = true;
+                this.log('🚀 מתחיל בדיקות מהירות...', 'info');
+                this.updateProgress(0, 12, 'בדיקת זמינות רכיבים...');
+                
+                try {
+                    const testRunner = new TestRunner();
+                    const results = await testRunner.runAllTests();
+                    
+                    this.testResults = results;
+                    this.updateMetrics();
+                    
+                    if (results.failed === 0) {
+                        this.log('✅ כל הבדיקות עברו בהצלחה!', 'success');
+                    } else {
+                        this.log(`⚠️ ${results.failed} בדיקות נכשלו`, 'warning');
+                    }
+                    
+                    this.log(`📊 סה"כ: ${results.total}, עברו: ${results.passed}, נכשלו: ${results.failed}`, 'info');
+                    
+                } catch (error) {
+                    this.log(`❌ שגיאה בהרצת בדיקות: ${error.message}`, 'error');
+                } finally {
+                    this.isRunning = false;
+                    this.updateProgress(12, 12, 'בדיקות הושלמו');
+                }
+            }
+            
+            async runComprehensiveTests() {
+                if (this.isRunning) return;
+                
+                this.isRunning = true;
+                this.log('🔧 מתחיל בדיקות מקיפות...', 'info');
+                
+                try {
+                    if (window.InitTestingSystem) {
+                        const results = await window.InitTestingSystem.runAllTests();
+                        
+                        if (results.success) {
+                            this.log('✅ בדיקות מקיפות הושלמו בהצלחה!', 'success');
+                        } else {
+                            this.log(`⚠️ ${results.failedTests} בדיקות נכשלו`, 'warning');
+                        }
+                        
+                        this.log(`📊 תוצאות: ${JSON.stringify(results, null, 2)}`, 'info');
+                    } else {
+                        this.log('❌ מערכת בדיקות לא זמינה', 'error');
+                    }
+                    
+                } catch (error) {
+                    this.log(`❌ שגיאה בבדיקות מקיפות: ${error.message}`, 'error');
+                } finally {
+                    this.isRunning = false;
+                }
+            }
+            
+            async validateSystem() {
+                if (this.isRunning) return;
+                
+                this.isRunning = true;
+                this.log('🔍 מתחיל ולידציה...', 'info');
+                
+                try {
+                    if (window.InitValidator) {
+                        const results = window.InitValidator.validateSystem();
+                        
+                        if (results.valid) {
+                            this.log('✅ ולידציה עברה בהצלחה!', 'success');
+                        } else {
+                            this.log(`⚠️ בעיות בוולידציה: ${results.errors.join(', ')}`, 'warning');
+                        }
+                        
+                        this.log(`📊 תוצאות ולידציה: ${JSON.stringify(results, null, 2)}`, 'info');
+                    } else {
+                        this.log('❌ מערכת ולידציה לא זמינה', 'error');
+                    }
+                    
+                } catch (error) {
+                    this.log(`❌ שגיאה בוולידציה: ${error.message}`, 'error');
+                } finally {
+                    this.isRunning = false;
+                }
+            }
+            
+            clearLogs() {
+                document.getElementById('testLogs').innerHTML = `
+                    <div class="log-entry log-info">🧹 לוגים נוקו</div>
+                    <div class="log-entry log-info">📋 מוכן לבדיקות חדשות</div>
+                `;
+            }
+        }
+        
+        // Global functions for buttons
+        function runQuickTests() {
+            window.testingDashboard.runQuickTests();
+        }
+        
+        function runComprehensiveTests() {
+            window.testingDashboard.runComprehensiveTests();
+        }
+        
+        function validateSystem() {
+            window.testingDashboard.validateSystem();
+        }
+        
+        function clearLogs() {
+            window.testingDashboard.clearLogs();
+        }
+        
+        // Initialize dashboard when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            window.testingDashboard = new TestingDashboard();
+        });
+    </script>
+</body>
+</html>
+

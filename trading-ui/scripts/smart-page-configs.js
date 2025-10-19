@@ -1102,10 +1102,5 @@ class SmartPageConfigs {
 // Export to global scope
 window.SMART_PAGE_CONFIGS = SMART_PAGE_CONFIGS;
 window.SmartPageConfigs = SmartPageConfigs;
-window.smartPageInitializationConfigs = SMART_PAGE_CONFIGS;
-
-// Export legacy format for backward compatibility
-window.PAGE_CONFIGS = window.getAllPageConfigs();
-window.pageInitializationConfigs = window.PAGE_CONFIGS;
 
 console.log('✅ Smart Page Initialization Configs loaded successfully');

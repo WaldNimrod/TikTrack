@@ -2,6 +2,36 @@
  * Package Manifest - TikTrack Initialization System
  * מנפסט חבילות מרכזי לניהול תלויות ובדיקות תקינות
  * 
+ * 🏗️ HIERARCHY & DEPENDENCIES:
+ * =============================
+ * 
+ * 📦 BASE PACKAGE (חובה לכל עמוד)
+ * ├── מערכות ליבה בסיסיות
+ * ├── notification-system.js
+ * ├── button-system-init.js
+ * ├── ui-utils.js
+ * └── translation-utils.js
+ * 
+ * 📦 CRUD PACKAGE (תלוי ב-BASE)
+ * ├── מערכות ניהול נתונים
+ * ├── tables.js
+ * ├── data-utils.js
+ * ├── date-utils.js ← formatDate function
+ * └── actions-menu-system.js
+ * 
+ * 📦 CHARTS PACKAGE (תלוי ב-BASE)
+ * ├── מערכות גרפים
+ * ├── chart-utils.js
+ * └── chart-renderer.js
+ * 
+ * ⚠️ IMPORTANT NOTES:
+ * ==================
+ * - BASE is MANDATORY for all pages
+ * - CRUD includes date-utils.js (formatDate function)
+ * - CHARTS is optional, depends on BASE
+ * - Each package is INDEPENDENT - no automatic inclusion
+ * - Pages must explicitly request packages they need
+ * 
  * @version 2.0.0
  * @created October 2025
  * @author TikTrack Development Team

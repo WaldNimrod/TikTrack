@@ -5,6 +5,40 @@
  * קונפיגורציות אתחול ספציפיות לעמודים שונים
  * מאפשר גמישות מקסימלית עם תחזוקה קלה
  *
+ * 📦 PACKAGE USAGE GUIDE:
+ * ======================
+ * 
+ * 🔹 BASE PACKAGE (חובה לכל עמוד):
+ *    - notification-system.js
+ *    - button-system-init.js  
+ *    - ui-utils.js
+ *    - translation-utils.js
+ * 
+ * 🔹 CRUD PACKAGE (לעמודי נתונים):
+ *    - tables.js
+ *    - data-utils.js
+ *    - date-utils.js ← formatDate function
+ *    - actions-menu-system.js
+ * 
+ * 🔹 CHARTS PACKAGE (לעמודי גרפים):
+ *    - chart-utils.js
+ *    - chart-renderer.js
+ * 
+ * ⚠️ CRITICAL RULES:
+ * =================
+ * 1. BASE is MANDATORY - always include 'base' in packages array
+ * 2. CRUD includes date-utils.js - use for pages needing formatDate
+ * 3. CHARTS is optional - only for pages with charts
+ * 4. Each package is INDEPENDENT - no automatic inclusion
+ * 5. Pages must explicitly request ALL packages they need
+ * 
+ * 💡 EXAMPLES:
+ * ============
+ * - Simple page: packages: ['base']
+ * - Data page: packages: ['base', 'crud']  
+ * - Chart page: packages: ['base', 'charts']
+ * - Full page: packages: ['base', 'crud', 'charts']
+ *
  * @version 1.0.0
  * @lastUpdated January 2025
  * @author TikTrack Development Team
@@ -382,12 +416,15 @@ const PAGE_CONFIGS = {
     
     'cash_flows': {
         name: 'Cash Flows',
+        // 📦 PACKAGES EXPLANATION:
+        // - 'base': button-system-init.js (for button rendering)
+        // - 'crud': date-utils.js (for formatDate function)
         packages: ['base', 'crud'],
         requiredGlobals: [
-            'NotificationSystem',
-            'DataUtils',
+            'NotificationSystem',    // from base package
+            'DataUtils',            // from crud package  
             'window.loadCashFlowsData',
-            'window.formatDate'
+            'window.formatDate'     // from crud package (date-utils.js)
         ],
         description: 'ניהול תזרימי מזומנים - הכנסות והוצאות',
         lastModified: '2025-10-19',

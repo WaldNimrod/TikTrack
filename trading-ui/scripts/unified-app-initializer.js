@@ -5,6 +5,26 @@
  * המערכת הסופית המאוחדת שמחליפה את כל ה-DOMContentLoaded listeners
  * ומאפשרת גמישות מקסימלית עם תחזוקה קלה
  *
+ * 📦 PACKAGE LOADING SYSTEM:
+ * ==========================
+ * 
+ * 🔹 PACKAGE HIERARCHY:
+ *   - BASE (mandatory) → CRUD (optional) → CHARTS (optional)
+ *   - Each package is INDEPENDENT - no automatic inclusion
+ *   - Pages must explicitly request ALL packages they need
+ * 
+ * 🔹 LOADING PROCESS:
+ *   1. Read page config from PAGE_CONFIGS
+ *   2. Load requested packages in dependency order
+ *   3. Validate required globals are available
+ *   4. Execute custom initializers
+ * 
+ * 🔹 CRITICAL RULES:
+ *   - BASE package is MANDATORY for all pages
+ *   - CRUD package includes date-utils.js (formatDate function)
+ *   - CHARTS package is optional, depends on BASE
+ *   - No package automatically includes others
+ * 
  * FINAL ARCHITECTURE:
  * ===================
  * 1. Single Point of Entry - נקודת כניסה אחת

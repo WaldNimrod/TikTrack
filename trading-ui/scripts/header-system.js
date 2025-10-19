@@ -156,7 +156,6 @@ class HeaderSystem {
                       </a>
                       <ul class="tiktrack-dropdown-menu">
                         <!-- ניהול מערכת -->
-                        <li><a class="tiktrack-dropdown-item" href="/system-management">🔧 ניהול מערכת</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/external-data-dashboard">📊 דשבורד נתונים חיצוניים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/notifications-center">🔔 מרכז התראות</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/background-tasks">⚙️ ניהול משימות ברקע</a></li>
@@ -166,6 +165,7 @@ class HeaderSystem {
                         
                         <!-- כלי פיתוח -->
                         <li><a class="tiktrack-dropdown-item" href="/init-system-management.html">🚀 ניהול מערכת אתחול</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/system-management">🔧 מנהל מערכת</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/page-scripts-matrix">📄 מטריקס JS</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/js-map">🗺️ מפת JS</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/linter-realtime-monitor.html">🔍 דשבורד Linter</a></li>

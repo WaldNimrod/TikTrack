@@ -83,21 +83,23 @@
         <div class="page-body">
             <!-- Main content limited in width -->
             <div class="main-content">
-                <!-- UI Content Section Top Start-->
+                <!-- System Management Dashboard - Top Section -->
                 <div class="top-section" data-section="top">
-                    <div class="section-header">
+                    <div class="section-header entity-test-sub-header">
                         <h2>🔧 מנהל מערכת</h2>
                         <div class="header-actions">
-                            <button data-button-type="TOGGLE" data-classes="btn btn-sm btn-outline-success" data-attributes="id='quickRestartSystemBtn' title='איתחול מהיר של השרת'">
+                            <button class="btn btn-sm btn-outline-success" id="quickRestartSystemBtn" title="איתחול מהיר של השרת">
                                 <i class="fas fa-redo"></i> איתחול מהיר
                             </button>
-                            <button data-button-type="TOGGLE" data-classes="btn btn-sm btn-outline-warning" data-attributes="id='changeModeSystemBtn' title='שינוי מצב מטמון'">
+                            <button class="btn btn-sm btn-outline-warning" id="changeModeSystemBtn" title="שינוי מצב מטמון">
                                 <i class="fas fa-cogs"></i> מצב מטמון
                             </button>
-                            <button data-button-type="VIEW" data-classes="btn btn-sm btn-outline-info" data-attributes="id='openServerMonitorBtn' title='פתח דשבורד ניטור שרת'">
+                            <button class="btn btn-sm btn-outline-info" id="openServerMonitorBtn" title="פתח דשבורד ניטור שרת">
                                 <i class="fas fa-desktop"></i> ניטור שרת
                             </button>
-                            <button data-button-type="COPY" data-variant="full" data-onclick="copyDetailedLog()" data-text="העתק לוג מפורט" title="העתק לוג מפורט עם כל הנתונים והסטטוס"></button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
+                                <i class="fas fa-copy"></i> העתק לוג
+                            </button>
                             <button data-button-type="REFRESH" data-onclick="refreshSystemData()" data-classes="btn btn-sm btn-outline-primary" data-attributes="title='רענן נתוני מערכת'">
                                 <i class="fas fa-sync-alt"></i> רענן
                             </button>
@@ -134,23 +136,27 @@
                                         <h3>📊 סטטוס מהיר</h3>
                                     </div>
                                     <div class="card-body">
-                                        <div class="status-grid">
-                                            <div class="status-item">
-                                                <span class="status-label">שרת:</span>
-                                                <span class="status-value active" id="serverHealthStats">פעיל</span>
-                                            </div>
-                                            <div class="status-item">
-                                                <span class="status-label">בסיס נתונים:</span>
-                                                <span class="status-value active" id="databaseHealthStats">מחובר</span>
-                                            </div>
-                                            <div class="status-item">
-                                                <span class="status-label">מטמון:</span>
-                                                <span class="status-value active" id="cacheHealthStats">בריא</span>
-                                            </div>
-                                            <div class="status-item">
-                                                <span class="status-label">רשת:</span>
-                                                <span class="status-value active" id="networkHealthStats">יציב</span>
-                                            </div>
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-striped">
+                                                <tbody>
+                                                    <tr>
+                                                        <td>שרת:</td>
+                                                        <td><span class="badge bg-success" id="serverHealthStats">פעיל</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>בסיס נתונים:</td>
+                                                        <td><span class="badge bg-success" id="databaseHealthStats">מחובר</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>מטמון:</td>
+                                                        <td><span class="badge bg-success" id="cacheHealthStats">בריא</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>רשת:</td>
+                                                        <td><span class="badge bg-success" id="networkHealthStats">יציב</span></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>
@@ -856,6 +862,26 @@
 
     <!-- Core System Scripts -->
     <!-- 🔄 NEW UNIFIED INITIALIZATION SYSTEM -->
+    
+    <!-- System Management Core Scripts -->
+    <script src="scripts/system-management/core/sm-base.js"></script>
+    <script src="scripts/system-management/core/sm-error-handler.js"></script>
+    <script src="scripts/system-management/core/sm-ui-components.js"></script>
+    
+    <!-- System Management Sections -->
+    <script src="scripts/system-management/sections/sm-section-dashboard.js"></script>
+    <script src="scripts/system-management/sections/sm-section-server.js"></script>
+    <script src="scripts/system-management/sections/sm-section-cache.js"></script>
+    <script src="scripts/system-management/sections/sm-section-external-data.js"></script>
+    <script src="scripts/system-management/sections/sm-section-database.js"></script>
+    <script src="scripts/system-management/sections/sm-section-alerts.js"></script>
+    <script src="scripts/system-management/sections/sm-section-background-tasks.js"></script>
+    <script src="scripts/system-management/sections/sm-section-operations.js"></script>
+    <script src="scripts/system-management/sections/sm-section-performance.js"></script>
+    
+    <!-- System Management Main Orchestrator -->
+    <script src="scripts/system-management/system-management-main.js"></script>
+    
     <!-- Core Systems -->
     <script src="scripts/global-favicon.js"></script>
     <script src="scripts/translation-utils.js"></script>

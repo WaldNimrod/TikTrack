@@ -295,7 +295,7 @@ class ActionsMenuSystem {
                 default: icon = '⚙️'; break;
             }
             
-            return `<button class="btn btn-sm" onclick="${onclick}" title="${title}">${icon} ${text}</button>`;
+            return `<button class="btn btn-sm" data-button-type="${buttonType}" onclick="${onclick}" title="${title}">${icon} ${text}</button>`;
         }).join('');
         
         return `
@@ -375,6 +375,22 @@ class ActionsMenuSystem {
     }
 
     /**
+     * מיקום התפריט הנפתח
+     */
+    positionPopup(wrapper) {
+        const popup = wrapper.querySelector('.actions-menu-popup');
+        const trigger = wrapper.querySelector('.actions-trigger');
+        
+        if (!popup || !trigger) return;
+        
+        const triggerRect = trigger.getBoundingClientRect();
+        
+        // מיקום התפריט מימין לכפתור (לכיוון מרכז הטבלה)
+        popup.style.top = `${triggerRect.top}px`;
+        popup.style.left = `${triggerRect.right + 8}px`;
+    }
+
+    /**
      * הוספת לוגים לבדיקת z-index כשהתפריט נפתח
      */
     attachZIndexDebugLogger() {
@@ -384,6 +400,7 @@ class ActionsMenuSystem {
         document.addEventListener('mouseenter', (e) => {
             if (e.target && typeof e.target.closest === 'function' && e.target.closest('.actions-menu-wrapper')) {
                 console.log('🎯 [Actions Menu Debug] Mouse entered actions menu');
+                this.positionPopup(e.target.closest('.actions-menu-wrapper'));
             }
         }, true);
         

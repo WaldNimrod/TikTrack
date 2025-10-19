@@ -175,15 +175,9 @@ function renderPendingExecutionRow(execution) {
             <td>${tickerBadge}</td>
             <td>${execution.account_name || '-'}</td>
             <td class="actions-cell">
-                ${window.createActionsMenu ? window.createActionsMenu([
-                    { type: 'EDIT', onclick: `editExecutionFromWidget(${execution.id})`, text: 'ערוך', title: 'ערוך עסקה' },
-                    { type: 'DELETE', onclick: `deleteExecutionFromWidget(${execution.id})`, text: 'מחק', title: 'מחק עסקה' },
-                    { type: 'LINK', onclick: `goToExecutionsPage(${execution.id})`, text: 'פתח בדף עסקאות', title: 'עבור לדף עסקאות' }
-                ]) : `
-                <button class="btn btn-sm" onclick="editExecutionFromWidget(${execution.id})" title="ערוך עסקה">✏️ ערוך</button>
-                <button class="btn btn-sm" onclick="deleteExecutionFromWidget(${execution.id})" title="מחק עסקה">🗑️ מחק</button>
-                <button class="btn btn-sm" onclick="goToExecutionsPage(${execution.id})" title="עבור לדף עסקאות">🔗 פתח בדף עסקאות</button>
-                `}
+                <button class="btn btn-sm" onclick="editExecutionFromWidget(${execution.id})" title="ערוך עסקה">✏️</button>
+                <button class="btn btn-sm" onclick="deleteExecutionFromWidget(${execution.id})" title="מחק עסקה">🗑️</button>
+                <button class="btn btn-sm" onclick="goToExecutionsPage(${execution.id})" title="עבור לדף עסקאות">🔗</button>
             </td>
         </tr>
     `;

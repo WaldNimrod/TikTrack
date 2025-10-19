@@ -959,9 +959,9 @@ async function renderCashFlowsTable() {
     cashFlow.source}</td>
             <td class="col-actions actions-cell actions-3-btn">
               ${window.createActionsMenu ? window.createActionsMenu([
-                { type: 'LINK', onclick: `window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})`, title: 'צפה בפריטים מקושרים' },
-                { type: 'EDIT', onclick: `showEditCashFlowModal(${cashFlow.id})`, title: 'ערוך תזרים' },
-                { type: 'DELETE', onclick: `deleteCashFlow(${cashFlow.id})`, title: 'מחק תזרים' }
+                { type: 'LINK', onclick: `window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})`, text: 'צפה בפריטים מקושרים', title: 'צפה בפריטים מקושרים' },
+                { type: 'EDIT', onclick: `showEditCashFlowModal(${cashFlow.id})`, text: 'ערוך תזרים', title: 'ערוך תזרים' },
+                { type: 'DELETE', onclick: `deleteCashFlow(${cashFlow.id})`, text: 'מחק תזרים', title: 'מחק תזרים' }
               ]) : `
               <button class="btn btn-sm" onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})" title="צפה בפריטים מקושרים">🔗</button>
               <button class="btn btn-sm" onclick="showEditCashFlowModal(${cashFlow.id})" title="ערוך תזרים">✏️</button>

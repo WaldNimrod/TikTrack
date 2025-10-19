@@ -404,26 +404,23 @@ tr:has(.actions-cell) {
   border-radius: 4px;
   font-size: 16px;
   line-height: 1;
-  border: 1px solid #e9ecef;
-  background: #fff;
-  color: #495057;
+  border: 1px solid var(--entity-primary-color, #26baac);
+  background: var(--entity-primary-color, #26baac);
+  color: white;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .actions-trigger:hover {
-  background: #e9ecef;
-  border-color: #adb5bd;
+  background: var(--entity-primary-dark, #1e7e80);
+  border-color: var(--entity-primary-dark, #1e7e80);
   transform: translateY(-1px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* התפריט הנפתח */
 .actions-menu-popup {
-  position: absolute;
-  top: 0;
-  right: 100%;
-  margin-right: 8px;
+  position: fixed;
   background: white;
   border: 1px solid #e5e5e5;
   border-radius: 8px;
@@ -456,26 +453,56 @@ tr:has(.actions-cell) {
 .actions-menu-popup .btn {
   width: 100%;
   height: auto;
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 0.8rem;
   margin: 0;
-  border: none;
-  border-radius: 0;
-  background: transparent;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  background: #fff;
   color: #495057;
   text-align: right;
-  font-size: 14px;
+  font-size: 12px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 0.5rem;
+  gap: 0.4rem;
   transition: all 0.2s ease;
+  min-height: 32px;
 }
 
 .actions-menu-popup .btn:hover {
   background: #f8f9fa;
+  border-color: #adb5bd;
   color: #007bff;
-  transform: none;
-  box-shadow: none;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* כפתורים ספציפיים לפי סוג */
+.actions-menu-popup .btn[data-button-type="LINK"] {
+  color: var(--color-action-link, #1f618d);
+}
+
+.actions-menu-popup .btn[data-button-type="LINK"]:hover {
+  background: var(--color-action-link, #1f618d);
+  color: white;
+}
+
+.actions-menu-popup .btn[data-button-type="EDIT"] {
+  color: var(--color-action-edit, #007bff);
+}
+
+.actions-menu-popup .btn[data-button-type="EDIT"]:hover {
+  background: var(--color-action-edit, #007bff);
+  color: white;
+}
+
+.actions-menu-popup .btn[data-button-type="DELETE"] {
+  color: var(--color-action-delete, #dc3545);
+}
+
+.actions-menu-popup .btn[data-button-type="DELETE"]:hover {
+  background: var(--color-action-delete, #dc3545);
+  color: white;
 }
 
 /* RTL Support */

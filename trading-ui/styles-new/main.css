@@ -44,7 +44,6 @@
 @import "06-components/_info-summary.css";
 @import "06-components/_entity-colors.css";
 @import "06-components/_constraints.css";
-@import "06-components/_system-management.css";
 @import "06-components/_chart-management.css";
 
 /* 07 - TRUMPS (High Specificity Overrides) */

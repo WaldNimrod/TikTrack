@@ -497,12 +497,8 @@ class UnifiedLogDisplay {
             <td class="category-cell">${categoryDisplay}</td>
             <td class="page-cell">${pageDisplay}</td>
             <td class="actions-cell">
-                <button class="btn btn-action view-details-btn" title="פרטים">
-                    <i class="fas fa-eye"></i>
-                </button>
-                <button class="btn btn-action copy-btn" title="העתקה">
-                    <i class="fas fa-copy"></i>
-                </button>
+                <button data-button-type="VIEW" data-variant="small" data-text="" title="פרטים"></button>
+                <button data-button-type="COPY" data-variant="small" data-text="" title="העתקה"></button>
             </td>
         `;
 

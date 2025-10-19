@@ -323,9 +323,7 @@ function showDeleteConfirmationModal(filename) {
                     </div>
                     <div class="modal-footer">
                         <button data-button-type="CANCEL" data-attributes="data-bs-dismiss='modal' type='button'"></button>
-                        <button type="button" class="btn" onclick="confirmDeleteCssFile('${filename}')">
-                            <i class="fas fa-trash"></i> מחק
-                        </button>
+                        <button data-button-type="DELETE" data-variant="full" data-onclick="confirmDeleteCssFile('${filename}')" data-text="מחק" title="מחק"></button>
                     </div>
                 </div>
             </div>
@@ -500,12 +498,8 @@ function displaySearchResults(results, searchTerm) {
                     <div class="card-body">
                         <pre class="mb-2" style="background: #f8f9fa; padding: 10px; border-radius: 4px;">${result.content}</pre>
                         <div class="btn-group btn-group-sm">
-                            <button class="btn btn-sm" onclick="viewCssFile('${result.file}')">
-                                <i class="fas fa-eye"></i> צפה
-                            </button>
-                            <button class="btn btn-sm" onclick="editCssFile('${result.file}')">
-                                <i class="fas fa-edit"></i> ערוך
-                            </button>
+                            <button data-button-type="VIEW" data-variant="small" data-onclick="viewCssFile('${result.file}')" data-text="צפה" title="צפה"></button>
+                            <button data-button-type="EDIT" data-variant="small" data-onclick="editCssFile('${result.file}')" data-text="ערוך" title="ערוך"></button>
                         </div>
                     </div>
                 </div>
@@ -661,9 +655,7 @@ function showUnusedCssRemovalModal(cleanupResults) {
                     </div>
                     <div class="modal-footer">
                         <button data-button-type="CANCEL" data-attributes="data-bs-dismiss='modal' type='button'"></button>
-                        <button type="button" class="btn" onclick="executeUnusedCssRemoval()">
-                            <i class="fas fa-trash"></i> הסר נבחרים
-                        </button>
+                        <button data-button-type="DELETE" data-variant="full" data-onclick="executeUnusedCssRemoval()" data-text="הסר נבחרים" title="הסר נבחרים"></button>
                     </div>
                 </div>
             </div>
@@ -1008,9 +1000,7 @@ function displayDuplicateResults(results) {
                                 <button class="btn btn-sm" onclick="showSpecificDuplicateCleanupModal('${duplicate.selector}', {files: [${duplicate.files.map(f => `'${f}'`).join(', ')}]})">
                                     <i class="fas fa-merge"></i> איחוד
                                 </button>
-                            <button class="btn btn-sm" onclick="removeSpecificDuplicate('${duplicate.selector}')">
-                                <i class="fas fa-trash"></i> מחק
-                            </button>
+                            <button data-button-type="DELETE" data-variant="small" data-onclick="removeSpecificDuplicate('${duplicate.selector}')" data-text="מחק" title="מחק"></button>
                             </div>
                         </td>
                     </tr>
@@ -1507,9 +1497,7 @@ function showDeleteFileSelectionModal(selector, duplicate) {
                     </div>
                     <div class="modal-footer">
                         <button data-button-type="CANCEL" data-attributes="data-bs-dismiss='modal' type='button'"></button>
-                        <button type="button" class="btn" onclick="executeDeleteFromFile('${selector}')">
-                            <i class="fas fa-trash"></i> מחק מהקובץ
-                        </button>
+                        <button data-button-type="DELETE" data-variant="full" data-onclick="executeDeleteFromFile('${selector}')" data-text="מחק מהקובץ" title="מחק מהקובץ"></button>
                     </div>
                 </div>
             </div>
@@ -1970,15 +1958,9 @@ function displayCssFilesTable(files) {
             <td>${file.lastModified}</td>
             <td>
                 <div class="btn-group btn-group-sm">
-                    <button class="btn btn-sm" onclick="viewCssFile('${file.path}')" title="צפה בקובץ">
-                        <i class="fas fa-eye"></i> צפה
-                    </button>
-                    <button class="btn btn-sm" onclick="editCssFile('${file.path}')" title="ערוך קובץ">
-                        <i class="fas fa-edit"></i> ערוך
-                    </button>
-                    <button class="btn btn-sm" onclick="confirmDeleteCssFile('${file.path}')" title="מחק קובץ">
-                        <i class="fas fa-trash"></i> מחק
-                    </button>
+                    <button data-button-type="VIEW" data-variant="small" data-onclick="viewCssFile('${file.path}')" data-text="צפה" title="צפה בקובץ"></button>
+                    <button data-button-type="EDIT" data-variant="small" data-onclick="editCssFile('${file.path}')" data-text="ערוך" title="ערוך קובץ"></button>
+                    <button data-button-type="DELETE" data-variant="small" data-onclick="confirmDeleteCssFile('${file.path}')" data-text="מחק" title="מחק קובץ"></button>
                 </div>
             </td>
         `;

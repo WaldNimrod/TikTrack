@@ -1884,20 +1884,20 @@ function updateTickersTable(tickers) {
                     </td>
                     <td class="actions-cell">
                         <div class="btn-group btn-group-sm" role="group">
-                            <button class="btn" 
-                                    onclick="viewLinkedItemsForTicker(${ticker.id})" 
-                                    title="פריטים מקושרים">🔗</button>
-                            <button class="btn" 
-                                    onclick="editTicker(${ticker.id})" 
-                                    title="ערוך">✏️</button>
+                            <button data-button-type="LINK" data-variant="small" 
+                                    data-onclick="viewLinkedItemsForTicker(${ticker.id})" 
+                                    data-text="" title="פריטים מקושרים"></button>
+                            <button data-button-type="EDIT" data-variant="small" 
+                                    data-onclick="editTicker(${ticker.id})" 
+                                    data-text="" title="ערוך"></button>
                             ${ticker.status === 'cancelled' ?
-    `<button class="btn" 
-             onclick="window.reactivateTicker(${ticker.id})" 
-             title="הפעל מחדש טיקר"><span class="reactivate-icon">✓</span></button>` :
-    `<button class="btn" 
-             onclick="window.cancelTicker(${ticker.id})" 
-             title="בטל טיקר"><span class="cancel-icon">X</span></button>`
-}
+    `<button data-button-type="REACTIVATE" data-variant="small" 
+             data-onclick="window.reactivateTicker(${ticker.id})" 
+             data-text="" title="הפעל מחדש טיקר"></button>` :
+    `<button data-button-type="CANCEL" data-variant="small" 
+             data-onclick="window.cancelTicker(${ticker.id})" 
+             data-text="" title="בטל טיקר"></button>`
+                            }
                         </div>
                     </td>
                 </tr>

@@ -1155,13 +1155,17 @@ class ConditionsUIManager {
         actions.className = 'condition-actions';
 
         const editBtn = document.createElement('button');
-        editBtn.className = 'btn btn-sm btn-primary';
-        editBtn.innerHTML = '<i class="fas fa-edit"></i> עריכה';
+        editBtn.setAttribute('data-button-type', 'EDIT');
+        editBtn.setAttribute('data-variant', 'small');
+        editBtn.setAttribute('data-text', 'עריכה');
+        editBtn.setAttribute('title', 'עריכה');
         editBtn.onclick = () => this.editCondition(condition);
 
         const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'btn btn-sm btn-danger';
-        deleteBtn.innerHTML = '<i class="fas fa-trash"></i> מחיקה';
+        deleteBtn.setAttribute('data-button-type', 'DELETE');
+        deleteBtn.setAttribute('data-variant', 'small');
+        deleteBtn.setAttribute('data-text', 'מחיקה');
+        deleteBtn.setAttribute('title', 'מחיקה');
         deleteBtn.onclick = () => this.deleteCondition(condition.id);
 
         const alertBtn = document.createElement('button');

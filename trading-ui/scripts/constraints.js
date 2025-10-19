@@ -419,18 +419,10 @@ class ConstraintsMonitor {
                     </td>
                     <td>
                         <div class="btn-group btn-group-sm" role="group">
-                            <button type="button" class="btn" onclick="window.viewConstraint('${constraint.constraint_name}')" title="צפה בפרטים">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button type="button" class="btn" onclick="window.validateConstraint('${constraint.constraint_name}')" title="בדוק אילוץ">
-                                <i class="fas fa-check-circle"></i>
-                            </button>
-                            <button type="button" class="btn" onclick="window.editConstraint('${constraint.constraint_name}')" title="ערוך">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button type="button" class="btn" onclick="window.toggleConstraint('${constraint.constraint_name}')" title="${constraint.is_active ? 'השבת' : 'הפעל'}">
-                                <i class="fas fa-${constraint.is_active ? 'pause' : 'play'}"></i>
-                            </button>
+                            <button data-button-type="VIEW" data-variant="small" data-onclick="window.viewConstraint('${constraint.constraint_name}')" data-text="" title="צפה בפרטים"></button>
+                            <button data-button-type="CHECK" data-variant="small" data-onclick="window.validateConstraint('${constraint.constraint_name}')" data-text="" title="בדוק אילוץ"></button>
+                            <button data-button-type="EDIT" data-variant="small" data-onclick="window.editConstraint('${constraint.constraint_name}')" data-text="" title="ערוך"></button>
+                            <button data-button-type="${constraint.is_active ? 'PAUSE' : 'PLAY'}" data-variant="small" data-onclick="window.toggleConstraint('${constraint.constraint_name}')" data-text="" title="${constraint.is_active ? 'השבת' : 'הפעל'}"></button>
                         </div>
                     </td>
                 </tr>

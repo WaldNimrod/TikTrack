@@ -1744,10 +1744,10 @@ function updateTradePlansTable(trade_plans) {
           </span>
         </td>
         <td class="actions-cell">
-          <button class="btn btn-sm" onclick="if (typeof window.viewLinkedItemsForTradePlan === 'function') { window.viewLinkedItemsForTradePlan(${design.id}); }" title="קישור">🔗</button>
-          <button class="btn btn-sm" onclick="if (typeof window.openEditTradePlanModal === 'function') { window.openEditTradePlanModal(${design.id}); }" title="ערוך">✏️</button>
-          <button class="btn btn-sm" onclick="if (typeof window.cancelTradePlan === 'function') { window.cancelTradePlan(${design.id}); }" title="בטל">❌</button>
-          <button class="btn btn-sm" onclick="if (typeof window.openDeleteTradePlanModal === 'function') { window.openDeleteTradePlanModal(${design.id}); }" title="מחק">🗑️</button>
+          <button data-button-type="LINK" data-variant="small" data-onclick="if (typeof window.viewLinkedItemsForTradePlan === 'function') { window.viewLinkedItemsForTradePlan(${design.id}); }" data-text="" title="קישור"></button>
+          <button data-button-type="EDIT" data-variant="small" data-onclick="if (typeof window.openEditTradePlanModal === 'function') { window.openEditTradePlanModal(${design.id}); }" data-text="" title="ערוך"></button>
+          <button data-button-type="CANCEL" data-variant="small" data-onclick="if (typeof window.cancelTradePlan === 'function') { window.cancelTradePlan(${design.id}); }" data-text="" title="בטל"></button>
+          <button data-button-type="DELETE" data-variant="small" data-onclick="if (typeof window.openDeleteTradePlanModal === 'function') { window.openDeleteTradePlanModal(${design.id}); }" data-text="" title="מחק"></button>
         </td>
       </tr>
     `;

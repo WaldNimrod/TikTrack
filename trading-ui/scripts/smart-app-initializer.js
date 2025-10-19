@@ -433,7 +433,7 @@ class SmartAppInitializer {
             packages: [...new Set([...pageConfig.packages, ...template.packages])],
             systems: [...new Set([...pageConfig.systems, ...template.systems])],
             features: [...new Set([...pageConfig.features, ...template.features])],
-            customInitializers: [...pageConfig.customInitializers, ...template.initializers]
+            customInitializers: [...(pageConfig.customInitializers || []), ...(template.customInitializers || [])]
         };
     }
 
@@ -499,7 +499,8 @@ class SmartAppInitializer {
             
             const pkg = window.SYSTEM_PACKAGES[packageName];
             if (!pkg) {
-                throw new Error(`חבילה לא נמצאה: ${packageName}`);
+                console.warn(`חבילה לא נמצאה: ${packageName} - מדלג`);
+                return; // Skip missing packages instead of throwing error
             }
             
             // פתרון תלויות

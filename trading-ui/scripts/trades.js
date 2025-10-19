@@ -436,10 +436,10 @@ function updateTradesTable(trades) {
       <td>${trade.notes || ''}</td>
       <td class="actions-cell">
         <div class="d-flex gap-1 justify-content-center align-items-center" style="flex-wrap: nowrap;">
-          <button class="btn btn-sm" onclick="viewLinkedItemsForTrade(${trade.id})" title="הצג פריטים מקושרים">🔗</button>
-          <button class="btn btn-sm" onclick="editTradeRecord('${trade.id}')" title="ערוך טרייד">✏️</button>
-          <button class="btn btn-sm" onclick="window.cancelTrade(${trade.id})" title="בטל טרייד">❌</button>
-          <button class="btn btn-sm" onclick="deleteTradeRecord('${trade.id}')" title="מחק טרייד">🗑️</button>
+          <button data-button-type="LINK" data-variant="small" data-onclick="viewLinkedItemsForTrade(${trade.id})" data-text="" title="הצג פריטים מקושרים"></button>
+          <button data-button-type="EDIT" data-variant="small" data-onclick="editTradeRecord('${trade.id}')" data-text="" title="ערוך טרייד"></button>
+          <button data-button-type="CANCEL" data-variant="small" data-onclick="window.cancelTrade(${trade.id})" data-text="" title="בטל טרייד"></button>
+          <button data-button-type="DELETE" data-variant="small" data-onclick="deleteTradeRecord('${trade.id}')" data-text="" title="מחק טרייד"></button>
         </div>
       </td>
     </tr>

@@ -266,12 +266,8 @@ function createActionsHTML(row, tableType) {
 
   return `
     <div class="action-buttons">
-      <button class="btn btn-sm" onclick="editRecord('${tableType}', ${recordId})" title="ערוך">
-        <i class="fas fa-edit"></i>
-      </button>
-      <button class="btn btn-sm" onclick="deleteRecord('${tableType}', ${recordId})" title="מחק">
-        <i class="fas fa-trash"></i>
-      </button>
+      <button data-button-type="EDIT" data-variant="small" data-onclick="editRecord('${tableType}', ${recordId})" data-text="" title="ערוך"></button>
+      <button data-button-type="DELETE" data-variant="small" data-onclick="deleteRecord('${tableType}', ${recordId})" data-text="" title="מחק"></button>
     </div>
   `;
 }

@@ -178,15 +178,9 @@ function renderPendingExecutionRow(execution) {
                 <div class="actions-menu-container">
                     <button class="btn-icon actions-trigger" onclick="toggleActionsMenu(this, event)" title="פעולות">⋮</button>
                     <div class="actions-menu">
-                        <button onclick="editExecutionFromWidget(${execution.id})" title="ערוך עסקה">
-                            <i class="fas fa-edit"></i> ערוך
-                        </button>
-                        <button onclick="deleteExecutionFromWidget(${execution.id})" title="מחק עסקה">
-                            <i class="fas fa-trash"></i> מחק
-                        </button>
-                        <button onclick="goToExecutionsPage(${execution.id})" title="עבור לדף עסקאות">
-                            <i class="fas fa-external-link-alt"></i> פתח בדף עסקאות
-                        </button>
+                        <button data-button-type="EDIT" data-variant="small" data-onclick="editExecutionFromWidget(${execution.id})" data-text="ערוך" title="ערוך עסקה"></button>
+                        <button data-button-type="DELETE" data-variant="small" data-onclick="deleteExecutionFromWidget(${execution.id})" data-text="מחק" title="מחק עסקה"></button>
+                        <button data-button-type="LINK" data-variant="small" data-onclick="goToExecutionsPage(${execution.id})" data-text="פתח בדף עסקאות" title="עבור לדף עסקאות"></button>
                     </div>
                 </div>
             </td>

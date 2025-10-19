@@ -79,15 +79,9 @@ function updateChartsList() {
                     </div>
                 </div>
                 <div class="chart-actions">
-                    <button class="action-btn small" onclick="refreshChart(${index})">
-                        <i class="fas fa-sync"></i>
-                    </button>
-                    <button class="action-btn small" onclick="exportChart(${index})">
-                        <i class="fas fa-download"></i>
-                    </button>
-                    <button class="action-btn small danger" onclick="destroyChart(${index})">
-                        <i class="fas fa-trash"></i>
-                    </button>
+                    <button data-button-type="REFRESH" data-variant="small" data-onclick="refreshChart(${index})" data-text="" title="רענן"></button>
+                    <button data-button-type="EXPORT" data-variant="small" data-onclick="exportChart(${index})" data-text="" title="ייצא"></button>
+                    <button data-button-type="DELETE" data-variant="small" data-onclick="destroyChart(${index})" data-text="" title="מחק"></button>
                 </div>
             </div>
         `;

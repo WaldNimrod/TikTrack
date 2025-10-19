@@ -274,10 +274,8 @@ class ConstraintManager {
                 </div>
                 ${enumValuesHtml}
                 <div class="text-center">
-                    <button type="button" class="btn" 
-                            onclick="constraintManager.deleteConstraint(${constraint.id})">
-                        <i class="fas fa-trash"></i> מחק אילוץ
-                    </button>
+                    <button data-button-type="DELETE" data-variant="full" 
+                            data-onclick="constraintManager.deleteConstraint(${constraint.id})" data-text="מחק אילוץ" title="מחק אילוץ"></button>
                 </div>
             </form>
         `;
@@ -591,9 +589,7 @@ window.addEnumValue = function () {
             <input type="text" class="form-control" placeholder="ערך" name="enum-value">
             <input type="text" class="form-control" placeholder="שם תצוגה" name="enum-display">
             <input type="number" class="form-control" placeholder="סדר" name="enum-sort" value="1">
-            <button type="button" class="btn btn-sm" onclick="removeEnumValue(this)">
-                <i class="fas fa-trash"></i>
-            </button>
+            <button data-button-type="DELETE" data-variant="small" data-onclick="removeEnumValue(this)" data-text="" title="מחק"></button>
         `;
     container.appendChild(newItem);
   }

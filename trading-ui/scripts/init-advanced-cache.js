@@ -562,7 +562,7 @@
                 const cache = await caches.open(this.cacheLayers.serviceWorker);
                 const response = new Response(JSON.stringify(data));
                 // Convert key to valid URL for Service Worker cache
-                const cacheKey = key.startsWith('http') ? key : `cache://${key}`;
+                const cacheKey = key.startsWith('http') ? key : `http://127.0.0.1:8080/cache/${key}`;
                 await cache.put(cacheKey, response);
             } catch (error) {
                 console.warn('Service Worker set error:', error);

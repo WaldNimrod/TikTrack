@@ -100,9 +100,7 @@
                     <div class="section-header">
                         <h1>🔧 ניהול משימות רקע</h1>
                         <div class="header-actions">
-                            <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
-                                <i class="fas fa-copy"></i> העתק לוג מפורט
-                            </button>
+                            <button data-button-type="COPY" data-variant="full" data-onclick="copyDetailedLog()" data-text="העתק לוג מפורט" title="העתק לוג מפורט עם כל הנתונים והסטטוס"></button>
                             <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
                                 ${createToggleButton("toggleSection('top')", "הצג/הסתר סקשן")}
                             </button>

@@ -662,20 +662,17 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
         <td data-date='${note.created_at}'>${date}</td>
         <td>${attachmentDisplay}</td>
         <td class='actions-cell' onclick='event.stopPropagation();'>
-          <button class='btn btn-sm' 
-            onclick='window.showLinkedItemsModal && window.showLinkedItemsModal([], "note", ${note.id})' 
-            title='צפה בפריטים מקושרים'>
-            🔗
+          <button data-button-type="LINK" data-variant="small" 
+            data-onclick='window.showLinkedItemsModal && window.showLinkedItemsModal([], "note", ${note.id})' 
+            data-text="" title='צפה בפריטים מקושרים'>
           </button>
-          <button class='btn btn-sm' 
-            onclick='editNote("${note.id}")' 
-            title='ערוך הערה'>
-            ✏️
+          <button data-button-type="EDIT" data-variant="small" 
+            data-onclick='editNote("${note.id}")' 
+            data-text="" title='ערוך הערה'>
           </button>
-          <button class='btn btn-sm' 
-            onclick='deleteNote("${note.id}")' 
-            title='מחק הערה'>
-            🗑️
+          <button data-button-type="DELETE" data-variant="small" 
+            data-onclick='deleteNote("${note.id}")' 
+            data-text="" title='מחק הערה'>
           </button>
         </td>
       </tr>

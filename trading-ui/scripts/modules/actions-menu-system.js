@@ -221,14 +221,6 @@ window.debugActionsMenuOverflow = () => {
 
 console.log('✅ ActionsMenuSystem: debugActionsMenu מוגדרת וזמינה');
 
-// יצירת instance גלובלי
-window.actionsMenuSystem = new ActionsMenuSystem();
-
-// פונקציה גלובלית ליצירת תפריט פעולות
-window.createActionsMenu = function(buttons) {
-    return window.actionsMenuSystem.createActionsMenu(buttons);
-};
-
 class ActionsMenuSystem {
     constructor() {
         this.init();
@@ -375,7 +367,20 @@ class ActionsMenuSystem {
     }
 }
 
+// פונקציה גלובלית ליצירת תפריט פעולות
+window.createActionsMenu = function(buttons) {
+    if (window.actionsMenuSystem) {
+        return window.actionsMenuSystem.createActionsMenu(buttons);
+    } else {
+        console.warn('ActionsMenuSystem not yet initialized');
+        return null;
+    }
+};
+
 // Initialize דרך UnifiedAppInitializer - כלל 43
 // DOMContentLoaded listener הוסר לטובת מערכת האתחול המאוחדת
 window.ActionsMenuSystem = ActionsMenuSystem;
+
+// יצירת instance גלובלי אחרי שהקלאס מוגדר
+window.actionsMenuSystem = new ActionsMenuSystem();
 

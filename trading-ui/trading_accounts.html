@@ -379,6 +379,17 @@
         if (window.unifiedAppInitializer) {
             window.unifiedAppInitializer.initialize();
         }
+        
+        // Load trading accounts data after the script is fully loaded
+        setTimeout(async () => {
+            console.log('🔄 Manual loading of trading accounts data...');
+            if (typeof window.loadTradingAccountsDataForTradingAccountsPage === 'function') {
+                console.log('📡 Calling loadTradingAccountsDataForTradingAccountsPage...');
+                await window.loadTradingAccountsDataForTradingAccountsPage();
+            } else {
+                console.error('❌ loadTradingAccountsDataForTradingAccountsPage still not available');
+            }
+        }, 1000);
     </script>
 </body>
 </html>

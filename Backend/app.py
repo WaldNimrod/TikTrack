@@ -1857,13 +1857,13 @@ if __name__ == "__main__":
     # - Notification system works without WebSockets
     
     print("🚀 Starting TikTrack Server...")
-    print("📡 Server running on port 5000")
+    print("📡 Server running on port 5001")
     print("✅ All systems operational")
     
     # Run with standard Flask
     app.run(
         host='127.0.0.1',
-        port=5000,
+        port=5001,
         debug=DEVELOPMENT_MODE,
         use_reloader=False  # Disable auto-reload to prevent issues
     )

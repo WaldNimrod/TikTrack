@@ -877,7 +877,7 @@ class UnifiedAppInitializer {
         
         // חישוב ממוצע
         try {
-            const key = `init_metrics_${this.pageInfo.name}`;
+            const key = `init_metrics_${this.pageInfo?.name || 'unknown'}`;
             const history = JSON.parse(localStorage.getItem(key) || '[]');
             
             if (history.length > 0) {

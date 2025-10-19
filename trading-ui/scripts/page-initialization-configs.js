@@ -1024,8 +1024,12 @@ window.getPageInitSummary = function(pageName) {
                      (config.requiresValidation ? 1 : 0) + 
                      (config.requiresTables ? 1 : 0) + 
                      config.customInitializers.length
-    },
+    };
+};
 
+// ===== ADDITIONAL PAGE CONFIGS =====
+
+const ADDITIONAL_PAGE_CONFIGS = {
     // Init System Management
     'init-system-management': {
         name: 'Init System Management',
@@ -1055,6 +1059,9 @@ window.getPageInitSummary = function(pageName) {
 };
 
 // ===== GLOBAL EXPORT =====
+
+// Merge additional configs
+Object.assign(PAGE_CONFIGS, ADDITIONAL_PAGE_CONFIGS);
 
 window.PAGE_CONFIGS = PAGE_CONFIGS;
 window.pageInitializationConfigs = PAGE_CONFIGS;

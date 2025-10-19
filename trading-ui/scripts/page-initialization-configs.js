@@ -1024,7 +1024,7 @@ window.getPageInitSummary = function(pageName) {
                      (config.requiresValidation ? 1 : 0) + 
                      (config.requiresTables ? 1 : 0) + 
                      config.customInitializers.length
-    }
+    },
 
     // Init System Management
     'init-system-management': {

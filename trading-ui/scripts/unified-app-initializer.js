@@ -836,7 +836,7 @@ class UnifiedAppInitializer {
     trackLoadTimes() {
         const metrics = {
             timestamp: new Date().toISOString(),
-            pageName: this.pageInfo.name,
+            pageName: this.pageInfo?.name || 'unknown',
             totalTime: this.performanceMetrics.totalTime,
             stages: this.performanceMetrics.stageTimes,
             packages: this.pageConfig?.packages,

@@ -760,6 +760,118 @@ function runStandardizationAnalysis() {
 }
 
 /**
+ * Check for duplicate initialization across all pages
+ */
+async function checkDuplicateInitialization() {
+    const resultsContainer = document.getElementById('toolsResults');
+    
+    try {
+        if (!window.DuplicateInitializationChecker) {
+            resultsContainer.innerHTML = `
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    DuplicateInitializationChecker לא זמין
+                </div>
+            `;
+            return;
+        }
+        
+        resultsContainer.innerHTML = `
+            <div class="text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">בודק עמודים...</span>
+                </div>
+                <p class="mt-2">בודק אתחול כפול ונוסף בכל העמודים...</p>
+            </div>
+        `;
+        
+        const checker = new window.DuplicateInitializationChecker();
+        const results = await checker.checkAllPages();
+        const report = checker.generateReport(results);
+        
+        // Convert console report to HTML
+        const htmlReport = report
+            .replace(/\n/g, '<br>')
+            .replace(/=/g, '═')
+            .replace(/✅/g, '<span class="text-success">✅</span>')
+            .replace(/❌/g, '<span class="text-danger">❌</span>')
+            .replace(/🔄/g, '<span class="text-warning">🔄</span>')
+            .replace(/⚠️/g, '<span class="text-warning">⚠️</span>')
+            .replace(/📊/g, '<span class="text-info">📊</span>')
+            .replace(/📈/g, '<span class="text-info">📈</span>')
+            .replace(/🔴/g, '<span class="text-danger">🔴</span>')
+            .replace(/📋/g, '<span class="text-primary">📋</span>')
+            .replace(/🎯/g, '<span class="text-success">🎯</span>');
+        
+        resultsContainer.innerHTML = `
+            <div class="duplicate-check-report">
+                <h4><i class="fas fa-exclamation-triangle"></i> דוח בדיקת אתחול כפול</h4>
+                <div class="report-content" style="font-family: monospace; white-space: pre-wrap; background: #f8f9fa; padding: 15px; border-radius: 5px; max-height: 600px; overflow-y: auto;">
+                    ${htmlReport}
+                </div>
+                
+                <div class="action-buttons mt-3">
+                    <button onclick="copyReportToClipboard()" class="btn btn-outline-primary">
+                        <i class="fas fa-copy"></i> העתק דוח
+                    </button>
+                    <button onclick="exportReportAsFile()" class="btn btn-outline-success">
+                        <i class="fas fa-download"></i> ייצא לקובץ
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        // Store report for copying/exporting
+        window.lastDuplicateCheckReport = report;
+        
+    } catch (error) {
+        console.error('❌ Failed to check duplicate initialization:', error);
+        resultsContainer.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle"></i>
+                שגיאה בבדיקת אתחול כפול: ${error.message}
+            </div>
+        `;
+    }
+}
+
+/**
+ * Copy report to clipboard
+ */
+function copyReportToClipboard() {
+    if (window.lastDuplicateCheckReport) {
+        navigator.clipboard.writeText(window.lastDuplicateCheckReport).then(() => {
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showNotification('דוח הועתק ללוח', 'success');
+            }
+        }).catch(err => {
+            console.error('Failed to copy report:', err);
+        });
+    }
+}
+
+/**
+ * Export report as file
+ */
+function exportReportAsFile() {
+    if (window.lastDuplicateCheckReport) {
+        const blob = new Blob([window.lastDuplicateCheckReport], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `duplicate-initialization-report-${new Date().toISOString().split('T')[0]}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        if (window.NotificationSystem) {
+            window.NotificationSystem.showNotification('דוח יוצא לקובץ', 'success');
+        }
+    }
+}
+
+/**
  * Show package stats
  */
 function showPackageStats() {

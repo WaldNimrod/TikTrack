@@ -54,10 +54,9 @@
 <div class="table-title">
 <img src="images/icons/trade_plans.svg" alt="תכנון טריידים והשקעות" class="section-icon" style="width: 28px; height: 28px;"> תכנון טריידים והשקעות </div>
 <div class="table-actions">
-<button data-button-type="SAVE" data-classes="btn btn-primary" data-text="שמור"></button>
-<i class="fas fa-download">
-</i> העתק לוג מפורט </button>
-<button data-button-type="TOGGLE" data-classes="btn btn-outline-warning" data-text="הצג/הסתר"></button>
+<button class="btn btn-primary">שמור</button>
+<button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט"><i class="fas fa-download"></i> העתק לוג מפורט</button>
+<button class="btn btn-outline-warning" onclick="toggleSection('top')"><i class="fas fa-chevron-up"></i> הצג/הסתר</button>
 <span class="filter-icon">▲</span>
 </button>
 </div>
@@ -86,27 +85,14 @@
 <img src="images/icons/trade_plans.svg" alt="התכנונים שלי" class="section-icon" style="width: 28px; height: 28px;"> התכנונים שלי </div>
 <div class="table-count" id="trade_plansCount">טוען...</div>
 <div class="table-actions">
-<button data-button-type="ADD" data-onclick="if (typeof window.showAddTradePlanModal === 'function') { window.showAddTradePlanModal(); }" data-classes="btn btn-success" data-attributes="type='button' id='addTradePlanBtn' title='הוסף תכנון חדש'">
-<i class="fas fa-plus">
-</i> הוסף תכנון חדש </button>
-<button data-button-type="TOGGLE" data-onclick="toggleSection('top')" data-classes="btn btn-outline-secondary" data-attributes="type='button' title='הצג/הסתר אזור תכנון טריידים'">
-<span class="filter-icon">▲</span>
-</button>
+<button class="btn btn-success" onclick="if (typeof window.showAddTradePlanModal === 'function') { window.showAddTradePlanModal(); }" type="button" id="addTradePlanBtn" title="הוסף תכנון חדש"><i class="fas fa-plus"></i> הוסף תכנון חדש</button>
+<button class="btn btn-outline-secondary" onclick="toggleSection('top')" type="button" title="הצג/הסתר אזור תכנון טריידים"><span class="filter-icon">▲</span></button>
 </div>
 <div class="filter-buttons-container button-row" style="margin-top: 10px;">
-<button data-button-type="FILTER" data-onclick="filterTradePlansByType('all')" data-classes="btn btn-sm active" data-attributes="type='button' data-type='all' title='הצג הכל' style='background-color: white; color: #28a745; border-color: #28a745;'" data-text="הצג הכל"></button>
-<button data-button-type="FILTER" data-onclick="filterTradePlansByType('swing')" data-classes="btn btn-sm btn-outline-primary" data-attributes="type='button' data-type='swing' title='Swing Trading' style='width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;'">
-<i class="fas fa-chart-line" style="font-size: 12px;">
-</i>
-</button>
-<button data-button-type="FILTER" data-onclick="filterTradePlansByType('investment')" data-classes="btn btn-sm btn-outline-primary" data-attributes="type='button' data-type='investment' title='השקעות' style='width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;'">
-<i class="fas fa-chart-bar" style="font-size: 12px;">
-</i>
-</button>
-<button data-button-type="FILTER" data-onclick="filterTradePlansByType('passive')" data-classes="btn btn-sm btn-outline-primary" data-attributes="type='button' data-type='passive' title='השקעות פאסיביות' style='width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;'">
-<i class="fas fa-coins" style="font-size: 12px;">
-</i>
-</button>
+<button class="btn btn-sm active" onclick="filterTradePlansByType('all')" type="button" data-type="all" title="הצג הכל" style="background-color: white; color: #28a745; border-color: #28a745;">הצג הכל</button>
+<button class="btn btn-sm btn-outline-primary" onclick="filterTradePlansByType('swing')" type="button" data-type="swing" title="Swing Trading" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;"><i class="fas fa-chart-line" style="font-size: 12px;"></i></button>
+<button class="btn btn-sm btn-outline-primary" onclick="filterTradePlansByType('investment')" type="button" data-type="investment" title="השקעות" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;"><i class="fas fa-chart-bar" style="font-size: 12px;"></i></button>
+<button class="btn btn-sm btn-outline-primary" onclick="filterTradePlansByType('passive')" type="button" data-type="passive" title="השקעות פאסיביות" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;"><i class="fas fa-coins" style="font-size: 12px;"></i></button>
 </div>
 </div>
 <div class="section-body">
@@ -337,10 +323,8 @@
 </div>
 </div>
 <div class="modal-footer">
-<button data-button-type="SAVE" data-classes="btn btn-primary" data-text="שמור"></button>
-<i class="fas fa-times">
-</i> ביטול </button>
-<button data-button-type="SAVE" data-classes="btn btn-primary" data-text="שמור"></button>
+<button class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i> ביטול</button>
+<button class="btn btn-primary" onclick="saveForm()"><i class="fas fa-save"></i> שמור</button>
 <i class="fas fa-save">
 </i> שמור </button>
 </div>
@@ -359,12 +343,12 @@
 <!-- Navigation tabs -->
 <ul class="nav nav-tabs" id="editTradePlanTabs" role="tablist">
     <li class="nav-item" role="presentation">
-        <button data-button-type="TOGGLE" data-classes="nav-link active" data-attributes="id='edit-basic-tab' data-bs-toggle='tab' data-bs-target='#edit-basic-pane' type='button' role='tab'">
+        <button class="nav-link active" id="edit-basic-tab" data-bs-toggle="tab" data-bs-target="#edit-basic-pane" type="button" role="tab">
             <i class="fa fa-info-circle me-2"></i>פרטים בסיסיים
         </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button data-button-type="TOGGLE" data-classes="nav-link" data-attributes="id='edit-conditions-tab' data-bs-toggle='tab' data-bs-target='#edit-conditions-pane' type='button' role='tab'">
+        <button class="nav-link" id="edit-conditions-tab" data-bs-toggle="tab" data-bs-target="#edit-conditions-pane" type="button" role="tab">
             <i class="fa fa-chart-line me-2"></i>סיבות ותנאים
         </button>
     </li>
@@ -518,10 +502,8 @@
 </div>
 </div>
 <div class="modal-footer">
-<button data-button-type="SAVE" data-classes="btn btn-primary" data-text="שמור"></button>
-<i class="fas fa-times">
-</i> ביטול </button>
-<button data-button-type="SAVE" data-classes="btn btn-primary" data-text="שמור"></button>
+<button class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i> ביטול</button>
+<button class="btn btn-primary" onclick="saveForm()"><i class="fas fa-save"></i> שמור</button>
 <i class="fas fa-save">
 </i> שמור </button>
 </div>

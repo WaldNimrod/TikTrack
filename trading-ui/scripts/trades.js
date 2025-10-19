@@ -2499,36 +2499,23 @@ function updateTableStats() {
   const negativePL = tradesData.filter(trade => (trade.total_pl || 0) < 0).length;
 
   // עדכון סטטיסטיקות סיכום
-  const summaryStatsElement = document.getElementById('summaryStats');
-  if (summaryStatsElement) {
-    summaryStatsElement.innerHTML = `
-      <div class="stats-grid">
-        <div class="stat-item">
-          <span class="stat-label">פתוחים:</span>
-          <span class="stat-value">${openTrades}</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">סגורים:</span>
-          <span class="stat-value">${closedTrades}</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">מבוטלים:</span>
-          <span class="stat-value">${cancelledTrades}</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">רווח כולל:</span>
-          <span class="stat-value ${totalPL >= 0 ? 'positive' : 'negative'}">$${totalPL.toFixed(2)}</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">רווחיים:</span>
-          <span class="stat-value positive">${positivePL}</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">מפסידים:</span>
-          <span class="stat-value negative">${negativePL}</span>
-        </div>
-      </div>
-    `;
+  const totalTradesElement = document.getElementById('totalTrades');
+  const openTradesElement = document.getElementById('openTrades');
+  const closedTradesElement = document.getElementById('closedTrades');
+  const totalPLElement = document.getElementById('totalPL');
+
+  if (totalTradesElement) {
+    totalTradesElement.textContent = tradesData.length;
+  }
+  if (openTradesElement) {
+    openTradesElement.textContent = openTrades;
+  }
+  if (closedTradesElement) {
+    closedTradesElement.textContent = closedTrades;
+  }
+  if (totalPLElement) {
+    totalPLElement.textContent = `$${totalPL.toFixed(2)}`;
+    totalPLElement.className = totalPL >= 0 ? 'positive' : 'negative';
   } else {
     if (typeof handleElementNotFound === 'function') {
       handleElementNotFound('summaryStats', 'CRITICAL');

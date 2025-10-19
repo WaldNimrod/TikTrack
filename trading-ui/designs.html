@@ -109,14 +109,14 @@
                                 <table class="table table-striped table-hover" id="buttonSystemTable">
                                     <thead class="table-dark">
                                         <tr>
-                                            <th>דוגמאות חיות (3 מצבים)</th>
-                                            <th>שם הכפתור</th>
-                                            <th>תיאור</th>
-                                            <th>משתנה צבע</th>
-                                            <th>קוד HTML (ישן)</th>
-                                            <th>קוד HTML (חדש)</th>
-                                            <th>קוד JavaScript</th>
-                                            <th>פעולות</th>
+                                            <th style="width: 30%;">דוגמאות חיות</th>
+                                            <th style="width: 20%;">שם הכפתור</th>
+                                            <th style="width: 30%;">תיאור</th>
+                                            <th style="width: 20%;">משתנה צבע</th>
+                                            <th style="display: none;">קוד HTML (ישן)</th>
+                                            <th style="display: none;">קוד HTML (חדש)</th>
+                                            <th style="display: none;">קוד JavaScript</th>
+                                            <th style="display: none;">פעולות</th>
                                         </tr>
                                     </thead>
                                     <tbody id="buttonTableBody"></tbody>
@@ -246,7 +246,7 @@
         }
 
         .button-system-demo table {
-            min-width: 1200px !important;
+            min-width: 800px !important;
             table-layout: auto !important;
             width: 100% !important;
         }
@@ -259,7 +259,19 @@
         /* Live Examples Column */
         .button-system-demo th:nth-child(1),
         .button-system-demo td:nth-child(1) {
-            min-width: 200px;
+            min-width: 250px;
+        }
+        
+        /* Hide code columns */
+        .button-system-demo th:nth-child(5),
+        .button-system-demo th:nth-child(6),
+        .button-system-demo th:nth-child(7),
+        .button-system-demo th:nth-child(8),
+        .button-system-demo td:nth-child(5),
+        .button-system-demo td:nth-child(6),
+        .button-system-demo td:nth-child(7),
+        .button-system-demo td:nth-child(8) {
+            display: none !important;
         }
 
         .button-variants-container {
@@ -380,6 +392,61 @@
         // Local copyDetailedLog function for designs page
         async function copyButtonSystemDetailedLog() {
             try {
+                // Collect all buttons with their actual colors and styles
+                const allButtons = document.querySelectorAll('button[data-button-type]');
+                const buttonDetails = [];
+                
+                allButtons.forEach((btn, index) => {
+                    const computedStyle = window.getComputedStyle(btn);
+                    const buttonType = btn.getAttribute('data-button-type');
+                    const variant = btn.getAttribute('data-variant') || 'normal';
+                    const size = btn.getAttribute('data-size') || 'normal';
+                    const style = btn.getAttribute('data-style') || 'default';
+                    const entityType = btn.getAttribute('data-entity-type');
+                    
+                    buttonDetails.push({
+                        index: index + 1,
+                        type: buttonType,
+                        variant: variant,
+                        size: size,
+                        style: style,
+                        entityType: entityType,
+                        actualColors: {
+                            backgroundColor: computedStyle.backgroundColor,
+                            color: computedStyle.color,
+                            borderColor: computedStyle.borderColor
+                        },
+                        cssClasses: btn.className,
+                        content: btn.innerHTML.trim(),
+                        dataAttributes: {
+                            'data-button-type': buttonType,
+                            'data-variant': variant,
+                            'data-size': size,
+                            'data-style': style,
+                            'data-entity-type': entityType
+                        }
+                    });
+                });
+
+                // Collect CSS variables for button colors
+                const rootStyle = window.getComputedStyle(document.documentElement);
+                const colorVariables = {};
+                const buttonColorVars = [
+                    '--color-action-edit', '--color-action-delete', '--color-action-add',
+                    '--color-action-save', '--color-action-cancel', '--color-action-link',
+                    '--color-action-close', '--color-action-refresh', '--color-action-export',
+                    '--color-action-import', '--color-action-search', '--color-action-filter',
+                    '--color-action-sort', '--color-action-toggle', '--color-action-copy',
+                    '--color-action-reactivate', '--color-action-view', '--color-action-duplicate',
+                    '--color-action-archive', '--color-action-restore', '--color-action-approve',
+                    '--color-action-reject', '--color-action-pause', '--color-action-play',
+                    '--color-action-stop', '--color-action-read', '--color-action-check'
+                ];
+                
+                buttonColorVars.forEach(varName => {
+                    colorVariables[varName] = rootStyle.getPropertyValue(varName);
+                });
+
                 const logData = {
                     timestamp: new Date().toISOString(),
                     page: 'designs',
@@ -393,12 +460,28 @@
                         totalRows: document.querySelectorAll('#buttonTableBody tr').length,
                         visibleRows: document.querySelectorAll('#buttonTableBody tr:not(.d-none)').length,
                         hasData: document.querySelectorAll('#buttonTableBody tr').length > 0
+                    },
+                    allButtonsOnPage: {
+                        totalFound: allButtons.length,
+                        buttons: buttonDetails
+                    },
+                    colorVariables: colorVariables,
+                    systemInfo: {
+                        userAgent: navigator.userAgent,
+                        viewport: {
+                            width: window.innerWidth,
+                            height: window.innerHeight
+                        },
+                        buttonSystemLoaded: typeof window.advancedButtonSystem !== 'undefined',
+                        buttonIconsLoaded: typeof window.BUTTON_ICONS !== 'undefined',
+                        buttonTextsLoaded: typeof window.BUTTON_TEXTS !== 'undefined'
                     }
                 };
+                
                 const detailedLog = JSON.stringify(logData, null, 2);
                 await navigator.clipboard.writeText(detailedLog);
                 if (window.showSuccessNotification) {
-                    window.showSuccessNotification('לוג מפורט הועתק ללוח', 'הלוג מכיל את כל מה שרואה המשתמש בעמוד');
+                    window.showSuccessNotification('לוג מפורט הועתק ללוח', 'הלוג מכיל את כל הצבעים והסגנונות של הכפתורים');
                 } else {
                     alert('לוג מפורט הועתק ללוח!');
                 }

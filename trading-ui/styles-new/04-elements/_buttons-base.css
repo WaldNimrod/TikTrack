@@ -38,6 +38,95 @@ button,.btn{background-color:white;color:var(--primary-color,#29a6a8);border:1px
     font-size: 14px !important;
 }
 
+.btn[data-variant="full"] i,
+.btn[data-variant="full"] .icon {
+    margin-right: 4px;
+}
+
+/* Spacing for small variant buttons with icons */
+.btn[data-variant="small"] i,
+.btn[data-variant="small"] .icon {
+    margin-right: 3px;
+}
+
+/* Spacing for normal variant buttons with icons */
+.btn[data-variant="normal"] i,
+.btn[data-variant="normal"] .icon {
+    margin-right: 4px;
+}
+
+/* Spacing for large variant buttons with icons */
+.btn[data-variant="large"] i,
+.btn[data-variant="large"] .icon {
+    margin-right: 5px;
+}
+
+/* Spacing for xlarge variant buttons with icons */
+.btn[data-variant="xlarge"] i,
+.btn[data-variant="xlarge"] .icon {
+    margin-right: 6px;
+}
+
+/* Spacing for small buttons with icons */
+.btn[data-size="small"] i,
+.btn[data-size="small"] .icon {
+    margin-right: 3px;
+}
+
+/* Spacing for small variant buttons with icons */
+.btn[data-variant="small"] i,
+.btn[data-variant="small"] .icon {
+    margin-right: 3px;
+}
+
+/* Spacing for normal buttons with icons */
+.btn[data-size="normal"] i,
+.btn[data-size="normal"] .icon {
+    margin-right: 4px;
+}
+
+/* Spacing for normal variant buttons with icons */
+.btn[data-variant="normal"] i,
+.btn[data-variant="normal"] .icon {
+    margin-right: 4px;
+}
+
+/* Spacing for large buttons with icons */
+.btn[data-size="large"] i,
+.btn[data-size="large"] .icon {
+    margin-right: 5px;
+}
+
+/* Spacing for large variant buttons with icons */
+.btn[data-variant="large"] i,
+.btn[data-variant="large"] .icon {
+    margin-right: 5px;
+}
+
+/* Spacing for large variant buttons with icons */
+.btn[data-variant="large"] i,
+.btn[data-variant="large"] .icon {
+    margin-right: 5px;
+}
+
+/* Spacing for xlarge buttons with icons */
+.btn[data-size="xlarge"] i,
+.btn[data-size="xlarge"] .icon {
+    margin-right: 6px;
+}
+
+/* Spacing for xlarge variant buttons with icons */
+.btn[data-variant="xlarge"] i,
+.btn[data-variant="xlarge"] .icon {
+    margin-right: 6px;
+}
+
+/* Spacing for xlarge variant buttons with icons */
+.btn[data-variant="xlarge"] i,
+.btn[data-variant="xlarge"] .icon {
+    margin-right: 6px;
+}
+
 /* 
  * Button System Demo Styles removed - moved to designs.html as inline styles
  * סגנונות הדמו הועברו לעמוד designs.html כסגנונות אינליין

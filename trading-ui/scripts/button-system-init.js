@@ -283,16 +283,27 @@ class AdvancedButtonSystem {
     }
 
     processButtonElement(element, index) {
+        // Check if button was already processed
+        if (element.hasAttribute('data-button-processed')) {
+            return;
+        }
+
         const buttonType = element.getAttribute('data-button-type');
         const entityType = element.getAttribute('data-entity-type');
         const size = element.getAttribute('data-size');
         const style = element.getAttribute('data-style');
         const onClick = element.getAttribute('data-onclick');
-        const variant = element.getAttribute('data-variant');
+        let variant = element.getAttribute('data-variant');
         const classes = element.getAttribute('data-classes') || '';
         const attributes = element.getAttribute('data-attributes') || '';
         const text = element.getAttribute('data-text') || '';
+        const icon = element.getAttribute('data-icon') || '';
         const id = element.getAttribute('data-id') || `btn-${index}`;
+
+        // Set default variant to normal if not specified
+        if (!variant || variant === 'default' || variant === '') {
+            variant = 'normal';
+        }
 
         this.logger.debug(`Processing button ${index}: ${buttonType}`, {
             onClick, classes, attributes, text, entityType, size, style, variant
@@ -300,7 +311,7 @@ class AdvancedButtonSystem {
 
         const newButton = this.createButtonFromData(
             buttonType, onClick, classes, attributes, text, id,
-            entityType, size, style, variant
+            entityType, size, style, variant, icon
         );
 
         if (newButton) {
@@ -313,6 +324,11 @@ class AdvancedButtonSystem {
                 this.applyEntityColors(createdButton, entityType);
             }
 
+            // Mark button as processed
+            if (createdButton) {
+                createdButton.setAttribute('data-button-processed', 'true');
+            }
+
             this.buttons.set(id, {
                 type: buttonType, onClick, classes, attributes, text,
                 entityType, size, style, variant, processed: true
@@ -321,24 +337,42 @@ class AdvancedButtonSystem {
     }
 
     createButtonFromData(type, onClick, classes, attributes, text, id,
-                         entityType, size, style, variant) {
+                         entityType, size, style, variant, iconOverride = '') {
         if (window.BUTTON_ICONS && window.BUTTON_TEXTS && window.getButtonClass) {
-            const icon = window.BUTTON_ICONS[type.toUpperCase()] || '';
+            const icon = iconOverride || window.BUTTON_ICONS[type.toUpperCase()] || '';
             const buttonText = text || window.BUTTON_TEXTS[type.toUpperCase()] || '';
             const buttonClass = window.getButtonClass(type);
+
+            // Set default variant to normal if not specified
+            if (!variant || variant === 'default' || variant === '') {
+                variant = 'normal';
+            }
 
             let allAttributes = '';
             if (attributes) allAttributes += ' ' + attributes;
             if (entityType) allAttributes += ` data-entity-type='${entityType}'`;
             if (size) allAttributes += ` data-size='${size}'`;
             if (style) allAttributes += ` data-style='${style}'`;
-            if (variant) allAttributes += ` data-variant='${variant}'`;
+            allAttributes += ` data-variant='${variant}'`;
 
             let onclickAttr = onClick ? ` onclick='${onClick}'` : '';
             let titleAttr = buttonText ? ` title='${buttonText}'` : '';
             let idAttr = id ? ` id='${id}'` : '';
 
-            return `<button class='btn ${buttonClass}${classes}'${idAttr}${onclickAttr}${titleAttr}${allAttributes}>${icon}${buttonText}</button>`;
+            // Set content based on variant
+            let content = '';
+            if (variant === 'small') {
+                content = icon;
+            } else if (variant === 'normal') {
+                content = buttonText;
+            } else if (variant === 'full') {
+                content = `${icon} ${buttonText}`.trim();
+            } else {
+                // Default to normal variant
+                content = buttonText;
+            }
+
+            return `<button class='btn ${buttonClass}${classes}' data-button-type='${type}' data-button-processed='true'${idAttr}${onclickAttr}${titleAttr}${allAttributes}>${content}</button>`;
         } else {
             this.logger.warn('Button system dependencies not found, using fallback');
             return this.createFallbackButton(type, onClick, classes, attributes, text, id);
@@ -359,17 +393,24 @@ class AdvancedButtonSystem {
         this.logger.debug(`Applied entity colors for ${entityType}`, colors);
     }
 
-    createFallbackButton(type, onClick, classes, attributes, text, id) {
+    createFallbackButton(type, onClick, classes, attributes, text, id, variant = 'normal') {
         const buttonText = text || type || 'כפתור';
         const buttonClass = this.config.fallback.defaultButtonClass;
 
+        // Set default variant to normal if not specified
+        if (!variant || variant === 'default' || variant === '') {
+            variant = 'normal';
+        }
+
         let allAttributes = '';
         if (attributes) allAttributes += ' ' + attributes;
+        allAttributes += ` data-variant='${variant}'`;
 
         let onclickAttr = onClick ? ` onclick='${onClick}'` : '';
         let idAttr = id ? ` id='${id}'` : '';
 
-        return `<button class='btn ${buttonClass}${classes}'${idAttr}${onclickAttr}${allAttributes}>${buttonText}</button>`;
+        // For fallback, always show text (normal variant behavior)
+        return `<button class='btn ${buttonClass}${classes}' data-button-type='${type}' data-button-processed='true'${idAttr}${onclickAttr}${allAttributes}>${buttonText}</button>`;
     }
 
     applyFallbackButton(element) {
@@ -378,21 +419,22 @@ class AdvancedButtonSystem {
         const classes = element.getAttribute('data-classes') || '';
         const attributes = element.getAttribute('data-attributes') || '';
         const text = element.getAttribute('data-text') || type;
+        const variant = element.getAttribute('data-variant') || 'normal';
 
-        const fallbackButton = this.createFallbackButton(type, onClick, classes, attributes, text);
+        const fallbackButton = this.createFallbackButton(type, onClick, classes, attributes, text, '', variant);
         element.outerHTML = fallbackButton;
     }
 
-    addButton(container, type, onClick, classes = '', attributes = '', text = '', id = '') {
-        const buttonHtml = this.createButtonFromData(type, onClick, classes, attributes, text, id);
+    addButton(container, type, onClick, classes = '', attributes = '', text = '', id = '', variant = 'normal') {
+        const buttonHtml = this.createButtonFromData(type, onClick, classes, attributes, text, id, '', '', variant, '');
         container.insertAdjacentHTML('beforeend', buttonHtml);
         this.logger.debug(`Added dynamic button: ${type}`);
     }
 
-    updateButton(buttonId, type, onClick, classes = '', attributes = '', text = '') {
+    updateButton(buttonId, type, onClick, classes = '', attributes = '', text = '', variant = 'normal') {
         const element = document.getElementById(buttonId);
         if (element) {
-            const newButton = this.createButtonFromData(type, onClick, classes, attributes, text, buttonId);
+            const newButton = this.createButtonFromData(type, onClick, classes, attributes, text, buttonId, '', '', variant, '');
             element.outerHTML = newButton;
             this.logger.debug(`Updated button: ${buttonId}`);
         } else {

@@ -100,8 +100,8 @@
                         תזרימי מזומנים
                     </div>
                     <div class="table-actions">
-                        ${createButton('EXPORT', 'copyDetailedLog()', 'btn-sm btn-outline-secondary', 'title="העתק לוג מפורט"')}
-                        ${createToggleButton("toggleSection('top')", "הצג/הסתר")}
+                        <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט"><i class="fas fa-file-export"></i></button>
+                        <button class="btn btn-outline-warning" onclick="toggleSection('top')"><i class="fas fa-chevron-up"></i> הצג/הסתר</button>
                     </div>
                 </div>
 
@@ -131,8 +131,8 @@
                         </div>
                         <div class="table-count" id="cashFlowsCount">טוען...</div>
                         <div class="table-actions">
-                            ${createButton('ADD', 'showAddModal()', 'btn-success', 'title="הוסף"')}
-                            ${createToggleButton("toggleSection('top')", "הצג/הסתר")}
+                            <button class="btn btn-success" onclick="showAddModal()" title="הוסף"><i class="fas fa-plus"></i> הוסף</button>
+                            <button class="btn btn-outline-warning" onclick="toggleSection('main')"><i class="fas fa-chevron-up"></i> הצג/הסתר</button>
                         </div>
                     </div>
 
@@ -258,8 +258,8 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        ${createButton('CANCEL', 'data-bs-dismiss="modal"', '', 'type="button"')}
-                        ${createButton('SAVE', 'saveForm()', '', 'type="button"')}
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                        <button type="button" class="btn btn-primary" onclick="saveForm()">שמור</button>
                     </div>
                 </div>
             </div>
@@ -334,8 +334,8 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        ${createButton('CANCEL', 'data-bs-dismiss="modal"', '', 'type="button"')}
-                        ${createButton('SAVE', 'saveForm()', '', 'type="button"')}
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                        <button type="button" class="btn btn-primary" onclick="saveForm()">שמור</button>
                     </div>
                 </div>
             </div>

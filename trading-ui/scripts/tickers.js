@@ -1865,7 +1865,6 @@ function updateTickersTable(tickers) {
                             ${statusLabel}
                         </span>
                     </td>
-                    <td title="${updatedAtDisplay !== 'N/A' ? `עודכן ב: ${updatedAtDisplay}` : 'אין נתוני עדכון'}" style="text-align: center;">${updatedAtDisplay}</td>
                     <td title="${typeLabel}">
                         <span style="background-color: ${typeStyle.backgroundColor}; 
                                      color: ${typeStyle.color}; 

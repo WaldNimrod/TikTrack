@@ -501,7 +501,7 @@ function initializeButtonVariantsDemo() {
  */
 function createVariantButton(button, variant, size = 'normal', style = 'default', entityType = null) {
     const btn = document.createElement('button');
-    btn.className = `btn ${button.class}`;
+    btn.className = `btn`;
     btn.style.fontSize = '12px';
     btn.style.padding = '4px 8px';
     btn.style.height = '28px';
@@ -513,6 +513,12 @@ function createVariantButton(button, variant, size = 'normal', style = 'default'
     if (size !== 'normal') btn.setAttribute('data-size', size);
     if (style !== 'default') btn.setAttribute('data-style', style);
     if (entityType) btn.setAttribute('data-entity-type', entityType);
+    
+    // Set default variant to normal if not specified
+    if (!variant || variant === 'default' || variant === '') {
+        btn.setAttribute('data-variant', 'normal');
+        variant = 'normal';
+    }
     
     // Auto-generate variant data for all buttons
     let variantData;
@@ -530,7 +536,21 @@ function createVariantButton(button, variant, size = 'normal', style = 'default'
             variantData = { icon: button.icon || '', text: button.text || '' };
     }
     
-    btn.innerHTML = `${variantData.icon} ${variantData.text}`.trim();
+    // Set content based on variant - let the button system handle the content
+    if (variant === 'small') {
+        btn.setAttribute('data-text', '');
+        btn.setAttribute('data-icon', variantData.icon);
+    } else if (variant === 'normal') {
+        btn.setAttribute('data-text', variantData.text);
+        btn.setAttribute('data-icon', '');
+    } else if (variant === 'full') {
+        btn.setAttribute('data-text', variantData.text);
+        btn.setAttribute('data-icon', variantData.icon);
+    } else {
+        // Default to normal variant
+        btn.setAttribute('data-text', variantData.text);
+        btn.setAttribute('data-icon', '');
+    }
     
     btn.onclick = () => {
         alert(`כפתור ${button.name} (${variant}) נלחץ!`);
@@ -626,75 +646,30 @@ function createButtonRow(button, index) {
         <div><small class="text-muted">תומך בישויות: ${['CLOSE', 'ADD', 'LINK', 'SAVE'].includes(button.type) ? 'כן' : 'לא'}</small></div>
     `;
     
-    // Old HTML cell
+    // Create hidden cells for code columns (for developers)
     const oldHtmlCell = document.createElement('td');
+    oldHtmlCell.style.display = 'none';
     const oldCode = document.createElement('code');
     oldCode.textContent = button.oldHtml;
     oldCode.className = 'small';
     oldHtmlCell.appendChild(oldCode);
     
-    // New HTML cell
     const newHtmlCell = document.createElement('td');
+    newHtmlCell.style.display = 'none';
     const newCode = document.createElement('code');
     newCode.textContent = button.newHtml;
     newCode.className = 'small';
     newHtmlCell.appendChild(newCode);
     
-    // Add examples for new variants
-    const variantsExamples = document.createElement('div');
-    variantsExamples.innerHTML = `
-        <small class="text-muted">דוגמאות נוספות:</small><br>
-        <code style="font-size: 9px;">data-size="xlarge"</code><br>
-        <code style="font-size: 9px;">data-style="negative"</code><br>
-        <code style="font-size: 9px;">data-entity-type="trade_plan"</code>
-    `;
-    newHtmlCell.appendChild(variantsExamples);
-    
-    // JavaScript code cell
     const jsCodeCell = document.createElement('td');
+    jsCodeCell.style.display = 'none';
     const jsCode = document.createElement('code');
     jsCode.textContent = button.jsCode;
     jsCode.className = 'small';
     jsCodeCell.appendChild(jsCode);
     
-    // Add examples for new variants
-    const jsVariantsExamples = document.createElement('div');
-    jsVariantsExamples.innerHTML = `
-        <small class="text-muted">דוגמאות נוספות:</small><br>
-        <code style="font-size: 9px;">addDynamicButton(container, '${button.type}', 'onClick()', '', 'data-size="xlarge"')</code><br>
-        <code style="font-size: 9px;">addDynamicButton(container, '${button.type}', 'onClick()', '', 'data-style="negative"')</code><br>
-        <code style="font-size: 9px;">addDynamicButton(container, '${button.type}', 'onClick()', '', 'data-entity-type="trade_plan"')</code>
-    `;
-    jsCodeCell.appendChild(jsVariantsExamples);
-    
-    // Actions cell
     const actionsCell = document.createElement('td');
-    const copyButton = document.createElement('button');
-    copyButton.className = 'btn btn-sm btn-outline-primary';
-    copyButton.innerHTML = '📋 העתק';
-    copyButton.onclick = () => copyToClipboard(button.newHtml);
-    actionsCell.appendChild(copyButton);
-    
-    // Add copy buttons for new variants
-    const copyXLargeButton = document.createElement('button');
-    copyXLargeButton.className = 'btn btn-sm btn-outline-secondary';
-    copyXLargeButton.innerHTML = '📋 XLarge';
-    copyXLargeButton.onclick = () => copyToClipboard(button.newHtml.replace('>', ' data-size="xlarge">'));
-    actionsCell.appendChild(copyXLargeButton);
-    
-    const copyNegativeButton = document.createElement('button');
-    copyNegativeButton.className = 'btn btn-sm btn-outline-secondary';
-    copyNegativeButton.innerHTML = '📋 נגטיב';
-    copyNegativeButton.onclick = () => copyToClipboard(button.newHtml.replace('>', ' data-style="negative">'));
-    actionsCell.appendChild(copyNegativeButton);
-    
-    if (['CLOSE', 'ADD', 'LINK', 'SAVE'].includes(button.type)) {
-        const copyEntityButton = document.createElement('button');
-        copyEntityButton.className = 'btn btn-sm btn-outline-secondary';
-        copyEntityButton.innerHTML = '📋 ישות';
-        copyEntityButton.onclick = () => copyToClipboard(button.newHtml.replace('>', ' data-entity-type="trade_plan">'));
-        actionsCell.appendChild(copyEntityButton);
-    }
+    actionsCell.style.display = 'none';
     
     row.appendChild(liveExampleCell);
     row.appendChild(nameCell);
@@ -716,15 +691,18 @@ function createButtonRow(button, index) {
  */
 function createLiveButton(button) {
     const liveButton = document.createElement('button');
-    liveButton.className = `btn ${button.class}`;
+    liveButton.className = `btn`;
+    liveButton.setAttribute('data-button-type', button.type);
     
     // Use full variant by default
     const variant = button.variants?.full || { icon: button.icon, text: button.text };
-    liveButton.innerHTML = `${variant.icon} ${variant.text}`.trim();
+    liveButton.setAttribute('data-text', variant.text);
+    liveButton.setAttribute('data-icon', variant.icon);
     
     liveButton.onclick = () => {
         alert(`כפתור ${button.name} נלחץ!`);
     };
+    
     return liveButton;
 }
 

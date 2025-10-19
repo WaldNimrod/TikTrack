@@ -359,71 +359,105 @@ function updateTradingAccountsTable(trading_accounts) {
   
   tbody.innerHTML = trading_accounts.map(tradingAccount => {
     // המרת סטטוס לעברית לפילטר
-    const statusForFilter = account.status === 'open' ? 'פתוח' :
-      account.status === 'closed' ? 'סגור' :
-        account.status === 'cancelled' ? 'מבוטל' : account.status || '-';
+    const statusForFilter = tradingAccount.status === 'open' ? 'פתוח' :
+      tradingAccount.status === 'closed' ? 'סגור' :
+        tradingAccount.status === 'cancelled' ? 'מבוטל' : tradingAccount.status || '-';
 
     return `
-    <tr data-trading-account-id="${account.id}">
-      <td class="ticker-cell" data-tradingAccount="${account.name || '-'}">
+    <tr data-trading-account-id="${tradingAccount.id}">
+      <td class="ticker-cell" data-tradingAccount="${tradingAccount.name || '-'}">
         <div style="display: flex; align-items: center; gap: 8px;">
           <button class="btn btn-sm btn-outline-info" 
-            onclick="showEntityDetails('account', ${account.id})" 
+            onclick="showEntityDetails('account', ${tradingAccount.id})" 
             title="פרטי חשבון" 
             style="background-color: white; font-size: 0.8em;">
             🔗
           </button>
           <span class="entity-trading-account-badge" 
                 style="padding: 2px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
-            ${account.name || '-'}
+            ${tradingAccount.name || '-'}
           </span>
         </div>
       </td>
-      <td>${account.currency || '-'}</td>
+      <td>${tradingAccount.type || '-'}</td>
+      <td>${tradingAccount.currency || '-'}</td>
+      <td>
+        <span class="numeric-value-positive" 
+              style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
+          $${tradingAccount.balance ? tradingAccount.balance.toLocaleString() : '0'}
+        </span>
+      </td>
       <td class="status-cell" data-status="${statusForFilter}">
-        <span class="status-${account.status}-badge" 
+        <span class="status-${tradingAccount.status}-badge" 
               style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
           ${statusForFilter}
         </span>
       </td>
-      <td>
-        <span class="numeric-value-positive" 
-              style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
-          $${account.cash_balance ? account.cash_balance.toLocaleString() : '0'}
-        </span>
-      </td>
-      <td>
-        <span class="numeric-value-positive" 
-              style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
-          $${account.total_value ? account.total_value.toLocaleString() : '0'}
-        </span>
-      </td>
-      <td>
-        <span class="${account.total_pl >= 0 ? 'numeric-value-positive' : 'numeric-value-negative'}" 
-              style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
-          ${account.total_pl ? `$${account.total_pl.toLocaleString()}` : '$0'}
-        </span>
-      </td>
-      <td>${account.notes || '-'}</td>
+      <td>${tradingAccount.created_at ? new Date(tradingAccount.created_at).toLocaleDateString('he-IL') : '-'}</td>
       <td class="actions-cell">
-        <button data-button-type="LINK" data-onclick="window.showLinkedItemsModal && window.showLinkedItemsModal(linkedItemsData, 'tradingAccount', ${account.id})"></button>
-        <button data-button-type="EDIT" data-onclick="showEditTradingAccountModalById(${account.id})"></button>
-        <button data-button-type="${account.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL'}" data-onclick="window.${account.status === 'cancelled' ? 'reactivate' : 'cancel'}Account && window.${account.status === 'cancelled' ? 'reactivate' : 'cancel'}Account(${account.id})" data-classes="${account.status === 'cancelled' ? 'btn-success' : 'btn-danger'} btn-sm" data-attributes="data-item-type='account' data-item-id='${account.id}'"></button>
-        <button data-button-type="DELETE" data-onclick="deleteTradingAccountWithLinkedItemsCheck(${account.id}, '${account.name || 'Unknown'}')"></button>
+        <button class="btn btn-sm btn-info" onclick="window.showLinkedItemsModal && window.showLinkedItemsModal(linkedItemsData, 'tradingAccount', ${tradingAccount.id})" title="פריטים מקושרים">🔗</button>
+        <button class="btn btn-sm btn-secondary" onclick="showEditTradingAccountModalById(${tradingAccount.id})" title="ערוך">✏️</button>
+        <button class="btn btn-sm ${tradingAccount.status === 'cancelled' ? 'btn-success' : 'btn-danger'}" onclick="window.${tradingAccount.status === 'cancelled' ? 'reactivate' : 'cancel'}Account && window.${tradingAccount.status === 'cancelled' ? 'reactivate' : 'cancel'}Account(${tradingAccount.id})" title="${tradingAccount.status === 'cancelled' ? 'הפעל מחדש' : 'בטל'}">${tradingAccount.status === 'cancelled' ? '✓' : '✗'}</button>
       </td>
     </tr>
   `;}).join('');
 
   // עדכון ספירת רשומות
-  const countElement = document.getElementById('trading_accountsCount');
+  const countElement = document.getElementById('accountsCount');
   if (countElement) {
     countElement.textContent = `${trading_accounts.length} חשבונות`;
   }
+
+  // עדכון הסטטיסטיקות
+  updateTradingAccountsSummary(trading_accounts);
 
   console.log('✅ טבלת חשבונות עודכנה בהצלחה עם', trading_accounts.length, 'חשבונות');
   console.log('🔍 tbody.innerHTML אחרי עדכון:', tbody.innerHTML.length, 'תווים');
   console.log('🔍 מספר שורות בטבלה:', tbody.children.length);
   // END UPDATE TRADING ACCOUNTS TABLE
+}
+
+/**
+ * עדכון סיכום נתונים לחשבונות מסחר
+ * @param {Array} trading_accounts - מערך החשבונות
+ */
+function updateTradingAccountsSummary(trading_accounts) {
+  // בדיקה אם האלמנטים קיימים בדף
+  const totalAccountsElement = document.getElementById('totalAccounts');
+  const activeAccountsElement = document.getElementById('activeAccounts');
+  const openAccountsElement = document.getElementById('openAccounts');
+  const totalBalanceElement = document.getElementById('totalBalance');
+
+  if (!totalAccountsElement || !activeAccountsElement || !openAccountsElement || !totalBalanceElement) {
+    console.warn('⚠️ Trading accounts summary elements not found');
+    return;
+  }
+
+  if (!trading_accounts || trading_accounts.length === 0) {
+    // איפוס ערכים
+    totalAccountsElement.textContent = '0';
+    activeAccountsElement.textContent = '0';
+    openAccountsElement.textContent = '0';
+    totalBalanceElement.textContent = '$0';
+    return;
+  }
+
+  // חישוב סיכומים
+  const totalAccounts = trading_accounts.length;
+  const activeAccounts = trading_accounts.filter(account => account.status === 'open').length;
+  const openAccounts = trading_accounts.filter(account => account.status === 'open').length;
+  
+  // חישוב סה"כ יתרה
+  const totalBalance = trading_accounts.reduce((sum, account) => {
+    const balance = parseFloat(account.balance) || 0;
+    return sum + balance;
+  }, 0);
+
+  // עדכון ה-DOM
+  totalAccountsElement.textContent = totalAccounts;
+  activeAccountsElement.textContent = activeAccounts;
+  openAccountsElement.textContent = openAccounts;
+  totalBalanceElement.textContent = `$${totalBalance.toFixed(2)}`;
 }
 
 /**
@@ -510,6 +544,7 @@ window.updateTradingAccountFilterDisplayText = updateTradingAccountFilterDisplay
 // window.isTradingAccountsLoaded = isTradingAccountsLoaded; // הועבר ל-trading-account-service.js
 window.loadTradingAccountsData = loadTradingAccountsData;
 window.updateTradingAccountsTable = updateTradingAccountsTable;
+window.updateTradingAccountsSummary = updateTradingAccountsSummary;
 window.loadTradingAccounts = loadTradingAccounts;
 
 // פונקציה גלובלית לעדכון ידני של תפריט החשבונות
@@ -2867,14 +2902,14 @@ function getTradingAccounts() {
     return new Promise((resolve, reject) => {
         if (window.trading_accountsData && Array.isArray(window.trading_accountsData)) {
             // החזרת רק חשבונות פעילים
-            const activeAccounts = window.trading_accountsData.filter(tradingAccount => account.status === 'open');
+            const activeAccounts = window.trading_accountsData.filter(tradingAccount => tradingAccount.status === 'open');
             resolve(activeAccounts);
         } else {
             // אם אין נתונים, נטען אותם
             if (typeof window.loadTradingAccountsFromServer === 'function') {
                 window.loadTradingAccountsFromServer().then(() => {
                     const activeAccounts = window.trading_accountsData ? 
-                        window.trading_accountsData.filter(tradingAccount => account.status === 'open') : [];
+                        window.trading_accountsData.filter(tradingAccount => tradingAccount.status === 'open') : [];
                     resolve(activeAccounts);
                 }).catch(reject);
             } else {

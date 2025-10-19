@@ -423,7 +423,7 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
   if (!notes || notes.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="6" class="text-center text-muted">
+        <td colspan="7" class="text-center text-muted">
           <div style="padding: 20px;">
             <h5>📝 אין הערות</h5>
             <p>לא נמצאו הערות במערכת</p>
@@ -588,16 +588,16 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
 
     return `
       <tr onclick='viewNote(${note.id})' style='cursor: pointer;'>
-        <td class='ticker-cell'><span class='symbol-text'>${symbolLink}</span></td>
+        <td class='ticker-cell'><span class='symbol-text'>${note.title || '-'}</span></td>
+        <td>${contentDisplay}</td>
         <td style='padding: 0;' data-type='${typeForFilter}'>
           <div class='related-object-cell ${relatedClass}' 
             style='justify-content: flex-start; text-align: right; min-width: 150px;'>
             ${relatedDisplay}
           </div>
         </td>
-        <td>${contentDisplay}</td>
-        <td>${attachmentDisplay}</td>
         <td data-date='${note.created_at}'>${date}</td>
+        <td>${attachmentDisplay}</td>
         <td class='actions-cell' onclick='event.stopPropagation();'>
           <button class='btn btn-sm btn-info' 
             onclick='window.showLinkedItemsModal && window.showLinkedItemsModal([], "note", ${note.id})' 

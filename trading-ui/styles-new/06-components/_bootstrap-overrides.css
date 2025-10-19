@@ -12,14 +12,14 @@
 
 /* Primary Buttons - Outline Style */
 .btn-primary {
-    background-color: white;
-    border-color: var(--primary-color);
-    color: var(--primary-color);
+    background-color: white !important;
+    border-color: var(--primary-color) !important;
+    color: var(--primary-color) !important;
 }
 .btn-primary:hover {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
-    color: white;
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: white !important;
 }
 
 /* Dynamic Button Colors - כפתורים עם צבעים דינמיים */
@@ -284,6 +284,7 @@
     height: var(--button-height-xlarge) !important;
     padding: var(--button-padding-xlarge) !important;
     font-size: var(--button-font-size-xlarge) !important;
+    min-width: 120px !important;
 }
 
 .btn[data-size="xlarge"] i,
@@ -293,15 +294,15 @@
 
 /* Negative Variant - וריאנט נגטיב */
 .btn[data-style="negative"] {
-    background-color: var(--button-negative-bg) !important;
-    border-color: var(--button-negative-bg) !important;
-    color: var(--button-negative-text) !important;
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: white !important;
 }
 
 .btn[data-style="negative"]:hover {
-    background-color: var(--button-negative-hover-bg) !important;
-    border-color: var(--button-negative-hover-bg) !important;
-    color: var(--button-negative-text) !important;
+    background-color: var(--primary-hover) !important;
+    border-color: var(--primary-hover) !important;
+    color: white !important;
 }
 
 /* Negative + Entity - שילוב נגטיב עם ישות */
@@ -319,62 +320,62 @@
 
 /* Success Buttons - Outline Style */
 .btn-success {
-    background-color: white;
-    border-color: var(--success-color);
-    color: var(--success-color);
+    background-color: white !important;
+    border-color: var(--success-color) !important;
+    color: var(--success-color) !important;
 }
 .btn-success:hover {
-    background-color: var(--success-color);
-    border-color: var(--success-color);
-    color: white;
+    background-color: var(--success-color) !important;
+    border-color: var(--success-color) !important;
+    color: white !important;
 }
 
 /* Danger Buttons - Outline Style */
 .btn-danger {
-    background-color: white;
-    border-color: var(--danger-color);
-    color: var(--danger-color);
+    background-color: white !important;
+    border-color: var(--danger-color) !important;
+    color: var(--danger-color) !important;
 }
 .btn-danger:hover {
-    background-color: var(--danger-color);
-    border-color: var(--danger-color);
-    color: white;
+    background-color: var(--danger-color) !important;
+    border-color: var(--danger-color) !important;
+    color: white !important;
 }
 
 /* Secondary Buttons - Outline Style */
 .btn-secondary {
-    background-color: white;
-    border-color: var(--secondary-color);
-    color: var(--secondary-color);
+    background-color: white !important;
+    border-color: var(--secondary-color) !important;
+    color: var(--secondary-color) !important;
 }
 .btn-secondary:hover {
-    background-color: var(--secondary-color);
-    border-color: var(--secondary-color);
-    color: white;
+    background-color: var(--secondary-color) !important;
+    border-color: var(--secondary-color) !important;
+    color: white !important;
 }
 
 /* Warning Buttons - Outline Style */
 .btn-warning {
-    background-color: white;
-    border-color: var(--warning-color);
-    color: var(--warning-color);
+    background-color: white !important;
+    border-color: var(--warning-color) !important;
+    color: var(--warning-color) !important;
 }
 .btn-warning:hover {
-    background-color: var(--warning-color);
-    border-color: var(--warning-color);
-    color: var(--text-color);
+    background-color: var(--warning-color) !important;
+    border-color: var(--warning-color) !important;
+    color: white !important;
 }
 
 /* Info Buttons - Outline Style */
 .btn-info {
-    background-color: white;
-    border-color: var(--info-color);
-    color: var(--info-color);
+    background-color: white !important;
+    border-color: var(--info-color) !important;
+    color: var(--info-color) !important;
 }
 .btn-info:hover {
-    background-color: var(--info-color);
-    border-color: var(--info-color);
-    color: white;
+    background-color: var(--info-color) !important;
+    border-color: var(--info-color) !important;
+    color: white !important;
 }
 
 /* Outline Variants */

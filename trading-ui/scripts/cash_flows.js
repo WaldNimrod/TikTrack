@@ -958,9 +958,9 @@ async function renderCashFlowsTable() {
     window.translateCashFlowSource(cashFlow.source) :
     cashFlow.source}</td>
             <td class="col-actions actions-cell actions-3-btn">
-              <button data-button-type="LINK" data-onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})"></button>
-              <button data-button-type="EDIT" data-onclick="showEditCashFlowModal(${cashFlow.id})"></button>
-              <button data-button-type="DELETE" data-onclick="deleteCashFlow(${cashFlow.id})"></button>
+              <button class="btn btn-sm btn-info" onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})" title="צפה בפריטים מקושרים">🔗</button>
+              <button class="btn btn-sm btn-secondary" onclick="showEditCashFlowModal(${cashFlow.id})" title="ערוך תזרים">✏️</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteCashFlow(${cashFlow.id})" title="מחק תזרים">🗑️</button>
 
             </td>
         `;

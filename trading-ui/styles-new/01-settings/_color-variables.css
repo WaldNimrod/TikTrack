@@ -21,8 +21,6 @@
     --color-action-toggle: var(--warning-color);      /* Toggle buttons */
     --color-action-copy: var(--secondary-color);      /* Copy buttons */
     --color-action-reactivate: var(--success-color);  /* Reactivate buttons */
-    
-    /* Entity Button Colors - כפתורי ישויות */
     --color-action-view: var(--info-color);           /* View buttons */
     --color-action-duplicate: var(--primary-color);   /* Duplicate buttons */
     --color-action-archive: var(--warning-color);     /* Archive buttons */

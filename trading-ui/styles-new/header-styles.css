@@ -58,13 +58,11 @@
 /* Filters Container - Same max-width and padding as header-container */
 .filters-container {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
     gap: var(--spacing-md, 16px);
     max-width: var(--container-xl, 1400px);
     margin: 0 auto;
     box-sizing: border-box;
-    padding: 0 1rem;
 }
 
 /* Header Filters - No side padding, no top margin */
@@ -76,8 +74,6 @@
     min-height: 60px;
     display: block; /* פתוח כברירת מחדל */
     margin-top: 0;
-    width: 100%;
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 #unified-header .header-top {
@@ -189,13 +185,6 @@
         max-width: 100%;
         padding: 0 15px;
         gap: var(--spacing-sm, 8px);
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-    
-    .filter-group {
-        margin-bottom: 0.25rem;
-        flex-shrink: 1;
     }
 
     #unified-header .logo-text {
@@ -449,8 +438,6 @@
     align-items: center;
     font-size: 0.9em;
     position: relative;
-    flex-shrink: 0;
-    margin-bottom: 0.5rem;
 }
 
 .filter-toggle {
@@ -693,12 +680,10 @@
 
 .filters-container {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
     gap: 1rem;
     max-width: 1400px;
     margin: 0 auto;
-    padding: 0 1rem;
 }
 
 .filter-group {
@@ -706,8 +691,6 @@
     align-items: center;
     font-size: 0.9em;
     position: relative;
-    flex-shrink: 0;
-    margin-bottom: 0.5rem;
 }
 
 .filter-toggle {
@@ -948,34 +931,5 @@
     height: 1px;
     background: #e5e5e5;
     margin: 0.5rem 0;
-}
-
-/* Mobile Styles for Filters - מסכים קטנים מאוד */
-@media (max-width: 480px) {
-    .filters-container {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.5rem;
-        padding: 0 10px;
-    }
-    
-    .filter-group {
-        margin-bottom: 0.25rem;
-        width: 100%;
-    }
-    
-    .filter-toggle {
-        width: 100%;
-        justify-content: space-between;
-    }
-    
-    .search-filter-input {
-        width: 100%;
-    }
-    
-    .filter-actions {
-        justify-content: center;
-        width: 100%;
-    }
 }
 

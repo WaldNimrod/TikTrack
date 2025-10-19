@@ -469,6 +469,12 @@ if (typeof window !== 'undefined') {
   window.PackageManifest = PackageManifest;
 }
 
+// Export for browser
+if (typeof window !== 'undefined') {
+  window.PACKAGE_MANIFEST = PACKAGE_MANIFEST;
+  window.PackageManifest = PackageManifest;
+}
+
 // Export for Node.js
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { PACKAGE_MANIFEST, PackageManifest };

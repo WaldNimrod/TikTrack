@@ -1024,7 +1024,34 @@ window.getPageInitSummary = function(pageName) {
                      (config.requiresValidation ? 1 : 0) + 
                      (config.requiresTables ? 1 : 0) + 
                      config.customInitializers.length
-    };
+    },
+
+    // Init System Management
+    'init-system-management': {
+        name: 'Init System Management',
+        packages: ['base', 'dev-tools'],
+        requiredGlobals: [
+            'NotificationSystem',
+            'PackageManifest',
+            'RuntimeValidator',
+            'ScriptAnalyzer',
+            'PageTemplateGenerator'
+        ],
+        description: 'ניהול מערכת האתחול - חבילות, ולידציה, כלי פיתוח',
+        lastModified: '2025-10-19',
+        pageType: 'development',
+        preloadAssets: ['package-data'],
+        cacheStrategy: 'standard',
+        requiresFilters: false,
+        requiresValidation: false,
+        requiresTables: false,
+        customInitializers: [
+            function() {
+                console.log('🚀 Initializing Init System Management...');
+                // Init system management specific initialization
+            }
+        ]
+    }
 };
 
 // ===== GLOBAL EXPORT =====

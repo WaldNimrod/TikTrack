@@ -129,45 +129,52 @@ async function loadPackagesList() {
         }
         
         const packages = Object.values(window.PACKAGE_MANIFEST);
-        let packagesHTML = '<div class="packages-grid">';
+        let packagesHTML = '';
         
         packages.forEach(pkg => {
-            const criticalClass = pkg.critical ? 'critical' : '';
+            const criticalClass = pkg.critical ? 'border-danger' : 'border-primary';
             const dependenciesText = pkg.dependencies?.length > 0 ? 
                 `תלויות: ${pkg.dependencies.join(', ')}` : 'אין תלויות';
             
             packagesHTML += `
-                <div class="package-card ${criticalClass}">
-                    <div class="package-header">
-                        <h5>${pkg.name}</h5>
-                        <span class="package-id">${pkg.id}</span>
-                        ${pkg.critical ? '<span class="critical-badge">קריטי</span>' : ''}
-                    </div>
-                    <div class="package-body">
-                        <p class="package-description">${pkg.description}</p>
-                        <div class="package-stats">
-                            <div class="stat">
-                                <span class="label">סקריפטים:</span>
-                                <span class="value">${pkg.scripts.length}</span>
-                            </div>
-                            <div class="stat">
-                                <span class="label">גודל:</span>
-                                <span class="value">${pkg.estimatedSize}</span>
-                            </div>
-                            <div class="stat">
-                                <span class="label">זמן טעינה:</span>
-                                <span class="value">${pkg.initTime}</span>
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 ${criticalClass}">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">${pkg.name}</h6>
+                            <div>
+                                ${pkg.critical ? '<span class="badge bg-danger">קריטי</span>' : '<span class="badge bg-primary">אופציונלי</span>'}
+                                <small class="text-muted">${pkg.id}</small>
                             </div>
                         </div>
-                        <div class="package-dependencies">
-                            <small>${dependenciesText}</small>
+                        <div class="card-body">
+                            <p class="card-text">${pkg.description}</p>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <small class="text-muted">סקריפטים:</small>
+                                    <div class="fw-bold">${pkg.scripts?.length || 0}</div>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted">גודל:</small>
+                                    <div class="fw-bold">${pkg.estimatedSize || 'לא ידוע'}</div>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted">סדר טעינה:</small>
+                                    <div class="fw-bold">${pkg.loadOrder || 'לא מוגדר'}</div>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted">גרסה:</small>
+                                    <div class="fw-bold">${pkg.version || '1.0.0'}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <small class="text-muted">${dependenciesText}</small>
                         </div>
                     </div>
                 </div>
             `;
         });
         
-        packagesHTML += '</div>';
         packagesContainer.innerHTML = packagesHTML;
         
     } catch (error) {

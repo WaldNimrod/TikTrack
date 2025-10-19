@@ -1030,6 +1030,215 @@ window.getPageInitSummary = function(pageName) {
 // ===== ADDITIONAL PAGE CONFIGS =====
 
 const ADDITIONAL_PAGE_CONFIGS = {
+    // Missing pages from documentation
+    'db_extradata': {
+        name: 'Database Extra Data',
+        packages: ['base', 'crud'],
+        requiredGlobals: [
+            'NotificationSystem',
+            'DataUtils',
+            'window.loadExtraData'
+        ],
+        description: 'תצוגת נתונים נוספים במסד הנתונים',
+        lastModified: '2025-10-19',
+        pageType: 'database',
+        preloadAssets: ['extra-data'],
+        cacheStrategy: 'standard',
+        requiresFilters: false,
+        requiresValidation: false,
+        requiresTables: true,
+        customInitializers: [
+            async (pageConfig) => {
+                console.log('🗄️ Initializing Database Extra Data...');
+                if (typeof window.loadExtraData === 'function') {
+                    await window.loadExtraData();
+                }
+            }
+        ]
+    },
+    
+    'constraints': {
+        name: 'System Constraints',
+        packages: ['base', 'validation'],
+        requiredGlobals: [
+            'NotificationSystem',
+            'window.loadConstraints',
+            'window.ConstraintManager'
+        ],
+        description: 'ניהול אילוצי מערכת',
+        lastModified: '2025-10-19',
+        pageType: 'system',
+        preloadAssets: ['constraints-data'],
+        cacheStrategy: 'persistent',
+        requiresFilters: false,
+        requiresValidation: true,
+        requiresTables: true,
+        customInitializers: [
+            async (pageConfig) => {
+                console.log('🔒 Initializing System Constraints...');
+                if (typeof window.loadConstraints === 'function') {
+                    await window.loadConstraints();
+                }
+            }
+        ]
+    },
+    
+    'background-tasks': {
+        name: 'Background Tasks',
+        packages: ['base', 'system-management'],
+        requiredGlobals: [
+            'NotificationSystem',
+            'window.loadBackgroundTasks',
+            'window.BackgroundTaskManager'
+        ],
+        description: 'ניהול משימות רקע',
+        lastModified: '2025-10-19',
+        pageType: 'system',
+        preloadAssets: ['background-tasks'],
+        cacheStrategy: 'standard',
+        requiresFilters: false,
+        requiresValidation: false,
+        requiresTables: true,
+        customInitializers: [
+            async (pageConfig) => {
+                console.log('⚙️ Initializing Background Tasks...');
+                if (typeof window.loadBackgroundTasks === 'function') {
+                    await window.loadBackgroundTasks();
+                }
+            }
+        ]
+    },
+    
+    'page-scripts-matrix': {
+        name: 'Page Scripts Matrix',
+        packages: ['base', 'dev-tools'],
+        requiredGlobals: [
+            'NotificationSystem',
+            'window.loadScriptsMatrix',
+            'window.ScriptsMatrix'
+        ],
+        description: 'מטריצת סקריפטים לעמודים',
+        lastModified: '2025-10-19',
+        pageType: 'development',
+        preloadAssets: ['scripts-matrix'],
+        cacheStrategy: 'standard',
+        requiresFilters: false,
+        requiresValidation: false,
+        requiresTables: true,
+        customInitializers: [
+            async (pageConfig) => {
+                console.log('📊 Initializing Page Scripts Matrix...');
+                if (typeof window.loadScriptsMatrix === 'function') {
+                    await window.loadScriptsMatrix();
+                }
+            }
+        ]
+    },
+    
+    'css-management': {
+        name: 'CSS Management',
+        packages: ['base', 'dev-tools'],
+        requiredGlobals: [
+            'NotificationSystem',
+            'window.loadCSSManagement',
+            'window.CSSManager'
+        ],
+        description: 'ניהול CSS במערכת',
+        lastModified: '2025-10-19',
+        pageType: 'development',
+        preloadAssets: ['css-data'],
+        cacheStrategy: 'standard',
+        requiresFilters: false,
+        requiresValidation: false,
+        requiresTables: false,
+        customInitializers: [
+            async (pageConfig) => {
+                console.log('🎨 Initializing CSS Management...');
+                if (typeof window.loadCSSManagement === 'function') {
+                    await window.loadCSSManagement();
+                }
+            }
+        ]
+    },
+    
+    'dynamic-colors-display': {
+        name: 'Dynamic Colors Display',
+        packages: ['base'],
+        requiredGlobals: [
+            'NotificationSystem',
+            'window.loadColorDisplay',
+            'window.ColorSchemeSystem'
+        ],
+        description: 'תצוגת צבעים דינמיים',
+        lastModified: '2025-10-19',
+        pageType: 'utility',
+        preloadAssets: ['color-schemes'],
+        cacheStrategy: 'standard',
+        requiresFilters: false,
+        requiresValidation: false,
+        requiresTables: false,
+        customInitializers: [
+            async (pageConfig) => {
+                console.log('🌈 Initializing Dynamic Colors Display...');
+                if (typeof window.loadColorDisplay === 'function') {
+                    await window.loadColorDisplay();
+                }
+            }
+        ]
+    },
+    
+    'designs': {
+        name: 'Design Gallery',
+        packages: ['base'],
+        requiredGlobals: [
+            'NotificationSystem',
+            'window.loadDesigns',
+            'window.DesignGallery'
+        ],
+        description: 'גלריית עיצובים',
+        lastModified: '2025-10-19',
+        pageType: 'utility',
+        preloadAssets: ['designs-data'],
+        cacheStrategy: 'standard',
+        requiresFilters: false,
+        requiresValidation: false,
+        requiresTables: false,
+        customInitializers: [
+            async (pageConfig) => {
+                console.log('🎭 Initializing Design Gallery...');
+                if (typeof window.loadDesigns === 'function') {
+                    await window.loadDesigns();
+                }
+            }
+        ]
+    },
+    
+    'chart-management': {
+        name: 'Chart Management',
+        packages: ['base', 'charts'],
+        requiredGlobals: [
+            'NotificationSystem',
+            'window.loadChartManagement',
+            'window.ChartManagement'
+        ],
+        description: 'ניהול גרפים במערכת',
+        lastModified: '2025-10-19',
+        pageType: 'development',
+        preloadAssets: ['chart-data'],
+        cacheStrategy: 'standard',
+        requiresFilters: false,
+        requiresValidation: false,
+        requiresTables: true,
+        customInitializers: [
+            async (pageConfig) => {
+                console.log('📈 Initializing Chart Management...');
+                if (typeof window.loadChartManagement === 'function') {
+                    await window.loadChartManagement();
+                }
+            }
+        ]
+    },
+    
     // Init System Management
     'init-system-management': {
         name: 'Init System Management',

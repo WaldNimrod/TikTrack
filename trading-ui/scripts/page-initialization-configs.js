@@ -5,6 +5,37 @@
  * קונפיגורציות אתחול ספציפיות לעמודים שונים
  * מאפשר גמישות מקסימלית עם תחזוקה קלה
  *
+ * ⚠️ IMPORTANT FOR DEVELOPERS:
+ * ============================
+ * 
+ * This file defines PAGE CONFIGURATIONS for the monitoring system.
+ * When you add new scripts to pages, you MUST update the page configuration here.
+ * 
+ * 🔧 HOW TO UPDATE PAGE CONFIGURATION:
+ * ====================================
+ * 
+ * 1. FIND YOUR PAGE:
+ *    - Look for your page name in PAGE_CONFIGS object
+ *    - If not found, add new configuration
+ * 
+ * 2. ADD REQUIRED PACKAGES:
+ *    - Add package names to packages array
+ *    - Always include 'base' package
+ *    - Add 'crud' for data pages, 'charts' for chart pages
+ * 
+ * 3. ADD REQUIRED GLOBALS:
+ *    - Add global variables that your page needs
+ *    - These are checked by the monitoring system
+ * 
+ * 4. UPDATE ACTUAL PAGE:
+ *    - Add script tags to HTML page
+ *    - Ensure scripts are loaded in correct order
+ * 
+ * 📖 DETAILED DOCUMENTATION:
+ * ==========================
+ * - Developer Guide: documentation/frontend/init-system/DEVELOPER_GUIDE.md
+ * - Management Interface: /init-system-management
+ *
  * 📦 PACKAGE USAGE GUIDE:
  * ======================
  * 
@@ -35,10 +66,10 @@
  * 💡 EXAMPLES:
  * ============
  * - Simple page: packages: ['base']
- * - Data page: packages: ['base', 'crud']  
+ * - Data page: packages: ['base', 'crud']
  * - Chart page: packages: ['base', 'charts']
  * - Full page: packages: ['base', 'crud', 'charts']
- *
+ * 
  * @version 1.0.0
  * @lastUpdated January 2025
  * @author TikTrack Development Team

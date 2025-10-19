@@ -357,3 +357,194 @@
 2025-10-20 00:48:49,318 - services.external_data.yahoo_finance_adapter - INFO - Updated provider yahoo_finance health: True
 2025-10-20 00:48:49,321 - services.data_refresh_scheduler - INFO - Batch refresh completed: 4 successful, 0 failed
 2025-10-20 00:48:49,322 - services.data_refresh_scheduler - INFO - Group refresh completed: ID 33632 - 4 successful, 0 failed
+2025-10-20 01:07:06,315 - root - INFO - 🚀 Starting TikTrack server...
+2025-10-20 01:07:06,315 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend
+2025-10-20 01:07:06,316 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-10-20 01:07:06,316 - root - INFO - 📦 Flask version: 2.3.3
+2025-10-20 01:07:06,316 - root - INFO - 🗄️ Initializing database...
+2025-10-20 01:07:06,316 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-10-20 01:07:06,320 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.004s
+2025-10-20 01:07:06,320 - root - INFO - ✅ Database initialized successfully
+2025-10-20 01:07:07,325 - utils.performance_monitor - INFO - System metrics: CPU: 12.0%, Memory: 64.7%, Disk: 3.6%
+2025-10-20 01:07:07,325 - root - INFO - ✅ Database initialized successfully
+2025-10-20 01:07:07,326 - root - INFO - ✅ Server initialization completed
+2025-10-20 01:07:07,377 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
+2025-10-20 01:07:07,377 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
+2025-10-20 01:07:07,377 - root - INFO - ✅ Condition evaluation task registered successfully
+2025-10-20 01:07:07,377 - root - INFO - 🚀 Starting background task scheduler...
+2025-10-20 01:07:07,377 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-10-20 01:07:07,377 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-10-20 01:07:07,377 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-10-20 01:07:07,377 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-10-20 01:07:07,377 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-10-20 01:07:07,377 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-10-20 01:07:07,377 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-10-20 01:07:07,378 - services.background_tasks - INFO - Background task scheduler started
+2025-10-20 01:07:07,378 - root - INFO - ✅ Background task scheduler started successfully
+2025-10-20 01:07:07,378 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:fa5bb506b4030ff1c9fe0f918f88ec5f
+2025-10-20 01:07:07,405 - cache - INFO - Cache SET: services.system_settings_service.get_setting:fa5bb506b4030ff1c9fe0f918f88ec5f (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-20 01:07:07,405 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-10-20 01:07:07,406 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-10-20 01:07:07,406 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-10-20 01:07:21,514 - root - INFO - 🚀 Starting TikTrack server...
+2025-10-20 01:07:21,514 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend
+2025-10-20 01:07:21,515 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-10-20 01:07:21,515 - root - INFO - 📦 Flask version: 2.3.3
+2025-10-20 01:07:21,515 - root - INFO - 🗄️ Initializing database...
+2025-10-20 01:07:21,515 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-10-20 01:07:21,518 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.003s
+2025-10-20 01:07:21,518 - root - INFO - ✅ Database initialized successfully
+2025-10-20 01:07:22,523 - utils.performance_monitor - INFO - System metrics: CPU: 57.6%, Memory: 64.7%, Disk: 3.6%
+2025-10-20 01:07:22,523 - root - INFO - ✅ Database initialized successfully
+2025-10-20 01:07:22,523 - root - INFO - ✅ Server initialization completed
+2025-10-20 01:07:22,598 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
+2025-10-20 01:07:22,598 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
+2025-10-20 01:07:22,599 - root - INFO - ✅ Condition evaluation task registered successfully
+2025-10-20 01:07:22,599 - root - INFO - 🚀 Starting background task scheduler...
+2025-10-20 01:07:22,599 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-10-20 01:07:22,599 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-10-20 01:07:22,599 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-10-20 01:07:22,599 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-10-20 01:07:22,599 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-10-20 01:07:22,599 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-10-20 01:07:22,599 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-10-20 01:07:22,599 - services.background_tasks - INFO - Background task scheduler started
+2025-10-20 01:07:22,600 - root - INFO - ✅ Background task scheduler started successfully
+2025-10-20 01:07:22,600 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:5e1eb2bc771c46918f46a489785a74e9
+2025-10-20 01:07:22,625 - cache - INFO - Cache SET: services.system_settings_service.get_setting:5e1eb2bc771c46918f46a489785a74e9 (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-20 01:07:22,625 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-10-20 01:07:22,626 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-10-20 01:07:22,627 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-10-20 01:17:54,699 - services.background_tasks - INFO - Starting background task: collect_metrics
+2025-10-20 01:17:55,707 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.007s - Success: True
+2025-10-20 01:17:55,707 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.007s
+2025-10-20 01:17:55,714 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.007s - Success: True
+2025-10-20 01:17:55,715 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-20 01:17:55,715 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-20 01:17:55,715 - services.background_tasks - INFO - Metrics collection completed
+2025-10-20 01:17:55,715 - utils.performance_monitor - INFO - Performance: collect_metrics - Duration: 1.014s - Success: True
+2025-10-20 01:17:55,715 - utils.performance_monitor - WARNING - Slow operation detected: collect_metrics - Duration: 1.014s
+2025-10-20 01:17:55,715 - services.background_tasks - INFO - Background task 'collect_metrics' completed successfully in 1016ms
+2025-10-20 01:47:55,837 - services.background_tasks - INFO - Starting background task: cleanup_cache
+2025-10-20 01:47:55,837 - services.background_tasks - ERROR - Error during cache cleanup: 'AdvancedCacheService' object has no attribute 'cleanup_expired'
+2025-10-20 01:47:55,837 - utils.performance_monitor - INFO - Performance: cleanup_cache - Duration: 0.000s - Success: True
+2025-10-20 01:47:55,838 - services.background_tasks - INFO - Background task 'cleanup_cache' completed successfully in 0ms
+2025-10-20 01:47:55,838 - services.background_tasks - INFO - Starting background task: system_health_check
+2025-10-20 01:47:56,840 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.002s - Success: True
+2025-10-20 01:47:56,840 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.002s
+2025-10-20 01:47:56,849 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.009s - Success: True
+2025-10-20 01:47:56,850 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.001s - Success: True
+2025-10-20 01:47:56,850 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-20 01:47:56,851 - services.background_tasks - INFO - System health check passed
+2025-10-20 01:47:56,851 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 1.013s - Success: True
+2025-10-20 01:47:56,851 - utils.performance_monitor - WARNING - Slow operation detected: system_health_check - Duration: 1.013s
+2025-10-20 01:47:56,851 - services.background_tasks - INFO - Background task 'system_health_check' completed successfully in 1013ms
+2025-10-20 01:47:56,851 - services.background_tasks - INFO - Starting background task: collect_metrics
+2025-10-20 01:47:57,856 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.005s - Success: True
+2025-10-20 01:47:57,856 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.005s
+2025-10-20 01:47:57,860 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.003s - Success: True
+2025-10-20 01:47:57,861 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.001s - Success: True
+2025-10-20 01:47:57,861 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-20 01:47:57,861 - services.background_tasks - INFO - Metrics collection completed
+2025-10-20 01:47:57,861 - utils.performance_monitor - INFO - Performance: collect_metrics - Duration: 1.010s - Success: True
+2025-10-20 01:47:57,861 - utils.performance_monitor - WARNING - Slow operation detected: collect_metrics - Duration: 1.010s
+2025-10-20 01:47:57,861 - services.background_tasks - INFO - Background task 'collect_metrics' completed successfully in 1010ms
+2025-10-20 01:48:49,690 - services.data_refresh_scheduler - INFO - Refreshing 4 active tickers during off-hours
+2025-10-20 01:48:49,695 - services.data_refresh_scheduler - INFO - Group refresh started: active_trades/off_hours - 4 tickers (ID: 33634)
+2025-10-20 01:48:49,695 - services.data_refresh_scheduler - INFO - Refreshing batch of 4 tickers: AAPL, GOOGL, AMZN, TSLA
+2025-10-20 01:48:49,696 - services.external_data.yahoo_finance_adapter - INFO - Processing 4 symbols in 1 batches
+2025-10-20 01:48:50,155 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-10-20 01:48:50,155 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Current price: $252.29
+2025-10-20 01:48:50,155 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Calculated change_amount = 252.29 - 247.45 = 4.840000000000003
+2025-10-20 01:48:50,156 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Calculated change_pct = (4.840000000000003 / 247.45) * 100 = 1.96%
+2025-10-20 01:48:50,156 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: volume = 49146961
+2025-10-20 01:48:50,156 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Final quote data - price: $252.29, change_pct: 1.96%, change_amount: $4.84
+2025-10-20 01:48:50,156 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AAPL
+2025-10-20 01:48:50,158 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AAPL (ID: 1) - proceeding to cache quote
+2025-10-20 01:48:50,158 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AAPL = $252.29 (USD)
+2025-10-20 01:48:50,158 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 1: List argument must consist only of tuples or dictionaries
+2025-10-20 01:48:50,158 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AAPL
+2025-10-20 01:48:50,161 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AAPL: $252.29
+2025-10-20 01:48:50,297 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-10-20 01:48:50,297 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Current price: $253.3
+2025-10-20 01:48:50,298 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Calculated change_amount = 253.3 - 251.46 = 1.8400000000000034
+2025-10-20 01:48:50,298 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Calculated change_pct = (1.8400000000000034 / 251.46) * 100 = 0.73%
+2025-10-20 01:48:50,298 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: volume = 29671629
+2025-10-20 01:48:50,298 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Final quote data - price: $253.3, change_pct: 0.73%, change_amount: $1.84
+2025-10-20 01:48:50,298 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: GOOGL
+2025-10-20 01:48:50,299 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker GOOGL (ID: 2) - proceeding to cache quote
+2025-10-20 01:48:50,299 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: GOOGL = $253.3 (USD)
+2025-10-20 01:48:50,299 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 2: List argument must consist only of tuples or dictionaries
+2025-10-20 01:48:50,299 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for GOOGL
+2025-10-20 01:48:50,300 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for GOOGL: $253.3
+2025-10-20 01:48:50,431 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-10-20 01:48:50,431 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Current price: $213.04
+2025-10-20 01:48:50,431 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Calculated change_amount = 213.04 - 214.47 = -1.4300000000000068
+2025-10-20 01:48:50,432 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Calculated change_pct = (-1.4300000000000068 / 214.47) * 100 = -0.67%
+2025-10-20 01:48:50,432 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: volume = 45986944
+2025-10-20 01:48:50,432 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Final quote data - price: $213.04, change_pct: -0.67%, change_amount: $-1.43
+2025-10-20 01:48:50,432 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AMZN
+2025-10-20 01:48:50,432 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AMZN (ID: 6) - proceeding to cache quote
+2025-10-20 01:48:50,432 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AMZN = $213.04 (USD)
+2025-10-20 01:48:50,433 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 6: List argument must consist only of tuples or dictionaries
+2025-10-20 01:48:50,433 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AMZN
+2025-10-20 01:48:50,434 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AMZN: $213.04
+2025-10-20 01:48:50,561 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-10-20 01:48:50,561 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Current price: $439.31
+2025-10-20 01:48:50,561 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Calculated change_amount = 439.31 - 428.75 = 10.560000000000002
+2025-10-20 01:48:50,562 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Calculated change_pct = (10.560000000000002 / 428.75) * 100 = 2.46%
+2025-10-20 01:48:50,562 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: volume = 89331578
+2025-10-20 01:48:50,562 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Final quote data - price: $439.31, change_pct: 2.46%, change_amount: $10.56
+2025-10-20 01:48:50,562 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: TSLA
+2025-10-20 01:48:50,563 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker TSLA (ID: 4) - proceeding to cache quote
+2025-10-20 01:48:50,563 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: TSLA = $439.31 (USD)
+2025-10-20 01:48:50,563 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 4: List argument must consist only of tuples or dictionaries
+2025-10-20 01:48:50,563 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for TSLA
+2025-10-20 01:48:50,564 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for TSLA: $439.31
+2025-10-20 01:48:50,564 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AAPL
+2025-10-20 01:48:50,565 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AAPL (ID: 1) - proceeding to cache quote
+2025-10-20 01:48:50,565 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AAPL = $252.29 (USD)
+2025-10-20 01:48:50,565 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 1: List argument must consist only of tuples or dictionaries
+2025-10-20 01:48:50,565 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AAPL
+2025-10-20 01:48:50,566 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AAPL: $252.29
+2025-10-20 01:48:50,566 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: GOOGL
+2025-10-20 01:48:50,566 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker GOOGL (ID: 2) - proceeding to cache quote
+2025-10-20 01:48:50,566 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: GOOGL = $253.3 (USD)
+2025-10-20 01:48:50,566 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 2: List argument must consist only of tuples or dictionaries
+2025-10-20 01:48:50,567 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for GOOGL
+2025-10-20 01:48:50,568 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for GOOGL: $253.3
+2025-10-20 01:48:50,568 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AMZN
+2025-10-20 01:48:50,569 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AMZN (ID: 6) - proceeding to cache quote
+2025-10-20 01:48:50,569 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AMZN = $213.04 (USD)
+2025-10-20 01:48:50,569 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 6: List argument must consist only of tuples or dictionaries
+2025-10-20 01:48:50,569 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AMZN
+2025-10-20 01:48:50,569 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AMZN: $213.04
+2025-10-20 01:48:50,570 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: TSLA
+2025-10-20 01:48:50,570 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker TSLA (ID: 4) - proceeding to cache quote
+2025-10-20 01:48:50,570 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: TSLA = $439.31 (USD)
+2025-10-20 01:48:50,570 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 4: List argument must consist only of tuples or dictionaries
+2025-10-20 01:48:50,570 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for TSLA
+2025-10-20 01:48:50,571 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for TSLA: $439.31
+2025-10-20 01:48:50,573 - services.external_data.yahoo_finance_adapter - INFO - Updated provider yahoo_finance health: True
+2025-10-20 01:48:50,578 - services.data_refresh_scheduler - INFO - Batch refresh completed: 4 successful, 0 failed
+2025-10-20 01:48:50,579 - services.data_refresh_scheduler - INFO - Group refresh completed: ID 33634 - 4 successful, 0 failed
+2025-10-20 02:00:57,925 - services.background_tasks - INFO - Starting background task: cleanup_expired_data
+2025-10-20 02:00:57,928 - services.background_tasks - INFO - Data cleanup completed: 0 records cleaned
+2025-10-20 02:00:57,929 - utils.performance_monitor - INFO - Performance: cleanup_expired_data - Duration: 0.002s - Success: True
+2025-10-20 02:00:57,929 - services.background_tasks - INFO - Background task 'cleanup_expired_data' completed successfully in 3ms
+2025-10-20 02:00:57,929 - services.background_tasks - INFO - Starting background task: update_closed_tickers_daily
+2025-10-20 02:00:57,929 - services.background_tasks - INFO - Market not closed yet, skipping closed tickers update
+2025-10-20 02:00:57,929 - utils.performance_monitor - INFO - Performance: update_closed_tickers_daily - Duration: 0.000s - Success: True
+2025-10-20 02:00:57,929 - services.background_tasks - INFO - Background task 'update_closed_tickers_daily' completed successfully in 0ms
+2025-10-20 02:17:58,004 - services.background_tasks - INFO - Starting background task: collect_metrics
+2025-10-20 02:17:59,011 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.006s - Success: True
+2025-10-20 02:17:59,011 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.006s
+2025-10-20 02:17:59,020 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.009s - Success: True
+2025-10-20 02:17:59,021 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.001s - Success: True
+2025-10-20 02:17:59,021 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-20 02:17:59,021 - services.background_tasks - INFO - Metrics collection completed
+2025-10-20 02:17:59,021 - utils.performance_monitor - INFO - Performance: collect_metrics - Duration: 1.016s - Success: True
+2025-10-20 02:17:59,021 - utils.performance_monitor - WARNING - Slow operation detected: collect_metrics - Duration: 1.016s
+2025-10-20 02:17:59,021 - services.background_tasks - INFO - Background task 'collect_metrics' completed successfully in 1017ms

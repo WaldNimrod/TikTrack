@@ -61,6 +61,8 @@
                     <div class="table-title">
                         <img src="images/icons/cash_flows.svg" alt="תזרימי מזומנים" class="section-icon">
                         תזרימי מזומנים
+                        <!-- ריבוע בדיקת צבע ישות -->
+                        <div class="entity-color-test" style="display: inline-block; width: 20px; height: 20px; background-color: var(--current-entity-color, #26baac); border: 1px solid #ccc; margin-right: 10px; border-radius: 4px;" title="צבע ישות נוכחי"></div>
                     </div>
                     <div class="table-actions">
                         <button data-button-type="COPY" data-variant="full" data-onclick="copyDetailedLog()" data-text="העתק לוג מפורט" title="העתק לוג מפורט"></button>
@@ -71,6 +73,32 @@
                 <!-- Alert cards -->
                 <div class="section-body">
                     <active-alerts></active-alerts>
+
+                    <!-- בדיקת צבעי ישות -->
+                    <div class="entity-colors-test" style="margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
+                        <strong>בדיקת צבעי ישות:</strong>
+                        <div style="display: flex; gap: 10px; margin-top: 5px;">
+                            <div style="display: flex; align-items: center; gap: 5px;">
+                                <div style="width: 20px; height: 20px; background-color: var(--current-entity-color, #26baac); border: 1px solid #ccc; border-radius: 4px;"></div>
+                                <span>ראשי: <code>var(--current-entity-color)</code></span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 5px;">
+                                <div style="width: 20px; height: 20px; background-color: var(--entity-cash-flow-color-light, rgba(212, 165, 116, 0.1)); border: 1px solid #ccc; border-radius: 4px;"></div>
+                                <span>בהיר: <code>var(--entity-cash-flow-color-light)</code></span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 5px;">
+                                <div style="width: 20px; height: 20px; background-color: var(--entity-cash-flow-color-dark, #a67c52); border: 1px solid #ccc; border-radius: 4px;"></div>
+                                <span>כהה: <code>var(--entity-cash-flow-color-dark)</code></span>
+                            </div>
+                        </div>
+                        <!-- לוג דיבוג -->
+                        <div id="color-debug-info" style="margin-top: 10px; font-family: monospace; font-size: 12px; color: #666;">
+                            <div>Body classes: <span id="body-classes">טוען...</span></div>
+                            <div>Current entity color (ראשי): <span id="current-color">טוען...</span></div>
+                            <div>Entity cash flow light (בהיר): <span id="entity-light-color">טוען...</span></div>
+                            <div>Entity cash flow dark (כהה): <span id="entity-dark-color">טוען...</span></div>
+                        </div>
+                    </div>
 
                     <!-- Data summary -->
                     <div class="info-summary" id="summaryStats">
@@ -316,12 +344,13 @@
     <script src="scripts/ui-utils.js?v=1.0.0"></script>
     <script src="scripts/page-utils.js?v=1.0.0"></script>
     <script src="scripts/translation-utils.js?v=1.0.0"></script>
-    <script src="scripts/button-icons.js?v=1.0.0"></script>
-    <script src="scripts/button-system-init.js?v=1.0.0"></script>
+        <script src="scripts/button-icons.js?v=1.0.0"></script>
+        <script src="scripts/button-system-init.js?v=1.0.0"></script>
     <script src="scripts/unified-cache-manager.js?v=1.0.0"></script>
     <script src="scripts/cache-sync-manager.js?v=1.0.0"></script>
     <script src="scripts/header-system.js?v=1.0.0"></script>
     <script src="scripts/preferences.js?v=1.0.0"></script>
+    <script src="scripts/color-scheme-system.js?v=1.0.0"></script>
     
     <!-- CRUD Package Scripts -->
     <script src="scripts/tables.js?v=1.0.0"></script>
@@ -335,9 +364,44 @@
     <script src="scripts/unified-app-initializer.js?v=1.0.0"></script>
     <!-- Page-specific Scripts -->
     <script src="scripts/cash_flows.js?v=1.0.0"></script>
-    <script>
-        // Make the local copyDetailedLog function available globally for this page only
-        window.copyDetailedLog = copyDetailedLog;
-    </script>
+        <script>
+            // Make the local copyDetailedLog function available globally for this page only
+            window.copyDetailedLog = copyDetailedLog;
+            
+           // בדיקת צבעים דיבוג
+           function updateColorDebugInfo() {
+               setTimeout(() => {
+                   const computedStyle = getComputedStyle(document.documentElement);
+                   
+                   document.getElementById('body-classes').textContent = document.body.classList.toString();
+                   document.getElementById('current-color').textContent = computedStyle.getPropertyValue('--current-entity-color').trim() || 'לא מוגדר';
+                   document.getElementById('entity-light-color').textContent = computedStyle.getPropertyValue('--entity-cash-flow-color-light').trim() || 'לא מוגדר';
+                   document.getElementById('entity-dark-color').textContent = computedStyle.getPropertyValue('--entity-cash-flow-color-dark').trim() || 'לא מוגדר';
+                   
+                   console.log('🎨 Color Debug Info - שלושת הוריאנטים:');
+                   console.log('Body classes:', document.body.classList.toString());
+                   console.log('--current-entity-color (ראשי):', computedStyle.getPropertyValue('--current-entity-color').trim());
+                   console.log('--entity-cash-flow-color-light (בהיר):', computedStyle.getPropertyValue('--entity-cash-flow-color-light').trim());
+                   console.log('--entity-cash-flow-color-dark (כהה):', computedStyle.getPropertyValue('--entity-cash-flow-color-dark').trim());
+               }, 1000);
+           }
+            
+            // הרץ בדיקה כשהעמוד נטען
+            document.addEventListener('DOMContentLoaded', updateColorDebugInfo);
+            
+            // הרץ בדיקה שוב אחרי 3 שניות (לאחר שהמערכת תיטען)
+            setTimeout(updateColorDebugInfo, 3000);
+            
+            // נסה לעדכן את הצבע אחרי שההעדפות נטענו
+            setTimeout(async () => {
+                console.log('🎨 Attempting to set current entity color...');
+                if (window.setCurrentEntityColorFromPage) {
+                    await window.setCurrentEntityColorFromPage();
+                    updateColorDebugInfo();
+                } else {
+                    console.warn('🎨 setCurrentEntityColorFromPage function not found');
+                }
+            }, 5000);
+        </script>
 </body>
 </html>

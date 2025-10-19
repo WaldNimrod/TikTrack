@@ -2,6 +2,38 @@
  * Package Manifest - TikTrack Initialization System
  * מנפסט חבילות מרכזי לניהול תלויות ובדיקות תקינות
  * 
+ * ⚠️ IMPORTANT FOR DEVELOPERS:
+ * ============================
+ * 
+ * This file defines the PACKAGE STRUCTURE for the monitoring system.
+ * When you add new scripts to pages, you MUST update this file to avoid monitoring errors.
+ * 
+ * 🔧 HOW TO ADD NEW SCRIPTS:
+ * ==========================
+ * 
+ * 1. ADD TO APPROPRIATE PACKAGE:
+ *    - Base Package: Core systems required by all pages
+ *    - CRUD Package: Data management systems
+ *    - Charts Package: Chart and visualization systems
+ *    - Create new package if needed
+ * 
+ * 2. DEFINE GLOBAL CHECK:
+ *    - Add globalCheck property to verify script loaded correctly
+ *    - Use window object property that the script creates
+ * 
+ * 3. UPDATE PAGE CONFIGURATION:
+ *    - Add package to page config in page-initialization-configs.js
+ *    - Add required globals to the page configuration
+ * 
+ * 4. UPDATE ACTUAL PAGE:
+ *    - Add script tag to HTML page
+ *    - Ensure correct loading order
+ * 
+ * 📖 DETAILED DOCUMENTATION:
+ * ==========================
+ * - Developer Guide: documentation/frontend/init-system/DEVELOPER_GUIDE.md
+ * - Management Interface: /init-system-management
+ * 
  * 🏗️ HIERARCHY & DEPENDENCIES:
  * =============================
  * 

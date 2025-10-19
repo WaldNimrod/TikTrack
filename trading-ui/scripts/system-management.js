@@ -2436,7 +2436,7 @@ SystemManagement.executeCacheMode = async function(mode) {
  * פתיחת דשבורד ניטור שרת
  */
 SystemManagement.openServerMonitor = function() {
-  window.open('http://127.0.0.1:8080/server-monitor', '_blank');
+  window.open('http://127.0.0.1:5001/server-monitor', '_blank');
   SystemManagement.showNotification('🔧 פתיחת דשבורד ניטור שרת', 'info');
 };
 
@@ -2445,9 +2445,9 @@ SystemManagement.openServerMonitor = function() {
  * פתיחת כל הדשבורדים
  */
 SystemManagement.openAllDashboards = function() {
-  window.open('http://127.0.0.1:8080/server-monitor', '_blank');
-  window.open('http://127.0.0.1:8080/external-data-dashboard.html', '_blank');
-  window.open('http://127.0.0.1:8080/crud-testing-dashboard.html', '_blank');
+  window.open('http://127.0.0.1:5001/server-monitor', '_blank');
+  window.open('http://127.0.0.1:5001/external-data-dashboard.html', '_blank');
+  window.open('http://127.0.0.1:5001/crud-testing-dashboard.html', '_blank');
   SystemManagement.showNotification('🚀 פתיחת כל הדשבורדים', 'info');
 };
 
@@ -2456,7 +2456,7 @@ SystemManagement.openAllDashboards = function() {
  * פתיחת דשבורד נתונים חיצוניים
  */
 SystemManagement.openExternalData = function() {
-  window.open('http://127.0.0.1:8080/external-data-dashboard.html', '_blank');
+  window.open('http://127.0.0.1:5001/external-data-dashboard.html', '_blank');
   SystemManagement.showNotification('📊 פתיחת דשבורד נתונים חיצוניים', 'info');
 };
 
@@ -2465,7 +2465,7 @@ SystemManagement.openExternalData = function() {
  * פתיחת דשבורד בדיקות CRUD
  */
 SystemManagement.openCrudTesting = function() {
-  window.open('http://127.0.0.1:8080/crud-testing-dashboard.html', '_blank');
+  window.open('http://127.0.0.1:5001/crud-testing-dashboard.html', '_blank');
   SystemManagement.showNotification('🧪 פתיחת דשבורד בדיקות CRUD', 'info');
 };
 

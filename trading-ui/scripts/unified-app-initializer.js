@@ -5,6 +5,40 @@
  * המערכת הסופית המאוחדת שמחליפה את כל ה-DOMContentLoaded listeners
  * ומאפשרת גמישות מקסימלית עם תחזוקה קלה
  *
+ * ⚠️ IMPORTANT FOR DEVELOPERS:
+ * ============================
+ * 
+ * This is a MONITORING AND VALIDATION system, NOT an automatic script loader.
+ * When you see monitoring errors, it means the system detected changes in page loading structure.
+ * 
+ * 🔧 HOW TO FIX MONITORING ERRORS:
+ * ================================
+ * 
+ * If the changes are intentional and correct, you need to update the monitoring system:
+ * 
+ * 1. UPDATE PACKAGE MANIFEST:
+ *    - Add new scripts to appropriate package in `package-manifest.js`
+ *    - Define global checks for each script
+ * 
+ * 2. UPDATE PAGE CONFIGURATION:
+ *    - Add required packages to page config in `page-initialization-configs.js`
+ *    - Add required globals to the page configuration
+ * 
+ * 3. UPDATE ACTUAL PAGE:
+ *    - Add the new script tags to the HTML page
+ *    - Ensure correct loading order
+ * 
+ * 4. TEST AND VALIDATE:
+ *    - Run the monitoring system to verify everything is correct
+ *    - Fix any remaining issues
+ * 
+ * 📖 DETAILED DOCUMENTATION:
+ * ==========================
+ * - Developer Guide: documentation/frontend/init-system/DEVELOPER_GUIDE.md
+ * - User Guide: documentation/frontend/init-system/USER_GUIDE.md
+ * - Enhanced System: documentation/frontend/init-system/ENHANCED_INITIALIZATION_SYSTEM.md
+ * - Management Interface: /init-system-management
+ *
  * 📦 PACKAGE LOADING SYSTEM:
  * ==========================
  * 
@@ -94,6 +128,15 @@ class UnifiedAppInitializer {
             this.performanceMetrics.totalTime = this.performanceMetrics.endTime - this.performanceMetrics.startTime;
             
             this.initialized = true;
+            
+            // ← NEW: ניטור בסוף האתחול (לא חוסם)
+            const validation = this.validateRequiredSystems(config);
+            if (validation.valid) {
+                console.log('✅ All systems validated successfully');
+            } else {
+                console.warn('⚠️ Some systems need attention (see details above)');
+            }
+            
             this.logSuccess();
             
             return this.getStatus();
@@ -207,11 +250,7 @@ class UnifiedAppInitializer {
             // ← NEW: לוג חבילות
             this.logPackageLoading(config.packages);
             
-            // ← NEW: ולידציה
-            const validation = this.validateRequiredSystems(config);
-            if (!validation.valid) {
-                throw new Error('System validation failed');
-            }
+            // Note: Monitoring moved to end of initialization
             
             // Initialize IndexedDB first (blocking) to prevent race conditions
             await this.initializeCacheSystem();
@@ -796,7 +835,36 @@ class UnifiedAppInitializer {
      * Show Critical Error
      */
     showCriticalError(validationResult) {
-        console.group('🔴 שגיאה קריטית באתחול');
+        console.group('⚠️ ניטור מערכת - זיהוי שינויים');
+        
+        // Add monitoring system explanation
+        console.group('⚠️ IMPORTANT FOR DEVELOPERS:');
+        console.log('This is a MONITORING AND VALIDATION system, NOT an automatic script loader.');
+        console.log('The monitoring system has detected changes in the page loading structure.');
+        console.log('');
+        console.log('🔧 HOW TO FIX MONITORING ERRORS:');
+        console.log('If the changes are intentional and correct, you need to update the monitoring system:');
+        console.log('');
+        console.log('1. UPDATE PACKAGE MANIFEST:');
+        console.log('   - Add new scripts to appropriate package in package-manifest.js');
+        console.log('   - Define global checks for each script');
+        console.log('');
+        console.log('2. UPDATE PAGE CONFIGURATION:');
+        console.log('   - Add required packages to page config in page-initialization-configs.js');
+        console.log('   - Add required globals to the page configuration');
+        console.log('');
+        console.log('3. UPDATE ACTUAL PAGE:');
+        console.log('   - Add the new script tags to the HTML page');
+        console.log('   - Ensure correct loading order');
+        console.log('');
+        console.log('4. TEST AND VALIDATE:');
+        console.log('   - Run the monitoring system to verify everything is correct');
+        console.log('   - Fix any remaining issues');
+        console.log('');
+        console.log('📖 DETAILED DOCUMENTATION:');
+        console.log('- Developer Guide: documentation/frontend/init-system/DEVELOPER_GUIDE.md');
+        console.log('- Management Interface: /init-system-management');
+        console.groupEnd();
         
         if (validationResult.errors.length > 0) {
             console.error('שגיאות:', validationResult.errors);
@@ -815,11 +883,143 @@ class UnifiedAppInitializer {
         
         console.groupEnd();
         
-        // הצג גם על המסך
-        if (typeof window.showNotification === 'function') {
-            const msg = `שגיאה קריטית: ${validationResult.missing.length} סקריפטים חסרים. בדוק console`;
-            window.showNotification(msg, 'error');
+        // הצג מודול שגיאה מפורט עם כל ההנחיות
+        this.showDetailedErrorModal(validationResult);
+    }
+
+    /**
+     * Show Detailed Error Modal
+     */
+    showDetailedErrorModal(validationResult) {
+        // נסה להציג מודול מפורט, אם לא זמין - השתמש בהודעה רגילה
+        const tryShowDetailed = () => {
+            if (typeof window.showCriticalErrorModal === 'function') {
+                console.log('✅ Using showCriticalErrorModal for detailed error information');
+                const errorInfo = {
+                    title: 'ניטור מערכת - זיהוי שינויים בטעינת סקריפטים',
+                    type: 'warning',
+                    category: 'system',
+                    timestamp: new Date().toISOString()
+                };
+                const detailedMessage = this.buildDetailedErrorMessage(validationResult);
+                window.showCriticalErrorModal(errorInfo, detailedMessage);
+                return true;
+            }
+            return false;
+        };
+
+        // נסה מיד
+        if (tryShowDetailed()) {
+            return;
         }
+
+        // אם לא עבד, נסה שוב אחרי השהיה קצרה
+        setTimeout(() => {
+            if (tryShowDetailed()) {
+                return;
+            }
+
+            // אם עדיין לא עבד, השתמש בהודעה רגילה
+            console.log('⚠️ showCriticalErrorModal not available, using fallback');
+            if (typeof window.showNotification === 'function') {
+                const msg = `⚠️ ניטור: ${validationResult.missing.length} סקריפטים דורשים עדכון הגדרות. בדוק console`;
+                window.showNotification(msg, 'warning');
+            }
+        }, 100);
+    }
+
+    /**
+     * Build Detailed Error Message for Modal
+     */
+    buildDetailedErrorMessage(validationResult) {
+        let message = '';
+        
+        // כותרת והסבר
+        message += '=== ניטור מערכת - זיהוי שינויים בטעינת סקריפטים ===\n\n';
+        message += '⚠️ חשוב להבין:\n';
+        message += 'זוהי מערכת ניטור ולידציה, לא טוען אוטומטי של סקריפטים.\n';
+        message += 'השגיאות מציינות שהמערכת זיהתה שינויים שדורשים עדכון הגדרות.\n\n';
+        
+        // סקריפטים חסרים
+        if (validationResult.missing.length > 0) {
+            message += `📋 סקריפטים שדורשים עדכון הגדרות (${validationResult.missing.length}):\n`;
+            message += '==========================================\n';
+            
+            validationResult.missing.forEach((item, index) => {
+                message += `\n${index + 1}. ${item.script}\n`;
+                message += `   📦 חבילה: ${item.package}\n`;
+                message += `   🔗 Global: ${item.global}\n`;
+                message += `   📝 תיאור: ${item.description}\n`;
+                message += `   🔧 פתרון: הוסף <script src="scripts/${item.script}"></script>\n`;
+            });
+            message += '\n';
+        }
+        
+        // שגיאות אחרות
+        if (validationResult.errors.length > 0) {
+            message += `❌ שגיאות נוספות (${validationResult.errors.length}):\n`;
+            message += '============================\n';
+            validationResult.errors.forEach((error, index) => {
+                message += `${index + 1}. ${error}\n`;
+            });
+            message += '\n';
+        }
+        
+        // הנחיות תיקון מפורטות
+        message += '🔧 הנחיות תיקון מפורטות:\n';
+        message += '========================\n\n';
+        
+        message += 'שלב 1: עדכון Package Manifest\n';
+        message += '-----------------------------\n';
+        message += '1. פתח את הקובץ: scripts/init-system/package-manifest.js\n';
+        message += '2. מצא את החבילה המתאימה (base, crud, charts)\n';
+        message += '3. הוסף את הסקריפט החדש עם globalCheck\n';
+        message += '4. דוגמה:\n';
+        message += '   {\n';
+        message += '     file: "new-script.js",\n';
+        message += '     globalCheck: "window.newFunction",\n';
+        message += '     description: "תיאור הסקריפט",\n';
+        message += '     required: true\n';
+        message += '   }\n\n';
+        
+        message += 'שלב 2: עדכון Page Configuration\n';
+        message += '--------------------------------\n';
+        message += '1. פתח את הקובץ: scripts/page-initialization-configs.js\n';
+        message += '2. מצא את העמוד שלך (למשל: cash_flows)\n';
+        message += '3. הוסף את החבילה ל-packages array\n';
+        message += '4. הוסף את ה-global ל-requiredGlobals array\n';
+        message += '5. דוגמה:\n';
+        message += '   "cash_flows": {\n';
+        message += '     packages: ["base", "crud"],\n';
+        message += '     requiredGlobals: ["window.newFunction"]\n';
+        message += '   }\n\n';
+        
+        message += 'שלב 3: עדכון העמוד בפועל\n';
+        message += '-------------------------\n';
+        message += '1. פתח את קובץ ה-HTML של העמוד\n';
+        message += '2. הוסף את תג הסקריפט במקום הנכון\n';
+        message += '3. וודא סדר טעינה נכון\n';
+        message += '4. דוגמה:\n';
+        message += '   <script src="scripts/new-script.js?v=1.0.0"></script>\n\n';
+        
+        message += 'שלב 4: בדיקה ולידציה\n';
+        message += '---------------------\n';
+        message += '1. רענן את העמוד\n';
+        message += '2. בדוק את הקונסול - לא אמורות להיות שגיאות ניטור\n';
+        message += '3. הרץ את מערכת הניטור: /init-system-management\n';
+        message += '4. וודא שהכל עובד תקין\n\n';
+        
+        // קישורים למשאבים
+        message += '📖 משאבים נוספים:\n';
+        message += '==================\n';
+        message += '• מדריך מפתח: documentation/frontend/init-system/DEVELOPER_GUIDE.md\n';
+        message += '• ממשק ניהול: /init-system-management\n';
+        message += '• מדריך משתמש: documentation/frontend/init-system/USER_GUIDE.md\n';
+        message += '• מערכת משופרת: documentation/frontend/init-system/ENHANCED_INITIALIZATION_SYSTEM.md\n\n';
+        
+        message += '💡 טיפ: העתק את ההודעה הזו ללוח כדי לשמור על ההנחיות!';
+        
+        return message;
     }
 
     /**
@@ -962,12 +1162,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('🔍 Current pathname:', window.location.pathname);
     
     try {
-        // Small delay to ensure all scripts are loaded
+        // Delay to ensure all scripts are loaded and initialized
         setTimeout(async () => {
             console.log('🚀 About to call initializeUnifiedApp...');
             await window.initializeUnifiedApp();
             console.log('✅ initializeUnifiedApp completed');
-        }, 100);
+        }, 500);
         
     } catch (error) {
         console.error('❌ Unified App auto-initialization failed:', error);

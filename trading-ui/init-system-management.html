@@ -28,6 +28,112 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
         
+        /* Advanced Monitoring Styles */
+        .test-results {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .test-summary {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        .test-stats {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .test-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #fff;
+        }
+        
+        .test-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+        
+        .test-icon {
+            font-size: 16px;
+        }
+        
+        .test-name {
+            font-weight: bold;
+            flex: 1;
+        }
+        
+        .test-status {
+            font-weight: bold;
+        }
+        
+        .test-details {
+            font-size: 14px;
+            color: #666;
+            margin-left: 26px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        
+        .error {
+            color: #dc3545;
+            padding: 10px;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+        }
+        
+        /* Monitoring Explanation Styles */
+        .monitoring-explanation {
+            margin-bottom: 20px;
+        }
+        
+        .monitoring-explanation .alert {
+            border-left: 4px solid #0dcaf0;
+        }
+        
+        .monitoring-explanation h6 {
+            color: #0c5460;
+            margin-bottom: 10px;
+        }
+        
+        .monitoring-explanation ol {
+            margin: 10px 0;
+            padding-right: 20px;
+        }
+        
+        .monitoring-explanation li {
+            margin-bottom: 8px;
+        }
+        
+        .monitoring-explanation code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .monitoring-explanation a {
+            color: #0c5460;
+            text-decoration: underline;
+        }
+        
+        .monitoring-explanation a:hover {
+            color: #0a4750;
+        }
+        
         .page-header {
             background: #f8f9fa;
             padding: 15px;
@@ -215,6 +321,83 @@
                     </div>
                 </div>
                 
+                <!-- מערכת ניטור מתקדמת -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2>🔍 מערכת ניטור מתקדמת</h2>
+                        <div class="table-actions">
+                            <button data-button-type="COPY" data-variant="full" data-onclick="copyDetailedLog()" data-text="העתק לוג מפורט" title="העתק לוג מפורט"></button>
+                            <button data-button-type="REFRESH" data-variant="small" data-onclick="runAdvancedMonitoring()" data-text="הרץ בדיקות" title="הרץ בדיקות ניטור מתקדמות"></button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>📋 בדיקות סקריפטים</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="scriptTests" class="test-results">
+                                            <div class="loading">
+                                                <i class="fas fa-spinner fa-spin"></i>
+                                                טוען בדיקות סקריפטים...
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>🔗 בדיקות תלויות</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="dependencyTests" class="test-results">
+                                            <div class="loading">
+                                                <i class="fas fa-spinner fa-spin"></i>
+                                                טוען בדיקות תלויות...
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>⚡ בדיקות ביצועים</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="performanceTests" class="test-results">
+                                            <div class="loading">
+                                                <i class="fas fa-spinner fa-spin"></i>
+                                                טוען בדיקות ביצועים...
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>🎯 בדיקות ולידציה</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="validationTests" class="test-results">
+                                            <div class="loading">
+                                                <i class="fas fa-spinner fa-spin"></i>
+                                                טוען בדיקות ולידציה...
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- דוח ביצועים -->
                 <div class="content-section">
                     <div class="section-header">
@@ -246,9 +429,9 @@
         <script src="scripts/header-system.js?v=v6.0.0"></script>
         
         <!-- Page Configs and Initializer -->
+        <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script>
         <script src="scripts/page-initialization-configs.js?v=1.0.0"></script>
         <script src="scripts/unified-app-initializer.js?v=1.0.0"></script>
-        <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script>
         <script src="scripts/init-system/validators/runtime-validator.js?v=1.0.0"></script>
         <script src="scripts/init-system/dev-tools/script-analyzer.js?v=1.0.0"></script>
         <script src="scripts/init-system/dev-tools/page-template-generator.js?v=1.0.0"></script>

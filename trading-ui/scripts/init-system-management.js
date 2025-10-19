@@ -25,6 +25,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         await loadPerformanceReport();
         loadPackagesCheckboxes();
         
+        // Load advanced monitoring
+        await loadAdvancedMonitoring();
+        
         console.log('✅ Init System Management page initialized');
     } catch (error) {
         console.error('❌ Failed to initialize Init System Management page:', error);
@@ -1063,4 +1066,430 @@ function showNotification(message, type = 'info') {
     } else {
         console.log(`${type.toUpperCase()}: ${message}`);
     }
+}
+
+// ===== ADVANCED MONITORING SYSTEM =====
+
+/**
+ * Load advanced monitoring data
+ */
+async function loadAdvancedMonitoring() {
+    console.log('🔍 Loading advanced monitoring...');
+    
+    try {
+        await Promise.all([
+            loadScriptTests(),
+            loadDependencyTests(),
+            loadPerformanceTests(),
+            loadValidationTests()
+        ]);
+        
+        console.log('✅ Advanced monitoring loaded');
+    } catch (error) {
+        console.error('❌ Failed to load advanced monitoring:', error);
+        showNotification('שגיאה בטעינת ניטור מתקדם', 'error');
+    }
+}
+
+/**
+ * Load script tests
+ */
+async function loadScriptTests() {
+    const container = document.getElementById('scriptTests');
+    
+    try {
+        const tests = await runScriptTests();
+        displayTestResults(container, 'בדיקות סקריפטים', tests);
+    } catch (error) {
+        container.innerHTML = `<div class="error">שגיאה בטעינת בדיקות סקריפטים: ${error.message}</div>`;
+    }
+}
+
+/**
+ * Load dependency tests
+ */
+async function loadDependencyTests() {
+    const container = document.getElementById('dependencyTests');
+    
+    try {
+        const tests = await runDependencyTests();
+        displayTestResults(container, 'בדיקות תלויות', tests);
+    } catch (error) {
+        container.innerHTML = `<div class="error">שגיאה בטעינת בדיקות תלויות: ${error.message}</div>`;
+    }
+}
+
+/**
+ * Load performance tests
+ */
+async function loadPerformanceTests() {
+    const container = document.getElementById('performanceTests');
+    
+    try {
+        const tests = await runPerformanceTests();
+        displayTestResults(container, 'בדיקות ביצועים', tests);
+    } catch (error) {
+        container.innerHTML = `<div class="error">שגיאה בטעינת בדיקות ביצועים: ${error.message}</div>`;
+    }
+}
+
+/**
+ * Load validation tests
+ */
+async function loadValidationTests() {
+    const container = document.getElementById('validationTests');
+    
+    try {
+        const tests = await runValidationTests();
+        displayTestResults(container, 'בדיקות ולידציה', tests);
+    } catch (error) {
+        container.innerHTML = `<div class="error">שגיאה בטעינת בדיקות ולידציה: ${error.message}</div>`;
+    }
+}
+
+/**
+ * Run script tests
+ */
+async function runScriptTests() {
+    const tests = [];
+    
+    // Test 1: Check if all required scripts are loaded
+    const requiredScripts = [
+        'unified-app-initializer.js',
+        'package-manifest.js',
+        'page-initialization-configs.js',
+        'notification-system.js',
+        'ui-utils.js'
+    ];
+    
+    for (const script of requiredScripts) {
+        const isLoaded = document.querySelector(`script[src*="${script}"]`) !== null;
+        tests.push({
+            name: `סקריפט ${script}`,
+            status: isLoaded ? 'success' : 'error',
+            message: isLoaded ? 'נטען בהצלחה' : 'לא נטען',
+            details: isLoaded ? `סקריפט ${script} נמצא בעמוד` : `סקריפט ${script} חסר מהעמוד`
+        });
+    }
+    
+    // Test 2: Check script loading order
+    const scripts = Array.from(document.querySelectorAll('script[src]'));
+    const initScriptIndex = scripts.findIndex(s => s.src.includes('unified-app-initializer.js'));
+    const manifestScriptIndex = scripts.findIndex(s => s.src.includes('package-manifest.js'));
+    
+    const correctOrder = manifestScriptIndex < initScriptIndex;
+    tests.push({
+        name: 'סדר טעינת סקריפטים',
+        status: correctOrder ? 'success' : 'warning',
+        message: correctOrder ? 'סדר נכון' : 'סדר שגוי',
+        details: correctOrder ? 
+            'package-manifest.js נטען לפני unified-app-initializer.js' : 
+            'package-manifest.js צריך להיטען לפני unified-app-initializer.js'
+    });
+    
+    // Test 3: Check for duplicate scripts
+    const scriptSources = scripts.map(s => s.src);
+    const duplicates = scriptSources.filter((src, index) => scriptSources.indexOf(src) !== index);
+    
+    tests.push({
+        name: 'סקריפטים כפולים',
+        status: duplicates.length === 0 ? 'success' : 'error',
+        message: duplicates.length === 0 ? 'אין כפילויות' : `${duplicates.length} כפילויות נמצאו`,
+        details: duplicates.length === 0 ? 
+            'כל הסקריפטים נטענים פעם אחת בלבד' : 
+            `סקריפטים כפולים: ${duplicates.join(', ')}`
+    });
+    
+    return tests;
+}
+
+/**
+ * Run dependency tests
+ */
+async function runDependencyTests() {
+    const tests = [];
+    
+    // Test 1: Check package dependencies
+    if (window.PACKAGE_MANIFEST) {
+        const packages = Object.keys(window.PACKAGE_MANIFEST);
+        tests.push({
+            name: 'חבילות זמינות',
+            status: packages.length > 0 ? 'success' : 'error',
+            message: `${packages.length} חבילות זמינות`,
+            details: `חבילות: ${packages.join(', ')}`
+        });
+        
+        // Test 2: Check base package
+        const basePackage = window.PACKAGE_MANIFEST.base;
+        if (basePackage) {
+            tests.push({
+                name: 'חבילת Base',
+                status: 'success',
+                message: 'חבילת Base זמינה',
+                details: `${basePackage.scripts.length} סקריפטים בחבילת Base`
+            });
+        } else {
+            tests.push({
+                name: 'חבילת Base',
+                status: 'error',
+                message: 'חבילת Base חסרה',
+                details: 'חבילת Base חובה לכל העמודים'
+            });
+        }
+    } else {
+        tests.push({
+            name: 'מנפסט חבילות',
+            status: 'error',
+            message: 'מנפסט חבילות לא זמין',
+            details: 'window.PACKAGE_MANIFEST לא מוגדר'
+        });
+    }
+    
+    // Test 3: Check page configurations
+    if (window.PAGE_CONFIGS) {
+        const pageName = window.location.pathname.split('/').pop().replace('.html', '');
+        const pageConfig = window.PAGE_CONFIGS[pageName];
+        
+        if (pageConfig) {
+            tests.push({
+                name: 'קונפיגורציית עמוד',
+                status: 'success',
+                message: 'קונפיגורציה זמינה',
+                details: `עמוד ${pageName} מוגדר עם ${pageConfig.packages?.length || 0} חבילות`
+            });
+        } else {
+            tests.push({
+                name: 'קונפיגורציית עמוד',
+                status: 'warning',
+                message: 'קונפיגורציה חסרה',
+                details: `עמוד ${pageName} לא מוגדר ב-PAGE_CONFIGS`
+            });
+        }
+    }
+    
+    return tests;
+}
+
+/**
+ * Run performance tests
+ */
+async function runPerformanceTests() {
+    const tests = [];
+    
+    // Test 1: Check page load time
+    const loadTime = performance.now();
+    tests.push({
+        name: 'זמן טעינת עמוד',
+        status: loadTime < 1000 ? 'success' : loadTime < 3000 ? 'warning' : 'error',
+        message: `${Math.round(loadTime)}ms`,
+        details: loadTime < 1000 ? 'טעינה מהירה' : loadTime < 3000 ? 'טעינה בינונית' : 'טעינה איטית'
+    });
+    
+    // Test 2: Check memory usage
+    if (performance.memory) {
+        const memoryUsage = performance.memory.usedJSHeapSize / 1024 / 1024;
+        tests.push({
+            name: 'שימוש בזיכרון',
+            status: memoryUsage < 50 ? 'success' : memoryUsage < 100 ? 'warning' : 'error',
+            message: `${Math.round(memoryUsage)}MB`,
+            details: memoryUsage < 50 ? 'שימוש נמוך בזיכרון' : memoryUsage < 100 ? 'שימוש בינוני בזיכרון' : 'שימוש גבוה בזיכרון'
+        });
+    }
+    
+    // Test 3: Check script count
+    const scriptCount = document.querySelectorAll('script[src]').length;
+    tests.push({
+        name: 'מספר סקריפטים',
+        status: scriptCount < 20 ? 'success' : scriptCount < 30 ? 'warning' : 'error',
+        message: `${scriptCount} סקריפטים`,
+        details: scriptCount < 20 ? 'מספר סקריפטים סביר' : scriptCount < 30 ? 'מספר סקריפטים גבוה' : 'מספר סקריפטים גבוה מאוד'
+    });
+    
+    return tests;
+}
+
+/**
+ * Run validation tests
+ */
+async function runValidationTests() {
+    const tests = [];
+    
+    // Test 1: Check unified app initializer
+    if (window.unifiedAppInit) {
+        const status = window.unifiedAppInit.getStatus ? window.unifiedAppInit.getStatus() : 'unknown';
+        tests.push({
+            name: 'מערכת אתחול מאוחדת',
+            status: status === 'initialized' ? 'success' : 'warning',
+            message: status === 'initialized' ? 'מאותחלת' : 'לא מאותחלת',
+            details: `סטטוס: ${status}`
+        });
+    } else {
+        tests.push({
+            name: 'מערכת אתחול מאוחדת',
+            status: 'error',
+            message: 'לא זמינה',
+            details: 'window.unifiedAppInit לא מוגדר'
+        });
+    }
+    
+    // Test 2: Check notification system
+    if (window.NotificationSystem) {
+        tests.push({
+            name: 'מערכת התראות',
+            status: 'success',
+            message: 'זמינה',
+            details: 'window.NotificationSystem זמין'
+        });
+    } else {
+        tests.push({
+            name: 'מערכת התראות',
+            status: 'error',
+            message: 'לא זמינה',
+            details: 'window.NotificationSystem לא מוגדר'
+        });
+    }
+    
+    // Test 3: Check button system
+    if (window.ButtonSystem || window.advancedButtonSystem) {
+        tests.push({
+            name: 'מערכת כפתורים',
+            status: 'success',
+            message: 'זמינה',
+            details: 'מערכת כפתורים זמינה'
+        });
+    } else {
+        tests.push({
+            name: 'מערכת כפתורים',
+            status: 'error',
+            message: 'לא זמינה',
+            details: 'מערכת כפתורים לא מוגדרת'
+        });
+    }
+    
+    return tests;
+}
+
+/**
+ * Display test results
+ */
+function displayTestResults(container, title, tests) {
+    const totalTests = tests.length;
+    const passedTests = tests.filter(t => t.status === 'success').length;
+    const failedTests = tests.filter(t => t.status === 'error').length;
+    const warningTests = tests.filter(t => t.status === 'warning').length;
+    
+    // Add monitoring system explanation if there are errors
+    let explanationHtml = '';
+    if (failedTests > 0 || warningTests > 0) {
+        explanationHtml = `
+            <div class="monitoring-explanation">
+                <div class="alert alert-info">
+                    <h6><i class="fas fa-info-circle"></i> Monitoring System Detected Changes</h6>
+                    <p><strong>The monitoring system has detected changes in the page loading structure.</strong></p>
+                    <p>If these changes are intentional and correct, you need to update the monitoring system configuration:</p>
+                    <ol>
+                        <li><strong>Update Package Manifest:</strong> Add new scripts to the appropriate package in <code>package-manifest.js</code></li>
+                        <li><strong>Update Page Configuration:</strong> Add required packages and globals to the page config in <code>page-initialization-configs.js</code></li>
+                        <li><strong>Update Actual Page:</strong> Add the new script tags to the HTML page</li>
+                        <li><strong>Test and Validate:</strong> Run the monitoring system to verify everything is correct</li>
+                    </ol>
+                    <p><strong>📖 For detailed instructions:</strong> See <a href="/init-system-management" target="_blank">Initialization System Management</a> and the <a href="documentation/frontend/init-system/DEVELOPER_GUIDE.md" target="_blank">Developer Guide</a></p>
+                </div>
+            </div>
+        `;
+    }
+    
+    let html = `
+        <div class="test-summary">
+            <div class="test-stats">
+                <span class="badge bg-success">${passedTests} הצלחות</span>
+                <span class="badge bg-warning">${warningTests} אזהרות</span>
+                <span class="badge bg-danger">${failedTests} שגיאות</span>
+            </div>
+        </div>
+        ${explanationHtml}
+        <div class="test-list">
+    `;
+    
+    tests.forEach(test => {
+        const statusIcon = test.status === 'success' ? '✅' : test.status === 'warning' ? '⚠️' : '❌';
+        const statusClass = test.status === 'success' ? 'text-success' : test.status === 'warning' ? 'text-warning' : 'text-danger';
+        
+        html += `
+            <div class="test-item">
+                <div class="test-header">
+                    <span class="test-icon">${statusIcon}</span>
+                    <span class="test-name">${test.name}</span>
+                    <span class="test-status ${statusClass}">${test.message}</span>
+                </div>
+                <div class="test-details">${test.details}</div>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+/**
+ * Run advanced monitoring
+ */
+async function runAdvancedMonitoring() {
+    console.log('🔍 Running advanced monitoring...');
+    
+    try {
+        await loadAdvancedMonitoring();
+        showNotification('בדיקות ניטור מתקדמות הושלמו', 'success');
+    } catch (error) {
+        console.error('❌ Failed to run advanced monitoring:', error);
+        showNotification('שגיאה בהרצת בדיקות ניטור', 'error');
+    }
+}
+
+/**
+ * Copy detailed log
+ */
+function copyDetailedLog() {
+    const logData = {
+        timestamp: new Date().toISOString(),
+        page: window.location.pathname,
+        userAgent: navigator.userAgent,
+        tests: {
+            scripts: document.getElementById('scriptTests').innerHTML,
+            dependencies: document.getElementById('dependencyTests').innerHTML,
+            performance: document.getElementById('performanceTests').innerHTML,
+            validation: document.getElementById('validationTests').innerHTML
+        },
+        systemInfo: {
+            unifiedAppStatus: window.unifiedAppInit?.getStatus?.() || 'unknown',
+            packageManifest: window.PACKAGE_MANIFEST ? Object.keys(window.PACKAGE_MANIFEST) : [],
+            pageConfigs: window.PAGE_CONFIGS ? Object.keys(window.PAGE_CONFIGS) : [],
+            loadedScripts: Array.from(document.querySelectorAll('script[src]')).map(s => s.src)
+        }
+    };
+    
+    const logText = `
+=== TikTrack Advanced Monitoring Log ===
+תאריך: ${logData.timestamp}
+עמוד: ${logData.page}
+דפדפן: ${logData.userAgent}
+
+=== מערכת אתחול ===
+סטטוס: ${logData.systemInfo.unifiedAppStatus}
+חבילות זמינות: ${logData.systemInfo.packageManifest.join(', ')}
+קונפיגורציות עמודים: ${logData.systemInfo.pageConfigs.join(', ')}
+
+=== סקריפטים נטענים ===
+${logData.systemInfo.loadedScripts.map((script, index) => `${index + 1}. ${script}`).join('\n')}
+
+=== תוצאות בדיקות ===
+${JSON.stringify(logData.tests, null, 2)}
+    `.trim();
+    
+    navigator.clipboard.writeText(logText).then(() => {
+        showNotification('לוג מפורט הועתק ללוח', 'success');
+    }).catch(err => {
+        console.error('Failed to copy log:', err);
+        showNotification('שגיאה בהעתקת לוג', 'error');
+    });
 }

@@ -8,7 +8,9 @@
 
 ### 📋 Overview
 
-The Unified Initialization System is a revolutionary approach to JavaScript initialization in TikTrack, replacing 111 DOMContentLoaded listeners across 66 files with a single, efficient, hierarchical system.
+The Unified Initialization System is a monitoring and validation system for JavaScript initialization in TikTrack. The system provides centralized monitoring of script loading, real-time validation, and complete standardization of all 28 pages in the system.
+
+**⚠️ Important:** The system performs **monitoring and validation** only - not automatic script loading.
 
 ### 🎯 **Key Benefits**
 
@@ -81,6 +83,37 @@ The Unified Initialization System is a revolutionary approach to JavaScript init
 - **Systems:** State restoration, success notifications
 - **Dependencies:** All previous stages
 - **Duration:** ~0.2ms
+
+### **🚀 For Developers - Correct Workflow**
+
+**⚠️ Important:** The system performs **monitoring and validation** only. Updating page loading requires a two-step process:
+
+#### **Step 1: Update Monitoring System**
+```javascript
+// Update package-manifest.js - Define the package
+'base': {
+    scripts: [
+        { file: 'color-scheme-system.js', globalCheck: 'window.loadDynamicColors' }
+    ]
+}
+
+// Update page-initialization-configs.js - Define the page
+'cash_flows': {
+    packages: ['base', 'crud'],
+    requiredGlobals: ['NotificationSystem', 'DataUtils', 'window.formatDate']
+}
+```
+
+#### **Step 2: Update the Actual Page**
+```html
+<!-- Add the script to the page -->
+<script src="scripts/color-scheme-system.js?v=1.0.0"></script>
+```
+
+#### **Step 3: Testing and Validation**
+- Open the page and check the console
+- Run the monitoring system to verify everything is correct
+- Fix issues if necessary
 
 ### **🔧 Section State Persistence**
 The finalization stage includes comprehensive section state persistence:

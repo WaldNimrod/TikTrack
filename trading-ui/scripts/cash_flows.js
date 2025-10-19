@@ -1161,7 +1161,7 @@ async function loadUserPreferences() {
   try {
     console.log('🔧 טוען העדפות משתמש...');
     
-    // טעינת העדפות רלוונטיות לתזרימי מזומנים
+    // טעינת העדפות רלוונטיות לתזרימי מזומנים + צבעי ישויות
     const preferences = await window.getPreferencesByNames([
       'pagination_size_cash_flows',
       'auto_refresh_interval',
@@ -1169,7 +1169,32 @@ async function loadUserPreferences() {
       'show_currency_conversion',
       'date_format',
       'number_format',
-      'cash_flows_display_mode'
+      'cash_flows_display_mode',
+      // צבעי ישויות
+      'entityCashFlowColor',
+      'entityCashFlowColorLight',
+      'entityCashFlowColorDark',
+      'entityTradeColor',
+      'entityTradeColorLight',
+      'entityTradeColorDark',
+      'entityTickerColor',
+      'entityTickerColorLight',
+      'entityTickerColorDark',
+      'entityAlertColor',
+      'entityAlertColorLight',
+      'entityAlertColorDark',
+      'entityNoteColor',
+      'entityNoteColorLight',
+      'entityNoteColorDark',
+      'entityExecutionColor',
+      'entityExecutionColorLight',
+      'entityExecutionColorDark',
+      'entityTradePlanColor',
+      'entityTradePlanColorLight',
+      'entityTradePlanColorDark',
+      'entityTradingAccountColor',
+      'entityTradingAccountColorLight',
+      'entityTradingAccountColorDark'
     ]);
     
     // שמירת העדפות בגלובל scope

@@ -164,11 +164,11 @@ class HeaderSystem {
                         <li class="separator"></li>
                         
                         <!-- כלי פיתוח -->
-                        <li><a class="tiktrack-dropdown-item" href="/init-system-management.html">🚀 ניהול מערכת אתחול</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/init-system-management">🚀 ניהול מערכת אתחול</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/system-management">🔧 מנהל מערכת</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/page-scripts-matrix">📄 מטריקס JS</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/js-map">🗺️ מפת JS</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/linter-realtime-monitor.html">🔍 דשבורד Linter</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/linter-realtime-monitor">🔍 דשבורד Linter</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/chart-management">📊 ניהול גרפים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/css-management">🎨 מנהל CSS</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/crud-testing-dashboard">🧪 בדיקות CRUD</a></li>

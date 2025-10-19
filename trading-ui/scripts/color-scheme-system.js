@@ -47,6 +47,271 @@ const VALID_ENTITY_TYPES = [
   'preference',       // העדפות
 ];
 
+// ===== PAGE ENTITY COLOR MAPPING =====
+// מיפוי צבעי ישויות לפי עמודים
+
+/**
+ * מיפוי עמודים לצבעי ישויות
+ */
+const PAGE_ENTITY_MAP = {
+  // עמודי משתמש
+  'cash-flows-page': 'cash_flow',
+  'trades-page': 'trade', 
+  'tickers-page': 'ticker',
+  'alerts-page': 'alert',
+  'notes-page': 'note',
+  'constraints-page': 'constraint',
+  'designs-page': 'design',
+  'preferences-page': 'preference',
+  'executions-page': 'execution',
+  'trade-plans-page': 'trade_plan',
+  'trading-accounts-page': 'account',
+  'research-page': 'research',
+  'db-display-page': 'preference',
+  'db-extradata-page': 'preference',
+  
+  // עמודי כלי פיתוח
+  'development-page': 'preference',
+  'system-management-page': 'preference',
+  'cache-management-page': 'preference',
+  'database-management-page': 'preference',
+  'logs-page': 'preference',
+  'performance-page': 'preference',
+  'api-testing-page': 'preference',
+  'backup-page': 'preference'
+};
+
+/**
+ * הגדרת צבע ישות נוכחי לפי העמוד - מטען מהעדפות המשתמש
+ */
+async function setCurrentEntityColorFromPage() {
+  const body = document.body;
+  if (!body) {
+    console.warn('🎨 No body element found');
+    return;
+  }
+  
+  console.log('🎨 Body classes:', body.classList.toString());
+  
+  // מציאת ה-class של העמוד
+  const pageClass = findPageClass(body);
+  if (!pageClass) {
+    console.warn('🎨 No page class found, using default color');
+    setDefaultCurrentEntityColor();
+    return;
+  }
+  
+  console.log('🎨 Found page class:', pageClass);
+  
+  // מציאת סוג הישות המתאים
+  const entityType = PAGE_ENTITY_MAP[pageClass];
+  if (!entityType) {
+    console.warn(`🎨 No entity mapping for page class: ${pageClass}`);
+    setDefaultCurrentEntityColor();
+    return;
+  }
+  
+  console.log('🎨 Mapped to entity type:', entityType);
+  
+         // טעינת צבע מהעדפות המשתמש - כל שלושת הוריאנטים
+         try {
+           const colorVariants = await getAllEntityColorVariantsFromPreferences(entityType);
+           console.log('🎨 Retrieved color variants from preferences:', colorVariants);
+           
+           if (colorVariants.primary) {
+             document.documentElement.style.setProperty('--current-entity-color', colorVariants.primary);
+             console.log(`🎨 Set current entity color for ${pageClass} (${entityType}): ${colorVariants.primary}`);
+           } else {
+             console.warn('🎨 No primary color found in preferences, using fallback');
+             const fallbackColor = getEntityColor(entityType);
+             document.documentElement.style.setProperty('--current-entity-color', fallbackColor);
+             console.log(`🎨 Set fallback color for ${pageClass} (${entityType}): ${fallbackColor}`);
+           }
+           
+           // הגדרת הוריאנטים הבהיר והכהה
+           if (colorVariants.light) {
+             document.documentElement.style.setProperty(`--entity-${entityType}-color-light`, colorVariants.light);
+             console.log(`🎨 Set light variant for ${entityType}: ${colorVariants.light}`);
+           }
+           
+           if (colorVariants.dark) {
+             document.documentElement.style.setProperty(`--entity-${entityType}-color-dark`, colorVariants.dark);
+             console.log(`🎨 Set dark variant for ${entityType}: ${colorVariants.dark}`);
+           }
+           
+         } catch (error) {
+           console.warn('🎨 Failed to load color variants from preferences:', error);
+           const fallbackColor = getEntityColor(entityType);
+           document.documentElement.style.setProperty('--current-entity-color', fallbackColor);
+           console.log(`🎨 Set fallback color for ${pageClass} (${entityType}): ${fallbackColor}`);
+         }
+}
+
+/**
+ * מציאת ה-class של העמוד
+ */
+function findPageClass(body) {
+  const classList = body.classList;
+  
+  // חיפוש class שמסתיים ב-page
+  for (let className of classList) {
+    if (className.endsWith('-page')) {
+      return className;
+    }
+  }
+  
+  return null;
+}
+
+/**
+ * קבלת צבע ישות מהעדפות המשתמש - כל הוריאנטים
+ * Get entity color from user preferences - all variants
+ * 
+ * @param {string} entityType - סוג הישות
+ * @param {string} variant - הוריאנט: 'primary', 'light', 'dark' (ברירת מחדל: 'primary')
+ * @returns {Promise<string>} קוד הצבע
+ */
+async function getEntityColorFromPreferences(entityType, variant = 'primary') {
+  try {
+    console.log(`🎨 getEntityColorFromPreferences called with: ${entityType}, ${variant}`);
+    
+    // טעינת העדפות המשתמש
+    if (typeof window.loadUserPreferences === 'function') {
+      const success = await window.loadUserPreferences();
+      if (!success) {
+        console.warn('🎨 Failed to load user preferences');
+        return null;
+      }
+    }
+    
+    // קבלת העדפות מהמטמון הגלובלי - UnifiedCacheManager
+    let preferences = {};
+    if (window.UnifiedCacheManager) {
+      try {
+        preferences = await window.UnifiedCacheManager.get('user-preferences') || {};
+        console.log('🎨 Retrieved preferences from UnifiedCacheManager:', Object.keys(preferences));
+      } catch (error) {
+        console.warn('🎨 Failed to get preferences from UnifiedCacheManager:', error);
+      }
+    }
+    
+    // Fallback - נסה לקבל ישירות מהשרת
+    if (Object.keys(preferences).length === 0 && typeof window.getAllUserPreferences === 'function') {
+      try {
+        const allPrefs = await window.getAllUserPreferences();
+        preferences = allPrefs || {};
+        console.log('🎨 Retrieved preferences from getAllUserPreferences:', Object.keys(preferences));
+      } catch (error) {
+        console.warn('🎨 Failed to get preferences from getAllUserPreferences:', error);
+      }
+    }
+    
+    console.log('🎨 Final preferences object:', Object.keys(preferences));
+    
+    // מיפוי סוג ישות לשמות העדפות לכל הוריאנטים
+    const entityPreferenceMap = {
+      'cash_flow': {
+        primary: 'entityCashFlowColor',
+        light: 'entityCashFlowColorLight', 
+        dark: 'entityCashFlowColorDark'
+      },
+      'trade': {
+        primary: 'entityTradeColor',
+        light: 'entityTradeColorLight',
+        dark: 'entityTradeColorDark'
+      },
+      'trade_plan': {
+        primary: 'entityTradePlanColor',
+        light: 'entityTradePlanColorLight',
+        dark: 'entityTradePlanColorDark'
+      },
+      'execution': {
+        primary: 'entityExecutionColor',
+        light: 'entityExecutionColorLight',
+        dark: 'entityExecutionColorDark'
+      },
+      'account': {
+        primary: 'entityTradingAccountColor',
+        light: 'entityTradingAccountColorLight',
+        dark: 'entityTradingAccountColorDark'
+      },
+      'ticker': {
+        primary: 'entityTickerColor',
+        light: 'entityTickerColorLight',
+        dark: 'entityTickerColorDark'
+      },
+      'alert': {
+        primary: 'entityAlertColor',
+        light: 'entityAlertColorLight',
+        dark: 'entityAlertColorDark'
+      },
+      'note': {
+        primary: 'entityNoteColor',
+        light: 'entityNoteColorLight',
+        dark: 'entityNoteColorDark'
+      }
+    };
+    
+    const entityMapping = entityPreferenceMap[entityType];
+    if (!entityMapping) {
+      console.warn(`🎨 No preference mapping for entity type: ${entityType}`);
+      return null;
+    }
+    
+    const preferenceKey = entityMapping[variant];
+    if (!preferenceKey) {
+      console.warn(`🎨 No preference mapping for variant: ${variant} of entity: ${entityType}`);
+      return null;
+    }
+    
+    const color = preferences[preferenceKey];
+    console.log(`🎨 Looking for preference key: ${preferenceKey}, found: ${color}`);
+    if (color) {
+      console.log(`🎨 Found ${entityType} ${variant} color in preferences: ${color}`);
+      return color;
+    } else {
+      console.warn(`🎨 No ${variant} color found in preferences for ${entityType} (key: ${preferenceKey})`);
+      return null;
+    }
+    
+  } catch (error) {
+    console.error('🎨 Error loading entity color from preferences:', error);
+    return null;
+  }
+}
+
+/**
+ * קבלת כל הוריאנטים של צבע ישות מהעדפות המשתמש
+ * Get all variants of entity color from user preferences
+ * 
+ * @param {string} entityType - סוג הישות
+ * @returns {Promise<Object>} אובייקט עם כל הוריאנטים
+ */
+async function getAllEntityColorVariantsFromPreferences(entityType) {
+  try {
+    const variants = {};
+    
+    // קבלת כל הוריאנטים
+    variants.primary = await getEntityColorFromPreferences(entityType, 'primary');
+    variants.light = await getEntityColorFromPreferences(entityType, 'light');
+    variants.dark = await getEntityColorFromPreferences(entityType, 'dark');
+    
+    console.log(`🎨 Loaded all color variants for ${entityType}:`, variants);
+    return variants;
+    
+  } catch (error) {
+    console.error('🎨 Error loading all entity color variants:', error);
+    return { primary: null, light: null, dark: null };
+  }
+}
+
+/**
+ * הגדרת צבע ברירת מחדל
+ */
+function setDefaultCurrentEntityColor() {
+  document.documentElement.style.setProperty('--current-entity-color', '#26baac');
+}
+
 // ===== DYNAMIC COLOR SCHEME =====
 // מערכת צבעים דינמית
 
@@ -2618,9 +2883,20 @@ async function loadDynamicColors() {
 
 // Export functions
 window.loadDynamicColors = loadDynamicColors;
+window.setCurrentEntityColorFromPage = setCurrentEntityColorFromPage;
+window.getEntityColorFromPreferences = getEntityColorFromPreferences;
+window.getAllEntityColorVariantsFromPreferences = getAllEntityColorVariantsFromPreferences;
 
 // הוסר - המערכת המאוחדת מטפלת באתחול
 // Auto-load on DOM ready
 // document.addEventListener('DOMContentLoaded', loadDynamicColors);
 
+// Set current entity color when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => setCurrentEntityColorFromPage());
+} else {
+    setCurrentEntityColorFromPage();
+}
+
 // Color Scheme System loaded successfully
+}

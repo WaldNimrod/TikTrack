@@ -394,12 +394,31 @@ tr:has(.actions-cell) {
 }
 
 /* כפתור הטריגר - השתמש במערכת הכפתורים המרכזית */
+.actions-menu-wrapper .actions-trigger {
+  /* רקע לבן ומסגרת בצבע הישות */
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  font-size: 16px;
+  border: 1px solid var(--current-entity-color, #26baac) !important;
+  background: white !important;
+  color: var(--current-entity-color, #26baac) !important;
+  transform: none; /* דרוס את ה-transform של המערכת המרכזית */
+}
+
+.actions-menu-wrapper .actions-trigger:hover {
+  background: var(--current-entity-color, #26baac) !important;
+  border-color: var(--current-entity-color, #26baac) !important;
+  color: white !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
 
 /* התפריט הנפתח */
 .actions-menu-popup {
   position: fixed;
   background: white; /* רקע לבן */
-  border: 1px solid var(--entity-primary-color, #26baac); /* מסגרת בצבע הישות */
+  border: 1px solid var(--current-entity-color, #26baac); /* מסגרת בצבע הישות */
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   min-width: 120px;

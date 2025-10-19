@@ -899,6 +899,20 @@ class UnifiedAppInitializer {
         
         return report;
     }
+
+    /**
+     * Get current system status
+     */
+    getStatus() {
+        return {
+            initialized: this.initialized,
+            initializationInProgress: this.initializationInProgress,
+            pageInfo: this.pageInfo,
+            availableSystems: Array.from(this.availableSystems),
+            performanceMetrics: this.performanceMetrics,
+            pageConfig: this.pageConfig
+        };
+    }
 }
 
 // ===== GLOBAL INSTANCE =====

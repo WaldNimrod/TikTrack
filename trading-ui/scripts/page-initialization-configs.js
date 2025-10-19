@@ -194,11 +194,18 @@ const PAGE_CONFIGS = {
         customInitializers: [
             async (pageConfig) => {
                 console.log('🏦 Initializing Trading Accounts...');
+                console.log('🔍 Checking function availability:');
+                console.log('  - loadTradingAccountsDataForTradingAccountsPage:', typeof window.loadTradingAccountsDataForTradingAccountsPage);
+                console.log('  - loadAccountsData:', typeof window.loadAccountsData);
                 
                 if (typeof window.loadTradingAccountsDataForTradingAccountsPage === 'function') {
+                    console.log('📡 Calling loadTradingAccountsDataForTradingAccountsPage...');
                     await window.loadTradingAccountsDataForTradingAccountsPage();
                 } else if (typeof window.loadAccountsData === 'function') {
+                    console.log('📡 Calling loadAccountsData...');
                     await window.loadAccountsData();
+                } else {
+                    console.log('⚠️ No suitable function found for loading trading accounts data');
                 }
             }
         ]

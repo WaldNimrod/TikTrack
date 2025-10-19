@@ -283,9 +283,81 @@ const PACKAGE_MANIFEST = {
     dependencies: ['base'],
     scripts: [
       {
+        file: 'system-management/core/sm-base.js',
+        globalCheck: 'window.SMBaseSection',
+        description: 'Base classes for system management',
+        required: true
+      },
+      {
+        file: 'system-management/core/sm-error-handler.js',
+        globalCheck: 'window.SMErrorHandler',
+        description: 'Error handling for system management',
+        required: true
+      },
+      {
+        file: 'system-management/core/sm-ui-components.js',
+        globalCheck: 'window.SMUIComponents',
+        description: 'UI components for system management',
+        required: true
+      },
+      {
+        file: 'system-management/system-management-main.js',
+        globalCheck: 'window.SystemManagementMain',
+        description: 'Main orchestrator for system management',
+        required: true
+      },
+      {
+        file: 'system-management/sections/sm-section-dashboard.js',
+        globalCheck: 'window.SMSectionDashboard',
+        description: 'Dashboard section',
+        required: true
+      },
+      {
+        file: 'system-management/sections/sm-section-server.js',
+        globalCheck: 'window.SMSectionServer',
+        description: 'Server section',
+        required: true
+      },
+      {
+        file: 'system-management/sections/sm-section-cache.js',
+        globalCheck: 'window.SMSectionCache',
+        description: 'Cache section',
+        required: true
+      },
+      {
+        file: 'system-management/sections/sm-section-external-data.js',
+        globalCheck: 'window.SMSectionExternalData',
+        description: 'External data section',
+        required: true
+      },
+      {
+        file: 'system-management/sections/sm-section-database.js',
+        globalCheck: 'window.SMSectionDatabase',
+        description: 'Database section',
+        required: true
+      },
+      {
+        file: 'system-management/sections/sm-section-alerts.js',
+        globalCheck: 'window.SMSectionAlerts',
+        description: 'Alerts section',
+        required: true
+      },
+      {
+        file: 'system-management/sections/sm-section-background-tasks.js',
+        globalCheck: 'window.SMSectionBackgroundTasks',
+        description: 'Background tasks section',
+        required: true
+      },
+      {
+        file: 'system-management/sections/sm-section-operations.js',
+        globalCheck: 'window.SMSectionOperations',
+        description: 'Operations section',
+        required: true
+      },
+      {
         file: 'system-management.js',
         globalCheck: 'window.SystemManagement',
-        description: 'ניהול מערכת',
+        description: 'Legacy system management',
         required: false
       },
       {
@@ -301,8 +373,8 @@ const PACKAGE_MANIFEST = {
         required: false
       }
     ],
-    estimatedSize: '~180KB',
-    initTime: '~90ms'
+    estimatedSize: '~300KB',
+    initTime: '~150ms'
   },
 
   // 8. DEVELOPMENT TOOLS PACKAGE

@@ -2179,12 +2179,19 @@ function getSubHeaderOpacityHex() {
   });
   
   // אחרי טעינת ההעדפות, עדכן את הכותרות עם הצבעים החדשים
-  const bodyClass = document.body.className;
-  if (bodyClass) {
-    // חילוץ סוג הישות מהקלאס של הגוף
-    const entityType = bodyClass.split(' ').find(cls => 
-      ['tickers-page', 'trades-page', 'accounts-page', 'alerts-page', 'cash-flows-page', 'test-header-only'].includes(cls)
-    );
+  function updateEntityColors() {
+    const bodyElement = document.body;
+    if (!bodyElement) {
+      console.warn('⚠️ Document body not available yet, skipping color scheme update');
+      return;
+    }
+    
+    const bodyClass = bodyElement.className;
+    if (bodyClass) {
+      // חילוץ סוג הישות מהקלאס של הגוף
+      const entityType = bodyClass.split(' ').find(cls => 
+        ['tickers-page', 'trades-page', 'accounts-page', 'alerts-page', 'cash-flows-page', 'test-header-only'].includes(cls)
+      );
     
     if (entityType) {
       let type = entityType.replace('-page', '');
@@ -2207,6 +2214,9 @@ function getSubHeaderOpacityHex() {
       }
     }
   }
+  
+  // קריאה לפונקציה
+  updateEntityColors();
 // });
 
 // ===== COLOR SCHEME MANAGEMENT FUNCTIONS =====

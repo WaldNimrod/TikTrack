@@ -300,7 +300,7 @@ class ActionsMenuSystem {
         
         return `
             <div class="actions-menu-wrapper">
-                <button class="btn-icon actions-trigger" title="פעולות">⋮</button>
+                <button class="btn actions-trigger" title="פעולות">⚙️</button>
                 <div class="actions-menu-popup">
                     ${menuButtons}
                 </div>
@@ -381,14 +381,25 @@ class ActionsMenuSystem {
         const popup = wrapper.querySelector('.actions-menu-popup');
         const trigger = wrapper.querySelector('.actions-trigger');
         
-        if (!popup || !trigger) return;
+        // Debug logs removed - system working correctly
+        
+        if (!popup || !trigger) {
+            console.log('❌ [Actions Menu Debug] Missing popup or trigger');
+            return;
+        }
         
         const triggerRect = trigger.getBoundingClientRect();
+        console.log('🔧 [Actions Menu Debug] Trigger rect:', triggerRect);
         
         // מיקום התפריט מימין לכפתור (לכיוון מרכז הטבלה)
         // מיקום קרוב מאוד לכפתור ועוד יותר גבוה
         popup.style.top = `${triggerRect.top - 12}px`; // 12px יותר גבוה (במקום 8px)
         popup.style.left = `${triggerRect.right - 2}px`; // 2px חופף לכפתור (במקום 1px)
+        
+        console.log('🔧 [Actions Menu Debug] Popup positioned at:', {
+            top: popup.style.top,
+            left: popup.style.left
+        });
     }
 
     /**
@@ -401,7 +412,16 @@ class ActionsMenuSystem {
         document.addEventListener('mouseenter', (e) => {
             if (e.target && typeof e.target.closest === 'function' && e.target.closest('.actions-menu-wrapper')) {
                 console.log('🎯 [Actions Menu Debug] Mouse entered actions menu');
-                this.positionPopup(e.target.closest('.actions-menu-wrapper'));
+                const wrapper = e.target.closest('.actions-menu-wrapper');
+                const popup = wrapper.querySelector('.actions-menu-popup');
+                console.log('🔍 [Actions Menu Debug] Popup element:', popup);
+                console.log('🔍 [Actions Menu Debug] Popup styles:', {
+                    opacity: popup.style.opacity,
+                    visibility: popup.style.visibility,
+                    display: popup.style.display
+                });
+                console.log('🔍 [Actions Menu Debug] Wrapper HTML:', wrapper.innerHTML);
+                this.positionPopup(wrapper);
             }
         }, true);
         

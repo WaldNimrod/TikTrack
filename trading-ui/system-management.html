@@ -157,8 +157,8 @@
                                                     </tr>
                                                 </tbody>
                                             </table>
-                                        </div>
-                                    </div>
+                                            </div>
+                                            </div>
                                 </div>
                             </div>
                             
@@ -875,6 +875,7 @@
     <script src="scripts/global-favicon.js"></script>
     <script src="scripts/translation-utils.js"></script>
     <script src="scripts/ui-utils.js"></script>
+    <script src="scripts/button-icons.js"></script>
     <script src="scripts/button-system-init.js?v=1.0.0"></script>
     <script src="scripts/data-utils.js"></script>
     <script src="scripts/notification-system.js"></script>
@@ -919,10 +920,152 @@
     <!-- Local copyDetailedLog function for system-management page -->
     <script>
         // Define copyDetailedLog function first
-        function copyDetailedLog() {
-            console.log('📋 copyDetailedLog called - collecting system data...');
-            // Implementation will be added later
-            alert('פונקציית העתקת לוג מפורט - בפיתוח');
+        async function copyDetailedLog() {
+            try {
+                const timestamp = new Date().toLocaleString('he-IL');
+                const log = [];
+
+                log.push('=== לוג מפורט - ניהול מערכת ===');
+                log.push(`זמן יצירה: ${timestamp}`);
+                log.push(`עמוד: ${window.location.href}`);
+                log.push('');
+
+                // 1. מצב כללי של העמוד
+                log.push('--- מצב כללי של העמוד ---');
+                const sections = document.querySelectorAll('.content-section');
+                sections.forEach((section, index) => {
+                    const header = section.querySelector('.section-header h2');
+                    const body = section.querySelector('.section-body, .card-body');
+                    const isOpen = body && body.style.display !== 'none' && !section.classList.contains('collapsed');
+                    const title = header ? header.textContent.trim() : `סקשן ${index + 1}`;
+                    log.push(`  ${index + 1}. "${title}" (${section.id}): ${isOpen ? 'פתוח' : 'סגור'}`);
+                });
+
+                // 2. סטטיסטיקות מערכת
+                log.push('');
+                log.push('--- סטטיסטיקות מערכת ---');
+                const systemStats = [
+                    'overallHealthStatus', 'systemScore', 'responseTime', 'uptime',
+                    'serverHealthStats', 'databaseHealthStats', 'cacheHealthStats', 'networkHealthStats',
+                    'cpuUsage', 'memoryUsage', 'diskUsage', 'networkStatus',
+                    'activeProvidersCount', 'lastDataUpdate', 'dataAccuracy', 'cacheStatus',
+                    'errorCount', 'warningCount', 'infoCount', 'totalAlerts'
+                ];
+                
+                systemStats.forEach(statId => {
+                    const element = document.getElementById(statId);
+                    if (element) {
+                        const value = element.textContent.trim();
+                        const visible = element.offsetParent !== null ? 'נראה' : 'לא נראה';
+                        log.push(`  ${statId}: ${value} (${visible})`);
+                    }
+                });
+
+                // 3. כפתורים וקונטרולים
+                log.push('');
+                log.push('--- כפתורים וקונטרולים ---');
+                const buttonIds = [
+                    'refreshSystemDataBtn', 'runSystemCheckBtn', 'clearCacheBtn', 'runBackupBtn',
+                    'restoreFromBackupBtn', 'checkDependenciesBtn', 'copyCheckResultsBtn',
+                    'copyDetailedLogBtn', 'toggleAllSectionsBtn', 'quickRestartSystemBtn',
+                    'changeModeSystemBtn', 'openServerMonitorBtn'
+                ];
+                
+                buttonIds.forEach(btnId => {
+                    const btn = document.getElementById(btnId);
+                    if (btn) {
+                        const visible = btn.offsetParent !== null ? 'נראה' : 'לא נראה';
+                        const disabled = btn.disabled ? 'מבוטל' : 'פעיל';
+                        const text = btn.textContent.trim() || btn.value || 'ללא טקסט';
+                        log.push(`  ${btnId}: ${visible} - ${disabled} - "${text}"`);
+                    }
+                });
+
+                // 4. תוצאות בדיקות מערכת
+                log.push('');
+                log.push('--- תוצאות בדיקות מערכת ---');
+                const checkResults = document.querySelectorAll('.check-result, .system-check-item, .health-check-item');
+                log.push(`  מספר בדיקות: ${checkResults.length}`);
+                checkResults.forEach((result, index) => {
+                    const status = result.querySelector('.status, .badge, .status-value')?.textContent.trim() || 'לא ידוע';
+                    const description = result.querySelector('.description, .text, .check-name')?.textContent.trim() || 'ללא תיאור';
+                    log.push(`    ${index + 1}. ${status}: ${description}`);
+                });
+
+                // 5. רשימת ספקים
+                log.push('');
+                log.push('--- רשימת ספקים ---');
+                const providerList = document.getElementById('providerList');
+                if (providerList) {
+                    const providers = providerList.querySelectorAll('.provider-item, .provider-card');
+                    log.push(`  מספר ספקים: ${providers.length}`);
+                    providers.forEach((provider, index) => {
+                        const name = provider.querySelector('.provider-name, .card-title')?.textContent.trim() || 'ללא שם';
+                        const status = provider.querySelector('.provider-status, .badge')?.textContent.trim() || 'לא ידוע';
+                        log.push(`    ${index + 1}. ${name}: ${status}`);
+                    });
+                }
+
+                // 6. מידע טכני
+                log.push('');
+                log.push('--- מידע טכני ---');
+                log.push(`  זמן יצירת הלוג: ${timestamp}`);
+                log.push(`  גרסת דפדפן: ${navigator.userAgent}`);
+                log.push(`  רזולוציה מסך: ${screen.width}x${screen.height}`);
+                log.push(`  גודל חלון: ${window.innerWidth}x${window.innerHeight}`);
+                
+                if (performance.timing) {
+                    const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+                    log.push(`  זמן טעינת עמוד: ${loadTime}ms`);
+                }
+                
+                if (navigator.deviceMemory) {
+                    log.push(`  זיכרון זמין: ${navigator.deviceMemory}GB`);
+                }
+                
+                log.push(`  שפת דפדפן: ${navigator.language}`);
+                log.push(`  פלטפורמה: ${navigator.platform}`);
+
+                // 7. מידע על המערכת המאוחדת
+                log.push('');
+                log.push('--- מערכת אתחול מאוחדת ---');
+                log.push(`  UnifiedAppInitializer: ${typeof window.UnifiedAppInitializer !== 'undefined' ? 'זמין' : 'לא זמין'}`);
+                log.push(`  UnifiedCacheManager: ${typeof window.UnifiedCacheManager !== 'undefined' ? 'זמין' : 'לא זמין'}`);
+                log.push(`  UnifiedLogManager: ${typeof window.UnifiedLogManager !== 'undefined' ? 'זמין' : 'לא זמין'}`);
+                log.push(`  SystemManagement: ${typeof window.SystemManagement !== 'undefined' ? 'זמין' : 'לא זמין'}`);
+
+                // 8. שגיאות והערות מהקונסולה
+                log.push('');
+                log.push('--- שגיאות והערות מהקונסולה ---');
+                log.push('  ⚠️ חשוב: הלוג המפורט חייב לכלול שגיאות קונסולה לאבחון בעיות');
+                log.push('  📋 הוראות: פתח את Developer Tools (F12) > Console');
+                log.push('  📋 העתק את כל השגיאות וההערות מהקונסולה');
+                log.push('  📋 הוסף אותן ללוג המפורט לפני שליחה');
+
+                log.push('');
+                log.push('=== סוף לוג ===');
+                
+                const detailedLogText = log.join('\n');
+                
+                // Copy to clipboard
+                await navigator.clipboard.writeText(detailedLogText);
+                
+                // Show success notification
+                if (typeof window.showSuccessNotification === 'function') {
+                    window.showSuccessNotification('לוג מפורט הועתק ללוח', 'הלוג מכיל את כל מה שרואה המשתמש בעמוד');
+                } else if (typeof window.showNotification === 'function') {
+                    window.showNotification('לוג מפורט הועתק ללוח', 'success');
+                } else {
+                    alert('לוג מפורט הועתק ללוח!');
+                }
+            } catch (error) {
+                console.error('שגיאה בהעתקת הלוג המפורט:', error);
+                if (typeof window.showErrorNotification === 'function') {
+                    window.showErrorNotification('שגיאה בהעתקת הלוג', error.message);
+                } else {
+                    alert('שגיאה בהעתקת הלוג: ' + error.message);
+                }
+            }
         }
         
         // Make the local copyDetailedLog function available globally for this page only
@@ -1135,8 +1278,10 @@
             }
         };
         
-        // Initialize background task log listener
+        // Initialize background task log listener using polling instead of WebSocket
         let backgroundTaskLogListenerInitialized = false;
+        let backgroundTaskPollingInterval = null;
+        
         function initializeBackgroundTaskLogListener() {
             if (backgroundTaskLogListenerInitialized) {
                 console.log('⚠️ Background task log listener already initialized, skipping');
@@ -1145,36 +1290,45 @@
             backgroundTaskLogListenerInitialized = true;
             
             try {
-                // Listen for background task log events from server
-                if (window.io && window.io.socket) {
-                    window.io.socket.on('background_task_log', async (logData) => {
-                        try {
-                            console.log('📥 Received background task log in system-management:', logData);
-                            
-                            // Save to IndexedDB using unified cache system
-                            if (window.saveBackgroundTaskLog) {
-                                await window.saveBackgroundTaskLog(logData.task_name, {
-                                    status: logData.status,
-                                    duration_ms: logData.duration_ms,
-                                    result: logData.result,
-                                    error: logData.error,
-                                    user_id: logData.user_id
-                                });
+                console.log('🔧 Initializing background task log listener using polling...');
+                
+                // Use polling instead of WebSocket for background task updates
+                if (backgroundTaskPollingInterval) {
+                    clearInterval(backgroundTaskPollingInterval);
+                }
+                
+                // Poll for background task updates every 30 seconds
+                backgroundTaskPollingInterval = setInterval(async () => {
+                    try {
+                        // Check for new background task logs via API
+                        const response = await fetch('/api/background-tasks/recent-logs?limit=10');
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.logs && data.logs.length > 0) {
+                                console.log('📊 Found new background task logs:', data.logs.length);
                                 
-                                // Refresh the log display if it's currently showing background tasks
-                                const currentLogType = document.querySelector('#unified-logs-container')?.getAttribute('data-current-log-type');
+                                // Process new logs
+                                for (const log of data.logs) {
+                            if (window.saveBackgroundTaskLog) {
+                                        await window.saveBackgroundTaskLog(log.task_name, {
+                                            status: log.status,
+                                            duration_ms: log.duration_ms,
+                                            result: log.result,
+                                            error: log.error,
+                                            user_id: log.user_id
+                                        });
+                                    }
+                                }
+                            }
                             }
                         } catch (error) {
-                            console.error('❌ Error processing background task log in system-management:', error);
+                        console.warn('⚠️ Failed to poll for background task logs:', error);
                         }
-                    });
+                }, 30000); // Poll every 30 seconds
                     
-                    console.log('✅ Background task log listener initialized in system-management');
-                } else {
-                    console.warn('⚠️ Socket.IO not available for background task log listening in system-management');
-                }
+                console.log('✅ Background task log listener initialized with polling');
             } catch (error) {
-                console.error('❌ Failed to initialize background task log listener in system-management:', error);
+                console.error('❌ Failed to initialize background task log listener:', error);
             }
         }
         

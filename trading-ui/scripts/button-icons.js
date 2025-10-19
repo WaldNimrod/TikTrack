@@ -38,7 +38,8 @@ const BUTTON_ICONS = {
   CHECK: '✓',
   TOGGLE: '▼',
   SORT: '↕️',
-  COPY: '📋'
+  COPY: '📋',
+  MENU: '⚙️'
 };
 
 const BUTTON_TEXTS = {
@@ -68,7 +69,8 @@ const BUTTON_TEXTS = {
   CHECK: 'סמן',
   TOGGLE: 'הצג/הסתר',
   SORT: 'מיון',
-  COPY: 'העתק'
+  COPY: 'העתק',
+  MENU: 'תפריט'
 };
 
 /**
@@ -102,13 +104,14 @@ function getButtonClass(type) {
     STOP: 'btn',
     TOGGLE: 'btn',
     SORT: 'btn',
-    COPY: 'btn'
+    COPY: 'btn',
+    MENU: 'btn'
   };
   return classMap[type.toUpperCase()] || 'btn';
 }
 
 // Buttons that support entity color variants
-window.ENTITY_VARIANT_BUTTONS = ['CLOSE', 'ADD', 'LINK', 'SAVE'];
+window.ENTITY_VARIANT_BUTTONS = ['CLOSE', 'ADD', 'LINK', 'SAVE', 'MENU'];
 
 window.supportsEntityVariant = function(buttonType) {
     return window.ENTITY_VARIANT_BUTTONS.includes(buttonType.toUpperCase());

@@ -1038,7 +1038,70 @@ window.getPageInitSummary = function(pageName) {
 
 // ===== GLOBAL EXPORT =====
 
+// ===== SMART PAGE CONFIGS CLASS =====
+
+/**
+ * Smart Page Configs Manager
+ * מנהל קונפיגורציות עמודים חכמות
+ */
+class SmartPageConfigs {
+    /**
+     * Get configuration for a specific page
+     * קבלת קונפיגורציה לעמוד ספציפי
+     */
+    static getConfig(pageName) {
+        return SMART_PAGE_CONFIGS[pageName] || null;
+    }
+
+    /**
+     * Validate page configuration
+     * ולידציה של קונפיגורציית עמוד
+     */
+    static validateConfig(pageName) {
+        const config = this.getConfig(pageName);
+        if (!config) {
+            return { valid: false, error: `Configuration not found for page: ${pageName}` };
+        }
+
+        const requiredFields = ['name', 'template', 'packages'];
+        for (const field of requiredFields) {
+            if (!config[field]) {
+                return { valid: false, error: `Missing required field: ${field}` };
+            }
+        }
+
+        return { valid: true };
+    }
+
+    /**
+     * Get template for a page
+     * קבלת תבנית לעמוד
+     */
+    static getTemplate(pageName) {
+        const config = this.getConfig(pageName);
+        return config ? config.template : null;
+    }
+
+    /**
+     * Get all available page names
+     * קבלת כל שמות העמודים הזמינים
+     */
+    static getAllPageNames() {
+        return Object.keys(SMART_PAGE_CONFIGS);
+    }
+
+    /**
+     * Get all configurations
+     * קבלת כל הקונפיגורציות
+     */
+    static getAllConfigs() {
+        return SMART_PAGE_CONFIGS;
+    }
+}
+
+// Export to global scope
 window.SMART_PAGE_CONFIGS = SMART_PAGE_CONFIGS;
+window.SmartPageConfigs = SmartPageConfigs;
 window.smartPageInitializationConfigs = SMART_PAGE_CONFIGS;
 
 // Export legacy format for backward compatibility

@@ -808,10 +808,23 @@ class ConditionsUIManager {
         this.conditions = [];
         this.currentCondition = null;
         this.currentTradePlanId = 1; // Default to plan 1 for demo
+        
+        // Modular components
+        this.conditionsSystem = null;
+        this.translator = null;
+        this.validator = null;
+        this.crudManager = null;
+        this.formGenerator = null;
     }
 
     async initialize() {
         console.log('🎨 Initializing Conditions UI Manager...');
+        
+        // Wait for conditions system to be ready
+        await this.waitForConditionsSystem();
+        
+        // Initialize modular components
+        this.initializeModularComponents();
         
         // Setup event listeners
         this.setupEventListeners();
@@ -823,6 +836,48 @@ class ConditionsUIManager {
         await this.loadConditions();
         
         console.log('✅ Conditions UI Manager initialized');
+    }
+    
+    /**
+     * Wait for conditions system to be ready
+     * המתנה למערכת התנאים להיות מוכנה
+     */
+    async waitForConditionsSystem() {
+        let attempts = 0;
+        const maxAttempts = 50; // 5 seconds max
+        
+        while (attempts < maxAttempts) {
+            if (window.conditionsSystem && window.conditionsSystem.initializer) {
+                const status = window.conditionsSystem.initializer.getStatus();
+                if (status.isInitialized) {
+                    console.log('✅ Conditions system is ready for UI Manager');
+                    return;
+                }
+            }
+            
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
+        }
+        
+        throw new Error('Conditions system not ready for UI Manager after 5 seconds');
+    }
+    
+    /**
+     * Initialize modular components
+     * אתחול רכיבים מודולריים
+     */
+    initializeModularComponents() {
+        if (window.conditionsSystem) {
+            this.conditionsSystem = window.conditionsSystem;
+            this.translator = this.conditionsSystem.translations;
+            this.validator = this.conditionsSystem.validator;
+            this.crudManager = this.conditionsSystem.crudManager;
+            this.formGenerator = this.conditionsSystem.formGenerator;
+            
+            console.log('✅ UI Manager modular components initialized');
+        } else {
+            throw new Error('Conditions system not available for UI Manager');
+        }
     }
 
     setupEventListeners() {
@@ -863,13 +918,20 @@ class ConditionsUIManager {
 
     async loadMethods() {
         try {
-            const response = await fetch('/api/trading-methods/');
-            const result = await response.json();
-            
-            if (result.status === 'success') {
-                this.methods = result.data;
+            if (this.crudManager) {
+                this.methods = await this.crudManager.getTradingMethods();
                 this.populateMethodsSelect();
-                console.log(`✅ Loaded ${this.methods.length} methods`);
+                console.log(`✅ Loaded ${this.methods.length} methods using modular system`);
+            } else {
+                // Fallback to direct API call
+                const response = await fetch('/api/trading-methods/');
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    this.methods = result.data;
+                    this.populateMethodsSelect();
+                    console.log(`✅ Loaded ${this.methods.length} methods using fallback`);
+                }
             }
         } catch (error) {
             console.error('❌ Failed to load methods:', error);
@@ -963,13 +1025,20 @@ class ConditionsUIManager {
 
             listBody.innerHTML = '<div class="text-center p-3 text-muted"><i class="fas fa-spinner fa-spin"></i> טוען תנאים...</div>';
 
-            const response = await fetch(`/api/plan-conditions/trade-plans/${this.currentTradePlanId}/conditions`);
-            const result = await response.json();
-
-            if (result.status === 'success') {
-                this.conditions = result.data;
+            if (this.crudManager) {
+                this.conditions = await this.crudManager.readConditions(this.currentTradePlanId);
                 this.renderConditions();
-                console.log(`✅ Loaded ${this.conditions.length} conditions`);
+                console.log(`✅ Loaded ${this.conditions.length} conditions using modular system`);
+            } else {
+                // Fallback to direct API call
+                const response = await fetch(`/api/plan-conditions/trade-plans/${this.currentTradePlanId}/conditions`);
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    this.conditions = result.data;
+                    this.renderConditions();
+                    console.log(`✅ Loaded ${this.conditions.length} conditions using fallback`);
+                }
             }
         } catch (error) {
             console.error('❌ Failed to load conditions:', error);
@@ -1120,30 +1189,46 @@ class ConditionsUIManager {
                 is_active: document.getElementById('isActive').checked
             };
 
-            let response;
-            if (this.currentCondition) {
-                // Update
-                response = await fetch(`/api/plan-conditions/${this.currentCondition.id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-            } else {
-                // Create
-                response = await fetch(`/api/plan-conditions/trade-plans/${this.currentTradePlanId}/conditions`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-            }
-
-            const result = await response.json();
-            if (result.status === 'success') {
-                console.log('✅ Condition saved successfully');
+            // Use modular system if available
+            if (this.crudManager) {
+                if (this.currentCondition) {
+                    // Update
+                    await this.crudManager.updateCondition(this.currentCondition.id, data);
+                } else {
+                    // Create
+                    await this.crudManager.createCondition(this.currentTradePlanId, data);
+                }
+                
+                console.log('✅ Condition saved successfully using modular system');
                 this.hideForm();
                 await this.loadConditions();
             } else {
-                alert('שגיאה בשמירת התנאי');
+                // Fallback to direct API calls
+                let response;
+                if (this.currentCondition) {
+                    // Update
+                    response = await fetch(`/api/plan-conditions/${this.currentCondition.id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                } else {
+                    // Create
+                    response = await fetch(`/api/plan-conditions/trade-plans/${this.currentTradePlanId}/conditions`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                }
+
+                const result = await response.json();
+                if (result.status === 'success') {
+                    console.log('✅ Condition saved successfully using fallback');
+                    this.hideForm();
+                    await this.loadConditions();
+                } else {
+                    alert('שגיאה בשמירת התנאי');
+                }
             }
         } catch (error) {
             console.error('❌ Failed to save condition:', error);
@@ -1159,16 +1244,24 @@ class ConditionsUIManager {
         if (!confirm('האם למחוק את התנאי?')) return;
 
         try {
-            const response = await fetch(`/api/plan-conditions/${conditionId}`, {
-                method: 'DELETE'
-            });
-
-            const result = await response.json();
-            if (result.status === 'success') {
-                console.log('✅ Condition deleted successfully');
+            // Use modular system if available
+            if (this.crudManager) {
+                await this.crudManager.deleteCondition(conditionId);
+                console.log('✅ Condition deleted successfully using modular system');
                 await this.loadConditions();
             } else {
-                alert('שגיאה במחיקת התנאי');
+                // Fallback to direct API call
+                const response = await fetch(`/api/plan-conditions/${conditionId}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+                if (result.status === 'success') {
+                    console.log('✅ Condition deleted successfully using fallback');
+                    await this.loadConditions();
+                } else {
+                    alert('שגיאה במחיקת התנאי');
+                }
             }
         } catch (error) {
             console.error('❌ Failed to delete condition:', error);

@@ -49,6 +49,12 @@ const PACKAGE_MANIFEST = {
         required: true
       },
       {
+        file: 'button-system-init.js',
+        globalCheck: 'window.ButtonSystem',
+        description: 'מערכת כפתורים',
+        required: true
+      },
+      {
         file: 'unified-cache-manager.js',
         globalCheck: 'window.UnifiedCacheManager',
         description: 'מנהל cache מאוחד',

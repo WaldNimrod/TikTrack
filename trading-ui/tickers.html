@@ -304,56 +304,29 @@
     
     <!-- ===== BASE PACKAGE SYSTEMS - CORRECT LOADING ORDER ===== -->
     
-    <!-- Stage 1: Initialization Systems (Must be first) -->
-    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script>
-    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script>
-    
-    <!-- Stage 2: Core Base Systems -->
+    <!-- Base Package Scripts -->
     <script src="scripts/global-favicon.js?v=1.0.0"></script>
-    <script src="scripts/translation-utils.js?v=1.0.0"></script>
-    
-    <!-- Stage 3: UI Base Systems -->
     <script src="scripts/notification-system.js?v=1.0.0"></script>
-    
-    <!-- Stage 4: Cache and Refresh Systems -->
-    <script src="scripts/cache-sync-manager.js?v=1.0.0"></script>
-    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script>
-    <script src="scripts/cache-policy-manager.js?v=1.0.0"></script>
-    <script src="scripts/memory-optimizer.js?v=1.0.0"></script>
-    
-    <!-- Stage 5: Advanced UI Systems (Always required) -->
     <script src="scripts/ui-utils.js?v=1.0.0"></script>
-    <script src="scripts/color-scheme-system.js?v=1.0.0"></script>
-    <script src="scripts/button-system-init.js?v=1.0.0"></script>
+    <script src="scripts/page-utils.js?v=1.0.0"></script>
+    <script src="scripts/translation-utils.js?v=1.0.0"></script>
+    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script>
+    <script src="scripts/cache-sync-manager.js?v=1.0.0"></script>
     <script src="scripts/header-system.js?v=v6.0.0"></script>
     
-    <!-- Stage 6: Data and Utility Systems -->
-    <script src="scripts/data-utils.js?v=1.0.0"></script>
-    <script src="scripts/date-utils.js?v=1.0.0"></script>
-    <script src="scripts/button-icons.js?v=1.0.0"></script>
+    <!-- CRUD Package Scripts -->
     <script src="scripts/tables.js?v=1.0.0"></script>
-    <script src="scripts/table-mappings.js?v=1.0.0"></script>
-    <script src="scripts/page-utils.js?v=1.0.0"></script>
+    <script src="scripts/data-utils.js?v=1.0.0"></script>
+    <script src="scripts/pagination-system.js?v=1.0.0"></script>
     
-    <!-- Stage 7: Additional Systems (As needed) -->
-    <script src="scripts/preferences.js?v=1.0.0"></script>
-    <script src="scripts/notification-category-detector.js?v=1.0.0"></script>
-    <script src="scripts/global-notification-collector.js?v=1.0.0"></script>
-    <script src="scripts/system-management.js?v=1.0.0"></script>
-    <script src="scripts/error-handlers.js?v=1.0.0"></script>
-    
-    <!-- Stage 8: Page-specific Script -->
+    <!-- Page Configs and Initializer -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script>
+    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script>
+    <!-- Page-specific Scripts -->
     <script src="scripts/tickers.js?v=1.0.0"></script>
-    
-    <!-- Local copyDetailedLog function for tickers page -->
     <script>
-        // Make the local copyDetailedLog function available globally for this page only                                                                        
+        // Make the local copyDetailedLog function available globally for this page only
         window.copyDetailedLog = copyDetailedLog;
-        
-        // Unified initialization - UI Standardization Round C
-        if (window.unifiedAppInitializer) {
-            window.unifiedAppInitializer.initialize();
-        }
     </script>
 </body>
 </html>

@@ -56,8 +56,7 @@
 <div class="table-actions">
 <button data-button-type="EXPORT" data-onclick="copyDetailedLog()" data-classes="btn-sm btn-outline-secondary" data-text="העתק לוג מפורט" data-attributes="title=\"העתק לוג מפורט\"">
 </button>
-<button data-button-type="TOGGLE" data-onclick="toggleSection('top')" data-classes="btn-outline-warning" data-text="הצג/הסתר" data-attributes="title=\"הצג/הסתר\"">
-</button>
+<button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר" title="הצג/הסתר"></button>
 </div>
 </div>
 <div class="section-body">
@@ -82,13 +81,12 @@
 <img src="images/icons/trades.svg" alt="הטריידים שלי" class="section-icon"> הטריידים שלי </div>
 <div class="table-count" id="tradesCount">טוען...</div>
 <div class="table-actions">
-<button id="addTradeBtn" data-button-type="ADD" data-onclick="showAddTradeModal()" data-classes="btn btn-success" data-attributes="title='הוסף טרייד חדש'"> ➕ הוסף </button>
+<button data-button-type="ADD" data-entity-type="trade" data-variant="full" data-onclick="showAddTradeModal()" data-text="הוסף טרייד" title="הוסף טרייד חדש"></button>
 <button id="editTradeBtn" data-button-type="EDIT" data-onclick="editTradeRecord('')" data-classes="btn btn-secondary d-none" data-attributes="title='ערוך טרייד נבחר'"> ✏️ ערוך </button>
 <button id="deleteTradeBtn" data-button-type="DELETE" data-onclick="deleteTradeRecord('')" data-classes="btn btn-danger d-none" data-attributes="title='מחק טרייד נבחר'"> 🗑️ מחק </button>
 <div class="action-separator">
 </div>
-<button data-button-type="TOGGLE" data-onclick="toggleSection('top')" data-classes="btn-outline-warning" data-text="הצג/הסתר" data-attributes="title=\"הצג/הסתר\"">
-</button>
+<button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר" title="הצג/הסתר"></button>
 </div>
 </div>
 <div class="section-body">
@@ -431,10 +429,8 @@
 <div class="modal-footer">
 <div class="d-flex justify-content-between w-100">
 <div>
-<button data-button-type="ADD" data-onclick="addImportantNote()" data-classes="btn btn-info me-2" data-text="הוסף הערה חשובה">
-</button>
-<button data-button-type="ADD" data-onclick="addReminder()" data-classes="btn btn-warning" data-text="הוסף תזכורת">
-</button>
+<button data-button-type="ADD" data-entity-type="note" data-variant="full" data-onclick="addImportantNote()" data-text="הוסף הערה חשובה" title="הוסף הערה חשובה"></button>
+<button data-button-type="ADD" data-entity-type="reminder" data-variant="full" data-onclick="addReminder()" data-text="הוסף תזכורת" title="הוסף תזכורת"></button>
 </div>
 <div>
 <button data-button-type="SAVE" data-classes="btn btn-primary" data-text="שמור">

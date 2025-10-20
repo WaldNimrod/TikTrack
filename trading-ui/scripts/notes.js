@@ -1196,10 +1196,16 @@ function validateEditNoteForm(content, relationType, relatedId, attachment) {
 
 // פונקציות שמירה ומחיקה
 async function saveNote() {
-  // איסוף נתונים מהטופס
+  // שימוש ב-DataCollectionService לאיסוף נתונים
+  const noteData = DataCollectionService.collectFormData({
+    content: { id: 'addNoteContent', type: 'text', isTextContent: true },
+    relationType: { id: 'noteRelationType', type: 'text', isRadioChecked: true },
+    relatedId: { id: 'noteRelatedObjectSelect', type: 'int' }
+  });
+
   const content = getEditorContent('add');
-  const relationType = document.querySelector('input[name="noteRelationType"]:checked')?.value;
-  const relatedId = document.getElementById('noteRelatedObjectSelect').value;
+  const relationType = noteData.relationType;
+  const relatedId = noteData.relatedId;
   const attachment = document.getElementById('noteAttachment').files[0];
 
   // ולידציה מקיפה
@@ -1225,73 +1231,31 @@ async function saveNote() {
       body: JSON.stringify(requestData),
     });
 
-    const result = await response.json();
-
-    if (response.ok && result.status === 'success') {
-      window.showSuccessNotification('הצלחה', 'הערה נשמרה בהצלחה!');
-
-      // סגירת המודל וטעינה מחדש
-      const modal = bootstrap.Modal.getInstance(document.getElementById('addNoteModal'));
-      modal.hide();
-      loadNotesData();
-    } else {
-
-      // טיפול בשגיאות וולידציה מהשרת
-      if (result.error && result.error.message) {
-        const serverMessage = result.error.message;
-
-        // אם זו שגיאת וולידציה, נפרק אותה להודעות ספציפיות
-        if (serverMessage.includes('validation failed')) {
-          const validationErrors = serverMessage.replace('Note validation failed: ', '').split('; ');
-
-          // הצגת כל שגיאה בנפרד
-          validationErrors.forEach(error => {
-            let fieldError = error;
-            let fieldName = '';
-
-            // תרגום שגיאות ספציפיות
-            if (error.includes('Field \'content\' is required')) {
-              fieldError = 'תוכן הערה הוא שדה חובה';
-              fieldName = 'contentError';
-            } else if (error.includes('Field \'related_type_id\' is required')) {
-              fieldError = 'יש לבחור סוג אובייקט לשיוך';
-              fieldName = 'relationTypeError';
-            } else if (error.includes('Field \'related_id\' is required')) {
-              fieldError = 'יש לבחור אובייקט לשיוך';
-              fieldName = 'relatedObjectError';
-            } else if (error.includes('Field \'related_id\' references non-existent record')) {
-              fieldError = 'האובייקט שנבחר לא קיים במערכת';
-              fieldName = 'relatedObjectError';
-            }
-
-            // שימוש במערכת ההתראות המובנת
-            if (fieldName && window.showValidationWarning) {
-              window.showValidationWarning(fieldName, fieldError);
-            } else {
-              window.showErrorNotification('שגיאת וולידציה', fieldError);
-            }
-          });
-        } else {
-          // שגיאה כללית
-          window.showErrorNotification('שגיאה בשמירה', serverMessage);
-        }
-      } else {
-        // הצגת הודעת שגיאה כללית
-        window.showErrorNotification('שגיאה בשמירה', 'שגיאה בשמירת הערה - בדוק את הנתונים שהוזנו');
-      }
-    }
-
-  } catch {
-    window.showErrorNotification('שגיאה בשמירה', 'שגיאה בשמירת הערה - בדוק את הנתונים שהוזנו');
+    // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
+    await CRUDResponseHandler.handleSaveResponse(response, {
+      modalId: 'addNoteModal',
+      successMessage: 'הערה נשמרה בהצלחה!',
+      apiUrl: '/api/notes/',
+      entityName: 'הערה'
+    });
+  } catch (error) {
+    CRUDResponseHandler.handleError(error, 'שמירת הערה');
   }
 }
 
 async function updateNoteFromModal() {
-  // איסוף נתונים מהטופס
-  const noteId = document.getElementById('editNoteId').value;
+  // שימוש ב-DataCollectionService לאיסוף נתונים
+  const noteData = DataCollectionService.collectFormData({
+    id: { id: 'editNoteId', type: 'int' },
+    content: { id: 'editNoteContent', type: 'text', isTextContent: true },
+    relationType: { id: 'editNoteRelationType', type: 'text', isRadioChecked: true },
+    relatedId: { id: 'editNoteRelatedObjectSelect', type: 'int' }
+  });
+
+  const noteId = noteData.id;
   const content = getEditorContent('edit');
-  const relationType = document.querySelector('input[name="editNoteRelationType"]:checked')?.value;
-  const relatedId = document.getElementById('editNoteRelatedObjectSelect').value;
+  const relationType = noteData.relationType;
+  const relatedId = noteData.relatedId;
   const attachment = document.getElementById('editNoteAttachment').files[0];
 
   // בדיקה אם נדרשת מחיקת קובץ
@@ -1344,68 +1308,20 @@ async function updateNoteFromModal() {
       });
     }
 
-    const result = await response.json();
+    // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
+    await CRUDResponseHandler.handleUpdateResponse(response, {
+      modalId: 'editNoteModal',
+      successMessage: 'הערה עודכנה בהצלחה!',
+      apiUrl: '/api/notes/',
+      entityName: 'הערה'
+    });
 
-    if (response.ok && result.status === 'success') {
-      window.showSuccessNotification('הצלחה', 'הערה עודכנה בהצלחה!');
+    // ניקוי דגלים
+    window.removeAttachmentFlag = false;
+    window.replaceAttachmentFlag = false;
 
-      // ניקוי דגלים
-      window.removeAttachmentFlag = false;
-      window.replaceAttachmentFlag = false;
-
-      // סגירת המודל וטעינה מחדש
-      const modal = bootstrap.Modal.getInstance(document.getElementById('editNoteModal'));
-      modal.hide();
-      loadNotesData();
-    } else {
-
-      // טיפול בשגיאות וולידציה מהשרת
-      if (result.error && result.error.message) {
-        const serverMessage = result.error.message;
-
-        // אם זו שגיאת וולידציה, נפרק אותה להודעות ספציפיות
-        if (serverMessage.includes('validation failed')) {
-          const validationErrors = serverMessage.replace('Note validation failed: ', '').split('; ');
-
-          // הצגת כל שגיאה בנפרד
-          validationErrors.forEach(error => {
-            let fieldError = error;
-            let fieldName = '';
-
-            // תרגום שגיאות ספציפיות
-            if (error.includes('Field \'content\' is required')) {
-              fieldError = 'תוכן הערה הוא שדה חובה';
-              fieldName = 'editContentError';
-            } else if (error.includes('Field \'related_type_id\' is required')) {
-              fieldError = 'יש לבחור סוג אובייקט לשיוך';
-              fieldName = 'editRelationTypeError';
-            } else if (error.includes('Field \'related_id\' is required')) {
-              fieldError = 'יש לבחור אובייקט לשיוך';
-              fieldName = 'editRelatedObjectError';
-            } else if (error.includes('Field \'related_id\' references non-existent record')) {
-              fieldError = 'האובייקט שנבחר לא קיים במערכת';
-              fieldName = 'editRelatedObjectError';
-            }
-
-            // שימוש במערכת ההתראות המובנת
-            if (fieldName && window.showValidationWarning) {
-              window.showValidationWarning(fieldName, fieldError);
-            } else {
-              window.showErrorNotification('שגיאת וולידציה', fieldError);
-            }
-          });
-        } else {
-          // שגיאה כללית
-          window.showErrorNotification('שגיאה בעדכון', serverMessage);
-        }
-      } else {
-        // הצגת הודעת שגיאה כללית
-        window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון הערה - בדוק את הנתונים שהוזנו');
-      }
-    }
-
-  } catch {
-    window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון הערה - בדוק את הנתונים שהוזנו');
+  } catch (error) {
+    CRUDResponseHandler.handleError(error, 'עדכון הערה');
   }
 }
 
@@ -1432,35 +1348,20 @@ async function deleteNoteFromServer(noteId) {
         method: 'DELETE',
       });
 
-      const result = await response.json();
-
-      if (response.ok && result.status === 'success') {
-        window.showSuccessNotification('הצלחה', 'הערה נמחקה בהצלחה!');
-        loadNotesData();
-        return; // יציאה מוצלחת
-      } else {
-
-        // טיפול בשגיאות מהשרת
-        if (result.error && result.error.message) {
-          const serverMessage = result.error.message;
-
-          if (serverMessage.includes('has linked items')) {
-            window.showErrorNotification('שגיאה במחיקה', 'לא ניתן למחוק הערה זו - יש פריטים מקושרים אליה');
-          } else {
-            window.showErrorNotification('שגיאה במחיקה', serverMessage);
-          }
-        } else {
-          window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת הערה - בדוק את הנתונים');
-        }
-        return; // יציאה עם שגיאה
-      }
-
-    } catch {
+      // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
+      await CRUDResponseHandler.handleDeleteResponse(response, {
+        successMessage: 'הערה נמחקה בהצלחה!',
+        apiUrl: '/api/notes/',
+        entityName: 'הערה'
+      });
+      return; // יציאה מוצלחת
+    } catch (error) {
       retryCount++;
 
       if (retryCount >= maxRetries) {
         // ניסיונות נגמרו - הצגת שגיאה
-        window.showErrorNotification('שגיאה', `שגיאה במחיקת הערה לאחר ${maxRetries} ניסיונות. בדוק את חיבור השרת.`);
+        CRUDResponseHandler.handleError(error, 'מחיקת הערה');
+        return;
       } else {
         // המתנה לפני ניסיון נוסף
         const currentRetryCount = retryCount;

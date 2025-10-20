@@ -1771,36 +1771,227 @@ function getStatusText(status) {
 }
 
 /**
- * Show Page Details Modal
+ * Show Page Details Modal - Detailed Scan Results
  */
-function showPageDetails(pageName) {
-    // Use existing modal system to show detailed information
+async function showPageDetails(pageName) {
     const pageConfig = window.PAGE_CONFIGS[pageName];
     
+    // Run detailed scan for this specific page
+    const scanResults = await runDetailedPageScan(pageName, pageConfig);
+    
     let detailsHtml = `
-        <h5>פרטי עמוד: ${pageConfig.name || pageName}</h5>
+        <h5>🔍 תוצאות סריקה מפורטת: ${pageConfig.name || pageName}</h5>
         <hr>
         
-        <h6>📦 חבילות:</h6>
-        <ul>
-            ${(pageConfig.packages || []).map(pkg => `<li>${pkg}</li>`).join('')}
-        </ul>
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <div class="card ${scanResults.criticalErrors > 0 ? 'bg-danger' : scanResults.mismatches > 0 ? 'bg-warning' : 'bg-success'} text-white">
+                    <div class="card-body text-center">
+                        <h6>${scanResults.criticalErrors + scanResults.mismatches}</h6>
+                        <small>בעיות שזוהו</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card ${scanResults.criticalErrors > 0 ? 'bg-danger' : 'bg-light'} text-center">
+                    <div class="card-body">
+                        <h6>${scanResults.criticalErrors}</h6>
+                        <small>שגיאות קריטיות</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card ${scanResults.mismatches > 0 ? 'bg-warning' : 'bg-light'} text-center">
+                    <div class="card-body">
+                        <h6>${scanResults.mismatches}</h6>
+                        <small>אי-התאמות</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card ${scanResults.duplicates.length > 0 ? 'bg-danger' : 'bg-light'} text-center">
+                    <div class="card-body">
+                        <h6>${scanResults.duplicates.length}</h6>
+                        <small>כפילויות</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Critical Errors Section
+    if (scanResults.criticalErrors > 0) {
+        detailsHtml += `
+            <div class="alert alert-danger">
+                <h6><i class="fas fa-exclamation-triangle"></i> שגיאות קריטיות (${scanResults.criticalErrors})</h6>
+                <p><strong>בעיות שדורשות תיקון מיידי:</strong></p>
+        `;
         
-        <h6>🔗 Globals נדרשים:</h6>
-        <ul>
-            ${(pageConfig.requiredGlobals || []).map(g => `<li><code>${g}</code></li>`).join('')}
-        </ul>
+        if (scanResults.duplicates.length > 0) {
+            detailsHtml += `
+                <h6>🔴 כפילויות סקריפטים:</h6>
+                <ul>
+                    ${scanResults.duplicates.map(d => `
+                        <li><strong>${d.script}</strong> - נטען ${d.count} פעמים</li>
+                    `).join('')}
+                </ul>
+            `;
+        }
         
-        <h6>📝 מידע נוסף:</h6>
-        <ul>
-            <li><strong>תיאור:</strong> ${pageConfig.description || 'לא זמין'}</li>
-            <li><strong>סוג עמוד:</strong> ${pageConfig.pageType || 'לא מוגדר'}</li>
-            <li><strong>עדכון אחרון:</strong> ${pageConfig.lastModified || 'לא ידוע'}</li>
-        </ul>
+        if (scanResults.loadOrderIssues.length > 0) {
+            detailsHtml += `
+                <h6>🔴 בעיות סדר טעינה:</h6>
+                <ul>
+                    ${scanResults.loadOrderIssues.map(issue => `
+                        <li>חבילה <strong>${issue.package}</strong> דורשת <strong>${issue.missingDependency}</strong></li>
+                    `).join('')}
+                </ul>
+            `;
+        }
+        
+        detailsHtml += `
+                <div class="mt-2">
+                    <strong>🔧 פעולה נדרשת:</strong> תקן את הבעיות ב-HTML של העמוד
+                </div>
+            </div>
+        `;
+    }
+    
+    // Mismatches Section
+    if (scanResults.mismatches > 0) {
+        detailsHtml += `
+            <div class="alert alert-warning">
+                <h6><i class="fas fa-info-circle"></i> אי-התאמות תיעוד (${scanResults.mismatches})</h6>
+                <p><strong>התיעוד לא תואם למה שנטען בפועל:</strong></p>
+                <ul class="mb-2">
+                    ${scanResults.mismatchDetails.map(m => `
+                        <li class="mb-1">
+                            <strong>📄 ${m.script}</strong> 
+                            <small class="text-muted">(${m.package})</small><br>
+                            <small class="text-muted">מצפה ל: <code>${m.global}</code></small>
+                        </li>
+                    `).join('')}
+                </ul>
+                <small class="text-info"><strong>💡 זכור:</strong> מערכת הניטור לא טוענת סקריפטים אוטומטית</small>
+            </div>
+        `;
+    }
+    
+    // Success Section
+    if (scanResults.criticalErrors === 0 && scanResults.mismatches === 0) {
+        detailsHtml += `
+            <div class="alert alert-success">
+                <h6><i class="fas fa-check-circle"></i> עמוד תקין לחלוטין</h6>
+                <p>לא נמצאו שגיאות קריטיות או אי-התאמות. העמוד עובד כמתוכנן.</p>
+            </div>
+        `;
+    }
+    
+    // Package Information
+    detailsHtml += `
+        <div class="mt-3">
+            <h6>📦 חבילות מוגדרות:</h6>
+            <div class="row">
+                ${(pageConfig.packages || []).map(pkg => `
+                    <div class="col-md-4 mb-2">
+                        <span class="badge bg-primary">${pkg}</span>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+    
+    // Add copy button to the modal
+    detailsHtml += `
+        <div class="mt-3 text-center">
+            <button class="btn btn-outline-primary btn-sm" onclick="copyDetailedPageResults()">
+                <i class="fas fa-copy"></i> העתק תוצאות
+            </button>
+        </div>
     `;
     
     if (typeof window.showDetailsModal === 'function') {
-        window.showDetailsModal(`פרטי עמוד: ${pageName}`, detailsHtml);
+        window.showDetailsModal(`🔍 סריקה מפורטת: ${pageName}`, detailsHtml);
+    }
+}
+
+/**
+ * Run Detailed Page Scan
+ */
+async function runDetailedPageScan(pageName, pageConfig) {
+    const result = {
+        pageName: pageName,
+        criticalErrors: 0,
+        mismatches: 0,
+        duplicates: [],
+        loadOrderIssues: [],
+        mismatchDetails: []
+    };
+    
+    // Check for duplicates
+    const duplicates = checkForDuplicates(pageConfig);
+    result.duplicates = duplicates;
+    result.criticalErrors += duplicates.length;
+    
+    // Check load order
+    const loadOrderIssues = checkLoadOrder(pageConfig);
+    result.loadOrderIssues = loadOrderIssues;
+    result.criticalErrors += loadOrderIssues.length;
+    
+    // Check for mismatches (documented vs actual)
+    const mismatches = await checkForMismatches(pageName, pageConfig);
+    result.mismatchDetails = mismatches;
+    result.mismatches = mismatches.length;
+    
+    return result;
+}
+
+/**
+ * Get Detailed Mismatches for a Page
+ */
+function getDetailedMismatches(pageName, pageConfig) {
+    const mismatches = [];
+    
+    if (pageConfig.packages) {
+        for (const pkgName of pageConfig.packages) {
+            const pkg = window.PACKAGE_MANIFEST?.[pkgName];
+            if (pkg && pkg.scripts) {
+                for (const script of pkg.scripts) {
+                    if (script.required && script.globalCheck) {
+                        // Check if global exists
+                        if (!checkGlobalExists(script.globalCheck)) {
+                            mismatches.push({
+                                script: script.file,
+                                package: pkgName,
+                                global: script.globalCheck,
+                                description: script.description
+                            });
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    return mismatches;
+}
+
+/**
+ * Check if Global Exists
+ */
+function checkGlobalExists(globalPath) {
+    try {
+        const parts = globalPath.replace('window.', '').split('.');
+        let obj = window;
+        for (const part of parts) {
+            if (obj[part] === undefined) {
+                return false;
+            }
+            obj = obj[part];
+        }
+        return true;
+    } catch (e) {
+        return false;
     }
 }
 
@@ -1900,5 +2091,64 @@ function copyComprehensiveResults() {
     }).catch(err => {
         console.error('Failed to copy comprehensive results:', err);
         showNotification('שגיאה בהעתקת תוצאות בדיקות', 'error');
+    });
+}
+
+/**
+ * Copy detailed page scan results
+ */
+function copyDetailedPageResults() {
+    // Get the current modal content
+    const modalContent = document.querySelector('.modal-body .details-content');
+    if (!modalContent) {
+        showNotification('לא נמצא תוכן להעתקה', 'error');
+        return;
+    }
+    
+    let copyText = '=== TikTrack Detailed Page Scan Results ===\n';
+    copyText += `Date: ${new Date().toISOString()}\n\n`;
+    
+    // Extract title
+    const title = modalContent.querySelector('h5')?.textContent || 'Unknown Page';
+    copyText += `Page: ${title}\n\n`;
+    
+    // Extract summary cards
+    const cards = modalContent.querySelectorAll('.card');
+    copyText += 'SUMMARY:\n';
+    cards.forEach(card => {
+        const number = card.querySelector('h6')?.textContent || '0';
+        const label = card.querySelector('small')?.textContent || 'Unknown';
+        copyText += `- ${label}: ${number}\n`;
+    });
+    
+    // Extract mismatches
+    const mismatches = modalContent.querySelectorAll('.alert-warning li');
+    if (mismatches.length > 0) {
+        copyText += '\nMISMATCHES:\n';
+        mismatches.forEach((mismatch, index) => {
+            const script = mismatch.querySelector('strong')?.textContent || '';
+            const package = mismatch.querySelector('small')?.textContent || '';
+            const global = mismatch.querySelector('code')?.textContent || '';
+            
+            copyText += `${index + 1}. ${script}\n`;
+            copyText += `   Package: ${package}\n`;
+            copyText += `   Expected Global: ${global}\n`;
+        });
+    }
+    
+    // Extract packages
+    const packages = modalContent.querySelectorAll('.badge.bg-primary');
+    if (packages.length > 0) {
+        copyText += '\nPACKAGES:\n';
+        packages.forEach(pkg => {
+            copyText += `- ${pkg.textContent}\n`;
+        });
+    }
+    
+    navigator.clipboard.writeText(copyText).then(() => {
+        showNotification('תוצאות הסריקה המפורטת הועתקו ללוח', 'success');
+    }).catch(err => {
+        console.error('Failed to copy detailed results:', err);
+        showNotification('שגיאה בהעתקת התוצאות המפורטות', 'error');
     });
 }

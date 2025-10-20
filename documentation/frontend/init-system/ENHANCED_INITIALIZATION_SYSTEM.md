@@ -265,32 +265,185 @@ console.log('טרנד:', report.trend);
 
 **⚠️ חשוב:** המערכת מבצעת **ניטור ולידציה** בלבד. עדכון טעינה בעמוד דורש תהליך דו-שלבי:
 
-#### **שלב 1: עדכון מערכת הניטור**
+## 📋 **תהליך מלא של 4 שלבים להוספת סקריפט חדש:**
+
+### **שלב 1: יצירת הסקריפט החדש**
 ```javascript
-// עדכון package-manifest.js - הגדרת החבילה
-'base': {
+// scripts/my-new-script.js
+(function() {
+    'use strict';
+    
+    // הקוד שלך כאן
+    function myNewFunction() {
+        console.log('New script loaded!');
+    }
+    
+    // חשוב: יצירת Global לזיהוי
+    window.MyNewScript = {
+        init: myNewFunction,
+        version: '1.0.0'
+    };
+    
+    console.log('✅ MyNewScript loaded successfully');
+})();
+```
+
+### **שלב 2: עדכון Package Manifest**
+```javascript
+// scripts/init-system/package-manifest.js
+// הוסף לחבילה המתאימה (או צור חבילה חדשה)
+
+'my-package': {
+    id: 'my-package',
+    name: 'My Package',
+    description: 'חבילה חדשה עם הסקריפט שלי',
+    version: '1.0.0',
+    critical: false,
+    loadOrder: 5,
+    dependencies: ['base'], // אם נדרש
     scripts: [
-        { file: 'color-scheme-system.js', globalCheck: 'window.loadDynamicColors' }
-    ]
-}
-
-// עדכון page-initialization-configs.js - הגדרת העמוד
-'cash_flows': {
-    packages: ['base', 'crud'],
-    requiredGlobals: ['NotificationSystem', 'DataUtils', 'window.formatDate']
+        {
+            file: 'my-new-script.js',
+            globalCheck: 'window.MyNewScript', // חשוב: Global לזיהוי
+            description: 'הסקריפט החדש שלי',
+            required: true
+        }
+    ],
+    estimatedSize: '~10KB',
+    initTime: '~5ms'
 }
 ```
 
-#### **שלב 2: עדכון העמוד בפועל**
+### **שלב 3: עדכון Page Configuration**
+```javascript
+// scripts/page-initialization-configs.js
+// עדכן את העמוד הרלוונטי
+
+'my-page': {
+    name: 'My Page',
+    packages: ['base', 'my-package'], // הוסף את החבילה החדשה
+    requiredGlobals: [
+        'NotificationSystem',
+        'MyNewScript' // הוסף את ה-Global החדש
+    ],
+    description: 'עמוד עם הסקריפט החדש',
+    lastModified: '2025-01-20',
+    pageType: 'data-management',
+    customInitializer: async () => {
+        console.log('🚀 Initializing My Page...');
+        if (window.MyNewScript) {
+            window.MyNewScript.init();
+        }
+    }
+}
+```
+
+### **שלב 4: עדכון HTML Page**
 ```html
-<!-- הוספת הסקריפט לעמוד -->
-<script src="scripts/color-scheme-system.js?v=1.0.0"></script>
+<!-- my-page.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- ... head content ... -->
+</head>
+<body>
+    <!-- ... page content ... -->
+    
+    <!-- Base Package Scripts -->
+    <script src="scripts/global-favicon.js?v=1.0.0"></script>
+    <script src="scripts/notification-system.js?v=1.0.0"></script>
+    <!-- ... other base scripts ... -->
+    
+    <!-- My Package Scripts -->
+    <script src="scripts/my-new-script.js?v=1.0.0"></script>
+    
+    <!-- Page Configs and Initializer -->
+    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script>
+    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script>
+    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script>
+    
+    <!-- Page-specific Scripts -->
+    <script src="scripts/my-page.js?v=1.0.0"></script>
+</body>
+</html>
 ```
 
-#### **שלב 3: בדיקה ולידציה**
-- פתיחת העמוד ובדיקת הקונסול
-- הרצת מערכת הניטור לוידוא שהכל תקין
-- תיקון בעיות במידת הצורך
+## 🔍 **בדיקה ואימות:**
+
+### **בדיקה 1: פתח את העמוד**
+- רענן את הדפדפן
+- בדוק את הקונסול - אמור לראות: `✅ MyNewScript loaded successfully`
+
+### **בדיקה 2: הרץ מערכת הניטור**
+- לך ל: `/init-system-management`
+- לחץ על "הרץ בדיקות מלאות"
+- אמור לראות: עמוד "תקין" ללא אי-התאמות
+
+### **בדיקה 3: בדיקת Global**
+```javascript
+// בקונסול הדפדפן
+console.log(window.MyNewScript); // אמור להחזיר את האובייקט
+```
+
+## ⚠️ **נקודות חשובות:**
+
+### **1. סדר הטעינה:**
+- **תמיד** טען את `package-manifest.js` לפני `page-initialization-configs.js`
+- **תמיד** טען את `unified-app-initializer.js` אחרון
+- **תמיד** טען את הסקריפטים החדשים לפני מערכת הניטור
+
+### **2. Global Check:**
+- **חובה** ליצור Global ב-`window` לזיהוי
+- **חובה** להשתמש באותו Global ב-`globalCheck`
+- **חובה** להוסיף אותו ל-`requiredGlobals`
+
+### **3. Versioning:**
+- **הוסף** `?v=1.0.0` לכל סקריפט חדש
+- **עדכן** את הגרסה כשמשנה את הסקריפט
+
+## 🚨 **מה קורה אם מפספסים שלב?**
+
+### **אם מפספסים שלב 2 (Package Manifest):**
+- מערכת הניטור תזהה "אי-התאמה"
+- תקבל אזהרה: "התיעוד לא תואם למה שנטען"
+
+### **אם מפספסים שלב 3 (Page Config):**
+- מערכת הניטור תזהה "אי-התאמה"
+- תקבל אזהרה: "Global לא מתועד"
+
+### **אם מפספסים שלב 4 (HTML):**
+- הסקריפט לא ייטען
+- מערכת הניטור תזהה "אי-התאמה"
+- תקבל אזהרה: "סקריפט מתועד אבל לא נטען"
+
+## 🔄 **תהליכים נוספים:**
+
+### **הוספת סקריפט קיים לעמוד חדש:**
+1. **עדכן Page Config** - הוסף את החבילה ל-`packages`
+2. **עדכן HTML** - הוסף את הסקריפטים הנדרשים
+3. **בדוק ולידד** - הרץ מערכת הניטור
+
+### **הסרת סקריפט מעמוד:**
+1. **הסר מ-HTML** - מחק את תג ה-`<script>`
+2. **עדכן Page Config** - הסר את החבילה מ-`packages`
+3. **הסר Globals** - הסר מ-`requiredGlobals`
+4. **בדוק ולידד** - הרץ מערכת הניטור
+
+### **הסרת סקריפט מהמערכת לחלוטין:**
+1. **הסר מכל העמודים** - מחק מכל קבצי ה-HTML
+2. **עדכן Package Manifest** - הסר את הסקריפט מהחבילה
+3. **עדכן Page Configs** - הסר את החבילה מכל העמודים
+4. **מחק את הקובץ** - הסר את `scripts/my-script.js`
+5. **בדוק ולידד** - הרץ מערכת הניטור
+
+## ✅ **סיכום - 4 שלבים פשוטים:**
+
+1. **צור סקריפט** + Global
+2. **עדכן Package Manifest** + globalCheck
+3. **עדכן Page Config** + requiredGlobals
+4. **עדכן HTML** + script tag
+
+**אחרי זה - הכל יעבוד מושלם!** 🎉
 
 ### אינטגרציה עם מערכות קיימות
 

@@ -11,25 +11,100 @@
  * This file defines PAGE CONFIGURATIONS for the monitoring system.
  * When you add new scripts to pages, you MUST update the page configuration here.
  *
- * 🔧 HOW TO UPDATE PAGE CONFIGURATION:
- * ====================================
+ * 🔧 COMPLETE WORKFLOW FOR ADDING NEW SCRIPTS:
+ * ============================================
  *
- * 1. FIND YOUR PAGE:
- *    - Look for your page name in PAGE_CONFIGS object
- *    - If not found, add new configuration
+ * STEP 1: Create the Script
+ * -------------------------
+ * // scripts/my-new-script.js
+ * (function() {
+ *     'use strict';
+ *     
+ *     function myNewFunction() {
+ *         console.log('New script loaded!');
+ *     }
+ *     
+ *     // IMPORTANT: Create Global for identification
+ *     window.MyNewScript = {
+ *         init: myNewFunction,
+ *         version: '1.0.0'
+ *     };
+ *     
+ *     console.log('✅ MyNewScript loaded successfully');
+ * })();
  *
- * 2. ADD REQUIRED PACKAGES:
- *    - Add package names to packages array
- *    - Always include 'base' package
- *    - Add 'crud' for data pages, 'charts' for chart pages
+ * STEP 2: Update Package Manifest
+ * -------------------------------
+ * // scripts/init-system/package-manifest.js
+ * 'my-package': {
+ *     scripts: [
+ *         {
+ *             file: 'my-new-script.js',
+ *             globalCheck: 'window.MyNewScript', // IMPORTANT: Global for identification
+ *             description: 'My new script',
+ *             required: true
+ *         }
+ *     ]
+ * }
  *
- * 3. ADD REQUIRED GLOBALS:
- *    - Add global variables that your page needs
- *    - These are checked by the monitoring system
+ * STEP 3: Update This File (Page Configuration)
+ * ---------------------------------------------
+ * 'my-page': {
+ *     name: 'My Page',
+ *     packages: ['base', 'my-package'], // Add the new package
+ *     requiredGlobals: [
+ *         'NotificationSystem',
+ *         'MyNewScript' // Add the new Global
+ *     ],
+ *     description: 'Page with new script',
+ *     lastModified: '2025-01-20'
+ * }
  *
- * 4. UPDATE ACTUAL PAGE:
- *    - Add script tags to HTML page
- *    - Ensure scripts are loaded in correct order
+ * STEP 4: Update HTML Page
+ * ------------------------
+ * <!-- my-page.html -->
+ * <script src="scripts/my-new-script.js?v=1.0.0"></script>
+ * <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script>
+ * <script src="scripts/page-initialization-configs.js?v=1.0.0"></script>
+ * <script src="scripts/unified-app-initializer.js?v=1.0.0"></script>
+ *
+ * ADDITIONAL WORKFLOWS:
+ * =====================
+ *
+ * Adding Existing Script to New Page:
+ * 1. Update Page Config - add package to 'packages'
+ * 2. Update HTML - add required scripts
+ * 3. Test and validate
+ *
+ * Removing Script from Page:
+ * 1. Remove from HTML - delete <script> tag
+ * 2. Update Page Config - remove package from 'packages'
+ * 3. Remove Globals - remove from 'requiredGlobals'
+ * 4. Test and validate
+ *
+ * Removing Script from System Completely:
+ * 1. Remove from all pages - delete from all HTML files
+ * 2. Update Package Manifest - remove script from package
+ * 3. Update Page Configs - remove package from all pages
+ * 4. Delete the file - remove scripts/my-script.js
+ * 5. Test and validate
+ *
+ * ⚠️ IMPORTANT RULES:
+ * ==================
+ *
+ * 1. LOADING ORDER:
+ *    - Always load package-manifest.js before page-initialization-configs.js
+ *    - Always load unified-app-initializer.js last
+ *    - Always load new scripts before monitoring system
+ *
+ * 2. GLOBAL CHECK:
+ *    - Must create Global in window for identification
+ *    - Must use same Global in globalCheck
+ *    - Must add to requiredGlobals
+ *
+ * 3. VERSIONING:
+ *    - Add ?v=1.0.0 to every new script
+ *    - Update version when changing script
  *
  * 📖 DETAILED DOCUMENTATION:
  * ==========================

@@ -1084,11 +1084,18 @@ class SystemManagement {
         warning: 1,
         info: 0
       },
-      performance: {
-        cpu_usage: 0,
-        memory_usage: 0,
-        disk_usage: 0
-      },
+            performance: {
+              cpu_usage: 0,
+              memory_usage: 256,
+              disk_usage: 0
+            },
+            cache: {
+              mode: 'development',
+              status: 'warning',
+              hit_rate: 0
+            },
+            environment: 'development',
+            protocol: 'HTTP/HTTPS',
       external_data: {
         last_update: null,
         sources: 0,
@@ -1336,27 +1343,68 @@ class SystemManagement {
       const healthStatus = data.health.overall_status || 'unknown';
       overallHealthElement.textContent = healthStatus === 'healthy' ? 'בריא' : 
                                         healthStatus === 'warning' ? 'אזהרה' : 'בעיה';
-      overallHealthElement.className = healthStatus === 'healthy' ? 'summary-value text-success' :
-                                       healthStatus === 'warning' ? 'summary-value text-warning' : 'summary-value text-danger';
+      overallHealthElement.className = healthStatus === 'healthy' ? 'badge bg-success' :
+                                       healthStatus === 'warning' ? 'badge bg-warning' : 'badge bg-danger';
     }
     
     if (systemScoreElement && data.system_score !== undefined) {
       systemScoreElement.textContent = `${data.system_score}%`;
-      systemScoreElement.className = data.system_score >= 90 ? 'summary-value text-success' :
-                                     data.system_score >= 70 ? 'summary-value text-warning' : 'summary-value text-danger';
+      systemScoreElement.className = data.system_score >= 90 ? 'badge bg-success' :
+                                     data.system_score >= 70 ? 'badge bg-warning' : 'badge bg-danger';
     }
     
     if (responseTimeElement && (data.response_time || data.health?.response_time_ms)) {
       const responseTime = data.response_time || data.health.response_time_ms;
       responseTimeElement.textContent = responseTime.includes('ms') ? responseTime : `${responseTime}ms`;
       const responseTimeMs = parseInt(responseTime) || 0;
-      responseTimeElement.className = responseTimeMs < 200 ? 'summary-value text-success' :
-                                      responseTimeMs < 500 ? 'summary-value text-warning' : 'summary-value text-danger';
+      responseTimeElement.className = responseTimeMs < 200 ? 'badge bg-success' :
+                                      responseTimeMs < 500 ? 'badge bg-warning' : 'badge bg-danger';
     }
     
     if (uptimeElement && (data.uptime || data.summary?.uptime)) {
       uptimeElement.textContent = data.uptime || data.summary.uptime;
-      uptimeElement.className = 'summary-value text-info';
+      uptimeElement.className = 'badge bg-primary';
+    }
+    
+    // Update memory usage
+    if (data.performance && data.performance.memory_usage) {
+      SystemManagement.updateSystemMemory(data.performance.memory_usage);
+    }
+    
+    // Update cache mode
+    if (data.cache && data.cache.mode) {
+      SystemManagement.updateSystemStatus(data.cache.mode);
+    }
+    
+    // Update additional system information
+    this.updateSystemInfo(data);
+  }
+
+  /**
+   * Update system information
+   * עדכון מידע מערכת
+   */
+  updateSystemInfo(data) {
+    // Update environment info
+    const environmentElement = document.querySelector('td:contains("סביבה") + td span');
+    if (environmentElement && data.environment) {
+      environmentElement.textContent = data.environment;
+      environmentElement.className = data.environment === 'production' ? 'badge bg-success' : 
+                                    data.environment === 'development' ? 'badge bg-warning' : 'badge bg-info';
+    }
+    
+    // Update last update time
+    const lastUpdateElement = document.querySelector('td:contains("עדכון אחרון") + td span');
+    if (lastUpdateElement) {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+      lastUpdateElement.textContent = timeStr;
+    }
+    
+    // Update protocol info
+    const protocolElement = document.querySelector('td:contains("פרוטוקול") + td span');
+    if (protocolElement && data.protocol) {
+      protocolElement.textContent = data.protocol;
     }
   }
 
@@ -2236,9 +2284,9 @@ async function copyDetailedLog() {
 
 // הוסר - המערכת המאוחדת מטפלת באתחול
 // Initialize dashboard when DOM is ready
-// document.addEventListener('DOMContentLoaded', () => {
-//   window.systemManagement = new SystemManagement();
-//   window.systemManagement.init();
+document.addEventListener('DOMContentLoaded', () => {
+  window.systemManagement = new SystemManagement();
+  window.systemManagement.init();
   
   // Make functions globally available (only if not already defined by page-specific script)
   window.refreshSystemData = SystemManagement.refreshSystemData;
@@ -2260,7 +2308,7 @@ async function copyDetailedLog() {
   
   // window.toggleAllSections export removed - using global version from ui-utils.js
   // window.toggleSection export removed - using global version from ui-utils.js
-// });
+});
 
 // ========================================
 // Cursor Tasks Integration Functions
@@ -2537,6 +2585,24 @@ SystemManagement.updateSystemStatus = function(mode) {
   if (systemCacheMode) {
     systemCacheMode.textContent = mode;
     systemCacheMode.className = `badge bg-${SystemManagement.getModeColor(mode)}`;
+  }
+};
+
+/**
+ * Update system memory display
+ * עדכון תצוגת זיכרון מערכת
+ */
+SystemManagement.updateSystemMemory = function(memoryUsage) {
+  const systemMemory = document.getElementById('systemMemory');
+  if (systemMemory) {
+    if (memoryUsage && memoryUsage > 0) {
+      systemMemory.textContent = `${memoryUsage} MB`;
+      systemMemory.className = memoryUsage > 1000 ? 'badge bg-danger' : 
+                               memoryUsage > 500 ? 'badge bg-warning' : 'badge bg-success';
+    } else {
+      systemMemory.textContent = 'לא זמין';
+      systemMemory.className = 'badge bg-secondary';
+    }
   }
 };
 

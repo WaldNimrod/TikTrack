@@ -964,19 +964,23 @@ function updateEditAmountFromShares() {
  */
 async function saveEditTradePlan() {
   try {
-    // איסוף נתונים מהטופס
-  const formData = {
-    id: tradePlanId,
-    ticker_id: document.getElementById('editTicker').value,
-    investment_type: document.getElementById('editType').value,
-    side: document.getElementById('editSide').value,
-    status: 'open', // Default status
-    planned_amount: parseFloat(document.getElementById('editQuantity').value),
-    stop_price: parseFloat(document.getElementById('editPrice').value) || null,
-    target_price: parseFloat(document.getElementById('editPrice').value) || null,
-    entry_conditions: document.getElementById('editNotes').value,
-    reasons: document.getElementById('editNotes').value, // Temporary workaround
-  };
+    // שימוש ב-DataCollectionService לאיסוף נתונים
+    const tradePlanData = DataCollectionService.collectFormData({
+      id: { id: 'editTradePlanId', type: 'int' },
+      ticker_id: { id: 'editTicker', type: 'int' },
+      investment_type: { id: 'editType', type: 'text' },
+      side: { id: 'editSide', type: 'text' },
+      planned_amount: { id: 'editQuantity', type: 'number' },
+      stop_price: { id: 'editPrice', type: 'number' },
+      target_price: { id: 'editPrice', type: 'number' },
+      entry_conditions: { id: 'editNotes', type: 'text' },
+      reasons: { id: 'editNotes', type: 'text' }
+    });
+
+    const formData = {
+      ...tradePlanData,
+      status: 'open' // Default status
+    };
 
     // בדיקה אם הסטטוס משתנה ל-'cancelled'
     const originalTradePlan = window.tradePlansData.find(tp => tp.id === formData.id);
@@ -1012,8 +1016,7 @@ async function saveEditTradePlan() {
     }
 
     // שליחה לשרת
-    const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-    const response = await fetch(`${base}/api/trade_plans/${formData.id}`, {
+    const response = await fetch(`/api/trade_plans/${formData.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -1021,38 +1024,16 @@ async function saveEditTradePlan() {
       body: JSON.stringify(formData),
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText);
-    }
-
-    // הצגת הודעת הצלחה
-    if (typeof window.showNotification === 'function') {
-      window.showNotification('תכנון עודכן בהצלחה!', 'success');
-    }
-
-    // סגירת המודל
-    const modal = bootstrap.Modal.getInstance(document.getElementById('editTradePlanModal'));
-    modal.hide();
-
-    // רענון הטבלה
-    await loadTradePlansData();
+    // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
+    await CRUDResponseHandler.handleUpdateResponse(response, {
+      modalId: 'editTradePlanModal',
+      successMessage: 'תכנון עודכן בהצלחה!',
+      apiUrl: '/api/trade_plans/',
+      entityName: 'תכנון'
+    });
 
   } catch (error) {
-    handleSaveError(error, 'עדכון תכנון');
-
-    // הצגת הודעת שגיאה
-    let errorMessage = 'שגיאה בעדכון התכנון';
-    try {
-      const errorData = JSON.parse(error.message);
-      errorMessage = errorData.error?.message || errorMessage;
-    } catch {
-      errorMessage = error.message || errorMessage;
-    }
-
-    if (typeof window.showNotification === 'function') {
-      window.showNotification(errorMessage, 'error');
-    }
+    CRUDResponseHandler.handleError(error, 'עדכון תכנון');
   }
 }
 
@@ -2554,71 +2535,19 @@ function editTradePlan(designId) {
  */
 async function deleteTradePlan(tradePlanId) {
   try {
-    const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-    const response = await fetch(`${base}/api/trade_plans/${tradePlanId}`, {
+    const response = await fetch(`/api/trade_plans/${tradePlanId}`, {
       method: 'DELETE',
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText);
-    }
-
-    // הצגת הודעת הצלחה
-    if (typeof window.showNotification === 'function') {
-      window.showNotification('תכנון נמחק בהצלחה!', 'success');
-    }
-
-    // רענון הטבלה
-    await loadTradePlansData();
+    // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
+    await CRUDResponseHandler.handleDeleteResponse(response, {
+      successMessage: 'תכנון נמחק בהצלחה!',
+      apiUrl: '/api/trade_plans/',
+      entityName: 'תכנון'
+    });
 
   } catch (error) {
-    handleDeleteError(error, 'תכנון');
-
-    let errorMessage = 'שגיאה במחיקת התכנון';
-    let hasLinkedItems = false;
-
-    try {
-      const errorData = JSON.parse(error.message);
-      errorMessage = errorData.error?.message || errorMessage;
-
-      // בדיקה אם השגיאה היא על פריטים מקושרים
-      if (errorMessage.includes('פריטים מקושרים') || errorMessage.includes('linked items')) {
-        hasLinkedItems = true;
-      }
-    } catch {
-      errorMessage = error.message || errorMessage;
-    }
-
-    if (hasLinkedItems) {
-      // הצגת חלון מקושרים באמצעות המערכת הכללית
-      if (typeof window.showLinkedItemsModal === 'function') {
-        try {
-          const response = await fetch(`/api/linked-items/trade_plan/${tradePlanId}`);
-          if (response.ok) {
-            const data = await response.json();
-            window.showLinkedItemsModal(data, 'trade_plan', tradePlanId);
-          } else {
-            throw new Error('Failed to load linked items data');
-          }
-        } catch (linkedError) {
-          handleDataLoadError(linkedError, 'פריטים מקושרים');
-          if (typeof window.showNotification === 'function') {
-            window.showNotification('לא ניתן למחוק תכנון שיש לו פריטים מקושרים', 'error');
-          }
-        }
-      } else {
-        handleFunctionNotFound('showLinkedItemsModal');
-        if (typeof window.showNotification === 'function') {
-          window.showNotification('לא ניתן למחוק תכנון שיש לו פריטים מקושרים', 'error');
-        }
-      }
-    } else {
-      // הצגת הודעת שגיאה רגילה
-      if (typeof window.showNotification === 'function') {
-        window.showNotification(errorMessage, 'error');
-      }
-    }
+    CRUDResponseHandler.handleError(error, 'מחיקת תכנון');
   }
 }
 

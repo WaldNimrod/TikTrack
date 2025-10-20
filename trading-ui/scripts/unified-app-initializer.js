@@ -32,32 +32,101 @@
  *    - Script failed to load (404/syntax error)
  *    - Action: Fix immediately in HTML
  *
- * ⚠️ IMPORTANT FOR DEVELOPERS:
- * ============================
+ * 🔧 COMPLETE WORKFLOW FOR ADDING NEW SCRIPTS:
+ * ============================================
  * 
- * This is a MONITORING AND VALIDATION system, NOT an automatic script loader.
- * When you see monitoring errors, it means the system detected changes in page loading structure.
+ * STEP 1: Create the Script
+ * -------------------------
+ * // scripts/my-new-script.js
+ * (function() {
+ *     'use strict';
+ *     
+ *     function myNewFunction() {
+ *         console.log('New script loaded!');
+ *     }
+ *     
+ *     // IMPORTANT: Create Global for identification
+ *     window.MyNewScript = {
+ *         init: myNewFunction,
+ *         version: '1.0.0'
+ *     };
+ *     
+ *     console.log('✅ MyNewScript loaded successfully');
+ * })();
  * 
- * 🔧 HOW TO FIX MONITORING ERRORS:
- * ================================
+ * STEP 2: Update Package Manifest
+ * -------------------------------
+ * // scripts/init-system/package-manifest.js
+ * 'my-package': {
+ *     id: 'my-package',
+ *     name: 'My Package',
+ *     scripts: [
+ *         {
+ *             file: 'my-new-script.js',
+ *             globalCheck: 'window.MyNewScript', // IMPORTANT: Global for identification
+ *             description: 'My new script',
+ *             required: true
+ *         }
+ *     ]
+ * }
  * 
- * If the changes are intentional and correct, you need to update the monitoring system:
+ * STEP 3: Update Page Configuration
+ * ---------------------------------
+ * // scripts/page-initialization-configs.js
+ * 'my-page': {
+ *     name: 'My Page',
+ *     packages: ['base', 'my-package'], // Add the new package
+ *     requiredGlobals: [
+ *         'NotificationSystem',
+ *         'MyNewScript' // Add the new Global
+ *     ]
+ * }
  * 
- * 1. UPDATE PACKAGE MANIFEST:
- *    - Add new scripts to appropriate package in `package-manifest.js`
- *    - Define global checks for each script
+ * STEP 4: Update HTML Page
+ * ------------------------
+ * <!-- my-page.html -->
+ * <script src="scripts/my-new-script.js?v=1.0.0"></script>
+ * <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script>
+ * <script src="scripts/page-initialization-configs.js?v=1.0.0"></script>
+ * <script src="scripts/unified-app-initializer.js?v=1.0.0"></script>
  * 
- * 2. UPDATE PAGE CONFIGURATION:
- *    - Add required packages to page config in `page-initialization-configs.js`
- *    - Add required globals to the page configuration
+ * ADDITIONAL WORKFLOWS:
+ * =====================
  * 
- * 3. UPDATE ACTUAL PAGE:
- *    - Add the new script tags to the HTML page
- *    - Ensure correct loading order
+ * Adding Existing Script to New Page:
+ * 1. Update Page Config - add package to 'packages'
+ * 2. Update HTML - add required scripts
+ * 3. Test and validate
  * 
- * 4. TEST AND VALIDATE:
- *    - Run the monitoring system to verify everything is correct
- *    - Fix any remaining issues
+ * Removing Script from Page:
+ * 1. Remove from HTML - delete <script> tag
+ * 2. Update Page Config - remove package from 'packages'
+ * 3. Remove Globals - remove from 'requiredGlobals'
+ * 4. Test and validate
+ * 
+ * Removing Script from System Completely:
+ * 1. Remove from all pages - delete from all HTML files
+ * 2. Update Package Manifest - remove script from package
+ * 3. Update Page Configs - remove package from all pages
+ * 4. Delete the file - remove scripts/my-script.js
+ * 5. Test and validate
+ * 
+ * ⚠️ IMPORTANT RULES:
+ * ==================
+ * 
+ * 1. LOADING ORDER:
+ *    - Always load package-manifest.js before page-initialization-configs.js
+ *    - Always load unified-app-initializer.js last
+ *    - Always load new scripts before monitoring system
+ * 
+ * 2. GLOBAL CHECK:
+ *    - Must create Global in window for identification
+ *    - Must use same Global in globalCheck
+ *    - Must add to requiredGlobals
+ * 
+ * 3. VERSIONING:
+ *    - Add ?v=1.0.0 to every new script
+ *    - Update version when changing script
  * 
  * 📖 DETAILED DOCUMENTATION:
  * ==========================
@@ -68,24 +137,24 @@
  *
  * 📦 PACKAGE LOADING SYSTEM:
  * ==========================
- * 
+ *
  * 🔹 PACKAGE HIERARCHY:
  *   - BASE (mandatory) → CRUD (optional) → CHARTS (optional)
  *   - Each package is INDEPENDENT - no automatic inclusion
  *   - Pages must explicitly request ALL packages they need
- * 
+ *
  * 🔹 LOADING PROCESS:
  *   1. Read page config from PAGE_CONFIGS
  *   2. Load requested packages in dependency order
  *   3. Validate required globals are available
  *   4. Execute custom initializers
- * 
+ *
  * 🔹 CRITICAL RULES:
  *   - BASE package is MANDATORY for all pages
  *   - CRUD package includes date-utils.js (formatDate function)
  *   - CHARTS package is optional, depends on BASE
  *   - No package automatically includes others
- * 
+ *
  * FINAL ARCHITECTURE:
  * ===================
  * 1. Single Point of Entry - נקודת כניסה אחת

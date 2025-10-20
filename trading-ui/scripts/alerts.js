@@ -1494,23 +1494,23 @@ async function saveAlert() {
   }
   console.log('🔧 Form validation passed');
 
-  // בדיקת שדות חובה
-  const formData = new FormData(form);
-  const relatedType = formData.get('alertRelationType');
-  const relatedId = document.getElementById('alertRelatedObjectSelect').value;
+  // איסוף נתונים מהטופס באמצעות DataCollectionService
+  const alertData = DataCollectionService.collectFormData({
+    alertRelationType: { id: 'alertRelationType', type: 'text' },
+    alertRelatedObjectSelect: { id: 'alertRelatedObjectSelect', type: 'int' },
+    conditionAttribute: { id: 'conditionAttribute', type: 'text' },
+    conditionOperator: { id: 'conditionOperator', type: 'text' },
+    conditionNumber: { id: 'conditionNumber', type: 'number' },
+    message: { id: 'message', type: 'text' },
+    priority: { id: 'priority', type: 'text' },
+    status: { id: 'status', type: 'text', default: 'open' }
+  });
 
-  // console.log('🔧 Form validation:');
-  // console.log('🔧 Related type:', relatedType);
-  // console.log('🔧 Related ID:', relatedId);
-
-  // בדיקת תנאי התראה
-  const conditionAttributeElement = document.getElementById('conditionAttribute');
-  const conditionOperatorElement = document.getElementById('conditionOperator');
-  const conditionNumberElement = document.getElementById('conditionNumber');
-
-  const conditionAttribute = conditionAttributeElement.value;
-  const conditionOperator = conditionOperatorElement.value;
-  const conditionNumber = conditionNumberElement.value;
+  const relatedType = alertData.alertRelationType;
+  const relatedId = alertData.alertRelatedObjectSelect;
+  const conditionAttribute = alertData.conditionAttribute;
+  const conditionOperator = alertData.conditionOperator;
+  const conditionNumber = alertData.conditionNumber;
 
   // console.log('🔧 Condition validation:');
   // console.log('🔧 Condition attribute:', conditionAttribute);
@@ -1597,13 +1597,13 @@ async function saveAlert() {
     return;
   }
 
-  const alertData = {
-    related_type_id: parseInt(formData.get('alertRelationType')),
-    related_id: parseInt(document.getElementById('alertRelatedObjectSelect').value),
+  const alertPayload = {
+    related_type_id: parseInt(relatedType),
+    related_id: parseInt(relatedId),
     condition_attribute: conditionAttribute,
     condition_operator: conditionOperator,
     condition_number: conditionNumber,
-    message: document.getElementById('alertMessage').value || null,
+    message: alertData.message || null,
     status: 'open',
     is_triggered: 'false',
   };
@@ -1627,45 +1627,19 @@ async function saveAlert() {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(alertData),
+      body: JSON.stringify(alertPayload),
     });
 
-    console.log('🔧 Response status:', response.status);
-    console.log('🔧 Response ok:', response.ok);
+    // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
+    await CRUDResponseHandler.handleSaveResponse(response, {
+      modalId: 'addAlertModal',
+      successMessage: 'התראה נשמרה בהצלחה!',
+      apiUrl: '/api/alerts/',
+      entityName: 'התראה'
+    });
 
-    if (response.ok) {
-      const newAlert = await response.json();
-      console.log('🔧 New alert created:', newAlert);
-
-      // התראה נשמרה בהצלחה
-
-      // שימוש במערכת הריענון המרכזית
-      if (window.centralRefresh) {
-        await window.centralRefresh.showSuccessAndRefresh('alerts', 'התראה נשמרה בהצלחה!');
-      } else {
-        // Fallback למערכת הישנה
-        // הצגת הודעה
-        if (window.showSuccessNotification) {
-          window.showSuccessNotification('הצלחה', 'התראה נשמרה בהצלחה!', 4000, 'business');
-        }
-
-        // רענון הנתונים
-        await loadAlertsData();
-      }
-
-      // סגירת המודל
-      closeModal('addAlertModal');
-      
-    } else {
-      const errorText = await response.text();
-      console.error('🔧 Server error response:', errorText);
-      throw new Error(`שגיאה בשמירת התראה: ${response.status} - ${errorText}`);
-    }
   } catch (error) {
-    console.error('🔧 Error saving alert:', error);
-    if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה בשמירת התראה', 'שגיאה בשמירת התראה: ' + error.message);
-    }
+    CRUDResponseHandler.handleError(error, 'שמירת התראה');
   }
 }
 
@@ -2150,54 +2124,15 @@ async function confirmDeleteAlert(alertId) {
       method: 'DELETE',
     });
 
-    const result = await response.json();
+    // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
+    await CRUDResponseHandler.handleDeleteResponse(response, {
+      successMessage: 'התראה נמחקה בהצלחה!',
+      apiUrl: '/api/alerts/',
+      entityName: 'התראה'
+    });
 
-    if (response.ok && result.status === 'success') {
-      // console.log('✅ התראה נמחקה בהצלחה');
-      if (window.showSuccessNotification) {
-        window.showSuccessNotification('הצלחה', 'התראה נמחקה בהצלחה!', 4000, 'business');
-      }
-      loadAlertsData();
-      
-    } else {
-      // console.error('❌ שגיאה במחיקת התראה:', result);
-
-      // טיפול בשגיאות מהשרת
-      if (result.error && result.error.message) {
-        const serverMessage = result.error.message;
-
-        if (serverMessage.includes('has linked items')) {
-          if (window.showErrorNotification) {
-            window.showErrorNotification(
-              'שגיאה במחיקה',
-              'לא ניתן למחוק התראה זו - יש פריטים מקושרים אליה',
-            );
-          }
-        } else {
-          if (window.showErrorNotification) {
-            window.showErrorNotification(
-              'שגיאה במחיקה',
-              serverMessage,
-            );
-          }
-        }
-      } else {
-        if (window.showErrorNotification) {
-          window.showErrorNotification(
-            'שגיאה במחיקה',
-            'שגיאה במחיקת התראה - בדוק את הנתונים',
-          );
-        }
-      }
-    }
-  } catch {
-    // console.error('❌ שגיאה במחיקת התראה:', error);
-    if (window.showErrorNotification) {
-      window.showErrorNotification(
-        'שגיאה',
-        'שגיאה במחיקת התראה - בדוק את חיבור השרת',
-      );
-    }
+  } catch (error) {
+    CRUDResponseHandler.handleError(error, 'מחיקת התראה');
   }
 }
 

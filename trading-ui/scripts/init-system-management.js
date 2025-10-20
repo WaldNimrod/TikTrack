@@ -1766,7 +1766,14 @@ async function checkForMismatches(pageName, pageConfig) {
     console.log(`🔍 checkForMismatches: Starting for page ${pageName}`);
     const mismatches = [];
     
-    // Wait for specific scripts to be ready instead of generic delay
+    // Get actually loaded scripts from the current page
+    const loadedScripts = Array.from(document.querySelectorAll('script[src]'))
+        .map(script => script.src.split('/').pop().split('?')[0])
+        .filter(script => script.endsWith('.js'));
+    
+    console.log(`🔍 checkForMismatches: Actually loaded scripts:`, loadedScripts);
+    
+    // Check only scripts that are actually loaded on this page
     const requiredScripts = [];
     if (pageConfig.packages) {
         console.log(`🔍 checkForMismatches: Page packages:`, pageConfig.packages);
@@ -1775,7 +1782,7 @@ async function checkForMismatches(pageName, pageConfig) {
             console.log(`🔍 checkForMismatches: Package ${pkgName}:`, pkg);
             if (pkg && pkg.scripts) {
                 for (const script of pkg.scripts) {
-                    if (script.required && script.globalCheck) {
+                    if (script.required && script.globalCheck && loadedScripts.includes(script.file)) {
                         requiredScripts.push(script.file);
                         console.log(`🔍 checkForMismatches: Added required script: ${script.file}`);
                     }

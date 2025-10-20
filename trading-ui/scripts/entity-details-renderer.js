@@ -1409,14 +1409,15 @@ class EntityDetailsRenderer {
 /**
  * Auto-initialize when DOM is ready - אתחול אוטומטי כשה-DOM מוכן
  */
-// document.addEventListener('DOMContentLoaded', () => {
-//     try {
-//         // אתחול מערכת הרנדור
+// Auto-initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        // אתחול מערכת הרנדור
         new EntityDetailsRenderer();
         
         console.info('Entity Details Renderer system loaded and ready');
         
-//     } catch (error) {
-//         console.error('Error auto-initializing EntityDetailsRenderer:', error);
-//     }
-// });
+    } catch (error) {
+        console.error('Error auto-initializing EntityDetailsRenderer:', error);
+    }
+});

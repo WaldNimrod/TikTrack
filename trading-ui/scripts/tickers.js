@@ -476,11 +476,15 @@ function restoreTickersSectionState() {
 /**
  * הצגת מודל הוספת טיקר
  */
-function showAddTickerModal() {
+async function showAddTickerModal() {
   // הצגת מודל הוספת טיקר
 
-  // עדכון אפשרויות מטבע לפני הצגת הטופס
-  updateCurrencyOptions();
+  // טעינת מטבעות עם ברירת מחדל מהעדפות
+  await SelectPopulatorService.populateCurrenciesSelect('addTickerCurrency', {
+    includeEmpty: true,
+    emptyText: 'בחר מטבע',
+    defaultFromPreferences: true
+  });
 
   // ניקוי הטופס
   document.getElementById('addTickerForm').reset();

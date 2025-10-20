@@ -990,14 +990,40 @@ async function loadModalData() {
 
     // הגדרת נתונים ראשוניים (ברירת מחדל לטיקר)
     // console.log('🔧 Setting initial data for tickers...');
-    populateSelect('alertRelatedObjectSelect', tickers, 'symbol', '');
-    populateSelect('editAlertRelatedObjectSelect', tickers, 'symbol', '');
+    await SelectPopulatorService.populateTickersSelect('alertRelatedObjectSelect', {
+      includeEmpty: true,
+      emptyText: 'בחר טיקר',
+      defaultFromPreferences: true,
+      filterFn: (ticker) => ticker.status === 'open' || ticker.status === 'closed'
+    });
+    
+    await SelectPopulatorService.populateTickersSelect('editAlertRelatedObjectSelect', {
+      includeEmpty: true,
+      emptyText: 'בחר טיקר',
+      defaultFromPreferences: true,
+      filterFn: (ticker) => ticker.status === 'open' || ticker.status === 'closed'
+    });
   } catch (error) {
     // console.error('שגיאה בטעינת נתונים למודל:', error);
     // המשך עם מערכים ריקים
     updateRadioButtons([], [], [], []);
-    populateSelect('alertRelatedObjectSelect', [], 'symbol', '');
-    populateSelect('editAlertRelatedObjectSelect', [], 'symbol', '');
+    
+    // Fallback עם SelectPopulatorService
+    try {
+      await SelectPopulatorService.populateTickersSelect('alertRelatedObjectSelect', {
+        includeEmpty: true,
+        emptyText: 'בחר טיקר',
+        defaultFromPreferences: true
+      });
+      
+      await SelectPopulatorService.populateTickersSelect('editAlertRelatedObjectSelect', {
+        includeEmpty: true,
+        emptyText: 'בחר טיקר',
+        defaultFromPreferences: true
+      });
+    } catch (fallbackError) {
+      console.error('שגיאה ב-fallback:', fallbackError);
+    }
   }
 }
 

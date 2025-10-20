@@ -237,7 +237,7 @@ class UnifiedAppInitializer {
                 } else {
                     console.warn('⚠️ Some systems need attention (see details above)');
                 }
-            }, 2000);
+            }, 5000);
             
             this.logSuccess();
             
@@ -844,8 +844,8 @@ class UnifiedAppInitializer {
      * Wait for Required Scripts to be Ready
      */
     async waitForRequiredScripts(config) {
-        const maxWaitTime = 10000; // 10 seconds max
-        const checkInterval = 200; // Check every 200ms
+        const maxWaitTime = 15000; // 15 seconds max
+        const checkInterval = 500; // Check every 500ms
         let elapsed = 0;
         
         // Get required scripts from config
@@ -1426,7 +1426,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log('🚀 About to call initializeUnifiedApp...');
             await window.initializeUnifiedApp();
             console.log('✅ initializeUnifiedApp completed');
-        }, 5000);
+        }, 10000);
         
     } catch (error) {
         console.error('❌ Unified App auto-initialization failed:', error);

@@ -183,9 +183,13 @@ async function showAddExecutionModal() {
     document.getElementById('addExecutionCommission').value = 1.0;
   }
 
-  // טעינת טיקרים לפי הצ'קבוקס
-  const showClosedTrades = document.getElementById('addExecutionShowClosedTrades')?.checked || false;
-  await updateTickersList('add', showClosedTrades);
+  // טעינת טיקרים עם ברירת מחדל מהעדפות
+  await SelectPopulatorService.populateTickersSelect('addExecutionTicker', {
+    includeEmpty: true,
+    emptyText: 'בחר טיקר',
+    defaultFromPreferences: true,
+    filterFn: (ticker) => ticker.status === 'open' || ticker.status === 'closed'
+  });
 
   // חישוב ערכים מחושבים
   calculateAddExecutionValues();

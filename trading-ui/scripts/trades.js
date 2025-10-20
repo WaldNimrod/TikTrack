@@ -1475,58 +1475,38 @@ async function loadModalData() {
   try {
     console.log('🔄 Loading modal data...');
 
-    // טעינת חשבונות
-    const accountsResponse = await fetch('/api/trading-accounts/');
-    if (!accountsResponse.ok) {
-      throw new Error(`Failed to load accounts: ${accountsResponse.status}`);
-    }
-    const accounts = await accountsResponse.json();
-    console.log('✅ Accounts loaded:', accounts.data?.length || 0);
+    // טעינת חשבונות עם ברירת מחדל מהעדפות
+    await SelectPopulatorService.populateAccountsSelect('addAccount', {
+      includeEmpty: true,
+      emptyText: 'בחר חשבון',
+      defaultFromPreferences: true,
+      filterFn: (account) => account.status === 'open'
+    });
 
-    // טעינת טיקרים פעילים
-    try {
-      const tickersResponse = await fetch('/api/tickers/');
-      const tickersData = await tickersResponse.json();
-      const tickers = tickersData.data || [];
-      
-      const tickerSelect = document.getElementById('addTicker');
-      if (tickerSelect) {
-        tickerSelect.innerHTML = '<option value="">בחר טיקר</option>';
-        tickers.forEach(ticker => {
-          if (ticker.status === 'open' || ticker.status === 'closed') {
-            const option = document.createElement('option');
-            option.value = ticker.id;
-            option.textContent = `${ticker.symbol} - ${ticker.name}`;
-            tickerSelect.appendChild(option);
-          }
-        });
-      }
-    } catch (error) {
+    // טעינת טיקרים עם ברירת מחדל מהעדפות
+    await SelectPopulatorService.populateTickersSelect('addTicker', {
+      includeEmpty: true,
+      emptyText: 'בחר טיקר',
+      defaultFromPreferences: true,
+      filterFn: (ticker) => ticker.status === 'open' || ticker.status === 'closed'
+    });
+
+    console.log('✅ Modal data loaded with SelectPopulatorService');
+  } catch (error) {
       console.error('Error loading tickers:', error);
     }
 
     // טעינת תוכניות מסחר פתוחות
-    const tradePlansResponse = await fetch('/api/trade_plans/?status=open');
-    if (!tradePlansResponse.ok) {
-      throw new Error(`Failed to load trade plans: ${tradePlansResponse.status}`);
-    }
-    const tradePlansData = await tradePlansResponse.json();
-    const tradePlans = tradePlansData.data || [];
-    console.log('✅ Trade plans loaded:', tradePlans.length);
-    
-    const addTradePlanSelect = document.getElementById('addTradePlan');
-    if (addTradePlanSelect) {
-      addTradePlanSelect.innerHTML = '<option value="">בחר תוכנית מסחר</option>';
-      tradePlans.forEach(plan => {
-        const option = document.createElement('option');
-        option.value = plan.id;
-        option.textContent = `${plan.ticker?.symbol || 'טיקר לא ידוע'} - ${plan.investment_type} - $${plan.planned_amount}`;
-        addTradePlanSelect.appendChild(option);
-      });
-    }
+    await SelectPopulatorService.populateTradePlansSelect('addTradePlan', {
+      includeEmpty: true,
+      emptyText: 'בחר תוכנית מסחר',
+      defaultFromPreferences: true,
+      filterFn: (plan) => plan.status === 'open'
+    });
 
 
     // הוספת event listener לבחירת תוכנית מסחר
+    const addTradePlanSelect = document.getElementById('addTradePlan');
     if (addTradePlanSelect) {
       addTradePlanSelect.addEventListener('change', function() {
         if (this.value) {

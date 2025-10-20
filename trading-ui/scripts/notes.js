@@ -884,8 +884,19 @@ async function loadModalData() {
     updateRadioButtons(accounts, trades, tradePlans, tickers);
 
     // הגדרת נתונים ראשוניים (ברירת מחדל לטיקר)
-    populateSelect('noteRelatedObjectSelect', tickers, 'symbol', '');
-    populateSelect('editNoteRelatedObjectSelect', tickers, 'symbol', '');
+    await SelectPopulatorService.populateTickersSelect('noteRelatedObjectSelect', {
+      includeEmpty: true,
+      emptyText: 'בחר טיקר',
+      defaultFromPreferences: true,
+      filterFn: (ticker) => ticker.status === 'open' || ticker.status === 'closed'
+    });
+    
+    await SelectPopulatorService.populateTickersSelect('editNoteRelatedObjectSelect', {
+      includeEmpty: true,
+      emptyText: 'בחר טיקר',
+      defaultFromPreferences: true,
+      filterFn: (ticker) => ticker.status === 'open' || ticker.status === 'closed'
+    });
 
   } catch {
     // המשך עם מערכים ריקים

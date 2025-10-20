@@ -1936,18 +1936,15 @@ async function showAddTradePlanModal() {
     planDateDisplay.textContent = todayDisplay;
   }
 
-  // Loading tickers from server FIRST
-  console.log('🔄 showAddTradePlanModal: Loading tickers from server...');
-  if (typeof window.tickerService?.loadTickersForTradePlan === 'function') {
-    console.log('✅ showAddTradePlanModal: tickerService.loadTickersForTradePlan found, calling...');
-    await window.tickerService.loadTickersForTradePlan();
-    console.log('✅ showAddTradePlanModal: tickerService.loadTickersForTradePlan completed');
-  } else {
-    console.log('❌ showAddTradePlanModal: tickerService.loadTickersForTradePlan not available');
-    if (typeof window.showNotification === 'function') {
-      window.showNotification('tickerService.loadTickersForTradePlan not available', 'warning');
-    }
-  }
+  // Loading tickers with default from preferences
+  console.log('🔄 showAddTradePlanModal: Loading tickers with SelectPopulatorService...');
+  await SelectPopulatorService.populateTickersSelect('ticker', {
+    includeEmpty: true,
+    emptyText: 'בחר טיקר',
+    defaultFromPreferences: true,
+    filterFn: (ticker) => ticker.status === 'open' || ticker.status === 'closed'
+  });
+  console.log('✅ showAddTradePlanModal: Tickers loaded with SelectPopulatorService');
 
 
   // Clear any existing validation errors

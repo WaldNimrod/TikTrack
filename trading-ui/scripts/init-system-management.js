@@ -1533,10 +1533,11 @@ ${JSON.stringify(logData.tests, null, 2)}
  * Run Comprehensive Tests on All Pages
  */
 async function runComprehensiveTests() {
-    console.log('🔍 Starting comprehensive tests for all pages...');
+    console.log('🔍 runComprehensiveTests: Starting comprehensive tests for all pages...');
     
     // Get all page configs
     const allPages = Object.keys(window.PAGE_CONFIGS || {});
+    console.log('🔍 runComprehensiveTests: Found pages:', allPages);
     const results = [];
     
     // Summary counters
@@ -1576,6 +1577,7 @@ async function runComprehensiveTests() {
  * Test Single Page
  */
 async function testSinglePage(pageName, pageConfig) {
+    console.log(`🔍 testSinglePage: Testing page ${pageName}`);
     const result = {
         pageName: pageName,
         displayName: pageConfig.name || pageName,
@@ -1672,25 +1674,40 @@ function checkLoadOrder(pageConfig) {
  * Wait for Scripts to be Ready
  */
 async function waitForScriptsReady(requiredScripts) {
-    const maxWaitTime = 10000; // 10 seconds max
-    const checkInterval = 200; // Check every 200ms
+    console.log('🔍 waitForScriptsReady: Starting to wait for scripts:', requiredScripts);
+    const maxWaitTime = 15000; // 15 seconds max
+    const checkInterval = 500; // Check every 500ms
     let elapsed = 0;
     
     while (elapsed < maxWaitTime) {
+        console.log(`🔍 waitForScriptsReady: Checking at ${elapsed}ms...`);
+        
         const allReady = requiredScripts.every(script => {
+            let isReady = false;
             switch (script) {
                 case 'color-scheme-system.js':
-                    return window.colorSchemeSystemReady === true;
+                    isReady = window.colorSchemeSystemReady === true;
+                    console.log(`🔍 ${script}: ${isReady} (window.colorSchemeSystemReady = ${window.colorSchemeSystemReady})`);
+                    break;
                 case 'data-utils.js':
-                    return window.dataUtilsReady === true;
+                    isReady = window.dataUtilsReady === true;
+                    console.log(`🔍 ${script}: ${isReady} (window.dataUtilsReady = ${window.dataUtilsReady})`);
+                    break;
                 case 'date-utils.js':
-                    return window.dateUtilsReady === true;
+                    isReady = window.dateUtilsReady === true;
+                    console.log(`🔍 ${script}: ${isReady} (window.dateUtilsReady = ${window.dateUtilsReady})`);
+                    break;
                 default:
-                    return true; // Assume ready if no specific check
+                    isReady = true; // Assume ready if no specific check
+                    console.log(`🔍 ${script}: ${isReady} (default - no specific check)`);
             }
+            return isReady;
         });
         
+        console.log(`🔍 waitForScriptsReady: All ready = ${allReady}`);
+        
         if (allReady) {
+            console.log('✅ waitForScriptsReady: All scripts are ready!');
             return true;
         }
         
@@ -1698,6 +1715,7 @@ async function waitForScriptsReady(requiredScripts) {
         elapsed += checkInterval;
     }
     
+    console.log('⏰ waitForScriptsReady: Timeout reached, not all scripts ready');
     return false; // Timeout
 }
 
@@ -1705,24 +1723,30 @@ async function waitForScriptsReady(requiredScripts) {
  * Check for Mismatches
  */
 async function checkForMismatches(pageName, pageConfig) {
+    console.log(`🔍 checkForMismatches: Starting for page ${pageName}`);
     const mismatches = [];
     
     // Wait for specific scripts to be ready instead of generic delay
     const requiredScripts = [];
     if (pageConfig.packages) {
+        console.log(`🔍 checkForMismatches: Page packages:`, pageConfig.packages);
         for (const pkgName of pageConfig.packages) {
             const pkg = window.PACKAGE_MANIFEST?.[pkgName];
+            console.log(`🔍 checkForMismatches: Package ${pkgName}:`, pkg);
             if (pkg && pkg.scripts) {
                 for (const script of pkg.scripts) {
                     if (script.required && script.globalCheck) {
                         requiredScripts.push(script.file);
+                        console.log(`🔍 checkForMismatches: Added required script: ${script.file}`);
                     }
                 }
             }
         }
     }
     
+    console.log(`🔍 checkForMismatches: Required scripts:`, requiredScripts);
     await waitForScriptsReady(requiredScripts);
+    console.log(`🔍 checkForMismatches: Scripts ready, checking for mismatches...`);
     
     if (pageConfig.packages) {
         for (const pkgName of pageConfig.packages) {
@@ -1824,10 +1848,21 @@ function getStatusText(status) {
  * Show Page Details Modal - Detailed Scan Results
  */
 async function showPageDetails(pageName) {
+    console.log(`🔍 showPageDetails: Starting for page: ${pageName}`);
     const pageConfig = window.PAGE_CONFIGS[pageName];
     
+    if (!pageConfig) {
+        console.log(`❌ showPageDetails: No config found for page ${pageName}`);
+        showNotification(`לא נמצא קונפיגורציה לעמוד ${pageName}`, 'error');
+        return;
+    }
+    
+    console.log(`🔍 showPageDetails: Found config for page ${pageName}:`, pageConfig);
+    
     // Run detailed scan for this specific page
+    console.log(`🔍 showPageDetails: Running detailed scan for ${pageName}...`);
     const scanResults = await runDetailedPageScan(pageName, pageConfig);
+    console.log(`🔍 showPageDetails: Scan completed for ${pageName}:`, scanResults);
     
     let detailsHtml = `
         <h5>🔍 תוצאות סריקה מפורטת: ${pageConfig.name || pageName}</h5>
@@ -1969,6 +2004,7 @@ async function showPageDetails(pageName) {
  * Run Detailed Page Scan
  */
 async function runDetailedPageScan(pageName, pageConfig) {
+    console.log(`🔍 runDetailedPageScan: Starting detailed scan for page ${pageName}`);
     const result = {
         pageName: pageName,
         criticalErrors: 0,
@@ -1989,8 +2025,10 @@ async function runDetailedPageScan(pageName, pageConfig) {
     result.criticalErrors += loadOrderIssues.length;
     
     // Wait for specific scripts to be ready instead of generic delay
+    console.log(`🔍 runDetailedPageScan: Waiting for scripts for page ${pageName}`);
     const requiredScripts = [];
     if (pageConfig.packages) {
+        console.log(`🔍 runDetailedPageScan: Page packages:`, pageConfig.packages);
         for (const pkgName of pageConfig.packages) {
             const pkg = window.PACKAGE_MANIFEST?.[pkgName];
             if (pkg && pkg.scripts) {
@@ -2003,7 +2041,9 @@ async function runDetailedPageScan(pageName, pageConfig) {
         }
     }
     
+    console.log(`🔍 runDetailedPageScan: Required scripts:`, requiredScripts);
     await waitForScriptsReady(requiredScripts);
+    console.log(`🔍 runDetailedPageScan: Scripts ready, proceeding with scan...`);
     
     // Check for mismatches (documented vs actual)
     const mismatches = await checkForMismatches(pageName, pageConfig);

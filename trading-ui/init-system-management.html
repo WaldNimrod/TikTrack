@@ -251,6 +251,11 @@
                 <div class="content-section">
                     <div class="section-header">
                         <h2>🔍 כלי בדיקה</h2>
+                        <div class="table-actions">
+                            <button onclick="copyAllResults()" class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-copy"></i> העתק תוצאות
+                            </button>
+                        </div>
                     </div>
                     <div class="section-body">
                         <div class="tools-grid">
@@ -279,65 +284,90 @@
                                 סטטיסטיקות חבילות
                             </button>
                         </div>
-                        <div class="mt-3 text-center">
-                            <button onclick="copyAllResults()" class="btn btn-outline-secondary">
-                                <i class="fas fa-copy"></i> העתק כל התוצאות
-                            </button>
-                        </div>
                         <div id="toolsResults" class="tools-results mt-3"></div>
                     </div>
                 </div>
                 
-                <!-- יוצר עמוד חדש -->
+                <!-- סקשן 2 - בדיקות מקיפות - כל העמודים -->
                 <div class="content-section">
                     <div class="section-header">
-                        <h2>✨ יוצר עמוד חדש</h2>
+                        <h2>🔍 בדיקות מקיפות - כל העמודים</h2>
+                        <div class="table-actions">
+                            <button onclick="runComprehensiveTests()" class="btn btn-primary">
+                                <i class="fas fa-play"></i> הרץ בדיקות מלאות
+                            </button>
+                            <button onclick="copyComprehensiveResults()" class="btn btn-outline-secondary">
+                                <i class="fas fa-copy"></i> העתק תוצאות
+                            </button>
+                            <button onclick="exportTestResults()" class="btn btn-secondary">
+                                <i class="fas fa-download"></i> ייצא תוצאות
+                            </button>
+                        </div>
                     </div>
                     <div class="section-body">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">שם עמוד:</label>
-                                <input type="text" id="newPageName" class="form-control" placeholder="my-new-page">
+                        <!-- Summary Cards -->
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <div class="card bg-success text-white">
+                                    <div class="card-body">
+                                        <h5 id="totalPagesCount">0</h5>
+                                        <p>סך עמודים</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">חבילות:</label>
-                                <div id="packagesCheckboxes" class="packages-checkboxes"></div>
+                            <div class="col-md-3">
+                                <div class="card bg-danger text-white">
+                                    <div class="card-body">
+                                        <h5 id="criticalErrorsCount">0</h5>
+                                        <p>שגיאות קריטיות</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-warning text-dark">
+                                    <div class="card-body">
+                                        <h5 id="mismatchCount">0</h5>
+                                        <p>אי-התאמות</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-info text-white">
+                                    <div class="card-body">
+                                        <h5 id="healthyPagesCount">0</h5>
+                                        <p>עמודים תקינים</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="mt-3">
-                            <button onclick="generatePage()" class="btn btn-primary">
-                                <i class="fas fa-magic"></i>
-                                יצור HTML
-                            </button>
-                            <button onclick="generateConfig()" class="btn btn-secondary">
-                                <i class="fas fa-cog"></i>
-                                יצור Config
-                            </button>
-                            <button onclick="generateJavaScript()" class="btn btn-info">
-                                <i class="fas fa-code"></i>
-                                יצור JavaScript
-                            </button>
+                        
+                        <!-- Detailed Results Table -->
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>עמוד</th>
+                                        <th>סטטוס</th>
+                                        <th>שגיאות קריטיות</th>
+                                        <th>אי-התאמות</th>
+                                        <th>כפילויות</th>
+                                        <th>סדר טעינה</th>
+                                        <th>פעולות</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="comprehensiveTestResults">
+                                    <tr>
+                                        <td colspan="7" class="text-center">
+                                            <i class="fas fa-spinner fa-spin"></i> לחץ "הרץ בדיקות מלאות" להתחלה
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
-                        <div id="generatedContent" class="generated-content mt-3"></div>
                     </div>
                 </div>
                 
-                <!-- Package Manifest -->
-                <div class="content-section">
-                    <div class="section-header">
-                        <h2>📦 חבילות מערכת</h2>
-                    </div>
-                    <div class="section-body">
-                        <div id="packagesList" class="packages-cards row g-3">
-                            <div class="loading">
-                                <i class="fas fa-spinner fa-spin"></i>
-                                טוען רשימת חבילות...
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- מערכת ניטור מתקדמת -->
+                <!-- סקשן 3 - מערכת ניטור מתקדמת -->
                 <div class="content-section">
                     <div class="section-header">
                         <h2>🔍 מערכת ניטור מתקדמת</h2>
@@ -417,105 +447,75 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- דוח ביצועים -->
+                
+                <!-- סקשן 4 - חבילות מערכת -->
                 <div class="content-section">
                     <div class="section-header">
-                        <h2>📊 דוח ביצועים</h2>
+                        <h2>📦 חבילות מערכת</h2>
+                        <div class="table-actions">
+                            <button onclick="copyPackagesList()" class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-copy"></i> העתק רשימה
+                            </button>
+                        </div>
                     </div>
                     <div class="section-body">
-                        <div id="performanceReport" class="performance-report">
+                        <div id="packagesList" class="packages-cards row g-3">
                             <div class="loading">
                                 <i class="fas fa-spinner fa-spin"></i>
-                                טוען דוח ביצועים...
+                                טוען רשימת חבילות...
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- בדיקות מקיפות לכל העמודים -->
+                
+                <!-- סקשן 5 - יוצר עמוד חדש -->
                 <div class="content-section">
                     <div class="section-header">
-                        <h2>🔍 בדיקות מקיפות - כל העמודים</h2>
+                        <h2>✨ יוצר עמוד חדש</h2>
                         <div class="table-actions">
-                            <button onclick="runComprehensiveTests()" class="btn btn-primary">
-                                <i class="fas fa-play"></i> הרץ בדיקות מלאות
-                            </button>
-                            <button onclick="copyComprehensiveResults()" class="btn btn-outline-secondary">
-                                <i class="fas fa-copy"></i> העתק תוצאות
-                            </button>
-                            <button onclick="exportTestResults()" class="btn btn-secondary">
-                                <i class="fas fa-download"></i> ייצא תוצאות
+                            <button onclick="copyGeneratedContent()" class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-copy"></i> העתק תוכן
                             </button>
                         </div>
                     </div>
                     <div class="section-body">
-                        <!-- Summary Cards -->
-                        <div class="row mb-3">
-                            <div class="col-md-3">
-                                <div class="card bg-success text-white">
-                                    <div class="card-body">
-                                        <h5 id="totalPagesCount">0</h5>
-                                        <p>סך עמודים</p>
-                                    </div>
-                                </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">שם עמוד:</label>
+                                <input type="text" id="newPageName" class="form-control" placeholder="my-new-page">
                             </div>
-                            <div class="col-md-3">
-                                <div class="card bg-danger text-white">
-                                    <div class="card-body">
-                                        <h5 id="criticalErrorsCount">0</h5>
-                                        <p>שגיאות קריטיות</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="card bg-warning text-dark">
-                                    <div class="card-body">
-                                        <h5 id="mismatchCount">0</h5>
-                                        <p>אי-התאמות</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="card bg-info text-white">
-                                    <div class="card-body">
-                                        <h5 id="healthyPagesCount">0</h5>
-                                        <p>עמודים תקינים</p>
-                                    </div>
-                                </div>
+                            <div class="col-md-6">
+                                <label class="form-label">חבילות:</label>
+                                <div id="packagesCheckboxes" class="packages-checkboxes"></div>
                             </div>
                         </div>
-                        
-                        <!-- Detailed Results Table -->
-                        <div class="table-responsive">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>עמוד</th>
-                                        <th>סטטוס</th>
-                                        <th>שגיאות קריטיות</th>
-                                        <th>אי-התאמות</th>
-                                        <th>כפילויות</th>
-                                        <th>סדר טעינה</th>
-                                        <th>פעולות</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="comprehensiveTestResults">
-                                    <tr>
-                                        <td colspan="7" class="text-center">
-                                            <i class="fas fa-spinner fa-spin"></i> לחץ "הרץ בדיקות מלאות" להתחלה
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <div class="mt-3">
+                            <button onclick="generatePage()" class="btn btn-primary">
+                                <i class="fas fa-magic"></i>
+                                יצור HTML
+                            </button>
+                            <button onclick="generateConfig()" class="btn btn-secondary">
+                                <i class="fas fa-cog"></i>
+                                יצור Config
+                            </button>
+                            <button onclick="generateJavaScript()" class="btn btn-info">
+                                <i class="fas fa-code"></i>
+                                יצור JavaScript
+                            </button>
                         </div>
+                        <div id="generatedContent" class="generated-content mt-3"></div>
                     </div>
                 </div>
-
+                
                 <!-- סקשן 6 - מיפוי עמודים במערכת -->
                 <div class="content-section">
                     <div class="section-header">
                         <h2>🗺️ מיפוי עמודים במערכת</h2>
+                        <div class="table-actions">
+                            <button onclick="copyPagesMapping()" class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-copy"></i> העתק מיפוי
+                            </button>
+                        </div>
                     </div>
                     <div class="section-body">
                         <div class="row">
@@ -552,11 +552,16 @@
                         </div>
                     </div>
                 </div>
-
+                
                 <!-- סקשן 7 - דוח ביצועים -->
                 <div class="content-section">
                     <div class="section-header">
                         <h2>📊 דוח ביצועים</h2>
+                        <div class="table-actions">
+                            <button onclick="copyPerformanceReport()" class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-copy"></i> העתק דוח
+                            </button>
+                        </div>
                     </div>
                     <div class="section-body">
                         <div class="row">

@@ -2328,3 +2328,157 @@ function copyDetailedPageResults() {
         showNotification('שגיאה בהעתקת התוצאות המפורטות', 'error');
     });
 }
+
+/**
+ * Copy packages list
+ */
+function copyPackagesList() {
+    const packagesContainer = document.getElementById('packagesList');
+    if (!packagesContainer || packagesContainer.innerHTML.trim() === '') {
+        showNotification('אין רשימת חבילות להעתקה', 'warning');
+        return;
+    }
+    
+    let copyText = '=== TikTrack System Packages ===\n';
+    copyText += `Date: ${new Date().toISOString()}\n\n`;
+    
+    if (window.PACKAGE_MANIFEST) {
+        const packages = Object.values(window.PACKAGE_MANIFEST);
+        packages.forEach(pkg => {
+            copyText += `Package: ${pkg.name} (${pkg.id})\n`;
+            copyText += `Description: ${pkg.description}\n`;
+            copyText += `Critical: ${pkg.critical ? 'Yes' : 'No'}\n`;
+            copyText += `Scripts: ${pkg.scripts?.length || 0}\n`;
+            copyText += `Size: ${pkg.estimatedSize || 'Unknown'}\n`;
+            copyText += `Version: ${pkg.version || '1.0.0'}\n`;
+            if (pkg.dependencies && pkg.dependencies.length > 0) {
+                copyText += `Dependencies: ${pkg.dependencies.join(', ')}\n`;
+            }
+            copyText += '\n';
+        });
+    } else {
+        copyText += 'Package Manifest not available\n';
+    }
+    
+    navigator.clipboard.writeText(copyText).then(() => {
+        showNotification('רשימת חבילות הועתקה ללוח', 'success');
+    }).catch(err => {
+        console.error('Failed to copy packages list:', err);
+        showNotification('שגיאה בהעתקת רשימת חבילות', 'error');
+    });
+}
+
+/**
+ * Copy generated content
+ */
+function copyGeneratedContent() {
+    const generatedContainer = document.getElementById('generatedContent');
+    if (!generatedContainer || generatedContainer.innerHTML.trim() === '') {
+        showNotification('אין תוכן שנוצר להעתקה', 'warning');
+        return;
+    }
+    
+    const codeElement = generatedContainer.querySelector('pre code');
+    if (!codeElement) {
+        showNotification('לא נמצא קוד להעתקה', 'warning');
+        return;
+    }
+    
+    const content = codeElement.textContent || codeElement.innerText;
+    navigator.clipboard.writeText(content).then(() => {
+        showNotification('תוכן הועתק ללוח', 'success');
+    }).catch(err => {
+        console.error('Failed to copy generated content:', err);
+        showNotification('שגיאה בהעתקת תוכן', 'error');
+    });
+}
+
+/**
+ * Copy pages mapping
+ */
+function copyPagesMapping() {
+    const mappingContainer = document.getElementById('pagesMapping');
+    const statsContainer = document.getElementById('pagesStats');
+    
+    if (!mappingContainer && !statsContainer) {
+        showNotification('אין מיפוי עמודים להעתקה', 'warning');
+        return;
+    }
+    
+    let copyText = '=== TikTrack Pages Mapping ===\n';
+    copyText += `Date: ${new Date().toISOString()}\n\n`;
+    
+    if (window.PAGE_CONFIGS) {
+        const pages = Object.entries(window.PAGE_CONFIGS);
+        copyText += `Total Pages: ${pages.length}\n\n`;
+        
+        pages.forEach(([pageId, config]) => {
+            copyText += `Page: ${config.name || pageId} (${pageId})\n`;
+            copyText += `Description: ${config.description || 'No description'}\n`;
+            copyText += `Type: ${config.pageType || 'standard'}\n`;
+            copyText += `Packages: ${config.packages?.join(', ') || 'None'}\n`;
+            copyText += `Required Globals: ${config.requiredGlobals?.join(', ') || 'None'}\n`;
+            copyText += `Requires Filters: ${config.requiresFilters ? 'Yes' : 'No'}\n`;
+            copyText += `Requires Validation: ${config.requiresValidation ? 'Yes' : 'No'}\n`;
+            copyText += `Requires Tables: ${config.requiresTables ? 'Yes' : 'No'}\n`;
+            copyText += `Custom Initializers: ${config.customInitializers?.length || 0}\n`;
+            copyText += `Last Modified: ${config.lastModified || 'Unknown'}\n\n`;
+        });
+    } else {
+        copyText += 'Page Configs not available\n';
+    }
+    
+    navigator.clipboard.writeText(copyText).then(() => {
+        showNotification('מיפוי עמודים הועתק ללוח', 'success');
+    }).catch(err => {
+        console.error('Failed to copy pages mapping:', err);
+        showNotification('שגיאה בהעתקת מיפוי עמודים', 'error');
+    });
+}
+
+/**
+ * Copy performance report
+ */
+function copyPerformanceReport() {
+    const reportContainer = document.getElementById('performanceReport');
+    if (!reportContainer || reportContainer.innerHTML.trim() === '') {
+        showNotification('אין דוח ביצועים להעתקה', 'warning');
+        return;
+    }
+    
+    let copyText = '=== TikTrack Performance Report ===\n';
+    copyText += `Date: ${new Date().toISOString()}\n\n`;
+    
+    // Get performance data from unified initializer
+    const report = window.unifiedAppInit?.getPerformanceReport ? 
+        window.unifiedAppInit.getPerformanceReport() : null;
+    
+    if (report) {
+        copyText += `Current Load Time: ${report.current?.totalTime || 'N/A'}ms\n`;
+        copyText += `Average Load Time: ${report.average || 'N/A'}ms\n`;
+        copyText += `Performance Trend: ${report.trend || 'Unknown'}\n`;
+        copyText += `Overall Score: ${report.overallScore || 'N/A'}/100\n`;
+        
+        if (report.current?.memoryUsage) {
+            copyText += `Memory Used: ${Math.round(report.current.memoryUsage.used / 1024 / 1024)}MB\n`;
+            copyText += `Total Memory: ${Math.round(report.current.memoryUsage.total / 1024 / 1024)}MB\n`;
+        }
+        
+        if (report.current?.stages) {
+            copyText += '\nInitialization Stages:\n';
+            copyText += `- Detect: ${report.current.stages.detect || 0}ms\n`;
+            copyText += `- Prepare: ${report.current.stages.prepare || 0}ms\n`;
+            copyText += `- Execute: ${report.current.stages.execute || 0}ms\n`;
+            copyText += `- Finalize: ${report.current.stages.finalize || 0}ms\n`;
+        }
+    } else {
+        copyText += 'Performance data not available\n';
+    }
+    
+    navigator.clipboard.writeText(copyText).then(() => {
+        showNotification('דוח ביצועים הועתק ללוח', 'success');
+    }).catch(err => {
+        console.error('Failed to copy performance report:', err);
+        showNotification('שגיאה בהעתקת דוח ביצועים', 'error');
+    });
+}

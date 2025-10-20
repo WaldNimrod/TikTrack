@@ -1388,6 +1388,60 @@ const ADDITIONAL_PAGE_CONFIGS = {
                 // Init system management specific initialization
             }
         ]
+    },
+    
+    // Cache Management
+    'cache-management': {
+        name: 'Cache Management',
+        packages: ['base', 'system-management', 'preferences'],
+        requiredGlobals: [
+            'NotificationSystem',
+            'window.loadCacheManagement',
+            'window.CacheManager'
+        ],
+        description: 'ניהול מטמון מערכת - ניקוי, אופטימיזציה וניטור',
+        lastModified: '2025-10-19',
+        pageType: 'system',
+        preloadAssets: ['cache-data'],
+        cacheStrategy: 'standard',
+        requiresFilters: false,
+        requiresValidation: false,
+        requiresTables: true,
+        customInitializers: [
+            async (pageConfig) => {
+                console.log('🗄️ Initializing Cache Management...');
+                if (typeof window.loadCacheManagement === 'function') {
+                    await window.loadCacheManagement();
+                }
+            }
+        ]
+    },
+    
+    // Conditions Test
+    'conditions-test': {
+        name: 'Conditions Test',
+        packages: ['base', 'validation', 'preferences'],
+        requiredGlobals: [
+            'NotificationSystem',
+            'window.loadConditionsTest',
+            'window.ConditionsTestManager'
+        ],
+        description: 'בדיקת תנאי מערכת - ולידציה ובדיקות',
+        lastModified: '2025-10-19',
+        pageType: 'testing',
+        preloadAssets: ['conditions-data'],
+        cacheStrategy: 'standard',
+        requiresFilters: false,
+        requiresValidation: true,
+        requiresTables: true,
+        customInitializers: [
+            async (pageConfig) => {
+                console.log('🧪 Initializing Conditions Test...');
+                if (typeof window.loadConditionsTest === 'function') {
+                    await window.loadConditionsTest();
+                }
+            }
+        ]
     }
 };
 

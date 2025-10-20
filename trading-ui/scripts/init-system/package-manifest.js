@@ -1,38 +1,48 @@
 /**
  * Package Manifest - TikTrack Initialization System
  * מנפסט חבילות מרכזי לניהול תלויות ובדיקות תקינות
- * 
+ *
  * ⚠️ IMPORTANT FOR DEVELOPERS:
  * ============================
- * 
+ *
  * This file defines the PACKAGE STRUCTURE for the monitoring system.
  * When you add new scripts to pages, you MUST update this file to avoid monitoring errors.
- * 
+ *
  * 🔧 HOW TO ADD NEW SCRIPTS:
  * ==========================
- * 
+ *
  * 1. ADD TO APPROPRIATE PACKAGE:
  *    - Base Package: Core systems required by all pages
  *    - CRUD Package: Data management systems
  *    - Charts Package: Chart and visualization systems
  *    - Create new package if needed
- * 
+ *
  * 2. DEFINE GLOBAL CHECK:
  *    - Add globalCheck property to verify script loaded correctly
  *    - Use window object property that the script creates
- * 
+ *
  * 3. UPDATE PAGE CONFIGURATION:
  *    - Add package to page config in page-initialization-configs.js
  *    - Add required globals to the page configuration
- * 
+ *
  * 4. UPDATE ACTUAL PAGE:
  *    - Add script tag to HTML page
  *    - Ensure correct loading order
- * 
+ *
  * 📖 DETAILED DOCUMENTATION:
  * ==========================
  * - Developer Guide: documentation/frontend/init-system/DEVELOPER_GUIDE.md
  * - Management Interface: /init-system-management
+ *
+ * 🔍 MONITORING SYSTEM ROLE:
+ * ==========================
+ * This file is used by the monitoring system to:
+ * - Compare documented scripts vs actually loaded scripts
+ * - Validate script availability via global checks
+ * - Report mismatches between documentation and reality
+ * 
+ * The monitoring system does NOT load scripts automatically.
+ * It only compares and reports differences.
  * 
  * 🏗️ HIERARCHY & DEPENDENCIES:
  * =============================
@@ -123,6 +133,12 @@ const PACKAGE_MANIFEST = {
         required: true
       },
       {
+        file: 'color-scheme-system.js',
+        globalCheck: 'window.loadDynamicColors',
+        description: 'מערכת צבעים דינמית',
+        required: true
+      },
+      {
         file: 'unified-cache-manager.js',
         globalCheck: 'window.UnifiedCacheManager',
         description: 'מנהל cache מאוחד',
@@ -144,6 +160,12 @@ const PACKAGE_MANIFEST = {
         file: 'preferences.js',
         globalCheck: 'window.getCurrentPreference',
         description: 'מערכת העדפות',
+        required: true
+      },
+      {
+        file: 'button-system-init.js',
+        globalCheck: 'window.ButtonSystem',
+        description: 'מערכת כפתורים',
         required: true
       }
     ],
@@ -315,78 +337,6 @@ const PACKAGE_MANIFEST = {
     dependencies: ['base'],
     scripts: [
       {
-        file: 'system-management/core/sm-base.js',
-        globalCheck: 'window.SMBaseSection',
-        description: 'Base classes for system management',
-        required: true
-      },
-      {
-        file: 'system-management/core/sm-error-handler.js',
-        globalCheck: 'window.SMErrorHandler',
-        description: 'Error handling for system management',
-        required: true
-      },
-      {
-        file: 'system-management/core/sm-ui-components.js',
-        globalCheck: 'window.SMUIComponents',
-        description: 'UI components for system management',
-        required: true
-      },
-      {
-        file: 'system-management/system-management-main.js',
-        globalCheck: 'window.SystemManagementMain',
-        description: 'Main orchestrator for system management',
-        required: true
-      },
-      {
-        file: 'system-management/sections/sm-section-dashboard.js',
-        globalCheck: 'window.SMSectionDashboard',
-        description: 'Dashboard section',
-        required: true
-      },
-      {
-        file: 'system-management/sections/sm-section-server.js',
-        globalCheck: 'window.SMSectionServer',
-        description: 'Server section',
-        required: true
-      },
-      {
-        file: 'system-management/sections/sm-section-cache.js',
-        globalCheck: 'window.SMSectionCache',
-        description: 'Cache section',
-        required: true
-      },
-      {
-        file: 'system-management/sections/sm-section-external-data.js',
-        globalCheck: 'window.SMSectionExternalData',
-        description: 'External data section',
-        required: true
-      },
-      {
-        file: 'system-management/sections/sm-section-database.js',
-        globalCheck: 'window.SMSectionDatabase',
-        description: 'Database section',
-        required: true
-      },
-      {
-        file: 'system-management/sections/sm-section-alerts.js',
-        globalCheck: 'window.SMSectionAlerts',
-        description: 'Alerts section',
-        required: true
-      },
-      {
-        file: 'system-management/sections/sm-section-background-tasks.js',
-        globalCheck: 'window.SMSectionBackgroundTasks',
-        description: 'Background tasks section',
-        required: true
-      },
-      {
-        file: 'system-management/sections/sm-section-operations.js',
-        globalCheck: 'window.SMSectionOperations',
-        description: 'Operations section',
-        required: true
-      },
-      {
         file: 'system-management.js',
         globalCheck: 'window.SystemManagement',
         description: 'Legacy system management',
@@ -405,8 +355,8 @@ const PACKAGE_MANIFEST = {
         required: false
       }
     ],
-    estimatedSize: '~300KB',
-    initTime: '~150ms'
+    estimatedSize: '~180KB',
+    initTime: '~90ms'
   },
 
   // 8. DEVELOPMENT TOOLS PACKAGE

@@ -397,6 +397,11 @@ async function loadNotesData() {
             </td>
           </tr>
         `;
+        
+        // 🔘 עדכון כפתורים דינמיים
+        if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
+          window.ButtonSystem.initializeButtons();
+        }
       }
       return;
     }
@@ -460,6 +465,11 @@ async function loadNotesData() {
           </td>
         </tr>
       `;
+      
+      // 🔘 עדכון כפתורים דינמיים
+      if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
+        window.ButtonSystem.initializeButtons();
+      }
     }
 
     if (typeof window.showErrorNotification === 'function') {
@@ -495,6 +505,11 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
         </td>
       </tr>
     `;
+    
+    // 🔘 עדכון כפתורים דינמיים
+    if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
+      window.ButtonSystem.initializeButtons();
+    }
     return;
   }
 
@@ -691,6 +706,11 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
   
   // עדכון table-count ו-info-summary
   updateNotesSummary(notes);
+  
+  // 🔘 עדכון כפתורים דינמיים
+  if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
+    window.ButtonSystem.initializeButtons();
+  }
 }
 
 // פונקציה לעדכון סיכום הערות

@@ -7,34 +7,44 @@
  *
  * ⚠️ IMPORTANT FOR DEVELOPERS:
  * ============================
- * 
+ *
  * This file defines PAGE CONFIGURATIONS for the monitoring system.
  * When you add new scripts to pages, you MUST update the page configuration here.
- * 
+ *
  * 🔧 HOW TO UPDATE PAGE CONFIGURATION:
  * ====================================
- * 
+ *
  * 1. FIND YOUR PAGE:
  *    - Look for your page name in PAGE_CONFIGS object
  *    - If not found, add new configuration
- * 
+ *
  * 2. ADD REQUIRED PACKAGES:
  *    - Add package names to packages array
  *    - Always include 'base' package
  *    - Add 'crud' for data pages, 'charts' for chart pages
- * 
+ *
  * 3. ADD REQUIRED GLOBALS:
  *    - Add global variables that your page needs
  *    - These are checked by the monitoring system
- * 
+ *
  * 4. UPDATE ACTUAL PAGE:
  *    - Add script tags to HTML page
  *    - Ensure scripts are loaded in correct order
- * 
+ *
  * 📖 DETAILED DOCUMENTATION:
  * ==========================
  * - Developer Guide: documentation/frontend/init-system/DEVELOPER_GUIDE.md
  * - Management Interface: /init-system-management
+ *
+ * 🔍 MONITORING SYSTEM ROLE:
+ * ==========================
+ * This file is used by the monitoring system to:
+ * - Compare documented page requirements vs actually loaded scripts
+ * - Validate that required globals are available
+ * - Report mismatches between documentation and reality
+ * 
+ * The monitoring system does NOT load scripts automatically.
+ * It only compares and reports differences.
  *
  * 📦 PACKAGE USAGE GUIDE:
  * ======================
@@ -193,6 +203,7 @@ const PAGE_CONFIGS = {
             'NotificationSystem',
             'DataUtils',
             'window.loadTradesData',
+            'window.loadUserPreferences',
             'window.setupSortableHeaders',
             'window.initializeTradeConditionsSystem'
         ],
@@ -247,7 +258,8 @@ const PAGE_CONFIGS = {
         requiredGlobals: [
             'NotificationSystem',
             'DataUtils',
-            'window.loadExecutionsData'
+            'window.loadExecutionsData',
+            'window.loadUserPreferences'
         ],
         
         // ← NEW: מטאדאטה
@@ -317,6 +329,7 @@ const PAGE_CONFIGS = {
             'NotificationSystem',
             'DataUtils',
             'window.loadAlertsData',
+            'window.loadUserPreferences',
             'window.initializeAlertModalTabs'
         ],
         
@@ -488,6 +501,7 @@ const PAGE_CONFIGS = {
             'NotificationSystem',
             'DataUtils',
             'window.loadTickersData',
+            'window.loadUserPreferences',
             'window.YahooFinanceService'
         ],
         
@@ -520,6 +534,11 @@ const PAGE_CONFIGS = {
         requiresFilters: false,
         requiresValidation: true,
         requiresTables: false,
+        requiredGlobals: [
+            'NotificationSystem',
+            'window.loadNotesData',
+            'window.loadUserPreferences'
+        ],
         customInitializers: [
             async (pageConfig) => {
                 console.log('📝 Initializing Notes...');
@@ -977,9 +996,16 @@ const PAGE_CONFIGS = {
     
     'db_display': {
         name: 'Database Display',
+        packages: ['base', 'crud'],
         requiresFilters: false,
         requiresValidation: false,
         requiresTables: true,
+        requiredGlobals: [
+            'NotificationSystem',
+            'DataUtils',
+            'window.loadDatabaseInfo',
+            'window.loadUserPreferences'
+        ],
         customInitializers: [
             async (pageConfig) => {
                 console.log('🗄️ Initializing Database Display...');
@@ -1117,7 +1143,8 @@ const ADDITIONAL_PAGE_CONFIGS = {
         requiredGlobals: [
             'NotificationSystem',
             'DataUtils',
-            'window.loadExtraData'
+            'window.loadExtraData',
+            'window.loadUserPreferences'
         ],
         description: 'תצוגת נתונים נוספים במסד הנתונים',
         lastModified: '2025-10-19',

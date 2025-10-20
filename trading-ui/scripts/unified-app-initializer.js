@@ -5,6 +5,33 @@
  * המערכת הסופית המאוחדת שמחליפה את כל ה-DOMContentLoaded listeners
  * ומאפשרת גמישות מקסימלית עם תחזוקה קלה
  *
+ * WHAT THIS SYSTEM DOES:
+ * ======================
+ * 
+ * ✅ Monitors: Compares documented scripts vs actually loaded scripts
+ * ✅ Validates: Checks for duplicates, load order, and availability
+ * ✅ Reports: Warns about mismatches and errors
+ * ✅ Orchestrates: Runs existing initialization functions in correct order
+ * 
+ * ❌ DOES NOT: Load scripts automatically
+ * ❌ DOES NOT: Inject script tags into HTML
+ * ❌ DOES NOT: Modify the page structure
+ * 
+ * TYPES OF MESSAGES:
+ * ==================
+ * 
+ * ⚠️ WARNING (Documentation Mismatch):
+ *    - Package manifest says script X should load
+ *    - But script X is not in the HTML
+ *    - OR: HTML loads script Y but it's not documented
+ *    - Action: Decide which side to update
+ * 
+ * ❌ ERROR (Real Issues):
+ *    - Script loaded twice (duplicate)
+ *    - Wrong load order (dependency issue)
+ *    - Script failed to load (404/syntax error)
+ *    - Action: Fix immediately in HTML
+ *
  * ⚠️ IMPORTANT FOR DEVELOPERS:
  * ============================
  * 
@@ -835,7 +862,7 @@ class UnifiedAppInitializer {
      * Show Critical Error
      */
     showCriticalError(validationResult) {
-        console.group('⚠️ ניטור מערכת - זיהוי שינויים');
+        console.group('⚠️ אי-התאמה: תיעוד מערכת ≠ עמוד בפועל');
         
         // Add monitoring system explanation
         console.group('⚠️ IMPORTANT FOR DEVELOPERS:');
@@ -871,13 +898,13 @@ class UnifiedAppInitializer {
         }
         
         if (validationResult.missing.length > 0) {
-            console.error('סקריפטים חסרים:');
+            console.warn('⚠️ אי-התאמות תיעוד:');
             validationResult.missing.forEach(m => {
-                console.error(`  ❌ ${m.script}`);
-                console.error(`     חבילה: ${m.package}`);
-                console.error(`     Global: ${m.global}`);
-                console.error(`     תיאור: ${m.description}`);
-                console.error(`     פתרון: הוסף <script src="scripts/${m.script}"></script>`);
+                console.warn(`  ⚠️ ${m.script}`);
+                console.warn(`     מתועד בחבילה: ${m.package}`);
+                console.warn(`     מצפה ל-Global: ${m.global}`);
+                console.warn(`     תיאור: ${m.description}`);
+                console.warn(`     🤔 בחר: (1) הוסף לעמוד או (2) הסר מתיעוד`);
             });
         }
         
@@ -896,9 +923,9 @@ class UnifiedAppInitializer {
             if (typeof window.showCriticalErrorModal === 'function') {
                 console.log('✅ Using showCriticalErrorModal for detailed error information');
                 const errorInfo = {
-                    title: 'ניטור מערכת - זיהוי שינויים בטעינת סקריפטים',
-                    type: 'warning',
-                    category: 'system',
+                    title: '⚠️ אי-התאמה: תיעוד vs מציאות',
+                    type: 'info',
+                    category: 'monitoring',
                     timestamp: new Date().toISOString()
                 };
                 const detailedMessage = this.buildDetailedErrorMessage(validationResult);
@@ -935,22 +962,30 @@ class UnifiedAppInitializer {
         let message = '';
         
         // כותרת והסבר
-        message += '=== ניטור מערכת - זיהוי שינויים בטעינת סקריפטים ===\n\n';
-        message += '⚠️ חשוב להבין:\n';
-        message += 'זוהי מערכת ניטור ולידציה, לא טוען אוטומטי של סקריפטים.\n';
-        message += 'השגיאות מציינות שהמערכת זיהתה שינויים שדורשים עדכון הגדרות.\n\n';
+        message += '=== ⚠️ אי-התאמה: תיעוד מערכת ≠ עמוד בפועל ===\n\n';
+        message += '🔍 מה קרה?\n';
+        message += 'מערכת הניטור משווה בין מה שמתועד (package-manifest.js + page-initialization-configs.js)\n';
+        message += 'לבין מה שנטען בפועל בעמוד HTML.\n';
+        message += 'זיהינו הבדלים שדורשים את תשומת ליבך.\n\n';
+        message += '⚠️ חשוב: מערכת זו לא טוענת סקריפטים אוטומטית!\n';
+        message += 'היא רק משווה ומתריעה על אי-התאמות.\n\n';
         
         // סקריפטים חסרים
         if (validationResult.missing.length > 0) {
-            message += `📋 סקריפטים שדורשים עדכון הגדרות (${validationResult.missing.length}):\n`;
-            message += '==========================================\n';
+            message += `⚠️ אי-התאמות שזוהו (${validationResult.missing.length}):\n`;
+            message += '===========================================\n';
+            message += 'לכל אי-התאמה - עליך להחליט מי "צודק":\n';
+            message += 'האם התיעוד צריך עדכון? או שהעמוד צריך עדכון?\n\n';
             
             validationResult.missing.forEach((item, index) => {
                 message += `\n${index + 1}. ${item.script}\n`;
-                message += `   📦 חבילה: ${item.package}\n`;
-                message += `   🔗 Global: ${item.global}\n`;
+                message += `   📦 מתועד בחבילה: ${item.package}\n`;
+                message += `   🔗 מצפה ל-Global: ${item.global}\n`;
                 message += `   📝 תיאור: ${item.description}\n`;
-                message += `   🔧 פתרון: הוסף <script src="scripts/${item.script}"></script>\n`;
+                message += `   \n`;
+                message += `   🤔 שאל את עצמך:\n`;
+                message += `   • האם הסקריפט צריך להיטען בעמוד? → הוסף <script src="scripts/${item.script}"></script>\n`;
+                message += `   • האם התיעוד מיושן/מוטעה? → הסר מ-package-manifest.js או page-configs\n`;
             });
             message += '\n';
         }
@@ -966,8 +1001,11 @@ class UnifiedAppInitializer {
         }
         
         // הנחיות תיקון מפורטות
-        message += '🔧 הנחיות תיקון מפורטות:\n';
-        message += '========================\n\n';
+        message += '🔧 איך לתקן אי-התאמה?\n';
+        message += '==========================\n\n';
+        message += '⚠️ קודם כל - החלט מי צודק:\n';
+        message += '• האם הסקריפטים באמת צריכים להיטען? (עדכן את העמוד)\n';
+        message += '• או שהתיעוד מיושן? (עדכן את המניפסט)\n\n';
         
         message += 'שלב 1: עדכון Package Manifest\n';
         message += '-----------------------------\n';
@@ -1018,6 +1056,101 @@ class UnifiedAppInitializer {
         message += '• מערכת משופרת: documentation/frontend/init-system/ENHANCED_INITIALIZATION_SYSTEM.md\n\n';
         
         message += '💡 טיפ: העתק את ההודעה הזו ללוח כדי לשמור על ההנחיות!';
+        
+        return message;
+    }
+
+    /**
+     * Show Real Error (for critical issues like duplicates, load order)
+     */
+    showRealError(errorType, errorData) {
+        console.group('❌ שגיאה חמורה - דורש תיקון מיידי');
+        
+        switch(errorType) {
+            case 'DUPLICATE_SCRIPT':
+                console.error(`🔴 כפילות בטעינה: ${errorData.script}`);
+                console.error(`נטען ${errorData.count} פעמים`);
+                console.error('זו בעיית ביצועים חמורה - הסר את הכפילות מה-HTML');
+                break;
+                
+            case 'LOAD_ORDER':
+                console.error(`🔴 סדר טעינה שגוי: ${errorData.script}`);
+                console.error(`נטען לפני: ${errorData.dependency}`);
+                console.error('זו שגיאה קריטית - תקן את סדר הטעינה ב-HTML');
+                break;
+                
+            case 'SCRIPT_FAILED':
+                console.error(`🔴 סקריפט נכשל בטעינה: ${errorData.script}`);
+                console.error(`שגיאה: ${errorData.error}`);
+                console.error('בדוק את הנתיב, תחביר, או קונסול לפרטים');
+                break;
+        }
+        
+        console.groupEnd();
+        
+        // Show error modal (critical error modal for real errors)
+        if (typeof window.showCriticalErrorModal === 'function') {
+            const errorInfo = {
+                title: `שגיאה קריטית: ${errorType}`,
+                type: 'error',  // Critical error type
+                category: 'system',
+                timestamp: new Date().toISOString()
+            };
+            window.showCriticalErrorModal(errorInfo, this.buildRealErrorMessage(errorType, errorData));
+        }
+    }
+
+    /**
+     * Build Real Error Message (for critical errors)
+     */
+    buildRealErrorMessage(errorType, errorData) {
+        let message = '';
+        
+        message += '=== ❌ שגיאה קריטית במערכת ===\n\n';
+        message += 'זוהי שגיאה אמיתית שדורשת תיקון מיידי.\n';
+        message += 'המערכת זיהתה בעיה שמונעת פעולה תקינה.\n\n';
+        
+        switch(errorType) {
+            case 'DUPLICATE_SCRIPT':
+                message += '🔴 כפילות בטעינת סקריפט\n';
+                message += '========================\n\n';
+                message += `הסקריפט ${errorData.script} נטען ${errorData.count} פעמים.\n`;
+                message += 'זו בעיית ביצועים חמורה שעלולה לגרום לבעיות בזיכרון ולהתנהגות לא צפויה.\n\n';
+                message += '🔧 פתרון:\n';
+                message += `1. פתח את קובץ ה-HTML\n`;
+                message += `2. מצא את כל הופעות <script src="scripts/${errorData.script}"></script>\n`;
+                message += `3. הסר את הכפילויות - השאר רק העתק אחד\n`;
+                message += `4. רענן את העמוד\n`;
+                break;
+                
+            case 'LOAD_ORDER':
+                message += '🔴 סדר טעינה שגוי\n';
+                message += '==================\n\n';
+                message += `הסקריפט ${errorData.script} נטען לפני ${errorData.dependency}.\n`;
+                message += 'זה יכול לגרום לשגיאות "undefined" ולהתנהגות לא צפויה.\n\n';
+                message += '🔧 פתרון:\n';
+                message += `1. פתח את קובץ ה-HTML\n`;
+                message += `2. מצא את <script src="scripts/${errorData.script}"></script>\n`;
+                message += `3. הזז אותו להיות אחרי <script src="scripts/${errorData.dependency}"></script>\n`;
+                message += `4. רענן את העמוד\n`;
+                break;
+                
+            case 'SCRIPT_FAILED':
+                message += '🔴 סקריפט נכשל בטעינה\n';
+                message += '======================\n\n';
+                message += `הסקריפט ${errorData.script} לא נטען בהצלחה.\n`;
+                message += `שגיאה: ${errorData.error}\n\n`;
+                message += '🔧 פתרונות אפשריים:\n';
+                message += `1. בדוק שהקובץ קיים: scripts/${errorData.script}\n`;
+                message += `2. בדוק שאין שגיאות תחביר בקובץ\n`;
+                message += `3. בדוק את הקונסול לפרטים נוספים\n`;
+                message += `4. בדוק הרשאות קריאה לקובץ\n`;
+                break;
+        }
+        
+        message += '\n📖 עזרה נוספת:\n';
+        message += '• עמוד ניהול מערכת: /init-system-management\n';
+        message += '• מדריך מפתח: documentation/frontend/init-system/DEVELOPER_GUIDE.md\n';
         
         return message;
     }

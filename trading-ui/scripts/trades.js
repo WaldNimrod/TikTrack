@@ -468,6 +468,11 @@ function updateTradesTable(trades) {
 
   // הוספת סולם צבעים לעמודת סוג השקעה
   addInvestmentTypeColorLegend();
+  
+  // 🔘 עדכון כפתורים דינמיים
+  if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
+    window.ButtonSystem.initializeButtons();
+  }
 }
 
 // פונקציות נוספות
@@ -2012,12 +2017,79 @@ function getCurrentPosition(_tradeId) {
 }
 
 // ========================================
+// טעינת העדפות משתמש
+// ========================================
+
+/**
+ * טעינת העדפות משתמש
+ */
+async function loadUserPreferences() {
+  try {
+    console.log('🔧 טוען העדפות משתמש...');
+    
+    // טעינת העדפות רלוונטיות לטריידים + צבעי ישויות
+    const preferences = await window.getPreferencesByNames([
+      // העדפות בסיסיות
+      'pagination_size_trades',
+      'auto_refresh_interval',
+      'default_currency',
+      'show_currency_conversion',
+      'date_format',
+      'number_format',
+      'trades_display_mode',
+      
+      // ✅ חובה: צבעי ישויות
+      'entityCashFlowColor',
+      'entityCashFlowColorLight',
+      'entityCashFlowColorDark',
+      'entityTradeColor',
+      'entityTradeColorLight',
+      'entityTradeColorDark',
+      'entityTickerColor',
+      'entityTickerColorLight',
+      'entityTickerColorDark',
+      'entityAlertColor',
+      'entityAlertColorLight',
+      'entityAlertColorDark',
+      'entityNoteColor',
+      'entityNoteColorLight',
+      'entityNoteColorDark',
+      'entityExecutionColor',
+      'entityExecutionColorLight',
+      'entityExecutionColorDark',
+      'entityTradePlanColor',
+      'entityTradePlanColorLight',
+      'entityTradePlanColorDark',
+      'entityTradingAccountColor',
+      'entityTradingAccountColorLight',
+      'entityTradingAccountColorDark'
+    ]);
+    
+    // שמירת העדפות בגלובל scope
+    window.tradesPreferences = preferences;
+    
+    console.log('✅ העדפות משתמש נטענו בהצלחה:', preferences);
+    return preferences;
+    
+  } catch (error) {
+    console.error('❌ שגיאה בטעינת העדפות משתמש:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
+
+// ========================================
 // אתחול וולידציה
 // ========================================
 
 // Initialize trades page - integrated with unified system
 window.initializeTradesPage = async function() {
   console.log('📊 Trades page initialized via unified system');
+  
+  // טעינת העדפות צבעי ישויות
+  await loadUserPreferences();
   
   // שחזור מצב הסגירה (נטען על ידי UnifiedAppInitializer)
 
@@ -2097,6 +2169,7 @@ window.initializeTradesPage = async function() {
 // פונקציות יסוד:
 window.loadTradesData = loadTradesData;                    // טעינת נתוני טריידים
 window.updateTradesTable = updateTradesTable;              // עדכון טבלת טריידים
+window.loadUserPreferences = loadUserPreferences;          // טעינת העדפות משתמש
 
 // פונקציות פעולות:
 window.viewTickerDetails = viewTickerDetails;              // צפייה בפרטי טיקר

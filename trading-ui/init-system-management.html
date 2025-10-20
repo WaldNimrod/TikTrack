@@ -203,7 +203,7 @@
     <div class="background-wrapper">
         <div class="page-body">
             <div class="main-content">
-                <!-- סטטוס מערכת -->
+                <!-- סקשן עליון - ניהול מערכת אתחול -->
                 <div class="content-section">
                     <div class="section-header">
                         <div class="table-title">
@@ -212,31 +212,42 @@
                         </div>
                     </div>
                     <div class="section-body">
-                        <div id="systemStatus" class="system-status">
-                            <div class="status-loading">
-                                <i class="fas fa-spinner fa-spin"></i>
-                                טוען סטטוס מערכת...
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card bg-primary text-white">
+                                    <div class="card-body text-center">
+                                        <h5 id="systemStatusCard" class="card-title">
+                                            <i class="fas fa-spinner fa-spin"></i> טוען...
+                                        </h5>
+                                        <p class="card-text">סטטוס מערכת</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-success text-white">
+                                    <div class="card-body text-center">
+                                        <h5 id="pagesCountCard" class="card-title">
+                                            <i class="fas fa-spinner fa-spin"></i> טוען...
+                                        </h5>
+                                        <p class="card-text">עמודים במערכת</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-info text-white">
+                                    <div class="card-body text-center">
+                                        <h5 id="packagesCountCard" class="card-title">
+                                            <i class="fas fa-spinner fa-spin"></i> טוען...
+                                        </h5>
+                                        <p class="card-text">חבילות זמינות</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- מיפוי עמודים -->
-                <div class="content-section">
-                    <div class="section-header">
-                        <h2>🗺️ מיפוי עמודים במערכת</h2>
-                    </div>
-                    <div class="section-body">
-                        <div id="pagesMapping" class="pages-mapping">
-                            <div class="text-center">
-                                <i class="fas fa-spinner fa-spin"></i>
-                                טוען מיפוי עמודים...
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- כלי בדיקה -->
+                <!-- סקשן 1 - כלי בדיקה -->
                 <div class="content-section">
                     <div class="section-header">
                         <h2>🔍 כלי בדיקה</h2>
@@ -266,6 +277,11 @@
                             <button onclick="showPackageStats()" class="btn btn-warning tool-btn">
                                 <i class="fas fa-boxes"></i>
                                 סטטיסטיקות חבילות
+                            </button>
+                        </div>
+                        <div class="mt-3 text-center">
+                            <button onclick="copyAllResults()" class="btn btn-outline-secondary">
+                                <i class="fas fa-copy"></i> העתק כל התוצאות
                             </button>
                         </div>
                         <div id="toolsResults" class="tools-results mt-3"></div>
@@ -326,8 +342,12 @@
                     <div class="section-header">
                         <h2>🔍 מערכת ניטור מתקדמת</h2>
                         <div class="table-actions">
-                            <button data-button-type="COPY" data-variant="full" data-onclick="copyDetailedLog()" data-text="העתק לוג מפורט" title="העתק לוג מפורט"></button>
-                            <button data-button-type="REFRESH" data-variant="small" data-onclick="runAdvancedMonitoring()" data-text="הרץ בדיקות" title="הרץ בדיקות ניטור מתקדמות"></button>
+                            <button onclick="runAdvancedMonitoring()" class="btn btn-primary">
+                                <i class="fas fa-play"></i> הרץ בדיקות
+                            </button>
+                            <button onclick="copyDetailedLog()" class="btn btn-outline-secondary">
+                                <i class="fas fa-copy"></i> העתק לוג מפורט
+                            </button>
                         </div>
                     </div>
                     <div class="section-body">
@@ -408,6 +428,175 @@
                             <div class="loading">
                                 <i class="fas fa-spinner fa-spin"></i>
                                 טוען דוח ביצועים...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- בדיקות מקיפות לכל העמודים -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2>🔍 בדיקות מקיפות - כל העמודים</h2>
+                        <div class="table-actions">
+                            <button onclick="runComprehensiveTests()" class="btn btn-primary">
+                                <i class="fas fa-play"></i> הרץ בדיקות מלאות
+                            </button>
+                            <button onclick="copyComprehensiveResults()" class="btn btn-outline-secondary">
+                                <i class="fas fa-copy"></i> העתק תוצאות
+                            </button>
+                            <button onclick="exportTestResults()" class="btn btn-secondary">
+                                <i class="fas fa-download"></i> ייצא תוצאות
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- Summary Cards -->
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <div class="card bg-success text-white">
+                                    <div class="card-body">
+                                        <h5 id="totalPagesCount">0</h5>
+                                        <p>סך עמודים</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-danger text-white">
+                                    <div class="card-body">
+                                        <h5 id="criticalErrorsCount">0</h5>
+                                        <p>שגיאות קריטיות</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-warning text-dark">
+                                    <div class="card-body">
+                                        <h5 id="mismatchCount">0</h5>
+                                        <p>אי-התאמות</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-info text-white">
+                                    <div class="card-body">
+                                        <h5 id="healthyPagesCount">0</h5>
+                                        <p>עמודים תקינים</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Detailed Results Table -->
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>עמוד</th>
+                                        <th>סטטוס</th>
+                                        <th>שגיאות קריטיות</th>
+                                        <th>אי-התאמות</th>
+                                        <th>כפילויות</th>
+                                        <th>סדר טעינה</th>
+                                        <th>פעולות</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="comprehensiveTestResults">
+                                    <tr>
+                                        <td colspan="7" class="text-center">
+                                            <i class="fas fa-spinner fa-spin"></i> לחץ "הרץ בדיקות מלאות" להתחלה
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- סקשן 6 - מיפוי עמודים במערכת -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2>🗺️ מיפוי עמודים במערכת</h2>
+                    </div>
+                    <div class="section-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>📋 עמודים מוגדרים</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="pagesMapping" class="pages-mapping">
+                                            <div class="text-center">
+                                                <i class="fas fa-spinner fa-spin"></i>
+                                                טוען מיפוי עמודים...
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>📊 סטטיסטיקות עמודים</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="pagesStats" class="pages-stats">
+                                            <div class="text-center">
+                                                <i class="fas fa-spinner fa-spin"></i>
+                                                טוען סטטיסטיקות...
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- סקשן 7 - דוח ביצועים -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2>📊 דוח ביצועים</h2>
+                    </div>
+                    <div class="section-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h5 id="performanceCard1" class="card-title">
+                                            <i class="fas fa-spinner fa-spin"></i> טוען...
+                                        </h5>
+                                        <p class="card-text">זמן טעינה ממוצע</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h5 id="performanceCard2" class="card-title">
+                                            <i class="fas fa-spinner fa-spin"></i> טוען...
+                                        </h5>
+                                        <p class="card-text">זיכרון בשימוש</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h5 id="performanceCard3" class="card-title">
+                                            <i class="fas fa-spinner fa-spin"></i> טוען...
+                                        </h5>
+                                        <p class="card-text">ביצועים כללי</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <div id="performanceReport" class="performance-report">
+                                <div class="loading">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    טוען דוח ביצועים...
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -12,6 +12,22 @@ The Unified Initialization System is a monitoring and validation system for Java
 
 **⚠️ Important:** The system performs **monitoring and validation** only - not automatic script loading.
 
+### 🔍 Message Types and How to Handle Them
+
+#### Type 1: Documentation Mismatch (Warning)
+- **Title:** "Documentation Mismatch Detected"
+- **Color:** Orange/Yellow (warning)
+- **Icon:** ⚠️
+- **What it means:** The page's actual loaded scripts don't match what's documented in the monitoring configuration
+- **How to handle:** You need to decide which side is correct and update the other
+
+#### Type 2: Real Errors (Error)
+- **Title:** "Script Loading Error"
+- **Color:** Red (error)
+- **Icon:** ❌
+- **What it means:** Critical issues like duplicates, wrong load order, or actual script failures
+- **How to handle:** Fix immediately in HTML pages
+
 ### 🎯 **Key Benefits**
 
 - **Single Point of Entry:** One centralized initialization system

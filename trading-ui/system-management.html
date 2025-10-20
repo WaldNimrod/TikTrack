@@ -293,8 +293,8 @@
                 </div>
                 <!-- UI Content Section 1 End -->  
 
-                <!-- Section 2: Server Management -->
-                <div class="content-section" id="sm-server">
+                        <!-- Section 2: Server Management - DISABLED FOR SIMPLIFICATION -->
+                        <!-- <div class="content-section" id="sm-server">
                     <div class="section-header">
                         <h2>🌐 נתונים חיצוניים</h2>
                         <div class="header-actions">
@@ -305,7 +305,7 @@
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
-                    </div>
+                            </div> -->
                     <div class="section-body">
                         <!-- External Data Summary -->
                         <div class="info-summary external-data-overview" id="externalDataSummary">
@@ -347,8 +347,8 @@
                 <!-- UI Content Section 3 End--> 
 
                 <!-- UI Content Section 4 Start-->
-                <!-- Section 3: Cache Management -->
-                <div class="content-section" id="sm-cache">
+                        <!-- Section 3: Cache Management - DISABLED FOR SIMPLIFICATION -->
+                        <!-- <div class="content-section" id="sm-cache">
                     <div class="section-header entity-test-sub-header">
                         <h2>🚨 התראות מערכת</h2>
                         <div class="header-actions">
@@ -359,7 +359,7 @@
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
-                    </div>
+                            </div> -->
                     <div class="section-body">
                         <!-- Alerts Summary -->
                         <div class="info-summary alerts-overview" id="alertsSummary">
@@ -401,14 +401,14 @@
                 <!-- UI Content Section 4 End--> 
 
                 <!-- UI Content Section 5 Start-->
-                <!-- Section 4: External Data -->
-                <div class="content-section" id="sm-external-data">
+                <!-- Section 4: External Data - DISABLED FOR SIMPLIFICATION -->
+                <!-- <div class="content-section" id="sm-external-data">
                     <div class="section-header entity-test-sub-header">
                         <h2>🔒 אבטחה</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
-                    </div>
+                    </div> -->
                     <div class="section-body">
                         <!-- אבטחה - Info Summary -->
                         <div class="info-summary security-overview" id="securitySummary">
@@ -477,14 +477,14 @@
                 <!-- UI Content Section 5 End--> 
 
                 <!-- UI Content Section 6 Start-->
-                <!-- Section 5: Database -->
-                <div class="content-section" id="sm-database">
+                <!-- Section 5: Database - DISABLED FOR SIMPLIFICATION -->
+                <!-- <div class="content-section" id="sm-database">
                     <div class="section-header entity-test-sub-header">
                         <h2>📋 לוגים וניטור</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section5')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
-                    </div>
+                    </div> -->
                     <div class="section-body">
                         <!-- פילטרים לכל הרוחב -->
                         <div class="card mb-3">
@@ -533,14 +533,14 @@
                 <!-- UI Content Section 6 End--> 
 
                 <!-- UI Content Section 7 Start-->
-                <!-- Section 6: Alerts -->
-                <div class="content-section" id="sm-alerts">
+                <!-- Section 6: Alerts - DISABLED FOR SIMPLIFICATION -->
+                <!-- <div class="content-section" id="sm-alerts">
                     <div class="section-header entity-test-sub-header">
                         <h2>💾 גיבויים ושחזור</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section6')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
-                    </div>
+                    </div> -->
                     <div class="section-body">
                         <!-- תוכן בשתי עמודות -->
                         <div class="row">
@@ -633,14 +633,14 @@
                 <!-- UI Content Section 7 End--> 
 
                 <!-- UI Content Section 7 Start - Initialization System Monitoring -->
-                <!-- Section 7: Background Tasks -->
-                <div class="content-section" id="sm-background-tasks">
+                <!-- Section 7: Background Tasks - DISABLED FOR SIMPLIFICATION -->
+                <!-- <div class="content-section" id="sm-background-tasks">
                     <div class="section-header entity-test-sub-header">
                         <h2>🚀 מערכת אתחול חכמה - ניטור ופיתוח</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section7')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
-                    </div>
+                    </div> -->
                     <div class="section-body">
                         <!-- Initialization System Status -->
                         <div class="row mb-3">
@@ -788,14 +788,14 @@
                 <!-- UI Content Section 7 End - Initialization System Monitoring -->
 
                 <!-- UI Content Section 8 Start - Unified Log System -->
-                <!-- Section 8: Operations -->
-                <div class="content-section" id="sm-operations">
+                <!-- Section 8: Operations - DISABLED FOR SIMPLIFICATION -->
+                <!-- <div class="content-section" id="sm-operations">
                     <div class="section-header entity-test-sub-header">
                         <h2>📊 מערכת לוגים מאוחדת</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section8')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
-                    </div>
+                    </div> -->
                     <div class="section-body">
                         <!-- Log Type Selection -->
                         <div class="log-type-selection mb-3">
@@ -880,21 +880,8 @@
     <script src="scripts/data-utils.js"></script>
     <script src="scripts/notification-system.js"></script>
     <script src="scripts/cache-sync-manager.js"></script>
-    <!-- System Management Package Scripts -->
-    <script src="scripts/color-scheme-system.js?v=1.0.0"></script>
-    <script src="scripts/system-management/core/sm-base.js?v=1.0.0"></script>
-    <script src="scripts/system-management/core/sm-error-handler.js?v=1.0.0"></script>
-    <script src="scripts/system-management/core/sm-ui-components.js?v=1.0.0"></script>
-    <script src="scripts/system-management/system-management-main.js?v=1.0.0"></script>
-    <script src="scripts/system-management/sections/sm-section-dashboard.js?v=1.0.0"></script>
-    <script src="scripts/system-management/sections/sm-section-server.js?v=1.0.0"></script>
-    <script src="scripts/system-management/sections/sm-section-cache.js?v=1.0.0"></script>
-    <script src="scripts/system-management/sections/sm-section-external-data.js?v=1.0.0"></script>
-    <script src="scripts/system-management/sections/sm-section-database.js?v=1.0.0"></script>
-    <script src="scripts/system-management/sections/sm-section-alerts.js?v=1.0.0"></script>
-    <script src="scripts/system-management/sections/sm-section-background-tasks.js?v=1.0.0"></script>
-    <script src="scripts/system-management/sections/sm-section-operations.js?v=1.0.0"></script>
-    <script src="scripts/system-management.js?v=1.0.0"></script>
+    <!-- System Management Package Scripts - ONLY BASIC FOR DASHBOARD -->
+    <script src="scripts/system-management.js"></script>
     
     <!-- Test Runner for Smart Initialization System -->
     <script src="scripts/test-runner.js?v=1.0.0"></script>

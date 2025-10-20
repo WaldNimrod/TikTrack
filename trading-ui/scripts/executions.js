@@ -1840,6 +1840,11 @@ async function updateExecutionsTableMain(executions) {
                 <td data-date="${execution.date || execution.execution_date}">${execution.date || execution.execution_date ? new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL') : '-'}</td>
                 <td style="text-align: left; direction: ltr;">${execution.source || '-'}</td>
                 <td class="actions-cell">
+                    ${window.createActionsMenu ? window.createActionsMenu([
+                      { type: 'LINK', onclick: `console.log('🔗 [LINKED ITEMS] לחיצה על כפתור מקושרים עבור עסקה:', ${execution.id}); if(window.loadLinkedItemsData) { window.loadLinkedItemsData('execution', ${execution.id}).then(data => { console.log('🔗 [LINKED ITEMS] נתונים נטענו:', data); if(data) { console.log('🔗 [LINKED ITEMS] מציג מודל עם נתונים'); window.showLinkedItemsModal(data, 'execution', ${execution.id}, 'view'); } else { console.log('❌ [LINKED ITEMS] אין נתונים להצגה'); } }); } else { console.log('❌ [LINKED ITEMS] loadLinkedItemsData לא זמין'); }`, title: 'פריטים מקושרים' },
+                      { type: 'EDIT', onclick: `editExecution(${execution.id})`, title: 'ערוך' },
+                      { type: 'DELETE', onclick: `deleteExecution(${execution.id})`, title: 'מחק' }
+                    ]) : `
                     <button class="btn btn-sm" 
                       onclick="console.log('🔗 [LINKED ITEMS] לחיצה על כפתור מקושרים עבור עסקה:', ${execution.id}); if(window.loadLinkedItemsData) { window.loadLinkedItemsData('execution', ${execution.id}).then(data => { console.log('🔗 [LINKED ITEMS] נתונים נטענו:', data); if(data) { console.log('🔗 [LINKED ITEMS] מציג מודל עם נתונים'); window.showLinkedItemsModal(data, 'execution', ${execution.id}, 'view'); } else { console.log('❌ [LINKED ITEMS] אין נתונים להצגה'); } }); } else { console.log('❌ [LINKED ITEMS] loadLinkedItemsData לא זמין'); }" 
                       title="פריטים מקושרים">🔗</button>
@@ -1849,6 +1854,7 @@ async function updateExecutionsTableMain(executions) {
                     <button class="btn btn-sm" 
                       onclick="deleteExecution(${execution.id})" 
                       title="מחק">🗑️</button>
+                    `}
                 </td>
             </tr>
         `;

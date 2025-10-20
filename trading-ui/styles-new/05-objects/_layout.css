@@ -107,7 +107,7 @@
 .main-content {
   width: 100%;
   max-width: var(--container-xl, 1400px);
-  margin: 0 auto;
+  margin: 0;
   padding: var(--spacing-md, 16px);
   box-sizing: border-box;
   overflow-x: hidden;

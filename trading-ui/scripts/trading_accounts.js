@@ -218,31 +218,19 @@ async function loadCurrenciesFromServer() {
 // }
 
 // פונקציה ליצירת אפשרויות מטבע בטופס
-function generateCurrencyOptions(tradingAccount = null) {
-  // generateCurrencyOptions STARTED
-  // Currencies data
-  // Currencies loaded
-
-  if (!window.currenciesData || window.currenciesData.length === 0) {
-    // No currencies data, using default
-    // אם אין מטבעות, נחזיר ברירת מחדל
-    return `
-      <option value="1" ${tradingAccount && tradingAccount.currency_id === 1 ? 'selected' : ''}>דולר אמריקאי (USD)</option>
-    `;
+async function generateCurrencyOptions(tradingAccount = null) {
+  // שימוש ב-SelectPopulatorService למילוי מטבעות
+  const selectId = 'currency_id';
+  const options = {
+    includeEmpty: false,
+    defaultFromPreferences: true
+  };
+  
+  if (tradingAccount) {
+    options.defaultText = `${tradingAccount.currency_name || 'דולר אמריקאי'} (${tradingAccount.currency_symbol || 'USD'})`;
   }
-
-  const options = window.currenciesData.map(currency => {
-    const isSelected = tradingAccount && (
-      tradingAccount.currency_id === currency.id ||
-      tradingAccount.currency_symbol === currency.symbol
-    );
-
-    return `<option value="${currency.id}" ${isSelected ? 'selected' : ''}>${currency.name} (${currency.symbol})</option>`;
-  }).join('');
-
-  // Generated options
-  // generateCurrencyOptions COMPLETED
-  return options;
+  
+  await SelectPopulatorService.populateCurrenciesSelect(selectId, options);
 }
 
 // פונקציה לטעינת חשבונות מהשרת
@@ -482,18 +470,12 @@ function updateTradingAccountsTable(trading_accounts) {
       <td>${tradingAccount.type || '-'}</td>
       <td>${tradingAccount.currency || '-'}</td>
       <td>
-        <span class="numeric-value-positive" 
-              style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
-          $${tradingAccount.balance ? tradingAccount.balance.toLocaleString() : '0'}
-        </span>
+        ${FieldRendererService.renderNumericValue(tradingAccount.balance || 0, ' $', false)}
       </td>
       <td class="status-cell" data-status="${statusForFilter}">
-        <span class="status-${tradingAccount.status}-badge" 
-              style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
-          ${statusForFilter}
-        </span>
+        ${FieldRendererService.renderStatus(tradingAccount.status, 'account')}
       </td>
-      <td>${tradingAccount.created_at ? new Date(tradingAccount.created_at).toLocaleDateString('he-IL') : '-'}</td>
+      <td>${FieldRendererService.renderDate(tradingAccount.created_at, false)}</td>
       <td class="actions-cell">
         ${window.createActionsMenu ? window.createActionsMenu([
           { type: 'LINK', onclick: `window.showLinkedItemsModal && window.showLinkedItemsModal(linkedItemsData, 'tradingAccount', ${tradingAccount.id})`, title: 'פריטים מקושרים' },
@@ -1093,17 +1075,14 @@ async function saveTradingAccount(mode, tradingAccountId = null) {
       window.clearCacheBeforeCRUD('trading_accounts', mode === 'add' ? 'add' : 'edit');
     }
     
-    // איסוף נתונים מהטופס
-    const form = document.getElementById('tradingAccountForm');
-    const formData = new FormData(form);
-
-    const tradingAccountData = {
-      name: formData.get('name'),
-      currency_id: parseInt(formData.get('currency_id')),
-      status: formData.get('status'),
-      cash_balance: parseFloat(formData.get('cash_balance')) || 0,
-      notes: formData.get('notes'),
-    };
+    // איסוף נתונים מהטופס באמצעות DataCollectionService
+    const tradingAccountData = DataCollectionService.collectFormData({
+      name: { id: 'name', type: 'text' },
+      currency_id: { id: 'currency_id', type: 'int' },
+      status: { id: 'status', type: 'text' },
+      cash_balance: { id: 'cash_balance', type: 'number' },
+      notes: { id: 'notes', type: 'text' }
+    });
 
     // בדיקת תקינות
     const validation = validateTradingAccountData(tradingAccountData);
@@ -1112,65 +1091,37 @@ async function saveTradingAccount(mode, tradingAccountId = null) {
       return; // לא ממשיכים אם יש שגיאה
     }
 
-    // קריאה ל-API
+    // קריאה ל-API עם CRUDResponseHandler
     if (mode === 'add') {
-      await addTradingAccountToAPI(tradingAccountData);
+      const response = await fetch('/api/trading-accounts/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(tradingAccountData),
+      });
+      
+      await CRUDResponseHandler.handleSaveResponse(response, {
+        modalId: 'tradingAccountModal',
+        successMessage: 'חשבון נוסף בהצלחה!',
+        apiUrl: '/api/trading-accounts/',
+        entityName: 'חשבון מסחר'
+      });
     } else {
-      await updateTradingAccountInAPI(tradingAccountId, tradingAccountData);
-    }
-
-    // רענון הנתונים לפני סגירת המודל
-    try {
-      // שימוש במערכת הריענון המרכזית
-      if (window.centralRefresh) {
-        const message = mode === 'add' ? 'חשבון נוסף בהצלחה' : 'חשבון עודכן בהצלחה';
-        await window.centralRefresh.showSuccessAndRefresh('trading_accounts', message);
-      } else {
-        // Fallback למערכת הישנה
-        if (typeof window.loadTradingAccountsDataForTradingAccountsPage === 'function') {
-          await window.loadTradingAccountsDataForTradingAccountsPage();
-        } else if (typeof window.loadTradingAccountsData === 'function') {
-          const trading_accounts = await window.loadTradingAccountsData();
-          if (typeof window.updateTradingAccountsTable === 'function') {
-            window.updateTradingAccountsTable(trading_accounts);
-          }
-        }
-
-        // הצגת הודעה
-        const message = mode === 'add' ? 'חשבון נוסף בהצלחה' : 'חשבון עודכן בהצלחה';
-        if (typeof window.showSuccessNotification === 'function') {
-          window.showSuccessNotification('הצלחה', message);
-        }
-      }
-
-      // רק אם הרענון הצליח, נסגור את המודל
-      const modal = document.getElementById('tradingAccountModal');
-      if (modal) {
-        const bootstrapModal = bootstrap.Modal.getInstance(modal);
-        if (bootstrapModal) {
-          bootstrapModal.hide();
-        }
-        // הסרת המודל מה-DOM
-        modal.remove();
-      }
-
-    } catch (refreshError) {
-      handleSystemError(refreshError, 'רענון הטבלה');
-      // אם יש שגיאה ברענון, לא סוגרים את המודל ומציגים הודעת שגיאה
-      if (typeof window.showWarningNotification === 'function') {
-        window.showWarningNotification('אזהרה', 'החשבון נשמר אך יש בעיה בעדכון הטבלה. אנא רענן את הדף.');
-      } else {
-        // console.warn('החשבון נשמר אך יש בעיה בעדכון הטבלה. אנא רענן את הדף.');
-      }
+      const response = await fetch(`/api/trading-accounts/${tradingAccountId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(tradingAccountData),
+      });
+      
+      await CRUDResponseHandler.handleUpdateResponse(response, {
+        modalId: 'tradingAccountModal',
+        successMessage: 'חשבון עודכן בהצלחה!',
+        apiUrl: '/api/trading-accounts/',
+        entityName: 'חשבון מסחר'
+      });
     }
 
   } catch (error) {
-    handleSaveError(error, 'שמירת חשבון');
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה', 'שגיאה בשמירת החשבון');
-    } else {
-      handleSystemError(new Error('שגיאה בשמירת החשבון'), 'שמירת חשבון');
-    }
+    CRUDResponseHandler.handleError(error, 'שמירת חשבון');
   }
 }
 
@@ -1361,22 +1312,15 @@ async function deleteTradingAccountFromAPI(tradingAccountId, tradingAccountName)
       method: 'DELETE',
     });
 
-    if (response.ok) {
+    // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
+    await CRUDResponseHandler.handleDeleteResponse(response, {
+      successMessage: `החשבון "${tradingAccountName}" נמחק בהצלחה!`,
+      apiUrl: '/api/trading-accounts/',
+      entityName: 'חשבון מסחר'
+    });
 
-        // רענון הנתונים
-        if (typeof loadTradingAccounts === 'function') {
-          loadTradingAccounts();
-        }
-
-      // הצגת הודעה
-      showSuccessMessage(`החשבון "${accountName}" נמחק בהצלחה`);
-    } else {
-      const data = await response.json();
-      showErrorMessage(data.message || 'שגיאה במחיקת חשבון');
-    }
   } catch (error) {
-    handleDeleteError(error, 'מחיקת חשבון');
-    showErrorMessage('שגיאה במחיקת החשבון');
+    CRUDResponseHandler.handleError(error, 'מחיקת חשבון');
   }
 }
 

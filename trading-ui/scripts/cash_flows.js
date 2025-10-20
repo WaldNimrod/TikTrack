@@ -806,24 +806,13 @@ async function loadAccountsForCashFlow() {
  */
 async function loadAccountsForEditCashFlow() {
   try {
-    const response = await fetch('http://127.0.0.1:8080/api/trading-accounts/');
-    if (response.ok) {
-      const result = await response.json();
-      if (result.status === 'success') {
-        const select = document.getElementById('editCashFlowAccount');
-        select.innerHTML = '<option value="">בחר חשבון...</option>';
-
-        // הצגת רק חשבונות פתוחים
-        result.data
-          .filter(account => account.status === 'open')
-          .forEach(account => {
-            const option = document.createElement('option');
-            option.value = account.id;
-            option.textContent = account.name;
-            select.appendChild(option);
-          });
-      }
-    }
+    // שימוש ב-SelectPopulatorService
+    await SelectPopulatorService.populateAccountsSelect('editCashFlowAccount', {
+      includeEmpty: true,
+      emptyText: 'בחר חשבון...',
+      defaultFromPreferences: false,
+      filterFn: (account) => account.status === 'open'
+    });
   } catch (error) {
     handleDataLoadError(error, 'טעינת חשבונות');
   }
@@ -1082,17 +1071,14 @@ function formatUsdRate(rate) {
  * @param {number} cashFlowId - מזהה התזרים
  */
 function showCashFlowDetails(cashFlowId) {
-  // מציאת התזרים
-  const cashFlow = cashFlowsData.find(cf => cf.id === cashFlowId);
-  if (!cashFlow) {
+  // שימוש במערכת הפרטים הגלובלית
+  if (window.showEntityDetails) {
+    window.showEntityDetails('cash_flow', cashFlowId, { mode: 'view' });
+  } else {
     if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה', 'תזרים מזומנים לא נמצא');
+      window.showErrorNotification('שגיאה', 'מערכת פרטי ישויות לא זמינה');
     }
-    return;
   }
-  
-  // פתיחת מודל עריכה במצב "קריאה בלבד"
-  showEditCashFlowModal(cashFlowId);
 }
 
 /**
@@ -1778,7 +1764,9 @@ async function _showEditCashFlowModal(id) {
     }
     document.getElementById('editCashFlowAmount').value = cashFlow.amount;
     document.getElementById('editCashFlowCurrency').value = cashFlow.currency_id || '';
-    document.getElementById('editCashFlowDate').value = cashFlow.date;
+    // המרת תאריך לפורמט datetime-local
+    const dateValue = cashFlow.date ? new Date(cashFlow.date).toISOString().slice(0, 16) : '';
+    document.getElementById('editCashFlowDate').value = dateValue;
     document.getElementById('editCashFlowDescription').value = cashFlow.description || '';
 
     const editSourceField = document.getElementById('editCashFlowSource');

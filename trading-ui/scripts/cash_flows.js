@@ -614,31 +614,26 @@ async function loadCurrenciesFromServer() {
 }
 
 /**
- * טעינת רשימת חשבונות למודל הוספה
+ * טעינת רשימת חשבונות למודולי cash flow
+ * @param {string} selectId - ID של ה-select element
+ * @param {boolean} useDefaultFromPreferences - האם להשתמש בברירת מחדל מהעדפות
  */
-async function loadAccountsForCashFlow() {
+async function loadAccountsForCashFlow(selectId, useDefaultFromPreferences = false) {
   try {
-    // בדיקת העדפות לפני טעינה
-    console.log('🔍 בדיקת העדפות חשבון ברירת מחדל:');
-    console.log('window.PreferencesSystem:', window.PreferencesSystem);
-    console.log('currentPreferences:', window.PreferencesSystem?.manager?.currentPreferences);
-    
-    // בדיקה ישירה של העדפת חשבון ברירת מחדל
-    const defaultAccountPref = window.PreferencesSystem?.manager?.currentPreferences?.default_trading_account;
-    console.log('default_trading_account preference:', defaultAccountPref);
-    
-    // שימוש ב-SelectPopulatorService עם ברירת מחדל מהעדפות
-    await SelectPopulatorService.populateAccountsSelect('cashFlowAccount', {
+    // שימוש ב-SelectPopulatorService
+    await SelectPopulatorService.populateAccountsSelect(selectId, {
       includeEmpty: true,
       emptyText: 'בחר חשבון...',
-      defaultFromPreferences: true,
+      defaultFromPreferences: useDefaultFromPreferences,
       filterFn: (account) => account.status === 'open'
     });
     
-    // בדיקה אחרי טעינה
-    const select = document.getElementById('cashFlowAccount');
-    console.log('✅ אחרי טעינה - ערך נבחר:', select?.value);
-    console.log('✅ אחרי טעינה - טקסט נבחר:', select?.options[select?.selectedIndex]?.text);
+    // לוגים רק למודול הוספה
+    if (useDefaultFromPreferences) {
+      const select = document.getElementById(selectId);
+      console.log('✅ אחרי טעינה - ערך נבחר:', select?.value);
+      console.log('✅ אחרי טעינה - טקסט נבחר:', select?.options[select?.selectedIndex]?.text);
+    }
     
   } catch (error) {
     handleDataLoadError(error, 'טעינת חשבונות');
@@ -651,32 +646,17 @@ async function loadAccountsForCashFlow() {
 }
 
 /**
- * טעינת רשימת חשבונות למודל עריכה
+ * טעינת רשימת מטבעות למודולי cash flow
+ * @param {string} selectId - ID של ה-select element
+ * @param {boolean} useDefaultFromPreferences - האם להשתמש בברירת מחדל מהעדפות
  */
-async function loadAccountsForEditCashFlow() {
+async function loadCurrenciesForCashFlow(selectId, useDefaultFromPreferences = false) {
   try {
     // שימוש ב-SelectPopulatorService
-    await SelectPopulatorService.populateAccountsSelect('editCashFlowAccount', {
-      includeEmpty: true,
-      emptyText: 'בחר חשבון...',
-      defaultFromPreferences: false,
-      filterFn: (account) => account.status === 'open'
-    });
-  } catch (error) {
-    handleDataLoadError(error, 'טעינת חשבונות');
-  }
-}
-
-/**
- * טעינת רשימת מטבעות למודל הוספה
- */
-async function loadCurrenciesForCashFlow() {
-  try {
-    // שימוש ב-SelectPopulatorService עם ברירת מחדל מהעדפות
-    await SelectPopulatorService.populateCurrenciesSelect('cashFlowCurrency', {
+    await SelectPopulatorService.populateCurrenciesSelect(selectId, {
       includeEmpty: true,
       emptyText: 'בחר מטבע...',
-      defaultFromPreferences: true
+      defaultFromPreferences: useDefaultFromPreferences
     });
   } catch (error) {
     handleDataLoadError(error, 'טעינת מטבעות');
@@ -685,28 +665,6 @@ async function loadCurrenciesForCashFlow() {
     if (window.showInfoNotification) {
       window.showInfoNotification('מידע על הטעינה', 'שגיאה בטעינת מטבעות');
     }
-  }
-}
-
-/**
- * טעינת רשימת מטבעות למודל עריכה
- */
-async function loadCurrenciesForEditCashFlow() {
-  try {
-    // טעינת מטבעות מהשרת עם המערכת החדשה
-    const currencies = await loadCurrenciesFromServer();
-
-    const select = document.getElementById('editCashFlowCurrency');
-    select.innerHTML = '<option value="">בחר מטבע...</option>';
-
-    currencies.forEach(currency => {
-      const option = document.createElement('option');
-      option.value = currency.id;
-      option.textContent = `${currency.symbol} - ${currency.name}`;
-      select.appendChild(option);
-    });
-  } catch (error) {
-    handleDataLoadError(error, 'טעינת מטבעות');
   }
 }
 
@@ -1514,11 +1472,11 @@ async function _showAddCashFlowModal() {
 
   try {
     // טעינת רשימת החשבונות והמטבעות
-    await loadAccountsForCashFlow();
-    await loadCurrenciesForCashFlow();
+    await loadAccountsForCashFlow('cashFlowAccount', true);
+    await loadCurrenciesForCashFlow('cashFlowCurrency', true);
     // טעינת רשימת הטריידים והתוכניות
-    await loadTradesForAddCashFlow();
-    await loadTradePlansForAddCashFlow();
+    await loadTradesForCashFlow('cashFlowTrade');
+    await loadTradePlansForCashFlow('cashFlowTradePlan');
     // אתחול שדה מזהה חיצוני
     initializeExternalIdFields();
 
@@ -1549,11 +1507,11 @@ async function _showEditCashFlowModal(id) {
 
   try {
     // טעינת רשימת החשבונות והמטבעות קודם
-    await loadAccountsForEditCashFlow();
-    await loadCurrenciesForEditCashFlow();
+    await loadAccountsForCashFlow('editCashFlowAccount', false);
+    await loadCurrenciesForCashFlow('editCashFlowCurrency', false);
     // טעינת רשימת הטריידים והתוכניות
-    await loadTradesForEditCashFlow();
-    await loadTradePlansForEditCashFlow();
+    await loadTradesForCashFlow('editCashFlowTrade');
+    await loadTradePlansForCashFlow('editCashFlowTradePlan');
     // מילוי הטופס אחרי שהרשימות נטענו
     const editTypeField = document.getElementById('editCashFlowType');
     document.getElementById('editCashFlowId').value = cashFlow.id;
@@ -1723,9 +1681,10 @@ function editCashFlow(id) {
 // ===== TRADE AND TRADE PLAN LOADING FUNCTIONS =====
 
 /**
- * Load trades for edit cash flow modal
+ * Load trades for cash flow modals
+ * @param {string} selectId - ID של ה-select element
  */
-async function loadTradesForEditCashFlow() {
+async function loadTradesForCashFlow(selectId) {
   try {
     const response = await fetch('/api/trades/');
     if (!response.ok) {
@@ -1742,10 +1701,10 @@ async function loadTradesForEditCashFlow() {
       return symbolA.localeCompare(symbolB, 'he');
     });
     
-    const editTradeSelect = document.getElementById('editCashFlowTrade');
-    if (editTradeSelect) {
+    const tradeSelect = document.getElementById(selectId);
+    if (tradeSelect) {
       // Clear existing options except the first one
-      editTradeSelect.innerHTML = '<option value="">בחר טרייד (אופציונלי)</option>';
+      tradeSelect.innerHTML = '<option value="">בחר טרייד (אופציונלי)</option>';
       
       // Add trade options
       trades.forEach(trade => {
@@ -1754,18 +1713,19 @@ async function loadTradesForEditCashFlow() {
         const tradeDate = trade.opened_at ? new Date(trade.opened_at).toLocaleDateString('he-IL') : 'לא מוגדר';
         const sideText = trade.side === 'buy' ? 'קנייה' : trade.side === 'sell' ? 'מכירה' : trade.side || 'לא מוגדר';
         option.textContent = `${trade.ticker_symbol || 'לא מוגדר'} | ${tradeDate} | ${sideText}`;
-        editTradeSelect.appendChild(option);
+        tradeSelect.appendChild(option);
       });
     }
   } catch (error) {
-    console.error('Error loading trades for edit modal:', error);
+    console.error('Error loading trades for cash flow modal:', error);
   }
 }
 
 /**
- * Load trade plans for edit cash flow modal
+ * Load trade plans for cash flow modals
+ * @param {string} selectId - ID של ה-select element
  */
-async function loadTradePlansForEditCashFlow() {
+async function loadTradePlansForCashFlow(selectId) {
   try {
     const response = await fetch('/api/trade_plans/');
     if (!response.ok) {
@@ -1782,10 +1742,10 @@ async function loadTradePlansForEditCashFlow() {
       return symbolA.localeCompare(symbolB, 'he');
     });
     
-    const editTradePlanSelect = document.getElementById('editCashFlowTradePlan');
-    if (editTradePlanSelect) {
+    const tradePlanSelect = document.getElementById(selectId);
+    if (tradePlanSelect) {
       // Clear existing options except the first one
-      editTradePlanSelect.innerHTML = '<option value="">בחר תוכנית השקעה (אופציונלי)</option>';
+      tradePlanSelect.innerHTML = '<option value="">בחר תוכנית השקעה (אופציונלי)</option>';
       
       // Add trade plan options
       tradePlans.forEach(plan => {
@@ -1795,92 +1755,11 @@ async function loadTradePlansForEditCashFlow() {
         const sideText = plan.side === 'buy' ? 'קנייה' : plan.side === 'sell' ? 'מכירה' : plan.side || 'לא מוגדר';
         const symbol = plan.ticker && plan.ticker.symbol ? plan.ticker.symbol : 'לא מוגדר';
         option.textContent = `${symbol} | ${planDate} | ${sideText}`;
-        editTradePlanSelect.appendChild(option);
+        tradePlanSelect.appendChild(option);
       });
     }
   } catch (error) {
-    console.error('Error loading trade plans for edit modal:', error);
-  }
-}
-
-/**
- * Load trades for add cash flow modal
- */
-async function loadTradesForAddCashFlow() {
-  try {
-    const response = await fetch('/api/trades/');
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    const trades = data.data || [];
-    
-    // Sort trades by ticker symbol alphabetically
-    trades.sort((a, b) => {
-      const symbolA = a.ticker_symbol || '';
-      const symbolB = b.ticker_symbol || '';
-      return symbolA.localeCompare(symbolB, 'he');
-    });
-    
-    const addTradeSelect = document.getElementById('cashFlowTrade');
-    if (addTradeSelect) {
-      // Clear existing options except the first one
-      addTradeSelect.innerHTML = '<option value="">בחר טרייד (אופציונלי)</option>';
-      
-      // Add trade options
-      trades.forEach(trade => {
-        const option = document.createElement('option');
-        option.value = trade.id;
-        const tradeDate = trade.opened_at ? new Date(trade.opened_at).toLocaleDateString('he-IL') : 'לא מוגדר';
-        const sideText = trade.side === 'buy' ? 'קנייה' : trade.side === 'sell' ? 'מכירה' : trade.side || 'לא מוגדר';
-        option.textContent = `${trade.ticker_symbol || 'לא מוגדר'} | ${tradeDate} | ${sideText}`;
-        addTradeSelect.appendChild(option);
-      });
-    }
-  } catch (error) {
-    console.error('Error loading trades for add modal:', error);
-  }
-}
-
-/**
- * Load trade plans for add cash flow modal
- */
-async function loadTradePlansForAddCashFlow() {
-  try {
-    const response = await fetch('/api/trade_plans/');
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    const tradePlans = data.data || [];
-    
-    // Sort trade plans by ticker symbol alphabetically
-    tradePlans.sort((a, b) => {
-      const symbolA = a.ticker && a.ticker.symbol ? a.ticker.symbol : '';
-      const symbolB = b.ticker && b.ticker.symbol ? b.ticker.symbol : '';
-      return symbolA.localeCompare(symbolB, 'he');
-    });
-    
-    const addTradePlanSelect = document.getElementById('cashFlowTradePlan');
-    if (addTradePlanSelect) {
-      // Clear existing options except the first one
-      addTradePlanSelect.innerHTML = '<option value="">בחר תוכנית השקעה (אופציונלי)</option>';
-      
-      // Add trade plan options
-      tradePlans.forEach(plan => {
-        const option = document.createElement('option');
-        option.value = plan.id;
-        const planDate = plan.created_at ? new Date(plan.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
-        const sideText = plan.side === 'buy' ? 'קנייה' : plan.side === 'sell' ? 'מכירה' : plan.side || 'לא מוגדר';
-        const symbol = plan.ticker && plan.ticker.symbol ? plan.ticker.symbol : 'לא מוגדר';
-        option.textContent = `${symbol} | ${planDate} | ${sideText}`;
-        addTradePlanSelect.appendChild(option);
-      });
-    }
-  } catch (error) {
-    console.error('Error loading trade plans for add modal:', error);
+    console.error('Error loading trade plans for cash flow modal:', error);
   }
 }
 
@@ -2228,7 +2107,7 @@ function handleDataLoadError(error, context, retryCount = 0) {
       } else if (context.includes('מטבעות')) {
         loadCurrenciesFromServer();
       } else if (context.includes('חשבונות')) {
-        loadAccountsForCashFlow();
+        loadAccountsForCashFlow('cashFlowAccount', true);
       }
     }, 2000 * (retryCount + 1)); // השהיה הולכת וגדלה
   }
@@ -2368,9 +2247,7 @@ window.editCashFlow = editCashFlow;
 // פונקציות טעינה
 window.loadCurrenciesFromServer = loadCurrenciesFromServer;
 window.loadAccountsForCashFlow = loadAccountsForCashFlow;
-window.loadAccountsForEditCashFlow = loadAccountsForEditCashFlow;
 window.loadCurrenciesForCashFlow = loadCurrenciesForCashFlow;
-window.loadCurrenciesForEditCashFlow = loadCurrenciesForEditCashFlow;
 
 // פונקציות תצוגה
 window.renderCashFlowsTable = renderCashFlowsTable;

@@ -362,94 +362,41 @@ async function loadCashFlows() {
 }
 
 /**
- * וולידציה של טופס תזרים מזומנים
- * @param {Object} formData - נתוני הטופס
- * @returns {boolean} true אם הטופס תקין, false אחרת
+ * ולידציה של טופס תזרים מזומנים
  */
-function validateCashFlowForm(formData) {
-  let isValid = true;
-
-  // ניקוי הודעות שגיאה קודמות
-  clearValidationErrors();
-
-  // וולידציה של חשבון מסחר
-  if (!formData.trading_account_id || isNaN(formData.trading_account_id)) {
-    if (window.showValidationWarning) {
-      window.showValidationWarning('cashFlowAccount', 'יש לבחור חשבון מסחר');
-    }
-    isValid = false;
-  }
-
-  // וולידציה של סוג
-  if (!formData.type) {
-    if (window.showValidationWarning) {
-      window.showValidationWarning('cashFlowType', 'יש לבחור סוג תזרים');
-    }
-    isValid = false;
-  }
-
-  // וולידציה של סכום
-  if (!formData.amount || isNaN(formData.amount)) {
-    if (window.showValidationWarning) {
-      window.showValidationWarning('cashFlowAmount', 'יש להזין סכום תקין');
-    }
-    isValid = false;
-  } else if (formData.amount === 0) {
-    if (window.showValidationWarning) {
-      window.showValidationWarning('cashFlowAmount', 'סכום לא יכול להיות 0');
-    }
-    isValid = false;
-  } else if (Math.abs(formData.amount) > 10000000) {
-    if (window.showValidationWarning) {
-      window.showValidationWarning('cashFlowAmount', 'סכום גבוה מדי (מקסימום 10,000,000)');
-    }
-    isValid = false;
-  }
-
-  // וולידציה של מטבע - מטבע הוא אופציונלי
-  if (formData.currency_id && isNaN(formData.currency_id)) {
-    if (window.showValidationWarning) {
-      window.showValidationWarning('cashFlowCurrency', 'יש לבחור מטבע תקין');
-    }
-    isValid = false;
-  }
-
-  // וולידציה של תאריך
-  if (!formData.date) {
-    if (window.showValidationWarning) {
-      window.showValidationWarning('cashFlowDate', 'יש להזין תאריך');
-    }
-    isValid = false;
-  } else {
-    const date = new Date(formData.date);
-    const today = new Date();
-    const maxDate = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
-
-    if (date > maxDate) {
-      if (window.showValidationWarning) {
-        window.showValidationWarning('cashFlowDate', 'תאריך לא יכול להיות יותר משנה קדימה');
+function validateCashFlowForm() {
+  return window.validateEntityForm('addCashFlowForm', [
+    { id: 'cashFlowType', name: 'סוג תזרים' },
+    { 
+      id: 'cashFlowAmount', 
+      name: 'סכום',
+      validation: (value) => {
+        const amount = parseFloat(value);
+        if (isNaN(amount)) return 'יש להזין סכום תקין';
+        if (amount === 0) return 'סכום לא יכול להיות 0';
+        if (Math.abs(amount) > 10000000) return 'סכום גבוה מדי (מקסימום 10,000,000)';
+        return true;
       }
-      isValid = false;
-    }
-
-    const minDate = new Date(2000, 0, 1);
-    if (date < minDate) {
-      if (window.showValidationWarning) {
-        window.showValidationWarning('cashFlowDate', 'תאריך לא יכול להיות לפני שנת 2000');
+    },
+    { 
+      id: 'cashFlowDate', 
+      name: 'תאריך',
+      validation: (value) => {
+        if (!value) return 'יש להזין תאריך';
+        const date = new Date(value);
+        const today = new Date();
+        const maxDate = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
+        const minDate = new Date(2000, 0, 1);
+        
+        if (date > maxDate) return 'תאריך לא יכול להיות יותר משנה קדימה';
+        if (date < minDate) return 'תאריך לא יכול להיות לפני שנת 2000';
+        return true;
       }
-      isValid = false;
-    }
-  }
-
-  // וולידציה של מקור
-  if (!formData.source) {
-    if (window.showValidationWarning) {
-      window.showValidationWarning('cashFlowSource', 'יש לבחור מקור');
-    }
-    isValid = false;
-  }
-
-  return isValid;
+    },
+    { id: 'cashFlowAccount', name: 'חשבון מסחר' },
+    { id: 'cashFlowCurrency', name: 'מטבע' },
+    { id: 'cashFlowSource', name: 'מקור' }
+  ]);
 }
 
 /**
@@ -457,145 +404,47 @@ function validateCashFlowForm(formData) {
  * @param {string} fieldId - מזהה השדה
  * @param {string} message - הודעת השגיאה
  */
-// showFieldError() - זמינה גלובלית מ-ui-utils.js כ-showValidationWarning
+// ולידציה - משתמש במערכת הכללית window.validateEntityForm
 
 /**
- * ניקוי הודעות שגיאה
+ * ולידציה של טופס עריכת תזרים מזומנים
  */
-function clearValidationErrors() {
-  const fields = ['cashFlowAccount', 'cashFlowType', 'cashFlowAmount', 'cashFlowCurrency', 'cashFlowDate', 'cashFlowDescription', 'cashFlowSource', 'cashFlowExternalId'];
-
-  fields.forEach(fieldId => {
-    const field = document.getElementById(fieldId);
-    const errorDiv = document.getElementById(fieldId + 'Error');
-
-    if (field) {
-      field.classList.remove('is-invalid');
-    }
-
-    if (errorDiv) {
-      errorDiv.textContent = '';
-      errorDiv.style.display = 'none';
-    }
-  });
+function validateEditCashFlowForm() {
+  return window.validateEntityForm('editCashFlowForm', [
+    { id: 'editCashFlowType', name: 'סוג תזרים' },
+    { 
+      id: 'editCashFlowAmount', 
+      name: 'סכום',
+      validation: (value) => {
+        const amount = parseFloat(value);
+        if (isNaN(amount)) return 'יש להזין סכום תקין';
+        if (amount === 0) return 'סכום לא יכול להיות 0';
+        if (Math.abs(amount) > 10000000) return 'סכום גבוה מדי (מקסימום 10,000,000)';
+        return true;
+      }
+    },
+    { 
+      id: 'editCashFlowDate', 
+      name: 'תאריך',
+      validation: (value) => {
+        if (!value) return 'יש להזין תאריך';
+        const date = new Date(value);
+        const today = new Date();
+        const maxDate = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
+        const minDate = new Date(2000, 0, 1);
+        
+        if (date > maxDate) return 'תאריך לא יכול להיות יותר משנה קדימה';
+        if (date < minDate) return 'תאריך לא יכול להיות לפני שנת 2000';
+        return true;
+      }
+    },
+    { id: 'editCashFlowAccount', name: 'חשבון מסחר' },
+    { id: 'editCashFlowCurrency', name: 'מטבע' },
+    { id: 'editCashFlowSource', name: 'מקור' }
+  ]);
 }
 
-/**
- * וולידציה של טופס עריכת תזרים מזומנים
- * @param {Object} formData - נתוני הטופס
- * @returns {boolean} true אם הטופס תקין, false אחרת
- */
-function validateEditCashFlowForm(formData) {
-  let isValid = true;
-
-  // ניקוי הודעות שגיאה קודמות
-  clearEditValidationErrors();
-
-  // וולידציה של חשבון מסחר
-  if (!formData.trading_account_id || isNaN(formData.trading_account_id)) {
-    showEditFieldError('editCashFlowAccount', 'יש לבחור חשבון מסחר');
-    isValid = false;
-  }
-
-  // וולידציה של סוג
-  if (!formData.type) {
-    showEditFieldError('editCashFlowType', 'יש לבחור סוג תזרים');
-    isValid = false;
-  }
-
-  // וולידציה של סכום
-  if (!formData.amount || isNaN(formData.amount)) {
-    showEditFieldError('editCashFlowAmount', 'יש להזין סכום תקין');
-    isValid = false;
-  } else if (formData.amount === 0) {
-    showEditFieldError('editCashFlowAmount', 'סכום לא יכול להיות 0');
-    isValid = false;
-  } else if (Math.abs(formData.amount) > 10000000) {
-    showEditFieldError('editCashFlowAmount', 'סכום גבוה מדי (מקסימום 10,000,000)');
-    isValid = false;
-  }
-
-  // וולידציה של מטבע - מטבע הוא אופציונלי
-  if (formData.currency_id && isNaN(formData.currency_id)) {
-    showEditFieldError('editCashFlowCurrency', 'יש לבחור מטבע תקין');
-    isValid = false;
-  }
-
-  // וולידציה של תאריך
-  if (!formData.date) {
-    showEditFieldError('editCashFlowDate', 'יש להזין תאריך');
-    isValid = false;
-  } else {
-    const date = new Date(formData.date);
-    const today = new Date();
-    const maxDate = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
-
-    if (date > maxDate) {
-      showEditFieldError('editCashFlowDate', 'תאריך לא יכול להיות יותר משנה קדימה');
-      isValid = false;
-    }
-
-    const minDate = new Date(2000, 0, 1);
-    if (date < minDate) {
-      showEditFieldError('editCashFlowDate', 'תאריך לא יכול להיות לפני שנת 2000');
-      isValid = false;
-    }
-  }
-
-  // וולידציה של מקור
-  if (!formData.source) {
-    showEditFieldError('editCashFlowSource', 'יש לבחור מקור');
-    isValid = false;
-  }
-
-  return isValid;
-}
-
-/**
- * הצגת שגיאת וולידציה לשדה עריכה
- * @param {string} fieldId - מזהה השדה
- * @param {string} message - הודעת השגיאה
- */
-function showEditFieldError(fieldId, message) {
-  const field = document.getElementById(fieldId);
-  const errorDiv = document.getElementById(fieldId + 'Error');
-
-  if (field) {
-    field.classList.add('is-invalid');
-    field.focus();
-  }
-
-  if (errorDiv) {
-    errorDiv.textContent = message;
-    errorDiv.style.display = 'block';
-  }
-
-  // שימוש במערכת האזהרות החדשה
-  if (window.showValidationWarning) {
-    window.showValidationWarning(fieldId, message);
-  }
-}
-
-/**
- * ניקוי הודעות שגיאה לעריכה
- */
-function clearEditValidationErrors() {
-  const fields = ['editCashFlowAccount', 'editCashFlowType', 'editCashFlowAmount', 'editCashFlowCurrency', 'editCashFlowDate', 'editCashFlowSource'];
-
-  fields.forEach(fieldId => {
-    const field = document.getElementById(fieldId);
-    const errorDiv = document.getElementById(fieldId + 'Error');
-
-    if (field) {
-      field.classList.remove('is-invalid');
-    }
-
-    if (errorDiv) {
-      errorDiv.textContent = '';
-      errorDiv.style.display = 'none';
-    }
-  });
-}
+// ולידציה - משתמש במערכת הכללית window.validateEntityForm
 
 
 // ========================================
@@ -1355,9 +1204,8 @@ async function initializeCashFlowsPage() {
     // שחזור מצב סידור
     restoreSortState();
 
-    // הגדרת event listeners לשדות מקור ווולידציה מיידית
+    // הגדרת event listeners לשדות מקור
     setupSourceFieldListeners();
-    setupValidationListeners();
 
     // אתחול מערכת וולידציה
     if (window.initializeValidation) {
@@ -1471,12 +1319,6 @@ function setupSourceFieldListeners() {
   if (addSourceField) {
     addSourceField.addEventListener('change', function () {
       manageExternalIdField(this.value, 'add');
-      validateField('cashFlowSource', this.value, 'add');
-      // בדיקת שדה מזהה חיצוני אחרי שינוי מקור
-      const externalIdField = document.getElementById('cashFlowExternalId');
-      if (externalIdField) {
-        validateField('cashFlowExternalId', externalIdField.value, 'add');
-      }
     });
   }
 
@@ -1485,54 +1327,11 @@ function setupSourceFieldListeners() {
   if (editSourceField) {
     editSourceField.addEventListener('change', function () {
       manageExternalIdField(this.value, 'edit');
-      validateField('editCashFlowSource', this.value, 'edit');
-      // בדיקת שדה מזהה חיצוני אחרי שינוי מקור
-      const externalIdField = document.getElementById('editCashFlowExternalId');
-      if (externalIdField) {
-        validateField('editCashFlowExternalId', externalIdField.value, 'edit');
-      }
     });
   }
 }
 
-/**
- * הוספת event listeners לוולידציה מיידית
- */
-function setupValidationListeners() {
-  // שדות למודל הוספה
-  const addFields = ['cashFlowAccount', 'cashFlowType', 'cashFlowAmount', 'cashFlowCurrency', 'cashFlowDate', 'cashFlowDescription', 'cashFlowSource', 'cashFlowExternalId'];
-  addFields.forEach(fieldId => {
-    const field = document.getElementById(fieldId);
-    if (field) {
-      field.addEventListener('blur', function() {
-        validateField(fieldId, this.value, 'add');
-      });
-      field.addEventListener('input', function() {
-        const inputField = document.getElementById(fieldId);
-        if (inputField && window.clearFieldValidation) {
-          window.clearFieldValidation(inputField);
-        }
-      });
-    }
-  });
-
-  // שדות למודל עריכה
-  const editFields = ['editCashFlowAccount', 'editCashFlowType', 'editCashFlowAmount', 'editCashFlowCurrency', 'editCashFlowDate', 'editCashFlowDescription', ''];
-  editFields.forEach(fieldId => {
-    const field = document.getElementById(fieldId);
-    if (field) {
-      field.addEventListener('blur', function() {
-        validateField(fieldId, this.value, 'edit');
-      });
-      field.addEventListener('input', function() {
-        const inputField = document.getElementById(fieldId);
-        if (inputField && window.clearFieldValidation) {
-          window.clearFieldValidation(inputField);
-        }
-      });
-    }
-  });
-}
+// ולידציה - משתמש במערכת הכללית window.validateEntityForm
 
 /**
  * וולידציה מיידית של שדה בודד
@@ -1665,10 +1464,10 @@ function validateField(fieldId, value, formType) {
   }
 
   // הצגת סימון ירוק כשהערך תקין
-  const field = document.getElementById(fieldId);
-  if (field && window.showFieldSuccess) {
-    window.showFieldSuccess(field);
-  }
+  // const field = document.getElementById(fieldId);
+  // if (field && window.showFieldSuccess) {
+  //   window.showFieldSuccess(field);
+  // }
   return true;
 }
 
@@ -1719,9 +1518,6 @@ async function _showAddCashFlowModal() {
     await loadCurrenciesForCashFlow();
     // אתחול שדה מזהה חיצוני
     initializeExternalIdFields();
-
-    // הוספת event listeners לוולידציה מיידית
-    setupValidationListeners();
 
     // הוספת event listeners לשדות מקור
     setupSourceFieldListeners();
@@ -1776,8 +1572,8 @@ async function _showEditCashFlowModal(id) {
     // אתחול שדה מזהה חיצוני
     initializeExternalIdFields();
 
-    // הוספת event listeners לוולידציה מיידית
-    setupValidationListeners();
+    // הוספת event listeners לשדות מקור
+    setupSourceFieldListeners();
 
     // הצגת המודל
     const modal = new bootstrap.Modal(document.getElementById('editCashFlowModal'));
@@ -1809,11 +1605,7 @@ async function saveCashFlow() {
     };
 
     // בדיקת תקינות מקיפה
-    if (window.validateForm) {
-      if (!window.validateForm('addCashFlowForm')) {
-        return;
-      }
-    } else if (!validateCashFlowForm(formData)) {
+    if (!validateCashFlowForm()) {
       return;
     }
 
@@ -1860,11 +1652,7 @@ async function updateCashFlow() {
     };
 
     // בדיקת תקינות מקיפה
-    if (window.validateForm) {
-      if (!window.validateForm('editCashFlowForm')) {
-        return;
-      }
-    } else if (!validateEditCashFlowForm(formData)) {
+    if (!validateEditCashFlowForm()) {
       return;
     }
 
@@ -2309,6 +2097,7 @@ function handleValidationError(fieldId, message, context = '') {
   }
 }
 
+
 /**
  * טיפול מתקדם בשגיאות רשת
  */
@@ -2389,10 +2178,7 @@ window.loadCashFlows = loadCashFlows;
 
 // פונקציות טופס
 window.validateCashFlowForm = validateCashFlowForm;
-window.clearValidationErrors = clearValidationErrors;
 window.validateEditCashFlowForm = validateEditCashFlowForm;
-window.showEditFieldError = showEditFieldError;
-window.clearEditValidationErrors = clearEditValidationErrors;
 
 // פונקציות CRUD
 window.deleteCashFlow = deleteCashFlow;
@@ -2445,8 +2231,6 @@ window.applyUserPreferences = applyUserPreferences;
 window.applyDynamicColors = applyDynamicColors;
 
 // פונקציות אימות
-window.validateField = validateField;
-window.setupValidationListeners = setupValidationListeners;
 window.setupSourceFieldListeners = setupSourceFieldListeners;
 window.initializeExternalIdFields = initializeExternalIdFields;
 window.manageExternalIdField = manageExternalIdField;

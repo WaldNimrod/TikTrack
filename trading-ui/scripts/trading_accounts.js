@@ -478,10 +478,12 @@ function updateTradingAccountsTable(trading_accounts) {
       <td>${FieldRendererService.renderDate(tradingAccount.created_at, false)}</td>
       <td class="actions-cell">
         ${window.createActionsMenu ? window.createActionsMenu([
+          { type: 'VIEW', onclick: `window.showEntityDetails('trading_account', ${tradingAccount.id}, { mode: 'view' })`, title: 'צפה בפרטי חשבון' },
           { type: 'LINK', onclick: `window.showLinkedItemsModal && window.showLinkedItemsModal(linkedItemsData, 'tradingAccount', ${tradingAccount.id})`, title: 'פריטים מקושרים' },
           { type: 'EDIT', onclick: `showEditTradingAccountModalById(${tradingAccount.id})`, title: 'ערוך' },
           { type: tradingAccount.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `window.${tradingAccount.status === 'cancelled' ? 'reactivate' : 'cancel'}Account && window.${tradingAccount.status === 'cancelled' ? 'reactivate' : 'cancel'}Account(${tradingAccount.id})`, title: tradingAccount.status === 'cancelled' ? 'הפעל מחדש' : 'בטל' }
         ]) : `
+        <button data-button-type="VIEW" data-variant="small" data-onclick="window.showEntityDetails('trading_account', ${tradingAccount.id}, { mode: 'view' })" data-text="" title="צפה בפרטי חשבון"></button>
         <button data-button-type="LINK" data-variant="small" data-onclick="window.showLinkedItemsModal && window.showLinkedItemsModal(linkedItemsData, 'tradingAccount', ${tradingAccount.id})" data-text="" title="פריטים מקושרים"></button>
         <button data-button-type="EDIT" data-variant="small" data-onclick="showEditTradingAccountModalById(${tradingAccount.id})" data-text="" title="ערוך"></button>
         <button data-button-type="${tradingAccount.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL'}" data-variant="small" data-onclick="window.${tradingAccount.status === 'cancelled' ? 'reactivate' : 'cancel'}Account && window.${tradingAccount.status === 'cancelled' ? 'reactivate' : 'cancel'}Account(${tradingAccount.id})" data-text="" title="${tradingAccount.status === 'cancelled' ? 'הפעל מחדש' : 'בטל'}"></button>

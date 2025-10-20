@@ -240,12 +240,12 @@ class AdvancedButtonSystem {
         if (this.debounceTimer) {
             clearTimeout(this.debounceTimer);
         }
-        this.debounceTimer = setTimeout(() => {
-            this.initializeButtons();
+        this.debounceTimer = setTimeout(async () => {
+            await this.initializeButtons();
         }, this.config.performance.debounceDelay);
     }
 
-    initializeButtons() {
+    async initializeButtons() {
         this.logger.info('Starting button initialization...');
         const buttonElements = document.querySelectorAll('[data-button-type]:not([data-button-processed])');
         const totalButtons = buttonElements.length;
@@ -256,12 +256,34 @@ class AdvancedButtonSystem {
             return;
         }
 
+        // Wait for button icons to be loaded
+        await this.waitForButtonIcons();
+        
         this.processButtonsInBatches(buttonElements);
 
         this.performance.endTime = performance.now();
         const duration = this.performance.endTime - this.performance.startTime;
         this.logger.info(`Button initialization completed in ${duration.toFixed(2)}ms`);
         this.logger.info(`Processed: ${this.performance.processedButtons}, Errors: ${this.performance.errors}`);
+    }
+
+    async waitForButtonIcons() {
+        const maxWaitTime = 5000; // 5 seconds max
+        const checkInterval = 100; // Check every 100ms
+        let elapsed = 0;
+        
+        while (elapsed < maxWaitTime) {
+            if (window.BUTTON_ICONS && window.BUTTON_TEXTS && window.getButtonClass) {
+                this.logger.debug('Button icons loaded successfully');
+                return true;
+            }
+            
+            await new Promise(resolve => setTimeout(resolve, checkInterval));
+            elapsed += checkInterval;
+        }
+        
+        this.logger.warn('Button icons not loaded within timeout, using fallback');
+        return false;
     }
 
     processButtonsInBatches(buttonElements) {

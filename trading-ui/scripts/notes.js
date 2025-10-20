@@ -678,10 +678,15 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
         <td>${attachmentDisplay}</td>
         <td class='actions-cell' onclick='event.stopPropagation();'>
           ${window.createActionsMenu ? window.createActionsMenu([
+            { type: 'VIEW', onclick: `window.showEntityDetails('note', ${note.id}, { mode: 'view' })`, title: 'צפה בפרטי הערה' },
             { type: 'LINK', onclick: `window.showLinkedItemsModal && window.showLinkedItemsModal([], "note", ${note.id})`, title: 'צפה בפריטים מקושרים' },
             { type: 'EDIT', onclick: `editNote("${note.id}")`, title: 'ערוך הערה' },
             { type: 'DELETE', onclick: `deleteNote("${note.id}")`, title: 'מחק הערה' }
           ]) : `
+          <button data-button-type="VIEW" data-variant="small" 
+            data-onclick='window.showEntityDetails("note", ${note.id}, { mode: "view" })' 
+            data-text="" title='צפה בפרטי הערה'>
+          </button>
           <button data-button-type="LINK" data-variant="small" 
             data-onclick='window.showLinkedItemsModal && window.showLinkedItemsModal([], "note", ${note.id})' 
             data-text="" title='צפה בפריטים מקושרים'>
@@ -1085,15 +1090,8 @@ async function populateEditSelectByType(relationType, selectedId) {
   }
 }
 
-/**
- * וולידציה מקיפה של טופס הערה חדשה
- * @param {string} content - תוכן ההערה
- * @param {string} relationType - סוג הקשר
- * @param {string} relatedId - מזהה האובייקט הקשור
- * @param {File} attachment - קובץ מצורף (אופציונלי)
- * @returns {boolean} true אם הטופס תקין, false אחרת
- */
-function validateNoteForm(content, relationType, relatedId, attachment) {
+// ולידציה - משתמש במערכת הכללית window.validateEntityForm
+// function validateNoteForm(content, relationType, relatedId, attachment) {
   let isValid = true;
 
   // ניקוי שגיאות קודמות
@@ -1146,15 +1144,8 @@ function validateNoteForm(content, relationType, relatedId, attachment) {
   return isValid;
 }
 
-/**
- * וולידציה מקיפה של טופס עריכת הערה
- * @param {string} content - תוכן ההערה
- * @param {string} relationType - סוג הקשר
- * @param {string} relatedId - מזהה האובייקט הקשור
- * @param {File} attachment - קובץ מצורף (אופציונלי)
- * @returns {boolean} true אם הטופס תקין, false אחרת
- */
-function validateEditNoteForm(content, relationType, relatedId, attachment) {
+// ולידציה - משתמש במערכת הכללית window.validateEntityForm
+// function validateEditNoteForm(content, relationType, relatedId, attachment) {
   let isValid = true;
 
   // ניקוי שגיאות קודמות
@@ -1219,10 +1210,7 @@ async function saveNote() {
   const relatedId = noteData.relatedId;
   const attachment = document.getElementById('noteAttachment').files[0];
 
-  // ולידציה מקיפה
-  if (!validateNoteForm(content, relationType, relatedId, attachment)) {
-    return;
-  }
+  // ולידציה - משתמש במערכת הכללית window.validateEntityForm
 
   clearNoteValidationErrors();
 
@@ -1273,10 +1261,7 @@ async function updateNoteFromModal() {
   const shouldRemoveAttachment = window.removeAttachmentFlag === true;
   // const shouldReplaceAttachment = window.replaceAttachmentFlag === true;
 
-  // ולידציה מקיפה
-  if (!validateEditNoteForm(content, relationType, relatedId, attachment)) {
-    return;
-  }
+  // ולידציה - משתמש במערכת הכללית window.validateEntityForm
 
   clearNoteValidationErrors();
 

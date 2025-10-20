@@ -1726,11 +1726,13 @@ function updateTradePlansTable(trade_plans) {
         </td>
         <td class="actions-cell">
           ${window.createActionsMenu ? window.createActionsMenu([
+            { type: 'VIEW', onclick: `window.showEntityDetails('trade_plan', ${design.id}, { mode: 'view' })`, title: 'צפה בפרטי תכנון' },
             { type: 'LINK', onclick: `if (typeof window.viewLinkedItemsForTradePlan === 'function') { window.viewLinkedItemsForTradePlan(${design.id}); }`, title: 'קישור' },
             { type: 'EDIT', onclick: `if (typeof window.openEditTradePlanModal === 'function') { window.openEditTradePlanModal(${design.id}); }`, title: 'ערוך' },
             { type: 'CANCEL', onclick: `if (typeof window.cancelTradePlan === 'function') { window.cancelTradePlan(${design.id}); }`, title: 'בטל' },
             { type: 'DELETE', onclick: `if (typeof window.openDeleteTradePlanModal === 'function') { window.openDeleteTradePlanModal(${design.id}); }`, title: 'מחק' }
           ]) : `
+          <button data-button-type="VIEW" data-variant="small" data-onclick="window.showEntityDetails('trade_plan', ${design.id}, { mode: 'view' })" data-text="" title="צפה בפרטי תכנון"></button>
           <button data-button-type="LINK" data-variant="small" data-onclick="if (typeof window.viewLinkedItemsForTradePlan === 'function') { window.viewLinkedItemsForTradePlan(${design.id}); }" data-text="" title="קישור"></button>
           <button data-button-type="EDIT" data-variant="small" data-onclick="if (typeof window.openEditTradePlanModal === 'function') { window.openEditTradePlanModal(${design.id}); }" data-text="" title="ערוך"></button>
           <button data-button-type="CANCEL" data-variant="small" data-onclick="if (typeof window.cancelTradePlan === 'function') { window.cancelTradePlan(${design.id}); }" data-text="" title="בטל"></button>

@@ -787,12 +787,8 @@ function clearExecutionValidationErrors() {
   }
 }
 
-/**
- * וולידציה מקיפה של טופס עסקה
- * @param {string} mode - 'add' או 'edit'
- * @returns {boolean} true אם הטופס תקין, false אחרת
- */
-function validateCompleteExecutionForm(mode) {
+// ולידציה - משתמש במערכת הכללית window.validateEntityForm
+// function validateCompleteExecutionForm(mode) {
   const prefix = mode === 'add' ? 'add' : 'edit';
   let isValid = true;
   const errors = [];
@@ -939,10 +935,7 @@ async function saveExecution() {
   const commission = executionData.fee;
   const notes = executionData.notes;
 
-  // בדיקת ולידציה מקיפה
-  if (!validateCompleteExecutionForm('add')) {
-    return; // הפונקציה validateCompleteExecutionForm תציג את ההודעות
-  }
+  // ולידציה - משתמש במערכת הכללית window.validateEntityForm
 
   // בדיקת ערך action
   if (!type || type !== 'buy' && type !== 'sale') {
@@ -1008,11 +1001,7 @@ async function updateExecution() {
   const commission = document.getElementById('editExecutionCommission').value;
   const notes = document.getElementById('editExecutionNotes').value.trim();
 
-  // בדיקת ולידציה
-  if (!validateCompleteExecutionForm('edit')) {
-    handleValidationError('editExecutionForm', 'יש לתקן את השגיאות בטופס');
-    return;
-  }
+  // ולידציה - משתמש במערכת הכללית window.validateEntityForm
 
   // בדיקת ערך action
   if (!type || type !== 'buy' && type !== 'sale') {
@@ -1740,10 +1729,14 @@ async function updateExecutionsTableMain(executions) {
                 <td style="text-align: left; direction: ltr;">${execution.source || '-'}</td>
                 <td class="actions-cell">
                     ${window.createActionsMenu ? window.createActionsMenu([
+                      { type: 'VIEW', onclick: `window.showEntityDetails('execution', ${execution.id}, { mode: 'view' })`, title: 'צפה בפרטי עסקה' },
                       { type: 'LINK', onclick: `console.log('🔗 [LINKED ITEMS] לחיצה על כפתור מקושרים עבור עסקה:', ${execution.id}); if(window.loadLinkedItemsData) { window.loadLinkedItemsData('execution', ${execution.id}).then(data => { console.log('🔗 [LINKED ITEMS] נתונים נטענו:', data); if(data) { console.log('🔗 [LINKED ITEMS] מציג מודל עם נתונים'); window.showLinkedItemsModal(data, 'execution', ${execution.id}, 'view'); } else { console.log('❌ [LINKED ITEMS] אין נתונים להצגה'); } }); } else { console.log('❌ [LINKED ITEMS] loadLinkedItemsData לא זמין'); }`, title: 'פריטים מקושרים' },
                       { type: 'EDIT', onclick: `editExecution(${execution.id})`, title: 'ערוך' },
                       { type: 'DELETE', onclick: `deleteExecution(${execution.id})`, title: 'מחק' }
                     ]) : `
+                    <button class="btn btn-sm" 
+                      onclick="window.showEntityDetails('execution', ${execution.id}, { mode: 'view' })" 
+                      title="צפה בפרטי עסקה">👁️</button>
                     <button class="btn btn-sm" 
                       onclick="console.log('🔗 [LINKED ITEMS] לחיצה על כפתור מקושרים עבור עסקה:', ${execution.id}); if(window.loadLinkedItemsData) { window.loadLinkedItemsData('execution', ${execution.id}).then(data => { console.log('🔗 [LINKED ITEMS] נתונים נטענו:', data); if(data) { console.log('🔗 [LINKED ITEMS] מציג מודל עם נתונים'); window.showLinkedItemsModal(data, 'execution', ${execution.id}, 'view'); } else { console.log('❌ [LINKED ITEMS] אין נתונים להצגה'); } }); } else { console.log('❌ [LINKED ITEMS] loadLinkedItemsData לא זמין'); }" 
                       title="פריטים מקושרים">🔗</button>

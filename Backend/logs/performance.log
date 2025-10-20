@@ -4105,3 +4105,37 @@
 2025-10-20 23:56:37,054 - utils.performance_monitor - INFO - Performance: collect_metrics - Duration: 1.018s - Success: True
 2025-10-20 23:56:37,054 - utils.performance_monitor - WARNING - Slow operation detected: collect_metrics - Duration: 1.018s
 2025-10-20 23:56:37,054 - services.background_tasks - INFO - Background task 'collect_metrics' completed successfully in 1021ms
+2025-10-21 00:26:37,150 - services.background_tasks - INFO - Starting background task: collect_metrics
+2025-10-21 00:26:38,159 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.005s - Success: True
+2025-10-21 00:26:38,159 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.005s
+2025-10-21 00:26:38,163 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.004s - Success: True
+2025-10-21 00:26:38,163 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-21 00:26:38,163 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-21 00:26:38,163 - services.background_tasks - INFO - Metrics collection completed
+2025-10-21 00:26:38,163 - utils.performance_monitor - INFO - Performance: collect_metrics - Duration: 1.010s - Success: True
+2025-10-21 00:26:38,163 - utils.performance_monitor - WARNING - Slow operation detected: collect_metrics - Duration: 1.010s
+2025-10-21 00:26:38,164 - services.background_tasks - INFO - Background task 'collect_metrics' completed successfully in 1013ms
+2025-10-21 00:44:38,266 - services.background_tasks - INFO - Starting background task: cleanup_cache
+2025-10-21 00:44:38,267 - services.background_tasks - ERROR - Error during cache cleanup: 'AdvancedCacheService' object has no attribute 'cleanup_expired'
+2025-10-21 00:44:38,268 - utils.performance_monitor - INFO - Performance: cleanup_cache - Duration: 0.000s - Success: True
+2025-10-21 00:44:38,268 - services.background_tasks - INFO - Background task 'cleanup_cache' completed successfully in 1ms
+2025-10-21 00:44:38,268 - services.background_tasks - INFO - Starting background task: system_health_check
+2025-10-21 00:44:39,273 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.005s - Success: True
+2025-10-21 00:44:39,273 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.005s
+2025-10-21 00:44:39,279 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.005s - Success: True
+2025-10-21 00:44:39,280 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-21 00:44:39,280 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-21 00:44:39,280 - services.background_tasks - INFO - System health check passed
+2025-10-21 00:44:39,280 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 1.012s - Success: True
+2025-10-21 00:44:39,280 - utils.performance_monitor - WARNING - Slow operation detected: system_health_check - Duration: 1.012s
+2025-10-21 00:44:39,280 - services.background_tasks - INFO - Background task 'system_health_check' completed successfully in 1012ms
+2025-10-21 00:56:39,347 - services.background_tasks - INFO - Starting background task: collect_metrics
+2025-10-21 00:56:40,352 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.003s - Success: True
+2025-10-21 00:56:40,352 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.003s
+2025-10-21 00:56:40,357 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.005s - Success: True
+2025-10-21 00:56:40,358 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.001s - Success: True
+2025-10-21 00:56:40,359 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-21 00:56:40,359 - services.background_tasks - INFO - Metrics collection completed
+2025-10-21 00:56:40,359 - utils.performance_monitor - INFO - Performance: collect_metrics - Duration: 1.010s - Success: True
+2025-10-21 00:56:40,359 - utils.performance_monitor - WARNING - Slow operation detected: collect_metrics - Duration: 1.010s
+2025-10-21 00:56:40,359 - services.background_tasks - INFO - Background task 'collect_metrics' completed successfully in 1012ms

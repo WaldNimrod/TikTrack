@@ -752,12 +752,16 @@ function updateAlertsTable(alerts) {
           <td data-date="${alert.created_at}"><span class="date-text">${createdAt}</span></td>
           <td class="actions-cell" data-entity-id="${alert.id}" data-status="${alert.status || ''}">
             ${window.createActionsMenu ? window.createActionsMenu([
+              { type: 'VIEW', onclick: `window.showEntityDetails('alert', ${alert.id}, { mode: 'view' })`, title: 'צפה בפרטי התראה' },
               { type: 'LINK', onclick: `viewLinkedItemsForAlert(${alert.id})`, title: 'צפה בפריטים מקושרים' },
               { type: 'EDIT', onclick: `editAlert(${alert.id})`, title: 'ערוך התראה' },
               { type: alert.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert && window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert(${alert.id})`, title: alert.status === 'cancelled' ? 'הפעל מחדש' : 'בטל' },
               { type: 'DELETE', onclick: `deleteAlert(${alert.id})`, title: 'מחק התראה' }
             ]) : `
             <div class="btn-group btn-group-sm actions-btn-group" role="group">
+              <button class="btn btn-sm" onclick="window.showEntityDetails('alert', ${alert.id}, { mode: 'view' })" title="צפה בפרטי התראה">
+                👁️
+              </button>
               <button class="btn btn-sm" onclick="viewLinkedItemsForAlert(${alert.id})" title="צפה בפריטים מקושרים">
                 🔗
               </button>

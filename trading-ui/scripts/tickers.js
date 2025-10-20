@@ -1723,11 +1723,15 @@ function updateTickersTable(tickers) {
                     </td>
                     <td class="actions-cell">
                         ${window.createActionsMenu ? window.createActionsMenu([
+                          { type: 'VIEW', onclick: `window.showEntityDetails('ticker', ${ticker.id}, { mode: 'view' })`, title: 'צפה בפרטי טיקר' },
                           { type: 'LINK', onclick: `viewLinkedItemsForTicker(${ticker.id})`, title: 'פריטים מקושרים' },
                           { type: 'EDIT', onclick: `editTicker(${ticker.id})`, title: 'ערוך' },
                           { type: ticker.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `window.${ticker.status === 'cancelled' ? 'reactivate' : 'cancel'}Ticker(${ticker.id})`, title: ticker.status === 'cancelled' ? 'הפעל מחדש טיקר' : 'בטל טיקר' }
                         ]) : `
                         <div class="btn-group btn-group-sm" role="group">
+                            <button data-button-type="VIEW" data-variant="small" 
+                                    data-onclick="window.showEntityDetails('ticker', ${ticker.id}, { mode: 'view' })" 
+                                    data-text="" title="צפה בפרטי טיקר"></button>
                             <button data-button-type="LINK" data-variant="small" 
                                     data-onclick="viewLinkedItemsForTicker(${ticker.id})" 
                                     data-text="" title="פריטים מקושרים"></button>

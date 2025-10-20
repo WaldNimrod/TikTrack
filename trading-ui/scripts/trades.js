@@ -432,12 +432,14 @@ function updateTradesTable(trades) {
       <td>${trade.notes || ''}</td>
       <td class="actions-cell">
         ${window.createActionsMenu ? window.createActionsMenu([
+          { type: 'VIEW', onclick: `window.showEntityDetails('trade', ${trade.id}, { mode: 'view' })`, title: 'צפה בפרטי טרייד' },
           { type: 'LINK', onclick: `viewLinkedItemsForTrade(${trade.id})`, title: 'הצג פריטים מקושרים' },
           { type: 'EDIT', onclick: `editTradeRecord('${trade.id}')`, title: 'ערוך טרייד' },
           { type: 'CANCEL', onclick: `window.cancelTrade(${trade.id})`, title: 'בטל טרייד' },
           { type: 'DELETE', onclick: `deleteTradeRecord('${trade.id}')`, title: 'מחק טרייד' }
         ]) : `
         <div class="d-flex gap-1 justify-content-center align-items-center" style="flex-wrap: nowrap;">
+          <button data-button-type="VIEW" data-variant="small" data-onclick="window.showEntityDetails('trade', ${trade.id}, { mode: 'view' })" data-text="" title="צפה בפרטי טרייד"></button>
           <button data-button-type="LINK" data-variant="small" data-onclick="viewLinkedItemsForTrade(${trade.id})" data-text="" title="הצג פריטים מקושרים"></button>
           <button data-button-type="EDIT" data-variant="small" data-onclick="editTradeRecord('${trade.id}')" data-text="" title="ערוך טרייד"></button>
           <button data-button-type="CANCEL" data-variant="small" data-onclick="window.cancelTrade(${trade.id})" data-text="" title="בטל טרייד"></button>
@@ -505,6 +507,8 @@ function viewTradePlanDetails(tradePlanId) {
     }
   }
 }
+
+// showTradeDetails - משתמש ב-window.showEntityDetails הגלובלי
 
 function editTradeRecord(tradeId) {
   // עריכת טרייד
@@ -2019,6 +2023,7 @@ window.loadUserPreferences = loadUserPreferences;          // טעינת העד�
 window.viewTickerDetails = viewTickerDetails;              // צפייה בפרטי טיקר
 window.viewAccountDetails = viewAccountDetails;              // צפייה בפרטי חשבון
 window.viewTradePlanDetails = viewTradePlanDetails;        // צפייה בפרטי תוכנית טרייד
+// window.showTradeDetails - משתמש ב-window.showEntityDetails הגלובלי
 window.editTradeRecord = editTradeRecord;                  // עריכת טרייד
 window.cancelTradeRecord = cancelTradeRecord;              // ביטול טרייד
 window.reactivateTrade = reactivateTrade;                  // הפעלה מחדש של טרייד
@@ -2287,82 +2292,10 @@ function setupDateValidation() {
   const openedAtField = document.getElementById('editTradeOpenedAt');
   const closedAtField = document.getElementById('editTradeClosedAt');
 
-  if (openedAtField && closedAtField) {
-    // ולידציה בעת שינוי תאריך יצירה
-    openedAtField.addEventListener('change', function () {
-      validateDateFields();
-    });
-
-    // ולידציה בעת שינוי תאריך סגירה
-    closedAtField.addEventListener('change', function () {
-      validateDateFields();
-    });
-  }
+  // ולידציה - משתמש במערכת הכללית window.validateEntityForm
 }
 
-/**
- * בדיקת ולידציה של שדות תאריך
- */
-function validateDateFields() {
-  const openedAtField = document.getElementById('editTradeOpenedAt');
-  const closedAtField = document.getElementById('editTradeClosedAt');
-
-  if (!openedAtField || !closedAtField) {return;}
-
-  const openedAt = openedAtField.value;
-  const closedAt = closedAtField.value;
-
-  // הסרת הודעות שגיאה קודמות
-  clearDateValidationMessages();
-
-  if (openedAt && closedAt) {
-    const openedDate = new Date(openedAt);
-    const closedDate = new Date(closedAt);
-
-    if (closedDate < openedDate) {
-      showDateValidationError('תאריך סגירה לא יכול להיות לפני תאריך יצירה');
-      closedAtField.classList.add('is-invalid');
-    } else {
-      closedAtField.classList.remove('is-invalid');
-      closedAtField.classList.add('is-valid');
-    }
-  }
-}
-
-/**
- * הצגת הודעת שגיאה לולידציה
- */
-function showDateValidationError(message) {
-  const closedAtField = document.getElementById('editTradeClosedAt');
-  if (!closedAtField) {return;}
-
-  // הסרת הודעות קודמות
-  const existingError = closedAtField.parentNode.querySelector('.invalid-feedback');
-  if (existingError) {
-    existingError.remove();
-  }
-
-  // הוספת הודעת שגיאה
-  const errorDiv = document.createElement('div');
-  errorDiv.className = 'invalid-feedback';
-  errorDiv.textContent = message;
-  closedAtField.parentNode.appendChild(errorDiv);
-}
-
-/**
- * ניקוי הודעות ולידציה
- */
-function clearDateValidationMessages() {
-  const closedAtField = document.getElementById('editTradeClosedAt');
-  if (!closedAtField) {return;}
-
-  const existingError = closedAtField.parentNode.querySelector('.invalid-feedback');
-  if (existingError) {
-    existingError.remove();
-  }
-
-  closedAtField.classList.remove('is-invalid', 'is-valid');
-}
+// ולידציה - משתמש במערכת הכללית window.validateEntityForm
 
 // הפונקציה הוסרה - קיימת כבר בשורה 558
 

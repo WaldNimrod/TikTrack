@@ -226,12 +226,15 @@ class UnifiedAppInitializer {
             this.initialized = true;
             
             // ← NEW: ניטור בסוף האתחול (לא חוסם)
-            const validation = this.validateRequiredSystems(config);
-            if (validation.valid) {
-                console.log('✅ All systems validated successfully');
-            } else {
-                console.warn('⚠️ Some systems need attention (see details above)');
-            }
+            // Wait for globals to be available
+            setTimeout(() => {
+                const validation = this.validateRequiredSystems(config);
+                if (validation.valid) {
+                    console.log('✅ All systems validated successfully');
+                } else {
+                    console.warn('⚠️ Some systems need attention (see details above)');
+                }
+            }, 1500);
             
             this.logSuccess();
             
@@ -1372,7 +1375,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log('🚀 About to call initializeUnifiedApp...');
             await window.initializeUnifiedApp();
             console.log('✅ initializeUnifiedApp completed');
-        }, 500);
+        }, 1000);
         
     } catch (error) {
         console.error('❌ Unified App auto-initialization failed:', error);

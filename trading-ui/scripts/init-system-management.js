@@ -1674,6 +1674,9 @@ function checkLoadOrder(pageConfig) {
 async function checkForMismatches(pageName, pageConfig) {
     const mismatches = [];
     
+    // Wait for globals to be available
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
     if (pageConfig.packages) {
         for (const pkgName of pageConfig.packages) {
             const pkg = window.PACKAGE_MANIFEST?.[pkgName];
@@ -1937,6 +1940,9 @@ async function runDetailedPageScan(pageName, pageConfig) {
     const loadOrderIssues = checkLoadOrder(pageConfig);
     result.loadOrderIssues = loadOrderIssues;
     result.criticalErrors += loadOrderIssues.length;
+    
+    // Wait for globals to be available
+    await new Promise(resolve => setTimeout(resolve, 1000));
     
     // Check for mismatches (documented vs actual)
     const mismatches = await checkForMismatches(pageName, pageConfig);

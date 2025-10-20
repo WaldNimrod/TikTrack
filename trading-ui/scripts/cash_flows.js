@@ -729,7 +729,7 @@ const editCashFlowValidationRules = {
     required: true,
     message: 'נדרש לבחור מקור',
   },
-: {
+  cashFlowExternalId: {
     required: false, // לא חובה - תלוי במקור
     message: 'נדרש להזין מזהה חיצוני',
   },

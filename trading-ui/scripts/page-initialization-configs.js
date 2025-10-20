@@ -544,6 +544,7 @@ const PAGE_CONFIGS = {
         requiredGlobals: [
             'NotificationSystem',    // from base package
             'DataUtils',            // from crud package  
+            'getCurrentPreference', // from preferences package
             'window.loadCashFlowsData',
             'window.formatDate'     // from crud package (date-utils.js)
         ],

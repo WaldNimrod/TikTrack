@@ -161,12 +161,6 @@ const PACKAGE_MANIFEST = {
         globalCheck: 'window.getCurrentPreference',
         description: 'מערכת העדפות',
         required: true
-      },
-      {
-        file: 'button-system-init.js',
-        globalCheck: 'window.ButtonSystem',
-        description: 'מערכת כפתורים',
-        required: true
       }
     ],
     estimatedSize: '~280KB',

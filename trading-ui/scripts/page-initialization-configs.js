@@ -1371,6 +1371,39 @@ const ADDITIONAL_PAGE_CONFIGS = {
                 // Init system management specific initialization
             }
         ]
+    },
+    
+    'cache-management': {
+        name: 'Cache Management',
+        packages: ['base'],
+        requiredGlobals: [
+            'NotificationSystem',
+            'UnifiedCacheManager'
+        ],
+        description: 'ניהול מערכת המטמון - בדיקות וניטור',
+        lastModified: '2025-10-19',
+        pageType: 'system-management',
+        preloadAssets: ['cache-data'],
+        cacheStrategy: 'standard',
+        requiresFilters: false,
+        requiresValidation: false,
+        requiresTables: false
+    },
+    
+    'conditions-test': {
+        name: 'Conditions Test',
+        packages: ['base'],
+        requiredGlobals: [
+            'NotificationSystem'
+        ],
+        description: 'בדיקת מערכת התנאים',
+        lastModified: '2025-10-19',
+        pageType: 'testing',
+        preloadAssets: ['conditions-data'],
+        cacheStrategy: 'standard',
+        requiresFilters: false,
+        requiresValidation: false,
+        requiresTables: false
     }
 };
 

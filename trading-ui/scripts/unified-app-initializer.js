@@ -926,7 +926,10 @@ class UnifiedAppInitializer {
                     title: '⚠️ אי-התאמה: תיעוד vs מציאות',
                     type: 'info',
                     category: 'monitoring',
-                    timestamp: new Date().toISOString()
+                    timestamp: new Date().toISOString(),
+                    page: window.location.pathname,
+                    source: 'unified-app-initializer',
+                    function: 'validateRequiredSystems'
                 };
                 const detailedMessage = this.buildDetailedErrorMessage(validationResult);
                 window.showCriticalErrorModal(errorInfo, detailedMessage);

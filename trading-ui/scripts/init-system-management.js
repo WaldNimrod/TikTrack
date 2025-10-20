@@ -57,9 +57,9 @@ async function loadSystemStatus() {
         
         if (systemStatusCard) {
             const isInitialized = status && status.initialized;
-            systemStatusCard.innerHTML = isInitialized ? 
-                '<i class="fas fa-check-circle text-success"></i> פעילה' : 
-                '<i class="fas fa-times-circle text-danger"></i> לא פעילה';
+            const statusText = isInitialized ? 'פעילה' : 'לא פעילה';
+            const statusIcon = isInitialized ? 'fa-check-circle text-success' : 'fa-times-circle text-danger';
+            systemStatusCard.innerHTML = `<i class="fas ${statusIcon}"></i> ${statusText}`;
         }
         
         if (pagesCountCard) {
@@ -1334,12 +1334,16 @@ async function runValidationTests() {
     
     // Test 1: Check unified app initializer
     if (window.unifiedAppInit) {
-        const status = window.unifiedAppInit.getStatus ? window.unifiedAppInit.getStatus() : 'unknown';
+        const statusObj = window.unifiedAppInit.getStatus ? window.unifiedAppInit.getStatus() : null;
+        const isInitialized = statusObj && statusObj.initialized;
+        const statusText = isInitialized ? 'מאותחלת' : 'לא מאותחלת';
+        const statusValue = isInitialized ? 'initialized' : 'not-initialized';
+        
         tests.push({
             name: 'מערכת אתחול מאוחדת',
-            status: status === 'initialized' ? 'success' : 'warning',
-            message: status === 'initialized' ? 'מאותחלת' : 'לא מאותחלת',
-            details: `סטטוס: ${status}`
+            status: isInitialized ? 'success' : 'warning',
+            message: statusText,
+            details: `סטטוס: ${statusValue}`
         });
     } else {
         tests.push({

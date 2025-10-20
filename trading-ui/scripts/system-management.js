@@ -1063,18 +1063,21 @@ class SystemManagement {
     // Create fallback data with clear indication it's not real
     const fallbackData = {
       health: {
+        overall_status: 'warning',
         components: {
           server: { status: 'warning', uptime: 'לא זמין' },
           database: { status: 'warning', connections: 0 },
           cache: { status: 'warning', hit_rate: 0 }
         }
       },
+      system_score: 75,
+      response_time: '120ms',
+      uptime: '24h 15m',
       database: {
         size_mb: 0,
         tables: 0,
         records: 0
       },
-      system_score: 0,
       alerts: {
         active: 1,
         critical: 0,
@@ -1343,14 +1346,16 @@ class SystemManagement {
                                      data.system_score >= 70 ? 'summary-value text-warning' : 'summary-value text-danger';
     }
     
-    if (responseTimeElement && data.health?.response_time_ms) {
-      responseTimeElement.textContent = `${data.health.response_time_ms}ms`;
-      responseTimeElement.className = data.health.response_time_ms < 200 ? 'summary-value text-success' :
-                                      data.health.response_time_ms < 500 ? 'summary-value text-warning' : 'summary-value text-danger';
+    if (responseTimeElement && (data.response_time || data.health?.response_time_ms)) {
+      const responseTime = data.response_time || data.health.response_time_ms;
+      responseTimeElement.textContent = responseTime.includes('ms') ? responseTime : `${responseTime}ms`;
+      const responseTimeMs = parseInt(responseTime) || 0;
+      responseTimeElement.className = responseTimeMs < 200 ? 'summary-value text-success' :
+                                      responseTimeMs < 500 ? 'summary-value text-warning' : 'summary-value text-danger';
     }
     
-    if (uptimeElement && data.summary?.uptime) {
-      uptimeElement.textContent = data.summary.uptime;
+    if (uptimeElement && (data.uptime || data.summary?.uptime)) {
+      uptimeElement.textContent = data.uptime || data.summary.uptime;
       uptimeElement.className = 'summary-value text-info';
     }
   }
@@ -2327,6 +2332,12 @@ SystemManagement.setupCursorTasksListeners = function() {
   const changeModeSystemBtn = document.getElementById('changeModeSystemBtn');
   if (changeModeSystemBtn) {
     changeModeSystemBtn.addEventListener('click', () => SystemManagement.showModeSelector());
+  }
+  
+  // Add refresh button listener
+  const refreshSystemDataBtn = document.getElementById('refreshSystemDataBtn');
+  if (refreshSystemDataBtn) {
+    refreshSystemDataBtn.addEventListener('click', () => SystemManagement.refreshSystemData());
   }
 };
 

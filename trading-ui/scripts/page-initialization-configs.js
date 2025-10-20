@@ -168,12 +168,13 @@ const PAGE_CONFIGS = {
         name: 'Dashboard',
         
         // ← NEW: חבילות נדרשות
-        packages: ['base', 'crud', 'charts'],
+        packages: ['base', 'crud', 'charts', 'preferences'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
             'NotificationSystem',
             'DataUtils',
+            'getCurrentPreference',
             'window.loadDashboardData',
             'window.initializeCharts'
         ],
@@ -271,12 +272,13 @@ const PAGE_CONFIGS = {
         name: 'Trades',
         
         // ← NEW: חבילות נדרשות
-        packages: ['base', 'crud', 'filters', 'advanced-notifications'],
+        packages: ['base', 'crud', 'filters', 'advanced-notifications', 'preferences'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
             'NotificationSystem',
             'DataUtils',
+            'getCurrentPreference',
             'window.loadTradesData',
             'window.loadUserPreferences',
             'window.setupSortableHeaders',
@@ -327,7 +329,7 @@ const PAGE_CONFIGS = {
         name: 'Executions',
         
         // ← NEW: חבילות נדרשות
-        packages: ['base', 'crud', 'filters'],
+        packages: ['base', 'crud', 'filters', 'preferences'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
@@ -397,7 +399,7 @@ const PAGE_CONFIGS = {
         name: 'Alerts',
         
         // ← NEW: חבילות נדרשות
-        packages: ['base', 'crud', 'filters', 'advanced-notifications'],
+        packages: ['base', 'crud', 'filters', 'advanced-notifications', 'preferences'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
@@ -490,7 +492,7 @@ const PAGE_CONFIGS = {
         name: 'Trading Accounts',
         
         // ← NEW: חבילות נדרשות
-        packages: ['base', 'crud', 'filters', 'validation'],
+        packages: ['base', 'crud', 'filters', 'validation', 'preferences'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
@@ -538,7 +540,7 @@ const PAGE_CONFIGS = {
         // 📦 PACKAGES EXPLANATION:
         // - 'base': button-system-init.js (for button rendering)
         // - 'crud': date-utils.js (for formatDate function)
-        packages: ['base', 'crud'],
+        packages: ['base', 'crud', 'preferences'],
         requiredGlobals: [
             'NotificationSystem',    // from base package
             'DataUtils',            // from crud package  
@@ -569,7 +571,7 @@ const PAGE_CONFIGS = {
         name: 'Tickers',
         
         // ← NEW: חבילות נדרשות
-        packages: ['base', 'crud', 'filters', 'external-data'],
+        packages: ['base', 'crud', 'filters', 'external-data', 'preferences'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
@@ -1071,7 +1073,7 @@ const PAGE_CONFIGS = {
     
     'db_display': {
         name: 'Database Display',
-        packages: ['base', 'crud'],
+        packages: ['base', 'crud', 'preferences'],
         requiresFilters: false,
         requiresValidation: false,
         requiresTables: true,
@@ -1214,7 +1216,7 @@ const ADDITIONAL_PAGE_CONFIGS = {
     // Missing pages from documentation
     'db_extradata': {
         name: 'Database Extra Data',
-        packages: ['base', 'crud'],
+        packages: ['base', 'crud', 'preferences'],
         requiredGlobals: [
             'NotificationSystem',
             'DataUtils',
@@ -1241,7 +1243,7 @@ const ADDITIONAL_PAGE_CONFIGS = {
     
     'constraints': {
         name: 'System Constraints',
-        packages: ['base', 'validation'],
+        packages: ['base', 'validation', 'preferences'],
         requiredGlobals: [
             'NotificationSystem',
             'window.loadConstraints',
@@ -1267,7 +1269,7 @@ const ADDITIONAL_PAGE_CONFIGS = {
     
     'background-tasks': {
         name: 'Background Tasks',
-        packages: ['base', 'system-management'],
+        packages: ['base', 'system-management', 'preferences'],
         requiredGlobals: [
             'NotificationSystem',
             'window.loadBackgroundTasks',
@@ -1293,7 +1295,7 @@ const ADDITIONAL_PAGE_CONFIGS = {
     
     'page-scripts-matrix': {
         name: 'Page Scripts Matrix',
-        packages: ['base', 'dev-tools'],
+        packages: ['base', 'dev-tools', 'preferences'],
         requiredGlobals: [
             'NotificationSystem',
             'window.loadScriptsMatrix',
@@ -1319,7 +1321,7 @@ const ADDITIONAL_PAGE_CONFIGS = {
     
     'css-management': {
         name: 'CSS Management',
-        packages: ['base', 'dev-tools'],
+        packages: ['base', 'dev-tools', 'preferences'],
         requiredGlobals: [
             'NotificationSystem',
             'window.loadCSSManagement',
@@ -1345,7 +1347,7 @@ const ADDITIONAL_PAGE_CONFIGS = {
     
     'dynamic-colors-display': {
         name: 'Dynamic Colors Display',
-        packages: ['base'],
+        packages: ['base', 'preferences'],
         requiredGlobals: [
             'NotificationSystem',
             'window.loadColorDisplay',
@@ -1371,7 +1373,7 @@ const ADDITIONAL_PAGE_CONFIGS = {
     
     'designs': {
         name: 'Design Gallery',
-        packages: ['base'],
+        packages: ['base', 'preferences'],
         requiredGlobals: [
             'NotificationSystem',
             'window.loadDesigns',
@@ -1397,7 +1399,7 @@ const ADDITIONAL_PAGE_CONFIGS = {
     
     'chart-management': {
         name: 'Chart Management',
-        packages: ['base', 'charts'],
+        packages: ['base', 'charts', 'preferences'],
         requiredGlobals: [
             'NotificationSystem',
             'window.loadChartManagement',
@@ -1424,7 +1426,7 @@ const ADDITIONAL_PAGE_CONFIGS = {
     // Init System Management
     'init-system-management': {
         name: 'Init System Management',
-        packages: ['base', 'dev-tools'],
+        packages: ['base', 'dev-tools', 'preferences'],
         requiredGlobals: [
             'NotificationSystem',
             'PackageManifest',
@@ -1450,7 +1452,7 @@ const ADDITIONAL_PAGE_CONFIGS = {
     
     'cache-management': {
         name: 'Cache Management',
-        packages: ['base'],
+        packages: ['base', 'preferences'],
         requiredGlobals: [
             'NotificationSystem',
             'UnifiedCacheManager'
@@ -1467,7 +1469,7 @@ const ADDITIONAL_PAGE_CONFIGS = {
     
     'conditions-test': {
         name: 'Conditions Test',
-        packages: ['base'],
+        packages: ['base', 'preferences'],
         requiredGlobals: [
             'NotificationSystem'
         ],

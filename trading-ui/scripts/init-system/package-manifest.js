@@ -227,12 +227,6 @@ const PACKAGE_MANIFEST = {
         description: 'מערכת header',
         required: true
       },
-      {
-        file: 'preferences.js',
-        globalCheck: 'window.getCurrentPreference',
-        description: 'מערכת העדפות',
-        required: true
-      }
     ],
     estimatedSize: '~280KB',
     initTime: '~150ms'
@@ -469,9 +463,9 @@ const PACKAGE_MANIFEST = {
     scripts: [
       {
         file: 'preferences.js',
-        globalCheck: 'window.Preferences',
+        globalCheck: 'window.getCurrentPreference',
         description: 'מערכת העדפות',
-        required: false
+        required: true
       },
       {
         file: 'preferences-core.js',

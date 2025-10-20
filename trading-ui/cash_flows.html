@@ -95,7 +95,7 @@
                         </div>
                         <div class="table-count" id="cashFlowsCount">טוען...</div>
                         <div class="table-actions">
-                            <button data-button-type="ADD" data-entity-type="cash_flow" data-variant="full" data-onclick="showAddModal()" data-text="הוסף תזרים מזומנים" title="הוסף תזרים מזומנים חדש"></button>
+                            <button data-button-type="ADD" data-entity-type="cash_flow" data-variant="full" data-onclick="showAddCashFlowModal()" data-text="הוסף תזרים מזומנים" title="הוסף תזרים מזומנים חדש"></button>
                             <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('main')" data-text="הצג/הסתר"></button>
                         </div>
                     </div>
@@ -157,7 +157,7 @@
                 <div class="modal-content">
                     <div class="modal-header modal-header-colored">
                         <h5 class="modal-title" id="addCashFlowModalLabel">הוספת תזרים מזומנים חדש</h5>
-                        <button data-button-type="CLOSE" data-entity-type="cash_flow" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="סגור"></button>
                     </div>
                     <div class="modal-body">
                         <form id="addCashFlowForm">
@@ -236,10 +236,11 @@
                 <div class="modal-content">
                     <div class="modal-header modal-header-colored">
                         <h5 class="modal-title" id="editCashFlowModalLabel">עריכת תזרים מזומנים</h5>
-                        <button data-button-type="CLOSE" data-entity-type="cash_flow" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="סגור"></button>
                     </div>
                     <div class="modal-body">
                         <form id="editCashFlowForm">
+                            <input type="hidden" id="editCashFlowId" value="">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">

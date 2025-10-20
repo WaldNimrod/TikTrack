@@ -3281,3 +3281,865 @@
 2025-10-20 20:03:09,087 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.001s - Success: True
 2025-10-20 20:03:09,087 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
 2025-10-20 20:03:09,103 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:03:09] "GET /api/system/overview HTTP/1.1" 200 -
+2025-10-20 20:04:08,073 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:04:08] "GET /api/system/settings/primaryDataProvider HTTP/1.1" 200 -
+2025-10-20 20:04:08,079 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-20T20:04:08.079257', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/api/background-tasks/recent-logs?limit=10', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-20 20:04:08,083 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-20T20:04:08.079257', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/api/background-tasks/recent-logs?limit=10', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-20 20:04:08,084 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:04:08] "[33mGET /api/background-tasks/recent-logs?limit=10 HTTP/1.1[0m" 404 -
+2025-10-20 20:04:08,098 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+2025-10-20 20:04:08,098 - cache - INFO - Cache SET: health_check_1760979848 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-20 20:04:08,098 - cache - INFO - Cache HIT: health_check_1760979848 (Access count: 1)
+2025-10-20 20:04:08,098 - cache - INFO - Cache DELETE: health_check_1760979848 (Was accessed 1 times)
+2025-10-20 20:04:08,098 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.001s - Success: True
+2025-10-20 20:04:08,099 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:04:08,099 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:04:09,105 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.006s - Success: True
+2025-10-20 20:04:09,105 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.006s
+2025-10-20 20:04:09,108 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.003s - Success: True
+2025-10-20 20:04:09,109 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-20 20:04:09,109 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-20 20:04:09,123 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:04:09] "GET /api/system/overview HTTP/1.1" 200 -
+2025-10-20 20:04:44,257 - services.background_tasks - INFO - Starting background task: collect_metrics
+2025-10-20 20:04:45,260 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.003s - Success: True
+2025-10-20 20:04:45,261 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.003s
+2025-10-20 20:04:45,273 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.010s - Success: True
+2025-10-20 20:04:45,274 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.001s - Success: True
+2025-10-20 20:04:45,275 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-20 20:04:45,275 - services.background_tasks - INFO - Metrics collection completed
+2025-10-20 20:04:45,275 - utils.performance_monitor - INFO - Performance: collect_metrics - Duration: 1.018s - Success: True
+2025-10-20 20:04:45,275 - utils.performance_monitor - WARNING - Slow operation detected: collect_metrics - Duration: 1.018s
+2025-10-20 20:04:45,276 - services.background_tasks - INFO - Background task 'collect_metrics' completed successfully in 1018ms
+2025-10-20 20:05:08,062 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:05:08] "GET /api/system/settings/primaryDataProvider HTTP/1.1" 200 -
+2025-10-20 20:05:08,073 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.002s - Success: True
+2025-10-20 20:05:08,074 - cache - INFO - Cache SET: health_check_1760979908 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-20 20:05:08,074 - cache - INFO - Cache HIT: health_check_1760979908 (Access count: 1)
+2025-10-20 20:05:08,074 - cache - INFO - Cache DELETE: health_check_1760979908 (Was accessed 1 times)
+2025-10-20 20:05:08,074 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:05:08,075 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:05:08,075 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:05:09,080 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.006s - Success: True
+2025-10-20 20:05:09,081 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.006s
+2025-10-20 20:05:09,085 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.004s - Success: True
+2025-10-20 20:05:09,086 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.001s - Success: True
+2025-10-20 20:05:09,086 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-20 20:05:09,106 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:05:09] "GET /api/system/overview HTTP/1.1" 200 -
+2025-10-20 20:06:08,066 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:06:08] "GET /api/system/settings/primaryDataProvider HTTP/1.1" 200 -
+2025-10-20 20:06:08,073 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+2025-10-20 20:06:08,073 - cache - INFO - Cache SET: health_check_1760979968 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-20 20:06:08,073 - cache - INFO - Cache HIT: health_check_1760979968 (Access count: 1)
+2025-10-20 20:06:08,074 - cache - INFO - Cache DELETE: health_check_1760979968 (Was accessed 1 times)
+2025-10-20 20:06:08,074 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.001s - Success: True
+2025-10-20 20:06:08,074 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:06:08,074 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:06:09,080 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.006s - Success: True
+2025-10-20 20:06:09,081 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.006s
+2025-10-20 20:06:09,085 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.004s - Success: True
+2025-10-20 20:06:09,086 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.001s - Success: True
+2025-10-20 20:06:09,086 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-20 20:06:09,098 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:06:09] "GET /api/system/overview HTTP/1.1" 200 -
+2025-10-20 20:07:08,064 - utils.rate_limiter - INFO - Rate limiter cleanup: removed 0 empty entries
+2025-10-20 20:07:08,065 - utils.rate_limiter - INFO - Rate limiter cleanup: removed 0 empty entries
+2025-10-20 20:07:08,067 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:07:08] "GET /api/system/settings/primaryDataProvider HTTP/1.1" 200 -
+2025-10-20 20:07:08,072 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+2025-10-20 20:07:08,072 - cache - INFO - Cache SET: health_check_1760980028 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-20 20:07:08,073 - cache - INFO - Cache HIT: health_check_1760980028 (Access count: 1)
+2025-10-20 20:07:08,073 - cache - INFO - Cache DELETE: health_check_1760980028 (Was accessed 1 times)
+2025-10-20 20:07:08,073 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.001s - Success: True
+2025-10-20 20:07:08,074 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:07:08,074 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:07:09,079 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.005s - Success: True
+2025-10-20 20:07:09,079 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.005s
+2025-10-20 20:07:09,082 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.002s - Success: True
+2025-10-20 20:07:09,082 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-20 20:07:09,082 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-20 20:07:09,093 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:07:09] "GET /api/system/overview HTTP/1.1" 200 -
+2025-10-20 20:08:08,070 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:08:08] "GET /api/system/settings/primaryDataProvider HTTP/1.1" 200 -
+2025-10-20 20:08:08,079 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+2025-10-20 20:08:08,079 - cache - INFO - Cache SET: health_check_1760980088 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-20 20:08:08,079 - cache - INFO - Cache HIT: health_check_1760980088 (Access count: 1)
+2025-10-20 20:08:08,079 - cache - INFO - Cache DELETE: health_check_1760980088 (Was accessed 1 times)
+2025-10-20 20:08:08,080 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.001s - Success: True
+2025-10-20 20:08:08,080 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:08:08,081 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:08:09,087 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.006s - Success: True
+2025-10-20 20:08:09,088 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.006s
+2025-10-20 20:08:09,092 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.004s - Success: True
+2025-10-20 20:08:09,093 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.001s - Success: True
+2025-10-20 20:08:09,093 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-20 20:08:09,113 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:08:09] "GET /api/system/overview HTTP/1.1" 200 -
+2025-10-20 20:08:20,930 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:08:20] "GET /images/icons/cash_flows.svg HTTP/1.1" 200 -
+2025-10-20 20:08:20,946 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-20T20:08:20.945216', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/.well-known/appspecific/com.chrome.devtools.json', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-20 20:08:20,946 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-20T20:08:20.945216', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/.well-known/appspecific/com.chrome.devtools.json', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-20 20:08:20,948 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:08:20] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-10-20 20:08:23,893 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:08:23] "GET /sw.js HTTP/1.1" 200 -
+2025-10-20 20:09:08,082 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-20T20:09:08.082300', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/api/background-tasks/recent-logs?limit=10', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-20 20:09:08,083 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-20T20:09:08.082300', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/api/background-tasks/recent-logs?limit=10', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-20 20:09:08,084 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:09:08] "[33mGET /api/background-tasks/recent-logs?limit=10 HTTP/1.1[0m" 404 -
+2025-10-20 20:09:08,086 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:09:08] "GET /api/system/settings/primaryDataProvider HTTP/1.1" 200 -
+2025-10-20 20:09:08,101 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+2025-10-20 20:09:08,102 - cache - INFO - Cache SET: health_check_1760980148 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-20 20:09:08,105 - cache - INFO - Cache HIT: health_check_1760980148 (Access count: 1)
+2025-10-20 20:09:08,105 - cache - INFO - Cache DELETE: health_check_1760980148 (Was accessed 1 times)
+2025-10-20 20:09:08,106 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.004s - Success: True
+2025-10-20 20:09:08,107 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:09:08,107 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:09:09,111 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.004s - Success: True
+2025-10-20 20:09:09,112 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.004s
+2025-10-20 20:09:09,117 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.005s - Success: True
+2025-10-20 20:09:09,118 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.001s - Success: True
+2025-10-20 20:09:09,118 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-20 20:09:09,135 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:09:09] "GET /api/system/overview HTTP/1.1" 200 -
+2025-10-20 20:10:08,063 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:08] "GET /api/system/settings/primaryDataProvider HTTP/1.1" 200 -
+2025-10-20 20:10:08,071 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+2025-10-20 20:10:08,072 - cache - INFO - Cache SET: health_check_1760980208 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-20 20:10:08,072 - cache - INFO - Cache HIT: health_check_1760980208 (Access count: 1)
+2025-10-20 20:10:08,072 - cache - INFO - Cache DELETE: health_check_1760980208 (Was accessed 1 times)
+2025-10-20 20:10:08,072 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:10:08,072 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:10:08,072 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:10:09,079 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.006s - Success: True
+2025-10-20 20:10:09,080 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.006s
+2025-10-20 20:10:09,088 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.008s - Success: True
+2025-10-20 20:10:09,090 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.002s - Success: True
+2025-10-20 20:10:09,091 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-20 20:10:09,132 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:09] "GET /api/system/overview HTTP/1.1" 200 -
+2025-10-20 20:10:48,231 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /cash_flows HTTP/1.1" 200 -
+2025-10-20 20:10:48,252 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/header-styles.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,251 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-20T20:10:48.251448', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/.well-known/appspecific/com.chrome.devtools.json', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-20 20:10:48,253 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-20T20:10:48.251448', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/.well-known/appspecific/com.chrome.devtools.json', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-20 20:10:48,255 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-10-20 20:10:48,261 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_constraints.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,261 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_modals.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,261 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_forms-advanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,261 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_entity-colors.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,261 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_badges-status.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,261 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/08-themes/_light.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,266 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_notifications.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,267 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_navigation.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,268 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_page-headers.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,268 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/master.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,268 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_chart-management.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,270 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_info-summary.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,272 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /images/icons/cash_flows.svg HTTP/1.1" 200 -
+2025-10-20 20:10:48,272 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/09-utilities/_utilities.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,277 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /scripts/global-favicon.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,277 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /scripts/notification-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,280 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/01-settings/_variables.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,281 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/01-settings/_color-variables.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,282 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/01-settings/_colors-dynamic.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,283 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/01-settings/_colors-semantic.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,285 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/01-settings/_typography.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,286 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/01-settings/_spacing.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,287 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/01-settings/_rtl-logical.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,288 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/01-settings/_breakpoints.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,289 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/02-tools/_functions.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,289 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/02-tools/_mixins.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,290 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/02-tools/_utilities.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,291 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/03-generic/_reset.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,292 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/03-generic/_base.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,295 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/04-elements/_links.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,295 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/04-elements/_headings.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,295 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/04-elements/_forms-base.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,295 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/04-elements/_buttons-base.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,296 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/05-objects/_grid.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,296 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/05-objects/_layout.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,300 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_bootstrap-overrides.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,300 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_tables.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,301 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_buttons-advanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,302 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_pagination-system.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,303 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_cards.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,303 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_background-tasks.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,308 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_monitoring-enhanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,308 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_crud-testing-dashboard.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,310 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_linter-realtime-monitor.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,311 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_server-monitor.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,313 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_unified-log-display.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,316 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/07-trumps/chart-management.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,317 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/07-trumps/index-hero-section.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,318 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/08-themes/_high-contrast.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,320 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/07-trumps/page-scripts-matrix.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,320 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/07-trumps/js-map-advanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,321 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/main.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,323 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /scripts/ui-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,325 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /scripts/page-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,328 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /scripts/translation-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,329 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /scripts/button-icons.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,332 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /scripts/button-system-init.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,336 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/01-settings/_variables.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,336 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /scripts/unified-cache-manager.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,337 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/01-settings/_colors-semantic.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,339 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/01-settings/_colors-dynamic.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,341 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/01-settings/_spacing.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,342 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/01-settings/_typography.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,345 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/01-settings/_breakpoints.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,348 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/03-generic/_reset.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,349 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/02-tools/_mixins.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,349 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/01-settings/_rtl-logical.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,350 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/03-generic/_base.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,350 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/02-tools/_functions.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,351 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/04-elements/_headings.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,353 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/04-elements/_links.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,356 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/04-elements/_buttons-base.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,356 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/04-elements/_forms-base.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,360 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/05-objects/_grid.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,360 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/05-objects/_layout.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,362 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_bootstrap-overrides.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,363 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_buttons-advanced.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,365 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_tables.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,366 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_cards.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,369 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_modals.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,370 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_notifications.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,373 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_forms-advanced.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,373 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_navigation.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,375 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_badges-status.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,377 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_page-headers.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,379 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_info-summary.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,381 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_entity-colors.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,381 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_constraints.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,384 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/06-components/_chart-management.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,386 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/07-trumps/page-scripts-matrix.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,388 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/07-trumps/chart-management.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,388 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/08-themes/_light.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,389 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /styles-new/09-utilities/_utilities.css HTTP/1.1" 200 -
+2025-10-20 20:10:48,393 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /scripts/header-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,393 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /scripts/cache-sync-manager.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,394 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /scripts/preferences-core.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,394 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /scripts/color-scheme-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,397 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /scripts/services/data-collection-service.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,397 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /scripts/services/field-renderer-service.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,402 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /scripts/services/select-populator-service.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,403 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /scripts/services/crud-response-handler.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,408 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /scripts/services/default-value-setter.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,408 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /scripts/data-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,409 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /scripts/services/statistics-calculator.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,409 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /scripts/tables.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,411 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /scripts/date-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,412 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /scripts/modules/actions-menu-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,414 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /scripts/init-system/package-manifest.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,419 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /scripts/page-initialization-configs.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,420 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /scripts/unified-app-initializer.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:48,422 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:48] "GET /scripts/cash_flows.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:10:49,541 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:49] "GET /api/preferences/user HTTP/1.1" 200 -
+2025-10-20 20:10:49,604 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:49] "GET /favicon.ico HTTP/1.1" 200 -
+2025-10-20 20:10:50,514 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:50] "GET /images/icons/home.svg HTTP/1.1" 200 -
+2025-10-20 20:10:50,514 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:50] "GET /images/logo.svg HTTP/1.1" 200 -
+2025-10-20 20:10:50,519 - routes.api.base_entity.cash_flows - INFO - Getting all cash_flows records
+2025-10-20 20:10:50,520 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:50] "GET /api/preferences/user/single?preference_name=notifications_ui_enabled&user_id=1 HTTP/1.1" 200 -
+2025-10-20 20:10:50,519 - cache - INFO - Cache MISS: get_all_cash_flows_99914b932bd37a50b983c5e7c90ae93b
+2025-10-20 20:10:50,521 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:50] "GET /api/preferences/user/single?preference_name=notifications_business_enabled&user_id=1 HTTP/1.1" 200 -
+2025-10-20 20:10:50,521 - cache - INFO - Cache SET: get_all_cash_flows_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 2416 chars)
+2025-10-20 20:10:50,522 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:50] "GET /api/cash_flows/ HTTP/1.1" 200 -
+2025-10-20 20:10:50,613 - routes.api.base_entity.trading_accounts - INFO - Getting all trading_accounts records
+2025-10-20 20:10:50,613 - cache - INFO - Cache MISS: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b
+2025-10-20 20:10:50,614 - cache - INFO - Cache SET: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 2908 chars)
+2025-10-20 20:10:50,615 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:50] "GET /api/trading-accounts/ HTTP/1.1" 200 -
+2025-10-20 20:10:50,620 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:10:50] "GET /api/preferences/user/single?preference_name=notifications_system_enabled&user_id=1 HTTP/1.1" 200 -
+2025-10-20 20:11:08,070 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-20T20:11:08.070261', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/api/background-tasks/recent-logs?limit=10', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-20 20:11:08,071 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-20T20:11:08.070261', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/api/background-tasks/recent-logs?limit=10', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-20 20:11:08,072 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:11:08] "[33mGET /api/background-tasks/recent-logs?limit=10 HTTP/1.1[0m" 404 -
+2025-10-20 20:11:08,072 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:11:08] "GET /api/system/settings/primaryDataProvider HTTP/1.1" 200 -
+2025-10-20 20:11:08,077 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+2025-10-20 20:11:08,077 - cache - INFO - Cache SET: health_check_1760980268 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-20 20:11:08,078 - cache - INFO - Cache HIT: health_check_1760980268 (Access count: 1)
+2025-10-20 20:11:08,078 - cache - INFO - Cache DELETE: health_check_1760980268 (Was accessed 1 times)
+2025-10-20 20:11:08,078 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.001s - Success: True
+2025-10-20 20:11:08,078 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:11:08,078 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:11:09,084 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.006s - Success: True
+2025-10-20 20:11:09,084 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.006s
+2025-10-20 20:11:09,088 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.004s - Success: True
+2025-10-20 20:11:09,089 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.001s - Success: True
+2025-10-20 20:11:09,089 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-20 20:11:09,101 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:11:09] "GET /api/system/overview HTTP/1.1" 200 -
+2025-10-20 20:12:08,066 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:12:08] "GET /api/system/settings/primaryDataProvider HTTP/1.1" 200 -
+2025-10-20 20:12:08,076 - utils.rate_limiter - INFO - Rate limiter cleanup: removed 0 empty entries
+2025-10-20 20:12:08,077 - utils.rate_limiter - INFO - Rate limiter cleanup: removed 0 empty entries
+2025-10-20 20:12:08,079 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+2025-10-20 20:12:08,079 - cache - INFO - Cache SET: health_check_1760980328 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-20 20:12:08,079 - cache - INFO - Cache HIT: health_check_1760980328 (Access count: 1)
+2025-10-20 20:12:08,079 - cache - INFO - Cache DELETE: health_check_1760980328 (Was accessed 1 times)
+2025-10-20 20:12:08,080 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.001s - Success: True
+2025-10-20 20:12:08,080 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:12:08,080 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:12:09,085 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.006s - Success: True
+2025-10-20 20:12:09,086 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.006s
+2025-10-20 20:12:09,092 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.006s - Success: True
+2025-10-20 20:12:09,093 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.001s - Success: True
+2025-10-20 20:12:09,093 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-20 20:12:09,109 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:12:09] "GET /api/system/overview HTTP/1.1" 200 -
+2025-10-20 20:13:01,030 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /cash_flows HTTP/1.1" 200 -
+2025-10-20 20:13:01,043 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/master.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,044 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_notifications.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,045 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_modals.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,046 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_navigation.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,046 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_forms-advanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,048 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_badges-status.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,051 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_entity-colors.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,055 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_page-headers.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,055 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_info-summary.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,059 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_constraints.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,060 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_chart-management.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,060 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/08-themes/_light.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,060 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/09-utilities/_utilities.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,063 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/header-styles.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,064 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/01-settings/_color-variables.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,064 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/01-settings/_variables.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,065 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/01-settings/_colors-dynamic.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,066 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/01-settings/_colors-semantic.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,066 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/01-settings/_spacing.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,067 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/01-settings/_typography.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,068 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/01-settings/_rtl-logical.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,069 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/01-settings/_breakpoints.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,070 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/02-tools/_mixins.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,070 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/02-tools/_functions.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,072 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/02-tools/_utilities.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,072 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/03-generic/_reset.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,074 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/03-generic/_base.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,075 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/04-elements/_headings.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,075 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/04-elements/_links.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,076 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/04-elements/_forms-base.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,077 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/05-objects/_layout.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,077 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/04-elements/_buttons-base.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,078 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/05-objects/_grid.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,079 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_bootstrap-overrides.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,079 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_buttons-advanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,081 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_tables.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,082 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_cards.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,083 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_background-tasks.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,083 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_pagination-system.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,084 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_crud-testing-dashboard.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,086 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_linter-realtime-monitor.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,087 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_monitoring-enhanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,087 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_server-monitor.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,089 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_unified-log-display.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,090 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/07-trumps/chart-management.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,090 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/07-trumps/index-hero-section.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,090 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/07-trumps/js-map-advanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,091 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/07-trumps/page-scripts-matrix.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,092 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/08-themes/_high-contrast.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,094 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/main.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,095 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /images/icons/cash_flows.svg HTTP/1.1" 200 -
+2025-10-20 20:13:01,095 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-20T20:13:01.094388', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/.well-known/appspecific/com.chrome.devtools.json', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-20 20:13:01,096 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /scripts/global-favicon.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,098 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /scripts/notification-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,098 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-20T20:13:01.094388', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/.well-known/appspecific/com.chrome.devtools.json', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-20 20:13:01,101 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /scripts/ui-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,101 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-10-20 20:13:01,102 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/01-settings/_variables.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,102 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /scripts/page-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,103 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/01-settings/_colors-semantic.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,105 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/01-settings/_colors-dynamic.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,107 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/01-settings/_spacing.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,108 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/01-settings/_typography.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,109 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/01-settings/_rtl-logical.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,109 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/01-settings/_breakpoints.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,112 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/02-tools/_functions.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,112 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/02-tools/_mixins.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,113 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/03-generic/_reset.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,114 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/03-generic/_base.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,116 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/04-elements/_headings.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,118 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/04-elements/_buttons-base.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,118 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/05-objects/_layout.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,118 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/04-elements/_forms-base.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,118 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/04-elements/_links.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,120 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/05-objects/_grid.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,120 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_bootstrap-overrides.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,122 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_buttons-advanced.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,123 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_tables.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,124 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_cards.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,125 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_notifications.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,125 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_modals.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,125 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_navigation.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,127 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_forms-advanced.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,128 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_badges-status.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,128 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_page-headers.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,130 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_info-summary.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,132 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_entity-colors.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,134 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_chart-management.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,134 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/06-components/_constraints.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,135 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/07-trumps/page-scripts-matrix.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,136 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/08-themes/_light.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,138 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/09-utilities/_utilities.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,137 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /styles-new/07-trumps/chart-management.css HTTP/1.1" 200 -
+2025-10-20 20:13:01,139 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /scripts/translation-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,140 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /scripts/button-icons.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,140 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /scripts/button-system-init.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,142 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /scripts/unified-cache-manager.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,145 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /scripts/preferences-core.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,145 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /scripts/cache-sync-manager.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,145 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /scripts/header-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,147 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /scripts/services/data-collection-service.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,147 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /scripts/color-scheme-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,151 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /scripts/services/field-renderer-service.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,152 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /scripts/services/default-value-setter.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,152 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /scripts/services/crud-response-handler.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,153 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /scripts/services/select-populator-service.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,155 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /scripts/services/statistics-calculator.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,157 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /scripts/tables.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,159 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /scripts/date-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,160 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /scripts/modules/actions-menu-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,160 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /scripts/data-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,160 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /scripts/init-system/package-manifest.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,161 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /scripts/page-initialization-configs.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,162 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /scripts/unified-app-initializer.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,164 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /scripts/cash_flows.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:13:01,271 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /api/preferences/user HTTP/1.1" 200 -
+2025-10-20 20:13:01,359 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:01] "GET /favicon.ico HTTP/1.1" 200 -
+2025-10-20 20:13:02,293 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:02] "GET /images/icons/home.svg HTTP/1.1" 200 -
+2025-10-20 20:13:02,293 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:02] "GET /images/logo.svg HTTP/1.1" 200 -
+2025-10-20 20:13:02,298 - routes.api.base_entity.cash_flows - INFO - Getting all cash_flows records
+2025-10-20 20:13:02,299 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:02] "GET /api/preferences/user/single?preference_name=notifications_ui_enabled&user_id=1 HTTP/1.1" 200 -
+2025-10-20 20:13:02,299 - cache - INFO - Cache EXPIRED: get_all_cash_flows_99914b932bd37a50b983c5e7c90ae93b (Age: 131.8s)
+2025-10-20 20:13:02,299 - cache - INFO - Cache DELETE: get_all_cash_flows_99914b932bd37a50b983c5e7c90ae93b (Was accessed 0 times)
+2025-10-20 20:13:02,300 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:02] "GET /api/preferences/user/single?preference_name=notifications_business_enabled&user_id=1 HTTP/1.1" 200 -
+2025-10-20 20:13:02,300 - cache - INFO - Cache SET: get_all_cash_flows_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 2416 chars)
+2025-10-20 20:13:02,301 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:02] "GET /api/cash_flows/ HTTP/1.1" 200 -
+2025-10-20 20:13:02,391 - routes.api.base_entity.trading_accounts - INFO - Getting all trading_accounts records
+2025-10-20 20:13:02,391 - cache - INFO - Cache EXPIRED: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Age: 131.8s)
+2025-10-20 20:13:02,391 - cache - INFO - Cache DELETE: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Was accessed 0 times)
+2025-10-20 20:13:02,392 - cache - INFO - Cache SET: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 2908 chars)
+2025-10-20 20:13:02,392 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:02] "GET /api/trading-accounts/ HTTP/1.1" 200 -
+2025-10-20 20:13:02,398 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:02] "GET /api/preferences/user/single?preference_name=notifications_system_enabled&user_id=1 HTTP/1.1" 200 -
+2025-10-20 20:13:03,806 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-20T20:13:03.806736', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/api/accounts/', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-20 20:13:03,807 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-20T20:13:03.806736', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/api/accounts/', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-20 20:13:03,807 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:03] "[33mGET /api/accounts/ HTTP/1.1[0m" 404 -
+2025-10-20 20:13:03,814 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:03] "GET /api/currencies/dropdown HTTP/1.1" 200 -
+2025-10-20 20:13:08,069 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-20T20:13:08.068790', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/api/background-tasks/recent-logs?limit=10', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-20 20:13:08,069 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-20T20:13:08.068790', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/api/background-tasks/recent-logs?limit=10', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-20 20:13:08,070 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:08] "[33mGET /api/background-tasks/recent-logs?limit=10 HTTP/1.1[0m" 404 -
+2025-10-20 20:13:08,071 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:08] "GET /api/system/settings/primaryDataProvider HTTP/1.1" 200 -
+2025-10-20 20:13:08,075 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+2025-10-20 20:13:08,076 - cache - INFO - Cache SET: health_check_1760980388 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-20 20:13:08,076 - cache - INFO - Cache HIT: health_check_1760980388 (Access count: 1)
+2025-10-20 20:13:08,076 - cache - INFO - Cache DELETE: health_check_1760980388 (Was accessed 1 times)
+2025-10-20 20:13:08,076 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.001s - Success: True
+2025-10-20 20:13:08,076 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:13:08,077 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:13:09,084 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.007s - Success: True
+2025-10-20 20:13:09,085 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.007s
+2025-10-20 20:13:09,093 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.007s - Success: True
+2025-10-20 20:13:09,094 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.001s - Success: True
+2025-10-20 20:13:09,095 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.001s - Success: True
+2025-10-20 20:13:09,119 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:13:09] "GET /api/system/overview HTTP/1.1" 200 -
+2025-10-20 20:14:08,103 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:14:08] "GET /api/system/settings/primaryDataProvider HTTP/1.1" 200 -
+2025-10-20 20:14:08,115 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+2025-10-20 20:14:08,117 - cache - INFO - Cache SET: health_check_1760980448 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-20 20:14:08,117 - cache - INFO - Cache HIT: health_check_1760980448 (Access count: 1)
+2025-10-20 20:14:08,118 - cache - INFO - Cache DELETE: health_check_1760980448 (Was accessed 1 times)
+2025-10-20 20:14:08,118 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.002s - Success: True
+2025-10-20 20:14:08,118 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:14:08,118 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:14:09,119 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.001s - Success: True
+2025-10-20 20:14:09,120 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.001s
+2025-10-20 20:14:09,124 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.004s - Success: True
+2025-10-20 20:14:09,125 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-20 20:14:09,125 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-20 20:14:09,134 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:14:09] "GET /api/system/overview HTTP/1.1" 200 -
+2025-10-20 20:15:08,064 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:15:08] "GET /api/system/settings/primaryDataProvider HTTP/1.1" 200 -
+2025-10-20 20:15:08,072 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+2025-10-20 20:15:08,073 - cache - INFO - Cache SET: health_check_1760980508 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-20 20:15:08,073 - cache - INFO - Cache HIT: health_check_1760980508 (Access count: 1)
+2025-10-20 20:15:08,074 - cache - INFO - Cache DELETE: health_check_1760980508 (Was accessed 1 times)
+2025-10-20 20:15:08,074 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.001s - Success: True
+2025-10-20 20:15:08,074 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:15:08,075 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:15:09,079 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.004s - Success: True
+2025-10-20 20:15:09,079 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.004s
+2025-10-20 20:15:09,083 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.004s - Success: True
+2025-10-20 20:15:09,083 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-20 20:15:09,084 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-20 20:15:09,095 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:15:09] "GET /api/system/overview HTTP/1.1" 200 -
+2025-10-20 20:16:08,100 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:16:08] "GET /api/system/settings/primaryDataProvider HTTP/1.1" 200 -
+2025-10-20 20:16:08,121 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.004s - Success: True
+2025-10-20 20:16:08,123 - cache - INFO - Cache SET: health_check_1760980568 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-20 20:16:08,125 - cache - INFO - Cache HIT: health_check_1760980568 (Access count: 1)
+2025-10-20 20:16:08,127 - cache - INFO - Cache DELETE: health_check_1760980568 (Was accessed 1 times)
+2025-10-20 20:16:08,127 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.005s - Success: True
+2025-10-20 20:16:08,127 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:16:08,127 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:16:09,133 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.005s - Success: True
+2025-10-20 20:16:09,133 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.005s
+2025-10-20 20:16:09,137 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.004s - Success: True
+2025-10-20 20:16:09,138 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-20 20:16:09,138 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-20 20:16:09,149 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:16:09] "GET /api/system/overview HTTP/1.1" 200 -
+2025-10-20 20:17:08,068 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:17:08] "GET /api/system/settings/primaryDataProvider HTTP/1.1" 200 -
+2025-10-20 20:17:08,077 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.003s - Success: True
+2025-10-20 20:17:08,079 - cache - INFO - Cache SET: health_check_1760980628 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-20 20:17:08,079 - cache - INFO - Cache HIT: health_check_1760980628 (Access count: 1)
+2025-10-20 20:17:08,080 - cache - INFO - Cache DELETE: health_check_1760980628 (Was accessed 1 times)
+2025-10-20 20:17:08,080 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.002s - Success: True
+2025-10-20 20:17:08,081 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:17:08,081 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:17:09,086 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.005s - Success: True
+2025-10-20 20:17:09,087 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.005s
+2025-10-20 20:17:09,090 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.004s - Success: True
+2025-10-20 20:17:09,091 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-20 20:17:09,091 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-20 20:17:09,102 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:17:09] "GET /api/system/overview HTTP/1.1" 200 -
+2025-10-20 20:18:08,074 - utils.rate_limiter - INFO - Rate limiter cleanup: removed 0 empty entries
+2025-10-20 20:18:08,079 - utils.rate_limiter - INFO - Rate limiter cleanup: removed 0 empty entries
+2025-10-20 20:18:08,092 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:18:08] "GET /api/system/settings/primaryDataProvider HTTP/1.1" 200 -
+2025-10-20 20:18:08,107 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+2025-10-20 20:18:08,110 - cache - INFO - Cache SET: health_check_1760980688 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-20 20:18:08,111 - cache - INFO - Cache HIT: health_check_1760980688 (Access count: 1)
+2025-10-20 20:18:08,111 - cache - INFO - Cache DELETE: health_check_1760980688 (Was accessed 1 times)
+2025-10-20 20:18:08,111 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.002s - Success: True
+2025-10-20 20:18:08,112 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:18:08,112 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:18:08,090 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-20T20:18:08.089378', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/api/background-tasks/recent-logs?limit=10', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-20 20:18:08,119 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-20T20:18:08.089378', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/api/background-tasks/recent-logs?limit=10', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-20 20:18:08,120 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:18:08] "[33mGET /api/background-tasks/recent-logs?limit=10 HTTP/1.1[0m" 404 -
+2025-10-20 20:18:09,069 - cache - INFO - Cache DELETE: get_all_cash_flows_99914b932bd37a50b983c5e7c90ae93b (Was accessed 0 times)
+2025-10-20 20:18:09,070 - cache - INFO - Cache DELETE: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Was accessed 0 times)
+2025-10-20 20:18:09,117 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.005s - Success: True
+2025-10-20 20:18:09,118 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.005s
+2025-10-20 20:18:09,120 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.002s - Success: True
+2025-10-20 20:18:09,120 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-20 20:18:09,120 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-20 20:18:09,129 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:18:09] "GET /api/system/overview HTTP/1.1" 200 -
+2025-10-20 20:19:08,049 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:08] "GET /api/system/settings/primaryDataProvider HTTP/1.1" 200 -
+2025-10-20 20:19:08,060 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.002s - Success: True
+2025-10-20 20:19:08,061 - cache - INFO - Cache SET: health_check_1760980748 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-20 20:19:08,061 - cache - INFO - Cache HIT: health_check_1760980748 (Access count: 1)
+2025-10-20 20:19:08,061 - cache - INFO - Cache DELETE: health_check_1760980748 (Was accessed 1 times)
+2025-10-20 20:19:08,062 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.001s - Success: True
+2025-10-20 20:19:08,062 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:19:08,063 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:19:09,069 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.006s - Success: True
+2025-10-20 20:19:09,069 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.006s
+2025-10-20 20:19:09,072 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.003s - Success: True
+2025-10-20 20:19:09,073 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-20 20:19:09,073 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-20 20:19:09,083 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:09] "GET /api/system/overview HTTP/1.1" 200 -
+2025-10-20 20:19:38,619 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:38] "GET /sw.js HTTP/1.1" 200 -
+2025-10-20 20:19:47,273 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /cash_flows HTTP/1.1" 200 -
+2025-10-20 20:19:47,287 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/master.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,288 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_modals.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,289 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_notifications.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,291 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_navigation.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,295 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_forms-advanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,295 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_badges-status.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,303 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_entity-colors.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,304 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_page-headers.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,305 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_constraints.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,306 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_info-summary.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,307 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_chart-management.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,308 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/08-themes/_light.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,309 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/09-utilities/_utilities.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,310 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/header-styles.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,311 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/01-settings/_variables.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,313 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/01-settings/_color-variables.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,313 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/01-settings/_colors-dynamic.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,314 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/01-settings/_colors-semantic.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,316 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/01-settings/_spacing.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,316 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/01-settings/_typography.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,317 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/01-settings/_rtl-logical.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,317 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/01-settings/_breakpoints.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,319 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/02-tools/_mixins.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,319 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/02-tools/_functions.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,320 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/02-tools/_utilities.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,321 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/03-generic/_reset.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,322 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/03-generic/_base.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,322 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/04-elements/_headings.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,323 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/04-elements/_links.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,325 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/04-elements/_forms-base.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,326 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/04-elements/_buttons-base.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,327 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/05-objects/_layout.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,328 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_bootstrap-overrides.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,328 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/05-objects/_grid.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,330 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_buttons-advanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,330 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_cards.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,331 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_tables.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,333 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_background-tasks.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,333 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_pagination-system.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,335 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_crud-testing-dashboard.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,336 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_linter-realtime-monitor.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,337 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_monitoring-enhanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,338 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_server-monitor.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,339 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_unified-log-display.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,341 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/07-trumps/index-hero-section.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,344 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/07-trumps/chart-management.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,344 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/07-trumps/js-map-advanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,344 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/07-trumps/page-scripts-matrix.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,345 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/08-themes/_high-contrast.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,346 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /images/icons/cash_flows.svg HTTP/1.1" 200 -
+2025-10-20 20:19:47,347 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/main.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,348 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-20T20:19:47.347817', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/.well-known/appspecific/com.chrome.devtools.json', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-20 20:19:47,352 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /scripts/notification-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,352 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /scripts/global-favicon.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,353 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /scripts/ui-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,352 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-20T20:19:47.347817', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/.well-known/appspecific/com.chrome.devtools.json', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-20 20:19:47,355 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /scripts/page-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,355 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /scripts/translation-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,356 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-10-20 20:19:47,357 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/01-settings/_variables.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,360 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/01-settings/_colors-semantic.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,361 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/01-settings/_colors-dynamic.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,362 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/01-settings/_spacing.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,362 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/01-settings/_typography.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,363 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/01-settings/_breakpoints.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,364 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/01-settings/_rtl-logical.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,366 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/02-tools/_functions.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,367 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/03-generic/_base.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,367 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/03-generic/_reset.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,367 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/02-tools/_mixins.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,367 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/04-elements/_headings.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,369 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/04-elements/_links.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,370 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/04-elements/_forms-base.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,371 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/04-elements/_buttons-base.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,372 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/05-objects/_layout.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,373 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/05-objects/_grid.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,374 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_bootstrap-overrides.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,374 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_buttons-advanced.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,375 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_tables.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,377 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_cards.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,377 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_modals.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,378 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_notifications.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,379 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_navigation.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,380 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_forms-advanced.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,381 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_badges-status.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,382 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_page-headers.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,383 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_info-summary.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,385 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_constraints.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,385 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_entity-colors.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,386 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/06-components/_chart-management.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,387 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/07-trumps/page-scripts-matrix.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,387 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/07-trumps/chart-management.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,388 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/08-themes/_light.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,390 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /styles-new/09-utilities/_utilities.css HTTP/1.1" 200 -
+2025-10-20 20:19:47,391 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /scripts/button-system-init.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,392 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /scripts/button-icons.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,392 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /scripts/unified-cache-manager.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,393 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /scripts/cache-sync-manager.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,394 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /scripts/header-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,395 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /scripts/preferences-core.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,397 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /scripts/color-scheme-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,397 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /scripts/services/data-collection-service.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,400 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /scripts/services/field-renderer-service.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,403 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /scripts/services/select-populator-service.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,404 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /scripts/services/crud-response-handler.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,404 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /scripts/services/default-value-setter.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,405 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /scripts/services/statistics-calculator.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,406 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /scripts/tables.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,409 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /scripts/data-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,409 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /scripts/date-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,409 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /scripts/modules/actions-menu-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,410 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /scripts/init-system/package-manifest.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,411 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /scripts/page-initialization-configs.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,411 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /scripts/unified-app-initializer.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,414 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /scripts/cash_flows.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:19:47,699 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /api/preferences/user/single?preference_name=notifications_system_enabled&user_id=1 HTTP/1.1" 200 -
+2025-10-20 20:19:47,704 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /api/preferences/user HTTP/1.1" 200 -
+2025-10-20 20:19:47,797 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:47] "GET /favicon.ico HTTP/1.1" 200 -
+2025-10-20 20:19:48,699 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:48] "GET /images/icons/home.svg HTTP/1.1" 200 -
+2025-10-20 20:19:48,699 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:48] "GET /images/logo.svg HTTP/1.1" 200 -
+2025-10-20 20:19:48,703 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:48] "GET /api/preferences/user/single?preference_name=notifications_business_enabled&user_id=1 HTTP/1.1" 200 -
+2025-10-20 20:19:48,797 - routes.api.base_entity.trading_accounts - INFO - Getting all trading_accounts records
+2025-10-20 20:19:48,797 - cache - INFO - Cache MISS: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b
+2025-10-20 20:19:48,799 - cache - INFO - Cache SET: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 2908 chars)
+2025-10-20 20:19:48,799 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:19:48] "GET /api/trading-accounts/ HTTP/1.1" 200 -
+2025-10-20 20:20:08,042 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-20T20:20:08.041903', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/api/background-tasks/recent-logs?limit=10', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-20 20:20:08,042 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-20T20:20:08.041903', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/api/background-tasks/recent-logs?limit=10', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-20 20:20:08,043 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:20:08] "[33mGET /api/background-tasks/recent-logs?limit=10 HTTP/1.1[0m" 404 -
+2025-10-20 20:20:08,044 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:20:08] "GET /api/system/settings/primaryDataProvider HTTP/1.1" 200 -
+2025-10-20 20:20:08,048 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+2025-10-20 20:20:08,049 - cache - INFO - Cache SET: health_check_1760980808 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-20 20:20:08,049 - cache - INFO - Cache HIT: health_check_1760980808 (Access count: 1)
+2025-10-20 20:20:08,049 - cache - INFO - Cache DELETE: health_check_1760980808 (Was accessed 1 times)
+2025-10-20 20:20:08,049 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.001s - Success: True
+2025-10-20 20:20:08,050 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:20:08,050 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:20:09,053 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.003s - Success: True
+2025-10-20 20:20:09,053 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.003s
+2025-10-20 20:20:09,057 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.003s - Success: True
+2025-10-20 20:20:09,057 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-20 20:20:09,058 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-20 20:20:09,068 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:20:09] "GET /api/system/overview HTTP/1.1" 200 -
+2025-10-20 20:20:48,995 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-20T20:20:48.994992', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/.well-known/appspecific/com.chrome.devtools.json', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-20 20:20:48,998 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-20T20:20:48.994992', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/.well-known/appspecific/com.chrome.devtools.json', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-20 20:20:49,007 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:20:49] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-10-20 20:20:50,852 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:20:50] "GET /sw.js HTTP/1.1" 200 -
+2025-10-20 20:21:08,044 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:21:08] "GET /api/system/settings/primaryDataProvider HTTP/1.1" 200 -
+2025-10-20 20:21:08,049 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+2025-10-20 20:21:08,050 - cache - INFO - Cache SET: health_check_1760980868 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-20 20:21:08,051 - cache - INFO - Cache HIT: health_check_1760980868 (Access count: 1)
+2025-10-20 20:21:08,051 - cache - INFO - Cache DELETE: health_check_1760980868 (Was accessed 1 times)
+2025-10-20 20:21:08,051 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.001s - Success: True
+2025-10-20 20:21:08,051 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:21:08,051 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:21:09,054 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.002s - Success: True
+2025-10-20 20:21:09,054 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.002s
+2025-10-20 20:21:09,060 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.006s - Success: True
+2025-10-20 20:21:09,061 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.001s - Success: True
+2025-10-20 20:21:09,061 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-20 20:21:09,079 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:21:09] "GET /api/system/overview HTTP/1.1" 200 -
+2025-10-20 20:22:00,263 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /init-system-management HTTP/1.1" 200 -
+2025-10-20 20:22:00,277 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/master.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,281 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/header-styles.css?v=v6.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,283 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /images/icons/server.svg HTTP/1.1" 200 -
+2025-10-20 20:22:00,286 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /scripts/global-favicon.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,287 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /scripts/notification-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,288 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /scripts/ui-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,288 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /scripts/page-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,290 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/01-settings/_variables.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,294 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/01-settings/_color-variables.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,294 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/01-settings/_colors-dynamic.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,296 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/01-settings/_colors-semantic.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,297 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/01-settings/_spacing.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,298 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/01-settings/_typography.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,302 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/01-settings/_rtl-logical.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,304 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/01-settings/_breakpoints.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,304 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/02-tools/_functions.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,306 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/02-tools/_mixins.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,308 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/02-tools/_utilities.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,309 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/03-generic/_reset.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,310 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/03-generic/_base.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,310 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/04-elements/_headings.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,311 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/04-elements/_links.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,313 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/04-elements/_forms-base.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,314 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/04-elements/_buttons-base.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,314 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/05-objects/_layout.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,315 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/05-objects/_grid.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,316 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_bootstrap-overrides.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,316 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_buttons-advanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,319 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_tables.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,322 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_modals.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,322 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_cards.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,323 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_notifications.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,323 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_navigation.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,324 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_forms-advanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,325 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_badges-status.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,325 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_entity-colors.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,328 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_page-headers.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,328 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_info-summary.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,328 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_pagination-system.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,330 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_background-tasks.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,330 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_constraints.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,331 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_chart-management.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,332 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_crud-testing-dashboard.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,333 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_monitoring-enhanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,334 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_linter-realtime-monitor.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,335 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_server-monitor.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,336 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_unified-log-display.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,336 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/07-trumps/chart-management.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,337 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/07-trumps/index-hero-section.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,338 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/07-trumps/page-scripts-matrix.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,338 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/07-trumps/js-map-advanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,338 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/08-themes/_light.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,341 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/09-utilities/_utilities.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,342 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/08-themes/_high-contrast.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,343 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/main.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,343 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-20T20:22:00.342954', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/.well-known/appspecific/com.chrome.devtools.json', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-20 20:22:00,344 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /scripts/translation-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,347 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /scripts/button-icons.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,345 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-20T20:22:00.342954', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/.well-known/appspecific/com.chrome.devtools.json', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-20 20:22:00,348 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /scripts/color-scheme-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,349 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /scripts/button-system-init.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,350 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-10-20 20:22:00,351 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /scripts/unified-cache-manager.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,352 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/01-settings/_variables.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,352 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/01-settings/_colors-semantic.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,353 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/01-settings/_colors-dynamic.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,354 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/01-settings/_spacing.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,357 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/01-settings/_typography.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,358 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/01-settings/_breakpoints.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,358 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/01-settings/_rtl-logical.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,359 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/02-tools/_functions.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,359 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/02-tools/_mixins.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,360 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/03-generic/_reset.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,362 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/03-generic/_base.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,362 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/04-elements/_links.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,363 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/04-elements/_headings.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,363 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/04-elements/_forms-base.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,365 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/04-elements/_buttons-base.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,366 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/05-objects/_layout.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,366 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/05-objects/_grid.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,367 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_bootstrap-overrides.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,368 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_buttons-advanced.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,368 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_tables.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,369 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_cards.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,369 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_modals.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,370 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_notifications.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,371 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_navigation.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,372 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_forms-advanced.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,373 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_badges-status.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,373 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_page-headers.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,374 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_entity-colors.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,374 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_info-summary.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,374 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_constraints.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,376 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/06-components/_chart-management.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,376 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/07-trumps/page-scripts-matrix.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,379 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/07-trumps/chart-management.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,379 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/08-themes/_light.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,380 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /styles-new/09-utilities/_utilities.css HTTP/1.1" 200 -
+2025-10-20 20:22:00,381 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /scripts/cache-sync-manager.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,381 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /scripts/header-system.js?v=v6.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,382 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /scripts/init-system/package-manifest.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,383 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /scripts/page-initialization-configs.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,385 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /scripts/unified-app-initializer.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,385 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /scripts/init-system/validators/runtime-validator.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,387 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /scripts/init-system/dev-tools/script-analyzer.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,390 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /scripts/init-system/dev-tools/page-template-generator.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,392 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /scripts/standardize-pages.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,392 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /scripts/check-duplicate-initialization.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,393 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /scripts/init-system-management.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-20 20:22:00,415 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /api/preferences/user HTTP/1.1" 200 -
+2025-10-20 20:22:00,633 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:00] "GET /favicon.ico HTTP/1.1" 200 -
+2025-10-20 20:22:01,450 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:01] "GET /images/icons/home.svg HTTP/1.1" 200 -
+2025-10-20 20:22:01,450 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:01] "GET /images/logo.svg HTTP/1.1" 200 -
+2025-10-20 20:22:01,544 - routes.api.base_entity.trading_accounts - INFO - Getting all trading_accounts records
+2025-10-20 20:22:01,545 - cache - INFO - Cache EXPIRED: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Age: 132.7s)
+2025-10-20 20:22:01,546 - cache - INFO - Cache DELETE: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Was accessed 0 times)
+2025-10-20 20:22:01,549 - cache - INFO - Cache SET: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 2908 chars)
+2025-10-20 20:22:01,550 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:01] "GET /api/trading-accounts/ HTTP/1.1" 200 -
+2025-10-20 20:22:02,460 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:02] "GET /index.html HTTP/1.1" 200 -
+2025-10-20 20:22:02,464 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:02] "GET /preferences.html HTTP/1.1" 200 -
+2025-10-20 20:22:02,468 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:02] "GET /trades.html HTTP/1.1" 200 -
+2025-10-20 20:22:02,473 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:02] "GET /executions.html HTTP/1.1" 200 -
+2025-10-20 20:22:02,478 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:02] "GET /trade_plans.html HTTP/1.1" 200 -
+2025-10-20 20:22:02,481 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:02] "GET /alerts.html HTTP/1.1" 200 -
+2025-10-20 20:22:02,485 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:02] "GET /trading_accounts.html HTTP/1.1" 200 -
+2025-10-20 20:22:02,504 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:02] "GET /cash_flows.html HTTP/1.1" 200 -
+2025-10-20 20:22:02,507 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:02] "GET /tickers.html HTTP/1.1" 200 -
+2025-10-20 20:22:02,510 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:02] "GET /notes.html HTTP/1.1" 200 -
+2025-10-20 20:22:02,513 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:02] "GET /research.html HTTP/1.1" 200 -
+2025-10-20 20:22:02,517 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:02] "GET /db_display.html HTTP/1.1" 200 -
+2025-10-20 20:22:02,519 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:02] "GET /system-management.html HTTP/1.1" 200 -
+2025-10-20 20:22:02,521 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:02] "GET /server-monitor.html HTTP/1.1" 200 -
+2025-10-20 20:22:02,523 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-20T20:22:02.523019', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/cache-test.html', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-20 20:22:02,523 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-20T20:22:02.523019', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/cache-test.html', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-20 20:22:02,523 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:02] "[33mGET /cache-test.html HTTP/1.1[0m" 404 -
+2025-10-20 20:22:02,525 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:02] "GET /linter-realtime-monitor.html HTTP/1.1" 200 -
+2025-10-20 20:22:02,527 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:02] "GET /notifications-center.html HTTP/1.1" 200 -
+2025-10-20 20:22:02,529 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:02] "GET /external-data-dashboard.html HTTP/1.1" 200 -
+2025-10-20 20:22:02,530 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:02] "GET /crud-testing-dashboard.html HTTP/1.1" 200 -
+2025-10-20 20:22:02,532 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-20T20:22:02.531913', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/conditions_test.html', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-20 20:22:02,532 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-20T20:22:02.531913', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/conditions_test.html', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-20 20:22:02,532 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:02] "[33mGET /conditions_test.html HTTP/1.1[0m" 404 -
+2025-10-20 20:22:02,534 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:02] "GET /conditions-test.html HTTP/1.1" 200 -
+2025-10-20 20:22:02,535 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:02] "GET /db_extradata.html HTTP/1.1" 200 -
+2025-10-20 20:22:02,536 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:02] "GET /constraints.html HTTP/1.1" 200 -
+2025-10-20 20:22:02,538 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:02] "GET /background-tasks.html HTTP/1.1" 200 -
+2025-10-20 20:22:02,539 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:02] "GET /page-scripts-matrix.html HTTP/1.1" 200 -
+2025-10-20 20:22:02,540 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:02] "GET /css-management.html HTTP/1.1" 200 -
+2025-10-20 20:22:02,541 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:02] "GET /dynamic-colors-display.html HTTP/1.1" 200 -
+2025-10-20 20:22:02,543 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:02] "GET /designs.html HTTP/1.1" 200 -
+2025-10-20 20:22:02,544 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:02] "GET /chart-management.html HTTP/1.1" 200 -
+2025-10-20 20:22:02,545 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:02] "GET /init-system-management.html HTTP/1.1" 200 -
+2025-10-20 20:22:08,044 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-20T20:22:08.044296', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/api/background-tasks/recent-logs?limit=10', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-20 20:22:08,045 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-20T20:22:08.044296', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/api/background-tasks/recent-logs?limit=10', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-20 20:22:08,046 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:08] "[33mGET /api/background-tasks/recent-logs?limit=10 HTTP/1.1[0m" 404 -
+2025-10-20 20:22:08,047 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:08] "GET /api/system/settings/primaryDataProvider HTTP/1.1" 200 -
+2025-10-20 20:22:08,050 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+2025-10-20 20:22:08,051 - cache - INFO - Cache SET: health_check_1760980928 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-20 20:22:08,051 - cache - INFO - Cache HIT: health_check_1760980928 (Access count: 1)
+2025-10-20 20:22:08,051 - cache - INFO - Cache DELETE: health_check_1760980928 (Was accessed 1 times)
+2025-10-20 20:22:08,051 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.001s - Success: True
+2025-10-20 20:22:08,052 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:22:08,052 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-20 20:22:09,057 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.005s - Success: True
+2025-10-20 20:22:09,057 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.005s
+2025-10-20 20:22:09,059 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.002s - Success: True
+2025-10-20 20:22:09,060 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-20 20:22:09,060 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-20 20:22:09,070 - werkzeug - INFO - 127.0.0.1 - - [20/Oct/2025 20:22:09] "GET /api/system/overview HTTP/1.1" 200 -

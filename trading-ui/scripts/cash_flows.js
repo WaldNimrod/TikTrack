@@ -769,32 +769,13 @@ async function loadCurrenciesFromServer() {
  */
 async function loadAccountsForCashFlow() {
   try {
-    const response = await fetch('http://127.0.0.1:8080/api/trading-accounts/');
-    if (response.ok) {
-      const result = await response.json();
-      if (result.status === 'success') {
-        const select = document.getElementById('cashFlowAccount');
-        if (select) {
-          select.innerHTML = '<option value="">בחר חשבון...</option>';
-
-          // הצגת רק חשבונות פתוחים
-          const activeAccounts = result.data.filter(account => account.status === 'open');
-          activeAccounts.forEach(account => {
-            const option = document.createElement('option');
-            option.value = account.id;
-            option.textContent = account.name;
-            select.appendChild(option);
-          });
-
-        } else {
-          handleElementNotFound('loadAccountsForCashFlow', 'לא נמצא אלמנט select עם ID: cashFlowAccount');
-        }
-      } else {
-        handleApiError('שגיאה בתגובת API', result.error);
-      }
-    } else {
-      handleApiError('שגיאת HTTP', response.status);
-    }
+    // שימוש ב-SelectPopulatorService עם ברירת מחדל מהעדפות
+    await SelectPopulatorService.populateAccountsSelect('cashFlowAccount', {
+      includeEmpty: true,
+      emptyText: 'בחר חשבון...',
+      defaultFromPreferences: true,
+      filterFn: (account) => account.status === 'open'
+    });
   } catch (error) {
     handleDataLoadError(error, 'טעינת חשבונות');
 
@@ -838,22 +819,12 @@ async function loadAccountsForEditCashFlow() {
  */
 async function loadCurrenciesForCashFlow() {
   try {
-    // טעינת מטבעות מהשרת עם המערכת החדשה
-    const currencies = await loadCurrenciesFromServer();
-    const select = document.getElementById('cashFlowCurrency');
-    if (select) {
-      select.innerHTML = '<option value="">בחר מטבע...</option>';
-
-      currencies.forEach(currency => {
-        const option = document.createElement('option');
-        option.value = currency.id;
-        option.textContent = `${currency.symbol} - ${currency.name}`;
-        select.appendChild(option);
-      });
-
-    } else {
-      handleElementNotFound('loadCurrenciesForCashFlow', 'לא נמצא אלמנט select עם ID: cashFlowCurrency');
-    }
+    // שימוש ב-SelectPopulatorService עם ברירת מחדל מהעדפות
+    await SelectPopulatorService.populateCurrenciesSelect('cashFlowCurrency', {
+      includeEmpty: true,
+      emptyText: 'בחר מטבע...',
+      defaultFromPreferences: true
+    });
   } catch (error) {
     handleDataLoadError(error, 'טעינת מטבעות');
 
@@ -1700,6 +1671,9 @@ async function _showAddCashFlowModal() {
   // הגדרת תאריך ברירת מחדל להיום
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('cashFlowDate').value = today;
+
+  // הגדרת מקור ברירת מחדל ל"ידני"
+  document.getElementById('cashFlowSource').value = 'manual';
 
   try {
     // טעינת רשימת החשבונות והמטבעות

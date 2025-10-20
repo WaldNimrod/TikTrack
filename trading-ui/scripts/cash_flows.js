@@ -769,7 +769,7 @@ async function loadCurrenciesFromServer() {
  */
 async function loadAccountsForCashFlow() {
   try {
-    const response = await fetch('http://127.0.0.1:8080/api/trading_accounts/');
+    const response = await fetch('http://127.0.0.1:8080/api/trading-accounts/');
     if (response.ok) {
       const result = await response.json();
       if (result.status === 'success') {
@@ -810,7 +810,7 @@ async function loadAccountsForCashFlow() {
  */
 async function loadAccountsForEditCashFlow() {
   try {
-    const response = await fetch('http://127.0.0.1:8080/api/trading_accounts/');
+    const response = await fetch('http://127.0.0.1:8080/api/trading-accounts/');
     if (response.ok) {
       const result = await response.json();
       if (result.status === 'success') {
@@ -1428,7 +1428,7 @@ function restoreSortState() {
  * @param {string} modalType - סוג המודל ('add' או 'edit')
  */
 function manageExternalIdField(source, modalType) {
-  const fieldId = modalType === 'edit' ? '' : 'cashFlowExternalId';
+  const fieldId = modalType === 'edit' ? 'editCashFlowExternalId' : 'cashFlowExternalId';
   const externalIdField = document.getElementById(fieldId);
 
   if (!externalIdField) {

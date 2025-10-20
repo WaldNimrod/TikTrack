@@ -449,44 +449,6 @@ const PAGE_CONFIGS = {
         ]
     },
     
-    'conditions_test': {
-        name: 'Conditions Test',
-        requiresFilters: false,
-        requiresValidation: false,
-        requiresTables: false,
-        customInitializers: [
-            async (pageConfig) => {
-                console.log('🔧 Initializing Conditions Test Page...');
-                
-                // Initialize conditions test page
-                if (typeof window.initializeConditionsTestPage === 'function') {
-                    await window.initializeConditionsTestPage();
-                } else {
-                    console.log('🔧 initializeConditionsTestPage function not found!');
-                }
-            }
-        ]
-    },
-    
-    'conditions-test': {
-        name: 'Conditions Test',
-        requiresFilters: false,
-        requiresValidation: false,
-        requiresTables: false,
-        customInitializers: [
-            async (pageConfig) => {
-                console.log('🔧 Initializing Conditions Test Page...');
-                
-                // Initialize conditions test page
-                if (typeof window.initializeConditionsTestPage === 'function') {
-                    await window.initializeConditionsTestPage();
-                } else {
-                    console.log('🔧 initializeConditionsTestPage function not found!');
-                }
-            }
-        ]
-    },
-    
     // Account Management
     'trading_accounts': {
         name: 'Trading Accounts',
@@ -1109,36 +1071,6 @@ const PAGE_CONFIGS = {
                 }
             }
         ]
-    },
-    
-    'cache-test': {
-        name: 'Cache Test',
-        requiresFilters: false,
-        requiresValidation: false,
-        requiresTables: false,
-        customInitializers: [
-            async (pageConfig) => {
-                console.log('🧪 Initializing Cache Test...');
-                console.log('🔍 Page config received:', pageConfig);
-                console.log('🔍 Checking if initializeCacheTest function exists:', typeof window.initializeCacheTest);
-                console.log('🔍 Document ready state:', document.readyState);
-                console.log('🔍 DOM elements loaded:', document.body ? 'Yes' : 'No');
-                console.log('🔍 Available functions:', Object.keys(window).filter(k => k.includes('Cache')));
-                
-                if (typeof window.initializeCacheTest === 'function') {
-                    console.log('✅ Calling initializeCacheTest...');
-                    try {
-                        await window.initializeCacheTest();
-                        console.log('✅ initializeCacheTest completed successfully');
-                    } catch (error) {
-                        console.error('❌ Error in initializeCacheTest:', error);
-                    }
-                } else {
-                    console.error('❌ initializeCacheTest function not found!');
-                    console.error('❌ Available window functions:', Object.keys(window).filter(k => k.includes('initialize')));
-                }
-            }
-        ]
     }
 };
 
@@ -1449,39 +1381,6 @@ const ADDITIONAL_PAGE_CONFIGS = {
                 // Init system management specific initialization
             }
         ]
-    },
-    
-    'cache-management': {
-        name: 'Cache Management',
-        packages: ['base', 'preferences'],
-        requiredGlobals: [
-            'NotificationSystem',
-            'UnifiedCacheManager'
-        ],
-        description: 'ניהול מערכת המטמון - בדיקות וניטור',
-        lastModified: '2025-10-19',
-        pageType: 'system-management',
-        preloadAssets: ['cache-data'],
-        cacheStrategy: 'standard',
-        requiresFilters: false,
-        requiresValidation: false,
-        requiresTables: false
-    },
-    
-    'conditions-test': {
-        name: 'Conditions Test',
-        packages: ['base', 'preferences'],
-        requiredGlobals: [
-            'NotificationSystem'
-        ],
-        description: 'בדיקת מערכת התנאים',
-        lastModified: '2025-10-19',
-        pageType: 'testing',
-        preloadAssets: ['conditions-data'],
-        cacheStrategy: 'standard',
-        requiresFilters: false,
-        requiresValidation: false,
-        requiresTables: false
     }
 };
 

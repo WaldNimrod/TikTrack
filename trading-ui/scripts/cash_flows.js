@@ -1516,6 +1516,9 @@ async function _showAddCashFlowModal() {
     // טעינת רשימת החשבונות והמטבעות
     await loadAccountsForCashFlow();
     await loadCurrenciesForCashFlow();
+    // טעינת רשימת הטריידים והתוכניות
+    await loadTradesForAddCashFlow();
+    await loadTradePlansForAddCashFlow();
     // אתחול שדה מזהה חיצוני
     initializeExternalIdFields();
 
@@ -1548,6 +1551,9 @@ async function _showEditCashFlowModal(id) {
     // טעינת רשימת החשבונות והמטבעות קודם
     await loadAccountsForEditCashFlow();
     await loadCurrenciesForEditCashFlow();
+    // טעינת רשימת הטריידים והתוכניות
+    await loadTradesForEditCashFlow();
+    await loadTradePlansForEditCashFlow();
     // מילוי הטופס אחרי שהרשימות נטענו
     const editTypeField = document.getElementById('editCashFlowType');
     document.getElementById('editCashFlowId').value = cashFlow.id;
@@ -1568,6 +1574,10 @@ async function _showEditCashFlowModal(id) {
     const editSourceField = document.getElementById('editCashFlowSource');
     editSourceField.value = cashFlow.source || 'manual';
     document.getElementById('editCashFlowExternalId').value = cashFlow.external_id || '0';
+
+    // מילוי שדות הקישור
+    document.getElementById('editCashFlowTrade').value = cashFlow.trade_id || '';
+    document.getElementById('editCashFlowTradePlan').value = cashFlow.trade_plan_id || '';
 
     // אתחול שדה מזהה חיצוני
     initializeExternalIdFields();
@@ -1596,7 +1606,9 @@ async function saveCashFlow() {
       date: { id: 'cashFlowDate', type: 'date' },
       description: { id: 'cashFlowDescription', type: 'text' },
       source: { id: 'cashFlowSource', type: 'text' },
-      external_id: { id: 'cashFlowExternalId', type: 'text', default: '0' }
+      external_id: { id: 'cashFlowExternalId', type: 'text', default: '0' },
+      trade_id: { id: 'cashFlowTrade', type: 'int', default: null },
+      trade_plan_id: { id: 'cashFlowTradePlan', type: 'int', default: null }
     });
 
     const formData = {
@@ -1643,7 +1655,9 @@ async function updateCashFlow() {
       date: { id: 'editCashFlowDate', type: 'date' },
       description: { id: 'editCashFlowDescription', type: 'text' },
       source: { id: 'editCashFlowSource', type: 'text' },
-      external_id: { id: 'editCashFlowExternalId', type: 'text', default: '0' }
+      external_id: { id: 'editCashFlowExternalId', type: 'text', default: '0' },
+      trade_id: { id: 'editCashFlowTrade', type: 'int', default: null },
+      trade_plan_id: { id: 'editCashFlowTradePlan', type: 'int', default: null }
     });
 
     const formData = {
@@ -1705,6 +1719,170 @@ function editCashFlow(id) {
     }
 }
 
+
+// ===== TRADE AND TRADE PLAN LOADING FUNCTIONS =====
+
+/**
+ * Load trades for edit cash flow modal
+ */
+async function loadTradesForEditCashFlow() {
+  try {
+    const response = await fetch('/api/trades/');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    const trades = data.data || [];
+    
+    // Sort trades by ticker symbol alphabetically
+    trades.sort((a, b) => {
+      const symbolA = a.ticker_symbol || '';
+      const symbolB = b.ticker_symbol || '';
+      return symbolA.localeCompare(symbolB, 'he');
+    });
+    
+    const editTradeSelect = document.getElementById('editCashFlowTrade');
+    if (editTradeSelect) {
+      // Clear existing options except the first one
+      editTradeSelect.innerHTML = '<option value="">בחר טרייד (אופציונלי)</option>';
+      
+      // Add trade options
+      trades.forEach(trade => {
+        const option = document.createElement('option');
+        option.value = trade.id;
+        const tradeDate = trade.opened_at ? new Date(trade.opened_at).toLocaleDateString('he-IL') : 'לא מוגדר';
+        const sideText = trade.side === 'buy' ? 'קנייה' : trade.side === 'sell' ? 'מכירה' : trade.side || 'לא מוגדר';
+        option.textContent = `${trade.ticker_symbol || 'לא מוגדר'} | ${tradeDate} | ${sideText}`;
+        editTradeSelect.appendChild(option);
+      });
+    }
+  } catch (error) {
+    console.error('Error loading trades for edit modal:', error);
+  }
+}
+
+/**
+ * Load trade plans for edit cash flow modal
+ */
+async function loadTradePlansForEditCashFlow() {
+  try {
+    const response = await fetch('/api/trade_plans/');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    const tradePlans = data.data || [];
+    
+    // Sort trade plans by ticker symbol alphabetically
+    tradePlans.sort((a, b) => {
+      const symbolA = a.ticker && a.ticker.symbol ? a.ticker.symbol : '';
+      const symbolB = b.ticker && b.ticker.symbol ? b.ticker.symbol : '';
+      return symbolA.localeCompare(symbolB, 'he');
+    });
+    
+    const editTradePlanSelect = document.getElementById('editCashFlowTradePlan');
+    if (editTradePlanSelect) {
+      // Clear existing options except the first one
+      editTradePlanSelect.innerHTML = '<option value="">בחר תוכנית השקעה (אופציונלי)</option>';
+      
+      // Add trade plan options
+      tradePlans.forEach(plan => {
+        const option = document.createElement('option');
+        option.value = plan.id;
+        const planDate = plan.created_at ? new Date(plan.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
+        const sideText = plan.side === 'buy' ? 'קנייה' : plan.side === 'sell' ? 'מכירה' : plan.side || 'לא מוגדר';
+        const symbol = plan.ticker && plan.ticker.symbol ? plan.ticker.symbol : 'לא מוגדר';
+        option.textContent = `${symbol} | ${planDate} | ${sideText}`;
+        editTradePlanSelect.appendChild(option);
+      });
+    }
+  } catch (error) {
+    console.error('Error loading trade plans for edit modal:', error);
+  }
+}
+
+/**
+ * Load trades for add cash flow modal
+ */
+async function loadTradesForAddCashFlow() {
+  try {
+    const response = await fetch('/api/trades/');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    const trades = data.data || [];
+    
+    // Sort trades by ticker symbol alphabetically
+    trades.sort((a, b) => {
+      const symbolA = a.ticker_symbol || '';
+      const symbolB = b.ticker_symbol || '';
+      return symbolA.localeCompare(symbolB, 'he');
+    });
+    
+    const addTradeSelect = document.getElementById('cashFlowTrade');
+    if (addTradeSelect) {
+      // Clear existing options except the first one
+      addTradeSelect.innerHTML = '<option value="">בחר טרייד (אופציונלי)</option>';
+      
+      // Add trade options
+      trades.forEach(trade => {
+        const option = document.createElement('option');
+        option.value = trade.id;
+        const tradeDate = trade.opened_at ? new Date(trade.opened_at).toLocaleDateString('he-IL') : 'לא מוגדר';
+        const sideText = trade.side === 'buy' ? 'קנייה' : trade.side === 'sell' ? 'מכירה' : trade.side || 'לא מוגדר';
+        option.textContent = `${trade.ticker_symbol || 'לא מוגדר'} | ${tradeDate} | ${sideText}`;
+        addTradeSelect.appendChild(option);
+      });
+    }
+  } catch (error) {
+    console.error('Error loading trades for add modal:', error);
+  }
+}
+
+/**
+ * Load trade plans for add cash flow modal
+ */
+async function loadTradePlansForAddCashFlow() {
+  try {
+    const response = await fetch('/api/trade_plans/');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    const tradePlans = data.data || [];
+    
+    // Sort trade plans by ticker symbol alphabetically
+    tradePlans.sort((a, b) => {
+      const symbolA = a.ticker && a.ticker.symbol ? a.ticker.symbol : '';
+      const symbolB = b.ticker && b.ticker.symbol ? b.ticker.symbol : '';
+      return symbolA.localeCompare(symbolB, 'he');
+    });
+    
+    const addTradePlanSelect = document.getElementById('cashFlowTradePlan');
+    if (addTradePlanSelect) {
+      // Clear existing options except the first one
+      addTradePlanSelect.innerHTML = '<option value="">בחר תוכנית השקעה (אופציונלי)</option>';
+      
+      // Add trade plan options
+      tradePlans.forEach(plan => {
+        const option = document.createElement('option');
+        option.value = plan.id;
+        const planDate = plan.created_at ? new Date(plan.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
+        const sideText = plan.side === 'buy' ? 'קנייה' : plan.side === 'sell' ? 'מכירה' : plan.side || 'לא מוגדר';
+        const symbol = plan.ticker && plan.ticker.symbol ? plan.ticker.symbol : 'לא מוגדר';
+        option.textContent = `${symbol} | ${planDate} | ${sideText}`;
+        addTradePlanSelect.appendChild(option);
+      });
+    }
+  } catch (error) {
+    console.error('Error loading trade plans for add modal:', error);
+  }
+}
 
 // ===== GLOBAL EXPORTS =====
 // Export functions to global scope for onclick attributes
@@ -2174,6 +2352,7 @@ window.loadCashFlowsData = loadCashFlowsData;
 window.calculateBalance = calculateBalance;
 window.toggleCashFlowsSection = toggleCashFlowsSection;
 window.restoreCashFlowsSectionState = restoreCashFlowsSectionState;
+
 window.loadCashFlows = loadCashFlows;
 
 // פונקציות טופס

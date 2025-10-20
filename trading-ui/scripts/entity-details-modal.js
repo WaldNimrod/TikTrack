@@ -896,3 +896,9 @@ function editTicker(tickerId) {
  * אתחול אוטומטי:
  * - DOMContentLoaded listener - אתחול כשה-DOM מוכן
  */
+
+// ===== GLOBAL FUNCTION EXPORTS =====
+
+// Export functions to global scope
+window.showEntityDetails = showEntityDetails;
+window.hideEntityDetails = hideEntityDetails;

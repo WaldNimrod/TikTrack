@@ -561,13 +561,13 @@ class EntityDetailsRenderer {
             <div class="entity-action-buttons border-top pt-3">
                 <h6 class="mb-3">פעולות מהירות</h6>
                 <div class="d-flex gap-2 flex-wrap">
-                    <button class="btn btn-sm" onclick="window.editTicker(${entityId})">
+                    <button class="btn btn-primary btn-sm" onclick="window.editTicker(${entityId})">
                         <i class="fas fa-edit me-1"></i>עריכה
                     </button>
-                    <button class="btn btn-sm" onclick="window.entityDetailsModal.showLinkedItems('${entityType}', ${entityId})">
+                    <button class="btn btn-secondary btn-sm" onclick="window.entityDetailsModal.showLinkedItems('${entityType}', ${entityId})">
                         <i class="fas fa-link me-1"></i>פריטים מקושרים
                     </button>
-                    <button class="btn btn-sm" onclick="window.entityDetailsModal.exportEntity('${entityType}', ${entityId})">
+                    <button class="btn btn-warning btn-sm" onclick="window.entityDetailsModal.exportEntity('${entityType}', ${entityId})">
                         <i class="fas fa-download me-1"></i>ייצוא
                     </button>
                 </div>
@@ -610,7 +610,7 @@ class EntityDetailsRenderer {
                     <div class="text-muted text-center py-4">
                         <i class="fas fa-link fa-2x mb-3"></i>
                         <p>אין פריטים מקושרים</p>
-                        <button class="btn btn-sm mt-2" onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'ticker', window.currentEntityId || 'null')">
+                        <button class="btn btn-outline-primary btn-sm mt-2" onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'ticker', window.currentEntityId || 'null')">
                             <i class="fas fa-search me-1"></i>חפש פריטים מקושרים
                         </button>
                     </div>
@@ -653,8 +653,10 @@ class EntityDetailsRenderer {
                     <td>${statusBadge}</td>
                     <td><small>${this.formatDateTime(item.created_at || item.updated_at)}</small></td>
                     <td>
-                        <button data-button-type="LINK" data-onclick="window.showEntityDetails('${item.type}', ${item.id})" data-classes="btn-sm"></button>
-                        <button data-button-type="EDIT" data-onclick="window.editTicker(${item.id})" data-classes="btn-sm"></button>
+                        ${window.createLinkButton ? window.createLinkButton(`window.showEntityDetails('${item.type}', ${item.id})`) : 
+                            `<button class="btn btn-sm btn-info" onclick="window.showEntityDetails('${item.type}', ${item.id})" title="צפה בפרטים"><i class="fas fa-eye"></i></button>`}
+                        ${window.createEditButton ? window.createEditButton(`window.editTicker(${item.id})`) : 
+                            `<button class="btn btn-sm btn-secondary" onclick="window.editTicker(${item.id})" title="ערוך"><i class="fas fa-edit"></i></button>`}
                         ${this.getActionButtonForType(item.type, item.id, item.status)}
                     </td>
                 </tr>
@@ -666,7 +668,7 @@ class EntityDetailsRenderer {
                     </table>
                 </div>
                 <div class="text-center mt-3">
-                    <button class="btn" onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'ticker', window.currentEntityId || 'null')">
+                    <button class="btn btn-outline-primary" onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'ticker', window.currentEntityId || 'null')">
                         <i class="fas fa-search me-1"></i>פריטים מקושרים מלאים
                     </button>
                 </div>
@@ -830,29 +832,12 @@ class EntityDetailsRenderer {
         
         if (cancelableTypes.includes(type)) {
             // כפתור ביטול/שיחזור - שימוש בפונקציה הגלובלית בדיוק
-            // יצירת כפתור ביטול/שיחזור עם המערכת החדשה
-            const isCancelled = status === 'cancelled' || status === 'canceled';
-            const buttonType = isCancelled ? 'REACTIVATE' : 'CANCEL';
-            const buttonClass = 'btn';
-            const title = isCancelled ? 'הפעל מחדש' : 'בטל';
-            
-            // יצירת onclick function
-            let onclick = '';
-            if (id) {
-                if (isCancelled) {
-                    const reactivateFunc = `window.reactivate${type.charAt(0).toUpperCase() + type.slice(1)}`;
-                    onclick = `${reactivateFunc} && ${reactivateFunc}(${id})`;
-                } else {
-                    const cancelFunc = `window.cancel${type.charAt(0).toUpperCase() + type.slice(1)}`;
-                    onclick = `${cancelFunc} && ${cancelFunc}(${id})`;
-                }
-            }
-            
-            return `<button data-button-type="${buttonType}" data-onclick="${onclick}" data-classes="${buttonClass} btn-sm" data-attributes="data-item-type='${type}' data-item-id='${id}' title='${title}'"></button>`;
-        } else {
+            if (window.createCancelButton) {
+                return window.createCancelButton(type, id, status);
+            } else {
                 // Fallback זהה בדיוק לפונקציה הגלובלית
                 const isCancelled = status === 'cancelled' || status === 'canceled';
-                const buttonClass = 'btn';
+                const buttonClass = isCancelled ? 'btn-success' : 'btn-danger';
                 const title = isCancelled ? 'הפעל מחדש' : 'בטל';
                 const icon = isCancelled ? '✓' : 'X';
                 
@@ -911,7 +896,13 @@ class EntityDetailsRenderer {
             }
         } else {
             // כפתור מחיקה לכל השאר
-            return `<button data-button-type="DELETE" data-onclick="if (typeof showNotification === 'function') { showNotification('מחיקה לא זמינה', 'warning'); } else { alert('מחיקה לא זמינה'); }" data-classes="btn-sm"></button>`;
+            if (window.createDeleteButtonByType) {
+                return window.createDeleteButtonByType(type, id);
+            } else if (window.createDeleteButton) {
+                return window.createDeleteButton(`if (typeof showNotification === 'function') { showNotification('מחיקה לא זמינה', 'warning'); } else { alert('מחיקה לא זמינה'); }`);
+            } else {
+                return createDeleteButton(`if (typeof showNotification === 'function') { showNotification('מחיקה לא זמינה', 'warning'); } else { alert('מחיקה לא זמינה'); }`);
+            }
         }
     }
 
@@ -1399,7 +1390,190 @@ class EntityDetailsRenderer {
             return dateString;
         }
     }
-    renderCashFlow(cashFlowData, options) { return '<div>תזרים מזומנים</div>'; }
+    renderCashFlow(cashFlowData, options = {}) {
+        const entityColor = this.entityColors.cash_flow || '#fd7e14';
+        const headerTitle = `${cashFlowData.currency_symbol || '$'}${Math.abs(parseFloat(cashFlowData.amount || 0)).toFixed(2)}`;
+        
+        return `
+            <div class="entity-details-container cash-flow-details">
+                ${this.renderEntityHeader('תזרים מזומנים', headerTitle, entityColor)}
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        ${this.renderBasicInfo(cashFlowData, 'cash_flow')}
+                    </div>
+                    <div class="col-md-6">
+                        ${this.renderCashFlowSpecific(cashFlowData)}
+                    </div>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-12">
+                        ${this.renderCashFlowLinkedItems(cashFlowData)}
+                    </div>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-12">
+                        ${this.renderActionButtons('cash_flow', cashFlowData.id)}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Render cash flow specific information - רנדור מידע ספציפי לתזרים מזומנים
+     */
+    renderCashFlowSpecific(cashFlowData) {
+        const amount = parseFloat(cashFlowData.amount || 0);
+        const amountClass = amount >= 0 ? 'text-success' : 'text-danger';
+        const amountIcon = amount >= 0 ? 'fa-arrow-up' : 'fa-arrow-down';
+        
+        return `
+            <div class="cash-flow-specific">
+                <h6 class="border-bottom pb-2 mb-3">פרטי תזרים</h6>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold">סכום:</label>
+                    <div class="d-flex align-items-center">
+                        <i class="fas ${amountIcon} ${amountClass} me-2"></i>
+                        <span class="${amountClass} fw-bold fs-5">
+                            ${cashFlowData.currency_symbol || '$'}${Math.abs(amount).toFixed(2)}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold">סוג תזרים:</label>
+                    <span class="badge bg-secondary">${this.translateCashFlowType(cashFlowData.type)}</span>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold">מקור:</label>
+                    <span class="badge bg-info">${this.translateCashFlowSource(cashFlowData.source)}</span>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold">תאריך:</label>
+                    <span>${this.formatDate(cashFlowData.date)}</span>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold">מזהה:</label>
+                    <span class="badge bg-light text-dark">#${cashFlowData.id}</span>
+                </div>
+                
+                ${cashFlowData.description ? `
+                <div class="mb-3">
+                    <label class="form-label fw-bold">תיאור:</label>
+                    <p class="mb-0">${cashFlowData.description}</p>
+                </div>
+                ` : ''}
+                
+                ${cashFlowData.external_id ? `
+                <div class="mb-3">
+                    <label class="form-label fw-bold">מזהה חיצוני:</label>
+                    <span class="badge bg-light text-dark">${cashFlowData.external_id}</span>
+                </div>
+                ` : ''}
+            </div>
+        `;
+    }
+
+    /**
+     * Translate cash flow type - תרגום סוג תזרים
+     */
+    translateCashFlowType(type) {
+        const translations = {
+            'deposit': 'הפקדה',
+            'withdrawal': 'משיכה',
+            'transfer': 'העברה',
+            'fee': 'עמלה',
+            'dividend': 'דיבידנד',
+            'interest': 'ריבית'
+        };
+        return translations[type] || type;
+    }
+
+    /**
+     * Translate cash flow source - תרגום מקור תזרים
+     */
+    translateCashFlowSource(source) {
+        const translations = {
+            'manual': 'ידני',
+            'api': 'API',
+            'import': 'ייבוא',
+            'system': 'מערכת'
+        };
+        return translations[source] || source;
+    }
+
+    /**
+     * Render cash flow linked items - רנדור פריטים מקושרים לתזרים מזומנים
+     */
+    renderCashFlowLinkedItems(cashFlowData) {
+        // הוספת החשבון המקושר כפריט מקושר ראשון
+        const accountItem = cashFlowData.trading_account_id ? `
+            <div class="col-md-6">
+                <div class="card linked-item-card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="linked-item-icon me-3">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="card-title mb-1">${cashFlowData.account_name || `חשבון ${cashFlowData.trading_account_id}`}</h6>
+                                <p class="card-text text-muted small mb-0">חשבון מסחר #${cashFlowData.trading_account_id}</p>
+                            </div>
+                            <div class="linked-item-actions">
+                                <button class="btn btn-sm btn-outline-primary" 
+                                        onclick="window.showEntityDetails('account', ${cashFlowData.trading_account_id})"
+                                        title="צפה בפרטים">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        ` : '';
+        
+        return `
+            <div class="linked-items-section">
+                <h6 class="border-bottom pb-2 mb-3">פריטים מקושרים</h6>
+                <div class="row g-3 mb-3">
+                    ${accountItem}
+                </div>
+                
+                <div class="text-center">
+                    <button class="btn btn-outline-primary" 
+                            onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlowData.id})"
+                            title="צפה בכל הפריטים המקושרים">
+                        <i class="fas fa-link me-2"></i>
+                        צפה בכל הפריטים המקושרים
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Get entity label - קבלת תווית ישות
+     */
+    getEntityLabel(entityType) {
+        const labels = {
+            'ticker': 'טיקר',
+            'trade': 'טרייד',
+            'trade_plan': 'תכנון',
+            'execution': 'ביצוע',
+            'account': 'חשבון',
+            'alert': 'התראה',
+            'cash_flow': 'תזרים',
+            'note': 'הערה'
+        };
+        return labels[entityType] || entityType;
+    }
     renderNote(noteData, options) { return '<div>הערה</div>'; }
     renderGeneric(entityData, entityType, options) { return '<div>ישות כללית</div>'; }
 }
@@ -1409,15 +1583,14 @@ class EntityDetailsRenderer {
 /**
  * Auto-initialize when DOM is ready - אתחול אוטומטי כשה-DOM מוכן
  */
-// Auto-initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    try {
-        // אתחול מערכת הרנדור
+// document.addEventListener('DOMContentLoaded', () => {
+//     try {
+//         // אתחול מערכת הרנדור
         new EntityDetailsRenderer();
         
         console.info('Entity Details Renderer system loaded and ready');
         
-    } catch (error) {
-        console.error('Error auto-initializing EntityDetailsRenderer:', error);
-    }
-});
+//     } catch (error) {
+//         console.error('Error auto-initializing EntityDetailsRenderer:', error);
+//     }
+// });

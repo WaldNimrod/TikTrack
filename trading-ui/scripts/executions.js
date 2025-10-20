@@ -915,14 +915,25 @@ function validateCompleteExecutionForm(mode) {
 async function saveExecution() {
 
 
-  // ולידציה
-  const tradeIdValue = document.getElementById('addExecutionTradeId').value;
-  const type = document.getElementById('addExecutionType').value;
-  const quantity = document.getElementById('addExecutionQuantity').value;
-  const price = document.getElementById('addExecutionPrice').value;
-  const executionDate = document.getElementById('addExecutionDate').value;
-  const commission = document.getElementById('addExecutionCommission').value;
-  const notes = document.getElementById('addExecutionNotes').value.trim();
+  // איסוף נתונים מהטופס באמצעות DataCollectionService
+  const executionData = DataCollectionService.collectFormData({
+    trade_id: { id: 'addExecutionTradeId', type: 'int' },
+    action: { id: 'addExecutionType', type: 'text' },
+    quantity: { id: 'addExecutionQuantity', type: 'int' },
+    price: { id: 'addExecutionPrice', type: 'number' },
+    date: { id: 'addExecutionDate', type: 'date' },
+    fee: { id: 'addExecutionCommission', type: 'number' },
+    notes: { id: 'addExecutionNotes', type: 'text' },
+    source: { id: 'addExecutionSource', type: 'text', default: 'manual' }
+  });
+
+  const tradeIdValue = executionData.trade_id;
+  const type = executionData.action;
+  const quantity = executionData.quantity;
+  const price = executionData.price;
+  const executionDate = executionData.date;
+  const commission = executionData.fee;
+  const notes = executionData.notes;
 
   // בדיקת ולידציה מקיפה
   if (!validateCompleteExecutionForm('add')) {
@@ -946,7 +957,7 @@ async function saveExecution() {
   }
 
   try {
-    const executionData = {
+    const executionPayload = {
       trade_id: tradeId,
       action: type,
       quantity: parseInt(quantity),
@@ -957,100 +968,24 @@ async function saveExecution() {
       notes: notes || null,
     };
 
-
     const response = await fetch('/api/executions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(executionData),
+      body: JSON.stringify(executionPayload),
     });
 
-    if (response.ok) {
-      await response.json();
-
-
-      // סגירת המודל
-      const modal = bootstrap.Modal.getInstance(document.getElementById('addExecutionModal'));
-      modal.hide();
-
-      // הצגת הודעת הצלחה
-      // Showing success notification for save
-      // window.showSuccessNotification exists check
-
-      if (typeof window.showSuccessNotification === 'function') {
-        // Calling showSuccessNotification
-        window.showSuccessNotification('הצלחה', 'עסקה חדשה נוספה בהצלחה למערכת', 4000, 'business');
-      } else {
-        handleSystemError(new Error('showSuccessNotification not available'), 'מערכת התראות');
-      }
-
-      // רענון הנתונים
-      await loadExecutionsData();
-
-    } else {
-      const result = await response.json();
-      handleSaveError(new Error(result.error), 'שמירת עסקה');
-
-      // טיפול בשגיאות וולידציה מהשרת
-
-      if (result.error && result.error.message) {
-        const serverMessage = result.error.message;
-
-        // אם זו שגיאת וולידציה, נפרק אותה להודעות ספציפיות
-        if (serverMessage.includes('validation failed')) {
-          const validationErrors = serverMessage.replace('Execution validation failed: ', '').split('; ');
-
-          // הצגת כל שגיאה בנפרד
-          validationErrors.forEach(error => {
-            let fieldError = error;
-            let fieldName = '';
-
-            // תרגום שגיאות ספציפיות
-            if (error.includes('Field \'action\' has invalid value')) {
-              fieldError = 'סוג עסקה לא תקין - יש לבחור ערך מהרשימה';
-              fieldName = 'addExecutionType';
-            } else if (error.includes('Field \'source\' has invalid value')) {
-              fieldError = 'מקור לא תקין - יש לבחור ערך מהרשימה';
-              fieldName = 'addExecutionSource';
-            } else if (error.includes('Field \'quantity\' is out of range')) {
-              fieldError = 'כמות חייבת להיות חיובית';
-              fieldName = 'addExecutionQuantity';
-            } else if (error.includes('Field \'price\' is out of range')) {
-              fieldError = 'מחיר חייב להיות חיובי';
-              fieldName = 'addExecutionPrice';
-            } else if (error.includes('Field \'date\' is out of range')) {
-              fieldError = 'תאריך עסקה חייב להיות אחרי תאריך פתיחת הטרייד';
-              fieldName = 'addExecutionDate';
-            } else if (error.includes('Field \'trade_id\' references non-existent record')) {
-              fieldError = 'טרייד לא קיים במערכת';
-              fieldName = 'addExecutionTradeId';
-            }
-
-            // שימוש במערכת ההתראות המובנת
-            // Field validation error (add) check
-            // window.showValidationWarning exists (add) check
-
-            if (fieldName && window.showValidationWarning) {
-              // Calling showValidationWarning (add)
-              window.showValidationWarning(fieldName, fieldError);
-            } else {
-              // Using showErrorNotification as fallback (add)
-              window.showErrorNotification('שגיאת וולידציה', fieldError);
-            }
-          });
-        } else {
-          // שגיאה כללית
-          window.showErrorNotification('שגיאה בשמירה', serverMessage);
-        }
-      } else {
-        // הצגת הודעת שגיאה כללית
-        window.showErrorNotification('שגיאה בשמירה', 'שגיאה בשמירת עסקה - בדוק את הנתונים שהוזנו');
-      }
-    }
+    // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
+    await CRUDResponseHandler.handleSaveResponse(response, {
+      modalId: 'addExecutionModal',
+      successMessage: 'עסקה נשמרה בהצלחה!',
+      apiUrl: '/api/executions/',
+      entityName: 'עסקה'
+    });
 
   } catch (error) {
-    handleSaveError(error, 'שמירת עסקה');
+    CRUDResponseHandler.handleError(error, 'שמירת עסקה');
   }
 }
 
@@ -1222,56 +1157,16 @@ async function confirmDeleteExecution(_id) {
     const response = await fetch(`/api/executions/${executionId}`, {
       method: 'DELETE',
     });
-    // DELETE response status
 
-    if (response.ok) {
-
-
-      // סגירת המודל - לא נדרש כי אין מודל
-      // Delete successful, no modal to close
-
-      // הצגת הודעת הצלחה
-      // Showing success notification for delete
-      // window.showSuccessNotification exists check
-
-      if (typeof window.showSuccessNotification === 'function') {
-        // Calling showSuccessNotification
-        window.showSuccessNotification('הצלחה', 'עסקה נמחקה בהצלחה מהמערכת', 4000, 'business');
-      } else {
-        handleSystemError(new Error('showSuccessNotification not available'), 'מערכת התראות');
-      }
-
-      // רענון הנתונים
-      await loadExecutionsData();
-
-    } else {
-      const errorResponse = await response.text();
-      handleDeleteError(new Error(errorResponse), 'עסקה');
-
-      try {
-        const errorData = JSON.parse(errorResponse);
-
-        // בדיקה אם השגיאה קשורה לפריטים מקושרים
-        if (errorData.error && errorData.error.message &&
-                    errorData.error.message.includes('linked items')) {
-
-          // סגירת מודל המחיקה הרגיל - לא נדרש
-          // Linked items found, no modal to close
-
-          // הצגת מודל הפריטים המקושרים
-          await showExecutionLinkedItemsModal(executionId, errorData);
-          return;
-        }
-
-        handleDeleteError(new Error(errorData.error.message), 'עסקה');
-
-      } catch {
-        handleDeleteError(new Error(errorResponse), 'עסקה');
-      }
-    }
+    // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
+    await CRUDResponseHandler.handleDeleteResponse(response, {
+      successMessage: 'עסקה נמחקה בהצלחה!',
+      apiUrl: '/api/executions/',
+      entityName: 'עסקה'
+    });
 
   } catch (error) {
-    handleDeleteError(error, 'עסקה');
+    CRUDResponseHandler.handleError(error, 'מחיקת עסקה');
   }
 }
 

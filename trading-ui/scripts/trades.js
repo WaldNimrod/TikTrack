@@ -1314,73 +1314,8 @@ function enableTradeFormFields() {
   });
 }
 
-/**
- * ולידציה של טופס הוספת טרייד לפי אילוצי בסיס הנתונים
- *
- * משתמשת בפונקציות הכלליות מ-validation-utils.js
- *
- * @returns {boolean} true אם הטופס תקין, false אם לא
- */
-function validateTradeForm() {
-  // הגדרת כללי הוולידציה לפי אילוצי בסיס הנתונים
-  const validationRules = {
-    'addTradeAccountId': { required: true, type: 'select' },
-    'addTradeTickerId': { required: true, type: 'select' },
-    'addTradeTradePlanId': { required: true, type: 'select' },
-    'addTradeStatus': {
-      required: false,
-      type: 'select',
-      enum: ['open', 'closed', 'cancelled'],
-    },
-    'addTradeType': {
-      required: false,
-      type: 'select',
-      enum: ['swing', 'investment', 'passive'],
-    },
-    'addTradeSide': {
-      required: false,
-      type: 'select',
-      enum: ['Long', 'Short'],
-    },
-    'addTradeOpenedAt': {
-      required: false,
-      type: 'datetime-local',
-      conditionalRequired: {
-        field: 'addTradeStatus',
-        value: 'open',
-        message: 'תאריך פתיחה הוא חובה עבור טריידים פתוחים',
-      },
-    },
-    'addTradeClosedAt': {
-      required: false,
-      type: 'datetime-local',
-      conditionalRequired: {
-        field: 'addTradeStatus',
-        value: 'closed',
-        message: 'תאריך סגירה הוא חובה עבור טריידים סגורים',
-      },
-      customValidation(value, formData) {
-        const openedAt = formData['addTradeOpenedAt'];
-        if (value && openedAt) {
-          const openedDate = new Date(openedAt);
-          const closedDate = new Date(value);
-          if (closedDate <= openedDate) {
-            return { isValid: false, message: 'תאריך סגירה חייב להיות אחרי תאריך פתיחה' };
-          }
-        }
-        return { isValid: true };
-      },
-    },
-  };
-
-  // שימוש בפונקציה הכללית לוולידציה
-  if (typeof window.validateForm === 'function') {
-    return window.validateForm('addTradeForm', validationRules);
-  } else {
-    // console.warn('⚠️ validateForm function not found - validation-utils.js not loaded, skipping validation');
-    return { isValid: true, errors: {}, errorMessages: [] };
-  }
-}
+// ולידציה - משתמש במערכת הכללית window.validateEntityForm
+// function validateTradeForm() {
 
 /**
  * שמירת טרייד חדש
@@ -1418,10 +1353,7 @@ async function saveNewTradeRecord() {
 
   // בדיקת אלמנטים לפני שמירה
 
-  // בדיקת ולידציה
-  if (!validateTradeForm()) {
-    return;
-  }
+  // ולידציה - משתמש במערכת הכללית window.validateEntityForm
 
   // איסוף נתונים מהטופס באמצעות DataCollectionService
   const formData = DataCollectionService.collectFormData({

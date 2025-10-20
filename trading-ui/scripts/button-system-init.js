@@ -268,8 +268,8 @@ class AdvancedButtonSystem {
     }
 
     async waitForButtonIcons() {
-        const maxWaitTime = 5000; // 5 seconds max
-        const checkInterval = 100; // Check every 100ms
+        const maxWaitTime = 1000; // 1 second max (reduced from 5 seconds)
+        const checkInterval = 50; // Check every 50ms (faster)
         let elapsed = 0;
         
         while (elapsed < maxWaitTime) {

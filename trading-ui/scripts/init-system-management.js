@@ -1547,8 +1547,15 @@ async function runComprehensiveTests() {
     
     // Test each page
     for (const pageName of allPages) {
+        console.log(`🔍 runComprehensiveTests: Testing page ${pageName}...`);
         const pageConfig = window.PAGE_CONFIGS[pageName];
+        if (!pageConfig) {
+            console.log(`❌ runComprehensiveTests: No config found for page ${pageName}`);
+            continue;
+        }
+        
         const pageResult = await testSinglePage(pageName, pageConfig);
+        console.log(`🔍 runComprehensiveTests: Page ${pageName} result:`, pageResult);
         results.push(pageResult);
         
         // Update counters
@@ -1559,18 +1566,44 @@ async function runComprehensiveTests() {
         } else {
             healthyPages++;
         }
+        
+        console.log(`🔍 runComprehensiveTests: Updated counters - critical: ${criticalErrors}, mismatches: ${mismatches}, healthy: ${healthyPages}`);
     }
     
     // Update summary cards
-    document.getElementById('totalPagesCount').textContent = allPages.length;
-    document.getElementById('criticalErrorsCount').textContent = criticalErrors;
-    document.getElementById('mismatchCount').textContent = mismatches;
-    document.getElementById('healthyPagesCount').textContent = healthyPages;
+    console.log('🔍 runComprehensiveTests: Updating summary cards...');
+    const totalPagesElement = document.getElementById('totalPagesCount');
+    const criticalErrorsElement = document.getElementById('criticalErrorsCount');
+    const mismatchElement = document.getElementById('mismatchCount');
+    const healthyPagesElement = document.getElementById('healthyPagesCount');
+    
+    if (totalPagesElement) totalPagesElement.textContent = allPages.length;
+    if (criticalErrorsElement) criticalErrorsElement.textContent = criticalErrors;
+    if (mismatchElement) mismatchElement.textContent = mismatches;
+    if (healthyPagesElement) healthyPagesElement.textContent = healthyPages;
+    
+    console.log('🔍 runComprehensiveTests: Summary cards updated');
     
     // Display results in table
+    console.log('🔍 runComprehensiveTests: Displaying results...');
     displayComprehensiveResults(results);
     
-    console.log('✅ Comprehensive tests completed');
+    console.log('✅ runComprehensiveTests: Comprehensive tests completed');
+    console.log('🔍 runComprehensiveTests: Final results summary:', {
+        totalPages: allPages.length,
+        criticalErrors,
+        mismatches,
+        healthyPages,
+        results: results.length
+    });
+    
+    // Show success notification
+    console.log('🔍 runComprehensiveTests: Showing success notification...');
+    showNotification('בדיקות מקיפות הושלמו בהצלחה', 'success');
+    console.log('🔍 runComprehensiveTests: Success notification shown');
+    
+    // Final log
+    console.log('🎯 runComprehensiveTests: All done! Check the table for results.');
 }
 
 /**
@@ -1590,18 +1623,24 @@ async function testSinglePage(pageName, pageConfig) {
     };
     
     // Check for duplicates
+    console.log(`🔍 testSinglePage: Checking duplicates for ${pageName}...`);
     const duplicates = checkForDuplicates(pageConfig);
     result.duplicates = duplicates;
     result.criticalErrors += duplicates.length;
+    console.log(`🔍 testSinglePage: Found ${duplicates.length} duplicates for ${pageName}`);
     
     // Check load order
+    console.log(`🔍 testSinglePage: Checking load order for ${pageName}...`);
     const loadOrderIssues = checkLoadOrder(pageConfig);
     result.loadOrderIssues = loadOrderIssues;
     result.criticalErrors += loadOrderIssues.length;
+    console.log(`🔍 testSinglePage: Found ${loadOrderIssues.length} load order issues for ${pageName}`);
     
     // Check for mismatches (documented vs actual)
+    console.log(`🔍 testSinglePage: Checking mismatches for ${pageName}...`);
     const mismatches = await checkForMismatches(pageName, pageConfig);
     result.mismatches = mismatches.length;
+    console.log(`🔍 testSinglePage: Found ${mismatches.length} mismatches for ${pageName}`);
     
     // Determine overall status
     if (result.criticalErrors > 0) {
@@ -1612,6 +1651,7 @@ async function testSinglePage(pageName, pageConfig) {
         result.status = 'success';
     }
     
+    console.log(`🔍 testSinglePage: Final result for ${pageName}:`, result);
     return result;
 }
 
@@ -1755,13 +1795,16 @@ async function checkForMismatches(pageName, pageConfig) {
                 for (const script of pkg.scripts) {
                     if (script.required && script.globalCheck) {
                         // Check if global exists
-                        if (!checkGlobalExists(script.globalCheck)) {
+                        const globalExists = checkGlobalExists(script.globalCheck);
+                        console.log(`🔍 checkForMismatches: ${script.file} - ${script.globalCheck} = ${globalExists}`);
+                        if (!globalExists) {
                             mismatches.push({
                                 script: script.file,
                                 package: pkgName,
                                 global: script.globalCheck,
                                 description: script.description
                             });
+                            console.log(`❌ checkForMismatches: Mismatch found for ${script.file}`);
                         }
                     }
                 }
@@ -1769,6 +1812,7 @@ async function checkForMismatches(pageName, pageConfig) {
         }
     }
     
+    console.log(`🔍 checkForMismatches: Found ${mismatches.length} mismatches for page ${pageName}`);
     return mismatches;
 }
 
@@ -1781,12 +1825,15 @@ function checkGlobalExists(globalPath) {
         let obj = window;
         for (const part of parts) {
             if (obj[part] === undefined) {
+                console.log(`🔍 checkGlobalExists: ${globalPath} - ${part} is undefined`);
                 return false;
             }
             obj = obj[part];
         }
+        console.log(`🔍 checkGlobalExists: ${globalPath} exists and is:`, obj);
         return true;
     } catch (e) {
+        console.log(`🔍 checkGlobalExists: ${globalPath} - Error:`, e);
         return false;
     }
 }
@@ -1795,10 +1842,21 @@ function checkGlobalExists(globalPath) {
  * Display Comprehensive Results
  */
 function displayComprehensiveResults(results) {
+    console.log('🔍 displayComprehensiveResults: Starting to display results...');
+    console.log('🔍 displayComprehensiveResults: Results:', results);
+    
     const tbody = document.getElementById('comprehensiveTestResults');
+    if (!tbody) {
+        console.log('❌ displayComprehensiveResults: comprehensiveTestResults element not found!');
+        return;
+    }
+    
+    console.log('🔍 displayComprehensiveResults: Clearing table...');
     tbody.innerHTML = '';
     
-    results.forEach(result => {
+    console.log('🔍 displayComprehensiveResults: Processing results...');
+    results.forEach((result, index) => {
+        console.log(`🔍 displayComprehensiveResults: Processing result ${index + 1}/${results.length}:`, result);
         const row = document.createElement('tr');
         
         // Status icon and color
@@ -1829,7 +1887,10 @@ function displayComprehensiveResults(results) {
         `;
         
         tbody.appendChild(row);
+        console.log(`🔍 displayComprehensiveResults: Added row for ${result.pageName}`);
     });
+    
+    console.log('🔍 displayComprehensiveResults: All rows added to table');
 }
 
 /**
@@ -1864,6 +1925,7 @@ async function showPageDetails(pageName) {
     const scanResults = await runDetailedPageScan(pageName, pageConfig);
     console.log(`🔍 showPageDetails: Scan completed for ${pageName}:`, scanResults);
     
+    console.log(`🔍 showPageDetails: Building HTML for ${pageName}...`);
     let detailsHtml = `
         <h5>🔍 תוצאות סריקה מפורטת: ${pageConfig.name || pageName}</h5>
         <hr>
@@ -1995,8 +2057,12 @@ async function showPageDetails(pageName) {
         </div>
     `;
     
+    console.log(`🔍 showPageDetails: Showing modal for ${pageName}...`);
     if (typeof window.showDetailsModal === 'function') {
         window.showDetailsModal(`🔍 סריקה מפורטת: ${pageName}`, detailsHtml);
+        console.log(`🔍 showPageDetails: Modal shown for ${pageName}`);
+    } else {
+        console.log(`❌ showPageDetails: showDetailsModal function not available`);
     }
 }
 
@@ -2046,10 +2112,13 @@ async function runDetailedPageScan(pageName, pageConfig) {
     console.log(`🔍 runDetailedPageScan: Scripts ready, proceeding with scan...`);
     
     // Check for mismatches (documented vs actual)
+    console.log(`🔍 runDetailedPageScan: Checking mismatches for ${pageName}...`);
     const mismatches = await checkForMismatches(pageName, pageConfig);
     result.mismatchDetails = mismatches;
     result.mismatches = mismatches.length;
+    console.log(`🔍 runDetailedPageScan: Found ${mismatches.length} mismatches for ${pageName}`);
     
+    console.log(`🔍 runDetailedPageScan: Final result for ${pageName}:`, result);
     return result;
 }
 

@@ -933,12 +933,14 @@ async function renderCashFlowsTable() {
             <td class="col-source">${window.translateCashFlowSource ?
     window.translateCashFlowSource(cashFlow.source) :
     cashFlow.source}</td>
-            <td class="col-actions actions-cell actions-3-btn">
+            <td class="col-actions actions-cell actions-4-btn">
               ${window.createActionsMenu ? window.createActionsMenu([
-                { type: 'LINK', onclick: `window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})`, text: 'צפה בפריטים מקושרים', title: 'צפה בפריטים מקושרים' },
-                { type: 'EDIT', onclick: `showEditCashFlowModal(${cashFlow.id})`, text: 'ערוך תזרים', title: 'ערוך תזרים' },
-                { type: 'DELETE', onclick: `deleteCashFlow(${cashFlow.id})`, text: 'מחק תזרים', title: 'מחק תזרים' }
+                { type: 'VIEW', onclick: `showCashFlowDetails(${cashFlow.id})`, text: 'פרטים', title: 'הצג פרטי תזרים' },
+                { type: 'LINK', onclick: `window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})`, text: 'פריטים מקושרים', title: 'צפה בפריטים מקושרים' },
+                { type: 'EDIT', onclick: `showEditCashFlowModal(${cashFlow.id})`, text: 'ערוך', title: 'ערוך תזרים' },
+                { type: 'DELETE', onclick: `deleteCashFlow(${cashFlow.id})`, text: 'מחק', title: 'מחק תזרים' }
               ]) : `
+              <button class="btn btn-sm" onclick="showCashFlowDetails(${cashFlow.id})" title="הצג פרטי תזרים">👁️</button>
               <button class="btn btn-sm" onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})" title="צפה בפריטים מקושרים">🔗</button>
               <button class="btn btn-sm" onclick="showEditCashFlowModal(${cashFlow.id})" title="ערוך תזרים">✏️</button>
               <button class="btn btn-sm" onclick="deleteCashFlow(${cashFlow.id})" title="מחק תזרים">🗑️</button>
@@ -1076,6 +1078,24 @@ function formatUsdRate(rate) {
 // ========================================
 
 /**
+ * הצגת פרטי תזרים מזומנים
+ * @param {number} cashFlowId - מזהה התזרים
+ */
+function showCashFlowDetails(cashFlowId) {
+  // מציאת התזרים
+  const cashFlow = cashFlowsData.find(cf => cf.id === cashFlowId);
+  if (!cashFlow) {
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאה', 'תזרים מזומנים לא נמצא');
+    }
+    return;
+  }
+  
+  // פתיחת מודל עריכה במצב "קריאה בלבד"
+  showEditCashFlowModal(cashFlowId);
+}
+
+/**
  * עדכון טבלת תזרימי מזומנים
  * @param {Array} cashFlows - מערך של תזרימי מזומנים
  */
@@ -1092,7 +1112,8 @@ function updateCashFlowsTable(cashFlows) {
   updatePageSummaryStats();
 }
 
-// הגדרת הפונקציה כגלובלית
+// הגדרת הפונקציות כגלובליות
+window.showCashFlowDetails = showCashFlowDetails;
 window.updateCashFlowsTable = updateCashFlowsTable;
 
 // פונקציית פילטור מקומי - הוסרה כי לא בשימוש

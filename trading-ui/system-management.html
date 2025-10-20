@@ -106,193 +106,85 @@
                         </div>
                     </div>
                     <div class="section-body">
-                        <!-- סקשן מאוחד - סטטוס מערכת ופרטים טכניים -->
+                        <!-- סקשן סטטיסטיקות מערכת מרוכז -->
                         <div class="row mt-3">
                             <div class="col-12">
                                 <div class="card">
                                     <div class="card-header">
                                         <h5 class="card-title mb-0">
-                                            <i class="fas fa-chart-line text-primary"></i> סטטוס מערכת ופרטים טכניים
+                                            <i class="fas fa-chart-line text-primary"></i> סטטיסטיקות מערכת
                                         </h5>
                                     </div>
                                     <div class="card-body">
                                         <!-- סטטיסטיקות מערכת מהירות -->
-                                        <div class="row mb-3">
-                                            <div class="col-md-2">
-                                                <strong>🏥 בריאות:</strong>
-                                                <span id="overallHealthStatus" class="badge bg-warning">טוען...</span>
-                                            </div>
-                                            <div class="col-md-2">
-                                                <strong>📊 ציון:</strong>
-                                                <span id="systemScore" class="badge bg-info">טוען...</span>
-                                            </div>
-                                            <div class="col-md-2">
-                                                <strong>⏱️ תגובה:</strong>
-                                                <span id="responseTime" class="badge bg-success">טוען...</span>
-                                            </div>
-                                            <div class="col-md-2">
-                                                <strong>🔄 פעילות:</strong>
-                                                <span id="uptime" class="badge bg-primary">טוען...</span>
-                                            </div>
-                                            <div class="col-md-2">
-                                                <strong>💾 זיכרון:</strong>
-                                                <span id="systemMemory" class="badge bg-secondary">טוען...</span>
-                                            </div>
-                                            <div class="col-md-2">
-                                                <strong>🗄️ מטמון:</strong>
-                                                <span id="systemCacheMode" class="badge bg-primary">טוען...</span>
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- פרטים טכניים מפורטים -->
                                         <div class="row">
-                                            <!-- עמודה שמאלית - מערכות ליבה -->
-                                            <div class="col-md-4">
-                                                <h6 class="text-muted mb-2">🔧 מערכות ליבה</h6>
-                                                <div class="table-responsive">
-                                                    <table class="table table-sm table-striped">
-                                                        <tbody>
-                                                            <tr>
-                                                                <td>שרת:</td>
-                                                                <td><span class="badge bg-success" id="serverHealthStats">פעיל</span></td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>בסיס נתונים:</td>
-                                                                <td><span class="badge bg-success" id="databaseHealthStats">מחובר</span></td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>מטמון:</td>
-                                                                <td><span class="badge bg-success" id="cacheHealthStats">בריא</span></td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
+                                            <div class="col-md-2">
+                                                <div class="text-center">
+                                                    <div class="h5 mb-1">🏥 בריאות</div>
+                                                    <span id="overallHealthStatus" class="badge bg-warning fs-6">טוען...</span>
                                             </div>
-                                            
-                                            <!-- עמודה מרכזית - רשת וגישה -->
-                                            <div class="col-md-4">
-                                                <h6 class="text-muted mb-2">🌐 רשת וגישה</h6>
-                                                <div class="table-responsive">
-                                                    <table class="table table-sm table-striped">
-                                                        <tbody>
-                                                            <tr>
-                                                                <td>רשת:</td>
-                                                                <td><span class="badge bg-success" id="networkHealthStats">יציב</span></td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>פורט:</td>
-                                                                <td><span class="badge bg-info">8080</span></td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>פרוטוקול:</td>
-                                                                <td><span class="badge bg-info">HTTP/HTTPS</span></td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
                                             </div>
-                                            
-                                            <!-- עמודה ימנית - מידע מערכת -->
-                                            <div class="col-md-4">
-                                                <h6 class="text-muted mb-2">ℹ️ מידע מערכת</h6>
-                                                <div class="table-responsive">
-                                                    <table class="table table-sm table-striped">
-                                                        <tbody>
-                                                            <tr>
-                                                                <td>גרסה:</td>
-                                                                <td><span class="badge bg-secondary">2.0.5</span></td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>סביבה:</td>
-                                                                <td><span class="badge bg-warning">Development</span></td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>עדכון אחרון:</td>
-                                                                <td><span class="badge bg-light text-dark">לפני 2 דקות</span></td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
+                                            <div class="col-md-2">
+                                                <div class="text-center">
+                                                    <div class="h5 mb-1">📊 ציון</div>
+                                                    <span id="systemScore" class="badge bg-info fs-6">טוען...</span>
+                                            </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="text-center">
+                                                    <div class="h5 mb-1">⏱️ תגובה</div>
+                                                    <span id="responseTime" class="badge bg-success fs-6">טוען...</span>
                                             </div>
                                         </div>
+                                            <div class="col-md-2">
+                                                <div class="text-center">
+                                                    <div class="h5 mb-1">🔄 פעילות</div>
+                                                    <span id="uptime" class="badge bg-primary fs-6">טוען...</span>
                                     </div>
                                 </div>
+                                            <div class="col-md-2">
+                                                <div class="text-center">
+                                                    <div class="h5 mb-1">💾 זיכרון</div>
+                                                    <span id="systemMemory" class="badge bg-secondary fs-6">טוען...</span>
                             </div>
                         </div>
-                            
-                        <!-- שורה של שלושת הכרטיסים -->
+                                            <div class="col-md-2">
+                                                <div class="text-center">
+                                                    <div class="h5 mb-1">🗄️ מטמון</div>
+                                                    <span id="systemCacheMode" class="badge bg-primary fs-6">טוען...</span>
+                    </div>
+                </div>
+                        </div>
+                        
+                                        <!-- סטטיסטיקות נוספות -->
                         <div class="row mt-3">
-                            <!-- כרטיס התראות -->
-                            <div class="col-md-4">
-                                <div class="card h-100">
-                                    <div class="card-header">
-                                        <h5 class="card-title mb-0">
-                                            <i class="fas fa-bell text-danger"></i> התראות פעילות
-                                        </h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <!-- קומפוננט התראות פעילות -->
-                                        <active-alerts></active-alerts>
-                                        
-                                        <!-- כפתורי פעולה מהירה -->
-                                        <div class="quick-actions mt-2">
-                                            <button data-button-type="REFRESH" data-onclick="refreshSystemData()" data-classes="btn btn-primary btn-sm">
-                                                🔄 רענן נתונים
-                                            </button>
-                                            <button class="btn btn-warning btn-sm" id="quickRestartSystemBtn2">
-                                                <i class="fas fa-redo"></i> איתחול מהיר
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
+                                            <div class="col-md-3">
+                                                <div class="text-center">
+                                                    <div class="h6 mb-1">🌐 שרת</div>
+                                                    <span id="serverHealthStats" class="badge bg-success">פעיל</span>
+                    </div>
+                        </div>
+                                            <div class="col-md-3">
+                                                <div class="text-center">
+                                                    <div class="h6 mb-1">🗃️ בסיס נתונים</div>
+                                                    <span id="databaseHealthStats" class="badge bg-success">מחובר</span>
+                    </div>
+                </div>
+                                            <div class="col-md-3">
+                                                <div class="text-center">
+                                                    <div class="h6 mb-1">🔗 רשת</div>
+                                                    <span id="networkHealthStats" class="badge bg-success">יציב</span>
+                        </div>
+                    </div>
+                                            <div class="col-md-3">
+                                                <div class="text-center">
+                                                    <div class="h6 mb-1">📋 גרסה</div>
+                                                    <span class="badge bg-secondary">2.0.5</span>
                             </div>
-                            
-                            <!-- כרטיס מצבי מטמון -->
-                            <div class="col-md-4">
-                                <div class="card h-100">
-                                    <div class="card-header">
-                                        <h5 class="card-title mb-0">
-                                            <i class="fas fa-database text-warning"></i> מצבי מטמון
-                                        </h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="d-grid gap-2">
-                                            <button class="btn btn-outline-primary" id="devModeSystemBtn">
-                                                <i class="fas fa-code"></i> Development
-                                            </button>
-                                            <button class="btn btn-outline-danger" id="noCacheSystemBtn">
-                                                <i class="fas fa-ban"></i> No Cache
-                                            </button>
-                                            <button class="btn btn-outline-success" id="productionModeSystemBtn">
-                                                <i class="fas fa-industry"></i> Production
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
-                            
-                            <!-- כרטיס כלי פיתוח -->
-                            <div class="col-md-4">
-                                <div class="card h-100">
-                                    <div class="card-header">
-                                        <h5 class="card-title mb-0">
-                                            <i class="fas fa-tools text-info"></i> כלי פיתוח
-                                        </h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="d-grid gap-2">
-                                            <button class="btn btn-outline-info" id="openServerMonitorSystemBtn">
-                                                <i class="fas fa-desktop"></i> ניטור שרת
-                                            </button>
-                                            <button class="btn btn-outline-secondary" id="openExternalDataBtn">
-                                                <i class="fas fa-chart-line"></i> נתונים חיצוניים
-                                            </button>
-                                            <button class="btn btn-outline-dark" id="openCrudTestingBtn">
-                                                <i class="fas fa-vial"></i> בדיקות CRUD
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
+                            </div>
+                            </div>
+                        </div>
                             </div>
                         </div>
                         
@@ -301,65 +193,7 @@
                 <!-- UI Content Section Cursor Tasks End-->
 
 
-                        <!-- Section 2: Server Management - DISABLED FOR SIMPLIFICATION -->
-                        <!-- <div class="content-section" id="sm-server">
-                    <div class="section-header">
-                        <h2>🌐 נתונים חיצוניים</h2>
-                        <div class="header-actions">
-                            <a href="external-data-dashboard.html" class="btn btn-sm btn-outline-primary" title="עמוד ניהול נתונים חיצוניים">
-                                <i class="fas fa-external-link-alt"></i> ניהול מתקדם
-                            </a>
-                            <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
-                        </div>
-                            </div> -->
-                    <div class="section-body">
-                        <!-- External Data Summary -->
-                        <div class="info-summary external-data-overview" id="externalDataSummary">
-                            <div class="summary-item">
-                                <span class="summary-label">🌐 ספקים פעילים:</span>
-                                <span class="summary-value" id="activeProvidersCount">טוען...</span>
-                            </div>
-                            <div class="summary-item">
-                                <span class="summary-label">📊 נתונים מעודכנים:</span>
-                                <span class="summary-value" id="lastDataUpdate">טוען...</span>
-                            </div>
-                            <div class="summary-item">
-                                <span class="summary-label">✅ דיוק נתונים:</span>
-                                <span class="summary-value" id="dataAccuracy">טוען...</span>
-                            </div>
-                            <div class="summary-item">
-                                <span class="summary-label">💾 מטמון:</span>
-                                <span class="summary-value" id="cacheStatus">טוען...</span>
-                            </div>
-                        </div>
-                        
-                        <!-- External Data Details -->
-                        <div class="external-data-details">
-                            <h4>ספקי נתונים</h4>
-                            <div class="provider-list" id="providerList">
-                                <!-- Providers will be loaded dynamically -->
-                            </div>
-                            
-                            <div class="mt-3">
-                                <small class="text-muted">
-                                    💡 לניהול מתקדם של נתונים חיצוניים, השתמש בעמוד 
-                                    <a href="external-data-dashboard.html" class="text-primary">ניהול נתונים חיצוניים</a>
-                                </small>
-                            </div>
-                        </div>
-                        
-                    </div>
-                </div>
-                <!-- UI Content Section 3 End--> 
-
-                <!-- UI Content Section 4 Start-->
-                        <!-- Section 3: Cache Management - DISABLED FOR SIMPLIFICATION -->
-                        <!-- <div class="content-section" id="sm-cache">
-                    <div class="section-header entity-test-sub-header">
-                        <h2>🚨 התראות מערכת</h2>
-                        <div class="header-actions">
+                        <!-- כל הסקשנים הנוספים הוסרו - נשאר רק סקשן הסטטיסטיקות -->
                             <a href="notifications-center.html" class="btn btn-sm btn-outline-primary" title="מרכז התראות מתקדם">
                                 <i class="fas fa-external-link-alt"></i> מרכז התראות
                             </a>

@@ -769,6 +769,15 @@ async function loadCurrenciesFromServer() {
  */
 async function loadAccountsForCashFlow() {
   try {
+    // בדיקת העדפות לפני טעינה
+    console.log('🔍 בדיקת העדפות חשבון ברירת מחדל:');
+    console.log('window.PreferencesSystem:', window.PreferencesSystem);
+    console.log('currentPreferences:', window.PreferencesSystem?.manager?.currentPreferences);
+    
+    // בדיקה ישירה של העדפת חשבון ברירת מחדל
+    const defaultAccountPref = window.PreferencesSystem?.manager?.currentPreferences?.default_trading_account;
+    console.log('default_trading_account preference:', defaultAccountPref);
+    
     // שימוש ב-SelectPopulatorService עם ברירת מחדל מהעדפות
     await SelectPopulatorService.populateAccountsSelect('cashFlowAccount', {
       includeEmpty: true,
@@ -776,6 +785,12 @@ async function loadAccountsForCashFlow() {
       defaultFromPreferences: true,
       filterFn: (account) => account.status === 'open'
     });
+    
+    // בדיקה אחרי טעינה
+    const select = document.getElementById('cashFlowAccount');
+    console.log('✅ אחרי טעינה - ערך נבחר:', select?.value);
+    console.log('✅ אחרי טעינה - טקסט נבחר:', select?.options[select?.selectedIndex]?.text);
+    
   } catch (error) {
     handleDataLoadError(error, 'טעינת חשבונות');
 

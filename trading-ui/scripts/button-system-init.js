@@ -303,10 +303,22 @@ class AdvancedButtonSystem {
         const onClick = element.getAttribute('data-onclick');
         let variant = element.getAttribute('data-variant');
         const classes = element.getAttribute('data-classes') || '';
-        const attributes = element.getAttribute('data-attributes') || '';
+        let attributes = element.getAttribute('data-attributes') || '';
         const text = element.getAttribute('data-text') || '';
         const icon = element.getAttribute('data-icon') || '';
         const id = element.getAttribute('data-id') || `btn-${index}`;
+
+        // Preserve important Bootstrap attributes
+        if (element.hasAttribute('data-bs-dismiss')) {
+            const dismissValue = element.getAttribute('data-bs-dismiss');
+            attributes += ` data-bs-dismiss="${dismissValue}"`;
+        }
+        
+        // Preserve type="button" attribute
+        if (element.hasAttribute('type')) {
+            const typeValue = element.getAttribute('type');
+            attributes += ` type="${typeValue}"`;
+        }
 
         // Set default variant to normal if not specified
         if (!variant || variant === 'default' || variant === '') {

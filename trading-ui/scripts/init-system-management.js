@@ -1672,8 +1672,8 @@ function checkLoadOrder(pageConfig) {
  * Wait for Scripts to be Ready
  */
 async function waitForScriptsReady(requiredScripts) {
-    const maxWaitTime = 5000; // 5 seconds max
-    const checkInterval = 100; // Check every 100ms
+    const maxWaitTime = 10000; // 10 seconds max
+    const checkInterval = 200; // Check every 200ms
     let elapsed = 0;
     
     while (elapsed < maxWaitTime) {

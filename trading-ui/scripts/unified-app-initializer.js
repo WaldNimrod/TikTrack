@@ -1375,7 +1375,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log('🚀 About to call initializeUnifiedApp...');
             await window.initializeUnifiedApp();
             console.log('✅ initializeUnifiedApp completed');
-        }, 1000);
+        }, 8000);
         
     } catch (error) {
         console.error('❌ Unified App auto-initialization failed:', error);

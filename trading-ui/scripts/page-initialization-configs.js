@@ -508,7 +508,8 @@ const PAGE_CONFIGS = {
             'DataUtils',            // from crud package  
             'getCurrentPreference', // from preferences package
             'window.loadCashFlowsData',
-            'window.formatDate'     // from crud package (date-utils.js)
+            'window.formatDate',    // from crud package (date-utils.js)
+            'window.loadDynamicColors' // from base package (color-scheme-system.js)
         ],
         description: 'ניהול תזרימי מזומנים - הכנסות והוצאות',
         lastModified: '2025-10-19',

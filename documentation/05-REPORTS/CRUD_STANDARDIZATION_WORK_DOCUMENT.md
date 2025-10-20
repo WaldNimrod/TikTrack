@@ -6,7 +6,7 @@ This document details the comprehensive standardization work performed across al
 
 **Date**: January 2025  
 **Scope**: 8 main CRUD pages  
-**Items Standardized**: 20 critical items  
+**Items Standardized**: 24 critical items (20 original + 4 enhancements)  
 **Status**: Completed
 
 ## 20 Standardization Items
@@ -166,8 +166,8 @@ This document details the comprehensive standardization work performed across al
 ### 6. Cash Flows (תזרימי מזומן)
 - **Files**: `trading-ui/cash_flows.html` + `trading-ui/scripts/cash_flows.js`
 - **Entity Type**: cash_flow
-- **Status**: ✅ Completed
-- **Key Features**: Cash flow tracking, account linking, external ID support
+- **Status**: ✅ Completed + Enhanced
+- **Key Features**: Cash flow tracking, account linking, external ID support, trade/trade plan linking, enhanced entity details
 
 ### 7. Trade Plans (תכנוני מסחר)
 - **Files**: `trading-ui/trade_plans.html` + `trading-ui/scripts/trade_plans.js`
@@ -254,13 +254,69 @@ function validateCashFlowForm() {
 ## Success Metrics
 
 - ✅ **100% Page Coverage**: All 8 pages standardized
-- ✅ **20/20 Items**: All standardization items implemented
-- ✅ **Zero Duplication**: Local validation functions removed
+- ✅ **24/24 Items**: All standardization items implemented (20 original + 4 enhancements)
+- ✅ **Zero Duplication**: Local validation functions removed + duplicate functions unified
 - ✅ **Global Systems**: Consistent use of global systems
 - ✅ **Button Functionality**: All action buttons properly connected
-- ✅ **Code Quality**: Clean, organized, maintainable code
+- ✅ **Code Quality**: Clean, organized, maintainable code (123 lines saved)
 - ✅ **RTL Support**: Proper Hebrew/RTL interface design
 - ✅ **No Linting Errors**: All files pass linting checks
+- ✅ **Enhanced Features**: Trade/trade plan linking, improved entity details, better UX
+
+## Additional Enhancements (January 2025)
+
+### 21. Enhanced Cash Flow Entity Details System
+- **Description**: Implemented comprehensive entity details rendering for cash flows
+- **Purpose**: Provide detailed view of cash flow information with proper formatting
+- **Implementation**: 
+  - Fixed syntax errors in `entity-details-renderer.js`
+  - Added global function exports in `entity-details-modal.js`
+  - Implemented full `renderCashFlow` function with proper data display
+- **Features**: Symbol in header, ID in details, linked items display, proper formatting
+- **Affected Files**: `entity-details-renderer.js`, `entity-details-modal.js`
+
+### 22. Trade and Trade Plan Linking for Cash Flows
+- **Description**: Added ability to link cash flows to specific trades and trade plans
+- **Purpose**: Enable comprehensive relationship tracking between financial entities
+- **Implementation**:
+  - Added trade and trade plan select fields to both add and edit modals
+  - Implemented proper field mapping (`ticker_symbol`, `opened_at`, `created_at`)
+  - Added alphabetical sorting by ticker symbol for better UX
+- **Features**: Optional linking, alphabetical sorting, proper field mapping
+- **Affected Files**: `cash_flows.html`, `cash_flows.js`
+
+### 23. Code Optimization and Duplicate Function Cleanup
+- **Description**: Unified duplicate functions across cash flow modals
+- **Purpose**: Improve code maintainability and reduce duplication
+- **Implementation**:
+  - Unified `loadAccountsForCashFlow` functions (2 → 1)
+  - Unified `loadCurrenciesForCashFlow` functions (2 → 1)
+  - Unified `loadTradesForCashFlow` functions (2 → 1)
+  - Unified `loadTradePlansForCashFlow` functions (2 → 1)
+- **Results**: Reduced from 8 functions to 4 functions, saved 123 lines of code
+- **Affected Files**: `cash_flows.js`
+
+### 24. Improved Data Display and Formatting
+- **Description**: Enhanced display format for trades and trade plans in select fields
+- **Purpose**: Better user experience with clear, organized information
+- **Implementation**:
+  - Format: `SYMBOL | DATE | SIDE` (e.g., "AAPL | 15/01/2025 | קנייה")
+  - Hebrew date formatting with `toLocaleDateString('he-IL')`
+  - Proper side translation (buy → קנייה, sell → מכירה)
+- **Features**: Consistent formatting, Hebrew localization, alphabetical sorting
+- **Affected Files**: `cash_flows.js`
+
+## Git Commits Summary
+
+### Commit 1: Enhanced cash flows with trade/trade plan linking
+- **Hash**: `dda80afc`
+- **Files**: 4 files changed, 475 insertions(+), 60 deletions(-)
+- **Changes**: Added linking fields, improved entity details, fixed global functions
+
+### Commit 2: Clean up duplicate functions in cash_flows.js
+- **Hash**: `3ba82042`
+- **Files**: 1 file changed, 44 insertions(+), 167 deletions(-)
+- **Changes**: Unified duplicate functions, improved code maintainability
 
 ## Next Steps
 
@@ -272,6 +328,6 @@ function validateCashFlowForm() {
 
 ---
 
-**Document Version**: 1.0  
+**Document Version**: 1.1  
 **Last Updated**: January 2025  
 **Author**: TikTrack Development Team

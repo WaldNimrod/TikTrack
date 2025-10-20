@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Favicon will be set by global-favicon.js -->
+    <title>מנהל מערכת - TikTrack</title>
+    
+    <!-- 
+    ===== IMPORTANT DEVELOPMENT RULES =====
+    
+    CSS RULES:
+    - Only external CSS files are used, following the system's CSS architecture
+    - NO inline styles or styles within the page are allowed in this system
+    - All styling must be defined in external stylesheets according to ITCSS methodology
+    
+    JAVASCRIPT RULES:
+    - All functions are located in external files
+    - NO functions are allowed within the page
+    - All system functions use shared global functions located in dedicated files
+    - Page-specific functions should be centralized only in the page's dedicated script file
+    
+    ======================================
+    -->
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"><link rel="stylesheet" href="styles-new/master.css?v=1.0.0">
+    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS Files - אחרי Bootstrap כדי לדרוס אותו -->
+    <!-- 🔄 MAJOR ARCHITECTURE CHANGE - September 2025: Individual <link> tags instead of @import -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <!-- Header Styles -->
+    
+    
+    <!-- Dynamic Color System Scripts -->
+    <script src="scripts/color-scheme-system.js"></script>
+    
+    <!-- Preferences System Scripts -->
+    
+    <!-- Color Demo Toggle Script -->
+    
+    <!-- Header System Script -->
+    <script src="scripts/header-system.js"></script>
+</head>
+
+<body>
+    <div class="background-wrapper">
+        <!-- Header System -->
+        <div id="unified-header"></div>
+
+        <!-- Page body -->
+        <div class="page-body">
+            <!-- Main content limited in width -->
+            <div class="main-content">
+                <!-- System Management Dashboard - Top Section -->
+                <div class="top-section" data-section="top">
+                    <div class="section-header entity-test-sub-header">
+                        <h2>🔧 מנהל מערכת</h2>
+                        <div class="header-actions">
+                            <button class="btn btn-sm btn-outline-success" id="quickRestartSystemBtn" title="איתחול מהיר של השרת">
+                                <i class="fas fa-redo"></i> איתחול מהיר
+                            </button>
+                            <button class="btn btn-sm btn-outline-warning" id="changeModeSystemBtn" title="שינוי מצב מטמון">
+                                <i class="fas fa-cogs"></i> מצב מטמון
+                            </button>
+                            <button class="btn btn-sm btn-outline-info" id="openServerMonitorBtn" title="פתח דשבורד ניטור שרת">
+                                <i class="fas fa-desktop"></i> ניטור שרת
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary" id="refreshSystemDataBtn" title="רענן נתוני מערכת">
+                                <i class="fas fa-sync-alt"></i> רענן
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
+                                <i class="fas fa-copy"></i> העתק לוג
+                            </button>
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleAllSections()" data-text="הצג/הסתר" title="הצג/הסתר כל הסקשנים"></button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- סקשן סטטיסטיקות מערכת מרוכז -->
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-chart-line text-primary"></i> סטטיסטיקות מערכת
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- סטטיסטיקות מערכת מהירות -->
+                                        <div class="row">
+                                            <div class="col-md-2">
+                                                <div class="text-center">
+                                                    <div class="h5 mb-1">🏥 בריאות</div>
+                                                    <span id="overallHealthStatus" class="badge bg-warning fs-6">טוען...</span>
+                                            </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="text-center">
+                                                    <div class="h5 mb-1">📊 ציון</div>
+                                                    <span id="systemScore" class="badge bg-info fs-6">טוען...</span>
+                                            </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="text-center">
+                                                    <div class="h5 mb-1">⏱️ תגובה</div>
+                                                    <span id="responseTime" class="badge bg-success fs-6">טוען...</span>
+                                            </div>
+                                        </div>
+                                            <div class="col-md-2">
+                                                <div class="text-center">
+                                                    <div class="h5 mb-1">🔄 פעילות</div>
+                                                    <span id="uptime" class="badge bg-primary fs-6">טוען...</span>
+                                    </div>
+                                </div>
+                                            <div class="col-md-2">
+                                                <div class="text-center">
+                                                    <div class="h5 mb-1">💾 זיכרון</div>
+                                                    <span id="systemMemory" class="badge bg-secondary fs-6">טוען...</span>
+                            </div>
+                        </div>
+                                            <div class="col-md-2">
+                                                <div class="text-center">
+                                                    <div class="h5 mb-1">🗄️ מטמון</div>
+                                                    <span id="systemCacheMode" class="badge bg-primary fs-6">טוען...</span>
+                    </div>
+                </div>
+                        </div>
+                        
+                                        <!-- סטטיסטיקות נוספות -->
+                        <div class="row mt-3">
+                                            <div class="col-md-3">
+                                                <div class="text-center">
+                                                    <div class="h6 mb-1">🌐 שרת</div>
+                                                    <span id="serverHealthStats" class="badge bg-success">פעיל</span>
+                    </div>
+                        </div>
+                                            <div class="col-md-3">
+                                                <div class="text-center">
+                                                    <div class="h6 mb-1">🗃️ בסיס נתונים</div>
+                                                    <span id="databaseHealthStats" class="badge bg-success">מחובר</span>
+                    </div>
+                </div>
+                                            <div class="col-md-3">
+                                                <div class="text-center">
+                                                    <div class="h6 mb-1">🔗 רשת</div>
+                                                    <span id="networkHealthStats" class="badge bg-success">יציב</span>
+                        </div>
+                    </div>
+                                            <div class="col-md-3">
+                                                <div class="text-center">
+                                                    <div class="h6 mb-1">📋 גרסה</div>
+                                                    <span class="badge bg-secondary">2.0.5</span>
+                            </div>
+                            </div>
+                            </div>
+                            </div>
+                        </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <!-- UI Content Section Cursor Tasks End-->
+
+
+                        <!-- כל הסקשנים הנוספים הוסרו - נשאר רק סקשן הסטטיסטיקות -->
+
+            </div>
+        </main>
+
+    <!-- Core System Scripts -->
+    <!-- 🔄 NEW UNIFIED INITIALIZATION SYSTEM -->
+    
+    <!-- System Management Scripts - Loaded via Unified System -->
+    
+    <!-- Core Systems -->
+    <script src="scripts/global-favicon.js"></script>
+    <script src="scripts/translation-utils.js"></script>
+    <script src="scripts/ui-utils.js"></script>
+                            <div class="summary-item">
+                                <span class="summary-label">ℹ️ מידע:</span>
+                                <span class="summary-value" id="infoCount">0</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">✅ סך הכל:</span>
+                                <span class="summary-value" id="totalAlerts">0</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Active Alerts -->
+                        <div class="active-alerts-container">
+                            <h4>התראות פעילות</h4>
+                            <div class="alerts-list" id="alerts-list">
+                                <!-- התראות יטענו אוטומטית מהמערכת הגלובלית -->
+                                <active-alerts></active-alerts>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <small class="text-muted">
+                                    💡 לניהול מתקדם של התראות, השתמש בעמוד 
+                                    <a href="notifications-center.html" class="text-primary">מרכז התראות</a>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 4 End--> 
+
+                <!-- UI Content Section 5 Start-->
+                <!-- Section 4: External Data - DISABLED FOR SIMPLIFICATION -->
+                <!-- <div class="content-section" id="sm-external-data">
+                    <div class="section-header entity-test-sub-header">
+                        <h2>🔒 אבטחה</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div> -->
+                    <div class="section-body">
+                        <!-- אבטחה - Info Summary -->
+                        <div class="info-summary security-overview" id="securitySummary">
+                            <div class="summary-item">
+                                <span class="summary-label">🛡️ סטטוס אבטחה:</span>
+                                <span class="summary-value" id="securityStatus">טוען...</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">🔐 הצפנה:</span>
+                                <span class="summary-value" id="encryptionStatus">טוען...</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">👤 משתמשים פעילים:</span>
+                                <span class="summary-value" id="activeUsers">טוען...</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">🚨 התראות אבטחה:</span>
+                                <span class="summary-value" id="securityAlerts">טוען...</span>
+                            </div>
+                        </div>
+                        
+                        <!-- תוכן בשתי עמודות -->
+                        <div class="row">
+                            <!-- עמודה שמאלית - ניטור איומים -->
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3>🛡️ ניטור איומים</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="status-card">
+                                            <div class="card-header">
+                                                <h3>ניטור איומים</h3>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="security-status safe">מערכת מאובטחת</div>
+                                                <div class="security-details">סריקה אחרונה: לפני 5 דקות</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- עמודה ימנית - בקרת גישה -->
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3>👤 בקרת גישה</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="status-card">
+                                            <div class="card-header">
+                                                <h3>בקרת גישה</h3>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="security-status safe">פעיל</div>
+                                                <div class="security-details">משתמשים מחוברים: 1</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 5 End--> 
+
+                <!-- UI Content Section 6 Start-->
+                <!-- Section 5: Database - DISABLED FOR SIMPLIFICATION -->
+                <!-- <div class="content-section" id="sm-database">
+                    <div class="section-header entity-test-sub-header">
+                        <h2>📋 לוגים וניטור</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section5')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div> -->
+                    <div class="section-body">
+                        <!-- פילטרים לכל הרוחב -->
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h3>🔍 פילטרים וממשק ניהול</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="logs-section">
+                                    <div class="log-filters">
+                                        <select id="log-level-filter" class="form-select">
+                                            <option value="all">כל הרמות</option>
+                                            <option value="info">מידע</option>
+                                            <option value="warning">אזהרה</option>
+                                            <option value="error">שגיאה</option>
+                                        </select>
+                                        <input type="text" id="log-search" class="form-control" placeholder="חיפוש בלוגים...">
+                                        <button class="btn btn-outline-primary refresh-btn" title="רענן נתונים">🔄 רענן</button>
+                                        <button data-button-type="COPY" data-variant="full" data-onclick="copyDetailedLog()" data-text="העתק לוג מפורט" title="העתק לוג מפורט"></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- תוכן לוגים לכל הרוחב -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>📄 תוכן לוגים</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="log-content" id="log-content">
+                                    <div class="log-entry log-info">
+                                        <div class="log-timestamp">טוען...</div>
+                                        <div class="log-level">INFO</div>
+                                        <div class="log-message">טוען נתוני מערכת...</div>
+                                    </div>
+                                </div>
+                                <div class="log-actions mt-3">
+                                    <small class="text-muted">
+                                        💡 הלוג כולל מידע מפורט על מצב המערכת, ביצועים והתראות
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 6 End--> 
+
+                <!-- UI Content Section 7 Start-->
+                <!-- Section 6: Alerts - DISABLED FOR SIMPLIFICATION -->
+                <!-- <div class="content-section" id="sm-alerts">
+                    <div class="section-header entity-test-sub-header">
+                        <h2>💾 גיבויים ושחזור</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section6')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div> -->
+                    <div class="section-body">
+                        <!-- תוכן בשתי עמודות -->
+                        <div class="row">
+                            <!-- עמודה שמאלית - גיבויים אוטומטיים -->
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3>🔄 גיבויים אוטומטיים</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="status-card">
+                                            <div class="card-header">
+                                                <h3>גיבויים אוטומטיים</h3>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="backup-info">
+                                                    <div class="backup-schedule">
+                                                        <strong>📅 לוח זמנים:</strong> גיבוי יומי בשעה 02:00
+                                                    </div>
+                                                    <div class="backup-location">
+                                                        <strong>📁 מיקום:</strong> /backups/system_backup_YYYY-MM-DD.sql
+                                                    </div>
+                                                    <div class="backup-size">
+                                                        <strong>📊 גודל:</strong> <span id="lastBackupSize">טוען...</span>
+                                                    </div>
+                                                    <div class="backup-last">
+                                                        <strong>🕐 אחרון:</strong> <span id="lastBackupDate">טוען...</span>
+                                                    </div>
+                                                    <div class="backup-status">
+                                                        <strong>✅ סטטוס:</strong> <span id="backupStatus">בודק...</span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="backup-contents">
+                                                    <strong>📋 מה כולל הגיבוי:</strong>
+                                                    <ul class="backup-list">
+                                                        <li>🗄️ בסיס נתונים מלא (SQLite)</li>
+                                                        <li>📊 כל הטבלאות והנתונים</li>
+                                                        <li>⚙️ הגדרות מערכת</li>
+                                                        <li>🔧 קונפיגורציות</li>
+                                                        <li>📝 לוגים מערכת</li>
+                                                        <li>🎨 קבצי CSS ו-JS</li>
+                                                    </ul>
+                                                    <div class="backup-info mt-2">
+                                                        <small class="text-muted">
+                                                            🔒 הגיבוי מוצפן ומאובטח - ניתן לשחזר בכל עת
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                                <button class="btn btn-primary" onclick="runBackup()">הפעל גיבוי עכשיו</button>
+                                        <button data-button-type="COPY" data-variant="full" data-onclick="copyDetailedLog()" data-text="העתק לוג מפורט" title="העתק לוג מפורט"></button>
+                                        <div class="backup-status mt-3">
+                                            <small class="text-muted">
+                                                💡 <strong>טיפ:</strong> הגיבוי כולל את כל הנתונים, הגדרות ולוגים של המערכת
+                                            </small>
+                                        </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- עמודה ימנית - שחזור מערכת -->
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3>🔄 שחזור מערכת</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="status-card">
+                                            <div class="card-header">
+                                                <h3>שחזור מערכת</h3>
+                                            </div>
+                                            <div class="card-body">
+                                                <p>שחזור מגיבוי אחרון</p>
+                                                <button class="btn btn-warning" onclick="restoreFromBackup()">שחזר מערכת</button>
+                                                <div class="restore-warning mt-3">
+                                                    <small class="text-warning">
+                                                        ⚠️ <strong>אזהרה:</strong> שחזור ימחק את כל הנתונים הנוכחיים
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 7 End--> 
+
+                <!-- UI Content Section 7 Start - Initialization System Monitoring -->
+                <!-- Section 7: Background Tasks - DISABLED FOR SIMPLIFICATION -->
+                <!-- <div class="content-section" id="sm-background-tasks">
+                    <div class="section-header entity-test-sub-header">
+                        <h2>🚀 מערכת אתחול חכמה - ניטור ופיתוח</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section7')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div> -->
+                    <div class="section-body">
+                        <!-- Initialization System Status -->
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <div class="summary-card">
+                                    <div class="summary-label">סטטוס כללי</div>
+                                    <div class="summary-value text-success" id="initSystemStatus">פעיל</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="summary-card">
+                                    <div class="summary-label">חבילות נטענו</div>
+                                    <div class="summary-value text-info" id="loadedPackagesCount">0</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="summary-card">
+                                    <div class="summary-label">זמן אתחול</div>
+                                    <div class="summary-value text-warning" id="initTimeMs">0ms</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="summary-card">
+                                    <div class="summary-label">שלב נוכחי</div>
+                                    <div class="summary-value text-primary" id="currentPhase">-</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Testing System Status -->
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <div class="summary-card">
+                                    <div class="summary-label">מערכת בדיקות</div>
+                                    <div class="summary-value text-success" id="testingSystemStatus">פעיל</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="summary-card">
+                                    <div class="summary-label">תוצאות בדיקות</div>
+                                    <div class="summary-value text-warning" id="testResultsCount">0/0</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="summary-card">
+                                    <div class="summary-label">כיסוי בדיקות</div>
+                                    <div class="summary-value text-success" id="testCoveragePercent">0%</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="summary-card">
+                                    <div class="summary-label">בדיקה אחרונה</div>
+                                    <div class="summary-value text-info" id="lastTestRunTime">-</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-primary" onclick="runComprehensiveTesting()">
+                                        <i class="fas fa-play"></i> הרץ בדיקות מקיפות
+                                    </button>
+                                    <button type="button" class="btn btn-info" onclick="validateTestingSystem()">
+                                        <i class="fas fa-check-circle"></i> ולידציה
+                                    </button>
+                                    <button type="button" class="btn btn-success" onclick="refreshInitializationData()">
+                                        <i class="fas fa-sync"></i> רענן נתונים
+                                    </button>
+                                    <button type="button" class="btn btn-warning" onclick="updateTestingSystemStatus()">
+                                        <i class="fas fa-chart-line"></i> עדכן סטטוס
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Performance Metrics -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <h5>📈 מדדי ביצועים</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>מדד</th>
+                                                <th>ערך נוכחי</th>
+                                                <th>ממוצע</th>
+                                                <th>מינימום</th>
+                                                <th>מקסימום</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="performanceMetricsTable">
+                                            <tr>
+                                                <td>זמן טעינת סקריפטים</td>
+                                                <td id="scriptLoadTime">-</td>
+                                                <td id="scriptLoadAvg">-</td>
+                                                <td id="scriptLoadMin">-</td>
+                                                <td id="scriptLoadMax">-</td>
+                                            </tr>
+                                            <tr>
+                                                <td>זמן אתחול מערכות</td>
+                                                <td id="systemInitTime">-</td>
+                                                <td id="systemInitAvg">-</td>
+                                                <td id="systemInitMin">-</td>
+                                                <td id="systemInitMax">-</td>
+                                            </tr>
+                                            <tr>
+                                                <td>זמן טעינת קאש</td>
+                                                <td id="cacheLoadTime">-</td>
+                                                <td id="cacheLoadAvg">-</td>
+                                                <td id="cacheLoadMin">-</td>
+                                                <td id="cacheLoadMax">-</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- System Components Status -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <h5>🔧 סטטוס רכיבי מערכת</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>רכיב</th>
+                                                <th>סטטוס</th>
+                                                <th>גרסה</th>
+                                                <th>זמן טעינה</th>
+                                                <th>תלויות</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="systemComponentsTable">
+                                            <!-- Will be populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 7 End - Initialization System Monitoring -->
+
+                <!-- UI Content Section 8 Start - Unified Log System -->
+                <!-- Section 8: Operations - DISABLED FOR SIMPLIFICATION -->
+                <!-- <div class="content-section" id="sm-operations">
+                    <div class="section-header entity-test-sub-header">
+                        <h2>📊 מערכת לוגים מאוחדת</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section8')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div> -->
+                    <div class="section-body">
+                        <!-- Log Type Selection -->
+                        <div class="log-type-selection mb-3">
+                            <div class="btn-group" role="group" aria-label="בחירת סוג לוג">
+                                <button type="button" class="btn btn-outline-primary" onclick="showNotificationLog()">
+                                    <i class="fas fa-bell"></i> התראות
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="showSystemLogs()">
+                                    <i class="fas fa-cog"></i> מערכת
+                                </button>
+                                <button type="button" class="btn btn-outline-danger" onclick="showErrorReports()">
+                                    <i class="fas fa-exclamation-triangle"></i> שגיאות
+                                </button>
+                                <button type="button" class="btn btn-outline-info" onclick="showLinterLog()">
+                                    <i class="fas fa-code"></i> Linter
+                                </button>
+                                <button type="button" class="btn btn-outline-success" onclick="showFileMappings()">
+                                    <i class="fas fa-folder"></i> קבצים
+                                </button>
+                                <button type="button" class="btn btn-outline-info" onclick="showExternalDataLog()">
+                                    <i class="fas fa-globe"></i> נתונים חיצוניים
+                                </button>
+                                <button type="button" class="btn btn-outline-warning" onclick="showServerAppLogs()">
+                                    <i class="fas fa-server"></i> לוג שרת - אפליקציה
+                                </button>
+                                <button type="button" class="btn btn-outline-danger" onclick="showServerErrorLogs()">
+                                    <i class="fas fa-exclamation-triangle"></i> לוג שרת - שגיאות
+                                </button>
+                                <button type="button" class="btn btn-outline-warning" onclick="showServerPerformanceLogs()">
+                                    <i class="fas fa-tachometer-alt"></i> לוג שרת - ביצועים
+                                </button>
+                                <button type="button" class="btn btn-outline-info" onclick="showServerDatabaseLogs()">
+                                    <i class="fas fa-database"></i> לוג שרת - בסיס נתונים
+                                </button>
+                                <button type="button" class="btn btn-outline-success" onclick="showBackgroundTasksFileLog()">
+                                    <i class="fas fa-tasks"></i> לוג שרת - משימות ברקע
+                                </button>
+                                <button type="button" class="btn btn-outline-success" onclick="showCacheLog()">
+                                    <i class="fas fa-memory"></i> לוג מטמון
+                                </button>
+                            </div>
+                            
+                            <!-- Test All Log Types Button -->
+                            <div class="mt-3">
+                                <button type="button" class="btn btn-primary" onclick="testAllLogTypes()">
+                                    <i class="fas fa-vial"></i> בדוק את כל סוגי הלוגים
+                                </button>
+                                <small class="text-muted ms-2">
+                                    <i class="fas fa-info-circle"></i>
+                                    בדיקה מקיפה של כל סוגי הנתונים במערכת
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Unified Log Display Container -->
+                        <div id="unified-logs-container" style="min-height: 400px;">
+                            <div class="d-flex justify-content-center align-items-center h-100">
+                                <div class="text-center">
+                                    <i class="fas fa-mouse-pointer fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted">לחץ על אחד מהכפתורים למעלה כדי להציג לוג במערכת החדשה</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 8 End - Unified Log System -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Core System Scripts -->
+    <!-- 🔄 NEW UNIFIED INITIALIZATION SYSTEM -->
+    
+    <!-- System Management Scripts - Loaded via Unified System -->
+    
+    <!-- Core Systems -->
+    <script src="scripts/global-favicon.js"></script>
+    <script src="scripts/translation-utils.js"></script>
+    <script src="scripts/ui-utils.js"></script>
+    <script src="scripts/button-icons.js"></script>
+    <script src="scripts/button-system-init.js?v=1.0.0"></script>
+    <script src="scripts/data-utils.js"></script>
+    <script src="scripts/notification-system.js"></script>
+    <script src="scripts/cache-sync-manager.js"></script>
+    <!-- System Management Package Scripts - ONLY BASIC FOR DASHBOARD -->
+    <script src="scripts/system-management.js"></script>
+    
+    <!-- Test Runner for Smart Initialization System -->
+    <script src="scripts/test-runner.js?v=1.0.0"></script>
+    <script src="scripts/notification-category-detector.js"></script>
+    <script src="scripts/global-notification-collector.js"></script>
+    <script src="scripts/tables.js"></script>
+    <script src="scripts/modules/actions-menu-system.js?v=1.0.0"></script>
+    <script src="scripts/page-utils.js"></script>
+    
+    <!-- Unified Log System -->
+    <!-- Socket.IO for Real-time Notifications -->
+    <script>
+        // Disable WebSocket notifications for system management page
+        window.disableWebSocketNotifications = true;
+    </script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="scripts/realtime-notifications-client.js"></script>
+    
+    <!-- Unified Cache System for Background Tasks Logs -->
+    <script src="scripts/unified-cache-manager.js"></script>
+    
+    <script src="scripts/pagination-system.js"></script>
+    <script src="scripts/unified-log-manager.js"></script>
+    <script src="scripts/unified-log-display.js"></script>
+    <script src="scripts/unified-log-api.js"></script>
+    
+    <!-- New Unified Initialization System -->
+    <script src="scripts/init-system/package-manifest.js"></script>
+    <script src="scripts/page-initialization-configs.js"></script>
+    <script src="scripts/unified-app-initializer.js"></script>
+    
+    <!-- Smart Initialization System Components - Removed missing scripts -->
+
+    <!-- 🔓 TEMPLATE ZONE 6 - Page-Specific Scripts (ADD NEW SCRIPTS HERE) -->
+    <!-- No manual DOMContentLoaded listener needed - handled by unified system -->
+    
+    <!-- Local copyDetailedLog function for system-management page -->
+    <script>
+        // Define copyDetailedLog function first
+        async function copyDetailedLog() {
+            try {
+                const timestamp = new Date().toLocaleString('he-IL');
+                const log = [];
+
+                log.push('=== לוג מפורט - ניהול מערכת ===');
+                log.push(`זמן יצירה: ${timestamp}`);
+                log.push(`עמוד: ${window.location.href}`);
+                log.push('');
+
+                // 1. מצב כללי של העמוד
+                log.push('--- מצב כללי של העמוד ---');
+                const sections = document.querySelectorAll('.content-section');
+                sections.forEach((section, index) => {
+                    const header = section.querySelector('.section-header h2');
+                    const body = section.querySelector('.section-body, .card-body');
+                    const isOpen = body && body.style.display !== 'none' && !section.classList.contains('collapsed');
+                    const title = header ? header.textContent.trim() : `סקשן ${index + 1}`;
+                    log.push(`  ${index + 1}. "${title}" (${section.id}): ${isOpen ? 'פתוח' : 'סגור'}`);
+                });
+
+                // 2. סטטיסטיקות מערכת
+                log.push('');
+                log.push('--- סטטיסטיקות מערכת ---');
+                const systemStats = [
+                    'overallHealthStatus', 'systemScore', 'responseTime', 'uptime',
+                    'serverHealthStats', 'databaseHealthStats', 'cacheHealthStats', 'networkHealthStats',
+                    'cpuUsage', 'memoryUsage', 'diskUsage', 'networkStatus',
+                    'activeProvidersCount', 'lastDataUpdate', 'dataAccuracy', 'cacheStatus',
+                    'errorCount', 'warningCount', 'infoCount', 'totalAlerts'
+                ];
+                
+                systemStats.forEach(statId => {
+                    const element = document.getElementById(statId);
+                    if (element) {
+                        const value = element.textContent.trim();
+                        const visible = element.offsetParent !== null ? 'נראה' : 'לא נראה';
+                        log.push(`  ${statId}: ${value} (${visible})`);
+                    }
+                });
+
+                // 3. כפתורים וקונטרולים
+                log.push('');
+                log.push('--- כפתורים וקונטרולים ---');
+                const buttonIds = [
+                    'refreshSystemDataBtn', 'runSystemCheckBtn', 'clearCacheBtn', 'runBackupBtn',
+                    'restoreFromBackupBtn', 'checkDependenciesBtn', 'copyCheckResultsBtn',
+                    'copyDetailedLogBtn', 'toggleAllSectionsBtn', 'quickRestartSystemBtn',
+                    'changeModeSystemBtn', 'openServerMonitorBtn'
+                ];
+                
+                buttonIds.forEach(btnId => {
+                    const btn = document.getElementById(btnId);
+                    if (btn) {
+                        const visible = btn.offsetParent !== null ? 'נראה' : 'לא נראה';
+                        const disabled = btn.disabled ? 'מבוטל' : 'פעיל';
+                        const text = btn.textContent.trim() || btn.value || 'ללא טקסט';
+                        log.push(`  ${btnId}: ${visible} - ${disabled} - "${text}"`);
+                    }
+                });
+
+                // 4. תוצאות בדיקות מערכת
+                log.push('');
+                log.push('--- תוצאות בדיקות מערכת ---');
+                const checkResults = document.querySelectorAll('.check-result, .system-check-item, .health-check-item');
+                log.push(`  מספר בדיקות: ${checkResults.length}`);
+                checkResults.forEach((result, index) => {
+                    const status = result.querySelector('.status, .badge, .status-value')?.textContent.trim() || 'לא ידוע';
+                    const description = result.querySelector('.description, .text, .check-name')?.textContent.trim() || 'ללא תיאור';
+                    log.push(`    ${index + 1}. ${status}: ${description}`);
+                });
+
+                // 5. רשימת ספקים
+                log.push('');
+                log.push('--- רשימת ספקים ---');
+                const providerList = document.getElementById('providerList');
+                if (providerList) {
+                    const providers = providerList.querySelectorAll('.provider-item, .provider-card');
+                    log.push(`  מספר ספקים: ${providers.length}`);
+                    providers.forEach((provider, index) => {
+                        const name = provider.querySelector('.provider-name, .card-title')?.textContent.trim() || 'ללא שם';
+                        const status = provider.querySelector('.provider-status, .badge')?.textContent.trim() || 'לא ידוע';
+                        log.push(`    ${index + 1}. ${name}: ${status}`);
+                    });
+                }
+
+                // 6. מידע טכני
+                log.push('');
+                log.push('--- מידע טכני ---');
+                log.push(`  זמן יצירת הלוג: ${timestamp}`);
+                log.push(`  גרסת דפדפן: ${navigator.userAgent}`);
+                log.push(`  רזולוציה מסך: ${screen.width}x${screen.height}`);
+                log.push(`  גודל חלון: ${window.innerWidth}x${window.innerHeight}`);
+                
+                if (performance.timing) {
+                    const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+                    log.push(`  זמן טעינת עמוד: ${loadTime}ms`);
+                }
+                
+                if (navigator.deviceMemory) {
+                    log.push(`  זיכרון זמין: ${navigator.deviceMemory}GB`);
+                }
+                
+                log.push(`  שפת דפדפן: ${navigator.language}`);
+                log.push(`  פלטפורמה: ${navigator.platform}`);
+
+                // 7. מידע על המערכת המאוחדת
+                log.push('');
+                log.push('--- מערכת אתחול מאוחדת ---');
+                log.push(`  UnifiedAppInitializer: ${typeof window.UnifiedAppInitializer !== 'undefined' ? 'זמין' : 'לא זמין'}`);
+                log.push(`  UnifiedCacheManager: ${typeof window.UnifiedCacheManager !== 'undefined' ? 'זמין' : 'לא זמין'}`);
+                log.push(`  UnifiedLogManager: ${typeof window.UnifiedLogManager !== 'undefined' ? 'זמין' : 'לא זמין'}`);
+                log.push(`  SystemManagement: ${typeof window.SystemManagement !== 'undefined' ? 'זמין' : 'לא זמין'}`);
+
+                // 8. שגיאות והערות מהקונסולה
+                log.push('');
+                log.push('--- שגיאות והערות מהקונסולה ---');
+                log.push('  ⚠️ חשוב: הלוג המפורט חייב לכלול שגיאות קונסולה לאבחון בעיות');
+                log.push('  📋 הוראות: פתח את Developer Tools (F12) > Console');
+                log.push('  📋 העתק את כל השגיאות וההערות מהקונסולה');
+                log.push('  📋 הוסף אותן ללוג המפורט לפני שליחה');
+
+                log.push('');
+                log.push('=== סוף לוג ===');
+                
+                const detailedLogText = log.join('\n');
+                
+                // Copy to clipboard
+                await navigator.clipboard.writeText(detailedLogText);
+                
+                // Show success notification
+                if (typeof window.showSuccessNotification === 'function') {
+                    window.showSuccessNotification('לוג מפורט הועתק ללוח', 'הלוג מכיל את כל מה שרואה המשתמש בעמוד');
+                } else if (typeof window.showNotification === 'function') {
+                    window.showNotification('לוג מפורט הועתק ללוח', 'success');
+                } else {
+                    alert('לוג מפורט הועתק ללוח!');
+                }
+            } catch (error) {
+                console.error('שגיאה בהעתקת הלוג המפורט:', error);
+                if (typeof window.showErrorNotification === 'function') {
+                    window.showErrorNotification('שגיאה בהעתקת הלוג', error.message);
+                } else {
+                    alert('שגיאה בהעתקת הלוג: ' + error.message);
+                }
+            }
+        }
+        
+        // Make the local copyDetailedLog function available globally for this page only
+        window.copyDetailedLog = copyDetailedLog;
+        
+        // Unified Log System Functions
+        window.showNotificationLog = function() {
+            window.UnifiedLogAPI.showLog('notificationHistory', 'unified-logs-container', {
+                displayConfig: 'default',
+                autoRefresh: true,
+                refreshInterval: 10000
+            });
+        };
+        
+        window.showSystemLogs = function() {
+            window.UnifiedLogAPI.showLog('systemLogs', 'unified-logs-container', {
+                displayConfig: 'default',
+                autoRefresh: true,
+                refreshInterval: 10000
+            });
+        };
+        
+        window.showErrorReports = function() {
+            window.UnifiedLogAPI.showLog('errorReports', 'unified-logs-container', {
+                displayConfig: 'default',
+                autoRefresh: true,
+                refreshInterval: 10000
+            });
+        };
+        
+        window.showLinterLog = function() {
+            window.UnifiedLogAPI.showLog('linterHistory', 'unified-logs-container', {
+                displayConfig: 'default',
+                autoRefresh: true,
+                refreshInterval: 10000
+            });
+        };
+        
+        window.showFileMappings = function() {
+            window.UnifiedLogAPI.showLog('fileMappings', 'unified-logs-container', {
+                displayConfig: 'default',
+                autoRefresh: true,
+                refreshInterval: 10000
+            });
+        };
+        
+        window.showExternalDataLog = function() {
+            window.UnifiedLogAPI.showLog('externalDataLog', 'unified-logs-container', {
+                displayConfig: 'default',
+                autoRefresh: true,
+                refreshInterval: 10000
+            });
+        };
+        
+        // Server Log Functions
+        window.showServerAppLogs = function() {
+            window.UnifiedLogAPI.showLog('serverAppLogs', 'unified-logs-container', {
+                displayConfig: 'default',
+                autoRefresh: true,
+                refreshInterval: 10000
+            });
+        };
+        
+        window.showServerErrorLogs = function() {
+            window.UnifiedLogAPI.showLog('serverErrorLogs', 'unified-logs-container', {
+                displayConfig: 'default',
+                autoRefresh: true,
+                refreshInterval: 10000
+            });
+        };
+        
+        window.showServerPerformanceLogs = function() {
+            window.UnifiedLogAPI.showLog('serverPerformanceLogs', 'unified-logs-container', {
+                displayConfig: 'default',
+                autoRefresh: true,
+                refreshInterval: 10000
+            });
+        };
+        
+        window.showServerDatabaseLogs = function() {
+            window.UnifiedLogAPI.showLog('serverDatabaseLogs', 'unified-logs-container', {
+                displayConfig: 'default',
+                autoRefresh: true,
+                refreshInterval: 10000
+            });
+        };
+        
+        window.showBackgroundTasksFileLog = function() {
+            window.UnifiedLogAPI.showLog('backgroundTasksFileLog', 'unified-logs-container', {
+                displayConfig: 'default',
+                autoRefresh: true,
+                refreshInterval: 10000
+            });
+        };
+        
+        
+        // Test all log types function
+        window.testAllLogTypes = async function() {
+            console.log('🧪 Testing all log types in system-management...');
+            try {
+                const results = await window.UnifiedLogManager.testAllLogTypes();
+                
+                // Show results in a modal
+                const modalHtml = `
+                    <div id="log-test-modal" class="modal fade show" style="display: block; background-color: rgba(0,0,0,0.5);" tabindex="-1">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">
+                                        <i class="fas fa-vial text-primary me-2"></i>
+                                        תוצאות בדיקת כל סוגי הלוגים
+                                    </h5>
+                                    <button data-button-type="CLOSE" data-size="large" data-variant="small" data-onclick="document.getElementById('log-test-modal').remove()" data-text="" title="סגור מודל" aria-label="סגור"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row mb-3">
+                                        <div class="col-md-3">
+                                            <div class="card bg-success text-white">
+                                                <div class="card-body text-center">
+                                                    <h4>${results.summary.successful}</h4>
+                                                    <small>הצליחו</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="card bg-danger text-white">
+                                                <div class="card-body text-center">
+                                                    <h4>${results.summary.failed}</h4>
+                                                    <small>נכשלו</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="card bg-info text-white">
+                                                <div class="card-body text-center">
+                                                    <h4>${results.summary.total}</h4>
+                                                    <small>סה"כ סוגים</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="card bg-warning text-white">
+                                                <div class="card-body text-center">
+                                                    <h4>${results.summary.totalRecords}</h4>
+                                                    <small>סה"כ רשומות</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>סוג לוג</th>
+                                                    <th>סטטוס</th>
+                                                    <th>כמות רשומות</th>
+                                                    <th>פרטים</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                ${Object.entries(results.results).map(([logType, result]) => `
+                                                    <tr class="${result.success ? 'table-success' : 'table-danger'}">
+                                                        <td>
+                                                            <i class="fas ${result.logConfig?.icon || 'fa-file'} me-2"></i>
+                                                            ${result.logConfig?.name || logType}
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge ${result.success ? 'bg-success' : 'bg-danger'}">
+                                                                ${result.success ? 'הצליח' : 'נכשל'}
+                                                            </span>
+                                                        </td>
+                                                        <td>${result.count}</td>
+                                                        <td>
+                                                            ${result.success ? 
+                                                                (result.data && result.data.length > 0 ? 
+                                                                    `<small class="text-muted">דוגמה: ${JSON.stringify(result.data[0]).substring(0, 100)}...</small>` : 
+                                                                    '<small class="text-muted">אין נתונים</small>'
+                                                                ) : 
+                                                                `<small class="text-danger">${result.error}</small>`
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                `).join('')}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('log-test-modal').remove()">
+                                        <i class="fas fa-times me-2"></i>
+                                        סגור
+                                    </button>
+                                    <button type="button" class="btn btn-primary" onclick="window.testAllLogTypes(); document.getElementById('log-test-modal').remove();">
+                                        <i class="fas fa-sync-alt me-2"></i>
+                                        רענן בדיקה
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                
+                return results;
+            } catch (error) {
+                console.error('❌ Error testing log types:', error);
+                alert('שגיאה בבדיקת סוגי הלוגים: ' + error.message);
+            }
+        };
+        
+        // Initialize background task log listener using polling instead of WebSocket
+        let backgroundTaskLogListenerInitialized = false;
+        let backgroundTaskPollingInterval = null;
+        
+        function initializeBackgroundTaskLogListener() {
+            if (backgroundTaskLogListenerInitialized) {
+                console.log('⚠️ Background task log listener already initialized, skipping');
+                return;
+            }
+            backgroundTaskLogListenerInitialized = true;
+            
+            try {
+                console.log('🔧 Initializing background task log listener using polling...');
+                
+                // Use polling instead of WebSocket for background task updates
+                if (backgroundTaskPollingInterval) {
+                    clearInterval(backgroundTaskPollingInterval);
+                }
+                
+                // Poll for background task updates every 30 seconds
+                backgroundTaskPollingInterval = setInterval(async () => {
+                    try {
+                        // Check for new background task logs via API
+                        const response = await fetch('/api/background-tasks/recent-logs?limit=10');
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.logs && data.logs.length > 0) {
+                                console.log('📊 Found new background task logs:', data.logs.length);
+                                
+                                // Process new logs
+                                for (const log of data.logs) {
+                            if (window.saveBackgroundTaskLog) {
+                                        await window.saveBackgroundTaskLog(log.task_name, {
+                                            status: log.status,
+                                            duration_ms: log.duration_ms,
+                                            result: log.result,
+                                            error: log.error,
+                                            user_id: log.user_id
+                                        });
+                                    }
+                                }
+                            }
+                            }
+                        } catch (error) {
+                        console.warn('⚠️ Failed to poll for background task logs:', error);
+                        }
+                }, 30000); // Poll every 30 seconds
+                    
+                console.log('✅ Background task log listener initialized with polling');
+            } catch (error) {
+                console.error('❌ Failed to initialize background task log listener:', error);
+            }
+        }
+        
+        // Load existing logs from API to IndexedDB
+        let existingLogsLoaded = false;
+        async function loadExistingLogsToIndexedDB() {
+            if (existingLogsLoaded) {
+                console.log('⚠️ Existing logs already loaded, skipping');
+                return;
+            }
+            existingLogsLoaded = true;
+            try {
+                console.log('🔄 Loading existing background task logs from API to IndexedDB...');
+                console.log('🔍 UnifiedCacheManager available:', !!window.UnifiedCacheManager);
+                console.log('🔍 UnifiedCacheManager initialized:', window.UnifiedCacheManager?.initialized);
+                console.log('🔍 saveBackgroundTaskLog available:', !!window.saveBackgroundTaskLog);
+                
+                // Check if we can access IndexedDB directly
+                if (window.UnifiedCacheManager && window.UnifiedCacheManager.layers && window.UnifiedCacheManager.layers.indexedDB) {
+                    console.log('🔍 IndexedDB layer available:', !!window.UnifiedCacheManager.layers.indexedDB);
+                    console.log('🔍 IndexedDB db available:', !!window.UnifiedCacheManager.layers.indexedDB.db);
+                }
+                
+                const response = await fetch('/api/background-tasks/history?hours=24');
+                if (response.ok) {
+                    const result = await response.json();
+                    const logs = result.history || [];
+                    
+                    console.log(`📊 Found ${logs.length} existing logs to save to IndexedDB`);
+                    console.log('📊 Logs:', logs);
+                    
+                    for (const log of logs) {
+                        if (window.saveBackgroundTaskLog) {
+                            console.log(`💾 Attempting to save log for ${log.task_name}:`, log);
+                            const success = await window.saveBackgroundTaskLog(log.task_name, {
+                                status: log.status,
+                                duration_ms: log.duration_ms,
+                                result: log.result,
+                                error: log.error,
+                                user_id: log.user_id
+                            });
+                            console.log(`💾 Saved log for ${log.task_name}: ${success}`);
+                        } else {
+                            console.warn('⚠️ saveBackgroundTaskLog not available');
+                        }
+                    }
+                    
+                    console.log('✅ Existing logs saved to IndexedDB');
+                } else {
+                    console.warn('⚠️ Failed to fetch existing logs from API');
+                }
+            } catch (error) {
+                console.error('❌ Error loading existing logs to IndexedDB:', error);
+            }
+        }
+        
+        // Initialize UnifiedCacheManager manually
+        async function initializeCacheManager() {
+            try {
+                console.log('🔧 Checking UnifiedCacheManager...');
+                console.log('🔍 UnifiedCacheManager available:', !!window.UnifiedCacheManager);
+                console.log('🔍 UnifiedCacheManager initialized:', window.UnifiedCacheManager?.initialized);
+                
+                if (window.UnifiedCacheManager && !window.UnifiedCacheManager.initialized) {
+                    console.log('🔧 Manually initializing UnifiedCacheManager...');
+                    const result = await window.UnifiedCacheManager.initialize();
+                    console.log('✅ UnifiedCacheManager initialized manually, result:', result);
+                } else if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+                    console.log('✅ UnifiedCacheManager already initialized');
+                } else {
+                    console.warn('⚠️ UnifiedCacheManager not available');
+                }
+            } catch (error) {
+                console.error('❌ Failed to initialize UnifiedCacheManager manually:', error);
+            }
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 DOMContentLoaded - starting initialization...');
+            
+            // Initialize cache manager first
+            setTimeout(initializeCacheManager, 500);
+            
+            // Wait for Socket.IO to be available
+            setTimeout(initializeBackgroundTaskLogListener, 1000);
+            
+            // Load existing logs after cache system is ready
+            setTimeout(() => {
+                console.log('⏰ Timeout reached - loading existing logs...');
+                loadExistingLogsToIndexedDB();
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
+

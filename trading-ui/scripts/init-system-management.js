@@ -1669,13 +1669,60 @@ function checkLoadOrder(pageConfig) {
 }
 
 /**
+ * Wait for Scripts to be Ready
+ */
+async function waitForScriptsReady(requiredScripts) {
+    const maxWaitTime = 5000; // 5 seconds max
+    const checkInterval = 100; // Check every 100ms
+    let elapsed = 0;
+    
+    while (elapsed < maxWaitTime) {
+        const allReady = requiredScripts.every(script => {
+            switch (script) {
+                case 'color-scheme-system.js':
+                    return window.colorSchemeSystemReady === true;
+                case 'data-utils.js':
+                    return window.dataUtilsReady === true;
+                case 'date-utils.js':
+                    return window.dateUtilsReady === true;
+                default:
+                    return true; // Assume ready if no specific check
+            }
+        });
+        
+        if (allReady) {
+            return true;
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, checkInterval));
+        elapsed += checkInterval;
+    }
+    
+    return false; // Timeout
+}
+
+/**
  * Check for Mismatches
  */
 async function checkForMismatches(pageName, pageConfig) {
     const mismatches = [];
     
-    // Wait for globals to be available
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // Wait for specific scripts to be ready instead of generic delay
+    const requiredScripts = [];
+    if (pageConfig.packages) {
+        for (const pkgName of pageConfig.packages) {
+            const pkg = window.PACKAGE_MANIFEST?.[pkgName];
+            if (pkg && pkg.scripts) {
+                for (const script of pkg.scripts) {
+                    if (script.required && script.globalCheck) {
+                        requiredScripts.push(script.file);
+                    }
+                }
+            }
+        }
+    }
+    
+    await waitForScriptsReady(requiredScripts);
     
     if (pageConfig.packages) {
         for (const pkgName of pageConfig.packages) {
@@ -1941,8 +1988,22 @@ async function runDetailedPageScan(pageName, pageConfig) {
     result.loadOrderIssues = loadOrderIssues;
     result.criticalErrors += loadOrderIssues.length;
     
-    // Wait for globals to be available
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    // Wait for specific scripts to be ready instead of generic delay
+    const requiredScripts = [];
+    if (pageConfig.packages) {
+        for (const pkgName of pageConfig.packages) {
+            const pkg = window.PACKAGE_MANIFEST?.[pkgName];
+            if (pkg && pkg.scripts) {
+                for (const script of pkg.scripts) {
+                    if (script.required && script.globalCheck) {
+                        requiredScripts.push(script.file);
+                    }
+                }
+            }
+        }
+    }
+    
+    await waitForScriptsReady(requiredScripts);
     
     // Check for mismatches (documented vs actual)
     const mismatches = await checkForMismatches(pageName, pageConfig);

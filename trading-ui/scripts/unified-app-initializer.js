@@ -227,14 +227,17 @@ class UnifiedAppInitializer {
             
             // ← NEW: ניטור בסוף האתחול (לא חוסם)
             // Wait for globals to be available
-            setTimeout(() => {
+            setTimeout(async () => {
+                // Wait for specific scripts to be ready
+                await this.waitForRequiredScripts(config);
+                
                 const validation = this.validateRequiredSystems(config);
                 if (validation.valid) {
                     console.log('✅ All systems validated successfully');
                 } else {
                     console.warn('⚠️ Some systems need attention (see details above)');
                 }
-            }, 3000);
+            }, 1000);
             
             this.logSuccess();
             
@@ -835,6 +838,54 @@ class UnifiedAppInitializer {
         this.errorHandlers = [];
         this.customInitializers = [];
         this.pageConfig = null;
+    }
+
+    /**
+     * Wait for Required Scripts to be Ready
+     */
+    async waitForRequiredScripts(config) {
+        const maxWaitTime = 5000; // 5 seconds max
+        const checkInterval = 100; // Check every 100ms
+        let elapsed = 0;
+        
+        // Get required scripts from config
+        const requiredScripts = [];
+        if (config.packages) {
+            for (const pkgName of config.packages) {
+                const pkg = window.PACKAGE_MANIFEST?.[pkgName];
+                if (pkg && pkg.scripts) {
+                    for (const script of pkg.scripts) {
+                        if (script.required && script.globalCheck) {
+                            requiredScripts.push(script.file);
+                        }
+                    }
+                }
+            }
+        }
+        
+        while (elapsed < maxWaitTime) {
+            const allReady = requiredScripts.every(script => {
+                switch (script) {
+                    case 'color-scheme-system.js':
+                        return window.colorSchemeSystemReady === true;
+                    case 'data-utils.js':
+                        return window.dataUtilsReady === true;
+                    case 'date-utils.js':
+                        return window.dateUtilsReady === true;
+                    default:
+                        return true; // Assume ready if no specific check
+                }
+            });
+            
+            if (allReady) {
+                return true;
+            }
+            
+            await new Promise(resolve => setTimeout(resolve, checkInterval));
+            elapsed += checkInterval;
+        }
+        
+        return false; // Timeout
     }
 
     /**

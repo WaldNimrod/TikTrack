@@ -468,3 +468,7 @@ window.dataUtils = {
 // Alias for compatibility with package manifest
 window.DataUtils = window.dataUtils;
 
+// Mark as ready
+window.dataUtilsReady = true;
+console.log('✅ Data Utils ready');
+

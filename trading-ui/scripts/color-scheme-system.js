@@ -2901,4 +2901,3 @@ if (document.readyState === 'loading') {
 // Color Scheme System loaded successfully
 window.colorSchemeSystemReady = true;
 console.log('✅ Color Scheme System ready');
-}

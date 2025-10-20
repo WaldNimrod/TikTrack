@@ -2242,3 +2242,13 @@
 2025-10-20 23:44:36,016 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 1.012s - Success: True
 2025-10-20 23:44:36,016 - utils.performance_monitor - WARNING - Slow operation detected: system_health_check - Duration: 1.012s
 2025-10-20 23:44:36,016 - services.background_tasks - INFO - Background task 'system_health_check' completed successfully in 1012ms
+2025-10-20 23:56:36,033 - services.background_tasks - INFO - Starting background task: collect_metrics
+2025-10-20 23:56:37,040 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.004s - Success: True
+2025-10-20 23:56:37,041 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.004s
+2025-10-20 23:56:37,052 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.010s - Success: True
+2025-10-20 23:56:37,053 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.001s - Success: True
+2025-10-20 23:56:37,053 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-20 23:56:37,053 - services.background_tasks - INFO - Metrics collection completed
+2025-10-20 23:56:37,054 - utils.performance_monitor - INFO - Performance: collect_metrics - Duration: 1.018s - Success: True
+2025-10-20 23:56:37,054 - utils.performance_monitor - WARNING - Slow operation detected: collect_metrics - Duration: 1.018s
+2025-10-20 23:56:37,054 - services.background_tasks - INFO - Background task 'collect_metrics' completed successfully in 1021ms

@@ -13,8 +13,8 @@ class PageStandardizer {
             'index', 'preferences', 'trades', 'executions', 'trade_plans', 
             'alerts', 'trading_accounts', 'cash_flows', 'tickers', 'notes',
             'research', 'db_display', 'system-management', 'server-monitor',
-            'cache-test', 'linter-realtime-monitor', 'notifications-center',
-            'external-data-dashboard', 'crud-testing-dashboard', 'conditions_test',
+            'linter-realtime-monitor', 'notifications-center',
+            'external-data-dashboard', 'crud-testing-dashboard',
             'conditions-test', 'db_extradata', 'constraints', 'background-tasks',
             'page-scripts-matrix', 'css-management', 'dynamic-colors-display',
             'designs', 'chart-management', 'init-system-management'

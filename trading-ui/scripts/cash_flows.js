@@ -936,7 +936,7 @@ async function renderCashFlowsTable() {
             <td class="col-actions actions-cell actions-4-btn">
               ${window.createActionsMenu ? window.createActionsMenu([
                 { type: 'VIEW', onclick: `showCashFlowDetails(${cashFlow.id})`, text: 'פרטים', title: 'הצג פרטי תזרים' },
-                { type: 'LINK', onclick: `window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})`, text: 'פריטים מקושרים', title: 'צפה בפריטים מקושרים' },
+                { type: 'LINK', onclick: `showLinkedItemsModal('cash_flow', ${cashFlow.id})`, text: 'פריטים מקושרים', title: 'צפה בפריטים מקושרים' },
                 { type: 'EDIT', onclick: `showEditCashFlowModal(${cashFlow.id})`, text: 'ערוך', title: 'ערוך תזרים' },
                 { type: 'DELETE', onclick: `deleteCashFlow(${cashFlow.id})`, text: 'מחק', title: 'מחק תזרים' }
               ]) : `
@@ -1096,6 +1096,21 @@ function showCashFlowDetails(cashFlowId) {
 }
 
 /**
+ * הצגת פריטים מקושרים לתזרים מזומנים
+ * @param {string} entityType - סוג הישות
+ * @param {number} entityId - מזהה הישות
+ */
+function showLinkedItemsModal(entityType, entityId) {
+  if (window.showLinkedItemsModal) {
+    window.showLinkedItemsModal([], entityType, entityId);
+  } else {
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאה', 'מערכת פריטים מקושרים לא זמינה');
+    }
+  }
+}
+
+/**
  * עדכון טבלת תזרימי מזומנים
  * @param {Array} cashFlows - מערך של תזרימי מזומנים
  */
@@ -1114,6 +1129,7 @@ function updateCashFlowsTable(cashFlows) {
 
 // הגדרת הפונקציות כגלובליות
 window.showCashFlowDetails = showCashFlowDetails;
+window.showLinkedItemsModal = showLinkedItemsModal;
 window.updateCashFlowsTable = updateCashFlowsTable;
 
 // פונקציית פילטור מקומי - הוסרה כי לא בשימוש
@@ -1485,9 +1501,9 @@ function setupSourceFieldListeners() {
       manageExternalIdField(this.value, 'edit');
       validateField('editCashFlowSource', this.value, 'edit');
       // בדיקת שדה מזהה חיצוני אחרי שינוי מקור
-      const externalIdField = document.getElementById('');
+      const externalIdField = document.getElementById('editCashFlowExternalId');
       if (externalIdField) {
-        validateField('', externalIdField.value, 'edit');
+        validateField('editCashFlowExternalId', externalIdField.value, 'edit');
       }
     });
   }
@@ -1753,7 +1769,7 @@ async function _showEditCashFlowModal(id) {
     // מילוי הטופס אחרי שהרשימות נטענו
     const editTypeField = document.getElementById('editCashFlowType');
     document.getElementById('editCashFlowId').value = cashFlow.id;
-    document.getElementById('editCashFlowAccount').value = cashFlow.account_id;
+    document.getElementById('editCashFlowAccount').value = cashFlow.trading_account_id;
 
     if (editTypeField) {
       editTypeField.value = cashFlow.type;

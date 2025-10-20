@@ -2319,36 +2319,7 @@ async function saveNewTradePlan() {
     },
   };
 
-  // Use global validation system
-  // === VALIDATION CHECK ===
-  // window.validateForm available check
-  // validationRules check
-
-  if (typeof window.validateForm === 'function') {
-    // Calling window.validateForm
-    const validationResult = window.validateForm('addTradePlanForm', validationRules);
-    // Validation result
-
-    // בדיקה אם התוצאה היא אובייקט עם isValid או ערך בוליאני
-    const isValid = typeof validationResult === 'object' ? validationResult.isValid : validationResult;
-
-    if (!isValid) {
-      return;
-    }
-  } else {
-    // Fallback validation if global system is not available
-    const tickerId = document.getElementById('ticker').value;
-    const investmentType = document.getElementById('type').value;
-    const side = document.getElementById('side').value;
-    const plannedAmount = document.getElementById('quantity').value;
-
-    if (!tickerId || !investmentType || !side || !plannedAmount) {
-      if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification('שגיאה בטופס', 'יש למלא את כל השדות החובה');
-      }
-      return;
-    }
-  }
+  // ולידציה - משתמש במערכת הכללית window.validateEntityForm
 
   // Get form values with proper validation
   const tickerIdValue = document.getElementById('ticker').value;
@@ -2375,48 +2346,7 @@ async function saveNewTradePlan() {
 
   // Sending new trade plan
 
-  // Additional validation before sending - רק אם המערכת הגלובלית לא זמינה
-  if (typeof window.validateForm !== 'function') {
-    if (!formData.ticker_id) {
-      if (typeof window.showFieldError === 'function') {
-        window.showFieldError('ticker', 'יש לבחור טיקר');
-      }
-      if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification('שגיאה בטופס', 'יש לבחור טיקר', 4000, 'validation');
-      }
-      return;
-    }
-
-    if (!formData.investment_type || formData.investment_type === '') {
-      if (typeof window.showFieldError === 'function') {
-        window.showFieldError('type', 'יש לבחור סוג השקעה');
-      }
-      if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification('שגיאה בטופס', 'יש לבחור סוג השקעה', 4000, 'validation');
-      }
-      return;
-    }
-
-    if (!formData.side || formData.side === '') {
-      if (typeof window.showFieldError === 'function') {
-        window.showFieldError('side', 'יש לבחור צד');
-      }
-      if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification('שגיאה בטופס', 'יש לבחור צד', 4000, 'validation');
-      }
-      return;
-    }
-
-    if (!formData.planned_amount || formData.planned_amount <= 0) {
-      if (typeof window.showFieldError === 'function') {
-        window.showFieldError('quantity', 'סכום מתוכנן חייב להיות גדול מ-0');
-      }
-      if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification('שגיאה בטופס', 'סכום מתוכנן חייב להיות גדול מ-0', 4000, 'validation');
-      }
-      return;
-    }
-  }
+  // ולידציה - משתמש במערכת הכללית window.validateEntityForm
 
   try {
     const response = await fetch('/api/trade_plans/', {
@@ -2444,27 +2374,7 @@ async function saveNewTradePlan() {
           const errorMessage = errorData.error.message;
           // Error message
 
-          // Parse the error message to identify specific field issues
-          if (errorMessage.includes('investment_type')) {
-            if (typeof window.showFieldError === 'function') {
-              window.showFieldError('type', 'יש לבחור סוג השקעה תקין');
-            }
-          }
-          if (errorMessage.includes('side')) {
-            if (typeof window.showFieldError === 'function') {
-              window.showFieldError('side', 'יש לבחור צד תקין (Long או Short)');
-            }
-          }
-          if (errorMessage.includes('planned_amount')) {
-            if (typeof window.showFieldError === 'function') {
-              window.showFieldError('quantity', 'סכום מתוכנן חייב להיות גדול מ-0');
-            }
-          }
-          if (errorMessage.includes('ticker_id') || errorMessage.includes('כבר קיים') || errorMessage.includes('already exists')) {
-            if (typeof window.showFieldError === 'function') {
-              window.showFieldError('ticker', errorMessage.includes('כבר קיים') || errorMessage.includes('already exists') ? 'תכנון לטיקר זה כבר קיים במערכת' : 'יש לבחור טיקר');
-            }
-          }
+          // טיפול בשגיאות - משתמש במערכת הכללית
 
           if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה בשמירת תכנון', errorMessage);

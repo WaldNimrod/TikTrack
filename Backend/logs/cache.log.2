@@ -13593,3 +13593,19 @@
 2025-10-21 01:14:18,430 - werkzeug - INFO - 127.0.0.1 - - [21/Oct/2025 01:14:18] "GET /scripts/page-initialization-configs.js?v=1.0.0 HTTP/1.1" 200 -
 2025-10-21 01:14:18,431 - werkzeug - INFO - 127.0.0.1 - - [21/Oct/2025 01:14:18] "GET /scripts/unified-app-initializer.js?v=1.0.0 HTTP/1.1" 200 -
 2025-10-21 01:14:18,643 - werkzeug - INFO - 127.0.0.1 - - [21/Oct/2025 01:14:18] "GET /favicon.ico HTTP/1.1" 200 -
+2025-10-21 01:14:29,023 - werkzeug - INFO - 127.0.0.1 - - [21/Oct/2025 01:14:29] "GET /images/icons/home.svg HTTP/1.1" 200 -
+2025-10-21 01:14:29,023 - werkzeug - INFO - 127.0.0.1 - - [21/Oct/2025 01:14:29] "GET /images/logo.svg HTTP/1.1" 200 -
+2025-10-21 01:14:29,025 - werkzeug - INFO - 127.0.0.1 - - [21/Oct/2025 01:14:29] "GET /api/preferences/health HTTP/1.1" 200 -
+2025-10-21 01:14:29,042 - werkzeug - INFO - 127.0.0.1 - - [21/Oct/2025 01:14:29] "GET /api/preferences/profiles?user_id=1 HTTP/1.1" 200 -
+2025-10-21 01:14:29,045 - werkzeug - INFO - 127.0.0.1 - - [21/Oct/2025 01:14:29] "GET /api/preferences/user?user_id=1&profile_id=3 HTTP/1.1" 200 -
+2025-10-21 01:14:29,049 - werkzeug - INFO - 127.0.0.1 - - [21/Oct/2025 01:14:29] "GET /api/preferences/groups HTTP/1.1" 200 -
+2025-10-21 01:14:29,051 - cache - INFO - Cache HIT: routes.api.currencies.get_currencies:11e7903cf562f028d788fc601ffc9a04 (Access count: 7)
+2025-10-21 01:14:29,051 - werkzeug - INFO - 127.0.0.1 - - [21/Oct/2025 01:14:29] "GET /api/currencies/ HTTP/1.1" 200 -
+2025-10-21 01:14:29,053 - routes.api.base_entity.cash_flows - INFO - Getting all cash_flows records
+2025-10-21 01:14:29,054 - cache - INFO - Cache MISS: get_all_cash_flows_99914b932bd37a50b983c5e7c90ae93b
+2025-10-21 01:14:29,055 - cache - INFO - Cache SET: get_all_cash_flows_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 2087 chars)
+2025-10-21 01:14:29,055 - werkzeug - INFO - 127.0.0.1 - - [21/Oct/2025 01:14:29] "GET /api/cash_flows/ HTTP/1.1" 200 -
+2025-10-21 01:14:29,121 - routes.api.base_entity.trading_accounts - INFO - Getting all trading_accounts records
+2025-10-21 01:14:29,121 - cache - INFO - Cache MISS: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b
+2025-10-21 01:14:29,122 - cache - INFO - Cache SET: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 2908 chars)
+2025-10-21 01:14:29,122 - werkzeug - INFO - 127.0.0.1 - - [21/Oct/2025 01:14:29] "GET /api/trading-accounts/ HTTP/1.1" 200 -

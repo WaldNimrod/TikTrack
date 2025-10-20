@@ -234,7 +234,7 @@ class UnifiedAppInitializer {
                 } else {
                     console.warn('⚠️ Some systems need attention (see details above)');
                 }
-            }, 1000);
+            }, 3000);
             
             this.logSuccess();
             
@@ -1375,7 +1375,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log('🚀 About to call initializeUnifiedApp...');
             await window.initializeUnifiedApp();
             console.log('✅ initializeUnifiedApp completed');
-        }, 500);
+        }, 2000);
         
     } catch (error) {
         console.error('❌ Unified App auto-initialization failed:', error);

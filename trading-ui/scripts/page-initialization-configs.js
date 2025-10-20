@@ -523,6 +523,12 @@ const PAGE_CONFIGS = {
             async (pageConfig) => {
                 console.log('💰 Initializing Cash Flows...');
                 
+                // אתחול מערכת ההעדפות לפני טעינת הנתונים
+                if (window.PreferencesSystem && !window.PreferencesSystem.initialized) {
+                    console.log('⚙️ Initializing PreferencesSystem for Cash Flows...');
+                    await window.PreferencesSystem.initialize();
+                }
+                
                 if (typeof window.loadCashFlowsData === 'function') {
                     await window.loadCashFlowsData();
                 }

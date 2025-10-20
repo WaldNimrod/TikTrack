@@ -4071,3 +4071,13 @@
 2025-10-20 22:56:33,730 - utils.performance_monitor - INFO - Performance: collect_metrics - Duration: 1.014s - Success: True
 2025-10-20 22:56:33,730 - utils.performance_monitor - WARNING - Slow operation detected: collect_metrics - Duration: 1.014s
 2025-10-20 22:56:33,730 - services.background_tasks - INFO - Background task 'collect_metrics' completed successfully in 1016ms
+2025-10-20 23:26:33,900 - services.background_tasks - INFO - Starting background task: collect_metrics
+2025-10-20 23:26:34,907 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.006s - Success: True
+2025-10-20 23:26:34,907 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.006s
+2025-10-20 23:26:34,911 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.004s - Success: True
+2025-10-20 23:26:34,912 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.000s - Success: True
+2025-10-20 23:26:34,912 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.000s - Success: True
+2025-10-20 23:26:34,912 - services.background_tasks - INFO - Metrics collection completed
+2025-10-20 23:26:34,912 - utils.performance_monitor - INFO - Performance: collect_metrics - Duration: 1.011s - Success: True
+2025-10-20 23:26:34,912 - utils.performance_monitor - WARNING - Slow operation detected: collect_metrics - Duration: 1.011s
+2025-10-20 23:26:34,912 - services.background_tasks - INFO - Background task 'collect_metrics' completed successfully in 1012ms

@@ -774,7 +774,7 @@ async function renderCashFlowsTable() {
             <td class="col-actions actions-cell actions-4-btn">
               ${window.createActionsMenu ? window.createActionsMenu([
                 { type: 'VIEW', onclick: `showCashFlowDetails(${cashFlow.id})`, text: 'פרטים', title: 'הצג פרטי תזרים' },
-                { type: 'LINK', onclick: `showLinkedItemsModal('cash_flow', ${cashFlow.id})`, text: 'פריטים מקושרים', title: 'צפה בפריטים מקושרים' },
+                { type: 'LINK', onclick: `window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})`, text: 'פריטים מקושרים', title: 'צפה בפריטים מקושרים' },
                 { type: 'EDIT', onclick: `showEditCashFlowModal(${cashFlow.id})`, text: 'ערוך', title: 'ערוך תזרים' },
                 { type: 'DELETE', onclick: `deleteCashFlow(${cashFlow.id})`, text: 'מחק', title: 'מחק תזרים' }
               ]) : `

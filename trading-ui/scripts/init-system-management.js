@@ -1675,7 +1675,7 @@ async function checkForMismatches(pageName, pageConfig) {
     const mismatches = [];
     
     // Wait for globals to be available
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 5000));
     
     if (pageConfig.packages) {
         for (const pkgName of pageConfig.packages) {
@@ -1942,7 +1942,7 @@ async function runDetailedPageScan(pageName, pageConfig) {
     result.criticalErrors += loadOrderIssues.length;
     
     // Wait for globals to be available
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    await new Promise(resolve => setTimeout(resolve, 6000));
     
     // Check for mismatches (documented vs actual)
     const mismatches = await checkForMismatches(pageName, pageConfig);

@@ -175,9 +175,9 @@
             data-bs-backdrop="true" data-bs-keyboard="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
-                    <div class="modal-header modal-header-colored">
+                    <div class="modal-header modal-header-colored d-flex justify-content-between align-items-center">
                         <h5 class="modal-title" id="addExecutionModalLabel">הוספת עסקה חדשה</h5>
-                        <button data-button-type="CLOSE" data-entity-type="execution" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
+                        <button data-button-type="CLOSE" data-bs-dismiss="modal" data-text="סגור"></button>
                     </div>
                     <div class="modal-body">
                         <form id="addExecutionForm">
@@ -239,9 +239,9 @@
                             </div>
                         </form>
                     </div>
-                    <div class="modal-footer">
-                        <button data-button-type="CANCEL" data-onclick="data-bs-dismiss='modal'" data-text="ביטול" title="ביטול"></button>
-                        <button data-button-type="SAVE" data-entity-type="execution" data-onclick="addExecution()" data-text="שמור" title="שמור ביצוע"></button>
+                    <div class="modal-footer d-flex justify-content-end">
+                        <button data-button-type="CANCEL" data-bs-dismiss="modal" data-text="ביטול"></button>
+                        <button data-button-type="SAVE" data-onclick="addExecution()" data-text="שמור"></button>
                     </div>
                 </div>
             </div>
@@ -252,9 +252,9 @@
             data-bs-backdrop="true" data-bs-keyboard="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
-                    <div class="modal-header modal-header-colored">
+                    <div class="modal-header modal-header-colored d-flex justify-content-between align-items-center">
                         <h5 class="modal-title" id="editExecutionModalLabel">עריכת עסקה</h5>
-                        <button data-button-type="CLOSE" data-entity-type="execution" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
+                        <button data-button-type="CLOSE" data-bs-dismiss="modal" data-text="סגור"></button>
                     </div>
                     <div class="modal-body">
                         <form id="editExecutionForm">
@@ -313,9 +313,9 @@
                             </div>
                         </form>
                     </div>
-                    <div class="modal-footer">
-                        <button data-button-type="CANCEL" data-onclick="data-bs-dismiss='modal'" data-text="ביטול" title="ביטול"></button>
-                        <button data-button-type="SAVE" data-entity-type="execution" data-onclick="updateExecution()" data-text="שמור" title="עדכן ביצוע"></button>
+                    <div class="modal-footer d-flex justify-content-end">
+                        <button data-button-type="CANCEL" data-bs-dismiss="modal" data-text="ביטול"></button>
+                        <button data-button-type="SAVE" data-onclick="updateExecution()" data-text="עדכן"></button>
                     </div>
                 </div>
             </div>

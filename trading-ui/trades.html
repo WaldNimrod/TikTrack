@@ -167,9 +167,9 @@
         <div class="modal fade" id="addTradeModal" tabindex="-1" aria-labelledby="addTradeModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
-                    <div class="modal-header modal-header-colored">
+                    <div class="modal-header modal-header-colored d-flex justify-content-between align-items-center">
                         <h5 class="modal-title" id="addTradeModalLabel">הוספת טרייד חדש</h5>
-                        <button data-button-type="CLOSE" data-entity-type="trade" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
+                        <button data-button-type="CLOSE" data-bs-dismiss="modal" data-text="סגור"></button>
                     </div>
                     <div class="modal-body">
                         <form id="addTradeForm">
@@ -236,9 +236,9 @@
                             </div>
                         </form>
                     </div>
-                    <div class="modal-footer">
-                        <button data-button-type="CANCEL" data-onclick="data-bs-dismiss='modal'" data-text="ביטול" title="ביטול"></button>
-                        <button data-button-type="SAVE" data-entity-type="trade" data-onclick="saveNewTradeRecord()" data-text="שמור" title="שמור טרייד"></button>
+                    <div class="modal-footer d-flex justify-content-end">
+                        <button data-button-type="CANCEL" data-bs-dismiss="modal" data-text="ביטול"></button>
+                        <button data-button-type="SAVE" data-onclick="saveNewTradeRecord()" data-text="שמור"></button>
                     </div>
                 </div>
             </div>
@@ -248,9 +248,9 @@
         <div class="modal fade" id="editTradeModal" tabindex="-1" aria-labelledby="editTradeModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
-                    <div class="modal-header modal-header-colored">
+                    <div class="modal-header modal-header-colored d-flex justify-content-between align-items-center">
                         <h5 class="modal-title" id="editTradeModalLabel">עריכת טרייד</h5>
-                        <button data-button-type="CLOSE" data-entity-type="trade" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
+                        <button data-button-type="CLOSE" data-bs-dismiss="modal" data-text="סגור"></button>
                     </div>
 
                     <!-- שורת מידע ואיקונים מתחת לכותרת -->
@@ -380,15 +380,15 @@
         <div class="modal fade" id="linkedItemsModal" tabindex="-1" aria-labelledby="linkedItemsModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
             <div class="modal-dialog modal-xl">
                 <div class="modal-content">
-                    <div class="modal-header modal-header-colored">
+                    <div class="modal-header modal-header-colored d-flex justify-content-between align-items-center">
                         <h5 class="modal-title" id="linkedItemsModalLabel">פרטים מקושרים</h5>
-                        <button data-button-type="CLOSE" data-entity-type="trade" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
+                        <button data-button-type="CLOSE" data-bs-dismiss="modal" data-text="סגור"></button>
                     </div>
                     <div class="modal-body" id="linkedItemsModalBody">
                         <!-- תוכן המודל יוכנס כאן דינמית -->
                     </div>
-                    <div class="modal-footer">
-                        <button data-button-type="CANCEL" data-onclick="data-bs-dismiss='modal'" data-text="ביטול" title="ביטול"></button>
+                    <div class="modal-footer d-flex justify-content-end">
+                        <button data-button-type="CANCEL" data-bs-dismiss="modal" data-text="ביטול"></button>
                     </div>
                 </div>
             </div>

@@ -146,9 +146,9 @@
             data-bs-backdrop="true" data-bs-keyboard="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
-                    <div class="modal-header modal-header-colored">
+                    <div class="modal-header modal-header-colored d-flex justify-content-between align-items-center">
                         <h5 class="modal-title" id="addAccountModalLabel">הוספת חשבון מסחר חדש</h5>
-                        <button data-button-type="CLOSE" data-entity-type="account" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
+                        <button data-button-type="CLOSE" data-bs-dismiss="modal" data-text="סגור"></button>
                     </div>
                     <div class="modal-body">
                         <form id="addAccountForm">
@@ -201,9 +201,9 @@
                             </div>
                         </form>
                     </div>
-                    <div class="modal-footer">
-                        <button data-button-type="CANCEL" data-onclick="data-bs-dismiss='modal'" data-text="ביטול" title="ביטול"></button>
-                        <button data-button-type="SAVE" data-entity-type="account" data-onclick="addAccount()" data-text="שמור" title="שמור חשבון"></button>
+                    <div class="modal-footer d-flex justify-content-end">
+                        <button data-button-type="CANCEL" data-bs-dismiss="modal" data-text="ביטול"></button>
+                        <button data-button-type="SAVE" data-onclick="addAccount()" data-text="שמור"></button>
                     </div>
                 </div>
             </div>
@@ -214,9 +214,9 @@
             data-bs-backdrop="true" data-bs-keyboard="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
-                    <div class="modal-header modal-header-colored">
+                    <div class="modal-header modal-header-colored d-flex justify-content-between align-items-center">
                         <h5 class="modal-title" id="editAccountModalLabel">עריכת חשבון מסחר</h5>
-                        <button data-button-type="CLOSE" data-entity-type="account" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
+                        <button data-button-type="CLOSE" data-bs-dismiss="modal" data-text="סגור"></button>
                     </div>
                     <div class="modal-body">
                         <form id="editAccountForm">
@@ -267,9 +267,9 @@
                             </div>
                         </form>
                     </div>
-                    <div class="modal-footer">
-                        <button data-button-type="CANCEL" data-onclick="data-bs-dismiss='modal'" data-text="ביטול" title="ביטול"></button>
-                        <button data-button-type="SAVE" data-entity-type="account" data-onclick="updateAccount()" data-text="שמור" title="עדכן חשבון"></button>
+                    <div class="modal-footer d-flex justify-content-end">
+                        <button data-button-type="CANCEL" data-bs-dismiss="modal" data-text="ביטול"></button>
+                        <button data-button-type="SAVE" data-onclick="updateAccount()" data-text="עדכן"></button>
                     </div>
                 </div>
             </div>

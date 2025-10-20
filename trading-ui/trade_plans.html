@@ -126,9 +126,9 @@
 <div class="modal fade" id="addTradePlanModal" tabindex="-1" aria-labelledby="addTradePlanModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
 <div class="modal-dialog modal-lg">
 <div class="modal-content">
-<div class="modal-header modal-header-colored">
+<div class="modal-header modal-header-colored d-flex justify-content-between align-items-center">
 <h5 class="modal-title" id="addTradePlanModalLabel">הוספת תכנון חדש</h5>
-<button data-button-type="CLOSE" data-entity-type="trade_plan" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור">
+<button data-button-type="CLOSE" data-bs-dismiss="modal" data-text="סגור">
 </button>
 </div>
 <div class="modal-body">
@@ -295,11 +295,9 @@
     </div>
 </div>
 </div>
-<div class="modal-footer">
-<button data-button-type="CANCEL" data-onclick="data-bs-dismiss='modal'" data-text="ביטול" title="ביטול"></button>
-<button data-button-type="SAVE" data-entity-type="trade_plan" data-onclick="saveForm()" data-text="שמור" title="שמור תכנון"></button>
-<i class="fas fa-save">
-</i> שמור </button>
+<div class="modal-footer d-flex justify-content-end">
+<button data-button-type="CANCEL" data-bs-dismiss="modal" data-text="ביטול"></button>
+<button data-button-type="SAVE" data-onclick="saveTradePlan()" data-text="שמור"></button>
 </div>
 </div>
 </div>
@@ -307,9 +305,9 @@
 <div class="modal fade" id="editTradePlanModal" tabindex="-1" aria-labelledby="editTradePlanModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
 <div class="modal-dialog modal-lg">
 <div class="modal-content">
-<div class="modal-header modal-header-colored">
+<div class="modal-header modal-header-colored d-flex justify-content-between align-items-center">
 <h5 class="modal-title" id="editTradePlanModalLabel">עריכת תכנון</h5>
-<button data-button-type="CLOSE" data-entity-type="trade_plan" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור">
+<button data-button-type="CLOSE" data-bs-dismiss="modal" data-text="סגור">
 </button>
 </div>
 <div class="modal-body">
@@ -474,11 +472,9 @@
     </div>
 </div>
 </div>
-<div class="modal-footer">
-<button data-button-type="CANCEL" data-onclick="data-bs-dismiss='modal'" data-text="ביטול" title="ביטול"></button>
-<button data-button-type="SAVE" data-entity-type="trade_plan" data-onclick="saveForm()" data-text="שמור" title="שמור תכנון"></button>
-<i class="fas fa-save">
-</i> שמור </button>
+<div class="modal-footer d-flex justify-content-end">
+<button data-button-type="CANCEL" data-bs-dismiss="modal" data-text="ביטול"></button>
+<button data-button-type="SAVE" data-onclick="updateTradePlan()" data-text="עדכן"></button>
 </div>
 </div>
 </div>

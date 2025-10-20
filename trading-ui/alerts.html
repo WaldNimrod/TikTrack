@@ -193,9 +193,9 @@
             data-bs-backdrop="true" data-bs-keyboard="true">
             <div class="modal-dialog modal-xl">
                 <div class="modal-content">
-                    <div class="modal-header modal-header-colored">
+                    <div class="modal-header modal-header-colored d-flex justify-content-between align-items-center">
                         <h5 class="modal-title" id="addAlertModalLabel">הוספת התראה</h5>
-                        <button data-button-type="CLOSE" data-entity-type="alert" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
+                        <button data-button-type="CLOSE" data-bs-dismiss="modal" data-text="סגור"></button>
                     </div>
                     <div class="modal-body">
                         <!-- Navigation tabs -->
@@ -380,9 +380,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button data-button-type="CANCEL" data-onclick="data-bs-dismiss='modal'" data-text="ביטול" title="ביטול"></button>
-                        <button data-button-type="SAVE" data-entity-type="alert" data-onclick="addAlert()" data-text="הוסף התראה" title="הוסף התראה"></button>
+                    <div class="modal-footer d-flex justify-content-end">
+                        <button data-button-type="CANCEL" data-bs-dismiss="modal" data-text="ביטול"></button>
+                        <button data-button-type="SAVE" data-onclick="addAlert()" data-text="הוסף התראה"></button>
                         <button type="button" class="btn btn-primary" onclick="createAlertFromCondition()" id="createFromConditionBtn" style="display: none;">
                             צור התראה מתנאי
                         </button>
@@ -396,9 +396,9 @@
             data-bs-backdrop="true" data-bs-keyboard="true">
             <div class="modal-dialog modal-xl">
                 <div class="modal-content">
-                    <div class="modal-header modal-header-colored">
+                    <div class="modal-header modal-header-colored d-flex justify-content-between align-items-center">
                         <h5 class="modal-title" id="editAlertModalLabel">עריכת התראה</h5>
-                        <button data-button-type="CLOSE" data-entity-type="alert" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
+                        <button data-button-type="CLOSE" data-bs-dismiss="modal" data-text="סגור"></button>
                     </div>
                     <div class="modal-body">
                         <form id="editAlertForm">
@@ -455,9 +455,9 @@
                             </div>
                         </form>
                     </div>
-                    <div class="modal-footer">
-                        <button data-button-type="CANCEL" data-onclick="data-bs-dismiss='modal'" data-text="ביטול" title="ביטול"></button>
-                        <button data-button-type="SAVE" data-entity-type="alert" data-onclick="updateAlert()" data-text="עדכן התראה" title="עדכן התראה"></button>
+                    <div class="modal-footer d-flex justify-content-end">
+                        <button data-button-type="CANCEL" data-bs-dismiss="modal" data-text="ביטול"></button>
+                        <button data-button-type="SAVE" data-onclick="updateAlert()" data-text="עדכן התראה"></button>
                     </div>
                 </div>
             </div>

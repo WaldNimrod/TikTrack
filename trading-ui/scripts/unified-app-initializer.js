@@ -234,7 +234,7 @@ class UnifiedAppInitializer {
                 } else {
                     console.warn('⚠️ Some systems need attention (see details above)');
                 }
-            }, 1500);
+            }, 5000);
             
             this.logSuccess();
             

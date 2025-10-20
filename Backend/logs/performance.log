@@ -2995,3 +2995,161 @@
 2025-10-20 20:26:24,686 - utils.performance_monitor - INFO - Performance: collect_metrics - Duration: 1.018s - Success: True
 2025-10-20 20:26:24,687 - utils.performance_monitor - WARNING - Slow operation detected: collect_metrics - Duration: 1.018s
 2025-10-20 20:26:24,687 - services.background_tasks - INFO - Background task 'collect_metrics' completed successfully in 1020ms
+2025-10-20 20:30:34,448 - services.data_refresh_scheduler - INFO - Refreshing 4 active tickers during trading hours
+2025-10-20 20:30:34,453 - services.data_refresh_scheduler - INFO - Group refresh started: active_trades/in_hours - 4 tickers (ID: 33764)
+2025-10-20 20:30:34,454 - services.data_refresh_scheduler - INFO - Refreshing batch of 4 tickers: AAPL, GOOGL, AMZN, TSLA
+2025-10-20 20:30:34,454 - services.external_data.yahoo_finance_adapter - INFO - Processing 4 symbols in 1 batches
+2025-10-20 20:30:35,977 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-10-20 20:30:35,977 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Current price: $263.14
+2025-10-20 20:30:35,978 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Calculated change_amount = 263.14 - 252.29 = 10.849999999999994
+2025-10-20 20:30:35,978 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Calculated change_pct = (10.849999999999994 / 252.29) * 100 = 4.30%
+2025-10-20 20:30:35,978 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: volume = 62103676
+2025-10-20 20:30:35,978 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Final quote data - price: $263.14, change_pct: 4.30%, change_amount: $10.85
+2025-10-20 20:30:35,978 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AAPL
+2025-10-20 20:30:35,978 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AAPL (ID: 1) - proceeding to cache quote
+2025-10-20 20:30:35,978 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AAPL = $263.14 (USD)
+2025-10-20 20:30:35,979 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 1: List argument must consist only of tuples or dictionaries
+2025-10-20 20:30:35,979 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AAPL
+2025-10-20 20:30:35,979 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AAPL: $263.14
+2025-10-20 20:30:36,111 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-10-20 20:30:36,111 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Current price: $256.075
+2025-10-20 20:30:36,111 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Calculated change_amount = 256.075 - 253.3 = 2.7749999999999773
+2025-10-20 20:30:36,111 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Calculated change_pct = (2.7749999999999773 / 253.3) * 100 = 1.10%
+2025-10-20 20:30:36,112 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: volume = 13243422
+2025-10-20 20:30:36,112 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Final quote data - price: $256.075, change_pct: 1.10%, change_amount: $2.77
+2025-10-20 20:30:36,112 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: GOOGL
+2025-10-20 20:30:36,112 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker GOOGL (ID: 2) - proceeding to cache quote
+2025-10-20 20:30:36,112 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: GOOGL = $256.075 (USD)
+2025-10-20 20:30:36,112 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 2: List argument must consist only of tuples or dictionaries
+2025-10-20 20:30:36,112 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for GOOGL
+2025-10-20 20:30:36,113 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for GOOGL: $256.075
+2025-10-20 20:30:36,305 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-10-20 20:30:36,305 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Current price: $215.58
+2025-10-20 20:30:36,305 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Calculated change_amount = 215.58 - 213.04 = 2.5400000000000205
+2025-10-20 20:30:36,305 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Calculated change_pct = (2.5400000000000205 / 213.04) * 100 = 1.19%
+2025-10-20 20:30:36,305 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: volume = 18717060
+2025-10-20 20:30:36,305 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Final quote data - price: $215.58, change_pct: 1.19%, change_amount: $2.54
+2025-10-20 20:30:36,305 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AMZN
+2025-10-20 20:30:36,305 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AMZN (ID: 6) - proceeding to cache quote
+2025-10-20 20:30:36,306 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AMZN = $215.58 (USD)
+2025-10-20 20:30:36,306 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 6: List argument must consist only of tuples or dictionaries
+2025-10-20 20:30:36,306 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AMZN
+2025-10-20 20:30:36,306 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AMZN: $215.58
+2025-10-20 20:30:36,455 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-10-20 20:30:36,455 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Current price: $443.31
+2025-10-20 20:30:36,455 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Calculated change_amount = 443.31 - 439.31 = 4.0
+2025-10-20 20:30:36,455 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Calculated change_pct = (4.0 / 439.31) * 100 = 0.91%
+2025-10-20 20:30:36,455 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: volume = 43539106
+2025-10-20 20:30:36,455 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Final quote data - price: $443.31, change_pct: 0.91%, change_amount: $4.00
+2025-10-20 20:30:36,455 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: TSLA
+2025-10-20 20:30:36,456 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker TSLA (ID: 4) - proceeding to cache quote
+2025-10-20 20:30:36,456 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: TSLA = $443.31 (USD)
+2025-10-20 20:30:36,456 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 4: List argument must consist only of tuples or dictionaries
+2025-10-20 20:30:36,456 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for TSLA
+2025-10-20 20:30:36,457 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for TSLA: $443.31
+2025-10-20 20:30:36,457 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AAPL
+2025-10-20 20:30:36,457 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AAPL (ID: 1) - proceeding to cache quote
+2025-10-20 20:30:36,457 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AAPL = $263.14 (USD)
+2025-10-20 20:30:36,457 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 1: List argument must consist only of tuples or dictionaries
+2025-10-20 20:30:36,457 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AAPL
+2025-10-20 20:30:36,458 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AAPL: $263.14
+2025-10-20 20:30:36,458 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: GOOGL
+2025-10-20 20:30:36,458 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker GOOGL (ID: 2) - proceeding to cache quote
+2025-10-20 20:30:36,458 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: GOOGL = $256.075 (USD)
+2025-10-20 20:30:36,458 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 2: List argument must consist only of tuples or dictionaries
+2025-10-20 20:30:36,458 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for GOOGL
+2025-10-20 20:30:36,459 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for GOOGL: $256.075
+2025-10-20 20:30:36,459 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AMZN
+2025-10-20 20:30:36,459 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AMZN (ID: 6) - proceeding to cache quote
+2025-10-20 20:30:36,459 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AMZN = $215.58 (USD)
+2025-10-20 20:30:36,459 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 6: List argument must consist only of tuples or dictionaries
+2025-10-20 20:30:36,459 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AMZN
+2025-10-20 20:30:36,459 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AMZN: $215.58
+2025-10-20 20:30:36,460 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: TSLA
+2025-10-20 20:30:36,460 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker TSLA (ID: 4) - proceeding to cache quote
+2025-10-20 20:30:36,460 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: TSLA = $443.31 (USD)
+2025-10-20 20:30:36,460 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 4: List argument must consist only of tuples or dictionaries
+2025-10-20 20:30:36,460 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for TSLA
+2025-10-20 20:30:36,460 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for TSLA: $443.31
+2025-10-20 20:30:36,461 - services.external_data.yahoo_finance_adapter - INFO - Updated provider yahoo_finance health: True
+2025-10-20 20:30:36,473 - services.data_refresh_scheduler - INFO - Batch refresh completed: 4 successful, 0 failed
+2025-10-20 20:30:36,473 - services.data_refresh_scheduler - INFO - Group refresh completed: ID 33764 - 4 successful, 0 failed
+2025-10-20 20:35:36,520 - services.data_refresh_scheduler - INFO - Refreshing 4 active tickers during trading hours
+2025-10-20 20:35:36,522 - services.data_refresh_scheduler - INFO - Group refresh started: active_trades/in_hours - 4 tickers (ID: 33766)
+2025-10-20 20:35:36,522 - services.data_refresh_scheduler - INFO - Refreshing batch of 4 tickers: AAPL, GOOGL, AMZN, TSLA
+2025-10-20 20:35:36,522 - services.external_data.yahoo_finance_adapter - INFO - Processing 4 symbols in 1 batches
+2025-10-20 20:35:37,013 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-10-20 20:35:37,014 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Current price: $263.071
+2025-10-20 20:35:37,014 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Calculated change_amount = 263.071 - 252.29 = 10.781000000000034
+2025-10-20 20:35:37,015 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Calculated change_pct = (10.781000000000034 / 252.29) * 100 = 4.27%
+2025-10-20 20:35:37,015 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: volume = 62417969
+2025-10-20 20:35:37,015 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Final quote data - price: $263.071, change_pct: 4.27%, change_amount: $10.78
+2025-10-20 20:35:37,015 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AAPL
+2025-10-20 20:35:37,017 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AAPL (ID: 1) - proceeding to cache quote
+2025-10-20 20:35:37,017 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AAPL = $263.071 (USD)
+2025-10-20 20:35:37,018 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 1: List argument must consist only of tuples or dictionaries
+2025-10-20 20:35:37,019 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AAPL
+2025-10-20 20:35:37,021 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AAPL: $263.071
+2025-10-20 20:35:37,219 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-10-20 20:35:37,220 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Current price: $256.125
+2025-10-20 20:35:37,220 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Calculated change_amount = 256.125 - 253.3 = 2.8249999999999886
+2025-10-20 20:35:37,220 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Calculated change_pct = (2.8249999999999886 / 253.3) * 100 = 1.12%
+2025-10-20 20:35:37,220 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: volume = 13318818
+2025-10-20 20:35:37,220 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Final quote data - price: $256.125, change_pct: 1.12%, change_amount: $2.82
+2025-10-20 20:35:37,221 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: GOOGL
+2025-10-20 20:35:37,223 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker GOOGL (ID: 2) - proceeding to cache quote
+2025-10-20 20:35:37,223 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: GOOGL = $256.125 (USD)
+2025-10-20 20:35:37,223 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 2: List argument must consist only of tuples or dictionaries
+2025-10-20 20:35:37,224 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for GOOGL
+2025-10-20 20:35:37,225 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for GOOGL: $256.125
+2025-10-20 20:35:37,381 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-10-20 20:35:37,382 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Current price: $215.688
+2025-10-20 20:35:37,382 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Calculated change_amount = 215.688 - 213.04 = 2.647999999999996
+2025-10-20 20:35:37,382 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Calculated change_pct = (2.647999999999996 / 213.04) * 100 = 1.24%
+2025-10-20 20:35:37,382 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: volume = 18952855
+2025-10-20 20:35:37,382 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Final quote data - price: $215.688, change_pct: 1.24%, change_amount: $2.65
+2025-10-20 20:35:37,383 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AMZN
+2025-10-20 20:35:37,383 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AMZN (ID: 6) - proceeding to cache quote
+2025-10-20 20:35:37,384 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AMZN = $215.688 (USD)
+2025-10-20 20:35:37,384 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 6: List argument must consist only of tuples or dictionaries
+2025-10-20 20:35:37,384 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AMZN
+2025-10-20 20:35:37,385 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AMZN: $215.688
+2025-10-20 20:35:37,519 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-10-20 20:35:37,520 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Current price: $443.64
+2025-10-20 20:35:37,520 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Calculated change_amount = 443.64 - 439.31 = 4.329999999999984
+2025-10-20 20:35:37,520 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Calculated change_pct = (4.329999999999984 / 439.31) * 100 = 0.99%
+2025-10-20 20:35:37,520 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: volume = 43873866
+2025-10-20 20:35:37,521 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Final quote data - price: $443.64, change_pct: 0.99%, change_amount: $4.33
+2025-10-20 20:35:37,521 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: TSLA
+2025-10-20 20:35:37,522 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker TSLA (ID: 4) - proceeding to cache quote
+2025-10-20 20:35:37,523 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: TSLA = $443.64 (USD)
+2025-10-20 20:35:37,523 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 4: List argument must consist only of tuples or dictionaries
+2025-10-20 20:35:37,523 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for TSLA
+2025-10-20 20:35:37,525 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for TSLA: $443.64
+2025-10-20 20:35:37,525 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AAPL
+2025-10-20 20:35:37,526 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AAPL (ID: 1) - proceeding to cache quote
+2025-10-20 20:35:37,527 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AAPL = $263.071 (USD)
+2025-10-20 20:35:37,527 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 1: List argument must consist only of tuples or dictionaries
+2025-10-20 20:35:37,527 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AAPL
+2025-10-20 20:35:37,528 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AAPL: $263.071
+2025-10-20 20:35:37,528 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: GOOGL
+2025-10-20 20:35:37,529 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker GOOGL (ID: 2) - proceeding to cache quote
+2025-10-20 20:35:37,530 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: GOOGL = $256.125 (USD)
+2025-10-20 20:35:37,530 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 2: List argument must consist only of tuples or dictionaries
+2025-10-20 20:35:37,530 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for GOOGL
+2025-10-20 20:35:37,531 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for GOOGL: $256.125
+2025-10-20 20:35:37,531 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AMZN
+2025-10-20 20:35:37,532 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AMZN (ID: 6) - proceeding to cache quote
+2025-10-20 20:35:37,532 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AMZN = $215.688 (USD)
+2025-10-20 20:35:37,532 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 6: List argument must consist only of tuples or dictionaries
+2025-10-20 20:35:37,532 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AMZN
+2025-10-20 20:35:37,533 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AMZN: $215.688
+2025-10-20 20:35:37,533 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: TSLA
+2025-10-20 20:35:37,534 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker TSLA (ID: 4) - proceeding to cache quote
+2025-10-20 20:35:37,534 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: TSLA = $443.64 (USD)
+2025-10-20 20:35:37,534 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 4: List argument must consist only of tuples or dictionaries
+2025-10-20 20:35:37,534 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for TSLA
+2025-10-20 20:35:37,535 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for TSLA: $443.64
+2025-10-20 20:35:37,537 - services.external_data.yahoo_finance_adapter - INFO - Updated provider yahoo_finance health: True
+2025-10-20 20:35:37,542 - services.data_refresh_scheduler - INFO - Batch refresh completed: 4 successful, 0 failed
+2025-10-20 20:35:37,543 - services.data_refresh_scheduler - INFO - Group refresh completed: ID 33766 - 4 successful, 0 failed

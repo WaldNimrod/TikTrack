@@ -463,7 +463,7 @@ function validateCashFlowForm(formData) {
  * ניקוי הודעות שגיאה
  */
 function clearValidationErrors() {
-  const fields = ['cashFlowAccount', 'cashFlowType', 'cashFlowAmount', 'cashFlowCurrency', 'cashFlowDate', 'cashFlowDescription'];
+  const fields = ['cashFlowAccount', 'cashFlowType', 'cashFlowAmount', 'cashFlowCurrency', 'cashFlowDate', 'cashFlowDescription', 'cashFlowSource', 'cashFlowExternalId'];
 
   fields.forEach(fieldId => {
     const field = document.getElementById(fieldId);
@@ -729,7 +729,7 @@ const editCashFlowValidationRules = {
     required: true,
     message: 'נדרש לבחור מקור',
   },
-  cashFlowExternalId: {
+  editCashFlowExternalId: {
     required: false, // לא חובה - תלוי במקור
     message: 'נדרש להזין מזהה חיצוני',
   },
@@ -1491,7 +1491,7 @@ function setupSourceFieldListeners() {
  */
 function setupValidationListeners() {
   // שדות למודל הוספה
-  const addFields = ['cashFlowAccount', 'cashFlowType', 'cashFlowAmount', 'cashFlowCurrency', 'cashFlowDate', 'cashFlowDescription'];
+  const addFields = ['cashFlowAccount', 'cashFlowType', 'cashFlowAmount', 'cashFlowCurrency', 'cashFlowDate', 'cashFlowDescription', 'cashFlowSource', 'cashFlowExternalId'];
   addFields.forEach(fieldId => {
     const field = document.getElementById(fieldId);
     if (field) {
@@ -1757,7 +1757,7 @@ async function _showEditCashFlowModal(id) {
 
     const editSourceField = document.getElementById('editCashFlowSource');
     editSourceField.value = cashFlow.source || 'manual';
-    document.getElementById('').value = cashFlow.external_id || '0';
+    document.getElementById('editCashFlowExternalId').value = cashFlow.external_id || '0';
 
     // אתחול שדה מזהה חיצוני
     initializeExternalIdFields();
@@ -1785,6 +1785,8 @@ async function saveCashFlow() {
       currency_id: { id: 'cashFlowCurrency', type: 'int' },
       date: { id: 'cashFlowDate', type: 'date' },
       description: { id: 'cashFlowDescription', type: 'text' },
+      source: { id: 'cashFlowSource', type: 'text' },
+      external_id: { id: 'cashFlowExternalId', type: 'text', default: '0' }
     });
 
     const formData = {
@@ -1835,7 +1837,7 @@ async function updateCashFlow() {
       date: { id: 'editCashFlowDate', type: 'date' },
       description: { id: 'editCashFlowDescription', type: 'text' },
       source: { id: 'editCashFlowSource', type: 'text' },
-      external_id: { id: '', type: 'text', default: '0' }
+      external_id: { id: 'editCashFlowExternalId', type: 'text', default: '0' }
     });
 
     const formData = {

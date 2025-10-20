@@ -219,6 +219,25 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="cashFlowSource" class="form-label">מקור</label>
+                                        <select class="form-select" id="cashFlowSource" required>
+                                            <option value="">בחר מקור</option>
+                                            <option value="manual">ידני</option>
+                                            <option value="IBKR-tradelog-csv">IBKR CSV</option>
+                                            <option value="IBKR-api">IBKR API</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="cashFlowExternalId" class="form-label">מזהה חיצוני</label>
+                                        <input type="text" class="form-control" id="cashFlowExternalId" placeholder="מזהה חיצוני (אופציונלי)" value="0">
+                                    </div>
+                                </div>
+                            </div>
                         </form>
                     </div>
                     <div class="modal-footer">
@@ -293,6 +312,25 @@
                                     <div class="mb-3">
                                         <label for="editCashFlowDescription" class="form-label">תיאור</label>
                                         <input type="text" class="form-control" id="editCashFlowDescription">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editCashFlowSource" class="form-label">מקור</label>
+                                        <select class="form-select" id="editCashFlowSource" required>
+                                            <option value="">בחר מקור</option>
+                                            <option value="manual">ידני</option>
+                                            <option value="IBKR-tradelog-csv">IBKR CSV</option>
+                                            <option value="IBKR-api">IBKR API</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editCashFlowExternalId" class="form-label">מזהה חיצוני</label>
+                                        <input type="text" class="form-control" id="editCashFlowExternalId" placeholder="מזהה חיצוני (אופציונלי)">
                                     </div>
                                 </div>
                             </div>

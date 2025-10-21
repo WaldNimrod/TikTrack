@@ -183,7 +183,7 @@ async function showAddExecutionModal() {
   }
 
   // טעינת טיקרים עם ברירת מחדל מהעדפות
-  await SelectPopulatorService.populateTickersSelect('addExecutionTicker', {
+  await SelectPopulatorService.populateTickersSelect('executionTicker', {
     includeEmpty: true,
     emptyText: 'בחר טיקר',
     defaultFromPreferences: true,
@@ -2142,7 +2142,7 @@ async function loadActiveTradesForTicker(mode = 'add', _showClosedTrades = false
   console.log('🔄 טעינת טריידים לטיקר, מצב:', mode, 'הצג טריידים סגורים:', _showClosedTrades);
 
   const tickerId = mode === 'add'
-    ? document.getElementById('addExecutionTicker').value
+    ? document.getElementById('executionTicker').value
     : document.getElementById('editExecutionTicker').value;
 
   if (!tickerId) {
@@ -2523,13 +2523,17 @@ window.addNewTrade = addNewTrade;
  * חישוב ערכים מחושבים לטופס הוספה
  */
 function calculateAddExecutionValues() {
-  const quantity = parseFloat(document.getElementById('addExecutionQuantity').value) || 0;
-  const price = parseFloat(document.getElementById('addExecutionPrice').value) || 0;
-  const commission = parseFloat(document.getElementById('addExecutionCommission').value) || 0;
+  const quantity = parseFloat(document.getElementById('executionQuantity').value) || 0;
+  const price = parseFloat(document.getElementById('executionPrice').value) || 0;
+  // Commission field does not exist in execution modal
 
-  const total = quantity * price + commission;
+  const total = quantity * price; // No commission in executions
 
-  document.getElementById('addExecutionTotal').textContent = `$${total.toFixed(2)}`;
+  // Total field may not exist - check if element exists
+  const totalElement = document.getElementById('executionTotal');
+  if (totalElement) {
+    totalElement.textContent = `$${total.toFixed(2)}`;
+  }
 }
 
 /**
@@ -2555,7 +2559,7 @@ window.calculateEditExecutionValues = calculateEditExecutionValues;
  */
 function goToLinkedTrade(mode = 'edit') {
   const tradeId = mode === 'add'
-    ? document.getElementById('addExecutionTradeId').value
+    ? document.getElementById('executionTradeId').value
     : document.getElementById('editExecutionTradeLink').getAttribute('data-trade-id');
 
   if (tradeId) {

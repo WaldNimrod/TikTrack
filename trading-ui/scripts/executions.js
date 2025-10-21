@@ -213,6 +213,16 @@ async function showAddExecutionModal() {
     filterFn: (account) => account.status === 'open'
   });
 
+  // אם לא נבחר חשבון ברירת מחדל, נבחר את הראשון
+  const accountSelect = document.getElementById('executionAccount');
+  if (accountSelect && accountSelect.value === '') {
+    const firstOption = accountSelect.querySelector('option:not([value=""])');
+    if (firstOption) {
+      accountSelect.value = firstOption.value;
+      console.log(`✅ נבחר חשבון ברירת מחדל: ${firstOption.textContent}`);
+    }
+  }
+
   // הוספת event listener לטיקר
   const tickerSelect = document.getElementById('executionTicker');
   if (tickerSelect) {

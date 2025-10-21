@@ -657,6 +657,49 @@ window.setCurrentEntityColorFromPage = setCurrentEntityColorFromPage;
 window.getEntityColorFromPreferences = getEntityColorFromPreferences;
 window.getAllEntityColorVariantsFromPreferences = getAllEntityColorVariantsFromPreferences;
 
+// ===== TABLE COLORS FUNCTIONS =====
+
+/**
+ * קבלת צבעים מוכנים לשימוש בטבלאות
+ * Get ready-to-use colors for tables
+ * @returns {Object} אובייקט עם צבעים מוכנים לשימוש
+ */
+function getTableColors() {
+  return {
+    positive: NUMERIC_VALUE_COLORS.positive || '#28a745',
+    negative: NUMERIC_VALUE_COLORS.negative || '#dc3545',
+    secondary: ENTITY_COLORS.preference || '#6c757d',
+    success: ENTITY_COLORS.account || '#28a745',
+    warning: ENTITY_COLORS.alert || '#ffc107',
+    info: ENTITY_COLORS.execution || '#17a2b8',
+    primary: ENTITY_COLORS.trade || '#007bff',
+  };
+}
+
+/**
+ * קבלת צבעים מוכנים לשימוש בטבלאות עם ברירות מחדל
+ * Get ready-to-use colors for tables with fallbacks
+ * @returns {Object} אובייקט עם צבעים מוכנים לשימוש
+ */
+function getTableColorsWithFallbacks() {
+  const colors = getTableColors();
+
+  // הוספת ברירות מחדל במקרה שהפונקציות לא עובדות
+  return {
+    positive: colors.positive || '#28a745',
+    negative: colors.negative || '#dc3545',
+    secondary: colors.secondary || '#6c757d',
+    success: colors.success || '#28a745',
+    warning: colors.warning || '#ffc107',
+    info: colors.info || '#17a2b8',
+    primary: colors.primary || '#007bff',
+  };
+}
+
+// Export functions
+window.getTableColors = getTableColors;
+window.getTableColorsWithFallbacks = getTableColorsWithFallbacks;
+
 // Export constants
 window.VALID_ENTITY_TYPES = VALID_ENTITY_TYPES;
 window.ENTITY_COLORS = ENTITY_COLORS;

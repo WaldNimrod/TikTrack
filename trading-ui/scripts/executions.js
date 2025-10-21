@@ -245,8 +245,8 @@ async function showAddExecutionModal() {
   calculateAddExecutionValues();
 
   // הצגת המודל
-  const modal = new bootstrap.Modal(document.getElementById('addExecutionModal'));
-  modal.show();
+  const bootstrapModal = new bootstrap.Modal(document.getElementById('addExecutionModal'));
+  bootstrapModal.show();
 }
 
 /**

@@ -2738,11 +2738,11 @@ function calculateAddExecutionValues() {
   let label = '';
 
   if (type === 'buy') {
-    // בקנייה: סה"כ עלות = כמות * מחיר + עמלה
-    total = quantity * price + commission;
+    // בקנייה: סה"כ עלות = -(כמות * מחיר + עמלה) - שלילי כי זה כסף שיוצא
+    total = -(quantity * price + commission);
     label = 'סה"כ עלות:';
   } else if (type === 'sell') {
-    // במכירה: סה"כ מזומן = כמות * מחיר - עמלה
+    // במכירה: סה"כ מזומן = כמות * מחיר - עמלה - חיובי כי זה כסף שנכנס
     total = quantity * price - commission;
     label = 'סה"כ מזומן:';
   } else {

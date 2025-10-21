@@ -177,10 +177,9 @@ async function showAddExecutionModal() {
       console.log(`✅ Using commission from userPreferences: ${defaultCommission}`);
     }
     
-    document.getElementById('addExecutionCommission').value = defaultCommission;
+    // Commission field does not exist in execution modal - skipped
   } catch (error) {
     console.warn('⚠️ Could not load default commission from preferences:', error);
-    document.getElementById('addExecutionCommission').value = 1.0;
   }
 
   // טעינת טיקרים עם ברירת מחדל מהעדפות

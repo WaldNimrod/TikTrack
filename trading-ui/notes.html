@@ -55,12 +55,14 @@
     <!-- Page Content -->
     <div class="background-wrapper">
         <div class="page-body">
-            <!-- Notes area - top-Section -->
-            <div class="top-section" data-section="top">
+            <!-- Main content -->
+            <div class="main-content">
+                <!-- Notes area - top-Section -->
+                <div class="top-section" data-section="top">
                 <!-- Main header -->
                 <div class="section-header">
                     <div class="table-title">
-                        <img src="images/icons/home.svg" alt="הערות" class="section-icon" style="width: 28px; height: 28px;">
+                        <img src="images/icons/home.svg" alt="הערות" class="section-icon">
                         הערות
                     </div>
                     <div class="table-actions">
@@ -90,7 +92,7 @@
                     <!-- Notes header -->
                     <div class="section-header">
                         <div class="table-title">
-                            <img src="images/icons/home.svg" alt="ניהול הערות" class="section-icon" style="width: 28px; height: 28px;">
+                            <img src="images/icons/home.svg" alt="ניהול הערות" class="section-icon">
                             ניהול הערות
                         </div>
                         <div class="table-count" id="notesCount">טוען...</div>
@@ -107,19 +109,19 @@
                                 <thead>
                                     <tr>
                                         <th class="col-symbol">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">סימבול <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); }">סימבול <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-content">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">תוכן <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); }">תוכן <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-related">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">אובייקט מקושר <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); }">אובייקט מקושר <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-created">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">נוצר ב <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); }">נוצר ב <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-attachment">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">קובץ מצורף <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); }">קובץ מצורף <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-actions actions-cell actions-3-btn">
                                             פעולות
@@ -139,7 +141,7 @@
         </div>
 
         <!-- Bottom page spacing -->
-        <div style="height: 3rem;"></div>
+        <div class="spacer-bottom"></div>
 
         <!-- Notification system -->
         <div class="notification-container" id="notificationContainer"></div>
@@ -275,6 +277,12 @@
     <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script>
     <script src="scripts/page-initialization-configs.js?v=1.0.0"></script>
     <script src="scripts/unified-app-initializer.js?v=1.0.0"></script>
+    
+    <!-- 14. Init System Check (Available on all pages) -->
+    <script src="scripts/init-system-check.js?v=1.0.0"></script>
+    
+    <!-- 15. Monitoring Functions (Required for page checks) -->
+    <script src="scripts/monitoring-functions.js?v=1.0.0"></script>
     
     <!-- Stage 2: Core Base Systems -->
     <script src="scripts/global-favicon.js?v=1.0.0"></script>

@@ -321,8 +321,8 @@ async function loadTradesData() {
     updateTableStats();
 
   } catch (error) {
-    if (typeof handleDataLoadError === 'function') {
-      handleDataLoadError(error, 'נתוני טריידים');
+    if (typeof handleApiError === 'function') {
+      handleApiError(error, 'נתוני טריידים');
     } else {
       // console.error('Error loading trades data:', error);
     }
@@ -1064,8 +1064,8 @@ async function loadEditTradeModalData(trade) {
     }
 
   } catch (error) {
-    if (typeof handleDataLoadError === 'function') {
-      handleDataLoadError(error, 'נתונים למודל עריכת טרייד');
+    if (typeof handleApiError === 'function') {
+      handleApiError(error, 'נתונים למודל עריכת טרייד');
     } else {
       // console.error('Error loading edit modal data:', error);
     }
@@ -1550,8 +1550,8 @@ async function loadModalData() {
 
   } catch (error) {
     console.error('❌ Error loading modal data:', error);
-    if (typeof handleDataLoadError === 'function') {
-      handleDataLoadError(error, 'נתונים למודל');
+    if (typeof handleApiError === 'function') {
+      handleApiError(error, 'נתונים למודל');
     } else {
       // console.error('Error loading modal data:', error);
     }
@@ -1600,8 +1600,8 @@ async function updateTickerFromTradePlan(tickerId) {
     enableTradeFormFields();
   } catch (error) {
     console.error('❌ Error updating ticker:', error);
-    if (typeof handleDataLoadError === 'function') {
-      handleDataLoadError(error, 'עדכון טיקר');
+    if (typeof handleApiError === 'function') {
+      handleApiError(error, 'עדכון טיקר');
     }
   }
 }
@@ -2341,8 +2341,8 @@ async function loadTradePlanDates() {
         }
       } catch (error) {
         link.textContent = 'תוכנית קיימת';
-        if (typeof handleDataLoadError === 'function') {
-          handleDataLoadError(error, `תוכנית ${planId}`);
+        if (typeof handleApiError === 'function') {
+          handleApiError(error, `תוכנית ${planId}`);
         } else {
           // console.error(`Error loading plan ${planId}:`, error);
         }
@@ -2802,8 +2802,8 @@ async function updateEditTradeTickerFromPlan(tradePlanId) {
     }
 
   } catch (error) {
-    if (typeof handleDataLoadError === 'function') {
-      handleDataLoadError(error, 'עדכון טיקר במודל העריכה');
+    if (typeof handleApiError === 'function') {
+      handleApiError(error, 'עדכון טיקר במודל העריכה');
     } else {
       // console.error('Error updating ticker in edit modal:', error);
     }
@@ -2850,8 +2850,8 @@ async function updateEditTradePriceFromTicker(tickerId) {
       }
     }
   } catch (error) {
-    if (typeof handleDataLoadError === 'function') {
-      handleDataLoadError(error, 'עדכון מחיר במודל העריכה');
+    if (typeof handleApiError === 'function') {
+      handleApiError(error, 'עדכון מחיר במודל העריכה');
     } else {
       // console.error('Error updating price in edit modal:', error);
     }

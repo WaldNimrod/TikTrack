@@ -711,7 +711,7 @@ async function loadTickersForEditModal() {
       tickerSelect.appendChild(option);
     });
   } catch (error) {
-    handleDataLoadError(error, 'טיקרים למודל עריכה');
+    handleApiError(error, 'טיקרים למודל עריכה');
   }
 }
 
@@ -1094,8 +1094,8 @@ async function checkLinkedItemsBeforeCancel(tradePlanId) {
     // console.error('❌ שגיאה בבדיקת פריטים מקושרים:', error);
     if (typeof window.handleSystemError === 'function') {
       window.handleSystemError(error, 'בדיקת פריטים מקושרים');
-    } else if (typeof window.handleDataLoadError === 'function') {
-      window.handleDataLoadError(error, 'בדיקת פריטים מקושרים');
+    } else if (typeof window.handleApiError === 'function') {
+      window.handleApiError(error, 'בדיקת פריטים מקושרים');
     }
     // במקרה של שגיאה - ממשיכים עם הביטול
     await cancelTradePlan(tradePlanId);
@@ -1451,7 +1451,7 @@ async function loadTradePlansData() {
       return data;
     }
   } catch (error) {
-    handleDataLoadError(error, 'נתוני תכנונים');
+    handleApiError(error, 'נתוני תכנונים');
     return [];
   }
 }

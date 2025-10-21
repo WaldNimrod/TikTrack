@@ -76,8 +76,14 @@
     margin-top: 0;
 }
 
+#unified-header .header-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
 #unified-header .header-top {
-    margin: 0;
+    margin: 0 !important;
     padding: 0;
     display: flex;
     justify-content: center;
@@ -87,6 +93,7 @@
     min-height: 70px;
     direction: rtl;
     background: var(--apple-bg-elevated);
+    width: 100%;
 }
 
 #unified-header .header-top .logo-section {

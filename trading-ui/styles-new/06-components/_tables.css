@@ -45,6 +45,77 @@
   min-width: 80px;
 }
 
+/* ===== Sortable Headers ===== */
+.sortable-header {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    text-align: center;
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    font-weight: inherit;
+    font-size: inherit;
+}
+
+/* ===== Bottom Spacer ===== */
+.spacer-bottom {
+    height: 3rem;
+}
+
+/* ===== Filter Components ===== */
+.filter-icon-btn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.filter-icon {
+    width: 14px;
+    height: 14px;
+}
+
+.filter-separator {
+    margin: 0 10px;
+    color: #666;
+}
+
+/* ===== Toast High Z-Index ===== */
+.toast-high-z {
+    z-index: 1000000002;
+}
+
+/* ===== Alert Table Columns ===== */
+.col-ticker { width: 10%; }
+.col-condition { width: 18%; }
+.col-status { width: 8%; }
+.col-triggered { width: 8%; }
+.col-linked-object { width: 20%; }
+.col-message { width: 12%; }
+.col-created { width: 10%; }
+.col-actions { width: 14%; }
+
+/* ===== Filter Components ===== */
+.filter-margin-top {
+    margin-top: 10px;
+}
+
+.filter-active-btn {
+    background-color: white;
+    color: #28a745;
+    border-color: #28a745;
+}
+
+/* ===== Form Components ===== */
+.flex-1 {
+    flex: 1;
+}
+
 .col-price { 
   width: 10%; 
   min-width: 90px;

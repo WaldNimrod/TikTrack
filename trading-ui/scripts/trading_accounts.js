@@ -394,7 +394,7 @@ async function loadTradingAccountsData() {
       return trading_accounts;
     }
   } catch (error) {
-    handleDataLoadError(error, 'טעינת נתוני חשבונות');
+    handleApiError(error, 'טעינת נתוני חשבונות');
     throw error;
   }
 }
@@ -568,7 +568,7 @@ async function loadTradingAccounts() {
     }
 
   } catch (error) {
-    handleDataLoadError(error, 'טעינת חשבונות');
+    handleApiError(error, 'טעינת חשבונות');
     const tbody = document.querySelector('.content-section:nth-child(2) tbody');
     if (tbody) {
       const errorText = `שגיאה בטעינת חשבונות: ${error.message}`;
@@ -1223,11 +1223,11 @@ async function showEditTradingAccountModalById(tradingAccountId) {
     showEditTradingAccountModal(tradingAccount);
 
   } catch (error) {
-    handleDataLoadError(error, 'טעינת נתוני חשבון');
+    handleApiError(error, 'טעינת נתוני חשבון');
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני החשבון: ' + error.message);
     } else {
-      handleDataLoadError(error, 'טעינת נתוני החשבון');
+      handleApiError(error, 'טעינת נתוני החשבון');
     }
   }
 }

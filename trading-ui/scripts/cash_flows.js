@@ -352,7 +352,7 @@ async function loadCashFlows() {
       }
     }
   } catch (error) {
-    handleDataLoadError(error, 'טעינת תזרימי מזומנים');
+    handleApiError(error, 'טעינת תזרימי מזומנים');
 
     // הצגת הודעת שגיאה
     if (window.showInfoNotification) {
@@ -603,7 +603,7 @@ async function loadCurrenciesFromServer() {
       }
     }
   } catch (error) {
-    handleDataLoadError(error, 'טעינת מטבעות מהשרת');
+    handleApiError(error, 'טעינת מטבעות מהשרת');
 
     // הצגת הודעת שגיאה
     if (window.showInfoNotification) {
@@ -636,7 +636,7 @@ async function loadAccountsForCashFlow(selectId, useDefaultFromPreferences = fal
     }
     
   } catch (error) {
-    handleDataLoadError(error, 'טעינת חשבונות');
+    handleApiError(error, 'טעינת חשבונות');
 
     // הצגת הודעת שגיאה
     if (window.showInfoNotification) {
@@ -659,7 +659,7 @@ async function loadCurrenciesForCashFlow(selectId, useDefaultFromPreferences = f
       defaultFromPreferences: useDefaultFromPreferences
     });
   } catch (error) {
-    handleDataLoadError(error, 'טעינת מטבעות');
+    handleApiError(error, 'טעינת מטבעות');
 
     // הצגת הודעת שגיאה
     if (window.showInfoNotification) {
@@ -1487,8 +1487,7 @@ async function _showAddCashFlowModal() {
     const modal = new bootstrap.Modal(document.getElementById('addCashFlowModal'));
     modal.show();
   } catch (error) {
-    handleDataLoadError(error, 'טעינת נתונים להוספה');
-    window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתונים להוספה');
+    handleApiError(error, 'טעינת נתונים להוספה');
   }
 }
 
@@ -1547,8 +1546,7 @@ async function _showEditCashFlowModal(id) {
     const modal = new bootstrap.Modal(document.getElementById('editCashFlowModal'));
     modal.show();
   } catch (error) {
-    handleDataLoadError(error, 'טעינת נתונים לעריכה');
-    window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתונים לעריכה');
+    handleApiError(error, 'טעינת נתונים לעריכה');
   }
 }
 
@@ -2030,198 +2028,8 @@ async function copyDetailedLog() {
     }
 }
 
-// ===== מערכת טיפול בשגיאות מתקדמת =====
-
-/**
- * טיפול מתקדם בשגיאות API
- */
-function handleApiError(context, error, fallbackData = null) {
-  console.error(`❌ API Error in ${context}:`, error);
-  
-  // הודעת שגיאה מפורטת
-  let errorMessage = `שגיאה ב-${context}`;
-  let errorDetails = '';
-  
-  if (typeof error === 'string') {
-    errorDetails = error;
-  } else if (error && error.message) {
-    errorDetails = error.message;
-  } else if (error && error.status) {
-    errorDetails = `HTTP ${error.status}`;
-  } else {
-    errorDetails = 'שגיאה לא ידועה';
-  }
-  
-  // הצגת הודעת שגיאה למשתמש
-  if (typeof window.showErrorNotification === 'function') {
-    window.showErrorNotification(errorMessage, errorDetails);
-  } else if (typeof window.showNotification === 'function') {
-    window.showNotification(errorMessage, 'error');
-  } else {
-    alert(`${errorMessage}: ${errorDetails}`);
-  }
-  
-  // שימוש בנתוני fallback אם קיימים
-  if (fallbackData) {
-    console.log(`🔄 משתמש בנתוני fallback עבור ${context}`);
-    return fallbackData;
-  }
-  
-  return null;
-}
-
-/**
- * טיפול מתקדם בשגיאות טעינת נתונים
- */
-function handleDataLoadError(error, context, retryCount = 0) {
-  console.error(`❌ Data Load Error in ${context}:`, error);
-  
-  // הודעת שגיאה מותאמת לפי הקשר
-  let errorMessage = `שגיאה בטעינת ${context}`;
-  let errorDetails = '';
-  
-  if (error && error.message) {
-    errorDetails = error.message;
-  } else if (typeof error === 'string') {
-    errorDetails = error;
-  } else {
-    errorDetails = 'שגיאה לא ידועה';
-  }
-  
-  // הצגת הודעת שגיאה למשתמש
-  if (typeof window.showErrorNotification === 'function') {
-    window.showErrorNotification(errorMessage, errorDetails);
-  } else if (typeof window.showNotification === 'function') {
-    window.showNotification(errorMessage, 'error');
-  } else {
-    alert(`${errorMessage}: ${errorDetails}`);
-  }
-  
-  // ניסיון חוזר אוטומטי (עד 3 פעמים)
-  if (retryCount < 3) {
-    console.log(`🔄 מנסה שוב (${retryCount + 1}/3) עבור ${context}`);
-    setTimeout(() => {
-      // קריאה חוזרת לפונקציה המקורית
-      if (context.includes('תזרימי מזומנים')) {
-        loadCashFlows();
-      } else if (context.includes('מטבעות')) {
-        loadCurrenciesFromServer();
-      } else if (context.includes('חשבונות')) {
-        loadAccountsForCashFlow('cashFlowAccount', true);
-      }
-    }, 2000 * (retryCount + 1)); // השהיה הולכת וגדלה
-  }
-}
-
-/**
- * טיפול מתקדם בשגיאות אלמנטים לא נמצאו
- */
-function handleElementNotFound(context, elementId) {
-  console.error(`❌ Element Not Found in ${context}:`, elementId);
-  
-  // הודעת שגיאה מפורטת
-  const errorMessage = `אלמנט לא נמצא`;
-  const errorDetails = `האלמנט ${elementId} לא נמצא ב-${context}`;
-  
-  // הצגת הודעת שגיאה למשתמש
-  if (typeof window.showErrorNotification === 'function') {
-    window.showErrorNotification(errorMessage, errorDetails);
-  } else if (typeof window.showNotification === 'function') {
-    window.showNotification(errorMessage, 'error');
-  } else {
-    alert(`${errorMessage}: ${errorDetails}`);
-  }
-}
-
-/**
- * טיפול מתקדם בשגיאות validation
- */
-function handleValidationError(fieldId, message, context = '') {
-  console.error(`❌ Validation Error in ${context}:`, fieldId, message);
-  
-  // הצגת שגיאה בשדה
-  if (typeof window.showValidationWarning === 'function') {
-    window.showValidationWarning(fieldId, message);
-  } else if (typeof window.showFieldError === 'function') {
-    window.showFieldError(fieldId, message);
-  } else {
-    // fallback פשוט
-    const field = document.getElementById(fieldId);
-    if (field) {
-      field.style.borderColor = '#dc3545';
-      field.title = message;
-    }
-  }
-}
-
-
-/**
- * טיפול מתקדם בשגיאות רשת
- */
-function handleNetworkError(error, context) {
-  console.error(`❌ Network Error in ${context}:`, error);
-  
-  // זיהוי סוג השגיאה
-  let errorMessage = 'שגיאת רשת';
-  let errorDetails = '';
-  
-  if (error.name === 'TypeError' && error.message.includes('fetch')) {
-    errorMessage = 'שגיאת חיבור לשרת';
-    errorDetails = 'לא ניתן להתחבר לשרת. אנא בדוק את החיבור לאינטרנט.';
-  } else if (error.name === 'AbortError') {
-    errorMessage = 'בקשה בוטלה';
-    errorDetails = 'הבקשה בוטלה על ידי המשתמש או השרת.';
-  } else if (error.status === 500) {
-    errorMessage = 'שגיאת שרת';
-    errorDetails = 'השרת חווה שגיאה פנימית. אנא נסה שוב מאוחר יותר.';
-  } else if (error.status === 404) {
-    errorMessage = 'משאב לא נמצא';
-    errorDetails = 'המשאב המבוקש לא נמצא בשרת.';
-  } else if (error.status === 403) {
-    errorMessage = 'אין הרשאה';
-    errorDetails = 'אין לך הרשאה לגשת למשאב זה.';
-  } else {
-    errorDetails = error.message || 'שגיאה לא ידועה';
-  }
-  
-  // הצגת הודעת שגיאה למשתמש
-  if (typeof window.showErrorNotification === 'function') {
-    window.showErrorNotification(errorMessage, errorDetails);
-  } else if (typeof window.showNotification === 'function') {
-    window.showNotification(errorMessage, 'error');
-  } else {
-    alert(`${errorMessage}: ${errorDetails}`);
-  }
-}
-
-/**
- * טיפול מתקדם בשגיאות כללי
- */
-function handleGeneralError(error, context, fallbackAction = null) {
-  console.error(`❌ General Error in ${context}:`, error);
-  
-  // הודעת שגיאה כללית
-  const errorMessage = `שגיאה ב-${context}`;
-  const errorDetails = error.message || error.toString() || 'שגיאה לא ידועה';
-  
-  // הצגת הודעת שגיאה למשתמש
-  if (typeof window.showErrorNotification === 'function') {
-    window.showErrorNotification(errorMessage, errorDetails);
-  } else if (typeof window.showNotification === 'function') {
-    window.showNotification(errorMessage, 'error');
-  } else {
-    alert(`${errorMessage}: ${errorDetails}`);
-  }
-  
-  // ביצוע פעולת fallback אם קיימת
-  if (fallbackAction && typeof fallbackAction === 'function') {
-    try {
-      fallbackAction();
-    } catch (fallbackError) {
-      console.error('❌ Fallback action failed:', fallbackError);
-    }
-  }
-}
+// ===== מערכת טיפול בשגיאות =====
+// השתמש במערכת הכללית error-handlers.js
 
 // ===== ייצוא פונקציות לגלובל scope =====
 // הוספת פונקציות חשובות ל-window object כדי שיהיו זמינות גלובלית
@@ -2270,13 +2078,7 @@ window.confirmDeleteCashFlow = confirmDeleteCashFlow;
 window.generateDetailedLog = generateDetailedLog;
 // window.copyDetailedLog export removed - using local function only
 
-// פונקציות טיפול בשגיאות מתקדמות
-window.handleApiError = handleApiError;
-window.handleDataLoadError = handleDataLoadError;
-window.handleElementNotFound = handleElementNotFound;
-window.handleValidationError = handleValidationError;
-window.handleNetworkError = handleNetworkError;
-window.handleGeneralError = handleGeneralError;
+// פונקציות טיפול בשגיאות - משתמש במערכת הכללית error-handlers.js
 
 // פונקציות אתחול
 window.initializeCashFlowsPage = initializeCashFlowsPage;

@@ -53,7 +53,7 @@
                     </div>
                     <div class="section-body">
                         <!-- Color Scheme Demo for Alerts -->
-                        <div id="alertsColorDemo" class="mb-3" style="display: none;">
+                        <div id="alertsColorDemo" class="mb-3 d-none">
                             <div class="d-flex gap-2 mb-2">
                                 <span class="entity-alert-badge">התראה פעילה</span>
                                 <span class="entity-ticker-badge">טיקר AAPL</span>
@@ -86,23 +86,23 @@
                         <div class="filter-buttons-container button-row">
                             <button data-button-type="ADD" data-entity-type="alert" data-variant="full" data-onclick="showAddAlertModal()" data-text="הוסף התראה" title="הוסף התראה חדשה"></button>
                             <div class="action-separator"></div>
-                            <button class="btn btn-sm active" onclick="filterAlertsByRelatedObjectType('all')" data-type="all" title="הצג הכל" style="background-color: white; color: #28a745; border-color: #28a745;">
+                            <button class="btn btn-sm active" onclick="filterAlertsByRelatedObjectType('all')" data-type="all" title="הצג הכל">
                                 הכל
                             </button>
-                            <button class="btn btn-sm btn-outline-primary" onclick="filterAlertsByRelatedObjectType('account')" data-type="account" title="חשבונות" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
-                                <img src="images/icons/trading_accounts.svg" alt="חשבונות מסחר" style="width: 14px; height: 14px;">
+                            <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterAlertsByRelatedObjectType('account')" data-type="account" title="חשבונות">
+                                <img src="images/icons/trading_accounts.svg" alt="חשבונות מסחר" class="filter-icon">
                             </button>
-                            <button class="btn btn-sm btn-outline-primary" onclick="filterAlertsByRelatedObjectType('trade')" data-type="trade" title="טריידים" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
-                                <img src="images/icons/trades.svg" alt="טריידים" style="width: 14px; height: 14px;">
+                            <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterAlertsByRelatedObjectType('trade')" data-type="trade" title="טריידים">
+                                <img src="images/icons/trades.svg" alt="טריידים" class="filter-icon">
                             </button>
-                            <button class="btn btn-sm btn-outline-primary" onclick="filterAlertsByRelatedObjectType('trade_plan')" data-type="trade_plan" title="תוכניות" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
-                                <img src="images/icons/trade_plans.svg" alt="תוכניות" style="width: 14px; height: 14px;">
+                            <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterAlertsByRelatedObjectType('trade_plan')" data-type="trade_plan" title="תוכניות">
+                                <img src="images/icons/trade_plans.svg" alt="תוכניות" class="filter-icon">
                             </button>
-                            <button class="btn btn-sm btn-outline-primary" onclick="filterAlertsByRelatedObjectType('ticker')" data-type="ticker" title="טיקרים" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
-                                <img src="images/icons/tickers.svg" alt="טיקרים" style="width: 14px; height: 14px;">
+                            <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterAlertsByRelatedObjectType('ticker')" data-type="ticker" title="טיקרים">
+                                <img src="images/icons/tickers.svg" alt="טיקרים" class="filter-icon">
                             </button>
                             
-                            <span style="margin: 0 10px; color: #666;">|</span>
+                            <span class="filter-separator">|</span>
                         </div>
                         <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('section1')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
                     </div>
@@ -112,56 +112,49 @@
                             <table class="table" id="alertsTable" data-table-type="alerts">
                                 <thead>
                                     <tr>
-                                        <th style="width: 10%;">
+                                        <th class="col-ticker">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(0, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(0, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
                                                 טיקר <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
-                                        <th style="width: 18%;">
+                                        <th class="col-condition">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(1, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(1, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
                                                 תנאי <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
-                                        <th style="width: 8%;">
+                                        <th class="col-status">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(2, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(2, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
                                                 סטטוס <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
-                                        <th style="width: 8%;">
+                                        <th class="col-triggered">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(3, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(3, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
                                                 הופעל <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
-                                        <th style="width: 20%;">
+                                        <th class="col-linked-object">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(4, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(4, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
                                                 קשור ל: <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
-                                        <th style="width: 12%;">
+                                        <th class="col-message">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(5, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(5, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
                                                 הודעה <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
-                                        <th style="width: 10%;">
+                                        <th class="col-created">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(6, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(6, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
                                                 נוצר ב: <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
-                                        <th class="actions-cell" style="width: 14%;">
+                                        <th class="actions-cell col-actions">
                                             פעולות
                                         </th>
                                     </tr>
@@ -180,13 +173,13 @@
         </div>
 
         <!-- Bottom page spacing -->
-        <div style="height: 3rem;"></div>
+        <div class="spacer-bottom"></div>
 
         <!-- Notification system -->
         <div class="notification-container" id="notificationContainer"></div>
 
         <!-- Toast container for notifications -->
-        <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1000000002;"></div>
+        <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3 toast-high-z"></div>
 
         <!-- Add Alert Modal -->
         <div class="modal fade" id="addAlertModal" tabindex="-1" aria-labelledby="addAlertModalLabel" aria-hidden="true"
@@ -355,7 +348,7 @@
                                     </div>
                                     
                                     <!-- Alert Configuration -->
-                                    <div class="row" id="alertConfigSection" style="display: none;">
+                                    <div class="row d-none" id="alertConfigSection">
                                         <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="alertMessageFromCondition" class="form-label">הודעת התראה</label>
@@ -383,7 +376,7 @@
                     <div class="modal-footer d-flex justify-content-end">
                         <button data-button-type="CANCEL" data-bs-dismiss="modal" data-text="ביטול"></button>
                         <button data-button-type="SAVE" data-onclick="addAlert()" data-text="הוסף התראה"></button>
-                        <button type="button" class="btn btn-primary" onclick="createAlertFromCondition()" id="createFromConditionBtn" style="display: none;">
+                        <button type="button" class="btn btn-primary d-none" onclick="createAlertFromCondition()" id="createFromConditionBtn">
                             צור התראה מתנאי
                         </button>
                     </div>
@@ -471,6 +464,7 @@
     <script src="scripts/global-favicon.js?v=1.0.0"></script>
     <script src="scripts/notification-system.js?v=1.0.0"></script>
     <script src="scripts/warning-system.js?v=1.0.0"></script>
+    <script src="scripts/error-handlers.js?v=1.0.0"></script>
     <script src="scripts/entity-details-api.js?v=1.0.0"></script>
     <script src="scripts/entity-details-renderer.js?v=1.0.0"></script>
     <script src="scripts/entity-details-modal.js?v=1.0.0"></script>
@@ -513,6 +507,13 @@
     <script src="scripts/unified-app-initializer.js?v=1.0.0"></script>
     <!-- Page-specific Scripts -->
     <script src="scripts/alerts.js?v=1.0.0"></script>
+    
+    <!-- 14. Init System Check (Available on all pages) -->
+    <script src="scripts/init-system-check.js?v=1.0.0"></script>
+    
+    <!-- 15. Monitoring Functions (Required for page checks) -->
+    <script src="scripts/monitoring-functions.js?v=1.0.0"></script>
+    
     <script>
         // Make the local copyDetailedLog function available globally for this page only
         window.copyDetailedLog = copyDetailedLog;

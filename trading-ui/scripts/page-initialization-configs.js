@@ -329,14 +329,14 @@ const PAGE_CONFIGS = {
         name: 'Executions',
         
         // ← NEW: חבילות נדרשות
-        packages: ['base', 'crud', 'filters', 'preferences'],
+        packages: ['base', 'services', 'ui-advanced', 'crud', 'filters', 'preferences', 'init'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
             'NotificationSystem',
             'DataUtils',
             'window.loadExecutionsData',
-            'window.loadUserPreferences'
+            'window.getCurrentPreference'
         ],
         
         // ← NEW: מטאדאטה
@@ -500,12 +500,15 @@ const PAGE_CONFIGS = {
     'cash_flows': {
         name: 'Cash Flows',
         // 📦 PACKAGES EXPLANATION:
-        // - 'base': button-system-init.js (for button rendering)
-        // - 'crud': date-utils.js (for formatDate function)
-        packages: ['base', 'crud', 'preferences'],
+        // - 'base': מערכות ליבה בסיסיות
+        // - 'services': שירותי עזר כלליים
+        // - 'ui-advanced': ממשק משתמש מתקדם (כפתורים, טבלאות)
+        // - 'crud': מערכות CRUD ו-entity-details
+        // - 'preferences': מערכת העדפות
+        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init', 'cash-flows'],
         requiredGlobals: [
             'NotificationSystem',    // from base package
-            'DataUtils',            // from crud package  
+            'DataUtils',            // from services package  
             'getCurrentPreference', // from preferences package
             'window.loadCashFlowsData',
             'window.formatDate',    // from crud package (date-utils.js)

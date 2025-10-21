@@ -104,7 +104,7 @@ async function loadTableData(tableType) {
 
   } catch (error) {
     // console.error(`❌ Error loading data for ${tableType}:`, error);
-    handleDataLoadError(error, tableType);
+    handleApiError(error, `טעינת נתוני ${tableType}`);
   }
 }
 
@@ -352,32 +352,8 @@ function formatStatus(status) {
   return statusMap[status] || status;
 }
 
-/**
- * Handle data load error
- * @param {Error} error - The error
- * @param {string} tableType - The table type
- */
-function handleDataLoadError(error, tableType) {
-  // console.error(`❌ Error loading ${tableType} data:`, error);
-
-  // Show error notification
-  if (window.showErrorNotification) {
-    window.showErrorNotification(`שגיאה בטעינת נתוני ${tableType}`);
-  }
-
-  // Show error state in table
-  if (currentTableType) {
-    const containerId = `${currentTableType}Container`;
-    const tableContainer = document.getElementById(containerId);
-    if (tableContainer) {
-      const tbody = tableContainer.querySelector('tbody');
-      if (tbody) {
-        tbody.innerHTML = '<tr><td colspan="10" class="text-center text-danger">' +
-          `שגיאה בטעינת נתונים: ${error.message}</td></tr>`;
-      }
-    }
-  }
-}
+// ===== מערכת טיפול בשגיאות =====
+// השתמש במערכת הכללית error-handlers.js
 
 /**
  * Toggle top section visibility

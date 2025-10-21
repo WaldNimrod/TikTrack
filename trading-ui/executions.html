@@ -55,12 +55,14 @@
     <!-- Page Content -->
     <div class="background-wrapper">
         <div class="page-body">
-            <!-- Executions area - top-Section -->
-            <div class="top-section" data-section="top">
+            <!-- Main content -->
+            <div class="main-content">
+                <!-- Executions area - top-Section -->
+                <div class="top-section" data-section="top">
                 <!-- Main header -->
                 <div class="section-header">
                     <div class="table-title">
-                        <img src="images/icons/executions.svg" alt="עסקעות" class="section-icon" style="width: 28px; height: 28px;">
+                        <img src="images/icons/executions.svg" alt="עסקעות" class="section-icon">
                         עסקעות
                     </div>
                     <div class="table-actions">
@@ -90,7 +92,7 @@
                     <!-- Executions header -->
                     <div class="section-header">
                         <div class="table-title">
-                            <img src="images/icons/executions.svg" alt="ניהול עסקעות" class="section-icon" style="width: 28px; height: 28px;">
+                            <img src="images/icons/executions.svg" alt="ניהול עסקעות" class="section-icon">
                             ניהול עסקעות
                         </div>
                         <div class="table-count" id="executionsCount">טוען...</div>
@@ -107,42 +109,42 @@
                                 <thead>
                                     <tr>
                                         <th class="col-ticker">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); }">
                                                 טיקר <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-action">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); }">
                                                 פעולה <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-account">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); }">
                                                 חשבון <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-quantity">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); }">
                                                 כמות <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-price">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); }">
                                                 מחיר <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-pnl">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); }">
                                                 P&L <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-execution-date">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(6); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(6); }">
                                                 תאריך ביצוע <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-source">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(7); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">מקור <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(7); }">מקור <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-actions actions-cell actions-3-btn">
                                             פעולות
@@ -162,7 +164,7 @@
         </div>
 
         <!-- Bottom page spacing -->
-        <div style="height: 3rem;"></div>
+        <div class="spacer-bottom"></div>
 
         <!-- Notification system -->
         <div class="notification-container" id="notificationContainer"></div>

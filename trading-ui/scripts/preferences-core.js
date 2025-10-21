@@ -863,43 +863,16 @@ class ProfileManager {
     }
     
     /**
-     * Update profile UI elements
+     * Update profile UI elements (delegated to preferences page)
      * Updates both display (currentActiveProfile) and selection (profileSwitchSelect)
      */
     async updateDropdown() {
-        // 1. Update current active profile display
-        const currentActiveElem = document.getElementById('currentActiveProfile');
-        if (currentActiveElem) {
-            const activeProfile = this.profiles.find(p => p.active);
-            if (activeProfile) {
-                currentActiveElem.textContent = activeProfile.name;
-                currentActiveElem.dataset.profileId = activeProfile.id;
-            }
+        // Delegate to preferences page if available
+        if (typeof window.updateDropdown === 'function') {
+            await window.updateDropdown();
+        } else {
+            console.log('📊 updateDropdown not available - preferences page not loaded');
         }
-        
-        // 2. Update profile selection dropdown
-        const switchSelect = document.getElementById('profileSwitchSelect');
-        if (switchSelect) {
-            // Clear existing options
-            switchSelect.innerHTML = '<option value="">בחר פרופיל...</option>';
-            
-            // Add all profiles (including active one)
-            this.profiles.forEach(profile => {
-                const option = document.createElement('option');
-                option.value = profile.id;
-                option.textContent = profile.name;
-                option.dataset.profileName = profile.name;
-                
-                // Mark if this is the current active profile
-                if (profile.active) {
-                    option.textContent += ' (פעיל כעת)';
-                }
-                
-                switchSelect.appendChild(option);
-            });
-        }
-        
-        console.log(`📋 Updated profile UI with ${this.profiles.length} profiles`);
     }
     
     /**
@@ -1115,55 +1088,15 @@ class UIManager {
     }
     
     /**
-     * Update statistics counters
+     * Update statistics counters (delegated to preferences page)
      * @param {Object} preferencesData - Current preferences
      */
     async updateCounters(preferencesData = null) {
-        try {
-            console.log('📊 Updating counters...');
-            
-            // Preferences count
-            if (preferencesData) {
-                const count = Object.keys(preferencesData).length;
-                this._updateElement('preferencesCount', count);
-                console.log(`📊 Preferences count: ${count}`);
-            }
-            
-            // Profiles count
-            try {
-                const profiles = await this.api.getProfiles(this.preferencesManager?.userId || 1);
-                const profilesCount = profiles?.profiles?.length || 0;
-                this._updateElement('profilesCount', profilesCount);
-                console.log(`📊 Profiles count: ${profilesCount}`);
-                
-                // Active profile - update both displays
-                const activeProfile = profiles?.profiles?.find(p => p.active);
-                if (activeProfile) {
-                    // Update top statistics
-                    this._updateElement('activeProfileInfo', activeProfile.name);
-                    // Update section 1 display
-                    this._updateElement('currentActiveProfile', activeProfile.name);
-                    console.log(`📊 Active profile: ${activeProfile.name}`);
-                }
-            } catch (error) {
-                console.warn('⚠️ Could not load profiles count:', error);
-            }
-            
-            // Groups count
-            try {
-                const groups = await this.api.getGroups();
-                const groupsCount = groups?.groups?.length || 13;  // Fallback to known count
-                this._updateElement('groupsCount', groupsCount);
-                console.log(`📊 Groups count: ${groupsCount}`);
-            } catch (error) {
-                console.warn('⚠️ Could not load groups count, using fallback');
-                this._updateElement('groupsCount', 13);
-            }
-            
-            console.log('✅ Counters updated successfully');
-            
-        } catch (error) {
-            console.error('❌ Error updating counters:', error);
+        // Delegate to preferences page if available
+        if (typeof window.updateCounters === 'function') {
+            await window.updateCounters(preferencesData);
+        } else {
+            console.log('📊 updateCounters not available - preferences page not loaded');
         }
     }
     
@@ -1208,15 +1141,15 @@ class UIManager {
     }
     
     /**
-     * Update element text content
+     * Update element text content (delegated to preferences page)
      * @private
      */
     _updateElement(id, value) {
-        const element = document.getElementById(id);
-        if (element) {
-            element.textContent = value;
+        // Delegate to preferences page if available
+        if (typeof window.updateElement === 'function') {
+            window.updateElement(id, value);
         } else {
-            console.warn(`⚠️ Element not found: ${id}`);
+            console.log(`📊 updateElement not available - preferences page not loaded (${id})`);
         }
     }
     
@@ -1285,19 +1218,16 @@ class PreferencesSystem {
                 console.warn('⚠️ Preferences normalization failed:', e);
             }
 
-            // Step 8: Load accounts using SelectPopulatorService
-            if (typeof window.SelectPopulatorService !== 'undefined') {
+            // Step 8: Load accounts using SelectPopulatorService (delegated to preferences page)
+            if (typeof window.loadAccountsForPreferences === 'function') {
                 try {
-                    await window.SelectPopulatorService.populateAccountsSelect('defaultAccountFilter', {
-                        includeEmpty: true,
-                        emptyText: 'בחר חשבון מסחר',
-                        defaultFromPreferences: true,
-                        filterFn: account => account.status === 'open'
-                    });
+                    await window.loadAccountsForPreferences();
                     console.log('✅ Trading accounts loaded');
                 } catch (error) {
                     console.warn('⚠️ Could not load trading accounts:', error);
                 }
+            } else {
+                console.log('📊 Skipping accounts loading - preferences page not loaded');
             }
             
             // Step 9: Setup event listeners
@@ -1558,123 +1488,57 @@ class PreferencesSystem {
     }
     
     /**
-     * Collect form data from all inputs
+     * Collect form data from all inputs (delegated to preferences page)
      * @private
      * @returns {Object} Form data
      */
     _collectFormData() {
-        const formData = {};
-        const inputs = document.querySelectorAll('input, select, textarea');
-        
-        inputs.forEach(input => {
-            if (input.id && !input.disabled) {
-                // Skip buttons and non-preference fields
-                const skipIds = [
-                    'saveAllBtn', 'resetBtn', 'toggleAllBtn', 'addPreferenceBtn',
-                    'profileSelect', 'profileSwitchSelect', 'newProfileName', 'currentActiveProfile', 'switchProfileBtn',  // Profile management
-                    'admin-user-select', 'admin-profile-select', 'admin-group-select', 'admin-search-input',  // Admin (if exists)
-                    'preferenceName', 'preferenceValue', 'preferenceType', 'preferenceCategory', 'preferenceDescription',  // Modal fields
-                    'editPreferenceName', 'editPreferenceValue', 'editPreferenceType', 'editPreferenceCategory', 'editPreferenceDescription'  // Edit modal
-                ];
-                
-                if (skipIds.includes(input.id)) {
-                    return;
-                }
-                
-                // Get value based on input type
-                if (input.type === 'checkbox') {
-                    formData[input.id] = input.checked;
-                } else if (input.type === 'number') {
-                    formData[input.id] = parseFloat(input.value) || 0;
-                } else if (input.type === 'color') {
-                    formData[input.id] = input.value || '#000000';
-                } else {
-                    formData[input.id] = input.value;
-                }
-            }
-        });
-        
-        console.log(`📋 Collected ${Object.keys(formData).length} form fields`);
-        return formData;
+        // Delegate to preferences page if available
+        if (typeof window.collectFormData === 'function') {
+            return window.collectFormData();
+        } else {
+            console.log('📊 collectFormData not available - preferences page not loaded');
+            return {};
+        }
     }
     
     /**
-     * Apply preferences to form inputs
+     * Apply preferences to form inputs (delegated to preferences page)
      * @param {Object} preferences - Preferences to apply
      * @private
      */
     _applyToForm(preferences) {
-        if (!preferences) return;
-        
-        let updated = 0;
-        
-        Object.entries(preferences).forEach(([key, value]) => {
-            const element = document.getElementById(key);
-            if (element && !element.disabled) {
-                // Apply value based on element type
-                if (element.type === 'checkbox') {
-                    element.checked = (value === true || value === 'true' || value === '1' || value === 1);
-                    updated++;
-                } else if (element.type === 'number') {
-                    element.value = parseFloat(value) || 0;
-                    updated++;
-                } else if (element.type === 'color') {
-                    element.value = value || '#000000';
-                    updated++;
-                } else if (element.tagName === 'SELECT') {
-                    element.value = value || '';
-                    updated++;
-                } else {
-                    element.value = value || '';
-                    updated++;
-                }
-            }
-        });
-        
-        console.log(`📝 Applied ${updated} preferences to form`);
+        // Delegate to preferences page if available
+        if (typeof window.applyToForm === 'function') {
+            window.applyToForm(preferences);
+        } else {
+            console.log('📊 applyToForm not available - preferences page not loaded');
+        }
     }
     
     /**
-     * Setup event listeners
+     * Setup event listeners (delegated to preferences page)
      * @private
      */
     _setupEventListeners() {
-        // No auto-switching on dropdown change!
-        // User must click "החלף לפרופיל זה" button explicitly
-        console.log('✅ Event listeners setup complete (profile switching requires explicit button click)');
+        // Delegate to preferences page if available
+        if (typeof window.setupEventListeners === 'function') {
+            window.setupEventListeners();
+        } else {
+            console.log('📊 Event listeners setup skipped - preferences page not loaded');
+        }
     }
     
     /**
-     * Switch to selected profile from dropdown
+     * Switch to selected profile from dropdown (delegated to preferences page)
      * Called when user clicks "החלף לפרופיל זה" button
      */
     async switchToSelectedProfile() {
-        try {
-            const switchSelect = document.getElementById('profileSwitchSelect');
-            const selectedProfileId = parseInt(switchSelect?.value);
-            
-            if (!selectedProfileId) {
-                this.ui.showWarning('לא נבחר פרופיל', 'אנא בחר פרופיל מהרשימה');
-                return;
-            }
-            
-            // Check if already active
-            const activeProfile = this.profiles.getActiveProfile();
-            if (selectedProfileId === activeProfile?.id) {
-                this.ui.showWarning('פרופיל כבר פעיל', 'הפרופיל הזה כבר פעיל במערכת');
-                return;
-            }
-            
-            // Switch profile (includes backend activation + page reload)
-            await this.profiles.switchProfile(selectedProfileId);
-            
-            // Note: switchProfile() will trigger page reload automatically
-            // No need for additional UI updates here
-            
-            return true;
-            
-        } catch (error) {
-            this.ui.showError('שגיאה בהחלפת פרופיל', error.message);
+        // Delegate to preferences page if available
+        if (typeof window.switchToSelectedProfile === 'function') {
+            return await window.switchToSelectedProfile();
+        } else {
+            console.log('📊 switchToSelectedProfile not available - preferences page not loaded');
             return false;
         }
     }
@@ -1763,69 +1627,13 @@ window.validateCurrency = (selectElement) => {
     }
 };
 
-// Copy detailed log (kept from old system)
+// Copy detailed log (delegated to preferences page)
 window.copyDetailedLog = async () => {
-    try {
-        const log = [];
-        const timestamp = new Date().toLocaleString('he-IL');
-        
-        log.push('=== לוג מפורט - עמוד העדפות TikTrack ===');
-        log.push(`זמן יצירה: ${timestamp}`);
-        log.push(`עמוד: ${window.location.href}`);
-        log.push('');
-        
-        log.push('--- מצב כללי ---');
-        log.push(`כותרת: ${document.title}`);
-        log.push(`סטטוס טעינה: ${document.readyState}`);
-        log.push('');
-        
-        log.push('--- סטטיסטיקות ---');
-        const prefsCount = document.getElementById('preferencesCount')?.textContent || '0';
-        const profilesCount = document.getElementById('profilesCount')?.textContent || '0';
-        const groupsCount = document.getElementById('groupsCount')?.textContent || '0';
-        const activeProfile = document.getElementById('activeProfileInfo')?.textContent || 'לא זמין';
-        
-        log.push(`מספר העדפות: ${prefsCount}`);
-        log.push(`מספר פרופילים: ${profilesCount}`);
-        log.push(`מספר קבוצות: ${groupsCount}`);
-        log.push(`פרופיל פעיל: ${activeProfile}`);
-        log.push('');
-        
-        log.push('--- מצב סקשנים ---');
-        const sections = document.querySelectorAll('.content-section, .top-section');
-        sections.forEach((section, index) => {
-            const sectionId = section.id || `section-${index + 1}`;
-            const sectionBody = section.querySelector('.section-body');
-            const isVisible = sectionBody ? sectionBody.style.display !== 'none' : true;
-            log.push(`  ${index + 1}. ${sectionId}: ${isVisible ? 'פתוח' : 'סגור'}`);
-        });
-        log.push('');
-        
-        log.push('--- סטטוס מערכת ---');
-        log.push(`PreferencesSystem initialized: ${window.PreferencesSystem?.initialized || false}`);
-        log.push(`Current preferences loaded: ${window.PreferencesSystem?.manager?.currentPreferences ? 'Yes' : 'No'}`);
-        log.push(`Profiles loaded: ${window.PreferencesSystem?.profiles?.profiles?.length || 0}`);
-        log.push('');
-        
-        log.push('=== סוף לוג ===');
-        
-        const logText = log.join('\n');
-        
-        // Copy to clipboard
-        await navigator.clipboard.writeText(logText);
-        
-        if (typeof window.showSuccessNotification === 'function') {
-            window.showSuccessNotification('לוג מפורט הועתק ללוח', 'הלוג מכיל את כל מה שרואה המשתמש בעמוד');
-        }
-        
-        console.log('📋 Detailed log copied to clipboard');
-        return true;
-        
-    } catch (error) {
-        console.error('❌ Error copying detailed log:', error);
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה בהעתקת הלוג', error.message);
-        }
+    // Delegate to preferences page if available
+    if (typeof window.copyDetailedLog === 'function') {
+        return await window.copyDetailedLog();
+    } else {
+        console.log('📊 copyDetailedLog not available - preferences page not loaded');
         return false;
     }
 };
@@ -1854,62 +1662,12 @@ window.switchToSelectedProfile = async () => {
 };
 
 window.createNewProfile = async () => {
-    try {
-        const nameInput = document.getElementById('newProfileName');
-        const profileName = nameInput?.value?.trim();
-        
-        if (!profileName) {
-            window.showWarningNotification(
-                'שם פרופיל חסר',
-                'אנא הכנס שם לפרופיל החדש'
-            );
-            return;
-        }
-        
-        // Show loading
-        window.PreferencesSystem.ui.showLoading('create-profile');
-        
-        // Create profile
-        await window.PreferencesSystem.profiles.createProfile(
-            profileName,
-            `פרופיל ${profileName}`
-        );
-        
-        // Clear input
-        nameInput.value = '';
-        
-        // Hide loading
-        window.PreferencesSystem.ui.hideLoading('create-profile');
-        
-        // Success notification
-        window.showSuccessNotification(
-            'פרופיל נוצר והופעל בהצלחה',
-            `הפרופיל "${profileName}" נוצר עם ברירות מחדל והפך לפעיל. הדף ירענן בעוד רגע...`
-        );
-        
-        // Reload page to show the new active profile
-        setTimeout(() => {
-            window.location.reload();
-        }, 2000);
-        
-    } catch (error) {
-        window.PreferencesSystem.ui.hideLoading('create-profile');
-        
-        // Extract error message
-        const errorMsg = error.message || error.error || String(error);
-        
-        // Check for specific error types
-        if (errorMsg.includes('already exists')) {
-            window.showWarningNotification(
-                'שם פרופיל קיים',
-                `פרופיל בשם "${profileName}" כבר קיים במערכת. אנא בחר שם אחר.`
-            );
-        } else {
-            window.showErrorNotification(
-                'שגיאה ביצירת פרופיל',
-                errorMsg
-            );
-        }
+    // Delegate to preferences page if available
+    if (typeof window.createNewProfile === 'function') {
+        return await window.createNewProfile();
+    } else {
+        console.log('📊 createNewProfile not available - preferences page not loaded');
+        return false;
     }
 };
 

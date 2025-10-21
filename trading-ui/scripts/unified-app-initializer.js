@@ -225,20 +225,6 @@ class UnifiedAppInitializer {
             
             this.initialized = true;
             
-            // ← NEW: ניטור בסוף האתחול (לא חוסם)
-            // Wait for globals to be available
-            setTimeout(async () => {
-                // Wait for specific scripts to be ready
-                await this.waitForRequiredScripts(config);
-                
-                const validation = this.validateRequiredSystems(config);
-                if (validation.valid) {
-                    console.log('✅ All systems validated successfully');
-                } else {
-                    console.warn('⚠️ Some systems need attention (see details above)');
-                }
-            }, 5000);
-            
             this.logSuccess();
             
             return this.getStatus();

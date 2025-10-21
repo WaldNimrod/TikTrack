@@ -448,7 +448,7 @@ async function loadNotesData() {
     // loadNotesData הושלם בהצלחה
 
   } catch (error) {
-    handleDataLoadError(error, 'טעינת נתונים');
+    handleApiError(error, 'טעינת נתונים');
 
     // הצגת הודעת שגיאה בטבלה
     const tbody = document.querySelector('#notesTable tbody');
@@ -475,7 +475,7 @@ async function loadNotesData() {
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתונים מהשרת: ' + error.message);
     } else {
-      handleDataLoadError(error, 'טעינת נתונים מהשרת');
+      handleApiError(error, 'טעינת נתונים מהשרת');
     }
   }
 }

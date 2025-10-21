@@ -553,4 +553,321 @@ window.initializeInfoSummary = initializeInfoSummary;
 window.collectFormData = collectFormData;
 window.saveAllPreferences = saveAllPreferences;
 
+// Export preferences page specific functions
+window.updateCounters = updateCounters;
+window.updateDropdown = updateDropdown;
+window.switchToSelectedProfile = switchToSelectedProfile;
+window.createNewProfile = createNewProfile;
+window.copyDetailedLog = copyDetailedLog;
+window.updateElement = updateElement;
+
+/**
+ * Setup event listeners (preferences page only)
+ */
+function setupEventListeners() {
+    // No auto-switching on dropdown change!
+    // User must click "החלף לפרופיל זה" button explicitly
+    console.log('✅ Event listeners setup complete (profile switching requires explicit button click)');
+}
+
+/**
+ * Apply preferences to form inputs (preferences page only)
+ * @param {Object} preferences - Preferences to apply
+ */
+function applyToForm(preferences) {
+    if (!preferences) return;
+    
+    let updated = 0;
+    
+    Object.entries(preferences).forEach(([key, value]) => {
+        const element = document.getElementById(key);
+        if (element && !element.disabled) {
+            // Apply value based on element type
+            if (element.type === 'checkbox') {
+                element.checked = (value === true || value === 'true' || value === '1' || value === 1);
+                updated++;
+            } else if (element.type === 'number') {
+                element.value = parseFloat(value) || 0;
+                updated++;
+            } else if (element.type === 'color') {
+                element.value = value || '#000000';
+                updated++;
+            } else if (element.tagName === 'SELECT') {
+                element.value = value || '';
+                updated++;
+            } else {
+                element.value = value || '';
+                updated++;
+            }
+        }
+    });
+    
+    console.log(`📝 Applied ${updated} preferences to form`);
+}
+
+// Export additional functions
+window.setupEventListeners = setupEventListeners;
+window.applyToForm = applyToForm;
+
+/**
+ * Update statistics counters (preferences page only)
+ * @param {Object} preferencesData - Current preferences
+ */
+async function updateCounters(preferencesData = null) {
+    try {
+        console.log('📊 Updating counters...');
+        
+        // Preferences count
+        if (preferencesData) {
+            const count = Object.keys(preferencesData).length;
+            updateElement('preferencesCount', count);
+            console.log(`📊 Preferences count: ${count}`);
+        }
+        
+        // Profiles count
+        try {
+            const profiles = await window.PreferencesSystem?.api?.getProfiles(window.PreferencesSystem?.preferencesManager?.userId || 1);
+            const profilesCount = profiles?.profiles?.length || 0;
+            updateElement('profilesCount', profilesCount);
+            console.log(`📊 Profiles count: ${profilesCount}`);
+            
+            // Active profile - update both displays
+            const activeProfile = profiles?.profiles?.find(p => p.active);
+            if (activeProfile) {
+                // Update top statistics
+                updateElement('activeProfileInfo', activeProfile.name);
+                // Update section 1 display
+                updateElement('currentActiveProfile', activeProfile.name);
+                console.log(`📊 Active profile: ${activeProfile.name}`);
+            }
+        } catch (error) {
+            console.warn('⚠️ Could not load profiles count:', error);
+        }
+        
+        // Groups count
+        try {
+            const groups = await window.PreferencesSystem?.api?.getGroups();
+            const groupsCount = groups?.groups?.length || 13;  // Fallback to known count
+            updateElement('groupsCount', groupsCount);
+            console.log(`📊 Groups count: ${groupsCount}`);
+        } catch (error) {
+            console.warn('⚠️ Could not load groups count, using fallback');
+            updateElement('groupsCount', 13);
+        }
+        
+        console.log('✅ Counters updated successfully');
+        
+    } catch (error) {
+        console.error('❌ Error updating counters:', error);
+    }
+}
+
+/**
+ * Update profile UI elements (preferences page only)
+ * Updates both display (currentActiveProfile) and selection (profileSwitchSelect)
+ */
+async function updateDropdown() {
+    try {
+        // 1. Update current active profile display
+        const currentActiveElem = document.getElementById('currentActiveProfile');
+        if (currentActiveElem) {
+            const activeProfile = window.PreferencesSystem?.profiles?.profiles?.find(p => p.active);
+            if (activeProfile) {
+                currentActiveElem.textContent = activeProfile.name;
+                currentActiveElem.dataset.profileId = activeProfile.id;
+            }
+        }
+        
+        // 2. Update profile selection dropdown
+        const switchSelect = document.getElementById('profileSwitchSelect');
+        if (switchSelect) {
+            // Clear existing options
+            switchSelect.innerHTML = '<option value="">בחר פרופיל...</option>';
+            
+            // Add all profiles (including active one)
+            const profiles = window.PreferencesSystem?.profiles?.profiles || [];
+            profiles.forEach(profile => {
+                const option = document.createElement('option');
+                option.value = profile.id;
+                option.textContent = profile.name;
+                option.dataset.profileName = profile.name;
+                
+                // Mark if this is the current active profile
+                if (profile.active) {
+                    option.textContent += ' (פעיל כעת)';
+                }
+                
+                switchSelect.appendChild(option);
+            });
+        }
+        
+        console.log(`📋 Updated profile UI with ${window.PreferencesSystem?.profiles?.profiles?.length || 0} profiles`);
+        
+    } catch (error) {
+        console.error('❌ Error updating dropdown:', error);
+    }
+}
+
+/**
+ * Switch to selected profile from dropdown (preferences page only)
+ * Called when user clicks "החלף לפרופיל זה" button
+ */
+async function switchToSelectedProfile() {
+    try {
+        const switchSelect = document.getElementById('profileSwitchSelect');
+        const selectedProfileId = parseInt(switchSelect?.value);
+        
+        if (!selectedProfileId) {
+            if (typeof window.showWarningNotification === 'function') {
+                window.showWarningNotification('לא נבחר פרופיל', 'אנא בחר פרופיל מהרשימה');
+            }
+            return false;
+        }
+        
+        // Check if already active
+        const activeProfile = window.PreferencesSystem?.profiles?.profiles?.find(p => p.active);
+        if (selectedProfileId === activeProfile?.id) {
+            if (typeof window.showWarningNotification === 'function') {
+                window.showWarningNotification('פרופיל כבר פעיל', 'הפרופיל הזה כבר פעיל במערכת');
+            }
+            return false;
+        }
+        
+        // Switch profile (includes backend activation + page reload)
+        await window.PreferencesSystem?.profiles?.switchProfile(selectedProfileId);
+        
+        // Note: switchProfile() will trigger page reload automatically
+        // No need for additional UI updates here
+        
+        return true;
+        
+    } catch (error) {
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בהחלפת פרופיל', error.message);
+        }
+        return false;
+    }
+}
+
+/**
+ * Create new profile (preferences page only)
+ */
+async function createNewProfile() {
+    try {
+        const nameInput = document.getElementById('newProfileName');
+        const profileName = nameInput?.value?.trim();
+        
+        if (!profileName) {
+            if (typeof window.showWarningNotification === 'function') {
+                window.showWarningNotification(
+                    'שם פרופיל חסר',
+                    'אנא הכנס שם לפרופיל החדש'
+                );
+            }
+            return;
+        }
+        
+        // Show loading
+        if (window.PreferencesSystem?.ui?.showLoading) {
+            window.PreferencesSystem.ui.showLoading('create-profile');
+        }
+        
+        // Create profile
+        await window.PreferencesSystem?.profiles?.createProfile(
+            profileName,
+            `פרופיל ${profileName}`
+        );
+        
+        // Clear input
+        nameInput.value = '';
+        
+        // Hide loading
+        if (window.PreferencesSystem?.ui?.hideLoading) {
+            window.PreferencesSystem.ui.hideLoading('create-profile');
+        }
+        
+        // Success notification
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification(
+                'פרופיל נוצר והופעל בהצלחה',
+                `הפרופיל "${profileName}" נוצר עם ברירות מחדל והפך לפעיל. הדף ירענן בעוד רגע...`
+            );
+        }
+        
+        // Reload page to show the new active profile
+        setTimeout(() => {
+            window.location.reload();
+        }, 2000);
+        
+    } catch (error) {
+        if (window.PreferencesSystem?.ui?.hideLoading) {
+            window.PreferencesSystem.ui.hideLoading('create-profile');
+        }
+        
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה ביצירת פרופיל', error.message);
+        }
+    }
+}
+
+/**
+ * Copy detailed log (preferences page only)
+ */
+async function copyDetailedLog() {
+    try {
+        const log = [];
+        const timestamp = new Date().toLocaleString('he-IL');
+        
+        log.push('=== לוג מפורט - עמוד העדפות TikTrack ===');
+        log.push(`זמן יצירה: ${timestamp}`);
+        log.push(`עמוד: ${window.location.href}`);
+        log.push('');
+        
+        log.push('--- מצב כללי ---');
+        log.push(`כותרת: ${document.title}`);
+        log.push(`סטטוס טעינה: ${document.readyState}`);
+        log.push('');
+        
+        log.push('--- סטטיסטיקות ---');
+        const prefsCount = document.getElementById('preferencesCount')?.textContent || '0';
+        const profilesCount = document.getElementById('profilesCount')?.textContent || '0';
+        const groupsCount = document.getElementById('groupsCount')?.textContent || '0';
+        const activeProfile = document.getElementById('activeProfileInfo')?.textContent || 'לא זמין';
+        
+        log.push(`מספר העדפות: ${prefsCount}`);
+        log.push(`מספר פרופילים: ${profilesCount}`);
+        log.push(`מספר קבוצות: ${groupsCount}`);
+        log.push(`פרופיל פעיל: ${activeProfile}`);
+        log.push('');
+        
+        // Copy to clipboard
+        const logText = log.join('\n');
+        await navigator.clipboard.writeText(logText);
+        
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('לוג הועתק ללוח', 'הלוג המפורט הועתק בהצלחה ללוח');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error copying log:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בהעתקת לוג', error.message);
+        }
+    }
+}
+
+/**
+ * Update element text content
+ * @param {string} id - Element ID
+ * @param {any} value - Value to set
+ */
+function updateElement(id, value) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.textContent = value;
+    } else {
+        console.warn(`⚠️ Element not found: ${id}`);
+    }
+}
+
 console.log('✅ preferences-page.js loaded successfully');

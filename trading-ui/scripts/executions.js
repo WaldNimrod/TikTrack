@@ -2401,7 +2401,7 @@ async function updateTradesOnTickerChange(mode = 'add') {
 
   } catch (error) {
     // console.error('❌ שגיאה בעדכון טריידים:', error);
-    handleDataLoadError(error, 'עדכון טריידים לפי שינוי טיקר');
+    handleApiError(error, 'עדכון טריידים לפי שינוי טיקר');
   }
 }
 
@@ -2709,9 +2709,9 @@ function displayExecutionTickerInfo(ticker) {
  * הסתרת מידע על הטיקר
  */
 function hideExecutionTickerInfo() {
-  const tickerInfoRow = document.getElementById('executionTickerInfoRow');
-  if (tickerInfoRow) {
-    tickerInfoRow.remove();
+  const tickerInfoDiv = document.getElementById('executionTickerInfo');
+  if (tickerInfoDiv) {
+    tickerInfoDiv.remove();
   }
 }
 
@@ -2813,7 +2813,7 @@ function loadTradeExecutions(_tradeId) {
     // loadTradeExecutions called on executions page - no action needed
     // loadTradeExecutions completed successfully
   } catch (error) {
-    handleDataLoadError(error, 'עסקאות לטרייד');
+    handleApiError(error, 'עסקאות לטרייד');
   }
 }
 
@@ -3063,7 +3063,7 @@ function setupExecutionsFilterFunctions() {
           applyAccountFilterWithTradesData(namesArray);
         })
         .catch(error => {
-          handleDataLoadError(error, 'טריידים לפילטר חשבון');
+          handleApiError(error, 'טריידים לפילטר חשבון');
           // Fallback - הצגת כל הביצועים
           filteredExecutions = [...allExecutions];
           updateExecutionsTableMain(filteredExecutions);
@@ -3228,7 +3228,7 @@ window.loadExecutionsData = async function() {
       tradesData = data.data || [];
       // Loaded trades data for account filter
     } catch (error) {
-      handleDataLoadError(error, 'נתוני טריידים');
+      handleApiError(error, 'נתוני טריידים');
       tradesData = [];
     }
 
@@ -3242,7 +3242,7 @@ window.loadExecutionsData = async function() {
     // console.log('✅ טבלת טיקרים חלקית נטענה בהצלחה');
   } catch (error) {
     // console.error('❌ שגיאה בטעינת טבלת טיקרים חלקית:', error);
-    handleDataLoadError(error, 'טבלת טיקרים חלקית');
+    handleApiError(error, 'טבלת טיקרים חלקית');
   }
 };
 
@@ -3381,7 +3381,7 @@ async function loadTickersSummaryData() {
 
   } catch (error) {
     // console.error('❌ שגיאה בטעינת טיקרים חלקיים:', error);
-    handleDataLoadError(error, 'טעינת טיקרים חלקיים');
+    handleApiError(error, 'טעינת טיקרים חלקיים');
     return [];
   }
 }
@@ -3629,7 +3629,7 @@ async function updateTickersList(mode, showClosedTrades = false) {
 
   } catch (error) {
     // console.error('❌ שגיאה בעדכון רשימת טיקרים:', error);
-    handleDataLoadError(error, 'עדכון רשימת טיקרים');
+    handleApiError(error, 'עדכון רשימת טיקרים');
   }
 }
 

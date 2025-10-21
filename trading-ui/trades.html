@@ -37,38 +37,37 @@
     <!-- Page Content -->
     <div class="background-wrapper">
         <div class="page-body">
-            <!-- אזור מעקב טריידים - top-Section -->
-            <div class="top-section tracking-page">
-                <!-- כותרת מעקב טריידים -->
-                <div class="section-header entity-trade-main-header">
-                    <div class="table-title">
-                        <img src="images/icons/trades.svg" alt="מעקב טריידים" class="section-icon">
-                        מעקב טריידים
-                    </div>
-                    <div class="table-actions">
-                        <button data-button-type="COPY" data-variant="full" data-onclick="copyDetailedLog()" data-text="העתק לוג מפורט" title="העתק לוג מפורט עם כל הנתונים והטריידים"></button>
-                        <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר" title="הצג/הסתר אזור מעקב טריידים"></button>
-                    </div>
-                </div>
-
-                <!-- כרטיסיות התראות -->
-                <div class="section-body">
-                    
-                    <!-- ווב קומפוננט של התראות פעילות -->
-                    <active-alerts></active-alerts>
-
-                    <!-- סיכום נתונים -->
-                    <div class="info-summary" id="summaryStats">
-                        <div>סה"כ טריידים: <strong id="totalTrades">0</strong></div>
-                        <div>טריידים פתוחים: <strong id="openTrades">0</strong></div>
-                        <div>טריידים סגורים: <strong id="closedTrades">0</strong></div>
-                        <div>רווח/הפסד כולל: <strong id="totalPL">$0</strong></div>
-                    </div>
-                </div>
-            </div> <!-- סוף top-section -->
-
             <!-- תוכן ראשי -->
             <div class="main-content">
+                <!-- אזור מעקב טריידים - top-Section -->
+                <div class="top-section tracking-page">
+                    <!-- כותרת מעקב טריידים -->
+                    <div class="section-header entity-trade-main-header">
+                        <div class="table-title">
+                            <img src="images/icons/trades.svg" alt="מעקב טריידים" class="section-icon">
+                            מעקב טריידים
+                        </div>
+                        <div class="table-actions">
+                            <button data-button-type="COPY" data-variant="full" data-onclick="copyDetailedLog()" data-text="העתק לוג מפורט" title="העתק לוג מפורט עם כל הנתונים והטריידים"></button>
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר" title="הצג/הסתר אזור מעקב טריידים"></button>
+                        </div>
+                    </div>
+
+                    <!-- כרטיסיות התראות -->
+                    <div class="section-body">
+                        
+                        <!-- ווב קומפוננט של התראות פעילות -->
+                        <active-alerts></active-alerts>
+
+                        <!-- סיכום נתונים -->
+                        <div class="info-summary" id="summaryStats">
+                            <div>סה"כ טריידים: <strong id="totalTrades">0</strong></div>
+                            <div>טריידים פתוחים: <strong id="openTrades">0</strong></div>
+                            <div>טריידים סגורים: <strong id="closedTrades">0</strong></div>
+                            <div>רווח/הפסד כולל: <strong id="totalPL">$0</strong></div>
+                        </div>
+                    </div>
+                </div> <!-- סוף top-section -->
 
                 <!-- אזור הטריידים שלי - content-section -->
                 <div class="content-section tracking-page" id="main">
@@ -104,40 +103,40 @@
                                 <thead>
                                     <tr>
                                         <th class="col-ticker">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">טיקר <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); }">טיקר <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-price">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">מחיר נוכחי <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); }">מחיר נוכחי <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-change">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">שינוי % <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); }">שינוי % <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-status">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">סטטוס <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); }">סטטוס <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-type">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">סוג <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); }">סוג <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-side">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">צד <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); }">צד <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-plan">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(6); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">תוכנית <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(6); }">תוכנית <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-pnl">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(7); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">רווח/הפסד <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(7); }">רווח/הפסד <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-created">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(8); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">נוצר ב <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(8); }">נוצר ב <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-closed">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(9); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">נסגר ב <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(9); }">נסגר ב <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-account">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(10); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">חשבון <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(10); }">חשבון <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-notes">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(11); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">הערות <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(11); }">הערות <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-actions actions-cell actions-3-btn">
                                             פעולות
@@ -411,6 +410,7 @@
     <script src="scripts/global-favicon.js?v=1.0.0"></script>
     <script src="scripts/notification-system.js?v=1.0.0"></script>
     <script src="scripts/warning-system.js?v=1.0.0"></script>
+    <script src="scripts/error-handlers.js?v=1.0.0"></script>
     <script src="scripts/entity-details-api.js?v=1.0.0"></script>
     <script src="scripts/entity-details-renderer.js?v=1.0.0"></script>
     <script src="scripts/entity-details-modal.js?v=1.0.0"></script>
@@ -449,6 +449,13 @@
     <script src="scripts/unified-app-initializer.js?v=1.0.0"></script>
     <!-- Page-specific Scripts -->
     <script src="scripts/trades.js?v=1.0.0"></script>
+    
+    <!-- 14. Init System Check (Available on all pages) -->
+    <script src="scripts/init-system-check.js?v=1.0.0"></script>
+    
+    <!-- 15. Monitoring Functions (Required for page checks) -->
+    <script src="scripts/monitoring-functions.js?v=1.0.0"></script>
+    
     <script>
         // Make the local copyDetailedLog function available globally for this page only
         window.copyDetailedLog = copyDetailedLog;

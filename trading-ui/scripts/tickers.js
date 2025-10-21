@@ -217,7 +217,7 @@ async function loadCurrenciesData() {
     window.currenciesLoaded = true;
 
   } catch (error) {
-    handleDataLoadError(error, 'טעינת מטבעות');
+    handleApiError(error, 'טעינת מטבעות');
     window.currenciesData = [];
     window.currenciesLoaded = false;
   }
@@ -793,7 +793,7 @@ async function updateTicker() {
               throw new Error('Failed to load linked items data');
             }
           } catch (error) {
-            handleDataLoadError(error, 'פריטים מקושרים');
+            handleApiError(error, 'פריטים מקושרים');
           }
         } else {
           handleFunctionNotFound('showLinkedItemsModal', 'פונקציית בדיקת פריטים מקושרים לא זמינה');
@@ -984,7 +984,7 @@ async function performTickerCancellation(tickerId) {
                 throw new Error('Failed to load linked items data');
               }
             } catch (error) {
-              handleDataLoadError(error, 'פריטים מקושרים');
+              handleApiError(error, 'פריטים מקושרים');
             }
           } else {
             if (window.showErrorNotification) {
@@ -1402,7 +1402,7 @@ async function performTickerDeletion(tickerId) {
                 throw new Error('Failed to load linked items data');
               }
             } catch (error) {
-              handleDataLoadError(error, 'פריטים מקושרים');
+              handleApiError(error, 'פריטים מקושרים');
             }
           } else {
             if (window.showErrorNotification) {
@@ -1520,7 +1520,7 @@ async function loadTickersData() {
 
 
   } catch (error) {
-    handleDataLoadError(error, 'טעינת נתוני טיקרים');
+    handleApiError(error, 'טעינת נתוני טיקרים');
 
   }
 

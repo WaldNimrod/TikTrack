@@ -426,7 +426,7 @@ class HeaderSystem {
       /* Header Styles - Basic styles only, main styles in header-styles.css */
       .header-content {
         position: relative;
-        max-width: 1400px;
+        width: 100%;
         margin: 0 auto;
         z-index: 960;
         display: flex;
@@ -435,9 +435,8 @@ class HeaderSystem {
 
       .header-top {
         padding: 15px 0;
-        max-width: 1400px;
-        margin: 0 auto;
         width: 100%;
+        margin: 0;
       }
 
       .header-container {

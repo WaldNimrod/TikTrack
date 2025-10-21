@@ -116,7 +116,7 @@ async function loadCurrencies() {
       }
     }
   } catch (error) {
-    handleDataLoadError(error, 'טעינת מטבעות');
+    handleApiError(error, 'טעינת מטבעות');
     // הצגת שגיאה למשתמש
     const tbody = document.querySelector('#currenciesTable tbody');
     if (tbody) {

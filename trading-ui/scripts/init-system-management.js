@@ -1773,8 +1773,8 @@ async function checkForMismatches(pageName, pageConfig) {
     
     console.log(`🔍 checkForMismatches: Actually loaded scripts:`, loadedScripts);
     
-    // Check only scripts that are actually loaded on this page
-    const requiredScripts = [];
+    // Get required scripts from documentation
+    const documentedScripts = [];
     if (pageConfig.packages) {
         console.log(`🔍 checkForMismatches: Page packages:`, pageConfig.packages);
         for (const pkgName of pageConfig.packages) {
@@ -1782,25 +1782,277 @@ async function checkForMismatches(pageName, pageConfig) {
             console.log(`🔍 checkForMismatches: Package ${pkgName}:`, pkg);
             if (pkg && pkg.scripts) {
                 for (const script of pkg.scripts) {
-                    if (script.required && script.globalCheck && loadedScripts.includes(script.file)) {
-                        requiredScripts.push(script.file);
-                        console.log(`🔍 checkForMismatches: Added required script: ${script.file}`);
+                    if (script.required) {
+                        documentedScripts.push(script.file);
+                        console.log(`🔍 checkForMismatches: Documented script: ${script.file}`);
                     }
                 }
             }
         }
     }
     
+    console.log(`🔍 checkForMismatches: Documented scripts:`, documentedScripts);
+    
+    // Check for missing scripts (documented but not loaded)
+    const missingScripts = documentedScripts.filter(script => !loadedScripts.includes(script));
+    console.log(`🔍 checkForMismatches: Missing scripts:`, missingScripts);
+    
+    // Check for extra scripts (loaded but not documented)
+    // Only check scripts that are NOT part of the initialization system or external libraries
+    const initSystemScripts = [
+        'unified-app-initializer.js',
+        'package-manifest.js', 
+        'page-initialization-configs.js',
+        'notification-system.js',
+        'preferences-core.js',
+        'preferences.js',
+        'button-system-init.js',
+        'color-scheme-system.js',
+        'runtime-validator.js',
+        'script-analyzer.js',
+        'page-template-generator.js',
+        'standardize-pages.js',
+        'check-duplicate-initialization.js',
+        'init-system-management.js'
+    ];
+    
+    const externalLibraries = [
+        'bootstrap',
+        'jquery',
+        'tables.js'
+    ];
+    
+    const extraScripts = loadedScripts.filter(script => 
+        !documentedScripts.includes(script) && 
+        !initSystemScripts.includes(script) &&
+        !externalLibraries.some(lib => script.includes(lib))
+    );
+    console.log(`🔍 checkForMismatches: Extra scripts:`, extraScripts);
+    
+    // Check for duplicate scripts
+    const scriptCounts = {};
+    const duplicateScripts = [];
+    for (const script of loadedScripts) {
+        scriptCounts[script] = (scriptCounts[script] || 0) + 1;
+        if (scriptCounts[script] > 1) {
+            duplicateScripts.push(script);
+        }
+    }
+    console.log(`🔍 checkForMismatches: Duplicate scripts:`, duplicateScripts);
+    
+    // Check loading order - scripts should be loaded in package order
+    const loadingOrderIssues = [];
+    if (pageConfig.packages) {
+        const expectedOrder = [];
+        for (const pkgName of pageConfig.packages) {
+            const pkg = window.PACKAGE_MANIFEST?.[pkgName];
+            if (pkg && pkg.scripts) {
+                for (const script of pkg.scripts) {
+                    if (script.required && loadedScripts.includes(script.file)) {
+                        expectedOrder.push(script.file);
+                    }
+                }
+            }
+        }
+        
+        // Check if actual order matches expected order
+        const actualOrder = loadedScripts.filter(script => expectedOrder.includes(script));
+        for (let i = 0; i < Math.min(expectedOrder.length, actualOrder.length); i++) {
+            if (expectedOrder[i] !== actualOrder[i]) {
+                loadingOrderIssues.push({
+                    expected: expectedOrder[i],
+                    actual: actualOrder[i],
+                    position: i
+                });
+            }
+        }
+    }
+    console.log(`🔍 checkForMismatches: Loading order issues:`, loadingOrderIssues);
+    
+    // Check for required initialization system elements
+    const initSystemElements = [
+        { id: 'unified-app-initializer', type: 'script', required: true, message: 'סקריפט מערכת האיתחול המאוחדת' },
+        { id: 'package-manifest', type: 'script', required: true, message: 'מנפסט החבילות' },
+        { id: 'page-initialization-configs', type: 'script', required: true, message: 'תצורות אתחול העמודים' },
+        { id: 'notification-system', type: 'script', required: true, message: 'מערכת התראות' },
+        { id: 'preferences-core', type: 'script', required: true, message: 'ליבת העדפות' },
+        { id: 'preferences', type: 'script', required: true, message: 'מערכת העדפות' },
+        { id: 'button-system-init', type: 'script', required: true, message: 'מערכת הכפתורים' },
+        { id: 'color-scheme-system', type: 'script', required: true, message: 'מערכת צבעים דינמית' }
+    ];
+    
+    const missingInitElements = [];
+    const extraInitElements = [];
+    
+    // Check for missing required elements
+    for (const element of initSystemElements) {
+        const elementExists = loadedScripts.includes(element.id + '.js');
+        if (!elementExists && element.required) {
+            missingInitElements.push({
+                element: element.id,
+                message: `${element.message} חסר: ${element.id}.js`
+            });
+        }
+    }
+    
+    // Check for extra elements that shouldn't be there
+    const expectedInitScripts = initSystemElements.map(el => el.id + '.js');
+    for (const script of loadedScripts) {
+        if (script.includes('init-') || script.includes('system-') || script.includes('unified-')) {
+            if (!expectedInitScripts.includes(script) && !documentedScripts.includes(script)) {
+                // Only flag as extra if it's not a standard system script
+                if (!script.includes('runtime-validator') && 
+                    !script.includes('script-analyzer') && 
+                    !script.includes('page-template-generator') &&
+                    !script.includes('standardize-pages') &&
+                    !script.includes('check-duplicate-initialization') &&
+                    !script.includes('init-system-management')) {
+                    extraInitElements.push({
+                        script: script,
+                        message: `סקריפט מערכת איתחול נוסף: ${script}`
+                    });
+                }
+            }
+        }
+    }
+    
+    console.log(`🔍 checkForMismatches: Missing init elements:`, missingInitElements);
+    console.log(`🔍 checkForMismatches: Extra init elements:`, extraInitElements);
+    
+    // Check initialization order - critical scripts must be in correct order
+    const criticalOrder = [
+        'package-manifest.js',
+        'page-initialization-configs.js', 
+        'preferences-core.js',
+        'preferences.js',
+        'notification-system.js',
+        'button-system-init.js',
+        'color-scheme-system.js',
+        'unified-app-initializer.js'
+    ];
+    
+    const initOrderIssues = [];
+    const criticalScripts = loadedScripts.filter(script => criticalOrder.includes(script));
+    
+    for (let i = 0; i < criticalScripts.length; i++) {
+        const expectedScript = criticalOrder[i];
+        const actualScript = criticalScripts[i];
+        
+        if (expectedScript && actualScript && expectedScript !== actualScript) {
+            initOrderIssues.push({
+                expected: expectedScript,
+                actual: actualScript,
+                position: i,
+                message: `סדר אתחול שגוי: במקום ${i} צפוי ${expectedScript} אבל נטען ${actualScript}`
+            });
+        }
+    }
+    
+    console.log(`🔍 checkForMismatches: Init order issues:`, initOrderIssues);
+    
+    // Wait for documented scripts that are actually loaded
+    const requiredScripts = documentedScripts.filter(script => loadedScripts.includes(script));
+    
     console.log(`🔍 checkForMismatches: Required scripts:`, requiredScripts);
     await waitForScriptsReady(requiredScripts);
     console.log(`🔍 checkForMismatches: Scripts ready, checking for mismatches...`);
+    
+    // Add missing scripts to mismatches
+    for (const script of missingScripts) {
+        mismatches.push({
+            type: 'missing_script',
+            script: script,
+            message: `סקריפט חסר: ${script} - מתועד אבל לא נטען`,
+            severity: 'error'
+        });
+    }
+    
+    // Add extra scripts to mismatches
+    for (const script of extraScripts) {
+        mismatches.push({
+            type: 'extra_script',
+            script: script,
+            message: `סקריפט נוסף: ${script} - נטען אבל לא מתועד`,
+            severity: 'warning'
+        });
+    }
+    
+    // Add duplicate scripts to mismatches
+    for (const script of duplicateScripts) {
+        mismatches.push({
+            type: 'duplicate_script',
+            script: script,
+            message: `סקריפט כפול: ${script} - נטען ${scriptCounts[script]} פעמים`,
+            severity: 'error'
+        });
+    }
+    
+    // Add loading order issues to mismatches
+    for (const issue of loadingOrderIssues) {
+        mismatches.push({
+            type: 'loading_order',
+            expected: issue.expected,
+            actual: issue.actual,
+            position: issue.position,
+            message: `סדר טעינה שגוי: במקום ${issue.position} צפוי ${issue.expected} אבל נטען ${issue.actual}`,
+            severity: 'warning'
+        });
+    }
+    
+    // Add missing initialization elements to mismatches
+    for (const element of missingInitElements) {
+        mismatches.push({
+            type: 'missing_init_element',
+            element: element.element,
+            message: element.message,
+            severity: 'error'
+        });
+    }
+    
+    // Add extra initialization elements to mismatches
+    for (const element of extraInitElements) {
+        mismatches.push({
+            type: 'extra_init_element',
+            script: element.script,
+            message: element.message,
+            severity: 'warning'
+        });
+    }
+    
+    // Add initialization order issues to mismatches
+    for (const issue of initOrderIssues) {
+        mismatches.push({
+            type: 'init_order',
+            expected: issue.expected,
+            actual: issue.actual,
+            position: issue.position,
+            message: issue.message,
+            severity: 'error'
+        });
+    }
+    
+    // Check for required globals from page config
+    if (pageConfig.requiredGlobals) {
+        for (const global of pageConfig.requiredGlobals) {
+            const globalExists = checkGlobalExists(global);
+            console.log(`🔍 checkForMismatches: Required global ${global} = ${globalExists}`);
+            if (!globalExists) {
+                mismatches.push({
+                    type: 'missing_global',
+                    global: global,
+                    message: `גלובל חסר: ${global} - נדרש לפי התיעוד אבל לא זמין`,
+                    severity: 'error'
+                });
+            }
+        }
+    }
     
     if (pageConfig.packages) {
         for (const pkgName of pageConfig.packages) {
             const pkg = window.PACKAGE_MANIFEST?.[pkgName];
             if (pkg && pkg.scripts) {
                 for (const script of pkg.scripts) {
-                    if (script.required && script.globalCheck) {
+                    if (script.required && script.globalCheck && loadedScripts.includes(script.file)) {
                         // Check if global exists
                         const globalExists = checkGlobalExists(script.globalCheck);
                         console.log(`🔍 checkForMismatches: ${script.file} - ${script.globalCheck} = ${globalExists}`);
@@ -1809,7 +2061,8 @@ async function checkForMismatches(pageName, pageConfig) {
                                 script: script.file,
                                 package: pkgName,
                                 global: script.globalCheck,
-                                description: script.description
+                                message: `גלובל חסר: ${script.globalCheck} - נדרש על ידי ${script.file} (חבילה: ${pkgName})`,
+                                severity: 'error'
                             });
                             console.log(`❌ checkForMismatches: Mismatch found for ${script.file}`);
                         }
@@ -1821,6 +2074,26 @@ async function checkForMismatches(pageName, pageConfig) {
     
     console.log(`🔍 checkForMismatches: Found ${mismatches.length} mismatches for page ${pageName}`);
     return mismatches;
+}
+
+/**
+ * Wait for Page to be Fully Loaded
+ */
+async function waitForPageFullyLoaded() {
+    return new Promise((resolve) => {
+        // Check if page is already fully loaded
+        if (document.readyState === 'complete') {
+            // Wait a bit more for all scripts to initialize
+            setTimeout(resolve, 1000);
+            return;
+        }
+        
+        // Wait for page to be fully loaded
+        window.addEventListener('load', () => {
+            // Wait a bit more for all scripts to initialize
+            setTimeout(resolve, 1000);
+        });
+    });
 }
 
 /**
@@ -2020,9 +2293,8 @@ async function showPageDetails(pageName) {
                 <ul class="mb-2">
                     ${scanResults.mismatchDetails.map(m => `
                         <li class="mb-1">
-                            <strong>📄 ${m.script}</strong> 
-                            <small class="text-muted">(${m.package})</small><br>
-                            <small class="text-muted">מצפה ל: <code>${m.global}</code></small>
+                            <span class="badge ${m.severity === 'error' ? 'bg-danger' : 'bg-warning'}">${m.type}</span>
+                            <strong>${m.message}</strong>
                         </li>
                     `).join('')}
                 </ul>
@@ -2097,26 +2369,33 @@ async function runDetailedPageScan(pageName, pageConfig) {
     result.loadOrderIssues = loadOrderIssues;
     result.criticalErrors += loadOrderIssues.length;
     
-    // Wait for specific scripts to be ready instead of generic delay
-    console.log(`🔍 runDetailedPageScan: Waiting for scripts for page ${pageName}`);
-    const requiredScripts = [];
-    if (pageConfig.packages) {
-        console.log(`🔍 runDetailedPageScan: Page packages:`, pageConfig.packages);
-        for (const pkgName of pageConfig.packages) {
-            const pkg = window.PACKAGE_MANIFEST?.[pkgName];
-            if (pkg && pkg.scripts) {
-                for (const script of pkg.scripts) {
-                    if (script.required && script.globalCheck) {
-                        requiredScripts.push(script.file);
-                    }
-                }
-            }
-        }
+    // Wait for page to be fully loaded before scanning
+    console.log(`🔍 runDetailedPageScan: Waiting for page ${pageName} to be fully loaded...`);
+    
+    // Check if we're on the correct page
+    const currentPage = window.location.pathname.split('/').pop().replace('.html', '');
+    if (currentPage !== pageName) {
+        console.log(`🔍 runDetailedPageScan: Not on target page. Current: ${currentPage}, Target: ${pageName}`);
+        console.log(`🔍 runDetailedPageScan: Skipping detailed scan - need to be on the actual page`);
+        
+        // Return empty results since we can't scan a different page
+        return {
+            pageName: pageName,
+            criticalErrors: 0,
+            mismatches: 1,
+            duplicates: [],
+            loadOrderIssues: [],
+            mismatchDetails: [{
+                type: 'page_mismatch',
+                message: `⚠️ לא ניתן לסרוק עמוד ${pageName} - צריך להיות על העמוד בפועל. עבור לעמוד ${pageName}.html והרץ את הבדיקה משם.`,
+                severity: 'warning'
+            }]
+        };
     }
     
-    console.log(`🔍 runDetailedPageScan: Required scripts:`, requiredScripts);
-    await waitForScriptsReady(requiredScripts);
-    console.log(`🔍 runDetailedPageScan: Scripts ready, proceeding with scan...`);
+    // Wait for page to be fully loaded
+    await waitForPageFullyLoaded();
+    console.log(`🔍 runDetailedPageScan: Page ${pageName} fully loaded, proceeding with scan...`);
     
     // Check for mismatches (documented vs actual)
     console.log(`🔍 runDetailedPageScan: Checking mismatches for ${pageName}...`);
@@ -2159,24 +2438,6 @@ function getDetailedMismatches(pageName, pageConfig) {
     return mismatches;
 }
 
-/**
- * Check if Global Exists
- */
-function checkGlobalExists(globalPath) {
-    try {
-        const parts = globalPath.replace('window.', '').split('.');
-        let obj = window;
-        for (const part of parts) {
-            if (obj[part] === undefined) {
-                return false;
-            }
-            obj = obj[part];
-        }
-        return true;
-    } catch (e) {
-        return false;
-    }
-}
 
 /**
  * Export Test Results

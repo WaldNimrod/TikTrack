@@ -1370,7 +1370,7 @@ async function loadLinkedItemsFromMultipleSources(executionId) {
     displayLinkedItems(linkedItems);
 
   } catch (error) {
-    handleDataLoadError(error, 'פריטים מקושרים');
+    handleApiError(error, 'פריטים מקושרים');
     document.getElementById('linkedItemsContent').innerHTML =
             '<div class="alert alert-danger">שגיאה בטעינת פרטי הפריטים המקושרים</div>';
   }
@@ -1650,12 +1650,12 @@ async function loadExecutionsData() {
 
     } else {
       const errorText = await response.text();
-      handleDataLoadError(new Error(`סטטוס: ${response.status} - ${errorText}`), 'עסקעות');
-      handleDataLoadError(new Error(`סטטוס: ${response.status} - ${errorText}`), 'עסקעות');
+      handleApiError(new Error(`סטטוס: ${response.status} - ${errorText}`), 'עסקעות');
+      handleApiError(new Error(`סטטוס: ${response.status} - ${errorText}`), 'עסקעות');
     }
 
   } catch (error) {
-    handleDataLoadError(error, 'עסקעות');
+    handleApiError(error, 'עסקעות');
   }
 }
 
@@ -2152,14 +2152,14 @@ async function loadTickersWithOpenOrClosedTradesAndPlans() {
     window.tickerService.updateTickerSelect('editExecutionTicker', tickersToShow);
 
   } catch (error) {
-    handleDataLoadError(error, 'טיקרים עם טריידים ותכנונים');
+    handleApiError(error, 'טיקרים עם טריידים ותכנונים');
     // Fallback - טעינת כל הטיקרים
     try {
       const allTickers = await window.tickerService.getTickers();
       window.tickerService.updateTickerSelect('addExecutionTicker', allTickers);
       window.tickerService.updateTickerSelect('editExecutionTicker', allTickers);
     } catch (fallbackError) {
-      handleDataLoadError(fallbackError, 'טיקרים (גיבוי)');
+      handleApiError(fallbackError, 'טיקרים (גיבוי)');
     }
   }
 }
@@ -2340,7 +2340,7 @@ async function loadActiveTradesForTicker(mode = 'add', _showClosedTrades = false
 
   } catch (error) {
     // // console.error('❌ שגיאה בטעינת טריידים:', error);
-    handleDataLoadError(error, 'טעינת טריידים לטיקר');
+    handleApiError(error, 'טעינת טריידים לטיקר');
   }
 }
 
@@ -2377,7 +2377,7 @@ async function updateTradesOnCheckboxChange(mode = 'add') {
 
   } catch (error) {
     // // console.error('❌ שגיאה בעדכון טריידים:', error);
-    handleDataLoadError(error, 'עדכון טריידים לפי צ\'קבוקס');
+    handleApiError(error, 'עדכון טריידים לפי צ\'קבוקס');
   }
 }
 
@@ -2678,14 +2678,26 @@ function displayExecutionTickerInfo(ticker) {
   // Create or update ticker info display
   let tickerInfoDiv = document.getElementById('executionTickerInfo');
   if (!tickerInfoDiv) {
+    // Create a new row for ticker info
+    const tickerInfoRow = document.createElement('div');
+    tickerInfoRow.className = 'row';
+    tickerInfoRow.id = 'executionTickerInfoRow';
+    
+    // Create column for ticker info
+    const tickerInfoCol = document.createElement('div');
+    tickerInfoCol.className = 'col-12';
+    
     tickerInfoDiv = document.createElement('div');
     tickerInfoDiv.id = 'executionTickerInfo';
     tickerInfoDiv.className = 'mb-3 p-3 bg-light rounded';
     
-    // Insert after the ticker row (not just the select)
-    const tickerRow = document.getElementById('executionTicker').closest('.row');
-    if (tickerRow && tickerRow.parentNode) {
-      tickerRow.parentNode.insertBefore(tickerInfoDiv, tickerRow.nextSibling);
+    tickerInfoCol.appendChild(tickerInfoDiv);
+    tickerInfoRow.appendChild(tickerInfoCol);
+    
+    // Insert after the ticker/type row
+    const tickerTypeRow = document.getElementById('executionTicker').closest('.row');
+    if (tickerTypeRow && tickerTypeRow.parentNode) {
+      tickerTypeRow.parentNode.insertBefore(tickerInfoRow, tickerTypeRow.nextSibling);
     }
   }
   
@@ -2697,9 +2709,9 @@ function displayExecutionTickerInfo(ticker) {
  * הסתרת מידע על הטיקר
  */
 function hideExecutionTickerInfo() {
-  const tickerInfoDiv = document.getElementById('executionTickerInfo');
-  if (tickerInfoDiv) {
-    tickerInfoDiv.remove();
+  const tickerInfoRow = document.getElementById('executionTickerInfoRow');
+  if (tickerInfoRow) {
+    tickerInfoRow.remove();
   }
 }
 

@@ -114,7 +114,10 @@ function deleteExecution(id) {
  */
 function resetAddExecutionForm() {
   // ניקוי הטופס
-  document.getElementById('addExecutionForm').reset();
+  const form = document.getElementById('addExecutionForm');
+  if (form) {
+    form.reset();
+  }
   clearExecutionValidationErrors();
 
   // השבתת כל השדות חוץ מטיקר
@@ -148,7 +151,12 @@ function resetAddExecutionForm() {
  * הצגת מודל הוספת עסקה
  */
 async function showAddExecutionModal() {
-
+  // בדיקה שהמודל קיים
+  const modal = document.getElementById('addExecutionModal');
+  if (!modal) {
+    console.error('❌ Add execution modal not found');
+    return;
+  }
 
   // ניקוי והשבתת השדות
   resetAddExecutionForm();
@@ -156,7 +164,14 @@ async function showAddExecutionModal() {
   // הגדרת תאריך ברירת מחדל - היום
   const today = new Date();
   const todayString = today.toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
-  document.getElementById('executionDate').value = todayString;
+  
+  // המתנה קצרה לטעינת השדות
+  setTimeout(() => {
+    const dateField = document.getElementById('executionDate');
+    if (dateField) {
+      dateField.value = todayString;
+    }
+  }, 100);
 
   // הגדרת עמלה ברירת מחדל לפי העדפות
   // ✨ עודכן לתמיכה במערכת העדפות!

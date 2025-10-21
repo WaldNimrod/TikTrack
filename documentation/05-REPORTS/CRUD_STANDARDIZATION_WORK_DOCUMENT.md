@@ -6,7 +6,7 @@ This document details the comprehensive standardization work performed across al
 
 **Date**: January 2025  
 **Scope**: 8 main CRUD pages  
-**Items Standardized**: 24 critical items (20 original + 4 enhancements)  
+**Items Standardized**: 26 critical items (20 original + 4 enhancements + 2 bug fixes)  
 **Status**: Completed
 
 ## 20 Standardization Items
@@ -306,6 +306,26 @@ function validateCashFlowForm() {
 - **Features**: Consistent formatting, Hebrew localization, alphabetical sorting
 - **Affected Files**: `cash_flows.js`
 
+### 25. Fix Missing getTableColors Function (January 2025)
+- **Description**: Added missing `getTableColors()` and `getTableColorsWithFallbacks()` functions to `color-scheme-system.js`
+- **Purpose**: Resolve `TypeError: window.getTableColors is not a function` errors across all pages
+- **Implementation**:
+  - Added functions using existing color constants (NUMERIC_VALUE_COLORS, ENTITY_COLORS)
+  - Exported to window object for global access
+  - Provides fallback colors for all table color needs
+- **Impact**: Fixed loading errors in executions, trades, and other pages using table colors
+- **Affected Files**: `color-scheme-system.js`
+
+### 26. Fix Executions Page Field References (January 2025)
+- **Description**: Corrected field ID references in executions page modals
+- **Purpose**: Resolve `Cannot set properties of null` errors when opening modals
+- **Implementation**:
+  - Fixed `showAddExecutionModal`: Changed `addExecutionDate` → `executionDate`
+  - Fixed `resetAddExecutionForm`: Removed 'add' prefix from all field IDs
+  - Added `error-handlers.js` script for proper error handling
+- **Results**: Executions page add/edit modals now open without errors
+- **Affected Files**: `executions.html`, `executions.js`
+
 ## Git Commits Summary
 
 ### Commit 1: Enhanced cash flows with trade/trade plan linking
@@ -317,6 +337,16 @@ function validateCashFlowForm() {
 - **Hash**: `3ba82042`
 - **Files**: 1 file changed, 44 insertions(+), 167 deletions(-)
 - **Changes**: Unified duplicate functions, improved code maintainability
+
+### Commit 3: Fix missing getTableColors function
+- **Hash**: `f7c282c7`
+- **Files**: 1 file changed, 43 insertions(+)
+- **Changes**: Added getTableColors and getTableColorsWithFallbacks functions to color-scheme-system.js
+
+### Commit 4: Fix executions.html button errors and field references
+- **Hash**: `bce71c6e`
+- **Files**: 2 files changed, 17 insertions(+), 9 deletions(-)
+- **Changes**: Fixed field ID references, added error-handlers.js, resolved null errors
 
 ## Next Steps
 

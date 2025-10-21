@@ -2680,7 +2680,7 @@ function displayExecutionTickerInfo(ticker) {
   if (!tickerInfoDiv) {
     tickerInfoDiv = document.createElement('div');
     tickerInfoDiv.id = 'executionTickerInfo';
-    tickerInfoDiv.className = 'ticker-info-display mb-3 p-3 bg-light rounded';
+    tickerInfoDiv.className = 'mb-3 p-3 bg-light rounded';
     
     // Insert after ticker select
     const tickerSelect = document.getElementById('executionTicker');
@@ -2689,30 +2689,8 @@ function displayExecutionTickerInfo(ticker) {
     }
   }
   
-  const changeColor = ticker.daily_change >= 0 ? 'text-success' : 'text-danger';
-  const changeIcon = ticker.daily_change >= 0 ? '↗' : '↘';
-  
-  tickerInfoDiv.innerHTML = `
-    <div class="row">
-      <div class="col-md-6">
-        <strong>${ticker.symbol}</strong> - ${ticker.name || 'N/A'}
-      </div>
-      <div class="col-md-6 text-end">
-        <span class="fw-bold">$${ticker.current_price || 'N/A'}</span>
-        <span class="${changeColor}">
-          ${changeIcon} ${ticker.daily_change || 0} (${ticker.daily_change_percent || 0}%)
-        </span>
-      </div>
-    </div>
-    <div class="row mt-1">
-      <div class="col-12">
-        <small class="text-muted">
-          נפח: ${ticker.volume || 'N/A'} | 
-          שינוי יומי: ${ticker.daily_change || 0} (${ticker.daily_change_percent || 0}%)
-        </small>
-      </div>
-    </div>
-  `;
+  // Use the new global renderTickerInfo function
+  tickerInfoDiv.innerHTML = window.renderTickerInfo(ticker, 'ticker-info-display');
 }
 
 /**

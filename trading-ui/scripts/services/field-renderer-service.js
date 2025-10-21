@@ -5,9 +5,10 @@
  * מערכת מרכזית לרנדור שדות מורכבים: badges, currency, dates
  * מחליפה קוד חוזר ב-138 מקומות במערכת
  * 
- * @version 1.3.0
+ * @version 1.4.0
  * @created January 2025
  * @updated October 13, 2025 - Added renderBoolean() for yes/no icons
+ * @updated January 21, 2025 - Added renderTickerInfo() for ticker price display
  * @author TikTrack Development Team
  * 
  * תכונות:
@@ -20,6 +21,7 @@
  * - רנדור priority badges (high, medium, low)
  * - רנדור shares/quantity (תמיד עם # prefix)
  * - רנדור boolean (כן/לא עם איקונים ✓/✗)
+ * - רנדור פרטי טיקר (מחיר, שינוי, נפח) בשורה אחת
  * - שימוש ב-date-utils.js לתאריכים
  * - אינטגרציה מלאה עם מערכת צבעים דינמית (3 ווריאנטים)
  */
@@ -492,6 +494,71 @@ class FieldRendererService {
         return `<span class="${classes}">${icon}</span>`;
     }
 
+    /**
+     * רנדור פרטי מחיר טיקר בשורה אחת
+     * 
+     * @param {Object} ticker - אובייקט טיקר עם פרטים
+     * @param {string} ticker.symbol - סמל הטיקר
+     * @param {string} ticker.name - שם הטיקר
+     * @param {number} ticker.current_price - מחיר נוכחי
+     * @param {number} ticker.daily_change - שינוי יומי
+     * @param {number} ticker.daily_change_percent - אחוז שינוי יומי
+     * @param {number} ticker.volume - נפח מסחר
+     * @param {string} cssClass - מחלקות CSS נוספות
+     * @returns {string} - HTML מוכן להצגה
+     * 
+     * @example
+     * const html = FieldRendererService.renderTickerInfo({
+     *   symbol: 'AAPL',
+     *   name: 'Apple Inc.',
+     *   current_price: 150.25,
+     *   daily_change: 2.15,
+     *   daily_change_percent: 1.45,
+     *   volume: 45000000
+     * });
+     */
+    static renderTickerInfo(ticker, cssClass = '') {
+        if (!ticker) return '<div class="text-muted">טיקר לא זמין</div>';
+        
+        const symbol = ticker.symbol || 'N/A';
+        const name = ticker.name || 'N/A';
+        const price = ticker.current_price || 0;
+        const change = ticker.daily_change || 0;
+        const changePercent = ticker.daily_change_percent || 0;
+        const volume = ticker.volume || 0;
+        
+        // צבעים לפי כיוון השינוי
+        const changeColor = change >= 0 ? 'text-success' : 'text-danger';
+        const changeIcon = change >= 0 ? '↗' : '↘';
+        
+        // פורמט נפח
+        const formattedVolume = volume > 0 ? volume.toLocaleString('he-IL') : 'N/A';
+        
+        return `
+            <div class="ticker-info-display ${cssClass}">
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong>${symbol}</strong> - ${name}
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <span class="fw-bold">$${price.toFixed(2)}</span>
+                        <span class="${changeColor}">
+                            ${changeIcon} ${change.toFixed(2)} (${changePercent.toFixed(2)}%)
+                        </span>
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-12">
+                        <small class="text-muted">
+                            נפח: ${formattedVolume} | 
+                            שינוי יומי: ${change.toFixed(2)} (${changePercent.toFixed(2)}%)
+                        </small>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
     // ===== PRIVATE HELPER METHODS =====
 
     /**
@@ -549,5 +616,6 @@ window.renderPriority = (priority) => FieldRendererService.renderPriority(priori
 window.renderDate = (date, includeTime) => FieldRendererService.renderDate(date, includeTime);
 window.renderShares = (shares, cssClass) => FieldRendererService.renderShares(shares, cssClass);
 window.renderBoolean = (value, size) => FieldRendererService.renderBoolean(value, size);
+window.renderTickerInfo = (ticker, cssClass) => FieldRendererService.renderTickerInfo(ticker, cssClass);
 
-console.log('✅ field-renderer-service.js v=1.3.0 loaded - added renderBoolean() for yes/no icons');
+console.log('✅ field-renderer-service.js v=1.4.0 loaded - added renderTickerInfo() for ticker price display');

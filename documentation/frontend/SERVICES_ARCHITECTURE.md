@@ -2,8 +2,8 @@
 ## ארכיטקטורת מערכות שירות כלליות
 
 **תאריך יצירה:** 9 בינואר 2025  
-**עדכון אחרון:** 13 באוקטובר 2025  
-**גרסה:** 4.1.0 🎊  
+**עדכון אחרון:** 21 בינואר 2025  
+**גרסה:** 4.2.0 🎊  
 **סטטוס:** 🏆 **6/6 מערכות + 8/8 עמודים - מושלמות מוחלטת (100%)!**
 
 ---
@@ -120,15 +120,19 @@ const response = await fetch('/api/executions', {
 ### **2. FieldRendererService** ⭐ גבוה (P1)
 
 **קובץ:** `trading-ui/scripts/services/field-renderer-service.js`  
-**שורות:** 355  
-**גרסה:** 1.3.0  
-**עדכון אחרון:** 13 באוקטובר 2025
+**שורות:** 420  
+**גרסה:** 1.4.0  
+**עדכון אחרון:** 21 בינואר 2025
 
 #### תיאור:
 מערכת מרכזית לרנדור שדות מורכבים: status badges, ערכים מספריים עם צבע לפי סימן, currency display, תאריכים, וכו'.
 
 #### 🆕 עדכון 11/01/2025: מערכת Badges דינמית
 **מהפכה בצבעים!** כל ה-badges עכשיו מקבלים צבעים מהעדפות המשתמש.
+
+#### 🆕 עדכון 21/01/2025: רכיב פרטי טיקר
+**רכיב חדש:** `renderTickerInfo()` - הצגת פרטי מחיר טיקר בשורה אחת
+**שימוש:** במודלים של הוספת עסקאות, תוכניות השקעה, וכל מקום שצריך להציג מידע על טיקר
 
 **שינויים עיקריים:**
 - ✅ הוסרה `_getStatusColors()` - לא נחוץ יותר
@@ -175,6 +179,7 @@ const badgeHTML = FieldRendererService.renderStatus(status, 'account');
 | `renderDate(date, includeTime)` | date: string/Date, includeTime: boolean | string | תאריך מפורמט |
 | `renderShares(shares, cssClass)` | shares: number, cssClass: string | string (HTML) | כמות מניות עם # prefix |
 | `renderBoolean(value, size)` | value: boolean/string/number, size: string | string (HTML) | ✅ **כן/לא עם איקונים ✓/✗** |
+| `renderTickerInfo(ticker, cssClass)` | ticker: object, cssClass: string | string (HTML) | 🆕 **פרטי מחיר טיקר** - סמל, מחיר, שינוי, נפח |
 
 #### 🆕 `renderNumericValue` - פונקציה כללית לערכים מספריים:
 **שם מדויק:** ערכים מספריים עם צבע לפי סימן (חיובי/שלילי/אפס)  
@@ -196,6 +201,29 @@ const loss = FieldRendererService.renderNumericValue(-100.00, ' $', true);
 // אפס
 const zero = FieldRendererService.renderNumericValue(0, ' $', false);
 // תוצאה: 0.00 $ (אפור)
+```
+
+#### 🆕 `renderTickerInfo` - פרטי מחיר טיקר:
+**שם מדויק:** הצגת פרטי מחיר טיקר בשורה אחת - סמל, שם, מחיר, שינוי, נפח  
+**שימוש:** במודלים של הוספת עסקאות, תוכניות השקעה, וכל מקום שצריך להציג מידע על טיקר
+
+```javascript
+// פרטי טיקר מלאים
+const ticker = {
+  symbol: 'AAPL',
+  name: 'Apple Inc.',
+  current_price: 150.25,
+  daily_change: 2.15,
+  daily_change_percent: 1.45,
+  volume: 45000000
+};
+
+const tickerHTML = FieldRendererService.renderTickerInfo(ticker);
+// תוצאה: HTML מוכן עם סמל, מחיר, שינוי (ירוק/אדום), נפח
+
+// עם CSS classes נוספים
+const tickerHTMLWithClass = FieldRendererService.renderTickerInfo(ticker, 'my-custom-class');
+// תוצאה: HTML עם מחלקות CSS נוספות
 ```
 
 **צבעים דינמיים מהעדפות:** ⭐ **עדכון 11/01/2025**
@@ -220,6 +248,7 @@ const zero = FieldRendererService.renderNumericValue(0, ' $', false);
 8. **Date** - **תמיד DD/MM/YY** (11/01/2025) - חיסכון 25% במקום
 9. **Shares** - כמות מניות עם # prefix (#150)
 10. **Boolean** - ✓ (ירוק) או ✗ (אדום) לערכי כן/לא
+11. **Ticker Info** - 🆕 **פרטי מחיר טיקר** - סמל, מחיר, שינוי, נפח בשורה אחת
 
 #### ⭐ סטטוסים אחידים בכל המערכת (מאילוצי DB):
 
@@ -268,7 +297,7 @@ row.innerHTML = `
 |---|------|------------------|-------|
 | 1 | **trades.js** | `renderStatus`, `renderType`, `renderSide`, `renderNumericValue`, `renderDate` | ✅ הושלם |
 | 2 | **trade_plans.js** | `renderStatus`, `renderType`, `renderSide`, `renderNumericValue`, `renderDate` | ✅ הושלם |
-| 3 | **executions.js** | `renderAction`, `renderNumericValue`, `renderDate` | ✅ הושלם |
+| 3 | **executions.js** | `renderAction`, `renderNumericValue`, `renderDate`, `renderTickerInfo` | ✅ הושלם |
 | 4 | **tickers.js** | `renderStatus`, `renderNumericValue`, `renderDate` | ✅ הושלם |
 | 5 | **cash_flows.js** | `renderType`, `renderNumericValue`, `renderDate` | ✅ הושלם |
 | 6 | **alerts.js** | `renderStatus`, `renderType`, `renderDate` | ✅ הושלם |

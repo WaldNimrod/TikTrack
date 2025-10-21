@@ -216,6 +216,16 @@ async function showAddExecutionModal() {
     });
   }
 
+  // הוספת event listeners לחישוב אוטומטי
+  const calculationFields = ['executionType', 'executionQuantity', 'executionPrice', 'executionCommission'];
+  calculationFields.forEach(fieldId => {
+    const field = document.getElementById(fieldId);
+    if (field) {
+      field.addEventListener('input', calculateAddExecutionValues);
+      field.addEventListener('change', calculateAddExecutionValues);
+    }
+  });
+
   // חישוב ערכים מחושבים
   calculateAddExecutionValues();
 
@@ -2550,7 +2560,7 @@ window.addNewTrade = addNewTrade;
  */
 function enableExecutionFormFields() {
   const formFields = [
-    'executionType', 'executionQuantity', 'executionPrice', 'executionDate', 'executionAccount'
+    'executionType', 'executionQuantity', 'executionPrice', 'executionDate', 'executionAccount', 'executionCommission'
   ];
   
   formFields.forEach(fieldId => {
@@ -2567,7 +2577,7 @@ function enableExecutionFormFields() {
  */
 function disableExecutionFormFields() {
   const formFields = [
-    'executionType', 'executionQuantity', 'executionPrice', 'executionDate', 'executionAccount'
+    'executionType', 'executionQuantity', 'executionPrice', 'executionDate', 'executionAccount', 'executionCommission'
   ];
   
   formFields.forEach(fieldId => {
@@ -2614,6 +2624,21 @@ async function loadExecutionTickerInfo(tickerId) {
     const priceField = document.getElementById('executionPrice');
     if (priceField && ticker.current_price) {
       priceField.value = ticker.current_price;
+    }
+    
+    // Set default commission from preferences
+    const commissionField = document.getElementById('executionCommission');
+    if (commissionField) {
+      try {
+        if (typeof window.getCurrentPreference === 'function') {
+          const defaultCommission = await window.getCurrentPreference('defaultCommission');
+          if (defaultCommission !== null && defaultCommission !== undefined) {
+            commissionField.value = defaultCommission;
+          }
+        }
+      } catch (error) {
+        console.warn('⚠️ Could not load default commission from preferences:', error);
+      }
     }
     
   } catch (error) {
@@ -2681,14 +2706,31 @@ function hideExecutionTickerInfo() {
 function calculateAddExecutionValues() {
   const quantity = parseFloat(document.getElementById('executionQuantity').value) || 0;
   const price = parseFloat(document.getElementById('executionPrice').value) || 0;
-  // Commission field does not exist in execution modal
+  const commission = parseFloat(document.getElementById('executionCommission').value) || 0;
+  const type = document.getElementById('executionType').value;
 
-  const total = quantity * price; // No commission in executions
+  let total = 0;
+  let label = '';
 
-  // Total field may not exist - check if element exists
+  if (type === 'buy') {
+    // בקנייה: סה"כ עלות = כמות * מחיר + עמלה
+    total = quantity * price + commission;
+    label = 'סה"כ עלות:';
+  } else if (type === 'sell') {
+    // במכירה: סה"כ מזומן = כמות * מחיר - עמלה
+    total = quantity * price - commission;
+    label = 'סה"כ מזומן:';
+  } else {
+    // אם לא נבחר סוג, הצג סכום בסיסי
+    total = quantity * price;
+    label = 'סה"כ:';
+  }
+
+  // עדכון התצוגה
   const totalElement = document.getElementById('executionTotal');
   if (totalElement) {
-    totalElement.textContent = `$${total.toFixed(2)}`;
+    const sign = total >= 0 ? '' : '-';
+    totalElement.innerHTML = `<strong>${label}</strong> ${sign}$${Math.abs(total).toFixed(2)}`;
   }
 }
 

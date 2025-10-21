@@ -190,6 +190,32 @@ async function showAddExecutionModal() {
     filterFn: (ticker) => ticker.status === 'open' || ticker.status === 'closed'
   });
 
+  // טעינת חשבונות עם ברירת מחדל מהעדפות
+  await SelectPopulatorService.populateAccountsSelect('executionAccount', {
+    includeEmpty: true,
+    emptyText: 'בחר חשבון...',
+    defaultFromPreferences: true,
+    filterFn: (account) => account.status === 'open'
+  });
+
+  // הוספת event listener לטיקר
+  const tickerSelect = document.getElementById('executionTicker');
+  if (tickerSelect) {
+    tickerSelect.addEventListener('change', function() {
+      if (this.value) {
+        // הפעלת כל השדות
+        enableExecutionFormFields();
+        // טעינת מידע על הטיקר
+        loadExecutionTickerInfo(this.value);
+      } else {
+        // השבתת כל השדות
+        disableExecutionFormFields();
+        // הסתרת מידע על הטיקר
+        hideExecutionTickerInfo();
+      }
+    });
+  }
+
   // חישוב ערכים מחושבים
   calculateAddExecutionValues();
 
@@ -2518,6 +2544,136 @@ window.showTickerHelp = showTickerHelp;
 window.addNewTicker = addNewTicker;
 window.addNewPlan = addNewPlan;
 window.addNewTrade = addNewTrade;
+
+/**
+ * הפעלת שדות הטופס אחרי בחירת טיקר
+ */
+function enableExecutionFormFields() {
+  const formFields = [
+    'executionType', 'executionQuantity', 'executionPrice', 'executionDate', 'executionAccount'
+  ];
+  
+  formFields.forEach(fieldId => {
+    const field = document.getElementById(fieldId);
+    if (field) {
+      field.disabled = false;
+      field.classList.remove('disabled');
+    }
+  });
+}
+
+/**
+ * השבתת שדות הטופס
+ */
+function disableExecutionFormFields() {
+  const formFields = [
+    'executionType', 'executionQuantity', 'executionPrice', 'executionDate', 'executionAccount'
+  ];
+  
+  formFields.forEach(fieldId => {
+    const field = document.getElementById(fieldId);
+    if (field) {
+      field.disabled = true;
+      field.classList.add('disabled');
+    }
+  });
+}
+
+/**
+ * טעינת מידע על הטיקר
+ */
+async function loadExecutionTickerInfo(tickerId) {
+  try {
+    console.log('🔄 Loading ticker info for ID:', tickerId);
+    
+    // Get ticker data from API
+    const response = await fetch(`/api/tickers/`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    const tickers = data.data || data;
+    
+    // Find the specific ticker
+    const ticker = tickers.find(t => t.id == tickerId);
+    if (!ticker) {
+      throw new Error('Ticker not found');
+    }
+    
+    // Display ticker info
+    displayExecutionTickerInfo(ticker);
+    
+    // Set default quantity to 100
+    const quantityField = document.getElementById('executionQuantity');
+    if (quantityField) {
+      quantityField.value = 100;
+    }
+    
+    // Set default price to current price
+    const priceField = document.getElementById('executionPrice');
+    if (priceField && ticker.current_price) {
+      priceField.value = ticker.current_price;
+    }
+    
+  } catch (error) {
+    console.error('❌ Error loading ticker info:', error);
+  }
+}
+
+/**
+ * הצגת מידע על הטיקר
+ */
+function displayExecutionTickerInfo(ticker) {
+  // Create or update ticker info display
+  let tickerInfoDiv = document.getElementById('executionTickerInfo');
+  if (!tickerInfoDiv) {
+    tickerInfoDiv = document.createElement('div');
+    tickerInfoDiv.id = 'executionTickerInfo';
+    tickerInfoDiv.className = 'ticker-info-display mb-3 p-3 bg-light rounded';
+    
+    // Insert after ticker select
+    const tickerSelect = document.getElementById('executionTicker');
+    if (tickerSelect && tickerSelect.parentNode) {
+      tickerSelect.parentNode.insertBefore(tickerInfoDiv, tickerSelect.nextSibling);
+    }
+  }
+  
+  const changeColor = ticker.daily_change >= 0 ? 'text-success' : 'text-danger';
+  const changeIcon = ticker.daily_change >= 0 ? '↗' : '↘';
+  
+  tickerInfoDiv.innerHTML = `
+    <div class="row">
+      <div class="col-md-6">
+        <strong>${ticker.symbol}</strong> - ${ticker.name || 'N/A'}
+      </div>
+      <div class="col-md-6 text-end">
+        <span class="fw-bold">$${ticker.current_price || 'N/A'}</span>
+        <span class="${changeColor}">
+          ${changeIcon} ${ticker.daily_change || 0} (${ticker.daily_change_percent || 0}%)
+        </span>
+      </div>
+    </div>
+    <div class="row mt-1">
+      <div class="col-12">
+        <small class="text-muted">
+          נפח: ${ticker.volume || 'N/A'} | 
+          שינוי יומי: ${ticker.daily_change || 0} (${ticker.daily_change_percent || 0}%)
+        </small>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * הסתרת מידע על הטיקר
+ */
+function hideExecutionTickerInfo() {
+  const tickerInfoDiv = document.getElementById('executionTickerInfo');
+  if (tickerInfoDiv) {
+    tickerInfoDiv.remove();
+  }
+}
 
 /**
  * חישוב ערכים מחושבים לטופס הוספה

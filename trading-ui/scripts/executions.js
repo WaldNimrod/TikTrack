@@ -119,13 +119,13 @@ function resetAddExecutionForm() {
 
   // השבתת כל השדות חוץ מטיקר
   const fieldsToDisable = [
-    'addExecutionTradeId',
-    'addExecutionType',
-    'addExecutionQuantity',
-    'addExecutionPrice',
-    'addExecutionCommission',
-    'addExecutionDate',
-    'addExecutionNotes',
+    'executionTradeId',
+    'executionType',
+    'executionQuantity',
+    'executionPrice',
+    'executionCommission',
+    'executionDate',
+    'executionNotes',
   ];
 
   fieldsToDisable.forEach(fieldId => {
@@ -156,7 +156,7 @@ async function showAddExecutionModal() {
   // הגדרת תאריך ברירת מחדל - היום
   const today = new Date();
   const todayString = today.toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
-  document.getElementById('addExecutionDate').value = todayString;
+  document.getElementById('executionDate').value = todayString;
 
   // הגדרת עמלה ברירת מחדל לפי העדפות
   // ✨ עודכן לתמיכה במערכת העדפות!
@@ -788,7 +788,7 @@ function clearExecutionValidationErrors() {
 }
 
 // ולידציה - משתמש במערכת הכללית window.validateEntityForm
-// function validateCompleteExecutionForm(mode) {
+function validateCompleteExecutionForm(mode) {
   const prefix = mode === 'add' ? 'add' : 'edit';
   let isValid = true;
   const errors = [];

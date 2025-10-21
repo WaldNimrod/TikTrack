@@ -556,7 +556,7 @@ async function showEditExecutionModal(id) {
     }
 
   } catch (error) {
-    handleDataLoadError(error, 'פרטי אובייקט מקושר');
+    handleApiError(error, 'פרטי אובייקט מקושר');
   }
 
   clearExecutionValidationErrors();
@@ -1267,7 +1267,7 @@ async function showExecutionLinkedItemsModal(executionId, _errorData) {
     }
 
   } catch (error) {
-    handleDataLoadError(error, 'נתונים מקושרים');
+    handleApiError(error, 'נתונים מקושרים');
   }
 }
 
@@ -1295,7 +1295,7 @@ async function loadLinkedItemsDetails(executionId, _errorData = null) {
     }
 
   } catch (error) {
-    handleDataLoadError(error, 'פריטים מקושרים');
+    handleApiError(error, 'פריטים מקושרים');
     // אם יש שגיאה, ננסה לטעון מכל ה-APIs
     await loadLinkedItemsFromMultipleSources(executionId);
   }
@@ -2682,10 +2682,10 @@ function displayExecutionTickerInfo(ticker) {
     tickerInfoDiv.id = 'executionTickerInfo';
     tickerInfoDiv.className = 'mb-3 p-3 bg-light rounded';
     
-    // Insert after ticker select
-    const tickerSelect = document.getElementById('executionTicker');
-    if (tickerSelect && tickerSelect.parentNode) {
-      tickerSelect.parentNode.insertBefore(tickerInfoDiv, tickerSelect.nextSibling);
+    // Insert after the ticker row (not just the select)
+    const tickerRow = document.getElementById('executionTicker').closest('.row');
+    if (tickerRow && tickerRow.parentNode) {
+      tickerRow.parentNode.insertBefore(tickerInfoDiv, tickerRow.nextSibling);
     }
   }
   

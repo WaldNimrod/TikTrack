@@ -527,7 +527,10 @@ class FieldRendererService {
         const changePercent = ticker.daily_change_percent || 0;
         const volume = ticker.volume || 0;
         
-        // צבעים לפי כיוון השינוי
+        // סמל מטבע דינמי
+        const currencySymbol = ticker.currency_symbol || '$';
+        
+        // שימוש במערכת הצבעים הכללית
         const changeColor = change >= 0 ? 'text-success' : 'text-danger';
         const changeIcon = change >= 0 ? '↗' : '↘';
         
@@ -541,7 +544,7 @@ class FieldRendererService {
                         <strong>${symbol}</strong> - ${name}
                     </div>
                     <div class="col-md-6 text-end">
-                        <span class="fw-bold">$${price.toFixed(2)}</span>
+                        <span class="fw-bold">${currencySymbol}${price.toFixed(2)}</span>
                         <span class="${changeColor}">
                             ${changeIcon} ${change.toFixed(2)} (${changePercent.toFixed(2)}%)
                         </span>

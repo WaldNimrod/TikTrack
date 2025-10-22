@@ -543,6 +543,6 @@ window.ActionsMenuSystem = ActionsMenuSystem;
 // יצירת instance גלובלי אחרי שהקלאס מוגדר - רק אם עדיין לא קיים
 if (!window.actionsMenuSystem) {
     window.actionsMenuSystem = new ActionsMenuSystem();
-    console.log('🔧 ActionsMenuSystem: Instance created and ready');
+    console.log('✅ ActionsMenuSystem initialized manually');
 }
 

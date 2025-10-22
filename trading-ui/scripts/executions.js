@@ -65,8 +65,12 @@ let tradesData = []; // נתוני טריידים לשמירת מפת חשבונ
 
 // פונקציות בסיסיות
 function openExecutionDetails(_id) {
-
-  showAddExecutionModal();
+  // שימוש במערכת הכללית
+  if (typeof window.showAddExecutionModal === 'function') {
+    window.showAddExecutionModal();
+  } else {
+    console.error('❌ showAddExecutionModal לא זמין במערכת הכללית');
+  }
 }
 
 function editExecution(id) {
@@ -152,9 +156,6 @@ function resetAddExecutionForm() {
 }
 
 // showAddExecutionModal הועבר למערכת הכללית
-  const bootstrapModal = new bootstrap.Modal(document.getElementById('addExecutionModal'));
-  bootstrapModal.show();
-}
 
 /**
  * ניקוי והשבתת שדות בטופס עריכת עסקה
@@ -1897,7 +1898,7 @@ window.deleteExecution = deleteExecution;
 // resetAllFiltersAndReloadData() - לא בשימוש, הוסרה
 
 // פונקציות מודלים
-window.showAddExecutionModal = showAddExecutionModal;
+// window.showAddExecutionModal = showAddExecutionModal; // הועבר למערכת הכללית
 window.showEditExecutionModal = showEditExecutionModal;
 // window.showDeleteExecutionModal = showDeleteExecutionModal; // הוסר - שימוש במערכת הגלובלית
 window.saveExecution = saveExecution;
@@ -3149,7 +3150,7 @@ if (typeof window.registerCRUDFunctions === 'function') {
     read: loadExecutionsData,
     update: updateExecution,
     delete: confirmDeleteExecution,
-    showAddModal: showAddExecutionModal,
+    showAddModal: window.showAddExecutionModal, // שימוש במערכת הכללית
     showEditModal: showEditExecutionModal,
     showDeleteModal: deleteExecution,
   });
@@ -3414,8 +3415,12 @@ function addExecutionForTicker(tickerId) {
     return;
   }
 
-  // פתיחת מודל הוספת עסקה
-  showAddExecutionModal();
+  // פתיחת מודל הוספת עסקה - שימוש במערכת הכללית
+  if (typeof window.showAddExecutionModal === 'function') {
+    window.showAddExecutionModal();
+  } else {
+    console.error('❌ showAddExecutionModal לא זמין במערכת הכללית');
+  }
 
   // בחירת הטיקר במודל
   setTimeout(() => {

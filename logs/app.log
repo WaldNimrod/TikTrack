@@ -25651,3 +25651,237 @@
 2025-10-22 23:20:20,815 - cache - INFO - Cache DELETE: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Was accessed 2 times)
 2025-10-22 23:20:20,816 - cache - INFO - Cache SET: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 2569 chars)
 2025-10-22 23:20:20,817 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:20:20] "GET /api/executions/?_t=1761164420812 HTTP/1.1" 200 -
+2025-10-22 23:21:20,820 - routes.api.base_entity.executions - INFO - Getting all executions records
+2025-10-22 23:21:20,821 - cache - INFO - Cache EXPIRED: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Age: 60.0s)
+2025-10-22 23:21:20,821 - cache - INFO - Cache DELETE: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Was accessed 0 times)
+2025-10-22 23:21:20,827 - cache - INFO - Cache SET: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 2569 chars)
+2025-10-22 23:21:20,828 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:21:20] "GET /api/executions/?_t=1761164480786 HTTP/1.1" 200 -
+2025-10-22 23:21:20,834 - routes.api.base_entity.executions - INFO - Getting all executions records
+2025-10-22 23:21:20,838 - cache - INFO - Cache HIT: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Access count: 1)
+2025-10-22 23:21:20,838 - routes.api.base_entity.executions - INFO - Cache hit for executions get_all
+2025-10-22 23:21:20,840 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:21:20] "GET /api/executions/?_t=1761164480831 HTTP/1.1" 200 -
+2025-10-22 23:22:20,828 - routes.api.base_entity.executions - INFO - Getting all executions records
+2025-10-22 23:22:20,828 - cache - INFO - Cache EXPIRED: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Age: 60.0s)
+2025-10-22 23:22:20,828 - cache - INFO - Cache DELETE: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Was accessed 1 times)
+2025-10-22 23:22:20,830 - cache - INFO - Cache SET: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 2569 chars)
+2025-10-22 23:22:20,831 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /api/executions/?_t=1761164540825 HTTP/1.1" 200 -
+2025-10-22 23:22:20,843 - routes.api.base_entity.executions - INFO - Getting all executions records
+2025-10-22 23:22:20,843 - cache - INFO - Cache HIT: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Access count: 1)
+2025-10-22 23:22:20,843 - routes.api.base_entity.executions - INFO - Cache hit for executions get_all
+2025-10-22 23:22:20,844 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /api/executions/?_t=1761164540841 HTTP/1.1" 200 -
+2025-10-22 23:22:20,858 - services.trade_service - INFO - Loading trades with joinedload for account and ticker
+2025-10-22 23:22:20,862 - services.trade_service - INFO - Loaded 13 trades
+2025-10-22 23:22:20,863 - services.trade_service - INFO - First trade ID: 1
+2025-10-22 23:22:20,868 - services.trade_service - INFO - First trade trading_account_id: 1
+2025-10-22 23:22:20,873 - services.trade_service - INFO - First trade ticker_id: 1
+2025-10-22 23:22:20,878 - services.trade_service - INFO - First trade has account attribute: True
+2025-10-22 23:22:20,883 - services.trade_service - INFO - First trade account object: <TradingAccount(name='חשבון מעודכן', currency_id='1', status='open')>
+2025-10-22 23:22:20,884 - services.trade_service - INFO - First trade has ticker attribute: True
+2025-10-22 23:22:20,884 - services.trade_service - INFO - First trade ticker object: <Ticker(symbol='AAPL', name='Apple Inc. - UPDATED', type='stock')>
+2025-10-22 23:22:20,884 - services.trade_service - INFO - First trade account name: חשבון מעודכן
+2025-10-22 23:22:20,884 - services.trade_service - INFO - First trade ticker symbol: AAPL
+2025-10-22 23:22:20,884 - models.trade - INFO - Trade 1: Using loaded account name: חשבון מעודכן
+2025-10-22 23:22:20,884 - models.trade - INFO - Trade 1: Using loaded ticker symbol: AAPL
+2025-10-22 23:22:20,884 - models.trade - INFO - Trade 1 to_dict result: {'id': 1, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'cancelled', 'investment_type': 'swing', 'side': 'Long', 'notes': 'קנייה של Apple', 'opened_at': '2025-08-15 03:51:43', 'closed_at': '2025-08-21 12:36:00', 'created_at': '2025-08-15 03:51:43', 'total_pl': 2500.0, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': '2025-08-31 14:28:23', 'cancel_reason': 'בוטל על ידי המשתמש'}
+2025-10-22 23:22:20,894 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /executions HTTP/1.1" 200 -
+2025-10-22 23:22:20,895 - models.trade - INFO - Trade 2: Using loaded account name: חשבון טכנולוגיה
+2025-10-22 23:22:20,895 - models.trade - INFO - Trade 2: Using loaded ticker symbol: GOOGL
+2025-10-22 23:22:20,895 - models.trade - INFO - Trade 2 to_dict result: {'id': 2, 'trading_account_id': 2, 'ticker_id': 2, 'trade_plan_id': 14, 'status': 'closed', 'investment_type': 'investment', 'side': 'Long', 'notes': 'טרייד מוצלח ב-Google', 'opened_at': '2025-08-15 03:51:43', 'closed_at': '2025-08-10 06:51:43', 'created_at': '2025-08-15 03:51:43', 'total_pl': 1500.0, 'account_name': 'חשבון טכנולוגיה', 'ticker_symbol': 'GOOGL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-22 23:22:20,909 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/master.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,910 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /images/icons/executions.svg HTTP/1.1" 200 -
+2025-10-22 23:22:20,915 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/header-styles.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,919 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /scripts/global-favicon.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,923 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /scripts/notification-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,926 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /scripts/ui-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,929 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /scripts/warning-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,931 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/01-settings/_variables.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,934 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/01-settings/_color-variables.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,935 - models.trade - INFO - Trade 3: Using loaded account name: חשבון ETF
+2025-10-22 23:22:20,938 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/01-settings/_colors-dynamic.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,940 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/01-settings/_spacing.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,940 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/01-settings/_colors-semantic.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,941 - models.trade - INFO - Trade 3: Using loaded ticker symbol: SPY
+2025-10-22 23:22:20,941 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/01-settings/_typography.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,942 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/01-settings/_rtl-logical.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,944 - models.trade - INFO - Trade 3 to_dict result: {'id': 3, 'trading_account_id': 3, 'ticker_id': 9, 'trade_plan_id': 2, 'status': 'cancelled', 'investment_type': 'passive', 'side': 'Long', 'notes': 'השקעה ב-ETF', 'opened_at': '2025-08-15 03:51:43', 'closed_at': None, 'created_at': '2025-08-15 03:51:43', 'total_pl': 800.0, 'account_name': 'חשבון ETF', 'ticker_symbol': 'SPY', 'cancelled_at': '2025-08-22 06:50:57', 'cancel_reason': 'בדיקת ביטול'}
+2025-10-22 23:22:20,945 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/01-settings/_breakpoints.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,950 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/02-tools/_functions.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,950 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/03-generic/_reset.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,950 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/02-tools/_mixins.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,951 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/02-tools/_utilities.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,951 - models.trade - INFO - Trade 4: Using loaded account name: חשבון מעודכן
+2025-10-22 23:22:20,957 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/04-elements/_headings.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,957 - models.trade - INFO - Trade 4: Using loaded ticker symbol: AAPL
+2025-10-22 23:22:20,958 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/04-elements/_links.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,958 - models.trade - INFO - Trade 4 to_dict result: {'id': 4, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'cancelled', 'investment_type': 'swing', 'side': 'Long', 'notes': None, 'opened_at': '2025-08-26 00:13:21', 'closed_at': None, 'created_at': '2025-08-26 00:13:21', 'total_pl': None, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': '2025-08-31 14:30:08', 'cancel_reason': 'בוטל על ידי המשתמש'}
+2025-10-22 23:22:20,959 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/03-generic/_base.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,961 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/04-elements/_forms-base.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,961 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/05-objects/_layout.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,961 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/04-elements/_buttons-base.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,964 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/05-objects/_grid.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,965 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/06-components/_bootstrap-overrides.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,970 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/06-components/_buttons-advanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,971 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/06-components/_tables.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,974 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/06-components/_notifications.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,975 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/06-components/_cards.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,975 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/06-components/_navigation.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,976 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/06-components/_modals.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,979 - models.trade - INFO - Trade 5: Using loaded account name: חשבון ETF
+2025-10-22 23:22:20,980 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/06-components/_forms-advanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,981 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/06-components/_entity-colors.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,982 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/06-components/_badges-status.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,983 - models.trade - INFO - Trade 5: Using loaded ticker symbol: AAPL
+2025-10-22 23:22:20,983 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/06-components/_info-summary.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,983 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/06-components/_page-headers.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,984 - models.trade - INFO - Trade 5 to_dict result: {'id': 5, 'trading_account_id': 3, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': 'גכעגעג', 'opened_at': '2025-08-30 22:02:00', 'closed_at': None, 'created_at': '2025-08-30 22:02:00', 'total_pl': 0.0, 'account_name': 'חשבון ETF', 'ticker_symbol': 'AAPL', 'cancelled_at': '2025-08-31 14:32:32', 'cancel_reason': 'test'}
+2025-10-22 23:22:20,992 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/06-components/_constraints.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,993 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/06-components/_chart-management.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,993 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/06-components/_pagination-system.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,993 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/06-components/_crud-testing-dashboard.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,993 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/06-components/_background-tasks.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,999 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/06-components/_linter-realtime-monitor.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,999 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/06-components/_monitoring-enhanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:20,999 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:20] "GET /styles-new/06-components/_server-monitor.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,001 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/06-components/_unified-log-display.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,001 - models.trade - INFO - Trade 6: Using loaded account name: חשבון טכנולוגיה
+2025-10-22 23:22:21,002 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/07-trumps/chart-management.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,006 - models.trade - INFO - Trade 6: Using loaded ticker symbol: GOOGL
+2025-10-22 23:22:21,008 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/07-trumps/js-map-advanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,009 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/07-trumps/index-hero-section.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,009 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/07-trumps/page-scripts-matrix.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,012 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/08-themes/_high-contrast.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,012 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/08-themes/_light.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,012 - models.trade - INFO - Trade 6 to_dict result: {'id': 6, 'trading_account_id': 2, 'ticker_id': 2, 'trade_plan_id': 1, 'status': 'open', 'investment_type': 'investment', 'side': 'Long', 'notes': '', 'opened_at': '2025-08-31 16:57:00', 'closed_at': None, 'created_at': '2025-08-31 16:57:00', 'total_pl': 0.0, 'account_name': 'חשבון טכנולוגיה', 'ticker_symbol': 'GOOGL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-22 23:22:21,017 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/09-utilities/_utilities.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,018 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/main.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,019 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /scripts/unified-cache-manager.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,020 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /scripts/error-handlers.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,023 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /scripts/cache-sync-manager.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,024 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /scripts/header-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,028 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /scripts/page-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,030 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/01-settings/_colors-semantic.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,031 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/01-settings/_variables.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,035 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/01-settings/_spacing.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,035 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/01-settings/_typography.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,037 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/01-settings/_colors-dynamic.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,040 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/01-settings/_breakpoints.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,042 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/02-tools/_functions.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,043 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/02-tools/_mixins.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,043 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/01-settings/_rtl-logical.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,044 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/03-generic/_reset.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,045 - models.trade - INFO - Trade 7: Using loaded account name: חשבון טכנולוגיה
+2025-10-22 23:22:21,046 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/03-generic/_base.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,049 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/04-elements/_headings.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,049 - models.trade - INFO - Trade 7: Using loaded ticker symbol: AMZN
+2025-10-22 23:22:21,050 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/04-elements/_links.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,050 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/04-elements/_forms-base.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,051 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/04-elements/_buttons-base.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,052 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/05-objects/_layout.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,052 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/05-objects/_grid.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,052 - models.trade - INFO - Trade 7 to_dict result: {'id': 7, 'trading_account_id': 2, 'ticker_id': 6, 'trade_plan_id': 9, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': None, 'opened_at': '2025-08-31 17:38:00', 'closed_at': None, 'created_at': '2025-08-31 17:38:00', 'total_pl': 0.0, 'account_name': 'חשבון טכנולוגיה', 'ticker_symbol': 'AMZN', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-22 23:22:21,058 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/06-components/_buttons-advanced.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,058 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/06-components/_bootstrap-overrides.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,060 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/06-components/_tables.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,062 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/06-components/_cards.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,063 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/06-components/_notifications.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,064 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/06-components/_modals.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,064 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/06-components/_navigation.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,067 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/06-components/_badges-status.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,068 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/06-components/_forms-advanced.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,069 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/06-components/_page-headers.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,073 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/06-components/_info-summary.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,074 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/06-components/_entity-colors.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,076 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/06-components/_chart-management.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,077 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/07-trumps/page-scripts-matrix.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,078 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/06-components/_constraints.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,078 - models.trade - INFO - Trade 8: Using loaded account name: חשבון מעודכן
+2025-10-22 23:22:21,079 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/07-trumps/chart-management.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,080 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/08-themes/_light.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,082 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /styles-new/09-utilities/_utilities.css HTTP/1.1" 200 -
+2025-10-22 23:22:21,083 - models.trade - INFO - Trade 8: Using loaded ticker symbol: AAPL
+2025-10-22 23:22:21,084 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /scripts/translation-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,085 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /scripts/button-icons.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,086 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /scripts/button-system-init.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,086 - models.trade - INFO - Trade 8 to_dict result: {'id': 8, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'closed', 'investment_type': 'investment', 'side': 'Long', 'notes': None, 'opened_at': '2025-09-01 23:51:48', 'closed_at': '2025-09-02 00:36:20', 'created_at': '2025-09-01 23:51:48', 'total_pl': None, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-22 23:22:21,089 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /scripts/color-scheme-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,089 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /scripts/services/data-collection-service.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,098 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /scripts/services/statistics-calculator.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,098 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /scripts/services/field-renderer-service.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,100 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /scripts/services/select-populator-service.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,100 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /scripts/services/crud-response-handler.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,101 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /scripts/services/default-value-setter.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,102 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /scripts/pagination-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,103 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /scripts/modules/actions-menu-system.js?v=1.0.1 HTTP/1.1" 200 -
+2025-10-22 23:22:21,108 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /scripts/date-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,111 - models.trade - INFO - Trade 9: Using loaded account name: חשבון מעודכן
+2025-10-22 23:22:21,112 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /scripts/data-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,112 - models.trade - INFO - Trade 9: Using loaded ticker symbol: GOOGL
+2025-10-22 23:22:21,112 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /scripts/tables.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,114 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /scripts/preferences.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,115 - models.trade - INFO - Trade 9 to_dict result: {'id': 9, 'trading_account_id': 1, 'ticker_id': 2, 'trade_plan_id': 14, 'status': 'closed', 'investment_type': 'investment', 'side': 'Long', 'notes': None, 'opened_at': '2025-09-02 00:41:51', 'closed_at': '2025-09-02 00:42:08', 'created_at': '2025-09-02 00:41:51', 'total_pl': None, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'GOOGL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-22 23:22:21,116 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /scripts/preferences-core.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,119 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /scripts/entity-details-api.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,119 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /scripts/entity-details-renderer.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,124 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /scripts/entity-details-modal.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,126 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /scripts/init-system/package-manifest.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,128 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /scripts/page-initialization-configs.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,138 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /scripts/unified-app-initializer.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,140 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /scripts/executions.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,144 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /scripts/init-system-check.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,147 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-22T23:22:21.146895', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/.well-known/appspecific/com.chrome.devtools.json', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-22 23:22:21,148 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /scripts/monitoring-functions.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-22 23:22:21,148 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-22T23:22:21.146895', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/.well-known/appspecific/com.chrome.devtools.json', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-22 23:22:21,150 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-10-22 23:22:21,154 - models.trade - INFO - Trade 10: Using loaded account name: חשבון מעודכן
+2025-10-22 23:22:21,156 - models.trade - INFO - Trade 10: Using loaded ticker symbol: TSLA
+2025-10-22 23:22:21,157 - models.trade - INFO - Trade 10 to_dict result: {'id': 10, 'trading_account_id': 1, 'ticker_id': 4, 'trade_plan_id': 1, 'status': 'open', 'investment_type': 'investment', 'side': 'Long', 'notes': None, 'opened_at': '2025-09-02 00:56:03', 'closed_at': None, 'created_at': '2025-09-02 00:56:03', 'total_pl': None, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'TSLA', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-22 23:22:21,180 - models.trade - INFO - Trade 11: Using loaded account name: חשבון מעודכן
+2025-10-22 23:22:21,180 - models.trade - INFO - Trade 11: Using loaded ticker symbol: AAPL
+2025-10-22 23:22:21,180 - models.trade - INFO - Trade 11 to_dict result: {'id': 11, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': None, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': 'Test trade', 'opened_at': '2025-10-06 21:05:06', 'closed_at': None, 'created_at': '2025-10-06 21:05:06', 'total_pl': 0.0, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-22 23:22:21,195 - models.trade - INFO - Trade 18: Using loaded account name: חשבון מעודכן
+2025-10-22 23:22:21,195 - models.trade - INFO - Trade 18: Using loaded ticker symbol: AAPL
+2025-10-22 23:22:21,195 - models.trade - INFO - Trade 18 to_dict result: {'id': 18, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': None, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': 'Test trade for CRUD testing', 'opened_at': '2025-10-07 16:13:43', 'closed_at': None, 'created_at': '2025-10-07 16:13:43', 'total_pl': 0.0, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-22 23:22:21,204 - models.trade - INFO - Trade 19: Using loaded account name: חשבון מעודכן
+2025-10-22 23:22:21,204 - models.trade - INFO - Trade 19: Using loaded ticker symbol: AAPL
+2025-10-22 23:22:21,204 - models.trade - INFO - Trade 19 to_dict result: {'id': 19, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': None, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': None, 'opened_at': '2025-10-17 12:36:57', 'closed_at': None, 'created_at': '2025-10-17 12:36:57', 'total_pl': 0.0, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-22 23:22:21,214 - routes.api.trades - INFO - First trade data: {'id': 1, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'cancelled', 'investment_type': 'swing', 'side': 'Long', 'notes': 'קנייה של Apple', 'opened_at': '2025-08-15 03:51:43', 'closed_at': '2025-08-21 12:36:00', 'created_at': '2025-08-15 03:51:43', 'total_pl': 2500.0, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': '2025-08-31 14:28:23', 'cancel_reason': 'בוטל על ידי המשתמש', 'current_price': 258.55, 'daily_change': -1.6059671956463715, 'change_amount': -4.21999999999997}
+2025-10-22 23:22:21,215 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /api/trades/ HTTP/1.1" 200 -
+2025-10-22 23:22:21,831 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:21] "GET /favicon.ico HTTP/1.1" 200 -
+2025-10-22 23:22:22,668 - routes.api.base_entity.executions - INFO - Getting all executions records
+2025-10-22 23:22:22,668 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:22] "GET /images/icons/home.svg HTTP/1.1" 200 -
+2025-10-22 23:22:22,669 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:22] "GET /images/logo.svg HTTP/1.1" 200 -
+2025-10-22 23:22:22,668 - cache - INFO - Cache HIT: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Access count: 2)
+2025-10-22 23:22:22,669 - routes.api.base_entity.executions - INFO - Cache hit for executions get_all
+2025-10-22 23:22:22,670 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:22] "GET /api/executions/?_t=1761164542666 HTTP/1.1" 200 -
+2025-10-22 23:22:22,688 - cache - INFO - Cache MISS: services.ticker_service.get_all:257b086fd1b0b9cc23216eb2710e19ad
+2025-10-22 23:22:22,690 - services.ticker_service - INFO - Found 19 tickers in database
+2025-10-22 23:22:22,768 - routes.api.base_entity.trading_accounts - INFO - Getting all trading_accounts records
+2025-10-22 23:22:22,769 - cache - INFO - Cache MISS: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b
+2025-10-22 23:22:22,772 - cache - INFO - Cache SET: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 2908 chars)
+2025-10-22 23:22:22,773 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:22] "GET /api/trading-accounts/ HTTP/1.1" 200 -
+2025-10-22 23:22:22,786 - cache - INFO - Cache SET: services.ticker_service.get_all:257b086fd1b0b9cc23216eb2710e19ad (TTL: 30s, Dependencies: ['tickers'], Data size: 1206 chars)
+2025-10-22 23:22:22,786 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:22:22] "GET /api/tickers/ HTTP/1.1" 200 -
+2025-10-22 23:23:20,655 - routes.api.base_entity.executions - INFO - Getting all executions records
+2025-10-22 23:23:20,655 - cache - INFO - Cache HIT: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Access count: 3)
+2025-10-22 23:23:20,655 - routes.api.base_entity.executions - INFO - Cache hit for executions get_all
+2025-10-22 23:23:20,656 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:23:20] "GET /api/executions/?_t=1761164600649 HTTP/1.1" 200 -
+2025-10-22 23:23:20,849 - routes.api.base_entity.executions - INFO - Getting all executions records
+2025-10-22 23:23:20,850 - cache - INFO - Cache EXPIRED: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Age: 60.0s)
+2025-10-22 23:23:20,850 - cache - INFO - Cache DELETE: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Was accessed 3 times)
+2025-10-22 23:23:20,853 - cache - INFO - Cache SET: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 2569 chars)
+2025-10-22 23:23:20,853 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:23:20] "GET /api/executions/?_t=1761164600845 HTTP/1.1" 200 -
+2025-10-22 23:24:20,698 - routes.api.base_entity.executions - INFO - Getting all executions records
+2025-10-22 23:24:20,702 - cache - INFO - Cache HIT: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Access count: 1)
+2025-10-22 23:24:20,702 - routes.api.base_entity.executions - INFO - Cache hit for executions get_all
+2025-10-22 23:24:20,703 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:24:20] "GET /api/executions/?_t=1761164660694 HTTP/1.1" 200 -
+2025-10-22 23:24:51,849 - utils.rate_limiter - INFO - Rate limiter cleanup: removed 0 empty entries
+2025-10-22 23:24:51,851 - routes.api.base_entity.executions - INFO - Getting all executions records
+2025-10-22 23:24:51,851 - cache - INFO - Cache EXPIRED: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Age: 91.0s)
+2025-10-22 23:24:51,851 - cache - INFO - Cache DELETE: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Was accessed 1 times)
+2025-10-22 23:24:51,854 - cache - INFO - Cache SET: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 2569 chars)
+2025-10-22 23:24:51,855 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:24:51] "GET /api/executions/?_t=1761164691836 HTTP/1.1" 200 -
+2025-10-22 23:24:53,351 - routes.api.base_entity.executions - INFO - Getting all executions records
+2025-10-22 23:24:53,351 - cache - INFO - Cache HIT: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Access count: 1)
+2025-10-22 23:24:53,351 - routes.api.base_entity.executions - INFO - Cache hit for executions get_all
+2025-10-22 23:24:53,351 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:24:53] "GET /api/executions/?_t=1761164693346 HTTP/1.1" 200 -
+2025-10-22 23:24:53,599 - werkzeug - INFO - 127.0.0.1 - - [22/Oct/2025 23:24:53] "GET /sw.js HTTP/1.1" 200 -

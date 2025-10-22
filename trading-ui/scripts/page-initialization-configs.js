@@ -174,7 +174,7 @@ const PAGE_CONFIGS = {
         // - 'crud': מערכות CRUD ו-entity-details
         // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
-        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
+        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-details', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
@@ -229,8 +229,10 @@ const PAGE_CONFIGS = {
         // - 'ui-advanced': ממשק משתמש מתקדם (כפתורים, טבלאות, עימוד)
         // - 'crud': מערכות CRUD ו-entity-details
         // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
+        // - 'validation': מערכת ולידציה (validation-utils.js)
+        // - 'system-management': ניהול מערכת (constraint-manager.js)
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
-        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
+        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'validation', 'system-management', 'entity-details', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
@@ -288,7 +290,7 @@ const PAGE_CONFIGS = {
         // - 'crud': מערכות CRUD ו-entity-details
         // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
-        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
+        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-details', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
@@ -347,7 +349,7 @@ const PAGE_CONFIGS = {
         // - 'crud': מערכות CRUD ו-entity-details
         // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
-        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
+        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-details', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
@@ -367,7 +369,7 @@ const PAGE_CONFIGS = {
         
         // קיים
         requiresFilters: true,
-        requiresValidation: false,
+        requiresValidation: true,
         requiresTables: true,
         customInitializers: [
             async (pageConfig) => {
@@ -390,7 +392,7 @@ const PAGE_CONFIGS = {
         // - 'crud': מערכות CRUD ו-entity-details
         // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
-        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
+        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-details', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
@@ -439,7 +441,7 @@ const PAGE_CONFIGS = {
         // - 'crud': מערכות CRUD ו-entity-details
         // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
-        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
+        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-details', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
@@ -498,7 +500,7 @@ const PAGE_CONFIGS = {
         // - 'crud': מערכות CRUD ו-entity-details
         // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
-        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
+        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-details', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
@@ -549,7 +551,7 @@ const PAGE_CONFIGS = {
         // - 'crud': מערכות CRUD ו-entity-details
         // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
-        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
+        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-details', 'init-system'],
         requiredGlobals: [
             'NotificationSystem',    // from base package
             'DataUtils',            // from services package  
@@ -557,11 +559,11 @@ const PAGE_CONFIGS = {
         ],
         description: 'ניהול תזרימי מזומנים - הכנסות והוצאות',
         lastModified: '2025-10-19',
-        pageType: 'data-management',
+        pageType: 'crud',
         preloadAssets: ['cash-flows-data'],
         cacheStrategy: 'standard',
         requiresFilters: true,
-        requiresValidation: false,
+        requiresValidation: true,
         requiresTables: true,
         customInitializers: [
             async (pageConfig) => {
@@ -591,7 +593,7 @@ const PAGE_CONFIGS = {
         // - 'crud': מערכות CRUD ו-entity-details
         // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
-        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
+        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-details', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
@@ -611,7 +613,7 @@ const PAGE_CONFIGS = {
         
         // קיים
         requiresFilters: true,
-        requiresValidation: false,
+        requiresValidation: true,
         requiresTables: true,
         customInitializers: [
             async (pageConfig) => {
@@ -634,7 +636,7 @@ const PAGE_CONFIGS = {
         // - 'crud': מערכות CRUD ו-entity-details
         // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
-        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
+        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-details', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
@@ -643,9 +645,9 @@ const PAGE_CONFIGS = {
             'window.loadNotesData'
         ],
         
-        requiresFilters: false,
+        requiresFilters: true,
         requiresValidation: true,
-        requiresTables: false,
+        requiresTables: true,
         customInitializers: [
             async (pageConfig) => {
                 console.log('📝 Initializing Notes...');

@@ -2067,7 +2067,7 @@ window.verifyCacheSystem = async function(options = {}) {
     }
 };
 
-console.log('📦 Unified Cache Manager loaded');
+// console.log('📦 Unified Cache Manager loaded');
 
 // Auto-initialize the cache manager immediately
 (async () => {

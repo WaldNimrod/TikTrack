@@ -509,151 +509,26 @@ function updateAlertsTable(alerts) {
       const statusColor = window.getStatusColor ? window.getStatusColor(alert.status, 'medium') : '#6c757d';
       const statusBgColor = window.getStatusBackgroundColor ? window.getStatusBackgroundColor(alert.status) : 'rgba(108, 117, 125, 0.1)';
       
-      // קביעת האובייקט המקושר
-      let relatedDisplay = '';
-      let relatedIcon = '';
-      let relatedClass = '';
-      let relatedColor = '';
-      let relatedBgColor = '';
+      // קביעת האובייקט המקושר באמצעות המערכת הכללית
+      const dataSources = {
+        accounts: accounts,
+        trades: trades,
+        tradePlans: tradePlans,
+        tickers: tickers
+      };
 
-      // console.log('🔍 Alert details:', {
-      //   id: alert.id,
-      //   related_type_id: alert.related_type_id,
-      //   related_id: alert.related_id,
-      //   status: alert.status,
-      // });
+      const relatedObjectInfo = window.getRelatedObjectDisplay ? 
+        window.getRelatedObjectDisplay(alert, dataSources, { showLink: true, format: 'full' }) :
+        { display: 'כללי', icon: '🌐', class: 'related-general', color: '', bgColor: '', type: 'general', id: null };
 
-      // console.log('📊 Related data counts:', {
-      //   accounts: accounts.length,
-      //   trades: trades.length,
-      //   tradePlans: tradePlans.length,
-      //   tickers: tickers.length,
-      // });
+      const relatedDisplay = relatedObjectInfo.display;
+      const relatedClass = relatedObjectInfo.class;
+      const relatedColor = relatedObjectInfo.color;
+      const relatedBgColor = relatedObjectInfo.bgColor;
 
-      // טיפול במקרים שבהם related_type_id הוא null
-      if (alert.related_type_id === null || alert.related_id === null) {
-        relatedDisplay = 'כללי';
-        relatedIcon = '🌐';
-        relatedClass = 'related-general';
-
-      } else {
-        switch (alert.related_type_id) {
-        case 1: { // חשבון
-          // console.log(`🔍 Looking for account with ID: ${alert.related_id}`);
-          // console.log('🔍 Available accounts:', accounts.map(a => ({ id: a.id, name: a.name || a.account_name })));
-          const account = accounts.find(a => a.id === alert.related_id);
-          if (account) {
-            const name = account.name || account.account_name || 'לא מוגדר';
-            const currency = account.currency || 'ILS';
-            relatedDisplay = `${name} (${currency})`;
-            // console.log(`✅ Found account: ${name} (${currency})`);
-          } else {
-            relatedDisplay = `חשבון ${alert.related_id}`;
-            // console.log(`❌ Account not found for ID: ${alert.related_id}`);
-          }
-          relatedIcon = '🏦';
-          relatedClass = 'related-account entity-account-badge';
-          relatedColor = window.getEntityColor ? window.getEntityColor('account') : '#28a745';
-          relatedBgColor = window.getEntityBackgroundColor ? window.getEntityBackgroundColor('account') : 'rgba(40, 167, 69, 0.1)';
-          break;
-        }
-        case 2: { // טרייד
-          // console.log(`🔍 Looking for trade with ID: ${alert.related_id}`);
-          // console.log('🔍 Available trades:', trades.map(t => ({
-          //   id: t.id, created_at: t.created_at, date: t.date,
-          //   side: t.side, investment_type: t.investment_type
-          // })));
-          const trade = trades.find(t => t.id === alert.related_id);
-          if (trade) {
-            const date = trade.created_at || trade.date;
-            const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
-            const side = trade.side || 'לא מוגדר';
-            const investmentType = trade.investment_type || 'לא מוגדר';
-            relatedDisplay = `טרייד | ${side} | ${investmentType} | ${formattedDate}`;
-            // console.log(`✅ Found trade: ${relatedDisplay}`);
-          } else {
-            relatedDisplay = `טרייד ${alert.related_id}`;
-            // console.log(`❌ Trade not found for ID: ${alert.related_id}`);
-          }
-          relatedIcon = '📈';
-          relatedClass = 'related-trade entity-trade-badge';
-          relatedColor = window.getEntityColor ? window.getEntityColor('trade') : '#007bff';
-          relatedBgColor = window.getEntityBackgroundColor ? window.getEntityBackgroundColor('trade') : 'rgba(0, 123, 255, 0.1)';
-          break;
-        }
-        case 3: { // תוכנית
-          // console.log(`🔍 Looking for trade plan with ID: ${alert.related_id}`);
-          // console.log('🔍 Available trade plans:', tradePlans.map(p => ({
-          //   id: p.id, created_at: p.created_at, date: p.date,
-          //   side: p.side, investment_type: p.investment_type
-          // })));
-          const plan = tradePlans.find(p => p.id === alert.related_id);
-          if (plan) {
-            const date = plan.created_at || plan.date;
-            const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
-            const side = plan.side || 'לא מוגדר';
-            const investmentType = plan.investment_type || 'לא מוגדר';
-            relatedDisplay = `תוכנית | ${side} | ${investmentType} | ${formattedDate}`;
-            // console.log(`✅ Found trade plan: ${relatedDisplay}`);
-          } else {
-            relatedDisplay = `תוכנית ${alert.related_id}`;
-            // console.log(`❌ Trade plan not found for ID: ${alert.related_id}`);
-          }
-          relatedIcon = '📋';
-          relatedClass = 'related-plan';
-          break;
-        }
-        case 4: { // טיקר
-          // console.log(`🔍 Looking for ticker with ID: ${alert.related_id}`);
-          // console.log('🔍 Available tickers:', tickers.map(t => ({ id: t.id, symbol: t.symbol })));
-          const ticker = tickers.find(t => t.id === alert.related_id);
-          if (ticker) {
-            relatedDisplay = ticker.symbol;
-            // console.log(`✅ Found ticker: ${ticker.symbol}`);
-          } else {
-            relatedDisplay = `טיקר ${alert.related_id}`;
-            // console.log(`❌ Ticker not found for ID: ${alert.related_id}`);
-          }
-          relatedIcon = '📊';
-          relatedClass = 'related-ticker';
-          break;
-        }
-        default:
-          relatedDisplay = `אובייקט ${alert.related_id}`;
-          relatedClass = 'related-other';
-          // console.log(`❓ Unknown related_type_id: ${alert.related_type_id}`);
-        }
-      }
-
-      // קביעת הסימבול לטור הראשון
-      let symbolDisplay = '';
-      if (alert.related_type_id === 1) { // חשבון - ריק
-        symbolDisplay = '-';
-      } else if (alert.related_type_id === 2) { // טרייד
-        const trade = trades.find(t => t.id === alert.related_id);
-        if (trade && trade.ticker_id) {
-          const ticker = tickers.find(tick => tick.id === trade.ticker_id);
-          symbolDisplay = ticker ? ticker.symbol : `טרייד ${alert.related_id}`;
-        } else {
-          symbolDisplay = `טרייד ${alert.related_id}`;
-        }
-      } else if (alert.related_type_id === 3) { // תוכנית
-        const plan = tradePlans.find(p => p.id === alert.related_id);
-        if (plan && plan.ticker_id) {
-          const ticker = tickers.find(tick => tick.id === plan.ticker_id);
-          symbolDisplay = ticker ? ticker.symbol : `תוכנית ${alert.related_id}`;
-        } else {
-          symbolDisplay = `תוכנית ${alert.related_id}`;
-        }
-      } else if (alert.related_type_id === 4) { // טיקר
-        const ticker = tickers.find(tick => tick.id === alert.related_id);
-        symbolDisplay = ticker ? ticker.symbol : `טיקר ${alert.related_id}`;
-      } else {
-        symbolDisplay = `אובייקט ${alert.related_id}`;
-      }
-
-      // הוספת איקון קישור לפני האובייקט
-      relatedDisplay = '🔗 ' + relatedDisplay;
+      // קביעת הסימבול לטור הראשון באמצעות המערכת הכללית
+      const symbolDisplay = window.getRelatedObjectSymbol ? 
+        window.getRelatedObjectSymbol(alert, dataSources) : '-';
 
       const createdAt = alert.created_at ? new Date(alert.created_at).toLocaleDateString('he-IL', {
         year: 'numeric',
@@ -712,17 +587,18 @@ function updateAlertsTable(alerts) {
 
       return `
         <tr data-status="${alert.status || ''}" data-date="${alert.created_at || ''}">
+          <td class="related-cell">
+            <div class="related-object-cell ${relatedClass}" 
+             title="קישור לדף אובייקט - בפיתוח">
+              ${relatedDisplay}
+            </div>
+          </td>
           <td class="ticker-cell">
             <div class="ticker-cell-content">
               <span class="ticker-symbol-link" 
                     onclick="showEntityDetails('alert', ${alert.id}); return false;" 
                     title="פרטי התראה">
                 ${symbolDisplay}
-              </span>
-              <span class="ticker-link-icon" 
-                    onclick="if (${alert.related_id || 'false'}) { showEntityDetails('ticker', ${alert.related_id}); } else { if (window.showErrorNotification) { window.showErrorNotification('שגיאה', 'מזהה טיקר לא זמין'); } else if (typeof showNotification === 'function') { showNotification('מזהה טיקר לא זמין', 'error'); } else { alert('מזהה טיקר לא זמין'); } } return false;" 
-                    title="פרטי טיקר">
-                🔗
               </span>
             </div>
           </td>
@@ -738,14 +614,12 @@ function updateAlertsTable(alerts) {
     return alert.condition || '-';
   })()}</span></td>
           <td class="status-cell" data-status="${alert.status || ''}">
-          <span class="status-badge ${statusClass}">${statusDisplay}</span>
-        </td>
-          <td><span class="triggered-badge ${triggeredClass}">${triggeredDisplay}</span></td>
-          <td class="related-cell">
-            <div class="related-object-cell ${relatedClass}" 
-             title="קישור לדף אובייקט - בפיתוח">
-              ${relatedDisplay}
-            </div>
+            ${window.renderStatus ? window.renderStatus(alert.status, 'alert') : 
+              `<span class="status-badge ${statusClass}">${statusDisplay}</span>`}
+          </td>
+          <td>
+            ${window.renderBoolean ? window.renderBoolean(alert.is_triggered) : 
+              `<span class="triggered-badge ${triggeredClass}">${triggeredDisplay}</span>`}
           </td>
 
           <td><span class="message-text">${alert.message || '-'}</span></td>

@@ -69,6 +69,66 @@ color: var(--numeric-negative-medium) ;
   font-weight: 600;
 }
 
+.numeric-value-positive {
+color: var(--numeric-positive-medium) ;
+  font-weight: 600;
+}
+
+.numeric-value-negative {
+  color: var(--numeric-negative-medium) ;
+    font-weight: 600;
+}
+
+/* Status Badge Styles */
+.status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  font-weight: 500;
+  text-align: center;
+  border: 1px solid;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Status Categories */
+.status-badge[data-status-category="open"] {
+  background-color: var(--status-open-bg, #e8f5e8);
+  color: var(--status-open-color, #2e7d32);
+  border-color: var(--status-open-border, #4caf50);
+}
+
+.status-badge[data-status-category="closed"] {
+  background-color: var(--status-closed-bg, #ffebee);
+  color: var(--status-closed-color, #c62828);
+  border-color: var(--status-closed-border, #f44336);
+}
+
+.status-badge[data-status-category="cancelled"] {
+  background-color: var(--status-cancelled-bg, #f3e5f5);
+  color: var(--status-cancelled-color, #7b1fa2);
+  border-color: var(--status-cancelled-border, #9c27b0);
+}
+
+.status-badge[data-status-category="warning"] {
+  background-color: var(--status-warning-bg, #fff3e0);
+  color: var(--status-warning-color, #ef6c00);
+  border-color: var(--status-warning-border, #ff9800);
+}
+
+.status-badge[data-status-category="info"] {
+  background-color: var(--status-info-bg, #e3f2fd);
+  color: var(--status-info-color, #1565c0);
+  border-color: var(--status-info-border, #2196f3);
+}
+
+.status-badge[data-status-category="unknown"] {
+  background-color: var(--status-unknown-bg, #f5f5f5);
+  color: var(--status-unknown-color, #616161);
+  border-color: var(--status-unknown-border, #9e9e9e);
+}
+
 .side-long {
 color: var(--color-success) ;
   font-weight: 600 ;

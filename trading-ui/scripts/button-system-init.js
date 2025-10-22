@@ -246,13 +246,13 @@ class AdvancedButtonSystem {
     }
 
     async initializeButtons() {
-        this.logger.info('Starting button initialization...');
+        // this.logger.info('Starting button initialization...');
         const buttonElements = document.querySelectorAll('[data-button-type]:not([data-button-processed])');
         const totalButtons = buttonElements.length;
-        this.logger.info(`Found ${totalButtons} buttons to process`);
+        // this.logger.info(`Found ${totalButtons} buttons to process`);
 
         if (totalButtons === 0) {
-            this.logger.info('No buttons found, initialization complete');
+            // this.logger.info('No buttons found, initialization complete');
             return;
         }
 
@@ -263,8 +263,8 @@ class AdvancedButtonSystem {
 
         this.performance.endTime = performance.now();
         const duration = this.performance.endTime - this.performance.startTime;
-        this.logger.info(`Button initialization completed in ${duration.toFixed(2)}ms`);
-        this.logger.info(`Processed: ${this.performance.processedButtons}, Errors: ${this.performance.errors}`);
+        // this.logger.info(`Button initialization completed in ${duration.toFixed(2)}ms`);
+        // this.logger.info(`Processed: ${this.performance.processedButtons}, Errors: ${this.performance.errors}`);
     }
 
     async waitForButtonIcons() {
@@ -323,7 +323,7 @@ class AdvancedButtonSystem {
         const size = element.getAttribute('data-size');
         const style = element.getAttribute('data-style');
         const onClick = element.getAttribute('data-onclick');
-        console.log(`🔘 Button System: Processing button with data-onclick: "${onClick}"`);
+        // console.log(`🔘 Button System: Processing button with data-onclick: "${onClick}"`);
         let variant = element.getAttribute('data-variant');
         const classes = element.getAttribute('data-classes') || '';
         let attributes = element.getAttribute('data-attributes') || '';

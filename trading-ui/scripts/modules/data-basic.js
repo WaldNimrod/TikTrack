@@ -456,17 +456,23 @@ function getColumnValue(item, columnIndex, tableType) {
           result = ''; // For accounts and general notes
         }
       } else if (fieldName === 'related_object') {
-        // For related object, we need to construct the display text
-        if (item.related_type_id && item.related_id) {
-          switch (item.related_type_id) {
-            case 1: result = `חשבון ${item.related_id}`; break;
-            case 2: result = `טרייד ${item.related_id}`; break;
-            case 3: result = `תוכנית ${item.related_id}`; break;
-            case 4: result = `טיקר ${item.related_id}`; break;
-            default: result = `אובייקט ${item.related_id}`;
-          }
+        // For related object, use the unified system
+        if (window.getRelatedObjectDisplay) {
+          const relatedInfo = window.getRelatedObjectDisplay(item, {}, { showLink: false, format: 'minimal' });
+          result = relatedInfo.display;
         } else {
-          result = 'כללי';
+          // Fallback to simple display
+          if (item.related_type_id && item.related_id) {
+            switch (item.related_type_id) {
+              case 1: result = `חשבון ${item.related_id}`; break;
+              case 2: result = `טרייד ${item.related_id}`; break;
+              case 3: result = `תוכנית ${item.related_id}`; break;
+              case 4: result = `טיקר ${item.related_id}`; break;
+              default: result = `אובייקט ${item.related_id}`;
+            }
+          } else {
+            result = 'כללי';
+          }
         }
       }
       

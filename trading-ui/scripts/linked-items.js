@@ -1522,6 +1522,230 @@ function getStatusBadge(status) {
   return `<span class="${badgeClass}">${badgeText}</span>`;
 }
 
+// ===== UNIFIED RELATED OBJECT DISPLAY SYSTEM =====
+
+/**
+ * Get related object display information
+ * 
+ * This is the unified function that replaces all the local implementations
+ * in alerts.js, notes.js, and data-basic.js
+ *
+ * @param {Object} item - The item with related_type_id and related_id
+ * @param {Object} dataSources - Object containing arrays of related data
+ * @param {Object} options - Display options
+ * @returns {Object} Display information object
+ */
+function getRelatedObjectDisplay(item, dataSources = {}, options = {}) {
+  const {
+    accounts = [],
+    trades = [],
+    tradePlans = [],
+    tickers = []
+  } = dataSources;
+
+  const {
+    showIcon = true,
+    showLink = true,
+    format = 'full' // 'full', 'simple', 'minimal'
+  } = options;
+
+  // Default values
+  let relatedDisplay = 'כללי';
+  let relatedIcon = '🌐';
+  let relatedClass = 'related-general';
+  let relatedColor = '';
+  let relatedBgColor = '';
+
+  // Handle null/undefined related_type_id
+  if (!item.related_type_id || !item.related_id) {
+    return {
+      display: relatedDisplay,
+      icon: relatedIcon,
+      class: relatedClass,
+      color: relatedColor,
+      bgColor: relatedBgColor,
+      type: 'general',
+      id: null
+    };
+  }
+
+  switch (item.related_type_id) {
+    case 1: { // חשבון
+      const account = accounts.find(a => a.id === item.related_id);
+      if (account) {
+        const name = account.name || account.account_name || 'לא מוגדר';
+        const currency = account.currency || 'ILS';
+        
+        if (format === 'minimal') {
+          relatedDisplay = name;
+        } else if (format === 'simple') {
+          relatedDisplay = `${name} (${currency})`;
+        } else {
+          relatedDisplay = `${name} (${currency})`;
+        }
+      } else {
+        relatedDisplay = `חשבון ${item.related_id}`;
+      }
+      relatedIcon = '🏦';
+      relatedClass = 'related-account entity-account-badge';
+      relatedColor = window.getEntityColor ? window.getEntityColor('account') : '#28a745';
+      relatedBgColor = window.getEntityBackgroundColor ? window.getEntityBackgroundColor('account') : 'rgba(40, 167, 69, 0.1)';
+      break;
+    }
+    case 2: { // טרייד
+      const trade = trades.find(t => t.id === item.related_id);
+      if (trade) {
+        const date = trade.created_at || trade.date;
+        const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
+        const side = trade.side || 'לא מוגדר';
+        const investmentType = trade.investment_type || 'לא מוגדר';
+        
+        if (format === 'minimal') {
+          relatedDisplay = `טרייד ${item.related_id}`;
+        } else if (format === 'simple') {
+          relatedDisplay = `טרייד | ${side} | ${formattedDate}`;
+        } else {
+          relatedDisplay = `טרייד | ${side} | ${investmentType} | ${formattedDate}`;
+        }
+      } else {
+        relatedDisplay = `טרייד ${item.related_id}`;
+      }
+      relatedIcon = '📈';
+      relatedClass = 'related-trade entity-trade-badge';
+      relatedColor = window.getEntityColor ? window.getEntityColor('trade') : '#007bff';
+      relatedBgColor = window.getEntityBackgroundColor ? window.getEntityBackgroundColor('trade') : 'rgba(0, 123, 255, 0.1)';
+      break;
+    }
+    case 3: { // תוכנית
+      const plan = tradePlans.find(p => p.id === item.related_id);
+      if (plan) {
+        const date = plan.created_at || plan.date;
+        const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
+        const side = plan.side || 'לא מוגדר';
+        const investmentType = plan.investment_type || 'לא מוגדר';
+        
+        if (format === 'minimal') {
+          relatedDisplay = `תוכנית ${item.related_id}`;
+        } else if (format === 'simple') {
+          relatedDisplay = `תוכנית | ${side} | ${formattedDate}`;
+        } else {
+          relatedDisplay = `תוכנית | ${side} | ${investmentType} | ${formattedDate}`;
+        }
+      } else {
+        relatedDisplay = `תוכנית ${item.related_id}`;
+      }
+      relatedIcon = '📋';
+      relatedClass = 'related-plan';
+      break;
+    }
+    case 4: { // טיקר
+      const ticker = tickers.find(t => t.id === item.related_id);
+      if (ticker) {
+        relatedDisplay = ticker.symbol || `טיקר ${item.related_id}`;
+      } else {
+        relatedDisplay = `טיקר ${item.related_id}`;
+      }
+      relatedIcon = '📊';
+      relatedClass = 'related-ticker';
+      break;
+    }
+    default:
+      relatedDisplay = `אובייקט ${item.related_id}`;
+      relatedClass = 'related-other';
+  }
+
+  // Add link icon if requested
+  if (showLink && item.related_type_id !== 1) { // Don't add link icon for accounts
+    relatedDisplay = '🔗 ' + relatedDisplay;
+  }
+
+  return {
+    display: relatedDisplay,
+    icon: showIcon ? relatedIcon : '',
+    class: relatedClass,
+    color: relatedColor,
+    bgColor: relatedBgColor,
+    type: getRelatedObjectTypeName(item.related_type_id),
+    id: item.related_id
+  };
+}
+
+/**
+ * Get related object type name by ID
+ * 
+ * @param {number} typeId - The related_type_id
+ * @returns {string} Type name
+ */
+function getRelatedObjectTypeName(typeId) {
+  const typeNames = {
+    1: 'account',
+    2: 'trade', 
+    3: 'trade_plan',
+    4: 'ticker'
+  };
+  return typeNames[typeId] || 'unknown';
+}
+
+/**
+ * Get related object type name in Hebrew
+ * 
+ * @param {number} typeId - The related_type_id
+ * @returns {string} Type name in Hebrew
+ */
+function getRelatedObjectTypeNameHebrew(typeId) {
+  const typeNames = {
+    1: 'חשבון',
+    2: 'טרייד',
+    3: 'תוכנית',
+    4: 'טיקר'
+  };
+  return typeNames[typeId] || 'אובייקט';
+}
+
+/**
+ * Get symbol display for related object
+ * 
+ * This function handles the complex logic for displaying ticker symbols
+ * based on the related object type and available data
+ *
+ * @param {Object} item - The item with related_type_id and related_id
+ * @param {Object} dataSources - Object containing arrays of related data
+ * @returns {string} Symbol display
+ */
+function getRelatedObjectSymbol(item, dataSources = {}) {
+  const { trades = [], tradePlans = [], tickers = [] } = dataSources;
+
+  if (!item.related_type_id || !item.related_id) {
+    return '-';
+  }
+
+  switch (item.related_type_id) {
+    case 1: // חשבון - ריק
+      return '-';
+    case 2: // טרייד
+      const trade = trades.find(t => t.id === item.related_id);
+      if (trade && trade.ticker_id) {
+        const ticker = tickers.find(tick => tick.id === trade.ticker_id);
+        return ticker ? ticker.symbol : `טרייד ${item.related_id}`;
+      } else {
+        return `טרייד ${item.related_id}`;
+      }
+    case 3: // תוכנית
+      const plan = tradePlans.find(p => p.id === item.related_id);
+      if (plan && plan.ticker_id) {
+        const ticker = tickers.find(tick => tick.id === plan.ticker_id);
+        return ticker ? ticker.symbol : `תוכנית ${item.related_id}`;
+      } else {
+        return `תוכנית ${item.related_id}`;
+      }
+    case 4: // טיקר
+      const ticker = tickers.find(tick => tick.id === item.related_id);
+      return ticker ? ticker.symbol : `טיקר ${item.related_id}`;
+    default:
+      return `אובייקט ${item.related_id}`;
+  }
+}
+
 /**
  * Load linked items data from server
  *
@@ -1576,6 +1800,12 @@ window.viewLinkedItemsForNote = viewLinkedItemsForNote;
 window.viewLinkedItemsForTradePlan = viewLinkedItemsForTradePlan;
 window.viewLinkedItemsForExecution = viewLinkedItemsForExecution;
 
+// New unified related object functions
+window.getRelatedObjectDisplay = getRelatedObjectDisplay;
+window.getRelatedObjectTypeName = getRelatedObjectTypeName;
+window.getRelatedObjectTypeNameHebrew = getRelatedObjectTypeNameHebrew;
+window.getRelatedObjectSymbol = getRelatedObjectSymbol;
+
 
 // ייצוא המודול עצמו
 window.linkedItems = {
@@ -1604,6 +1834,12 @@ window.linkedItems = {
   viewLinkedItemsForNote,
   viewLinkedItemsForTradePlan,
   viewLinkedItemsForExecution,
+
+  // New unified related object functions
+  getRelatedObjectDisplay,
+  getRelatedObjectTypeName,
+  getRelatedObjectTypeNameHebrew,
+  getRelatedObjectSymbol,
 };
 
 // Linked Items loaded successfully

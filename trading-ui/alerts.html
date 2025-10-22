@@ -106,34 +106,34 @@
                             <table class="table" id="alertsTable" data-table-type="alerts">
                                 <thead>
                                     <tr>
-                                        <th class="col-ticker">
+                                        <th class="col-linked-object">
                                             <button class="btn btn-link sortable-header"
                                                 onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(0, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
+                                                קשור ל: <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-ticker">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(1, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
                                                 טיקר <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-condition">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(1, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
+                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(2, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
                                                 תנאי <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-status">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(2, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
+                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(3, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
                                                 סטטוס <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-triggered">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(3, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
-                                                הופעל <span class="sort-icon">↕</span>
-                                            </button>
-                                        </th>
-                                        <th class="col-linked-object">
-                                            <button class="btn btn-link sortable-header"
                                                 onclick="if (typeof window.sortTable === 'function') { window.sortTableData(4, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
-                                                קשור ל: <span class="sort-icon">↕</span>
+                                                הופעל <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-message">

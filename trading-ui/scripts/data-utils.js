@@ -470,5 +470,5 @@ window.DataUtils = window.dataUtils;
 
 // Mark as ready
 window.dataUtilsReady = true;
-console.log('✅ Data Utils ready');
+// console.log('✅ Data Utils ready');
 

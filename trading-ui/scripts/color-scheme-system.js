@@ -598,6 +598,20 @@ function updateCSSVariablesFromPreferences(preferences) {
           document.documentElement.style.setProperty(`--entity-${entityType}-color-dark`, darkColor);
         });
       }
+
+      // Update status colors from preferences
+      if (preferences.colorScheme.status) {
+        Object.entries(preferences.colorScheme.status).forEach(([statusType, color]) => {
+          document.documentElement.style.setProperty(`--user-status-${statusType}-color`, color);
+          
+          // Add background and border variants
+          const bgColor = lightenColor(color, 10);
+          const borderColor = color;
+          
+          document.documentElement.style.setProperty(`--user-status-${statusType}-bg`, bgColor);
+          document.documentElement.style.setProperty(`--user-status-${statusType}-border`, borderColor);
+        });
+      }
     }
   } catch (error) {
     console.error('❌ Error updating CSS variables from preferences:', error);
@@ -781,4 +795,4 @@ if (document.readyState === 'loading') {
 
 // Color Scheme System loaded successfully
 window.colorSchemeSystemReady = true;
-console.log('✅ Color Scheme System ready');
+// console.log('✅ Color Scheme System ready');

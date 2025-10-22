@@ -192,5 +192,5 @@ window.updateFaviconBasedOnStatus = updateFaviconBasedOnStatus;
 window.getCurrentAppStatus = getCurrentAppStatus;
 window.restoreFaviconFromStatus = restoreFaviconFromStatus;
 
-console.log('🔧 Global Favicon Manager loaded successfully');
+// console.log('🔧 Global Favicon Manager loaded successfully');
 

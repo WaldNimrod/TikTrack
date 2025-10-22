@@ -393,3 +393,4 @@ class FinalValidator {
 window.FinalValidator = FinalValidator;
 
 console.log('✅ Final Validator loaded successfully');
+

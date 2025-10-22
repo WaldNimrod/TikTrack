@@ -1,6 +1,23 @@
 /* ===== מערכת ניהול חשבונות מסחר ===== */
 console.log('📁 trading_accounts.js נטען - מתחיל אתחול');
 
+// Import getCurrencyDisplay from data-utils.js
+if (typeof window.getCurrencyDisplay !== 'function') {
+  console.warn('⚠️ getCurrencyDisplay not available, using fallback');
+  window.getCurrencyDisplay = function(account) {
+    if (account.currency_symbol) {
+      switch (account.currency_symbol) {
+        case 'USD': return '$';
+        case 'ILS': return '₪';
+        case 'EUR': return '€';
+        case 'GBP': return '£';
+        default: return account.currency_symbol;
+      }
+    }
+    return '$'; // ברירת מחדל
+  };
+}
+
 // ייצוא מוקדם של הפונקציה למניעת שגיאות
 window.loadTradingAccountsDataForTradingAccountsPage = window.loadTradingAccountsDataForTradingAccountsPage || function() {
   // loadTradingAccountsDataForTradingAccountsPage not yet defined, using placeholder
@@ -470,12 +487,15 @@ function updateTradingAccountsTable(trading_accounts) {
       <td>${tradingAccount.type || '-'}</td>
       <td>${tradingAccount.currency || '-'}</td>
       <td>
-        ${FieldRendererService.renderNumericValue(tradingAccount.balance || 0, ' $', false)}
+        ${window.renderAmount ? window.renderAmount(tradingAccount.cash_balance || 0, getCurrencyDisplay(tradingAccount)) : 
+          `${(tradingAccount.cash_balance || 0).toFixed(2)} ${getCurrencyDisplay(tradingAccount)}`}
       </td>
       <td class="status-cell" data-status="${statusForFilter}">
-        ${FieldRendererService.renderStatus(tradingAccount.status, 'account')}
+        ${window.renderStatus ? window.renderStatus(tradingAccount.status, 'account') : 
+          `<span class="status-${tradingAccount.status}">${tradingAccount.status}</span>`}
       </td>
-      <td>${FieldRendererService.renderDate(tradingAccount.created_at, false)}</td>
+      <td>${window.renderDate ? window.renderDate(tradingAccount.created_at) : 
+          new Date(tradingAccount.created_at).toLocaleDateString('he-IL')}</td>
       <td class="actions-cell">
         ${window.createActionsMenu ? window.createActionsMenu([
           { type: 'VIEW', onclick: `window.showEntityDetails('trading_account', ${tradingAccount.id}, { mode: 'view' })`, title: 'צפה בפרטי חשבון' },

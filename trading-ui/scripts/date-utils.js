@@ -560,7 +560,7 @@ window.formatShortDate = formatShortDate;
 
 // Mark as ready
 window.dateUtilsReady = true;
-console.log('✅ Date Utils ready');
+// console.log('✅ Date Utils ready');
 window.formatLongDate = formatLongDate;
 window.formatTimeOnly = formatTimeOnly;
 window.parseDate = parseDate;

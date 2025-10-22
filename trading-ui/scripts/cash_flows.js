@@ -699,10 +699,7 @@ async function renderCashFlowsTable() {
             </td>
             <td class="col-type type-cell">${typeDisplay}</td>
             <td class="col-amount" style="text-align: left; direction: ltr;">
-                <span class="${cashFlow.amount >= 0 ? 'numeric-value-positive' : 'numeric-value-negative'}" 
-                      style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
-                    ${amountDisplay}
-                </span>
+                ${amountDisplay}
             </td>
             <td class="col-date" style="text-align: center;">${formatDate(cashFlow.date)}</td>
             <td class="col-description">${cashFlow.description || '-'}</td>
@@ -716,10 +713,15 @@ async function renderCashFlowsTable() {
                 { type: 'EDIT', onclick: `showEditCashFlowModal(${cashFlow.id})`, text: 'ערוך', title: 'ערוך תזרים' },
                 { type: 'DELETE', onclick: `deleteCashFlow(${cashFlow.id})`, text: 'מחק', title: 'מחק תזרים' }
               ]) : `
-              <button class="btn btn-sm" onclick="showCashFlowDetails(${cashFlow.id})" title="הצג פרטי תזרים">👁️</button>
-              <button class="btn btn-sm" onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})" title="צפה בפריטים מקושרים">🔗</button>
-              <button class="btn btn-sm" onclick="showEditCashFlowModal(${cashFlow.id})" title="ערוך תזרים">✏️</button>
-              <button class="btn btn-sm" onclick="deleteCashFlow(${cashFlow.id})" title="מחק תזרים">🗑️</button>
+              <div class="actions-menu-wrapper">
+                <button class="btn actions-trigger" title="פעולות">⚙️</button>
+                <div class="actions-menu-popup">
+                  <button class="btn" data-variant="small" data-button-type="VIEW" data-onclick="showCashFlowDetails(${cashFlow.id})" title="הצג פרטי תזרים">👁️</button>
+                  <button class="btn" data-variant="small" data-button-type="LINK" data-onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})" title="צפה בפריטים מקושרים">🔗</button>
+                  <button class="btn" data-variant="small" data-button-type="EDIT" data-onclick="showEditCashFlowModal(${cashFlow.id})" title="ערוך תזרים">✏️</button>
+                  <button class="btn" data-variant="small" data-button-type="DELETE" data-onclick="deleteCashFlow(${cashFlow.id})" title="מחק תזרים">🗑️</button>
+                </div>
+              </div>
               `}
             </td>
         `;
@@ -782,6 +784,32 @@ function formatAmount(amount) {
 function getCashFlowTypeWithColor(type) {
   const typeTranslation = window.translateCashFlowType ? window.translateCashFlowType(type) : type;
 
+  // שימוש במערכת הצבעים הדינמית - רק צבע טקסט ללא רקע
+  if (window.getTableColors) {
+    const colors = window.getTableColors();
+    let color = colors.secondary; // ברירת מחדל
+    
+    switch (type) {
+    case 'deposit':
+      color = colors.positive; // הפקדה - ירוק
+      break;
+    case 'withdrawal':
+      color = colors.negative; // משיכה - אדום
+      break;
+    case 'dividend':
+      color = colors.success; // דיבידנד - צבע הצלחה
+      break;
+    case 'fee':
+      color = colors.warning; // עמלה - צבע אזהרה
+      break;
+    default:
+      color = colors.secondary;
+    }
+    
+    return `<span style="color: ${color}; font-weight: 600;">${typeTranslation}</span>`;
+  }
+
+  // fallback למערכת הצביעה הישנה
   let cssClass = '';
   switch (type) {
   case 'deposit':
@@ -820,24 +848,19 @@ function formatCashFlowAmount(amount) {
   const isPositive = numAmount >= 0;
   const absAmount = Math.abs(numAmount);
 
-  // שימוש במערכת הפורמט החדשה
-  if (window.formatCurrencyWithCommas) {
-    const formattedAmount = window.formatCurrencyWithCommas(absAmount, 'USD');
-    const displayAmount = `${isPositive ? '+' : '-'}${formattedAmount}`;
-
-    // שימוש במערכת הצביעה החדשה
-    if (window.colorAmountByValue) {
-      return window.colorAmountByValue(numAmount, displayAmount);
-    }
-  }
-
   // עיצוב הסכום עם סימן בצד הנכון (שמאל)
   const formattedAmount = `${isPositive ? '+' : '-'}$${absAmount.toFixed(2)}`;
 
-  // צביעה לפי סכום
-  const colorClass = isPositive ? 'profit-positive' : 'profit-negative';
+  // שימוש במערכת הצבעים הדינמית - רק צבע טקסט ללא רקע
+  if (window.getTableColors) {
+    const colors = window.getTableColors();
+    const color = isPositive ? colors.positive : colors.negative;
+    return `<span style="color: ${color}; font-weight: 600;">${formattedAmount}</span>`;
+  }
 
-  return `<span class="${colorClass}">${formattedAmount}</span>`;
+  // fallback למערכת הצביעה הישנה
+  const colorClass = isPositive ? 'numeric-value-positive' : 'numeric-value-negative';
+  return `<span class="${colorClass}" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">${formattedAmount}</span>`;
 }
 
 /**

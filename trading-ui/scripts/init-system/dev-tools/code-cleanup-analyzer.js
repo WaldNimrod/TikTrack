@@ -282,3 +282,4 @@ class CodeCleanupAnalyzer {
 window.CodeCleanupAnalyzer = CodeCleanupAnalyzer;
 
 console.log('✅ Code Cleanup Analyzer loaded successfully');
+

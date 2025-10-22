@@ -127,4 +127,29 @@
   --margin-inline-end: margin-inline-end;
   --padding-inline-start: padding-inline-start;
   --padding-inline-end: padding-inline-end;
+
+  /* ===== צבעי סטטוס דינמיים מהעדפות המשתמש ===== */
+  --status-open-color: var(--user-status-open-color, var(--apple-green));
+  --status-open-bg: var(--user-status-open-bg, color-mix(in srgb, var(--user-status-open-color, var(--apple-green)) 10%, transparent));
+  --status-open-border: var(--user-status-open-border, var(--user-status-open-color, var(--apple-green)));
+
+  --status-closed-color: var(--user-status-closed-color, var(--apple-orange));
+  --status-closed-bg: var(--user-status-closed-bg, color-mix(in srgb, var(--user-status-closed-color, var(--apple-orange)) 10%, transparent));
+  --status-closed-border: var(--user-status-closed-border, var(--user-status-closed-color, var(--apple-orange)));
+
+  --status-cancelled-color: var(--user-status-cancelled-color, var(--apple-red));
+  --status-cancelled-bg: var(--user-status-cancelled-bg, color-mix(in srgb, var(--user-status-cancelled-color, var(--apple-red)) 10%, transparent));
+  --status-cancelled-border: var(--user-status-cancelled-border, var(--user-status-cancelled-color, var(--apple-red)));
+
+  --status-warning-color: var(--user-status-warning-color, var(--apple-orange));
+  --status-warning-bg: var(--user-status-warning-bg, color-mix(in srgb, var(--user-status-warning-color, var(--apple-orange)) 10%, transparent));
+  --status-warning-border: var(--user-status-warning-border, var(--user-status-warning-color, var(--apple-orange)));
+
+  --status-info-color: var(--user-status-info-color, var(--apple-blue));
+  --status-info-bg: var(--user-status-info-bg, color-mix(in srgb, var(--user-status-info-color, var(--apple-blue)) 10%, transparent));
+  --status-info-border: var(--user-status-info-border, var(--user-status-info-color, var(--apple-blue)));
+
+  --status-unknown-color: var(--user-status-unknown-color, var(--apple-gray-6));
+  --status-unknown-bg: var(--user-status-unknown-bg, color-mix(in srgb, var(--user-status-unknown-color, var(--apple-gray-6)) 10%, transparent));
+  --status-unknown-border: var(--user-status-unknown-border, var(--user-status-unknown-color, var(--apple-gray-6)));
 }

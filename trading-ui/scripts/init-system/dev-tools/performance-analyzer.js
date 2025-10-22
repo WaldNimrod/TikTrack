@@ -301,3 +301,4 @@ class PerformanceAnalyzer {
 window.PerformanceAnalyzer = PerformanceAnalyzer;
 
 console.log('✅ Performance Analyzer loaded successfully');
+

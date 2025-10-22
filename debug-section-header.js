@@ -100,3 +100,6 @@ const uniqueVars = [...new Set(allVars)].filter(v => v.includes('entity') || v.i
 console.log('משתנים רלוונטיים:', uniqueVars);
 
 console.log('=== סיום בדיקה ===');
+
+
+

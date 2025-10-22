@@ -393,27 +393,6 @@ const PACKAGE_MANIFEST = {
         required: true,
         loadOrder: 2
       },
-      {
-        file: 'entity-details-api.js',
-        globalCheck: 'window.EntityDetailsAPI',
-        description: 'API פרטי ישויות',
-        required: true,
-        loadOrder: 3
-      },
-      {
-        file: 'entity-details-renderer.js',
-        globalCheck: 'window.EntityDetailsRenderer',
-        description: 'מציג פרטי ישויות',
-        required: true,
-        loadOrder: 4
-      },
-      {
-        file: 'entity-details-modal.js',
-        globalCheck: 'window.showEntityDetails',
-        description: 'מודל פרטי ישויות',
-        required: true,
-        loadOrder: 5
-      }
     ],
     estimatedSize: '~100KB',
     initTime: '~60ms'
@@ -1037,6 +1016,42 @@ const PACKAGE_MANIFEST = {
     initTime: '~20ms'
   },
 
+  // 17. ENTITY DETAILS PACKAGE - פרטי ישויות
+  'entity-details': {
+    id: 'entity-details',
+    name: 'Entity Details Package',
+    description: 'מערכות פרטי ישויות',
+    version: '2.0.0',
+    critical: false,
+    loadOrder: 17,
+    dependencies: ['base', 'services', 'ui-advanced', 'crud', 'preferences'],
+    scripts: [
+      {
+        file: 'entity-details-api.js',
+        globalCheck: 'window.EntityDetailsAPI',
+        description: 'API פרטי ישויות',
+        required: true,
+        loadOrder: 1
+      },
+      {
+        file: 'entity-details-renderer.js',
+        globalCheck: 'window.EntityDetailsRenderer',
+        description: 'מציג פרטי ישויות',
+        required: true,
+        loadOrder: 2
+      },
+      {
+        file: 'entity-details-modal.js',
+        globalCheck: 'window.showEntityDetails',
+        description: 'מודל פרטי ישויות',
+        required: true,
+        loadOrder: 3
+      }
+    ],
+    estimatedSize: '~45KB',
+    initTime: '~30ms'
+  },
+
   // 18. INIT PACKAGE - אתחול
   'init-system': {
     id: 'init-system',
@@ -1045,7 +1060,7 @@ const PACKAGE_MANIFEST = {
     version: '2.0.0',
     critical: false,
     loadOrder: 18,
-    dependencies: ['base', 'crud', 'services', 'ui-advanced', 'modules', 'preferences', 'validation', 'conditions', 'external-data', 'charts', 'logs', 'cache', 'entity-services', 'helper', 'system-management', 'management', 'dev-tools', 'filters', 'advanced-notifications', 'cash-flows'],
+    dependencies: ['base', 'crud', 'services', 'ui-advanced', 'modules', 'preferences', 'validation', 'conditions', 'external-data', 'charts', 'logs', 'cache', 'entity-services', 'helper', 'system-management', 'management', 'dev-tools', 'filters', 'advanced-notifications', 'cash-flows', 'entity-details'],
     scripts: [
       {
         file: 'init-system/package-manifest.js',
@@ -1068,20 +1083,6 @@ const PACKAGE_MANIFEST = {
         required: true,
         loadOrder: 3
       },
-      {
-        file: 'init-system-check.js',
-        globalCheck: 'window.initSystemCheck',
-        description: 'בדיקות מערכת אתחול',
-        required: true,
-        loadOrder: 4
-      },
-      {
-        file: 'monitoring-functions.js',
-        globalCheck: 'window.initSystemCheck',
-        description: 'פונקציות ניטור',
-        required: true,
-        loadOrder: 5
-      }
     ],
     estimatedSize: '~45KB',
     initTime: '~30ms'

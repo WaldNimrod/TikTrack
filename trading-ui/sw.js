@@ -71,12 +71,12 @@ self.addEventListener('fetch', (event) => {
             .then((response) => {
                 // Return cached version if available
                 if (response) {
-                    console.log('💾 Cache hit:', event.request.url);
+                    // console.log('💾 Cache hit:', event.request.url);
                     return response;
                 }
 
                 // Otherwise fetch from network
-                console.log('🌐 Network fetch:', event.request.url);
+                // console.log('🌐 Network fetch:', event.request.url);
                 return fetch(event.request)
                     .then((response) => {
                         // Don't cache non-successful responses
@@ -91,7 +91,7 @@ self.addEventListener('fetch', (event) => {
                         caches.open(CACHE_NAME)
                             .then((cache) => {
                                 cache.put(event.request, responseToCache);
-                                console.log('💾 Cached:', event.request.url);
+                                // console.log('💾 Cached:', event.request.url);
                             });
 
                         return response;

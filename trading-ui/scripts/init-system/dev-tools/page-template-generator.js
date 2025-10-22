@@ -102,7 +102,7 @@ ${scriptsHTML}
       
       sortedPackages.forEach((pkg, index) => {
         // Add package header with clear description
-        html += `    <!-- ===== ${pkg.name.toUpperCase()} PACKAGE (loadOrder: ${pkg.loadOrder}) ===== -->\n`;
+        html += `    <!-- ===== ${pkg.name.toUpperCase()} (loadOrder: ${pkg.loadOrder}) ===== -->\n`;
         html += `    <!-- ${pkg.description} -->\n`;
         html += `    <!-- Dependencies: ${pkg.dependencies ? pkg.dependencies.join(', ') : 'none'} -->\n`;
         html += `    <!-- Critical: ${pkg.critical ? 'YES' : 'NO'} | Version: ${pkg.version} -->\n`;
@@ -397,7 +397,7 @@ if (document.readyState === 'loading') {
     // Get packages from page-initialization-configs.js dynamically
     const pageConfig = window.PAGE_CONFIGS?.[pageName];
     const packages = pageConfig?.packages || ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'];
-    return this.generateScriptTags(packages);
+    return this.generateCompleteScriptSection(pageName);
   }
   
   /**
@@ -421,7 +421,7 @@ if (document.readyState === 'loading') {
         .sort((a, b) => (a.loadOrder || 0) - (b.loadOrder || 0));
       
       sortedPackages.forEach((pkg, index) => {
-        html += `    <!-- ===== ${pkg.name.toUpperCase()} PACKAGE (loadOrder: ${pkg.loadOrder}) ===== -->\n`;
+        html += `    <!-- ===== ${pkg.name.toUpperCase()} (loadOrder: ${pkg.loadOrder}) ===== -->\n`;
         html += `    <!-- ${pkg.description} -->\n`;
         html += `    <!-- Dependencies: ${pkg.dependencies ? pkg.dependencies.join(', ') : 'none'} -->\n`;
         html += `    <!-- Critical: ${pkg.critical ? 'YES' : 'NO'} | Version: ${pkg.version} -->\n`;
@@ -443,10 +443,29 @@ if (document.readyState === 'loading') {
       html += '    <!-- ⚠️ PACKAGE_MANIFEST not available -->\n';
     }
     
+    // Add Entity Details Systems (if entity-details package is included)
+    if (packages.includes('entity-details')) {
+      html += '\n    <!-- ===== ENTITY DETAILS SYSTEMS (Depend on Header) ===== -->\n';
+      html += '    <script src="scripts/entity-details-api.js?v=1.0.0"></script>\n';
+      html += '    <script src="scripts/entity-details-renderer.js?v=1.0.0"></script>\n';
+      html += '    <script src="scripts/entity-details-modal.js?v=1.0.0"></script>\n';
+      html += '    \n';
+    }
+    
     // Add page-specific script
-    html += '\n    <!-- Page-specific Scripts -->\n';
+    html += '    <!-- Page-specific Scripts -->\n';
     html += `    <script src="scripts/${pageName}.js?v=1.0.0"></script>\n`;
     html += '    \n';
+    
+    // Add monitoring scripts (if init-system package is included)
+    if (packages.includes('init-system')) {
+      html += '    <!-- 14. Init System Check (Available on all pages) -->\n';
+      html += '    <script src="scripts/init-system-check.js?v=1.0.0"></script>\n';
+      html += '    \n';
+      html += '    <!-- 15. Monitoring Functions (Required for page checks) -->\n';
+      html += '    <script src="scripts/monitoring-functions.js?v=1.0.0"></script>\n';
+      html += '    \n';
+    }
     
     return html;
   }

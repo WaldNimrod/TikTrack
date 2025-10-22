@@ -37,10 +37,22 @@ async function waitForPageFullyLoaded() {
 }
 
 /**
- * Check for mismatches between documentation and actual page
+ * Enhanced monitoring with real-time error detection
  */
 async function checkForMismatches(pageName, pageConfig) {
-    console.log(`🔍 checkForMismatches: Starting for page ${pageName}`);
+    console.log(`🔍 checkForMismatches: Starting enhanced monitoring for page ${pageName}`);
+    
+    // Real-time error detection
+    const errorLog = [];
+    const originalConsoleError = console.error;
+    console.error = function(...args) {
+        errorLog.push({
+            timestamp: new Date().toISOString(),
+            message: args.join(' '),
+            stack: new Error().stack
+        });
+        originalConsoleError.apply(console, args);
+    };
     
     const loadedScripts = Array.from(document.querySelectorAll('script[src]'))
         .map(script => script.src.split('/').pop().split('?')[0])
@@ -52,6 +64,75 @@ async function checkForMismatches(pageName, pageConfig) {
         .filter(src => src && !src.includes('bootstrap') && !src.includes('font-awesome'));
     
     console.log(`🔍 checkForMismatches: Found ${loadedScripts.length} loaded scripts:`, loadedScripts);
+    
+    // Check for scripts not defined in manifest
+    const manifestScripts = [];
+    if (window.PACKAGE_MANIFEST) {
+        Object.values(window.PACKAGE_MANIFEST).forEach(pkg => {
+            if (pkg.scripts) {
+                pkg.scripts.forEach(script => {
+                    manifestScripts.push(script.file);
+                });
+            }
+        });
+    }
+    
+    const undefinedScripts = loadedScripts.filter(script => 
+        !manifestScripts.includes(script) && 
+        !script.includes('bootstrap') && 
+        !script.includes('font-awesome')
+    );
+    
+    if (undefinedScripts.length > 0) {
+        console.warn(`⚠️ Undefined scripts found:`, undefinedScripts);
+    }
+    
+    // Check for circular dependencies
+    const circularDependencies = [];
+    if (window.PACKAGE_MANIFEST) {
+        Object.entries(window.PACKAGE_MANIFEST).forEach(([pkgName, pkg]) => {
+            if (pkg.dependencies) {
+                pkg.dependencies.forEach(dep => {
+                    const depPkg = window.PACKAGE_MANIFEST[dep];
+                    if (depPkg && depPkg.dependencies && depPkg.dependencies.includes(pkgName)) {
+                        circularDependencies.push(`${pkgName} ↔ ${dep}`);
+                    }
+                });
+            }
+        });
+    }
+    
+    if (circularDependencies.length > 0) {
+        console.error(`🔄 Circular dependencies detected:`, circularDependencies);
+    }
+    
+    // Version validation
+    const versionMismatches = [];
+    if (window.PACKAGE_MANIFEST) {
+        Object.entries(window.PACKAGE_MANIFEST).forEach(([pkgName, pkg]) => {
+            if (pkg.version && pkg.scripts) {
+                pkg.scripts.forEach(script => {
+                    const scriptElement = document.querySelector(`script[src*="${script.file}"]`);
+                    if (scriptElement) {
+                        const src = scriptElement.src;
+                        const expectedVersion = pkg.version;
+                        const actualVersion = src.match(/v=([^&]+)/)?.[1] || 'unknown';
+                        if (expectedVersion !== actualVersion && actualVersion !== 'unknown') {
+                            versionMismatches.push({
+                                script: script.file,
+                                expected: expectedVersion,
+                                actual: actualVersion
+                            });
+                        }
+                    }
+                });
+            }
+        });
+    }
+    
+    if (versionMismatches.length > 0) {
+        console.warn(`📦 Version mismatches detected:`, versionMismatches);
+    }
     
     const requiredScripts = [];
     const requiredGlobals = pageConfig.requiredGlobals || [];

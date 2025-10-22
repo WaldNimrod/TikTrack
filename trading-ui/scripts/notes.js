@@ -1145,7 +1145,7 @@ async function populateEditSelectByType(relationType, selectedId) {
 }
 
 // ולידציה - משתמש במערכת הכללית window.validateEntityForm
-// function validateEditNoteForm(content, relationType, relatedId, attachment) {
+function validateEditNoteForm(content, relationType, relatedId, attachment) {
   let isValid = true;
 
   // ניקוי שגיאות קודמות

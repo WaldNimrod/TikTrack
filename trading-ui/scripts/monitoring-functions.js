@@ -46,6 +46,11 @@ async function checkForMismatches(pageName, pageConfig) {
         .map(script => script.src.split('/').pop().split('?')[0])
         .filter(src => src && !src.includes('bootstrap') && !src.includes('font-awesome'));
     
+    // Also collect full paths for duplicate detection
+    const loadedScriptsFullPaths = Array.from(document.querySelectorAll('script[src]'))
+        .map(script => script.src.split('?')[0])
+        .filter(src => src && !src.includes('bootstrap') && !src.includes('font-awesome'));
+    
     console.log(`🔍 checkForMismatches: Found ${loadedScripts.length} loaded scripts:`, loadedScripts);
     
     const requiredScripts = [];
@@ -114,12 +119,21 @@ async function checkForMismatches(pageName, pageConfig) {
         }
     });
     
-    // Check for duplicates
+    // Check for duplicates (both filename and full path)
     const scriptCounts = {};
+    const scriptCountsFullPaths = {};
+    
+    // Check filename duplicates
     loadedScripts.forEach(script => {
         scriptCounts[script] = (scriptCounts[script] || 0) + 1;
     });
     
+    // Check full path duplicates
+    loadedScriptsFullPaths.forEach(script => {
+        scriptCountsFullPaths[script] = (scriptCountsFullPaths[script] || 0) + 1;
+    });
+    
+    // Report filename duplicates
     Object.entries(scriptCounts).forEach(([script, count]) => {
         if (count > 1) {
             duplicates.push(script);
@@ -128,6 +142,21 @@ async function checkForMismatches(pageName, pageConfig) {
                 message: `כפילות: ${script} נטען ${count} פעמים`,
                 severity: 'error'
             });
+        }
+    });
+    
+    // Report full path duplicates
+    Object.entries(scriptCountsFullPaths).forEach(([script, count]) => {
+        if (count > 1) {
+            const filename = script.split('/').pop();
+            if (!duplicates.includes(filename)) { // Avoid double reporting
+                duplicates.push(script);
+                mismatches.push({
+                    type: 'duplicate_script',
+                    message: `כפילות: ${script} נטען ${count} פעמים`,
+                    severity: 'error'
+                });
+            }
         }
     });
     

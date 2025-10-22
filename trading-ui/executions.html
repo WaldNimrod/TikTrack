@@ -380,19 +380,18 @@
     <script src="scripts/preferences-core.js?v=1.0.0"></script> <!-- ליבת העדפות -->
     <script src="scripts/preferences.js?v=1.0.0"></script> <!-- מערכת העדפות -->
 
-    <!-- ===== HEADER SYSTEM (Depend on Preferences) ===== -->
-    <!-- header-system.js already loaded in BASE package -->
-    
     <!-- ===== ENTITY DETAILS SYSTEMS (Depend on Header) ===== -->
     <script src="scripts/entity-details-api.js?v=1.0.0"></script>
     <script src="scripts/entity-details-renderer.js?v=1.0.0"></script>
     <script src="scripts/entity-details-modal.js?v=1.0.0"></script>
     
-    <!-- Page Configs and Initializer -->
-    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script>
-    <!-- Page Configs and Initializer -->
-    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script>
-    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script>
+    <!-- ===== INIT-SYSTEM PACKAGE (loadOrder: 6) ===== -->
+    <!-- מערכות אתחול וניטור -->
+    <!-- Dependencies: base, services, ui-advanced, crud, preferences -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- מניפסט חבילות -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- קונפיגורציות עמודים -->
+    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script> <!-- אתחול מאוחד -->
     
     <!-- Page-specific Scripts -->
     <script src="scripts/executions.js?v=1.0.0"></script>

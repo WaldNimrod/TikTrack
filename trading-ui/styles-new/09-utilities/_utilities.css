@@ -13,6 +13,12 @@
 .margin-3 { margin: var(--spacing-md) !important; }
 .margin-4 { margin: var(--spacing-lg) !important; }
 
+/* Filter Margin Utilities */
+.filter-margin-top { margin-top: 10px; }
+
+/* Layout Utilities */
+.spacer-bottom { height: 3rem; }
+
 .padding-0 { padding: 0 !important; }
 .padding-1 { padding: var(--spacing-xs) !important; }
 .padding-2 { padding: var(--spacing-sm) !important; }
@@ -27,12 +33,18 @@
 .display-flex { display: flex !important; }
 .display-grid { display: grid !important; }
 
+/* Flexbox Utilities */
+.flex-1 { flex: 1; }
+
 /* Position Utilities */
 .position-static { position: static !important; }
 .position-relative { position: relative !important; }
 .position-absolute { position: absolute !important; }
 .position-fixed { position: fixed !important; }
 .position-sticky { position: sticky !important; }
+
+/* Z-Index Utilities */
+.toast-high-z { z-index: 1000000002; }
 
 /* Text Utilities */
 .text-left { text-align: left !important; }

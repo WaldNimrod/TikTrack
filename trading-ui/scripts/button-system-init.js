@@ -323,6 +323,7 @@ class AdvancedButtonSystem {
         const size = element.getAttribute('data-size');
         const style = element.getAttribute('data-style');
         const onClick = element.getAttribute('data-onclick');
+        console.log(`🔘 Button System: Processing button with data-onclick: "${onClick}"`);
         let variant = element.getAttribute('data-variant');
         const classes = element.getAttribute('data-classes') || '';
         let attributes = element.getAttribute('data-attributes') || '';
@@ -397,7 +398,7 @@ class AdvancedButtonSystem {
             if (style) allAttributes += ` data-style='${style}'`;
             allAttributes += ` data-variant='${variant}'`;
 
-            let onclickAttr = onClick ? ` onclick='${onClick}'` : '';
+            let onclickAttr = onClick ? ` onclick="${onClick}"` : '';
             let titleAttr = buttonText ? ` title='${buttonText}'` : '';
             let idAttr = id ? ` id='${id}'` : '';
 

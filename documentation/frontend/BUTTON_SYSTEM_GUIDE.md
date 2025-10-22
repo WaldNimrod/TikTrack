@@ -9,13 +9,30 @@
 
 ## 🎯 סקירה כללית
 
-מערכת הכפתורים המאוחדת מספקת 9 פונקציות מרכזיות ליצירת כפתורים חוזרים במערכת, עם תמיכה מלאה בצבעים דינמיים ונגישות.
+מערכת הכפתורים המאוחדת מספקת 9 פונקציות מרכזיות ליצירת כפתורים חוזרים במערכת, עם תמיכה מלאה בצבעים דינמיים, נגישות ו-**Event Delegation System** מתקדם.
 
 ### עקרונות מנחים:
 - **רק כפתורים עם 2+ מופעים** עברו למערכת המרכזית
 - **כפתורים ייחודיים** נשארו ידניים ב-HTML
 - **צבעים דינמיים מלאים** - תמיכה ב-`--primary-color`, `--secondary-color`, `--danger-color`
+- **Event Delegation מתקדם** - תמיכה מלאה ב-`data-onclick` attributes
 - **Fallback בטיחותי** - אם הפונקציה לא קיימת, יוצג הכפתור הישן
+
+### 🆕 Event Delegation System
+מערכת הכפתורים כוללת מערכת event delegation מתקדמת המטפלת אוטומטית ב-`data-onclick` attributes:
+
+```html
+<!-- כפתור עם data-onclick - מערכת הכפתורים תטפל בו אוטומטית -->
+<button data-button-type="ADD" data-entity-type="execution" 
+        data-variant="full" data-onclick="openExecutionDetails()" 
+        data-text="הוסף ביצוע"></button>
+```
+
+**יתרונות:**
+- ✅ עובד עם כפתורים דינמיים שנוצרים בזמן ריצה
+- ✅ תאימות מלאה עם המערכת המאוחדת
+- ✅ Error handling אוטומטי
+- ✅ תמיכה בפונקציות מורכבות
 
 ---
 
@@ -285,7 +302,30 @@ ${window.createSaveButton ? window.createSaveButton(...) : '<button class="btn b
 
 ## 📋 דוגמאות שימוש
 
-### עמוד טריידים - דוגמה מלאה:
+### 🆕 שימוש ב-data-onclick (הדרך החדשה!)
+
+```html
+<!-- כפתור הוספה עם data-onclick -->
+<button data-button-type="ADD" data-entity-type="execution" 
+        data-variant="full" data-onclick="openExecutionDetails()" 
+        data-text="הוסף ביצוע" id="addExecutionBtn"></button>
+
+<!-- כפתור toggle section -->
+<button data-button-type="TOGGLE" data-variant="small" 
+        data-onclick="toggleSection('main')" data-text="הצג/הסתר"></button>
+
+<!-- כפתור עם פונקציה מורכבת -->
+<button data-button-type="VIEW" data-onclick="window.showEntityDetails('execution', 4, { mode: 'view' })" 
+        data-text="צפה"></button>
+```
+
+**יתרונות של data-onclick:**
+- ✅ עובד עם כפתורים דינמיים שנוצרים בזמן ריצה
+- ✅ תאימות מלאה עם המערכת המאוחדת
+- ✅ Error handling אוטומטי
+- ✅ תמיכה בפונקציות מורכבות
+
+### עמוד טריידים - דוגמה מלאה (הדרך הישנה):
 
 ```html
 <!-- כפתור העתקה -->

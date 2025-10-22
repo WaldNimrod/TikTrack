@@ -137,6 +137,37 @@ class FieldRendererService {
     }
 
     /**
+     * רנדור נפח במיליונים עם פסיקים
+     * 
+     * @param {number|string} volume - הנפח
+     * @param {boolean} showMillions - להציג במיליונים (ברירת מחדל true)
+     * @returns {string} - HTML מעוצב
+     * 
+     * @example
+     * const html = FieldRendererService.renderVolume(1500000);
+     * // Output: '<span class="volume-display">1.5M</span>'
+     */
+    static renderVolume(volume, showMillions = true) {
+        if (!volume || volume === 'N/A' || isNaN(volume)) {
+            return '<span class="volume-display">-</span>';
+        }
+        
+        const numVolume = parseFloat(volume);
+        if (numVolume === 0) return '<span class="volume-display">0</span>';
+        
+        if (showMillions) {
+            // המרה למיליונים
+            const millions = numVolume / 1000000;
+            const formatted = millions.toLocaleString('he-IL', { maximumFractionDigits: 1 });
+            return `<span class="volume-display" title="נפח: ${numVolume.toLocaleString('he-IL')}">${formatted}M</span>`;
+        } else {
+            // פורמט רגיל עם פסיקים
+            const formatted = numVolume.toLocaleString('he-IL');
+            return `<span class="volume-display">${formatted}</span>`;
+        }
+    }
+
+    /**
      * רנדור סכום עם מטבע (RTL: סימן משמאל למספר)
      * 
      * @param {number} value - ערך מספרי
@@ -442,6 +473,37 @@ class FieldRendererService {
     }
 
     /**
+     * רנדור תאריך ביצוע (שנה בשתי ספרות + שעה)
+     * 
+     * @param {string|Date} date - תאריך ביצוע
+     * @returns {string} - HTML עם תאריך ושעה בפורמט DD/MM/YY | HH:MM
+     * 
+     * @example
+     * const html = FieldRendererService.renderExecutionDate('2024-01-15T14:30:00');
+     * // Output: '<span class="execution-date">15/01/24 | 14:30</span>'
+     */
+    static renderExecutionDate(date) {
+        if (!date) return '-';
+        
+        try {
+            const dateObj = new Date(date);
+            const dateStr = dateObj.toLocaleDateString('he-IL', {
+                day: '2-digit',
+                month: '2-digit',
+                year: '2-digit'
+            });
+            const timeStr = dateObj.toLocaleTimeString('he-IL', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            });
+            return `<span class="execution-date">${dateStr} | ${timeStr}</span>`;
+        } catch (e) {
+            return date;
+        }
+    }
+
+    /**
      * רנדור shares/quantity עם # prefix
      * 
      * @param {number} shares - כמות מניות
@@ -620,5 +682,7 @@ window.renderDate = (date, includeTime) => FieldRendererService.renderDate(date,
 window.renderShares = (shares, cssClass) => FieldRendererService.renderShares(shares, cssClass);
 window.renderBoolean = (value, size) => FieldRendererService.renderBoolean(value, size);
 window.renderTickerInfo = (ticker, cssClass) => FieldRendererService.renderTickerInfo(ticker, cssClass);
+window.renderVolume = (volume, showMillions) => FieldRendererService.renderVolume(volume, showMillions);
+window.renderExecutionDate = (date) => FieldRendererService.renderExecutionDate(date);
 
 console.log('✅ field-renderer-service.js v=1.4.0 loaded - added renderTickerInfo() for ticker price display');

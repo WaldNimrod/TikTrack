@@ -111,8 +111,7 @@
                                         <th class="col-source">
                                             <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">מקור <span class="sort-icon">↕</span></button>
                                         </th>
-                                        <th class="col-actions actions-cell actions-4-btn">
-                                            פעולות
+                                        <th class="col-actions actions-cell actions-4-items">
                                         </th>
                                     </tr>
                                 </thead>
@@ -376,6 +375,7 @@
     
     <!-- 1. Base Systems (No Dependencies) -->
     <script src="scripts/global-favicon.js?v=1.0.0"></script>
+    <script src="scripts/notification-system.js?v=1.0.0"></script>
     <script src="scripts/warning-system.js?v=1.0.0"></script>
     <script src="scripts/error-handlers.js?v=1.0.0"></script>
     
@@ -393,14 +393,15 @@
     <script src="scripts/button-system-init.js?v=1.0.0"></script>
     <script src="scripts/color-scheme-system.js?v=1.0.0"></script>
     
-    <!-- 5. Preferences System (Depend on UI) -->
+    <!-- 5. Data Systems (Depend on UI) -->
+    <script src="scripts/tables.js?v=1.0.0"></script>
+    <script src="scripts/data-utils.js?v=1.0.0"></script>
+    
+    <!-- 6. Preferences System (Depend on Data) -->
     <script src="scripts/preferences-core.js?v=1.0.0"></script>
     <script src="scripts/preferences.js?v=1.0.0"></script>
     
-    <!-- 6. Notification System (Depend on Preferences) -->
-    <script src="scripts/notification-system.js?v=1.0.0"></script>
-    
-    <!-- 7. Header System (Depend on Notifications) -->
+    <!-- 7. Header System (Depend on Preferences) -->
     <script src="scripts/header-system.js?v=1.0.0"></script>
     
     <!-- 8. Entity Details Systems (Depend on Header) -->
@@ -409,14 +410,12 @@
     <script src="scripts/entity-details-modal.js?v=1.0.0"></script>
     
     <!-- 9. Services Package Scripts (Depend on Entity Details) -->
-    <script src="scripts/data-utils.js?v=1.0.0"></script>
     <script src="scripts/services/data-collection-service.js?v=1.0.0"></script>
     <script src="scripts/services/field-renderer-service.js?v=1.0.0"></script>
     <script src="scripts/services/select-populator-service.js?v=1.0.0"></script>
     <script src="scripts/services/statistics-calculator.js?v=1.0.0"></script>
     
     <!-- 10. UI Advanced Systems (Depend on Services) -->
-    <script src="scripts/tables.js?v=1.0.0"></script>
     <script src="scripts/modules/actions-menu-system.js?v=1.0.0"></script>
     <script src="scripts/pagination-system.js?v=1.0.0"></script>
     

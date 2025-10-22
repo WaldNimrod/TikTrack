@@ -8,15 +8,19 @@ function addExecution() {
   try {
     console.log('➕ מוסיף ביצוע חדש');
     
-    // פתיחת מודל הוספת ביצוע
-    showAddExecutionModal();
+    // פתיחת מודל הוספת ביצוע - שימוש במערכת הכללית
+    if (typeof window.showAddExecutionModal === 'function') {
+      window.showAddExecutionModal();
+    } else {
+      console.error('❌ showAddExecutionModal לא זמין במערכת הכללית');
+    }
     
   } catch (error) {
     console.error('שגיאה בהוספת ביצוע:', error);
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בהוספת ביצוע', error.message);
     } else if (typeof window.showNotification === 'function') {
-      window.showErrorNotification('שגיאה בהוספת ביצוע');
+      window.showNotification('שגיאה בהוספת ביצוע', 'error');
     }
   }
 }
@@ -147,91 +151,7 @@ function resetAddExecutionForm() {
 
 }
 
-/**
- * הצגת מודל הוספת עסקה
- */
-async function showAddExecutionModal() {
-  // בדיקה שהמודל קיים
-  const modal = document.getElementById('addExecutionModal');
-  if (!modal) {
-    console.error('❌ Add execution modal not found');
-    return;
-  }
-
-  // ניקוי והשבתת השדות
-  resetAddExecutionForm();
-
-  // הגדרת תאריך ברירת מחדל - היום
-  const today = new Date();
-  const todayString = today.toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
-  
-  // המתנה קצרה לטעינת השדות
-  setTimeout(() => {
-    const dateField = document.getElementById('executionDate');
-    if (dateField) {
-      dateField.value = todayString;
-    }
-  }, 100);
-
-  // הגדרת עמלה ברירת מחדל לפי העדפות
-  // ✨ עודכן לתמיכה במערכת העדפות!
-  try {
-    let defaultCommission = 1.0; // ברירת מחדל משופרת
-    
-    // נסה לקבל מהמערכת החדשה
-    if (typeof window.getCurrentPreference === 'function') {
-      const commissionFromPrefs = await window.getCurrentPreference('defaultCommission');
-      if (commissionFromPrefs !== null && commissionFromPrefs !== undefined) {
-        defaultCommission = commissionFromPrefs;
-        console.log(`✅ Using commission from preferences: ${defaultCommission}`);
-      }
-    } 
-    // Fallback ל-userPreferences
-    else if (window.userPreferences && window.userPreferences.defaultCommission) {
-      defaultCommission = window.userPreferences.defaultCommission;
-      console.log(`✅ Using commission from userPreferences: ${defaultCommission}`);
-    }
-    
-    // Commission field does not exist in execution modal - skipped
-  } catch (error) {
-    console.warn('⚠️ Could not load default commission from preferences:', error);
-  }
-
-  // טעינת טיקרים עם ברירת מחדל מהעדפות
-  await SelectPopulatorService.populateTickersSelect('executionTicker', {
-    includeEmpty: true,
-    emptyText: 'בחר טיקר',
-    defaultFromPreferences: true,
-    filterFn: (ticker) => ticker.status === 'open' || ticker.status === 'closed'
-  });
-
-  // טעינת חשבונות עם ברירת מחדל מהעדפות
-  await SelectPopulatorService.populateAccountsSelect('executionAccount', {
-    includeEmpty: true,
-    emptyText: 'בחר חשבון...',
-    defaultFromPreferences: true,
-    filterFn: (account) => account.status === 'open'
-  });
-
-  // אם לא נבחר חשבון ברירת מחדל, נבחר את הראשון
-  const accountSelect = document.getElementById('executionAccount');
-  if (accountSelect && accountSelect.value === '') {
-    const firstOption = accountSelect.querySelector('option:not([value=""])');
-    if (firstOption) {
-      accountSelect.value = firstOption.value;
-      console.log(`✅ נבחר חשבון ברירת מחדל: ${firstOption.textContent}`);
-    }
-  }
-
-  // הוספת event listener לטיקר
-  const tickerSelect = document.getElementById('executionTicker');
-  if (tickerSelect) {
-    tickerSelect.addEventListener('change', function() {
-      if (this.value) {
-        // הפעלת כל השדות
-        enableExecutionFormFields();
-        // טעינת מידע על הטיקר
-        loadExecutionTickerInfo(this.value);
+// showAddExecutionModal הועבר למערכת הכללית
       } else {
         // השבתת כל השדות
         disableExecutionFormFields();
@@ -1773,19 +1693,19 @@ async function updateExecutionsTableMain(executions) {
                              title="פריטים מקושרים לטיקר">🔗</button>
                        </div>
                    </td>
-                <td class="type-cell" data-type="${typeForFilter}" 
-                  style="background-color: ${(execution.action || execution.type) === 'buy' ? positiveBgColor : negativeBgColor}; border: 1px solid ${(execution.action || execution.type) === 'buy' ? positiveBorderColor : negativeBorderColor};">
-                    <span class="${(execution.action || execution.type) === 'buy' ? 'profit-positive' : 'profit-negative'}">
+                <td class="type-cell" data-type="${typeForFilter}">
+                    ${window.renderAction ? window.renderAction(execution.action || execution.type) : 
+                      `<span class="${(execution.action || execution.type) === 'buy' ? 'profit-positive' : 'profit-negative'}">
                         ${(execution.action || execution.type) === 'buy' ? 'קניה' : 'מכירה'}
-                    </span>
+                      </span>`}
                 </td>
                 <td data-account="${accountName}" style="cursor: pointer;" 
                   onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('account', '${accountName}', 'view'); } else { console.log('Entity details modal not available'); }" 
                   title="פתח פרטי חשבון">${accountName}</td>
-                <td>${execution.quantity}</td>
+                <td>${window.renderShares ? window.renderShares(execution.quantity) : execution.quantity}</td>
                 <td>$${execution.price}</td>
                 <td class="pl-cell">$0</td>
-                <td data-date="${execution.date || execution.execution_date}">${execution.date || execution.execution_date ? new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL') : '-'}</td>
+                <td data-date="${execution.date || execution.execution_date}">${window.renderExecutionDate ? window.renderExecutionDate(execution.date || execution.execution_date) : (execution.date || execution.execution_date ? new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL') : '-')}</td>
                 <td style="text-align: left; direction: ltr;">${execution.source || '-'}</td>
                 <td class="actions-cell">
                     ${window.createActionsMenu ? window.createActionsMenu([
@@ -2841,18 +2761,17 @@ function updateExecutionsTableForTradeModal(executions) {
     executions.forEach(execution => {
       const row = document.createElement('tr');
 
-      const typeBadge = execution.type === 'buy'
-        ? '<span class="badge bg-success">קניה</span>'
-        : '<span class="badge bg-danger">מכירה</span>';
+      const typeBadge = window.renderAction ? window.renderAction(execution.type) : 
+        (execution.type === 'buy' ? '<span class="badge bg-success">קניה</span>' : '<span class="badge bg-danger">מכירה</span>');
 
       const statusBadge = execution.status === 'completed'
         ? '<span class="badge bg-success">הושלם</span>'
         : '<span class="badge bg-warning">ממתין</span>';
 
       row.innerHTML = `
-                <td>${execution.date}</td>
+                <td>${window.renderExecutionDate ? window.renderExecutionDate(execution.date) : execution.date}</td>
                 <td>${typeBadge}</td>
-                <td>${execution.quantity}</td>
+                <td>${window.renderShares ? window.renderShares(execution.quantity) : execution.quantity}</td>
                 <td>$${execution.price.toFixed(2)}</td>
                 <td>$${execution.commission.toFixed(2)}</td>
                 <td>$${execution.total.toFixed(2)}</td>

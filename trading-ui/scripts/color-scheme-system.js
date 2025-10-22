@@ -144,6 +144,14 @@ function darkenColor(hex, percent) {
   return `rgb(${Math.round(rgb.r * factor)}, ${Math.round(rgb.g * factor)}, ${Math.round(rgb.b * factor)})`;
 }
 
+function lightenColor(hex, percent) {
+  const rgb = hexToRgb(hex);
+  if (!rgb) return hex;
+  
+  const factor = (100 + percent) / 100;
+  return `rgb(${Math.min(255, Math.round(rgb.r * factor))}, ${Math.min(255, Math.round(rgb.g * factor))}, ${Math.min(255, Math.round(rgb.b * factor))})`;
+}
+
 // ===== ENTITY COLOR FUNCTIONS =====
 function getEntityColor(entityType) {
   return ENTITY_COLORS[entityType] || ENTITY_COLORS.trade;
@@ -466,9 +474,27 @@ async function setCurrentEntityColorFromPage() {
     
     const pageClass = findPageClass(body);
     if (pageClass) {
-      const entityType = pageClass.replace('-page', '');
-      if (isValidEntityType(entityType)) {
+      // Use mapping to get correct entity type
+      const entityType = PAGE_TO_ENTITY_MAPPING[pageClass];
+      if (entityType && isValidEntityType(entityType)) {
         await getEntityColorFromPreferences(entityType);
+        
+        // Set current entity color and variants
+        const entityColor = ENTITY_COLORS[entityType] || ENTITY_COLORS.trade;
+        const lightColor = lightenColor(entityColor, 10);
+        const darkColor = darkenColor(entityColor, 20);
+        
+        document.documentElement.style.setProperty('--current-entity-color', entityColor);
+        document.documentElement.style.setProperty('--current-entity-color-light', lightColor);
+        document.documentElement.style.setProperty('--current-entity-color-dark', darkColor);
+        
+        console.log(`🎨 Set current entity color for ${entityType} (from ${pageClass}):`, {
+          primary: entityColor,
+          light: lightColor,
+          dark: darkColor
+        });
+      } else {
+        console.warn(`⚠️ No mapping found for page class: ${pageClass}`);
       }
     }
   } catch (error) {
@@ -480,6 +506,22 @@ function findPageClass(body) {
   const classList = Array.from(body.classList);
   return classList.find(cls => cls.endsWith('-page'));
 }
+
+// Page class to entity type mapping
+const PAGE_TO_ENTITY_MAPPING = {
+  'tickers-page': 'ticker',
+  'trades-page': 'trade',
+  'accounts-page': 'account',
+  'alerts-page': 'alert',
+  'cash-flows-page': 'cash_flow',
+  'notes-page': 'note',
+  'executions-page': 'execution',
+  'trade-plans-page': 'trade_plan',
+  'constraints-page': 'constraint',
+  'designs-page': 'design',
+  'research-page': 'research',
+  'preferences-page': 'preference'
+};
 
 async function getEntityColorFromPreferences(entityType, variant = 'primary') {
   try {
@@ -547,6 +589,13 @@ function updateCSSVariablesFromPreferences(preferences) {
       if (preferences.colorScheme.entities) {
         Object.entries(preferences.colorScheme.entities).forEach(([entityType, color]) => {
           document.documentElement.style.setProperty(`--entity-${entityType}-color`, color);
+          
+          // Add light and dark variants
+          const lightColor = lightenColor(color, 10);
+          const darkColor = darkenColor(color, 20);
+          
+          document.documentElement.style.setProperty(`--entity-${entityType}-color-light`, lightColor);
+          document.documentElement.style.setProperty(`--entity-${entityType}-color-dark`, darkColor);
         });
       }
     }
@@ -712,9 +761,22 @@ window.NUMERIC_VALUE_COLORS = NUMERIC_VALUE_COLORS;
 
 // Set current entity color when DOM is ready
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => setCurrentEntityColorFromPage());
+  document.addEventListener('DOMContentLoaded', async () => {
+    await setCurrentEntityColorFromPage();
+    // Also update CSS variables from preferences
+    const preferences = await loadColorPreferences();
+    if (preferences) {
+      updateCSSVariablesFromPreferences(preferences);
+    }
+  });
 } else {
   setCurrentEntityColorFromPage();
+  // Also update CSS variables from preferences
+  loadColorPreferences().then(preferences => {
+    if (preferences) {
+      updateCSSVariablesFromPreferences(preferences);
+    }
+  });
 }
 
 // Color Scheme System loaded successfully

@@ -1952,6 +1952,48 @@ window.updatePreferencesCounters = function(preferences) {
     }
 };
 
+// ===== LOAD SPECIFIC PREFERENCES =====
+
+/**
+ * טעינת העדפות ספציפיות לעמוד - ללא עדכון DOM
+ * @param {Array} preferenceKeys - רשימת מפתחות העדפות לטעינה
+ * @param {number} userId - מזהה משתמש
+ * @param {number|null} profileId - מזהה פרופיל
+ * @returns {Promise<Object>} - העדפות ספציפיות
+ */
+window.loadSpecificPreferences = async function(preferenceKeys, userId = 1, profileId = null) {
+    try {
+        console.log(`📂 Loading specific preferences for page: ${preferenceKeys.join(', ')}`);
+        
+        // Load preferences data without updating DOM
+        if (!window.currentPreferences) {
+            // Get user profiles
+            const profiles = await window.getUserProfiles(userId);
+            const activeProfile = profiles.find(p => p.active);
+            const profileIdToUse = profileId || (activeProfile ? activeProfile.id : null);
+            
+            // Get preferences from server
+            const allPreferences = await window.getAllUserPreferences(userId, profileIdToUse);
+            window.currentPreferences = allPreferences;
+        }
+        
+        // Filter to only requested preferences
+        const specificPreferences = {};
+        preferenceKeys.forEach(key => {
+            if (window.currentPreferences && window.currentPreferences[key] !== undefined) {
+                specificPreferences[key] = window.currentPreferences[key];
+            }
+        });
+        
+        console.log(`✅ Loaded ${Object.keys(specificPreferences).length} specific preferences`);
+        return specificPreferences;
+        
+    } catch (error) {
+        console.error('❌ Error loading specific preferences:', error);
+        return {};
+    }
+};
+
 // ===== EXPORT FOR TESTING =====
 
 // Export functions for testing

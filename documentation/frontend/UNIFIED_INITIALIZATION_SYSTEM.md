@@ -70,35 +70,104 @@ The Unified Initialization System is a monitoring and validation system for Java
 
 ### **🔄 5-Stage Initialization Process**
 
-#### **Stage 1: Core Systems**
+#### **Stage 1: BASE PACKAGE (loadOrder: 1)**
 - **Purpose:** Initialize fundamental systems
-- **Systems:** Notification, Preferences, Storage, UnifiedCacheManager, CacheSyncManager, CachePolicyManager, MemoryOptimizer
+- **Systems:** Global Favicon, Notification System, UI Utils, Warning System, Error Handlers, Unified Cache Manager, Cache Sync Manager, Header System, Page Utils, Translation Utils, Button Icons, Button System Init, Color Scheme System
 - **Dependencies:** None
 - **Duration:** ~0.5ms
+- **Scripts:** 13 core scripts in exact order
 
-#### **Stage 2: UI Systems**
-- **Purpose:** Initialize user interface systems
-- **Systems:** Header, Filter, UI Utilities
-- **Dependencies:** Core Systems
-- **Duration:** ~0.5ms
-
-#### **Stage 3: Page Systems**
-- **Purpose:** Initialize page-specific functionality
-- **Systems:** Page filters, tables, custom initializers
-- **Dependencies:** Core Systems, UI Systems
-- **Duration:** ~0.5ms
-
-#### **Stage 4: Validation Systems**
-- **Purpose:** Initialize validation and error handling
-- **Systems:** Form validation, data validation
-- **Dependencies:** Core Systems, UI Systems, Page Systems
+#### **Stage 2: SERVICES PACKAGE (loadOrder: 2)**
+- **Purpose:** Initialize general services
+- **Systems:** Data Collection Service, Field Renderer Service, Select Populator Service, Statistics Calculator, CRUD Response Handler, Default Value Setter
+- **Dependencies:** BASE PACKAGE
 - **Duration:** ~0.3ms
+- **Scripts:** 6 service scripts
 
-#### **Stage 5: Finalization**
-- **Purpose:** Complete initialization and restore state
-- **Systems:** State restoration, success notifications
-- **Dependencies:** All previous stages
+#### **Stage 3: UI-ADVANCED PACKAGE (loadOrder: 3)**
+- **Purpose:** Initialize advanced UI systems
+- **Systems:** Tables System, Pagination System, Actions Menu System
+- **Dependencies:** BASE PACKAGE, SERVICES PACKAGE
+- **Duration:** ~0.3ms
+- **Scripts:** 3 UI-advanced scripts
+
+#### **Stage 4: CRUD PACKAGE (loadOrder: 4)**
+- **Purpose:** Initialize data management systems
+- **Systems:** Date Utils, Data Utils, Entity Details API, Entity Details Renderer, Entity Details Modal
+- **Dependencies:** BASE PACKAGE, SERVICES PACKAGE
+- **Duration:** ~0.3ms
+- **Scripts:** 5 CRUD scripts
+
+#### **Stage 5: PREFERENCES PACKAGE (loadOrder: 5)**
+- **Purpose:** Initialize user preferences system
+- **Systems:** Preferences Core, Preferences System
+- **Dependencies:** BASE PACKAGE
 - **Duration:** ~0.2ms
+- **Scripts:** 2 preferences scripts
+
+#### **Stage 6: INIT-SYSTEM PACKAGE (loadOrder: 18)**
+- **Purpose:** Initialize monitoring and validation systems
+- **Systems:** Package Manifest, Page Initialization Configs, Unified App Initializer
+- **Dependencies:** All previous packages
+- **Duration:** ~0.2ms
+- **Scripts:** 3 init-system scripts
+
+### **📋 Standard Loading Order for User Pages**
+
+**Standard Package Order for All User Pages:**
+1. **BASE PACKAGE** (loadOrder: 1) - Core systems
+2. **SERVICES PACKAGE** (loadOrder: 2) - General services  
+3. **UI-ADVANCED PACKAGE** (loadOrder: 3) - Advanced UI systems
+4. **CRUD PACKAGE** (loadOrder: 4) - Data management
+5. **PREFERENCES PACKAGE** (loadOrder: 5) - User preferences
+6. **INIT-SYSTEM PACKAGE** (loadOrder: 18) - Monitoring and validation
+
+**Exact Script Order Within Each Package:**
+```html
+<!-- BASE PACKAGE (loadOrder: 1) -->
+<script src="scripts/global-favicon.js"></script>
+<script src="scripts/notification-system.js"></script>
+<script src="scripts/ui-utils.js"></script>
+<script src="scripts/warning-system.js"></script>
+<script src="scripts/error-handlers.js"></script>
+<script src="scripts/unified-cache-manager.js"></script>
+<script src="scripts/cache-sync-manager.js"></script>
+<script src="scripts/header-system.js"></script>
+<script src="scripts/page-utils.js"></script>
+<script src="scripts/translation-utils.js"></script>
+<script src="scripts/button-icons.js"></script>
+<script src="scripts/button-system-init.js"></script>
+<script src="scripts/color-scheme-system.js"></script>
+
+<!-- SERVICES PACKAGE (loadOrder: 2) -->
+<script src="scripts/services/data-collection-service.js"></script>
+<script src="scripts/services/field-renderer-service.js"></script>
+<script src="scripts/services/select-populator-service.js"></script>
+<script src="scripts/services/statistics-calculator.js"></script>
+<script src="scripts/services/crud-response-handler.js"></script>
+<script src="scripts/services/default-value-setter.js"></script>
+
+<!-- UI-ADVANCED PACKAGE (loadOrder: 3) -->
+<script src="scripts/tables.js"></script>
+<script src="scripts/pagination-system.js"></script>
+<script src="scripts/modules/actions-menu-system.js"></script>
+
+<!-- CRUD PACKAGE (loadOrder: 4) -->
+<script src="scripts/date-utils.js"></script>
+<script src="scripts/data-utils.js"></script>
+<script src="scripts/entity-details-api.js"></script>
+<script src="scripts/entity-details-renderer.js"></script>
+<script src="scripts/entity-details-modal.js"></script>
+
+<!-- PREFERENCES PACKAGE (loadOrder: 5) -->
+<script src="scripts/preferences-core.js"></script>
+<script src="scripts/preferences.js"></script>
+
+<!-- INIT-SYSTEM PACKAGE (loadOrder: 18) -->
+<script src="scripts/init-system/package-manifest.js"></script>
+<script src="scripts/page-initialization-configs.js"></script>
+<script src="scripts/unified-app-initializer.js"></script>
+```
 
 ### **🚀 For Developers - Correct Workflow**
 

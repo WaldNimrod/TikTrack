@@ -97,79 +97,92 @@ const PACKAGE_MANIFEST = {
         file: 'global-favicon.js',
         globalCheck: 'window.setFavicon',
         description: 'ניהול favicon',
-        required: true
+        required: true,
+        loadOrder: 1
       },
       {
         file: 'notification-system.js',
         globalCheck: 'window.NotificationSystem',
         description: 'מערכת התראות',
-        required: true
+        required: true,
+        loadOrder: 2
       },
       {
         file: 'ui-utils.js',
         globalCheck: 'window.toggleSection',
         description: 'כלי עזר UI',
-        required: true
+        required: true,
+        loadOrder: 3
       },
       {
         file: 'warning-system.js',
         globalCheck: 'window.WarningSystem',
         description: 'מערכת אזהרות',
-        required: true
+        required: true,
+        loadOrder: 4
       },
       {
         file: 'error-handlers.js',
         globalCheck: 'window.handleApiError',
         description: 'מערכת טיפול בשגיאות',
-        required: true
+        required: true,
+        loadOrder: 5
       },
       {
         file: 'unified-cache-manager.js',
         globalCheck: 'window.UnifiedCacheManager',
         description: 'מנהל מטמון מאוחד',
-        required: true
+        required: true,
+        loadOrder: 6
       },
       {
         file: 'cache-sync-manager.js',
         globalCheck: 'window.CacheSyncManager',
         description: 'מנהל סנכרון מטמון',
-        required: true
+        required: true,
+        loadOrder: 7
       },
       {
         file: 'header-system.js',
         globalCheck: 'window.HeaderSystem',
         description: 'מערכת כותרת',
-        required: true
+        required: true,
+        loadOrder: 8
       },
       {
         file: 'page-utils.js',
         globalCheck: 'window.loadPageState',
         description: 'כלי עזר עמוד',
-        required: true
+        required: true,
+        loadOrder: 9
       },
       {
         file: 'translation-utils.js',
         globalCheck: 'window.translateStatus',
         description: 'תרגומים',
-        required: true
+        required: true,
+        loadOrder: 10
       },
       {
         file: 'button-icons.js',
         globalCheck: 'window.BUTTON_ICONS',
         description: 'מערכת איקונים וכפתורים',
-        required: true
+        required: true,
+        loadOrder: 11
       },
       {
         file: 'button-system-init.js',
         globalCheck: 'window.ButtonSystem',
         description: 'מערכת כפתורים',
-        required: true
+        required: true,
+        loadOrder: 12
       },
       {
         file: 'color-scheme-system.js',
         globalCheck: 'window.loadDynamicColors',
         description: 'מערכת צבעים דינמית',
-        required: true
+        required: true,
+        loadOrder: 13
       }
     ],
     estimatedSize: '~280KB',
@@ -190,43 +203,49 @@ const PACKAGE_MANIFEST = {
         file: 'services/data-collection-service.js',
         globalCheck: 'window.DataCollectionService',
         description: 'שירות איסוף נתונים',
-        required: true
+        required: true,
+        loadOrder: 1
       },
       {
         file: 'services/field-renderer-service.js',
         globalCheck: 'window.FieldRendererService',
         description: 'שירות רנדור שדות',
-        required: true
+        required: true,
+        loadOrder: 2
       },
       {
         file: 'services/select-populator-service.js',
         globalCheck: 'window.SelectPopulatorService',
         description: 'שירות מילוי select boxes',
-        required: true
+        required: true,
+        loadOrder: 3
       },
       {
         file: 'services/statistics-calculator.js',
         globalCheck: 'window.StatisticsCalculator',
         description: 'מחשבון סטטיסטיקות',
-        required: true
+        required: true,
+        loadOrder: 4
       },
       {
         file: 'services/default-value-setter.js',
         globalCheck: 'window.DefaultValueSetter',
         description: 'שירות ברירות מחדל',
-        required: true
+        required: true,
+        loadOrder: 5
       },
       {
         file: 'services/crud-response-handler.js',
         globalCheck: 'window.CrudResponseHandler',
         description: 'מטפל בתגובות CRUD',
-        required: true
+        required: true,
+        loadOrder: 6
       },
       {
         file: 'services/alert-condition-renderer.js',
         globalCheck: 'window.AlertConditionRenderer',
         description: 'מציג תנאי התראות',
-        required: true
+        required: false
       }
     ],
     estimatedSize: '~120KB',
@@ -247,19 +266,22 @@ const PACKAGE_MANIFEST = {
         file: 'tables.js',
         globalCheck: 'window.sortTableData',
         description: 'מערכת טבלאות',
-        required: true
+        required: true,
+        loadOrder: 1
       },
       {
         file: 'pagination-system.js',
         globalCheck: 'window.PaginationSystem',
         description: 'מערכת עימוד',
-        required: true
+        required: true,
+        loadOrder: 2
       },
       {
         file: 'modules/actions-menu-system.js',
         globalCheck: 'window.ActionsMenuSystem',
         description: 'מערכת תפריט פעולות',
-        required: true
+        required: true,
+        loadOrder: 3
       }
     ],
     estimatedSize: '~80KB',
@@ -361,31 +383,36 @@ const PACKAGE_MANIFEST = {
         file: 'date-utils.js',
         globalCheck: 'window.formatDate',
         description: 'כלי עזר תאריכים',
-        required: true
+        required: true,
+        loadOrder: 1
       },
       {
         file: 'data-utils.js',
         globalCheck: 'window.isNumeric',
         description: 'כלי עזר נתונים כלליים',
-        required: true
+        required: true,
+        loadOrder: 2
       },
       {
         file: 'entity-details-api.js',
         globalCheck: 'window.EntityDetailsAPI',
         description: 'API פרטי ישויות',
-        required: true
+        required: true,
+        loadOrder: 3
       },
       {
         file: 'entity-details-renderer.js',
         globalCheck: 'window.EntityDetailsRenderer',
         description: 'מציג פרטי ישויות',
-        required: true
+        required: true,
+        loadOrder: 4
       },
       {
         file: 'entity-details-modal.js',
         globalCheck: 'window.showEntityDetails',
         description: 'מודל פרטי ישויות',
-        required: true
+        required: true,
+        loadOrder: 5
       }
     ],
     estimatedSize: '~100KB',
@@ -403,16 +430,18 @@ const PACKAGE_MANIFEST = {
     dependencies: ['base'],
     scripts: [
       {
-        file: 'preferences.js',
-        globalCheck: 'window.getCurrentPreference',
-        description: 'מערכת העדפות',
-        required: true
-      },
-      {
         file: 'preferences-core.js',
         globalCheck: 'window.PreferencesSystem',
         description: 'ליבת העדפות',
-        required: true
+        required: true,
+        loadOrder: 1
+      },
+      {
+        file: 'preferences.js',
+        globalCheck: 'window.getCurrentPreference',
+        description: 'מערכת העדפות',
+        required: true,
+        loadOrder: 2
       },
       {
         file: 'preferences-page.js',
@@ -954,12 +983,7 @@ const PACKAGE_MANIFEST = {
         description: 'מערכת סינון כללית',
         required: true
       },
-      {
-        file: 'header-system.js',
-        globalCheck: 'window.HeaderSystem',
-        description: 'מערכת כותרת עם פילטרים',
-        required: true
-      }
+      // header-system.js removed from FILTERS package - already in BASE package
     ],
     estimatedSize: '~40KB',
     initTime: '~25ms'
@@ -1014,8 +1038,8 @@ const PACKAGE_MANIFEST = {
   },
 
   // 18. INIT PACKAGE - אתחול
-  init: {
-    id: 'init',
+  'init-system': {
+    id: 'init-system',
     name: 'Initialization Package',
     description: 'מערכות אתחול וניטור',
     version: '2.0.0',
@@ -1027,19 +1051,22 @@ const PACKAGE_MANIFEST = {
         file: 'init-system/package-manifest.js',
         globalCheck: 'window.PACKAGE_MANIFEST',
         description: 'מנפסט חבילות',
-        required: true
+        required: true,
+        loadOrder: 1
       },
       {
         file: 'page-initialization-configs.js',
         globalCheck: 'window.PAGE_INITIALIZATION_CONFIGS',
         description: 'הגדרות אתחול עמודים',
-        required: true
+        required: true,
+        loadOrder: 2
       },
       {
         file: 'unified-app-initializer.js',
         globalCheck: 'window.UnifiedAppInitializer',
         description: 'מאתחל אפליקציה מאוחד',
-        required: true
+        required: true,
+        loadOrder: 3
       }
     ],
     estimatedSize: '~45KB',

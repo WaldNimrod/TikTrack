@@ -102,7 +102,10 @@ async function checkForMismatches(pageName, pageConfig) {
             !loadedScript.includes('bootstrap') && 
             !loadedScript.includes('font-awesome') &&
             !loadedScript.includes('monitoring-functions') &&
-            !loadedScript.includes('init-system-check')) {
+            !loadedScript.includes('init-system-check') &&
+            !loadedScript.includes('package-manifest') &&
+            !loadedScript.includes('page-initialization-configs') &&
+            !loadedScript.includes('unified-app-initializer')) {
             mismatches.push({
                 type: 'extra_script',
                 message: `סקריפט נוסף: ${loadedScript} - נטען אבל לא מתועד`,
@@ -144,6 +147,59 @@ async function checkForMismatches(pageName, pageConfig) {
                 severity: 'warning'
             });
         }
+    }
+    
+    // Check package loading order - IMPROVED: Check actual page order vs package dependencies
+    if (pageConfig.packages && window.PACKAGE_MANIFEST) {
+        // Get all packages for this page
+        const pagePackages = pageConfig.packages.map(pkgName => {
+            // Find package by name in the manifest object
+            for (const [key, pkg] of Object.entries(window.PACKAGE_MANIFEST)) {
+                if (pkg.name && pkg.name.toLowerCase().includes(pkgName.toLowerCase())) {
+                    return pkg;
+                }
+            }
+            return null;
+        }).filter(Boolean);
+        
+        // Sort packages by loadOrder
+        const sortedPackages = pagePackages.sort((a, b) => (a.loadOrder || 0) - (b.loadOrder || 0));
+        
+        // Check if scripts are loaded in the correct package order
+        let expectedOrder = [];
+        const seenScripts = new Set(); // Prevent duplicates
+        sortedPackages.forEach(pkg => {
+            if (pkg.scripts) {
+                pkg.scripts.forEach(script => {
+                    if (script.required !== false && !seenScripts.has(script.file)) {
+                        expectedOrder.push(script.file);
+                        seenScripts.add(script.file);
+                    }
+                });
+            }
+        });
+        
+        // Check actual order vs expected order
+        const processedScripts = new Set(); // Prevent duplicate checks
+        expectedOrder.forEach((expectedScript, expectedIndex) => {
+            const actualIndex = loadedScripts.indexOf(expectedScript);
+            if (actualIndex !== -1 && !processedScripts.has(expectedScript)) {
+                processedScripts.add(expectedScript);
+                
+                // Check if this script is loaded before its dependencies
+                const dependencies = expectedOrder.slice(0, expectedIndex);
+                dependencies.forEach(dep => {
+                    const depIndex = loadedScripts.indexOf(dep);
+                    if (depIndex !== -1 && actualIndex < depIndex) {
+                        loadOrderIssues.push({
+                            type: 'loading_order',
+                            message: `סדר טעינה שגוי: ${expectedScript} נטען במקום ${expectedIndex + 1} אבל נמצא במקום ${actualIndex + 1}`,
+                            severity: 'error'
+                        });
+                    }
+                });
+            }
+        });
     }
     
     // Check for missing globals

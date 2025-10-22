@@ -109,9 +109,7 @@
     padding: var(--spacing-md);
 }
 
-.filters-container {
-    /* Using Bootstrap classes: d-flex flex-wrap align-items-end gap-2 */
-}
+/* .filters-container moved to header-styles.css - more detailed definition */
 
 .filters-wrapper {
     /* Using Bootstrap class: me-auto to push filters to end of row (left side in RTL) */

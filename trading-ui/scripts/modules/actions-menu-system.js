@@ -392,8 +392,8 @@ class ActionsMenuSystem {
         console.log('🔧 [Actions Menu Debug] Trigger rect:', triggerRect);
         
         // מיקום התפריט מימין לכפתור (לכיוון מרכז הטבלה)
-        // מיקום קרוב מאוד לכפתור ועוד יותר גבוה
-        popup.style.top = `${triggerRect.top - 12}px`; // 12px יותר גבוה (במקום 8px)
+        // מיקום קרוב מאוד לכפתור
+        popup.style.top = `${triggerRect.top - 4}px`; // 4px יותר גבוה
         popup.style.left = `${triggerRect.right - 2}px`; // 2px חופף לכפתור (במקום 1px)
         
         console.log('🔧 [Actions Menu Debug] Popup positioned at:', {

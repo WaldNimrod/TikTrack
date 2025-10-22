@@ -235,6 +235,7 @@ function getCurrencySymbol(currencyId) {
   return currency ? currency.symbol : currencyId || 'N/A';
 }
 
+
 /**
  * חישוב משך הזמן שעבר מתאריך נתון - פורמט אחיד מלא
  */
@@ -1691,7 +1692,7 @@ function updateTickersTable(tickers) {
                     </td>
                     <td title="${formattedPrice !== 'N/A' ? `מחיר נוכחי: ${formattedPrice}` : 'אין נתוני מחיר'}" style="color: ${changeColor}; font-weight: bold; text-align: center; direction: ltr;">${formattedPrice}</td>
                     <td title="${changeDisplay !== 'N/A' ? `שינוי יומי: ${changeDisplay}` : 'אין נתוני שינוי'}" style="color: ${changeColor}; font-weight: bold; text-align: center; direction: ltr;">${changeDisplay}</td>
-                    <td title="${volume !== 'N/A' ? `נפח: ${volume}` : 'אין נתוני נפח'}" style="text-align: center; direction: ltr;">${volume}</td>
+                    <td title="${volume !== 'N/A' ? `נפח: ${volume}` : 'אין נתוני נפח'}" style="text-align: center; direction: ltr;">${window.renderVolume ? window.renderVolume(volume, true) : volume}</td>
                     <td title="${statusLabel}">
                         <span style="background-color: ${statusStyle.backgroundColor}; 
                                      color: ${statusStyle.color}; 
@@ -1717,9 +1718,11 @@ function updateTickersTable(tickers) {
                         </span>
                     </td>
                     <td title="${ticker.name || 'N/A'}">${ticker.name || 'N/A'}</td>
-                    <td title="${ticker.remarks || '-'}">${ticker.remarks || '-'}</td>
+                    <td title="${ticker.currency_id ? `מטבע: ${getCurrencySymbol(ticker.currency_id)}` : 'אין נתוני מטבע'}" style="text-align: center;">
+                        ${window.renderCurrency ? window.renderCurrency(ticker.currency_id, ticker.currency_name, getCurrencySymbol(ticker.currency_id)) : getCurrencySymbol(ticker.currency_id)}
+                    </td>
                     <td title="${ticker.yahoo_updated_at ? `עודכן: ${new Date(ticker.yahoo_updated_at).toLocaleString('he-IL')}` : 'אין נתוני עדכון'}" style="text-align: center;">
-                        ${ticker.yahoo_updated_at ? getTimeDuration(ticker.yahoo_updated_at) : 'N/A'}
+                        ${ticker.yahoo_updated_at ? (window.formatShortDate ? window.formatShortDate(ticker.yahoo_updated_at) : new Date(ticker.yahoo_updated_at).toLocaleDateString('he-IL')) + ' ' + (window.formatTimeOnly ? window.formatTimeOnly(ticker.yahoo_updated_at) : new Date(ticker.yahoo_updated_at).toLocaleTimeString('he-IL', {hour: '2-digit', minute: '2-digit'})) : 'N/A'}
                     </td>
                     <td class="actions-cell">
                         ${window.createActionsMenu ? window.createActionsMenu([
@@ -1838,13 +1841,7 @@ window.performTickerDeletion = performTickerDeletion;
  * שחזור מצב סידור - שימוש בפונקציה גלובלית
  * @deprecated Use window.restoreAnyTableSort from main.js instead
  */
-function restoreSortState() {
-  if (typeof window.restoreAnyTableSort === 'function') {
-    window.restoreAnyTableSort('tickers', window.tickersData || [], updateTickersTable);
-  } else {
-    handleFunctionNotFound('restoreAnyTableSort', 'פונקציית שחזור סידור לא נמצאה');
-  }
-}
+// restoreSortState - using global function from page-utils.js
 
 // הגדרת הפונקציות כגלובליות
 // window.sortTable export removed - using global version from tables.js
@@ -1871,20 +1868,35 @@ window.reactivateTicker = reactivateTicker;
  */
 async function loadColorsAndApplyToHeaders() {
   try {
-    // ✨ עדכון לתמיכה במערכת העדפות     // נסה לטעון העדפות  ראשית, ואז fallback
-    if (!window.currentPreferences) {
-      if (window.preferences && window.preferences.loadPreferences) {
-        await window.preferences.loadPreferences();
-        console.log('✅ Loaded  preferences for tickers');
-      } else if (window.loadPreferences) {
-        await window.loadPreferences();
-        console.log('🔄 Loaded preferences for tickers (fallback)');
+    // ✨ טעינת העדפות ספציפיות לעמוד tickers
+    const relevantPreferenceKeys = ['entityTickerColor', 'primaryColor', 'secondaryColor', 'theme', 'language'];
+    
+    if (window.loadSpecificPreferences) {
+      const specificPreferences = await window.loadSpecificPreferences(relevantPreferenceKeys, 1, null);
+      console.log('✅ Loaded specific preferences for tickers:', Object.keys(specificPreferences));
+      
+      // Apply only the loaded preferences
+      if (window.loadAllColorsFromPreferences && specificPreferences) {
+        window.loadAllColorsFromPreferences(specificPreferences);
       }
-    }
-
-    // טעינת צבעים מההעדפות
-    if (window.loadAllColorsFromPreferences && window.currentPreferences) {
-      window.loadAllColorsFromPreferences(window.currentPreferences);
+    } else if (window.loadPreferences) {
+      // Fallback to loading all preferences
+      await window.loadPreferences(1, null);
+      console.log('🔄 Loaded all preferences for tickers (fallback)');
+      
+      // Filter to only relevant preferences
+      if (window.currentPreferences) {
+        const relevantPreferences = {};
+        relevantPreferenceKeys.forEach(key => {
+          if (window.currentPreferences[key] !== undefined) {
+            relevantPreferences[key] = window.currentPreferences[key];
+          }
+        });
+        
+        if (window.loadAllColorsFromPreferences) {
+          window.loadAllColorsFromPreferences(relevantPreferences);
+        }
+      }
     }
 
     // יישום צבעי ישות על כותרות

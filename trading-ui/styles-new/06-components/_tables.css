@@ -60,10 +60,6 @@
     font-size: inherit;
 }
 
-/* ===== Bottom Spacer ===== */
-.spacer-bottom {
-    height: 3rem;
-}
 
 /* ===== Filter Components ===== */
 .filter-icon-btn {
@@ -85,10 +81,6 @@
     color: #666;
 }
 
-/* ===== Toast High Z-Index ===== */
-.toast-high-z {
-    z-index: 1000000002;
-}
 
 /* ===== Alert Table Columns ===== */
 .col-ticker { width: 10%; }
@@ -100,10 +92,6 @@
 .col-created { width: 10%; }
 .col-actions { width: 14%; }
 
-/* ===== Filter Components ===== */
-.filter-margin-top {
-    margin-top: 10px;
-}
 
 .filter-active-btn {
     background-color: white;
@@ -111,15 +99,227 @@
     border-color: #28a745;
 }
 
-/* ===== Form Components ===== */
-.flex-1 {
-    flex: 1;
-}
 
 .col-price { 
   width: 10%; 
   min-width: 90px;
 }
+
+/* ===== Trades Table Columns ===== */
+/* Trades Page - Column Widths for 12 columns layout */
+
+/* עמודות טקסט קצר */
+.data-table.trades-table .col-ticker,
+.data-table[data-table-type="trades"] .col-ticker {
+    width: 7%;
+    min-width: 60px;
+}
+
+.data-table.trades-table .col-status,
+.data-table[data-table-type="trades"] .col-status {
+    width: 7%;
+    min-width: 70px;
+}
+
+.data-table.trades-table .col-type,
+.data-table[data-table-type="trades"] .col-type {
+    width: 7%;
+    min-width: 70px;
+}
+
+.data-table.trades-table .col-side,
+.data-table[data-table-type="trades"] .col-side {
+    width: 6%;
+    min-width: 50px;
+}
+
+/* עמודות מספריות */
+.data-table.trades-table .col-price,
+.data-table[data-table-type="trades"] .col-price {
+    width: 8%;
+    min-width: 80px;
+}
+
+.data-table.trades-table .col-change,
+.data-table[data-table-type="trades"] .col-change {
+    width: 7%;
+    min-width: 70px;
+}
+
+.data-table.trades-table .col-quantity,
+.data-table[data-table-type="trades"] .col-quantity {
+    width: 8%;
+    min-width: 80px;
+}
+
+.data-table.trades-table .col-amount,
+.data-table[data-table-type="trades"] .col-amount {
+    width: 9%;
+    min-width: 90px;
+}
+
+.data-table.trades-table .col-fees,
+.data-table[data-table-type="trades"] .col-fees {
+    width: 7%;
+    min-width: 70px;
+}
+
+.data-table.trades-table .col-pnl,
+.data-table[data-table-type="trades"] .col-pnl {
+    width: 8%;
+    min-width: 80px;
+}
+
+.data-table.trades-table .col-date,
+.data-table[data-table-type="trades"] .col-date {
+    width: 10%;
+    min-width: 100px;
+}
+
+.data-table.trades-table .col-actions,
+.data-table[data-table-type="trades"] .col-actions {
+    width: 5%;
+    min-width: 50px;
+}
+
+/* ===== Executions Table Columns ===== */
+/* Executions Page - Column Widths for 9 columns layout */
+
+.data-table.executions-table .col-ticker,
+.data-table[data-table-type="executions"] .col-ticker {
+    width: 10%;
+    min-width: 80px;
+}
+
+.data-table.executions-table .col-action,
+.data-table[data-table-type="executions"] .col-action {
+    width: 8%;
+    min-width: 70px;
+}
+
+.data-table.executions-table .col-account,
+.data-table[data-table-type="executions"] .col-account {
+    width: 12%;
+    min-width: 100px;
+}
+
+.data-table.executions-table .col-quantity,
+.data-table[data-table-type="executions"] .col-quantity {
+    width: 8%;
+    min-width: 70px;
+}
+
+.data-table.executions-table .col-price,
+.data-table[data-table-type="executions"] .col-price {
+    width: 9%;
+    min-width: 80px;
+}
+
+.data-table.executions-table .col-pnl,
+.data-table[data-table-type="executions"] .col-pnl {
+    width: 9%;
+    min-width: 80px;
+}
+
+.data-table.executions-table .col-fees,
+.data-table[data-table-type="executions"] .col-fees {
+    width: 8%;
+    min-width: 70px;
+}
+
+.data-table.executions-table .col-date,
+.data-table[data-table-type="executions"] .col-date {
+    width: 12%;
+    min-width: 100px;
+}
+
+.data-table.executions-table .col-actions,
+.data-table[data-table-type="executions"] .col-actions {
+    width: 5%;
+    min-width: 50px;
+}
+
+/* ===== Tickers Table Columns ===== */
+/* Tickers Page - Column Widths for 10 columns layout */
+
+.data-table.tickers-table .col-name,
+.data-table[data-table-type="tickers"] .col-name {
+    width: 12%;
+    min-width: 100px;
+}
+
+.data-table.tickers-table .col-price,
+.data-table[data-table-type="tickers"] .col-price {
+    width: 10%;
+    min-width: 90px;
+}
+
+.data-table.tickers-table .col-change,
+.data-table[data-table-type="tickers"] .col-change {
+    width: 10%;
+    min-width: 90px;
+}
+
+.data-table.tickers-table .col-volume,
+.data-table[data-table-type="tickers"] .col-volume {
+    width: 10%;
+    min-width: 80px;
+}
+
+.data-table.tickers-table .col-status,
+.data-table[data-table-type="tickers"] .col-status {
+    width: 8%;
+    min-width: 70px;
+}
+
+.data-table.tickers-table .col-type,
+.data-table[data-table-type="tickers"] .col-type {
+    width: 8%;
+    min-width: 70px;
+}
+
+.data-table.tickers-table .col-company,
+.data-table[data-table-type="tickers"] .col-company {
+    width: 15%;
+    min-width: 120px;
+}
+
+.data-table.tickers-table .col-currency,
+.data-table[data-table-type="tickers"] .col-currency {
+    width: 8%;
+    min-width: 70px;
+}
+
+
+.data-table.tickers-table .col-updated,
+.data-table[data-table-type="tickers"] .col-updated {
+    width: 10%;
+    min-width: 90px;
+}
+
+.data-table.tickers-table .col-actions,
+.data-table[data-table-type="tickers"] .col-actions {
+    width: 5%;
+    min-width: 50px;
+}
+
+/* ===== Trade Plans Table Columns ===== */
+/* Trade Plans Page - Column Widths for 10 columns layout */
+
+.trade-plans-table .col-ticker { width: 10%; min-width: 80px; }     /* 1. טיקר */
+.trade-plans-table .col-price { width: 8%; min-width: 70px; }       /* 2. מחיר */
+.trade-plans-table .col-date { width: 10%; min-width: 90px; }       /* 3. תאריך */
+.trade-plans-table .col-type { width: 8%; min-width: 70px; }        /* 4. סוג */
+.trade-plans-table .col-side { width: 7%; min-width: 60px; }        /* 5. צד */
+.trade-plans-table .col-quantity { width: 9%; min-width: 75px; }    /* 6. כמות */
+.trade-plans-table .col-amount { width: 10%; min-width: 85px; }     /* 7. השקעה */
+.trade-plans-table .col-status { width: 8%; min-width: 70px; }      /* 8. סטטוס */
+.trade-plans-table .col-risk-reward { width: 18%; min-width: 150px; } /* 9. סיכוי/סיכון */
+.trade-plans-table .col-actions { 
+  width: 5%; 
+  min-width: 50px; 
+  max-width: 50px; 
+}   /* 10. פעולות - Actions Menu Popup - תפריט נפתח בלבד */
 
 .col-change { 
   width: 8%; 
@@ -312,9 +512,9 @@
 }
 
 .col-actions { 
-  width: var(--col-actions-width, 120px); 
-  min-width: var(--col-actions-width, 120px);
-  max-width: var(--col-actions-width, 120px);
+  width: var(--col-actions-width, 50px); 
+  min-width: var(--col-actions-width, 50px);
+  max-width: var(--col-actions-width, 50px);
 }
 
 /* הגדרות כלליות לכל הטבלאות */
@@ -389,7 +589,7 @@ table td,
   border-bottom: none;
 }
 
-/* עמודת פעולות - מחלקות לפי מספר כפתורים */
+/* עמודת פעולות - תפריט נפתח בלבד */
 .actions-cell {
   text-align: center;
   vertical-align: middle;
@@ -406,39 +606,33 @@ tr:has(.actions-cell) {
   overflow: visible;
 }
 
-/* 1 כפתור */
-.actions-1-btn {
-  width: var(--actions-1-btn-width, 60px);
-  min-width: var(--actions-1-btn-width, 60px);
-  max-width: var(--actions-1-btn-width, 60px);
+/* מחלקות לפי מספר אלמנטים בתפריט הנפתח */
+/* 2 אלמנטים */
+.actions-2-items {
+  width: var(--actions-2-items-width, 50px);
+  min-width: var(--actions-2-items-width, 50px);
+  max-width: var(--actions-2-items-width, 50px);
 }
 
-/* 2 כפתורים */
-.actions-2-btn {
-  width: var(--actions-2-btn-width, 80px);
-  min-width: var(--actions-2-btn-width, 80px);
-  max-width: var(--actions-2-btn-width, 80px);
+/* 3 אלמנטים */
+.actions-3-items {
+  width: var(--actions-3-items-width, 50px);
+  min-width: var(--actions-3-items-width, 50px);
+  max-width: var(--actions-3-items-width, 50px);
 }
 
-/* 3 כפתורים */
-.actions-3-btn {
-  width: var(--actions-3-btn-width, 120px);
-  min-width: var(--actions-3-btn-width, 120px);
-  max-width: var(--actions-3-btn-width, 120px);
+/* 4 אלמנטים */
+.actions-4-items {
+  width: var(--actions-4-items-width, 50px);
+  min-width: var(--actions-4-items-width, 50px);
+  max-width: var(--actions-4-items-width, 50px);
 }
 
-/* 4 כפתורים */
-.actions-4-btn {
-  width: var(--actions-4-btn-width, 160px);
-  min-width: var(--actions-4-btn-width, 160px);
-  max-width: var(--actions-4-btn-width, 160px);
-}
-
-/* 5 כפתורים */
-.actions-5-btn {
-  width: var(--actions-5-btn-width, 200px);
-  min-width: var(--actions-5-btn-width, 200px);
-  max-width: var(--actions-5-btn-width, 200px);
+/* 5 אלמנטים */
+.actions-5-items {
+  width: var(--actions-5-items-width, 50px);
+  min-width: var(--actions-5-items-width, 50px);
+  max-width: var(--actions-5-items-width, 50px);
 }
 
 .actions-cell .btn {
@@ -492,8 +686,9 @@ tr:has(.actions-cell) {
   border: 1px solid var(--current-entity-color, #26baac); /* מסגרת בצבע הישות */
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  min-width: 120px;
-  padding: 0.75rem; /* יותר רווח */
+  min-width: 80px; /* קטן יותר - רק תפריט נפתח */
+  max-width: 200px; /* מקסימום ל-5 אלמנטים */
+  padding: 0.5rem; /* פחות רווח */
   opacity: 0;
   visibility: hidden;
   transform: none; /* הסר את ה-slide animation */
@@ -502,9 +697,9 @@ tr:has(.actions-cell) {
   list-style: none;
   margin: 0;
   display: flex;
-  flex-direction: row; /* כפתורים אחד ליד השני */
-  align-items: center; /* מרכז את הכפתורים */
-  gap: 0.5rem; /* רווח בין הכפתורים */
+  flex-direction: row; /* אלמנטים אחד ליד השני */
+  align-items: center; /* יישור מרכזי */
+  gap: 0.25rem; /* פחות רווח בין הכפתורים */
 }
 
 /* הצגת התפריט ב-hover */
@@ -519,7 +714,19 @@ tr:has(.actions-cell) {
   transition-delay: 0.2s;
 }
 
-/* כפתורים בתוך התפריט - השתמש במערכת הכפתורים המרכזית בלבד */
+/* כפתורים בתוך התפריט - עיצוב מותאם */
+.actions-menu-popup .btn {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  font-size: 14px;
+  border-radius: 4px;
+  margin: 0 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
 
 /* RTL Support */
 [dir="rtl"] .actions-menu-popup {
@@ -539,11 +746,17 @@ tr:has(.actions-cell) {
 /* Responsive */
 @media (max-width: 768px) {
   .actions-menu-popup {
-    min-width: 100px;
+    min-width: 70px;
+    max-width: 150px;
     font-size: 12px;
+    padding: 0.25rem;
   }
   
-  /* כפתורים בתפריט - השתמש במערכת המרכזית */
+  .actions-menu-popup .btn {
+    width: 25px;
+    height: 25px;
+    font-size: 12px;
+  }
 }
 
 /* Table container */
@@ -752,17 +965,16 @@ tr:has(.actions-cell) {
   .col-account { width: 60%; }
   .col-type { width: 40%; }
   .col-actions { 
-    width: 120px; 
-    min-width: 120px;
-    max-width: 120px;
+    width: 50px; 
+    min-width: 50px;
+    max-width: 50px;
   }
   
-  /* מחלקות כפתורים */
-  .actions-1-btn { width: var(--actions-1-btn-width, 60px); min-width: var(--actions-1-btn-width, 60px); max-width: var(--actions-1-btn-width, 60px); }
-  .actions-2-btn { width: var(--actions-2-btn-width, 80px); min-width: var(--actions-2-btn-width, 80px); max-width: var(--actions-2-btn-width, 80px); }
-  .actions-3-btn { width: var(--actions-3-btn-width, 120px); min-width: var(--actions-3-btn-width, 120px); max-width: var(--actions-3-btn-width, 120px); }
-  .actions-4-btn { width: var(--actions-4-btn-width, 160px); min-width: var(--actions-4-btn-width, 160px); max-width: var(--actions-4-btn-width, 160px); }
-  .actions-5-btn { width: var(--actions-5-btn-width, 200px); min-width: var(--actions-5-btn-width, 200px); max-width: var(--actions-5-btn-width, 200px); }
+  /* מחלקות תפריט נפתח */
+  .actions-2-items { width: var(--actions-2-items-width, 50px); min-width: var(--actions-2-items-width, 50px); max-width: var(--actions-2-items-width, 50px); }
+  .actions-3-items { width: var(--actions-3-items-width, 50px); min-width: var(--actions-3-items-width, 50px); max-width: var(--actions-3-items-width, 50px); }
+  .actions-4-items { width: var(--actions-4-items-width, 50px); min-width: var(--actions-4-items-width, 50px); max-width: var(--actions-4-items-width, 50px); }
+  .actions-5-items { width: var(--actions-5-items-width, 50px); min-width: var(--actions-5-items-width, 50px); max-width: var(--actions-5-items-width, 50px); }
 }
 
 /* טלפונים (SM - 480-767px) */
@@ -815,17 +1027,16 @@ tr:has(.actions-cell) {
   .col-amount { width: 20%; }
   .col-description { width: 25%; }
   .col-actions { 
-    width: 120px; 
-    min-width: 120px;
-    max-width: 120px;
+    width: 50px; 
+    min-width: 50px;
+    max-width: 50px;
   }
   
-  /* מחלקות כפתורים */
-  .actions-1-btn { width: var(--actions-1-btn-width, 60px); min-width: var(--actions-1-btn-width, 60px); max-width: var(--actions-1-btn-width, 60px); }
-  .actions-2-btn { width: var(--actions-2-btn-width, 80px); min-width: var(--actions-2-btn-width, 80px); max-width: var(--actions-2-btn-width, 80px); }
-  .actions-3-btn { width: var(--actions-3-btn-width, 120px); min-width: var(--actions-3-btn-width, 120px); max-width: var(--actions-3-btn-width, 120px); }
-  .actions-4-btn { width: var(--actions-4-btn-width, 160px); min-width: var(--actions-4-btn-width, 160px); max-width: var(--actions-4-btn-width, 160px); }
-  .actions-5-btn { width: var(--actions-5-btn-width, 200px); min-width: var(--actions-5-btn-width, 200px); max-width: var(--actions-5-btn-width, 200px); }
+  /* מחלקות תפריט נפתח */
+  .actions-2-items { width: var(--actions-2-items-width, 50px); min-width: var(--actions-2-items-width, 50px); max-width: var(--actions-2-items-width, 50px); }
+  .actions-3-items { width: var(--actions-3-items-width, 50px); min-width: var(--actions-3-items-width, 50px); max-width: var(--actions-3-items-width, 50px); }
+  .actions-4-items { width: var(--actions-4-items-width, 50px); min-width: var(--actions-4-items-width, 50px); max-width: var(--actions-4-items-width, 50px); }
+  .actions-5-items { width: var(--actions-5-items-width, 50px); min-width: var(--actions-5-items-width, 50px); max-width: var(--actions-5-items-width, 50px); }
 }
 
 /* טאבלטים (MD - 768-991px) */
@@ -868,9 +1079,11 @@ tr:has(.actions-cell) {
   .col-investment-type,
   .col-target,
   .col-stop,
-  .col-current { 
-    display: none; 
-  }
+  .col-current,
+        .col-company,
+        .col-currency {
+            display: none;
+        }
   
   .col-description { width: 35%; }
 }
@@ -885,17 +1098,16 @@ tr:has(.actions-cell) {
   /* גלילה מינימלית */
   
   .col-actions { 
-    width: 120px; 
-    min-width: 120px;
-    max-width: 120px;
+    width: 50px; 
+    min-width: 50px;
+    max-width: 50px;
   }
   
-  /* מחלקות כפתורים */
-  .actions-1-btn { width: var(--actions-1-btn-width, 60px); min-width: var(--actions-1-btn-width, 60px); max-width: var(--actions-1-btn-width, 60px); }
-  .actions-2-btn { width: var(--actions-2-btn-width, 80px); min-width: var(--actions-2-btn-width, 80px); max-width: var(--actions-2-btn-width, 80px); }
-  .actions-3-btn { width: var(--actions-3-btn-width, 120px); min-width: var(--actions-3-btn-width, 120px); max-width: var(--actions-3-btn-width, 120px); }
-  .actions-4-btn { width: var(--actions-4-btn-width, 160px); min-width: var(--actions-4-btn-width, 160px); max-width: var(--actions-4-btn-width, 160px); }
-  .actions-5-btn { width: var(--actions-5-btn-width, 200px); min-width: var(--actions-5-btn-width, 200px); max-width: var(--actions-5-btn-width, 200px); }
+  /* מחלקות תפריט נפתח */
+  .actions-2-items { width: var(--actions-2-items-width, 50px); min-width: var(--actions-2-items-width, 50px); max-width: var(--actions-2-items-width, 50px); }
+  .actions-3-items { width: var(--actions-3-items-width, 50px); min-width: var(--actions-3-items-width, 50px); max-width: var(--actions-3-items-width, 50px); }
+  .actions-4-items { width: var(--actions-4-items-width, 50px); min-width: var(--actions-4-items-width, 50px); max-width: var(--actions-4-items-width, 50px); }
+  .actions-5-items { width: var(--actions-5-items-width, 50px); min-width: var(--actions-5-items-width, 50px); max-width: var(--actions-5-items-width, 50px); }
 }
 
 /* מחשבים (XL+ - 1200px+) - יעד: ללא גלילה */
@@ -908,15 +1120,14 @@ tr:has(.actions-cell) {
   /* ללא גלילה */
   
   .col-actions { 
-    width: 120px; 
-    min-width: 120px;
-    max-width: 120px;
+    width: 50px; 
+    min-width: 50px;
+    max-width: 50px;
   }
   
-  /* מחלקות כפתורים */
-  .actions-1-btn { width: var(--actions-1-btn-width, 60px); min-width: var(--actions-1-btn-width, 60px); max-width: var(--actions-1-btn-width, 60px); }
-  .actions-2-btn { width: var(--actions-2-btn-width, 80px); min-width: var(--actions-2-btn-width, 80px); max-width: var(--actions-2-btn-width, 80px); }
-  .actions-3-btn { width: var(--actions-3-btn-width, 120px); min-width: var(--actions-3-btn-width, 120px); max-width: var(--actions-3-btn-width, 120px); }
-  .actions-4-btn { width: var(--actions-4-btn-width, 160px); min-width: var(--actions-4-btn-width, 160px); max-width: var(--actions-4-btn-width, 160px); }
-  .actions-5-btn { width: var(--actions-5-btn-width, 200px); min-width: var(--actions-5-btn-width, 200px); max-width: var(--actions-5-btn-width, 200px); }
+  /* מחלקות תפריט נפתח */
+  .actions-2-items { width: var(--actions-2-items-width, 50px); min-width: var(--actions-2-items-width, 50px); max-width: var(--actions-2-items-width, 50px); }
+  .actions-3-items { width: var(--actions-3-items-width, 50px); min-width: var(--actions-3-items-width, 50px); max-width: var(--actions-3-items-width, 50px); }
+  .actions-4-items { width: var(--actions-4-items-width, 50px); min-width: var(--actions-4-items-width, 50px); max-width: var(--actions-4-items-width, 50px); }
+  .actions-5-items { width: var(--actions-5-items-width, 50px); min-width: var(--actions-5-items-width, 50px); max-width: var(--actions-5-items-width, 50px); }
 }

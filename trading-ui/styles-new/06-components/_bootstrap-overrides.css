@@ -35,16 +35,7 @@
     color: white;
 }
 
-.btn[data-button-type="ADD"] {
-    border-color: var(--color-action-add);
-    color: var(--color-action-add);
-    --current-button-color: var(--color-action-add);
-    --current-button-hover: var(--primary-hover, #1e8b7d);
-}
-.btn[data-button-type="ADD"]:hover {
-    background-color: var(--color-action-add);
-    color: white;
-}
+/* .btn[data-button-type="ADD"] - הוסר, מוגדר ב-_layout.css עם צבעים דינמיים */
 
 .btn[data-button-type="SAVE"] {
     border-color: var(--color-action-save);
@@ -315,7 +306,7 @@
 .btn[data-entity-type] {
     border-color: var(--current-entity-color) !important;
     color: var(--current-entity-color) !important;
-    background-color: white !important;
+    /* רקע - יוגדר ברירת מחדל במערכת */
 }
 
 .btn[data-entity-type]:hover {
@@ -328,7 +319,7 @@
 .btn[data-entity-type][data-button-type] {
     border-color: var(--current-entity-color) !important;
     color: var(--current-entity-color) !important;
-    background-color: white !important;
+    /* רקע - יוגדר ברירת מחדל במערכת */
 }
 
 .btn[data-entity-type][data-button-type]:hover {
@@ -336,6 +327,33 @@
     border-color: var(--current-entity-hover) !important;
     color: white !important;
 }
+
+/* כפתורים נגטיביים - רקע ספציפי שגובר על ברירת המחדל */
+.btn[data-button-type="REMOVE"],
+.btn[data-button-type="CANCEL"],
+.btn[data-button-type="CLOSE"] {
+    background-color: #dc3545 !important; /* רקע אדום לכפתורים נגטיביים */
+    color: white !important;
+    border-color: #dc3545 !important;
+}
+
+.btn[data-button-type="REMOVE"]:hover,
+.btn[data-button-type="CANCEL"]:hover,
+.btn[data-button-type="CLOSE"]:hover {
+    background-color: #c82333 !important; /* רקע אדום כהה יותר ב-hover */
+    border-color: #c82333 !important;
+    color: white !important;
+}
+
+/* כפתורים ספציפיים - רקע מותאם אישית */
+/* ניתן להוסיף כאן כפתורים ספציפיים לפי בקשה */
+/* דוגמה:
+.btn[data-button-type="SPECIAL"] {
+    background-color: #28a745 !important;
+    color: white !important;
+    border-color: #28a745 !important;
+}
+*/
 
 /* Size Variant: XLarge - וריאנט גדול יותר ב-20% */
 .btn[data-size="xlarge"] {

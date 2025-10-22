@@ -854,50 +854,64 @@ async function autoRefreshCurrentPage(operationName = 'פעולה') {
  * @param {string} sectionId - The ID of the section to toggle
  */
 window.toggleSection = function (sectionId) {
-  console.log(`🔧 toggleSection called with sectionId: "${sectionId}"`);
+  console.log(`🚀 ===== toggleSection CALLED =====`);
+  console.log(`📋 Function called at: ${new Date().toISOString()}`);
+  console.log(`📋 Section ID: "${sectionId}"`);
+  console.log(`📋 Function type: ${typeof window.toggleSection}`);
   
-  const section = document.getElementById(sectionId) || document.querySelector(`[data-section="${sectionId}"]`);
-  console.log(`🔍 Section found:`, section ? 'YES' : 'NO', section ? `(ID: ${section.id || 'no-id'}, data-section: ${section.getAttribute('data-section') || 'no-data-section'})` : '');
-  
-  const sectionBody = section ? section.querySelector('.section-body') : null;
-  console.log(`🔍 Section body found:`, sectionBody ? 'YES' : 'NO');
-  
-  const toggleBtn = section ? section.querySelector('button[onclick*="toggleSection"]') : null;
-  console.log(`🔍 Toggle button found:`, toggleBtn ? 'YES' : 'NO');
-  
-  const icon = toggleBtn ? toggleBtn.querySelector('.section-toggle-icon, .filter-icon, .filter-arrow') : null;
-  console.log(`🔍 Icon found:`, icon ? 'YES' : 'NO');
-  
-  if (sectionBody) {
-    const isCollapsed = sectionBody.classList.contains('collapsed') || sectionBody.style.display === 'none';
-    console.log(`🔍 Current state - isCollapsed: ${isCollapsed}, display: "${sectionBody.style.display}"`);
-
-    if (isCollapsed) {
-      sectionBody.classList.remove('collapsed');
-      sectionBody.style.display = 'block';
-      console.log(`✅ Section "${sectionId}" EXPANDED`);
-    } else {
-      sectionBody.classList.add('collapsed');
-      sectionBody.style.display = 'none';
-      console.log(`✅ Section "${sectionId}" COLLAPSED`);
-    }
-
-    // Update icon
-    if (icon) {
-      const newIcon = sectionBody.style.display === 'none' ? '▼' : '▲';
-      icon.textContent = newIcon;
-      console.log(`🎨 Icon updated to: "${newIcon}"`);
-    }
-
-    // Save state with page-specific key
-    const isHidden = sectionBody.style.display === 'none';
-    const pageName = getCurrentPageName();
-    const storageKey = `${pageName}_${sectionId}_SectionHidden`;
-    localStorage.setItem(storageKey, isHidden.toString());
-    console.log(`💾 State saved to localStorage: ${storageKey} = "${isHidden}"`);
+  try {
+    console.log(`🔧 toggleSection called with sectionId: "${sectionId}"`);
     
-  } else {
-    console.warn(`❌ Section ${sectionId} not found`);
+    const section = document.getElementById(sectionId) || document.querySelector(`[data-section="${sectionId}"]`);
+    console.log(`🔍 Section found:`, section ? 'YES' : 'NO', section ? `(ID: ${section.id || 'no-id'}, data-section: ${section.getAttribute('data-section') || 'no-data-section'})` : '');
+    
+    const sectionBody = section ? section.querySelector('.section-body') : null;
+    console.log(`🔍 Section body found:`, sectionBody ? 'YES' : 'NO');
+    
+    const toggleBtn = section ? section.querySelector('button[onclick*="toggleSection"], button[data-onclick*="toggleSection"]') : null;
+    console.log(`🔍 Toggle button found:`, toggleBtn ? 'YES' : 'NO');
+    
+    const icon = toggleBtn ? toggleBtn.querySelector('.section-toggle-icon, .filter-icon, .filter-arrow') : null;
+    console.log(`🔍 Icon found:`, icon ? 'YES' : 'NO');
+    
+    if (sectionBody) {
+      const isCollapsed = sectionBody.classList.contains('collapsed') || sectionBody.style.display === 'none';
+      console.log(`🔍 Current state - isCollapsed: ${isCollapsed}, display: "${sectionBody.style.display}"`);
+
+      if (isCollapsed) {
+        sectionBody.classList.remove('collapsed');
+        sectionBody.style.display = 'block';
+        console.log(`✅ Section "${sectionId}" EXPANDED`);
+      } else {
+        sectionBody.classList.add('collapsed');
+        sectionBody.style.display = 'none';
+        console.log(`✅ Section "${sectionId}" COLLAPSED`);
+      }
+
+      // Update icon
+      if (icon) {
+        const newIcon = sectionBody.style.display === 'none' ? '▼' : '▲';
+        icon.textContent = newIcon;
+        console.log(`🎨 Icon updated to: "${newIcon}"`);
+      }
+
+      // Save state with page-specific key
+      const isHidden = sectionBody.style.display === 'none';
+      const pageName = getCurrentPageName();
+      const storageKey = `${pageName}_${sectionId}_SectionHidden`;
+      localStorage.setItem(storageKey, isHidden.toString());
+      console.log(`💾 State saved to localStorage: ${storageKey} = "${isHidden}"`);
+      
+    } else {
+      console.warn(`❌ Section ${sectionId} not found`);
+    }
+    
+    console.log(`✅ ===== toggleSection COMPLETED SUCCESSFULLY =====`);
+  } catch (error) {
+    console.error(`❌ ===== toggleSection ERROR =====`);
+    console.error(`❌ Error in toggleSection:`, error);
+    console.error(`❌ Error stack:`, error.stack);
+    console.error(`❌ ===== END ERROR =====`);
   }
 };
 
@@ -923,7 +937,7 @@ window.restoreAllSectionStates = function () {
   sections.forEach((section, index) => {
     const sectionId = section.getAttribute('data-section') || section.id || `section-${index}`;
     const sectionBody = section.querySelector('.section-body, .section-content');
-    const toggleBtn = section.querySelector('button[onclick*="toggleSection"]');
+    const toggleBtn = section.querySelector('button[onclick*="toggleSection"], button[data-onclick*="toggleSection"]');
     const icon = toggleBtn ? toggleBtn.querySelector('.section-toggle-icon, .filter-icon, .filter-arrow') : 
                   section.querySelector('.section-toggle-icon, .filter-icon');
 
@@ -1006,7 +1020,7 @@ window.restoreSectionStates = function () {
       // console.log(`💾 Retrieved state for section "${sectionId}" on page "${pageName}": hidden=${sectionHidden}`);
       
       const sectionBody = section.querySelector('.section-body, .section-content');
-      const toggleBtn = section.querySelector('button[onclick*="toggleSection"]');
+      const toggleBtn = section.querySelector('button[onclick*="toggleSection"], button[data-onclick*="toggleSection"]');
       const icon = toggleBtn ? toggleBtn.querySelector('.section-toggle-icon, .filter-icon, .filter-arrow') : 
                     section.querySelector('.section-toggle-icon, .filter-icon');
 

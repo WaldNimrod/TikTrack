@@ -591,27 +591,7 @@ const editCashFlowValidationRules = {
 /**
  * טעינת מטבעות מהשרת עם מערכת המטבעות החדשה
  */
-async function loadCurrenciesFromServer() {
-  try {
-    const response = await fetch('http://127.0.0.1:8080/api/currencies/dropdown');
-    if (response.ok) {
-      const result = await response.json();
-      if (result.status === 'success') {
-        // עדכון המשתנה הגלובלי של מטבעות
-        window.currenciesData = result.data;
-        return result.data;
-      }
-    }
-  } catch (error) {
-    handleApiError(error, 'טעינת מטבעות מהשרת');
-
-    // הצגת הודעת שגיאה
-    if (window.showInfoNotification) {
-      window.showInfoNotification('מידע על הטעינה', 'שגיאה בטעינת מטבעות מהשרת');
-    }
-  }
-  return [];
-}
+// loadCurrenciesFromServer - using global function from data-utils.js
 
 /**
  * טעינת רשימת חשבונות למודולי cash flow
@@ -729,7 +709,7 @@ async function renderCashFlowsTable() {
             <td class="col-source">${window.translateCashFlowSource ?
     window.translateCashFlowSource(cashFlow.source) :
     cashFlow.source}</td>
-            <td class="col-actions actions-cell actions-4-btn">
+            <td class="col-actions actions-cell actions-4-items">
               ${window.createActionsMenu ? window.createActionsMenu([
                 { type: 'VIEW', onclick: `showCashFlowDetails(${cashFlow.id})`, text: 'פרטים', title: 'הצג פרטי תזרים' },
                 { type: 'LINK', onclick: `window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})`, text: 'פריטים מקושרים', title: 'צפה בפריטים מקושרים' },
@@ -893,15 +873,7 @@ function showCashFlowDetails(cashFlowId) {
  * @param {string} entityType - סוג הישות
  * @param {number} entityId - מזהה הישות
  */
-function showLinkedItemsModal(entityType, entityId) {
-  if (window.showLinkedItemsModal) {
-    window.showLinkedItemsModal([], entityType, entityId);
-  } else {
-    if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה', 'מערכת פריטים מקושרים לא זמינה');
-    }
-  }
-}
+// showLinkedItemsModal - using global function from linked-items.js
 
 /**
  * עדכון טבלת תזרימי מזומנים
@@ -922,7 +894,7 @@ function updateCashFlowsTable(cashFlows) {
 
 // הגדרת הפונקציות כגלובליות
 window.showCashFlowDetails = showCashFlowDetails;
-window.showLinkedItemsModal = showLinkedItemsModal;
+// window.showLinkedItemsModal = showLinkedItemsModal; // הוסר - הפונקציה לא מוגדרת כאן
 window.updateCashFlowsTable = updateCashFlowsTable;
 
 // פונקציית פילטור מקומי - הוסרה כי לא בשימוש
@@ -963,56 +935,7 @@ function startAutoRefresh() {
 /**
  * טעינת העדפות משתמש
  */
-async function loadUserPreferences() {
-  try {
-    console.log('🔧 טוען העדפות משתמש...');
-    
-    // טעינת העדפות רלוונטיות לתזרימי מזומנים + צבעי ישויות
-    const preferences = await window.getPreferencesByNames([
-      'pagination_size_cash_flows',
-      'auto_refresh_interval',
-      'default_currency',
-      'show_currency_conversion',
-      'date_format',
-      'number_format',
-      'cash_flows_display_mode',
-      // צבעי ישויות
-      'entityCashFlowColor',
-      'entityCashFlowColorLight',
-      'entityCashFlowColorDark',
-      'entityTradeColor',
-      'entityTradeColorLight',
-      'entityTradeColorDark',
-      'entityTickerColor',
-      'entityTickerColorLight',
-      'entityTickerColorDark',
-      'entityAlertColor',
-      'entityAlertColorLight',
-      'entityAlertColorDark',
-      'entityNoteColor',
-      'entityNoteColorLight',
-      'entityNoteColorDark',
-      'entityExecutionColor',
-      'entityExecutionColorLight',
-      'entityExecutionColorDark',
-      'entityTradePlanColor',
-      'entityTradePlanColorLight',
-      'entityTradePlanColorDark',
-      'entityTradingAccountColor',
-      'entityTradingAccountColorLight',
-      'entityTradingAccountColorDark'
-    ]);
-    
-    // שמירת העדפות בגלובל scope
-    window.cashFlowsPreferences = preferences;
-    
-    console.log('✅ העדפות משתמש נטענו בהצלחה:', preferences);
-    return preferences;
-  } catch (error) {
-    console.warn('⚠️ שגיאה בטעינת העדפות, משתמש בברירות מחדל:', error);
-    return null;
-  }
-}
+// loadUserPreferences - using global function from preferences-core.js
 
 /**
  * החלת מערכת צבעים דינמית
@@ -1140,7 +1063,7 @@ async function initializeCashFlowsPage() {
 
   try {
     // טעינת העדפות משתמש
-    const preferences = await loadUserPreferences();
+    const preferences = await window.loadUserPreferences();
     
     // החלת העדפות על העמוד
     applyUserPreferences(preferences);
@@ -1149,7 +1072,7 @@ async function initializeCashFlowsPage() {
     await applyDynamicColors();
 
     // טעינת מטבעות מהשרת
-    await loadCurrenciesFromServer();
+    await window.loadCurrenciesFromServer();
 
     // טעינת נתונים
     await loadCashFlows();
@@ -1221,14 +1144,7 @@ window.confirmDeleteCashFlow = confirmDeleteCashFlow;
  * שחזור מצב סידור - שימוש בפונקציה גלובלית
  * @deprecated Use window.restoreAnyTableSort from main.js instead
  */
-function restoreSortState() {
-
-  if (typeof window.restoreAnyTableSort === 'function') {
-    window.restoreAnyTableSort('cash_flows', window.cashFlowsData || [], updateCashFlowsTable);
-  } else {
-    handleFunctionNotFound('restoreAnyTableSort', 'פונקציית שחזור סידור לא נמצאה');
-  }
-}
+// restoreSortState - using global function from page-utils.js
 
 // הגדרת הפונקציה כגלובלית
 // window.sortTable export removed - using global version from tables.js
@@ -1289,145 +1205,6 @@ function setupSourceFieldListeners() {
   }
 }
 
-// ולידציה - משתמש במערכת הכללית window.validateEntityForm
-
-/**
- * וולידציה מיידית של שדה בודד
- */
-function validateField(fieldId, value, formType) {
-  // הסרת prefix אם יש
-  let actualFieldId = fieldId;
-  if (formType === 'edit' && fieldId.startsWith('edit')) {
-    actualFieldId = fieldId.replace('edit', '');
-  }
-
-  // קבלת שם השדה ללא prefix
-  let fieldName = actualFieldId;
-  if (actualFieldId.startsWith('cashFlow')) {
-    fieldName = actualFieldId.replace('cashFlow', '');
-  }
-
-  switch (fieldName) {
-  case 'AccountId':
-    if (!value || isNaN(value)) {
-      const field = document.getElementById(fieldId);
-      if (field && window.showFieldError) {
-        window.showFieldError(field, 'יש לבחור חשבון');
-      }
-      return false;
-    }
-    break;
-  case 'Type':
-    if (!value) {
-      const field = document.getElementById(fieldId);
-      if (field && window.showFieldError) {
-        window.showFieldError(field, 'יש לבחור סוג תזרים');
-      }
-      return false;
-    }
-    break;
-  case 'Amount':
-    if (!value || isNaN(value)) {
-      const field = document.getElementById(fieldId);
-      if (field && window.showFieldError) {
-        window.showFieldError(field, 'יש להזין סכום תקין');
-      }
-      return false;
-    } else if (parseFloat(value) === 0) {
-      const field = document.getElementById(fieldId);
-      if (field && window.showFieldError) {
-        window.showFieldError(field, 'סכום לא יכול להיות 0');
-      }
-      return false;
-    } else if (Math.abs(parseFloat(value)) > 10000000) {
-      const field = document.getElementById(fieldId);
-      if (field && window.showFieldError) {
-        window.showFieldError(field, 'סכום גבוה מדי (מקסימום 10,000,000)');
-      }
-      return false;
-    }
-    break;
-  case 'CurrencyId':
-    if (value && isNaN(value)) {
-      const field = document.getElementById(fieldId);
-      if (field && window.showFieldError) {
-        window.showFieldError(field, 'יש לבחור מטבע תקין');
-      }
-      return false;
-    }
-    break;
-  case 'Date':
-    if (!value) {
-      const field = document.getElementById(fieldId);
-      if (field && window.showFieldError) {
-        window.showFieldError(field, 'יש להזין תאריך');
-      }
-      return false;
-    } else {
-      const date = new Date(value);
-      const today = new Date();
-      const maxDate = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
-      const minDate = new Date(2000, 0, 1);
-
-      if (date > maxDate) {
-        const field = document.getElementById(fieldId);
-        if (field && window.showFieldError) {
-          window.showFieldError(field, 'תאריך לא יכול להיות יותר משנה קדימה');
-        }
-        return false;
-      }
-      if (date < minDate) {
-        const field = document.getElementById(fieldId);
-        if (field && window.showFieldError) {
-          window.showFieldError(field, 'תאריך לא יכול להיות לפני שנת 2000');
-        }
-        return false;
-      }
-    }
-    break;
-  case 'Source':
-    if (!value) {
-      const field = document.getElementById(fieldId);
-      if (field && window.showFieldError) {
-        window.showFieldError(field, 'יש לבחור מקור');
-      }
-      return false;
-    }
-    break;
-  case 'Description':
-    if (value && value.length > 500) {
-      const field = document.getElementById(fieldId);
-      if (field && window.showFieldError) {
-        window.showFieldError(field, 'תיאור לא יכול להיות יותר מ-500 תווים');
-      }
-      return false;
-    }
-    break;
-  case 'ExternalId': {
-    // וולידציה של מזהה חיצוני תלויה במקור
-    const sourceFieldId = fieldId.includes('edit') ? 'editCashFlowSource' : 'cashFlowSource';
-    const sourceField = document.getElementById(sourceFieldId);
-    const source = sourceField ? sourceField.value : 'manual';
-
-    // אם המקור אינו ידני, המזהה החיצוני נדרש
-    if (source !== 'manual' && !value) {
-      const field = document.getElementById(fieldId);
-      if (field && window.showFieldError) {
-        window.showFieldError(field, 'נדרש להזין מזהה חיצוני כשהמקור אינו ידני');
-      }
-      return false;
-    }
-    break;
-  }
-  }
-
-  // הצגת סימון ירוק כשהערך תקין
-  // const field = document.getElementById(fieldId);
-  // if (field && window.showFieldSuccess) {
-  //   window.showFieldSuccess(field);
-  // }
-  return true;
-}
 
 /**
  * הצגת שגיאה לשדה בודד
@@ -2053,7 +1830,7 @@ window.updateCashFlow = updateCashFlow;
 window.editCashFlow = editCashFlow;
 
 // פונקציות טעינה
-window.loadCurrenciesFromServer = loadCurrenciesFromServer;
+// window.loadCurrenciesFromServer export removed - using global function from data-utils.js
 window.loadAccountsForCashFlow = loadAccountsForCashFlow;
 window.loadCurrenciesForCashFlow = loadCurrenciesForCashFlow;
 
@@ -2084,7 +1861,7 @@ window.generateDetailedLog = generateDetailedLog;
 window.initializeCashFlowsPage = initializeCashFlowsPage;
 window.restoreSortState = restoreSortState;
 window.startAutoRefresh = startAutoRefresh;
-window.loadUserPreferences = loadUserPreferences;
+// window.loadUserPreferences export removed - using global function from preferences-core.js
 window.applyUserPreferences = applyUserPreferences;
 window.applyDynamicColors = applyDynamicColors;
 

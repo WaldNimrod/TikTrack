@@ -1,54 +1,22 @@
-// 🔍 Quick Debug - העתק לקונסולה
-console.log('🔍 Quick Header Filters Debug');
+// בדיקה מהירה - העתק והדבק בקונסולה
+console.log('=== בדיקה מהירה ===');
 
-// בדיקת אלמנטים
-const headerFilters = document.querySelector('.header-filters');
-const filtersContainer = document.querySelector('.filters-container');
+// בדיקת משתנים
+const style = getComputedStyle(document.documentElement);
+console.log('current-entity-color:', style.getPropertyValue('--current-entity-color'));
+console.log('current-entity-color-light:', style.getPropertyValue('--current-entity-color-light'));
+console.log('current-entity-color-dark:', style.getPropertyValue('--current-entity-color-dark'));
 
-console.log('header-filters קיים:', !!headerFilters);
-console.log('filters-container קיים:', !!filtersContainer);
-
-if (filtersContainer) {
-    const styles = window.getComputedStyle(filtersContainer);
-    console.log('filters-container styles:', {
-        display: styles.display,
-        flexDirection: styles.flexDirection,
-        alignItems: styles.alignItems,
-        flexWrap: styles.flexWrap,
-        margin: styles.margin,
-        padding: styles.padding
-    });
-    
-    // בדיקת מיקום
-    const rect = filtersContainer.getBoundingClientRect();
-    console.log('filters-container position:', {
-        top: rect.top,
-        left: rect.left,
-        width: rect.width,
-        height: rect.height
-    });
+// בדיקת section-header
+const header = document.querySelector('.section-header');
+if (header) {
+    const headerStyle = getComputedStyle(header);
+    console.log('header background:', headerStyle.backgroundColor);
+    console.log('header color:', headerStyle.color);
+    console.log('header border:', headerStyle.borderBottom);
+} else {
+    console.log('לא נמצא section-header');
 }
 
-if (headerFilters) {
-    const styles = window.getComputedStyle(headerFilters);
-    console.log('header-filters styles:', {
-        display: styles.display,
-        width: styles.width,
-        margin: styles.margin,
-        padding: styles.padding
-    });
-    
-    const rect = headerFilters.getBoundingClientRect();
-    console.log('header-filters position:', {
-        top: rect.top,
-        left: rect.left,
-        width: rect.width,
-        height: rect.height
-    });
-}
-
-// בדיקת סגנונות inline
-console.log('header-filters inline style:', headerFilters?.getAttribute('style'));
-console.log('filters-container inline style:', filtersContainer?.getAttribute('style'));
-
-console.log('✅ Quick debug completed');
+// בדיקת class של העמוד
+console.log('page class:', document.body.className);

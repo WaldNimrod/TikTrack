@@ -129,7 +129,7 @@ class InitSystemCheck {
      * הצגת תוצאות הבדיקה
      */
     displayResults(results, pageName) {
-        const totalIssues = results.criticalErrors + results.mismatches;
+        const totalIssues = results.criticalErrors + results.mismatches + (results.loadOrderIssues ? results.loadOrderIssues.length : 0);
         
         if (totalIssues === 0) {
             if (typeof showNotification === 'function') {
@@ -144,12 +144,21 @@ class InitSystemCheck {
         errorMessage += `• בעיות שזוהו: ${totalIssues}\n`;
         errorMessage += `• שגיאות קריטיות: ${results.criticalErrors}\n`;
         errorMessage += `• אי-התאמות: ${results.mismatches}\n`;
-        errorMessage += `• כפילויות: ${results.duplicates.length}\n\n`;
+        errorMessage += `• כפילויות: ${results.duplicates.length}\n`;
+        errorMessage += `• בעיות סדר טעינה: ${results.loadOrderIssues ? results.loadOrderIssues.length : 0}\n\n`;
 
         if (results.mismatchDetails && results.mismatchDetails.length > 0) {
             errorMessage += `🔧 בעיות שזוהו:\n`;
             results.mismatchDetails.forEach((m, index) => {
                 errorMessage += `${index + 1}. ${m.type}: ${m.message}\n`;
+            });
+        }
+
+        // הוספת בעיות סדר טעינה
+        if (results.loadOrderIssues && results.loadOrderIssues.length > 0) {
+            errorMessage += `\n⏱️ בעיות סדר טעינה:\n`;
+            results.loadOrderIssues.forEach((issue, index) => {
+                errorMessage += `${index + 1}. ${issue.type}: ${issue.message}\n`;
             });
         }
 
@@ -191,6 +200,16 @@ class InitSystemCheck {
                         </div>
                     </div>
                 </div>
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <div class="card ${results.loadOrderIssues.length > 0 ? 'bg-warning' : 'bg-light'} text-center">
+                            <div class="card-body">
+                                <h6>${results.loadOrderIssues.length}</h6>
+                                <small>בעיות סדר טעינה</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             `;
             
             // הוספת פרטי הבעיות
@@ -203,6 +222,23 @@ class InitSystemCheck {
                                 <li class="mb-1">
                                     <span class="badge ${m.severity === 'error' ? 'bg-danger' : 'bg-warning'}">${m.type}</span>
                                     <strong>${m.message}</strong>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+
+            // הוספת בעיות סדר טעינה
+            if (results.loadOrderIssues && results.loadOrderIssues.length > 0) {
+                detailsHtml += `
+                    <div class="alert alert-warning">
+                        <h6><i class="fas fa-clock"></i> בעיות סדר טעינה (${results.loadOrderIssues.length})</h6>
+                        <ul class="mb-2">
+                            ${results.loadOrderIssues.map(issue => `
+                                <li class="mb-1">
+                                    <span class="badge bg-warning">${issue.type}</span>
+                                    <strong>${issue.message}</strong>
                                 </li>
                             `).join('')}
                         </ul>
@@ -245,7 +281,7 @@ function copyMonitoringResults() {
     }
     
     const results = window.lastMonitoringResults;
-    const totalIssues = results.criticalErrors + results.mismatches;
+    const totalIssues = results.criticalErrors + results.mismatches + (results.loadOrderIssues ? results.loadOrderIssues.length : 0);
     
     let copyText = `=== TikTrack Page Monitoring Results ===\n`;
     copyText += `Date: ${new Date().toISOString()}\n`;
@@ -254,12 +290,20 @@ function copyMonitoringResults() {
     copyText += `- בעיות שזוהו: ${totalIssues}\n`;
     copyText += `- שגיאות קריטיות: ${results.criticalErrors}\n`;
     copyText += `- אי-התאמות: ${results.mismatches}\n`;
-    copyText += `- כפילויות: ${results.duplicates.length}\n\n`;
+    copyText += `- כפילויות: ${results.duplicates.length}\n`;
+    copyText += `- בעיות סדר טעינה: ${results.loadOrderIssues ? results.loadOrderIssues.length : 0}\n\n`;
     
     if (results.mismatchDetails && results.mismatchDetails.length > 0) {
         copyText += `MISMATCHES:\n`;
         results.mismatchDetails.forEach((m, index) => {
             copyText += `${index + 1}. ${m.type}: ${m.message}\n`;
+        });
+    }
+    
+    if (results.loadOrderIssues && results.loadOrderIssues.length > 0) {
+        copyText += `\nLOADING ORDER ISSUES:\n`;
+        results.loadOrderIssues.forEach((issue, index) => {
+            copyText += `${index + 1}. ${issue.type}: ${issue.message}\n`;
         });
     }
     

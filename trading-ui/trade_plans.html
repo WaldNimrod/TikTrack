@@ -10,8 +10,6 @@
     <link rel="stylesheet" href="styles-new/master.css?v=1.0.0">
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">    
-    <!-- Page-specific Styles -->
-    <style> .disabled { opacity: 0.6; cursor: not-allowed; } .disabled input, .disabled select, .disabled textarea { background-color: #f8f9fa; border-color: #dee2e6; } </style>
     
     <!-- External Libraries -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
@@ -104,7 +102,7 @@
 <th class="col-notes">
 <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(9, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }">הערות <span class="sort-icon">↕</span></button>
 </th>
-<th class="col-actions actions-cell actions-3-btn"> פעולות </th>
+<th class="col-actions actions-cell actions-3-items"></th>
 </tr>
 </thead>
 <tbody>

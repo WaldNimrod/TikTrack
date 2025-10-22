@@ -48,7 +48,8 @@
     margin: 0;
 }
 
-.btn,
+/* .btn moved to 04-elements/_buttons-base.css - more detailed definition */
+
 .action-btn {
     display: inline-flex;
     align-items: center;
@@ -100,10 +101,10 @@ button.btn-add {
     box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
 }
 
+/* .filter-toggle-btn moved to 05-objects/_layout.css - more detailed definition */
+
 .btn-toggle,
-.filter-toggle-btn,
-button.btn-toggle,
-button.filter-toggle-btn {
+button.btn-toggle {
     background-color: white;
     color: var(--secondary-color, #6c757d);
     border: 2px solid var(--secondary-color, #6c757d);
@@ -120,8 +121,7 @@ button.filter-toggle-btn {
     justify-content: center;
 }
 
-.btn-toggle:hover,
-.filter-toggle-btn:hover {
+.btn-toggle:hover {
     background-color: color-mix(in srgb, var(--secondary-color, #6c757d) 30%, transparent);
     color: var(--secondary-color, #6c757d);
     transform: translateY(-1px);
@@ -230,20 +230,7 @@ button[title*="הפעל מחדש"]:hover {
 }
 
 /* Button Constraints - אילוצי כפתורים */
-.btn,
-.btn-sm,
-.btn-lg {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 200px;
-    min-width: fit-content;
-}
-
-.btn-sm {
-    font-size: 0.75rem;
-    padding: 0.25rem 0.5rem;
-    max-width: 150px;
+/* .btn, .btn-sm, .btn-lg moved to 04-elements/_buttons-base.css - more detailed definition */
 }
 
 /* Details Content - תוכן פרטים */

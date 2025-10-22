@@ -52,9 +52,7 @@
 .status-complete { background: #28a745; }
 .status-partial { background: #fd7e14; }
 
-.page-body {
-    padding: 20px;
-}
+/* .page-body moved to 05-objects/_layout.css - unified definition */
 
 .test-section {
     margin-bottom: 25px;

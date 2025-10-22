@@ -67,10 +67,7 @@
 /* .action-buttons .btn.btn-primary - הוסר, מוגדר ב-_bootstrap-overrides.css */
 
 
-.btn.loading {
-    opacity: 0.7;
-    cursor: not-allowed;
-}
+/* .loading moved to 07-trumps/chart-management.css - more detailed definition with animation */
 
 /* ===== TASK STATUS ===== */
 .task-status {

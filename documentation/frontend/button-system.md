@@ -13,6 +13,32 @@
 
 ## תכונות חדשות
 
+### Event Delegation System (חדש!)
+מערכת הכפתורים כוללת מערכת event delegation מתקדמת המטפלת ב-`data-onclick` attributes:
+
+```javascript
+// Event delegation for data-onclick attributes
+document.addEventListener('click', (event) => {
+    const button = event.target.closest('button[data-onclick]');
+    if (button) {
+        const onclickValue = button.getAttribute('data-onclick');
+        if (onclickValue && onclickValue !== 'null') {
+            try {
+                eval(onclickValue);
+            } catch (error) {
+                console.error(`Button System: Error executing data-onclick:`, error);
+            }
+        }
+    }
+});
+```
+
+**יתרונות:**
+- ✅ תמיכה מלאה ב-`data-onclick` attributes
+- ✅ טיפול אוטומטי בכפתורים דינמיים
+- ✅ Error handling מובנה
+- ✅ תאימות מלאה עם המערכת המאוחדת
+
 ### משתני צבע דינמיים
 כל כפתור משתמש במשתנה CSS דינמי שניתן להתאים אישית:
 - `--color-action-edit` - צבע כפתור עריכה (מחובר ל-`--secondary-color`)
@@ -77,6 +103,28 @@
 ```
 
 ## דוגמאות מתקדמות
+
+### שימוש ב-data-onclick (חדש!)
+```html
+<!-- כפתור עם data-onclick - מערכת הכפתורים תטפל בו אוטומטית -->
+<button data-button-type="ADD" data-entity-type="execution" 
+        data-variant="full" data-onclick="openExecutionDetails()" 
+        data-text="הוסף ביצוע" id="addExecutionBtn"></button>
+
+<!-- כפתור toggle section -->
+<button data-button-type="TOGGLE" data-variant="small" 
+        data-onclick="toggleSection('main')" data-text="הצג/הסתר"></button>
+
+<!-- כפתור עם פונקציה מורכבת -->
+<button data-button-type="VIEW" data-onclick="window.showEntityDetails('execution', 4, { mode: 'view' })" 
+        data-text="צפה"></button>
+```
+
+**יתרונות של data-onclick:**
+- ✅ עובד עם כפתורים דינמיים שנוצרים בזמן ריצה
+- ✅ תאימות מלאה עם המערכת המאוחדת
+- ✅ Error handling אוטומטי
+- ✅ תמיכה בפונקציות מורכבות
 
 ### JavaScript עם וריאנטים
 ```javascript

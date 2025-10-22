@@ -577,6 +577,7 @@ function colorAmountByValue(amount, displayText = null, element = null) {
   return `<span style="color: ${color}; font-weight: bold;">${text}</span>`;
 }
 
+
 // ייצוא פונקציות פורמט מספרים
 window.formatNumberWithCommas = formatNumberWithCommas;
 window.formatCurrencyWithCommas = formatCurrencyWithCommas;

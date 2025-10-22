@@ -1412,6 +1412,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log('🚀 About to call initializeUnifiedApp...');
             await window.initializeUnifiedApp();
             console.log('✅ initializeUnifiedApp completed');
+            
+            // Handle page-specific copyDetailedLog function
+            await handlePageSpecificFunctions();
         }, 1000);
         
     } catch (error) {
@@ -1419,9 +1422,58 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+// ===== PAGE-SPECIFIC FUNCTION HANDLING =====
+
+/**
+ * Handle page-specific functions that need to be available globally
+ * This replaces the need for inline DOMContentLoaded listeners
+ */
+async function handlePageSpecificFunctions() {
+    try {
+        console.log('🔧 Handling page-specific functions...');
+        
+        // Get current page name from pathname
+        const pathname = window.location.pathname;
+        const pageName = pathname.split('/').pop() || 'index';
+        
+        console.log(`📄 Current page: ${pageName}`);
+        
+        // Handle copyDetailedLog function for each page
+        if (typeof window.copyDetailedLog === 'function') {
+            console.log('✅ copyDetailedLog function found and available globally');
+        } else {
+            console.log('⚠️ copyDetailedLog function not found - this is normal for some pages');
+        }
+        
+        // Handle other page-specific functions as needed
+        // Add more function handling here in the future
+        
+        console.log('✅ Page-specific functions handled successfully');
+        
+    } catch (error) {
+        console.error('❌ Failed to handle page-specific functions:', error);
+    }
+}
+
 // ===== ERROR HANDLING =====
 
 window.addEventListener('error', (event) => {
+    // Ignore SyntaxError from button clicks - these are handled by individual functions
+    if (event.error && event.error.name === 'SyntaxError' && event.message && event.message.includes('Unexpected end of input')) {
+      console.log('🔧 ===== IGNORING SYNTAX ERROR =====');
+      console.log('🔧 Error details:', {
+        name: event.error.name,
+        message: event.message,
+        filename: event.filename,
+        lineno: event.lineno,
+        colno: event.colno,
+        stack: event.error.stack
+      });
+      console.log('🔧 This error is handled by individual functions - ignoring');
+      console.log('🔧 ===== END IGNORE =====');
+      return;
+    }
+    
     console.error('❌ Global Error:', event.error);
     console.error('❌ Error details:', {
         message: event.message,

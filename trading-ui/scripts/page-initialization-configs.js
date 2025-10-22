@@ -167,16 +167,20 @@ const PAGE_CONFIGS = {
     'index': {
         name: 'Dashboard',
         
-        // ← NEW: חבילות נדרשות
-        packages: ['base', 'crud', 'charts', 'preferences'],
+        // 📦 STANDARD BASIC PACKAGE FOR ALL PAGES:
+        // - 'base': מערכות ליבה בסיסיות (התראות, שגיאות, צבעים, תאריכים)
+        // - 'services': שירותי עזר כלליים (נתונים, שדות, סטטיסטיקות)
+        // - 'ui-advanced': ממשק משתמש מתקדם (כפתורים, טבלאות, עימוד)
+        // - 'crud': מערכות CRUD ו-entity-details
+        // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
+        // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
+        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
             'NotificationSystem',
             'DataUtils',
-            'getCurrentPreference',
-            'window.loadDashboardData',
-            'window.initializeCharts'
+            'window.loadDashboardData'
         ],
         
         // ← NEW: מטאדאטה
@@ -219,14 +223,20 @@ const PAGE_CONFIGS = {
     'preferences': {
         name: 'Preferences',
         
-        // ← NEW: חבילות נדרשות
-        packages: ['base', 'preferences', 'validation'],
+        // 📦 STANDARD BASIC PACKAGE FOR ALL PAGES:
+        // - 'base': מערכות ליבה בסיסיות (התראות, שגיאות, צבעים, תאריכים)
+        // - 'services': שירותי עזר כלליים (נתונים, שדות, סטטיסטיקות)
+        // - 'ui-advanced': ממשק משתמש מתקדם (כפתורים, טבלאות, עימוד)
+        // - 'crud': מערכות CRUD ו-entity-details
+        // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
+        // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
+        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
             'NotificationSystem',
-            'window.initializePreferences',
-            'window.loadAllPreferences'
+            'DataUtils',
+            'window.initializePreferences'
         ],
         
         // ← NEW: מטאדאטה
@@ -271,18 +281,20 @@ const PAGE_CONFIGS = {
     'trades': {
         name: 'Trades',
         
-        // ← NEW: חבילות נדרשות
-        packages: ['base', 'crud', 'filters', 'advanced-notifications', 'preferences'],
+        // 📦 STANDARD BASIC PACKAGE FOR ALL PAGES:
+        // - 'base': מערכות ליבה בסיסיות (התראות, שגיאות, צבעים, תאריכים)
+        // - 'services': שירותי עזר כלליים (נתונים, שדות, סטטיסטיקות)
+        // - 'ui-advanced': ממשק משתמש מתקדם (כפתורים, טבלאות, עימוד)
+        // - 'crud': מערכות CRUD ו-entity-details
+        // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
+        // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
+        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
             'NotificationSystem',
             'DataUtils',
-            'getCurrentPreference',
-            'window.loadTradesData',
-            'window.loadUserPreferences',
-            'window.setupSortableHeaders',
-            'window.initializeTradeConditionsSystem'
+            'window.loadTradesData'
         ],
         
         // ← NEW: מטאדאטה
@@ -328,15 +340,20 @@ const PAGE_CONFIGS = {
     'executions': {
         name: 'Executions',
         
-        // ← NEW: חבילות נדרשות
-        packages: ['base', 'services', 'ui-advanced', 'crud', 'filters', 'preferences', 'init'],
+        // 📦 STANDARD BASIC PACKAGE FOR ALL PAGES:
+        // - 'base': מערכות ליבה בסיסיות (התראות, שגיאות, צבעים, תאריכים)
+        // - 'services': שירותי עזר כלליים (נתונים, שדות, סטטיסטיקות)
+        // - 'ui-advanced': ממשק משתמש מתקדם (כפתורים, טבלאות, עימוד)
+        // - 'crud': מערכות CRUD ו-entity-details
+        // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
+        // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
+        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
             'NotificationSystem',
             'DataUtils',
-            'window.loadExecutionsData',
-            'window.getCurrentPreference'
+            'window.loadExecutionsData'
         ],
         
         // ← NEW: מטאדאטה
@@ -365,6 +382,23 @@ const PAGE_CONFIGS = {
     
     'trade_plans': {
         name: 'Trade Plans',
+        
+        // 📦 STANDARD BASIC PACKAGE FOR ALL PAGES:
+        // - 'base': מערכות ליבה בסיסיות (התראות, שגיאות, צבעים, תאריכים)
+        // - 'services': שירותי עזר כלליים (נתונים, שדות, סטטיסטיקות)
+        // - 'ui-advanced': ממשק משתמש מתקדם (כפתורים, טבלאות, עימוד)
+        // - 'crud': מערכות CRUD ו-entity-details
+        // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
+        // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
+        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
+        
+        // ← NEW: בדיקות תקינות
+        requiredGlobals: [
+            'NotificationSystem',
+            'DataUtils',
+            'window.loadTradePlansData'
+        ],
+        
         requiresFilters: true,
         requiresValidation: true,
         requiresTables: true,
@@ -398,16 +432,20 @@ const PAGE_CONFIGS = {
     'alerts': {
         name: 'Alerts',
         
-        // ← NEW: חבילות נדרשות
-        packages: ['base', 'crud', 'filters', 'advanced-notifications', 'preferences'],
+        // 📦 STANDARD BASIC PACKAGE FOR ALL PAGES:
+        // - 'base': מערכות ליבה בסיסיות (התראות, שגיאות, צבעים, תאריכים)
+        // - 'services': שירותי עזר כלליים (נתונים, שדות, סטטיסטיקות)
+        // - 'ui-advanced': ממשק משתמש מתקדם (כפתורים, טבלאות, עימוד)
+        // - 'crud': מערכות CRUD ו-entity-details
+        // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
+        // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
+        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
             'NotificationSystem',
             'DataUtils',
-            'window.loadAlertsData',
-            'window.loadUserPreferences',
-            'window.initializeAlertModalTabs'
+            'window.loadAlertsData'
         ],
         
         // ← NEW: מטאדאטה
@@ -453,15 +491,20 @@ const PAGE_CONFIGS = {
     'trading_accounts': {
         name: 'Trading Accounts',
         
-        // ← NEW: חבילות נדרשות
-        packages: ['base', 'crud', 'filters', 'validation', 'preferences'],
+        // 📦 STANDARD BASIC PACKAGE FOR ALL PAGES:
+        // - 'base': מערכות ליבה בסיסיות (התראות, שגיאות, צבעים, תאריכים)
+        // - 'services': שירותי עזר כלליים (נתונים, שדות, סטטיסטיקות)
+        // - 'ui-advanced': ממשק משתמש מתקדם (כפתורים, טבלאות, עימוד)
+        // - 'crud': מערכות CRUD ו-entity-details
+        // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
+        // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
+        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
             'NotificationSystem',
             'DataUtils',
-            'window.loadTradingAccountsDataForTradingAccountsPage',
-            'window.loadAccountsData'
+            'window.loadTradingAccountsDataForTradingAccountsPage'
         ],
         
         // ← NEW: מטאדאטה
@@ -499,20 +542,18 @@ const PAGE_CONFIGS = {
     
     'cash_flows': {
         name: 'Cash Flows',
-        // 📦 PACKAGES EXPLANATION:
-        // - 'base': מערכות ליבה בסיסיות
-        // - 'services': שירותי עזר כלליים
-        // - 'ui-advanced': ממשק משתמש מתקדם (כפתורים, טבלאות)
+        // 📦 STANDARD BASIC PACKAGE FOR ALL PAGES:
+        // - 'base': מערכות ליבה בסיסיות (התראות, שגיאות, צבעים, תאריכים)
+        // - 'services': שירותי עזר כלליים (נתונים, שדות, סטטיסטיקות)
+        // - 'ui-advanced': ממשק משתמש מתקדם (כפתורים, טבלאות, עימוד)
         // - 'crud': מערכות CRUD ו-entity-details
-        // - 'preferences': מערכת העדפות
-        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init', 'cash-flows'],
+        // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
+        // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
+        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
         requiredGlobals: [
             'NotificationSystem',    // from base package
             'DataUtils',            // from services package  
-            'getCurrentPreference', // from preferences package
-            'window.loadCashFlowsData',
-            'window.formatDate',    // from crud package (date-utils.js)
-            'window.loadDynamicColors' // from base package (color-scheme-system.js)
+            'window.loadCashFlowsData'
         ],
         description: 'ניהול תזרימי מזומנים - הכנסות והוצאות',
         lastModified: '2025-10-19',
@@ -543,16 +584,20 @@ const PAGE_CONFIGS = {
     'tickers': {
         name: 'Tickers',
         
-        // ← NEW: חבילות נדרשות
-        packages: ['base', 'crud', 'filters', 'external-data', 'preferences'],
+        // 📦 STANDARD BASIC PACKAGE FOR ALL PAGES:
+        // - 'base': מערכות ליבה בסיסיות (התראות, שגיאות, צבעים, תאריכים)
+        // - 'services': שירותי עזר כלליים (נתונים, שדות, סטטיסטיקות)
+        // - 'ui-advanced': ממשק משתמש מתקדם (כפתורים, טבלאות, עימוד)
+        // - 'crud': מערכות CRUD ו-entity-details
+        // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
+        // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
+        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
             'NotificationSystem',
             'DataUtils',
-            'window.loadTickersData',
-            'window.loadUserPreferences',
-            'window.YahooFinanceService'
+            'window.loadTickersData'
         ],
         
         // ← NEW: מטאדאטה
@@ -581,14 +626,26 @@ const PAGE_CONFIGS = {
     
     'notes': {
         name: 'Notes',
+        
+        // 📦 STANDARD BASIC PACKAGE FOR ALL PAGES:
+        // - 'base': מערכות ליבה בסיסיות (התראות, שגיאות, צבעים, תאריכים)
+        // - 'services': שירותי עזר כלליים (נתונים, שדות, סטטיסטיקות)
+        // - 'ui-advanced': ממשק משתמש מתקדם (כפתורים, טבלאות, עימוד)
+        // - 'crud': מערכות CRUD ו-entity-details
+        // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
+        // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
+        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
+        
+        // ← NEW: בדיקות תקינות
+        requiredGlobals: [
+            'NotificationSystem',
+            'DataUtils',
+            'window.loadNotesData'
+        ],
+        
         requiresFilters: false,
         requiresValidation: true,
         requiresTables: false,
-        requiredGlobals: [
-            'NotificationSystem',
-            'window.loadNotesData',
-            'window.loadUserPreferences'
-        ],
         customInitializers: [
             async (pageConfig) => {
                 console.log('📝 Initializing Notes...');
@@ -604,14 +661,17 @@ const PAGE_CONFIGS = {
     'system-management': {
         name: 'System Management',
         
-        // ← NEW: חבילות נדרשות
-        packages: ['base', 'system-management', 'dev-tools'],
+        // 📦 STANDARD BASIC PACKAGE FOR ALL PAGES:
+        // - 'base': מערכות ליבה בסיסיות (התראות, שגיאות, צבעים, תאריכים)
+        // - 'services': שירותי עזר כלליים (נתונים, שדות, סטטיסטיקות)
+        // - 'ui-advanced': ממשק משתמש מתקדם (כפתורים, טבלאות, עימוד)
+        // - 'crud': מערכות CRUD ו-entity-details
+        packages: ['base', 'services', 'ui-advanced', 'crud'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
             'NotificationSystem',
-            'window.loadSystemInfo',
-            'window.UnifiedLogAPI'
+            'DataUtils'
         ],
         
         // ← NEW: מטאדאטה
@@ -650,6 +710,15 @@ const PAGE_CONFIGS = {
     
     'server-monitor': {
         name: 'Server Monitor',
+        
+        // 📦 STANDARD BASIC PACKAGE FOR ALL PAGES:
+        packages: ['base', 'services', 'ui-advanced', 'crud'],
+        
+        requiredGlobals: [
+            'NotificationSystem',
+            'DataUtils'
+        ],
+        
         requiresFilters: false,
         requiresValidation: false,
         requiresTables: false,
@@ -671,6 +740,15 @@ const PAGE_CONFIGS = {
     
     'crud-testing-dashboard': {
         name: 'CRUD Testing',
+        
+        // 📦 STANDARD BASIC PACKAGE FOR ALL PAGES:
+        packages: ['base', 'services', 'ui-advanced', 'crud'],
+        
+        requiredGlobals: [
+            'NotificationSystem',
+            'DataUtils'
+        ],
+        
         requiresFilters: false,
         requiresValidation: true,
         requiresTables: true,
@@ -688,15 +766,17 @@ const PAGE_CONFIGS = {
     'external-data-dashboard': {
         name: 'External Data',
         
-        // ← NEW: חבילות נדרשות
-        packages: ['base', 'external-data', 'system-management'],
+        // 📦 STANDARD BASIC PACKAGE FOR ALL PAGES:
+        // - 'base': מערכות ליבה בסיסיות (התראות, שגיאות, צבעים, תאריכים)
+        // - 'services': שירותי עזר כלליים (נתונים, שדות, סטטיסטיקות)
+        // - 'ui-advanced': ממשק משתמש מתקדם (כפתורים, טבלאות, עימוד)
+        // - 'crud': מערכות CRUD ו-entity-details
+        packages: ['base', 'services', 'ui-advanced', 'crud'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
             'NotificationSystem',
-            'window.loadExternalData',
-            'window.ExternalDataDashboard',
-            'window.UnifiedLogAPI'
+            'DataUtils'
         ],
         
         // ← NEW: מטאדאטה
@@ -952,6 +1032,15 @@ const PAGE_CONFIGS = {
     
     'linter-realtime-monitor': {
         name: 'Linter Monitor',
+        
+        // 📦 STANDARD BASIC PACKAGE FOR ALL PAGES:
+        packages: ['base', 'services', 'ui-advanced', 'crud'],
+        
+        requiredGlobals: [
+            'NotificationSystem',
+            'DataUtils'
+        ],
+        
         requiresFilters: false,
         requiresValidation: false,
         requiresTables: false,
@@ -968,6 +1057,15 @@ const PAGE_CONFIGS = {
     
     'notifications-center': {
         name: 'Notifications Center',
+        
+        // 📦 STANDARD BASIC PACKAGE FOR ALL PAGES:
+        packages: ['base', 'services', 'ui-advanced', 'crud'],
+        
+        requiredGlobals: [
+            'NotificationSystem',
+            'DataUtils'
+        ],
+        
         requiresFilters: false,
         requiresValidation: false,
         requiresTables: false,
@@ -985,6 +1083,15 @@ const PAGE_CONFIGS = {
     },
     'notifications-center.html': {
         name: 'Notifications Center HTML',
+        
+        // 📦 STANDARD BASIC PACKAGE FOR ALL PAGES:
+        packages: ['base', 'services', 'ui-advanced', 'crud'],
+        
+        requiredGlobals: [
+            'NotificationSystem',
+            'DataUtils'
+        ],
+        
         requiresFilters: false,
         requiresValidation: false,
         requiresTables: false,

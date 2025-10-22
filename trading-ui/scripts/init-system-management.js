@@ -969,12 +969,13 @@ function generatePage() {
     }
 }
 
+
+
 /**
- * Generate config
+ * Generate complete script section with correct loading order
  */
-function generateConfig() {
+function generateCompleteScriptSection() {
     const pageName = document.getElementById('newPageName').value.trim();
-    const selectedPackages = getSelectedPackages();
     
     if (!pageName) {
         showNotification('אנא הזן שם עמוד', 'warning');
@@ -982,21 +983,20 @@ function generateConfig() {
     }
     
     try {
-        const config = pageTemplateGenerator.generateConfig(pageName, selectedPackages);
-        displayGeneratedContent('Config', config);
+        const scriptSection = pageTemplateGenerator.generateCompleteScriptSection(pageName);
+        displayGeneratedContent('Script Section', scriptSection);
         
     } catch (error) {
-        console.error('❌ Failed to generate config:', error);
-        showNotification('שגיאה ביצירת קונפיג', 'error');
+        console.error('❌ Failed to generate script section:', error);
+        showNotification('שגיאה ביצירת קוד סקריפטים', 'error');
     }
 }
 
 /**
- * Generate JavaScript
+ * Generate script tags for specific page
  */
-function generateJavaScript() {
+function generateScriptTagsForPage() {
     const pageName = document.getElementById('newPageName').value.trim();
-    const selectedPackages = getSelectedPackages();
     
     if (!pageName) {
         showNotification('אנא הזן שם עמוד', 'warning');
@@ -1004,12 +1004,12 @@ function generateJavaScript() {
     }
     
     try {
-        const javascript = pageTemplateGenerator.generateJavaScriptTemplate(pageName);
-        displayGeneratedContent('JavaScript', javascript);
+        const scriptTags = pageTemplateGenerator.generateScriptTagsForPage(pageName);
+        displayGeneratedContent('Script Tags', scriptTags);
         
     } catch (error) {
-        console.error('❌ Failed to generate JavaScript:', error);
-        showNotification('שגיאה ביצירת JavaScript', 'error');
+        console.error('❌ Failed to generate script tags:', error);
+        showNotification('שגיאה ביצירת תגי סקריפטים', 'error');
     }
 }
 
@@ -1762,7 +1762,8 @@ async function waitForScriptsReady(requiredScripts) {
 /**
  * Check for Mismatches
  */
-async function checkForMismatches(pageName, pageConfig) {
+// checkForMismatches - using global function from monitoring-functions.js
+async function checkForMismatches_OLD(pageName, pageConfig) {
     console.log(`🔍 checkForMismatches: Starting for page ${pageName}`);
     const mismatches = [];
     
@@ -2348,7 +2349,8 @@ async function showPageDetails(pageName) {
 /**
  * Run Detailed Page Scan
  */
-async function runDetailedPageScan(pageName, pageConfig) {
+// runDetailedPageScan - using global function from monitoring-functions.js
+async function runDetailedPageScan_OLD(pageName, pageConfig) {
     console.log(`🔍 runDetailedPageScan: Starting detailed scan for page ${pageName}`);
     const result = {
         pageName: pageName,

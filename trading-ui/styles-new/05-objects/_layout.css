@@ -14,6 +14,7 @@
   direction: rtl;
   text-align: right;
   width: 100%;
+  padding: 0;
 }
 
 /* Dashboard rows - for statistics sections */
@@ -108,22 +109,16 @@
   width: 100%;
   max-width: var(--container-xl, 1400px);
   margin: 0 auto;
-  padding: var(--spacing-md, 16px);
+  padding: 0;
   box-sizing: border-box;
   overflow-x: hidden;
 }
 
-/* התאמה רספונסיבית לנקודות שבירה */
+/* התאמה רספונסיבית לנקודות שבירה - תואם ל-header-container ו-filters-container */
 @media (min-width: 768px) {
   .main-content {
-    max-width: var(--container-md, 960px);
-    padding: var(--spacing-lg, 24px);
-  }
-}
-
-@media (min-width: 992px) {
-  .main-content {
     max-width: var(--container-lg, 1200px);
+    padding: 0;
   }
 }
 
@@ -152,12 +147,14 @@
   align-items: center;
   margin-bottom: 1.5rem;
   padding: 1rem;
-  border-bottom: 1px solid var(--border-color, #e9ecef);
+  border-bottom: 1px solid var(--current-entity-color-dark, #e9ecef);
+  border-inline-start: 3px solid var(--current-entity-color-dark, #e9ecef);
   border-radius: 8px;
-  background: var(--card-bg, #ffffff);
+  background: var(--current-entity-color-light, #ffffff);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
 }
+
 
 /* יישור כל האלמנטים לימין - תחילת השורה */
 .section-header h1,
@@ -167,11 +164,82 @@
   flex: 1;
   text-align: right; /* יישור לימין - תחילת השורה */
   direction: rtl; /* RTL לכותרת */
+  color: var(--current-entity-color-dark, #333333); /* טקסט כהה של הישות */
 }
+
 
 /* יישור לאמצע הגובה לכל האלמנטים ב-section-header */
 .section-header > * {
   align-self: center;
+}
+
+/* כותרות מודלים - צבעים דינמיים */
+.modal-header {
+  background: var(--current-entity-color-light, #ffffff);
+  color: var(--current-entity-color-dark, #333333);
+  border-bottom: 1px solid var(--current-entity-color-dark, #e9ecef);
+}
+
+.modal-header .modal-title {
+  color: var(--current-entity-color-dark, #333333);
+}
+
+/* כותרות טבלאות - צבעים דינמיים */
+.sortable-header {
+  background: var(--current-entity-color-light, #ffffff);
+  color: var(--current-entity-color-dark, #333333);
+  border-bottom: 1px solid var(--current-entity-color-dark, #e9ecef);
+}
+
+.sortable-header:hover {
+  background: var(--current-entity-color-light, #f8f9fa);
+  color: var(--current-entity-color-dark, #333333);
+}
+
+/* כותרות טבלאות - צבעים דינמיים */
+.table-title {
+  background: var(--current-entity-color-light, #ffffff);
+  color: var(--current-entity-color-dark, #333333);
+}
+
+.table-title h1,
+.table-title h2,
+.table-title h3,
+.table-title h4,
+.table-title h5,
+.table-title h6 {
+  color: var(--current-entity-color-dark, #333333);
+}
+
+/* כרטיסים - צבעים דינמיים */
+.card {
+  background: var(--current-entity-color-light, #ffffff);
+  border: 1px solid var(--current-entity-color-dark, #e9ecef);
+}
+
+.card-header {
+  background: var(--current-entity-color-light, #f8f9fa);
+  border-bottom: 1px solid var(--current-entity-color-dark, #e9ecef);
+  color: var(--current-entity-color-dark, #333333);
+}
+
+.card-title {
+  color: var(--current-entity-color-dark, #333333);
+}
+
+.card-text {
+  color: var(--current-entity-color-dark, #666666);
+}
+
+/* סיכום מידע - צבעים דינמיים */
+.info-summary {
+  background: var(--current-entity-color-light, #ffffff);
+  border: 1px solid var(--current-entity-color-dark, #e9ecef);
+  color: var(--current-entity-color-dark, #333333);
+}
+
+.info-summary strong {
+  color: var(--current-entity-color-dark, #333333);
 }
 
 /* כפתורים בשורת הכותרת - ייצוא ורענון */
@@ -181,6 +249,117 @@
 .section-header .refresh-btn {
   margin-inline-end: 0.5rem;
   align-self: center;
+  color: var(--current-entity-color-dark, #333333); /* טקסט כהה של הישות */
+  border-color: var(--current-entity-color-dark, #333333); /* גבול כהה של הישות */
+}
+
+/* כפתורים דינמיים - צבעים לפי ישות */
+.btn[data-entity-type] {
+  color: var(--current-entity-color-dark, #333333);
+  border-color: var(--current-entity-color-dark, #333333);
+  background: var(--current-entity-color-light, #ffffff);
+}
+
+.btn[data-entity-type]:hover {
+  background: var(--current-entity-color, #007bff);
+  color: white;
+  border-color: var(--current-entity-color, #007bff);
+}
+
+.btn[data-entity-type="ticker"] {
+  color: var(--entity-ticker-color-dark, #333333);
+  border-color: var(--entity-ticker-color-dark, #333333);
+  background: var(--entity-ticker-color-light, #ffffff);
+}
+
+.btn[data-entity-type="ticker"]:hover {
+  background: var(--entity-ticker-color, #20c997);
+  color: white;
+  border-color: var(--entity-ticker-color, #20c997);
+}
+
+.btn[data-entity-type="trade"] {
+  color: var(--entity-trade-color-dark, #333333);
+  border-color: var(--entity-trade-color-dark, #333333);
+  background: var(--entity-trade-color-light, #ffffff);
+}
+
+.btn[data-entity-type="trade"]:hover {
+  background: var(--entity-trade-color, #007bff);
+  color: white;
+  border-color: var(--entity-trade-color, #007bff);
+}
+
+.btn[data-entity-type="account"] {
+  color: var(--entity-account-color-dark, #333333);
+  border-color: var(--entity-account-color-dark, #333333);
+  background: var(--entity-account-color-light, #ffffff);
+}
+
+.btn[data-entity-type="account"]:hover {
+  background: var(--entity-account-color, #6f42c1);
+  color: white;
+  border-color: var(--entity-account-color, #6f42c1);
+}
+
+.btn[data-entity-type="alert"] {
+  color: var(--entity-alert-color-dark, #333333);
+  border-color: var(--entity-alert-color-dark, #333333);
+  background: var(--entity-alert-color-light, #ffffff);
+}
+
+.btn[data-entity-type="alert"]:hover {
+  background: var(--entity-alert-color, #dc3545);
+  color: white;
+  border-color: var(--entity-alert-color, #dc3545);
+}
+
+.btn[data-entity-type="cash_flow"] {
+  color: var(--entity-cash_flow-color-dark, #333333);
+  border-color: var(--entity-cash_flow-color-dark, #333333);
+  background: var(--entity-cash_flow-color-light, #ffffff);
+}
+
+.btn[data-entity-type="cash_flow"]:hover {
+  background: var(--entity-cash_flow-color, #fd7e14);
+  color: white;
+  border-color: var(--entity-cash_flow-color, #fd7e14);
+}
+
+.btn[data-entity-type="note"] {
+  color: var(--entity-note-color-dark, #333333);
+  border-color: var(--entity-note-color-dark, #333333);
+  background: var(--entity-note-color-light, #ffffff);
+}
+
+.btn[data-entity-type="note"]:hover {
+  background: var(--entity-note-color, #6c757d);
+  color: white;
+  border-color: var(--entity-note-color, #6c757d);
+}
+
+.btn[data-entity-type="execution"] {
+  color: var(--entity-execution-color-dark, #333333);
+  border-color: var(--entity-execution-color-dark, #333333);
+  background: var(--entity-execution-color-light, #ffffff);
+}
+
+.btn[data-entity-type="execution"]:hover {
+  background: var(--entity-execution-color, #17a2b8);
+  color: white;
+  border-color: var(--entity-execution-color, #17a2b8);
+}
+
+.btn[data-entity-type="trade_plan"] {
+  color: var(--entity-trade_plan-color-dark, #333333);
+  border-color: var(--entity-trade_plan-color-dark, #333333);
+  background: var(--entity-trade_plan-color-light, #ffffff);
+}
+
+.btn[data-entity-type="trade_plan"]:hover {
+  background: var(--entity-trade_plan-color, #28a745);
+  color: white;
+  border-color: var(--entity-trade_plan-color, #28a745);
 }
 
 /* הפרדה בין כפתורי פעולה לכפתור הפתיחה/סגירה */
@@ -195,10 +374,6 @@
   order: 2; /* לפני כפתור הפתיחה/סגירה */
 }
 
-/* רקע ברירת מחדל לכותרות ללא מחלקות דינמיות */
-.section-header:not([class*="entity-"]) {
-  background: #ffffff;
-}
 
 /* כותרות עם שקיפות מוגברת */
 .section-header.transparent {
@@ -395,7 +570,7 @@
 
 /* ===== תיקוני כפתורים ===== */
 
-/* תיקון לכפתורים עם container-fluid main-content */
+/* תיקון לכפתורים עם container-fluid main-content - ללא דריסת צבעים */
 .container-fluid .main-content .btn {
   box-sizing: border-box;
   min-height: 38px;
@@ -417,6 +592,10 @@
   justify-content: center;
   gap: 6px;
   white-space: nowrap;
+  /* צבעים דינמיים - לא לדרוס */
+  color: inherit;
+  background: inherit;
+  border-color: inherit;
 }
 
 /* וודא שמסגרת הכפתור מכסה את כל התוכן */

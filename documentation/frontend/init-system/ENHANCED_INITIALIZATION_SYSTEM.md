@@ -37,6 +37,24 @@
 └─────────────────────────────────────────────────────────────┘
 ```
 
+### 📋 סדר טעינה סטנדרטי לעמודי משתמש
+
+**חבילות סטנדרטיות לכל עמודי המשתמש:**
+1. **BASE PACKAGE** (loadOrder: 1) - מערכות ליבה
+2. **SERVICES PACKAGE** (loadOrder: 2) - שירותים כלליים  
+3. **UI-ADVANCED PACKAGE** (loadOrder: 3) - ממשק משתמש מתקדם
+4. **CRUD PACKAGE** (loadOrder: 4) - ניהול נתונים
+5. **PREFERENCES PACKAGE** (loadOrder: 5) - העדפות משתמש
+6. **INIT-SYSTEM PACKAGE** (loadOrder: 18) - ניטור ולידציה
+
+**סדר סקריפטים מדויק בתוך כל חבילה:**
+- **BASE:** 13 סקריפטים בסדר קבוע
+- **SERVICES:** 6 סקריפטי שירות
+- **UI-ADVANCED:** 3 סקריפטי ממשק מתקדם
+- **CRUD:** 5 סקריפטי ניהול נתונים
+- **PREFERENCES:** 2 סקריפטי העדפות
+- **INIT-SYSTEM:** 3 סקריפטי ניטור
+
 ### רכיבי המערכת
 
 #### 1. Package Manifest (`package-manifest.js`)

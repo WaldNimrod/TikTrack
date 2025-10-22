@@ -9,35 +9,7 @@
 
 /* Chart Management Page Specific Overrides */
 
-/* Header Actions */
-.header-actions {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-
-.header-actions .action-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    background: var(--secondary-color);
-    color: var(--text-color);
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-}
-
-.header-actions .action-btn:hover {
-    background: var(--secondary-hover);
-    transform: translateY(-1px);
-}
-
-.header-actions .action-btn i {
-    font-size: 0.8rem;
-}
+/* Header Actions - moved to header-styles.css */
 
 /* Section Toggle */
 .filter-toggle-btn {

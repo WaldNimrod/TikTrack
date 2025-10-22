@@ -1067,6 +1067,20 @@ const PACKAGE_MANIFEST = {
         description: 'מאתחל אפליקציה מאוחד',
         required: true,
         loadOrder: 3
+      },
+      {
+        file: 'init-system-check.js',
+        globalCheck: 'window.initSystemCheck',
+        description: 'בדיקות מערכת אתחול',
+        required: true,
+        loadOrder: 4
+      },
+      {
+        file: 'monitoring-functions.js',
+        globalCheck: 'window.initSystemCheck',
+        description: 'פונקציות ניטור',
+        required: true,
+        loadOrder: 5
       }
     ],
     estimatedSize: '~45KB',

@@ -152,29 +152,6 @@ function resetAddExecutionForm() {
 }
 
 // showAddExecutionModal הועבר למערכת הכללית
-      } else {
-        // השבתת כל השדות
-        disableExecutionFormFields();
-        // הסתרת מידע על הטיקר
-        hideExecutionTickerInfo();
-      }
-    });
-  }
-
-  // הוספת event listeners לחישוב אוטומטי
-  const calculationFields = ['executionType', 'executionQuantity', 'executionPrice', 'executionCommission'];
-  calculationFields.forEach(fieldId => {
-    const field = document.getElementById(fieldId);
-    if (field) {
-      field.addEventListener('input', calculateAddExecutionValues);
-      field.addEventListener('change', calculateAddExecutionValues);
-    }
-  });
-
-  // חישוב ערכים מחושבים
-  calculateAddExecutionValues();
-
-  // הצגת המודל
   const bootstrapModal = new bootstrap.Modal(document.getElementById('addExecutionModal'));
   bootstrapModal.show();
 }

@@ -20627,3 +20627,190 @@
 2025-10-23 20:33:40,069 - services.data_refresh_scheduler - INFO - Batch refresh completed: 4 successful, 0 failed
 2025-10-23 20:33:40,069 - services.data_refresh_scheduler - INFO - Group refresh completed: ID 34216 - 4 successful, 0 failed
 2025-10-23 20:34:59,230 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:34:59] "GET /trading-ui/preferences.html HTTP/1.1" 200 -
+2025-10-23 20:35:21,110 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:21] "GET /api/preferences/user/single?preference_name=notifications_development_enabled&user_id=1 HTTP/1.1" 200 -
+2025-10-23 20:35:22,615 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /trade_plans HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,628 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/master.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,637 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/header-styles.css?v=v6.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,641 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/global-favicon.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,643 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/notification-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,647 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/ui-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,648 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/error-handlers.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,648 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/warning-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,649 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/01-settings/_variables.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,651 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/01-settings/_color-variables.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,657 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/01-settings/_colors-dynamic.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,659 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/01-settings/_colors-semantic.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,659 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/01-settings/_spacing.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,660 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/01-settings/_typography.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,661 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/01-settings/_rtl-logical.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,664 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/01-settings/_breakpoints.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,664 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/02-tools/_mixins.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,665 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/02-tools/_functions.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,667 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/03-generic/_reset.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,667 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/03-generic/_base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,668 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/04-elements/_headings.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,670 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/04-elements/_links.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,671 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/04-elements/_forms-base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,672 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/05-objects/_layout.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,673 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/05-objects/_grid.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,673 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/02-tools/_utilities.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,674 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/04-elements/_buttons-base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,674 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_bootstrap-overrides.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,676 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_tables.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,676 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_buttons-advanced.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,679 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_modals.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,681 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_cards.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,683 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_navigation.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,686 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /styles-new/06-components/_badges-status.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,686 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_page-headers.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,687 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_notifications.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,687 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_forms-advanced.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,689 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_entity-colors.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,690 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_pagination-system.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,692 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_info-summary.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,693 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_background-tasks.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,694 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_crud-testing-dashboard.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,696 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_chart-management.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,696 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_constraints.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,697 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_linter-realtime-monitor.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,698 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_monitoring-enhanced.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,699 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/07-trumps/chart-management.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,699 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_server-monitor.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,700 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_unified-log-display.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,704 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/07-trumps/js-map-advanced.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,705 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/07-trumps/index-hero-section.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,706 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/07-trumps/page-scripts-matrix.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,707 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/08-themes/_light.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,709 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/08-themes/_high-contrast.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,709 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/09-utilities/_utilities.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,711 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/main.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,713 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/unified-cache-manager.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,715 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/cache-sync-manager.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,716 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/page-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,717 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/header-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,719 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/translation-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,725 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/button-icons.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,728 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/01-settings/_variables.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,729 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/01-settings/_colors-semantic.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,729 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/01-settings/_colors-dynamic.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,733 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/01-settings/_spacing.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,734 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/01-settings/_typography.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,734 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/01-settings/_breakpoints.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,735 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/01-settings/_rtl-logical.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,737 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/03-generic/_reset.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,737 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/02-tools/_functions.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,738 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/02-tools/_mixins.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,740 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/04-elements/_links.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,740 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/04-elements/_headings.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,741 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/03-generic/_base.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,742 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/04-elements/_forms-base.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,743 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/04-elements/_buttons-base.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,744 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/05-objects/_layout.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,746 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/05-objects/_grid.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,750 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_bootstrap-overrides.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,751 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_buttons-advanced.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,751 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_tables.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,751 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /styles-new/06-components/_badges-status.css HTTP/1.1" 200 -
+2025-10-23 20:35:22,753 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_page-headers.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,754 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_navigation.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,756 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_constraints.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,759 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_forms-advanced.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,761 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_notifications.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,762 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_cards.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,764 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_modals.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,765 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_info-summary.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,767 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_entity-colors.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,768 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/06-components/_chart-management.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,769 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/07-trumps/page-scripts-matrix.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,771 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/08-themes/_light.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,772 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/07-trumps/chart-management.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,773 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "[36mGET /styles-new/09-utilities/_utilities.css HTTP/1.1[0m" 304 -
+2025-10-23 20:35:22,775 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/button-system-init.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,776 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/color-scheme-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,776 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/services/data-collection-service.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,777 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/services/field-renderer-service.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,778 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/services/statistics-calculator.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,779 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/services/select-populator-service.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,788 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/services/default-value-setter.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,788 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/services/crud-response-handler.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,789 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/pagination-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,790 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/modules/actions-menu-system.js?v=1.0.1 HTTP/1.1" 200 -
+2025-10-23 20:35:22,795 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/date-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,796 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/data-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,799 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/preferences-core.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,800 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/tables.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,803 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/preferences.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,803 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/entity-details-api.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,804 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/entity-details-renderer.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,808 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/init-system/package-manifest.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,808 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/entity-details-modal.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,809 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/page-initialization-configs.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,814 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/unified-app-initializer.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,817 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/trade_plans.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,818 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/monitoring-functions.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:22,819 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:22] "GET /scripts/init-system-check.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:35:23,328 - utils.rate_limiter - INFO - Rate limiter cleanup: removed 0 empty entries
+2025-10-23 20:35:23,328 - routes.api.base_entity.trade_plans - INFO - Getting all trade_plans records
+2025-10-23 20:35:23,328 - cache - INFO - Cache MISS: get_all_trade_plans_99914b932bd37a50b983c5e7c90ae93b
+2025-10-23 20:35:23,328 - services.trade_plan_service - INFO - Loading trade plans with joinedload for ticker and account
+2025-10-23 20:35:23,329 - services.trade_plan_service - INFO - Loaded 21 trade plans
+2025-10-23 20:35:23,329 - services.trade_plan_service - INFO - First plan ticker: <Ticker(symbol='TSLA', name='Tesla Inc.', type='stock')>
+2025-10-23 20:35:23,329 - services.trade_plan_service - INFO - First plan account: <TradingAccount(name='חשבון מעודכן', currency_id='1', status='open')>
+2025-10-23 20:35:23,330 - models.trade_plan - INFO - Trade plan 1: Using loaded ticker relationship
+2025-10-23 20:35:23,330 - models.trade_plan - INFO - Trade plan 1: Using loaded account relationship
+2025-10-23 20:35:23,330 - models.trade_plan - INFO - Trade plan 2: Using loaded ticker relationship
+2025-10-23 20:35:23,330 - models.trade_plan - INFO - Trade plan 2: Using loaded account relationship
+2025-10-23 20:35:23,330 - models.trade_plan - INFO - Trade plan 3: Using loaded ticker relationship
+2025-10-23 20:35:23,330 - models.trade_plan - INFO - Trade plan 3: Using loaded account relationship
+2025-10-23 20:35:23,330 - models.trade_plan - INFO - Trade plan 4: Using loaded ticker relationship
+2025-10-23 20:35:23,330 - models.trade_plan - INFO - Trade plan 4: Using loaded account relationship
+2025-10-23 20:35:23,330 - models.trade_plan - INFO - Trade plan 5: Using loaded ticker relationship
+2025-10-23 20:35:23,330 - models.trade_plan - INFO - Trade plan 5: Using loaded account relationship
+2025-10-23 20:35:23,330 - models.trade_plan - INFO - Trade plan 6: Using loaded ticker relationship
+2025-10-23 20:35:23,330 - models.trade_plan - INFO - Trade plan 6: Using loaded account relationship
+2025-10-23 20:35:23,330 - models.trade_plan - INFO - Trade plan 7: Using loaded ticker relationship
+2025-10-23 20:35:23,330 - models.trade_plan - INFO - Trade plan 7: Using loaded account relationship
+2025-10-23 20:35:23,330 - models.trade_plan - INFO - Trade plan 8: Using loaded ticker relationship
+2025-10-23 20:35:23,330 - models.trade_plan - INFO - Trade plan 8: Using loaded account relationship
+2025-10-23 20:35:23,330 - models.trade_plan - INFO - Trade plan 9: Using loaded ticker relationship
+2025-10-23 20:35:23,331 - models.trade_plan - INFO - Trade plan 9: Using loaded account relationship
+2025-10-23 20:35:23,331 - models.trade_plan - INFO - Trade plan 10: Using loaded ticker relationship
+2025-10-23 20:35:23,331 - models.trade_plan - INFO - Trade plan 10: Using loaded account relationship
+2025-10-23 20:35:23,331 - models.trade_plan - INFO - Trade plan 11: Using loaded ticker relationship
+2025-10-23 20:35:23,331 - models.trade_plan - INFO - Trade plan 11: Using loaded account relationship
+2025-10-23 20:35:23,331 - models.trade_plan - INFO - Trade plan 12: Using loaded ticker relationship
+2025-10-23 20:35:23,331 - models.trade_plan - INFO - Trade plan 12: Using loaded account relationship
+2025-10-23 20:35:23,331 - models.trade_plan - INFO - Trade plan 14: Using loaded ticker relationship
+2025-10-23 20:35:23,331 - models.trade_plan - INFO - Trade plan 14: Using loaded account relationship
+2025-10-23 20:35:23,331 - models.trade_plan - INFO - Trade plan 15: Using loaded ticker relationship
+2025-10-23 20:35:23,331 - models.trade_plan - INFO - Trade plan 15: Using loaded account relationship
+2025-10-23 20:35:23,331 - models.trade_plan - INFO - Trade plan 20: Using loaded ticker relationship
+2025-10-23 20:35:23,331 - models.trade_plan - INFO - Trade plan 20: Using loaded account relationship
+2025-10-23 20:35:23,331 - models.trade_plan - INFO - Trade plan 21: Using loaded ticker relationship
+2025-10-23 20:35:23,331 - models.trade_plan - INFO - Trade plan 21: Using loaded account relationship
+2025-10-23 20:35:23,332 - models.trade_plan - INFO - Trade plan 22: Using loaded ticker relationship
+2025-10-23 20:35:23,332 - models.trade_plan - INFO - Trade plan 22: Using loaded account relationship
+2025-10-23 20:35:23,332 - models.trade_plan - INFO - Trade plan 23: Using loaded ticker relationship
+2025-10-23 20:35:23,332 - models.trade_plan - INFO - Trade plan 23: Using loaded account relationship
+2025-10-23 20:35:23,332 - models.trade_plan - INFO - Trade plan 24: Using loaded ticker relationship
+2025-10-23 20:35:23,332 - models.trade_plan - INFO - Trade plan 24: Using loaded account relationship
+2025-10-23 20:35:23,332 - models.trade_plan - INFO - Trade plan 25: Using loaded ticker relationship
+2025-10-23 20:35:23,332 - models.trade_plan - INFO - Trade plan 25: Using loaded account relationship
+2025-10-23 20:35:23,332 - models.trade_plan - INFO - Trade plan 27: Using loaded ticker relationship
+2025-10-23 20:35:23,332 - models.trade_plan - INFO - Trade plan 27: Using loaded account relationship
+2025-10-23 20:35:23,332 - cache - INFO - Cache SET: get_all_trade_plans_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 10867 chars)
+2025-10-23 20:35:23,333 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:23] "GET /api/trade_plans/ HTTP/1.1" 200 -
+2025-10-23 20:35:24,398 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:24] "[36mGET /sw.js HTTP/1.1[0m" 304 -
+2025-10-23 20:35:24,430 - routes.api.base_entity.trading_accounts - INFO - Getting all trading_accounts records
+2025-10-23 20:35:24,430 - cache - INFO - Cache EXPIRED: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Age: 136.0s)
+2025-10-23 20:35:24,430 - cache - INFO - Cache DELETE: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Was accessed 0 times)
+2025-10-23 20:35:24,431 - cache - INFO - Cache SET: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 2908 chars)
+2025-10-23 20:35:24,431 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:35:24] "GET /api/trading-accounts/ HTTP/1.1" 200 -
+2025-10-23 20:36:39,486 - utils.rate_limiter - INFO - Rate limiter cleanup: removed 0 empty entries
+2025-10-23 20:36:39,486 - utils.rate_limiter - INFO - Rate limiter cleanup: removed 0 empty entries
+2025-10-23 20:36:39,488 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:36:39] "GET /api/preferences/groups HTTP/1.1" 200 -
+2025-10-23 20:36:39,488 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:36:39] "GET /api/preferences/profiles?user_id=1 HTTP/1.1" 200 -
+2025-10-23 20:37:19,916 - cache - INFO - Cache DELETE: get_all_trade_plans_99914b932bd37a50b983c5e7c90ae93b (Was accessed 0 times)
+2025-10-23 20:37:19,917 - cache - INFO - Cache DELETE: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Was accessed 0 times)
+2025-10-23 20:37:34,440 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:37:34] "GET /trading-ui/preferences.html HTTP/1.1" 200 -
+2025-10-23 20:37:39,485 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:37:39] "GET /api/preferences/user/check-updates?user_id=1 HTTP/1.1" 200 -

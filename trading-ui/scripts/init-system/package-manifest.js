@@ -430,11 +430,18 @@ const PACKAGE_MANIFEST = {
         loadOrder: 3
       },
       {
+        file: 'preferences-validation.js',
+        globalCheck: 'window.PreferenceValidator',
+        description: 'validation system',
+        required: true,
+        loadOrder: 4
+      },
+      {
         file: 'preferences-ui.js',
         globalCheck: 'window.PreferencesUI',
         description: 'ממשק משתמש',
         required: true,
-        loadOrder: 4
+        loadOrder: 5
       }
     ],
     estimatedSize: '~120KB',

@@ -58,7 +58,12 @@
 .linked-items-container .linked-item-description { font-size: 12px; color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .linked-items-container .linked-item-basic-details { font-size: 12px; color: #444; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-.linked-items-container .linked-item-type .badge { border-radius: 12px; padding: 2px 8px; }
+.linked-items-container .linked-item-type .badge { 
+  border-radius: 4px; 
+  padding: 4px 8px; 
+  font-size: 0.85em;
+  font-weight: 500;
+}
 .linked-items-container .linked-item-row .badge { margin: 0 4px; }
 
 /* Colored start-border per entity type using logical property */

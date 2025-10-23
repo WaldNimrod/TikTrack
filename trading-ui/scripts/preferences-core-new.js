@@ -547,19 +547,38 @@ class PreferencesCore {
     }
     
     /**
-     * Save single preference with validation
+     * Save single preference with strict validation
      * @param {string} preferenceName - Preference name
      * @param {any} value - Preference value
      * @param {number} userId - User ID
      * @param {number} profileId - Profile ID
-     * @returns {Promise<boolean>} Success status
+     * @param {string} dataType - Expected data type
+     * @returns {Promise<Object>} Save result with validation
      */
-    async savePreference(preferenceName, value, userId = null, profileId = null) {
+    async savePreference(preferenceName, value, userId = null, profileId = null, dataType = 'string') {
         try {
-            // Validate preference exists
-            const exists = await this.validationManager.checkPreferenceExists(preferenceName);
-            if (!exists) {
-                throw new ValidationError(`Preference ${preferenceName} not found in database. Please create a migration to add this preference.`);
+            // Strict validation if available
+            if (window.PreferenceValidator) {
+                console.log(`🔍 Validating preference ${preferenceName} before save...`);
+                
+                const validationResult = await window.PreferenceValidator.validatePreference(
+                    preferenceName, 
+                    value, 
+                    dataType
+                );
+                
+                if (!validationResult.valid) {
+                    const errorMessages = validationResult.errors.map(e => e.message).join(', ');
+                    throw new ValidationError(`Validation failed for ${preferenceName}: ${errorMessages}`);
+                }
+                
+                console.log(`✅ Validation passed for ${preferenceName}`);
+            } else {
+                // Fallback to basic validation
+                const exists = await this.validationManager.checkPreferenceExists(preferenceName);
+                if (!exists) {
+                    throw new ValidationError(`Preference ${preferenceName} not found in database. Please create a migration to add this preference.`);
+                }
             }
             
             // Save via API
@@ -577,13 +596,26 @@ class PreferencesCore {
                 this.cacheManager.delete(`all_preferences_${userId || this.currentUserId}_${profileId || this.currentProfileId}`);
                 
                 console.log(`✅ Saved preference ${preferenceName}:`, value);
+                
+                return {
+                    success: true,
+                    validation: { valid: true, errors: [] }
+                };
+            } else {
+                return {
+                    success: false,
+                    validation: { valid: true, errors: [] },
+                    error: 'Save failed'
+                };
             }
-            
-            return success;
             
         } catch (error) {
             console.error(`❌ Error saving preference ${preferenceName}:`, error);
-            return false;
+            return {
+                success: false,
+                validation: { valid: false, errors: [error] },
+                error: error.message
+            };
         }
     }
     

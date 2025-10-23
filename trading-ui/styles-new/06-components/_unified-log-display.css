@@ -442,8 +442,9 @@
     min-width: 100px;
     
     .badge {
-        font-size: var(--font-size-xs);
-        padding: var(--spacing-xs) var(--spacing-sm);
+        font-size: 0.85em;
+        padding: 4px 8px;
+        font-weight: 500;
     }
 }
 
@@ -468,8 +469,9 @@
     text-align: center;
     
     .badge {
-        font-size: var(--font-size-xs);
-        padding: var(--spacing-xs) var(--spacing-sm);
+        font-size: 0.85em;
+        padding: 4px 8px;
+        font-weight: 500;
     }
 }
 

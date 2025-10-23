@@ -98,7 +98,7 @@ function refreshTickerData(tickerId) {
     
     // הצגת אינדיקטור טעינה
     if (typeof window.showNotification === 'function') {
-      window.showInfoNotification('מרענן נתוני טיקר...');
+      window.showInfoNotification('רענון', 'מרענן נתוני טיקר...');
     }
     
     // שליחה לשרת לרענון נתוני הטיקר

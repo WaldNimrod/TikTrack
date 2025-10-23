@@ -2936,7 +2936,7 @@ function refreshTrades() {
     
     // הצגת אינדיקטור טעינה
     if (typeof window.showNotification === 'function') {
-      window.showInfoNotification('מרענן נתוני טריידים...');
+      window.showInfoNotification('רענון', 'מרענן נתוני טריידים...');
     }
     
     // טעינת נתונים מחדש

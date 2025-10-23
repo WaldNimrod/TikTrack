@@ -1738,17 +1738,17 @@ function updateTradePlansTable(trade_plans) {
               // חישוב סיכון (הפסד מקסימלי)
               const potentialLoss = quantity * (currentPrice - stopPrice);
               
-              // פורמט התצוגה
-              const profitFormatted = potentialProfit.toFixed(2);
-              const lossFormatted = Math.abs(potentialLoss).toFixed(2);
+              // פורמט התצוגה עם פסיקים
+              const profitFormatted = potentialProfit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+              const lossFormatted = Math.abs(potentialLoss).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
               
               return `
                 <div class="risk-reward-display" style="font-size: 0.85em;">
-                  <div style="color: ${window.getTableColors ? window.getTableColors().positive : '#28a745'}; margin-bottom: 2px;">
-                    <strong>סיכוי:</strong> $${profitFormatted}
+                  <div class="numeric-value-positive" style="margin-bottom: 2px;">
+                    $${profitFormatted}
                   </div>
-                  <div style="color: ${window.getTableColors ? window.getTableColors().negative : '#dc3545'};">
-                    <strong>סיכון:</strong> $${lossFormatted}
+                  <div class="numeric-value-negative">
+                    $${lossFormatted}
                   </div>
                 </div>
               `;

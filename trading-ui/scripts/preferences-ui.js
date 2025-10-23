@@ -498,6 +498,11 @@ class PreferencesUI {
                         profileId || this.currentProfileId
                     );
                     Object.assign(preferences, colors);
+                    
+                    // Load colors into color pickers
+                    if (window.ColorPickerManager) {
+                        window.ColorPickerManager.loadColors(colors);
+                    }
                 }
                 
                 // Populate form

@@ -402,8 +402,8 @@ const PACKAGE_MANIFEST = {
   preferences: {
     id: 'preferences',
     name: 'Preferences Package',
-    description: 'מערכת העדפות משתמש (3 קבצים)',
-    version: '3.0.0',
+    description: 'מערכת העדפות משתמש v2.0 (5 קבצים)',
+    version: '2.0.0',
     critical: false,
     loadOrder: 5,
     dependencies: ['base'],
@@ -444,8 +444,8 @@ const PACKAGE_MANIFEST = {
         loadOrder: 5
       }
     ],
-    estimatedSize: '~120KB',
-    initTime: '~60ms'
+    estimatedSize: '~140KB',
+    initTime: '~80ms'
   },
 
   // 6. VALIDATION PACKAGE - ולידציה

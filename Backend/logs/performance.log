@@ -20558,3 +20558,255 @@
 2025-10-23 20:37:19,917 - cache - INFO - Cache DELETE: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Was accessed 0 times)
 2025-10-23 20:37:34,440 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:37:34] "GET /trading-ui/preferences.html HTTP/1.1" 200 -
 2025-10-23 20:37:39,485 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:37:39] "GET /api/preferences/user/check-updates?user_id=1 HTTP/1.1" 200 -
+2025-10-23 20:38:40,095 - services.data_refresh_scheduler - INFO - Refreshing 4 active tickers during trading hours
+2025-10-23 20:38:40,096 - services.data_refresh_scheduler - INFO - Group refresh started: active_trades/in_hours - 4 tickers (ID: 34218)
+2025-10-23 20:38:40,096 - services.data_refresh_scheduler - INFO - Refreshing batch of 4 tickers: AAPL, GOOGL, AMZN, TSLA
+2025-10-23 20:38:40,096 - services.external_data.yahoo_finance_adapter - INFO - Processing 4 symbols in 1 batches
+2025-10-23 20:38:40,579 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-10-23 20:38:40,579 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Current price: $260.38
+2025-10-23 20:38:40,579 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Calculated change_amount = 260.38 - 258.45 = 1.9300000000000068
+2025-10-23 20:38:40,579 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Calculated change_pct = (1.9300000000000068 / 258.45) * 100 = 0.75%
+2025-10-23 20:38:40,579 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: volume = 15196256
+2025-10-23 20:38:40,579 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Final quote data - price: $260.38, change_pct: 0.75%, change_amount: $1.93
+2025-10-23 20:38:40,579 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AAPL
+2025-10-23 20:38:40,579 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AAPL (ID: 1) - proceeding to cache quote
+2025-10-23 20:38:40,580 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AAPL = $260.38 (USD)
+2025-10-23 20:38:40,580 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 1: List argument must consist only of tuples or dictionaries
+2025-10-23 20:38:40,580 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AAPL
+2025-10-23 20:38:40,580 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AAPL: $260.38
+2025-10-23 20:38:40,714 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-10-23 20:38:40,714 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Current price: $254.221
+2025-10-23 20:38:40,714 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Calculated change_amount = 254.221 - 251.69 = 2.531000000000006
+2025-10-23 20:38:40,714 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Calculated change_pct = (2.531000000000006 / 251.69) * 100 = 1.01%
+2025-10-23 20:38:40,715 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: volume = 10679486
+2025-10-23 20:38:40,715 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Final quote data - price: $254.221, change_pct: 1.01%, change_amount: $2.53
+2025-10-23 20:38:40,715 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: GOOGL
+2025-10-23 20:38:40,715 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker GOOGL (ID: 2) - proceeding to cache quote
+2025-10-23 20:38:40,715 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: GOOGL = $254.221 (USD)
+2025-10-23 20:38:40,715 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 2: List argument must consist only of tuples or dictionaries
+2025-10-23 20:38:40,715 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for GOOGL
+2025-10-23 20:38:40,716 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for GOOGL: $254.221
+2025-10-23 20:38:40,848 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-10-23 20:38:40,848 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Current price: $220.16
+2025-10-23 20:38:40,848 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Calculated change_amount = 220.16 - 217.95 = 2.210000000000008
+2025-10-23 20:38:40,848 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Calculated change_pct = (2.210000000000008 / 217.95) * 100 = 1.01%
+2025-10-23 20:38:40,848 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: volume = 15937188
+2025-10-23 20:38:40,849 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Final quote data - price: $220.16, change_pct: 1.01%, change_amount: $2.21
+2025-10-23 20:38:40,849 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AMZN
+2025-10-23 20:38:40,850 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AMZN (ID: 6) - proceeding to cache quote
+2025-10-23 20:38:40,850 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AMZN = $220.16 (USD)
+2025-10-23 20:38:40,850 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 6: List argument must consist only of tuples or dictionaries
+2025-10-23 20:38:40,850 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AMZN
+2025-10-23 20:38:40,850 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AMZN: $220.16
+2025-10-23 20:38:40,975 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-10-23 20:38:40,975 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Current price: $447.0
+2025-10-23 20:38:40,976 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Calculated change_amount = 447.0 - 438.97 = 8.029999999999973
+2025-10-23 20:38:40,976 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Calculated change_pct = (8.029999999999973 / 438.97) * 100 = 1.83%
+2025-10-23 20:38:40,976 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: volume = 89902697
+2025-10-23 20:38:40,976 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Final quote data - price: $447.0, change_pct: 1.83%, change_amount: $8.03
+2025-10-23 20:38:40,976 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: TSLA
+2025-10-23 20:38:40,976 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker TSLA (ID: 4) - proceeding to cache quote
+2025-10-23 20:38:40,976 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: TSLA = $447.0 (USD)
+2025-10-23 20:38:40,976 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 4: List argument must consist only of tuples or dictionaries
+2025-10-23 20:38:40,976 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for TSLA
+2025-10-23 20:38:40,977 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for TSLA: $447.0
+2025-10-23 20:38:40,977 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AAPL
+2025-10-23 20:38:40,977 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AAPL (ID: 1) - proceeding to cache quote
+2025-10-23 20:38:40,977 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AAPL = $260.38 (USD)
+2025-10-23 20:38:40,978 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 1: List argument must consist only of tuples or dictionaries
+2025-10-23 20:38:40,978 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AAPL
+2025-10-23 20:38:40,978 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AAPL: $260.38
+2025-10-23 20:38:40,978 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: GOOGL
+2025-10-23 20:38:40,979 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker GOOGL (ID: 2) - proceeding to cache quote
+2025-10-23 20:38:40,979 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: GOOGL = $254.221 (USD)
+2025-10-23 20:38:40,979 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 2: List argument must consist only of tuples or dictionaries
+2025-10-23 20:38:40,979 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for GOOGL
+2025-10-23 20:38:40,979 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for GOOGL: $254.221
+2025-10-23 20:38:40,979 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AMZN
+2025-10-23 20:38:40,980 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AMZN (ID: 6) - proceeding to cache quote
+2025-10-23 20:38:40,980 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AMZN = $220.16 (USD)
+2025-10-23 20:38:40,980 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 6: List argument must consist only of tuples or dictionaries
+2025-10-23 20:38:40,980 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AMZN
+2025-10-23 20:38:40,981 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AMZN: $220.16
+2025-10-23 20:38:40,981 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: TSLA
+2025-10-23 20:38:40,981 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker TSLA (ID: 4) - proceeding to cache quote
+2025-10-23 20:38:40,981 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: TSLA = $447.0 (USD)
+2025-10-23 20:38:40,981 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 4: List argument must consist only of tuples or dictionaries
+2025-10-23 20:38:40,981 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for TSLA
+2025-10-23 20:38:40,982 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for TSLA: $447.0
+2025-10-23 20:38:40,983 - services.external_data.yahoo_finance_adapter - INFO - Updated provider yahoo_finance health: True
+2025-10-23 20:38:40,986 - services.data_refresh_scheduler - INFO - Batch refresh completed: 4 successful, 0 failed
+2025-10-23 20:38:40,986 - services.data_refresh_scheduler - INFO - Group refresh completed: ID 34218 - 4 successful, 0 failed
+2025-10-23 20:41:31,152 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:31] "GET /api/preferences/user/single?preference_name=notifications_development_enabled&user_id=1 HTTP/1.1" 200 -
+2025-10-23 20:41:32,661 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /trade_plans HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,681 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/master.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,685 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/header-styles.css?v=v6.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,692 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/global-favicon.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,695 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/ui-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,699 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/notification-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,705 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/warning-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,706 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/unified-cache-manager.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,706 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/error-handlers.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,707 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/01-settings/_variables.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,713 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/01-settings/_color-variables.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,715 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/01-settings/_colors-dynamic.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,716 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/01-settings/_colors-semantic.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,718 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/01-settings/_spacing.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,719 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/01-settings/_typography.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,722 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/01-settings/_rtl-logical.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,723 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/01-settings/_breakpoints.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,725 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/02-tools/_mixins.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,725 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/03-generic/_reset.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,726 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/03-generic/_base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,727 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/04-elements/_headings.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,728 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/04-elements/_links.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,729 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/04-elements/_forms-base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,730 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/02-tools/_functions.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,731 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/02-tools/_utilities.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,732 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/05-objects/_layout.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,733 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/04-elements/_buttons-base.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,733 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/05-objects/_grid.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,736 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_buttons-advanced.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,736 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_bootstrap-overrides.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,737 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_cards.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,739 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_modals.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,740 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_notifications.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,740 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_tables.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,741 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_navigation.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,743 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_forms-advanced.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,744 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_badges-status.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,745 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_entity-colors.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,747 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_page-headers.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,748 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_pagination-system.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,748 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_background-tasks.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,749 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_info-summary.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,749 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_chart-management.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,751 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /styles-new/06-components/_crud-testing-dashboard.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,752 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_constraints.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,753 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_linter-realtime-monitor.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,755 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_monitoring-enhanced.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,755 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_server-monitor.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,756 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /styles-new/06-components/_unified-log-display.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,756 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/07-trumps/chart-management.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,756 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/07-trumps/index-hero-section.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,758 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /styles-new/07-trumps/js-map-advanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,758 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/07-trumps/page-scripts-matrix.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,760 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/08-themes/_light.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,763 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/08-themes/_high-contrast.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,763 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/09-utilities/_utilities.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,764 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/main.css?v=1.0.0 HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,766 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/cache-sync-manager.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,767 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/header-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,770 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/page-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,773 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/translation-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,774 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/button-icons.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,774 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/button-system-init.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,778 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/01-settings/_variables.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,780 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/01-settings/_colors-semantic.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,781 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/01-settings/_spacing.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,782 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/01-settings/_colors-dynamic.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,782 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/01-settings/_typography.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,783 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/01-settings/_breakpoints.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,784 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/01-settings/_rtl-logical.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,785 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/02-tools/_functions.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,786 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/02-tools/_mixins.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,787 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/03-generic/_reset.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,788 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/03-generic/_base.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,789 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/04-elements/_headings.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,790 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/04-elements/_links.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,791 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/04-elements/_forms-base.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,792 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/04-elements/_buttons-base.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,792 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/05-objects/_layout.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,793 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/05-objects/_grid.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,794 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_bootstrap-overrides.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,796 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_buttons-advanced.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,797 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_tables.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,798 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_navigation.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,800 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_badges-status.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,800 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_cards.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,801 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_modals.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,802 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_notifications.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,803 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_forms-advanced.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,804 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_page-headers.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,805 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_entity-colors.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,805 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/07-trumps/page-scripts-matrix.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,806 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_info-summary.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,808 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_constraints.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,808 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/06-components/_chart-management.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,810 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/09-utilities/_utilities.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,811 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/08-themes/_light.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,811 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "[36mGET /styles-new/07-trumps/chart-management.css HTTP/1.1[0m" 304 -
+2025-10-23 20:41:32,815 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/services/data-collection-service.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,815 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/color-scheme-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,816 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/services/select-populator-service.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,817 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/services/field-renderer-service.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,817 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/services/statistics-calculator.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,819 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/services/crud-response-handler.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,820 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/services/default-value-setter.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,830 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/modules/actions-menu-system.js?v=1.0.1 HTTP/1.1" 200 -
+2025-10-23 20:41:32,830 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/pagination-system.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,831 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/date-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,831 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/data-utils.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,832 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/preferences-core.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,833 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/tables.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,835 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/preferences.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,838 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/entity-details-api.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,838 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/entity-details-renderer.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,840 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/init-system/package-manifest.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,840 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/entity-details-modal.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,841 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/page-initialization-configs.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,848 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/trade_plans.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,848 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/unified-app-initializer.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,848 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/init-system-check.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:32,849 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:32] "GET /scripts/monitoring-functions.js?v=1.0.0 HTTP/1.1" 200 -
+2025-10-23 20:41:33,361 - utils.rate_limiter - INFO - Rate limiter cleanup: removed 0 empty entries
+2025-10-23 20:41:33,361 - routes.api.base_entity.trade_plans - INFO - Getting all trade_plans records
+2025-10-23 20:41:33,361 - cache - INFO - Cache MISS: get_all_trade_plans_99914b932bd37a50b983c5e7c90ae93b
+2025-10-23 20:41:33,361 - services.trade_plan_service - INFO - Loading trade plans with joinedload for ticker and account
+2025-10-23 20:41:33,362 - services.trade_plan_service - INFO - Loaded 21 trade plans
+2025-10-23 20:41:33,362 - services.trade_plan_service - INFO - First plan ticker: <Ticker(symbol='TSLA', name='Tesla Inc.', type='stock')>
+2025-10-23 20:41:33,362 - services.trade_plan_service - INFO - First plan account: <TradingAccount(name='חשבון מעודכן', currency_id='1', status='open')>
+2025-10-23 20:41:33,362 - models.trade_plan - INFO - Trade plan 1: Using loaded ticker relationship
+2025-10-23 20:41:33,362 - models.trade_plan - INFO - Trade plan 1: Using loaded account relationship
+2025-10-23 20:41:33,362 - models.trade_plan - INFO - Trade plan 2: Using loaded ticker relationship
+2025-10-23 20:41:33,362 - models.trade_plan - INFO - Trade plan 2: Using loaded account relationship
+2025-10-23 20:41:33,363 - models.trade_plan - INFO - Trade plan 3: Using loaded ticker relationship
+2025-10-23 20:41:33,363 - models.trade_plan - INFO - Trade plan 3: Using loaded account relationship
+2025-10-23 20:41:33,363 - models.trade_plan - INFO - Trade plan 4: Using loaded ticker relationship
+2025-10-23 20:41:33,363 - models.trade_plan - INFO - Trade plan 4: Using loaded account relationship
+2025-10-23 20:41:33,363 - models.trade_plan - INFO - Trade plan 5: Using loaded ticker relationship
+2025-10-23 20:41:33,363 - models.trade_plan - INFO - Trade plan 5: Using loaded account relationship
+2025-10-23 20:41:33,363 - models.trade_plan - INFO - Trade plan 6: Using loaded ticker relationship
+2025-10-23 20:41:33,363 - models.trade_plan - INFO - Trade plan 6: Using loaded account relationship
+2025-10-23 20:41:33,363 - models.trade_plan - INFO - Trade plan 7: Using loaded ticker relationship
+2025-10-23 20:41:33,363 - models.trade_plan - INFO - Trade plan 7: Using loaded account relationship
+2025-10-23 20:41:33,363 - models.trade_plan - INFO - Trade plan 8: Using loaded ticker relationship
+2025-10-23 20:41:33,363 - models.trade_plan - INFO - Trade plan 8: Using loaded account relationship
+2025-10-23 20:41:33,363 - models.trade_plan - INFO - Trade plan 9: Using loaded ticker relationship
+2025-10-23 20:41:33,363 - models.trade_plan - INFO - Trade plan 9: Using loaded account relationship
+2025-10-23 20:41:33,363 - models.trade_plan - INFO - Trade plan 10: Using loaded ticker relationship
+2025-10-23 20:41:33,363 - models.trade_plan - INFO - Trade plan 10: Using loaded account relationship
+2025-10-23 20:41:33,363 - models.trade_plan - INFO - Trade plan 11: Using loaded ticker relationship
+2025-10-23 20:41:33,363 - models.trade_plan - INFO - Trade plan 11: Using loaded account relationship
+2025-10-23 20:41:33,364 - models.trade_plan - INFO - Trade plan 12: Using loaded ticker relationship
+2025-10-23 20:41:33,364 - models.trade_plan - INFO - Trade plan 12: Using loaded account relationship
+2025-10-23 20:41:33,364 - models.trade_plan - INFO - Trade plan 14: Using loaded ticker relationship
+2025-10-23 20:41:33,364 - models.trade_plan - INFO - Trade plan 14: Using loaded account relationship
+2025-10-23 20:41:33,364 - models.trade_plan - INFO - Trade plan 15: Using loaded ticker relationship
+2025-10-23 20:41:33,364 - models.trade_plan - INFO - Trade plan 15: Using loaded account relationship
+2025-10-23 20:41:33,364 - models.trade_plan - INFO - Trade plan 20: Using loaded ticker relationship
+2025-10-23 20:41:33,364 - models.trade_plan - INFO - Trade plan 20: Using loaded account relationship
+2025-10-23 20:41:33,364 - models.trade_plan - INFO - Trade plan 21: Using loaded ticker relationship
+2025-10-23 20:41:33,364 - models.trade_plan - INFO - Trade plan 21: Using loaded account relationship
+2025-10-23 20:41:33,364 - models.trade_plan - INFO - Trade plan 22: Using loaded ticker relationship
+2025-10-23 20:41:33,364 - models.trade_plan - INFO - Trade plan 22: Using loaded account relationship
+2025-10-23 20:41:33,364 - models.trade_plan - INFO - Trade plan 23: Using loaded ticker relationship
+2025-10-23 20:41:33,364 - models.trade_plan - INFO - Trade plan 23: Using loaded account relationship
+2025-10-23 20:41:33,364 - models.trade_plan - INFO - Trade plan 24: Using loaded ticker relationship
+2025-10-23 20:41:33,364 - models.trade_plan - INFO - Trade plan 24: Using loaded account relationship
+2025-10-23 20:41:33,364 - models.trade_plan - INFO - Trade plan 25: Using loaded ticker relationship
+2025-10-23 20:41:33,364 - models.trade_plan - INFO - Trade plan 25: Using loaded account relationship
+2025-10-23 20:41:33,365 - models.trade_plan - INFO - Trade plan 27: Using loaded ticker relationship
+2025-10-23 20:41:33,365 - models.trade_plan - INFO - Trade plan 27: Using loaded account relationship
+2025-10-23 20:41:33,365 - cache - INFO - Cache SET: get_all_trade_plans_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 10867 chars)
+2025-10-23 20:41:33,365 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:41:33] "GET /api/trade_plans/ HTTP/1.1" 200 -

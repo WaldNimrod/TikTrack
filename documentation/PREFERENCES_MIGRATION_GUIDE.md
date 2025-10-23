@@ -1,9 +1,69 @@
-# מדריך הוספת העדפות חדשות
-## Preferences Migration Guide
+# מדריך מערכת העדפות - TikTrack
+## Preferences System Guide
 
 **Author:** TikTrack Development Team  
 **Date:** January 23, 2025  
-**Version:** 1.0.0
+**Version:** 2.0.0
+
+---
+
+## 🏗️ ארכיטקטורה חדשה (v2.0)
+
+המערכת עברה לארכיטקטורה של **5 קבצים ממוקדים**:
+
+### 📁 מבנה הקבצים:
+1. **`preferences-core-new.js`** - לוגיקה עסקית (ללא צבעים)
+2. **`preferences-colors.js`** - מערכת צבעים ייעודית (60+ העדפות)
+3. **`preferences-lazy-loader.js`** - lazy loading חכם
+4. **`preferences-validation.js`** - validation קפדני
+5. **`preferences-ui.js`** - ממשק משתמש
+
+### 🚀 תכונות חדשות:
+- **Lazy Loading**: טעינה חכמה לפי עדיפות
+- **Validation קפדני**: בדיקת קיום, פורמט וחוקי עסק
+- **מערכת צבעים ייעודית**: ניהול 60+ העדפות צבע
+- **Cache חכם**: ביצועים מיטביים
+- **Migration Guide**: הוספת העדפות בקלות
+
+---
+
+---
+
+## 🎯 Lazy Loading System
+
+המערכת החדשה כוללת **lazy loading חכם** עם 4 רמות עדיפות:
+
+### 📊 סיווג העדפות:
+- **Critical** (מיד): `defaultAccountFilter`, `primaryColor`, `enableNotifications`
+- **High** (100ms): הגדרות chart, status colors, filter defaults
+- **Medium** (500ms): צבעי chart, entity colors, value variants
+- **Low** (2s): console logs, הגדרות מתקדמות
+
+### 🔧 איך זה עובד:
+1. **Critical preferences** נטענים מיד
+2. **High priority** נטענים ברקע אחרי 100ms
+3. **Medium priority** נטענים אחרי 500ms
+4. **Low priority** נטענים ברקע אחרי 2 שניות
+
+---
+
+## 🔍 Validation System
+
+מערכת validation מקיפה עם 3 סוגי בדיקות:
+
+### ✅ סוגי Validation:
+- **ExistenceError**: בדיקת קיום בבסיס הנתונים
+- **FormatError**: בדיקת פורמט נתונים (string, number, boolean, color)
+- **ConstraintError**: בדיקת חוקי עסק (min/max, length limits)
+
+### 🎯 דוגמאות:
+```javascript
+// בדיקת קיום
+await window.PreferenceValidator.validatePreference('myNewPreference', 'value', 'string');
+
+// בדיקת מספר עם constraints
+await window.PreferenceValidator.validatePreference('pagination_size', 25, 'number');
+```
 
 ---
 

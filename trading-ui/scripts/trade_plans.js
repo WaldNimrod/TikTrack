@@ -1697,10 +1697,11 @@ function updateTradePlansTable(trade_plans) {
             const targetPrice = design.target_price || 0;
             const calculatedQuantity = targetPrice > 0 ? (plannedAmount / targetPrice) : 0;
             
-            if (window.renderShares) {
-              return window.renderShares(calculatedQuantity);
+            if (calculatedQuantity > 0) {
+              const formatted = calculatedQuantity.toFixed(1);
+              return `<span class="numeric-value-positive" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">#${formatted}</span>`;
             } else {
-              return `<span class="numeric-value-positive" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">${calculatedQuantity > 0 ? calculatedQuantity.toFixed(1) : '-'}</span>`;
+              return `<span class="numeric-value-positive" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">-</span>`;
             }
           })()}
         </td>
@@ -1720,9 +1721,41 @@ function updateTradePlansTable(trade_plans) {
           ${window.renderStatus ? window.renderStatus(design.status, 'trade_plan') : `<span class="status-${design.status}-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">${statusDisplay}</span>`}
         </td>
         <td class="profit-cell">
-          <span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
-            ${currentDisplay}
-          </span>
+          ${(() => {
+            // חישוב סיכוי וסיכון
+            const plannedAmount = design.planned_amount || 0;
+            const targetPrice = design.target_price || 0;
+            const stopPrice = design.stop_price || 0;
+            const currentPrice = design.current || 0;
+            
+            if (plannedAmount > 0 && targetPrice > 0 && stopPrice > 0) {
+              // חישוב כמות
+              const quantity = plannedAmount / targetPrice;
+              
+              // חישוב סיכוי (רווח פוטנציאלי)
+              const potentialProfit = quantity * (targetPrice - currentPrice);
+              
+              // חישוב סיכון (הפסד מקסימלי)
+              const potentialLoss = quantity * (currentPrice - stopPrice);
+              
+              // פורמט התצוגה
+              const profitFormatted = potentialProfit.toFixed(2);
+              const lossFormatted = Math.abs(potentialLoss).toFixed(2);
+              
+              return `
+                <div class="risk-reward-display" style="font-size: 0.85em;">
+                  <div style="color: ${window.getTableColors ? window.getTableColors().positive : '#28a745'}; margin-bottom: 2px;">
+                    <strong>סיכוי:</strong> $${profitFormatted}
+                  </div>
+                  <div style="color: ${window.getTableColors ? window.getTableColors().negative : '#dc3545'};">
+                    <strong>סיכון:</strong> $${lossFormatted}
+                  </div>
+                </div>
+              `;
+            } else {
+              return `<span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">-</span>`;
+            }
+          })()}
         </td>
         <td class="actions-cell">
           ${window.createActionsMenu ? window.createActionsMenu([

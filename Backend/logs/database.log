@@ -21210,3 +21210,135 @@
 2025-10-23 20:46:39,485 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:46:39] "GET /api/preferences/profiles?user_id=1 HTTP/1.1" 200 -
 2025-10-23 20:46:39,485 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:46:39] "GET /api/preferences/groups HTTP/1.1" 200 -
 2025-10-23 20:47:12,477 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:47:12] "GET /trading-ui/preferences.html HTTP/1.1" 200 -
+2025-10-23 20:47:19,928 - cache - INFO - Cache DELETE: get_all_trade_plans_99914b932bd37a50b983c5e7c90ae93b (Was accessed 0 times)
+2025-10-23 20:47:39,484 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:47:39] "GET /api/preferences/user/check-updates?user_id=1 HTTP/1.1" 200 -
+2025-10-23 20:48:42,225 - services.data_refresh_scheduler - INFO - Refreshing 4 active tickers during trading hours
+2025-10-23 20:48:42,227 - services.data_refresh_scheduler - INFO - Group refresh started: active_trades/in_hours - 4 tickers (ID: 34222)
+2025-10-23 20:48:42,227 - services.data_refresh_scheduler - INFO - Refreshing batch of 4 tickers: AAPL, GOOGL, AMZN, TSLA
+2025-10-23 20:48:42,227 - services.external_data.yahoo_finance_adapter - INFO - Processing 4 symbols in 1 batches
+2025-10-23 20:48:42,667 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-10-23 20:48:42,667 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Current price: $260.22
+2025-10-23 20:48:42,667 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Calculated change_amount = 260.22 - 258.45 = 1.7700000000000387
+2025-10-23 20:48:42,667 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Calculated change_pct = (1.7700000000000387 / 258.45) * 100 = 0.68%
+2025-10-23 20:48:42,668 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: volume = 15554150
+2025-10-23 20:48:42,668 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Final quote data - price: $260.22, change_pct: 0.68%, change_amount: $1.77
+2025-10-23 20:48:42,668 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AAPL
+2025-10-23 20:48:42,668 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AAPL (ID: 1) - proceeding to cache quote
+2025-10-23 20:48:42,668 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AAPL = $260.22 (USD)
+2025-10-23 20:48:42,669 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 1: List argument must consist only of tuples or dictionaries
+2025-10-23 20:48:42,669 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AAPL
+2025-10-23 20:48:42,669 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AAPL: $260.22
+2025-10-23 20:48:42,797 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-10-23 20:48:42,797 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Current price: $254.09
+2025-10-23 20:48:42,797 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Calculated change_amount = 254.09 - 251.69 = 2.4000000000000057
+2025-10-23 20:48:42,797 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Calculated change_pct = (2.4000000000000057 / 251.69) * 100 = 0.95%
+2025-10-23 20:48:42,797 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: volume = 10862046
+2025-10-23 20:48:42,797 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Final quote data - price: $254.09, change_pct: 0.95%, change_amount: $2.40
+2025-10-23 20:48:42,797 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: GOOGL
+2025-10-23 20:48:42,797 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker GOOGL (ID: 2) - proceeding to cache quote
+2025-10-23 20:48:42,798 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: GOOGL = $254.09 (USD)
+2025-10-23 20:48:42,798 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 2: List argument must consist only of tuples or dictionaries
+2025-10-23 20:48:42,798 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for GOOGL
+2025-10-23 20:48:42,798 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for GOOGL: $254.09
+2025-10-23 20:48:42,916 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-10-23 20:48:42,917 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Current price: $220.27
+2025-10-23 20:48:42,917 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Calculated change_amount = 220.27 - 217.95 = 2.3200000000000216
+2025-10-23 20:48:42,917 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Calculated change_pct = (2.3200000000000216 / 217.95) * 100 = 1.06%
+2025-10-23 20:48:42,917 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: volume = 16181875
+2025-10-23 20:48:42,917 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Final quote data - price: $220.27, change_pct: 1.06%, change_amount: $2.32
+2025-10-23 20:48:42,917 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AMZN
+2025-10-23 20:48:42,918 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AMZN (ID: 6) - proceeding to cache quote
+2025-10-23 20:48:42,918 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AMZN = $220.27 (USD)
+2025-10-23 20:48:42,918 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 6: List argument must consist only of tuples or dictionaries
+2025-10-23 20:48:42,918 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AMZN
+2025-10-23 20:48:42,919 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AMZN: $220.27
+2025-10-23 20:48:43,053 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-10-23 20:48:43,053 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Current price: $445.92
+2025-10-23 20:48:43,053 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Calculated change_amount = 445.92 - 438.97 = 6.949999999999989
+2025-10-23 20:48:43,053 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Calculated change_pct = (6.949999999999989 / 438.97) * 100 = 1.58%
+2025-10-23 20:48:43,053 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: volume = 91676964
+2025-10-23 20:48:43,053 - services.external_data.yahoo_finance_adapter - INFO - 📊 TSLA: Final quote data - price: $445.92, change_pct: 1.58%, change_amount: $6.95
+2025-10-23 20:48:43,053 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: TSLA
+2025-10-23 20:48:43,053 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker TSLA (ID: 4) - proceeding to cache quote
+2025-10-23 20:48:43,054 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: TSLA = $445.92 (USD)
+2025-10-23 20:48:43,054 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 4: List argument must consist only of tuples or dictionaries
+2025-10-23 20:48:43,054 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for TSLA
+2025-10-23 20:48:43,054 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for TSLA: $445.92
+2025-10-23 20:48:43,054 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AAPL
+2025-10-23 20:48:43,055 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AAPL (ID: 1) - proceeding to cache quote
+2025-10-23 20:48:43,055 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AAPL = $260.22 (USD)
+2025-10-23 20:48:43,055 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 1: List argument must consist only of tuples or dictionaries
+2025-10-23 20:48:43,055 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AAPL
+2025-10-23 20:48:43,055 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AAPL: $260.22
+2025-10-23 20:48:43,055 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: GOOGL
+2025-10-23 20:48:43,056 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker GOOGL (ID: 2) - proceeding to cache quote
+2025-10-23 20:48:43,056 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: GOOGL = $254.09 (USD)
+2025-10-23 20:48:43,056 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 2: List argument must consist only of tuples or dictionaries
+2025-10-23 20:48:43,056 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for GOOGL
+2025-10-23 20:48:43,056 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for GOOGL: $254.09
+2025-10-23 20:48:43,056 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AMZN
+2025-10-23 20:48:43,056 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AMZN (ID: 6) - proceeding to cache quote
+2025-10-23 20:48:43,056 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AMZN = $220.27 (USD)
+2025-10-23 20:48:43,057 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 6: List argument must consist only of tuples or dictionaries
+2025-10-23 20:48:43,057 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AMZN
+2025-10-23 20:48:43,057 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AMZN: $220.27
+2025-10-23 20:48:43,057 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: TSLA
+2025-10-23 20:48:43,057 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker TSLA (ID: 4) - proceeding to cache quote
+2025-10-23 20:48:43,057 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: TSLA = $445.92 (USD)
+2025-10-23 20:48:43,057 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 4: List argument must consist only of tuples or dictionaries
+2025-10-23 20:48:43,057 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for TSLA
+2025-10-23 20:48:43,058 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for TSLA: $445.92
+2025-10-23 20:48:43,059 - services.external_data.yahoo_finance_adapter - INFO - Updated provider yahoo_finance health: True
+2025-10-23 20:48:43,063 - services.data_refresh_scheduler - INFO - Batch refresh completed: 4 successful, 0 failed
+2025-10-23 20:48:43,064 - services.data_refresh_scheduler - INFO - Group refresh completed: ID 34222 - 4 successful, 0 failed
+2025-10-23 20:49:16,303 - root - INFO - 🚀 Starting TikTrack server...
+2025-10-23 20:49:16,303 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend
+2025-10-23 20:49:16,303 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-10-23 20:49:16,303 - root - INFO - 📦 Flask version: 2.3.3
+2025-10-23 20:49:16,303 - root - INFO - 🗄️ Initializing database...
+2025-10-23 20:49:16,303 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-10-23 20:49:16,307 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.004s
+2025-10-23 20:49:16,307 - root - INFO - ✅ Database initialized successfully
+2025-10-23 20:49:17,310 - utils.performance_monitor - INFO - System metrics: CPU: 28.6%, Memory: 54.4%, Disk: 3.6%
+2025-10-23 20:49:17,310 - root - INFO - ✅ Database initialized successfully
+2025-10-23 20:49:17,310 - root - INFO - ✅ Server initialization completed
+2025-10-23 20:49:17,349 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
+2025-10-23 20:49:17,349 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
+2025-10-23 20:49:17,349 - root - INFO - ✅ Condition evaluation task registered successfully
+2025-10-23 20:49:17,349 - root - INFO - 🚀 Starting background task scheduler...
+2025-10-23 20:49:17,349 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-10-23 20:49:17,349 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-10-23 20:49:17,349 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-10-23 20:49:17,349 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-10-23 20:49:17,350 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-10-23 20:49:17,350 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-10-23 20:49:17,350 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-10-23 20:49:17,350 - services.background_tasks - INFO - Background task scheduler started
+2025-10-23 20:49:17,350 - root - INFO - ✅ Background task scheduler started successfully
+2025-10-23 20:49:17,350 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:c7c5031c124e1a95463f0dc6fe303fee
+2025-10-23 20:49:17,376 - cache - INFO - Cache SET: services.system_settings_service.get_setting:c7c5031c124e1a95463f0dc6fe303fee (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-23 20:49:17,376 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-10-23 20:49:17,377 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-10-23 20:49:17,377 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-10-23 20:49:17,387 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:8080
+2025-10-23 20:49:17,387 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-23 20:49:24,587 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.003s - Success: True
+2025-10-23 20:49:24,587 - cache - INFO - Cache SET: health_check_1761241764 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-23 20:49:24,587 - cache - INFO - Cache HIT: health_check_1761241764 (Access count: 1)
+2025-10-23 20:49:24,587 - cache - INFO - Cache DELETE: health_check_1761241764 (Was accessed 1 times)
+2025-10-23 20:49:24,587 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-10-23 20:49:24,588 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-23 20:49:24,588 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-23 20:49:24,588 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:49:24] "GET /api/health HTTP/1.1" 200 -
+2025-10-23 20:49:29,064 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:49:29] "GET /api/preferences/user?user_id=1&profile_id=3 HTTP/1.1" 200 -
+2025-10-23 20:49:31,909 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:49:31] "GET /api/preferences/user?user_id=1&profile_id=3 HTTP/1.1" 200 -
+2025-10-23 20:49:34,945 - services.constraint_service - INFO - Retrieved 16 constraints for table preference_types
+2025-10-23 20:49:34,947 - services.preferences_service - INFO - Cache invalidated for user 1, profile 3
+2025-10-23 20:49:34,947 - services.preferences_service - INFO - Saved preference primaryColor for user 1
+2025-10-23 20:49:34,947 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:49:34] "POST /api/preferences/user/single HTTP/1.1" 200 -
+2025-10-23 20:49:37,053 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:49:37] "GET /api/preferences/user/preference?name=primaryColor&user_id=1 HTTP/1.1" 200 -
+2025-10-23 20:49:39,750 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:49:39] "GET /trading-ui/preferences.html HTTP/1.1" 200 -
+2025-10-23 20:49:54,421 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:49:54] "GET /api/preferences/user/single?preference_name=notifications_business_enabled&user_id=1 HTTP/1.1" 200 -
+2025-10-23 20:49:54,422 - werkzeug - INFO - 127.0.0.1 - - [23/Oct/2025 20:49:54] "GET /api/preferences/user/single?preference_name=notifications_development_enabled&user_id=1 HTTP/1.1" 200 -

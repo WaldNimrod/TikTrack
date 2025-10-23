@@ -152,4 +152,11 @@
   --status-unknown-color: var(--user-status-unknown-color, var(--apple-gray-6));
   --status-unknown-bg: var(--user-status-unknown-bg, color-mix(in srgb, var(--user-status-unknown-color, var(--apple-gray-6)) 10%, transparent));
   --status-unknown-border: var(--user-status-unknown-border, var(--user-status-unknown-color, var(--apple-gray-6)));
+
+  /* ===== צבעי סוגי טרייד ===== */
+  --type-swing-color: #007AFF;        /* כחול - סווינג */
+  --type-investment-color: #34C759;   /* ירוק - השקעה */
+  --type-passive-color: #FF9500;      /* כתום - פסיבי */
+  --type-day-trading-color: #AF52DE;  /* סגול - מסחר יומי */
+  --type-scalping-color: #FF2D92;     /* ורוד - סקלפינג */
 }

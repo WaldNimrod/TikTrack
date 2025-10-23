@@ -402,35 +402,36 @@ const PACKAGE_MANIFEST = {
   preferences: {
     id: 'preferences',
     name: 'Preferences Package',
-    description: 'מערכת העדפות משתמש',
-    version: '2.0.0',
+    description: 'מערכת העדפות משתמש (3 קבצים)',
+    version: '3.0.0',
     critical: false,
     loadOrder: 5,
     dependencies: ['base'],
     scripts: [
       {
-        file: 'preferences-core.js',
-        globalCheck: 'window.PreferencesSystem',
-        description: 'ליבת העדפות',
+        file: 'preferences-core-new.js',
+        globalCheck: 'window.PreferencesCore',
+        description: 'ליבת העדפות (ללא צבעים)',
         required: true,
         loadOrder: 1
       },
       {
-        file: 'preferences.js',
-        globalCheck: 'window.getCurrentPreference',
-        description: 'מערכת העדפות',
+        file: 'preferences-colors.js',
+        globalCheck: 'window.ColorManager',
+        description: 'מערכת צבעים (60+ העדפות)',
         required: true,
         loadOrder: 2
       },
       {
-        file: 'preferences-page.js',
-        globalCheck: 'window.loadColorsForPreferences',
-        description: 'עמוד העדפות',
-        required: false
+        file: 'preferences-ui.js',
+        globalCheck: 'window.PreferencesUI',
+        description: 'ממשק משתמש',
+        required: true,
+        loadOrder: 3
       }
     ],
-    estimatedSize: '~140KB',
-    initTime: '~70ms'
+    estimatedSize: '~120KB',
+    initTime: '~60ms'
   },
 
   // 6. VALIDATION PACKAGE - ולידציה

@@ -264,3 +264,22 @@ background-color: var(--status-pending-color);
   border: 1px solid var(--user-status-negative-color, #dc3545);
 }
 
+/* סוג טרייד */
+.badge-type {
+  background-color: var(--current-entity-color, #007bff);
+  color: white;
+  border: 1px solid var(--current-entity-color, #007bff);
+}
+
+.badge-type.text-success {
+  background-color: var(--user-status-positive-color, #28a745);
+  color: white;
+  border: 1px solid var(--user-status-positive-color, #28a745);
+}
+
+.badge-type.text-danger {
+  background-color: var(--user-status-negative-color, #dc3545);
+  color: white;
+  border: 1px solid var(--user-status-negative-color, #dc3545);
+}
+

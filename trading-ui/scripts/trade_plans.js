@@ -1972,6 +1972,14 @@ async function showAddTradePlanModal() {
         updateAmountFromShares();
       });
     }
+
+    // Add event listener for price field to calculate amount
+    const priceInput = document.getElementById('price');
+    if (priceInput) {
+      priceInput.addEventListener('input', function() {
+        updateAmountFromShares();
+      });
+    }
     
     tickerSelect.value = '';
     console.log(`🔧 showAddTradePlanModal: Ticker select reset, new value: "${tickerSelect.value}"`);
@@ -3783,14 +3791,22 @@ function updateSharesFromAmount() {
  */
 function updateAmountFromShares() {
   const sharesInput = document.getElementById('quantity');
+  const priceInput = document.getElementById('price');
   const priceDisplay = document.getElementById('currentPriceDisplay');
 
-  if (sharesInput && priceDisplay) {
-    if (sharesInput.value && priceDisplay.textContent !== '-') {
-      const shares = parseFloat(sharesInput.value);
-      const price = parseFloat(priceDisplay.textContent.replace('$', ''));
+  // נסה תחילה את שדה המחיר, אחר כך את התצוגה
+  let price = 0;
+  if (priceInput && priceInput.value) {
+    price = parseFloat(priceInput.value);
+  } else if (priceDisplay && priceDisplay.textContent !== '-' && priceDisplay.textContent !== '') {
+    price = parseFloat(priceDisplay.textContent.replace('$', ''));
+  }
 
-      if (price > 0) {
+  if (sharesInput && price > 0) {
+    if (sharesInput.value) {
+      const shares = parseFloat(sharesInput.value);
+
+      if (shares > 0) {
         // בדיקה אם הפונקציה הכללית זמינה
         if (typeof window.convertSharesToAmount === 'function') {
           const amount = window.convertSharesToAmount(shares, price);
@@ -3811,7 +3827,11 @@ function updateAmountFromShares() {
       }
     }
   } else {
-    handleElementNotFound('updateAmountFromShares', 'אלמנטים נדרשים לא נמצאו לעדכון סכום');
+    // אם אין מחיר או כמות, אפס את התצוגה
+    const amountDisplay = document.getElementById('amountDisplay');
+    if (amountDisplay) {
+      amountDisplay.textContent = '$0.00';
+    }
   }
 }
 

@@ -10,7 +10,7 @@ function loadCashFlowsData() {
     
     // הצגת אינדיקטור טעינה
     if (typeof window.showNotification === 'function') {
-      window.showInfoNotification('טוען נתוני תזרימי מזומנים...');
+      window.showInfoNotification('טעינה', 'טוען נתוני תזרימי מזומנים...');
     }
     
     // שליחה לשרת

@@ -429,7 +429,6 @@ function updateTradesTable(trades) {
       <td data-date="${trade.created_at}">${window.renderDate ? window.renderDate(trade.created_at, false) : FieldRendererService.renderDate(trade.created_at, false)}</td>
       <td>${window.renderDate ? window.renderDate(trade.closed_at || trade.cancelled_at, false) : FieldRendererService.renderDate(trade.closed_at || trade.cancelled_at, false)}</td>
       <td><strong><a href="#" onclick="viewAccountDetails('${trade.account_id}')" class="account-link">${trade.account_name || trade.account_id || 'חשבון לא ידוע'}</a></strong></td>
-      <td>${trade.notes || ''}</td>
       <td class="actions-cell">
         ${window.createActionsMenu ? window.createActionsMenu([
           { type: 'VIEW', onclick: `window.showEntityDetails('trade', ${trade.id}, { mode: 'view' })`, title: 'צפה בפרטי טרייד' },

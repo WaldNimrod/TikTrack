@@ -1691,7 +1691,18 @@ function updateTradePlansTable(trade_plans) {
           ${window.renderSide ? window.renderSide(design.side) : `<span class="${design.side === 'Long' ? 'numeric-value-positive' : 'numeric-value-negative'}" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">${sideDisplay}</span>`}
         </td>
         <td class="quantity-cell">
-          ${window.renderShares ? window.renderShares(design.quantity) : `<span class="numeric-value-positive" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">${design.quantity || 'לא מוגדר'}</span>`}
+          ${(() => {
+            // חישוב כמות מהסכום המתוכנן ומחיר היעד
+            const plannedAmount = design.planned_amount || 0;
+            const targetPrice = design.target_price || 0;
+            const calculatedQuantity = targetPrice > 0 ? (plannedAmount / targetPrice) : 0;
+            
+            if (window.renderShares) {
+              return window.renderShares(calculatedQuantity);
+            } else {
+              return `<span class="numeric-value-positive" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">${calculatedQuantity > 0 ? calculatedQuantity.toFixed(1) : '-'}</span>`;
+            }
+          })()}
         </td>
         <td class="price-cell">
           <span class="target-text" style="color: ${window.getTableColors ? window.getTableColors().positive : '#28a745'};">
@@ -1699,7 +1710,11 @@ function updateTradePlansTable(trade_plans) {
           </span>
         </td>
         <td class="investment-cell">
-          ${window.renderAmount ? window.renderAmount(design.planned_amount) : `<span class="numeric-value-positive" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">${amountDisplay}</span>`}
+          ${(() => {
+            const amount = design.planned_amount || 0;
+            const formatted = amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            return `<span class="amount-display">${formatted} $</span>`;
+          })()}
         </td>
         <td class="status-cell" data-status="${statusForFilter}">
           ${window.renderStatus ? window.renderStatus(design.status, 'trade_plan') : `<span class="status-${design.status}-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">${statusDisplay}</span>`}

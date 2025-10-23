@@ -194,7 +194,7 @@ class PreferencesAPIClient {
             data.profile_id = profileId;
         }
         
-        const result = await this.post('/user/save', data);
+        const result = await this.post('/user/single', data);
         return result.success;
     }
     

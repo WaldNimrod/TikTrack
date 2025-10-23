@@ -198,7 +198,7 @@ class ColorManager {
                 throw new Error(`Invalid color format: ${colorValue}`);
             }
             
-            const response = await fetch('/api/preferences/user/save', {
+            const response = await fetch('/api/preferences/user/single', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

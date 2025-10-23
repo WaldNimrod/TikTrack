@@ -434,6 +434,29 @@ console.log('Cache hit rate:', stats.performance.hitRate);
 
 ---
 
+## שילוב מערכת ההעדפות
+
+מערכת ההעדפות משתמשת ב-UnifiedCacheManager לניהול מטמון:
+
+### מדיניות מטמון להעדפות:
+- **Layer:** localStorage
+- **TTL:** 300000ms (5 דקות)
+- **Key Format:** `preference_{name}_{userId}_{profileId}`
+- **Validation:** true
+- **Sync to Backend:** false (manual save)
+
+### תהליך שמירת העדפה:
+1. שמירה ל-backend
+2. מחיקת key מ-UnifiedCacheManager
+3. טעינה מחדש בגישה הבאה
+
+### תהליך החלפת פרופיל:
+1. עדכון profileId ב-PreferencesCore
+2. קריאה ל-clearAllUnifiedCacheQuick()
+3. רענון העמוד
+
+---
+
 ## 🔗 קישורים רלוונטיים
 
 ### דוקומנטציה קשורה:

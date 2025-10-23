@@ -1125,6 +1125,18 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
             errors.push(`Unified Cache: ${error.message}`);
         }
         
+        // 1.5. Clear Preferences Cache Manager
+        try {
+            if (window.PreferencesCore && window.PreferencesCore.cacheManager) {
+                window.PreferencesCore.cacheManager.clear();
+                clearedLayers.push('Preferences Cache Manager');
+                console.log('✅ Preferences Cache Manager cleared successfully');
+            }
+        } catch (error) {
+            console.error('❌ Error clearing Preferences Cache Manager:', error);
+            errors.push(`Preferences Cache Manager: ${error.message}`);
+        }
+        
         // 2. Clear localStorage
         try {
             localStorage.clear();
@@ -1964,18 +1976,20 @@ UnifiedCacheManager.prototype.refreshMarketData = async function() {
 UnifiedCacheManager.prototype.refreshUserPreferences = async function() {
     try {
         // Clear preferences cache
-        this.remove('user-preferences');
+        const keys = await this.getAllKeys();
+        const prefKeys = keys.filter(k => k.includes('preference_') || k.includes('all_preferences_'));
         
-        // Trigger preferences reload
-        if (typeof window.dispatchEvent === 'function') {
-            window.dispatchEvent(new CustomEvent('tiktrack:refresh-preferences', {
-                detail: { source: 'cache-clear' }
-            }));
+        for (const key of prefKeys) {
+            await this.remove(key);
         }
         
         // If preferences system is available, refresh it
-        if (typeof window.refreshUserPreferences === 'function') {
-            await window.refreshUserPreferences();
+        if (window.PreferencesCore) {
+            await window.PreferencesCore.initializeWithLazyLoading(
+                window.PreferencesCore.currentUserId,
+                window.PreferencesCore.currentProfileId
+            );
+            console.log('✅ User preferences refreshed from backend');
         }
         
     } catch (error) {

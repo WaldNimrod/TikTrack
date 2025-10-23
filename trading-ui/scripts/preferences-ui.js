@@ -449,9 +449,11 @@ class PreferencesUI {
         try {
             this.loadingManager.startLoading(loaderId, 'טוען העדפות...');
             
+            // 🔍 Cache & Profile Debug Logging
+            console.log(`🔍 CACHE DEBUG: Loading preferences for user ${userId || this.currentUserId}, profile ${profileId || this.currentProfileId}`);
+            
             // Initialize lazy loading if available
             if (window.LazyLoader) {
-                console.log('🚀 Using lazy loading for preferences');
                 await window.LazyLoader.initialize(
                     userId || this.currentUserId, 
                     profileId || this.currentProfileId
@@ -459,7 +461,7 @@ class PreferencesUI {
                 
                 // Get loading stats
                 const stats = window.LazyLoader.getLoadingStats();
-                console.log(`📊 Lazy loading stats: ${stats.loaded}/${stats.total} (${stats.percentage}%)`);
+                console.log(`🔍 CACHE DEBUG: Lazy loading stats: ${stats.loaded}/${stats.total} (${stats.percentage}%)`);
                 
                 // Load critical preferences immediately
                 const criticalPrefs = window.LazyLoader.classifier.getPreferencesByClassification('critical');
@@ -469,6 +471,7 @@ class PreferencesUI {
                     try {
                         const value = await window.PreferencesCore.getPreference(prefName, userId, profileId);
                         preferences[prefName] = value;
+                        console.log(`🔍 CACHE DEBUG: Loaded ${prefName} = ${value}`);
                     } catch (error) {
                         console.warn(`⚠️ Failed to load critical preference ${prefName}:`, error);
                     }
@@ -478,7 +481,10 @@ class PreferencesUI {
                 this.formManager.populateForm(preferences);
                 
                 // Update counters
-                this.updateCounters(preferences);
+                await this.updateCounters(preferences);
+                
+                // Load profiles to dropdown
+                await window.loadProfilesToDropdown();
                 
                 this.loadingManager.stopLoading(loaderId, true, `נטענו ${Object.keys(preferences).length} העדפות קריטיות`);
                 
@@ -509,7 +515,11 @@ class PreferencesUI {
                 this.formManager.populateForm(preferences);
                 
                 // Update counters
-                this.updateCounters(preferences);
+                await this.updateCounters(preferences);
+                
+                // Load profiles to dropdown
+                console.log('🔄 Calling loadProfilesToDropdown...');
+                await window.loadProfilesToDropdown();
                 
                 this.loadingManager.stopLoading(loaderId, true, 'העדפות נטענו בהצלחה');
             }
@@ -522,76 +532,123 @@ class PreferencesUI {
     }
     
     /**
-     * Save all preferences from form
+     * Save All Preferences - Clean Implementation
+     * Handles saving preferences with proper validation and error handling
      * @param {number} userId - User ID
      * @param {number} profileId - Profile ID
+     * @returns {Promise<boolean>} Success status
      */
     async saveAllPreferences(userId = null, profileId = null) {
-        const loaderId = 'save_preferences';
-        
         try {
-            this.loadingManager.startLoading(loaderId, 'שומר העדפות...');
-            this.uiManager.updateFormStatus('saving', 'שומר...');
+            console.log('💾 Starting save all preferences process...');
             
-            // Validate form
-            const validation = this.formManager.validateForm();
-            if (!validation.valid) {
-                throw new Error('Validation failed: ' + validation.errors.join(', '));
+            // 1. Get form element
+            const form = document.getElementById('preferencesForm');
+            if (!form) {
+                throw new Error('Preferences form not found');
             }
             
-            // Collect form data
-            const formData = this.formManager.collectFormData();
+            // 2. Collect form data
+            const formData = new FormData(form);
+            const changedPreferences = {};
             
-            // Separate color and non-color preferences
-            const colorPreferences = {};
-            const nonColorPreferences = {};
-            
-            Object.entries(formData).forEach(([name, value]) => {
-                if (name.includes('Color') || name.includes('color')) {
-                    colorPreferences[name] = value;
-                } else {
-                    nonColorPreferences[name] = value;
+            // 3. Check for changes and collect only changed preferences
+            for (let [key, value] of formData.entries()) {
+                if (this.hasChanged(key, value)) {
+                    changedPreferences[key] = value;
                 }
+            }
+            
+            // 4. Check if there are any changes
+            if (Object.keys(changedPreferences).length === 0) {
+                console.log('ℹ️ No changes to save');
+                if (typeof window.showInfoNotification === 'function') {
+                    window.showInfoNotification('אין שינויים לשמירה');
+                }
+                return true;
+            }
+            
+            console.log(`📊 Found ${Object.keys(changedPreferences).length} changed preferences`);
+            
+            // 5. Validate all changed preferences
+            for (let [name, value] of Object.entries(changedPreferences)) {
+                console.log(`🔍 Validating ${name}...`);
+                
+                if (window.PreferenceValidator) {
+                    const validation = await window.PreferenceValidator.validatePreference(name, value);
+                    if (!validation.valid) {
+                        const errorMessages = validation.errors.map(e => e.message).join(', ');
+                        throw new Error(`Validation failed for ${name}: ${errorMessages}`);
+                    }
+                }
+            }
+            
+            console.log('✅ All preferences validated successfully');
+            
+            // 6. Save to backend
+            const response = await fetch('/api/preferences/user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_id: userId || window.PreferencesCore.currentUserId,
+                    profile_id: profileId || window.PreferencesCore.currentProfileId,
+                    preferences: changedPreferences
+                })
             });
             
-            let totalSaved = 0;
-            let totalErrors = 0;
-            
-            // Save non-color preferences
-            if (Object.keys(nonColorPreferences).length > 0) {
-                const result = await window.PreferencesCore.savePreferences(
-                    nonColorPreferences, 
-                    userId || this.currentUserId, 
-                    profileId || this.currentProfileId
-                );
-                totalSaved += result.saved;
-                totalErrors += result.errors;
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
             
-            // Save color preferences
-            if (Object.keys(colorPreferences).length > 0 && window.ColorManager) {
-                const colorResult = await window.saveAllColorPreferences(
-                    userId || this.currentUserId, 
-                    profileId || this.currentProfileId
-                );
-                totalSaved += colorResult.saved;
-                totalErrors += colorResult.errors;
+            const result = await response.json();
+            if (!result.success) {
+                throw new Error(result.error || 'Failed to save preferences');
             }
             
-            if (totalErrors === 0) {
-                this.loadingManager.stopLoading(loaderId, true, `נשמרו ${totalSaved} העדפות בהצלחה`);
-                this.uiManager.updateFormStatus('saved', 'נשמר בהצלחה');
+            console.log('✅ Preferences saved successfully');
+            
+            // 7. Clear all cache layers via UnifiedCacheManager
+            if (window.clearAllUnifiedCacheQuick) {
+                await window.clearAllUnifiedCacheQuick();
+                console.log('✅ All cache layers cleared');
             } else {
-                this.loadingManager.stopLoading(loaderId, false, `נשמרו ${totalSaved} העדפות, ${totalErrors} שגיאות`);
-                this.uiManager.updateFormStatus('error', `${totalErrors} שגיאות`);
+                console.log('⚠️ UnifiedCacheManager not available for cache clearing');
             }
+            
+            // 8. Show success notification
+            if (typeof window.showSuccessNotification === 'function') {
+                window.showSuccessNotification(`נשמרו ${Object.keys(changedPreferences).length} העדפות בהצלחה`);
+            }
+            
+            // 9. Reload page after 1.5 seconds
+            console.log('🔄 Page will reload in 1.5 seconds...');
+            setTimeout(() => {
+                window.location.reload(true);
+            }, 1500);
+            
+            return true;
             
         } catch (error) {
             console.error('❌ Error saving preferences:', error);
-            this.loadingManager.stopLoading(loaderId, false, 'שגיאה בשמירת העדפות');
-            this.uiManager.updateFormStatus('error', 'שגיאה בשמירה');
-            this.uiManager.showError('שגיאה בשמירת העדפות: ' + error.message);
+            
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification(`שגיאה בשמירת העדפות: ${error.message}`);
+            }
+            
+            return false;
         }
+    }
+    
+    /**
+     * Check if preference has changed
+     * @param {string} key - Preference key
+     * @param {string} value - New value
+     * @returns {boolean} True if changed
+     */
+    hasChanged(key, value) {
+        // For now, assume all values are changed
+        // In a more sophisticated implementation, we would compare with original values
+        return value !== null && value !== undefined && value !== '';
     }
     
     /**
@@ -624,7 +681,7 @@ class PreferencesUI {
      * Update counters
      * @param {Object} preferences - Preferences object
      */
-    updateCounters(preferences) {
+    async updateCounters(preferences) {
         const totalCount = Object.keys(preferences).length;
         const colorCount = Object.keys(preferences).filter(key => 
             key.includes('Color') || key.includes('color')
@@ -634,6 +691,70 @@ class PreferencesUI {
         this.uiManager.updateCounter('total-preferences', totalCount, 'סה"כ העדפות: ');
         this.uiManager.updateCounter('color-preferences', colorCount, 'צבעים: ');
         this.uiManager.updateCounter('non-color-preferences', nonColorCount, 'אחרות: ');
+        
+        // Update HTML statistics
+        await this.updateStatistics(preferences);
+    }
+    
+    /**
+     * Update statistics in HTML
+     * @param {Object} preferences - Preferences object
+     */
+    async updateStatistics(preferences) {
+        try {
+            console.log('📊 Updating statistics...');
+            
+            // Update preferences count
+            const preferencesCount = Object.keys(preferences).length;
+            const preferencesCountElement = document.getElementById('preferencesCount');
+            if (preferencesCountElement) {
+                preferencesCountElement.textContent = preferencesCount;
+                console.log(`📊 Updated preferences count: ${preferencesCount}`);
+            }
+            
+            // Update profiles count
+            try {
+                const profiles = await window.getUserProfiles();
+                const profilesCount = profiles.length;
+                const profilesCountElement = document.getElementById('profilesCount');
+                if (profilesCountElement) {
+                    profilesCountElement.textContent = profilesCount;
+                    console.log(`📊 Updated profiles count: ${profilesCount}`);
+                }
+            } catch (error) {
+                console.error('❌ Error loading profiles count:', error);
+                const profilesCountElement = document.getElementById('profilesCount');
+                if (profilesCountElement) {
+                    profilesCountElement.textContent = 'שגיאה';
+                }
+            }
+            
+            // Update groups count
+            try {
+                const response = await fetch('/api/preferences/groups');
+                if (response.ok) {
+                    const result = await response.json();
+                    const groupsCount = result.data.groups.length;
+                    const groupsCountElement = document.getElementById('groupsCount');
+                    if (groupsCountElement) {
+                        groupsCountElement.textContent = groupsCount;
+                        console.log(`📊 Updated groups count: ${groupsCount}`);
+                    }
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                console.error('❌ Error loading groups count:', error);
+                const groupsCountElement = document.getElementById('groupsCount');
+                if (groupsCountElement) {
+                    groupsCountElement.textContent = 'שגיאה';
+                }
+            }
+            
+            console.log('✅ Statistics updated successfully');
+        } catch (error) {
+            console.error('❌ Error updating statistics:', error);
+        }
     }
     
     /**
@@ -687,6 +808,55 @@ window.saveAllPreferences = async function(userId = null, profileId = null) {
 };
 
 /**
+ * Save individual preference with cache management
+ * @param {string} preferenceName - Preference name
+ * @param {any} value - Preference value
+ * @param {number} userId - User ID
+ * @param {number} profileId - Profile ID
+ * @returns {Promise<boolean>} Success status
+ */
+window.saveIndividualPreference = async function(preferenceName, value, userId = null, profileId = null) {
+    try {
+        console.log(`💾 Saving individual preference: ${preferenceName} = ${value}`);
+        
+        // Validate
+        if (window.PreferenceValidator) {
+            const validation = await window.PreferenceValidator.validatePreference(preferenceName, value);
+            if (!validation.valid) {
+                throw new Error(validation.errors.map(e => e.message).join(', '));
+            }
+        }
+        
+        // Save to backend
+        const success = await window.PreferencesCore.savePreference(preferenceName, value, userId, profileId);
+        
+        if (success) {
+            // Clear cache for this preference
+            const cacheKey = `preference_${preferenceName}_${userId || window.PreferencesCore.currentUserId}_${profileId || window.PreferencesCore.currentProfileId}`;
+            if (window.UnifiedCacheManager) {
+                await window.UnifiedCacheManager.remove(cacheKey);
+            }
+            
+            // Show success
+            if (typeof window.showSuccessNotification === 'function') {
+                window.showSuccessNotification(`העדפה "${preferenceName}" נשמרה בהצלחה`);
+            }
+            
+            console.log(`✅ Individual preference saved: ${preferenceName}`);
+            return true;
+        }
+        
+        return false;
+    } catch (error) {
+        console.error(`❌ Error saving individual preference ${preferenceName}:`, error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification(`שגיאה בשמירת העדפה: ${error.message}`);
+        }
+        return false;
+    }
+};
+
+/**
  * Reset to defaults (backward compatibility)
  */
 window.resetToDefaults = function() {
@@ -697,8 +867,8 @@ window.resetToDefaults = function() {
  * Update counters (backward compatibility)
  * @param {Object} preferences - Preferences object
  */
-window.updateCounters = function(preferences) {
-    return window.PreferencesUI.updateCounters(preferences);
+window.updateCounters = async function(preferences) {
+    return await window.PreferencesUI.updateCounters(preferences);
 };
 
 /**
@@ -709,9 +879,356 @@ window.toggleSection = function(sectionName) {
     return window.PreferencesUI.toggleSection(sectionName);
 };
 
+/**
+ * Load profiles to dropdown
+ * @returns {Promise<boolean>} Success status
+ */
+window.loadProfilesToDropdown = async function() {
+    try {
+        console.log('📂 Loading profiles to dropdown...');
+        
+        // Get profiles from API
+        const response = await fetch('/api/preferences/profiles');
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        if (!result.success) {
+            throw new Error(result.error || 'Failed to load profiles');
+        }
+        
+        const profiles = result.data.profiles;
+        const profileSelect = document.getElementById('profileSelect');
+        
+        if (!profileSelect) {
+            console.warn('⚠️ Profile select element not found');
+            return false;
+        }
+        
+        // Clear existing options
+        profileSelect.innerHTML = '';
+        
+        // Add default option first
+        const defaultOption = document.createElement('option');
+        defaultOption.value = 'ברירת מחדל';
+        defaultOption.textContent = 'ברירת מחדל';
+        profileSelect.appendChild(defaultOption);
+        
+        if (profiles && profiles.length > 0) {
+            profiles.forEach(profile => {
+                // Skip if this is already the default profile
+                if (profile.name === 'ברירת מחדל') {
+                    return;
+                }
+                
+                const option = document.createElement('option');
+                option.value = profile.name;
+                option.textContent = profile.name;
+                if (profile.active) {
+                    option.selected = true;
+                }
+                profileSelect.appendChild(option);
+            });
+            
+            // Find and select the active profile
+            const activeProfile = profiles.find(p => p.active);
+            console.log(`🔍 PROFILE DEBUG: Found active profile:`, activeProfile);
+            
+            if (activeProfile) {
+                // Select the active profile in dropdown
+                const activeOption = profileSelect.querySelector(`option[value="${activeProfile.name}"]`);
+                if (activeOption) {
+                    activeOption.selected = true;
+                    console.log(`🔍 UI DEBUG: Selected active profile in dropdown: ${activeProfile.name}`);
+                } else {
+                    console.warn(`⚠️ Active profile option not found in dropdown: ${activeProfile.name}`);
+                }
+            } else {
+                // No active profile found, select default
+                const defaultOption = profileSelect.querySelector('option[value="ברירת מחדל"]');
+                if (defaultOption) {
+                    defaultOption.selected = true;
+                    console.log(`🔍 UI DEBUG: No active profile found, selected default`);
+                }
+            }
+            
+            console.log(`✅ Loaded ${profiles.length} profiles to dropdown`);
+            
+            // Update active profile info in the new card format
+            const activeProfileName = document.getElementById('activeProfileName');
+            const activeProfileDescription = document.getElementById('activeProfileDescription');
+            
+            if (activeProfile) {
+                if (activeProfileName) {
+                    activeProfileName.textContent = activeProfile.name;
+                }
+                if (activeProfileDescription) {
+                    activeProfileDescription.textContent = activeProfile.description || 'פרופיל משתמש';
+                }
+                console.log(`🔍 UI DEBUG: Updated active profile card to: ${activeProfile.name}`);
+                
+                // Check if this is the default profile and disable all preferences
+                const isDefaultProfile = activeProfile.is_default || activeProfile.default || activeProfile.name === 'ברירת מחדל';
+                if (isDefaultProfile) {
+                    console.log('🔒 Default profile active - disabling all preferences interface');
+                    window.disableAllPreferencesInterface();
+                } else {
+                    console.log('✅ User profile active - enabling all preferences interface');
+                    window.enableAllPreferencesInterface();
+                }
+            } else {
+                if (activeProfileName) {
+                    activeProfileName.textContent = 'ברירת מחדל';
+                }
+                if (activeProfileDescription) {
+                    activeProfileDescription.textContent = 'פרופיל ברירת מחדל של המערכת';
+                }
+                console.log(`🔍 UI DEBUG: Updated active profile card to: ברירת מחדל (no active profile)`);
+                
+                // Default profile is active - disable all preferences
+                console.log('🔒 Default profile active - disabling all preferences interface');
+                window.disableAllPreferencesInterface();
+            }
+            
+            return true;
+        } else {
+            console.log('⚠️ No profiles found, using default');
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ Error loading profiles to dropdown:', error);
+        return false;
+    }
+};
+
+/**
+ * Get user profiles
+ * @param {number} userId - User ID
+ * @returns {Promise<Array>} Profiles array
+ */
+window.getUserProfiles = async function(userId = 1) {
+    try {
+        const response = await fetch(`/api/preferences/profiles?user_id=${userId}`);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        if (!result.success) {
+            throw new Error(result.error || 'Failed to load profiles');
+        }
+        
+        return result.data.profiles;
+    } catch (error) {
+        console.error('❌ Error loading profiles:', error);
+        return [];
+    }
+};
+
+/**
+ * Switch profile
+ * @param {number} profileId - Profile ID
+ * @returns {Promise<boolean>} Success status
+ */
+window.switchProfile = async function(profileId) {
+    try {
+        console.log(`🔄 Switching to profile ID: ${profileId}`);
+        
+        const response = await fetch('/api/preferences/profiles/activate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                user_id: 1,
+                profile_id: profileId
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        if (!result.success) {
+            throw new Error(result.error || 'Failed to switch profile');
+        }
+        
+        console.log('✅ Profile switched successfully');
+        return true;
+    } catch (error) {
+        console.error('❌ Error switching profile:', error);
+        return false;
+    }
+};
+
+/**
+ * Load preferences (backward compatibility)
+ * @param {number} userId - User ID
+ * @param {number} profileId - Profile ID
+ * @returns {Promise<boolean>} Success status
+ */
+window.loadPreferences = async function(userId = 1, profileId = 3) {
+    try {
+        console.log(`🔄 Loading preferences for user ${userId}, profile ${profileId}`);
+        
+        if (window.PreferencesUI) {
+            await window.PreferencesUI.loadAllPreferences(userId, profileId);
+            return true;
+        } else {
+            console.warn('⚠️ PreferencesUI not available');
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ Error loading preferences:', error);
+        return false;
+    }
+};
+
 // ============================================================================
 // INITIALIZATION
 // ============================================================================
+
+// ============================================================================
+// DEFAULT PROFILE PROTECTION
+// ============================================================================
+
+/**
+ * Disable all preferences interface when default profile is active
+ */
+window.disableAllPreferencesInterface = function() {
+    console.log('🔒 Disabling all preferences interface...');
+    
+    // Disable all form inputs except profile management
+    const allInputs = document.querySelectorAll('#preferencesForm input, #preferencesForm select, #preferencesForm textarea');
+    allInputs.forEach(input => {
+        // Keep profile select and new profile name input enabled
+        if (input.id === 'profileSelect' || input.id === 'newProfileName') {
+            input.disabled = false;
+            input.classList.remove('disabled');
+        } else {
+            input.disabled = true;
+            input.classList.add('disabled');
+        }
+    });
+    
+    // Disable all buttons except profile management (keep profile switching and creation enabled)
+    const allButtons = document.querySelectorAll('#preferencesForm button:not([onclick*="switchActiveProfile"]):not([onclick*="createNewProfile"]):not([id*="switchProfileBtn"]):not([id*="createProfileBtn"])');
+    allButtons.forEach(button => {
+        button.disabled = true;
+        button.classList.add('disabled');
+    });
+    
+    // Keep profile management buttons enabled
+    const profileButtons = document.querySelectorAll('button[onclick*="switchActiveProfile"], button[onclick*="createNewProfile"], #switchProfileBtn, #createProfileBtn');
+    profileButtons.forEach(button => {
+        button.disabled = false;
+        button.classList.remove('disabled');
+        console.log(`✅ Kept profile management button enabled: ${button.id || button.onclick}`);
+    });
+    
+    // Keep profile select and new profile name input enabled
+    const profileSelect = document.getElementById('profileSelect');
+    const newProfileName = document.getElementById('newProfileName');
+    if (profileSelect) {
+        profileSelect.disabled = false;
+        profileSelect.classList.remove('disabled');
+        console.log('✅ Kept profile select enabled');
+    }
+    if (newProfileName) {
+        newProfileName.disabled = false;
+        newProfileName.classList.remove('disabled');
+        console.log('✅ Kept new profile name input enabled');
+    }
+    
+    // Add visual indicator to all save buttons
+    const saveButtons = document.querySelectorAll('button[onclick*="saveAllPreferences"], #savePreferencesBtn');
+    saveButtons.forEach(saveButton => {
+        saveButton.innerHTML = '<i class="bi bi-lock"></i> פרופיל ברירת מחדל - לא ניתן לערוך';
+        saveButton.classList.add('btn-secondary', 'disabled');
+        saveButton.classList.remove('btn-success');
+        console.log(`🔒 Disabled save button: ${saveButton.id || 'unnamed'}`);
+    });
+    
+    // Show warning message (only if not already shown)
+    if (!document.getElementById('defaultProfileWarning')) {
+        showDefaultProfileWarning();
+    }
+    
+    console.log('✅ All preferences interface disabled');
+};
+
+/**
+ * Enable all preferences interface when user profile is active
+ */
+window.enableAllPreferencesInterface = function() {
+    console.log('✅ Enabling all preferences interface...');
+    
+    // Enable all form inputs
+    const allInputs = document.querySelectorAll('#preferencesForm input, #preferencesForm select, #preferencesForm textarea');
+    allInputs.forEach(input => {
+        input.disabled = false;
+        input.classList.remove('disabled');
+    });
+    
+    // Enable all buttons
+    const allButtons = document.querySelectorAll('#preferencesForm button');
+    allButtons.forEach(button => {
+        button.disabled = false;
+        button.classList.remove('disabled');
+    });
+    
+    // Restore all save buttons
+    const saveButtons = document.querySelectorAll('button[onclick*="saveAllPreferences"], #savePreferencesBtn');
+    saveButtons.forEach(saveButton => {
+        saveButton.innerHTML = '<i class="bi bi-save me-2"></i>שמור העדפות';
+        saveButton.classList.add('btn-success');
+        saveButton.classList.remove('btn-secondary', 'disabled');
+        console.log(`✅ Enabled save button: ${saveButton.id || 'unnamed'}`);
+    });
+    
+    // Hide warning message
+    hideDefaultProfileWarning();
+    
+    console.log('✅ All preferences interface enabled');
+};
+
+/**
+ * Show warning message for default profile
+ */
+function showDefaultProfileWarning() {
+    // Remove existing warning if any
+    hideDefaultProfileWarning();
+    
+    // Create warning message
+    const warningDiv = document.createElement('div');
+    warningDiv.id = 'defaultProfileWarning';
+    warningDiv.className = 'alert alert-warning alert-dismissible fade show';
+    warningDiv.innerHTML = `
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        <strong>פרופיל ברירת מחדל פעיל!</strong>
+        לא ניתן לערוך הגדרות בפרופיל ברירת מחדל. 
+        החלף לפרופיל משתמש כדי לערוך הגדרות.
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    // Insert after the profile management section
+    const profileSection = document.getElementById('section1');
+    if (profileSection) {
+        profileSection.insertAdjacentElement('afterend', warningDiv);
+    }
+}
+
+/**
+ * Hide warning message for default profile
+ */
+function hideDefaultProfileWarning() {
+    const warningDiv = document.getElementById('defaultProfileWarning');
+    if (warningDiv) {
+        warningDiv.remove();
+    }
+}
 
 // Auto-initialize when DOM is ready
 if (document.readyState === 'loading') {

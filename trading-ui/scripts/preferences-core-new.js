@@ -240,66 +240,7 @@ class PreferencesAPIClient {
  * Preferences Cache Manager
  * Handles caching with TTL and invalidation
  */
-class PreferencesCacheManager {
-    constructor() {
-        this.cache = new Map();
-        this.ttl = 5 * 60 * 1000; // 5 minutes TTL
-        this.timestamps = new Map();
-    }
-    
-    /**
-     * Get value from cache
-     * @param {string} key - Cache key
-     * @returns {any} Cached value or null
-     */
-    get(key) {
-        const timestamp = this.timestamps.get(key);
-        if (!timestamp) return null;
-        
-        // Check TTL
-        if (Date.now() - timestamp > this.ttl) {
-            this.delete(key);
-            return null;
-        }
-        
-        return this.cache.get(key);
-    }
-    
-    /**
-     * Set value in cache
-     * @param {string} key - Cache key
-     * @param {any} value - Value to cache
-     */
-    set(key, value) {
-        this.cache.set(key, value);
-        this.timestamps.set(key, Date.now());
-    }
-    
-    /**
-     * Delete key from cache
-     * @param {string} key - Cache key
-     */
-    delete(key) {
-        this.cache.delete(key);
-        this.timestamps.delete(key);
-    }
-    
-    /**
-     * Clear all cache
-     */
-    clear() {
-        this.cache.clear();
-        this.timestamps.clear();
-    }
-    
-    /**
-     * Invalidate specific keys
-     * @param {Array<string>} keys - Keys to invalidate
-     */
-    invalidate(keys) {
-        keys.forEach(key => this.delete(key));
-    }
-}
+// PreferencesCacheManager removed - using UnifiedCacheManager instead
 
 // ============================================================================
 // VALIDATION MANAGER CLASS
@@ -444,7 +385,7 @@ class ProfileManager {
 class PreferencesCore {
     constructor() {
         this.apiClient = new PreferencesAPIClient();
-        this.cacheManager = new PreferencesCacheManager();
+        // NO cacheManager - using UnifiedCacheManager!
         this.validationManager = new PreferencesValidationManager();
         this.profileManager = new ProfileManager();
         
@@ -452,6 +393,30 @@ class PreferencesCore {
         this.currentProfileId = 3; // Default profile
     }
     
+    /**
+     * Get default preference value from preference_types table
+     * @param {string} preferenceName - Name of the preference
+     * @returns {Promise<any>} Default preference value
+     */
+    async getDefaultPreference(preferenceName) {
+        try {
+            const response = await fetch(`/api/preferences/default?preference_name=${preferenceName}`);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const result = await response.json();
+            if (!result.success) {
+                throw new Error(result.error || 'Failed to get default preference');
+            }
+            
+            return result.data.default_value;
+        } catch (error) {
+            console.error(`❌ Error getting default preference ${preferenceName}:`, error);
+            return null;
+        }
+    }
+
     /**
      * Get single preference with caching and lazy loading support
      * @param {string} preferenceName - Preference name
@@ -461,14 +426,22 @@ class PreferencesCore {
      * @returns {Promise<any>} Preference value
      */
     async getPreference(preferenceName, userId = null, profileId = null, useLazyLoading = true) {
-        const cacheKey = `${preferenceName}_${userId || this.currentUserId}_${profileId || this.currentProfileId}`;
+        const cacheKey = `preference_${preferenceName}_${userId || this.currentUserId}_${profileId || this.currentProfileId}`;
         
-        // Check cache first
-        const cached = this.cacheManager.get(cacheKey);
-        if (cached !== null) {
-            console.log(`✅ Cache hit for ${preferenceName}`);
-            return cached;
+        // Use UnifiedCacheManager
+        if (window.UnifiedCacheManager) {
+            const cached = await window.UnifiedCacheManager.get(cacheKey, {
+                layer: 'localStorage',
+                ttl: 300000 // 5 minutes
+            });
+            
+            if (cached !== null) {
+                console.log(`🔍 CACHE DEBUG: Cache hit for ${preferenceName} = ${cached} (key: ${cacheKey})`);
+                return cached;
+            }
         }
+        
+        console.log(`🔍 CACHE DEBUG: Cache miss for ${preferenceName} (key: ${cacheKey}) - loading from API`);
         
         // Check lazy loading if enabled
         if (useLazyLoading && window.LazyLoader) {
@@ -481,7 +454,14 @@ class PreferencesCore {
                     userId || this.currentUserId, 
                     profileId || this.currentProfileId
                 );
-                this.cacheManager.set(cacheKey, value);
+                
+                // Save to UnifiedCacheManager
+                if (window.UnifiedCacheManager) {
+                    await window.UnifiedCacheManager.save(cacheKey, value, {
+                        layer: 'localStorage',
+                        ttl: 300000
+                    });
+                }
                 return value;
             }
         }
@@ -494,8 +474,13 @@ class PreferencesCore {
                 profileId || this.currentProfileId
             );
             
-            // Cache the result
-            this.cacheManager.set(cacheKey, value);
+            // Save to UnifiedCacheManager
+            if (window.UnifiedCacheManager) {
+                await window.UnifiedCacheManager.save(cacheKey, value, {
+                    layer: 'localStorage',
+                    ttl: 300000
+                });
+            }
             
             console.log(`✅ Loaded preference ${preferenceName}:`, value);
             return value;
@@ -516,11 +501,16 @@ class PreferencesCore {
     async getAllPreferences(userId = null, profileId = null, criticalPrefs = []) {
         const cacheKey = `all_preferences_${userId || this.currentUserId}_${profileId || this.currentProfileId}`;
         
-        // Check cache first
-        const cached = this.cacheManager.get(cacheKey);
-        if (cached !== null) {
-            console.log('✅ Cache hit for all preferences');
-            return cached;
+        // Check cache first via UnifiedCacheManager
+        if (window.UnifiedCacheManager) {
+            const cached = await window.UnifiedCacheManager.get(cacheKey, {
+                layer: 'localStorage',
+                ttl: 300000
+            });
+            if (cached !== null) {
+                console.log('✅ Cache hit for all preferences');
+                return cached;
+            }
         }
         
         try {
@@ -541,8 +531,13 @@ class PreferencesCore {
             // Merge critical preferences
             const result = { ...allPreferences, ...criticalPreferences };
             
-            // Cache the result
-            this.cacheManager.set(cacheKey, result);
+            // Cache the result via UnifiedCacheManager
+            if (window.UnifiedCacheManager) {
+                await window.UnifiedCacheManager.save(cacheKey, result, {
+                    layer: 'localStorage',
+                    ttl: 300000
+                });
+            }
             
             console.log(`✅ Loaded ${Object.keys(result).length} preferences`);
             return result;
@@ -597,10 +592,12 @@ class PreferencesCore {
             );
             
             if (success) {
-                // Invalidate cache
-                const cacheKey = `${preferenceName}_${userId || this.currentUserId}_${profileId || this.currentProfileId}`;
-                this.cacheManager.delete(cacheKey);
-                this.cacheManager.delete(`all_preferences_${userId || this.currentUserId}_${profileId || this.currentProfileId}`);
+                // Invalidate cache via UnifiedCacheManager
+                const cacheKey = `preference_${preferenceName}_${userId || this.currentUserId}_${profileId || this.currentProfileId}`;
+                if (window.UnifiedCacheManager) {
+                    await window.UnifiedCacheManager.remove(cacheKey);
+                    await window.UnifiedCacheManager.remove(`all_preferences_${userId || this.currentUserId}_${profileId || this.currentProfileId}`);
+                }
                 
                 console.log(`✅ Saved preference ${preferenceName}:`, value);
                 
@@ -656,19 +653,21 @@ class PreferencesCore {
             }
         }
         
-        // Invalidate all preferences cache
-        this.cacheManager.delete(`all_preferences_${userId || this.currentUserId}_${profileId || this.currentProfileId}`);
+        // Invalidate all preferences cache via UnifiedCacheManager
+        if (window.UnifiedCacheManager) {
+            await window.UnifiedCacheManager.remove(`all_preferences_${userId || this.currentUserId}_${profileId || this.currentProfileId}`);
+        }
         
         console.log(`✅ Saved ${results.saved} preferences, ${results.errors} errors`);
         return results;
     }
     
     /**
-     * Clear cache
+     * Clear cache - now handled by UnifiedCacheManager
      */
     clearCache() {
-        this.cacheManager.clear();
-        console.log('🧹 Cleared preferences cache');
+        // Cache clearing is now handled by UnifiedCacheManager
+        console.log('🧹 Cache clearing handled by UnifiedCacheManager');
     }
     
     /**
@@ -677,10 +676,31 @@ class PreferencesCore {
      */
     invalidatePreferences(preferenceNames) {
         const keys = preferenceNames.map(name => 
-            `${name}_${this.currentUserId}_${this.currentProfileId}`
+            `preference_${name}_${this.currentUserId}_${this.currentProfileId}`
         );
-        this.cacheManager.invalidate(keys);
+        if (window.UnifiedCacheManager) {
+            keys.forEach(key => window.UnifiedCacheManager.remove(key));
+        }
         console.log(`🧹 Invalidated ${preferenceNames.length} preferences`);
+    }
+    
+    /**
+     * Set current profile
+     * @param {number} userId - User ID
+     * @param {number} profileId - Profile ID
+     */
+    async setCurrentProfile(userId, profileId) {
+        console.log(`🔄 Setting current profile to user ${userId}, profile ${profileId}`);
+        this.currentUserId = userId;
+        this.currentProfileId = profileId;
+        
+        // Clear all cache layers for the new profile via UnifiedCacheManager
+        if (window.clearAllUnifiedCacheQuick) {
+            await window.clearAllUnifiedCacheQuick();
+            console.log('🧹 All cache layers cleared for profile switch');
+        } else {
+            console.log('🧹 UnifiedCacheManager not available for cache clearing');
+        }
     }
     
     /**
@@ -691,6 +711,11 @@ class PreferencesCore {
     async initializeWithLazyLoading(userId = null, profileId = null) {
         try {
             console.log('🚀 Initializing preferences with lazy loading...');
+            
+            // Update current profile if provided
+            if (userId !== null && profileId !== null) {
+                this.setCurrentProfile(userId, profileId);
+            }
             
             // Initialize lazy loader if available
             if (window.LazyLoader) {
@@ -777,6 +802,8 @@ window.initializePreferencesWithLazyLoading = async function(userId = null, prof
     return await window.PreferencesCore.initializeWithLazyLoading(userId, profileId);
 };
 
+// window.refreshUserPreferences removed - using UnifiedCacheManager.refreshUserPreferences instead
+
 // ============================================================================
 // INITIALIZATION
 // ============================================================================
@@ -789,5 +816,7 @@ if (document.readyState === 'loading') {
 } else {
     console.log('📄 Preferences core system initialized');
 }
+
+// Event listener removed - UnifiedCacheManager handles preferences refresh directly
 
 console.log('✅ preferences-core.js loaded successfully');

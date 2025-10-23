@@ -527,9 +527,30 @@ await window.resetToDefaults();
 **Status:** ✅ Production Ready - Full CRUD for Profiles
 ---
 
+## 🧹 Cache Management
+
+מערכת ההעדפות משתמשת ב-UnifiedCacheManager לניהול מטמון:
+
+### **מדיניות מטמון:**
+- **Layer:** localStorage
+- **TTL:** 300000ms (5 דקות)
+- **Key Format:** `preference_{name}_{userId}_{profileId}`
+- **Validation:** true
+- **Sync to Backend:** false (manual save)
+
+### **תהליכי מטמון:**
+1. **טעינת העדפה:** בדיקה ב-UnifiedCacheManager → טעינה מ-backend → שמירה ב-cache
+2. **שמירת העדפה:** שמירה ל-backend → מחיקת cache
+3. **החלפת פרופיל:** עדכון PreferencesCore → ניקוי כל המטמון
+
+### **ניקוי מטמון:**
+- **העדפה בודדת:** `window.UnifiedCacheManager.remove(cacheKey)`
+- **כל ההעדפות:** `window.clearAllUnifiedCacheQuick()`
+- **לפי פרופיל:** ניקוי כל ההעדפות של פרופיל מסוים
+
 ## 📚 מדריכים נוספים
 
-- **[Cache Integration Guide](PREFERENCES_CACHE_INTEGRATION.md)** - שילוב מלא עם AdvancedCacheService
+- **[Cache Integration Guide](PREFERENCES_CACHE_INTEGRATION.md)** - שילוב מלא עם UnifiedCacheManager
 - **[Developer Guide](PREFERENCES_DEVELOPER_GUIDE.md)** - הוספה, עדכון, מחיקה של preference types
 
 ---

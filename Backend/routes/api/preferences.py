@@ -30,6 +30,50 @@ preferences_bp = Blueprint('preferences', __name__, url_prefix='/api/preferences
 # Initialize base API (preferences is complex, so we'll use it selectively)
 
 # ============================================================================
+# Default Preferences Endpoints
+# ============================================================================
+
+@preferences_bp.route('/default', methods=['GET'])
+def get_default_preference() -> Any:
+    """
+    קבלת ערך ברירת מחדל של העדפה
+    
+    Query Parameters:
+        - preference_name (required): שם ההעדפה
+    """
+    try:
+        preference_name = request.args.get('preference_name')
+        if not preference_name:
+            return jsonify({
+                "success": False,
+                "error": "preference_name parameter is required"
+            }), 400
+        
+        # Get default value from preference_types table
+        default_value = preferences_service.get_default_preference(preference_name)
+        
+        if default_value is None:
+            return jsonify({
+                "success": False,
+                "error": f"Preference '{preference_name}' not found"
+            }), 404
+        
+        return jsonify({
+            "success": True,
+            "data": {
+                "preference_name": preference_name,
+                "default_value": default_value
+            }
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error getting default preference: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+# ============================================================================
 # User Preferences Endpoints
 # ============================================================================
 

@@ -723,6 +723,44 @@ class PreferencesService:
             logger.error(f"Error getting preference info for {preference_name}: {e}")
             raise
     
+    def get_default_preference(self, preference_name: str) -> Any:
+        """קבלת ערך ברירת מחדל של העדפה"""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            cursor.execute('''
+                SELECT default_value, data_type
+                FROM preference_types
+                WHERE preference_name = ? AND is_active = TRUE
+            ''', (preference_name,))
+            
+            result = cursor.fetchone()
+            conn.close()
+            
+            if result:
+                default_value = result[0]
+                data_type = result[1]
+                
+                # Convert to appropriate type
+                if data_type == 'number' and default_value is not None:
+                    try:
+                        return float(default_value)
+                    except ValueError:
+                        return int(default_value)
+                elif data_type == 'boolean' and default_value is not None:
+                    return default_value.lower() in ('true', '1', 'yes', 'on')
+                elif data_type == 'json' and default_value is not None:
+                    return json.loads(default_value)
+                else:
+                    return default_value
+            else:
+                return None
+                
+        except Exception as e:
+            logger.error(f"Error getting default preference for {preference_name}: {e}")
+            return None
+    
     def get_user_profiles(self, user_id: int) -> List[Dict[str, Any]]:
         """קבלת פרופילים של משתמש"""
         try:
@@ -799,6 +837,17 @@ class PreferencesService:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
             
+            # בדוק אם הפרופיל קיים
+            cursor.execute('''
+                SELECT id FROM preference_profiles 
+                WHERE user_id = ? AND id = ?
+            ''', (user_id, profile_id))
+            
+            if not cursor.fetchone():
+                logger.error(f"Profile {profile_id} not found for user {user_id}")
+                conn.close()
+                return False
+            
             # בטל הפעלה מכל הפרופילים של המשתמש
             cursor.execute('''
                 UPDATE preference_profiles 
@@ -814,9 +863,23 @@ class PreferencesService:
                 WHERE user_id = ? AND id = ?
             ''', (user_id, profile_id))
             
+            # בדוק שההפעלה הצליחה
+            cursor.execute('''
+                SELECT is_active FROM preference_profiles 
+                WHERE user_id = ? AND id = ?
+            ''', (user_id, profile_id))
+            
+            result = cursor.fetchone()
+            if not result or result[0] != 1:
+                logger.error(f"Failed to activate profile {profile_id} for user {user_id}")
+                conn.rollback()
+                conn.close()
+                return False
+            
             conn.commit()
             conn.close()
             
+            logger.info(f"Successfully activated profile {profile_id} for user {user_id}")
             return True
             
         except Exception as e:

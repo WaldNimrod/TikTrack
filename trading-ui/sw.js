@@ -5,10 +5,17 @@
 
 const CACHE_NAME = 'tiktrack-cache-v1';
 const CACHE_URLS = [
-    '/trading-ui/scripts/',
-    '/trading-ui/styles/',
     '/trading-ui/',
-    '/'
+    '/trading-ui/index.html',
+    '/trading-ui/trades.html',
+    '/trading-ui/trade_plans.html',
+    '/trading-ui/preferences.html',
+    '/trading-ui/executions.html',
+    '/trading-ui/cash_flows.html',
+    '/trading-ui/trading_accounts.html',
+    '/trading-ui/tickers.html',
+    '/trading-ui/notes.html',
+    '/trading-ui/alerts.html'
 ];
 
 // Install event

@@ -130,7 +130,7 @@ function validateCurrency(selectElement) {
         if (typeof window.showNotification === 'function') {
             window.showNotification('⚠️ המערכת תומכת כרגע רק בדולר אמריקאי (USD). השדה אופס לברירת המחדל.', 'warning', 'אזהרה', 5000, 'ui');
         } else {
-            window.showInfoNotification('⚠️ המערכת תומכת כרגע רק בדולר אמריקאי (USD). השדה אופס לברירת המחדל.');
+            window.showInfoNotification('אזהרה', '⚠️ המערכת תומכת כרגע רק בדולר אמריקאי (USD). השדה אופס לברירת המחדל.');
         }
         
         // Reset to USD

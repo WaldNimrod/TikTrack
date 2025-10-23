@@ -416,18 +416,18 @@ function updateTradesTable(trades) {
       <td class="price-cell">${trade.current_price ? `$${parseFloat(trade.current_price).toFixed(2)}` : '-'}</td>
       <td class="change-cell">${formatDailyChange(trade.daily_change)}</td>
       <td class="status-cell" data-status="${trade.status || ''}">
-        ${FieldRendererService.renderStatus(trade.status, 'trade')}
+        ${window.renderStatus ? window.renderStatus(trade.status, 'trade') : FieldRendererService.renderStatus(trade.status, 'trade')}
       </td>
       <td class="type-cell" data-type="${typeForFilter}">
-        ${FieldRendererService.renderType(trade.investment_type)}
+        ${window.renderType ? window.renderType(trade.investment_type) : FieldRendererService.renderType(trade.investment_type)}
       </td>
       <td class="side-cell" data-side="${trade.side || 'Long'}">
-        ${FieldRendererService.renderSide(trade.side)}
+        ${window.renderSide ? window.renderSide(trade.side) : FieldRendererService.renderSide(trade.side)}
       </td>
       <td class="plan-cell">${trade.trade_plan_id ? `<a href="#" onclick="viewTradePlanDetails('${trade.trade_plan_id}')" class="plan-link" data-plan-id="${trade.trade_plan_id}">טוען...</a>` : '-'}</td>
-      <td class="pl-cell">${FieldRendererService.renderNumericValue(trade.total_pl || 0, ' $', true)}</td>
-      <td data-date="${trade.created_at}">${FieldRendererService.renderDate(trade.created_at, false)}</td>
-      <td>${FieldRendererService.renderDate(trade.closed_at || trade.cancelled_at, false)}</td>
+      <td class="pl-cell">${window.renderAmount ? window.renderAmount(trade.total_pl || 0, ' $') : FieldRendererService.renderNumericValue(trade.total_pl || 0, ' $', true)}</td>
+      <td data-date="${trade.created_at}">${window.renderDate ? window.renderDate(trade.created_at, false) : FieldRendererService.renderDate(trade.created_at, false)}</td>
+      <td>${window.renderDate ? window.renderDate(trade.closed_at || trade.cancelled_at, false) : FieldRendererService.renderDate(trade.closed_at || trade.cancelled_at, false)}</td>
       <td><strong><a href="#" onclick="viewAccountDetails('${trade.account_id}')" class="account-link">${trade.account_name || trade.account_id || 'חשבון לא ידוע'}</a></strong></td>
       <td>${trade.notes || ''}</td>
       <td class="actions-cell">

@@ -81,18 +81,8 @@
                         <div class="table-actions">
                             <button data-button-type="ADD" data-entity-type="trade" data-variant="full" data-onclick="showAddTradeModal()" data-text="הוסף טרייד" title="הוסף טרייד חדש"></button>
                             
-                            <!-- כפתורי עריכה ומחיקה נסתרים (לזיהוי בבדיקות) -->
-                            <button id="editTradeBtn" class="btn btn-secondary d-none" onclick="editTradeRecord('')" title="ערוך טרייד נבחר">
-                                ✏️ ערוך
-                            </button>
-                            <button id="deleteTradeBtn" class="btn btn-danger d-none" onclick="deleteTradeRecord('')" title="מחק טרייד נבחר">
-                                🗑️ מחק
-                            </button>
 
-                            <div class="action-separator"></div>
-                            <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר אזור הטריידים שלי">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר" title="הצג/הסתר אזור הטריידים שלי"></button>
                         </div>
                     </div>
 

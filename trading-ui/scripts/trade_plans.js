@@ -1683,21 +1683,15 @@ function updateTradePlansTable(trade_plans) {
             </span>
           </div>
         </td>
-        <td data-date="${design.created_at}"><span class="date-text">${dateDisplay}</span></td>
+        <td data-date="${design.created_at}">${window.renderDate ? window.renderDate(design.created_at, false) : `<span class="date-text">${dateDisplay}</span>`}</td>
         <td class="type-cell" data-type="${typeForFilter}">
-          <span class="entity-trade-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
-            ${typeDisplay}
-          </span>
+          ${window.renderType ? window.renderType(design.investment_type) : `<span class="entity-trade-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">${typeDisplay}</span>`}
         </td>
         <td class="side-cell" data-side="${design.side}">
-          <span class="${design.side === 'Long' ? 'numeric-value-positive' : 'numeric-value-negative'}" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
-            ${sideDisplay}
-          </span>
+          ${window.renderSide ? window.renderSide(design.side) : `<span class="${design.side === 'Long' ? 'numeric-value-positive' : 'numeric-value-negative'}" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">${sideDisplay}</span>`}
         </td>
         <td class="quantity-cell">
-          <span class="numeric-value-positive" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
-            ${design.quantity || 'לא מוגדר'}
-          </span>
+          ${window.renderShares ? window.renderShares(design.quantity) : `<span class="numeric-value-positive" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">${design.quantity || 'לא מוגדר'}</span>`}
         </td>
         <td class="price-cell">
           <span class="target-text" style="color: ${window.getTableColors ? window.getTableColors().positive : '#28a745'};">
@@ -1705,23 +1699,14 @@ function updateTradePlansTable(trade_plans) {
           </span>
         </td>
         <td class="investment-cell">
-          <span class="numeric-value-positive" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
-            ${amountDisplay}
-          </span>
+          ${window.renderAmount ? window.renderAmount(design.planned_amount) : `<span class="numeric-value-positive" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">${amountDisplay}</span>`}
         </td>
         <td class="status-cell" data-status="${statusForFilter}">
-          <span class="status-${design.status}-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
-            ${statusDisplay}
-          </span>
+          ${window.renderStatus ? window.renderStatus(design.status, 'trade_plan') : `<span class="status-${design.status}-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">${statusDisplay}</span>`}
         </td>
         <td class="profit-cell">
           <span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
             ${currentDisplay}
-          </span>
-        </td>
-        <td class="notes-cell">
-          <span class="text-muted" style="font-size: 0.85em;">
-            ${design.notes || 'אין הערות'}
           </span>
         </td>
         <td class="actions-cell">
@@ -1979,6 +1964,14 @@ async function showAddTradePlanModal() {
         hideTickerInfo();
       }
     });
+
+    // Add event listener for quantity field to calculate amount
+    const quantityInput = document.getElementById('quantity');
+    if (quantityInput) {
+      quantityInput.addEventListener('input', function() {
+        updateAmountFromShares();
+      });
+    }
     
     tickerSelect.value = '';
     console.log(`🔧 showAddTradePlanModal: Ticker select reset, new value: "${tickerSelect.value}"`);
@@ -3790,10 +3783,9 @@ function updateSharesFromAmount() {
  */
 function updateAmountFromShares() {
   const sharesInput = document.getElementById('quantity');
-  const amountInput = document.getElementById('quantity');
   const priceDisplay = document.getElementById('currentPriceDisplay');
 
-  if (sharesInput && amountInput && priceDisplay) {
+  if (sharesInput && priceDisplay) {
     if (sharesInput.value && priceDisplay.textContent !== '-') {
       const shares = parseFloat(sharesInput.value);
       const price = parseFloat(priceDisplay.textContent.replace('$', ''));
@@ -3802,12 +3794,19 @@ function updateAmountFromShares() {
         // בדיקה אם הפונקציה הכללית זמינה
         if (typeof window.convertSharesToAmount === 'function') {
           const amount = window.convertSharesToAmount(shares, price);
-          amountInput.value = amount;
+          // עדכון תצוגת הסכום במקום שדה
+          const amountDisplay = document.getElementById('amountDisplay');
+          if (amountDisplay) {
+            amountDisplay.textContent = `$${amount.toFixed(2)}`;
+          }
         } else {
           handleFunctionNotFound('convertSharesToAmount', 'פונקציית המרת מניות לסכום לא נמצאה');
           // fallback
           const amount = shares * price;
-          amountInput.value = amount.toFixed(2);
+          const amountDisplay = document.getElementById('amountDisplay');
+          if (amountDisplay) {
+            amountDisplay.textContent = `$${amount.toFixed(2)}`;
+          }
         }
       }
     }

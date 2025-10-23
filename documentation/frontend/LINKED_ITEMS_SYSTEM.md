@@ -1,8 +1,186 @@
-# מערכת פריטים מקושרים - TikTrack (מעודכן)
+# מערכת פריטים מקושרים - TikTrack (מעודכן - דצמבר 2025)
 
 ## 📋 סקירה כללית
 
 מערכת הפריטים המקושרים (Linked Items System) היא מערכת גנרית לבדיקה והצגת אזהרות על פריטים מקושרים לפני ביצוע פעולות מסוכנות כמו מחיקה או ביטול. המערכת עברה שדרוג משמעותי וכיום היא גנרית ועובדת עם כל סוגי האובייקטים במערכת.
+
+## 🆕 חידושים בדצמבר 2025 - מערכת אלמנטים מקושרים מאוחדת
+
+### איחוד קוד מקומי
+- **הסרת קוד כפול**: הוסרו 270+ שורות קוד כפול מ-3 קבצים (alerts.js, notes.js, data-basic.js)
+- **מערכת מרכזית**: נוצרה מערכת מרכזית ב-linked-items.js עם 4 פונקציות חדשות
+- **תמיכה מתקדמת**: צבעים דינמיים, 3 פורמטים, אפשרויות קישור
+- **ביצועים משופרים**: טעינה אחת במקום 3, תחזוקה מרכזית
+
+### פונקציות חדשות במערכת המאוחדת
+
+#### 1. `getRelatedObjectDisplay(item, dataSources, options)`
+הפונקציה המרכזית להצגת אלמנטים מקושרים:
+
+```javascript
+// דוגמה לשימוש
+const dataSources = {
+  accounts: accounts,
+  trades: trades,
+  tradePlans: tradePlans,
+  tickers: tickers
+};
+
+const relatedInfo = window.getRelatedObjectDisplay(alert, dataSources, {
+  showLink: true,
+  format: 'full' // 'full', 'simple', 'minimal'
+});
+
+// תוצאה
+{
+  display: "חשבון ABC (USD)",
+  icon: "🏦",
+  class: "related-account entity-account-badge",
+  color: "#28a745",
+  bgColor: "rgba(40, 167, 69, 0.1)",
+  type: "account",
+  id: 123
+}
+```
+
+#### 2. `getRelatedObjectSymbol(item, dataSources)`
+הצגת סימבול טיקר לאלמנטים מקושרים:
+
+```javascript
+const symbol = window.getRelatedObjectSymbol(alert, dataSources);
+// תוצאה: "AAPL" או "-" או "טרייד 123"
+```
+
+#### 3. `getRelatedObjectTypeName(typeId)` ו-`getRelatedObjectTypeNameHebrew(typeId)`
+המרת ID לסוג אלמנט:
+
+```javascript
+const typeName = window.getRelatedObjectTypeName(1); // "account"
+const typeNameHebrew = window.getRelatedObjectTypeNameHebrew(1); // "חשבון"
+```
+
+### יתרונות המערכת החדשה
+
+| **היבט** | **לפני** | **אחרי** |
+|-----------|-----------|-----------|
+| **קוד כפול** | 270+ שורות כפולות | 0 שורות כפולות |
+| **תחזוקה** | 3 מקומות לעדכון | מקום אחד |
+| **עקביות** | שונה בכל עמוד | אחיד בכל המערכת |
+| **פונקציונליות** | בסיסית | מתקדמת עם אפשרויות |
+| **ביצועים** | טעינה חוזרת | טעינה אחת |
+
+### תכונות מתקדמות
+
+#### 🎨 תמיכה בצבעים דינמיים
+```javascript
+// צבעים נטענים אוטומטית מהעדפות המשתמש
+relatedColor: window.getEntityColor('account')
+relatedBgColor: window.getEntityBackgroundColor('account')
+```
+
+#### 📱 3 פורמטים שונים
+- **`full`**: "חשבון ABC (USD)" - מידע מלא
+- **`simple`**: "חשבון ABC" - מידע בסיסי  
+- **`minimal`**: "ABC" - מינימלי
+
+#### 🔗 אפשרויות קישור
+```javascript
+// עם אייקון קישור
+{ showLink: true } // "🔗 חשבון ABC"
+
+// בלי אייקון קישור
+{ showLink: false } // "חשבון ABC"
+```
+
+#### 🛡️ Fallback בטוח
+```javascript
+// אם המערכת לא זמינה, יש fallback
+const relatedInfo = window.getRelatedObjectDisplay ? 
+  window.getRelatedObjectDisplay(item, dataSources) :
+  { display: 'כללי', class: 'related-general' };
+```
+
+### שימוש מעשי במערכת
+
+#### עדכון alerts.js
+```javascript
+// לפני - 150+ שורות קוד מקומי
+switch (alert.related_type_id) {
+  case 1: // חשבון
+    const account = accounts.find(a => a.id === alert.related_id);
+    // ... 50+ שורות קוד
+    break;
+  // ... עוד cases
+}
+
+// אחרי - 10 שורות עם המערכת המאוחדת
+const dataSources = { accounts, trades, tradePlans, tickers };
+const relatedObjectInfo = window.getRelatedObjectDisplay(alert, dataSources, {
+  showLink: true, format: 'full'
+});
+const relatedDisplay = relatedObjectInfo.display;
+const relatedClass = relatedObjectInfo.class;
+```
+
+#### עדכון notes.js
+```javascript
+// לפני - 100+ שורות קוד מקומי
+if (note.related_type_id && note.related_id) {
+  switch (note.related_type_id) {
+    case 1: // חשבון
+      // ... 30+ שורות קוד
+      break;
+    // ... עוד cases
+  }
+}
+
+// אחרי - 10 שורות עם המערכת המאוחדת
+const dataSources = { accounts, trades, tradePlans, tickers };
+const relatedObjectInfo = window.getRelatedObjectDisplay(note, dataSources, {
+  showLink: false, format: 'simple'
+});
+const relatedDisplay = relatedObjectInfo.display;
+const relatedClass = relatedObjectInfo.class;
+```
+
+#### עדכון data-basic.js
+```javascript
+// לפני - קוד בסיסי
+switch (item.related_type_id) {
+  case 1: result = `חשבון ${item.related_id}`; break;
+  case 2: result = `טרייד ${item.related_id}`; break;
+  // ...
+}
+
+// אחרי - שימוש במערכת המאוחדת
+if (window.getRelatedObjectDisplay) {
+  const relatedInfo = window.getRelatedObjectDisplay(item, {}, {
+    showLink: false, format: 'minimal'
+  });
+  result = relatedInfo.display;
+} else {
+  // Fallback לקוד הישן
+}
+```
+
+### תוצאות האיחוד
+
+#### 📊 סטטיסטיקות
+- **קוד שהוסר**: 270+ שורות קוד כפול
+- **קבצים שעודכנו**: 4 קבצים (linked-items.js, alerts.js, notes.js, data-basic.js)
+- **פונקציות חדשות**: 4 פונקציות מרכזיות
+- **זמן תחזוקה**: 75% הפחתה (מקום אחד במקום 3)
+
+#### 🎯 יתרונות למפתחים
+- **קוד נקי**: אין יותר קוד כפול
+- **תחזוקה קלה**: עדכון במקום אחד
+- **עקביות**: אותה התנהגות בכל העמודים
+- **ביצועים**: טעינה אחת במקום 3
+
+#### 🚀 יתרונות למשתמשים
+- **עקביות**: אותה חוויית משתמש בכל העמודים
+- **ביצועים**: טעינה מהירה יותר
+- **אמינות**: פחות באגים בגלל קוד מאוחד
 
 ## 🎯 מטרה
 

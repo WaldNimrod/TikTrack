@@ -26,11 +26,8 @@
 <div class="table-title">
 <img src="images/icons/trade_plans.svg" alt="תכנון טריידים והשקעות" class="section-icon"> תכנון טריידים והשקעות </div>
 <div class="table-actions">
-<button class="btn btn-primary">שמור</button>
 <button data-button-type="COPY" data-variant="full" data-onclick="copyDetailedLog()" data-text="העתק לוג מפורט" title="העתק לוג מפורט"></button>
 <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר"></button>
-<span class="filter-icon">▲</span>
-</button>
 </div>
 </div>
 <div class="section-body">
@@ -57,14 +54,14 @@
 <img src="images/icons/trade_plans.svg" alt="התכנונים שלי" class="section-icon"> התכנונים שלי </div>
 <div class="table-count" id="trade_plansCount">טוען...</div>
 <div class="table-actions">
-<button data-button-type="ADD" data-entity-type="trade_plan" data-variant="full" data-onclick="if (typeof window.showAddTradePlanModal === 'function') { window.showAddTradePlanModal(); }" data-text="הוסף תכנון חדש" type="button" id="addTradePlanBtn" title="הוסף תכנון חדש"></button>
-<button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר" type="button" title="הצג/הסתר אזור תכנון טריידים"></button>
-</div>
-<div class="filter-buttons-container button-row filter-margin-top">
-<button class="btn btn-sm active filter-active-btn" onclick="filterTradePlansByType('all')" type="button" data-type="all" title="הצג הכל">הצג הכל</button>
+<div class="filter-buttons-container button-row">
+<button class="btn btn-sm" onclick="filterTradePlansByType('all')" type="button" data-type="all" title="הצג הכל">הצג הכל</button>
 <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterTradePlansByType('swing')" type="button" data-type="swing" title="Swing Trading"><i class="fas fa-chart-line filter-icon"></i></button>
 <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterTradePlansByType('investment')" type="button" data-type="investment" title="השקעות"><i class="fas fa-chart-bar filter-icon"></i></button>
 <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterTradePlansByType('passive')" type="button" data-type="passive" title="השקעות פאסיביות"><i class="fas fa-coins filter-icon"></i></button>
+</div>
+<button data-button-type="ADD" data-entity-type="trade_plan" data-variant="full" data-onclick="if (typeof window.showAddTradePlanModal === 'function') { window.showAddTradePlanModal(); }" data-text="הוסף תכנון חדש" type="button" id="addTradePlanBtn" title="הוסף תכנון חדש"></button>
+<button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר" type="button" title="הצג/הסתר אזור תכנון טריידים"></button>
 </div>
 </div>
 <div class="section-body">
@@ -99,15 +96,12 @@
 <th class="col-profit">
 <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(8, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }">רווח <span class="sort-icon">↕</span></button>
 </th>
-<th class="col-notes">
-<button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(9, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }">הערות <span class="sort-icon">↕</span></button>
-</th>
 <th class="col-actions actions-cell actions-3-items"></th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td colspan="11" class="loading">טוען תכנונים...</td>
+<td colspan="10" class="loading">טוען תכנונים...</td>
 </tr>
 </tbody>
 </table>
@@ -210,6 +204,7 @@
 <div class="mb-3">
 <label for="quantity" class="form-label">כמות</label>
 <input type="number" class="form-control" id="quantity" step="1" min="1" placeholder="1000" required>
+<div class="form-text">סכום מחושב: <span id="amountDisplay" class="fw-bold">$0.00</span></div>
 </div>
 </div>
 <div class="col-md-6">

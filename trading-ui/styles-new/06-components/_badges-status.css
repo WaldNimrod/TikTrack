@@ -251,3 +251,16 @@ background-color: var(--status-closed-color);
 background-color: var(--status-pending-color);
 }
 
+/* צד טרייד */
+.badge-long {
+  background-color: var(--user-status-positive-color, #28a745);
+  color: white;
+  border: 1px solid var(--user-status-positive-color, #28a745);
+}
+
+.badge-short {
+  background-color: var(--user-status-negative-color, #dc3545);
+  color: white;
+  border: 1px solid var(--user-status-negative-color, #dc3545);
+}
+

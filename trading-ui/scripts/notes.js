@@ -570,9 +570,12 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
     const symbolDisplay = window.getRelatedObjectSymbol ? 
       window.getRelatedObjectSymbol(note, dataSources) : '-';
 
-    // קביעת סוג לפילטר
+    // קביעת סוג לפילטר באמצעות המערכת הכללית
     let typeForFilter = 'כללי';
-    if (note.related_type_id) {
+    if (note.related_type_id && window.getRelatedObjectTypeNameHebrew) {
+      typeForFilter = window.getRelatedObjectTypeNameHebrew(note.related_type_id);
+    } else if (note.related_type_id) {
+      // Fallback למערכת הישנה
       switch (note.related_type_id) {
       case 1: typeForFilter = 'חשבון'; break;
       case 2: typeForFilter = 'טרייד'; break;
@@ -1880,12 +1883,30 @@ async function loadNoteForViewing(noteId) {
   }
 }
 
-// פונקציה לקבלת תצוגת הקשר של הערה
+// פונקציה לקבלת תצוגת הקשר של הערה - משתמשת במערכת הכללית
 function getNoteRelatedDisplay(note) {
   if (!note.related_type_id || !note.related_id) {
     return 'כללי';
   }
 
+  // שימוש במערכת הכללית אם זמינה
+  if (window.getRelatedObjectDisplay) {
+    const dataSources = {
+      accounts: window.accountsData || [],
+      trades: window.tradesData || [],
+      tradePlans: window.tradePlansData || [],
+      tickers: window.tickersData || []
+    };
+    
+    const relatedInfo = window.getRelatedObjectDisplay(note, dataSources, {
+      showLink: false,
+      format: 'minimal'
+    });
+    
+    return relatedInfo.display;
+  }
+
+  // Fallback למערכת הישנה
   switch (note.related_type_id) {
   case 1: return `🏦 חשבון ${note.related_id}`;
   case 2: return `📈 טרייד ${note.related_id}`;

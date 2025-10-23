@@ -395,7 +395,7 @@ window.savePreference = async function(preferenceName, value, userId = 1, profil
             // סינכרון עם Backend Cache
             if (window.CacheSyncManager) {
                 try {
-                    await window.CacheSyncManager.invalidate(['preferences', 'user_preferences']);
+                    await window.CacheSyncManager.invalidateBackend(['preferences', 'user_preferences']);
                 } catch (syncError) {
                     console.warn('⚠️ Could not sync cache with backend:', syncError.message);
                 }
@@ -452,7 +452,7 @@ window.savePreferences = async function(preferences, userId = 1, profileId = nul
                 // סינכרון עם Backend Cache
                 if (window.CacheSyncManager) {
                     try {
-                        await window.CacheSyncManager.invalidate(['preferences', 'user_preferences']);
+                        await window.CacheSyncManager.invalidateBackend(['preferences', 'user_preferences']);
                     } catch (syncError) {
                         console.warn('⚠️ Could not sync cache with backend:', syncError.message);
                     }

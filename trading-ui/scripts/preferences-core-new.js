@@ -475,7 +475,14 @@ class PreferencesCore {
             const isLoaded = window.LazyLoader.isLoaded(preferenceName);
             if (!isLoaded) {
                 console.log(`🎯 Loading ${preferenceName} on demand via lazy loader`);
-                return await window.LazyLoader.loadOnDemand(preferenceName, userId, profileId);
+                // Load directly from API to avoid infinite loop
+                const value = await this.apiClient.getPreference(
+                    preferenceName, 
+                    userId || this.currentUserId, 
+                    profileId || this.currentProfileId
+                );
+                this.cacheManager.set(cacheKey, value);
+                return value;
             }
         }
         

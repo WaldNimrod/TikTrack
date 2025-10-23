@@ -423,11 +423,18 @@ const PACKAGE_MANIFEST = {
         loadOrder: 2
       },
       {
+        file: 'preferences-lazy-loader.js',
+        globalCheck: 'window.LazyLoader',
+        description: 'lazy loading system',
+        required: true,
+        loadOrder: 3
+      },
+      {
         file: 'preferences-ui.js',
         globalCheck: 'window.PreferencesUI',
         description: 'ממשק משתמש',
         required: true,
-        loadOrder: 3
+        loadOrder: 4
       }
     ],
     estimatedSize: '~120KB',

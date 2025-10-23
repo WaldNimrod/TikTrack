@@ -439,7 +439,7 @@ class PreferencesUI {
     }
     
     /**
-     * Load all preferences into form
+     * Load all preferences into form with lazy loading
      * @param {number} userId - User ID
      * @param {number} profileId - Profile ID
      */
@@ -449,28 +449,65 @@ class PreferencesUI {
         try {
             this.loadingManager.startLoading(loaderId, 'טוען העדפות...');
             
-            // Load non-color preferences
-            const preferences = await window.PreferencesCore.getAllPreferences(
-                userId || this.currentUserId, 
-                profileId || this.currentProfileId
-            );
-            
-            // Load color preferences
-            if (window.ColorManager) {
-                const colors = await window.ColorManager.loadAllColors(
+            // Initialize lazy loading if available
+            if (window.LazyLoader) {
+                console.log('🚀 Using lazy loading for preferences');
+                await window.LazyLoader.initialize(
                     userId || this.currentUserId, 
                     profileId || this.currentProfileId
                 );
-                Object.assign(preferences, colors);
+                
+                // Get loading stats
+                const stats = window.LazyLoader.getLoadingStats();
+                console.log(`📊 Lazy loading stats: ${stats.loaded}/${stats.total} (${stats.percentage}%)`);
+                
+                // Load critical preferences immediately
+                const criticalPrefs = window.LazyLoader.classifier.getPreferencesByClassification('critical');
+                const preferences = {};
+                
+                for (const prefName of criticalPrefs) {
+                    try {
+                        const value = await window.PreferencesCore.getPreference(prefName, userId, profileId);
+                        preferences[prefName] = value;
+                    } catch (error) {
+                        console.warn(`⚠️ Failed to load critical preference ${prefName}:`, error);
+                    }
+                }
+                
+                // Populate form with critical preferences
+                this.formManager.populateForm(preferences);
+                
+                // Update counters
+                this.updateCounters(preferences);
+                
+                this.loadingManager.stopLoading(loaderId, true, `נטענו ${Object.keys(preferences).length} העדפות קריטיות`);
+                
+            } else {
+                console.log('⚠️ LazyLoader not available, using standard loading');
+                
+                // Load non-color preferences
+                const preferences = await window.PreferencesCore.getAllPreferences(
+                    userId || this.currentUserId, 
+                    profileId || this.currentProfileId
+                );
+                
+                // Load color preferences
+                if (window.ColorManager) {
+                    const colors = await window.ColorManager.loadAllColors(
+                        userId || this.currentUserId, 
+                        profileId || this.currentProfileId
+                    );
+                    Object.assign(preferences, colors);
+                }
+                
+                // Populate form
+                this.formManager.populateForm(preferences);
+                
+                // Update counters
+                this.updateCounters(preferences);
+                
+                this.loadingManager.stopLoading(loaderId, true, 'העדפות נטענו בהצלחה');
             }
-            
-            // Populate form
-            this.formManager.populateForm(preferences);
-            
-            // Update counters
-            this.updateCounters(preferences);
-            
-            this.loadingManager.stopLoading(loaderId, true, 'העדפות נטענו בהצלחה');
             
         } catch (error) {
             console.error('❌ Error loading preferences:', error);

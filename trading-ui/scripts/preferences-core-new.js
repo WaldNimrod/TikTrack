@@ -453,13 +453,14 @@ class PreferencesCore {
     }
     
     /**
-     * Get single preference with caching
+     * Get single preference with caching and lazy loading support
      * @param {string} preferenceName - Preference name
      * @param {number} userId - User ID
      * @param {number} profileId - Profile ID
+     * @param {boolean} useLazyLoading - Whether to use lazy loading
      * @returns {Promise<any>} Preference value
      */
-    async getPreference(preferenceName, userId = null, profileId = null) {
+    async getPreference(preferenceName, userId = null, profileId = null, useLazyLoading = true) {
         const cacheKey = `${preferenceName}_${userId || this.currentUserId}_${profileId || this.currentProfileId}`;
         
         // Check cache first
@@ -467,6 +468,15 @@ class PreferencesCore {
         if (cached !== null) {
             console.log(`✅ Cache hit for ${preferenceName}`);
             return cached;
+        }
+        
+        // Check lazy loading if enabled
+        if (useLazyLoading && window.LazyLoader) {
+            const isLoaded = window.LazyLoader.isLoaded(preferenceName);
+            if (!isLoaded) {
+                console.log(`🎯 Loading ${preferenceName} on demand via lazy loader`);
+                return await window.LazyLoader.loadOnDemand(preferenceName, userId, profileId);
+            }
         }
         
         try {
@@ -633,6 +643,35 @@ class PreferencesCore {
         this.cacheManager.invalidate(keys);
         console.log(`🧹 Invalidated ${preferenceNames.length} preferences`);
     }
+    
+    /**
+     * Initialize with lazy loading
+     * @param {number} userId - User ID
+     * @param {number} profileId - Profile ID
+     */
+    async initializeWithLazyLoading(userId = null, profileId = null) {
+        try {
+            console.log('🚀 Initializing preferences with lazy loading...');
+            
+            // Initialize lazy loader if available
+            if (window.LazyLoader) {
+                await window.LazyLoader.initialize(
+                    userId || this.currentUserId, 
+                    profileId || this.currentProfileId
+                );
+                console.log('✅ Lazy loading initialized');
+            } else {
+                console.warn('⚠️ LazyLoader not available, using standard loading');
+                // Fallback to standard loading
+                await this.getAllPreferences(userId, profileId);
+            }
+            
+        } catch (error) {
+            console.error('❌ Error initializing lazy loading:', error);
+            // Fallback to standard loading
+            await this.getAllPreferences(userId, profileId);
+        }
+    }
 }
 
 // ============================================================================
@@ -688,6 +727,15 @@ window.getAllPreferences = async function(userId = null, profileId = null) {
  */
 window.saveAllPreferences = async function(preferences, userId = null, profileId = null) {
     return await window.PreferencesCore.savePreferences(preferences, userId, profileId);
+};
+
+/**
+ * Initialize preferences with lazy loading (backward compatibility)
+ * @param {number} userId - User ID
+ * @param {number} profileId - Profile ID
+ */
+window.initializePreferencesWithLazyLoading = async function(userId = null, profileId = null) {
+    return await window.PreferencesCore.initializeWithLazyLoading(userId, profileId);
 };
 
 // ============================================================================

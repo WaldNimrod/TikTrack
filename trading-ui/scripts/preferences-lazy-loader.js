@@ -1,0 +1,539 @@
+/**
+ * Preferences Lazy Loader - TikTrack
+ * ==================================
+ * 
+ * Lazy loading system for preferences
+ * Loads critical preferences immediately, non-critical on demand
+ * 
+ * @version 1.0.0
+ * @date January 23, 2025
+ * @author TikTrack Development Team
+ * 
+ * @description
+ * Smart lazy loading system with:
+ * - Critical vs non-critical classification
+ * - Priority-based loading
+ * - Background loading for non-critical
+ * - User interaction triggers
+ * - Performance optimization
+ * 
+ * @architecture
+ * - PreferenceClassifier: Classifies preferences by importance
+ * - LazyLoader: Handles lazy loading logic
+ * - PriorityManager: Manages loading priorities
+ * - BackgroundLoader: Background loading for non-critical
+ */
+
+console.log('📄 Loading preferences-lazy-loader.js v1.0.0...');
+
+// ============================================================================
+// PREFERENCE CLASSIFIER
+// ============================================================================
+
+/**
+ * Preference Classification System
+ * Classifies preferences by importance and usage patterns
+ */
+class PreferenceClassifier {
+    constructor() {
+        this.classifications = {
+            // CRITICAL - Load immediately (affects core functionality)
+            critical: [
+                // User settings
+                'defaultAccountFilter',
+                'default_trading_account',
+                'defaultCommission',
+                'defaultStopLoss',
+                'defaultTargetPrice',
+                
+                // Core display
+                'compactMode',
+                'tablePageSize',
+                'pagination_size_default',
+                
+                // Essential notifications
+                'enableNotifications',
+                'enableRealtimeNotifications',
+                
+                // Core colors (most used)
+                'primaryColor',
+                'backgroundColor',
+                'textColor',
+                'dangerColor',
+                'successColor',
+                'warningColor',
+                'infoColor'
+            ],
+            
+            // HIGH - Load on page load (important for UX)
+            high: [
+                // Chart settings
+                'chartQuality',
+                'chartInteractive',
+                'chartShowTooltips',
+                'chartAutoRefresh',
+                'chartRefreshInterval',
+                
+                // Status colors
+                'statusOpenColor',
+                'statusClosedColor',
+                'statusCancelledColor',
+                'statusPendingColor',
+                
+                // Value colors
+                'valuePositiveColor',
+                'valueNegativeColor',
+                'valueNeutralColor',
+                
+                // Filter defaults
+                'defaultDateRangeFilter',
+                'defaultStatusFilter',
+                'defaultTypeFilter',
+                'defaultSearchFilter',
+                
+                // Notification settings
+                'enableBackgroundTaskNotifications',
+                'enableDataUpdateNotifications',
+                'enableExternalDataNotifications',
+                'enableSystemEventNotifications'
+            ],
+            
+            // MEDIUM - Load on user interaction
+            medium: [
+                // Chart colors
+                'chartBackgroundColor',
+                'chartBorderColor',
+                'chartGridColor',
+                'chartPointColor',
+                'chartPrimaryColor',
+                'chartTextColor',
+                
+                // Entity colors
+                'entityAlertColor',
+                'entityAlertColorDark',
+                'entityAlertColorLight',
+                'entityInfoColor',
+                'entityInfoColorDark',
+                'entityInfoColorLight',
+                
+                // Value color variants
+                'valuePositiveColorLight',
+                'valuePositiveColorDark',
+                'valueNegativeColorLight',
+                'valueNegativeColorDark',
+                'valueNeutralColorLight',
+                'valueNeutralColorDark',
+                
+                // Chart advanced
+                'chartAnimations',
+                'chartExportBackground',
+                'chartExportFormat',
+                'chartExportQuality',
+                'chartExportResolution'
+            ],
+            
+            // LOW - Load in background or on demand
+            low: [
+                // Console logs
+                'console_logs_business_enabled',
+                'console_logs_development_enabled',
+                'console_logs_performance_enabled',
+                'console_logs_system_enabled',
+                'console_logs_ui_enabled',
+                
+                // Advanced chart settings
+                'chartInteractive',
+                'chartQuality',
+                
+                // UI preferences
+                'showAnimations',
+                'theme',
+                
+                // Advanced colors
+                'borderColor',
+                'shadowColor',
+                'highlightColor',
+                'secondaryColor'
+            ]
+        };
+        
+        this.loadingOrder = ['critical', 'high', 'medium', 'low'];
+    }
+    
+    /**
+     * Classify a preference
+     * @param {string} preferenceName - Preference name
+     * @returns {string} Classification (critical, high, medium, low)
+     */
+    classify(preferenceName) {
+        for (const [classification, preferences] of Object.entries(this.classifications)) {
+            if (preferences.includes(preferenceName)) {
+                return classification;
+            }
+        }
+        return 'low'; // Default to low priority
+    }
+    
+    /**
+     * Get preferences by classification
+     * @param {string} classification - Classification level
+     * @returns {Array<string>} Preference names
+     */
+    getPreferencesByClassification(classification) {
+        return this.classifications[classification] || [];
+    }
+    
+    /**
+     * Get all preferences sorted by priority
+     * @returns {Array<Object>} Preferences with classification
+     */
+    getAllPreferencesSorted() {
+        const result = [];
+        
+        for (const classification of this.loadingOrder) {
+            const preferences = this.getPreferencesByClassification(classification);
+            preferences.forEach(name => {
+                result.push({
+                    name,
+                    classification,
+                    priority: this.loadingOrder.indexOf(classification)
+                });
+            });
+        }
+        
+        return result;
+    }
+}
+
+// ============================================================================
+// LAZY LOADER CLASS
+// ============================================================================
+
+/**
+ * Lazy Loading System
+ * Handles smart loading of preferences
+ */
+class LazyLoader {
+    constructor() {
+        this.classifier = new PreferenceClassifier();
+        this.loadedPreferences = new Set();
+        this.loadingPromises = new Map();
+        this.backgroundLoader = null;
+        
+        this.loadingStats = {
+            critical: { loaded: 0, total: 0 },
+            high: { loaded: 0, total: 0 },
+            medium: { loaded: 0, total: 0 },
+            low: { loaded: 0, total: 0 }
+        };
+    }
+    
+    /**
+     * Initialize lazy loading
+     * @param {number} userId - User ID
+     * @param {number} profileId - Profile ID
+     */
+    async initialize(userId = 1, profileId = 3) {
+        console.log('🚀 Initializing lazy loading system...');
+        
+        // Load critical preferences immediately
+        await this.loadCriticalPreferences(userId, profileId);
+        
+        // Start background loading for high priority
+        this.startBackgroundLoading(userId, profileId);
+        
+        console.log('✅ Lazy loading system initialized');
+    }
+    
+    /**
+     * Load critical preferences immediately
+     * @param {number} userId - User ID
+     * @param {number} profileId - Profile ID
+     */
+    async loadCriticalPreferences(userId, profileId) {
+        const criticalPrefs = this.classifier.getPreferencesByClassification('critical');
+        this.loadingStats.critical.total = criticalPrefs.length;
+        
+        console.log(`🔥 Loading ${criticalPrefs.length} critical preferences...`);
+        
+        const promises = criticalPrefs.map(async (prefName) => {
+            try {
+                const value = await this.loadSinglePreference(prefName, userId, profileId);
+                this.loadedPreferences.add(prefName);
+                this.loadingStats.critical.loaded++;
+                return { name: prefName, value, success: true };
+            } catch (error) {
+                console.warn(`⚠️ Failed to load critical preference ${prefName}:`, error);
+                return { name: prefName, value: null, success: false, error };
+            }
+        });
+        
+        const results = await Promise.all(promises);
+        const successCount = results.filter(r => r.success).length;
+        
+        console.log(`✅ Loaded ${successCount}/${criticalPrefs.length} critical preferences`);
+    }
+    
+    /**
+     * Start background loading for high priority preferences
+     * @param {number} userId - User ID
+     * @param {number} profileId - Profile ID
+     */
+    startBackgroundLoading(userId, profileId) {
+        if (this.backgroundLoader) {
+            clearTimeout(this.backgroundLoader);
+        }
+        
+        // Load high priority after a short delay
+        this.backgroundLoader = setTimeout(async () => {
+            await this.loadHighPriorityPreferences(userId, profileId);
+        }, 100);
+        
+        // Load medium priority after longer delay
+        setTimeout(async () => {
+            await this.loadMediumPriorityPreferences(userId, profileId);
+        }, 500);
+        
+        // Load low priority in background
+        setTimeout(async () => {
+            await this.loadLowPriorityPreferences(userId, profileId);
+        }, 2000);
+    }
+    
+    /**
+     * Load high priority preferences
+     * @param {number} userId - User ID
+     * @param {number} profileId - Profile ID
+     */
+    async loadHighPriorityPreferences(userId, profileId) {
+        const highPrefs = this.classifier.getPreferencesByClassification('high');
+        this.loadingStats.high.total = highPrefs.length;
+        
+        console.log(`⚡ Loading ${highPrefs.length} high priority preferences...`);
+        
+        // Load in batches to avoid overwhelming the server
+        const batchSize = 5;
+        for (let i = 0; i < highPrefs.length; i += batchSize) {
+            const batch = highPrefs.slice(i, i + batchSize);
+            const promises = batch.map(prefName => this.loadSinglePreference(prefName, userId, profileId));
+            
+            try {
+                await Promise.all(promises);
+                batch.forEach(prefName => {
+                    this.loadedPreferences.add(prefName);
+                    this.loadingStats.high.loaded++;
+                });
+            } catch (error) {
+                console.warn(`⚠️ Batch loading failed:`, error);
+            }
+            
+            // Small delay between batches
+            await new Promise(resolve => setTimeout(resolve, 50));
+        }
+        
+        console.log(`✅ Loaded ${this.loadingStats.high.loaded}/${highPrefs.length} high priority preferences`);
+    }
+    
+    /**
+     * Load medium priority preferences
+     * @param {number} userId - User ID
+     * @param {number} profileId - Profile ID
+     */
+    async loadMediumPriorityPreferences(userId, profileId) {
+        const mediumPrefs = this.classifier.getPreferencesByClassification('medium');
+        this.loadingStats.medium.total = mediumPrefs.length;
+        
+        console.log(`📊 Loading ${mediumPrefs.length} medium priority preferences...`);
+        
+        // Load in smaller batches
+        const batchSize = 3;
+        for (let i = 0; i < mediumPrefs.length; i += batchSize) {
+            const batch = mediumPrefs.slice(i, i + batchSize);
+            const promises = batch.map(prefName => this.loadSinglePreference(prefName, userId, profileId));
+            
+            try {
+                await Promise.all(promises);
+                batch.forEach(prefName => {
+                    this.loadedPreferences.add(prefName);
+                    this.loadingStats.medium.loaded++;
+                });
+            } catch (error) {
+                console.warn(`⚠️ Medium priority batch loading failed:`, error);
+            }
+            
+            // Longer delay between batches
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        
+        console.log(`✅ Loaded ${this.loadingStats.medium.loaded}/${mediumPrefs.length} medium priority preferences`);
+    }
+    
+    /**
+     * Load low priority preferences
+     * @param {number} userId - User ID
+     * @param {number} profileId - Profile ID
+     */
+    async loadLowPriorityPreferences(userId, profileId) {
+        const lowPrefs = this.classifier.getPreferencesByClassification('low');
+        this.loadingStats.low.total = lowPrefs.length;
+        
+        console.log(`🐌 Loading ${lowPrefs.length} low priority preferences in background...`);
+        
+        // Load one by one with longer delays
+        for (const prefName of lowPrefs) {
+            try {
+                await this.loadSinglePreference(prefName, userId, profileId);
+                this.loadedPreferences.add(prefName);
+                this.loadingStats.low.loaded++;
+            } catch (error) {
+                console.warn(`⚠️ Failed to load low priority preference ${prefName}:`, error);
+            }
+            
+            // Delay between each preference
+            await new Promise(resolve => setTimeout(resolve, 200));
+        }
+        
+        console.log(`✅ Loaded ${this.loadingStats.low.loaded}/${lowPrefs.length} low priority preferences`);
+    }
+    
+    /**
+     * Load single preference
+     * @param {string} preferenceName - Preference name
+     * @param {number} userId - User ID
+     * @param {number} profileId - Profile ID
+     * @returns {Promise<any>} Preference value
+     */
+    async loadSinglePreference(preferenceName, userId, profileId) {
+        // Check if already loading
+        if (this.loadingPromises.has(preferenceName)) {
+            return await this.loadingPromises.get(preferenceName);
+        }
+        
+        // Check if already loaded
+        if (this.loadedPreferences.has(preferenceName)) {
+            return await window.PreferencesCore.getPreference(preferenceName, userId, profileId);
+        }
+        
+        // Create loading promise
+        const promise = window.PreferencesCore.getPreference(preferenceName, userId, profileId);
+        this.loadingPromises.set(preferenceName, promise);
+        
+        try {
+            const value = await promise;
+            this.loadedPreferences.add(preferenceName);
+            return value;
+        } finally {
+            this.loadingPromises.delete(preferenceName);
+        }
+    }
+    
+    /**
+     * Load preference on demand
+     * @param {string} preferenceName - Preference name
+     * @param {number} userId - User ID
+     * @param {number} profileId - Profile ID
+     * @returns {Promise<any>} Preference value
+     */
+    async loadOnDemand(preferenceName, userId = 1, profileId = 3) {
+        console.log(`🎯 Loading preference on demand: ${preferenceName}`);
+        
+        const classification = this.classifier.classify(preferenceName);
+        console.log(`📊 Classification: ${classification}`);
+        
+        return await this.loadSinglePreference(preferenceName, userId, profileId);
+    }
+    
+    /**
+     * Get loading statistics
+     * @returns {Object} Loading stats
+     */
+    getLoadingStats() {
+        const total = Object.values(this.loadingStats).reduce((sum, stat) => sum + stat.total, 0);
+        const loaded = Object.values(this.loadingStats).reduce((sum, stat) => sum + stat.loaded, 0);
+        
+        return {
+            total,
+            loaded,
+            percentage: total > 0 ? Math.round((loaded / total) * 100) : 0,
+            byClassification: this.loadingStats,
+            loadedPreferences: Array.from(this.loadedPreferences)
+        };
+    }
+    
+    /**
+     * Check if preference is loaded
+     * @param {string} preferenceName - Preference name
+     * @returns {boolean} Is loaded
+     */
+    isLoaded(preferenceName) {
+        return this.loadedPreferences.has(preferenceName);
+    }
+    
+    /**
+     * Get loaded preferences count
+     * @returns {number} Count
+     */
+    getLoadedCount() {
+        return this.loadedPreferences.size;
+    }
+}
+
+// ============================================================================
+// GLOBAL INSTANCE
+// ============================================================================
+
+// Create global instance
+window.LazyLoader = new LazyLoader();
+
+// ============================================================================
+// GLOBAL FUNCTIONS
+// ============================================================================
+
+/**
+ * Initialize lazy loading system
+ * @param {number} userId - User ID
+ * @param {number} profileId - Profile ID
+ */
+window.initializeLazyLoading = async function(userId = 1, profileId = 3) {
+    return await window.LazyLoader.initialize(userId, profileId);
+};
+
+/**
+ * Load preference on demand
+ * @param {string} preferenceName - Preference name
+ * @param {number} userId - User ID
+ * @param {number} profileId - Profile ID
+ */
+window.loadPreferenceOnDemand = async function(preferenceName, userId = 1, profileId = 3) {
+    return await window.LazyLoader.loadOnDemand(preferenceName, userId, profileId);
+};
+
+/**
+ * Get loading statistics
+ */
+window.getLazyLoadingStats = function() {
+    return window.LazyLoader.getLoadingStats();
+};
+
+/**
+ * Check if preference is loaded
+ * @param {string} preferenceName - Preference name
+ */
+window.isPreferenceLoaded = function(preferenceName) {
+    return window.LazyLoader.isLoaded(preferenceName);
+};
+
+// ============================================================================
+// INITIALIZATION
+// ============================================================================
+
+// Auto-initialize when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('📄 Lazy loading system ready');
+    });
+} else {
+    console.log('📄 Lazy loading system ready');
+}
+
+console.log('✅ preferences-lazy-loader.js loaded successfully');

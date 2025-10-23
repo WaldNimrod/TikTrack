@@ -154,9 +154,9 @@
   --status-unknown-border: var(--user-status-unknown-border, var(--user-status-unknown-color, var(--apple-gray-6)));
 
   /* ===== צבעי סוגי טרייד ===== */
-  --type-swing-color: #007AFF;        /* כחול - סווינג */
-  --type-investment-color: #34C759;   /* ירוק - השקעה */
-  --type-passive-color: #FF9500;      /* כתום - פסיבי */
-  --type-day-trading-color: #AF52DE;  /* סגול - מסחר יומי */
-  --type-scalping-color: #FF2D92;     /* ורוד - סקלפינג */
+  --type-swing-color: var(--user-status-danger-color, #dc3545);        /* סכנה - סווינג */
+  --type-investment-color: var(--user-status-warning-color, #ffc107);  /* אזהרה - השקעה */
+  --type-passive-color: var(--user-status-info-color, #17a2b8);        /* מידע - פסיבי */
+  --type-day-trading-color: var(--user-status-primary-color, #007bff); /* ראשי - מסחר יומי */
+  --type-scalping-color: var(--user-status-secondary-color, #6c757d);  /* משני - סקלפינג */
 }

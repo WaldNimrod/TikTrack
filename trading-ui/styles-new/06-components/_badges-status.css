@@ -251,35 +251,130 @@ background-color: var(--status-closed-color);
 background-color: var(--status-pending-color);
 }
 
-/* צד טרייד */
+/* צד טרייד - סגנון אחיד עם באדג'י סטטוס */
 .badge-long {
-  background-color: var(--user-status-positive-color, #28a745);
-  color: white;
+  background-color: color-mix(in srgb, var(--user-status-positive-color, #28a745) 10%, transparent);
+  color: var(--user-status-positive-color, #28a745);
   border: 1px solid var(--user-status-positive-color, #28a745);
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  font-weight: 500;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
 }
 
 .badge-short {
-  background-color: var(--user-status-negative-color, #dc3545);
-  color: white;
+  background-color: color-mix(in srgb, var(--user-status-negative-color, #dc3545) 10%, transparent);
+  color: var(--user-status-negative-color, #dc3545);
   border: 1px solid var(--user-status-negative-color, #dc3545);
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  font-weight: 500;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
 }
 
-/* סוג טרייד */
+/* סוג טרייד - סגנון אחיד עם באדג'י סטטוס */
 .badge-type {
-  background-color: var(--current-entity-color, #007bff);
-  color: white;
+  background-color: color-mix(in srgb, var(--current-entity-color, #007bff) 10%, transparent);
+  color: var(--current-entity-color, #007bff);
   border: 1px solid var(--current-entity-color, #007bff);
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  font-weight: 500;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
 }
 
 .badge-type.text-success {
-  background-color: var(--user-status-positive-color, #28a745);
-  color: white;
+  background-color: color-mix(in srgb, var(--user-status-positive-color, #28a745) 10%, transparent);
+  color: var(--user-status-positive-color, #28a745);
   border: 1px solid var(--user-status-positive-color, #28a745);
 }
 
 .badge-type.text-danger {
-  background-color: var(--user-status-negative-color, #dc3545);
-  color: white;
+  background-color: color-mix(in srgb, var(--user-status-negative-color, #dc3545) 10%, transparent);
+  color: var(--user-status-negative-color, #dc3545);
   border: 1px solid var(--user-status-negative-color, #dc3545);
+}
+
+/* צבעים ספציפיים לכל סוג טרייד - סגנון אחיד עם באדג'י סטטוס */
+.badge-type[data-type="swing"] {
+  background-color: color-mix(in srgb, var(--type-swing-color) 10%, transparent);
+  color: var(--type-swing-color);
+  border: 1px solid var(--type-swing-color);
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  font-weight: 500;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.badge-type[data-type="investment"] {
+  background-color: color-mix(in srgb, var(--type-investment-color) 10%, transparent);
+  color: var(--type-investment-color);
+  border: 1px solid var(--type-investment-color);
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  font-weight: 500;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.badge-type[data-type="passive"] {
+  background-color: color-mix(in srgb, var(--type-passive-color) 10%, transparent);
+  color: var(--type-passive-color);
+  border: 1px solid var(--type-passive-color);
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  font-weight: 500;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.badge-type[data-type="day-trading"] {
+  background-color: color-mix(in srgb, var(--type-day-trading-color) 10%, transparent);
+  color: var(--type-day-trading-color);
+  border: 1px solid var(--type-day-trading-color);
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  font-weight: 500;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.badge-type[data-type="scalping"] {
+  background-color: color-mix(in srgb, var(--type-scalping-color) 10%, transparent);
+  color: var(--type-scalping-color);
+  border: 1px solid var(--type-scalping-color);
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  font-weight: 500;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
 }
 

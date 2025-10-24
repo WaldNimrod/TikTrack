@@ -1,207 +1,335 @@
 # Cache Standards - TikTrack
+# סטנדרטי מטמון
 
-> **גרסה 1.0** - סטנדרטים אחידים למערכת המטמון
-
----
-
-## 📋 Standard Cache Key Formats
-
-### Preferences
-- **Single preference:** `preference_{name}_{userId}_{profileId}`
-- **All preferences:** `all_preferences_{userId}_{profileId}`
-- **User preferences:** `user-preferences`
-
-### UI State
-- **Filter state:** `filter-state`
-- **UI state:** `ui-state`
-- **Page state:** `page-state-{pageName}`
-
-### Data
-- **Market data:** `market-data`
-- **Trade data:** `trade-data`
-- **Dashboard data:** `dashboard-data`
+**תאריך עדכון:** 26 בינואר 2025  
+**גרסה:** 1.0.0  
+**סטטוס:** ✅ פעיל  
+**מטרה:** סטנדרטים אחידים לניהול מטמון במערכת  
 
 ---
 
-## 🧹 Cache Clearing Standards
+## 📋 סקירה כללית
 
-### Preference-specific clearing
-Clear only: `preference_*`, `all_preferences_*`, `user-preferences`
-
-### Profile switch clearing
-Clear: All preference keys for old profile
-
-### Full clearing
-Clear: All layers (memory, localStorage, IndexedDB, backend)
+מסמך זה מגדיר סטנדרטים אחידים לניהול מטמון בכל המערכת, כולל פורמטים, מדיניות, ואסטרטגיות ניקוי.
 
 ---
 
-## 🏗️ Cache Layer Assignment
+## 🔑 Cache Key Standards
 
-### Memory Layer
-- **Temporary data** (<100KB)
-- **TTL:** Until page reload
-- **Examples:** UI state during session
+### פורמט מפתחות מטמון
 
-### localStorage Layer
-- **Simple data** (<1MB)
-- **TTL:** 1 hour (default) or null for persistent
-- **Examples:** User preferences, filter state
+#### 1. העדפות משתמש
+```
+preference_{name}_{userId}_{profileId}
+```
+**דוגמאות:**
+- `preference_primaryColor_1_2`
+- `preference_tablePageSize_1_3`
+- `preference_enableNotifications_1_1`
 
-### IndexedDB Layer
-- **Complex data** (>1MB)
-- **TTL:** 24 hours (default)
-- **Examples:** Notifications history, file mappings
+#### 2. נתוני טבלאות
+```
+table-{tableId}-{filters}
+```
+**דוגמאות:**
+- `table-trades-{"status":"active"}`
+- `table-alerts-{"type":"price"}`
 
-### Backend Cache Layer
-- **Critical data** with short TTL
-- **TTL:** 30 seconds - 5 minutes
-- **Examples:** Market data, trade data
+#### 3. נתוני מערכת
+```
+{system}-{dataType}-{identifier}
+```
+**דוגמאות:**
+- `user-preferences`
+- `profile-data`
+- `accounts-data`
+- `trades-data`
+
+#### 4. מצב UI
+```
+{component}-{stateType}
+```
+**דוגמאות:**
+- `table-trades-state`
+- `filter-alerts-state`
+- `ui-header-state`
 
 ---
 
-## 🔧 Pattern Matching
+## 🏗️ Cache Layer Assignment Rules
 
-### Wildcard Support
-- `preference_*` - All individual preferences
-- `all_preferences_*` - All preference collections
-- `user-preferences` - General user preferences key
+### 1. Frontend Memory Layer
+**שימוש:**
+- נתונים זמניים (<100KB)
+- מצב UI זמני
+- נתוני עמוד זמניים
 
-### Usage
+**TTL:** עד רענון דף  
+**דוגמאות:**
 ```javascript
-// Get policy for key with pattern matching
-const policy = window.UnifiedCacheManager.getKeyPolicy('preference_primaryColor_1_2');
-// Returns: { layer: 'localStorage', ttl: 300000, compress: false }
+// מצב UI זמני
+await UnifiedCacheManager.save('ui-temp-state', data, {
+    layer: 'memory',
+    ttl: 300000 // 5 דקות
+});
+```
+
+### 2. localStorage Layer
+**שימוש:**
+- נתונים פשוטים (<1MB)
+- העדפות משתמש
+- מצב מסננים
+- הגדרות UI
+
+**TTL:** 1 שעה (ברירת מחדל)  
+**דוגמאות:**
+```javascript
+// העדפות משתמש
+await UnifiedCacheManager.save('preference_primaryColor_1_2', '#26baac', {
+    layer: 'localStorage',
+    ttl: 300000 // 5 דקות
+});
+```
+
+### 3. IndexedDB Layer
+**שימוש:**
+- נתונים מורכבים (>1MB)
+- היסטוריית התראות
+- ניתוחי קוד
+- נתונים דחוסים
+
+**TTL:** 24 שעות (ברירת מחדל)  
+**דוגמאות:**
+```javascript
+// היסטוריית התראות
+await UnifiedCacheManager.save('notifications-history', history, {
+    layer: 'indexedDB',
+    ttl: 86400000, // 24 שעות
+    compress: true
+});
+```
+
+### 4. Backend Cache Layer
+**שימוש:**
+- נתונים קריטיים עם TTL
+- נתוני שוק
+- נתוני טריידים
+- נתונים שדורשים סינכרון
+
+**TTL:** 30 שניות - 5 דקות  
+**דוגמאות:**
+```javascript
+// נתוני שוק
+await UnifiedCacheManager.save('market-data', data, {
+    layer: 'backend',
+    ttl: 30000, // 30 שניות
+    syncToBackend: true
+});
 ```
 
 ---
 
-## 📊 Cache Performance Standards
+## ⏱️ TTL Guidelines
 
-### TTL Guidelines
-- **Critical data:** 30 seconds - 5 minutes
-- **User preferences:** 5 minutes
-- **UI state:** 1 hour
-- **Historical data:** 24 hours
-- **Persistent data:** null (no expiration)
+### TTL לפי סוג נתונים:
 
-### Size Limits
-- **Memory layer:** <100KB per entry
-- **localStorage:** <1MB per entry
-- **IndexedDB:** No limit (but monitor performance)
-- **Backend cache:** <10MB per entry
+#### 1. נתונים קריטיים (30 שניות - 2 דקות)
+- נתוני שוק
+- מחירים עדכניים
+- סטטוס עסקאות
 
----
+#### 2. נתונים משתמש (5 דקות - 1 שעה)
+- העדפות משתמש
+- מצב UI
+- מסננים
 
-## 🚨 Error Handling Standards
+#### 3. נתונים היסטוריים (24 שעות - 7 ימים)
+- היסטוריית התראות
+- ניתוחי קוד
+- לוגים
 
-### Cache Miss Handling
-1. Check all layers in order
-2. If not found, use fallback function
-3. Save result to appropriate layer
-4. Return data to caller
-
-### Cache Clear Failures
-1. Log error with context
-2. Continue with partial clearing
-3. Notify user of issues
-4. Retry failed operations
+#### 4. נתונים קבועים (ללא TTL)
+- הגדרות מערכת
+- מבנה נתונים
+- מטאדאטה
 
 ---
 
-## 🔍 Debugging Standards
+## 🧹 Clearing Strategies
 
-### Console Commands
-- `debugPreferencesCache()` - Show cache state
-- `debugProfileSwitch()` - Verify profile switching
-- `debugPreferenceCache("preferenceName")` - Check specific preference
+### 1. ניקוי מלא (Full Clear)
+**מתי:** רענון מערכת, החלפת פרופיל  
+**מה:** כל שכבות המטמון  
+**פונקציה:** `clearAllCache()`
 
-### Cache Management Page
-- Navigate to `/cache-management.html`
-- Use Light/Medium/Full/Nuclear clearing options
-- View cache statistics and health
+### 2. ניקוי ממוקד (Targeted Clear)
+**מתי:** עדכון העדפה, שינוי מסנן  
+**מה:** מפתחות ספציפיים  
+**פונקציה:** `remove(key)`
+
+### 3. ניקוי לפי דפוס (Pattern Clear)
+**מתי:** החלפת פרופיל, עדכון מערכת  
+**מה:** מפתחות לפי דפוס  
+**פונקציה:** `removePattern(pattern)`
+
+### 4. ניקוי לפי תלות (Dependency Clear)
+**מתי:** עדכון נתונים קשורים  
+**מה:** מפתחות תלויים  
+**פונקציה:** `invalidateByDependency(dep)`
 
 ---
 
-## 📚 Best Practices
+## 📊 Best Practices
 
-### 1. Always use UnifiedCacheManager
+### 1. בחירת שכבה
 ```javascript
-// ✅ Correct
-await window.UnifiedCacheManager.save(key, data, options);
+// ✅ נכון - בחירה לפי גודל וסוג
+if (dataSize < 100000) {
+    layer = 'localStorage';
+} else if (dataSize < 1000000) {
+    layer = 'indexedDB';
+} else {
+    layer = 'backend';
+}
 
-// ❌ Avoid
-localStorage.setItem(key, JSON.stringify(data));
+// ❌ לא נכון - בחירה שרירותית
+layer = 'localStorage'; // תמיד
 ```
 
-### 2. Follow standard key formats
+### 2. ניהול TTL
 ```javascript
-// ✅ Correct
-const key = `preference_${name}_${userId}_${profileId}`;
+// ✅ נכון - TTL לפי סוג נתונים
+const ttl = dataType === 'market' ? 30000 : 300000;
 
-// ❌ Avoid
-const key = `user_pref_${name}`;
+// ❌ לא נכון - TTL קבוע
+const ttl = 3600000; // תמיד שעה
 ```
 
-### 3. Set appropriate TTL
+### 3. ניקוי מטמון
 ```javascript
-// ✅ Correct
-const options = { ttl: 300000 }; // 5 minutes
+// ✅ נכון - ניקוי ממוקד
+await UnifiedCacheManager.remove('preference_primaryColor_1_2');
 
-// ❌ Avoid
-const options = { ttl: null }; // For temporary data
+// ❌ לא נכון - ניקוי מלא
+await UnifiedCacheManager.clearAllCache();
 ```
 
-### 4. Clear cache after data changes
+### 4. טיפול בשגיאות
 ```javascript
-// ✅ Correct
-await savePreference(name, value);
-await window.UnifiedCacheManager.remove(cacheKey);
+// ✅ נכון - טיפול בשגיאות
+try {
+    await UnifiedCacheManager.save(key, data);
+} catch (error) {
+    console.warn('Cache save failed:', error);
+    // fallback logic
+}
 
-// ❌ Avoid
-await savePreference(name, value);
-// Cache not cleared - stale data
+// ❌ לא נכון - התעלמות משגיאות
+await UnifiedCacheManager.save(key, data);
 ```
-
-### 5. Test profile switching thoroughly
-- Switch between all profiles
-- Verify data consistency
-- Check cache invalidation
-- Test UI updates
 
 ---
 
-## 🎯 Success Criteria
+## 🔍 Debugging Tools
 
-### Functional Requirements
-1. Profile switching works immediately and persistently
-2. Preference changes reflect in all systems
-3. No code duplications exist
-4. Clear standard for cache keys
-5. All cache clearing buttons connected correctly
+### 1. בדיקת מטמון
+```javascript
+// בדיקת מפתח ספציפי
+const data = await UnifiedCacheManager.get('preference_primaryColor_1_2');
+console.log('Cache data:', data);
 
-### Technical Requirements
-1. All 28 pages work with cache
-2. All 99 systems work with cache
-3. Documentation updated and accurate
-4. Git backup for each important stage
-5. Developer guide updated
+// בדיקת כל המפתחות
+const keys = await UnifiedCacheManager.getAllKeys();
+console.log('All cache keys:', keys);
+```
 
-### Performance Requirements
-1. Page load time not increased
-2. Cache reduces server calls
-3. No memory leaks created
-4. System stable after 1 hour of use
+### 2. סטטיסטיקות מטמון
+```javascript
+// סטטיסטיקות כלליות
+const stats = await UnifiedCacheManager.getStats();
+console.log('Cache stats:', stats);
+
+// סטטיסטיקות שכבה
+const layerStats = await UnifiedCacheManager.getLayerStats('localStorage');
+console.log('localStorage stats:', layerStats);
+```
+
+### 3. ניקוי מטמון
+```javascript
+// ניקוי מפתח ספציפי
+await UnifiedCacheManager.remove('preference_primaryColor_1_2');
+
+// ניקוי לפי דפוס
+await UnifiedCacheManager.removePattern('preference_*');
+
+// ניקוי מלא
+await UnifiedCacheManager.clearAllCache();
+```
 
 ---
 
-## 📖 Related Documentation
+## 📝 Examples
 
-- **[Unified Cache System](UNIFIED_CACHE_SYSTEM.md)** - Complete system specification
-- **[Preferences System](preferences/PREFERENCES_SYSTEM.md)** - Preferences integration
-- **[Cache Integration](preferences/PREFERENCES_CACHE_INTEGRATION.md)** - Detailed integration guide
-- **[Troubleshooting Guide](CACHE_TROUBLESHOOTING.md)** - Common issues and solutions
+### 1. שמירת העדפה
+```javascript
+async function savePreference(name, value, userId, profileId) {
+    const key = `preference_${name}_${userId}_${profileId}`;
+    
+    await UnifiedCacheManager.save(key, value, {
+        layer: 'localStorage',
+        ttl: 300000, // 5 דקות
+        syncToBackend: true
+    });
+    
+    // ניקוי מטמון קשור
+    await UnifiedCacheManager.remove(`all_preferences_${userId}_${profileId}`);
+}
+```
+
+### 2. טעינת נתוני טבלה
+```javascript
+async function loadTableData(tableId, filters) {
+    const key = `table-${tableId}-${JSON.stringify(filters)}`;
+    
+    const data = await UnifiedCacheManager.get(key, {
+        fallback: () => loadFromServer(tableId, filters),
+        ttl: 300000 // 5 דקות
+    });
+    
+    return data;
+}
+```
+
+### 3. ניקוי מטמון החלפת פרופיל
+```javascript
+async function switchProfile(profileId) {
+    // ניקוי מטמון העדפות
+    const keys = await UnifiedCacheManager.getAllKeys();
+    const prefKeys = keys.filter(k => 
+        k.includes('preference_') || 
+        k.includes('all_preferences_')
+    );
+    
+    for (const key of prefKeys) {
+        await UnifiedCacheManager.remove(key);
+    }
+    
+    // עדכון פרופיל פעיל
+    await UnifiedCacheManager.save('active-profile', profileId, {
+        layer: 'localStorage',
+        ttl: null // ללא TTL
+    });
+}
+```
 
 ---
 
-*Last updated: 24/10/2025*
+## 🎯 Summary
+
+סטנדרטי המטמון מבטיחים:
+- **עקביות** - פורמט אחיד לכל המפתחות
+- **ביצועים** - בחירה נכונה של שכבות
+- **אמינות** - טיפול נכון בשגיאות
+- **תחזוקה** - קוד נקי ומובן
+
+**זכור:** תמיד השתמש ב-UnifiedCacheManager ולא במערכות מטמון מקומיות!

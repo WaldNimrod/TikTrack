@@ -47,6 +47,92 @@
 
 ---
 
+## 🔄 CacheSyncManager Integration
+
+### CacheSyncManager Architecture
+
+המערכת כוללת מנהל סינכרון מתקדם בין Frontend ו-Backend:
+
+#### תכונות עיקריות:
+- **סינכרון דו-כיווני** - Frontend ↔ Backend Cache
+- **Invalidation Patterns** - ניקוי מטמון לפי dependencies
+- **Retry Logic** - ניסיונות חוזרים במקרה של כשל
+- **Queue Management** - ניהול תור סינכרון
+
+#### Dependencies Mapping:
+```javascript
+this.dependencies = {
+    'user-preferences': [],
+    'preference-data': ['user-preferences'],
+    'profile-data': ['user-preferences'],
+    'accounts-data': ['user-preferences'],
+    'trades-data': ['accounts-data'],
+    'executions-data': ['accounts-data'],
+    'tickers-data': ['accounts-data'],
+    'alerts-data': ['accounts-data'],
+    'market-data': ['tickers-data'],
+    'dashboard-data': ['market-data', 'trades-data', 'executions-data']
+};
+```
+
+#### Invalidation Patterns:
+```javascript
+this.invalidationPatterns = {
+    'preference-updated': ['preference-data', 'user-preferences'],
+    'profile-switched': ['preference-data', 'profile-data', 'user-preferences'],
+    'profile-created': ['profile-data', 'user-preferences'],
+    'profile-updated': ['profile-data', 'user-preferences'],
+    'profile-deleted': ['profile-data', 'user-preferences'],
+    // ... additional patterns
+};
+```
+
+### Backend API Endpoints
+
+#### `/api/cache/sync` (POST)
+```json
+{
+    "key": "cache_key_name",
+    "data": {...},
+    "dependencies": ["dep1", "dep2"],
+    "ttl": 300,
+    "timestamp": 1234567890
+}
+```
+
+#### `/api/cache/<key>` (GET)
+```json
+{
+    "success": true,
+    "data": {...},
+    "key": "cache_key_name"
+}
+```
+
+#### `/api/cache/invalidate` (POST)
+```json
+{
+    "dependencies": ["dep1", "dep2"]
+}
+```
+
+### Integration Examples
+
+#### Preferences System Integration:
+```javascript
+// In savePreference
+if (window.CacheSyncManager) {
+    await window.CacheSyncManager.invalidateByAction('preference-updated');
+}
+
+// In setCurrentProfile
+if (window.CacheSyncManager) {
+    await window.CacheSyncManager.invalidateByAction('profile-switched');
+}
+```
+
+---
+
 ## 🔧 API Documentation
 
 ### Core Class: UnifiedCacheManager

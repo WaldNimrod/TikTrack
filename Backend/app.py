@@ -205,6 +205,10 @@ app.register_blueprint(users_bp)
 app.register_blueprint(background_tasks_bp)
 app.register_blueprint(entity_details_bp)
 
+# Register Cache Sync blueprint
+from routes.api.cache_sync import cache_sync_bp
+app.register_blueprint(cache_sync_bp)
+
 
 app.register_blueprint(constraints_bp)
 app.register_blueprint(currencies_bp)

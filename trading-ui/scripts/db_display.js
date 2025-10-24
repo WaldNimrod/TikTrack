@@ -563,7 +563,7 @@ window.addRecord = addRecord;
 // window.sortTable export removed - using global version from tables.js
 window.editRecord = editRecord;
 window.deleteRecord = deleteRecord;
-// window.copyDetailedLog export removed - using global version from system-management.js
+// window. export removed - using global version from system-management.js
 // window.generateDetailedLog export removed - local function only
 
 /**
@@ -692,8 +692,8 @@ function generateDetailedLog() {
     return log.join('\n');
 }
 
-// Local copyDetailedLog function for db_display page
-async function copyDetailedLog() {
+// Local  function for db_display page
+async function  {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {

@@ -835,7 +835,7 @@ function generateDetailedLog() {
                 loadButtonTable: typeof window.loadButtonTable === 'function' ? 'זמין' : 'לא זמין',
                 filterButtons: typeof window.filterButtons === 'function' ? 'זמין' : 'לא זמין',
                 copyToClipboard: typeof window.copyToClipboard === 'function' ? 'זמין' : 'לא זמין',
-                copyDetailedLog: typeof window.copyDetailedLog === 'function' ? 'זמין' : 'לא זמין',
+                : typeof window. === 'function' ? 'זמין' : 'לא זמין',
                 toggleSection: typeof window.toggleSection === 'function' ? 'זמין' : 'לא זמין',
                 toggleAllSections: typeof window.toggleAllSections === 'function' ? 'זמין' : 'לא זמין'
             },

@@ -153,7 +153,7 @@ function toggleAllSections() {
     });
 }
 
-// copyDetailedLog function moved to window.copyDetailedLog below
+//  function moved to window. below
 
 
 // ===== CACHE STATUS FUNCTIONS =====
@@ -1302,7 +1302,7 @@ function deleteCacheEntry(key) {
  * Copy detailed log for cache test page
  * העתקת לוג מפורט לעמוד בדיקת מטמון
  */
-async function copyDetailedLog() {
+async function  {
     const timestamp = new Date().toLocaleString('he-IL');
     const log = [];
 
@@ -1501,7 +1501,7 @@ async function copyDetailedLog() {
 
     // --- כפתור העתק לוג מפורט ---
     log.push('--- כפתור העתק לוג מפורט ---');
-    const copyLogButton = document.querySelector('[onclick*="copyDetailedLog"]');
+    const copyLogButton = document.querySelector('[onclick*=""]');
     if (copyLogButton) {
         const visible = copyLogButton.offsetParent !== null ? 'נראה' : 'לא נראה';
         const disabled = copyLogButton.disabled ? 'מבוטל' : 'פעיל';
@@ -1509,11 +1509,11 @@ async function copyDetailedLog() {
         log.push(`כפתור העתק לוג: ${visible} - ${disabled} - "${text}"`);
         
         // בדיקת פונקציה
-        const hasFunction = typeof copyDetailedLog === 'function';
-        log.push(`פונקציית copyDetailedLog: ${hasFunction ? 'זמינה' : 'לא זמינה'}`);
+        const hasFunction = typeof  === 'function';
+        log.push(`פונקציית : ${hasFunction ? 'זמינה' : 'לא זמינה'}`);
     } else {
         log.push('כפתור העתק לוג: לא נמצא');
-        log.push('פונקציית copyDetailedLog: לא זמינה');
+        log.push('פונקציית : לא זמינה');
     }
     log.push('');
 
@@ -2511,7 +2511,7 @@ async function syncWithServer() {
 /**
  * Copy detailed log to clipboard
  */
-async function copyDetailedLog() {
+async function  {
     try {
         const logData = {
             timestamp: new Date().toISOString(),
@@ -2803,7 +2803,7 @@ function displayVerificationReport(report) {
 window.clearAllUnifiedCache = clearAllUnifiedCache;
 window.optimizeUnifiedCache = optimizeUnifiedCache;
 window.syncWithServer = syncWithServer;
-// window.copyDetailedLog export removed - using local function only
+// window. export removed - using local function only
 window.runCompleteCacheVerification = runCompleteCacheVerification;
 
 // End of cache-test.js

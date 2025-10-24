@@ -42,7 +42,7 @@
  *     'use strict';
  *     
  *     function myNewFunction() {
- *         console.log('New script loaded!');
+ *         window.Logger.info('New script loaded!', { page: "unified-app-initializer" });
  *     }
  *     
  *     // IMPORTANT: Create Global for identification
@@ -51,7 +51,7 @@
  *         version: '1.0.0'
  *     };
  *     
- *     console.log('✅ MyNewScript loaded successfully');
+ *     window.Logger.info('✅ MyNewScript loaded successfully', { page: "unified-app-initializer" });
  * })();
  * 
  * STEP 2: Update Package Manifest
@@ -194,16 +194,16 @@ class UnifiedAppInitializer {
      */
     async initialize() {
         if (this.initialized) {
-            // console.log('✅ Application already initialized');
+            // window.Logger.info('✅ Application already initialized', { page: "unified-app-initializer" });
             return this.getStatus();
         }
 
         if (this.initializationInProgress) {
-            // console.log('⏳ Initialization already in progress...');
+            // window.Logger.info('⏳ Initialization already in progress...', { page: "unified-app-initializer" });
             return this.getStatus();
         }
 
-        // console.log('🎯 Starting Unified App Initialization...');
+        // window.Logger.info('🎯 Starting Unified App Initialization...', { page: "unified-app-initializer" });
         this.initializationInProgress = true;
         this.performanceMetrics.startTime = Date.now();
 
@@ -241,7 +241,7 @@ class UnifiedAppInitializer {
      * Stage 1: Detect and analyze page and systems
      */
     async detectAndAnalyze() {
-        // console.log('🔍 Stage 1: Detecting and analyzing...');
+        // window.Logger.info('🔍 Stage 1: Detecting and analyzing...', { page: "unified-app-initializer" });
         const stageStart = Date.now();
         
         // Detect page information
@@ -254,49 +254,49 @@ class UnifiedAppInitializer {
         this.analyzePageRequirements();
         
         this.performanceMetrics.stageTimes.detect = Date.now() - stageStart;
-        // console.log('✅ Stage 1 Complete:', {
+        // window.Logger.info('✅ Stage 1 Complete:', {
         //     page: this.pageInfo.name,
         //     systems: this.availableSystems.size,
         //     requirements: this.pageInfo.requirements
-        // });
+        // }, { page: "unified-app-initializer" });
     }
 
     /**
      * Stage 2: Prepare optimal configuration
      */
     prepareConfiguration() {
-        // console.log('⚙️ Stage 2: Preparing configuration...');
+        // window.Logger.info('⚙️ Stage 2: Preparing configuration...', { page: "unified-app-initializer" });
         const stageStart = Date.now();
         
         // Load page-specific configuration from page-initialization-configs.js
         let pageConfig = null;
         // Debug info only in verbose mode
         if (window.DEBUG_MODE) {
-            console.log('🔍 Checking pageInitializationConfigs:', typeof window.pageInitializationConfigs);
-            console.log('🔍 Available configs:', window.pageInitializationConfigs ? Object.keys(window.pageInitializationConfigs) : 'undefined');
+            window.Logger.info('🔍 Checking pageInitializationConfigs:', typeof window.pageInitializationConfigs, { page: "unified-app-initializer" });
+            window.Logger.info('🔍 Available configs:', window.pageInitializationConfigs ? Object.keys(window.pageInitializationConfigs, { page: "unified-app-initializer" }) : 'undefined');
             const pageName = this.pageInfo?.name || 'unknown';
-            console.log('🔍 Looking for config:', pageName);
+            window.Logger.info('🔍 Looking for config:', pageName, { page: "unified-app-initializer" });
         }
         
         if (typeof window.pageInitializationConfigs !== 'undefined' && 
             window.pageInitializationConfigs[this.pageInfo?.name]) {
             pageConfig = window.pageInitializationConfigs[this.pageInfo.name];
-            console.log(`📋 Loaded page config for ${this.pageInfo.name}:`, pageConfig);
+            window.Logger.info(`📋 Loaded page config for ${this.pageInfo.name}:`, pageConfig, { page: "unified-app-initializer" });
         } else if (typeof window.PAGE_CONFIGS !== 'undefined' && 
                    window.PAGE_CONFIGS[this.pageInfo?.name]) {
             pageConfig = window.PAGE_CONFIGS[this.pageInfo.name];
-            console.log(`📋 Loaded page config from PAGE_CONFIGS for ${this.pageInfo.name}:`, pageConfig);
+            window.Logger.info(`📋 Loaded page config from PAGE_CONFIGS for ${this.pageInfo.name}:`, pageConfig, { page: "unified-app-initializer" });
         } else {
-            console.log(`⚠️ No page config found for ${this.pageInfo?.name || 'unknown'}`);
-            console.log('🔍 Available configs in pageInitializationConfigs:', window.pageInitializationConfigs ? Object.keys(window.pageInitializationConfigs) : 'undefined');
-            console.log('🔍 Available configs in PAGE_CONFIGS:', window.PAGE_CONFIGS ? Object.keys(window.PAGE_CONFIGS) : 'undefined');
+            window.Logger.info(`⚠️ No page config found for ${this.pageInfo?.name || 'unknown'}`, { page: "unified-app-initializer" });
+            window.Logger.info('🔍 Available configs in pageInitializationConfigs:', window.pageInitializationConfigs ? Object.keys(window.pageInitializationConfigs, { page: "unified-app-initializer" }) : 'undefined');
+            window.Logger.info('🔍 Available configs in PAGE_CONFIGS:', window.PAGE_CONFIGS ? Object.keys(window.PAGE_CONFIGS, { page: "unified-app-initializer" }) : 'undefined');
         }
         
         // Store custom initializers from page config
         if (pageConfig?.customInitializers) {
             this.customInitializers = pageConfig.customInitializers;
             if (window.DEBUG_MODE) {
-                console.log('🔧 Loaded custom initializers from page config:', this.customInitializers.length);
+                window.Logger.info('🔧 Loaded custom initializers from page config:', this.customInitializers.length, { page: "unified-app-initializer" });
             }
         }
         
@@ -322,7 +322,7 @@ class UnifiedAppInitializer {
         this.pageConfig = config;
         
         this.performanceMetrics.stageTimes.prepare = Date.now() - stageStart;
-        // console.log('✅ Stage 2 Complete:', config);
+        // window.Logger.info('✅ Stage 2 Complete:', config, { page: "unified-app-initializer" });
         
         return config;
     }
@@ -331,7 +331,7 @@ class UnifiedAppInitializer {
      * Stage 3: Execute initialization
      */
     async executeInitialization(config) {
-        console.log('🎯 Stage 3: Executing initialization...');
+        window.Logger.info('🎯 Stage 3: Executing initialization...', { page: "unified-app-initializer" });
         const stageStart = Date.now();
         
         try {
@@ -347,46 +347,46 @@ class UnifiedAppInitializer {
             await new Promise(resolve => setTimeout(resolve, 500));
             
             // Verify cache system is ready with detailed logging
-            // console.log('🔍 Verifying cache system readiness...');
-            // console.log('UnifiedCacheManager available:', !!window.UnifiedCacheManager);
-            // console.log('CacheSyncManager available:', !!window.CacheSyncManager);
-            // console.log('MemoryOptimizer available:', !!window.MemoryOptimizer);
+            // window.Logger.info('🔍 Verifying cache system readiness...', { page: "unified-app-initializer" });
+            // window.Logger.info('UnifiedCacheManager available:', !!window.UnifiedCacheManager, { page: "unified-app-initializer" });
+            // window.Logger.info('CacheSyncManager available:', !!window.CacheSyncManager, { page: "unified-app-initializer" });
+            // window.Logger.info('MemoryOptimizer available:', !!window.MemoryOptimizer, { page: "unified-app-initializer" });
             
             if (window.UnifiedCacheManager) {
-                // console.log('UnifiedCacheManager initialized:', window.UnifiedCacheManager.initialized);
+                // window.Logger.info('UnifiedCacheManager initialized:', window.UnifiedCacheManager.initialized, { page: "unified-app-initializer" });
             }
             if (window.CacheSyncManager) {
-                // console.log('CacheSyncManager initialized:', window.CacheSyncManager.initialized);
+                // window.Logger.info('CacheSyncManager initialized:', window.CacheSyncManager.initialized, { page: "unified-app-initializer" });
             }
             if (window.MemoryOptimizer) {
-                // console.log('MemoryOptimizer initialized:', window.MemoryOptimizer.initialized);
+                // window.Logger.info('MemoryOptimizer initialized:', window.MemoryOptimizer.initialized, { page: "unified-app-initializer" });
             }
             
             // Set global flag for other systems
             window.cacheSystemReady = window.UnifiedCacheManager && window.UnifiedCacheManager.initialized;
             
             if (window.cacheSystemReady) {
-                // console.log('✅ Cache system verified as ready');
+                // window.Logger.info('✅ Cache system verified as ready', { page: "unified-app-initializer" });
             } else {
-                // console.log('⚠️ Cache system not ready, using fallback mode');
+                // window.Logger.info('⚠️ Cache system not ready, using fallback mode', { page: "unified-app-initializer" });
             }
             
             // Use the application initializer if available
             if (typeof window.initializeApplication === 'function') {
-                // console.log('🔧 Using application initializer with config:', config);
+                // window.Logger.info('🔧 Using application initializer with config:', config, { page: "unified-app-initializer" });
                 await window.initializeApplication(config);
             } else {
-                // console.log('⚠️ Application initializer not found, using manual initialization');
+                // window.Logger.info('⚠️ Application initializer not found, using manual initialization', { page: "unified-app-initializer" });
                 // Fallback to manual initialization
                 await this.manualInitialization(config);
             }
             
         } catch (error) {
-            console.error('❌ Error in executeInitialization:', error);
+            window.Logger.error('❌ Error in executeInitialization:', error, { page: "unified-app-initializer" });
             throw error;
         } finally {
             this.performanceMetrics.stageTimes.execute = Date.now() - stageStart;
-            // console.log('✅ Stage 3 Complete');
+            // window.Logger.info('✅ Stage 3 Complete', { page: "unified-app-initializer" });
         }
     }
 
@@ -394,7 +394,7 @@ class UnifiedAppInitializer {
      * Stage 4: Finalize initialization
      */
     async finalizeInitialization(config) {
-        // console.log('🎯 Stage 4: Finalizing...');
+        // window.Logger.info('🎯 Stage 4: Finalizing...', { page: "unified-app-initializer" });
         const stageStart = Date.now();
         
         // Restore page state
@@ -403,21 +403,21 @@ class UnifiedAppInitializer {
         }
         
         // Execute custom finalizers
-        console.log('🔧 Executing custom initializers:', this.customInitializers.length);
+        window.Logger.info('🔧 Executing custom initializers:', this.customInitializers.length, { page: "unified-app-initializer" });
         for (let i = 0; i < this.customInitializers.length; i++) {
             const initializer = this.customInitializers[i];
-            console.log(`🔧 Executing custom initializer ${i + 1}/${this.customInitializers.length}:`, typeof initializer);
+            window.Logger.info(`🔧 Executing custom initializer ${i + 1}/${this.customInitializers.length}:`, typeof initializer, { page: "unified-app-initializer" });
             if (typeof initializer === 'function') {
                 try {
                     await initializer(config);
                     if (window.DEBUG_MODE) {
-                        console.log(`✅ Custom initializer ${i + 1} completed successfully`);
+                        window.Logger.info(`✅ Custom initializer ${i + 1} completed successfully`, { page: "unified-app-initializer" });
                     }
                 } catch (error) {
-                    // console.error(`❌ Custom initializer ${i + 1} failed:`, error);
+                    // window.Logger.error(`❌ Custom initializer ${i + 1} failed:`, error, { page: "unified-app-initializer" });
                 }
             } else {
-                // console.warn(`⚠️ Custom initializer ${i + 1} is not a function:`, typeof initializer);
+                // window.Logger.warn(`⚠️ Custom initializer ${i + 1} is not a function:`, typeof initializer, { page: "unified-app-initializer" });
             }
         }
         
@@ -427,7 +427,7 @@ class UnifiedAppInitializer {
         this.trackLoadTimes();
         this.logSystemStatus();
         
-        // console.log('✅ Stage 4 Complete');
+        // window.Logger.info('✅ Stage 4 Complete', { page: "unified-app-initializer" });
     }
 
     /**
@@ -438,7 +438,7 @@ class UnifiedAppInitializer {
         const filename = path.split('/').pop() || 'index';
         const pageName = filename.replace('.html', '');
         
-        console.log('🔍 Page detection:', { path, filename, pageName });
+        window.Logger.info('🔍 Page detection:', { path, filename, pageName }, { page: "unified-app-initializer" });
         
         const pageInfo = {
             name: pageName,
@@ -453,7 +453,7 @@ class UnifiedAppInitializer {
             }
         };
         
-        // console.log('📊 Detected page info:', pageInfo);
+        // window.Logger.info('📊 Detected page info:', pageInfo, { page: "unified-app-initializer" });
         return pageInfo;
     }
 
@@ -489,7 +489,7 @@ class UnifiedAppInitializer {
      */
     analyzePageRequirements() {
         // This is already done in detectPageInfo, but can be extended
-        // console.log('📊 Page requirements analyzed');
+        // window.Logger.info('📊 Page requirements analyzed', { page: "unified-app-initializer" });
     }
 
     /**
@@ -548,13 +548,13 @@ class UnifiedAppInitializer {
      * Initialize Unified Cache System
      */
     async initializeCacheSystem() {
-        // console.log('🔧 Initializing Unified Cache System...');
+        // window.Logger.info('🔧 Initializing Unified Cache System...', { page: "unified-app-initializer" });
         
         // Initialize UnifiedCacheManager with timeout
         if (typeof window.UnifiedCacheManager !== 'undefined') {
             try {
                 if (!window.UnifiedCacheManager.initialized) {
-                    // console.log('🔧 Initializing UnifiedCacheManager...');
+                    // window.Logger.info('🔧 Initializing UnifiedCacheManager...', { page: "unified-app-initializer" });
                     
                     // Add timeout to prevent hanging
                     const initPromise = window.UnifiedCacheManager.initialize();
@@ -564,28 +564,28 @@ class UnifiedAppInitializer {
                     
                     const initResult = await Promise.race([initPromise, timeoutPromise]);
                     if (initResult) {
-                        // console.log('✅ UnifiedCacheManager initialized successfully');
+                        // window.Logger.info('✅ UnifiedCacheManager initialized successfully', { page: "unified-app-initializer" });
                     } else {
                         throw new Error('UnifiedCacheManager initialization returned false');
                     }
                 } else {
-                    // console.log('✅ UnifiedCacheManager already initialized');
+                    // window.Logger.info('✅ UnifiedCacheManager already initialized', { page: "unified-app-initializer" });
                 }
             } catch (error) {
-                console.error('❌ UnifiedCacheManager initialization failed:', error);
-                console.log('⚠️ Using localStorage fallback');
+                window.Logger.error('❌ UnifiedCacheManager initialization failed:', error, { page: "unified-app-initializer" });
+                window.Logger.info('⚠️ Using localStorage fallback', { page: "unified-app-initializer" });
                 // Set a flag to indicate cache system is not available
                 window.UnifiedCacheManager = null;
             }
         } else {
-            console.log('⚠️ UnifiedCacheManager not available, using localStorage fallback');
+            window.Logger.info('⚠️ UnifiedCacheManager not available, using localStorage fallback', { page: "unified-app-initializer" });
         }
 
         // Initialize CacheSyncManager with timeout
         if (typeof window.CacheSyncManager !== 'undefined') {
             try {
                 if (!window.CacheSyncManager.initialized) {
-                    // console.log('🔧 Initializing CacheSyncManager...');
+                    // window.Logger.info('🔧 Initializing CacheSyncManager...', { page: "unified-app-initializer" });
                     
                     const initPromise = window.CacheSyncManager.initialize();
                     const timeoutPromise = new Promise((_, reject) => 
@@ -593,39 +593,39 @@ class UnifiedAppInitializer {
                     );
                     
                     await Promise.race([initPromise, timeoutPromise]);
-                    // console.log('✅ CacheSyncManager initialized successfully');
+                    // window.Logger.info('✅ CacheSyncManager initialized successfully', { page: "unified-app-initializer" });
                 } else {
-                    // console.log('✅ CacheSyncManager already initialized');
+                    // window.Logger.info('✅ CacheSyncManager already initialized', { page: "unified-app-initializer" });
                 }
             } catch (error) {
-                console.error('❌ CacheSyncManager initialization failed:', error);
+                window.Logger.error('❌ CacheSyncManager initialization failed:', error, { page: "unified-app-initializer" });
             }
         } else {
-            // console.log('⚠️ CacheSyncManager not available');
+            // window.Logger.info('⚠️ CacheSyncManager not available', { page: "unified-app-initializer" });
         }
 
         // Initialize CachePolicyManager
         if (typeof window.CachePolicyManager !== 'undefined') {
             try {
                 if (!window.CachePolicyManager.initialized) {
-                    // console.log('🔧 Initializing CachePolicyManager...');
+                    // window.Logger.info('🔧 Initializing CachePolicyManager...', { page: "unified-app-initializer" });
                     await window.CachePolicyManager.initialize();
-                    // console.log('✅ CachePolicyManager initialized successfully');
+                    // window.Logger.info('✅ CachePolicyManager initialized successfully', { page: "unified-app-initializer" });
                 } else {
-                    // console.log('✅ CachePolicyManager already initialized');
+                    // window.Logger.info('✅ CachePolicyManager already initialized', { page: "unified-app-initializer" });
                 }
             } catch (error) {
-                console.error('❌ CachePolicyManager initialization failed:', error);
+                window.Logger.error('❌ CachePolicyManager initialization failed:', error, { page: "unified-app-initializer" });
             }
         } else {
-            // console.log('⚠️ CachePolicyManager not available');
+            // window.Logger.info('⚠️ CachePolicyManager not available', { page: "unified-app-initializer" });
         }
 
         // Initialize MemoryOptimizer with timeout
         if (typeof window.MemoryOptimizer !== 'undefined') {
             try {
                 if (!window.MemoryOptimizer.initialized) {
-                    // console.log('🔧 Initializing MemoryOptimizer...');
+                    // window.Logger.info('🔧 Initializing MemoryOptimizer...', { page: "unified-app-initializer" });
                     
                     const initPromise = window.MemoryOptimizer.initialize();
                     const timeoutPromise = new Promise((_, reject) => 
@@ -633,15 +633,15 @@ class UnifiedAppInitializer {
                     );
                     
                     await Promise.race([initPromise, timeoutPromise]);
-                    // console.log('✅ MemoryOptimizer initialized successfully');
+                    // window.Logger.info('✅ MemoryOptimizer initialized successfully', { page: "unified-app-initializer" });
                 } else {
-                    // console.log('✅ MemoryOptimizer already initialized');
+                    // window.Logger.info('✅ MemoryOptimizer already initialized', { page: "unified-app-initializer" });
                 }
             } catch (error) {
-                console.error('❌ MemoryOptimizer initialization failed:', error);
+                window.Logger.error('❌ MemoryOptimizer initialization failed:', error, { page: "unified-app-initializer" });
             }
         } else {
-            // console.log('⚠️ MemoryOptimizer not available');
+            // window.Logger.info('⚠️ MemoryOptimizer not available', { page: "unified-app-initializer" });
         }
         
         // Initialize registered core systems (only if not already initialized)
@@ -657,8 +657,8 @@ class UnifiedAppInitializer {
      * Report cache system status
      */
     reportCacheSystemStatus() {
-        // console.log('📊 Cache System Status Report:');
-        // console.log('================================');
+        // window.Logger.info('📊 Cache System Status Report:', { page: "unified-app-initializer" });
+        // window.Logger.info('================================', { page: "unified-app-initializer" });
         
         const systems = [
             { name: 'UnifiedCacheManager', instance: window.UnifiedCacheManager },
@@ -670,13 +670,13 @@ class UnifiedAppInitializer {
         systems.forEach(system => {
             if (system.instance) {
                 const status = system.instance.initialized ? '✅ Ready' : '⚠️ Not Initialized';
-                // console.log(`${system.name}: ${status}`);
+                // window.Logger.info(`${system.name}: ${status}`, { page: "unified-app-initializer" });
             } else {
-                // console.log(`${system.name}: ❌ Not Available`);
+                // window.Logger.info(`${system.name}: ❌ Not Available`, { page: "unified-app-initializer" });
             }
         });
         
-        // console.log('================================');
+        // window.Logger.info('================================', { page: "unified-app-initializer" });
         
         // Set comprehensive cache system ready flag
         window.cacheSystemReady = systems.every(system => 
@@ -684,9 +684,9 @@ class UnifiedAppInitializer {
         );
         
         if (window.cacheSystemReady) {
-            // console.log('🎉 All cache systems are ready!');
+            // window.Logger.info('🎉 All cache systems are ready!', { page: "unified-app-initializer" });
         } else {
-            // console.log('⚠️ Some cache systems are not ready - using fallback modes');
+            // window.Logger.info('⚠️ Some cache systems are not ready - using fallback modes', { page: "unified-app-initializer" });
         }
     }
 
@@ -694,7 +694,7 @@ class UnifiedAppInitializer {
      * Manual initialization fallback
      */
     async manualInitialization(config) {
-            // console.log('🔧 Manual initialization fallback...');
+            // window.Logger.info('🔧 Manual initialization fallback...', { page: "unified-app-initializer" });
         
         // Initialize core systems
         if (this.availableSystems.has('notification') && typeof window.NotificationSystem !== 'undefined') {
@@ -719,7 +719,7 @@ class UnifiedAppInitializer {
         // Initialize Actions Menu System (Table Actions)
         if (typeof window.actionsMenuSystem !== 'undefined') {
             // Actions Menu System is already initialized when loaded
-            console.log('✅ Actions Menu System ready');
+            window.Logger.info('✅ Actions Menu System ready', { page: "unified-app-initializer" });
         }
         
         // Initialize page-specific systems
@@ -757,14 +757,14 @@ class UnifiedAppInitializer {
      * Handle errors
      */
     handleError(error) {
-        console.error('❌ Unified App Initialization Error:', error);
+        window.Logger.error('❌ Unified App Initialization Error:', error, { page: "unified-app-initializer" });
         
         // Execute error handlers
         for (const handler of this.errorHandlers) {
             try {
                 handler(error);
             } catch (handlerError) {
-                console.error('❌ Error handler failed:', handlerError);
+                window.Logger.error('❌ Error handler failed:', handlerError, { page: "unified-app-initializer" });
             }
         }
         
@@ -778,13 +778,13 @@ class UnifiedAppInitializer {
      * Log success
      */
     logSuccess() {
-        // console.log('🎉 Unified App Initialization Success!', {
+        // window.Logger.info('🎉 Unified App Initialization Success!', {
         //     page: this.pageInfo.name,
         //     type: this.pageInfo.type,
         //     systems: this.availableSystems.size,
         //     totalTime: `${this.performanceMetrics.totalTime}ms`,
         //     stages: this.performanceMetrics.stageTimes
-        // });
+        // }, { page: "unified-app-initializer" });
         
         // Show success notification
         if (typeof window.showNotification === 'function') {
@@ -942,7 +942,7 @@ class UnifiedAppInitializer {
         if (!result.valid) {
             this.showCriticalError(result);
         } else if (warnings.length > 0) {
-            console.warn('⚠️ אזהרות אתחול:', warnings);
+            window.Logger.warn('⚠️ אזהרות אתחול:', warnings, { page: "unified-app-initializer" });
         }
         
         return result;
@@ -975,45 +975,45 @@ class UnifiedAppInitializer {
         
         // Add monitoring system explanation
         console.group('⚠️ IMPORTANT FOR DEVELOPERS:');
-        console.log('This is a MONITORING AND VALIDATION system, NOT an automatic script loader.');
-        console.log('The monitoring system has detected changes in the page loading structure.');
-        console.log('');
-        console.log('🔧 HOW TO FIX MONITORING ERRORS:');
-        console.log('If the changes are intentional and correct, you need to update the monitoring system:');
-        console.log('');
-        console.log('1. UPDATE PACKAGE MANIFEST:');
-        console.log('   - Add new scripts to appropriate package in package-manifest.js');
-        console.log('   - Define global checks for each script');
-        console.log('');
-        console.log('2. UPDATE PAGE CONFIGURATION:');
-        console.log('   - Add required packages to page config in page-initialization-configs.js');
-        console.log('   - Add required globals to the page configuration');
-        console.log('');
-        console.log('3. UPDATE ACTUAL PAGE:');
-        console.log('   - Add the new script tags to the HTML page');
-        console.log('   - Ensure correct loading order');
-        console.log('');
-        console.log('4. TEST AND VALIDATE:');
-        console.log('   - Run the monitoring system to verify everything is correct');
-        console.log('   - Fix any remaining issues');
-        console.log('');
-        console.log('📖 DETAILED DOCUMENTATION:');
-        console.log('- Developer Guide: documentation/frontend/init-system/DEVELOPER_GUIDE.md');
-        console.log('- Management Interface: /init-system-management');
+        window.Logger.info('This is a MONITORING AND VALIDATION system, NOT an automatic script loader.', { page: "unified-app-initializer" });
+        window.Logger.info('The monitoring system has detected changes in the page loading structure.', { page: "unified-app-initializer" });
+        window.Logger.info('', { page: "unified-app-initializer" });
+        window.Logger.info('🔧 HOW TO FIX MONITORING ERRORS:', { page: "unified-app-initializer" });
+        window.Logger.info('If the changes are intentional and correct, you need to update the monitoring system:', { page: "unified-app-initializer" });
+        window.Logger.info('', { page: "unified-app-initializer" });
+        window.Logger.info('1. UPDATE PACKAGE MANIFEST:', { page: "unified-app-initializer" });
+        window.Logger.info('   - Add new scripts to appropriate package in package-manifest.js', { page: "unified-app-initializer" });
+        window.Logger.info('   - Define global checks for each script', { page: "unified-app-initializer" });
+        window.Logger.info('', { page: "unified-app-initializer" });
+        window.Logger.info('2. UPDATE PAGE CONFIGURATION:', { page: "unified-app-initializer" });
+        window.Logger.info('   - Add required packages to page config in page-initialization-configs.js', { page: "unified-app-initializer" });
+        window.Logger.info('   - Add required globals to the page configuration', { page: "unified-app-initializer" });
+        window.Logger.info('', { page: "unified-app-initializer" });
+        window.Logger.info('3. UPDATE ACTUAL PAGE:', { page: "unified-app-initializer" });
+        window.Logger.info('   - Add the new script tags to the HTML page', { page: "unified-app-initializer" });
+        window.Logger.info('   - Ensure correct loading order', { page: "unified-app-initializer" });
+        window.Logger.info('', { page: "unified-app-initializer" });
+        window.Logger.info('4. TEST AND VALIDATE:', { page: "unified-app-initializer" });
+        window.Logger.info('   - Run the monitoring system to verify everything is correct', { page: "unified-app-initializer" });
+        window.Logger.info('   - Fix any remaining issues', { page: "unified-app-initializer" });
+        window.Logger.info('', { page: "unified-app-initializer" });
+        window.Logger.info('📖 DETAILED DOCUMENTATION:', { page: "unified-app-initializer" });
+        window.Logger.info('- Developer Guide: documentation/frontend/init-system/DEVELOPER_GUIDE.md', { page: "unified-app-initializer" });
+        window.Logger.info('- Management Interface: /init-system-management', { page: "unified-app-initializer" });
         console.groupEnd();
         
         if (validationResult.errors.length > 0) {
-            console.error('שגיאות:', validationResult.errors);
+            window.Logger.error('שגיאות:', validationResult.errors, { page: "unified-app-initializer" });
         }
         
         if (validationResult.missing.length > 0) {
-            console.warn('⚠️ אי-התאמות תיעוד:');
+            window.Logger.warn('⚠️ אי-התאמות תיעוד:', { page: "unified-app-initializer" });
             validationResult.missing.forEach(m => {
-                console.warn(`  ⚠️ ${m.script}`);
-                console.warn(`     מתועד בחבילה: ${m.package}`);
-                console.warn(`     מצפה ל-Global: ${m.global}`);
-                console.warn(`     תיאור: ${m.description}`);
-                console.warn(`     🤔 בחר: (1) הוסף לעמוד או (2) הסר מתיעוד`);
+                window.Logger.warn(`  ⚠️ ${m.script}`, { page: "unified-app-initializer" });
+                window.Logger.warn(`     מתועד בחבילה: ${m.package}`, { page: "unified-app-initializer" });
+                window.Logger.warn(`     מצפה ל-Global: ${m.global}`, { page: "unified-app-initializer" });
+                window.Logger.warn(`     תיאור: ${m.description}`, { page: "unified-app-initializer" });
+                window.Logger.warn(`     🤔 בחר: (1, { page: "unified-app-initializer" }) הוסף לעמוד או (2) הסר מתיעוד`);
             });
         }
         
@@ -1030,7 +1030,7 @@ class UnifiedAppInitializer {
         // נסה להציג מודול מפורט, אם לא זמין - השתמש בהודעה רגילה
         const tryShowDetailed = () => {
             if (typeof window.showCriticalErrorModal === 'function') {
-                console.log('✅ Using showCriticalErrorModal for detailed error information');
+                window.Logger.info('✅ Using showCriticalErrorModal for detailed error information', { page: "unified-app-initializer" });
                 const errorInfo = {
                     title: '⚠️ אי-התאמה: תיעוד vs מציאות',
                     type: 'info',
@@ -1059,7 +1059,7 @@ class UnifiedAppInitializer {
             }
 
             // אם עדיין לא עבד, השתמש בהודעה רגילה
-            console.log('⚠️ showCriticalErrorModal not available, using fallback');
+            window.Logger.info('⚠️ showCriticalErrorModal not available, using fallback', { page: "unified-app-initializer" });
             if (typeof window.showNotification === 'function') {
                 const msg = `⚠️ ניטור: ${validationResult.missing.length} סקריפטים דורשים עדכון הגדרות. בדוק console`;
                 window.showNotification(msg, 'warning');
@@ -1180,21 +1180,21 @@ class UnifiedAppInitializer {
         
         switch(errorType) {
             case 'DUPLICATE_SCRIPT':
-                console.error(`🔴 כפילות בטעינה: ${errorData.script}`);
-                console.error(`נטען ${errorData.count} פעמים`);
-                console.error('זו בעיית ביצועים חמורה - הסר את הכפילות מה-HTML');
+                window.Logger.error(`🔴 כפילות בטעינה: ${errorData.script}`, { page: "unified-app-initializer" });
+                window.Logger.error(`נטען ${errorData.count} פעמים`, { page: "unified-app-initializer" });
+                window.Logger.error('זו בעיית ביצועים חמורה - הסר את הכפילות מה-HTML', { page: "unified-app-initializer" });
                 break;
                 
             case 'LOAD_ORDER':
-                console.error(`🔴 סדר טעינה שגוי: ${errorData.script}`);
-                console.error(`נטען לפני: ${errorData.dependency}`);
-                console.error('זו שגיאה קריטית - תקן את סדר הטעינה ב-HTML');
+                window.Logger.error(`🔴 סדר טעינה שגוי: ${errorData.script}`, { page: "unified-app-initializer" });
+                window.Logger.error(`נטען לפני: ${errorData.dependency}`, { page: "unified-app-initializer" });
+                window.Logger.error('זו שגיאה קריטית - תקן את סדר הטעינה ב-HTML', { page: "unified-app-initializer" });
                 break;
                 
             case 'SCRIPT_FAILED':
-                console.error(`🔴 סקריפט נכשל בטעינה: ${errorData.script}`);
-                console.error(`שגיאה: ${errorData.error}`);
-                console.error('בדוק את הנתיב, תחביר, או קונסול לפרטים');
+                window.Logger.error(`🔴 סקריפט נכשל בטעינה: ${errorData.script}`, { page: "unified-app-initializer" });
+                window.Logger.error(`שגיאה: ${errorData.error}`, { page: "unified-app-initializer" });
+                window.Logger.error('בדוק את הנתיב, תחביר, או קונסול לפרטים', { page: "unified-app-initializer" });
                 break;
         }
         
@@ -1277,9 +1277,9 @@ class UnifiedAppInitializer {
         packages.forEach(pkgName => {
             const pkg = window.PACKAGE_MANIFEST?.[pkgName];
             if (pkg) {
-                console.log(`  ✓ ${pkg.name} (${pkg.scripts.length} סקריפטים, ~${pkg.initTime})`);
+                window.Logger.info(`  ✓ ${pkg.name} (${pkg.scripts.length} סקריפטים, ~${pkg.initTime}, { page: "unified-app-initializer" })`);
             } else {
-                console.warn(`  ⚠️ ${pkgName} (לא מוגדר)`);
+                window.Logger.warn(`  ⚠️ ${pkgName} (לא מוגדר, { page: "unified-app-initializer" })`);
             }
         });
         console.groupEnd();
@@ -1290,9 +1290,9 @@ class UnifiedAppInitializer {
      */
     logSystemStatus() {
         console.group('📊 סטטוס מערכות');
-        console.log(`  ⏱️ זמן אתחול: ${this.performanceMetrics.totalTime}ms`);
-        console.log(`  📦 חבילות: ${this.pageConfig?.packages?.length || 0}`);
-        console.log(`  ✅ מערכות זמינות: ${this.availableSystems.size}`);
+        window.Logger.info(`  ⏱️ זמן אתחול: ${this.performanceMetrics.totalTime}ms`, { page: "unified-app-initializer" });
+        window.Logger.info(`  📦 חבילות: ${this.pageConfig?.packages?.length || 0}`, { page: "unified-app-initializer" });
+        window.Logger.info(`  ✅ מערכות זמינות: ${this.availableSystems.size}`, { page: "unified-app-initializer" });
         console.groupEnd();
     }
 
@@ -1326,7 +1326,7 @@ class UnifiedAppInitializer {
             
             localStorage.setItem(key, JSON.stringify(history));
         } catch (e) {
-            console.warn('Failed to save metrics:', e);
+            window.Logger.warn('Failed to save metrics:', e, { page: "unified-app-initializer" });
         }
         
         return metrics;
@@ -1359,7 +1359,7 @@ class UnifiedAppInitializer {
                 }
             }
         } catch (e) {
-            console.warn('Failed to calculate report:', e);
+            window.Logger.warn('Failed to calculate report:', e, { page: "unified-app-initializer" });
         }
         
         return report;
@@ -1385,12 +1385,12 @@ class UnifiedAppInitializer {
 window.UnifiedAppInitializer = UnifiedAppInitializer;
 window.unifiedAppInit = new UnifiedAppInitializer();
 
-console.log('🔧 UnifiedAppInitializer created:', window.unifiedAppInit);
+window.Logger.info('🔧 UnifiedAppInitializer created:', window.unifiedAppInit, { page: "unified-app-initializer" });
 
 // ===== GLOBAL EXPORT =====
 
 window.initializeUnifiedApp = async function() {
-    console.log('🔧 initializeUnifiedApp called');
+    window.Logger.info('🔧 initializeUnifiedApp called', { page: "unified-app-initializer" });
     return await window.unifiedAppInit.initialize();
 };
 
@@ -1402,23 +1402,23 @@ window.getUnifiedAppStatus = function() {
 
 // Single DOMContentLoaded listener - replaces all others
 document.addEventListener('DOMContentLoaded', async () => {
-        console.log('🎯 DOM Content Loaded - Starting Unified App Initialization');
-    console.log('🔍 Current URL:', window.location.href);
-    console.log('🔍 Current pathname:', window.location.pathname);
+        window.Logger.info('🎯 DOM Content Loaded - Starting Unified App Initialization', { page: "unified-app-initializer" });
+    window.Logger.info('🔍 Current URL:', window.location.href, { page: "unified-app-initializer" });
+    window.Logger.info('🔍 Current pathname:', window.location.pathname, { page: "unified-app-initializer" });
     
     try {
         // Delay to ensure all scripts are loaded and initialized
         setTimeout(async () => {
-            console.log('🚀 About to call initializeUnifiedApp...');
+            window.Logger.info('🚀 About to call initializeUnifiedApp...', { page: "unified-app-initializer" });
             await window.initializeUnifiedApp();
-            console.log('✅ initializeUnifiedApp completed');
+            window.Logger.info('✅ initializeUnifiedApp completed', { page: "unified-app-initializer" });
             
-            // Handle page-specific copyDetailedLog function
+            // Handle page-specific functions
             await handlePageSpecificFunctions();
         }, 1000);
         
     } catch (error) {
-        console.error('❌ Unified App auto-initialization failed:', error);
+        window.Logger.error('❌ Unified App auto-initialization failed:', error, { page: "unified-app-initializer" });
     }
 });
 
@@ -1430,28 +1430,23 @@ document.addEventListener('DOMContentLoaded', async () => {
  */
 async function handlePageSpecificFunctions() {
     try {
-        console.log('🔧 Handling page-specific functions...');
+        window.Logger.info('🔧 Handling page-specific functions...', { page: "unified-app-initializer" });
         
         // Get current page name from pathname
         const pathname = window.location.pathname;
         const pageName = pathname.split('/').pop() || 'index';
         
-        console.log(`📄 Current page: ${pageName}`);
+        window.Logger.info(`📄 Current page: ${pageName}`, { page: "unified-app-initializer" });
         
-        // Handle copyDetailedLog function for each page
-        if (typeof window.copyDetailedLog === 'function') {
-            console.log('✅ copyDetailedLog function found and available globally');
-        } else {
-            console.log('⚠️ copyDetailedLog function not found - this is normal for some pages');
-        }
+        // Handle page-specific functions as needed
         
         // Handle other page-specific functions as needed
         // Add more function handling here in the future
         
-        console.log('✅ Page-specific functions handled successfully');
+        window.Logger.info('✅ Page-specific functions handled successfully', { page: "unified-app-initializer" });
         
     } catch (error) {
-        console.error('❌ Failed to handle page-specific functions:', error);
+        window.Logger.error('❌ Failed to handle page-specific functions:', error, { page: "unified-app-initializer" });
     }
 }
 
@@ -1460,28 +1455,28 @@ async function handlePageSpecificFunctions() {
 window.addEventListener('error', (event) => {
     // Ignore SyntaxError from button clicks - these are handled by individual functions
     if (event.error && event.error.name === 'SyntaxError' && event.message && event.message.includes('Unexpected end of input')) {
-      console.log('🔧 ===== IGNORING SYNTAX ERROR =====');
-      console.log('🔧 Error details:', {
+      window.Logger.info('🔧 ===== IGNORING SYNTAX ERROR =====', { page: "unified-app-initializer" });
+      window.Logger.info('🔧 Error details:', {
         name: event.error.name,
         message: event.message,
         filename: event.filename,
         lineno: event.lineno,
         colno: event.colno,
         stack: event.error.stack
-      });
-      console.log('🔧 This error is handled by individual functions - ignoring');
-      console.log('🔧 ===== END IGNORE =====');
+      }, { page: "unified-app-initializer" });
+      window.Logger.info('🔧 This error is handled by individual functions - ignoring', { page: "unified-app-initializer" });
+      window.Logger.info('🔧 ===== END IGNORE =====', { page: "unified-app-initializer" });
       return;
     }
     
-    console.error('❌ Global Error:', event.error);
-    console.error('❌ Error details:', {
+    window.Logger.error('❌ Global Error:', event.error, { page: "unified-app-initializer" });
+    window.Logger.error('❌ Error details:', {
         message: event.message,
         filename: event.filename,
         lineno: event.lineno,
         colno: event.colno,
         stack: event.error?.stack
-    });
+    }, { page: "unified-app-initializer" });
     
     if (typeof window.showNotification === 'function') {
         window.showNotification('❌ System error occurred', 'error');
@@ -1489,7 +1484,7 @@ window.addEventListener('error', (event) => {
 });
 
 window.addEventListener('unhandledrejection', (event) => {
-    console.error('❌ Unhandled Promise Rejection:', event.reason);
+    window.Logger.error('❌ Unhandled Promise Rejection:', event.reason, { page: "unified-app-initializer" });
     
     if (typeof window.showNotification === 'function') {
         window.showNotification('❌ Promise rejection occurred', 'error');
@@ -1501,37 +1496,37 @@ window.UnifiedInitializationSystem = {
     coreSystems: new Map(),
     
     addCoreSystem(name, initFunction) {
-        // console.log(`📝 Registering core system: ${name}`);
+        // window.Logger.info(`📝 Registering core system: ${name}`, { page: "unified-app-initializer" });
         this.coreSystems.set(name, initFunction);
     },
     
     async initializeCoreSystems() {
-        // console.log('🔧 Initializing registered core systems...');
+        // window.Logger.info('🔧 Initializing registered core systems...', { page: "unified-app-initializer" });
         for (const [name, initFunction] of this.coreSystems) {
             try {
                 // בדיקה שהמערכת לא מאותחלת כבר
                 if (name === 'UnifiedCacheManager' && window.UnifiedCacheManager?.initialized) {
-                    // console.log(`✅ ${name} already initialized, skipping...`);
+                    // window.Logger.info(`✅ ${name} already initialized, skipping...`, { page: "unified-app-initializer" });
                     continue;
                 }
                 if (name === 'CacheSyncManager' && window.CacheSyncManager?.initialized) {
-                    // console.log(`✅ ${name} already initialized, skipping...`);
+                    // window.Logger.info(`✅ ${name} already initialized, skipping...`, { page: "unified-app-initializer" });
                     continue;
                 }
                 if (name === 'CachePolicyManager' && window.CachePolicyManager?.initialized) {
-                    // console.log(`✅ ${name} already initialized, skipping...`);
+                    // window.Logger.info(`✅ ${name} already initialized, skipping...`, { page: "unified-app-initializer" });
                     continue;
                 }
                 if (name === 'MemoryOptimizer' && window.MemoryOptimizer?.initialized) {
-                    // console.log(`✅ ${name} already initialized, skipping...`);
+                    // window.Logger.info(`✅ ${name} already initialized, skipping...`, { page: "unified-app-initializer" });
                     continue;
                 }
                 
-                // console.log(`🔧 Initializing ${name}...`);
+                // window.Logger.info(`🔧 Initializing ${name}...`, { page: "unified-app-initializer" });
                 await initFunction();
-                // console.log(`✅ ${name} initialized successfully`);
+                // window.Logger.info(`✅ ${name} initialized successfully`, { page: "unified-app-initializer" });
             } catch (error) {
-                console.error(`❌ Failed to initialize ${name}:`, error);
+                window.Logger.error(`❌ Failed to initialize ${name}:`, error, { page: "unified-app-initializer" });
             }
         }
     }

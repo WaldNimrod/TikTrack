@@ -3,42 +3,42 @@
 // ייצוא מוקדם של הפונקציה למניעת שגיאות
 window.loadNotesData = window.loadNotesData || function() {
   // loadNotesData not yet defined, using placeholder
-  console.log('⚠️ loadNotesData placeholder called');
+  window.Logger.info('⚠️ loadNotesData placeholder called', { page: "notes" });
 };
 
 // הגדרת הפונקציה המלאה מיד אחרי ה-placeholder
 window.loadNotesData = async function() {
-  console.log('🚀🚀🚀 loadNotesData התחיל 🚀🚀🚀');
+  window.Logger.info('🚀🚀🚀 loadNotesData התחיל 🚀🚀🚀', { page: "notes" });
 
   try {
     // קריאה לשרת לקבלת נתוני הערות
-    console.log('📡 קריאה לשרת לקבלת נתוני הערות...');
+    window.Logger.info('📡 קריאה לשרת לקבלת נתוני הערות...', { page: "notes" });
     const response = await fetch('/api/notes/');
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log('📊 נתונים שהתקבלו מהשרת:', data);
+    window.Logger.info('📊 נתונים שהתקבלו מהשרת:', data, { page: "notes" });
 
     // שמירת הנתונים במשתנה גלובלי
     window.notesData = data.data || data;
-    console.log('💾 נתונים נשמרו ב-window.notesData:', window.notesData.length, 'הערות');
+    window.Logger.info('💾 נתונים נשמרו ב-window.notesData:', window.notesData.length, 'הערות', { page: "notes" });
 
     // עדכון הטבלה
     if (typeof window.updateNotesTable === 'function') {
-      console.log('📊 מעדכן את טבלת הערות');
+      window.Logger.info('📊 מעדכן את טבלת הערות', { page: "notes" });
       window.updateNotesTable(window.notesData);
     } else {
-      console.warn('⚠️ updateNotesTable לא זמין');
+      window.Logger.warn('⚠️ updateNotesTable לא זמין', { page: "notes" });
     }
 
     // עדכון סטטיסטיקות
     if (typeof window.updateNotesSummary === 'function') {
-      console.log('📈 מעדכן את סטטיסטיקות הערות');
+      window.Logger.info('📈 מעדכן את סטטיסטיקות הערות', { page: "notes" });
       window.updateNotesSummary(window.notesData);
     } else {
-      console.warn('⚠️ updateNotesSummary לא זמין');
+      window.Logger.warn('⚠️ updateNotesSummary לא זמין', { page: "notes" });
     }
 
     // עדכון מונה הטבלה
@@ -47,10 +47,10 @@ window.loadNotesData = async function() {
       countElement.textContent = `${window.notesData.length} הערות`;
     }
 
-    console.log('✅ loadNotesData הושלם בהצלחה');
+    window.Logger.info('✅ loadNotesData הושלם בהצלחה', { page: "notes" });
 
   } catch (error) {
-    console.error('❌ שגיאה ב-loadNotesData:', error);
+    window.Logger.error('❌ שגיאה ב-loadNotesData:', error, { page: "notes" });
     
     // הצגת הודעת שגיאה למשתמש
     if (typeof window.showErrorNotification === 'function') {
@@ -69,13 +69,13 @@ window.loadNotesData = async function() {
  */
 function addNote() {
   try {
-    console.log('➕ מוסיף הערה חדשה');
+    window.Logger.info('➕ מוסיף הערה חדשה', { page: "notes" });
     
     // פתיחת מודל הוספת הערה
     showAddNoteModal();
     
   } catch (error) {
-    console.error('שגיאה בהוספת הערה:', error);
+    window.Logger.error('שגיאה בהוספת הערה:', error, { page: "notes" });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בהוספת הערה', error.message);
     } else if (typeof window.showNotification === 'function') {
@@ -91,7 +91,7 @@ function addNote() {
  */
 function uploadFile(noteId) {
   try {
-    console.log('📤 מעלה קובץ להערה:', noteId);
+    window.Logger.info('📤 מעלה קובץ להערה:', noteId, { page: "notes" });
     
     // יצירת input file
     const fileInput = document.createElement('input');
@@ -119,7 +119,7 @@ function uploadFile(noteId) {
         return response.json();
       })
       .then(data => {
-        console.log('✅ קובץ הועלה:', data);
+        window.Logger.info('✅ קובץ הועלה:', data, { page: "notes" });
         
         // הודעת הצלחה
         if (typeof window.showSuccessNotification === 'function') {
@@ -129,7 +129,7 @@ function uploadFile(noteId) {
         }
       })
       .catch(error => {
-        console.error('שגיאה בהעלאת קובץ:', error);
+        window.Logger.error('שגיאה בהעלאת קובץ:', error, { page: "notes" });
         if (typeof window.showErrorNotification === 'function') {
           window.showErrorNotification('שגיאה בהעלאת קובץ', error.message);
         } else if (typeof window.showNotification === 'function') {
@@ -142,7 +142,7 @@ function uploadFile(noteId) {
     fileInput.click();
     
   } catch (error) {
-    console.error('שגיאה בהעלאת קובץ:', error);
+    window.Logger.error('שגיאה בהעלאת קובץ:', error, { page: "notes" });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בהעלאת קובץ', error.message);
     } else if (typeof window.showNotification === 'function') {
@@ -159,7 +159,7 @@ function uploadFile(noteId) {
  */
 function downloadFile(noteId, fileName) {
   try {
-    console.log('📥 מוריד קובץ:', noteId, fileName);
+    window.Logger.info('📥 מוריד קובץ:', noteId, fileName, { page: "notes" });
     
     // יצירת קישור להורדה
     const downloadUrl = `/api/notes/${noteId}/download/${encodeURIComponent(fileName)}`;
@@ -183,7 +183,7 @@ function downloadFile(noteId, fileName) {
     }
     
   } catch (error) {
-    console.error('שגיאה בהורדת קובץ:', error);
+    window.Logger.error('שגיאה בהורדת קובץ:', error, { page: "notes" });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בהורדת קובץ', error.message);
     } else if (typeof window.showNotification === 'function') {
@@ -199,7 +199,7 @@ function downloadFile(noteId, fileName) {
  */
 function viewLinkedItems(noteId) {
   try {
-    console.log('🔗 מציג פריטים מקושרים להערה:', noteId);
+    window.Logger.info('🔗 מציג פריטים מקושרים להערה:', noteId, { page: "notes" });
     
     // חיפוש ההערה בנתונים
     const note = window.notesData.find(n => n.id === noteId);
@@ -228,7 +228,7 @@ function viewLinkedItems(noteId) {
     }
     
   } catch (error) {
-    console.error('שגיאה בהצגת פריטים מקושרים:', error);
+    window.Logger.error('שגיאה בהצגת פריטים מקושרים:', error, { page: "notes" });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בהצגת פריטים מקושרים', error.message);
     } else if (typeof window.showNotification === 'function') {
@@ -367,11 +367,11 @@ window.restoreNotesSectionState = restoreNotesSectionState;
 
 // פונקציה לטעינת נתונים
 async function loadNotesData() {
-  console.log('🚀🚀🚀 loadNotesData התחיל 🚀🚀🚀');
+  window.Logger.info('🚀🚀🚀 loadNotesData התחיל 🚀🚀🚀', { page: "notes" });
 
   try {
     // קריאה לשרת לקבלת נתוני הערות
-    console.log('📡 קריאה לשרת לקבלת נתוני הערות...');
+    window.Logger.info('📡 קריאה לשרת לקבלת נתוני הערות...', { page: "notes" });
     const response = await fetch('/api/notes/');
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -379,11 +379,11 @@ async function loadNotesData() {
 
     const responseData = await response.json();
     const notes = responseData.data || responseData;
-    console.log('✅ נתונים התקבלו מהשרת:', notes ? notes.length : 0, 'הערות');
+    window.Logger.info('✅ נתונים התקבלו מהשרת:', notes ? notes.length : 0, 'הערות', { page: "notes" });
 
     // בדיקה אם הנתונים ריקים או לא תקינים
     if (!notes || notes.length === 0) {
-      // console.warn('⚠️ לא נמצאו הערות בשרת');
+      // window.Logger.warn('⚠️ לא נמצאו הערות בשרת', { page: "notes" });
       const tbody = document.querySelector('#notesTable tbody');
       if (tbody) {
         tbody.innerHTML = `
@@ -413,17 +413,17 @@ async function loadNotesData() {
       try {
         const innerResponse = await fetch(url);
         if (!innerResponse.ok) {
-          // console.warn(`⚠️ שגיאה בטעינת ${_dataName}: ${innerResponse.status}`);
+          // window.Logger.warn(`⚠️ שגיאה בטעינת ${_dataName}: ${innerResponse.status}`, { page: "notes" });
           return [];
         }
         const data = await innerResponse.json();
         if (data.status === 'error') {
-          // console.warn(`⚠️ שגיאה ב-API ${_dataName}: ${data.error?.message || 'שגיאה לא ידועה'}`);
+          // window.Logger.warn(`⚠️ שגיאה ב-API ${_dataName}: ${data.error?.message || 'שגיאה לא ידועה'}`, { page: "notes" });
           return [];
         }
         return Array.isArray(data.data) ? data.data : [];
       } catch {
-        // console.warn(`⚠️ שגיאה בטעינת ${_dataName}:`);
+        // window.Logger.warn(`⚠️ שגיאה בטעינת ${_dataName}:`, { page: "notes" });
         return [];
       }
     };
@@ -482,16 +482,16 @@ async function loadNotesData() {
 
 // פונקציה לעדכון הטבלה
 function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], tickers = []) {
-  console.log('🚀🚀🚀 updateNotesTable התחיל עם', notes ? notes.length : 0, 'הערות 🚀🚀🚀');
+  window.Logger.info('🚀🚀🚀 updateNotesTable התחיל עם', notes ? notes.length : 0, 'הערות 🚀🚀🚀', { page: "notes" });
   
   const tbody = document.querySelector('#notesTable tbody');
   if (!tbody) {
-    console.error('❌ לא נמצא tbody בטבלה');
+    window.Logger.error('❌ לא נמצא tbody בטבלה', { page: "notes" });
     handleElementNotFound('updateNotesTable', 'לא נמצא tbody בטבלה');
     return;
   }
   
-  console.log('✅ tbody נמצא:', tbody);
+  window.Logger.info('✅ tbody נמצא:', tbody, { page: "notes" });
 
   if (!notes || notes.length === 0) {
     tbody.innerHTML = `
@@ -639,8 +639,8 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
   }).join('');
 
   tbody.innerHTML = rows;
-  console.log('✅ טבלת הערות עודכנה בהצלחה עם', notes.length, 'הערות');
-  console.log('🔍 מספר שורות בטבלה:', tbody.children.length);
+  window.Logger.info('✅ טבלת הערות עודכנה בהצלחה עם', notes.length, 'הערות', { page: "notes" });
+  window.Logger.info('🔍 מספר שורות בטבלה:', tbody.children.length, { page: "notes" });
   
   // עדכון table-count ו-info-summary
   updateNotesSummary(notes);
@@ -793,7 +793,7 @@ async function loadNoteData(noteId) {
         handleElementNotFound('populateEditSelectByType', `לא נמצא רדיו באטון עבור ערך: ${relationType}`);
       }
     } else {
-      // console.warn('⚠️ אין סוג קשר מוגדר');
+      // window.Logger.warn('⚠️ אין סוג קשר מוגדר', { page: "notes" });
     }
 
   } catch {
@@ -1634,7 +1634,7 @@ function formatText(command, mode = 'add') {
         'הכנס כתובת URL:',
         'http://',
         insertLink,
-        () => console.log('❌ הוספת לינק - משתמש ביטל')
+        () => window.Logger.info('❌ הוספת לינק - משתמש ביטל', { page: "notes" })
       );
     } else {
       // Fallback to browser prompt
@@ -1644,7 +1644,7 @@ function formatText(command, mode = 'add') {
     break;
   }
   default:
-    // console.warn(`⚠️ פקודה לא מוכרת: ${command}`);
+    // window.Logger.warn(`⚠️ פקודה לא מוכרת: ${command}`, { page: "notes" });
   }
 }
 
@@ -1725,7 +1725,7 @@ window.clearSelectedFile = clearSelectedFile;
 // פונקציה לסינון הערות לפי חיפוש
 function filterNotesData(searchTerm) {
   if (!window.notesData) {
-    // console.warn('⚠️ אין נתוני הערות זמינים לסינון');
+    // window.Logger.warn('⚠️ אין נתוני הערות זמינים לסינון', { page: "notes" });
     return;
   }
 
@@ -1749,7 +1749,7 @@ function filterNotesData(searchTerm) {
 // פונקציה לסינון הערות לפי סוג
 function filterNotesByType(type) {
   if (!window.notesData) {
-    // console.warn('⚠️ אין נתוני הערות זמינים לסינון');
+    // window.Logger.warn('⚠️ אין נתוני הערות זמינים לסינון', { page: "notes" });
     return;
   }
 
@@ -2020,7 +2020,7 @@ function toggleSection() {
     if (typeof window.toggleSection === 'function') {
         window.toggleSection();
     } else {
-        console.warn('toggleSection function not found');
+        window.Logger.warn('toggleSection function not found', { page: "notes" });
     }
 }
 
@@ -2031,7 +2031,7 @@ function openNoteDetails() {
     if (typeof window.openNoteDetails === 'function') {
         window.openNoteDetails();
     } else {
-        console.warn('openNoteDetails function not found');
+        window.Logger.warn('openNoteDetails function not found', { page: "notes" });
     }
 }
 
@@ -2039,7 +2039,7 @@ function editNote(id) {
     if (typeof window.editNote === 'function') {
         window.editNote(id);
     } else {
-        console.warn('editNote function not found');
+        window.Logger.warn('editNote function not found', { page: "notes" });
     }
 }
 
@@ -2047,7 +2047,7 @@ function deleteNote(id) {
     if (typeof window.deleteNote === 'function') {
         window.deleteNote(id);
     } else {
-        console.warn('deleteNote function not found');
+        window.Logger.warn('deleteNote function not found', { page: "notes" });
     }
 }
 
@@ -2056,7 +2056,7 @@ function filterNotesByRelatedObjectType(type) {
     if (typeof window.filterNotesByRelatedObjectType === 'function') {
         window.filterNotesByRelatedObjectType(type);
     } else {
-        console.warn('filterNotesByRelatedObjectType function not found');
+        window.Logger.warn('filterNotesByRelatedObjectType function not found', { page: "notes" });
     }
 }
 
@@ -2065,7 +2065,7 @@ function formatText(format) {
     if (typeof window.formatText === 'function') {
         window.formatText(format);
     } else {
-        console.warn('formatText function not found');
+        window.Logger.warn('formatText function not found', { page: "notes" });
     }
 }
 
@@ -2074,7 +2074,7 @@ function loadNotesData() {
     if (typeof window.loadNotesData === 'function') {
         window.loadNotesData();
     } else {
-        console.warn('loadNotesData function not found');
+        window.Logger.warn('loadNotesData function not found', { page: "notes" });
     }
 }
 
@@ -2195,11 +2195,11 @@ window.addNote = addNote;
 window.uploadFile = uploadFile;
 window.removeCurrentAttachment = removeCurrentAttachment;
 window.replaceCurrentAttachment = replaceCurrentAttachment;
-// window.copyDetailedLog export removed - using global version from system-management.js
+// window. export removed - using global version from system-management.js
 // window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 
-// Local copyDetailedLog function for notes page
-async function copyDetailedLog() {
+// Local  function for notes page
+async function  {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {
@@ -2217,7 +2217,7 @@ async function copyDetailedLog() {
             }
         }
     } catch (err) {
-        console.error('שגיאה בהעתקה:', err);
+        window.Logger.error('שגיאה בהעתקה:', err, { page: "notes" });
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה בהעתקת הלוג');
         } else {

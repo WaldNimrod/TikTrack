@@ -25,7 +25,7 @@
  * - ColorPreview: Live preview system
  */
 
-console.log('🎨 Loading preferences-colors.js v1.0.0...');
+window.Logger.info('🎨 Loading preferences-colors.js v1.0.0...', { page: "preferences-colors" });
 
 // ============================================================================
 // COLOR MANAGER CLASS
@@ -106,7 +106,7 @@ class ColorManager {
      */
     async loadAllColors(userId = 1, profileId = 3) {
         try {
-            console.log('🎨 Loading all color preferences...');
+            window.Logger.info('🎨 Loading all color preferences...', { page: "preferences-colors" });
             
             // Get all color preference names
             const colorNames = Object.keys(this.defaultColors);
@@ -129,7 +129,7 @@ class ColorManager {
                             return { name: colorName, value: result.data?.value || this.defaultColors[colorName] };
                         }
                     } catch (error) {
-                        console.warn(`⚠️ Failed to load color ${colorName}:`, error);
+                        window.Logger.warn(`⚠️ Failed to load color ${colorName}:`, error, { page: "preferences-colors" });
                     }
                     return { name: colorName, value: this.defaultColors[colorName] };
                 });
@@ -141,11 +141,11 @@ class ColorManager {
                 });
             }
             
-            console.log(`✅ Loaded ${Object.keys(allColors).length} color preferences`);
+            window.Logger.info(`✅ Loaded ${Object.keys(allColors, { page: "preferences-colors" }).length} color preferences`);
             return allColors;
             
         } catch (error) {
-            console.error('❌ Error loading colors:', error);
+            window.Logger.error('❌ Error loading colors:', error, { page: "preferences-colors" });
             return this.defaultColors;
         }
     }
@@ -160,7 +160,7 @@ class ColorManager {
     async loadColorGroup(groupName, userId = 1, profileId = 3) {
         const groupColors = this.colorGroups[groupName] || [];
         if (groupColors.length === 0) {
-            console.warn(`⚠️ Unknown color group: ${groupName}`);
+            window.Logger.warn(`⚠️ Unknown color group: ${groupName}`, { page: "preferences-colors" });
             return {};
         }
         
@@ -175,7 +175,7 @@ class ColorManager {
                     groupData[colorName] = this.defaultColors[colorName];
                 }
             } catch (error) {
-                console.warn(`⚠️ Failed to load color ${colorName}:`, error);
+                window.Logger.warn(`⚠️ Failed to load color ${colorName}:`, error, { page: "preferences-colors" });
                 groupData[colorName] = this.defaultColors[colorName];
             }
         }
@@ -220,7 +220,7 @@ class ColorManager {
                     await this.syncWithColorScheme(colorName, colorValue);
                 }
                 
-                console.log(`✅ Saved color ${colorName}: ${colorValue}`);
+                window.Logger.info(`✅ Saved color ${colorName}: ${colorValue}`, { page: "preferences-colors" });
                 return true;
             } else {
                 const error = await response.text();
@@ -228,7 +228,7 @@ class ColorManager {
             }
             
         } catch (error) {
-            console.error(`❌ Error saving color ${colorName}:`, error);
+            window.Logger.error(`❌ Error saving color ${colorName}:`, error, { page: "preferences-colors" });
             return false;
         }
     }
@@ -265,10 +265,10 @@ class ColorManager {
         try {
             if (window.ColorSchemeSystem && window.ColorSchemeSystem.updateColor) {
                 await window.ColorSchemeSystem.updateColor(colorName, colorValue);
-                console.log(`🎨 Synced ${colorName} with ColorSchemeSystem`);
+                window.Logger.info(`🎨 Synced ${colorName} with ColorSchemeSystem`, { page: "preferences-colors" });
             }
         } catch (error) {
-            console.warn(`⚠️ Failed to sync ${colorName} with ColorSchemeSystem:`, error);
+            window.Logger.warn(`⚠️ Failed to sync ${colorName} with ColorSchemeSystem:`, error, { page: "preferences-colors" });
         }
     }
     
@@ -317,7 +317,7 @@ class ColorPickerManager {
      */
     initializePickers() {
         const colorPickers = document.querySelectorAll('input[type="color"]');
-        console.log(`🎨 Found ${colorPickers.length} color pickers`);
+        window.Logger.info(`🎨 Found ${colorPickers.length} color pickers`, { page: "preferences-colors" });
         
         colorPickers.forEach(picker => {
             this.registerPicker(picker);
@@ -342,7 +342,7 @@ class ColorPickerManager {
         picker.addEventListener('change', (e) => this.onColorChange(id, e.target.value));
         picker.addEventListener('input', (e) => this.onColorInput(id, e.target.value));
         
-        console.log(`🎨 Registered color picker: ${id} (key: ${colorKey})`);
+        window.Logger.info(`🎨 Registered color picker: ${id} (key: ${colorKey}, { page: "preferences-colors" })`);
     }
     
     /**
@@ -354,7 +354,7 @@ class ColorPickerManager {
         const picker = this.pickers.get(pickerId);
         if (!picker) return;
         
-        console.log(`🎨 Color changed: ${pickerId} = ${colorValue}`);
+        window.Logger.info(`🎨 Color changed: ${pickerId} = ${colorValue}`, { page: "preferences-colors" });
         
         // Update preview if exists
         this.updatePreview(pickerId, colorValue);
@@ -424,15 +424,15 @@ class ColorPickerManager {
             if (window.ColorManager) {
                 const success = await window.ColorManager.saveColor(colorKey, colorValue);
                 if (success) {
-                    console.log(`✅ Saved color ${colorKey}: ${colorValue}`);
+                    window.Logger.info(`✅ Saved color ${colorKey}: ${colorValue}`, { page: "preferences-colors" });
                 } else {
-                    console.error(`❌ Failed to save color ${colorKey}`);
+                    window.Logger.error(`❌ Failed to save color ${colorKey}`, { page: "preferences-colors" });
                 }
             } else {
-                console.warn('⚠️ ColorManager not available');
+                window.Logger.warn('⚠️ ColorManager not available', { page: "preferences-colors" });
             }
         } catch (error) {
-            console.error(`❌ Error saving color ${colorKey}:`, error);
+            window.Logger.error(`❌ Error saving color ${colorKey}:`, error, { page: "preferences-colors" });
         }
     }
     
@@ -481,7 +481,7 @@ window.ColorPickerManager = new ColorPickerManager();
  */
 window.loadColorsForPreferences = async function(userId = 1, profileId = 3) {
     try {
-        console.log('🎨 Loading colors for preferences page...');
+        window.Logger.info('🎨 Loading colors for preferences page...', { page: "preferences-colors" });
         
         // Initialize color pickers
         window.ColorPickerManager.initializePickers();
@@ -492,10 +492,10 @@ window.loadColorsForPreferences = async function(userId = 1, profileId = 3) {
         // Load colors into pickers
         window.ColorPickerManager.loadColors(colors);
         
-        console.log(`✅ Loaded ${Object.keys(colors).length} colors for preferences`);
+        window.Logger.info(`✅ Loaded ${Object.keys(colors, { page: "preferences-colors" }).length} colors for preferences`);
         
     } catch (error) {
-        console.error('❌ Error loading colors for preferences:', error);
+        window.Logger.error('❌ Error loading colors for preferences:', error, { page: "preferences-colors" });
     }
 };
 
@@ -506,7 +506,7 @@ window.loadColorsForPreferences = async function(userId = 1, profileId = 3) {
  */
 window.saveAllColorPreferences = async function(userId = 1, profileId = 3) {
     try {
-        console.log('🎨 Saving all color preferences...');
+        window.Logger.info('🎨 Saving all color preferences...', { page: "preferences-colors" });
         
         const colorPickers = document.querySelectorAll('input[type="color"]');
         let savedCount = 0;
@@ -524,12 +524,12 @@ window.saveAllColorPreferences = async function(userId = 1, profileId = 3) {
                     errorCount++;
                 }
             } catch (error) {
-                console.error(`❌ Error saving color ${colorKey}:`, error);
+                window.Logger.error(`❌ Error saving color ${colorKey}:`, error, { page: "preferences-colors" });
                 errorCount++;
             }
         }
         
-        console.log(`✅ Saved ${savedCount} colors, ${errorCount} errors`);
+        window.Logger.info(`✅ Saved ${savedCount} colors, ${errorCount} errors`, { page: "preferences-colors" });
         
         return {
             saved: savedCount,
@@ -538,7 +538,7 @@ window.saveAllColorPreferences = async function(userId = 1, profileId = 3) {
         };
         
     } catch (error) {
-        console.error('❌ Error saving all color preferences:', error);
+        window.Logger.error('❌ Error saving all color preferences:', error, { page: "preferences-colors" });
         return { saved: 0, errors: 1, total: 0 };
     }
 };
@@ -548,7 +548,7 @@ window.saveAllColorPreferences = async function(userId = 1, profileId = 3) {
  */
 window.resetAllColorsToDefaults = function() {
     try {
-        console.log('🎨 Resetting all colors to defaults...');
+        window.Logger.info('🎨 Resetting all colors to defaults...', { page: "preferences-colors" });
         
         // Reset pickers
         window.ColorPickerManager.resetToDefaults();
@@ -556,10 +556,10 @@ window.resetAllColorsToDefaults = function() {
         // Clear cache
         window.ColorManager.colorCache.clear();
         
-        console.log('✅ Reset all colors to defaults');
+        window.Logger.info('✅ Reset all colors to defaults', { page: "preferences-colors" });
         
     } catch (error) {
-        console.error('❌ Error resetting colors:', error);
+        window.Logger.error('❌ Error resetting colors:', error, { page: "preferences-colors" });
     }
 };
 
@@ -588,10 +588,10 @@ window.setColorPreference = async function(colorName, colorValue) {
 // Auto-initialize when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-        console.log('🎨 Color preferences system initialized');
+        window.Logger.info('🎨 Color preferences system initialized', { page: "preferences-colors" });
     });
 } else {
-    console.log('🎨 Color preferences system initialized');
+    window.Logger.info('🎨 Color preferences system initialized', { page: "preferences-colors" });
 }
 
-console.log('✅ preferences-colors.js loaded successfully');
+window.Logger.info('✅ preferences-colors.js loaded successfully', { page: "preferences-colors" });

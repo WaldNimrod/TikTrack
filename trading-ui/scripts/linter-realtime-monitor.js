@@ -787,7 +787,7 @@ async function startFileScan() {
     console.log('🏁 ===== END START FILE SCAN =====');
 }
 
-// REMOVED: copyDetailedLog function - development mechanism, page-specific only
+// REMOVED:  function - development mechanism, page-specific only
 
 
 function clearFileCache() {
@@ -2370,8 +2370,8 @@ window.updateFileMappingStatus = updateFileMappingStatus;
 window.startFileScan = startFileScan;
 window.checkExistingScanResults = checkExistingScanResults;
 window.loadExistingFileMapping = loadExistingFileMapping;
-// // window.copyDetailedLog export removed - using global version from system-management.js // REMOVED: Development mechanism - page-specific only
-// window.copyLinterDetailedLog = copyDetailedLog; // REMOVED: Development mechanism - page-specific only
+// // window. export removed - using global version from system-management.js // REMOVED: Development mechanism - page-specific only
+// window.copyLinterDetailedLog = ; // REMOVED: Development mechanism - page-specific only
 // window.generateDetailedLog export removed - local function only
 // window.toggleSection removed - using global version from ui-utils.js
 // window.toggleSection export removed - using global version from ui-utils.js

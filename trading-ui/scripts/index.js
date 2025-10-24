@@ -7,7 +7,7 @@
  * @author TikTrack Development Team
  */
 
-console.log('🏠 Index page JavaScript loaded');
+window.Logger.info('🏠 Index page JavaScript loaded', { page: "index" });
 
 // Index page specific variables
 let homeCharts = {
@@ -41,7 +41,7 @@ function switchTableTab(tabName) {
 
 // Function to refresh overview data (placeholder)
 function refreshOverview() {
-    console.log('Refreshing overview data...');
+    window.Logger.info('Refreshing overview data...', { page: "index" });
     // Implement data fetching and UI update for overview section
 }
 
@@ -50,7 +50,7 @@ function exportOverview() {
     if (typeof showNotification === 'function') {
         showNotification('info', 'ייצוא נתוני סקירה יהיה זמין בעתיד');
     } else {
-        console.log('📤 Export overview data - Future feature');
+        window.Logger.info('📤 Export overview data - Future feature', { page: "index" });
     }
 }
 
@@ -59,7 +59,7 @@ function quickAction(actionType) {
     if (typeof showNotification === 'function') {
         showNotification('info', `פעולה מהירה '${actionType}' תהיה זמינה בעתיד`);
     } else {
-        console.log(`⚡ Quick action: ${actionType} - Future feature`);
+        window.Logger.info(`⚡ Quick action: ${actionType} - Future feature`, { page: "index" });
     }
 }
 
@@ -69,16 +69,17 @@ function quickAction(actionType) {
 // Chart Management Functions
 async function createTradesStatusChart() {
     try {
-        // console.log('📊 Creating trades status chart...');
+        // window.Logger.info('📊 Creating trades status chart...', { page: "index" });
         
         if (!window.ChartSystem || !window.TradesAdapter) {
-            console.warn('⚠️ Chart system or trades adapter not available');
+            window.Logger.warn('⚠️ Chart system or trades adapter not available', { page: "index" });
             return;
         }
         
         const tradesAdapter = new window.TradesAdapter();
+        await tradesAdapter.init();
         const rawData = await tradesAdapter.getData();
-        const chartData = tradesAdapter.formatData(rawData, 'status');
+        const chartData = tradesAdapter.formatData(rawData).status;
         
         homeCharts.tradesStatusChart = await window.ChartSystem.create({
             id: 'tradesStatusChart',
@@ -99,24 +100,25 @@ async function createTradesStatusChart() {
             }
         });
         
-        // console.log('✅ Trades status chart created successfully');
+        // window.Logger.info('✅ Trades status chart created successfully', { page: "index" });
     } catch (error) {
-        console.error('❌ Error creating trades status chart:', error);
+        window.Logger.error('❌ Error creating trades status chart:', error, { page: "index" });
     }
 }
 
 async function createPerformanceChart() {
     try {
-        // console.log('📈 Creating performance chart...');
+        // window.Logger.info('📈 Creating performance chart...', { page: "index" });
         
         if (!window.ChartSystem || !window.TradesAdapter) {
-            console.warn('⚠️ Chart system or trades adapter not available');
+            window.Logger.warn('⚠️ Chart system or trades adapter not available', { page: "index" });
             return;
         }
         
         const tradesAdapter = new window.TradesAdapter();
+        await tradesAdapter.init();
         const rawData = await tradesAdapter.getData();
-        const chartData = tradesAdapter.formatData(rawData, 'performance');
+        const chartData = tradesAdapter.formatData(rawData).performance;
         
         homeCharts.performanceChart = await window.ChartSystem.create({
             id: 'performanceChart',
@@ -139,24 +141,25 @@ async function createPerformanceChart() {
             }
         });
         
-        // console.log('✅ Performance chart created successfully');
+        // window.Logger.info('✅ Performance chart created successfully', { page: "index" });
     } catch (error) {
-        console.error('❌ Error creating performance chart:', error);
+        window.Logger.error('❌ Error creating performance chart:', error, { page: "index" });
     }
 }
 
 async function createAccountChart() {
     try {
-        // console.log('🏦 Creating account chart...');
+        // window.Logger.info('🏦 Creating account chart...', { page: "index" });
         
         if (!window.ChartSystem || !window.TradesAdapter) {
-            console.warn('⚠️ Chart system or trades adapter not available');
+            window.Logger.warn('⚠️ Chart system or trades adapter not available', { page: "index" });
             return;
         }
         
         const tradesAdapter = new window.TradesAdapter();
+        await tradesAdapter.init();
         const rawData = await tradesAdapter.getData();
-        const chartData = tradesAdapter.formatData(rawData, 'account');
+        const chartData = tradesAdapter.formatData(rawData).account;
         
         homeCharts.accountChart = await window.ChartSystem.create({
             id: 'accountChart',
@@ -179,26 +182,27 @@ async function createAccountChart() {
             }
         });
         
-        // console.log('✅ Account chart created successfully');
+        // window.Logger.info('✅ Account chart created successfully', { page: "index" });
     } catch (error) {
-        console.error('❌ Error creating account chart:', error);
+        window.Logger.error('❌ Error creating account chart:', error, { page: "index" });
     }
 }
 
 async function createMixedChart() {
     try {
-        // console.log('🔀 Creating mixed chart...');
+        // window.Logger.info('🔀 Creating mixed chart...', { page: "index" });
         
         if (!window.ChartSystem || !window.TradesAdapter) {
-            console.warn('⚠️ Chart system or trades adapter not available');
+            window.Logger.warn('⚠️ Chart system or trades adapter not available', { page: "index" });
             return;
         }
         
         const tradesAdapter = new window.TradesAdapter();
+        await tradesAdapter.init();
         const rawData = await tradesAdapter.getData();
-        const stats = tradesAdapter.getSummaryStats(rawData);
+        const chartData = tradesAdapter.formatData(rawData);
         
-        const mixedData = createMixedChartData(rawData, stats);
+        const mixedData = chartData.mixed;
         
         homeCharts.mixedChart = await window.ChartSystem.create({
             id: 'mixedChart',
@@ -222,9 +226,9 @@ async function createMixedChart() {
             }
         });
         
-        // console.log('✅ Mixed chart created successfully');
+        // window.Logger.info('✅ Mixed chart created successfully', { page: "index" });
     } catch (error) {
-        console.error('❌ Error creating mixed chart:', error);
+        window.Logger.error('❌ Error creating mixed chart:', error, { page: "index" });
     }
 }
 
@@ -294,7 +298,7 @@ function createMixedChartData(rawData, stats) {
 
 // Chart Management Functions
 async function refreshAllCharts() {
-    // console.log('🔄 Refreshing all charts...');
+    // window.Logger.info('🔄 Refreshing all charts...', { page: "index" });
     
     try {
         await Promise.all([
@@ -308,9 +312,9 @@ async function refreshAllCharts() {
             window.showNotification('כל הגרפים רוענו בהצלחה', 'success', 'business');
         }
         
-        // console.log('✅ All charts refreshed successfully');
+        // window.Logger.info('✅ All charts refreshed successfully', { page: "index" });
     } catch (error) {
-        console.error('❌ Error refreshing charts:', error);
+        window.Logger.error('❌ Error refreshing charts:', error, { page: "index" });
         if (window.showNotification) {
             window.showNotification('שגיאה ברענון הגרפים', 'error', 'business');
         }
@@ -318,7 +322,7 @@ async function refreshAllCharts() {
 }
 
 async function refreshChart(chartId) {
-    console.log(`🔄 Refreshing chart: ${chartId}`);
+    window.Logger.info(`🔄 Refreshing chart: ${chartId}`, { page: "index" });
     
     try {
         switch (chartId) {
@@ -335,7 +339,7 @@ async function refreshChart(chartId) {
                 await createMixedChart();
                 break;
             default:
-                console.warn(`⚠️ Unknown chart ID: ${chartId}`);
+                window.Logger.warn(`⚠️ Unknown chart ID: ${chartId}`, { page: "index" });
                 return;
         }
         
@@ -343,9 +347,9 @@ async function refreshChart(chartId) {
             window.showNotification(`גרף ${chartId} רוענן בהצלחה`, 'success', 'business');
         }
         
-        console.log(`✅ Chart ${chartId} refreshed successfully`);
+        window.Logger.info(`✅ Chart ${chartId} refreshed successfully`, { page: "index" });
     } catch (error) {
-        console.error(`❌ Error refreshing chart ${chartId}:`, error);
+        window.Logger.error(`❌ Error refreshing chart ${chartId}:`, error, { page: "index" });
         if (window.showNotification) {
             window.showNotification(`שגיאה ברענון גרף ${chartId}`, 'error', 'business');
         }
@@ -353,7 +357,7 @@ async function refreshChart(chartId) {
 }
 
 async function exportChart(chartId) {
-    console.log(`📤 Exporting chart: ${chartId}`);
+    window.Logger.info(`📤 Exporting chart: ${chartId}`, { page: "index" });
     
     try {
         if (window.ChartExportSystem) {
@@ -363,13 +367,13 @@ async function exportChart(chartId) {
                 filename: `home-${chartId}`
             });
         } else {
-            console.warn('⚠️ Chart export system not available');
+            window.Logger.warn('⚠️ Chart export system not available', { page: "index" });
             // if (window.showNotification) {
             //     window.showNotification('מערכת ייצוא הגרפים לא זמינה', 'info', 'system');
             // }
         }
     } catch (error) {
-        console.error(`❌ Error exporting chart ${chartId}:`, error);
+        window.Logger.error(`❌ Error exporting chart ${chartId}:`, error, { page: "index" });
         if (window.showNotification) {
             window.showNotification(`שגיאה בייצוא גרף ${chartId}`, 'error', 'business');
         }
@@ -377,7 +381,7 @@ async function exportChart(chartId) {
 }
 
 async function exportAllCharts() {
-    console.log('📤 Exporting all charts...');
+    window.Logger.info('📤 Exporting all charts...', { page: "index" });
     
     try {
         if (window.ChartExportSystem) {
@@ -388,13 +392,13 @@ async function exportAllCharts() {
                 filename: 'home-dashboard'
             });
         } else {
-            console.warn('⚠️ Chart export system not available');
+            window.Logger.warn('⚠️ Chart export system not available', { page: "index" });
             // if (window.showNotification) {
             //     window.showNotification('מערכת ייצוא הגרפים לא זמינה', 'info', 'system');
             // }
         }
     } catch (error) {
-        console.error('❌ Error exporting all charts:', error);
+        window.Logger.error('❌ Error exporting all charts:', error, { page: "index" });
         if (window.showNotification) {
             window.showNotification('שגיאה בייצוא כל הגרפים', 'error', 'business');
         }
@@ -403,7 +407,7 @@ async function exportAllCharts() {
 
 // Initialize index page - integrated with unified system
 window.initializeIndexPage = async function() {
-    console.log('🏠 Index page initialized via unified system');
+    window.Logger.info('🏠 Index page initialized via unified system', { page: "index" });
     
     // Initialize overview data
     refreshOverview();
@@ -421,7 +425,7 @@ window.initializeIndexPage = async function() {
     
     // Initialize charts after a short delay to ensure all systems are loaded
     setTimeout(async () => {
-        // console.log('📊 Initializing home page charts...');
+        // window.Logger.info('📊 Initializing home page charts...', { page: "index" });
         await refreshAllCharts();
     }, 1000);
 };
@@ -564,8 +568,8 @@ function generateDetailedLog() {
 
 // Z-Index Debug Function - בדיקת מצב z-index בפועל
 function debugZIndexStatus() {
-    console.log('🔍 בדיקת מצב Z-Index במערכת ראש הדף');
-    console.log('=====================================');
+    window.Logger.info('🔍 בדיקת מצב Z-Index במערכת ראש הדף', { page: "index" });
+    window.Logger.info('=====================================', { page: "index" });
     
     // בדיקת אלמנטים רלוונטיים
     const elements = [
@@ -587,49 +591,49 @@ function debugZIndexStatus() {
             const display = computedStyle.display;
             const visibility = computedStyle.visibility;
             
-            console.log(`📍 ${element.name}:`);
-            console.log(`   Selector: ${element.selector}`);
-            console.log(`   Z-Index: ${zIndex}`);
-            console.log(`   Position: ${position}`);
-            console.log(`   Display: ${display}`);
-            console.log(`   Visibility: ${visibility}`);
-            console.log(`   Visible: ${el.offsetParent !== null}`);
-            console.log('---');
+            window.Logger.info(`📍 ${element.name}:`, { page: "index" });
+            window.Logger.info(`   Selector: ${element.selector}`, { page: "index" });
+            window.Logger.info(`   Z-Index: ${zIndex}`, { page: "index" });
+            window.Logger.info(`   Position: ${position}`, { page: "index" });
+            window.Logger.info(`   Display: ${display}`, { page: "index" });
+            window.Logger.info(`   Visibility: ${visibility}`, { page: "index" });
+            window.Logger.info(`   Visible: ${el.offsetParent !== null}`, { page: "index" });
+            window.Logger.info('---', { page: "index" });
         } else {
-            console.log(`❌ ${element.name} (${element.selector}): לא נמצא`);
+            window.Logger.info(`❌ ${element.name} (${element.selector}): לא נמצא`, { page: "index" });
         }
     });
     
     // בדיקת כל התפריטים הפתוחים
-    console.log('🎯 בדיקת תפריטים פתוחים:');
+    window.Logger.info('🎯 בדיקת תפריטים פתוחים:', { page: "index" });
     const openMenus = document.querySelectorAll('.tiktrack-dropdown-menu:not([style*="display: none"])');
-    console.log(`תפריטים פתוחים: ${openMenus.length}`);
+    window.Logger.info(`תפריטים פתוחים: ${openMenus.length}`, { page: "index" });
     
     openMenus.forEach((menu, index) => {
         const computedStyle = window.getComputedStyle(menu);
-        console.log(`תפריט ${index + 1}: z-index = ${computedStyle.zIndex}`);
+        window.Logger.info(`תפריט ${index + 1}: z-index = ${computedStyle.zIndex}`, { page: "index" });
     });
     
     // בדיקת כפתור הפילטר
-    console.log('🔘 בדיקת כפתור פילטר:');
+    window.Logger.info('🔘 בדיקת כפתור פילטר:', { page: "index" });
     const filterBtn = document.querySelector('.header-filter-toggle-btn');
     if (filterBtn) {
         const computedStyle = window.getComputedStyle(filterBtn);
-        console.log(`כפתור פילטר: z-index = ${computedStyle.zIndex}`);
-        console.log(`כפתור פילטר: position = ${computedStyle.position}`);
-        console.log(`כפתור פילטר: visible = ${filterBtn.offsetParent !== null}`);
+        window.Logger.info(`כפתור פילטר: z-index = ${computedStyle.zIndex}`, { page: "index" });
+        window.Logger.info(`כפתור פילטר: position = ${computedStyle.position}`, { page: "index" });
+        window.Logger.info(`כפתור פילטר: visible = ${filterBtn.offsetParent !== null}`, { page: "index" });
     }
     
-    console.log('=====================================');
-    console.log('✅ בדיקת Z-Index הושלמה');
+    window.Logger.info('=====================================', { page: "index" });
+    window.Logger.info('✅ בדיקת Z-Index הושלמה', { page: "index" });
 }
 
 // Export log functions to global scope
-// window.copyDetailedLog export removed - using global version from system-management.js
+// window. export removed - using global version from system-management.js
 // window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 
-// Local copyDetailedLog function for index page
-async function copyDetailedLog() {
+// Local  function for index page
+async function  {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {
@@ -647,7 +651,7 @@ async function copyDetailedLog() {
             }
         }
     } catch (err) {
-        console.error('שגיאה בהעתקה:', err);
+        window.Logger.error('שגיאה בהעתקה:', err, { page: "index" });
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה בהעתקת הלוג');
         } else {
@@ -657,4 +661,4 @@ async function copyDetailedLog() {
 }
 window.debugZIndexStatus = debugZIndexStatus;
 
-console.log('✅ Index page ready');
+window.Logger.info('✅ Index page ready', { page: "index" });

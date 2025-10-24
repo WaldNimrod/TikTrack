@@ -1606,7 +1606,7 @@ function testDetailsModal() {
   }
 }
 
-async function copyDetailedLog() {
+async function  {
   try {
     const detailedLog = await generateDetailedLog();
     if (detailedLog) {
@@ -1675,7 +1675,7 @@ function toggleSection() {
 // ייצוא פונקציות ל-window scope
 window.copyNotificationsToClipboard = copyNotificationsToClipboard;
 window.copyFilteredHistoryToClipboard = copyFilteredHistoryToClipboard;
-// window.copyDetailedLog export removed - using global version from system-management.js
+// window. export removed - using global version from system-management.js
 window.clearHistory = clearHistory;
 window.refreshNotifications = refreshNotifications;
 window.filterHistory = filterHistory;
@@ -1742,7 +1742,7 @@ window.loadNotifications = async function() {
 
   // Make functions globally available
   window.copyNotificationsToClipboard = copyNotificationsToClipboard;
-  // window.copyDetailedLog = copyDetailedLog; // REMOVED: Local function only
+  // window. = ; // REMOVED: Local function only
   window.testSuccessNotification = testSuccessNotification;
   window.testErrorNotification = testErrorNotification;
   window.testWarningNotification = testWarningNotification;
@@ -1827,7 +1827,7 @@ async function generateDetailedLog() {
  */
 
 // ייצוא לגלובל scope
-// window.copyDetailedLog export removed - using global version from system-management.js
+// window. export removed - using global version from system-management.js
 
 // ===== UNIFIED LOG SYSTEM INTEGRATION =====
 

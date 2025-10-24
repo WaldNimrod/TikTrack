@@ -1118,7 +1118,7 @@ const detailedLogGenerator = {
   /**
    * Copy detailed log to clipboard
    */
-  async copyDetailedLog() {
+  async  {
     try {
       const log = this.generateDetailedLog();
 
@@ -1166,10 +1166,10 @@ async function initializeBackgroundTasks() {
     autoRefresh.start();
 
     // Initialize detailed log button
-    const copyLogBtn = document.getElementById('copyDetailedLogBtn');
+    const copyLogBtn = document.getElementById('Btn');
     if (copyLogBtn) {
       copyLogBtn.addEventListener('click', () => {
-        detailedLogGenerator.copyDetailedLog();
+        detailedLogGenerator.;
       });
     }
 
@@ -1197,10 +1197,10 @@ async function initializeBackgroundTasks() {
 }
 
 // Global functions for onclick handlers - Background Tasks specific
-// Local copyDetailedLog function for background-tasks page
-function copyDetailedLog() {
-  if (typeof detailedLogGenerator !== 'undefined' && detailedLogGenerator.copyDetailedLog) {
-    detailedLogGenerator.copyDetailedLog();
+// Local  function for background-tasks page
+function  {
+  if (typeof detailedLogGenerator !== 'undefined' && detailedLogGenerator.) {
+    detailedLogGenerator.;
   } else {
     console.error('❌ detailedLogGenerator לא זמין');
     if (window.showErrorNotification) {
@@ -1358,7 +1358,7 @@ function generateDetailedLog() {
  */
 
 // ייצוא לגלובל scope
-// window.copyDetailedLog export removed - using global version from system-management.js
+// window. export removed - using global version from system-management.js
 
 // ===== REAL-TIME LOG LISTENER =====
 

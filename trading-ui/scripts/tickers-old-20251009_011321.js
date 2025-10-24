@@ -2481,11 +2481,11 @@ window.confirmDeleteTicker = confirmDeleteTicker;
 window.refreshYahooFinanceData = refreshYahooFinanceData;
 window.editTicker = editTicker;
 window.viewTickerDetails = viewTickerDetails;
-// window.copyDetailedLog export removed - using global version from system-management.js
+// window. export removed - using global version from system-management.js
 // window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 
-// Local copyDetailedLog function for tickers page
-async function copyDetailedLog() {
+// Local  function for tickers page
+async function  {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {

@@ -1454,7 +1454,7 @@ class PageScriptsMatrixSystem {
         }
     }
 
-    async copyDetailedLog() {
+    async  {
         console.log('📋 Copying detailed log...');
         if (window.showNotification) {
             window.showNotification('יוצר לוג מפורט...', 'info');
@@ -2783,10 +2783,10 @@ class PageScriptsMatrixSystem {
     window.cleanupOldData = () => window.pageScriptsMatrix.cleanupOldData();
     // window.toggleAllSections export removed - using global version from ui-utils.js
     // window.toggleSection export removed - using global version from ui-utils.js
-    // window.copyDetailedLog export removed - using global version from system-management.js
+    // window. export removed - using global version from system-management.js
     
-    // Local copyDetailedLog function for page-scripts-matrix page
-    async function copyDetailedLog() {
+    // Local  function for page-scripts-matrix page
+    async function  {
         try {
             const detailedLog = generateDetailedLog();
             if (detailedLog) {
@@ -2966,7 +2966,7 @@ function generateDetailedLog() {
     // כפתורים וקונטרולים
     log.push('--- כפתורים וקונטרולים ---');
     const buttons = [
-        { id: 'copyDetailedLog', text: 'העתק לוג מפורט' },
+        { id: '', text: 'העתק לוג מפורט' },
         { id: 'refreshAllData', text: 'רענן' },
         { id: 'backupData', text: 'גיבוי' },
         { id: 'cleanupOldData', text: 'ניקוי' }
@@ -3022,4 +3022,4 @@ function generateDetailedLog() {
  */
 
 // ייצוא לגלובל scope
-// window.copyDetailedLog export removed - using global version from system-management.js
+// window. export removed - using global version from system-management.js

@@ -28,7 +28,7 @@
 מנהל מרכזי לכל שכבות המטמון עם החלטה אוטומטית על שכבה לפי קריטריונים.
 
 ### **מיקום:**
-`trading-ui/scripts/modules/cache-module.js` (Core Module - Stage 1)
+`trading-ui/scripts/unified-cache-manager.js` (Core Module - Stage 1)
 
 ### **תכונות עיקריות:**
 - החלטה אוטומטית על שכבה לפי קריטריונים
@@ -841,6 +841,213 @@ clearAllCache({ level: 'medium', validateAfter: true })
 - **Checkbox ולידציה** בעמוד ניהול מטמון (כבוי כברירת מחדל)
 - **כל 4 הכפתורים** תומכים ב-`validateAfter`
 - **הודעות מותאמות** לפי רמת ניקוי ותוצאות ולידציה
+
+---
+
+## 🆕 **פונקציות חדשות - Cache Dependencies & TTL**
+
+### **Cache Dependencies Configuration:**
+```javascript
+const CACHE_DEPENDENCIES = {
+    // User Level
+    'user-preferences': [],
+    'user-profile': ['user-preferences'],
+    
+    // Account Level  
+    'accounts-data': ['user-preferences'],
+    'account-{id}': ['accounts-data'],
+    
+    // Trading Level
+    'trades-data': ['accounts-data'],
+    'trade-{id}': ['trades-data'],
+    'executions-data': ['accounts-data'],
+    'execution-{id}': ['executions-data'],
+    
+    // Market Level
+    'tickers-data': ['accounts-data'],
+    'ticker-{id}': ['tickers-data'],
+    'market-data': ['tickers-data'],
+    'quote-{symbol}': ['market-data'],
+    
+    // Alerts Level
+    'alerts-data': ['accounts-data'],
+    'alert-{id}': ['alerts-data'],
+    'conditions-data': ['trades-data'],
+    
+    // Dashboard Level
+    'dashboard-data': ['market-data', 'trades-data', 'executions-data'],
+    'statistics-data': ['trades-data', 'executions-data']
+};
+```
+
+### **TTL Policies Configuration:**
+```javascript
+const TTL_POLICIES = {
+    'user-preferences': 'long',      // 24 hours
+    'user-profile': 'long',          // 24 hours
+    'accounts-data': 'medium',       // 30 minutes
+    'account-{id}': 'medium',        // 30 minutes
+    'trades-data': 'short',          // 5 minutes
+    'trade-{id}': 'short',           // 5 minutes
+    'executions-data': 'short',      // 5 minutes
+    'market-data': 'very-short',     // 1 minute
+    'quote-{symbol}': 'very-short',  // 1 minute
+    'dashboard-data': 'medium',      // 30 minutes
+    'statistics-data': 'medium'      // 30 minutes
+};
+
+const TTL_VALUES = {
+    'very-short': 1 * 60 * 1000,     // 1 minute
+    'short': 5 * 60 * 1000,          // 5 minutes
+    'medium': 30 * 60 * 1000,        // 30 minutes
+    'long': 24 * 60 * 60 * 1000      // 24 hours
+};
+```
+
+### **פונקציות חדשות:**
+
+#### **1. invalidateByDependency(changedKey)**
+```javascript
+/**
+ * Invalidate cache by dependency chain
+ * @param {string} changedKey - Key that changed
+ * @returns {Promise<number>} - Number of keys invalidated
+ */
+async invalidateByDependency(changedKey)
+```
+
+#### **2. invalidate(pattern)**
+```javascript
+/**
+ * Clear cache by pattern (supports wildcards)
+ * @param {string} pattern - Pattern to match (e.g., 'trades-*')
+ * @returns {Promise<number>} - Number of keys cleared
+ */
+async invalidate(pattern)
+```
+
+#### **3. getMultiple(keys)**
+```javascript
+/**
+ * Get multiple keys at once
+ * @param {string[]} keys - Array of keys to retrieve
+ * @returns {Promise<Object>} - Object with key-value pairs
+ */
+async getMultiple(keys)
+```
+
+#### **4. setMultiple(data, ttl)**
+```javascript
+/**
+ * Set multiple keys at once
+ * @param {Object} data - Object with key-value pairs
+ * @param {string} ttl - TTL policy
+ * @returns {Promise<number>} - Number of keys set
+ */
+async setMultiple(data, ttl = 'medium')
+```
+
+#### **5. has(key)**
+```javascript
+/**
+ * Check if key exists and is valid
+ * @param {string} key - Cache key to check
+ * @returns {Promise<boolean>} - True if exists and valid
+ */
+async has(key)
+```
+
+#### **6. getStats()**
+```javascript
+/**
+ * Get cache statistics
+ * @returns {Object} - Statistics object
+ */
+getStats()
+```
+
+#### **7. getCurrentVersion(key)**
+```javascript
+/**
+ * Get current version for a cache key
+ * @param {string} key - Cache key
+ * @returns {string} - Version string
+ */
+getCurrentVersion(key)
+```
+
+#### **8. isVersionValid(key, version)**
+```javascript
+/**
+ * Check if cached version is still valid
+ * @param {string} key - Cache key
+ * @param {string} version - Cached version
+ * @returns {boolean} - True if valid
+ */
+isVersionValid(key, version)
+```
+
+### **פונקציות גלובליות:**
+
+#### **גישה נוחה דרך window:**
+```javascript
+// Dependency invalidation
+window.invalidateByDependency('user-preferences');
+
+// Pattern clearing
+window.invalidateCache('trades-*');
+
+// Bulk operations
+const data = await window.getMultipleCache(['key1', 'key2']);
+await window.setMultipleCache({key1: 'value1', key2: 'value2'});
+
+// Utility functions
+const exists = await window.hasCache('some-key');
+const stats = window.getCacheStats();
+```
+
+### **דוגמאות שימוש:**
+
+#### **Dependency Invalidation:**
+```javascript
+// כאשר משתמש משנה העדפות
+await window.invalidateByDependency('user-preferences');
+// זה יבטל אוטומטית: user-profile, accounts-data, trades-data, וכו'
+```
+
+#### **Pattern Clearing:**
+```javascript
+// ניקוי כל נתוני הטריידים
+await window.invalidateCache('trades-*');
+
+// ניקוי כל נתוני השוק
+await window.invalidateCache('market-*');
+```
+
+#### **Bulk Operations:**
+```javascript
+// קבלת מספר מפתחות בבת אחת
+const userData = await window.getMultipleCache([
+    'user-preferences',
+    'user-profile', 
+    'accounts-data'
+]);
+
+// שמירת מספר מפתחות בבת אחת
+await window.setMultipleCache({
+    'user-preferences': preferences,
+    'user-profile': profile,
+    'accounts-data': accounts
+}, 'medium');
+```
+
+#### **Cache Statistics:**
+```javascript
+const stats = window.getCacheStats();
+console.log('Cache Hit Rate:', stats.performance.hitRate + '%');
+console.log('Memory Entries:', stats.layers.memory.entries);
+console.log('LocalStorage Size:', stats.layers.localStorage.size);
+```
 
 
 

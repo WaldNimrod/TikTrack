@@ -1483,7 +1483,7 @@ async function generateDetailedLog() {
  * Copy detailed log to clipboard
  * העתקת לוג מפורט ללוח
  */
-async function copyDetailedLog() {
+async function  {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {
@@ -1507,8 +1507,8 @@ async function copyDetailedLog() {
     }
 }
 
-// Export copyDetailedLog to global scope
-window.copyDetailedLog = copyDetailedLog;
+// Export  to global scope
+window. = ;
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {

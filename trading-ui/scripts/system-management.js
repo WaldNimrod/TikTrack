@@ -2188,7 +2188,7 @@ function generateDetailedLog() {
     const buttonIds = [
         'refreshSystemDataBtn', 'runSystemCheckBtn', 'clearCacheBtn', 'runBackupBtn',
         'restoreFromBackupBtn', 'checkDependenciesBtn', 'copyCheckResultsBtn',
-        'copyDetailedLogBtn', 'toggleAllSectionsBtn'
+        'Btn', 'toggleAllSectionsBtn'
     ];
     
     buttonIds.forEach(btnId => {
@@ -2259,8 +2259,8 @@ function generateDetailedLog() {
     return log.join('\n');
 }
 
-// Local copyDetailedLog function for system-management page
-async function copyDetailedLog() {
+// Local  function for system-management page
+async function  {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {

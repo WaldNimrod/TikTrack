@@ -10,7 +10,7 @@
  */
 function executeTradePlan(planId) {
   try {
-    console.log('⚡ מבצע תוכנית מסחר:', planId);
+    window.Logger.info('⚡ מבצע תוכנית מסחר:', planId, { page: "trade_plans" });
     
     // חיפוש התוכנית בנתונים
     const plan = window.tradePlansData.find(p => p.id === planId);
@@ -44,7 +44,7 @@ function executeTradePlan(planId) {
         return response.json();
       })
       .then(data => {
-        console.log('✅ תוכנית מסחר בוצעה:', data);
+        window.Logger.info('✅ תוכנית מסחר בוצעה:', data, { page: "trade_plans" });
         
         // רענון הטבלה
         loadTradePlansData();
@@ -57,7 +57,7 @@ function executeTradePlan(planId) {
         }
       })
       .catch(error => {
-        console.error('שגיאה בביצוע תוכנית מסחר:', error);
+        window.Logger.error('שגיאה בביצוע תוכנית מסחר:', error, { page: "trade_plans" });
         if (typeof window.showErrorNotification === 'function') {
           window.showErrorNotification('שגיאה בביצוע תוכנית מסחר', error.message, 6000, 'system');
         } else if (typeof window.showNotification === 'function') {
@@ -67,7 +67,7 @@ function executeTradePlan(planId) {
     }
     
   } catch (error) {
-    console.error('שגיאה בביצוע תוכנית מסחר:', error);
+    window.Logger.error('שגיאה בביצוע תוכנית מסחר:', error, { page: "trade_plans" });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בביצוע תוכנית מסחר', error.message, 6000, 'system');
     } else if (typeof window.showNotification === 'function') {
@@ -83,7 +83,7 @@ function executeTradePlan(planId) {
  */
 function copyTradePlan(planId) {
   try {
-    console.log('📋 מעתיק תוכנית מסחר:', planId);
+    window.Logger.info('📋 מעתיק תוכנית מסחר:', planId, { page: "trade_plans" });
     
     // חיפוש התוכנית בנתונים
     const plan = window.tradePlansData.find(p => p.id === planId);
@@ -116,7 +116,7 @@ function copyTradePlan(planId) {
       return response.json();
     })
     .then(data => {
-      console.log('✅ תוכנית מסחר הועתקה:', data);
+      window.Logger.info('✅ תוכנית מסחר הועתקה:', data, { page: "trade_plans" });
       
       // רענון הטבלה
       loadTradePlansData();
@@ -129,7 +129,7 @@ function copyTradePlan(planId) {
       }
     })
     .catch(error => {
-      console.error('שגיאה בהעתקת תוכנית מסחר:', error);
+      window.Logger.error('שגיאה בהעתקת תוכנית מסחר:', error, { page: "trade_plans" });
       if (typeof window.showErrorNotification === 'function') {
         window.showErrorNotification('שגיאה בהעתקת תוכנית מסחר', error.message, 6000, 'system');
       } else if (typeof window.showNotification === 'function') {
@@ -138,7 +138,7 @@ function copyTradePlan(planId) {
     });
     
   } catch (error) {
-    console.error('שגיאה בהעתקת תוכנית מסחר:', error);
+    window.Logger.error('שגיאה בהעתקת תוכנית מסחר:', error, { page: "trade_plans" });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בהעתקת תוכנית מסחר', error.message);
     } else if (typeof window.showNotification === 'function') {
@@ -304,7 +304,7 @@ function disableEditFields() {
 // Ticker info functions
 async function loadTickerInfo(tickerId) {
   try {
-    console.log('🔄 Loading ticker info for ID:', tickerId);
+    window.Logger.info('🔄 Loading ticker info for ID:', tickerId, { page: "trade_plans" });
     
     // Get ticker data from API
     const response = await fetch(`/api/tickers/`);
@@ -325,7 +325,7 @@ async function loadTickerInfo(tickerId) {
     displayTickerInfo(ticker);
     
   } catch (error) {
-    console.error('❌ Error loading ticker info:', error);
+    window.Logger.error('❌ Error loading ticker info:', error, { page: "trade_plans" });
     // Fallback to mock data for demonstration
     displayTickerInfo({
       symbol: 'AAPL',
@@ -379,7 +379,7 @@ function hideTickerInfo() {
  */
 async function updateFormFieldsWithTickerData(ticker, currentPrice) {
   try {
-    console.log('🔄 Updating form fields with ticker data:', ticker.symbol, 'Price:', currentPrice);
+    window.Logger.info('🔄 Updating form fields with ticker data:', ticker.symbol, 'Price:', currentPrice, { page: "trade_plans" });
     
     // Get user preferences for default percentages
     let defaultStopLoss = 2.5; // Default fallback
@@ -397,17 +397,17 @@ async function updateFormFieldsWithTickerData(ticker, currentPrice) {
           defaultTargetPrice = parseFloat(targetPricePref);
         }
         
-        console.log('✅ User preferences loaded:', { defaultStopLoss, defaultTargetPrice });
+        window.Logger.info('✅ User preferences loaded:', { defaultStopLoss, defaultTargetPrice }, { page: "trade_plans" });
       }
     } catch (error) {
-      console.warn('⚠️ Could not load user preferences, using defaults:', error);
+      window.Logger.warn('⚠️ Could not load user preferences, using defaults:', error, { page: "trade_plans" });
     }
     
     // Update entry price (current price)
     const priceInput = document.getElementById('price');
     if (priceInput) {
       priceInput.value = currentPrice.toFixed(2);
-      console.log('✅ Updated entry price:', currentPrice.toFixed(2));
+      window.Logger.info('✅ Updated entry price:', currentPrice.toFixed(2, { page: "trade_plans" }));
     }
     
     // Calculate and update target price and percentage based on side
@@ -420,11 +420,11 @@ async function updateFormFieldsWithTickerData(ticker, currentPrice) {
       if (side === 'Short') {
         // For Short: target price should be lower than entry price
         targetPrice = currentPrice * (1 - defaultTargetPrice / 100);
-        console.log('✅ Updated target price (Short):', targetPrice.toFixed(2), `(${defaultTargetPrice}% below entry)`);
+        window.Logger.info('✅ Updated target price (Short, { page: "trade_plans" }):', targetPrice.toFixed(2), `(${defaultTargetPrice}% below entry)`);
       } else {
         // For Long: target price should be higher than entry price
         targetPrice = currentPrice * (1 + defaultTargetPrice / 100);
-        console.log('✅ Updated target price (Long):', targetPrice.toFixed(2), `(${defaultTargetPrice}% above entry)`);
+        window.Logger.info('✅ Updated target price (Long, { page: "trade_plans" }):', targetPrice.toFixed(2), `(${defaultTargetPrice}% above entry)`);
       }
       targetPriceInput.value = targetPrice.toFixed(2);
       targetPercentageInput.value = defaultTargetPrice.toFixed(2);
@@ -439,25 +439,25 @@ async function updateFormFieldsWithTickerData(ticker, currentPrice) {
       if (side === 'Short') {
         // For Short: stop price should be higher than entry price (stop loss)
         stopPrice = currentPrice * (1 + defaultStopLoss / 100);
-        console.log('✅ Updated stop price (Short):', stopPrice.toFixed(2), `(${defaultStopLoss}% above entry)`);
+        window.Logger.info('✅ Updated stop price (Short, { page: "trade_plans" }):', stopPrice.toFixed(2), `(${defaultStopLoss}% above entry)`);
       } else {
         // For Long: stop price should be lower than entry price (stop loss)
         stopPrice = currentPrice * (1 - defaultStopLoss / 100);
-        console.log('✅ Updated stop price (Long):', stopPrice.toFixed(2), `(${defaultStopLoss}% below entry)`);
+        window.Logger.info('✅ Updated stop price (Long, { page: "trade_plans" }):', stopPrice.toFixed(2), `(${defaultStopLoss}% below entry)`);
       }
       stopPriceInput.value = stopPrice.toFixed(2);
       stopPercentageInput.value = defaultStopLoss.toFixed(2);
     }
     
   } catch (error) {
-    console.error('❌ Error updating form fields with ticker data:', error);
+    window.Logger.error('❌ Error updating form fields with ticker data:', error, { page: "trade_plans" });
   }
 }
 
 // Edit modal ticker info functions
 async function loadEditTickerInfo(tickerId) {
   try {
-    console.log('🔄 Loading edit ticker info for ID:', tickerId);
+    window.Logger.info('🔄 Loading edit ticker info for ID:', tickerId, { page: "trade_plans" });
     
     // Get ticker data from API
     const response = await fetch(`/api/tickers/`);
@@ -478,7 +478,7 @@ async function loadEditTickerInfo(tickerId) {
     displayEditTickerInfo(ticker);
     
   } catch (error) {
-    console.error('❌ Error loading edit ticker info:', error);
+    window.Logger.error('❌ Error loading edit ticker info:', error, { page: "trade_plans" });
     // Fallback to mock data for demonstration
     displayEditTickerInfo({
       symbol: 'AAPL',
@@ -532,7 +532,7 @@ function hideEditTickerInfo() {
  */
 async function updateEditFormFieldsWithTickerData(ticker, currentPrice) {
   try {
-    console.log('🔄 Updating edit form fields with ticker data:', ticker.symbol, 'Price:', currentPrice);
+    window.Logger.info('🔄 Updating edit form fields with ticker data:', ticker.symbol, 'Price:', currentPrice, { page: "trade_plans" });
     
     // Get user preferences for default percentages
     let defaultStopLoss = 2.5; // Default fallback
@@ -550,17 +550,17 @@ async function updateEditFormFieldsWithTickerData(ticker, currentPrice) {
           defaultTargetPrice = parseFloat(targetPricePref);
         }
         
-        console.log('✅ User preferences loaded for edit:', { defaultStopLoss, defaultTargetPrice });
+        window.Logger.info('✅ User preferences loaded for edit:', { defaultStopLoss, defaultTargetPrice }, { page: "trade_plans" });
       }
     } catch (error) {
-      console.warn('⚠️ Could not load user preferences for edit, using defaults:', error);
+      window.Logger.warn('⚠️ Could not load user preferences for edit, using defaults:', error, { page: "trade_plans" });
     }
     
     // Update entry price (current price) - only if field is empty
     const editPriceInput = document.getElementById('editPrice');
     if (editPriceInput && (!editPriceInput.value || editPriceInput.value === '')) {
       editPriceInput.value = currentPrice.toFixed(2);
-      console.log('✅ Updated edit entry price:', currentPrice.toFixed(2));
+      window.Logger.info('✅ Updated edit entry price:', currentPrice.toFixed(2, { page: "trade_plans" }));
     }
     
     // Calculate and update target price and percentage based on side - only if fields are empty
@@ -575,11 +575,11 @@ async function updateEditFormFieldsWithTickerData(ticker, currentPrice) {
       if (side === 'Short') {
         // For Short: target price should be lower than entry price
         targetPrice = currentPrice * (1 - defaultTargetPrice / 100);
-        console.log('✅ Updated edit target price (Short):', targetPrice.toFixed(2), `(${defaultTargetPrice}% below entry)`);
+        window.Logger.info('✅ Updated edit target price (Short, { page: "trade_plans" }):', targetPrice.toFixed(2), `(${defaultTargetPrice}% below entry)`);
       } else {
         // For Long: target price should be higher than entry price
         targetPrice = currentPrice * (1 + defaultTargetPrice / 100);
-        console.log('✅ Updated edit target price (Long):', targetPrice.toFixed(2), `(${defaultTargetPrice}% above entry)`);
+        window.Logger.info('✅ Updated edit target price (Long, { page: "trade_plans" }):', targetPrice.toFixed(2), `(${defaultTargetPrice}% above entry)`);
       }
       editTargetPriceInput.value = targetPrice.toFixed(2);
       editTargetPercentageInput.value = defaultTargetPrice.toFixed(2);
@@ -596,18 +596,18 @@ async function updateEditFormFieldsWithTickerData(ticker, currentPrice) {
       if (side === 'Short') {
         // For Short: stop price should be higher than entry price (stop loss)
         stopPrice = currentPrice * (1 + defaultStopLoss / 100);
-        console.log('✅ Updated edit stop price (Short):', stopPrice.toFixed(2), `(${defaultStopLoss}% above entry)`);
+        window.Logger.info('✅ Updated edit stop price (Short, { page: "trade_plans" }):', stopPrice.toFixed(2), `(${defaultStopLoss}% above entry)`);
       } else {
         // For Long: stop price should be lower than entry price (stop loss)
         stopPrice = currentPrice * (1 - defaultStopLoss / 100);
-        console.log('✅ Updated edit stop price (Long):', stopPrice.toFixed(2), `(${defaultStopLoss}% below entry)`);
+        window.Logger.info('✅ Updated edit stop price (Long, { page: "trade_plans" }):', stopPrice.toFixed(2), `(${defaultStopLoss}% below entry)`);
       }
       editStopPriceInput.value = stopPrice.toFixed(2);
       editStopPercentageInput.value = defaultStopLoss.toFixed(2);
     }
     
   } catch (error) {
-    console.error('❌ Error updating edit form fields with ticker data:', error);
+    window.Logger.error('❌ Error updating edit form fields with ticker data:', error, { page: "trade_plans" });
   }
 }
 
@@ -632,18 +632,18 @@ async function openEditTradePlanModal(tradePlanId) {
   
   // Add event listener for ticker selection in edit modal
   editTickerSelect.addEventListener('change', function() {
-    console.log('🎯 Edit Ticker selected:', this.value);
+    window.Logger.info('🎯 Edit Ticker selected:', this.value, { page: "trade_plans" });
     if (this.value) {
       // Enable all form fields
       enableEditFields();
-      console.log('✅ Edit form fields enabled after ticker selection');
+      window.Logger.info('✅ Edit form fields enabled after ticker selection', { page: "trade_plans" });
       
       // Load and display ticker info
       loadEditTickerInfo(this.value);
     } else {
       // Disable form fields
       disableEditFields();
-      console.log('❌ Edit form fields disabled - no ticker selected');
+      window.Logger.info('❌ Edit form fields disabled - no ticker selected', { page: "trade_plans" });
       
       // Hide ticker info
       hideEditTickerInfo();
@@ -871,7 +871,7 @@ async function updateEditTickerInfo() {
       const tickers = await window.tickerService.getTickers();
       ticker = tickers.find(t => t.id === tickerId);
     } catch {
-      // console.warn('Error getting tickers from service:', error);
+      // window.Logger.warn('Error getting tickers from service:', error, { page: "trade_plans" });
     }
   }
 
@@ -1091,7 +1091,7 @@ async function checkLinkedItemsBeforeCancel(tradePlanId) {
     }
 
   } catch (error) {
-    // console.error('❌ שגיאה בבדיקת פריטים מקושרים:', error);
+    // window.Logger.error('❌ שגיאה בבדיקת פריטים מקושרים:', error, { page: "trade_plans" });
     if (typeof window.handleSystemError === 'function') {
       window.handleSystemError(error, 'בדיקת פריטים מקושרים');
     } else if (typeof window.handleApiError === 'function') {
@@ -1137,7 +1137,7 @@ async function reactivateTradePlan(tradePlanId) {
       if (typeof window.updateTickerActiveTradesStatus === 'function') {
         await window.updateTickerActiveTradesStatus(tradePlan.ticker_id);
       } else {
-        // console.warn('⚠️ updateTickerActiveTradesStatus function not available');
+        // window.Logger.warn('⚠️ updateTickerActiveTradesStatus function not available', { page: "trade_plans" });
       }
     }
 
@@ -1319,18 +1319,18 @@ async function confirmDeleteTradePlan() {
  */
 function viewLinkedItemsForTradePlan(tradePlanId) {
   try {
-    console.log('🔗 Viewing linked items for trade plan:', tradePlanId);
+    window.Logger.info('🔗 Viewing linked items for trade plan:', tradePlanId, { page: "trade_plans" });
     
     if (typeof window.showLinkedItemsModal === 'function') {
       window.showLinkedItemsModal([], 'trade_plan', tradePlanId);
     } else {
-      console.warn('⚠️ showLinkedItemsModal function not available');
+      window.Logger.warn('⚠️ showLinkedItemsModal function not available', { page: "trade_plans" });
       if (typeof window.showErrorNotification === 'function') {
         window.showErrorNotification('שגיאה', 'מערכת הפריטים המקושרים לא זמינה', 4000, 'system');
       }
     }
   } catch (error) {
-    console.error('❌ Error viewing linked items:', error);
+    window.Logger.error('❌ Error viewing linked items:', error, { page: "trade_plans" });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה', 'שגיאה בהצגת פריטים מקושרים', 4000, 'system');
     }
@@ -1429,7 +1429,7 @@ async function loadTradePlansData() {
       return data;
     } else {
       // Fallback: load data directly from API
-      console.log('🔄 Loading trade plans data directly from API...');
+      window.Logger.info('🔄 Loading trade plans data directly from API...', { page: "trade_plans" });
       const response = await fetch('/api/trade_plans/');
       
       if (!response.ok) {
@@ -1444,10 +1444,10 @@ async function loadTradePlansData() {
       window.tradePlansLoaded = true;
       
       // Update the table
-      console.log(`🔄 Updating table with ${data.length} trade plans...`);
+      window.Logger.info(`🔄 Updating table with ${data.length} trade plans...`, { page: "trade_plans" });
       updateTradePlansTable(data);
       
-      console.log(`✅ Loaded ${data.length} trade plans`);
+      window.Logger.info(`✅ Loaded ${data.length} trade plans`, { page: "trade_plans" });
       return data;
     }
   } catch (error) {
@@ -1540,10 +1540,10 @@ function filterTradePlansData(filters) {
  */
 function updateTradePlansTable(trade_plans) {
   // === UPDATE TRADE PLANS TABLE FUNCTION CALLED ===
-  console.log(`🔄 updateTradePlansTable called with ${trade_plans ? trade_plans.length : 0} trade plans`);
+  window.Logger.info(`🔄 updateTradePlansTable called with ${trade_plans ? trade_plans.length : 0} trade plans`, { page: "trade_plans" });
 
   const tbody = document.querySelector('#trade_plansTable tbody');
-  console.log(`🔍 Looking for tbody:`, tbody);
+  window.Logger.info(`🔍 Looking for tbody:`, tbody, { page: "trade_plans" });
   // Looking for table body
 
   if (!tbody) {
@@ -1552,10 +1552,10 @@ function updateTradePlansTable(trade_plans) {
   }
 
   // Checking if there is data to display
-  console.log(`🔍 Checking data: trade_plans =`, trade_plans, `length =`, trade_plans?.length);
-  console.log(`🔍 Condition check: !trade_plans =`, !trade_plans, `trade_plans.length === 0 =`, trade_plans?.length === 0);
+  window.Logger.info(`🔍 Checking data: trade_plans =`, trade_plans, `length =`, trade_plans?.length, { page: "trade_plans" });
+  window.Logger.info(`🔍 Condition check: !trade_plans =`, !trade_plans, `trade_plans.length === 0 =`, trade_plans?.length === 0, { page: "trade_plans" });
   if (!trade_plans || trade_plans.length === 0) {
-    console.log(`❌ No data to display - entering error condition`);
+    window.Logger.info(`❌ No data to display - entering error condition`, { page: "trade_plans" });
     // No trade plans to display
 
     // Checking if it's because of filters or if there are no data at all
@@ -1624,7 +1624,7 @@ function updateTradePlansTable(trade_plans) {
     return;
   }
 
-  console.log(`✅ Data exists, proceeding to build table HTML`);
+  window.Logger.info(`✅ Data exists, proceeding to build table HTML`, { page: "trade_plans" });
   const tableHTML = trade_plans.map((design, index) => {
     try {
       // Safeguarding against invalid data
@@ -1695,7 +1695,7 @@ function updateTradePlansTable(trade_plans) {
                 return `<span class="date-text">${day}/${month}/${year}</span>`;
               }
             } catch (e) {
-              console.warn('Error parsing date:', design.created_at, e);
+              window.Logger.warn('Error parsing date:', design.created_at, e, { page: "trade_plans" });
             }
           }
           return `<span class="date-text">-</span>`;
@@ -1807,7 +1807,7 @@ function updateTradePlansTable(trade_plans) {
         <td class="actions-cell">
           ${(() => {
             if (!window.createActionsMenu) {
-              console.error('❌ createActionsMenu לא זמינה!');
+              window.Logger.error('❌ createActionsMenu לא זמינה!', { page: "trade_plans" });
               return `<div class="alert alert-danger">שגיאה: מערכת התפריט לא זמינה</div>`;
             }
             
@@ -1821,13 +1821,13 @@ function updateTradePlansTable(trade_plans) {
               ]);
               
               if (!result || result.trim().length === 0) {
-                console.error('❌ createActionsMenu החזירה תוצאה ריקה!');
+                window.Logger.error('❌ createActionsMenu החזירה תוצאה ריקה!', { page: "trade_plans" });
                 return `<div class="alert alert-warning">אזהרה: תפריט הפעולות לא נוצר</div>`;
               }
               
               return result;
             } catch (error) {
-              console.error('❌ שגיאה ביצירת תפריט פעולות:', error);
+              window.Logger.error('❌ שגיאה ביצירת תפריט פעולות:', error, { page: "trade_plans" });
               return `<div class="alert alert-danger">שגיאה: ${error.message}</div>`;
             }
           })()}
@@ -1835,15 +1835,15 @@ function updateTradePlansTable(trade_plans) {
       </tr>
     `;
     } catch (error) {
-      console.error(`❌ Error processing design ${index + 1}:`, error);
+      window.Logger.error(`❌ Error processing design ${index + 1}:`, error, { page: "trade_plans" });
       return `<tr><td colspan="11" class="text-center text-danger">שגיאה בעיבוד תכנון ${index + 1}</td></tr>`;
     }
   }).join('');
 
-  console.log(`🔄 Table HTML built successfully, length: ${tableHTML.length}`);
-  console.log(`🔄 Setting tbody.innerHTML with ${trade_plans.length} rows`);
+  window.Logger.info(`🔄 Table HTML built successfully, length: ${tableHTML.length}`, { page: "trade_plans" });
+  window.Logger.info(`🔄 Setting tbody.innerHTML with ${trade_plans.length} rows`, { page: "trade_plans" });
   tbody.innerHTML = tableHTML;
-  console.log(`✅ Table updated successfully`);
+  window.Logger.info(`✅ Table updated successfully`, { page: "trade_plans" });
 
       // Updating record count
     const countElement = document.querySelector('#trade_plansCount');
@@ -1956,13 +1956,13 @@ function updatePageSummaryStats() {
  * הצגת מודל הוספת תכנון
  */
 async function showAddTradePlanModal() {
-  console.log('🚀 showAddTradePlanModal: Starting modal preparation...');
-  console.log('🔍 showAddTradePlanModal: Checking if modal is already open...');
+  window.Logger.info('🚀 showAddTradePlanModal: Starting modal preparation...', { page: "trade_plans" });
+  window.Logger.info('🔍 showAddTradePlanModal: Checking if modal is already open...', { page: "trade_plans" });
   
   // Check if modal is already open
   const existingModal = document.querySelector('#addTradePlanModal.show');
   if (existingModal) {
-    console.log('⚠️ showAddTradePlanModal: Modal already open, closing first...');
+    window.Logger.info('⚠️ showAddTradePlanModal: Modal already open, closing first...', { page: "trade_plans" });
     const modal = bootstrap.Modal.getInstance(existingModal);
     if (modal) modal.hide();
   }
@@ -1970,16 +1970,16 @@ async function showAddTradePlanModal() {
   // Clearing the form completely
   const form = document.getElementById('addTradePlanForm');
   if (form) {
-    console.log('✅ showAddTradePlanModal: Form found, starting reset...');
+    window.Logger.info('✅ showAddTradePlanModal: Form found, starting reset...', { page: "trade_plans" });
     form.reset();
 
     // Clear all form fields manually to ensure complete reset
     const allInputs = form.querySelectorAll('input, select, textarea');
-    console.log(`🔧 showAddTradePlanModal: Clearing ${allInputs.length} form inputs...`);
+    window.Logger.info(`🔧 showAddTradePlanModal: Clearing ${allInputs.length} form inputs...`, { page: "trade_plans" });
     allInputs.forEach(input => {
       // Clear all inputs except date (which will be set later)
       if (input.type !== 'date') {
-        console.log(`🔧 Clearing input: ${input.id || input.name || input.type} (old value: "${input.value}")`);
+        window.Logger.info(`🔧 Clearing input: ${input.id || input.name || input.type} (old value: "${input.value}", { page: "trade_plans" })`);
         input.value = '';
       }
       // Remove validation classes
@@ -2032,14 +2032,14 @@ async function showAddTradePlanModal() {
   }
 
   // Loading tickers with default from preferences
-  console.log('🔄 showAddTradePlanModal: Loading tickers with SelectPopulatorService...');
+  window.Logger.info('🔄 showAddTradePlanModal: Loading tickers with SelectPopulatorService...', { page: "trade_plans" });
   await SelectPopulatorService.populateTickersSelect('ticker', {
     includeEmpty: true,
     emptyText: 'בחר טיקר',
     defaultFromPreferences: true,
     filterFn: (ticker) => ticker.status === 'open' || ticker.status === 'closed'
   });
-  console.log('✅ showAddTradePlanModal: Tickers loaded with SelectPopulatorService');
+  window.Logger.info('✅ showAddTradePlanModal: Tickers loaded with SelectPopulatorService', { page: "trade_plans" });
 
 
   // Clear any existing validation errors
@@ -2048,25 +2048,25 @@ async function showAddTradePlanModal() {
   }
 
   // Ensure ticker select is reset to default AFTER loading tickers
-  console.log('🔄 showAddTradePlanModal: Resetting ticker select...');
+  window.Logger.info('🔄 showAddTradePlanModal: Resetting ticker select...', { page: "trade_plans" });
   const tickerSelect = document.getElementById('ticker');
   if (tickerSelect) {
-    console.log(`🔧 showAddTradePlanModal: Ticker select found, current value: "${tickerSelect.value}"`);
+    window.Logger.info(`🔧 showAddTradePlanModal: Ticker select found, current value: "${tickerSelect.value}"`, { page: "trade_plans" });
     
     // Add event listener for ticker selection
     tickerSelect.addEventListener('change', function() {
-      console.log('🎯 Ticker selected:', this.value);
+      window.Logger.info('🎯 Ticker selected:', this.value, { page: "trade_plans" });
       if (this.value) {
         // Enable all form fields
         enableFormFields();
-        console.log('✅ Form fields enabled after ticker selection');
+        window.Logger.info('✅ Form fields enabled after ticker selection', { page: "trade_plans" });
         
         // Load and display ticker info
         loadTickerInfo(this.value);
       } else {
         // Disable form fields
         disableFormFields();
-        console.log('❌ Form fields disabled - no ticker selected');
+        window.Logger.info('❌ Form fields disabled - no ticker selected', { page: "trade_plans" });
         
         // Hide ticker info
         hideTickerInfo();
@@ -2090,31 +2090,31 @@ async function showAddTradePlanModal() {
     }
     
     tickerSelect.value = '';
-    console.log(`🔧 showAddTradePlanModal: Ticker select reset, new value: "${tickerSelect.value}"`);
+    window.Logger.info(`🔧 showAddTradePlanModal: Ticker select reset, new value: "${tickerSelect.value}"`, { page: "trade_plans" });
     // Trigger change event to ensure any dependent fields are updated
     tickerSelect.dispatchEvent(new Event('change'));
-    console.log('✅ showAddTradePlanModal: Ticker select change event triggered');
+    window.Logger.info('✅ showAddTradePlanModal: Ticker select change event triggered', { page: "trade_plans" });
   } else {
-    console.log('❌ showAddTradePlanModal: Ticker select not found');
+    window.Logger.info('❌ showAddTradePlanModal: Ticker select not found', { page: "trade_plans" });
   }
 
   // Wait a moment for the DOM to update, then display the modal
-  console.log('⏳ showAddTradePlanModal: Waiting 100ms before showing modal...');
+  window.Logger.info('⏳ showAddTradePlanModal: Waiting 100ms before showing modal...', { page: "trade_plans" });
   setTimeout(() => {
-    console.log('🔄 showAddTradePlanModal: Timeout completed, showing modal...');
+    window.Logger.info('🔄 showAddTradePlanModal: Timeout completed, showing modal...', { page: "trade_plans" });
     const addModalElement = document.getElementById('addTradePlanModal');
     if (addModalElement) {
-      console.log('✅ showAddTradePlanModal: Modal element found, creating Bootstrap modal...');
+      window.Logger.info('✅ showAddTradePlanModal: Modal element found, creating Bootstrap modal...', { page: "trade_plans" });
       const modal = new bootstrap.Modal(addModalElement);
-      console.log('🎬 showAddTradePlanModal: Showing modal...');
+      window.Logger.info('🎬 showAddTradePlanModal: Showing modal...', { page: "trade_plans" });
       modal.show();
-      console.log('✅ showAddTradePlanModal: Modal show() called');
+      window.Logger.info('✅ showAddTradePlanModal: Modal show(, { page: "trade_plans" }) called');
       
       // Setup price calculation functionality
       setTimeout(() => {
         if (typeof window.setupPriceCalculation === 'function') {
           window.setupPriceCalculation();
-          console.log('✅ showAddTradePlanModal: Price calculation setup completed');
+          window.Logger.info('✅ showAddTradePlanModal: Price calculation setup completed', { page: "trade_plans" });
         }
       }, 100);
       
@@ -2122,11 +2122,11 @@ async function showAddTradePlanModal() {
       setTimeout(() => {
         const tickerInputAfterModal = document.getElementById('ticker');
         if (tickerInputAfterModal) {
-          console.log(`🔍 showAddTradePlanModal: Ticker input value after modal shown: "${tickerInputAfterModal.value}"`);
+          window.Logger.info(`🔍 showAddTradePlanModal: Ticker input value after modal shown: "${tickerInputAfterModal.value}"`, { page: "trade_plans" });
         }
       }, 200);
     } else {
-      console.log('❌ showAddTradePlanModal: Modal element not found');
+      window.Logger.info('❌ showAddTradePlanModal: Modal element not found', { page: "trade_plans" });
     }
   }, 100);
 
@@ -2300,7 +2300,7 @@ async function showAddTradePlanModal() {
       setTimeout(() => {
         if (typeof window.setupEditPriceCalculation === 'function') {
           window.setupEditPriceCalculation();
-          console.log('✅ openEditTradePlanModal: Edit price calculation setup completed');
+          window.Logger.info('✅ openEditTradePlanModal: Edit price calculation setup completed', { page: "trade_plans" });
         }
       }, 100);
     } else {
@@ -2311,7 +2311,7 @@ async function showAddTradePlanModal() {
       setTimeout(() => {
         if (typeof window.setupEditPriceCalculation === 'function') {
           window.setupEditPriceCalculation();
-          console.log('✅ openEditTradePlanModal: Edit price calculation setup completed');
+          window.Logger.info('✅ openEditTradePlanModal: Edit price calculation setup completed', { page: "trade_plans" });
         }
       }, 100);
     }
@@ -2702,7 +2702,7 @@ function isDateValue(value) {
 function restoreSortState() {
   // Check if data is available
   if (!window.tradePlansData || window.tradePlansData.length === 0) {
-    console.log('⚠️ No trade plans data available for sort restoration');
+    window.Logger.info('⚠️ No trade plans data available for sort restoration', { page: "trade_plans" });
     return;
   }
 
@@ -2768,11 +2768,11 @@ function getTypeClass(type) {
  */
 async function loadUserPreferences() {
   try {
-    console.log('📋 Loading user preferences for trade_plans...');
+    window.Logger.info('📋 Loading user preferences for trade_plans...', { page: "trade_plans" });
     
     // נסה ראשית מערכת  גלובלית
     if (typeof window.getCurrentPreference === 'function') {
-      console.log('✅ Using global preferences system');
+      window.Logger.info('✅ Using global preferences system', { page: "trade_plans" });
       return {
         timezone: await window.getCurrentPreference('timezone') || 'Asia/Jerusalem',
         primaryCurrency: await window.getCurrentPreference('primaryCurrency') || 'USD',
@@ -2786,7 +2786,7 @@ async function loadUserPreferences() {
       if (newResponse.ok) {
         const newData = await newResponse.json();
         if (newData.success && newData.data.preferences) {
-          console.log('✅ Using new API preferences');
+          window.Logger.info('✅ Using new API preferences', { page: "trade_plans" });
           const prefs = newData.data.preferences;
           return {
             timezone: prefs.general?.timezone || 'Asia/Jerusalem',
@@ -2797,7 +2797,7 @@ async function loadUserPreferences() {
         }
       }
     } catch (newError) {
-      console.log('🔄 New API not available, trying fallback...');
+      window.Logger.info('🔄 New API not available, trying fallback...', { page: "trade_plans" });
     }
     
     // Fallback ל-API
@@ -2805,11 +2805,11 @@ async function loadUserPreferences() {
       const response = await fetch('/api/preferences/user');
       if (response.ok) {
         const preferences = await response.json();
-        console.log('✅ Using API preferences');
+        window.Logger.info('✅ Using API preferences', { page: "trade_plans" });
         return preferences;
       }
     } catch (migrationError) {
-      console.log('🔄 API not available, trying local config...');
+      window.Logger.info('🔄 API not available, trying local config...', { page: "trade_plans" });
     }
     
     // Fallback אחרון - קובץ JSON מקומי (legacy)
@@ -2817,15 +2817,15 @@ async function loadUserPreferences() {
       const response = await fetch('/api/preferences/user');
       if (response.ok) {
         const preferences = await response.json();
-        console.log('🔄 Using local JSON preferences (legacy)');
+        window.Logger.info('🔄 Using local JSON preferences (legacy, { page: "trade_plans" })');
         return preferences.user || preferences.defaults;
       }
     } catch (error) {
-      console.error('❌ Error loading preferences:', error);
+      window.Logger.error('❌ Error loading preferences:', error, { page: "trade_plans" });
     }
   
   // ברירת מחדל
-  console.log('🔄 Using default preferences');
+  window.Logger.info('🔄 Using default preferences', { page: "trade_plans" });
   return {
     timezone: 'Asia/Jerusalem',
     primaryCurrency: 'USD',
@@ -3162,15 +3162,15 @@ window.getCurrentEditPlanId = getCurrentEditPlanId;
  */
 function initializeTradePlanConditionsSystem() {
     try {
-        console.log('🔧 Initializing trade plans conditions system...');
+        window.Logger.info('🔧 Initializing trade plans conditions system...', { page: "trade_plans" });
         
         // Setup modal event listeners for automatic conditions initialization
         setupTradePlanModalListeners();
         
-        console.log('✅ Trade plans conditions system initialized');
+        window.Logger.info('✅ Trade plans conditions system initialized', { page: "trade_plans" });
         
     } catch (error) {
-        console.error('❌ Failed to initialize trade plans conditions system:', error);
+        window.Logger.error('❌ Failed to initialize trade plans conditions system:', error, { page: "trade_plans" });
     }
 }
 
@@ -3212,11 +3212,11 @@ function setupTradePlanModalListeners() {
  */
 function initializeTradePlanConditions(mode, planId = null) {
     try {
-        console.log(`🔧 Initializing trade plan conditions for ${mode} mode, planId: ${planId}`);
+        window.Logger.info(`🔧 Initializing trade plan conditions for ${mode} mode, planId: ${planId}`, { page: "trade_plans" });
         
         // Check if ConditionBuilder is available
         if (typeof ConditionBuilder === 'undefined') {
-            console.warn('⚠️ ConditionBuilder not available, skipping conditions initialization');
+            window.Logger.warn('⚠️ ConditionBuilder not available, skipping conditions initialization', { page: "trade_plans" });
             return false;
         }
         
@@ -3230,11 +3230,11 @@ function initializeTradePlanConditions(mode, planId = null) {
         const globalKey = `${mode}PlanConditionBuilder`;
         window[globalKey] = conditionBuilder;
         
-        console.log(`✅ Trade plan conditions initialized for ${mode} mode`);
+        window.Logger.info(`✅ Trade plan conditions initialized for ${mode} mode`, { page: "trade_plans" });
         return true;
         
     } catch (error) {
-        console.error('❌ Failed to initialize trade plan conditions:', error);
+        window.Logger.error('❌ Failed to initialize trade plan conditions:', error, { page: "trade_plans" });
         return false;
     }
 }
@@ -3252,10 +3252,10 @@ function cleanupTradePlanConditions(mode) {
                 window[globalKey].cleanup();
             }
             delete window[globalKey];
-            console.log(`✅ Trade plan conditions cleaned up for ${mode} mode`);
+            window.Logger.info(`✅ Trade plan conditions cleaned up for ${mode} mode`, { page: "trade_plans" });
         }
     } catch (error) {
-        console.error('❌ Failed to cleanup trade plan conditions:', error);
+        window.Logger.error('❌ Failed to cleanup trade plan conditions:', error, { page: "trade_plans" });
     }
 }
 
@@ -3271,14 +3271,14 @@ function getCurrentEditPlanId() {
 
 // Initialize trade plans page - integrated with unified system
 window.initializeTradePlansPage = async function() {
-  console.log('📋 Trade plans page initialized via unified system');
+  window.Logger.info('📋 Trade plans page initialized via unified system', { page: "trade_plans" });
 
   // Initialize Cache Manager if not already initialized
   if (typeof window.UnifiedCacheManager !== 'undefined' && typeof window.UnifiedCacheManager.initialize === 'function') {
     try {
       await window.UnifiedCacheManager.initialize();
     } catch (error) {
-      console.log('⚠️ Cache Manager initialization failed:', error);
+      window.Logger.info('⚠️ Cache Manager initialization failed:', error, { page: "trade_plans" });
     }
   }
 
@@ -3618,7 +3618,7 @@ function toggleSection() {
     if (typeof window.toggleSection === 'function') {
         window.toggleSection();
     } else {
-        console.warn('toggleSection function not found');
+        window.Logger.warn('toggleSection function not found', { page: "trade_plans" });
     }
 }
 
@@ -4097,11 +4097,11 @@ function generateDetailedLog() {
 
 
 // Export log functions to global scope
-// window.copyDetailedLog export removed - using global version from system-management.js
+// window. export removed - using global version from system-management.js
 // window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 
-// Local copyDetailedLog function for trade_plans page
-async function copyDetailedLog() {
+// Local  function for trade_plans page
+async function  {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {
@@ -4119,7 +4119,7 @@ async function copyDetailedLog() {
             }
         }
     } catch (err) {
-        console.error('שגיאה בהעתקה:', err);
+        window.Logger.error('שגיאה בהעתקה:', err, { page: "trade_plans" });
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה בהעתקת הלוג');
         } else {
@@ -4145,7 +4145,7 @@ async function copyDetailedLog() {
 // פונקציה לסינון תכנונים לפי סוג
 function filterTradePlansByType(type) {
   if (!window.trade_plansData) {
-    console.warn('⚠️ אין נתוני תכנונים זמינים לסינון');
+    window.Logger.warn('⚠️ אין נתוני תכנונים זמינים לסינון', { page: "trade_plans" });
     return;
   }
 

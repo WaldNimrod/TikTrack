@@ -969,7 +969,7 @@ window.changeChartTheme = changeChartTheme;
 window.toggleAutoRefresh = toggleAutoRefresh;
 window.exportAllCharts = exportAllCharts;
 window.exportSelectedCharts = exportSelectedCharts;
-// window.copyDetailedLog export removed - using global version from system-management.js
+// window. export removed - using global version from system-management.js
 // window.generateDetailedLog export removed - local function only
 window.createTestChart = createTestChart;
 window.createPerformanceChart = createPerformanceChart;

@@ -1494,7 +1494,7 @@ function initializeJsMapPage() {
  * Copy detailed log using global system
  * מעתיק לוג מפורט באמצעות המערכת הכללית
  */
-async function copyDetailedLog() {
+async function  {
     console.log('📋 Copying JS-Map detailed log...');
     
     try {
@@ -2852,11 +2852,11 @@ window.initializeDevelopmentSections = initializeDevelopmentSections;
 window.toggleDevelopmentSection = toggleDevelopmentSection;
 
 // Export log and refresh functions
-window.copyDetailedLog = copyDetailedLog;
-// // window.copyDetailedLog export removed - using global version from system-management.js
+window. = ;
+// // window. export removed - using global version from system-management.js
 
-// Local copyDetailedLog function for js-map page
-async function copyDetailedLog() {
+// Local  function for js-map page
+async function  {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {

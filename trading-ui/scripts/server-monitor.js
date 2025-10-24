@@ -383,7 +383,7 @@ class ServerMonitor {
   }
 
   // העתקת לוג מפורט
-  copyDetailedLog() {
+   {
     try {
       console.log('📋 ServerMonitor - מעתיק לוג מפורט');
       
@@ -1488,15 +1488,15 @@ window.serverMonitor = new ServerMonitor();
 
 // ===== GLOBAL FUNCTION EXPORTS =====
 
-// window.copyDetailedLog export removed - using global version from system-management.js
+// window. export removed - using global version from system-management.js
 // window.toggleAllSections export removed - using global version from ui-utils.js
 // window.toggleSection export removed - using global version from ui-utils.js
 
 // הוספת פונקציות גלובליות
-// Local copyDetailedLog function for server-monitor page
-async function copyDetailedLog() {
+// Local  function for server-monitor page
+async function  {
   if (window.serverMonitor) {
-    return window.serverMonitor.copyDetailedLog();
+    return window.serverMonitor.;
   } else {
     console.error('❌ serverMonitor instance לא קיים');
     if (window.showErrorNotification) {
@@ -1713,7 +1713,7 @@ function generateDetailedLog() {
  */
 
 // ייצוא לגלובל scope
-// window.copyDetailedLog export removed - using global version from system-management.js
+// window. export removed - using global version from system-management.js
 
 // ===== GLOBAL FUNCTION EXPORTS FOR SERVER MONITOR PAGE =====
 
@@ -2906,7 +2906,7 @@ function setupMonitoringEventListeners() {
   const pauseBtn = document.getElementById('pauseMonitoringBtn');
   const stopBtn = document.getElementById('stopMonitoringBtn');
   const analysisBtn = document.getElementById('monitoringAnalysisBtn');
-  const copyLogBtn = document.getElementById('copyDetailedLogBtn');
+  const copyLogBtn = document.getElementById('Btn');
   
   if (startBtn) {
     startBtn.addEventListener('click', window.startMonitoring);
@@ -2925,7 +2925,7 @@ function setupMonitoringEventListeners() {
   }
   
   if (copyLogBtn) {
-    copyLogBtn.addEventListener('click', window.copyDetailedLog);
+    copyLogBtn.addEventListener('click', window.);
   }
 }
 

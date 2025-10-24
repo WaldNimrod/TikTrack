@@ -45,7 +45,7 @@ class EntityDetailsRenderer {
         
         // אתחול async (לא-בלוקינג)
         this.init().catch(error => {
-            console.error('❌ EntityDetailsRenderer initialization failed:', error);
+            window.Logger.error('❌ EntityDetailsRenderer initialization failed:', error, { page: "entity-details-renderer" });
         });
     }
 
@@ -65,10 +65,10 @@ class EntityDetailsRenderer {
             // הוספה לאובייקט הגלובלי
             window.entityDetailsRenderer = this;
             
-            console.info('✅ EntityDetailsRenderer initialized successfully with preferences support');
+            window.Logger.info('✅ EntityDetailsRenderer initialized successfully with preferences support', { page: "entity-details-renderer" });
             
         } catch (error) {
-            console.error('❌ Error initializing EntityDetailsRenderer:', error);
+            window.Logger.error('❌ Error initializing EntityDetailsRenderer:', error, { page: "entity-details-renderer" });
         }
     }
 
@@ -93,17 +93,17 @@ class EntityDetailsRenderer {
 
         // ניסיון לטעון צבעים מהעדפות ראשית
         try {
-            console.log('🎨 Loading entity colors from preferences...');
-            console.log('🔍 Debug - window.ENTITY_COLORS:', window.ENTITY_COLORS);
-            console.log('🔍 Debug - window.currentPreferences:', window.currentPreferences);
-            console.log('🔍 Debug - window.userPreferences:', window.userPreferences);
+            window.Logger.info('🎨 Loading entity colors from preferences...', { page: "entity-details-renderer" });
+            window.Logger.info('🔍 Debug - window.ENTITY_COLORS:', window.ENTITY_COLORS, { page: "entity-details-renderer" });
+            window.Logger.info('🔍 Debug - window.currentPreferences:', window.currentPreferences, { page: "entity-details-renderer" });
+            window.Logger.info('🔍 Debug - window.userPreferences:', window.userPreferences, { page: "entity-details-renderer" });
             
             // נסה מערכת העדפות
             if (window.preferences && window.preferences.preferences && window.preferences.preferences.colorScheme) {
                 const colorScheme = window.preferences.preferences.colorScheme;
                 if (colorScheme.entities) {
                     Object.assign(this.entityColors, colorScheme.entities);
-                    console.log('✅ Loaded entity colors from preferences system');
+                    window.Logger.info('✅ Loaded entity colors from preferences system', { page: "entity-details-renderer" });
                     return;
                 }
             }
@@ -111,21 +111,21 @@ class EntityDetailsRenderer {
             // נסה מערכת currentPreferences
             if (window.currentPreferences && window.currentPreferences.entityColors) {
                 Object.assign(this.entityColors, window.currentPreferences.entityColors);
-                console.log('✅ Loaded entity colors from currentPreferences');
+                window.Logger.info('✅ Loaded entity colors from currentPreferences', { page: "entity-details-renderer" });
                 return;
             }
             
             // נסה מערכת גלובלית (compatibility layer)
             if (window.ENTITY_COLORS && Object.keys(window.ENTITY_COLORS).length > 0) {
                 Object.assign(this.entityColors, window.ENTITY_COLORS);
-                console.log('✅ Loaded entity colors from global system');
+                window.Logger.info('✅ Loaded entity colors from global system', { page: "entity-details-renderer" });
                 return;
             }
             
             // Fallback ל-userPreferences
             if (window.userPreferences && window.userPreferences.entityColors) {
                 Object.assign(this.entityColors, window.userPreferences.entityColors);
-                console.log('✅ Loaded entity colors from userPreferences');
+                window.Logger.info('✅ Loaded entity colors from userPreferences', { page: "entity-details-renderer" });
                 return;
             }
             
@@ -135,19 +135,19 @@ class EntityDetailsRenderer {
                     const preferences = await window.loadPreferences();
                     if (preferences && preferences.entityColors) {
                         Object.assign(this.entityColors, preferences.entityColors);
-                        console.log('✅ Loaded entity colors from loadPreferences');
+                        window.Logger.info('✅ Loaded entity colors from loadPreferences', { page: "entity-details-renderer" });
                         return;
                     }
                 }
             } catch (prefError) {
-                console.debug('loadPreferences not available, using defaults');
+                window.Logger.debug('loadPreferences not available, using defaults', { page: "entity-details-renderer" });
             }
             
         } catch (error) {
-            console.debug('Could not load entity colors from preferences, using defaults');
+            window.Logger.debug('Could not load entity colors from preferences, using defaults', { page: "entity-details-renderer" });
         }
         
-        console.log('🔄 Using default entity colors');
+        window.Logger.info('🔄 Using default entity colors', { page: "entity-details-renderer" });
     }
 
     /**
@@ -188,7 +188,7 @@ class EntityDetailsRenderer {
             }
 
         } catch (error) {
-            console.error('Error rendering entity details:', error);
+            window.Logger.error('Error rendering entity details:', error, { page: "entity-details-renderer" });
             return this.renderError(`שגיאה ברנדור: ${error.message}`);
         }
     }
@@ -202,7 +202,7 @@ class EntityDetailsRenderer {
      * @public
      */
     renderTicker(tickerData, options = {}) {
-        console.log(`🎨 Rendering ticker data:`, tickerData);
+        window.Logger.info(`🎨 Rendering ticker data:`, tickerData, { page: "entity-details-renderer" });
         
         // קבלת צבע הטיקר מההעדפות
         const tickerColor = this.entityColors.ticker || '#019193';
@@ -392,10 +392,10 @@ class EntityDetailsRenderer {
      * Render market data - רנדור נתוני שוק
      */
     renderMarketData(tickerData, entityColor = '#019193') {
-        console.log(`📈 Rendering market data for:`, tickerData);
+        window.Logger.info(`📈 Rendering market data for:`, tickerData, { page: "entity-details-renderer" });
         // בדיקה אם יש נתונים חיצוניים
         const hasExternalData = tickerData.current_price || tickerData.change_percent || tickerData.volume || tickerData.yahoo_updated_at;
-        console.log(`📈 Has external data:`, hasExternalData);
+        window.Logger.info(`📈 Has external data:`, hasExternalData, { page: "entity-details-renderer" });
         
         if (!hasExternalData) {
             return `
@@ -579,10 +579,10 @@ class EntityDetailsRenderer {
      * Render linked items - רנדור פריטים מקושרים
      */
     renderLinkedItems(linkedItems, entityColor = '#019193') {
-        console.log(`🔗 Rendering linked items:`, linkedItems);
+        window.Logger.info(`🔗 Rendering linked items:`, linkedItems, { page: "entity-details-renderer" });
         // בדיקה אם יש פריטים מקושרים
         const hasLinkedItems = linkedItems && linkedItems.length > 0;
-        console.log(`🔗 Has linked items:`, hasLinkedItems);
+        window.Logger.info(`🔗 Has linked items:`, hasLinkedItems, { page: "entity-details-renderer" });
         
         // מיון הפריטים המקושרים: פתוח ראשון, ואז לפי תאריך
         if (hasLinkedItems) {
@@ -1126,7 +1126,7 @@ class EntityDetailsRenderer {
 
     renderTradeSpecific(tradeData) { return '<div>פרטי טרייד</div>'; }
     renderTradePlan(tradePlanData, options = {}) {
-        console.log(`🎨 Rendering trade plan data:`, tradePlanData);
+        window.Logger.info(`🎨 Rendering trade plan data:`, tradePlanData, { page: "entity-details-renderer" });
         
         // קבלת צבע התוכנית מההעדפות
         const planColor = this.entityColors.trade_plan || '#6f42c1';
@@ -1162,7 +1162,7 @@ class EntityDetailsRenderer {
     renderExecution(executionData, options) { return '<div>ביצוע עסקה</div>'; }
     
     renderAccount(accountData, options = {}) {
-        console.log(`🎨 Rendering account data:`, accountData);
+        window.Logger.info(`🎨 Rendering account data:`, accountData, { page: "entity-details-renderer" });
         
         // קבלת צבע החשבון מההעדפות
         const accountColor = this.entityColors.account || '#28a745';
@@ -1196,7 +1196,7 @@ class EntityDetailsRenderer {
     }
     renderAlert(alertData, options) {
         try {
-            console.log('🎨 Rendering alert data:', alertData);
+            window.Logger.info('🎨 Rendering alert data:', alertData, { page: "entity-details-renderer" });
             
             // יצירת כותרת המודול
             const header = this.renderEntityHeader('התראה', alertData.id || 'לא זמין', this.entityColors.alert);
@@ -1230,7 +1230,7 @@ class EntityDetailsRenderer {
             `;
             
         } catch (error) {
-            console.error('Error rendering alert:', error);
+            window.Logger.error('Error rendering alert:', error, { page: "entity-details-renderer" });
             return '<div class="alert alert-danger">שגיאה בטעינת פרטי ההתראה</div>';
         }
     }
@@ -1588,9 +1588,9 @@ class EntityDetailsRenderer {
 //         // אתחול מערכת הרנדור
         new EntityDetailsRenderer();
         
-        console.info('Entity Details Renderer system loaded and ready');
+        window.Logger.info('Entity Details Renderer system loaded and ready', { page: "entity-details-renderer" });
         
 //     } catch (error) {
-//         console.error('Error auto-initializing EntityDetailsRenderer:', error);
+//         window.Logger.error('Error auto-initializing EntityDetailsRenderer:', error, { page: "entity-details-renderer" });
 //     }
 // });

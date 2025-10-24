@@ -452,7 +452,7 @@ const PACKAGE_MANIFEST = {
       },
       {
         file: 'preferences-page.js',
-        globalCheck: 'window.copyDetailedLog',
+        globalCheck: 'window.',
         description: 'פונקציות ספציפיות לעמוד העדפות',
         required: false,
         loadOrder: 6

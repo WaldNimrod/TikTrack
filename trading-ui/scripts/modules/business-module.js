@@ -3098,11 +3098,11 @@ function generateDetailedLog() {
 
 
 // Export log functions to global scope
-// window.copyDetailedLog export removed - using global version from system-management.js
+// window. export removed - using global version from system-management.js
 // window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 
-// Local copyDetailedLog function for trades page
-async function copyDetailedLog() {
+// Local  function for trades page
+async function  {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {

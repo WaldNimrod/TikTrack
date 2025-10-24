@@ -115,7 +115,7 @@
             ניטור Linter בזמן אמת
           </div>
           <div class="table-actions">
-            <button data-button-type="COPY" data-variant="full" data-onclick="copyDetailedLog()" data-text="העתק לוג מפורט" title="העתק לוג מפורט עם כל הנתונים והסטטוס"></button>
+            <button data-button-type="COPY" data-variant="full" data-onclick="" data-text="העתק לוג מפורט" title="העתק לוג מפורט עם כל הנתונים והסטטוס"></button>
             ${createToggleButton("toggleSection('top')", "הצג/הסתר אזור סיכום", "filter-toggle-btn")}
           </div>
         </div>
@@ -1559,7 +1559,7 @@
             }
         }
 
-        function copyDetailedLog() {
+        function  {
             try {
                 const logContent = generateDetailedLog();
                 navigator.clipboard.writeText(logContent).then(() => {
@@ -1711,7 +1711,7 @@
             }
         }
 
-        function copyDetailedLog() {
+        function  {
             try {
                 const logContent = generateDetailedLog();
                 navigator.clipboard.writeText(logContent).then(() => {
@@ -1741,7 +1741,7 @@
         }
 
         // Export functions to global scope
-        window.copyDetailedLog = copyDetailedLog;
+        window. = ;
         window.generateDetailedLog = generateDetailedLog;
     </script>
 </body>

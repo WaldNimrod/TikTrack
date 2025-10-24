@@ -25,7 +25,7 @@
  * - PreferencesUI: Main coordinator
  */
 
-console.log('📄 Loading preferences-ui.js v1.0.0...');
+window.Logger.info('📄 Loading preferences-ui.js v1.0.0...', { page: "preferences-ui" });
 
 // ============================================================================
 // FORM MANAGER CLASS
@@ -81,7 +81,7 @@ class FormManager {
     collectFormData(formId = null) {
         const form = formId ? document.getElementById(formId) : document.querySelector('form');
         if (!form) {
-            console.warn('⚠️ No form found');
+            window.Logger.warn('⚠️ No form found', { page: "preferences-ui" });
             return {};
         }
         
@@ -110,7 +110,7 @@ class FormManager {
             formData[name] = value;
         });
         
-        console.log('📋 Collected form data:', formData);
+        window.Logger.info('📋 Collected form data:', formData, { page: "preferences-ui" });
         return formData;
     }
     
@@ -122,7 +122,7 @@ class FormManager {
     populateForm(data, formId = null) {
         const form = formId ? document.getElementById(formId) : document.querySelector('form');
         if (!form) {
-            console.warn('⚠️ No form found');
+            window.Logger.warn('⚠️ No form found', { page: "preferences-ui" });
             return;
         }
         
@@ -143,7 +143,7 @@ class FormManager {
             }
         });
         
-        console.log('📋 Populated form with data');
+        window.Logger.info('📋 Populated form with data', { page: "preferences-ui" });
     }
     
     /**
@@ -187,7 +187,7 @@ class FormManager {
             errors: errors
         };
         
-        console.log('✅ Form validation result:', result);
+        window.Logger.info('✅ Form validation result:', result, { page: "preferences-ui" });
         return result;
     }
     
@@ -198,12 +198,12 @@ class FormManager {
     resetForm(formId = null) {
         const form = formId ? document.getElementById(formId) : document.querySelector('form');
         if (!form) {
-            console.warn('⚠️ No form found');
+            window.Logger.warn('⚠️ No form found', { page: "preferences-ui" });
             return;
         }
         
         form.reset();
-        console.log('🔄 Form reset to defaults');
+        window.Logger.info('🔄 Form reset to defaults', { page: "preferences-ui" });
     }
 }
 
@@ -241,7 +241,7 @@ class UIManager {
         `;
         element.disabled = true;
         
-        console.log(`⏳ Loading state: ${elementId}`);
+        window.Logger.info(`⏳ Loading state: ${elementId}`, { page: "preferences-ui" });
     }
     
     /**
@@ -259,7 +259,7 @@ class UIManager {
             this.loadingStates.delete(elementId);
         }
         
-        console.log(`✅ Loading complete: ${elementId}`);
+        window.Logger.info(`✅ Loading complete: ${elementId}`, { page: "preferences-ui" });
     }
     
     /**
@@ -275,7 +275,7 @@ class UIManager {
         element.textContent = `${label}${value}`;
         this.counters.set(counterId, value);
         
-        console.log(`📊 Updated counter ${counterId}: ${value}`);
+        window.Logger.info(`📊 Updated counter ${counterId}: ${value}`, { page: "preferences-ui" });
     }
     
     /**
@@ -287,7 +287,7 @@ class UIManager {
         if (window.showSuccessNotification) {
             window.showSuccessNotification('הצלחה', message, duration);
         } else {
-            console.log(`✅ ${message}`);
+            window.Logger.info(`✅ ${message}`, { page: "preferences-ui" });
         }
     }
     
@@ -300,7 +300,7 @@ class UIManager {
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה', message, duration);
         } else {
-            console.error(`❌ ${message}`);
+            window.Logger.error(`❌ ${message}`, { page: "preferences-ui" });
         }
     }
     
@@ -313,7 +313,7 @@ class UIManager {
         if (window.showInfoNotification) {
             window.showInfoNotification('מידע', message, duration);
         } else {
-            console.log(`ℹ️ ${message}`);
+            window.Logger.info(`ℹ️ ${message}`, { page: "preferences-ui" });
         }
     }
     
@@ -329,7 +329,7 @@ class UIManager {
         const isVisible = visible !== null ? visible : section.style.display !== 'none';
         section.style.display = isVisible ? 'block' : 'none';
         
-        console.log(`👁️ Section ${sectionId}: ${isVisible ? 'visible' : 'hidden'}`);
+        window.Logger.info(`👁️ Section ${sectionId}: ${isVisible ? 'visible' : 'hidden'}`, { page: "preferences-ui" });
     }
     
     /**
@@ -350,7 +350,7 @@ class UIManager {
         statusElement.className = statusClasses[status] || '';
         statusElement.textContent = message;
         
-        console.log(`📋 Form status: ${status} - ${message}`);
+        window.Logger.info(`📋 Form status: ${status} - ${message}`, { page: "preferences-ui" });
     }
 }
 
@@ -380,7 +380,7 @@ class LoadingManager {
             window.showInfoNotification('טעינה', message);
         }
         
-        console.log(`⏳ Started loading: ${loaderId}`);
+        window.Logger.info(`⏳ Started loading: ${loaderId}`, { page: "preferences-ui" });
     }
     
     /**
@@ -399,7 +399,7 @@ class LoadingManager {
             window.showErrorNotification('שגיאה', message);
         }
         
-        console.log(`✅ Stopped loading: ${loaderId} (${success ? 'success' : 'error'})`);
+        window.Logger.info(`✅ Stopped loading: ${loaderId} (${success ? 'success' : 'error'}, { page: "preferences-ui" })`);
     }
     
     /**
@@ -444,7 +444,7 @@ class PreferencesUI {
      */
     async loadActiveProfile() {
         try {
-            console.log('🔍 Loading active profile from server...');
+            window.Logger.info('🔍 Loading active profile from server...', { page: "preferences-ui" });
             const response = await fetch('/api/preferences/profiles');
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -461,14 +461,14 @@ class PreferencesUI {
             }
             
             this.currentProfileId = activeProfile.id;
-            console.log(`✅ Active profile loaded: ${activeProfile.name} (ID: ${activeProfile.id})`);
+            window.Logger.info(`✅ Active profile loaded: ${activeProfile.name} (ID: ${activeProfile.id}, { page: "preferences-ui" })`);
             return activeProfile.id;
             
         } catch (error) {
-            console.error('❌ Error loading active profile:', error);
+            window.Logger.error('❌ Error loading active profile:', error, { page: "preferences-ui" });
             // Fallback to default profile
             this.currentProfileId = 1;
-            console.log('⚠️ Using fallback profile ID: 1');
+            window.Logger.info('⚠️ Using fallback profile ID: 1', { page: "preferences-ui" });
             return 1;
         }
     }
@@ -491,10 +491,10 @@ class PreferencesUI {
             
             // Update currentProfileId to match the loaded profile
             this.currentProfileId = profileId;
-            console.log(`✅ PreferencesUI currentProfileId updated to: ${profileId}`);
+            window.Logger.info(`✅ PreferencesUI currentProfileId updated to: ${profileId}`, { page: "preferences-ui" });
             
             // 🔍 Cache & Profile Debug Logging
-            console.log(`🔍 CACHE DEBUG: Loading preferences for user ${userId || this.currentUserId}, profile ${profileId || this.currentProfileId}`);
+            window.Logger.info(`🔍 CACHE DEBUG: Loading preferences for user ${userId || this.currentUserId}, profile ${profileId || this.currentProfileId}`, { page: "preferences-ui" });
             
             // Initialize lazy loading if available
             if (window.LazyLoader) {
@@ -505,11 +505,11 @@ class PreferencesUI {
                 
                 // Get loading stats
                 const stats = window.LazyLoader.getLoadingStats();
-                console.log(`🔍 CACHE DEBUG: Lazy loading stats: ${stats.loaded}/${stats.total} (${stats.percentage}%)`);
+                window.Logger.info(`🔍 CACHE DEBUG: Lazy loading stats: ${stats.loaded}/${stats.total} (${stats.percentage}%, { page: "preferences-ui" })`);
                 
                 // Load ALL preferences at once from API
                 const allPreferences = await window.PreferencesCore.getAllPreferences(userId || this.currentUserId, profileId || this.currentProfileId);
-                console.log(`✅ Loaded ${Object.keys(allPreferences).length} preferences from API`);
+                window.Logger.info(`✅ Loaded ${Object.keys(allPreferences, { page: "preferences-ui" }).length} preferences from API`);
                 
                 // Populate form with ALL preferences
                 this.formManager.populateForm(allPreferences);
@@ -523,7 +523,7 @@ class PreferencesUI {
                 this.loadingManager.stopLoading(loaderId, true, `נטענו ${Object.keys(allPreferences).length} העדפות`);
                 
             } else {
-                console.log('⚠️ LazyLoader not available, using standard loading');
+                window.Logger.info('⚠️ LazyLoader not available, using standard loading', { page: "preferences-ui" });
                 
                 // Load non-color preferences
                 const preferences = await window.PreferencesCore.getAllPreferences(
@@ -552,14 +552,14 @@ class PreferencesUI {
                 await this.updateCounters(preferences);
                 
                 // Load profiles to dropdown
-                console.log('🔄 Calling loadProfilesToDropdown...');
+                window.Logger.info('🔄 Calling loadProfilesToDropdown...', { page: "preferences-ui" });
                 await window.loadProfilesToDropdown();
                 
                 this.loadingManager.stopLoading(loaderId, true, 'העדפות נטענו בהצלחה');
             }
             
         } catch (error) {
-            console.error('❌ Error loading preferences:', error);
+            window.Logger.error('❌ Error loading preferences:', error, { page: "preferences-ui" });
             this.loadingManager.stopLoading(loaderId, false, 'שגיאה בטעינת העדפות');
             this.uiManager.showError('שגיאה בטעינת העדפות: ' + error.message);
         }
@@ -574,7 +574,7 @@ class PreferencesUI {
      */
     async saveAllPreferences(userId = null, profileId = null) {
         try {
-            console.log('💾 Starting save all preferences process...');
+            window.Logger.info('💾 Starting save all preferences process...', { page: "preferences-ui" });
             
             // 1. Get form element
             const form = document.getElementById('preferencesForm');
@@ -595,18 +595,18 @@ class PreferencesUI {
             
             // 4. Check if there are any changes
             if (Object.keys(changedPreferences).length === 0) {
-                console.log('ℹ️ No changes to save');
+                window.Logger.info('ℹ️ No changes to save', { page: "preferences-ui" });
                 if (typeof window.showInfoNotification === 'function') {
                     window.showInfoNotification('אין שינויים לשמירה');
                 }
                 return true;
             }
             
-            console.log(`📊 Found ${Object.keys(changedPreferences).length} changed preferences`);
+            window.Logger.info(`📊 Found ${Object.keys(changedPreferences, { page: "preferences-ui" }).length} changed preferences`);
             
             // 5. Validate all changed preferences
             for (let [name, value] of Object.entries(changedPreferences)) {
-                console.log(`🔍 Validating ${name}...`);
+                window.Logger.info(`🔍 Validating ${name}...`, { page: "preferences-ui" });
                 
                 if (window.PreferenceValidator) {
                     const validation = await window.PreferenceValidator.validatePreference(name, value);
@@ -617,7 +617,7 @@ class PreferencesUI {
                 }
             }
             
-            console.log('✅ All preferences validated successfully');
+            window.Logger.info('✅ All preferences validated successfully', { page: "preferences-ui" });
             
             // 6. Save to backend
             const response = await fetch('/api/preferences/user', {
@@ -639,14 +639,14 @@ class PreferencesUI {
                 throw new Error(result.error || 'Failed to save preferences');
             }
             
-            console.log('✅ Preferences saved successfully');
+            window.Logger.info('✅ Preferences saved successfully', { page: "preferences-ui" });
             
             // 7. Clear all cache layers via UnifiedCacheManager
             if (window.clearAllUnifiedCacheQuick) {
                 await window.clearAllUnifiedCacheQuick();
-                console.log('✅ All cache layers cleared');
+                window.Logger.info('✅ All cache layers cleared', { page: "preferences-ui" });
             } else {
-                console.log('⚠️ UnifiedCacheManager not available for cache clearing');
+                window.Logger.info('⚠️ UnifiedCacheManager not available for cache clearing', { page: "preferences-ui" });
             }
             
             // 8. Show success notification
@@ -655,7 +655,7 @@ class PreferencesUI {
             }
             
             // 9. Reload page after 1.5 seconds
-            console.log('🔄 Page will reload in 1.5 seconds...');
+            window.Logger.info('🔄 Page will reload in 1.5 seconds...', { page: "preferences-ui" });
             setTimeout(() => {
                 window.location.reload(true);
             }, 1500);
@@ -663,7 +663,7 @@ class PreferencesUI {
             return true;
             
         } catch (error) {
-            console.error('❌ Error saving preferences:', error);
+            window.Logger.error('❌ Error saving preferences:', error, { page: "preferences-ui" });
             
             if (typeof window.showErrorNotification === 'function') {
                 window.showErrorNotification(`שגיאה בשמירת העדפות: ${error.message}`);
@@ -706,7 +706,7 @@ class PreferencesUI {
             this.uiManager.showSuccess('העדפות אופסו לברירות מחדל');
             
         } catch (error) {
-            console.error('❌ Error resetting preferences:', error);
+            window.Logger.error('❌ Error resetting preferences:', error, { page: "preferences-ui" });
             this.uiManager.showError('שגיאה באיפוס העדפות: ' + error.message);
         }
     }
@@ -736,14 +736,14 @@ class PreferencesUI {
      */
     async updateStatistics(preferences) {
         try {
-            console.log('📊 Updating statistics...');
+            window.Logger.info('📊 Updating statistics...', { page: "preferences-ui" });
             
             // Update preferences count
             const preferencesCount = Object.keys(preferences).length;
             const preferencesCountElement = document.getElementById('preferencesCount');
             if (preferencesCountElement) {
                 preferencesCountElement.textContent = preferencesCount;
-                console.log(`📊 Updated preferences count: ${preferencesCount}`);
+                window.Logger.info(`📊 Updated preferences count: ${preferencesCount}`, { page: "preferences-ui" });
             }
             
             // Update profiles count
@@ -753,10 +753,10 @@ class PreferencesUI {
                 const profilesCountElement = document.getElementById('profilesCount');
                 if (profilesCountElement) {
                     profilesCountElement.textContent = profilesCount;
-                    console.log(`📊 Updated profiles count: ${profilesCount}`);
+                    window.Logger.info(`📊 Updated profiles count: ${profilesCount}`, { page: "preferences-ui" });
                 }
             } catch (error) {
-                console.error('❌ Error loading profiles count:', error);
+                window.Logger.error('❌ Error loading profiles count:', error, { page: "preferences-ui" });
                 const profilesCountElement = document.getElementById('profilesCount');
                 if (profilesCountElement) {
                     profilesCountElement.textContent = 'שגיאה';
@@ -772,22 +772,22 @@ class PreferencesUI {
                     const groupsCountElement = document.getElementById('groupsCount');
                     if (groupsCountElement) {
                         groupsCountElement.textContent = groupsCount;
-                        console.log(`📊 Updated groups count: ${groupsCount}`);
+                        window.Logger.info(`📊 Updated groups count: ${groupsCount}`, { page: "preferences-ui" });
                     }
                 } else {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
             } catch (error) {
-                console.error('❌ Error loading groups count:', error);
+                window.Logger.error('❌ Error loading groups count:', error, { page: "preferences-ui" });
                 const groupsCountElement = document.getElementById('groupsCount');
                 if (groupsCountElement) {
                     groupsCountElement.textContent = 'שגיאה';
                 }
             }
             
-            console.log('✅ Statistics updated successfully');
+            window.Logger.info('✅ Statistics updated successfully', { page: "preferences-ui" });
         } catch (error) {
-            console.error('❌ Error updating statistics:', error);
+            window.Logger.error('❌ Error updating statistics:', error, { page: "preferences-ui" });
         }
     }
     
@@ -851,7 +851,7 @@ window.saveAllPreferences = async function(userId = null, profileId = null) {
  */
 window.saveIndividualPreference = async function(preferenceName, value, userId = null, profileId = null) {
     try {
-        console.log(`💾 Saving individual preference: ${preferenceName} = ${value}`);
+        window.Logger.info(`💾 Saving individual preference: ${preferenceName} = ${value}`, { page: "preferences-ui" });
         
         // Validate
         if (window.PreferenceValidator) {
@@ -876,13 +876,13 @@ window.saveIndividualPreference = async function(preferenceName, value, userId =
                 window.showSuccessNotification(`העדפה "${preferenceName}" נשמרה בהצלחה`);
             }
             
-            console.log(`✅ Individual preference saved: ${preferenceName}`);
+            window.Logger.info(`✅ Individual preference saved: ${preferenceName}`, { page: "preferences-ui" });
             return true;
         }
         
         return false;
     } catch (error) {
-        console.error(`❌ Error saving individual preference ${preferenceName}:`, error);
+        window.Logger.error(`❌ Error saving individual preference ${preferenceName}:`, error, { page: "preferences-ui" });
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification(`שגיאה בשמירת העדפה: ${error.message}`);
         }
@@ -919,7 +919,7 @@ window.toggleSection = function(sectionName) {
  */
 window.loadProfilesToDropdown = async function() {
     try {
-        console.log('📂 Loading profiles to dropdown...');
+        window.Logger.info('📂 Loading profiles to dropdown...', { page: "preferences-ui" });
         
         // Get profiles from API
         const response = await fetch('/api/preferences/profiles');
@@ -936,7 +936,7 @@ window.loadProfilesToDropdown = async function() {
         const profileSelect = document.getElementById('profileSelect');
         
         if (!profileSelect) {
-            console.warn('⚠️ Profile select element not found');
+            window.Logger.warn('⚠️ Profile select element not found', { page: "preferences-ui" });
             return false;
         }
         
@@ -967,33 +967,33 @@ window.loadProfilesToDropdown = async function() {
             
             // Find and select the active profile
             const activeProfile = profiles.find(p => p.active);
-            console.log(`🔍 PROFILE DEBUG: Found active profile:`, activeProfile);
+            window.Logger.info(`🔍 PROFILE DEBUG: Found active profile:`, activeProfile, { page: "preferences-ui" });
             
             if (activeProfile) {
                 // Update PreferencesUI currentProfileId
                 if (window.PreferencesUI) {
                     window.PreferencesUI.currentProfileId = activeProfile.id;
-                    console.log(`✅ PreferencesUI currentProfileId updated to: ${activeProfile.id}`);
+                    window.Logger.info(`✅ PreferencesUI currentProfileId updated to: ${activeProfile.id}`, { page: "preferences-ui" });
                 }
                 
                 // Select the active profile in dropdown
                 const activeOption = profileSelect.querySelector(`option[value="${activeProfile.name}"]`);
                 if (activeOption) {
                     activeOption.selected = true;
-                    console.log(`🔍 UI DEBUG: Selected active profile in dropdown: ${activeProfile.name}`);
+                    window.Logger.info(`🔍 UI DEBUG: Selected active profile in dropdown: ${activeProfile.name}`, { page: "preferences-ui" });
                 } else {
-                    console.warn(`⚠️ Active profile option not found in dropdown: ${activeProfile.name}`);
+                    window.Logger.warn(`⚠️ Active profile option not found in dropdown: ${activeProfile.name}`, { page: "preferences-ui" });
                 }
             } else {
                 // No active profile found, select default
                 const defaultOption = profileSelect.querySelector('option[value="ברירת מחדל"]');
                 if (defaultOption) {
                     defaultOption.selected = true;
-                    console.log(`🔍 UI DEBUG: No active profile found, selected default`);
+                    window.Logger.info(`🔍 UI DEBUG: No active profile found, selected default`, { page: "preferences-ui" });
                 }
             }
             
-            console.log(`✅ Loaded ${profiles.length} profiles to dropdown`);
+            window.Logger.info(`✅ Loaded ${profiles.length} profiles to dropdown`, { page: "preferences-ui" });
             
             // Update active profile info in the new card format
             const activeProfileName = document.getElementById('activeProfileName');
@@ -1006,15 +1006,15 @@ window.loadProfilesToDropdown = async function() {
                 if (activeProfileDescription) {
                     activeProfileDescription.textContent = activeProfile.description || 'פרופיל משתמש';
                 }
-                console.log(`🔍 UI DEBUG: Updated active profile card to: ${activeProfile.name}`);
+                window.Logger.info(`🔍 UI DEBUG: Updated active profile card to: ${activeProfile.name}`, { page: "preferences-ui" });
                 
                 // Check if this is the default profile and disable all preferences
                 const isDefaultProfile = activeProfile.is_default || activeProfile.default || activeProfile.name === 'ברירת מחדל';
                 if (isDefaultProfile) {
-                    console.log('🔒 Default profile active - disabling all preferences interface');
+                    window.Logger.info('🔒 Default profile active - disabling all preferences interface', { page: "preferences-ui" });
                     window.disableAllPreferencesInterface();
                 } else {
-                    console.log('✅ User profile active - enabling all preferences interface');
+                    window.Logger.info('✅ User profile active - enabling all preferences interface', { page: "preferences-ui" });
                     window.enableAllPreferencesInterface();
                 }
             } else {
@@ -1024,20 +1024,20 @@ window.loadProfilesToDropdown = async function() {
                 if (activeProfileDescription) {
                     activeProfileDescription.textContent = 'פרופיל ברירת מחדל של המערכת';
                 }
-                console.log(`🔍 UI DEBUG: Updated active profile card to: ברירת מחדל (no active profile)`);
+                window.Logger.info(`🔍 UI DEBUG: Updated active profile card to: ברירת מחדל (no active profile, { page: "preferences-ui" })`);
                 
                 // Default profile is active - disable all preferences
-                console.log('🔒 Default profile active - disabling all preferences interface');
+                window.Logger.info('🔒 Default profile active - disabling all preferences interface', { page: "preferences-ui" });
                 window.disableAllPreferencesInterface();
             }
             
             return true;
         } else {
-            console.log('⚠️ No profiles found, using default');
+            window.Logger.info('⚠️ No profiles found, using default', { page: "preferences-ui" });
             return false;
         }
     } catch (error) {
-        console.error('❌ Error loading profiles to dropdown:', error);
+        window.Logger.error('❌ Error loading profiles to dropdown:', error, { page: "preferences-ui" });
         return false;
     }
 };
@@ -1061,7 +1061,7 @@ window.getUserProfiles = async function(userId = 1) {
         
         return result.data.profiles;
     } catch (error) {
-        console.error('❌ Error loading profiles:', error);
+        window.Logger.error('❌ Error loading profiles:', error, { page: "preferences-ui" });
         return [];
     }
 };
@@ -1073,7 +1073,7 @@ window.getUserProfiles = async function(userId = 1) {
  */
 window.switchProfile = async function(profileId) {
     try {
-        console.log(`🔄 Switching to profile ID: ${profileId}`);
+        window.Logger.info(`🔄 Switching to profile ID: ${profileId}`, { page: "preferences-ui" });
         
         const response = await fetch('/api/preferences/profiles/activate', {
             method: 'POST',
@@ -1095,10 +1095,10 @@ window.switchProfile = async function(profileId) {
             throw new Error(result.error || 'Failed to switch profile');
         }
         
-        console.log('✅ Profile switched successfully');
+        window.Logger.info('✅ Profile switched successfully', { page: "preferences-ui" });
         return true;
     } catch (error) {
-        console.error('❌ Error switching profile:', error);
+        window.Logger.error('❌ Error switching profile:', error, { page: "preferences-ui" });
         return false;
     }
 };
@@ -1111,17 +1111,17 @@ window.switchProfile = async function(profileId) {
  */
 window.loadPreferences = async function(userId = 1, profileId = 3) {
     try {
-        console.log(`🔄 Loading preferences for user ${userId}, profile ${profileId}`);
+        window.Logger.info(`🔄 Loading preferences for user ${userId}, profile ${profileId}`, { page: "preferences-ui" });
         
         if (window.PreferencesUI) {
             await window.PreferencesUI.loadAllPreferences(userId, profileId);
             return true;
         } else {
-            console.warn('⚠️ PreferencesUI not available');
+            window.Logger.warn('⚠️ PreferencesUI not available', { page: "preferences-ui" });
             return false;
         }
     } catch (error) {
-        console.error('❌ Error loading preferences:', error);
+        window.Logger.error('❌ Error loading preferences:', error, { page: "preferences-ui" });
         return false;
     }
 };
@@ -1138,7 +1138,7 @@ window.loadPreferences = async function(userId = 1, profileId = 3) {
  * Disable all preferences interface when default profile is active
  */
 window.disableAllPreferencesInterface = function() {
-    console.log('🔒 Disabling all preferences interface...');
+    window.Logger.info('🔒 Disabling all preferences interface...', { page: "preferences-ui" });
     
     // Disable all form inputs except profile management
     const allInputs = document.querySelectorAll('#preferencesForm input, #preferencesForm select, #preferencesForm textarea');
@@ -1165,7 +1165,7 @@ window.disableAllPreferencesInterface = function() {
     profileButtons.forEach(button => {
         button.disabled = false;
         button.classList.remove('disabled');
-        console.log(`✅ Kept profile management button enabled: ${button.id || button.onclick}`);
+        window.Logger.info(`✅ Kept profile management button enabled: ${button.id || button.onclick}`, { page: "preferences-ui" });
     });
     
     // Keep profile select and new profile name input enabled
@@ -1174,12 +1174,12 @@ window.disableAllPreferencesInterface = function() {
     if (profileSelect) {
         profileSelect.disabled = false;
         profileSelect.classList.remove('disabled');
-        console.log('✅ Kept profile select enabled');
+        window.Logger.info('✅ Kept profile select enabled', { page: "preferences-ui" });
     }
     if (newProfileName) {
         newProfileName.disabled = false;
         newProfileName.classList.remove('disabled');
-        console.log('✅ Kept new profile name input enabled');
+        window.Logger.info('✅ Kept new profile name input enabled', { page: "preferences-ui" });
     }
     
     // Add visual indicator to all save buttons
@@ -1188,7 +1188,7 @@ window.disableAllPreferencesInterface = function() {
         saveButton.innerHTML = '<i class="bi bi-lock"></i> פרופיל ברירת מחדל - לא ניתן לערוך';
         saveButton.classList.add('btn-secondary', 'disabled');
         saveButton.classList.remove('btn-success');
-        console.log(`🔒 Disabled save button: ${saveButton.id || 'unnamed'}`);
+        window.Logger.info(`🔒 Disabled save button: ${saveButton.id || 'unnamed'}`, { page: "preferences-ui" });
     });
     
     // Show warning message (only if not already shown)
@@ -1196,14 +1196,14 @@ window.disableAllPreferencesInterface = function() {
         showDefaultProfileWarning();
     }
     
-    console.log('✅ All preferences interface disabled');
+    window.Logger.info('✅ All preferences interface disabled', { page: "preferences-ui" });
 };
 
 /**
  * Enable all preferences interface when user profile is active
  */
 window.enableAllPreferencesInterface = function() {
-    console.log('✅ Enabling all preferences interface...');
+    window.Logger.info('✅ Enabling all preferences interface...', { page: "preferences-ui" });
     
     // Enable all form inputs
     const allInputs = document.querySelectorAll('#preferencesForm input, #preferencesForm select, #preferencesForm textarea');
@@ -1225,13 +1225,13 @@ window.enableAllPreferencesInterface = function() {
         saveButton.innerHTML = '<i class="bi bi-save me-2"></i>שמור העדפות';
         saveButton.classList.add('btn-success');
         saveButton.classList.remove('btn-secondary', 'disabled');
-        console.log(`✅ Enabled save button: ${saveButton.id || 'unnamed'}`);
+        window.Logger.info(`✅ Enabled save button: ${saveButton.id || 'unnamed'}`, { page: "preferences-ui" });
     });
     
     // Hide warning message
     hideDefaultProfileWarning();
     
-    console.log('✅ All preferences interface enabled');
+    window.Logger.info('✅ All preferences interface enabled', { page: "preferences-ui" });
 };
 
 /**
@@ -1273,10 +1273,10 @@ function hideDefaultProfileWarning() {
 // Auto-initialize when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-        console.log('📄 Preferences UI system initialized');
+        window.Logger.info('📄 Preferences UI system initialized', { page: "preferences-ui" });
     });
 } else {
-    console.log('📄 Preferences UI system initialized');
+    window.Logger.info('📄 Preferences UI system initialized', { page: "preferences-ui" });
 }
 
-console.log('✅ preferences-ui.js loaded successfully');
+window.Logger.info('✅ preferences-ui.js loaded successfully', { page: "preferences-ui" });

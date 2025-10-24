@@ -6,17 +6,17 @@
  */
 function addExecution() {
   try {
-    console.log('➕ מוסיף ביצוע חדש');
+    window.Logger.info('➕ מוסיף ביצוע חדש', { page: "executions" });
     
     // פתיחת מודל הוספת ביצוע - שימוש במערכת הכללית
     if (typeof window.showAddExecutionModal === 'function') {
       window.showAddExecutionModal();
     } else {
-      console.error('❌ showAddExecutionModal לא זמין במערכת הכללית');
+      window.Logger.error('❌ showAddExecutionModal לא זמין במערכת הכללית', { page: "executions" });
     }
     
   } catch (error) {
-    console.error('שגיאה בהוספת ביצוע:', error);
+    window.Logger.error('שגיאה בהוספת ביצוע:', error, { page: "executions" });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בהוספת ביצוע', error.message);
     } else if (typeof window.showNotification === 'function') {
@@ -69,7 +69,7 @@ function openExecutionDetails(_id) {
   if (typeof window.showAddExecutionModal === 'function') {
     window.showAddExecutionModal();
   } else {
-    console.error('❌ showAddExecutionModal לא זמין במערכת הכללית');
+    window.Logger.error('❌ showAddExecutionModal לא זמין במערכת הכללית', { page: "executions" });
   }
 }
 
@@ -196,23 +196,23 @@ function resetEditExecutionForm() {
  * הצגת מודל עריכת עסקה
  */
 async function showEditExecutionModal(id) {
-  console.log('🔍 [EDIT MODAL] פתיחת מודל עריכה עבור עסקה ID:', id);
-  console.log('🔍 [EDIT MODAL] נתוני עסקעות במטמון:', executionsData.length, 'עסקעות');
-  console.log('🔍 [EDIT MODAL] נתוני עסקעות במטמון:', executionsData.map(e => `${e.id}(trade:${e.trade_id})`));
+  window.Logger.info('🔍 [EDIT MODAL] פתיחת מודל עריכה עבור עסקה ID:', id, { page: "executions" });
+  window.Logger.info('🔍 [EDIT MODAL] נתוני עסקעות במטמון:', executionsData.length, 'עסקעות', { page: "executions" });
+  window.Logger.info('🔍 [EDIT MODAL] נתוני עסקעות במטמון:', executionsData.map(e => `${e.id}(trade:${e.trade_id}, { page: "executions" })`));
 
   // מציאת העסקה לפי ID
   const execution = executionsData.find(e => e.id === id);
   if (!execution) {
-    console.log('❌ [EDIT MODAL] עסקה לא נמצאה במטמון:', id);
+    window.Logger.info('❌ [EDIT MODAL] עסקה לא נמצאה במטמון:', id, { page: "executions" });
     handleElementNotFound('execution', 'CRITICAL');
     return;
   }
   
-  console.log('✅ [EDIT MODAL] עסקה נמצאה:', execution);
+  window.Logger.info('✅ [EDIT MODAL] עסקה נמצאה:', execution, { page: "executions" });
 
   // מילוי שדה ה-ID לפני כל השאר
   document.getElementById('editExecutionId').value = execution.id;
-  console.log('✅ [EDIT MODAL] שדה ID מולא:', execution.id);
+  window.Logger.info('✅ [EDIT MODAL] שדה ID מולא:', execution.id, { page: "executions" });
 
   // טעינת טיקרים לפי הצ'קבוקס
   const showClosedTrades = document.getElementById('editExecutionShowClosedTrades')?.checked || false;
@@ -227,21 +227,21 @@ async function showEditExecutionModal(id) {
   try {
     // בדיקה אם יש טרייד מקושר
     if (execution.trade_id) {
-      console.log('🔍 [EDIT MODAL] מחפש טרייד מקושר ID:', execution.trade_id);
+      window.Logger.info('🔍 [EDIT MODAL] מחפש טרייד מקושר ID:', execution.trade_id, { page: "executions" });
       const tradesResponse = await fetch('/api/trades/');
       const responseData = await tradesResponse.json();
       const trades = responseData.data || responseData || [];
       
-      console.log('🔍 [EDIT MODAL] טריידים נטענו מהשרת:', trades.length, 'טריידים');
-      console.log('🔍 [EDIT MODAL] טריידים מהשרת:', trades.map(t => `${t.id}(ticker:${t.ticker_id},status:${t.status})`));
+      window.Logger.info('🔍 [EDIT MODAL] טריידים נטענו מהשרת:', trades.length, 'טריידים', { page: "executions" });
+      window.Logger.info('🔍 [EDIT MODAL] טריידים מהשרת:', trades.map(t => `${t.id}(ticker:${t.ticker_id},status:${t.status}, { page: "executions" })`));
 
       const trade = trades.find(t => t.id === execution.trade_id);
       if (trade) {
-        console.log('✅ [EDIT MODAL] טרייד מקושר נמצא:', trade);
+        window.Logger.info('✅ [EDIT MODAL] טרייד מקושר נמצא:', trade, { page: "executions" });
         linkedObject = { type: 'trade', data: trade };
         tickerId = trade.ticker_id;
       } else {
-        console.log('❌ [EDIT MODAL] טרייד מקושר לא נמצא:', execution.trade_id);
+        window.Logger.info('❌ [EDIT MODAL] טרייד מקושר לא נמצא:', execution.trade_id, { page: "executions" });
       }
     }
 
@@ -267,19 +267,19 @@ async function showEditExecutionModal(id) {
 
     // עדכון שדה הטיקר
     if (tickerId) {
-      console.log('🔍 [EDIT MODAL] מעדכן שדה טיקר ל-ID:', tickerId);
+      window.Logger.info('🔍 [EDIT MODAL] מעדכן שדה טיקר ל-ID:', tickerId, { page: "executions" });
       const tickerSelect = document.getElementById('editExecutionTicker');
       if (tickerSelect) {
         tickerSelect.value = tickerId;
-        console.log('✅ [EDIT MODAL] שדה טיקר עודכן ל:', tickerId);
+        window.Logger.info('✅ [EDIT MODAL] שדה טיקר עודכן ל:', tickerId, { page: "executions" });
         // טעינת טריידים ותכנונים לטיקר זה
         await loadActiveTradesForTicker('edit');
-        console.log('✅ [EDIT MODAL] טריידים נטענו לטיקר:', tickerId);
+        window.Logger.info('✅ [EDIT MODAL] טריידים נטענו לטיקר:', tickerId, { page: "executions" });
       } else {
-        console.log('❌ [EDIT MODAL] שדה טיקר לא נמצא ב-DOM');
+        window.Logger.info('❌ [EDIT MODAL] שדה טיקר לא נמצא ב-DOM', { page: "executions" });
       }
     } else {
-      console.log('⚠️ [EDIT MODAL] אין tickerId לעדכון');
+      window.Logger.info('⚠️ [EDIT MODAL] אין tickerId לעדכון', { page: "executions" });
     }
 
     // מילוי הטופס - שדה ID כבר מולא למעלה
@@ -293,11 +293,11 @@ async function showEditExecutionModal(id) {
 
         // פונקציה לבדיקה ומילוי
         const trySetTradeValue = () => {
-          console.log('🔍 [EDIT MODAL] מחפש ערך טרייד:', value, 'באפשרויות:', Array.from(tradeSelect.options).map(o => `${o.value}(${o.text})`));
+          window.Logger.info('🔍 [EDIT MODAL] מחפש ערך טרייד:', value, 'באפשרויות:', Array.from(tradeSelect.options, { page: "executions" }).map(o => `${o.value}(${o.text})`));
           const optionExists = Array.from(tradeSelect.options).some(option => option.value === value);
           if (optionExists) {
             tradeSelect.value = value;
-            console.log('✅ [EDIT MODAL] שדה טרייד/תכנון מולא:', value);
+            window.Logger.info('✅ [EDIT MODAL] שדה טרייד/תכנון מולא:', value, { page: "executions" });
             return true;
           }
           return false;
@@ -305,12 +305,12 @@ async function showEditExecutionModal(id) {
 
         // נסיון ראשון
         if (!trySetTradeValue()) {
-          console.log('⚠️ הערך לא נמצא באפשרויות:', value, 'אפשרויות:', Array.from(tradeSelect.options).map(o => o.value));
+          window.Logger.info('⚠️ הערך לא נמצא באפשרויות:', value, 'אפשרויות:', Array.from(tradeSelect.options, { page: "executions" }).map(o => o.value));
           
           // נסיון נוסף אחרי זמן קצר
           setTimeout(() => {
             if (!trySetTradeValue()) {
-              console.log('❌ לא ניתן למלא שדה טרייד/תכנון:', value);
+              window.Logger.info('❌ לא ניתן למלא שדה טרייד/תכנון:', value, { page: "executions" });
             }
           }, 500);
         }
@@ -323,12 +323,12 @@ async function showEditExecutionModal(id) {
       const actionSelect = document.getElementById('editExecutionType');
       if (actionSelect) {
         actionSelect.value = actionValue;
-        console.log('✅ [EDIT MODAL] שדה פעולה מולא:', actionValue);
+        window.Logger.info('✅ [EDIT MODAL] שדה פעולה מולא:', actionValue, { page: "executions" });
       } else {
-        console.log('❌ [EDIT MODAL] שדה פעולה לא נמצא ב-DOM');
+        window.Logger.info('❌ [EDIT MODAL] שדה פעולה לא נמצא ב-DOM', { page: "executions" });
       }
     } else {
-      console.log('⚠️ [EDIT MODAL] אין ערך פעולה לעסקה');
+      window.Logger.info('⚠️ [EDIT MODAL] אין ערך פעולה לעסקה', { page: "executions" });
     }
 
     // מילוי שדה הכמות
@@ -336,12 +336,12 @@ async function showEditExecutionModal(id) {
       const quantityField = document.getElementById('editExecutionQuantity');
       if (quantityField) {
         quantityField.value = execution.quantity;
-        console.log('✅ [EDIT MODAL] שדה כמות מולא:', execution.quantity);
+        window.Logger.info('✅ [EDIT MODAL] שדה כמות מולא:', execution.quantity, { page: "executions" });
       } else {
-        console.log('❌ [EDIT MODAL] שדה כמות לא נמצא ב-DOM');
+        window.Logger.info('❌ [EDIT MODAL] שדה כמות לא נמצא ב-DOM', { page: "executions" });
       }
     } else {
-      console.log('⚠️ [EDIT MODAL] אין כמות לעסקה');
+      window.Logger.info('⚠️ [EDIT MODAL] אין כמות לעסקה', { page: "executions" });
     }
 
     // מילוי שדה המחיר
@@ -349,22 +349,22 @@ async function showEditExecutionModal(id) {
       const priceField = document.getElementById('editExecutionPrice');
       if (priceField) {
         priceField.value = execution.price;
-        console.log('✅ [EDIT MODAL] שדה מחיר מולא:', execution.price);
+        window.Logger.info('✅ [EDIT MODAL] שדה מחיר מולא:', execution.price, { page: "executions" });
       } else {
-        console.log('❌ [EDIT MODAL] שדה מחיר לא נמצא ב-DOM');
+        window.Logger.info('❌ [EDIT MODAL] שדה מחיר לא נמצא ב-DOM', { page: "executions" });
       }
     } else {
-      console.log('⚠️ [EDIT MODAL] אין מחיר לעסקה');
+      window.Logger.info('⚠️ [EDIT MODAL] אין מחיר לעסקה', { page: "executions" });
     }
 
     // עיבוד תאריך ביצוע - בדיקה של שדות שונים
     executionDate = execution.date || execution.execution_date || execution.created_at;
-    console.log('🔍 [EDIT MODAL] תאריך ביצוע גולמי:', executionDate);
-    console.log('🔍 [EDIT MODAL] שדות תאריך זמינים:', {
+    window.Logger.info('🔍 [EDIT MODAL] תאריך ביצוע גולמי:', executionDate, { page: "executions" });
+    window.Logger.info('🔍 [EDIT MODAL] שדות תאריך זמינים:', {
       date: execution.date,
       execution_date: execution.execution_date,
       created_at: execution.created_at
-    });
+    }, { page: "executions" });
     if (executionDate) {
       try {
         // המרה לפורמט datetime-local
@@ -373,19 +373,19 @@ async function showEditExecutionModal(id) {
         const dateField = document.getElementById('editExecutionDate');
         if (dateField) {
           dateField.value = localDateTime;
-          console.log('✅ [EDIT MODAL] שדה תאריך מולא:', localDateTime, 'מהתאריך:', executionDate);
+          window.Logger.info('✅ [EDIT MODAL] שדה תאריך מולא:', localDateTime, 'מהתאריך:', executionDate, { page: "executions" });
         } else {
-          console.log('❌ [EDIT MODAL] שדה תאריך לא נמצא ב-DOM');
+          window.Logger.info('❌ [EDIT MODAL] שדה תאריך לא נמצא ב-DOM', { page: "executions" });
         }
       } catch (error) {
-        console.log('❌ [EDIT MODAL] שגיאה בעיבוד תאריך:', error, 'תאריך גולמי:', executionDate);
+        window.Logger.info('❌ [EDIT MODAL] שגיאה בעיבוד תאריך:', error, 'תאריך גולמי:', executionDate, { page: "executions" });
         const dateField = document.getElementById('editExecutionDate');
         if (dateField) {
           dateField.value = '';
         }
       }
     } else {
-      console.log('⚠️ [EDIT MODAL] אין תאריך ביצוע לעסקה');
+      window.Logger.info('⚠️ [EDIT MODAL] אין תאריך ביצוע לעסקה', { page: "executions" });
       const dateField = document.getElementById('editExecutionDate');
       if (dateField) {
         dateField.value = '';
@@ -398,12 +398,12 @@ async function showEditExecutionModal(id) {
       const commissionField = document.getElementById('editExecutionCommission');
       if (commissionField) {
         commissionField.value = commissionValue;
-        console.log('✅ [EDIT MODAL] שדה עמלה מולא:', commissionValue);
+        window.Logger.info('✅ [EDIT MODAL] שדה עמלה מולא:', commissionValue, { page: "executions" });
       } else {
-        console.log('❌ [EDIT MODAL] שדה עמלה לא נמצא ב-DOM');
+        window.Logger.info('❌ [EDIT MODAL] שדה עמלה לא נמצא ב-DOM', { page: "executions" });
       }
     } else {
-      console.log('⚠️ [EDIT MODAL] אין עמלה לעסקה');
+      window.Logger.info('⚠️ [EDIT MODAL] אין עמלה לעסקה', { page: "executions" });
     }
 
     // מילוי שדה המקור
@@ -411,9 +411,9 @@ async function showEditExecutionModal(id) {
     const sourceField = document.getElementById('editExecutionSource');
     if (sourceField) {
       sourceField.value = sourceValue;
-      console.log('✅ [EDIT MODAL] שדה מקור מולא:', sourceValue);
+      window.Logger.info('✅ [EDIT MODAL] שדה מקור מולא:', sourceValue, { page: "executions" });
     } else {
-      console.log('❌ [EDIT MODAL] שדה מקור לא נמצא ב-DOM');
+      window.Logger.info('❌ [EDIT MODAL] שדה מקור לא נמצא ב-DOM', { page: "executions" });
     }
 
     // מילוי שדה מזהה חיצוני אם קיים
@@ -422,10 +422,10 @@ async function showEditExecutionModal(id) {
     if (externalIdField) {
       externalIdField.value = externalIdValue;
       if (externalIdValue) {
-        console.log('✅ [EDIT MODAL] שדה מזהה חיצוני מולא:', externalIdValue);
+        window.Logger.info('✅ [EDIT MODAL] שדה מזהה חיצוני מולא:', externalIdValue, { page: "executions" });
       }
     } else {
-      console.log('❌ [EDIT MODAL] שדה מזהה חיצוני לא נמצא ב-DOM');
+      window.Logger.info('❌ [EDIT MODAL] שדה מזהה חיצוני לא נמצא ב-DOM', { page: "executions" });
     }
 
     // הצגת/הסתרת שדה מזהה חיצוני לפי המקור
@@ -437,12 +437,12 @@ async function showEditExecutionModal(id) {
       const notesField = document.getElementById('editExecutionNotes');
       if (notesField) {
         notesField.value = notesValue;
-        console.log('✅ [EDIT MODAL] שדה הערות מולא:', notesValue);
+        window.Logger.info('✅ [EDIT MODAL] שדה הערות מולא:', notesValue, { page: "executions" });
       } else {
-        console.log('❌ [EDIT MODAL] שדה הערות לא נמצא ב-DOM');
+        window.Logger.info('❌ [EDIT MODAL] שדה הערות לא נמצא ב-DOM', { page: "executions" });
       }
     } else {
-      console.log('⚠️ [EDIT MODAL] אין הערות לעסקה');
+      window.Logger.info('⚠️ [EDIT MODAL] אין הערות לעסקה', { page: "executions" });
     }
 
     // הצגת כפתור קישור לטרייד/תכנון אם יש
@@ -465,14 +465,14 @@ async function showEditExecutionModal(id) {
   // חישוב ערכים מחושבים
   calculateEditExecutionValues();
 
-  console.log('🎯 [EDIT MODAL] סיכום מילוי טופס עריכה:');
-  console.log('🎯 [EDIT MODAL] - עסקה ID:', execution.id);
-  console.log('🎯 [EDIT MODAL] - טרייד מקושר:', linkedObject ? `${linkedObject.type}:${linkedObject.data.id}` : 'אין');
-  console.log('🎯 [EDIT MODAL] - טיקר:', tickerId);
-  console.log('🎯 [EDIT MODAL] - פעולה:', actionValue);
-  console.log('🎯 [EDIT MODAL] - כמות:', execution.quantity);
-  console.log('🎯 [EDIT MODAL] - מחיר:', execution.price);
-  console.log('🎯 [EDIT MODAL] - תאריך:', executionDate);
+  window.Logger.info('🎯 [EDIT MODAL] סיכום מילוי טופס עריכה:', { page: "executions" });
+  window.Logger.info('🎯 [EDIT MODAL] - עסקה ID:', execution.id, { page: "executions" });
+  window.Logger.info('🎯 [EDIT MODAL] - טרייד מקושר:', linkedObject ? `${linkedObject.type}:${linkedObject.data.id}` : 'אין', { page: "executions" });
+  window.Logger.info('🎯 [EDIT MODAL] - טיקר:', tickerId, { page: "executions" });
+  window.Logger.info('🎯 [EDIT MODAL] - פעולה:', actionValue, { page: "executions" });
+  window.Logger.info('🎯 [EDIT MODAL] - כמות:', execution.quantity, { page: "executions" });
+  window.Logger.info('🎯 [EDIT MODAL] - מחיר:', execution.price, { page: "executions" });
+  window.Logger.info('🎯 [EDIT MODAL] - תאריך:', executionDate, { page: "executions" });
 
   // הצגת המודל
   const modal = new bootstrap.Modal(document.getElementById('editExecutionModal'));
@@ -1227,7 +1227,7 @@ async function loadLinkedItemsFromMultipleSources(executionId) {
         );
       }
     } catch (e) { 
-      console.warn('לא ניתן לטעון טריידים:', e); 
+      window.Logger.warn('לא ניתן לטעון טריידים:', e, { page: "executions" }); 
     }
 
     // טעינת תכנונים
@@ -1241,7 +1241,7 @@ async function loadLinkedItemsFromMultipleSources(executionId) {
         );
       }
     } catch (e) { 
-      console.warn('לא ניתן לטעון תכנונים:', e); 
+      window.Logger.warn('לא ניתן לטעון תכנונים:', e, { page: "executions" }); 
     }
 
     // טעינת התראות
@@ -1256,7 +1256,7 @@ async function loadLinkedItemsFromMultipleSources(executionId) {
         );
       }
     } catch (e) { 
-      console.warn('לא ניתן לטעון התראות:', e); 
+      window.Logger.warn('לא ניתן לטעון התראות:', e, { page: "executions" }); 
     }
 
     // טעינת הערות
@@ -1270,7 +1270,7 @@ async function loadLinkedItemsFromMultipleSources(executionId) {
         );
       }
     } catch (e) { 
-      console.warn('לא ניתן לטעון הערות:', e); 
+      window.Logger.warn('לא ניתן לטעון הערות:', e, { page: "executions" }); 
     }
 
     displayLinkedItems(linkedItems);
@@ -1572,7 +1572,7 @@ async function updateExecutionsTableMain(executions) {
   // updateExecutionsTableMain called with executions
   const tbody = document.querySelector('#executionsTable tbody');
   if (!tbody) {
-    // // console.warn('⚠️ executionsTable tbody not found - this is expected on trades page');
+    // // window.Logger.warn('⚠️ executionsTable tbody not found - this is expected on trades page', { page: "executions" });
     return;
   }
 
@@ -1603,7 +1603,7 @@ async function updateExecutionsTableMain(executions) {
         if (r.ok) {
           return r.json();
         } else {
-          // // console.warn('⚠️ Trades API returned error:', r.status);
+          // // window.Logger.warn('⚠️ Trades API returned error:', r.status, { page: "executions" });
           return { data: [] };
         }
       }).catch(() => ({ data: [] })),
@@ -1611,7 +1611,7 @@ async function updateExecutionsTableMain(executions) {
         if (r.ok) {
           return r.json();
         } else {
-          // // console.warn('⚠️ Tickers API returned error:', r.status);
+          // // window.Logger.warn('⚠️ Tickers API returned error:', r.status, { page: "executions" });
           return { data: [] };
         }
       }).catch(() => ({ data: [] })),
@@ -1622,17 +1622,17 @@ async function updateExecutionsTableMain(executions) {
 
     // וידוא שהנתונים הם מערכים
     if (!Array.isArray(trades)) {
-      // // console.warn('⚠️ trades אינו מערך:', trades);
+      // // window.Logger.warn('⚠️ trades אינו מערך:', trades, { page: "executions" });
       trades = [];
     }
     if (!Array.isArray(tickers)) {
-      // // console.warn('⚠️ tickers אינו מערך:', tickers);
+      // // window.Logger.warn('⚠️ tickers אינו מערך:', tickers, { page: "executions" });
       tickers = [];
     }
 
     // נטענו טריידים וטיקרים
   } catch {
-    // // console.warn('⚠️ שגיאה בטעינת נתונים נוספים:', error);
+    // // window.Logger.warn('⚠️ שגיאה בטעינת נתונים נוספים:', error, { page: "executions" });
     trades = [];
     tickers = [];
   }
@@ -1672,10 +1672,10 @@ async function updateExecutionsTableMain(executions) {
                                    <td class="ticker-cell">
                        <div style="display: flex; align-items: center; gap: 8px;">
                            <strong style="cursor: pointer; color: ${positiveColor};" 
-                             onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('ticker', ${ticker ? ticker.id : 'null'}, 'view'); } else { console.log('Entity details modal not available'); }" 
+                             onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('ticker', ${ticker ? ticker.id : 'null'}, 'view'); } else { window.Logger.info('Entity details modal not available', { page: "executions" }); }" 
                              title="פתח פרטי סימבול">${symbol}</strong>
                            <button class="btn btn-sm" 
-                             onclick="console.log('🔗 [LINKED ITEMS] לחיצה על כפתור מקושרים עבור טיקר:', ${ticker ? ticker.id : 'null'}); if(window.loadLinkedItemsData) { window.loadLinkedItemsData('ticker', ${ticker ? ticker.id : 'null'}).then(data => { console.log('🔗 [LINKED ITEMS] נתונים נטענו:', data); if(data) { console.log('🔗 [LINKED ITEMS] מציג מודל עם נתונים'); window.showLinkedItemsModal(data, 'ticker', ${ticker ? ticker.id : 'null'}, 'view'); } else { console.log('❌ [LINKED ITEMS] אין נתונים להצגה'); } }); } else { console.log('❌ [LINKED ITEMS] loadLinkedItemsData לא זמין'); }" 
+                             onclick="window.Logger.info('🔗 [LINKED ITEMS] לחיצה על כפתור מקושרים עבור טיקר:', ${ticker ? ticker.id : 'null'}, { page: "executions" }); if(window.loadLinkedItemsData) { window.loadLinkedItemsData('ticker', ${ticker ? ticker.id : 'null'}).then(data => { window.Logger.info('🔗 [LINKED ITEMS] נתונים נטענו:', data, { page: "executions" }); if(data) { window.Logger.info('🔗 [LINKED ITEMS] מציג מודל עם נתונים', { page: "executions" }); window.showLinkedItemsModal(data, 'ticker', ${ticker ? ticker.id : 'null'}, 'view'); } else { window.Logger.info('❌ [LINKED ITEMS] אין נתונים להצגה', { page: "executions" }); } }); } else { window.Logger.info('❌ [LINKED ITEMS] loadLinkedItemsData לא זמין', { page: "executions" }); }" 
                              title="פריטים מקושרים לטיקר">🔗</button>
                        </div>
                    </td>
@@ -1686,7 +1686,7 @@ async function updateExecutionsTableMain(executions) {
                       </span>`}
                 </td>
                 <td data-account="${accountName}" style="cursor: pointer;" 
-                  onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('account', '${accountName}', 'view'); } else { console.log('Entity details modal not available'); }" 
+                  onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('account', '${accountName}', 'view'); } else { window.Logger.info('Entity details modal not available', { page: "executions" }); }" 
                   title="פתח פרטי חשבון">${accountName}</td>
                 <td>${window.renderShares ? window.renderShares(execution.quantity) : execution.quantity}</td>
                 <td>$${execution.price}</td>
@@ -1696,7 +1696,7 @@ async function updateExecutionsTableMain(executions) {
                 <td class="actions-cell">
                     ${window.createActionsMenu ? window.createActionsMenu([
                       { type: 'VIEW', onclick: `window.showEntityDetails('execution', ${execution.id}, { mode: 'view' })`, title: 'צפה בפרטי עסקה' },
-                      { type: 'LINK', onclick: `console.log('🔗 [LINKED ITEMS] לחיצה על כפתור מקושרים עבור עסקה:', ${execution.id}); if(window.loadLinkedItemsData) { window.loadLinkedItemsData('execution', ${execution.id}).then(data => { console.log('🔗 [LINKED ITEMS] נתונים נטענו:', data); if(data) { console.log('🔗 [LINKED ITEMS] מציג מודל עם נתונים'); window.showLinkedItemsModal(data, 'execution', ${execution.id}, 'view'); } else { console.log('❌ [LINKED ITEMS] אין נתונים להצגה'); } }); } else { console.log('❌ [LINKED ITEMS] loadLinkedItemsData לא זמין'); }`, title: 'פריטים מקושרים' },
+                      { type: 'LINK', onclick: `window.Logger.info('🔗 [LINKED ITEMS] לחיצה על כפתור מקושרים עבור עסקה:', ${execution.id}, { page: "executions" }); if(window.loadLinkedItemsData) { window.loadLinkedItemsData('execution', ${execution.id}).then(data => { window.Logger.info('🔗 [LINKED ITEMS] נתונים נטענו:', data, { page: "executions" }); if(data) { window.Logger.info('🔗 [LINKED ITEMS] מציג מודל עם נתונים', { page: "executions" }); window.showLinkedItemsModal(data, 'execution', ${execution.id}, 'view'); } else { window.Logger.info('❌ [LINKED ITEMS] אין נתונים להצגה', { page: "executions" }); } }); } else { window.Logger.info('❌ [LINKED ITEMS] loadLinkedItemsData לא זמין', { page: "executions" }); }`, title: 'פריטים מקושרים' },
                       { type: 'EDIT', onclick: `editExecution(${execution.id})`, title: 'ערוך' },
                       { type: 'DELETE', onclick: `deleteExecution(${execution.id})`, title: 'מחק' }
                     ]) : `
@@ -1704,7 +1704,7 @@ async function updateExecutionsTableMain(executions) {
                       onclick="window.showEntityDetails('execution', ${execution.id}, { mode: 'view' })" 
                       title="צפה בפרטי עסקה">👁️</button>
                     <button class="btn btn-sm" 
-                      onclick="console.log('🔗 [LINKED ITEMS] לחיצה על כפתור מקושרים עבור עסקה:', ${execution.id}); if(window.loadLinkedItemsData) { window.loadLinkedItemsData('execution', ${execution.id}).then(data => { console.log('🔗 [LINKED ITEMS] נתונים נטענו:', data); if(data) { console.log('🔗 [LINKED ITEMS] מציג מודל עם נתונים'); window.showLinkedItemsModal(data, 'execution', ${execution.id}, 'view'); } else { console.log('❌ [LINKED ITEMS] אין נתונים להצגה'); } }); } else { console.log('❌ [LINKED ITEMS] loadLinkedItemsData לא זמין'); }" 
+                      onclick="window.Logger.info('🔗 [LINKED ITEMS] לחיצה על כפתור מקושרים עבור עסקה:', ${execution.id}, { page: "executions" }); if(window.loadLinkedItemsData) { window.loadLinkedItemsData('execution', ${execution.id}).then(data => { window.Logger.info('🔗 [LINKED ITEMS] נתונים נטענו:', data, { page: "executions" }); if(data) { window.Logger.info('🔗 [LINKED ITEMS] מציג מודל עם נתונים', { page: "executions" }); window.showLinkedItemsModal(data, 'execution', ${execution.id}, 'view'); } else { window.Logger.info('❌ [LINKED ITEMS] אין נתונים להצגה', { page: "executions" }); } }); } else { window.Logger.info('❌ [LINKED ITEMS] loadLinkedItemsData לא זמין', { page: "executions" }); }" 
                       title="פריטים מקושרים">🔗</button>
                     <button class="btn btn-sm" 
                       onclick="editExecution(${execution.id})" 
@@ -1814,7 +1814,7 @@ function filterExecutionsLocally(executions, selectedStatuses, selectedTypes, se
   // filterExecutionsLocally called
 
   if (!executions || !Array.isArray(executions)) {
-    // // console.warn('⚠️ No executions data to filter');
+    // // window.Logger.warn('⚠️ No executions data to filter', { page: "executions" });
     return [];
   }
 
@@ -1969,7 +1969,7 @@ function restoreSortState() {
 
 // Initialize executions page - integrated with unified system
 window.initializeExecutionsPage = async function() {
-  console.log('⚡ Executions page initialized via unified system');
+  window.Logger.info('⚡ Executions page initialized via unified system', { page: "executions" });
   
   // הגדרת מודלים שלא נסגרים בלחיצה על הרקע
   setupModalConfigurations();
@@ -1996,7 +1996,7 @@ window.initializeExecutionsPage = async function() {
 
   // עדכון אוטומטי כל 30 שניות
   setInterval(() => {
-    console.log('🔄 Auto-refreshing executions data...');
+    window.Logger.info('🔄 Auto-refreshing executions data...', { page: "executions" });
     loadExecutionsData();
   }, 30000);
 };
@@ -2106,18 +2106,18 @@ function enableAllFields(mode = 'add') {
  * @param {boolean} showClosedTrades - האם להציג טריידים סגורים
  */
 async function loadActiveTradesForTicker(mode = 'add', _showClosedTrades = false) {
-  console.log('🔄 טעינת טריידים לטיקר, מצב:', mode, 'הצג טריידים סגורים:', _showClosedTrades);
+  window.Logger.info('🔄 טעינת טריידים לטיקר, מצב:', mode, 'הצג טריידים סגורים:', _showClosedTrades, { page: "executions" });
 
   const tickerId = mode === 'add'
     ? document.getElementById('executionTicker').value
     : document.getElementById('editExecutionTicker').value;
 
   if (!tickerId) {
-    console.log('🔄 אין טיקר נבחר');
+    window.Logger.info('🔄 אין טיקר נבחר', { page: "executions" });
     return;
   }
   
-  console.log('🔄 טיקר נבחר:', tickerId);
+  window.Logger.info('🔄 טיקר נבחר:', tickerId, { page: "executions" });
 
   // בדיקת הצ'קבוקס (אם לא הועבר כפרמטר)
   let showClosedTrades = _showClosedTrades;
@@ -2148,51 +2148,51 @@ async function loadActiveTradesForTicker(mode = 'add', _showClosedTrades = false
 
       filteredTrades = [...activeTrades, ...closedTrades];
 
-      console.log('🔄 טריידים פעילים לטיקר:', activeTrades.length);
-      console.log('🔄 טריידים סגורים לטיקר:', closedTrades.length);
-      console.log('🔄 סה"כ טריידים רלוונטיים:', filteredTrades.length);
+      window.Logger.info('🔄 טריידים פעילים לטיקר:', activeTrades.length, { page: "executions" });
+      window.Logger.info('🔄 טריידים סגורים לטיקר:', closedTrades.length, { page: "executions" });
+      window.Logger.info('🔄 סה"כ טריידים רלוונטיים:', filteredTrades.length, { page: "executions" });
     } else {
       // הצג רק טריידים פעילים
       filteredTrades = trades.filter(trade =>
         trade.ticker_id === parseInt(tickerId) && (trade.status === 'active' || trade.status === 'open'),
       );
-      console.log('🔄 טריידים פעילים בלבד לטיקר:', filteredTrades.length);
+      window.Logger.info('🔄 טריידים פעילים בלבד לטיקר:', filteredTrades.length, { page: "executions" });
     }
 
     // במצב עריכה, נוודא שהטרייד המקושר לעסקה נמצא ברשימה
     if (mode === 'edit') {
       const executionId = document.getElementById('editExecutionId')?.value;
-      console.log('🔍 [EDIT MODAL] מחפש עסקה לעריכה ID:', executionId);
+      window.Logger.info('🔍 [EDIT MODAL] מחפש עסקה לעריכה ID:', executionId, { page: "executions" });
       const currentExecution = executionsData.find(e => e.id === parseInt(executionId));
-      console.log('🔍 [EDIT MODAL] עסקה נמצאה:', currentExecution);
+      window.Logger.info('🔍 [EDIT MODAL] עסקה נמצאה:', currentExecution, { page: "executions" });
       
       if (currentExecution && currentExecution.trade_id) {
-        console.log('🔍 [EDIT MODAL] מחפש טרייד מקושר ID:', currentExecution.trade_id);
+        window.Logger.info('🔍 [EDIT MODAL] מחפש טרייד מקושר ID:', currentExecution.trade_id, { page: "executions" });
         const specificTrade = trades.find(trade => trade.id === currentExecution.trade_id);
-        console.log('🔍 [EDIT MODAL] טרייד מקושר נמצא:', specificTrade);
+        window.Logger.info('🔍 [EDIT MODAL] טרייד מקושר נמצא:', specificTrade, { page: "executions" });
         
         if (specificTrade) {
           // בדיקה אם הטרייד הספציפי כבר ברשימה
           const alreadyInList = filteredTrades.some(trade => trade.id === specificTrade.id);
-          console.log('🔍 [EDIT MODAL] טרייד כבר ברשימה:', alreadyInList);
+          window.Logger.info('🔍 [EDIT MODAL] טרייד כבר ברשימה:', alreadyInList, { page: "executions" });
           
           if (!alreadyInList) {
             // הוספת הטרייד הספציפי לרשימה
             filteredTrades.unshift(specificTrade);
-            console.log('✅ [EDIT MODAL] הוספת טרייד ספציפי לעריכה:', specificTrade.id, 'סטטוס:', specificTrade.status);
+            window.Logger.info('✅ [EDIT MODAL] הוספת טרייד ספציפי לעריכה:', specificTrade.id, 'סטטוס:', specificTrade.status, { page: "executions" });
           } else {
-            console.log('✅ [EDIT MODAL] טרייד ספציפי כבר ברשימה:', specificTrade.id);
+            window.Logger.info('✅ [EDIT MODAL] טרייד ספציפי כבר ברשימה:', specificTrade.id, { page: "executions" });
           }
         } else {
-          console.log('❌ [EDIT MODAL] טרייד מקושר לא נמצא ברשימת הטריידים:', currentExecution.trade_id);
+          window.Logger.info('❌ [EDIT MODAL] טרייד מקושר לא נמצא ברשימת הטריידים:', currentExecution.trade_id, { page: "executions" });
         }
       } else {
-        console.log('❌ [EDIT MODAL] אין עסקה או trade_id:', currentExecution);
+        window.Logger.info('❌ [EDIT MODAL] אין עסקה או trade_id:', currentExecution, { page: "executions" });
       }
     }
 
-    console.log('🔄 נמצאו טריידים:', filteredTrades.length);
-    console.log('🔄 טריידים ברשימה:', filteredTrades.map(t => `${t.id}(${t.status})`));
+    window.Logger.info('🔄 נמצאו טריידים:', filteredTrades.length, { page: "executions" });
+    window.Logger.info('🔄 טריידים ברשימה:', filteredTrades.map(t => `${t.id}(${t.status}, { page: "executions" })`));
     
     // לוג נוסף לוודא שהטרייד המקושר נוסף
     if (mode === 'edit') {
@@ -2201,9 +2201,9 @@ async function loadActiveTradesForTicker(mode = 'add', _showClosedTrades = false
       if (currentExecution && currentExecution.trade_id) {
         const tradeInList = filteredTrades.find(t => t.id === currentExecution.trade_id);
         if (tradeInList) {
-          console.log('✅ [EDIT MODAL] טרייד מקושר נמצא ברשימה הסופית:', tradeInList.id, 'סטטוס:', tradeInList.status);
+          window.Logger.info('✅ [EDIT MODAL] טרייד מקושר נמצא ברשימה הסופית:', tradeInList.id, 'סטטוס:', tradeInList.status, { page: "executions" });
         } else {
-          console.log('❌ [EDIT MODAL] טרייד מקושר לא נמצא ברשימה הסופית:', currentExecution.trade_id);
+          window.Logger.info('❌ [EDIT MODAL] טרייד מקושר לא נמצא ברשימה הסופית:', currentExecution.trade_id, { page: "executions" });
         }
       }
     }
@@ -2231,7 +2231,7 @@ async function loadActiveTradesForTicker(mode = 'add', _showClosedTrades = false
             const date = new Date(trade.created_at);
             creationDate = date.toLocaleDateString('he-IL');
           } catch {
-            // // console.warn('⚠️ לא ניתן לעבד תאריך יצירה:', trade.created_at);
+            // // window.Logger.warn('⚠️ לא ניתן לעבד תאריך יצירה:', trade.created_at, { page: "executions" });
           }
         }
 
@@ -2241,11 +2241,11 @@ async function loadActiveTradesForTicker(mode = 'add', _showClosedTrades = false
 
       // הפעלת השדה
       tradeSelect.disabled = false;
-      // // console.log('✅ שדה טרייד עודכן:', filteredTrades.length, 'אפשרויות');
+      // // window.Logger.info('✅ שדה טרייד עודכן:', filteredTrades.length, 'אפשרויות', { page: "executions" });
     }
 
   } catch (error) {
-    // // console.error('❌ שגיאה בטעינת טריידים:', error);
+    // // window.Logger.error('❌ שגיאה בטעינת טריידים:', error, { page: "executions" });
     handleApiError(error, 'טעינת טריידים לטיקר');
   }
 }
@@ -2256,7 +2256,7 @@ async function loadActiveTradesForTicker(mode = 'add', _showClosedTrades = false
  * @param {string} mode - 'add' או 'edit'
  */
 async function updateTradesOnCheckboxChange(mode = 'add') {
-  // // console.log('🔄 עדכון טריידים לפי צ\'קבוקס, מצב:', mode);
+  // // window.Logger.info('🔄 עדכון טריידים לפי צ\'קבוקס, מצב:', mode, { page: "executions" });
 
   try {
     // בדיקת הצ'קבוקס
@@ -2264,7 +2264,7 @@ async function updateTradesOnCheckboxChange(mode = 'add') {
       ? document.getElementById('addExecutionShowClosedTrades')?.checked || false
       : document.getElementById('editExecutionShowClosedTrades')?.checked || false;
 
-    // console.log('🔄 הצג טריידים סגורים:', showClosedTrades);
+    // window.Logger.info('🔄 הצג טריידים סגורים:', showClosedTrades, { page: "executions" });
 
     // קבלת הטיקר הנבחר
     const tickerSelect = mode === 'add'
@@ -2282,7 +2282,7 @@ async function updateTradesOnCheckboxChange(mode = 'add') {
     }
 
   } catch (error) {
-    // // console.error('❌ שגיאה בעדכון טריידים:', error);
+    // // window.Logger.error('❌ שגיאה בעדכון טריידים:', error, { page: "executions" });
     handleApiError(error, 'עדכון טריידים לפי צ\'קבוקס');
   }
 }
@@ -2292,7 +2292,7 @@ async function updateTradesOnCheckboxChange(mode = 'add') {
  * @param {string} mode - 'add' או 'edit'
  */
 async function updateTradesOnTickerChange(mode = 'add') {
-  console.log('🔄 עדכון טריידים לפי שינוי טיקר, מצב:', mode);
+  window.Logger.info('🔄 עדכון טריידים לפי שינוי טיקר, מצב:', mode, { page: "executions" });
 
   try {
     // בדיקת הצ'קבוקס הנוכחי
@@ -2300,13 +2300,13 @@ async function updateTradesOnTickerChange(mode = 'add') {
       ? document.getElementById('addExecutionShowClosedTrades')?.checked || false
       : document.getElementById('editExecutionShowClosedTrades')?.checked || false;
 
-    console.log('🔄 הצג טריידים סגורים:', showClosedTrades);
+    window.Logger.info('🔄 הצג טריידים סגורים:', showClosedTrades, { page: "executions" });
 
     // עדכון הטריידים לטיקר הנבחר
     await loadActiveTradesForTicker(mode, showClosedTrades);
 
   } catch (error) {
-    // console.error('❌ שגיאה בעדכון טריידים:', error);
+    // window.Logger.error('❌ שגיאה בעדכון טריידים:', error, { page: "executions" });
     handleApiError(error, 'עדכון טריידים לפי שינוי טיקר');
   }
 }
@@ -2394,7 +2394,7 @@ function updateExecutionsSummary(executions) {
 
   if (!totalExecutionsElement || !totalBuyExecutionsElement || !totalSellExecutionsElement ||
         !totalBuyAmountElement || !totalSellAmountElement || !balanceAmountElement) {
-    // console.warn('⚠️ Executions summary elements not found - this is expected on trades page');
+    // window.Logger.warn('⚠️ Executions summary elements not found - this is expected on trades page', { page: "executions" });
     return;
   }
 
@@ -2525,7 +2525,7 @@ function disableExecutionFormFields() {
  */
 async function loadExecutionTickerInfo(tickerId) {
   try {
-    console.log('🔄 Loading ticker info for ID:', tickerId);
+    window.Logger.info('🔄 Loading ticker info for ID:', tickerId, { page: "executions" });
     
     // Get ticker data from API
     const response = await fetch(`/api/tickers/`);
@@ -2568,12 +2568,12 @@ async function loadExecutionTickerInfo(tickerId) {
           }
         }
       } catch (error) {
-        console.warn('⚠️ Could not load default commission from preferences:', error);
+        window.Logger.warn('⚠️ Could not load default commission from preferences:', error, { page: "executions" });
       }
     }
     
   } catch (error) {
-    console.error('❌ Error loading ticker info:', error);
+    window.Logger.error('❌ Error loading ticker info:', error, { page: "executions" });
   }
 }
 
@@ -2738,7 +2738,7 @@ function updateExecutionsTableForTradeModal(executions) {
     // בדף trades - עדכון טבלת העסקאות במודל העריכה
     const tableBody = document.getElementById('editTradeExecutionsTable');
     if (!tableBody) {
-      // console.warn('⚠️ editTradeExecutionsTable element not found on trades page');
+      // window.Logger.warn('⚠️ editTradeExecutionsTable element not found on trades page', { page: "executions" });
       return;
     }
 
@@ -2838,7 +2838,7 @@ window.resetExecutionsFilters = window.resetExecutionsFilters || function() {};
   if (typeof window.restoreAllSectionStates === 'function') {
     window.restoreAllSectionStates();
   } else {
-    // console.warn('⚠️ restoreAllSectionStates function not available, using fallback');
+    // window.Logger.warn('⚠️ restoreAllSectionStates function not available, using fallback', { page: "executions" });
     // Fallback: restore top section state manually
     const topSectionHidden = localStorage.getItem('executionsTopSectionCollapsed') === 'true';
     const topSection = document.querySelector('.top-section .section-body');
@@ -2912,14 +2912,14 @@ window.resetExecutionsFilters = window.resetExecutionsFilters || function() {};
 // });
 
 // בדיקה שהפונקציות נטענו בהצלחה
-// console.log('✅ Execution functions loaded:', {
+// window.Logger.info('✅ Execution functions loaded:', {
 //   loadTradeExecutions: typeof loadTradeExecutions,
 //   updateExecutionsTableMain: typeof updateExecutionsTableMain,
 //   updateExecutionsTableForTradeModal: typeof updateExecutionsTableForTradeModal,
 //   addEditBuySell: typeof addEditBuySell,
 //   linkExistingExecution: typeof linkExistingExecution,
 //   unlinkExecution: typeof unlinkExecution,
-// });
+// }, { page: "executions" });
 
 // ===== מערכת פילטרים לעמוד הביצועים =====
 
@@ -3144,9 +3144,9 @@ window.loadExecutionsData = async function() {
   try {
     const tickers = await loadTickersSummaryData();
     updateTickersSummaryTable(tickers);
-    // console.log('✅ טבלת טיקרים חלקית נטענה בהצלחה');
+    // window.Logger.info('✅ טבלת טיקרים חלקית נטענה בהצלחה', { page: "executions" });
   } catch (error) {
-    // console.error('❌ שגיאה בטעינת טבלת טיקרים חלקית:', error);
+    // window.Logger.error('❌ שגיאה בטעינת טבלת טיקרים חלקית:', error, { page: "executions" });
     handleApiError(error, 'טבלת טיקרים חלקית');
   }
 };
@@ -3193,7 +3193,7 @@ function toggleExternalIdField(mode) {
   const externalIdField = document.getElementById(`${prefix}ExecutionExternalId`);
 
   if (!sourceField || !externalIdContainer) {
-    // console.warn(`⚠️ שדות לא נמצאו עבור mode: ${mode}`);
+    // window.Logger.warn(`⚠️ שדות לא נמצאו עבור mode: ${mode}`, { page: "executions" });
     return;
   }
 
@@ -3227,7 +3227,7 @@ let tickersSummaryData = [];
  * טעינת נתוני טיקרים חלקיים
  */
 async function loadTickersSummaryData() {
-  // console.log('🔄 טעינת נתוני טיקרים חלקיים...');
+  // window.Logger.info('🔄 טעינת נתוני טיקרים חלקיים...', { page: "executions" });
 
   try {
     // טעינת טיקרים
@@ -3281,11 +3281,11 @@ async function loadTickersSummaryData() {
     tickersSummaryData = processedTickers;
     window.tickersSummaryData = processedTickers;
 
-    // console.log('✅ טעינת טיקרים חלקיים הושלמה:', processedTickers.length, 'טיקרים');
+    // window.Logger.info('✅ טעינת טיקרים חלקיים הושלמה:', processedTickers.length, 'טיקרים', { page: "executions" });
     return processedTickers;
 
   } catch (error) {
-    // console.error('❌ שגיאה בטעינת טיקרים חלקיים:', error);
+    // window.Logger.error('❌ שגיאה בטעינת טיקרים חלקיים:', error, { page: "executions" });
     handleApiError(error, 'טעינת טיקרים חלקיים');
     return [];
   }
@@ -3295,11 +3295,11 @@ async function loadTickersSummaryData() {
  * עדכון טבלת טיקרים חלקית
  */
 function updateTickersSummaryTable(tickers = null) {
-  // console.log('🔄 עדכון טבלת טיקרים חלקית...');
+  // window.Logger.info('🔄 עדכון טבלת טיקרים חלקית...', { page: "executions" });
 
   const tableBody = document.querySelector('#tickersTable tbody');
   if (!tableBody) {
-    // console.warn('⚠️ טבלת טיקרים לא נמצאה');
+    // window.Logger.warn('⚠️ טבלת טיקרים לא נמצאה', { page: "executions" });
     return;
   }
 
@@ -3328,7 +3328,7 @@ function updateTickersSummaryTable(tickers = null) {
         const date = new Date(ticker.created_at);
         creationDate = date.toLocaleDateString('he-IL');
       } catch {
-        // console.warn('⚠️ לא ניתן לעבד תאריך יצירה:', ticker.created_at);
+        // window.Logger.warn('⚠️ לא ניתן לעבד תאריך יצירה:', ticker.created_at, { page: "executions" });
       }
     }
 
@@ -3367,14 +3367,14 @@ function updateTickersSummaryTable(tickers = null) {
     tableBody.appendChild(row);
   });
 
-  // console.log('✅ טבלת טיקרים חלקית עודכנה:', dataToShow.length, 'שורות');
+  // window.Logger.info('✅ טבלת טיקרים חלקית עודכנה:', dataToShow.length, 'שורות', { page: "executions" });
 }
 
 /**
  * רענון רשימת טיקרים
  */
 async function refreshTickersSummary() {
-  // console.log('🔄 רענון רשימת טיקרים...');
+  // window.Logger.info('🔄 רענון רשימת טיקרים...', { page: "executions" });
 
   try {
     const tickers = await loadTickersSummaryData();
@@ -3384,7 +3384,7 @@ async function refreshTickersSummary() {
       window.showSuccessNotification('רענון הושלם', `נטענו ${tickers.length} טיקרים`);
     }
   } catch {
-    // console.error('❌ שגיאה ברענון טיקרים:', error);
+    // window.Logger.error('❌ שגיאה ברענון טיקרים:', error, { page: "executions" });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה ברענון', 'לא ניתן לרענן את רשימת הטיקרים');
     }
@@ -3395,12 +3395,12 @@ async function refreshTickersSummary() {
  * צפייה בפרטי טיקר
  */
 function viewTickerDetails(tickerId) {
-  // console.log('🔄 צפייה בפרטי טיקר:', tickerId);
+  // window.Logger.info('🔄 צפייה בפרטי טיקר:', tickerId, { page: "executions" });
 
   // מציאת הטיקר
   const ticker = tickersSummaryData.find(t => t.id === tickerId);
   if (!ticker) {
-    // console.warn('⚠️ טיקר לא נמצא:', tickerId);
+    // window.Logger.warn('⚠️ טיקר לא נמצא:', tickerId, { page: "executions" });
     return;
   }
 
@@ -3414,12 +3414,12 @@ function viewTickerDetails(tickerId) {
  * הוספת עסקה לטיקר
  */
 function addExecutionForTicker(tickerId) {
-  // console.log('🔄 הוספת עסקה לטיקר:', tickerId);
+  // window.Logger.info('🔄 הוספת עסקה לטיקר:', tickerId, { page: "executions" });
 
   // מציאת הטיקר
   const ticker = tickersSummaryData.find(t => t.id === tickerId);
   if (!ticker) {
-    // console.warn('⚠️ טיקר לא נמצא:', tickerId);
+    // window.Logger.warn('⚠️ טיקר לא נמצא:', tickerId, { page: "executions" });
     return;
   }
 
@@ -3427,7 +3427,7 @@ function addExecutionForTicker(tickerId) {
   if (typeof window.showAddExecutionModal === 'function') {
     window.showAddExecutionModal();
   } else {
-    console.error('❌ showAddExecutionModal לא זמין במערכת הכללית');
+    window.Logger.error('❌ showAddExecutionModal לא זמין במערכת הכללית', { page: "executions" });
   }
 
   // בחירת הטיקר במודל
@@ -3476,7 +3476,7 @@ window.toggleTickersSection = toggleTickersSection;
  * @param {boolean} showClosedTrades - האם להציג טריידים סגורים
  */
 async function updateTickersList(mode, showClosedTrades = false) {
-  // console.log('🔄 עדכון רשימת טיקרים:', { mode, showClosedTrades });
+  // window.Logger.info('🔄 עדכון רשימת טיקרים:', { mode, showClosedTrades }, { page: "executions" });
 
   try {
     // טעינת כל הטיקרים
@@ -3508,15 +3508,15 @@ async function updateTickersList(mode, showClosedTrades = false) {
         index === self.findIndex(t => t.id === ticker.id),
       );
 
-      // console.log('🔄 טיקרים עם טריידים פעילים:', tickersWithActiveTrades.map(t => t.symbol));
-      // console.log('🔄 טיקרים עם טריידים סגורים:', tickersWithClosedTrades.map(t => t.symbol));
-      // console.log('🔄 סה"כ טיקרים רלוונטיים:', filteredTickers.map(t => t.symbol));
+      // window.Logger.info('🔄 טיקרים עם טריידים פעילים:', tickersWithActiveTrades.map(t => t.symbol, { page: "executions" }));
+      // window.Logger.info('🔄 טיקרים עם טריידים סגורים:', tickersWithClosedTrades.map(t => t.symbol, { page: "executions" }));
+      // window.Logger.info('🔄 סה"כ טיקרים רלוונטיים:', filteredTickers.map(t => t.symbol, { page: "executions" }));
     } else {
       // הצג רק טיקרים עם טריידים פעילים
       filteredTickers = allTickers.filter(ticker =>
         trades.some(trade => trade.ticker_id === ticker.id && (trade.status === 'active' || trade.status === 'open')),
       );
-      // console.log('🔄 טיקרים עם טריידים פעילים בלבד:', filteredTickers.map(t => t.symbol));
+      // window.Logger.info('🔄 טיקרים עם טריידים פעילים בלבד:', filteredTickers.map(t => t.symbol, { page: "executions" }));
     }
 
     // עדכון שדה הטיקר
@@ -3532,12 +3532,12 @@ async function updateTickersList(mode, showClosedTrades = false) {
         option.textContent = `${ticker.symbol} - ${ticker.name}`;
         tickerSelect.appendChild(option);
       });
-      // console.log('✅ רשימת טיקרים עודכנה:', filteredTickers.length, 'טיקרים');
-      // console.log('🔄 טיקרים שנבחרו:', filteredTickers.map(t => t.symbol));
+      // window.Logger.info('✅ רשימת טיקרים עודכנה:', filteredTickers.length, 'טיקרים', { page: "executions" });
+      // window.Logger.info('🔄 טיקרים שנבחרו:', filteredTickers.map(t => t.symbol, { page: "executions" }));
     }
 
   } catch (error) {
-    // console.error('❌ שגיאה בעדכון רשימת טיקרים:', error);
+    // window.Logger.error('❌ שגיאה בעדכון רשימת טיקרים:', error, { page: "executions" });
     handleApiError(error, 'עדכון רשימת טיקרים');
   }
 }
@@ -3552,7 +3552,7 @@ function toggleExecutionsSection() {
     if (typeof window.toggleSection === 'function') {
         window.toggleSection('executions');
     } else {
-        console.warn('toggleSection function not found');
+        window.Logger.warn('toggleSection function not found', { page: "executions" });
     }
 }
 
@@ -3561,7 +3561,7 @@ function saveExecution() {
     if (typeof window.saveExecution === 'function') {
         window.saveExecution();
     } else {
-        console.warn('saveExecution function not found');
+        window.Logger.warn('saveExecution function not found', { page: "executions" });
     }
 }
 
@@ -3569,7 +3569,7 @@ function updateExecution() {
     if (typeof window.updateExecution === 'function') {
         window.updateExecution();
     } else {
-        console.warn('updateExecution function not found');
+        window.Logger.warn('updateExecution function not found', { page: "executions" });
     }
 }
 
@@ -3577,7 +3577,7 @@ function confirmDeleteExecution() {
     if (typeof window.confirmDeleteExecution === 'function') {
         window.confirmDeleteExecution();
     } else {
-        console.warn('confirmDeleteExecution function not found');
+        window.Logger.warn('confirmDeleteExecution function not found', { page: "executions" });
     }
 }
 
@@ -3586,7 +3586,7 @@ function goToLinkedTrade(mode = 'edit') {
     if (typeof window.goToLinkedTrade === 'function') {
         window.goToLinkedTrade(mode);
     } else {
-        console.warn('goToLinkedTrade function not found');
+        window.Logger.warn('goToLinkedTrade function not found', { page: "executions" });
     }
 }
 
@@ -3594,7 +3594,7 @@ function addNewPlan() {
     if (typeof window.addNewPlan === 'function') {
         window.addNewPlan();
     } else {
-        console.warn('addNewPlan function not found');
+        window.Logger.warn('addNewPlan function not found', { page: "executions" });
     }
 }
 
@@ -3602,7 +3602,7 @@ function addNewTrade() {
     if (typeof window.addNewTrade === 'function') {
         window.addNewTrade();
     } else {
-        console.warn('addNewTrade function not found');
+        window.Logger.warn('addNewTrade function not found', { page: "executions" });
     }
 }
 
@@ -3610,7 +3610,7 @@ function addNewTicker() {
     if (typeof window.addNewTicker === 'function') {
         window.addNewTicker();
     } else {
-        console.warn('addNewTicker function not found');
+        window.Logger.warn('addNewTicker function not found', { page: "executions" });
     }
 }
 
@@ -3771,8 +3771,8 @@ function generateDetailedLog() {
     return log.join('\n');
 }
 
-// Local copyDetailedLog function for executions page
-async function copyDetailedLog() {
+// Local  function for executions page
+async function  {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {
@@ -3787,7 +3787,7 @@ async function copyDetailedLog() {
             }
         }
     } catch (error) {
-        console.error('שגיאה בהעתקת הלוג המפורט:', error);
+        window.Logger.error('שגיאה בהעתקת הלוג המפורט:', error, { page: "executions" });
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה בהעתקת הלוג', error.message);
         } else {

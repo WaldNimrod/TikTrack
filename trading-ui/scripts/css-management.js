@@ -2029,7 +2029,7 @@ window.executeDeleteFromFile = executeDeleteFromFile;
 
 // פונקציה להעתקת לוג מפורט
 
-// window.copyDetailedLog export removed - using global version from system-management.js
+// window. export removed - using global version from system-management.js
 // window.toggleAllSections export removed - using global version from ui-utils.js
 // window.toggleSection export removed - using global version from ui-utils.js
 
@@ -2137,6 +2137,6 @@ function generateDetailedLog() {
  */
 
 // ייצוא לגלובל scope
-// window.copyDetailedLog export removed - using global version from system-management.js
+// window. export removed - using global version from system-management.js
 // window.generateDetailedLog export removed - local function only
 

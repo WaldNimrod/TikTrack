@@ -1484,7 +1484,7 @@ async function runAdvancedMonitoring() {
 /**
  * Copy detailed log
  */
-function copyDetailedLog() {
+function  {
     const logData = {
         timestamp: new Date().toISOString(),
         page: window.location.pathname,

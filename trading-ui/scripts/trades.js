@@ -80,13 +80,13 @@
 
 // בדיקה שהפונקציות הנדרשות נטענו
 if (typeof showErrorNotification === 'undefined') {
-  // console.error('showErrorNotification לא נטענה!');
+  // window.Logger.error('showErrorNotification לא נטענה!', { page: "trades" });
 }
 if (typeof showSuccessNotification === 'undefined') {
-  // console.error('showSuccessNotification לא נטענה!');
+  // window.Logger.error('showSuccessNotification לא נטענה!', { page: "trades" });
 }
 if (typeof handleFunctionNotFound === 'undefined') {
-  // console.error('handleFunctionNotFound לא נטענה!');
+  // window.Logger.error('handleFunctionNotFound לא נטענה!', { page: "trades" });
 }
 
 // משתנים גלובליים לדף המעקב
@@ -164,7 +164,7 @@ function getInvestmentTypeColor(investmentType) {
  */
 async function loadTradesData() {
   try {
-    console.log('🚀 loadTradesData: Starting to fetch trades data...');
+    window.Logger.info('🚀 loadTradesData: Starting to fetch trades data...', { page: "trades" });
 
     const response = await fetch('/api/trades/');
 
@@ -173,7 +173,7 @@ async function loadTradesData() {
     }
 
     const responseData = await response.json();
-    console.log('📊 loadTradesData: Received data:', responseData?.data?.length || 0, 'trades');
+    window.Logger.info('📊 loadTradesData: Received data:', responseData?.data?.length || 0, 'trades', { page: "trades" });
 
     if (responseData.status !== 'success') {
       throw new Error(`API error: ${responseData.message || 'Unknown error'}`);
@@ -208,9 +208,9 @@ async function loadTradesData() {
 
     // עדכון המשתנה הגלובלי
     window.tradesData = localTradesData;
-    console.log('💾 loadTradesData: Stored', localTradesData.length, 'trades in window.tradesData');
+    window.Logger.info('💾 loadTradesData: Stored', localTradesData.length, 'trades in window.tradesData', { page: "trades" });
 
-    console.log('🔄 loadTradesData: Calling updateTradesTable...');
+    window.Logger.info('🔄 loadTradesData: Calling updateTradesTable...', { page: "trades" });
     await updateTradesTable(localTradesData);
 
     // עדכון סטטיסטיקות
@@ -220,7 +220,7 @@ async function loadTradesData() {
     if (typeof handleDataLoadError === 'function') {
       handleDataLoadError(error, 'נתוני טריידים');
     } else {
-      // console.error('Error loading trades data:', error);
+      // window.Logger.error('Error loading trades data:', error, { page: "trades" });
     }
 
     const tbody = document.querySelector('#tradesTable tbody');
@@ -230,7 +230,7 @@ async function loadTradesData() {
       if (typeof handleElementNotFound === 'function') {
         handleElementNotFound('#tradesTable tbody', 'CRITICAL');
       } else {
-        // console.error('#tradesTable tbody element not found');
+        // window.Logger.error('#tradesTable tbody element not found', { page: "trades" });
       }
     }
   }
@@ -261,13 +261,13 @@ async function loadTradesData() {
  */
 async function loadTickerDataForTrades(trades) {
   try {
-    console.log('🔄 Loading ticker data for trades...');
+    window.Logger.info('🔄 Loading ticker data for trades...', { page: "trades" });
     
     // Get all unique ticker IDs
     const tickerIds = [...new Set(trades.map(trade => trade.ticker_id).filter(id => id))];
     
     if (tickerIds.length === 0) {
-      console.log('⚠️ No ticker IDs found in trades');
+      window.Logger.info('⚠️ No ticker IDs found in trades', { page: "trades" });
       return {};
     }
     
@@ -290,21 +290,21 @@ async function loadTickerDataForTrades(trades) {
       };
     });
     
-    console.log(`✅ Loaded ticker data for ${Object.keys(tickerDataMap).length} tickers`);
+    window.Logger.info(`✅ Loaded ticker data for ${Object.keys(tickerDataMap, { page: "trades" }).length} tickers`);
     return tickerDataMap;
     
   } catch (error) {
-    console.error('❌ Error loading ticker data:', error);
+    window.Logger.error('❌ Error loading ticker data:', error, { page: "trades" });
     return {};
   }
 }
 
 async function updateTradesTable(trades) {
-  console.log('🔍 updateTradesTable called with:', trades?.length || 0, 'trades');
+  window.Logger.info('🔍 updateTradesTable called with:', trades?.length || 0, 'trades', { page: "trades" });
   
   // בדיקה שהנתונים תקינים
   if (!trades || !Array.isArray(trades)) {
-    console.error('❌ Invalid trades data:', trades);
+    window.Logger.error('❌ Invalid trades data:', trades, { page: "trades" });
     handleValidationError('trades data', 'נתוני טריידים לא תקינים');
     return;
   }
@@ -315,24 +315,24 @@ async function updateTradesTable(trades) {
   // בדיקה אם אנחנו בדף הנכון
   const tradesTable = document.querySelector('#tradesTable');
   if (!tradesTable) {
-    console.warn('⚠️ #tradesTable not found - not on trades page');
+    window.Logger.warn('⚠️ #tradesTable not found - not on trades page', { page: "trades" });
     return;
   }
   
-  console.log('✅ Found #tradesTable, proceeding with update');
+  window.Logger.info('✅ Found #tradesTable, proceeding with update', { page: "trades" });
 
   const tbody = document.querySelector('#tradesTable tbody');
-  console.log('🔍 Looking for tbody:', tbody);
+  window.Logger.info('🔍 Looking for tbody:', tbody, { page: "trades" });
   if (!tbody) {
-    console.error('❌ tbody not found!');
+    window.Logger.error('❌ tbody not found!', { page: "trades" });
     if (typeof handleElementNotFound === 'function') {
       handleElementNotFound('#tradesTable tbody', 'CRITICAL');
     } else {
-      // console.error('#tradesTable tbody element not found');
+      // window.Logger.error('#tradesTable tbody element not found', { page: "trades" });
     }
     return;
   }
-  console.log('✅ Found tbody, proceeding with HTML generation');
+  window.Logger.info('✅ Found tbody, proceeding with HTML generation', { page: "trades" });
 
   const tableHTML = trades.map(trade => {
     // שמירת הערכים המקוריים באנגלית לפילטר
@@ -430,18 +430,18 @@ async function updateTradesTable(trades) {
         ${window.FieldRendererService ? window.FieldRendererService.renderSide(trade.side) : `<span class="side-badge ${trade.side === 'Long' ? 'side-long' : 'side-short'}">${trade.side || 'Long'}</span>`}
       </td>
       <td class="plan-cell">${trade.trade_plan_id ? (window.FieldRendererService ? (() => {
-        console.log('🔍 trades.js DEBUG:', { 
+        window.Logger.info('🔍 trades.js DEBUG:', { 
           trade_plan_id: trade.trade_plan_id, 
           trade_plan_planned_amount: trade.trade_plan_planned_amount, 
           trade_plan_created_at: trade.trade_plan_created_at 
-        });
+        }, { page: "trades" });
         const result = window.FieldRendererService.renderLinkedEntity('trade_plan', trade.trade_plan_id, trade.trade_plan_planned_amount || '', { 
           ticker: trade.ticker_symbol, 
           date: trade.trade_plan_created_at, 
           planned_amount: trade.trade_plan_planned_amount, 
           short: true 
         });
-        console.log('🔍 trades.js RESULT:', result);
+        window.Logger.info('🔍 trades.js RESULT:', result, { page: "trades" });
         return result;
       })() : `<span class="text-danger">❌ FieldRendererService לא זמין</span>`) : '-'}</td>
       <td><strong><a href="#" onclick="viewAccountDetails('${trade.account_id}')" class="account-link">${trade.account_name || trade.account_id || 'חשבון לא ידוע'}</a></strong></td>
@@ -527,7 +527,7 @@ function editTradeRecord(tradeId) {
     if (typeof handleElementNotFound === 'function') {
       handleElementNotFound('trade', 'CRITICAL');
     } else {
-      // console.error('trade not found');
+      // window.Logger.error('trade not found', { page: "trades" });
     }
     window.showErrorNotification('שגיאה', 'טרייד לא נמצא', 6000, 'system');
   }
@@ -548,7 +548,7 @@ async function cancelTradeRecord(tradeId) {
         tradeDetails = `\n\nפרטי הטרייד:\n• טיקר: ${trade.ticker_symbol || 'לא מוגדר'}\n• צד: ${trade.side || 'לא מוגדר'}\n• סטטוס: ${trade.status || 'לא מוגדר'}`;
       }
     } catch {
-      // console.warn('לא ניתן לטעון פרטי טרייד:');
+      // window.Logger.warn('לא ניתן לטעון פרטי טרייד:', { page: "trades" });
     }
 
     // אישור מהמשתמש באמצעות המערכת הגלובלית
@@ -613,7 +613,7 @@ async function cancelTradeRecord(tradeId) {
     if (typeof handleSaveError === 'function') {
       handleSaveError(error, 'ביטול טרייד');
     } else {
-      // console.error('Error canceling trade:', error);
+      // window.Logger.error('Error canceling trade:', error, { page: "trades" });
     }
     window.showErrorNotification('שגיאה', error.message, 6000, 'system');
   }
@@ -639,7 +639,7 @@ async function checkLinkedItemsAndCancel(tradeId) {
     if (typeof handleSystemError === 'function') {
       handleSystemError(error, 'בדיקת מקושרים');
     } else {
-      // console.error('Error checking linked items:', error);
+      // window.Logger.error('Error checking linked items:', error, { page: "trades" });
     }
     window.showErrorNotification('שגיאה', error.message, 6000, 'system');
   }
@@ -682,7 +682,7 @@ async function performTradeCancellation(tradeId) {
     if (typeof handleSaveError === 'function') {
       handleSaveError(error, 'ביטול טרייד');
     } else {
-      // console.error('Error canceling trade:', error);
+      // window.Logger.error('Error canceling trade:', error, { page: "trades" });
     }
     window.showErrorNotification('שגיאה', error.message, 6000, 'system');
   }
@@ -749,7 +749,7 @@ async function deleteTradeRecord(tradeId) {
     if (typeof handleDeleteError === 'function') {
       handleDeleteError(error, 'טרייד');
     } else {
-      // console.error('Error deleting trade:', error);
+      // window.Logger.error('Error deleting trade:', error, { page: "trades" });
     }
     window.showErrorNotification('שגיאה', error.message, 6000, 'system');
   }
@@ -791,7 +791,7 @@ async function performTradeDeletion(tradeId) {
     if (typeof handleDeleteError === 'function') {
       handleDeleteError(error, 'טרייד');
     } else {
-      // console.error('Error deleting trade:', error);
+      // window.Logger.error('Error deleting trade:', error, { page: "trades" });
     }
     window.showErrorNotification('שגיאה', error.message, 6000, 'system');
   }
@@ -840,14 +840,14 @@ async function showEditTradeModal(trade) {
       if (typeof handleFunctionNotFound === 'function') {
         handleFunctionNotFound('loadTradeExecutions');
       } else {
-        // console.warn('loadTradeExecutions function not found');
+        // window.Logger.warn('loadTradeExecutions function not found', { page: "trades" });
       }
     }
   } else {
     if (typeof handleFunctionNotFound === 'function') {
       handleFunctionNotFound('loadTradeExecutions');
     } else {
-      // console.warn('loadTradeExecutions function not found');
+      // window.Logger.warn('loadTradeExecutions function not found', { page: "trades" });
     }
   }
 
@@ -876,7 +876,7 @@ async function showEditTradeModal(trade) {
     if (typeof handleElementNotFound === 'function') {
       handleElementNotFound('editTradeModal', 'CRITICAL');
     } else {
-      // console.error('editTradeModal element not found');
+      // window.Logger.error('editTradeModal element not found', { page: "trades" });
     }
   }
 }
@@ -1053,7 +1053,7 @@ async function loadEditTradeModalData(trade) {
               editTradePlanSelect.value = trade.trade_plan_id;
             } else {
               // התוכנית לא נמצאת ברשימה (כנראה סגורה או מבוטלת)
-              // console.warn('⚠️ Trade plan not found in list - clearing plan link');
+              // window.Logger.warn('⚠️ Trade plan not found in list - clearing plan link', { page: "trades" });
               editTradePlanSelect.setAttribute('data-cleared', 'true');
               editTradePlanSelect.value = '';
 
@@ -1154,7 +1154,7 @@ async function loadEditTradeModalData(trade) {
     if (typeof handleDataLoadError === 'function') {
       handleDataLoadError(error, 'נתונים למודל עריכת טרייד');
     } else {
-      // console.error('Error loading edit modal data:', error);
+      // window.Logger.error('Error loading edit modal data:', error, { page: "trades" });
     }
     if (typeof window.showNotification === 'function') {
       window.showErrorNotification('שגיאה בטעינת נתונים', 'שגיאה בטעינת נתונים למודל העריכה');
@@ -1304,7 +1304,7 @@ async function saveEditTradeData() {
     if (typeof handleSaveError === 'function') {
       handleSaveError(error, 'עדכון טרייד');
     } else {
-      // console.error('Error updating trade:', error);
+      // window.Logger.error('Error updating trade:', error, { page: "trades" });
     }
     window.showErrorNotification('שגיאה', error.message, 6000, 'system');
   }
@@ -1365,7 +1365,7 @@ function showAddTradeModal() {
       if (typeof handleSystemError === 'function') {
         handleSystemError(new Error('Bootstrap is not loaded'), 'מערכת מודלים');
       } else {
-        // console.error('Bootstrap is not loaded');
+        // window.Logger.error('Bootstrap is not loaded', { page: "trades" });
       }
       // נסיון חלופי להצגת המודל
       modalElement.style.display = 'block';
@@ -1376,7 +1376,7 @@ function showAddTradeModal() {
     if (typeof handleElementNotFound === 'function') {
       handleElementNotFound('addTradeModal', 'CRITICAL');
     } else {
-      // console.error('addTradeModal element not found');
+      // window.Logger.error('addTradeModal element not found', { page: "trades" });
     }
   }
 }
@@ -1490,7 +1490,7 @@ function validateTradeForm() {
   if (typeof window.validateForm === 'function') {
     return window.validateForm('addTradeForm', validationRules);
   } else {
-    // console.warn('⚠️ validateForm function not found - validation-utils.js not loaded, skipping validation');
+    // window.Logger.warn('⚠️ validateForm function not found - validation-utils.js not loaded, skipping validation', { page: "trades" });
     return { isValid: true, errors: {}, errorMessages: [] };
   }
 }
@@ -1618,7 +1618,7 @@ async function saveNewTradeRecord() {
       if (typeof handleSaveError === 'function') {
         handleSaveError(new Error(`Status: ${response.status} - ${errorData.error?.message || errorData.message || 'שגיאה לא ידועה'}`), 'שמירת טרייד');
       } else {
-        // console.error('Error saving trade:', errorData);
+        // window.Logger.error('Error saving trade:', errorData, { page: "trades" });
       }
 
       window.showErrorNotification('שגיאה', `שגיאה בשמירת טרייד: ${errorData.error?.message || errorData.message || 'שגיאה לא ידועה'}`);
@@ -1628,7 +1628,7 @@ async function saveNewTradeRecord() {
     if (typeof handleSaveError === 'function') {
       handleSaveError(error, 'שמירת טרייד');
     } else {
-      // console.error('Error saving trade:', error);
+      // window.Logger.error('Error saving trade:', error, { page: "trades" });
     }
     window.showErrorNotification('שגיאה', 'שגיאה בתקשורת עם השרת');
   }
@@ -1747,7 +1747,7 @@ async function loadModalData() {
     if (typeof handleDataLoadError === 'function') {
       handleDataLoadError(error, 'נתונים למודל');
     } else {
-      // console.error('Error loading modal data:', error);
+      // window.Logger.error('Error loading modal data:', error, { page: "trades" });
     }
   }
 }
@@ -1833,7 +1833,7 @@ async function updateTickerFromTradePlan(tradePlanId) {
           if (typeof handleDataLoadError === 'function') {
             handleDataLoadError(error, 'נתוני טיקר');
           } else {
-            // console.error('Error loading ticker data:', error);
+            // window.Logger.error('Error loading ticker data:', error, { page: "trades" });
           }
           // ערכי ברירת מחדל
           document.getElementById('addTradeCurrentPrice').textContent = 'לא זמין';
@@ -1852,7 +1852,7 @@ async function updateTickerFromTradePlan(tradePlanId) {
     if (typeof handleDataLoadError === 'function') {
       handleDataLoadError(error, 'עדכון טיקר');
     } else {
-      // console.error('Error updating ticker:', error);
+      // window.Logger.error('Error updating ticker:', error, { page: "trades" });
     }
   }
 }
@@ -1927,7 +1927,7 @@ window.updateGridFromComponent = function (_selectedStatuses, _selectedTypes, _s
     if (typeof handleFunctionNotFound === 'function') {
       handleFunctionNotFound('loadTradesData');
     } else {
-      // console.warn('loadTradesData function not found');
+      // window.Logger.warn('loadTradesData function not found', { page: "trades" });
     }
   }
 };
@@ -2053,14 +2053,14 @@ function getCurrentPosition(_tradeId) {
 
 // Initialize trades page - integrated with unified system
 window.initializeTradesPage = async function() {
-  console.log('📊 Trades page initialized via unified system');
+  window.Logger.info('📊 Trades page initialized via unified system', { page: "trades" });
   
   // Initialize Cache Manager if not already initialized
   if (typeof window.UnifiedCacheManager !== 'undefined' && typeof window.UnifiedCacheManager.initialize === 'function') {
     try {
       await window.UnifiedCacheManager.initialize();
     } catch (error) {
-      console.log('⚠️ Cache Manager initialization failed:', error);
+      window.Logger.info('⚠️ Cache Manager initialization failed:', error, { page: "trades" });
     }
   }
 
@@ -2071,7 +2071,7 @@ window.initializeTradesPage = async function() {
     window.restoreAllSectionStates();
   } else {
     // Fallback to local section state restoration
-    console.log('⚠️ restoreAllSectionStates not available');
+    window.Logger.info('⚠️ restoreAllSectionStates not available', { page: "trades" });
   }
 
   // Initializing filters
@@ -2108,7 +2108,7 @@ window.initializeTradesPage = async function() {
  * @param {number} tradeId - Trade ID
  */
 function viewLinkedItemsForTrade(tradeId) {
-  console.log('🔗 Viewing linked items for trade:', tradeId);
+  window.Logger.info('🔗 Viewing linked items for trade:', tradeId, { page: "trades" });
   
   if (typeof window.showInfoNotification === 'function') {
     window.showInfoNotification('מידע', 'פונקציונליות זו תהיה זמינה בקרוב');
@@ -2171,7 +2171,7 @@ async function checkLinkedItemsBeforeDelete(tradeId) {
     if (typeof handleSystemError === 'function') {
       handleSystemError(error, 'בדיקת פריטים מקושרים');
     } else {
-      // console.error('Error checking linked items:', error);
+      // window.Logger.error('Error checking linked items:', error, { page: "trades" });
     }
     return false;
   }
@@ -2213,7 +2213,7 @@ async function checkLinkedItemsBeforeCancel(tradeId) {
     if (typeof handleSystemError === 'function') {
       handleSystemError(error, 'בדיקת פריטים מקושרים');
     } else {
-      // console.error('Error checking linked items:', error);
+      // window.Logger.error('Error checking linked items:', error, { page: "trades" });
     }
     return false;
   }
@@ -2282,15 +2282,15 @@ function setupTradeModalListeners() {
  */
 function initializeTradeConditionsSystem() {
     try {
-        console.log('🔧 Initializing trades conditions system...');
+        window.Logger.info('🔧 Initializing trades conditions system...', { page: "trades" });
         
         // Setup modal event listeners for automatic conditions initialization
         setupTradeModalListeners();
         
-        console.log('✅ Trades conditions system initialized');
+        window.Logger.info('✅ Trades conditions system initialized', { page: "trades" });
         
     } catch (error) {
-        console.error('❌ Failed to initialize trades conditions system:', error);
+        window.Logger.error('❌ Failed to initialize trades conditions system:', error, { page: "trades" });
     }
 }
 
@@ -2457,7 +2457,7 @@ async function refreshPositions() {
       window.showSuccessNotification('פוזיציות עודכנו', 'נתוני הפוזיציה עודכנו בהצלחה');
     }
   } catch (error) {
-    console.error('Error refreshing positions:', error);
+    window.Logger.error('Error refreshing positions:', error, { page: "trades" });
     if (window.showErrorNotification) {
       window.showErrorNotification('שגיאה ברענון פוזיציות', error.message);
     }
@@ -2483,7 +2483,7 @@ function updateTableStats() {
     if (typeof handleElementNotFound === 'function') {
       handleElementNotFound('tradesCount', 'CRITICAL');
     } else {
-      // console.error('tradesCount element not found');
+      // window.Logger.error('tradesCount element not found', { page: "trades" });
     }
   }
 
@@ -2548,7 +2548,7 @@ function updateTableStats() {
     if (typeof handleElementNotFound === 'function') {
       handleElementNotFound('summaryStats', 'CRITICAL');
     } else {
-      // console.error('summaryStats element not found');
+      // window.Logger.error('summaryStats element not found', { page: "trades" });
     }
   }
 
@@ -2584,7 +2584,7 @@ async function loadTradePlanDates() {
         if (typeof handleDataLoadError === 'function') {
           handleDataLoadError(error, `תוכנית ${planId}`);
         } else {
-          // console.error(`Error loading plan ${planId}:`, error);
+          // window.Logger.error(`Error loading plan ${planId}:`, error, { page: "trades" });
         }
       }
     }
@@ -2603,7 +2603,7 @@ function filterTradesData(_selectedStatuses, _selectedTypes, _selectedAccounts, 
     if (typeof handleFunctionNotFound === 'function') {
       handleFunctionNotFound('filterDataByFilters');
     } else {
-      // console.warn('filterDataByFilters function not found');
+      // window.Logger.warn('filterDataByFilters function not found', { page: "trades" });
     }
   }
 
@@ -2626,7 +2626,7 @@ function setupSortEventListeners() {
         if (typeof handleFunctionNotFound === 'function') {
           handleFunctionNotFound('sortTable');
         } else {
-          // console.warn('sortTable function not found');
+          // window.Logger.warn('sortTable function not found', { page: "trades" });
         }
       }
     });
@@ -2784,7 +2784,7 @@ async function validateTradeChanges(originalTrade, updatedTrade) {
  */
 async function applyStatusFilterToTrades(selectedStatuses) {
   if (!window.tradesData || !Array.isArray(window.tradesData)) {
-    // console.warn('⚠️ No trades data available for filtering');
+    // window.Logger.warn('⚠️ No trades data available for filtering', { page: "trades" });
     return;
   }
 
@@ -3045,7 +3045,7 @@ async function updateEditTradeTickerFromPlan(tradePlanId) {
     if (typeof handleDataLoadError === 'function') {
       handleDataLoadError(error, 'עדכון טיקר במודל העריכה');
     } else {
-      // console.error('Error updating ticker in edit modal:', error);
+      // window.Logger.error('Error updating ticker in edit modal:', error, { page: "trades" });
     }
   }
 }
@@ -3093,7 +3093,7 @@ async function updateEditTradePriceFromTicker(tickerId) {
     if (typeof handleDataLoadError === 'function') {
       handleDataLoadError(error, 'עדכון מחיר במודל העריכה');
     } else {
-      // console.error('Error updating price in edit modal:', error);
+      // window.Logger.error('Error updating price in edit modal:', error, { page: "trades" });
     }
   }
 }
@@ -3116,7 +3116,7 @@ async function reactivateTrade(tradeId) {
       if (typeof handleElementNotFound === 'function') {
         handleElementNotFound('trade', 'CRITICAL');
       } else {
-        // console.error('trade not found');
+        // window.Logger.error('trade not found', { page: "trades" });
       }
       throw new Error('טרייד לא נמצא');
     }
@@ -3156,7 +3156,7 @@ async function reactivateTrade(tradeId) {
     if (typeof handleSaveError === 'function') {
       handleSaveError(error, 'הפעלה מחדש של טרייד');
     } else {
-      // console.error('Error reactivating trade:', error);
+      // window.Logger.error('Error reactivating trade:', error, { page: "trades" });
     }
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בהפעלה מחדש', error.message);
@@ -3172,7 +3172,7 @@ async function reactivateTrade(tradeId) {
  */
 function refreshTrades() {
   try {
-    console.log('🔄 מרענן נתוני טריידים...');
+    window.Logger.info('🔄 מרענן נתוני טריידים...', { page: "trades" });
     
     // הצגת אינדיקטור טעינה
     if (typeof window.showNotification === 'function') {
@@ -3190,7 +3190,7 @@ function refreshTrades() {
     }
     
   } catch (error) {
-    console.error('שגיאה ברענון טריידים:', error);
+    window.Logger.error('שגיאה ברענון טריידים:', error, { page: "trades" });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה ברענון טריידים', error.message);
     } else if (typeof window.showNotification === 'function') {
@@ -3206,7 +3206,7 @@ function refreshTrades() {
  */
 function updateTrade(tradeId, tradeData) {
   try {
-    console.log('📝 מעדכן טרייד:', tradeId, tradeData);
+    window.Logger.info('📝 מעדכן טרייד:', tradeId, tradeData, { page: "trades" });
     
     // ולידציה בסיסית
     if (!tradeId || !tradeData) {
@@ -3228,7 +3228,7 @@ function updateTrade(tradeId, tradeData) {
       return response.json();
     })
     .then(data => {
-      console.log('✅ טרייד עודכן בהצלחה:', data);
+      window.Logger.info('✅ טרייד עודכן בהצלחה:', data, { page: "trades" });
       
       // רענון הטבלה
       loadTradesData();
@@ -3241,7 +3241,7 @@ function updateTrade(tradeId, tradeData) {
       }
     })
     .catch(error => {
-      console.error('שגיאה בעדכון טרייד:', error);
+      window.Logger.error('שגיאה בעדכון טרייד:', error, { page: "trades" });
       if (typeof window.showErrorNotification === 'function') {
         window.showErrorNotification('שגיאה בעדכון טרייד', error.message);
       } else if (typeof window.showNotification === 'function') {
@@ -3250,7 +3250,7 @@ function updateTrade(tradeId, tradeData) {
     });
     
   } catch (error) {
-    console.error('שגיאה בעדכון טרייד:', error);
+    window.Logger.error('שגיאה בעדכון טרייד:', error, { page: "trades" });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בעדכון טרייד', error.message);
     } else if (typeof window.showNotification === 'function') {
@@ -3266,7 +3266,7 @@ function updateTrade(tradeId, tradeData) {
  */
 function confirmDeleteTrade(tradeId) {
   try {
-    console.log('🗑️ מאשר מחיקת טרייד:', tradeId);
+    window.Logger.info('🗑️ מאשר מחיקת טרייד:', tradeId, { page: "trades" });
     
     // חיפוש הטרייד בנתונים
     const trade = window.tradesData.find(t => t.id === tradeId);
@@ -3287,7 +3287,7 @@ function confirmDeleteTrade(tradeId) {
     }
     
   } catch (error) {
-    console.error('שגיאה באישור מחיקת טרייד:', error);
+    window.Logger.error('שגיאה באישור מחיקת טרייד:', error, { page: "trades" });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה באישור מחיקת טרייד', error.message);
     } else if (typeof window.showNotification === 'function') {
@@ -3472,11 +3472,11 @@ function generateDetailedLog() {
 
 
 // Export log functions to global scope
-// window.copyDetailedLog export removed - using global version from system-management.js
+// window. export removed - using global version from system-management.js
 // window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 
-// Local copyDetailedLog function for trades page
-async function copyDetailedLog() {
+// Local  function for trades page
+async function  {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {
@@ -3494,7 +3494,7 @@ async function copyDetailedLog() {
             }
         }
     } catch (err) {
-        console.error('שגיאה בהעתקה:', err);
+        window.Logger.error('שגיאה בהעתקה:', err, { page: "trades" });
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה בהעתקת הלוג');
         } else {

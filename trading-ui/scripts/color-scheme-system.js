@@ -509,7 +509,9 @@ function findPageClass(body) {
 
 // Page class to entity type mapping
 const PAGE_TO_ENTITY_MAPPING = {
+  'index-page': 'trade', // Dashboard shows trades overview
   'tickers-page': 'ticker',
+  'trading-accounts-page': 'account', // Trading accounts page
   'trades-page': 'trade',
   'accounts-page': 'account',
   'alerts-page': 'alert',

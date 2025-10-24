@@ -31,7 +31,7 @@
  * - No HTML changes required!
  */
 
-console.log('📄 Loading preferences-core.js v3.0.0...');
+window.Logger.info('📄 Loading preferences-core.js v3.0.0...', { page: "preferences-core-new" });
 
 // ============================================================================
 // ERROR CLASSES
@@ -101,7 +101,7 @@ class PreferencesAPIClient {
             return await response.json();
             
         } catch (error) {
-            console.error(`❌ API GET error for ${endpoint}:`, error);
+            window.Logger.error(`❌ API GET error for ${endpoint}:`, error, { page: "preferences-core-new" });
             throw error;
         }
     }
@@ -130,7 +130,7 @@ class PreferencesAPIClient {
             return await response.json();
             
         } catch (error) {
-            console.error(`❌ API POST error for ${endpoint}:`, error);
+            window.Logger.error(`❌ API POST error for ${endpoint}:`, error, { page: "preferences-core-new" });
             throw error;
         }
     }
@@ -290,13 +290,13 @@ class PreferencesValidationManager {
     validate(preferenceName, value, dataType) {
         const validator = this.validators.get(dataType);
         if (!validator) {
-            console.warn(`⚠️ No validator for data type: ${dataType}`);
+            window.Logger.warn(`⚠️ No validator for data type: ${dataType}`, { page: "preferences-core-new" });
             return true; // Allow unknown types
         }
         
         const isValid = validator(value);
         if (!isValid) {
-            console.warn(`⚠️ Validation failed for ${preferenceName}: expected ${dataType}, got ${typeof value}`);
+            window.Logger.warn(`⚠️ Validation failed for ${preferenceName}: expected ${dataType}, got ${typeof value}`, { page: "preferences-core-new" });
         }
         
         return isValid;
@@ -316,7 +316,7 @@ class PreferencesValidationManager {
             }
             return false;
         } catch (error) {
-            console.error(`❌ Error checking preference existence:`, error);
+            window.Logger.error(`❌ Error checking preference existence:`, error, { page: "preferences-core-new" });
             return false;
         }
     }
@@ -351,7 +351,7 @@ class ProfileManager {
             }
             return [];
         } catch (error) {
-            console.error('❌ Error loading profiles:', error);
+            window.Logger.error('❌ Error loading profiles:', error, { page: "preferences-core-new" });
             return [];
         }
     }
@@ -362,7 +362,7 @@ class ProfileManager {
      */
     switchProfile(profileId) {
         this.currentProfile = profileId;
-        console.log(`🔄 Switched to profile: ${profileId}`);
+        window.Logger.info(`🔄 Switched to profile: ${profileId}`, { page: "preferences-core-new" });
     }
     
     /**
@@ -412,7 +412,7 @@ class PreferencesCore {
             
             return result.data.default_value;
         } catch (error) {
-            console.error(`❌ Error getting default preference ${preferenceName}:`, error);
+            window.Logger.error(`❌ Error getting default preference ${preferenceName}:`, error, { page: "preferences-core-new" });
             return null;
         }
     }
@@ -436,18 +436,18 @@ class PreferencesCore {
             });
             
             if (cached !== null) {
-                console.log(`🔍 CACHE DEBUG: Cache hit for ${preferenceName} = ${cached} (key: ${cacheKey})`);
+                window.Logger.info(`🔍 CACHE DEBUG: Cache hit for ${preferenceName} = ${cached} (key: ${cacheKey}, { page: "preferences-core-new" })`);
                 return cached;
             }
         }
         
-        console.log(`🔍 CACHE DEBUG: Cache miss for ${preferenceName} (key: ${cacheKey}) - loading from API`);
+        window.Logger.info(`🔍 CACHE DEBUG: Cache miss for ${preferenceName} (key: ${cacheKey}, { page: "preferences-core-new" }) - loading from API`);
         
         // Check lazy loading if enabled
         if (useLazyLoading && window.LazyLoader) {
             const isLoaded = window.LazyLoader.isLoaded(preferenceName);
             if (!isLoaded) {
-                console.log(`🎯 Loading ${preferenceName} on demand via lazy loader`);
+                window.Logger.info(`🎯 Loading ${preferenceName} on demand via lazy loader`, { page: "preferences-core-new" });
                 // Load all preferences at once from API
                 try {
                     const response = await fetch(`/api/preferences/user?user_id=${userId || this.currentUserId}&profile_id=${profileId || this.currentProfileId}`);
@@ -473,7 +473,7 @@ class PreferencesCore {
                     
                     return value;
                 } catch (error) {
-                    console.error(`❌ Error loading preferences:`, error);
+                    window.Logger.error(`❌ Error loading preferences:`, error, { page: "preferences-core-new" });
                     return null;
                 }
             }
@@ -495,11 +495,11 @@ class PreferencesCore {
                 });
             }
             
-            console.log(`✅ Loaded preference ${preferenceName}:`, value);
+            window.Logger.info(`✅ Loaded preference ${preferenceName}:`, value, { page: "preferences-core-new" });
             return value;
             
         } catch (error) {
-            console.error(`❌ Error loading preference ${preferenceName}:`, error);
+            window.Logger.error(`❌ Error loading preference ${preferenceName}:`, error, { page: "preferences-core-new" });
             return null;
         }
     }
@@ -521,7 +521,7 @@ class PreferencesCore {
                 ttl: 300000
             });
             if (cached !== null) {
-                console.log('✅ Cache hit for all preferences');
+                window.Logger.info('✅ Cache hit for all preferences', { page: "preferences-core-new" });
                 return cached;
             }
         }
@@ -552,11 +552,11 @@ class PreferencesCore {
                 });
             }
             
-            console.log(`✅ Loaded ${Object.keys(result).length} preferences`);
+            window.Logger.info(`✅ Loaded ${Object.keys(result, { page: "preferences-core-new" }).length} preferences`);
             return result;
             
         } catch (error) {
-            console.error('❌ Error loading all preferences:', error);
+            window.Logger.error('❌ Error loading all preferences:', error, { page: "preferences-core-new" });
             return {};
         }
     }
@@ -574,7 +574,7 @@ class PreferencesCore {
         try {
             // Strict validation if available
             if (window.PreferenceValidator) {
-                console.log(`🔍 Validating preference ${preferenceName} before save...`);
+                window.Logger.info(`🔍 Validating preference ${preferenceName} before save...`, { page: "preferences-core-new" });
                 
                 const validationResult = await window.PreferenceValidator.validatePreference(
                     preferenceName, 
@@ -587,7 +587,7 @@ class PreferencesCore {
                     throw new ValidationError(`Validation failed for ${preferenceName}: ${errorMessages}`);
                 }
                 
-                console.log(`✅ Validation passed for ${preferenceName}`);
+                window.Logger.info(`✅ Validation passed for ${preferenceName}`, { page: "preferences-core-new" });
             } else {
                 // Fallback to basic validation
                 const exists = await this.validationManager.checkPreferenceExists(preferenceName);
@@ -605,7 +605,7 @@ class PreferencesCore {
             );
             
             if (success) {
-                console.log(`✅ Saved preference ${preferenceName}:`, value);
+                window.Logger.info(`✅ Saved preference ${preferenceName}:`, value, { page: "preferences-core-new" });
 
                 return {
                     success: true,
@@ -620,7 +620,7 @@ class PreferencesCore {
             }
             
         } catch (error) {
-            console.error(`❌ Error saving preference ${preferenceName}:`, error);
+            window.Logger.error(`❌ Error saving preference ${preferenceName}:`, error, { page: "preferences-core-new" });
             return {
                 success: false,
                 validation: { valid: false, errors: [error] },
@@ -664,7 +664,7 @@ class PreferencesCore {
             await window.UnifiedCacheManager.remove(`all_preferences_${userId || this.currentUserId}_${profileId || this.currentProfileId}`);
         }
         
-        console.log(`✅ Saved ${results.saved} preferences, ${results.errors} errors`);
+        window.Logger.info(`✅ Saved ${results.saved} preferences, ${results.errors} errors`, { page: "preferences-core-new" });
         return results;
     }
     
@@ -673,7 +673,7 @@ class PreferencesCore {
      */
     clearCache() {
         // Cache clearing is now handled by UnifiedCacheManager
-        console.log('🧹 Cache clearing handled by UnifiedCacheManager');
+        window.Logger.info('🧹 Cache clearing handled by UnifiedCacheManager', { page: "preferences-core-new" });
     }
     
     /**
@@ -687,7 +687,7 @@ class PreferencesCore {
         if (window.UnifiedCacheManager) {
             keys.forEach(key => window.UnifiedCacheManager.remove(key));
         }
-        console.log(`🧹 Invalidated ${preferenceNames.length} preferences`);
+        window.Logger.info(`🧹 Invalidated ${preferenceNames.length} preferences`, { page: "preferences-core-new" });
     }
     
     /**
@@ -696,7 +696,7 @@ class PreferencesCore {
      * @param {number} profileId - Profile ID
      */
     async setCurrentProfile(userId, profileId) {
-        console.log(`🔄 Setting current profile to user ${userId}, profile ${profileId}`);
+        window.Logger.info(`🔄 Setting current profile to user ${userId}, profile ${profileId}`, { page: "preferences-core-new" });
         this.currentUserId = userId;
         this.currentProfileId = profileId;
         
@@ -711,7 +711,7 @@ class PreferencesCore {
         }
         
         // Profile switch completed - no cache clearing needed
-        console.log('✅ Profile switch completed successfully');
+        window.Logger.info('✅ Profile switch completed successfully', { page: "preferences-core-new" });
     }
     
     /**
@@ -721,7 +721,7 @@ class PreferencesCore {
      */
     async initializeWithLazyLoading(userId = null, profileId = null) {
         try {
-            console.log('🚀 Initializing preferences with lazy loading...');
+            window.Logger.info('🚀 Initializing preferences with lazy loading...', { page: "preferences-core-new" });
             
             // Update current profile if provided
             if (userId !== null && profileId !== null) {
@@ -734,15 +734,15 @@ class PreferencesCore {
                     userId || this.currentUserId, 
                     profileId || this.currentProfileId
                 );
-                console.log('✅ Lazy loading initialized');
+                window.Logger.info('✅ Lazy loading initialized', { page: "preferences-core-new" });
             } else {
-                console.warn('⚠️ LazyLoader not available, using standard loading');
+                window.Logger.warn('⚠️ LazyLoader not available, using standard loading', { page: "preferences-core-new" });
                 // Fallback to standard loading
                 await this.getAllPreferences(userId, profileId);
             }
             
         } catch (error) {
-            console.error('❌ Error initializing lazy loading:', error);
+            window.Logger.error('❌ Error initializing lazy loading:', error, { page: "preferences-core-new" });
             // Fallback to standard loading
             await this.getAllPreferences(userId, profileId);
         }
@@ -822,12 +822,12 @@ window.initializePreferencesWithLazyLoading = async function(userId = null, prof
 // Auto-initialize when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-        console.log('📄 Preferences core system initialized');
+        window.Logger.info('📄 Preferences core system initialized', { page: "preferences-core-new" });
     });
 } else {
-    console.log('📄 Preferences core system initialized');
+    window.Logger.info('📄 Preferences core system initialized', { page: "preferences-core-new" });
 }
 
 // Event listener removed - UnifiedCacheManager handles preferences refresh directly
 
-console.log('✅ preferences-core.js loaded successfully');
+window.Logger.info('✅ preferences-core.js loaded successfully', { page: "preferences-core-new" });

@@ -42,7 +42,7 @@
             <div class="d-flex justify-content-between align-items-center">
                 <h2><i class="bi bi-gear-fill"></i> העדפות</h2>
                 <div class="section-header-controls">
-                    <button data-button-type="COPY" data-variant="full" data-onclick="copyDetailedLog()" data-text="העתק לוג מפורט" title="העתק לוג מפורט"></button>
+                    <button data-button-type="COPY" data-variant="full" data-onclick="" data-text="העתק לוג מפורט" title="העתק לוג מפורט"></button>
                     <button class="btn btn-outline-secondary btn-sm" onclick="window.toggleSection('infoSummary')" id="toggleInfoBtn">
                         <i class="bi bi-chevron-down"></i>
           </button>
@@ -1154,13 +1154,13 @@
     <!-- 15. Monitoring Functions (Required for page checks) -->
     <script src="scripts/monitoring-functions.js?v=1.0.0"></script>
     
-    <!-- Local copyDetailedLog function for preferences page -->
+    <!-- Local  function for preferences page -->
     <script>
-        // Wait for DOM to be ready before accessing copyDetailedLog
+        // Wait for DOM to be ready before accessing 
         document.addEventListener('DOMContentLoaded', function() {
-            // Make the local copyDetailedLog function available globally for this page only
-            if (typeof copyDetailedLog === 'function') {
-                window.copyDetailedLog = copyDetailedLog;
+            // Make the local  function available globally for this page only
+            if (typeof  === 'function') {
+                window. = ;
             }
 
             // Unified initialization - UI Standardization Round C

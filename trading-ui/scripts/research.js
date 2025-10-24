@@ -2,7 +2,7 @@
 
 // Initialize research page
 function initializeResearchPage() {
-    console.log('🔍 Initializing Research Page...');
+    window.Logger.info('🔍 Initializing Research Page...', { page: "research" });
     
     // Load initial research data
     loadResearchData();
@@ -13,7 +13,7 @@ function initializeResearchPage() {
 
 // Load research data
 function loadResearchData() {
-    console.log('📊 Loading research data...');
+    window.Logger.info('📊 Loading research data...', { page: "research" });
     
     // Simulate loading data
     setTimeout(() => {
@@ -24,7 +24,7 @@ function loadResearchData() {
 // Setup event listeners
 function setupResearchEventListeners() {
     // Add any specific event listeners for research page
-    console.log('🎯 Setting up research event listeners...');
+    window.Logger.info('🎯 Setting up research event listeners...', { page: "research" });
 }
 
 // Research tool functions
@@ -176,11 +176,11 @@ function generateDetailedLog() {
 
 
 // Export functions to global scope
-// window.copyDetailedLog export removed - using global version from system-management.js
+// window. export removed - using global version from system-management.js
 // window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 
-// Local copyDetailedLog function for research page
-async function copyDetailedLog() {
+// Local  function for research page
+async function  {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {
@@ -198,7 +198,7 @@ async function copyDetailedLog() {
             }
         }
     } catch (err) {
-        console.error('שגיאה בהעתקה:', err);
+        window.Logger.error('שגיאה בהעתקה:', err, { page: "research" });
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה בהעתקת הלוג');
         } else {

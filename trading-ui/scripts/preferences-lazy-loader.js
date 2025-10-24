@@ -24,7 +24,7 @@
  * - BackgroundLoader: Background loading for non-critical
  */
 
-console.log('📄 Loading preferences-lazy-loader.js v1.0.0...');
+window.Logger.info('📄 Loading preferences-lazy-loader.js v1.0.0...', { page: "preferences-lazy-loader" });
 
 // ============================================================================
 // PREFERENCE CLASSIFIER
@@ -234,11 +234,11 @@ class LazyLoader {
      * @param {number} profileId - Profile ID
      */
     async initialize(userId = 1, profileId = 3) {
-        console.log('🚀 Initializing lazy loading system...');
+        window.Logger.info('🚀 Initializing lazy loading system...', { page: "preferences-lazy-loader" });
         
         // Check if PreferencesCore is available
         if (!window.PreferencesCore) {
-            console.warn('⚠️ PreferencesCore not available, skipping lazy loading initialization');
+            window.Logger.warn('⚠️ PreferencesCore not available, skipping lazy loading initialization', { page: "preferences-lazy-loader" });
             return;
         }
         
@@ -248,7 +248,7 @@ class LazyLoader {
         // Start background loading for high priority
         this.startBackgroundLoading(userId, profileId);
         
-        console.log('✅ Lazy loading system initialized');
+        window.Logger.info('✅ Lazy loading system initialized', { page: "preferences-lazy-loader" });
     }
     
     /**
@@ -260,7 +260,7 @@ class LazyLoader {
         const criticalPrefs = this.classifier.getPreferencesByClassification('critical');
         this.loadingStats.critical.total = criticalPrefs.length;
         
-        console.log(`🔥 Loading ${criticalPrefs.length} critical preferences...`);
+        window.Logger.info(`🔥 Loading ${criticalPrefs.length} critical preferences...`, { page: "preferences-lazy-loader" });
         
         try {
             // Load all preferences at once from API
@@ -286,10 +286,10 @@ class LazyLoader {
                 }
             }
             
-            console.log(`✅ Loaded ${successCount}/${criticalPrefs.length} critical preferences`);
+            window.Logger.info(`✅ Loaded ${successCount}/${criticalPrefs.length} critical preferences`, { page: "preferences-lazy-loader" });
             
         } catch (error) {
-            console.error('❌ Error loading critical preferences:', error);
+            window.Logger.error('❌ Error loading critical preferences:', error, { page: "preferences-lazy-loader" });
             // Fallback to individual loading
             const promises = criticalPrefs.map(async (prefName) => {
                 try {
@@ -298,7 +298,7 @@ class LazyLoader {
                     this.loadingStats.critical.loaded++;
                     return { name: prefName, value, success: true };
                 } catch (error) {
-                    console.warn(`⚠️ Failed to load critical preference ${prefName}:`, error);
+                    window.Logger.warn(`⚠️ Failed to load critical preference ${prefName}:`, error, { page: "preferences-lazy-loader" });
                     return { name: prefName, value: null, success: false, error };
                 }
             });
@@ -306,7 +306,7 @@ class LazyLoader {
             const results = await Promise.all(promises);
             const successCount = results.filter(r => r.success).length;
             
-            console.log(`✅ Loaded ${successCount}/${criticalPrefs.length} critical preferences (fallback)`);
+            window.Logger.info(`✅ Loaded ${successCount}/${criticalPrefs.length} critical preferences (fallback, { page: "preferences-lazy-loader" })`);
         }
     }
     
@@ -345,7 +345,7 @@ class LazyLoader {
         const highPrefs = this.classifier.getPreferencesByClassification('high');
         this.loadingStats.high.total = highPrefs.length;
         
-        console.log(`⚡ Loading ${highPrefs.length} high priority preferences...`);
+        window.Logger.info(`⚡ Loading ${highPrefs.length} high priority preferences...`, { page: "preferences-lazy-loader" });
         
         // Load in batches to avoid overwhelming the server
         const batchSize = 5;
@@ -360,14 +360,14 @@ class LazyLoader {
                     this.loadingStats.high.loaded++;
                 });
             } catch (error) {
-                console.warn(`⚠️ Batch loading failed:`, error);
+                window.Logger.warn(`⚠️ Batch loading failed:`, error, { page: "preferences-lazy-loader" });
             }
             
             // Small delay between batches
             await new Promise(resolve => setTimeout(resolve, 50));
         }
         
-        console.log(`✅ Loaded ${this.loadingStats.high.loaded}/${highPrefs.length} high priority preferences`);
+        window.Logger.info(`✅ Loaded ${this.loadingStats.high.loaded}/${highPrefs.length} high priority preferences`, { page: "preferences-lazy-loader" });
     }
     
     /**
@@ -379,7 +379,7 @@ class LazyLoader {
         const mediumPrefs = this.classifier.getPreferencesByClassification('medium');
         this.loadingStats.medium.total = mediumPrefs.length;
         
-        console.log(`📊 Loading ${mediumPrefs.length} medium priority preferences...`);
+        window.Logger.info(`📊 Loading ${mediumPrefs.length} medium priority preferences...`, { page: "preferences-lazy-loader" });
         
         // Load in smaller batches
         const batchSize = 3;
@@ -394,14 +394,14 @@ class LazyLoader {
                     this.loadingStats.medium.loaded++;
                 });
             } catch (error) {
-                console.warn(`⚠️ Medium priority batch loading failed:`, error);
+                window.Logger.warn(`⚠️ Medium priority batch loading failed:`, error, { page: "preferences-lazy-loader" });
             }
             
             // Longer delay between batches
             await new Promise(resolve => setTimeout(resolve, 100));
         }
         
-        console.log(`✅ Loaded ${this.loadingStats.medium.loaded}/${mediumPrefs.length} medium priority preferences`);
+        window.Logger.info(`✅ Loaded ${this.loadingStats.medium.loaded}/${mediumPrefs.length} medium priority preferences`, { page: "preferences-lazy-loader" });
     }
     
     /**
@@ -413,7 +413,7 @@ class LazyLoader {
         const lowPrefs = this.classifier.getPreferencesByClassification('low');
         this.loadingStats.low.total = lowPrefs.length;
         
-        console.log(`🐌 Loading ${lowPrefs.length} low priority preferences in background...`);
+        window.Logger.info(`🐌 Loading ${lowPrefs.length} low priority preferences in background...`, { page: "preferences-lazy-loader" });
         
         // Load one by one with longer delays
         for (const prefName of lowPrefs) {
@@ -422,14 +422,14 @@ class LazyLoader {
                 this.loadedPreferences.add(prefName);
                 this.loadingStats.low.loaded++;
             } catch (error) {
-                console.warn(`⚠️ Failed to load low priority preference ${prefName}:`, error);
+                window.Logger.warn(`⚠️ Failed to load low priority preference ${prefName}:`, error, { page: "preferences-lazy-loader" });
             }
             
             // Delay between each preference
             await new Promise(resolve => setTimeout(resolve, 200));
         }
         
-        console.log(`✅ Loaded ${this.loadingStats.low.loaded}/${lowPrefs.length} low priority preferences`);
+        window.Logger.info(`✅ Loaded ${this.loadingStats.low.loaded}/${lowPrefs.length} low priority preferences`, { page: "preferences-lazy-loader" });
     }
     
     /**
@@ -447,7 +447,7 @@ class LazyLoader {
         
         // Check if PreferencesCore is available
         if (!window.PreferencesCore) {
-            console.warn(`⚠️ PreferencesCore not available for ${preferenceName}`);
+            window.Logger.warn(`⚠️ PreferencesCore not available for ${preferenceName}`, { page: "preferences-lazy-loader" });
             return null;
         }
         
@@ -477,10 +477,10 @@ class LazyLoader {
      * @returns {Promise<any>} Preference value
      */
     async loadOnDemand(preferenceName, userId = 1, profileId = 3) {
-        console.log(`🎯 Loading preference on demand: ${preferenceName}`);
+        window.Logger.info(`🎯 Loading preference on demand: ${preferenceName}`, { page: "preferences-lazy-loader" });
         
         const classification = this.classifier.classify(preferenceName);
-        console.log(`📊 Classification: ${classification}`);
+        window.Logger.info(`📊 Classification: ${classification}`, { page: "preferences-lazy-loader" });
         
         return await this.loadSinglePreference(preferenceName, userId, profileId);
     }
@@ -572,10 +572,10 @@ window.isPreferenceLoaded = function(preferenceName) {
 // Auto-initialize when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-        console.log('📄 Lazy loading system ready');
+        window.Logger.info('📄 Lazy loading system ready', { page: "preferences-lazy-loader" });
     });
 } else {
-    console.log('📄 Lazy loading system ready');
+    window.Logger.info('📄 Lazy loading system ready', { page: "preferences-lazy-loader" });
 }
 
-console.log('✅ preferences-lazy-loader.js loaded successfully');
+window.Logger.info('✅ preferences-lazy-loader.js loaded successfully', { page: "preferences-lazy-loader" });

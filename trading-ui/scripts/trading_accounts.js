@@ -1,9 +1,9 @@
 /* ===== מערכת ניהול חשבונות מסחר ===== */
-console.log('📁 trading_accounts.js נטען - מתחיל אתחול');
+window.Logger.info('📁 trading_accounts.js נטען - מתחיל אתחול', { page: "trading_accounts" });
 
 // Import getCurrencyDisplay from data-utils.js
 if (typeof window.getCurrencyDisplay !== 'function') {
-  console.warn('⚠️ getCurrencyDisplay not available, using fallback');
+  window.Logger.warn('⚠️ getCurrencyDisplay not available, using fallback', { page: "trading_accounts" });
   window.getCurrencyDisplay = function(account) {
     if (account.currency_symbol) {
       switch (account.currency_symbol) {
@@ -21,31 +21,31 @@ if (typeof window.getCurrencyDisplay !== 'function') {
 // ייצוא מוקדם של הפונקציה למניעת שגיאות
 window.loadTradingAccountsDataForTradingAccountsPage = window.loadTradingAccountsDataForTradingAccountsPage || function() {
   // loadTradingAccountsDataForTradingAccountsPage not yet defined, using placeholder
-  console.log('⚠️ loadTradingAccountsDataForTradingAccountsPage placeholder called');
+  window.Logger.info('⚠️ loadTradingAccountsDataForTradingAccountsPage placeholder called', { page: "trading_accounts" });
 };
 
 // הגדרת הפונקציה המלאה מיד אחרי ה-placeholder
 window.loadTradingAccountsDataForTradingAccountsPage = async function() {
-  console.log('🚀🚀🚀 loadTradingAccountsDataForTradingAccountsPage התחיל 🚀🚀🚀');
-  console.log('🔍 בדיקת זמינות פונקציות:');
-  console.log('  - apiCall:', typeof window.apiCall);
-  console.log('  - updateTradingAccountsTable:', typeof window.updateTradingAccountsTable);
+  window.Logger.info('🚀🚀🚀 loadTradingAccountsDataForTradingAccountsPage התחיל 🚀🚀🚀', { page: "trading_accounts" });
+  window.Logger.info('🔍 בדיקת זמינות פונקציות:', { page: "trading_accounts" });
+  window.Logger.info('  - apiCall:', typeof window.apiCall, { page: "trading_accounts" });
+  window.Logger.info('  - updateTradingAccountsTable:', typeof window.updateTradingAccountsTable, { page: "trading_accounts" });
   try {
     // טעינת נתונים מהשרת
     let trading_accounts;
     if (typeof window.loadTradingAccountsDataFromAPI === 'function') {
-      console.log('📡 משתמש ב-loadTradingAccountsDataFromAPI');
+      window.Logger.info('📡 משתמש ב-loadTradingAccountsDataFromAPI', { page: "trading_accounts" });
       trading_accounts = await window.loadTradingAccountsDataFromAPI();
     } else {
-      console.log('📡 משתמש ב-loadTradingAccountsData');
+      window.Logger.info('📡 משתמש ב-loadTradingAccountsData', { page: "trading_accounts" });
       trading_accounts = await loadTradingAccountsData();
     }
     
-    console.log('📊 נתונים שהתקבלו:', trading_accounts ? trading_accounts.length : 0, 'חשבונות מסחר');
+    window.Logger.info('📊 נתונים שהתקבלו:', trading_accounts ? trading_accounts.length : 0, 'חשבונות מסחר', { page: "trading_accounts" });
 
     // בדיקה שהנתונים תקינים
     if (!trading_accounts || !Array.isArray(trading_accounts)) {
-      console.warn('⚠️ נתונים לא תקינים התקבלו מהשרת:', trading_accounts);
+      window.Logger.warn('⚠️ נתונים לא תקינים התקבלו מהשרת:', trading_accounts, { page: "trading_accounts" });
       // במקום לזרוק שגיאה, נשתמש בנתוני דמו
       trading_accounts = [];
     }
@@ -53,7 +53,7 @@ window.loadTradingAccountsDataForTradingAccountsPage = async function() {
     // שמירת הנתונים במשתנה גלובלי
     window.trading_accountsData = trading_accounts;
     window.allTradingAccountsData = trading_accounts;
-    console.log('💾 נתונים נשמרו ב-window.trading_accountsData:', trading_accounts.length, 'חשבונות מסחר');
+    window.Logger.info('💾 נתונים נשמרו ב-window.trading_accountsData:', trading_accounts.length, 'חשבונות מסחר', { page: "trading_accounts" });
 
     // החלת פילטרים על הנתונים
     let filteredTradingAccounts = [...trading_accounts];
@@ -77,22 +77,22 @@ window.loadTradingAccountsDataForTradingAccountsPage = async function() {
       }
     }
 
-    console.log('🔍 נתונים מסוננים:', filteredTradingAccounts.length, 'חשבונות מסחר');
+    window.Logger.info('🔍 נתונים מסוננים:', filteredTradingAccounts.length, 'חשבונות מסחר', { page: "trading_accounts" });
 
     // עדכון הטבלה
     if (typeof window.updateTradingAccountsTable === 'function') {
-      console.log('📊 מעדכן את טבלת החשבונות המסחר');
+      window.Logger.info('📊 מעדכן את טבלת החשבונות המסחר', { page: "trading_accounts" });
       window.updateTradingAccountsTable(filteredTradingAccounts);
     } else {
-      console.warn('⚠️ updateTradingAccountsTable לא זמין');
+      window.Logger.warn('⚠️ updateTradingAccountsTable לא זמין', { page: "trading_accounts" });
     }
 
     // עדכון סטטיסטיקות
     if (typeof window.updateTradingAccountsSummary === 'function') {
-      console.log('📈 מעדכן את סטטיסטיקות החשבונות המסחר');
+      window.Logger.info('📈 מעדכן את סטטיסטיקות החשבונות המסחר', { page: "trading_accounts" });
       window.updateTradingAccountsSummary(filteredTradingAccounts);
     } else {
-      console.warn('⚠️ updateTradingAccountsSummary לא זמין');
+      window.Logger.warn('⚠️ updateTradingAccountsSummary לא זמין', { page: "trading_accounts" });
     }
 
     // עדכון מונה הטבלה
@@ -101,10 +101,10 @@ window.loadTradingAccountsDataForTradingAccountsPage = async function() {
       countElement.textContent = `${filteredTradingAccounts.length} חשבונות מסחר`;
     }
 
-    console.log('✅ loadTradingAccountsDataForTradingAccountsPage הושלם בהצלחה');
+    window.Logger.info('✅ loadTradingAccountsDataForTradingAccountsPage הושלם בהצלחה', { page: "trading_accounts" });
 
   } catch (error) {
-    console.error('❌ שגיאה ב-loadTradingAccountsDataForTradingAccountsPage:', error);
+    window.Logger.error('❌ שגיאה ב-loadTradingAccountsDataForTradingAccountsPage:', error, { page: "trading_accounts" });
     
     // הצגת הודעת שגיאה למשתמש
     if (typeof window.showErrorNotification === 'function') {
@@ -162,7 +162,7 @@ window.currenciesLoaded = false;
 // פונקציה לטעינת מטבעות מהשרת
 async function loadCurrenciesFromServer() {
   try {
-    const token = localStorage.getItem('authToken');
+    const token = await window.unifiedCacheManager?.get('authToken') || localStorage.getItem('authToken');
     const headers = {
       'Content-Type': 'application/json',
     };
@@ -252,14 +252,14 @@ async function generateCurrencyOptions(tradingAccount = null) {
 
 // פונקציה לטעינת חשבונות מהשרת
 async function loadTradingAccountsFromServer() {
-  console.log('🚀🚀🚀 loadTradingAccountsFromServer התחיל 🚀🚀🚀');
+  window.Logger.info('🚀🚀🚀 loadTradingAccountsFromServer התחיל 🚀🚀🚀', { page: "trading_accounts" });
   try {
     // בדיקה אם יש token שמור
-    const token = localStorage.getItem('authToken');
-    console.log('🔑 Token זמין:', !!token);
+    const token = await window.unifiedCacheManager?.get('authToken') || localStorage.getItem('authToken');
+    window.Logger.info('🔑 Token זמין:', !!token, { page: "trading_accounts" });
 
     if (!token) {
-      console.log('⚠️ אין token - מנסה לטעון ללא הרשאה');
+      window.Logger.info('⚠️ אין token - מנסה לטעון ללא הרשאה', { page: "trading_accounts" });
     }
 
     // Fetching trading_accounts from server
@@ -271,25 +271,25 @@ async function loadTradingAccountsFromServer() {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    console.log('📡 שליחת בקשה ל-API:', '/api/trading-accounts/');
+    window.Logger.info('📡 שליחת בקשה ל-API:', '/api/trading-accounts/', { page: "trading_accounts" });
     const response = await fetch('/api/trading-accounts/', {
       method: 'GET',
       headers,
     });
     
-    console.log('📡 תגובת שרת:', response.status, response.ok);
+    window.Logger.info('📡 תגובת שרת:', response.status, response.ok, { page: "trading_accounts" });
 
     if (response.ok) {
       const responseData = await response.json();
-      console.log('📊 נתונים גולמיים מהשרת:', responseData);
+      window.Logger.info('📊 נתונים גולמיים מהשרת:', responseData, { page: "trading_accounts" });
 
       // טיפול במבנה התשובה - יכול להיות ישירות מערך או בתוך data
       const allTradingAccounts = responseData.data || responseData;
-      console.log('📊 כל החשבונות המסחר:', allTradingAccounts.length, 'חשבונות');
+      window.Logger.info('📊 כל החשבונות המסחר:', allTradingAccounts.length, 'חשבונות', { page: "trading_accounts" });
 
       // סינון רק חשבונות בסטטוס open
       const openTradingAccounts = allTradingAccounts.filter(tradingAccount => tradingAccount.status === 'open');
-      console.log('📊 חשבונות מסחר פתוחים:', openTradingAccounts.length, 'חשבונות');
+      window.Logger.info('📊 חשבונות מסחר פתוחים:', openTradingAccounts.length, 'חשבונות', { page: "trading_accounts" });
       
       window.trading_accountsData = openTradingAccounts;
       window.trading_accountsLoaded = true;
@@ -302,12 +302,12 @@ async function loadTradingAccountsFromServer() {
       // החזרת הנתונים לטעינה חוזרת
       return openTradingAccounts;
     } else {
-      console.warn('⚠️ תגובת שרת לא תקינה:', response.status);
+      window.Logger.warn('⚠️ תגובת שרת לא תקינה:', response.status, { page: "trading_accounts" });
       loadDefaultTradingAccounts();
     }
 
   } catch (error) {
-    console.error('❌ שגיאה בטעינת חשבונות מהשרת:', error);
+    window.Logger.error('❌ שגיאה בטעינת חשבונות מהשרת:', error, { page: "trading_accounts" });
     loadDefaultTradingAccounts();
   }
 }
@@ -315,7 +315,7 @@ async function loadTradingAccountsFromServer() {
 // פונקציה לטעינת כל החשבונות מהשרת (לפילטר)
 async function loadAllTradingAccountsFromServer() {
   try {
-    const token = localStorage.getItem('authToken');
+    const token = await window.unifiedCacheManager?.get('authToken') || localStorage.getItem('authToken');
     const headers = {
       'Content-Type': 'application/json',
     };
@@ -385,20 +385,20 @@ function loadDefaultTradingAccounts() {
 
 // פונקציה לטעינת נתוני חשבונות מסחר מהשרת
 async function loadTradingAccountsData() {
-  console.log('🚀🚀🚀 loadTradingAccountsData התחיל 🚀🚀🚀');
+  window.Logger.info('🚀🚀🚀 loadTradingAccountsData התחיל 🚀🚀🚀', { page: "trading_accounts" });
   try {
     // טוען נתוני חשבונות מסחר מהשרת
 
     // בדיקה אם יש פונקציה apiCall זמינה
     if (typeof window.apiCall === 'function') {
-      console.log('📡 משתמש ב-apiCall');
+      window.Logger.info('📡 משתמש ב-apiCall', { page: "trading_accounts" });
       const response = await window.apiCall('/api/trading-accounts/');
       const trading_accounts = response.data || response;
-      console.log('📊 חשבונות מסחר מ-apiCall:', trading_accounts.length, 'חשבונות');
+      window.Logger.info('📊 חשבונות מסחר מ-apiCall:', trading_accounts.length, 'חשבונות', { page: "trading_accounts" });
       // חשבונות שהתקבלו
       return trading_accounts;
     } else {
-      console.log('📡 apiCall לא זמין - משתמש ב-loadTradingAccountsFromServer');
+      window.Logger.info('📡 apiCall לא זמין - משתמש ב-loadTradingAccountsFromServer', { page: "trading_accounts" });
       // קריאה ישירה ל-API
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const response = await fetch(`${base}/api/trading-accounts/`);
@@ -426,41 +426,41 @@ async function loadTradingAccountsData() {
  * updateTradingAccountsTable(trading_accounts);
  */
 function updateTradingAccountsTable(trading_accounts) {
-  console.log('🚀🚀🚀 updateTradingAccountsTable התחיל עם', trading_accounts ? trading_accounts.length : 0, 'חשבונות 🚀🚀🚀');
+  window.Logger.info('🚀🚀🚀 updateTradingAccountsTable התחיל עם', trading_accounts ? trading_accounts.length : 0, 'חשבונות 🚀🚀🚀', { page: "trading_accounts" });
   
   // בדיקה שהפרמטר תקין
   if (!trading_accounts || !Array.isArray(trading_accounts)) {
-    console.error('❌ פרמטר חשבונות לא תקין:', trading_accounts);
+    window.Logger.error('❌ פרמטר חשבונות לא תקין:', trading_accounts, { page: "trading_accounts" });
     handleValidationError('updateTradingAccountsTable', 'פרמטר חשבונות לא תקין');
     return;
   }
 
   const tbody = document.querySelector('#accountsTable tbody');
   if (!tbody) {
-    console.warn('⚠️ לא נמצא tbody לטבלת חשבונות - ייתכן שהדף לא נטען עדיין');
-    console.log('🔍 חיפוש אלטרנטיבי...');
+    window.Logger.warn('⚠️ לא נמצא tbody לטבלת חשבונות - ייתכן שהדף לא נטען עדיין', { page: "trading_accounts" });
+    window.Logger.info('🔍 חיפוש אלטרנטיבי...', { page: "trading_accounts" });
     const table = document.querySelector('#accountsTable');
     if (table) {
-      console.log('✅ נמצאה הטבלה:', table);
+      window.Logger.info('✅ נמצאה הטבלה:', table, { page: "trading_accounts" });
       const tbodyAlt = table.querySelector('tbody');
       if (tbodyAlt) {
-        console.log('✅ נמצא tbody אלטרנטיבי:', tbodyAlt);
+        window.Logger.info('✅ נמצא tbody אלטרנטיבי:', tbodyAlt, { page: "trading_accounts" });
         // המשך עם tbodyAlt
         tbody = tbodyAlt;
       } else {
-        console.error('❌ לא נמצא tbody בטבלה');
+        window.Logger.error('❌ לא נמצא tbody בטבלה', { page: "trading_accounts" });
         return;
       }
     } else {
-      console.error('❌ לא נמצאה הטבלה #accountsTable');
+      window.Logger.error('❌ לא נמצאה הטבלה #accountsTable', { page: "trading_accounts" });
       return;
     }
   }
 
   // בניית הטבלה מחדש לפי הכותרות בדיוק
-  console.log('📊 עדכון טבלת חשבונות עם', trading_accounts.length, 'חשבונות');
-  console.log('🔍 tbody נמצא:', tbody);
-  console.log('🔍 tbody.innerHTML לפני עדכון:', tbody.innerHTML.length, 'תווים');
+  window.Logger.info('📊 עדכון טבלת חשבונות עם', trading_accounts.length, 'חשבונות', { page: "trading_accounts" });
+  window.Logger.info('🔍 tbody נמצא:', tbody, { page: "trading_accounts" });
+  window.Logger.info('🔍 tbody.innerHTML לפני עדכון:', tbody.innerHTML.length, 'תווים', { page: "trading_accounts" });
   
   tbody.innerHTML = trading_accounts.map(tradingAccount => {
     // המרת סטטוס לעברית לפילטר
@@ -521,9 +521,9 @@ function updateTradingAccountsTable(trading_accounts) {
   // עדכון הסטטיסטיקות
   updateTradingAccountsSummary(trading_accounts);
 
-  console.log('✅ טבלת חשבונות עודכנה בהצלחה עם', trading_accounts.length, 'חשבונות');
-  console.log('🔍 tbody.innerHTML אחרי עדכון:', tbody.innerHTML.length, 'תווים');
-  console.log('🔍 מספר שורות בטבלה:', tbody.children.length);
+  window.Logger.info('✅ טבלת חשבונות עודכנה בהצלחה עם', trading_accounts.length, 'חשבונות', { page: "trading_accounts" });
+  window.Logger.info('🔍 tbody.innerHTML אחרי עדכון:', tbody.innerHTML.length, 'תווים', { page: "trading_accounts" });
+  window.Logger.info('🔍 מספר שורות בטבלה:', tbody.children.length, { page: "trading_accounts" });
   // END UPDATE TRADING ACCOUNTS TABLE
 }
 
@@ -539,7 +539,7 @@ function updateTradingAccountsSummary(trading_accounts) {
   const totalBalanceElement = document.getElementById('totalBalance');
 
   if (!totalAccountsElement || !activeAccountsElement || !openAccountsElement || !totalBalanceElement) {
-    console.warn('⚠️ Trading accounts summary elements not found');
+    window.Logger.warn('⚠️ Trading accounts summary elements not found', { page: "trading_accounts" });
     return;
   }
 
@@ -1290,34 +1290,34 @@ function showEditTradingAccountModal(tradingAccount) {
  * @returns {Promise<Array>} מערך של חשבונות
  */
 async function loadTradingAccountsDataFromAPI() {
-  console.log('🚀🚀🚀 loadTradingAccountsDataFromAPI התחיל 🚀🚀🚀');
+  window.Logger.info('🚀🚀🚀 loadTradingAccountsDataFromAPI התחיל 🚀🚀🚀', { page: "trading_accounts" });
   try {
-    console.log('📡 שליחת בקשה ל-API:', '/api/trading-accounts/');
+    window.Logger.info('📡 שליחת בקשה ל-API:', '/api/trading-accounts/', { page: "trading_accounts" });
     const response = await fetch('/api/trading-accounts/');
-    console.log('📡 תגובת שרת:', response.status, response.ok);
+    window.Logger.info('📡 תגובת שרת:', response.status, response.ok, { page: "trading_accounts" });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const result = await response.json();
-    console.log('📊 תוצאה מ-API:', result);
+    window.Logger.info('📊 תוצאה מ-API:', result, { page: "trading_accounts" });
 
     // בדיקה אם התוצאה מכילה מערך נתונים
     if (result.data && Array.isArray(result.data)) {
-      console.log('📊 החזרת נתונים מ-result.data:', result.data.length, 'חשבונות');
+      window.Logger.info('📊 החזרת נתונים מ-result.data:', result.data.length, 'חשבונות', { page: "trading_accounts" });
       return result.data;
     } else if (Array.isArray(result)) {
-      console.log('📊 החזרת נתונים מ-result:', result.length, 'חשבונות');
+      window.Logger.info('📊 החזרת נתונים מ-result:', result.length, 'חשבונות', { page: "trading_accounts" });
       return result;
     } else {
-      console.error('❌ פורמט תגובה לא תקין:', result);
+      window.Logger.error('❌ פורמט תגובה לא תקין:', result, { page: "trading_accounts" });
       handleSystemError(new Error('מבנה נתונים לא צפוי'), 'מבנה נתונים לא צפוי מה-API');
       throw new Error('מבנה נתונים לא צפוי מה-API');
     }
 
   } catch (error) {
-    console.error('❌ שגיאה ב-loadTradingAccountsDataFromAPI:', error);
+    window.Logger.error('❌ שגיאה ב-loadTradingAccountsDataFromAPI:', error, { page: "trading_accounts" });
     handleApiError('שגיאה בקריאה ל-API', error.message);
     throw error;
   }
@@ -1636,7 +1636,7 @@ function showOpenTradesWarning(tradingAccountId, tradingAccountName) {
   if (typeof window.showWarningNotification === 'function') {
     window.showWarningNotification('אזהרה', `יש עסקאות פתוחות בחשבון "${accountName}". לא ניתן למחוק חשבון עם עסקאות פעילות.`);
   } else {
-    // console.warn(`יש עסקאות פתוחות בחשבון "${accountName}". לא ניתן למחוק חשבון עם עסקאות פעילות.`);
+    // window.Logger.warn(`יש עסקאות פתוחות בחשבון "${accountName}". לא ניתן למחוק חשבון עם עסקאות פעילות.`, { page: "trading_accounts" });
   }
 }
 
@@ -1718,26 +1718,26 @@ if (window.location.pathname.includes('/trading_accounts')) {
  * פונקציה זו מיועדת לדף חשבונות המסחר (trading_accounts.html)
  */
 async function loadTradingAccountsDataForTradingAccountsPage() {
-  console.log('🚀🚀🚀 loadTradingAccountsDataForTradingAccountsPage התחיל 🚀🚀🚀');
-  console.log('🔍 בדיקת זמינות פונקציות:');
-  console.log('  - apiCall:', typeof window.apiCall);
-  console.log('  - updateTradingAccountsTable:', typeof window.updateTradingAccountsTable);
+  window.Logger.info('🚀🚀🚀 loadTradingAccountsDataForTradingAccountsPage התחיל 🚀🚀🚀', { page: "trading_accounts" });
+  window.Logger.info('🔍 בדיקת זמינות פונקציות:', { page: "trading_accounts" });
+  window.Logger.info('  - apiCall:', typeof window.apiCall, { page: "trading_accounts" });
+  window.Logger.info('  - updateTradingAccountsTable:', typeof window.updateTradingAccountsTable, { page: "trading_accounts" });
   try {
     // טעינת נתונים מהשרת
     let trading_accounts;
     if (typeof window.loadTradingAccountsDataFromAPI === 'function') {
-      console.log('📡 משתמש ב-loadTradingAccountsDataFromAPI');
+      window.Logger.info('📡 משתמש ב-loadTradingAccountsDataFromAPI', { page: "trading_accounts" });
       trading_accounts = await window.loadTradingAccountsDataFromAPI();
     } else {
-      console.log('📡 משתמש ב-loadTradingAccountsData');
+      window.Logger.info('📡 משתמש ב-loadTradingAccountsData', { page: "trading_accounts" });
       trading_accounts = await loadTradingAccountsData();
     }
     
-    console.log('📊 נתונים שהתקבלו:', trading_accounts ? trading_accounts.length : 0, 'חשבונות מסחר');
+    window.Logger.info('📊 נתונים שהתקבלו:', trading_accounts ? trading_accounts.length : 0, 'חשבונות מסחר', { page: "trading_accounts" });
 
     // בדיקה שהנתונים תקינים
     if (!trading_accounts || !Array.isArray(trading_accounts)) {
-      console.warn('⚠️ נתונים לא תקינים התקבלו מהשרת:', trading_accounts);
+      window.Logger.warn('⚠️ נתונים לא תקינים התקבלו מהשרת:', trading_accounts, { page: "trading_accounts" });
       // במקום לזרוק שגיאה, נשתמש בנתוני דמו
       trading_accounts = [];
     }
@@ -1745,7 +1745,7 @@ async function loadTradingAccountsDataForTradingAccountsPage() {
     // שמירת הנתונים במשתנה גלובלי
     window.trading_accountsData = trading_accounts;
     window.allTradingAccountsData = trading_accounts;
-    console.log('💾 נתונים נשמרו ב-window.trading_accountsData:', trading_accounts.length, 'חשבונות מסחר');
+    window.Logger.info('💾 נתונים נשמרו ב-window.trading_accountsData:', trading_accounts.length, 'חשבונות מסחר', { page: "trading_accounts" });
 
     // החלת פילטרים על הנתונים
     let filteredTradingAccounts = [...trading_accounts];
@@ -1774,34 +1774,34 @@ async function loadTradingAccountsDataForTradingAccountsPage() {
 
     // עדכון הטבלה עם הנתונים המסוננים
     if (typeof window.updateTradingAccountsTable === 'function') {
-      console.log('📊 עדכון טבלה עם', filteredTradingAccounts.length, 'חשבונות מסחר');
-      console.log('🔍 קריאה ל-updateTradingAccountsTable...');
-      console.log('🔍 נתונים לשליחה:', filteredTradingAccounts.slice(0, 2)); // רק 2 ראשונים לדיבוג
-      console.log('🔍 בדיקת tbody לפני עדכון...');
+      window.Logger.info('📊 עדכון טבלה עם', filteredTradingAccounts.length, 'חשבונות מסחר', { page: "trading_accounts" });
+      window.Logger.info('🔍 קריאה ל-updateTradingAccountsTable...', { page: "trading_accounts" });
+      window.Logger.info('🔍 נתונים לשליחה:', filteredTradingAccounts.slice(0, 2, { page: "trading_accounts" })); // רק 2 ראשונים לדיבוג
+      window.Logger.info('🔍 בדיקת tbody לפני עדכון...', { page: "trading_accounts" });
       const tbodyBefore = document.querySelector('#accountsTable tbody');
       if (tbodyBefore) {
-        console.log('✅ tbody נמצא לפני עדכון:', tbodyBefore);
-        console.log('🔍 מספר שורות לפני עדכון:', tbodyBefore.children.length);
+        window.Logger.info('✅ tbody נמצא לפני עדכון:', tbodyBefore, { page: "trading_accounts" });
+        window.Logger.info('🔍 מספר שורות לפני עדכון:', tbodyBefore.children.length, { page: "trading_accounts" });
       } else {
-        console.error('❌ tbody לא נמצא לפני עדכון');
+        window.Logger.error('❌ tbody לא נמצא לפני עדכון', { page: "trading_accounts" });
       }
-      console.log('🔍 קריאה ל-updateTradingAccountsTable עם', filteredTradingAccounts.length, 'חשבונות מסחר...');
+      window.Logger.info('🔍 קריאה ל-updateTradingAccountsTable עם', filteredTradingAccounts.length, 'חשבונות מסחר...', { page: "trading_accounts" });
       try {
         window.updateTradingAccountsTable(filteredTradingAccounts);
-        console.log('✅ updateTradingAccountsTable הושלמה בהצלחה');
+        window.Logger.info('✅ updateTradingAccountsTable הושלמה בהצלחה', { page: "trading_accounts" });
       } catch (error) {
-        console.error('❌ שגיאה ב-updateTradingAccountsTable:', error);
+        window.Logger.error('❌ שגיאה ב-updateTradingAccountsTable:', error, { page: "trading_accounts" });
       }
 
       // בדיקה שהטבלה התעדכנה כראוי
       const tbody = document.querySelector('#accountsTable tbody');
       if (tbody && tbody.children.length === 0 && filteredTradingAccounts.length > 0) {
-        console.warn('⚠️ הטבלה לא התעדכנה כראוי - אין שורות בטבלה');
+        window.Logger.warn('⚠️ הטבלה לא התעדכנה כראוי - אין שורות בטבלה', { page: "trading_accounts" });
       } else {
-        console.log('✅ הטבלה התעדכנה בהצלחה');
-        console.log('🔍 מספר שורות אחרי עדכון:', tbody ? tbody.children.length : 'לא נמצא');
+        window.Logger.info('✅ הטבלה התעדכנה בהצלחה', { page: "trading_accounts" });
+        window.Logger.info('🔍 מספר שורות אחרי עדכון:', tbody ? tbody.children.length : 'לא נמצא', { page: "trading_accounts" });
         if (tbody && tbody.children.length > 0) {
-          console.log('🔍 תוכן השורה הראשונה:', tbody.children[0].textContent.substring(0, 100));
+          window.Logger.info('🔍 תוכן השורה הראשונה:', tbody.children[0].textContent.substring(0, 100, { page: "trading_accounts" }));
         }
       }
       
@@ -1810,11 +1810,11 @@ async function loadTradingAccountsDataForTradingAccountsPage() {
         window.applyEntityColorsToHeaders('trading_account');
       }
     } else {
-      console.error('❌ פונקציית עדכון הטבלה לא נמצאה');
+      window.Logger.error('❌ פונקציית עדכון הטבלה לא נמצאה', { page: "trading_accounts" });
     }
 
   } catch (error) {
-    console.error('❌ שגיאה בטעינת נתוני חשבונות מסחר:', error);
+    window.Logger.error('❌ שגיאה בטעינת נתוני חשבונות מסחר:', error, { page: "trading_accounts" });
 
     // הצגת הודעת שגיאה בטבלה
     const tbody = document.querySelector('#accountsTable tbody');
@@ -1975,8 +1975,8 @@ window.deleteTradingAccount = deleteTradingAccount;
 /**
  * שחזור מצב סקשן החשבונות
  */
-function restoreTradingAccountsSectionState() {
-  const savedState = localStorage.getItem('trading_accountsSectionCollapsed');
+async function restoreTradingAccountsSectionState() {
+  const savedState = await window.unifiedCacheManager?.get('trading_accountsSectionCollapsed') || localStorage.getItem('trading_accountsSectionCollapsed');
   if (savedState === 'true') {
     const trading_accountsSection = document.querySelector('.trading_accounts-section');
     if (trading_accountsSection) {
@@ -1999,41 +1999,41 @@ window.restoreTradingAccountsSectionState = restoreTradingAccountsSectionState;
 // הוסר - המערכת המאוחדת מטפלת באתחול
 // אתחול הדף
 // document.addEventListener('DOMContentLoaded', function () {
-//   console.log('🚀🚀🚀 DOMContentLoaded התחיל 🚀🚀🚀');
-//   console.log('📍 נתיב הדף:', window.location.pathname);
+//   window.Logger.info('🚀🚀🚀 DOMContentLoaded התחיל 🚀🚀🚀', { page: "trading_accounts" });
+//   window.Logger.info('📍 נתיב הדף:', window.location.pathname, { page: "trading_accounts" });
   
   // טעינת מטבעות
-  console.log('💰 טעינת מטבעות...');
+  window.Logger.info('💰 טעינת מטבעות...', { page: "trading_accounts" });
   loadCurrenciesFromServer();
 
   // יישום צבעי ישות על כותרות
   if (window.applyEntityColorsToHeaders) {
-    console.log('🎨 יישום צבעי ישות על כותרות');
+    window.Logger.info('🎨 יישום צבעי ישות על כותרות', { page: "trading_accounts" });
     window.applyEntityColorsToHeaders('account');
   }
 
   // בדיקה אם אנחנו בדף החשבונות
   if (window.location.pathname.includes('/trading_accounts')) {
-    console.log('🎯 נמצאים בדף החשבונות - מתחיל טעינת נתונים');
+    window.Logger.info('🎯 נמצאים בדף החשבונות - מתחיל טעינת נתונים', { page: "trading_accounts" });
     // טעינת נתוני חשבונות
     if (typeof window.loadTradingAccountsDataForTradingAccountsPage === 'function') {
-      console.log('📡 קורא ל-loadTradingAccountsDataForTradingAccountsPage');
+      window.Logger.info('📡 קורא ל-loadTradingAccountsDataForTradingAccountsPage', { page: "trading_accounts" });
       window.loadTradingAccountsDataForTradingAccountsPage();
     } else {
-      console.error('❌ loadTradingAccountsDataForTradingAccountsPage לא נמצאה');
+      window.Logger.error('❌ loadTradingAccountsDataForTradingAccountsPage לא נמצאה', { page: "trading_accounts" });
       handleFunctionNotFound('loadTradingAccountsDataForTradingAccountsPage', 'פונקציית טעינת נתוני חשבונות מסחר לא נמצאה');
     }
 
     // שחזור מצב הסקשנים
     if (typeof window.restoreAccountsSectionState === 'function') {
-      console.log('🔄 שחזור מצב הסקשנים');
+      window.Logger.info('🔄 שחזור מצב הסקשנים', { page: "trading_accounts" });
       window.restoreAccountsSectionState();
     } else {
-      console.error('❌ restoreAccountsSectionState לא נמצאה');
+      window.Logger.error('❌ restoreAccountsSectionState לא נמצאה', { page: "trading_accounts" });
       handleFunctionNotFound('restoreAccountsSectionState', 'פונקציית שחזור מצב סקשנים לא נמצאה');
     }
   } else {
-    console.log('📍 לא נמצאים בדף החשבונות - דילוג על טעינת נתונים');
+    window.Logger.info('📍 לא נמצאים בדף החשבונות - דילוג על טעינת נתונים', { page: "trading_accounts" });
   }
 // });
 
@@ -2054,7 +2054,7 @@ async function cancelTradingAccountWithLinkedItemsCheck(tradingAccountId, _accou
         accountDetails = `\n\nפרטי החשבון:\n• שם: ${tradingAccount.name || 'לא מוגדר'}\n• סטטוס: ${tradingAccount.status || 'לא מוגדר'}\n• יתרה: ${tradingAccount.cash_balance || '0'}`;
       }
     } catch {
-      // console.warn('לא ניתן לטעון פרטי חשבון:', error);
+      // window.Logger.warn('לא ניתן לטעון פרטי חשבון:', error, { page: "trading_accounts" });
     }
 
     // אישור מהמשתמש באמצעות המערכת הגלובלית
@@ -2114,7 +2114,7 @@ async function deleteTradingAccountWithLinkedItemsCheck(tradingAccountId, _accou
         accountDetails = `\n\nפרטי החשבון:\n• שם: ${tradingAccount.name || 'לא מוגדר'}\n• סטטוס: ${tradingAccount.status || 'לא מוגדר'}\n• יתרה: ${tradingAccount.cash_balance || '0'}`;
       }
     } catch {
-      // console.warn('לא ניתן לטעון פרטי חשבון:', error);
+      // window.Logger.warn('לא ניתן לטעון פרטי חשבון:', error, { page: "trading_accounts" });
     }
 
     // אישור מהמשתמש באמצעות המערכת הגלובלית
@@ -2423,7 +2423,7 @@ async function performTradingAccountDeletion(tradingAccountId) {
  */
 async function checkLinkedItemsBeforeCancelTradingAccount(tradingAccountId) {
   try {
-    // console.log('🔍 בדיקת פריטים מקושרים לחשבון:', tradingAccountId);
+    // window.Logger.info('🔍 בדיקת פריטים מקושרים לחשבון:', tradingAccountId, { page: "trading_accounts" });
 
     // בדיקה ישירה של טריידים פעילים (סטטוס 'open')
     const tradesResponse = await fetch(`/api/trades/?trading_account_id=${tradingAccountId}&status=open`);
@@ -2431,10 +2431,10 @@ async function checkLinkedItemsBeforeCancelTradingAccount(tradingAccountId) {
       const tradesData = await tradesResponse.json();
       const openTrades = tradesData.data || tradesData || [];
 
-      // console.log('📊 טריידים פעילים:', openTrades.length);
+      // window.Logger.info('📊 טריידים פעילים:', openTrades.length, { page: "trading_accounts" });
 
       if (openTrades.length > 0) {
-        // console.log('⚠️ יש טריידים פעילים - הצגת מודול מקושרים במצב אזהרה');
+        // window.Logger.info('⚠️ יש טריידים פעילים - הצגת מודול מקושרים במצב אזהרה', { page: "trading_accounts" });
 
         // יש טריידים פעילים - הצגת מודול מקושרים במצב אזהרה
         if (typeof window.showLinkedItemsModal === 'function') {
@@ -2456,7 +2456,7 @@ async function checkLinkedItemsBeforeCancelTradingAccount(tradingAccountId) {
 
           window.showLinkedItemsModal(linkedItemsData, 'tradingAccount', tradingAccountId, 'warningBlock');
         } else {
-          // console.log('❌ showLinkedItemsModal לא זמינה - הצגת אזהרה פשוטה');
+          // window.Logger.info('❌ showLinkedItemsModal לא זמינה - הצגת אזהרה פשוטה', { page: "trading_accounts" });
           if (typeof window.showWarningNotification === 'function') {
             window.showWarningNotification(
               'לא ניתן לבטל חשבון',
@@ -2472,22 +2472,22 @@ async function checkLinkedItemsBeforeCancelTradingAccount(tradingAccountId) {
     const response = await fetch(`/api/linked-items/account/${tradingAccountId}`);
 
     if (!response.ok) {
-      // console.log('❌ לא ניתן לבדוק פריטים מקושרים, ממשיכים עם הביטול');
+      // window.Logger.info('❌ לא ניתן לבדוק פריטים מקושרים, ממשיכים עם הביטול', { page: "trading_accounts" });
       return false;
     }
 
     const linkedItemsData = await response.json();
-    // console.log('📊 נתוני מקושרים:', linkedItemsData);
+    // window.Logger.info('📊 נתוני מקושרים:', linkedItemsData, { page: "trading_accounts" });
 
     const childEntities = linkedItemsData.child_entities || [];
     // const parentEntities = linkedItemsData.parent_entities || []; // לא בשימוש
 
-    // console.log('👶 פריטים מקושרים (child):', childEntities.length);
-    // console.log('👨‍👩‍👧‍👦 פריטים מקושרים (parent):', parentEntities.length);
+    // window.Logger.info('👶 פריטים מקושרים (child, { page: "trading_accounts" }):', childEntities.length);
+    // window.Logger.info('👨‍👩‍👧‍👦 פריטים מקושרים (parent, { page: "trading_accounts" }):', parentEntities.length);
 
     // בדיקה אם יש פריטים שמקושרים אל החשבון (child entities)
     if (childEntities.length > 0) {
-      // console.log('⚠️ יש פריטים מקושרים - הצגת חלון מקושרים');
+      // window.Logger.info('⚠️ יש פריטים מקושרים - הצגת חלון מקושרים', { page: "trading_accounts" });
       // יש פריטים מקושרים - הצגת חלון מקושרים
       if (typeof window.showLinkedItemsModal === 'function') {
         // הוספת פרטי החשבון לנתונים
@@ -2495,7 +2495,7 @@ async function checkLinkedItemsBeforeCancelTradingAccount(tradingAccountId) {
         window.showLinkedItemsModal(linkedItemsData, 'tradingAccount', tradingAccountId, 'warningBlock');
         return true;
       } else {
-        // console.log('❌ showLinkedItemsModal לא זמינה');
+        // window.Logger.info('❌ showLinkedItemsModal לא זמינה', { page: "trading_accounts" });
         if (typeof window.showNotification === 'function') {
           window.showNotification('יש פריטים מקושרים לחשבון זה', 'warning', 'אזהרה', 5000, 'business');
         }
@@ -2503,10 +2503,10 @@ async function checkLinkedItemsBeforeCancelTradingAccount(tradingAccountId) {
       }
     }
 
-    // console.log('✅ אין פריטים מקושרים - אפשר לבטל');
+    // window.Logger.info('✅ אין פריטים מקושרים - אפשר לבטל', { page: "trading_accounts" });
     return false;
   } catch (error) {
-    // console.error('❌ שגיאה בבדיקת פריטים מקושרים:', error);
+    // window.Logger.error('❌ שגיאה בבדיקת פריטים מקושרים:', error, { page: "trading_accounts" });
     handleSystemError(error, 'בדיקת פריטים מקושרים');
     return false;
   }
@@ -2610,7 +2610,7 @@ function getTradingAccountName(tradingAccountId) {
  */
 function updateTradingAccount(tradingAccountId, tradingAccountData) {
   try {
-    console.log('📝 מעדכן חשבון:', tradingAccountId, tradingAccountData);
+    window.Logger.info('📝 מעדכן חשבון:', tradingAccountId, tradingAccountData, { page: "trading_accounts" });
     
     // ולידציה בסיסית
     if (!tradingAccountId || !tradingAccountData) {
@@ -2632,7 +2632,7 @@ function updateTradingAccount(tradingAccountId, tradingAccountData) {
       return response.json();
     })
     .then(data => {
-      console.log('✅ חשבון עודכן בהצלחה:', data);
+      window.Logger.info('✅ חשבון עודכן בהצלחה:', data, { page: "trading_accounts" });
       
       // רענון הטבלה
       loadTradingAccountsFromServer();
@@ -2645,7 +2645,7 @@ function updateTradingAccount(tradingAccountId, tradingAccountData) {
       }
     })
     .catch(error => {
-      console.error('שגיאה בעדכון חשבון:', error);
+      window.Logger.error('שגיאה בעדכון חשבון:', error, { page: "trading_accounts" });
       if (typeof window.showErrorNotification === 'function') {
         window.showErrorNotification('שגיאה בעדכון חשבון', error.message);
       } else if (typeof window.showNotification === 'function') {
@@ -2654,7 +2654,7 @@ function updateTradingAccount(tradingAccountId, tradingAccountData) {
     });
     
   } catch (error) {
-    console.error('שגיאה בעדכון חשבון:', error);
+    window.Logger.error('שגיאה בעדכון חשבון:', error, { page: "trading_accounts" });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בעדכון חשבון', error.message);
     } else if (typeof window.showNotification === 'function') {
@@ -2670,7 +2670,7 @@ function updateTradingAccount(tradingAccountId, tradingAccountData) {
  */
 function viewTradingAccountDetails(tradingAccountId) {
   try {
-    console.log('👁️ מציג פרטי חשבון:', tradingAccountId);
+    window.Logger.info('👁️ מציג פרטי חשבון:', tradingAccountId, { page: "trading_accounts" });
     
     // חיפוש החשבון בנתונים
     const tradingAccount = window.trading_accountsData.find(a => a.id === tradingAccountId);
@@ -2714,7 +2714,7 @@ function viewTradingAccountDetails(tradingAccountId) {
     }
     
   } catch (error) {
-    console.error('שגיאה בהצגת פרטי חשבון:', error);
+    window.Logger.error('שגיאה בהצגת פרטי חשבון:', error, { page: "trading_accounts" });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בהצגת פרטי חשבון', error.message);
     } else if (typeof window.showNotification === 'function') {
@@ -2729,19 +2729,19 @@ function viewTradingAccountDetails(tradingAccountId) {
  */
 function showTradingAccountDetails(tradingAccountId) {
   try {
-    console.log('👁️ מציג פרטי חשבון:', tradingAccountId);
+    window.Logger.info('👁️ מציג פרטי חשבון:', tradingAccountId, { page: "trading_accounts" });
     
     // שימוש במודול פרטי ישות
     if (typeof window.showEntityDetails === 'function') {
       window.showEntityDetails('account', tradingAccountId, { mode: 'view' });
     } else {
-      console.error('❌ showEntityDetails לא זמינה');
+      window.Logger.error('❌ showEntityDetails לא זמינה', { page: "trading_accounts" });
       // fallback לפונקציה הקיימת
       viewTradingAccountDetails(tradingAccountId);
     }
     
   } catch (error) {
-    console.error('❌ שגיאה בהצגת פרטי חשבון:', error);
+    window.Logger.error('❌ שגיאה בהצגת פרטי חשבון:', error, { page: "trading_accounts" });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בהצגת פרטי חשבון', error.message);
     } else if (typeof window.showNotification === 'function') {
@@ -2755,47 +2755,47 @@ window.showTradingAccountDetails = showTradingAccountDetails;
 
 // הוספת timeout לאתחול - אחרי שהפונקציות מיוצאות
 setTimeout(() => {
-  console.log('⏰ Timeout 2 שניות - מתחיל אתחול');
+  window.Logger.info('⏰ Timeout 2 שניות - מתחיל אתחול', { page: "trading_accounts" });
   if (window.location.pathname.includes('/trading_accounts')) {
-    console.log('🎯 נמצאים בדף החשבונות - מתחיל טעינת נתונים');
-    console.log('🔍 בדיקת זמינות פונקציות:');
-    console.log('  - loadTradingAccountsDataForTradingAccountsPage:', typeof window.loadTradingAccountsDataForTradingAccountsPage);
-    console.log('  - apiCall:', typeof window.apiCall);
-    console.log('  - updateTradingAccountsTable:', typeof window.updateTradingAccountsTable);
+    window.Logger.info('🎯 נמצאים בדף החשבונות - מתחיל טעינת נתונים', { page: "trading_accounts" });
+    window.Logger.info('🔍 בדיקת זמינות פונקציות:', { page: "trading_accounts" });
+    window.Logger.info('  - loadTradingAccountsDataForTradingAccountsPage:', typeof window.loadTradingAccountsDataForTradingAccountsPage, { page: "trading_accounts" });
+    window.Logger.info('  - apiCall:', typeof window.apiCall, { page: "trading_accounts" });
+    window.Logger.info('  - updateTradingAccountsTable:', typeof window.updateTradingAccountsTable, { page: "trading_accounts" });
     
     if (typeof window.loadTradingAccountsDataForTradingAccountsPage === 'function') {
-      console.log('📡 קורא ל-loadTradingAccountsDataForTradingAccountsPage');
+      window.Logger.info('📡 קורא ל-loadTradingAccountsDataForTradingAccountsPage', { page: "trading_accounts" });
       window.loadTradingAccountsDataForTradingAccountsPage();
     } else {
-      console.error('❌ loadTradingAccountsDataForTradingAccountsPage לא נמצאה');
-      console.log('🔍 ניסיון לטעון נתונים ישירות...');
+      window.Logger.error('❌ loadTradingAccountsDataForTradingAccountsPage לא נמצאה', { page: "trading_accounts" });
+      window.Logger.info('🔍 ניסיון לטעון נתונים ישירות...', { page: "trading_accounts" });
       
       // ניסיון לטעון נתונים ישירות
       if (typeof window.apiCall === 'function') {
-        console.log('📡 משתמש ב-apiCall ישירות');
+        window.Logger.info('📡 משתמש ב-apiCall ישירות', { page: "trading_accounts" });
         window.apiCall('/api/trading-accounts/', 'GET')
           .then(data => {
-            console.log('✅ נתונים נטענו ישירות:', data);
+            window.Logger.info('✅ נתונים נטענו ישירות:', data, { page: "trading_accounts" });
             if (data && data.length > 0) {
-              console.log('📊 עדכון טבלה עם', data.length, 'רשומות');
+              window.Logger.info('📊 עדכון טבלה עם', data.length, 'רשומות', { page: "trading_accounts" });
               if (typeof window.updateTradingAccountsTable === 'function') {
                 window.updateTradingAccountsTable(data);
               } else {
-                console.error('❌ updateTradingAccountsTable לא נמצאה');
+                window.Logger.error('❌ updateTradingAccountsTable לא נמצאה', { page: "trading_accounts" });
               }
             }
           })
           .catch(error => {
-            console.error('❌ שגיאה בטעינת נתונים ישירה:', error);
+            window.Logger.error('❌ שגיאה בטעינת נתונים ישירה:', error, { page: "trading_accounts" });
           });
       } else {
-        console.error('❌ apiCall לא נמצאה');
+        window.Logger.error('❌ apiCall לא נמצאה', { page: "trading_accounts" });
       }
     }
   }
 }, 2000);
 
-console.log('✅ trading_accounts.js נטען בהצלחה');
+window.Logger.info('✅ trading_accounts.js נטען בהצלחה', { page: "trading_accounts" });
 
 // ===== Sorting system - adapted for trading_accounts =====
 
@@ -2819,7 +2819,7 @@ let trading_accountsCurrentSortDirection = 'asc';
  * @since 2.0
  */
 function sortTable(columnIndex) {
-  console.log(`🔄 מיון טבלת חשבונות לפי עמודה ${columnIndex}`);
+  window.Logger.info(`🔄 מיון טבלת חשבונות לפי עמודה ${columnIndex}`, { page: "trading_accounts" });
 
   // Use global function
   if (typeof window.sortTableData === 'function') {
@@ -2940,34 +2940,7 @@ function generateDetailedLog() {
     }
 }
 
-function copyDetailedLog() {
-    try {
-        const logContent = generateDetailedLog();
-        navigator.clipboard.writeText(logContent).then(() => {
-            if (window.showNotification) {
-                window.showNotification('לוג מפורט הועתק ללוח', 'success', 'הצלחה', 4000, 'development');
-            } else {
-                window.showInfoNotification('לוג מפורט הועתק ללוח');
-            }
-        }).catch(err => {
-            console.error('Failed to copy log:', err);
-            // Fallback: show in console
-            console.log('Detailed Log:', logContent);
-            if (window.showNotification) {
-                window.showNotification('לוג מפורט הוצג בקונסול', 'info', 'מידע', 4000, 'development');
-            } else {
-                window.showInfoNotification('לוג מפורט הוצג בקונסול');
-            }
-        });
-    } catch (error) {
-        console.error('Error copying log:', error);
-        if (window.showNotification) {
-            window.showNotification('שגיאה בהעתקת הלוג', 'error', 'שגיאה', 6000, 'development');
-        } else {
-            window.showInfoNotification('שגיאה בהעתקת הלוג');
-        }
-    }
-}
+//  function removed - no longer needed
 
 // פונקציה לטעינת חשבונות לפילטר (נדרשת על ידי header-system.js)
 function getTradingAccounts() {
@@ -2993,10 +2966,10 @@ function getTradingAccounts() {
 
 // Define function as global
 window.sortTable = sortTable;
-// window.copyDetailedLog = copyDetailedLog; // REMOVED: Local function only
+//  removed - no longer needed
 // window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 window.getTradingAccounts = getTradingAccounts;
 
 // סיום הקובץ
-console.log('✅ trading_accounts.js נטען בהצלחה');
+window.Logger.info('✅ trading_accounts.js נטען בהצלחה', { page: "trading_accounts" });
 }

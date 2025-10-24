@@ -7,17 +7,17 @@
  * @since January 2025
  */
 
-console.log('📄 Loading preferences-page.js v3.0 (Clean)...');
+window.Logger.info('📄 Loading preferences-page.js v3.0 (Clean, { page: "preferences-page" })...');
 
 /**
  * Load accounts using global function
  */
 async function loadAccountsForPreferences() {
     try {
-        console.log('🔄 Loading accounts for preferences...');
+        window.Logger.info('🔄 Loading accounts for preferences...', { page: "preferences-page" });
         if (typeof window.loadAccountsDataFromAPI === 'function') {
             const accounts = await window.loadAccountsDataFromAPI();
-            console.log('📊 Accounts loaded:', accounts);
+            window.Logger.info('📊 Accounts loaded:', accounts, { page: "preferences-page" });
             
             const accountSelect = document.getElementById('defaultAccountFilter');
             if (accountSelect && accounts) {
@@ -32,11 +32,11 @@ async function loadAccountsForPreferences() {
                     }
                 });
                 
-                console.log('✅ Loaded accounts for preferences:', accounts.length);
+                window.Logger.info('✅ Loaded accounts for preferences:', accounts.length, { page: "preferences-page" });
             }
         }
     } catch (error) {
-        console.error('❌ Error loading accounts:', error);
+        window.Logger.error('❌ Error loading accounts:', error, { page: "preferences-page" });
     }
 }
 
@@ -46,7 +46,7 @@ async function loadAccountsForPreferences() {
  */
 async function switchActiveProfile() {
     try {
-        console.log('🔄 Starting profile switch process...');
+        window.Logger.info('🔄 Starting profile switch process...', { page: "preferences-page" });
         
         const profileSelect = document.getElementById('profileSelect');
         if (!profileSelect) {
@@ -58,19 +58,19 @@ async function switchActiveProfile() {
             throw new Error('Please select a profile');
         }
         
-        console.log(`🔍 PROFILE DEBUG: Switching to profile: ${selectedProfileName}`);
-        console.log(`🔍 CACHE DEBUG: Current cache state before switch:`, window.PreferencesCore?.cacheManager?.getAll?.() || 'Cache not available');
+        window.Logger.info(`🔍 PROFILE DEBUG: Switching to profile: ${selectedProfileName}`, { page: "preferences-page" });
+        window.Logger.info(`🔍 CACHE DEBUG: Current cache state before switch:`, window.PreferencesCore?.cacheManager?.getAll?.(, { page: "preferences-page" }) || 'Cache not available');
         
         // 1. Get all profiles
         const profiles = await window.getUserProfiles();
         if (!profiles || profiles.length === 0) {
             throw new Error('No profiles available');
         }
-        console.log(`🔍 PROFILE DEBUG: Found ${profiles.length} profiles:`, profiles.map(p => `${p.name} (ID: ${p.id}, active: ${p.active}, default: ${p.default})`));
+        window.Logger.info(`🔍 PROFILE DEBUG: Found ${profiles.length} profiles:`, profiles.map(p => `${p.name} (ID: ${p.id}, active: ${p.active}, default: ${p.default}, { page: "preferences-page" })`));
         
         // 2. Handle default profile vs regular profiles
         if (selectedProfileName === 'ברירת מחדל') {
-            console.log('📋 Switching to default profile (system defaults)');
+            window.Logger.info('📋 Switching to default profile (system defaults, { page: "preferences-page" })');
             
             // Find the default profile in the database
             const defaultProfile = profiles.find(p => p.default === true || p.default === 1 || p.is_default === true || p.is_default === 1);
@@ -78,7 +78,7 @@ async function switchActiveProfile() {
                 throw new Error('Default profile not found in database');
             }
             
-            console.log(`📋 Found default profile: ${defaultProfile.name} (ID: ${defaultProfile.id})`);
+            window.Logger.info(`📋 Found default profile: ${defaultProfile.name} (ID: ${defaultProfile.id}, { page: "preferences-page" })`);
             
             // Call API to activate the default profile
             const response = await fetch('/api/preferences/profiles/activate', {
@@ -99,23 +99,23 @@ async function switchActiveProfile() {
                 throw new Error(result.error || 'Failed to activate default profile');
             }
             
-            console.log('✅ Default profile activated successfully');
+            window.Logger.info('✅ Default profile activated successfully', { page: "preferences-page" });
             
             // Update PreferencesCore current profile BEFORE clearing cache
             // Update PreferencesCore and clear cache
-            console.log('🔄 Updating PreferencesCore and clearing cache...');
+            window.Logger.info('🔄 Updating PreferencesCore and clearing cache...', { page: "preferences-page" });
             
             if (window.PreferencesCore) {
                 await window.PreferencesCore.setCurrentProfile(1, defaultProfile.id);
-                console.log('✅ PreferencesCore updated and cache cleared');
+                window.Logger.info('✅ PreferencesCore updated and cache cleared', { page: "preferences-page" });
             } else {
-                console.warn('⚠️ PreferencesCore not available');
+                window.Logger.warn('⚠️ PreferencesCore not available', { page: "preferences-page" });
             }
             
             // Update PreferencesUI currentProfileId for synchronization
             if (window.PreferencesUI) {
                 window.PreferencesUI.currentProfileId = defaultProfile.id;
-                console.log('✅ PreferencesUI currentProfileId synchronized');
+                window.Logger.info('✅ PreferencesUI currentProfileId synchronized', { page: "preferences-page" });
             }
             
             // Show success notification
@@ -124,8 +124,8 @@ async function switchActiveProfile() {
             }
             
             // Reload all form data for the new profile
-            console.log('🔍 PROFILE DEBUG: Profile switch completed successfully');
-            console.log('🔍 CACHE DEBUG: Final cache state:', window.PreferencesCore?.cacheManager?.getAll?.() || 'Cache not available');
+            window.Logger.info('🔍 PROFILE DEBUG: Profile switch completed successfully', { page: "preferences-page" });
+            window.Logger.info('🔍 CACHE DEBUG: Final cache state:', window.PreferencesCore?.cacheManager?.getAll?.(, { page: "preferences-page" }) || 'Cache not available');
             
             // Show loading notification
             if (typeof window.showInfoNotification === 'function') {
@@ -133,45 +133,45 @@ async function switchActiveProfile() {
             }
             
             // Reload all preferences and form data for the new profile
-            console.log('🔄 Reloading all form data for default profile...');
+            window.Logger.info('🔄 Reloading all form data for default profile...', { page: "preferences-page" });
             try {
                 // Reload preferences using the UI system with cache-busting
                 if (window.PreferencesUI && typeof window.PreferencesUI.loadAllPreferences === 'function') {
-                    console.log('🔄 Reloading preferences with cache-busting...');
-                    console.log(`🔄 Using cache buster: ${window.cacheBuster || 'none'}`);
+                    window.Logger.info('🔄 Reloading preferences with cache-busting...', { page: "preferences-page" });
+                    window.Logger.info(`🔄 Using cache buster: ${window.cacheBuster || 'none'}`, { page: "preferences-page" });
                     await window.PreferencesUI.loadAllPreferences(1, defaultProfile.id);
-                    console.log('✅ Preferences reloaded for default profile');
+                    window.Logger.info('✅ Preferences reloaded for default profile', { page: "preferences-page" });
                 }
                 
                 // Reload profiles dropdown to show current active profile
                 if (typeof window.loadProfilesToDropdown === 'function') {
-                    console.log('🔄 Reloading profiles dropdown to show active profile...');
+                    window.Logger.info('🔄 Reloading profiles dropdown to show active profile...', { page: "preferences-page" });
                     await window.loadProfilesToDropdown();
-                    console.log('✅ Profiles dropdown reloaded');
+                    window.Logger.info('✅ Profiles dropdown reloaded', { page: "preferences-page" });
                     
                     // Verify the dropdown shows the correct active profile
                     const profileSelectElement = document.getElementById('profileSelect');
                     if (profileSelectElement) {
                         const selectedValue = profileSelectElement.value;
-                        console.log(`🔍 UI DEBUG: Dropdown now shows: ${selectedValue}`);
-                        console.log(`🔍 UI DEBUG: Expected profile: ברירת מחדל`);
+                        window.Logger.info(`🔍 UI DEBUG: Dropdown now shows: ${selectedValue}`, { page: "preferences-page" });
+                        window.Logger.info(`🔍 UI DEBUG: Expected profile: ברירת מחדל`, { page: "preferences-page" });
                         
                         // Force update the dropdown if it doesn't match
                         if (selectedValue !== 'ברירת מחדל') {
-                            console.log(`⚠️ MISMATCH: Dropdown shows "${selectedValue}" but expected "ברירת מחדל"`);
-                            console.log(`🔄 Forcing dropdown update...`);
+                            window.Logger.info(`⚠️ MISMATCH: Dropdown shows "${selectedValue}" but expected "ברירת מחדל"`, { page: "preferences-page" });
+                            window.Logger.info(`🔄 Forcing dropdown update...`, { page: "preferences-page" });
                             
                             // Find and select the correct option
                             const correctOption = profileSelectElement.querySelector('option[value="ברירת מחדל"]');
                             if (correctOption) {
                                 correctOption.selected = true;
-                                console.log(`✅ Forced selection of "ברירת מחדל" in dropdown`);
+                                window.Logger.info(`✅ Forced selection of "ברירת מחדל" in dropdown`, { page: "preferences-page" });
                             } else {
-                                console.error(`❌ Option "ברירת מחדל" not found in dropdown!`);
-                                console.log(`🔍 Available options:`, Array.from(profileSelectElement.options).map(opt => opt.value));
+                                window.Logger.error(`❌ Option "ברירת מחדל" not found in dropdown!`, { page: "preferences-page" });
+                                window.Logger.info(`🔍 Available options:`, Array.from(profileSelectElement.options, { page: "preferences-page" }).map(opt => opt.value));
                             }
                         } else {
-                            console.log(`✅ Dropdown correctly shows "ברירת מחדל"`);
+                            window.Logger.info(`✅ Dropdown correctly shows "ברירת מחדל"`, { page: "preferences-page" });
                         }
                     }
                 }
@@ -186,10 +186,10 @@ async function switchActiveProfile() {
                 if (activeProfileDescription) {
                     activeProfileDescription.textContent = 'פרופיל ברירת מחדל של המערכת';
                 }
-                console.log(`🔍 UI DEBUG: Updated active profile card to: ברירת מחדל`);
+                window.Logger.info(`🔍 UI DEBUG: Updated active profile card to: ברירת מחדל`, { page: "preferences-page" });
                 
                 // Default profile is active - disable all preferences
-                console.log('🔒 Default profile active - disabling all preferences interface');
+                window.Logger.info('🔒 Default profile active - disabling all preferences interface', { page: "preferences-page" });
                 window.disableAllPreferencesInterface();
                 
                 // Show success notification
@@ -201,14 +201,14 @@ async function switchActiveProfile() {
                 const shouldReload = confirm('הפרופיל הוחלף בהצלחה. האם לרענן את העמוד כדי לראות את השינויים?');
                 
                 if (shouldReload) {
-                    console.log('🔄 User requested page reload');
+                    window.Logger.info('🔄 User requested page reload', { page: "preferences-page" });
                     window.location.reload();
                 }
                 
-                console.log('✅ Profile switch completed - all form data reloaded');
+                window.Logger.info('✅ Profile switch completed - all form data reloaded', { page: "preferences-page" });
                 
             } catch (error) {
-                console.error('❌ Error reloading form data:', error);
+                window.Logger.error('❌ Error reloading form data:', error, { page: "preferences-page" });
                 if (typeof window.showErrorNotification === 'function') {
                     window.showErrorNotification(`שגיאה בטעינת נתונים לפרופיל ברירת מחדל: ${error.message}`);
                 }
@@ -222,7 +222,7 @@ async function switchActiveProfile() {
         if (!profile) {
             throw new Error(`Profile "${selectedProfileName}" not found`);
         }
-        console.log(`📋 Found profile: ${profile.name} (ID: ${profile.id})`);
+        window.Logger.info(`📋 Found profile: ${profile.name} (ID: ${profile.id}, { page: "preferences-page" })`);
         
         // 4. Call API to activate profile
         const response = await fetch('/api/preferences/profiles/activate', {
@@ -243,27 +243,27 @@ async function switchActiveProfile() {
             throw new Error(result.error || 'Failed to activate profile');
         }
         
-        console.log('✅ Profile activated successfully');
+        window.Logger.info('✅ Profile activated successfully', { page: "preferences-page" });
         
         // 5. Update PreferencesCore current profile BEFORE clearing cache
         // 6. Update PreferencesCore and clear cache
-        console.log('🔄 Updating PreferencesCore and clearing cache...');
+        window.Logger.info('🔄 Updating PreferencesCore and clearing cache...', { page: "preferences-page" });
         
         if (window.PreferencesCore) {
             await window.PreferencesCore.setCurrentProfile(1, profile.id);
-            console.log('✅ PreferencesCore updated and cache cleared');
+            window.Logger.info('✅ PreferencesCore updated and cache cleared', { page: "preferences-page" });
         } else {
-            console.warn('⚠️ PreferencesCore not available');
+            window.Logger.warn('⚠️ PreferencesCore not available', { page: "preferences-page" });
         }
         
         // Update PreferencesUI currentProfileId for synchronization
         if (window.PreferencesUI) {
             window.PreferencesUI.currentProfileId = profile.id;
-            console.log('✅ PreferencesUI currentProfileId synchronized');
+            window.Logger.info('✅ PreferencesUI currentProfileId synchronized', { page: "preferences-page" });
         }
         
         // Profile switch completed successfully
-        console.log('✅ Profile switch completed successfully');
+        window.Logger.info('✅ Profile switch completed successfully', { page: "preferences-page" });
         
         // Show success notification
         if (typeof window.showSuccessNotification === 'function') {
@@ -271,7 +271,7 @@ async function switchActiveProfile() {
         }
         
     } catch (error) {
-        console.error('❌ Error switching profile:', error);
+        window.Logger.error('❌ Error switching profile:', error, { page: "preferences-page" });
         
         const errorMessage = error.message || error.toString() || 'Unknown error occurred';
         
@@ -287,7 +287,7 @@ async function switchActiveProfile() {
  */
 async function createNewProfile() {
     try {
-        console.log('🔄 Starting new profile creation...');
+        window.Logger.info('🔄 Starting new profile creation...', { page: "preferences-page" });
         
         const nameInput = document.getElementById('newProfileName');
         if (!nameInput) {
@@ -303,7 +303,7 @@ async function createNewProfile() {
             throw new Error('Cannot use "ברירת מחדל" as profile name');
         }
         
-        console.log(`📋 Creating profile: ${profileName}`);
+        window.Logger.info(`📋 Creating profile: ${profileName}`, { page: "preferences-page" });
         
         // Check if profile already exists
             const profiles = await window.getUserProfiles();
@@ -333,7 +333,7 @@ async function createNewProfile() {
             throw new Error(result.error || 'Failed to create profile');
         }
         
-        console.log('✅ Profile created successfully');
+        window.Logger.info('✅ Profile created successfully', { page: "preferences-page" });
         
         // Clear input
         nameInput.value = '';
@@ -349,7 +349,7 @@ async function createNewProfile() {
         }, 1500);
 
     } catch (error) {
-        console.error('❌ Error creating profile:', error);
+        window.Logger.error('❌ Error creating profile:', error, { page: "preferences-page" });
         
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification(`שגיאה ביצירת פרופיל: ${error.message}`);
@@ -358,9 +358,9 @@ async function createNewProfile() {
 }
 
 /**
- * Local copyDetailedLog function for preferences page
+ * Local  function for preferences page
  */
-async function copyDetailedLog() {
+async function  {
     try {
         const log = [];
         const timestamp = new Date().toLocaleString('he-IL');
@@ -415,20 +415,20 @@ async function copyDetailedLog() {
         // Copy to clipboard
         if (navigator.clipboard) {
             await navigator.clipboard.writeText(logContent);
-            console.log('✅ Log copied to clipboard');
+            window.Logger.info('✅ Log copied to clipboard', { page: "preferences-page" });
             
                 if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('לוג הועתק ללוח');
             }
         } else {
-            console.log('⚠️ Clipboard API not available');
-            console.log('📋 Log content:', logContent);
+            window.Logger.info('⚠️ Clipboard API not available', { page: "preferences-page" });
+            window.Logger.info('📋 Log content:', logContent, { page: "preferences-page" });
         }
         
         return logContent;
         
     } catch (error) {
-        console.error('❌ Error generating detailed log:', error);
+        window.Logger.error('❌ Error generating detailed log:', error, { page: "preferences-page" });
         return `Error generating log: ${error.message}`;
     }
 }
@@ -437,7 +437,7 @@ async function copyDetailedLog() {
  * Initialize page-specific functionality
  */
 function initializePreferencesPage() {
-    console.log('🚀 Initializing preferences page...');
+    window.Logger.info('🚀 Initializing preferences page...', { page: "preferences-page" });
     
     // Load accounts when page loads
     loadAccountsForPreferences();
@@ -445,9 +445,9 @@ function initializePreferencesPage() {
     // Make functions globally available
     window.switchActiveProfile = switchActiveProfile;
     window.createNewProfile = createNewProfile;
-    window.copyDetailedLog = copyDetailedLog;
+    window. = ;
     
-    console.log('✅ Preferences page initialized');
+    window.Logger.info('✅ Preferences page initialized', { page: "preferences-page" });
 }
 
 // Initialize when DOM is ready
@@ -457,4 +457,4 @@ if (document.readyState === 'loading') {
     initializePreferencesPage();
 }
 
-console.log('✅ preferences-page.js v3.0 loaded successfully');
+window.Logger.info('✅ preferences-page.js v3.0 loaded successfully', { page: "preferences-page" });

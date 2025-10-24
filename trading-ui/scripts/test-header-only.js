@@ -789,7 +789,7 @@ function generateDetailedLog() {
     log.push(`window.HeaderSystem: ${typeof window.HeaderSystem}`);
     log.push(`window.headerSystem: ${typeof window.headerSystem}`);
     log.push(`window.toggleSection: ${typeof window.toggleSection}`);
-    log.push(`window.copyDetailedLog: ${typeof window.copyDetailedLog}`);
+    log.push(`window.: ${typeof window.}`);
     
     // בדיקת צבעים דינמיים
     log.push('--- בדיקת צבעים דינמיים ---');
@@ -821,7 +821,7 @@ function generateDetailedLog() {
 }
 
 // הוספת הפונקציה ל-window object
-// window.copyDetailedLog export removed - using local function only
+// window. export removed - using local function only
 
 // פונקציה לפתיחה וסגירה של הסקשן העליון
 function toggleTopSection() {
@@ -851,7 +851,7 @@ window.toggleTopSection = toggleTopSection;
 /**
  * Copy detailed log to clipboard - Test Header Only Page
  */
-async function copyDetailedLog() {
+async function  {
     try {
         const log = generateDetailedLog();
         await navigator.clipboard.writeText(log);
@@ -885,12 +885,12 @@ async function copyDetailedLog() {
 }
 
 // Export functions
-// window.copyDetailedLog export removed - using local function only
+// window. export removed - using local function only
 // window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 window.registerTablesWithFilterSystem = registerTablesWithFilterSystem;
 
-// Local copyDetailedLog function for test-header-only page
-async function copyDetailedLog() {
+// Local  function for test-header-only page
+async function  {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {

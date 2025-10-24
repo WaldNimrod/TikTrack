@@ -55,6 +55,61 @@
  * ========================================
  */
 
+// Cache Dependencies Configuration
+const CACHE_DEPENDENCIES = {
+    // User Level
+    'user-preferences': [],
+    'user-profile': ['user-preferences'],
+    
+    // Account Level  
+    'accounts-data': ['user-preferences'],
+    'account-{id}': ['accounts-data'],
+    
+    // Trading Level
+    'trades-data': ['accounts-data'],
+    'trade-{id}': ['trades-data'],
+    'executions-data': ['accounts-data'],
+    'execution-{id}': ['executions-data'],
+    
+    // Market Level
+    'tickers-data': ['accounts-data'],
+    'ticker-{id}': ['tickers-data'],
+    'market-data': ['tickers-data'],
+    'quote-{symbol}': ['market-data'],
+    
+    // Alerts Level
+    'alerts-data': ['accounts-data'],
+    'alert-{id}': ['alerts-data'],
+    'conditions-data': ['trades-data'],
+    
+    // Dashboard Level
+    'dashboard-data': ['market-data', 'trades-data', 'executions-data'],
+    'statistics-data': ['trades-data', 'executions-data']
+};
+
+// TTL Policies Configuration
+const TTL_POLICIES = {
+    'user-preferences': 'long',      // 24 hours
+    'user-profile': 'long',          // 24 hours
+    'accounts-data': 'medium',       // 30 minutes
+    'account-{id}': 'medium',        // 30 minutes
+    'trades-data': 'short',          // 5 minutes
+    'trade-{id}': 'short',           // 5 minutes
+    'executions-data': 'short',      // 5 minutes
+    'market-data': 'very-short',     // 1 minute
+    'quote-{symbol}': 'very-short',  // 1 minute
+    'dashboard-data': 'medium',      // 30 minutes
+    'statistics-data': 'medium'      // 30 minutes
+};
+
+// TTL Values in milliseconds
+const TTL_VALUES = {
+    'very-short': 1 * 60 * 1000,     // 1 minute
+    'short': 5 * 60 * 1000,          // 5 minutes
+    'medium': 30 * 60 * 1000,        // 30 minutes
+    'long': 24 * 60 * 60 * 1000      // 24 hours
+};
+
 class UnifiedCacheManager {
     constructor() {
         this.initialized = false;
@@ -110,19 +165,40 @@ class UnifiedCacheManager {
     }
 
     /**
+     * Get current version for a cache key
+     * @param {string} key - Cache key
+     * @returns {string} - Version string
+     */
+    getCurrentVersion(key) {
+        // Simple version based on timestamp
+        return Date.now().toString();
+    }
+
+    /**
+     * Check if cached version is still valid
+     * @param {string} key - Cache key
+     * @param {string} version - Cached version
+     * @returns {boolean} - True if valid
+     */
+    isVersionValid(key, version) {
+        // For now, always valid - can be extended for cache busting
+        return true;
+    }
+
+    /**
      * אתחול מערכת המטמון המאוחדת
      * @returns {Promise<boolean>} הצלחת האתחול
      */
     async initialize() {
         try {
-            // console.log('🔄 Initializing Unified Cache Manager...');
+            // window.Logger.info('🔄 Initializing Unified Cache Manager...', { page: "unified-cache-manager" });
             
             // אתחול IndexedDB
             if (window.indexedDB) {
                 this.layers.indexedDB = new IndexedDBLayer();
                 await this.layers.indexedDB.initialize();
             } else {
-                console.warn('⚠️ IndexedDB not available, using localStorage fallback');
+                window.Logger.warn('⚠️ IndexedDB not available, using localStorage fallback', { page: "unified-cache-manager" });
                 this.layers.indexedDB = new LocalStorageLayer();
             }
             
@@ -135,7 +211,7 @@ class UnifiedCacheManager {
             await this.updateStats();
             
             this.initialized = true;
-            // console.log('✅ Unified Cache Manager initialized successfully');
+            // window.Logger.info('✅ Unified Cache Manager initialized successfully', { page: "unified-cache-manager" });
             
             // הודעת הצלחה - מועברת להודעה סופית
             // if (window.notificationSystem) {
@@ -147,7 +223,7 @@ class UnifiedCacheManager {
             
             return true;
         } catch (error) {
-            console.error('❌ Failed to initialize Unified Cache Manager:', error);
+            window.Logger.error('❌ Failed to initialize Unified Cache Manager:', error, { page: "unified-cache-manager" });
             
             // הודעת שגיאה
             if (window.notificationSystem) {
@@ -170,7 +246,7 @@ class UnifiedCacheManager {
      */
     async save(key, data, options = {}) {
         if (!this.initialized) {
-            console.warn('⚠️ Unified Cache Manager not initialized');
+            window.Logger.warn('⚠️ Unified Cache Manager not initialized', { page: "unified-cache-manager" });
             return false;
         }
 
@@ -208,11 +284,11 @@ class UnifiedCacheManager {
             const responseTime = performance.now() - startTime;
             this.updatePerformanceStats(responseTime, true);
             
-                // console.log(`✅ Saved ${key} to ${layer} layer (${responseTime.toFixed(2)}ms)`);
+                // window.Logger.info(`✅ Saved ${key} to ${layer} layer (${responseTime.toFixed(2, { page: "unified-cache-manager" })}ms)`);
             return result;
             
         } catch (error) {
-            console.error(`❌ Failed to save ${key}:`, error);
+            window.Logger.error(`❌ Failed to save ${key}:`, error, { page: "unified-cache-manager" });
             this.updatePerformanceStats(performance.now() - startTime, false);
             return false;
         }
@@ -226,7 +302,7 @@ class UnifiedCacheManager {
      */
     async get(key, options = {}) {
         if (!this.initialized) {
-            console.warn('⚠️ Unified Cache Manager not initialized');
+            window.Logger.warn('⚠️ Unified Cache Manager not initialized', { page: "unified-cache-manager" });
             return options.fallback ? await options.fallback() : null;
         }
 
@@ -247,7 +323,7 @@ class UnifiedCacheManager {
                         const responseTime = performance.now() - startTime;
                         this.updatePerformanceStats(responseTime, true);
                         
-                        // console.log(`✅ Retrieved ${key} from ${layer} layer (${responseTime.toFixed(2)}ms)`);
+                        // window.Logger.info(`✅ Retrieved ${key} from ${layer} layer (${responseTime.toFixed(2, { page: "unified-cache-manager" })}ms)`);
                         return data;
                     }
                 }
@@ -255,7 +331,7 @@ class UnifiedCacheManager {
             
             // אם לא נמצא, נסה fallback
             if (options.fallback) {
-                console.log(`⚠️ Key ${key} not found, using fallback`);
+                window.Logger.info(`⚠️ Key ${key} not found, using fallback`, { page: "unified-cache-manager" });
                 const fallbackData = await options.fallback();
                 
                 // שמור את הנתונים מהשירות למטמון
@@ -269,13 +345,136 @@ class UnifiedCacheManager {
             const responseTime = performance.now() - startTime;
             this.updatePerformanceStats(responseTime, false);
             
-            console.log(`❌ Key ${key} not found in any layer`);
+            window.Logger.info(`❌ Key ${key} not found in any layer`, { page: "unified-cache-manager" });
             return null;
             
         } catch (error) {
-            console.error(`❌ Failed to get ${key}:`, error);
+            window.Logger.error(`❌ Failed to get ${key}:`, error, { page: "unified-cache-manager" });
             this.updatePerformanceStats(performance.now() - startTime, false);
             return options.fallback ? await options.fallback() : null;
+        }
+    }
+
+    /**
+     * Get multiple keys at once
+     * @param {string[]} keys - Array of keys to retrieve
+     * @returns {Promise<Object>} - Object with key-value pairs
+     */
+    async getMultiple(keys) {
+        try {
+            const results = {};
+            
+            for (const key of keys) {
+                results[key] = await this.get(key);
+            }
+            
+            window.Logger.debug('Multiple cache get', { 
+                count: keys.length,
+                page: 'unified-cache-manager'
+            });
+            
+            return results;
+        } catch (error) {
+            window.Logger.error('Error getting multiple keys', error, { 
+                count: keys.length,
+                page: 'unified-cache-manager'
+            });
+            return {};
+        }
+    }
+
+    /**
+     * Set multiple keys at once
+     * @param {Object} data - Object with key-value pairs
+     * @param {string} ttl - TTL policy
+     * @returns {Promise<number>} - Number of keys set
+     */
+    async setMultiple(data, ttl = 'medium') {
+        try {
+            let setCount = 0;
+            
+            for (const [key, value] of Object.entries(data)) {
+                await this.save(key, value, { ttl });
+                setCount++;
+            }
+            
+            window.Logger.debug('Multiple cache set', { 
+                count: setCount,
+                page: 'unified-cache-manager'
+            });
+            
+            return setCount;
+        } catch (error) {
+            window.Logger.error('Error setting multiple keys', error, { 
+                count: Object.keys(data).length,
+                page: 'unified-cache-manager'
+            });
+            return 0;
+        }
+    }
+
+    /**
+     * Check if key exists and is valid
+     * @param {string} key - Cache key to check
+     * @returns {Promise<boolean>} - True if exists and valid
+     */
+    async has(key) {
+        try {
+            const value = await this.get(key);
+            return value !== null;
+        } catch (error) {
+            window.Logger.error('Error checking key existence', error, { 
+                key,
+                page: 'unified-cache-manager'
+            });
+            return false;
+        }
+    }
+
+    /**
+     * Get cache statistics
+     * @returns {Object} - Statistics object
+     */
+    getStats() {
+        try {
+            const stats = {
+                ...this.stats,
+                layers: {
+                    memory: {
+                        entries: Object.keys(this.memoryCache).length,
+                        size: JSON.stringify(this.memoryCache).length
+                    },
+                    localStorage: {
+                        entries: Object.keys(localStorage).length,
+                        size: new Blob([JSON.stringify(localStorage)]).size
+                    },
+                    indexedDB: this.stats.layers.indexedDB,
+                    backend: this.stats.layers.backend
+                },
+                performance: {
+                    avgResponseTime: this.responseTimes.length > 0 
+                        ? this.responseTimes.reduce((a, b) => a + b, 0) / this.responseTimes.length 
+                        : 0,
+                    hitRate: this.stats.operations.get > 0 
+                        ? (this.hits / this.stats.operations.get * 100).toFixed(2) 
+                        : 0,
+                    missRate: this.stats.operations.get > 0 
+                        ? ((this.stats.operations.get - this.hits) / this.stats.operations.get * 100).toFixed(2) 
+                        : 0
+                }
+            };
+            
+            window.Logger.debug('Cache stats retrieved', { 
+                stats,
+                page: 'unified-cache-manager'
+            });
+            
+            return stats;
+        } catch (error) {
+            window.Logger.error('Error getting cache stats', error, { 
+                page: 'unified-cache-manager'
+            });
+            return this.stats;
         }
     }
 
@@ -287,7 +486,7 @@ class UnifiedCacheManager {
      */
     async remove(key, options = {}) {
         if (!this.initialized) {
-            console.warn('⚠️ Unified Cache Manager not initialized');
+            window.Logger.warn('⚠️ Unified Cache Manager not initialized', { page: "unified-cache-manager" });
             return false;
         }
 
@@ -308,16 +507,135 @@ class UnifiedCacheManager {
             this.stats.operations.remove++;
             
             if (removed) {
-                console.log(`✅ Removed ${key} from cache`);
+                window.Logger.info(`✅ Removed ${key} from cache`, { page: "unified-cache-manager" });
             } else {
-                console.log(`⚠️ Key ${key} not found for removal`);
+                window.Logger.info(`⚠️ Key ${key} not found for removal`, { page: "unified-cache-manager" });
             }
             
             return removed;
             
         } catch (error) {
-            console.error(`❌ Failed to remove ${key}:`, error);
+            window.Logger.error(`❌ Failed to remove ${key}:`, error, { page: "unified-cache-manager" });
             return false;
+        }
+    }
+
+    /**
+     * Invalidate cache by dependency chain
+     * @param {string} changedKey - Key that changed
+     * @returns {Promise<number>} - Number of keys invalidated
+     */
+    async invalidateByDependency(changedKey) {
+        try {
+            const toInvalidate = this.findDependentKeys(changedKey);
+            
+            for (const key of toInvalidate) {
+                await this.remove(key);
+                // Recursive invalidation
+                await this.invalidateByDependency(key);
+            }
+            
+            window.Logger.info('Cache invalidated by dependency', { 
+                changedKey, 
+                invalidated: toInvalidate.length,
+                page: 'unified-cache-manager'
+            });
+            
+            return toInvalidate.length;
+        } catch (error) {
+            window.Logger.error('Error invalidating by dependency', error, { 
+                changedKey,
+                page: 'unified-cache-manager'
+            });
+            return 0;
+        }
+    }
+
+    /**
+     * Find all keys that depend on the given key
+     * @param {string} changedKey - Key that changed
+     * @returns {string[]} - Array of dependent keys
+     */
+    findDependentKeys(changedKey) {
+        const dependentKeys = [];
+        
+        for (const [key, dependencies] of Object.entries(CACHE_DEPENDENCIES)) {
+            if (dependencies.includes(changedKey)) {
+                dependentKeys.push(key);
+            }
+        }
+        
+        return dependentKeys;
+    }
+
+    /**
+     * Clear cache by pattern (supports wildcards)
+     * @param {string} pattern - Pattern to match (e.g., 'trades-*')
+     * @returns {Promise<number>} - Number of keys cleared
+     */
+    async invalidate(pattern) {
+        try {
+            const regex = new RegExp('^' + pattern.replace(/\*/g, '.*') + '$');
+            let clearedCount = 0;
+            
+            // Clear from all layers
+            for (const [layerName, layer] of Object.entries(this.layers)) {
+                if (!layer) continue;
+                
+                // Get all keys from this layer
+                const keys = await this.getLayerKeys(layerName);
+                
+                // Match and remove
+                for (const key of keys) {
+                    if (regex.test(key)) {
+                        await layer.remove(key);
+                        clearedCount++;
+                    }
+                }
+            }
+            
+            window.Logger.info('Cache cleared by pattern', { 
+                pattern, 
+                count: clearedCount,
+                page: 'unified-cache-manager'
+            });
+            
+            return clearedCount;
+        } catch (error) {
+            window.Logger.error('Error clearing by pattern', error, { 
+                pattern,
+                page: 'unified-cache-manager'
+            });
+            return 0;
+        }
+    }
+
+    /**
+     * Get all keys from a specific layer
+     * @param {string} layerName - Layer name
+     * @returns {Promise<string[]>} - Array of keys
+     */
+    async getLayerKeys(layerName) {
+        const layer = this.layers[layerName];
+        if (!layer) return [];
+        
+        try {
+            switch (layerName) {
+                case 'memory':
+                    return Object.keys(this.memoryCache);
+                case 'localStorage':
+                    return Object.keys(localStorage);
+                case 'indexedDB':
+                    // Implementation depends on IndexedDB structure
+                    return [];
+                case 'backend':
+                    // Would need API call
+                    return [];
+                default:
+                    return [];
+            }
+        } catch (error) {
+            return [];
         }
     }
 
@@ -329,7 +647,7 @@ class UnifiedCacheManager {
      */
     async clear(type = 'all', options = {}) {
         if (!this.initialized) {
-            console.warn('⚠️ Unified Cache Manager not initialized');
+            window.Logger.warn('⚠️ Unified Cache Manager not initialized', { page: "unified-cache-manager" });
             return false;
         }
 
@@ -361,7 +679,7 @@ class UnifiedCacheManager {
             this.stats.operations.clear++;
             
             if (cleared) {
-                console.log(`✅ Cleared ${type} cache`);
+                window.Logger.info(`✅ Cleared ${type} cache`, { page: "unified-cache-manager" });
                 
                 // הודעת הצלחה
                 if (window.notificationSystem) {
@@ -375,7 +693,7 @@ class UnifiedCacheManager {
             return cleared;
             
         } catch (error) {
-            console.error(`❌ Failed to clear ${type} cache:`, error);
+            window.Logger.error(`❌ Failed to clear ${type} cache:`, error, { page: "unified-cache-manager" });
             return false;
         }
     }
@@ -523,7 +841,7 @@ class UnifiedCacheManager {
             const jsonString = JSON.stringify(data);
             return jsonString.replace(/\s+/g, ' ').trim();
         } catch (error) {
-            console.warn('⚠️ Failed to compress data:', error);
+            window.Logger.warn('⚠️ Failed to compress data:', error, { page: "unified-cache-manager" });
             return data;
         }
     }
@@ -540,7 +858,7 @@ class UnifiedCacheManager {
                 await window.CacheSyncManager.syncToBackend(key, data, policy);
             }
         } catch (error) {
-            console.warn(`⚠️ Failed to sync ${key} to backend:`, error);
+            window.Logger.warn(`⚠️ Failed to sync ${key} to backend:`, error, { page: "unified-cache-manager" });
         }
     }
 
@@ -562,7 +880,7 @@ class UnifiedCacheManager {
             
             return Array.from(allKeys);
         } catch (error) {
-            console.warn('⚠️ Error getting all keys:', error);
+            window.Logger.warn('⚠️ Error getting all keys:', error, { page: "unified-cache-manager" });
             return [];
         }
     }
@@ -630,7 +948,7 @@ class UnifiedCacheManager {
                 }
             }
         } catch (error) {
-            console.warn('⚠️ Failed to update layer stats:', error);
+            window.Logger.warn('⚠️ Failed to update layer stats:', error, { page: "unified-cache-manager" });
         }
     }
 }
@@ -646,7 +964,7 @@ class MemoryLayer {
 
     async initialize() {
         this.cache.clear();
-                // console.log('✅ Memory Layer initialized');
+                // window.Logger.info('✅ Memory Layer initialized', { page: "unified-cache-manager" });
     }
 
     async save(key, data, policy) {
@@ -688,7 +1006,7 @@ class LocalStorageLayer {
     }
 
     async initialize() {
-                // console.log('✅ LocalStorage Layer initialized');
+                // window.Logger.info('✅ LocalStorage Layer initialized', { page: "unified-cache-manager" });
     }
 
     async save(key, data, policy) {
@@ -698,7 +1016,7 @@ class LocalStorageLayer {
             localStorage.setItem(fullKey, value);
             return true;
         } catch (error) {
-            console.error('❌ LocalStorage save failed:', error);
+            window.Logger.error('❌ LocalStorage save failed:', error, { page: "unified-cache-manager" });
             return false;
         }
     }
@@ -709,7 +1027,7 @@ class LocalStorageLayer {
             const value = localStorage.getItem(fullKey);
             return value ? JSON.parse(value) : null;
         } catch (error) {
-            console.error('❌ LocalStorage get failed:', error);
+            window.Logger.error('❌ LocalStorage get failed:', error, { page: "unified-cache-manager" });
             return null;
         }
     }
@@ -720,7 +1038,7 @@ class LocalStorageLayer {
             localStorage.removeItem(fullKey);
             return true;
         } catch (error) {
-            console.error('❌ LocalStorage remove failed:', error);
+            window.Logger.error('❌ LocalStorage remove failed:', error, { page: "unified-cache-manager" });
             return false;
         }
     }
@@ -735,7 +1053,7 @@ class LocalStorageLayer {
             });
             return true;
         } catch (error) {
-            console.error('❌ LocalStorage clear failed:', error);
+            window.Logger.error('❌ LocalStorage clear failed:', error, { page: "unified-cache-manager" });
             return false;
         }
     }
@@ -763,7 +1081,7 @@ class LocalStorageLayer {
         try {
             return Object.keys(localStorage).filter(key => key.startsWith(this.prefix));
         } catch (error) {
-            console.warn('⚠️ Error getting localStorage keys:', error);
+            window.Logger.warn('⚠️ Error getting localStorage keys:', error, { page: "unified-cache-manager" });
             return [];
         }
     }
@@ -784,13 +1102,13 @@ class IndexedDBLayer {
                 const request = window.indexedDB.open('UnifiedCacheDB', 2);
                 
                 request.onerror = () => {
-                    console.error('❌ IndexedDB open failed');
+                    window.Logger.error('❌ IndexedDB open failed', { page: "unified-cache-manager" });
                     reject(request.error);
                 };
                 
                 request.onsuccess = () => {
                     this.db = request.result;
-                    // console.log('✅ IndexedDB Layer initialized');
+                    // window.Logger.info('✅ IndexedDB Layer initialized', { page: "unified-cache-manager" });
                     resolve(true);
                 };
                 
@@ -799,12 +1117,12 @@ class IndexedDBLayer {
                     if (!db.objectStoreNames.contains('unified-cache')) {
                         const store = db.createObjectStore('unified-cache', { keyPath: 'key' });
                         store.createIndex('timestamp', 'timestamp', { unique: false });
-                        console.log('✅ IndexedDB object store created');
+                        window.Logger.info('✅ IndexedDB object store created', { page: "unified-cache-manager" });
                     }
                 };
             });
         }
-        console.warn('⚠️ IndexedDB not available');
+        window.Logger.warn('⚠️ IndexedDB not available', { page: "unified-cache-manager" });
         return false;
     }
 
@@ -821,7 +1139,7 @@ class IndexedDBLayer {
             }
             return false;
         } catch (error) {
-            console.error('❌ IndexedDB save failed:', error);
+            window.Logger.error('❌ IndexedDB save failed:', error, { page: "unified-cache-manager" });
             return false;
         }
     }
@@ -839,7 +1157,7 @@ class IndexedDBLayer {
             }
             return null;
         } catch (error) {
-            console.error('❌ IndexedDB get failed:', error);
+            window.Logger.error('❌ IndexedDB get failed:', error, { page: "unified-cache-manager" });
             return null;
         }
     }
@@ -857,7 +1175,7 @@ class IndexedDBLayer {
             }
             return false;
         } catch (error) {
-            console.error('❌ IndexedDB remove failed:', error);
+            window.Logger.error('❌ IndexedDB remove failed:', error, { page: "unified-cache-manager" });
             return false;
         }
     }
@@ -875,7 +1193,7 @@ class IndexedDBLayer {
             }
             return false;
         } catch (error) {
-            console.error('❌ IndexedDB clear failed:', error);
+            window.Logger.error('❌ IndexedDB clear failed:', error, { page: "unified-cache-manager" });
             return false;
         }
     }
@@ -910,7 +1228,7 @@ class IndexedDBLayer {
             }
             return [];
         } catch (error) {
-            console.warn('⚠️ Error getting IndexedDB keys:', error);
+            window.Logger.warn('⚠️ Error getting IndexedDB keys:', error, { page: "unified-cache-manager" });
             return [];
         }
     }
@@ -926,7 +1244,7 @@ class BackendCacheLayer {
 
     async initialize() {
         this.cache.clear();
-                // console.log('✅ Backend Cache Layer initialized');
+                // window.Logger.info('✅ Backend Cache Layer initialized', { page: "unified-cache-manager" });
     }
 
     async save(key, data, policy) {
@@ -938,7 +1256,7 @@ class BackendCacheLayer {
             });
             return true;
         } catch (error) {
-            console.error('❌ Backend Cache save failed:', error);
+            window.Logger.error('❌ Backend Cache save failed:', error, { page: "unified-cache-manager" });
             return false;
         }
     }
@@ -956,7 +1274,7 @@ class BackendCacheLayer {
             
             return entry.data;
         } catch (error) {
-            console.error('❌ Backend Cache get failed:', error);
+            window.Logger.error('❌ Backend Cache get failed:', error, { page: "unified-cache-manager" });
             return null;
         }
     }
@@ -965,7 +1283,7 @@ class BackendCacheLayer {
         try {
             return this.cache.delete(key);
         } catch (error) {
-            console.error('❌ Backend Cache remove failed:', error);
+            window.Logger.error('❌ Backend Cache remove failed:', error, { page: "unified-cache-manager" });
             return false;
         }
     }
@@ -975,7 +1293,7 @@ class BackendCacheLayer {
             this.cache.clear();
             return true;
         } catch (error) {
-            console.error('❌ Backend Cache clear failed:', error);
+            window.Logger.error('❌ Backend Cache clear failed:', error, { page: "unified-cache-manager" });
             return false;
         }
     }
@@ -1001,7 +1319,7 @@ class BackendCacheLayer {
                 const request = indexedDB.open('UnifiedCacheDB', 2);
                 
                 request.onerror = (event) => {
-                    console.warn('⚠️ IndexedDB not available:', event.target.error);
+                    window.Logger.warn('⚠️ IndexedDB not available:', event.target.error, { page: "unified-cache-manager" });
                     resolve(); // Continue without IndexedDB
                 };
                 
@@ -1012,7 +1330,7 @@ class BackendCacheLayer {
                             db.createObjectStore('unified-cache', { keyPath: 'key' });
                         }
                     } catch (upgradeError) {
-                        console.error('❌ Error during IndexedDB upgrade:', upgradeError);
+                        window.Logger.error('❌ Error during IndexedDB upgrade:', upgradeError, { page: "unified-cache-manager" });
                         reject(upgradeError);
                     }
                 };
@@ -1020,16 +1338,16 @@ class BackendCacheLayer {
                 request.onsuccess = () => {
                     try {
                         this.db = request.result;
-                        console.log('✅ IndexedDB initialized');
+                        window.Logger.info('✅ IndexedDB initialized', { page: "unified-cache-manager" });
                         resolve();
                     } catch (successError) {
-                        console.error('❌ Error after IndexedDB success:', successError);
+                        window.Logger.error('❌ Error after IndexedDB success:', successError, { page: "unified-cache-manager" });
                         reject(successError);
                     }
                 };
                 
             } catch (error) {
-                console.error('❌ Error opening IndexedDB:', error);
+                window.Logger.error('❌ Error opening IndexedDB:', error, { page: "unified-cache-manager" });
                 reject(error);
             }
         });
@@ -1078,7 +1396,7 @@ class BackendCacheLayer {
             this.stats.layers.localStorage.size = size;
             
         } catch (error) {
-            console.warn('⚠️ Could not load from localStorage:', error.message || error);
+            window.Logger.warn('⚠️ Could not load from localStorage:', error.message || error, { page: "unified-cache-manager" });
             // Continue with empty state
             if (this.stats && this.stats.layers) {
                 this.stats.layers.localStorage.entries = 0;
@@ -1128,7 +1446,7 @@ class BackendCacheLayer {
             this.stats.performance.avgResponseTime = this.calculateAvgResponseTime();
             this.stats.performance.hitRate = this.calculateHitRate();
         } catch (error) {
-            console.warn('⚠️ Error updating stats:', error);
+            window.Logger.warn('⚠️ Error updating stats:', error, { page: "unified-cache-manager" });
             // Continue with basic stats
             if (!this.stats) {
                 this.stats = {
@@ -1162,7 +1480,7 @@ class BackendCacheLayer {
             if (!this.responseTimes || this.responseTimes.length === 0) return 0;
             return this.responseTimes.reduce((sum, time) => sum + time, 0) / this.responseTimes.length;
         } catch (error) {
-            console.warn('⚠️ Error calculating average response time:', error);
+            window.Logger.warn('⚠️ Error calculating average response time:', error, { page: "unified-cache-manager" });
             return 0;
         }
     }
@@ -1177,7 +1495,7 @@ class BackendCacheLayer {
             if (total === 0) return 0;
             return (this.hits / total) * 100;
         } catch (error) {
-            console.warn('⚠️ Error calculating hit rate:', error);
+            window.Logger.warn('⚠️ Error calculating hit rate:', error, { page: "unified-cache-manager" });
             return 0;
         }
     }
@@ -1203,7 +1521,7 @@ if (window.UnifiedInitializationSystem) {
  */
 UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
     try {
-        console.log('🔄 Starting complete cache clearing process...');
+        window.Logger.info('🔄 Starting complete cache clearing process...', { page: "unified-cache-manager" });
         
         const clearedLayers = [];
         const errors = [];
@@ -1225,9 +1543,9 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
                     }
                 }
             }
-            console.log('✅ Unified Cache cleared successfully');
+            window.Logger.info('✅ Unified Cache cleared successfully', { page: "unified-cache-manager" });
         } catch (error) {
-            console.error('❌ Error clearing Unified Cache:', error);
+            window.Logger.error('❌ Error clearing Unified Cache:', error, { page: "unified-cache-manager" });
             errors.push(`Unified Cache: ${error.message}`);
         }
         
@@ -1236,10 +1554,10 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
             if (window.PreferencesCore && window.PreferencesCore.cacheManager) {
                 window.PreferencesCore.cacheManager.clear();
                 clearedLayers.push('Preferences Cache Manager');
-                console.log('✅ Preferences Cache Manager cleared successfully');
+                window.Logger.info('✅ Preferences Cache Manager cleared successfully', { page: "unified-cache-manager" });
             }
         } catch (error) {
-            console.error('❌ Error clearing Preferences Cache Manager:', error);
+            window.Logger.error('❌ Error clearing Preferences Cache Manager:', error, { page: "unified-cache-manager" });
             errors.push(`Preferences Cache Manager: ${error.message}`);
         }
         
@@ -1255,9 +1573,9 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
             
             ourKeys.forEach(key => localStorage.removeItem(key));
             clearedLayers.push(`localStorage (${ourKeys.length} keys)`);
-            console.log(`✅ localStorage cleared successfully (${ourKeys.length} keys)`);
+            window.Logger.info(`✅ localStorage cleared successfully (${ourKeys.length} keys, { page: "unified-cache-manager" })`);
         } catch (error) {
-            console.error('❌ Error clearing localStorage:', error);
+            window.Logger.error('❌ Error clearing localStorage:', error, { page: "unified-cache-manager" });
             errors.push(`localStorage: ${error.message}`);
         }
         
@@ -1273,9 +1591,9 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
             
             ourKeys.forEach(key => sessionStorage.removeItem(key));
             clearedLayers.push(`sessionStorage (${ourKeys.length} keys)`);
-            console.log(`✅ sessionStorage cleared successfully (${ourKeys.length} keys)`);
+            window.Logger.info(`✅ sessionStorage cleared successfully (${ourKeys.length} keys, { page: "unified-cache-manager" })`);
         } catch (error) {
-            console.error('❌ Error clearing sessionStorage:', error);
+            window.Logger.error('❌ Error clearing sessionStorage:', error, { page: "unified-cache-manager" });
             errors.push(`sessionStorage: ${error.message}`);
         }
         
@@ -1286,7 +1604,7 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
                 const cacheOnlyDatabases = ['unified-cache', 'tiktrack-cache']; // Only cache databases
                 const historicalDatabases = ['tiktrack-data', 'notifications-history', 'file-mappings', 'linter-results', 'js-analysis']; // Historical data - DO NOT DELETE
                 
-                console.log('🔄 Clearing IndexedDB cache only (preserving historical data)...');
+                window.Logger.info('🔄 Clearing IndexedDB cache only (preserving historical data, { page: "unified-cache-manager" })...');
                 
                 // Clear only cache databases
                 for (const dbName of cacheOnlyDatabases) {
@@ -1298,7 +1616,7 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
                                 
                                 // Check if database has any object stores
                                 if (db.objectStoreNames.length === 0) {
-                                    console.log(`ℹ️ Database ${dbName} has no object stores, skipping`);
+                                    window.Logger.info(`ℹ️ Database ${dbName} has no object stores, skipping`, { page: "unified-cache-manager" });
                                     db.close();
                                     resolve();
                                     return;
@@ -1312,10 +1630,10 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
                                     const store = transaction.objectStore(storeName);
                                     const clearReq = store.clear();
                                     clearReq.onsuccess = () => {
-                                        console.log(`✅ Cleared cache object store: ${dbName}.${storeName}`);
+                                        window.Logger.info(`✅ Cleared cache object store: ${dbName}.${storeName}`, { page: "unified-cache-manager" });
                                     };
                                     clearReq.onerror = () => {
-                                        console.warn(`⚠️ Failed to clear cache object store: ${dbName}.${storeName}`, clearReq.error);
+                                        window.Logger.warn(`⚠️ Failed to clear cache object store: ${dbName}.${storeName}`, clearReq.error, { page: "unified-cache-manager" });
                                     };
                                 }
                                 
@@ -1324,27 +1642,27 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
                                     resolve();
                                 };
                                 transaction.onerror = () => {
-                                    console.warn(`⚠️ Transaction failed for cache database ${dbName}`, transaction.error);
+                                    window.Logger.warn(`⚠️ Transaction failed for cache database ${dbName}`, transaction.error, { page: "unified-cache-manager" });
                                     db.close();
                                     resolve();
                                 };
                             };
                             openReq.onerror = () => {
-                                console.warn(`⚠️ Could not open cache database: ${dbName}`, openReq.error);
+                                window.Logger.warn(`⚠️ Could not open cache database: ${dbName}`, openReq.error, { page: "unified-cache-manager" });
                                 resolve();
                             };
                         });
                     } catch (error) {
-                        console.warn(`⚠️ Error clearing cache data from ${dbName}:`, error);
+                        window.Logger.warn(`⚠️ Error clearing cache data from ${dbName}:`, error, { page: "unified-cache-manager" });
                     }
                 }
                 
                 // Log preserved historical databases
-                console.log(`✅ Preserved historical data in IndexedDB: ${historicalDatabases.join(', ')}`);
+                window.Logger.info(`✅ Preserved historical data in IndexedDB: ${historicalDatabases.join(', ', { page: "unified-cache-manager" })}`);
                 
                 clearedLayers.push('IndexedDB Cache (historical data preserved)');
             } catch (error) {
-                console.error('❌ Error clearing IndexedDB cache:', error);
+                window.Logger.error('❌ Error clearing IndexedDB cache:', error, { page: "unified-cache-manager" });
                 errors.push(`IndexedDB Cache: ${error.message}`);
             }
         }
@@ -1357,9 +1675,9 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
                     cacheNames.map(cacheName => caches.delete(cacheName))
                 );
                 clearedLayers.push('Browser Cache');
-                console.log('✅ Browser Cache cleared successfully');
+                window.Logger.info('✅ Browser Cache cleared successfully', { page: "unified-cache-manager" });
             } catch (error) {
-                console.error('❌ Error clearing Browser Cache:', error);
+                window.Logger.error('❌ Error clearing Browser Cache:', error, { page: "unified-cache-manager" });
                 errors.push(`Browser Cache: ${error.message}`);
             }
         }
@@ -1377,9 +1695,9 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
                 sessionStorage.removeItem(key);
             });
             clearedLayers.push('Specific Cache Keys');
-            console.log('✅ Specific cache keys cleared successfully');
+            window.Logger.info('✅ Specific cache keys cleared successfully', { page: "unified-cache-manager" });
         } catch (error) {
-            console.error('❌ Error clearing specific cache keys:', error);
+            window.Logger.error('❌ Error clearing specific cache keys:', error, { page: "unified-cache-manager" });
             errors.push(`Cache Keys: ${error.message}`);
         }
         
@@ -1388,9 +1706,9 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
             try {
                 window.gc();
                 clearedLayers.push('Garbage Collection');
-                console.log('✅ Garbage Collection executed successfully');
+                window.Logger.info('✅ Garbage Collection executed successfully', { page: "unified-cache-manager" });
             } catch (error) {
-                console.warn('⚠️ Garbage Collection failed:', error);
+                window.Logger.warn('⚠️ Garbage Collection failed:', error, { page: "unified-cache-manager" });
             }
         }
         
@@ -1399,9 +1717,9 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
             try {
                 window.notificationCache.clear();
                 clearedLayers.push('Notification Cache');
-                console.log('✅ Notification Cache cleared successfully');
+                window.Logger.info('✅ Notification Cache cleared successfully', { page: "unified-cache-manager" });
             } catch (error) {
-                console.warn('⚠️ Notification Cache clear failed:', error);
+                window.Logger.warn('⚠️ Notification Cache clear failed:', error, { page: "unified-cache-manager" });
             }
         }
         
@@ -1410,31 +1728,31 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
             try {
                 await window.preferencesCache.clear();
                 clearedLayers.push('Preferences Cache');
-                console.log('✅ Preferences Cache cleared successfully');
+                window.Logger.info('✅ Preferences Cache cleared successfully', { page: "unified-cache-manager" });
             } catch (error) {
-                console.warn('⚠️ Preferences Cache clear failed:', error);
+                window.Logger.warn('⚠️ Preferences Cache clear failed:', error, { page: "unified-cache-manager" });
             }
         }
         
         // 10. Refresh data from backend database
         try {
-            console.log('🔄 Refreshing data from backend database...');
+            window.Logger.info('🔄 Refreshing data from backend database...', { page: "unified-cache-manager" });
             await this.refreshDataFromBackend();
             clearedLayers.push('Data Refresh from Backend');
-            console.log('✅ Data refreshed from backend successfully');
+            window.Logger.info('✅ Data refreshed from backend successfully', { page: "unified-cache-manager" });
         } catch (error) {
-            console.warn('⚠️ Failed to refresh data from backend:', error);
+            window.Logger.warn('⚠️ Failed to refresh data from backend:', error, { page: "unified-cache-manager" });
             errors.push(`Data Refresh: ${error.message}`);
         }
         
         // Update stats after clearing
         await this.updateStats();
         
-        console.log('✅ Complete cache clearing process finished');
+        window.Logger.info('✅ Complete cache clearing process finished', { page: "unified-cache-manager" });
         return { success: true, clearedLayers, errors };
         
     } catch (error) {
-        console.error('❌ Complete cache clearing process failed:', error);
+        window.Logger.error('❌ Complete cache clearing process failed:', error, { page: "unified-cache-manager" });
         return { success: false, error: error.message };
     }
 };
@@ -1446,7 +1764,7 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
  */
 UnifiedCacheManager.prototype.clearAllCacheQuick = async function(options = {}) {
     try {
-        console.log('🧹 Quick cache clearing for development...');
+        window.Logger.info('🧹 Quick cache clearing for development...', { page: "unified-cache-manager" });
         
         const result = await this.clearAllCache(options);
         
@@ -1469,13 +1787,13 @@ UnifiedCacheManager.prototype.clearAllCacheQuick = async function(options = {}) 
                 }, 1500);
             }
             
-            console.log('✅ Quick cache clearing completed - auto-refresh in 1.5 seconds');
+            window.Logger.info('✅ Quick cache clearing completed - auto-refresh in 1.5 seconds', { page: "unified-cache-manager" });
         }
         
         return result;
         
     } catch (error) {
-        console.error('❌ Quick cache clearing failed:', error);
+        window.Logger.error('❌ Quick cache clearing failed:', error, { page: "unified-cache-manager" });
         
         if (typeof window.showNotification === 'function') {
             window.showNotification(
@@ -1498,7 +1816,7 @@ UnifiedCacheManager.prototype.clearAllCacheQuick = async function(options = {}) 
  */
 UnifiedCacheManager.prototype.clearAllCacheDetailed = async function(options = {}) {
     try {
-        console.log('🔄 Starting detailed cache clearing process...');
+        window.Logger.info('🔄 Starting detailed cache clearing process...', { page: "unified-cache-manager" });
         
         const result = await this.clearAllCache(options);
         
@@ -1539,7 +1857,7 @@ UnifiedCacheManager.prototype.clearAllCacheDetailed = async function(options = {
         return result;
         
     } catch (error) {
-        console.error('❌ Detailed cache clearing failed:', error);
+        window.Logger.error('❌ Detailed cache clearing failed:', error, { page: "unified-cache-manager" });
         
         if (typeof window.showNotification === 'function') {
             window.showNotification(
@@ -1562,7 +1880,7 @@ UnifiedCacheManager.prototype.clearAllCacheDetailed = async function(options = {
  */
 UnifiedCacheManager.prototype.verifyCacheSystem = async function(options = {}) {
     try {
-        console.log('🔍 Starting complete cache verification process...');
+        window.Logger.info('🔍 Starting complete cache verification process...', { page: "unified-cache-manager" });
         
         const report = {
             timestamp: new Date().toISOString(),
@@ -1582,34 +1900,34 @@ UnifiedCacheManager.prototype.verifyCacheSystem = async function(options = {}) {
         };
         
         // Phase 1: Pre-clearing scan
-        console.log('📊 Phase 1: Scanning cache layers before clearing...');
+        window.Logger.info('📊 Phase 1: Scanning cache layers before clearing...', { page: "unified-cache-manager" });
         report.phases.preScan = await this.scanAllCacheLayers();
         report.summary.totalKeysBefore = this.countTotalKeys(report.phases.preScan);
         
         // Phase 2: Clear all cache
-        console.log('🧹 Phase 2: Clearing all cache layers...');
+        window.Logger.info('🧹 Phase 2: Clearing all cache layers...', { page: "unified-cache-manager" });
         const clearResult = await this.clearAllCache(options);
         report.phases.clearing = clearResult;
         
         // Phase 3: Post-clearing scan
-        console.log('📊 Phase 3: Scanning cache layers after clearing...');
+        window.Logger.info('📊 Phase 3: Scanning cache layers after clearing...', { page: "unified-cache-manager" });
         report.phases.postScan = await this.scanAllCacheLayers();
         report.summary.totalKeysAfter = this.countTotalKeys(report.phases.postScan);
         report.summary.clearedKeys = report.summary.totalKeysBefore - report.summary.totalKeysAfter;
         
         // Phase 4: Verification and test data insertion
-        console.log('✅ Phase 4: Verifying cache system functionality...');
+        window.Logger.info('✅ Phase 4: Verifying cache system functionality...', { page: "unified-cache-manager" });
         report.phases.verification = await this.verifyCacheFunctionality();
         report.summary.verificationPassed = report.phases.verification.success;
         
         // Update stats
         await this.updateStats();
         
-        console.log('✅ Complete cache verification process finished');
+        window.Logger.info('✅ Complete cache verification process finished', { page: "unified-cache-manager" });
         return report;
         
     } catch (error) {
-        console.error('❌ Cache verification process failed:', error);
+        window.Logger.error('❌ Cache verification process failed:', error, { page: "unified-cache-manager" });
         return {
             timestamp: new Date().toISOString(),
             success: false,
@@ -1721,7 +2039,7 @@ UnifiedCacheManager.prototype.scanAllCacheLayers = async function() {
                         scanResults.indexedDB.size += dbInfo.totalSize;
                     }
                 } catch (error) {
-                    console.warn(`⚠️ Error checking IndexedDB cache ${dbName}:`, error);
+                    window.Logger.warn(`⚠️ Error checking IndexedDB cache ${dbName}:`, error, { page: "unified-cache-manager" });
                 }
             }
             
@@ -1780,7 +2098,7 @@ UnifiedCacheManager.prototype.scanAllCacheLayers = async function() {
                         scanResults.indexedDB.size += dbInfo.totalSize;
                     }
                 } catch (error) {
-                    console.warn(`⚠️ Error checking IndexedDB historical ${dbName}:`, error);
+                    window.Logger.warn(`⚠️ Error checking IndexedDB historical ${dbName}:`, error, { page: "unified-cache-manager" });
                 }
             }
         }
@@ -1792,7 +2110,7 @@ UnifiedCacheManager.prototype.scanAllCacheLayers = async function() {
                 scanResults.browserCache.caches = cacheNames;
                 scanResults.browserCache.count = cacheNames.length;
             } catch (error) {
-                console.warn('⚠️ Error scanning browser cache:', error);
+                window.Logger.warn('⚠️ Error scanning browser cache:', error, { page: "unified-cache-manager" });
             }
         }
         
@@ -1811,7 +2129,7 @@ UnifiedCacheManager.prototype.scanAllCacheLayers = async function() {
         }
         
     } catch (error) {
-        console.error('❌ Error during cache scan:', error);
+        window.Logger.error('❌ Error during cache scan:', error, { page: "unified-cache-manager" });
     }
     
     return scanResults;
@@ -1947,7 +2265,7 @@ UnifiedCacheManager.prototype.verifyCacheFunctionality = async function() {
     } catch (error) {
         testResults.success = false;
         testResults.errors.push(error.message);
-        console.error('❌ Cache functionality verification failed:', error);
+        window.Logger.error('❌ Cache functionality verification failed:', error, { page: "unified-cache-manager" });
     }
     
     return testResults;
@@ -1965,15 +2283,15 @@ UnifiedCacheManager.prototype.refreshDataFromBackend = async function() {
     };
     
     try {
-        console.log('🔄 Starting data refresh from backend database...');
+        window.Logger.info('🔄 Starting data refresh from backend database...', { page: "unified-cache-manager" });
         
         // 1. Refresh trading data
         try {
             await this.refreshTradingData();
             refreshResults.refreshedSystems.push('Trading Data');
-            console.log('✅ Trading data refreshed');
+            window.Logger.info('✅ Trading data refreshed', { page: "unified-cache-manager" });
         } catch (error) {
-            console.warn('⚠️ Failed to refresh trading data:', error);
+            window.Logger.warn('⚠️ Failed to refresh trading data:', error, { page: "unified-cache-manager" });
             refreshResults.errors.push(`Trading Data: ${error.message}`);
         }
         
@@ -1981,9 +2299,9 @@ UnifiedCacheManager.prototype.refreshDataFromBackend = async function() {
         try {
             await this.refreshMarketData();
             refreshResults.refreshedSystems.push('Market Data');
-            console.log('✅ Market data refreshed');
+            window.Logger.info('✅ Market data refreshed', { page: "unified-cache-manager" });
         } catch (error) {
-            console.warn('⚠️ Failed to refresh market data:', error);
+            window.Logger.warn('⚠️ Failed to refresh market data:', error, { page: "unified-cache-manager" });
             refreshResults.errors.push(`Market Data: ${error.message}`);
         }
         
@@ -1991,9 +2309,9 @@ UnifiedCacheManager.prototype.refreshDataFromBackend = async function() {
         try {
             await this.refreshUserPreferences();
             refreshResults.refreshedSystems.push('User Preferences');
-            console.log('✅ User preferences refreshed');
+            window.Logger.info('✅ User preferences refreshed', { page: "unified-cache-manager" });
         } catch (error) {
-            console.warn('⚠️ Failed to refresh user preferences:', error);
+            window.Logger.warn('⚠️ Failed to refresh user preferences:', error, { page: "unified-cache-manager" });
             refreshResults.errors.push(`User Preferences: ${error.message}`);
         }
         
@@ -2001,9 +2319,9 @@ UnifiedCacheManager.prototype.refreshDataFromBackend = async function() {
         try {
             await this.refreshUIState();
             refreshResults.refreshedSystems.push('UI State');
-            console.log('✅ UI state refreshed');
+            window.Logger.info('✅ UI state refreshed', { page: "unified-cache-manager" });
         } catch (error) {
-            console.warn('⚠️ Failed to refresh UI state:', error);
+            window.Logger.warn('⚠️ Failed to refresh UI state:', error, { page: "unified-cache-manager" });
             refreshResults.errors.push(`UI State: ${error.message}`);
         }
         
@@ -2011,9 +2329,9 @@ UnifiedCacheManager.prototype.refreshDataFromBackend = async function() {
         try {
             await this.refreshNotifications();
             refreshResults.refreshedSystems.push('Notifications');
-            console.log('✅ Notifications refreshed');
+            window.Logger.info('✅ Notifications refreshed', { page: "unified-cache-manager" });
         } catch (error) {
-            console.warn('⚠️ Failed to refresh notifications:', error);
+            window.Logger.warn('⚠️ Failed to refresh notifications:', error, { page: "unified-cache-manager" });
             refreshResults.errors.push(`Notifications: ${error.message}`);
         }
         
@@ -2021,11 +2339,11 @@ UnifiedCacheManager.prototype.refreshDataFromBackend = async function() {
             refreshResults.success = false;
         }
         
-        console.log('✅ Data refresh from backend completed');
+        window.Logger.info('✅ Data refresh from backend completed', { page: "unified-cache-manager" });
         return refreshResults;
         
     } catch (error) {
-        console.error('❌ Data refresh from backend failed:', error);
+        window.Logger.error('❌ Data refresh from backend failed:', error, { page: "unified-cache-manager" });
         return {
             success: false,
             refreshedSystems: [],
@@ -2058,7 +2376,7 @@ UnifiedCacheManager.prototype.refreshTradingData = async function() {
         }
         
     } catch (error) {
-        console.warn('⚠️ Error refreshing trading data:', error);
+        window.Logger.warn('⚠️ Error refreshing trading data:', error, { page: "unified-cache-manager" });
         throw error;
     }
 };
@@ -2087,7 +2405,7 @@ UnifiedCacheManager.prototype.refreshMarketData = async function() {
         }
         
     } catch (error) {
-        console.warn('⚠️ Error refreshing market data:', error);
+        window.Logger.warn('⚠️ Error refreshing market data:', error, { page: "unified-cache-manager" });
         throw error;
     }
 };
@@ -2130,7 +2448,7 @@ UnifiedCacheManager.prototype.refreshUserPreferences = async function() {
             k === 'user-preferences'
         );
         
-        console.log(`🔄 Refreshing user preferences - clearing ${prefKeys.length} keys`);
+        window.Logger.info(`🔄 Refreshing user preferences - clearing ${prefKeys.length} keys`, { page: "unified-cache-manager" });
         
         for (const key of prefKeys) {
             await this.remove(key);
@@ -2142,11 +2460,11 @@ UnifiedCacheManager.prototype.refreshUserPreferences = async function() {
                 window.PreferencesCore.currentUserId,
                 window.PreferencesCore.currentProfileId
             );
-            console.log('✅ User preferences refreshed from backend');
+            window.Logger.info('✅ User preferences refreshed from backend', { page: "unified-cache-manager" });
         }
         
     } catch (error) {
-        console.warn('⚠️ Error refreshing user preferences:', error);
+        window.Logger.warn('⚠️ Error refreshing user preferences:', error, { page: "unified-cache-manager" });
         throw error;
     }
 };
@@ -2173,7 +2491,7 @@ UnifiedCacheManager.prototype.refreshUIState = async function() {
         }
         
     } catch (error) {
-        console.warn('⚠️ Error refreshing UI state:', error);
+        window.Logger.warn('⚠️ Error refreshing UI state:', error, { page: "unified-cache-manager" });
         throw error;
     }
 };
@@ -2199,7 +2517,7 @@ UnifiedCacheManager.prototype.refreshNotifications = async function() {
         }
         
     } catch (error) {
-        console.warn('⚠️ Error refreshing notifications:', error);
+        window.Logger.warn('⚠️ Error refreshing notifications:', error, { page: "unified-cache-manager" });
         throw error;
     }
 };
@@ -2211,7 +2529,7 @@ window.clearAllUnifiedCache = async function(options = {}) {
     if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
         return await window.UnifiedCacheManager.clearAllCacheDetailed(options);
     } else {
-        console.warn('⚠️ UnifiedCacheManager not initialized');
+        window.Logger.warn('⚠️ UnifiedCacheManager not initialized', { page: "unified-cache-manager" });
         return { success: false, error: 'UnifiedCacheManager not initialized' };
     }
 };
@@ -2220,7 +2538,7 @@ window.clearAllUnifiedCacheQuick = async function(options = {}) {
     if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
         return await window.UnifiedCacheManager.clearAllCacheQuick(options);
     } else {
-        console.warn('⚠️ UnifiedCacheManager not initialized');
+        window.Logger.warn('⚠️ UnifiedCacheManager not initialized', { page: "unified-cache-manager" });
         return { success: false, error: 'UnifiedCacheManager not initialized' };
     }
 };
@@ -2230,7 +2548,7 @@ window.clearAllCache = async function(options = {}) {
     if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
         return await window.UnifiedCacheManager.clearAllCacheDetailed(options);
     } else {
-        console.warn('⚠️ UnifiedCacheManager not initialized');
+        window.Logger.warn('⚠️ UnifiedCacheManager not initialized', { page: "unified-cache-manager" });
         return { success: false, error: 'UnifiedCacheManager not initialized' };
     }
 };
@@ -2239,7 +2557,7 @@ window.verifyCacheSystem = async function(options = {}) {
     if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
         return await window.UnifiedCacheManager.verifyCacheSystem(options);
     } else {
-        console.warn('⚠️ UnifiedCacheManager not initialized');
+        window.Logger.warn('⚠️ UnifiedCacheManager not initialized', { page: "unified-cache-manager" });
         return { success: false, error: 'UnifiedCacheManager not initialized' };
     }
 };
@@ -2256,16 +2574,16 @@ window.clearCacheQuick = async function(event) {
         event.preventDefault();
     }
     
-    console.log('🧹 ניקוי מהיר לצרכי פיתוח...');
+    window.Logger.info('🧹 ניקוי מהיר לצרכי פיתוח...', { page: "unified-cache-manager" });
     
     try {
         if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
             await window.UnifiedCacheManager.clearAllCacheQuick();
         } else {
-            console.warn('⚠️ UnifiedCacheManager לא זמין');
+            window.Logger.warn('⚠️ UnifiedCacheManager לא זמין', { page: "unified-cache-manager" });
         }
     } catch (error) {
-        console.error('❌ שגיאה בניקוי מהיר:', error);
+        window.Logger.error('❌ שגיאה בניקוי מהיר:', error, { page: "unified-cache-manager" });
     }
 };
 
@@ -2279,16 +2597,16 @@ window.clearCacheLayer = async function(layer, event) {
         event.preventDefault();
     }
     
-    console.log(`🗂️ ניקוי שכבה: ${layer}...`);
+    window.Logger.info(`🗂️ ניקוי שכבה: ${layer}...`, { page: "unified-cache-manager" });
     
     try {
         if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
             await window.UnifiedCacheManager.clearAllCache({ layers: [layer] });
         } else {
-            console.warn('⚠️ UnifiedCacheManager לא זמין');
+            window.Logger.warn('⚠️ UnifiedCacheManager לא זמין', { page: "unified-cache-manager" });
         }
     } catch (error) {
-        console.error(`❌ שגיאה בניקוי ${layer}:`, error);
+        window.Logger.error(`❌ שגיאה בניקוי ${layer}:`, error, { page: "unified-cache-manager" });
     }
 };
 
@@ -2301,16 +2619,16 @@ window.clearAllCacheAdvanced = async function(event) {
         event.preventDefault();
     }
     
-    console.log('🧠 ניקוי כל שכבות המטמון...');
+    window.Logger.info('🧠 ניקוי כל שכבות המטמון...', { page: "unified-cache-manager" });
     
     try {
         if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
             await window.UnifiedCacheManager.clearAllCacheDetailed();
         } else {
-            console.warn('⚠️ UnifiedCacheManager לא זמין');
+            window.Logger.warn('⚠️ UnifiedCacheManager לא זמין', { page: "unified-cache-manager" });
         }
     } catch (error) {
-        console.error('❌ שגיאה בניקוי מלא:', error);
+        window.Logger.error('❌ שגיאה בניקוי מלא:', error, { page: "unified-cache-manager" });
     }
 };
 
@@ -2323,13 +2641,13 @@ window.clearCacheFull = async function(event) {
         event.preventDefault();
     }
     
-    console.log('🔄 ניקוי מלא + רענון עמוד...');
+    window.Logger.info('🔄 ניקוי מלא + רענון עמוד...', { page: "unified-cache-manager" });
     
     try {
         if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
             await window.UnifiedCacheManager.clearAllCacheDetailed();
         } else {
-            console.warn('⚠️ UnifiedCacheManager לא זמין');
+            window.Logger.warn('⚠️ UnifiedCacheManager לא זמין', { page: "unified-cache-manager" });
         }
         
         // ריענון אוטומטי אחרי 1.5 שניות
@@ -2338,7 +2656,7 @@ window.clearCacheFull = async function(event) {
         }, 1500);
         
     } catch (error) {
-        console.error('❌ שגיאה בניקוי מלא:', error);
+        window.Logger.error('❌ שגיאה בניקוי מלא:', error, { page: "unified-cache-manager" });
     }
 };
 
@@ -2348,36 +2666,85 @@ window.clearCacheFull = async function(event) {
  * @param {string} operation - סוג הפעולה (add, edit, delete, cancel)
  */
 window.clearCacheBeforeCRUD = async function(entity, operation) {
-    console.log(`🧹 ניקוי מטמון לפני ${operation} של ${entity}...`);
+    window.Logger.info(`🧹 ניקוי מטמון לפני ${operation} של ${entity}...`, { page: "unified-cache-manager" });
     
     try {
         if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
             // ניקוי מהיר לפני פעולות CRUD
             await window.UnifiedCacheManager.clearAllCacheQuick();
         } else {
-            console.warn('⚠️ UnifiedCacheManager לא זמין - ניקוי בסיסי');
+            window.Logger.warn('⚠️ UnifiedCacheManager לא זמין - ניקוי בסיסי', { page: "unified-cache-manager" });
             // fallback לניקוי בסיסי
             localStorage.removeItem(`${entity}_cache`);
             sessionStorage.removeItem(`${entity}_cache`);
         }
         
-        console.log(`✅ ניקוי מטמון לפני ${operation} של ${entity} הושלם`);
+        window.Logger.info(`✅ ניקוי מטמון לפני ${operation} של ${entity} הושלם`, { page: "unified-cache-manager" });
         
     } catch (error) {
-        console.error(`❌ שגיאה בניקוי מטמון לפני ${operation} של ${entity}:`, error);
+        window.Logger.error(`❌ שגיאה בניקוי מטמון לפני ${operation} של ${entity}:`, error, { page: "unified-cache-manager" });
     }
 };
 
-// console.log('📦 Unified Cache Manager loaded');
+// window.Logger.info('📦 Unified Cache Manager loaded', { page: "unified-cache-manager" });
 
 // Auto-initialize the cache manager immediately
 (async () => {
     if (window.UnifiedCacheManager && !window.UnifiedCacheManager.initialized) {
         try {
             await window.UnifiedCacheManager.initialize();
-            console.log('✅ Unified Cache Manager auto-initialized successfully');
+            window.Logger.info('✅ Unified Cache Manager auto-initialized successfully', { page: "unified-cache-manager" });
         } catch (error) {
-            console.warn('⚠️ Failed to auto-initialize Unified Cache Manager:', error);
+            window.Logger.warn('⚠️ Failed to auto-initialize Unified Cache Manager:', error, { page: "unified-cache-manager" });
         }
     }
 })();
+
+// Export additional functions to window for easy access
+window.invalidateByDependency = function(changedKey) {
+    if (!window.unifiedCacheManager) {
+        window.Logger.error('Cache Manager not initialized', { changedKey, page: 'unified-cache-manager' });
+        return Promise.resolve(0);
+    }
+    return window.unifiedCacheManager.invalidateByDependency(changedKey);
+};
+
+window.invalidateCache = function(pattern) {
+    if (!window.unifiedCacheManager) {
+        window.Logger.error('Cache Manager not initialized', { pattern, page: 'unified-cache-manager' });
+        return Promise.resolve(0);
+    }
+    return window.unifiedCacheManager.invalidate(pattern);
+};
+
+window.getMultipleCache = function(keys) {
+    if (!window.unifiedCacheManager) {
+        window.Logger.error('Cache Manager not initialized', { count: keys.length, page: 'unified-cache-manager' });
+        return Promise.resolve({});
+    }
+    return window.unifiedCacheManager.getMultiple(keys);
+};
+
+window.setMultipleCache = function(data, ttl = 'medium') {
+    if (!window.unifiedCacheManager) {
+        window.Logger.error('Cache Manager not initialized', { count: Object.keys(data).length, page: 'unified-cache-manager' });
+        return Promise.resolve(0);
+    }
+    return window.unifiedCacheManager.setMultiple(data, ttl);
+};
+
+window.hasCache = function(key) {
+    if (!window.unifiedCacheManager) {
+        window.Logger.error('Cache Manager not initialized', { key, page: 'unified-cache-manager' });
+        return Promise.resolve(false);
+    }
+    return window.unifiedCacheManager.has(key);
+};
+
+window.getCacheStats = function() {
+    if (!window.unifiedCacheManager) {
+        window.Logger.error('Cache Manager not initialized', { page: 'unified-cache-manager' });
+        return {};
+    }
+    return window.unifiedCacheManager.getStats();
+};

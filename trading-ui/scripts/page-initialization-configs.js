@@ -21,7 +21,7 @@
  *     'use strict';
  *     
  *     function myNewFunction() {
- *         console.log('New script loaded!');
+ *         window.Logger.info('New script loaded!', { page: "page-initialization-configs" });
  *     }
  *     
  *     // IMPORTANT: Create Global for identification
@@ -30,7 +30,7 @@
  *         version: '1.0.0'
  *     };
  *     
- *     console.log('✅ MyNewScript loaded successfully');
+ *     window.Logger.info('✅ MyNewScript loaded successfully', { page: "page-initialization-configs" });
  * })();
  *
  * STEP 2: Update Package Manifest
@@ -201,7 +201,7 @@ const PAGE_CONFIGS = {
         customInitializers: [
             // Dashboard-specific initialization
             async (pageConfig) => {
-                // console.log('📊 Initializing Dashboard...');
+                // window.Logger.info('📊 Initializing Dashboard...', { page: "page-initialization-configs" });
                 
                 // Use the new unified initialization function
                 if (typeof window.initializeIndexPage === 'function') {
@@ -261,7 +261,7 @@ const PAGE_CONFIGS = {
         customInitializers: [
             // Preferences-specific initialization
             async (pageConfig) => {
-                console.log('⚙️ Initializing Preferences...');
+                window.Logger.info('⚙️ Initializing Preferences...', { page: "page-initialization-configs" });
                 
                 // טעינת מערכת העדפות
                 if (typeof window.initializePreferences === 'function') {
@@ -320,7 +320,7 @@ const PAGE_CONFIGS = {
         requiresTables: true,
         customInitializers: [
             async (pageConfig) => {
-                console.log('📈 Initializing Trades...');
+                window.Logger.info('📈 Initializing Trades...', { page: "page-initialization-configs" });
                 
                 // Use the new unified initialization function
                 if (typeof window.initializeTradesPage === 'function') {
@@ -333,13 +333,13 @@ const PAGE_CONFIGS = {
                 }
             },
             async (pageConfig) => {
-                console.log('🔧 Initializing Trades Conditions System...');
+                window.Logger.info('🔧 Initializing Trades Conditions System...', { page: "page-initialization-configs" });
                 
                 // Initialize conditions system for trades
                 if (typeof window.initializeTradeConditionsSystem === 'function') {
                     window.initializeTradeConditionsSystem();
                 } else {
-                    console.warn('⚠️ Trades conditions system not available');
+                    window.Logger.warn('⚠️ Trades conditions system not available', { page: "page-initialization-configs" });
                 }
             }
         ]
@@ -381,7 +381,7 @@ const PAGE_CONFIGS = {
         requiresTables: true,
         customInitializers: [
             async (pageConfig) => {
-                console.log('⚡ Initializing Executions...');
+                window.Logger.info('⚡ Initializing Executions...', { page: "page-initialization-configs" });
                 
                 if (typeof window.loadExecutionsData === 'function') {
                     await window.loadExecutionsData();
@@ -414,7 +414,7 @@ const PAGE_CONFIGS = {
         requiresTables: true,
         customInitializers: [
             async (pageConfig) => {
-                console.log('📋 Initializing Trade Plans...');
+                window.Logger.info('📋 Initializing Trade Plans...', { page: "page-initialization-configs" });
                 
                 // Use the new unified initialization function
                 if (typeof window.initializeTradePlansPage === 'function') {
@@ -427,13 +427,13 @@ const PAGE_CONFIGS = {
                 }
             },
             async (pageConfig) => {
-                console.log('🔧 Initializing Trade Plans Conditions System...');
+                window.Logger.info('🔧 Initializing Trade Plans Conditions System...', { page: "page-initialization-configs" });
                 
                 // Initialize conditions system for trade plans
                 if (typeof window.initializeTradePlanConditionsSystem === 'function') {
                     window.initializeTradePlanConditionsSystem();
                 } else {
-                    console.warn('⚠️ Trade plans conditions system not available');
+                    window.Logger.warn('⚠️ Trade plans conditions system not available', { page: "page-initialization-configs" });
                 }
             }
         ]
@@ -473,7 +473,7 @@ const PAGE_CONFIGS = {
         requiresTables: true,
         customInitializers: [
             async (pageConfig) => {
-                console.log('🔔 Initializing Alerts...');
+                window.Logger.info('🔔 Initializing Alerts...', { page: "page-initialization-configs" });
                 
                 if (typeof window.loadAlertsData === 'function') {
                     await window.loadAlertsData();
@@ -485,13 +485,13 @@ const PAGE_CONFIGS = {
                 // }
             },
             async (pageConfig) => {
-                console.log('🔧 Initializing Alerts Conditions Integration...');
+                window.Logger.info('🔧 Initializing Alerts Conditions Integration...', { page: "page-initialization-configs" });
                 
                 // Initialize conditions integration for alerts
                 if (typeof window.initializeAlertModalTabs === 'function') {
                     window.initializeAlertModalTabs();
                 } else {
-                    console.warn('⚠️ Alert modal tabs system not available');
+                    window.Logger.warn('⚠️ Alert modal tabs system not available', { page: "page-initialization-configs" });
                 }
             }
         ]
@@ -532,19 +532,19 @@ const PAGE_CONFIGS = {
         requiresTables: true,
         customInitializers: [
             async (pageConfig) => {
-                console.log('🏦 Initializing Trading Accounts...');
-                console.log('🔍 Checking function availability:');
-                console.log('  - loadTradingAccountsDataForTradingAccountsPage:', typeof window.loadTradingAccountsDataForTradingAccountsPage);
-                console.log('  - loadAccountsData:', typeof window.loadAccountsData);
+                window.Logger.info('🏦 Initializing Trading Accounts...', { page: "page-initialization-configs" });
+                window.Logger.info('🔍 Checking function availability:', { page: "page-initialization-configs" });
+                window.Logger.info('  - loadTradingAccountsDataForTradingAccountsPage:', typeof window.loadTradingAccountsDataForTradingAccountsPage, { page: "page-initialization-configs" });
+                window.Logger.info('  - loadAccountsData:', typeof window.loadAccountsData, { page: "page-initialization-configs" });
                 
                 if (typeof window.loadTradingAccountsDataForTradingAccountsPage === 'function') {
-                    console.log('📡 Calling loadTradingAccountsDataForTradingAccountsPage...');
+                    window.Logger.info('📡 Calling loadTradingAccountsDataForTradingAccountsPage...', { page: "page-initialization-configs" });
                     await window.loadTradingAccountsDataForTradingAccountsPage();
                 } else if (typeof window.loadAccountsData === 'function') {
-                    console.log('📡 Calling loadAccountsData...');
+                    window.Logger.info('📡 Calling loadAccountsData...', { page: "page-initialization-configs" });
                     await window.loadAccountsData();
                 } else {
-                    console.log('⚠️ No suitable function found for loading trading accounts data');
+                    window.Logger.info('⚠️ No suitable function found for loading trading accounts data', { page: "page-initialization-configs" });
                 }
             }
         ]
@@ -575,11 +575,11 @@ const PAGE_CONFIGS = {
         requiresTables: true,
         customInitializers: [
             async (pageConfig) => {
-                console.log('💰 Initializing Cash Flows...');
+                window.Logger.info('💰 Initializing Cash Flows...', { page: "page-initialization-configs" });
                 
                 // אתחול מערכת ההעדפות לפני טעינת הנתונים
                 if (window.PreferencesSystem && !window.PreferencesSystem.initialized) {
-                    console.log('⚙️ Initializing PreferencesSystem for Cash Flows...');
+                    window.Logger.info('⚙️ Initializing PreferencesSystem for Cash Flows...', { page: "page-initialization-configs" });
                     await window.PreferencesSystem.initialize();
                 }
                 
@@ -625,7 +625,7 @@ const PAGE_CONFIGS = {
         requiresTables: true,
         customInitializers: [
             async (pageConfig) => {
-                console.log('📊 Initializing Tickers...');
+                window.Logger.info('📊 Initializing Tickers...', { page: "page-initialization-configs" });
                 
                 if (typeof window.loadTickersData === 'function') {
                     await window.loadTickersData();
@@ -658,7 +658,7 @@ const PAGE_CONFIGS = {
         requiresTables: true,
         customInitializers: [
             async (pageConfig) => {
-                console.log('📝 Initializing Notes...');
+                window.Logger.info('📝 Initializing Notes...', { page: "page-initialization-configs" });
                 
                 if (typeof window.loadNotesData === 'function') {
                     await window.loadNotesData();
@@ -699,7 +699,7 @@ const PAGE_CONFIGS = {
         requiresTables: false,
         customInitializers: [
             async (pageConfig) => {
-                console.log('🔧 Initializing System Management...');
+                window.Logger.info('🔧 Initializing System Management...', { page: "page-initialization-configs" });
                 
                 if (typeof window.loadSystemInfo === 'function') {
                     await window.loadSystemInfo();
@@ -709,9 +709,9 @@ const PAGE_CONFIGS = {
                 if (window.UnifiedLogAPI && !window.UnifiedLogAPI.initialized) {
                     try {
                         await window.UnifiedLogAPI.initialize();
-                        console.log('✅ Unified Log System initialized for System Management');
+                        window.Logger.info('✅ Unified Log System initialized for System Management', { page: "page-initialization-configs" });
                     } catch (error) {
-                        console.warn('⚠️ Failed to initialize Unified Log System:', error);
+                        window.Logger.warn('⚠️ Failed to initialize Unified Log System:', error, { page: "page-initialization-configs" });
                     }
                 }
             }
@@ -734,16 +734,16 @@ const PAGE_CONFIGS = {
         requiresTables: false,
         customInitializers: [
             async (pageConfig) => {
-                console.log('🔧 Initializing Server Monitor...');
+                window.Logger.info('🔧 Initializing Server Monitor...', { page: "page-initialization-configs" });
                 
                 // Initialize server monitor if available
                 if (window.serverMonitor) {
-                    console.log('✅ Server Monitor already initialized');
+                    window.Logger.info('✅ Server Monitor already initialized', { page: "page-initialization-configs" });
                 } else {
-                    console.log('⚠️ Server Monitor not available');
+                    window.Logger.info('⚠️ Server Monitor not available', { page: "page-initialization-configs" });
                 }
                 
-                console.log('✅ Server Monitor initialization completed');
+                window.Logger.info('✅ Server Monitor initialization completed', { page: "page-initialization-configs" });
             }
         ]
     },
@@ -764,7 +764,7 @@ const PAGE_CONFIGS = {
         requiresTables: true,
         customInitializers: [
             async (pageConfig) => {
-                console.log('🧪 Initializing CRUD Testing...');
+                window.Logger.info('🧪 Initializing CRUD Testing...', { page: "page-initialization-configs" });
                 
                 if (typeof window.initializeCRUDTesting === 'function') {
                     await window.initializeCRUDTesting();
@@ -804,13 +804,13 @@ const PAGE_CONFIGS = {
         requiresTables: true,
         customInitializers: [
             async (pageConfig) => {
-                console.log('🌐 Initializing External Data...');
+                window.Logger.info('🌐 Initializing External Data...', { page: "page-initialization-configs" });
                 
                 // Check if ExternalDataDashboard class is available
-                console.log('🔍 Checking ExternalDataDashboard availability:', {
+                window.Logger.info('🔍 Checking ExternalDataDashboard availability:', {
                     ExternalDataDashboard: typeof ExternalDataDashboard,
                     windowExternalDataDashboard: typeof window.ExternalDataDashboard
-                });
+                }, { page: "page-initialization-configs" });
                 
                 if (typeof window.loadExternalData === 'function') {
                     await window.loadExternalData();
@@ -821,37 +821,37 @@ const PAGE_CONFIGS = {
                     try {
                         window.externalDataDashboard = new ExternalDataDashboard();
                         window.externalDataDashboard.init();
-                        console.log('✅ External Data Dashboard initialized');
+                        window.Logger.info('✅ External Data Dashboard initialized', { page: "page-initialization-configs" });
                     } catch (error) {
-                        console.error('❌ Failed to initialize External Data Dashboard:', error);
+                        window.Logger.error('❌ Failed to initialize External Data Dashboard:', error, { page: "page-initialization-configs" });
                     }
                 } else {
-                    console.log('🔍 External Data Dashboard check:', {
+                    window.Logger.info('🔍 External Data Dashboard check:', {
                         ExternalDataDashboard: typeof ExternalDataDashboard,
                         externalDataDashboard: typeof window.externalDataDashboard
-                    });
+                    }, { page: "page-initialization-configs" });
                 }
                 
                 // Initialize Unified Log System
                 if (window.UnifiedLogAPI && !window.UnifiedLogAPI.initialized) {
                     try {
                         await window.UnifiedLogAPI.initialize();
-                        console.log('✅ Unified Log System initialized for External Data Dashboard');
+                        window.Logger.info('✅ Unified Log System initialized for External Data Dashboard', { page: "page-initialization-configs" });
                     } catch (error) {
-                        console.warn('⚠️ Failed to initialize Unified Log System:', error);
+                        window.Logger.warn('⚠️ Failed to initialize Unified Log System:', error, { page: "page-initialization-configs" });
                     }
                 }
                 
                 // Define global functions for button onclick handlers
-                console.log('🔧 Defining global functions for External Data Dashboard...');
+                window.Logger.info('🔧 Defining global functions for External Data Dashboard...', { page: "page-initialization-configs" });
                 
                 window.testProvider = function(providerId) {
-                    // console.log('🧪 Testing provider:', providerId);
+                    // window.Logger.info('🧪 Testing provider:', providerId, { page: "page-initialization-configs" });
                     // Implementation for testing specific provider
                 };
 
                 window.toggleProvider = function(providerId) {
-                    // console.log('🔄 Toggling provider:', providerId);
+                    // window.Logger.info('🔄 Toggling provider:', providerId, { page: "page-initialization-configs" });
                     // Implementation for toggling provider status
                 };
 
@@ -898,11 +898,11 @@ const PAGE_CONFIGS = {
                 };
 
                 window.testAllProviders = function() {
-                    console.log('🔔 testAllProviders called from global function');
+                    window.Logger.info('🔔 testAllProviders called from global function', { page: "page-initialization-configs" });
                     if (window.externalDataDashboard) {
                         window.externalDataDashboard.testAllProviders();
                     } else {
-                        console.error('❌ externalDataDashboard not available');
+                        window.Logger.error('❌ externalDataDashboard not available', { page: "page-initialization-configs" });
                     }
                 };
 
@@ -1018,22 +1018,22 @@ const PAGE_CONFIGS = {
                                 window.externalDataDashboard.refreshPerformanceCharts();
                                 break;
                             default:
-                                console.warn(`Unknown chart ID: ${chartId}`);
+                                window.Logger.warn(`Unknown chart ID: ${chartId}`, { page: "page-initialization-configs" });
                         }
                     }
                 };
                 
-                console.log('✅ Global functions defined for External Data Dashboard');
+                window.Logger.info('✅ Global functions defined for External Data Dashboard', { page: "page-initialization-configs" });
                 
                 // Load external data log after page initialization
                 setTimeout(async () => {
                     try {
                         if (typeof window.loadExternalDataLog === 'function') {
                             await window.loadExternalDataLog();
-                            console.log('✅ External data log loaded after page initialization');
+                            window.Logger.info('✅ External data log loaded after page initialization', { page: "page-initialization-configs" });
                         }
                     } catch (error) {
-                        console.error('❌ Failed to load external data log:', error);
+                        window.Logger.error('❌ Failed to load external data log:', error, { page: "page-initialization-configs" });
                     }
                 }, 1000); // Wait 1 second after page load
             }
@@ -1056,7 +1056,7 @@ const PAGE_CONFIGS = {
         requiresTables: false,
         customInitializers: [
             async (pageConfig) => {
-                console.log('🔍 Initializing Linter Monitor...');
+                window.Logger.info('🔍 Initializing Linter Monitor...', { page: "page-initialization-configs" });
                 
                 if (typeof window.startLinterMonitoring === 'function') {
                     await window.startLinterMonitoring();
@@ -1081,7 +1081,7 @@ const PAGE_CONFIGS = {
         requiresTables: false,
         customInitializers: [
             async (pageConfig) => {
-                console.log('📬 Initializing Notifications Center...');
+                window.Logger.info('📬 Initializing Notifications Center...', { page: "page-initialization-configs" });
                 
                 if (typeof window.initializeNotificationsCenter === 'function') {
                     await window.initializeNotificationsCenter();
@@ -1107,7 +1107,7 @@ const PAGE_CONFIGS = {
         requiresTables: false,
         customInitializers: [
             async (pageConfig) => {
-                console.log('📬 Initializing Notifications Center HTML...');
+                window.Logger.info('📬 Initializing Notifications Center HTML...', { page: "page-initialization-configs" });
                 
                 if (typeof window.initializeNotificationsCenter === 'function') {
                     await window.initializeNotificationsCenter();
@@ -1117,14 +1117,14 @@ const PAGE_CONFIGS = {
                 
                 // Initialize Unified Log System if available
                 if (window.UnifiedLogAPI) {
-                    console.log('📊 Initializing Unified Log System for notifications center...');
+                    window.Logger.info('📊 Initializing Unified Log System for notifications center...', { page: "page-initialization-configs" });
                     try {
                         await window.UnifiedLogAPI.initialize();
                         
                         // Load notification log in the correct container
                         const logContainer = document.getElementById('notification-log-container');
                         if (logContainer && !logContainer.querySelector('.unified-log-display')) {
-                            console.log('🔄 Loading notification log in container...');
+                            window.Logger.info('🔄 Loading notification log in container...', { page: "page-initialization-configs" });
                             await window.showNotificationLog('notification-log-container', {
                                 displayConfig: 'default',
                                 autoRefresh: true,
@@ -1132,7 +1132,7 @@ const PAGE_CONFIGS = {
                             });
                         }
                     } catch (error) {
-                        console.warn('⚠️ Failed to initialize Unified Log System:', error);
+                        window.Logger.warn('⚠️ Failed to initialize Unified Log System:', error, { page: "page-initialization-configs" });
                     }
                 }
             }
@@ -1146,15 +1146,15 @@ const PAGE_CONFIGS = {
         requiresTables: false,
         customInitializers: [
             async (pageConfig) => {
-                console.log('📊 Initializing Unified Logs Demo...');
+                window.Logger.info('📊 Initializing Unified Logs Demo...', { page: "page-initialization-configs" });
                 
                 // Initialize Unified Log System
                 if (window.UnifiedLogAPI) {
                     try {
                         await window.UnifiedLogAPI.initialize();
-                        console.log('✅ Unified Log System initialized for demo');
+                        window.Logger.info('✅ Unified Log System initialized for demo', { page: "page-initialization-configs" });
                     } catch (error) {
-                        console.warn('⚠️ Failed to initialize Unified Log System for demo:', error);
+                        window.Logger.warn('⚠️ Failed to initialize Unified Log System for demo:', error, { page: "page-initialization-configs" });
                     }
                 }
             }
@@ -1175,7 +1175,7 @@ const PAGE_CONFIGS = {
         ],
         customInitializers: [
             async (pageConfig) => {
-                console.log('🗄️ Initializing Database Display...');
+                window.Logger.info('🗄️ Initializing Database Display...', { page: "page-initialization-configs" });
                 
                 if (typeof window.loadDatabaseInfo === 'function') {
                     await window.loadDatabaseInfo();
@@ -1191,7 +1191,7 @@ const PAGE_CONFIGS = {
         requiresTables: false,
         customInitializers: [
             async (pageConfig) => {
-                console.log('🔬 Initializing Research...');
+                window.Logger.info('🔬 Initializing Research...', { page: "page-initialization-configs" });
                 
                 if (typeof window.initializeResearchTools === 'function') {
                     await window.initializeResearchTools();
@@ -1293,7 +1293,7 @@ const ADDITIONAL_PAGE_CONFIGS = {
         requiresTables: true,
         customInitializers: [
             async (pageConfig) => {
-                console.log('🗄️ Initializing Database Extra Data...');
+                window.Logger.info('🗄️ Initializing Database Extra Data...', { page: "page-initialization-configs" });
                 if (typeof window.loadExtraData === 'function') {
                     await window.loadExtraData();
                 }
@@ -1319,7 +1319,7 @@ const ADDITIONAL_PAGE_CONFIGS = {
         requiresTables: true,
         customInitializers: [
             async (pageConfig) => {
-                console.log('🔒 Initializing System Constraints...');
+                window.Logger.info('🔒 Initializing System Constraints...', { page: "page-initialization-configs" });
                 if (typeof window.loadConstraints === 'function') {
                     await window.loadConstraints();
                 }
@@ -1345,7 +1345,7 @@ const ADDITIONAL_PAGE_CONFIGS = {
         requiresTables: true,
         customInitializers: [
             async (pageConfig) => {
-                console.log('⚙️ Initializing Background Tasks...');
+                window.Logger.info('⚙️ Initializing Background Tasks...', { page: "page-initialization-configs" });
                 if (typeof window.loadBackgroundTasks === 'function') {
                     await window.loadBackgroundTasks();
                 }
@@ -1371,7 +1371,7 @@ const ADDITIONAL_PAGE_CONFIGS = {
         requiresTables: true,
         customInitializers: [
             async (pageConfig) => {
-                console.log('📊 Initializing Page Scripts Matrix...');
+                window.Logger.info('📊 Initializing Page Scripts Matrix...', { page: "page-initialization-configs" });
                 if (typeof window.loadScriptsMatrix === 'function') {
                     await window.loadScriptsMatrix();
                 }
@@ -1397,7 +1397,7 @@ const ADDITIONAL_PAGE_CONFIGS = {
         requiresTables: false,
         customInitializers: [
             async (pageConfig) => {
-                console.log('🎨 Initializing CSS Management...');
+                window.Logger.info('🎨 Initializing CSS Management...', { page: "page-initialization-configs" });
                 if (typeof window.loadCSSManagement === 'function') {
                     await window.loadCSSManagement();
                 }
@@ -1423,7 +1423,7 @@ const ADDITIONAL_PAGE_CONFIGS = {
         requiresTables: false,
         customInitializers: [
             async (pageConfig) => {
-                console.log('🌈 Initializing Dynamic Colors Display...');
+                window.Logger.info('🌈 Initializing Dynamic Colors Display...', { page: "page-initialization-configs" });
                 if (typeof window.loadColorDisplay === 'function') {
                     await window.loadColorDisplay();
                 }
@@ -1449,7 +1449,7 @@ const ADDITIONAL_PAGE_CONFIGS = {
         requiresTables: false,
         customInitializers: [
             async (pageConfig) => {
-                console.log('🎭 Initializing Design Gallery...');
+                window.Logger.info('🎭 Initializing Design Gallery...', { page: "page-initialization-configs" });
                 if (typeof window.loadDesigns === 'function') {
                     await window.loadDesigns();
                 }
@@ -1475,7 +1475,7 @@ const ADDITIONAL_PAGE_CONFIGS = {
         requiresTables: true,
         customInitializers: [
             async (pageConfig) => {
-                console.log('📈 Initializing Chart Management...');
+                window.Logger.info('📈 Initializing Chart Management...', { page: "page-initialization-configs" });
                 if (typeof window.loadChartManagement === 'function') {
                     await window.loadChartManagement();
                 }
@@ -1504,7 +1504,7 @@ const ADDITIONAL_PAGE_CONFIGS = {
         requiresTables: false,
         customInitializers: [
             function() {
-                console.log('🚀 Initializing Init System Management...');
+                window.Logger.info('🚀 Initializing Init System Management...', { page: "page-initialization-configs" });
                 // Init system management specific initialization
             }
         ]
@@ -1529,7 +1529,7 @@ const ADDITIONAL_PAGE_CONFIGS = {
         requiresTables: true,
         customInitializers: [
             async (pageConfig) => {
-                console.log('🗄️ Initializing Cache Management...');
+                window.Logger.info('🗄️ Initializing Cache Management...', { page: "page-initialization-configs" });
                 if (typeof window.loadCacheManagement === 'function') {
                     await window.loadCacheManagement();
                 }
@@ -1556,7 +1556,7 @@ const ADDITIONAL_PAGE_CONFIGS = {
         requiresTables: true,
         customInitializers: [
             async (pageConfig) => {
-                console.log('🧪 Initializing Conditions Test...');
+                window.Logger.info('🧪 Initializing Conditions Test...', { page: "page-initialization-configs" });
                 if (typeof window.loadConditionsTest === 'function') {
                     await window.loadConditionsTest();
                 }

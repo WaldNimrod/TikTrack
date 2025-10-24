@@ -131,7 +131,7 @@ function isPrimarySeverity(category, type) {
     // בדוק אם הסוג נמצא ברשימת הודעות מרכזיות
     return severity.primary.includes(type);
   } catch (error) {
-    console.warn('Error checking primary severity:', error);
+    window.Logger.warn('Error checking primary severity:', error, { page: "notification-system" });
     return type === 'error'; // ברירת מחדל: רק שגיאות
   }
 }
@@ -174,7 +174,7 @@ function isUserInitiatedAction(message, title, functionName) {
     
     return hasUserKeywords || hasUserFunction;
   } catch (error) {
-    console.warn('Error checking user initiated action:', error);
+    window.Logger.warn('Error checking user initiated action:', error, { page: "notification-system" });
     return false;
   }
 }
@@ -215,7 +215,7 @@ function shouldShowInMode(mode, category, type, userInitiated = false) {
         return userInitiated || type === 'error';
     }
   } catch (error) {
-    console.warn('Error in shouldShowInMode:', error);
+    window.Logger.warn('Error in shouldShowInMode:', error, { page: "notification-system" });
     // במקרה של שגיאה, הצג רק שגיאות
     return type === 'error';
   }
@@ -244,9 +244,9 @@ async function createAlert(alertData) {
     // עדכון היסטוריית התראות
     await updateNotificationHistory('alert-created', alertData);
     
-    console.log('✅ Alert created successfully');
+    window.Logger.info('✅ Alert created successfully', { page: "notification-system" });
   } catch (error) {
-    console.error('❌ Failed to create alert:', error);
+    window.Logger.error('❌ Failed to create alert:', error, { page: "notification-system" });
     throw error;
   }
 }
@@ -294,7 +294,7 @@ async function updateNotificationHistory(action, data) {
       });
     }
   } catch (error) {
-    console.error('❌ Failed to update notification history:', error);
+    window.Logger.error('❌ Failed to update notification history:', error, { page: "notification-system" });
   }
 }
 
@@ -381,7 +381,7 @@ async function shouldShowNotification(category, type = 'info', userInitiated = f
       const mode = notificationMode || 'work'; // ברירת מחדל: מצב עבודה
       
       if (window.DEBUG_MODE) {
-        console.log(`🔍 Notification mode: ${mode}, category: ${category}, type: ${type}, userInitiated: ${userInitiated}`);
+        window.Logger.info(`🔍 Notification mode: ${mode}, category: ${category}, type: ${type}, userInitiated: ${userInitiated}`, { page: "notification-system" });
       }
       
       // בדוק אם ההודעה צריכה להיות מוצגת במצב הנוכחי
@@ -389,7 +389,7 @@ async function shouldShowNotification(category, type = 'info', userInitiated = f
       
       if (!shouldShow) {
         if (window.DEBUG_MODE) {
-          console.log(`🔍 Notification filtered out by mode ${mode}: category=${category}, type=${type}, userInitiated=${userInitiated}`);
+          window.Logger.info(`🔍 Notification filtered out by mode ${mode}: category=${category}, type=${type}, userInitiated=${userInitiated}`, { page: "notification-system" });
         }
         return false;
       }
@@ -397,32 +397,32 @@ async function shouldShowNotification(category, type = 'info', userInitiated = f
     
     // בדוק את ההגדרות הישנות (תאימות לאחור)
     const preferenceName = `notifications_${category}_enabled`;
-    console.log(`🔍 Checking preference: ${preferenceName}`);
+    window.Logger.info(`🔍 Checking preference: ${preferenceName}`, { page: "notification-system" });
     
     if (typeof window.getPreference !== 'function') {
-      console.warn('getPreference function not available, showing notification by default');
+      window.Logger.warn('getPreference function not available, showing notification by default', { page: "notification-system" });
       return true;
     }
     
     const isEnabled = await window.getPreference(preferenceName);
     if (window.DEBUG_MODE) {
-      console.log(`🔍 Preference ${preferenceName} value:`, isEnabled, typeof isEnabled);
+      window.Logger.info(`🔍 Preference ${preferenceName} value:`, isEnabled, typeof isEnabled, { page: "notification-system" });
     }
     
     // If preference is not found (null), don't show notification
     if (isEnabled === null) {
-      console.log(`⚠️ Preference ${preferenceName} not found - notification disabled`);
+      window.Logger.info(`⚠️ Preference ${preferenceName} not found - notification disabled`, { page: "notification-system" });
       return false;
     }
     
     const result = isEnabled === 'true' || isEnabled === true;
     if (window.DEBUG_MODE) {
-      console.log(`🔍 Should show notification for ${category}:`, result);
+      window.Logger.info(`🔍 Should show notification for ${category}:`, result, { page: "notification-system" });
     }
     return result;
   } catch (error) {
     if (window.DEBUG_MODE) {
-      console.warn('Failed to check notification preference, showing by default:', error);
+      window.Logger.warn('Failed to check notification preference, showing by default:', error, { page: "notification-system" });
     }
     // For general category, map to system category; for others, show by default
     if (category === 'general') {
@@ -446,7 +446,7 @@ async function shouldLogToConsole(category) {
     const isEnabled = await window.getPreference(preferenceName);
     return isEnabled === 'true' || isEnabled === true;
   } catch (error) {
-    console.warn('Failed to check console log preference, logging by default:', error);
+    window.Logger.warn('Failed to check console log preference, logging by default:', error, { page: "notification-system" });
     return true; // Default: write to console
   }
 }
@@ -517,9 +517,9 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
         }
       }
       
-      // console.log(`🔍 Auto-detected category: ${category} for type: ${type}`);
+      // window.Logger.info(`🔍 Auto-detected category: ${category} for type: ${type}`, { page: "notification-system" });
     } catch (error) {
-      console.warn('Failed to detect category, using default:', error);
+      window.Logger.warn('Failed to detect category, using default:', error, { page: "notification-system" });
       category = 'general';
     }
   } else if (!category) {
@@ -534,7 +534,7 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
   }
   
   // Check if notification should be shown based on category preferences and notification mode
-  console.log(`🔔 showNotification called: "${message}", type: ${type}, category: ${category}, options:`, options);
+  window.Logger.info(`🔔 showNotification called: "${message}", type: ${type}, category: ${category}, options:`, options, { page: "notification-system" });
   
   if (category) {
     try {
@@ -547,18 +547,18 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
         options.functionName || 'showNotification'
       );
       if (window.DEBUG_MODE) {
-        console.log(`🔍 Category ${category} enabled:`, shouldShow);
+        window.Logger.info(`🔍 Category ${category} enabled:`, shouldShow, { page: "notification-system" });
       }
       if (!shouldShow) {
-        console.log(`❌ Notification blocked for category: ${category}`);
+        window.Logger.info(`❌ Notification blocked for category: ${category}`, { page: "notification-system" });
         return; // Don't show notification if category is disabled
       }
     } catch (error) {
-      console.warn('Failed to check notification category, showing anyway:', error);
+      window.Logger.warn('Failed to check notification category, showing anyway:', error, { page: "notification-system" });
       // Continue to show notification if category check fails
     }
   } else {
-    console.log(`✅ Showing notification (category: ${category})`);
+    window.Logger.info(`✅ Showing notification (category: ${category}, { page: "notification-system" })`);
   }
   
   // Get dynamic colors from color scheme system
@@ -585,8 +585,8 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
   const notificationColor = getNotificationColor(type);
   
   // Debug: Log dynamic color
-  // console.log(`🎨 Dynamic notification color for ${type}:`, notificationColor);
-  // console.log(`🎨 getEntityColor function available:`, typeof window.getEntityColor);
+  // window.Logger.info(`🎨 Dynamic notification color for ${type}:`, notificationColor, { page: "notification-system" });
+  // window.Logger.info(`🎨 getEntityColor function available:`, typeof window.getEntityColor, { page: "notification-system" });
 
   // Create notification element
   const notification = document.createElement('div');
@@ -606,11 +606,11 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
   `;
 
   // Debug: Log notification element details
-  // console.log('🔍 DEBUG: Notification element created:', {
+  // window.Logger.info('🔍 DEBUG: Notification element created:', {
   //   element: notification,
   //   className: notification.className,
   //   type: type,
-  //   innerHTML: notification.innerHTML.substring(0, 200) + '...'
+  //   innerHTML: notification.innerHTML.substring(0, 200, { page: "notification-system" }) + '...'
   // });
 
   // Debug: Check computed styles
@@ -620,7 +620,7 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
     const messageElement = notification.querySelector('.notification-message');
     const iconElement = notification.querySelector('.notification-icon');
     
-    // console.log('🔍 DEBUG: Computed styles after creation:', {
+    // window.Logger.info('🔍 DEBUG: Computed styles after creation:', {
     //   notification: {
     //     backgroundColor: computedStyle.backgroundColor,
     //     color: computedStyle.color,
@@ -629,7 +629,7 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
     //     opacity: computedStyle.opacity
     //   },
     //   title: titleElement ? {
-    //     color: window.getComputedStyle(titleElement).color,
+    //     color: window.getComputedStyle(titleElement, { page: "notification-system" }).color,
     //     fontSize: window.getComputedStyle(titleElement).fontSize,
     //     fontWeight: window.getComputedStyle(titleElement).fontWeight
     //   } : 'No title element',
@@ -652,11 +652,11 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
     //     return false;
     //   }
     // });
-    // console.log('🔍 DEBUG: CSS file check:', {
+    // window.Logger.info('🔍 DEBUG: CSS file check:', {
     //   totalStylesheets: stylesheets.length,
     //   notificationCSSLoaded: !!notificationCSS,
     //   notificationCSSUrl: notificationCSS ? notificationCSS.href : 'Not found'
-    // });
+    // }, { page: "notification-system" });
     
     // Debug: Check CSS rules - DISABLED FOR PERFORMANCE
     // if (notificationCSS) {
@@ -665,10 +665,10 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
     //     const notificationRules = rules.filter(rule => 
     //       rule.selectorText && rule.selectorText.includes('.notification')
     //     );
-    //     console.log('🔍 DEBUG: CSS rules check:', {
+    //     window.Logger.info('🔍 DEBUG: CSS rules check:', {
     //       totalRules: rules.length,
     //       notificationRules: notificationRules.length,
-    //       notificationSelectors: notificationRules.map(rule => rule.selectorText)
+    //       notificationSelectors: notificationRules.map(rule => rule.selectorText, { page: "notification-system" })
     //     });
         
         // Debug: Check specific rules - DISABLED FOR PERFORMANCE
@@ -678,10 +678,10 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
         // const messageRulesDebug = rules.filter(rule => 
         //   rule.selectorText && rule.selectorText.includes('.notification-message')
         // );
-        // console.log('🔍 DEBUG: Specific rules check:', {
+        // window.Logger.info('🔍 DEBUG: Specific rules check:', {
         //   titleRules: titleRulesDebug.length,
         //   messageRules: messageRulesDebug.length,
-        //   titleSelectors: titleRulesDebug.map(rule => rule.selectorText),
+        //   titleSelectors: titleRulesDebug.map(rule => rule.selectorText, { page: "notification-system" }),
         //   messageSelectors: messageRulesDebug.map(rule => rule.selectorText)
         // });
         
@@ -689,32 +689,32 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
         // const importantRules = rules.filter(rule => 
         //   rule.cssText && rule.cssText.includes('!important')
         // );
-        // console.log('🔍 DEBUG: Important rules check:', {
+        // window.Logger.info('🔍 DEBUG: Important rules check:', {
         //   importantRulesCount: importantRules.length,
-        //   importantRules: importantRules.map(rule => rule.selectorText + ' -> ' + rule.cssText.substring(0, 100))
+        //   importantRules: importantRules.map(rule => rule.selectorText + ' -> ' + rule.cssText.substring(0, 100, { page: "notification-system" }))
         // });
         
         // Debug: Check specific color rules - DISABLED FOR PERFORMANCE
         // const colorRules = rules.filter(rule => 
         //   rule.cssText && (rule.cssText.includes('color:') || rule.cssText.includes('color :'))
         // );
-        // console.log('🔍 DEBUG: Color rules check:', {
+        // window.Logger.info('🔍 DEBUG: Color rules check:', {
         //   colorRulesCount: colorRules.length,
-        //   colorRules: colorRules.map(rule => rule.selectorText + ' -> ' + rule.cssText.substring(0, 150))
+        //   colorRules: colorRules.map(rule => rule.selectorText + ' -> ' + rule.cssText.substring(0, 150, { page: "notification-system" }))
         // });
         
         // Debug: Check if our specific rules are loaded - DISABLED FOR PERFORMANCE
         // const ourRules = rules.filter(rule => 
         //   rule.cssText && (rule.cssText.includes('#1a1a1a') || rule.cssText.includes('#666'))
         // );
-        // console.log('🔍 DEBUG: Our specific rules check:', {
+        // window.Logger.info('🔍 DEBUG: Our specific rules check:', {
         //   ourRulesCount: ourRules.length,
-        //   ourRules: ourRules.map(rule => rule.selectorText + ' -> ' + rule.cssText.substring(0, 150))
+        //   ourRules: ourRules.map(rule => rule.selectorText + ' -> ' + rule.cssText.substring(0, 150, { page: "notification-system" }))
         // });
         
         // Debug: Check the actual computed colors - DISABLED FOR PERFORMANCE
-        // console.log('🔍 DEBUG: Actual computed colors:', {
-        //   titleColor: titleElement ? window.getComputedStyle(titleElement).color : 'No title',
+        // window.Logger.info('🔍 DEBUG: Actual computed colors:', {
+        //   titleColor: titleElement ? window.getComputedStyle(titleElement, { page: "notification-system" }).color : 'No title',
         //   messageColor: messageElement ? window.getComputedStyle(messageElement).color : 'No message',
         //   iconColor: iconElement ? window.getComputedStyle(iconElement).color : 'No icon'
         // });
@@ -726,8 +726,8 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
         // const messageRulesDetailed = rules.filter(rule => 
         //   rule.selectorText && rule.selectorText.includes('.notification-message')
         // );
-        // console.log('🔍 DEBUG: Detailed CSS rules:', {
-        //   titleRules: titleRulesDetailed.map(rule => rule.selectorText + ' -> ' + rule.cssText),
+        // window.Logger.info('🔍 DEBUG: Detailed CSS rules:', {
+        //   titleRules: titleRulesDetailed.map(rule => rule.selectorText + ' -> ' + rule.cssText, { page: "notification-system" }),
         //   messageRules: messageRulesDetailed.map(rule => rule.selectorText + ' -> ' + rule.cssText)
         // });
         
@@ -735,12 +735,12 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
         // const bootstrapRules = rules.filter(rule => 
         //   rule.selectorText && (rule.selectorText.includes('.text-') || rule.selectorText.includes('.text-') || rule.selectorText.includes('body') || rule.selectorText.includes('*'))
         // );
-        // console.log('🔍 DEBUG: Bootstrap/Global rules that might override:', {
+        // window.Logger.info('🔍 DEBUG: Bootstrap/Global rules that might override:', {
         //   bootstrapRulesCount: bootstrapRules.length,
-        //   bootstrapRules: bootstrapRules.slice(0, 5).map(rule => rule.selectorText + ' -> ' + rule.cssText.substring(0, 100))
+        //   bootstrapRules: bootstrapRules.slice(0, 5, { page: "notification-system" }).map(rule => rule.selectorText + ' -> ' + rule.cssText.substring(0, 100))
         // });
       // } catch (e) {
-      //   console.log('🔍 DEBUG: Cannot access CSS rules:', e.message);
+      //   window.Logger.info('🔍 DEBUG: Cannot access CSS rules:', e.message, { page: "notification-system" });
       // }
     // }
   }, 100);
@@ -752,30 +752,30 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
     container.id = 'notification-container';
     container.className = 'notification-container';
     document.body.appendChild(container);
-    // console.log('🔍 DEBUG: Created notification container:', container);
+    // window.Logger.info('🔍 DEBUG: Created notification container:', container, { page: "notification-system" });
   }
   
   container.appendChild(notification);
-  // console.log('🔍 DEBUG: Notification added to container:', {
+  // window.Logger.info('🔍 DEBUG: Notification added to container:', {
   //   container: container,
   //   notification: notification,
   //   containerChildren: container.children.length
-  // });
+  // }, { page: "notification-system" });
 
   // Trigger animation
   setTimeout(() => {
     notification.classList.add('show');
-    // console.log('🔍 DEBUG: Animation triggered, notification classes:', notification.className);
+    // window.Logger.info('🔍 DEBUG: Animation triggered, notification classes:', notification.className, { page: "notification-system" });
   }, 10);
 
   // Auto remove after duration
   setTimeout(() => {
     if (notification.parentElement) {
-      // console.log('🔍 DEBUG: Starting notification removal, classes:', notification.className);
+      // window.Logger.info('🔍 DEBUG: Starting notification removal, classes:', notification.className, { page: "notification-system" });
       notification.classList.add('hide');
       setTimeout(() => {
         if (notification.parentElement) {
-          // console.log('🔍 DEBUG: Removing notification from DOM');
+          // window.Logger.info('🔍 DEBUG: Removing notification from DOM', { page: "notification-system" });
           notification.remove();
         }
       }, 300); // Wait for animation
@@ -784,11 +784,11 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
 
   // Save to global history
   saveNotificationToGlobalHistory(type, title, message, category).catch(error => {
-    console.warn('Failed to save notification to global history:', error);
+    window.Logger.warn('Failed to save notification to global history:', error, { page: "notification-system" });
   });
 
   // Console log for debugging
-  console.log(`🔔 ${type.toUpperCase()}: ${title} - ${message}`);
+  window.Logger.info(`🔔 ${type.toUpperCase()}: ${title} - ${message}`, { page: "notification-system" });
 }
 
 /**
@@ -827,36 +827,36 @@ async function loadLinkedItemsData(itemType, itemId) {
  * @returns {HTMLElement} Notification container element
  */
 function createNotificationContainer() {
-  console.log('🔧 createNotificationContainer נקרא');
+  window.Logger.info('🔧 createNotificationContainer נקרא', { page: "notification-system" });
   let container = document.getElementById('notification-container');
-  console.log('🔍 קונטיינר קיים?', !!container);
+  window.Logger.info('🔍 קונטיינר קיים?', !!container, { page: "notification-system" });
 
   if (!container) {
-    console.log('🔧 יוצר קונטיינר חדש...');
+    window.Logger.info('🔧 יוצר קונטיינר חדש...', { page: "notification-system" });
     container = document.createElement('div');
     container.id = 'notification-container';
     container.className = 'notification-container';
     document.body.appendChild(container);
-    console.log('✅ קונטיינר נוצר ונוסף ל-DOM');
+    window.Logger.info('✅ קונטיינר נוצר ונוסף ל-DOM', { page: "notification-system" });
     
     // בדיקת סגנונות מחושבים
     const computedStyle = window.getComputedStyle(container);
-    console.log('🔍 סגנונות מחושבים לקונטיינר:');
-    console.log('  position:', computedStyle.position);
-    console.log('  top:', computedStyle.top);
-    console.log('  right:', computedStyle.right);
-    console.log('  z-index:', computedStyle.zIndex);
-    console.log('  max-width:', computedStyle.maxWidth);
+    window.Logger.info('🔍 סגנונות מחושבים לקונטיינר:', { page: "notification-system" });
+    window.Logger.info('  position:', computedStyle.position, { page: "notification-system" });
+    window.Logger.info('  top:', computedStyle.top, { page: "notification-system" });
+    window.Logger.info('  right:', computedStyle.right, { page: "notification-system" });
+    window.Logger.info('  z-index:', computedStyle.zIndex, { page: "notification-system" });
+    window.Logger.info('  max-width:', computedStyle.maxWidth, { page: "notification-system" });
     
     // בדיקת טעינת CSS
-    console.log('🔍 בדיקת טעינת CSS:');
+    window.Logger.info('🔍 בדיקת טעינת CSS:', { page: "notification-system" });
     const styleSheets = Array.from(document.styleSheets);
     const headerCss = styleSheets.find(sheet => 
       sheet.href && sheet.href.includes('header-styles.css')
     );
-    console.log('  header-styles.css נטען?', !!headerCss);
+    window.Logger.info('  header-styles.css נטען?', !!headerCss, { page: "notification-system" });
     if (headerCss) {
-      console.log('  header-styles.css URL:', headerCss.href);
+      window.Logger.info('  header-styles.css URL:', headerCss.href, { page: "notification-system" });
     }
     
     // בדיקת סגנונות notification-container
@@ -870,15 +870,15 @@ function createNotificationContainer() {
         return [];
       }
     }).flat();
-    console.log('  סגנונות notification-container נמצאו:', notificationStyles.length);
+    window.Logger.info('  סגנונות notification-container נמצאו:', notificationStyles.length, { page: "notification-system" });
     notificationStyles.forEach(rule => {
-      console.log('    כלל:', rule.selectorText);
+      window.Logger.info('    כלל:', rule.selectorText, { page: "notification-system" });
     });
   } else {
-    console.log('✅ קונטיינר קיים');
+    window.Logger.info('✅ קונטיינר קיים', { page: "notification-system" });
   }
 
-  console.log('🔍 קונטיינר סופי:', container);
+  window.Logger.info('🔍 קונטיינר סופי:', container, { page: "notification-system" });
   return container;
 }
 
@@ -976,7 +976,7 @@ async function showInfoNotification(title, message, duration = 4000, category = 
  * @param {Object} options - Additional options
  */
 async function showDetailsModal(title, content, options = {}) {
-  console.log('🔍 showDetailsModal called:', { title, content, options });
+  window.Logger.info('🔍 showDetailsModal called:', { title, content, options }, { page: "notification-system" });
   
   // סגירת כל החלונות הקודמים
   closeAllDetailsModals();
@@ -1068,7 +1068,7 @@ async function showDetailsModal(title, content, options = {}) {
     });
   }
   
-  console.log('✅ Details modal shown:', modalId);
+  window.Logger.info('✅ Details modal shown:', modalId, { page: "notification-system" });
 }
 
 // Helper function to hide modal
@@ -1132,9 +1132,9 @@ function copyToClipboard(textContent, title) {
     if (navigator.clipboard && window.isSecureContext) {
       navigator.clipboard.writeText(formattedContent).then(() => {
         showSuccessNotification('התוכן הועתק ללוח בהצלחה', 'העתקה');
-        console.log('✅ Content copied to clipboard via Clipboard API');
+        window.Logger.info('✅ Content copied to clipboard via Clipboard API', { page: "notification-system" });
       }).catch(err => {
-        console.warn('Clipboard API failed, trying fallback:', err);
+        window.Logger.warn('Clipboard API failed, trying fallback:', err, { page: "notification-system" });
         fallbackCopyToClipboard(formattedContent);
       });
     } else {
@@ -1142,7 +1142,7 @@ function copyToClipboard(textContent, title) {
       fallbackCopyToClipboard(formattedContent);
     }
   } catch (error) {
-    console.error('❌ Error copying to clipboard:', error);
+    window.Logger.error('❌ Error copying to clipboard:', error, { page: "notification-system" });
     fallbackCopyToClipboard(formattedContent);
   }
 }
@@ -1165,12 +1165,12 @@ function fallbackCopyToClipboard(text) {
     
     if (successful) {
       showSuccessNotification('התוכן הועתק ללוח בהצלחה', 'העתקה');
-      console.log('✅ Content copied to clipboard via fallback method');
+      window.Logger.info('✅ Content copied to clipboard via fallback method', { page: "notification-system" });
     } else {
       throw new Error('execCommand failed');
     }
   } catch (error) {
-    console.error('❌ Fallback copy failed:', error);
+    window.Logger.error('❌ Fallback copy failed:', error, { page: "notification-system" });
     showErrorNotification('שגיאה בהעתקה ללוח', 'שגיאה');
   }
 }
@@ -1194,7 +1194,7 @@ function fallbackCopyToClipboard(text) {
  */
 function showNotificationLegacy(message, type = 'info', duration = 4000) {
   // Direct console log to avoid recursion
-  console.log(`🔔 ${type.toUpperCase()}: ${message}`);
+  window.Logger.info(`🔔 ${type.toUpperCase()}: ${message}`, { page: "notification-system" });
 }
 
 // ===== GLOBAL NOTIFICATION HISTORY SYSTEM =====
@@ -1230,11 +1230,11 @@ async function saveNotificationToGlobalHistory(type, title, message, category = 
           category: 'notification'
         });
       } catch (error) {
-        console.warn('שגיאה בשמירה במערכת המטמון החדשה, עובר ל-localStorage:', error.message);
+        window.Logger.warn('שגיאה בשמירה במערכת המטמון החדשה, עובר ל-localStorage:', error.message, { page: "notification-system" });
       }
     } else {
       // מערכת מטמון לא מאותחלת - מדלג על שמירה
-      console.log('⚠️ Cache system not initialized - skipping notification history save');
+      window.Logger.info('⚠️ Cache system not initialized - skipping notification history save', { page: "notification-system" });
     }
 
     // Fallback ל-localStorage במקרה של בעיה
@@ -1252,15 +1252,15 @@ async function saveNotificationToGlobalHistory(type, title, message, category = 
 
       localStorage.setItem('tiktrack_global_notifications_history', JSON.stringify(globalHistory));
     } catch (e) {
-      console.warn('שגיאה בשמירת fallback ל-localStorage:', e);
+      window.Logger.warn('שגיאה בשמירת fallback ל-localStorage:', e, { page: "notification-system" });
     }
 
     // עדכון סטטיסטיקות גלובליות
     await updateGlobalNotificationStats();
 
-    // console.log('✅ התראה נשמרה להיסטוריה גלובלית');
+    // window.Logger.info('✅ התראה נשמרה להיסטוריה גלובלית', { page: "notification-system" });
   } catch (error) {
-    console.warn('שגיאה בשמירת התראה להיסטוריה גלובלית:', error);
+    window.Logger.warn('שגיאה בשמירת התראה להיסטוריה גלובלית:', error, { page: "notification-system" });
   }
 }
 
@@ -1279,12 +1279,12 @@ async function updateGlobalNotificationStats() {
           fallback: () => []
         });
       } catch (error) {
-        console.warn('שגיאה בטעינה מ-UnifiedCacheManager, עובר ל-localStorage:', error.message);
+        window.Logger.warn('שגיאה בטעינה מ-UnifiedCacheManager, עובר ל-localStorage:', error.message, { page: "notification-system" });
         history = [];
       }
     } else {
       // מערכת מטמון לא מאותחלת - מדלג על טעינה
-      console.log('⚠️ Cache system not initialized - skipping notification history load');
+      window.Logger.info('⚠️ Cache system not initialized - skipping notification history load', { page: "notification-system" });
       history = [];
     }
     
@@ -1296,7 +1296,7 @@ async function updateGlobalNotificationStats() {
           history = JSON.parse(savedHistory);
         }
       } catch (e) {
-        console.warn('שגיאה בטעינת היסטוריה מ-localStorage:', e);
+        window.Logger.warn('שגיאה בטעינת היסטוריה מ-localStorage:', e, { page: "notification-system" });
       }
     }
 
@@ -1323,21 +1323,21 @@ async function updateGlobalNotificationStats() {
           category: 'notification'
         });
       } catch (error) {
-        console.warn('שגיאה בשמירת סטטיסטיקות ב-IndexedDB:', error.message);
+        window.Logger.warn('שגיאה בשמירת סטטיסטיקות ב-IndexedDB:', error.message, { page: "notification-system" });
       }
     } else {
       // מערכת מטמון לא מאותחלת - מדלג על שמירת סטטיסטיקות
-      console.log('⚠️ Cache system not initialized - skipping notification stats save');
+      window.Logger.info('⚠️ Cache system not initialized - skipping notification stats save', { page: "notification-system" });
     }
 
     // Fallback ל-localStorage
     try {
     localStorage.setItem('tiktrack_global_notifications_stats', JSON.stringify(stats));
     } catch (e) {
-      console.warn('שגיאה בשמירת סטטיסטיקות ל-localStorage:', e);
+      window.Logger.warn('שגיאה בשמירת סטטיסטיקות ל-localStorage:', e, { page: "notification-system" });
     }
   } catch (error) {
-    console.warn('שגיאה בעדכון סטטיסטיקות גלובליות:', error);
+    window.Logger.warn('שגיאה בעדכון סטטיסטיקות גלובליות:', error, { page: "notification-system" });
   }
 }
 
@@ -1359,14 +1359,14 @@ async function loadGlobalNotificationHistory() {
       }
     } else {
       // IndexedDB לא זמין או לא מאותחל - מדלג על טעינה מ-IndexedDB
-      // console.log('UnifiedIndexedDB לא מאותחל עדיין, מדלג על טעינת היסטוריה');
+      // window.Logger.info('UnifiedIndexedDB לא מאותחל עדיין, מדלג על טעינת היסטוריה', { page: "notification-system" });
     }
     
     // Fallback ל-localStorage
     const savedHistory = localStorage.getItem('tiktrack_global_notifications_history');
     return savedHistory ? JSON.parse(savedHistory) : [];
   } catch (error) {
-    console.warn('שגיאה בטעינת היסטוריית התראות גלובלית:', error);
+    window.Logger.warn('שגיאה בטעינת היסטוריית התראות גלובלית:', error, { page: "notification-system" });
     return [];
   }
 }
@@ -1389,7 +1389,7 @@ async function loadGlobalNotificationStats() {
       }
     } else {
       // IndexedDB לא זמין או לא מאותחל - מדלג על טעינה מ-IndexedDB
-      console.log('UnifiedIndexedDB לא מאותחל עדיין, מדלג על טעינת סטטיסטיקות');
+      window.Logger.info('UnifiedIndexedDB לא מאותחל עדיין, מדלג על טעינת סטטיסטיקות', { page: "notification-system" });
     }
     
     // Fallback ל-localStorage
@@ -1398,7 +1398,7 @@ async function loadGlobalNotificationStats() {
       return JSON.parse(savedStats);
     }
   } catch (error) {
-    console.warn('שגיאה בטעינת סטטיסטיקות גלובליות:', error);
+    window.Logger.warn('שגיאה בטעינת סטטיסטיקות גלובליות:', error, { page: "notification-system" });
   }
 
   // סטטיסטיקות ברירת מחדל
@@ -1496,7 +1496,7 @@ window.NotificationSystem = {
     migrate: window.migrateNotifications,
     isMigrationNeeded: window.isMigrationNeeded,
     initialize: function() {
-        // console.log('🚀 NotificationSystem.initialize called');
+        // window.Logger.info('🚀 NotificationSystem.initialize called', { page: "notification-system" });
         // Initialize notification system if needed
         // if (window.notificationSystemTester) {
         //     window.notificationSystemTester.runAllTests();
@@ -1554,7 +1554,7 @@ window.showDetailedNotification = async function(title, message, type = 'info', 
     
     return true;
   } catch (error) {
-    console.error('❌ Error showing detailed notification:', error);
+    window.Logger.error('❌ Error showing detailed notification:', error, { page: "notification-system" });
     // fallback להודעה רגילה
     return await window.showNotification(message, type, title, duration, category);
   }

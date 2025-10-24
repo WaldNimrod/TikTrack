@@ -2346,7 +2346,7 @@ class ExternalDataDashboard {
    * Copy detailed logs to clipboard
    * This function collects all relevant information and copies it to clipboard
    */
-  static copyDetailedLog() {
+  static  {
     try {
       // console.log('📋 Collecting detailed logs...');
 
@@ -2814,10 +2814,10 @@ function generateDetailedLog() {
  */
 
 // ייצוא לגלובל scope
-// window.copyDetailedLog export removed - using global version from system-management.js
+// window. export removed - using global version from system-management.js
 
-// Local copyDetailedLog function for external-data-dashboard page
-async function copyDetailedLog() {
+// Local  function for external-data-dashboard page
+async function  {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {

@@ -609,10 +609,10 @@ window.runCRUDTest = runCRUDTest;
 window.checkConnection = checkConnection;
 window.markPageComplete = markPageComplete;
 window.markPagePartial = markPagePartial;
-// window.copyDetailedLog export removed - using global version from system-management.js
+// window. export removed - using global version from system-management.js
 
-// Local copyDetailedLog function for crud-testing-dashboard page
-async function copyDetailedLog() {
+// Local  function for crud-testing-dashboard page
+async function  {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {
@@ -861,4 +861,4 @@ window.testDeleteOperation = testDeleteOperation;
 window.displayCRUDResults = displayCRUDResults;
 
 // ייצוא לגלובל scope
-// window.copyDetailedLog export removed - using global version from system-management.js
+// window. export removed - using global version from system-management.js

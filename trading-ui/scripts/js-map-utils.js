@@ -277,7 +277,7 @@ function initializeErrorTracking() {
 // window.toggleAllSections export removed - using global version from ui-utils.js
 window.performQuickSearch = performQuickSearch;
 window.toggleFunctionsDropdown = toggleFunctionsDropdown;
-// // window.copyDetailedLog export removed - using global version from system-management.js // REMOVED: Causes conflicts with other pages
+// // window. export removed - using global version from system-management.js // REMOVED: Causes conflicts with other pages
 window.scrollToTop = scrollToTop;
 window.exportDuplicatesReport = exportDuplicatesReport;
 window.refreshDuplicatesAnalysis = refreshDuplicatesAnalysis;

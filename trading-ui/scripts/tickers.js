@@ -6,7 +6,7 @@
  */
 function editTicker(tickerId) {
   try {
-    console.log('✏️ עורך טיקר:', tickerId);
+    window.Logger.info('✏️ עורך טיקר:', tickerId, { page: "tickers" });
     
     // חיפוש הטיקר בנתונים
     const ticker = window.tickersData.find(t => t.id === tickerId);
@@ -18,7 +18,7 @@ function editTicker(tickerId) {
     showAddTickerModal(ticker);
     
   } catch (error) {
-    console.error('שגיאה בעריכת טיקר:', error);
+    window.Logger.error('שגיאה בעריכת טיקר:', error, { page: "tickers" });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בעריכת טיקר', error.message);
     } else if (typeof window.showNotification === 'function') {
@@ -34,7 +34,7 @@ function editTicker(tickerId) {
  */
 function viewTickerDetails(tickerId) {
   try {
-    console.log('👁️ מציג פרטי טיקר:', tickerId);
+    window.Logger.info('👁️ מציג פרטי טיקר:', tickerId, { page: "tickers" });
     
     // חיפוש הטיקר בנתונים
     const ticker = window.tickersData.find(t => t.id === tickerId);
@@ -78,7 +78,7 @@ function viewTickerDetails(tickerId) {
     }
     
   } catch (error) {
-    console.error('שגיאה בהצגת פרטי טיקר:', error);
+    window.Logger.error('שגיאה בהצגת פרטי טיקר:', error, { page: "tickers" });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בהצגת פרטי טיקר', error.message);
     } else if (typeof window.showNotification === 'function') {
@@ -94,7 +94,7 @@ function viewTickerDetails(tickerId) {
  */
 function refreshTickerData(tickerId) {
   try {
-    console.log('🔄 מרענן נתוני טיקר:', tickerId);
+    window.Logger.info('🔄 מרענן נתוני טיקר:', tickerId, { page: "tickers" });
     
     // הצגת אינדיקטור טעינה
     if (typeof window.showNotification === 'function') {
@@ -115,7 +115,7 @@ function refreshTickerData(tickerId) {
       return response.json();
     })
     .then(data => {
-      console.log('✅ נתוני טיקר רוענו:', data);
+      window.Logger.info('✅ נתוני טיקר רוענו:', data, { page: "tickers" });
       
       // רענון הטבלה
       loadTickersData();
@@ -128,7 +128,7 @@ function refreshTickerData(tickerId) {
       }
     })
     .catch(error => {
-      console.error('שגיאה ברענון נתוני טיקר:', error);
+      window.Logger.error('שגיאה ברענון נתוני טיקר:', error, { page: "tickers" });
       if (typeof window.showErrorNotification === 'function') {
         window.showErrorNotification('שגיאה ברענון נתוני טיקר', error.message);
       } else if (typeof window.showNotification === 'function') {
@@ -137,7 +137,7 @@ function refreshTickerData(tickerId) {
     });
     
   } catch (error) {
-    console.error('שגיאה ברענון נתוני טיקר:', error);
+    window.Logger.error('שגיאה ברענון נתוני טיקר:', error, { page: "tickers" });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה ברענון נתוני טיקר', error.message);
     } else if (typeof window.showNotification === 'function') {
@@ -365,7 +365,7 @@ async function updateActiveTradesField() {
     // טעינת טריידים מהשרת
     const tradesResponse = await fetch('/api/trades/');
     if (!tradesResponse.ok) {
-      // console.warn('⚠️ Could not load trades for active_trades update');
+      // window.Logger.warn('⚠️ Could not load trades for active_trades update', { page: "tickers" });
       return;
     }
 
@@ -452,14 +452,14 @@ function restoreTickersSectionState() {
   if (typeof window.restoreAllSectionStates === 'function') {
     window.restoreAllSectionStates();
   } else {
-    // console.warn('⚠️ restoreAllSectionStates function not available globally');
+    // window.Logger.warn('⚠️ restoreAllSectionStates function not available globally', { page: "tickers" });
   }
 
   // שחזור מצב הסקשנים הפנימיים
   if (typeof window.restoreSectionStates === 'function') {
     window.restoreSectionStates();
   } else {
-    // console.warn('⚠️ restoreSectionStates function not available globally');
+    // window.Logger.warn('⚠️ restoreSectionStates function not available globally', { page: "tickers" });
   }
 }
 
@@ -869,7 +869,7 @@ async function cancelTicker(id) {
         tickerDetails = `\n\nפרטי הטיקר:\n• סימבול: ${ticker.symbol || 'לא מוגדר'}\n• שם: ${ticker.name || 'לא מוגדר'}\n• סטטוס: ${ticker.status || 'לא מוגדר'}`;
       }
     } catch {
-      // console.warn('לא ניתן לטעון פרטי טיקר:', error);
+      // window.Logger.warn('לא ניתן לטעון פרטי טיקר:', error, { page: "tickers" });
     }
 
     // אישור מהמשתמש באמצעות המערכת הגלובלית
@@ -1218,7 +1218,7 @@ async function performCancelTicker(id) {
 
     } else if (response.status === 404) {
       // הטיקר כבר לא קיים בבסיס הנתונים - נסיר אותו מהמטמון ונרענן
-      console.warn(`טיקר ${id} כבר לא קיים בבסיס הנתונים, מרענן נתונים`);
+      window.Logger.warn(`טיקר ${id} כבר לא קיים בבסיס הנתונים, מרענן נתונים`, { page: "tickers" });
       
       if (window.showSuccessNotification) {
         window.showSuccessNotification('מידע', `הטיקר כבר לא קיים במערכת - מרענן נתונים`);
@@ -1482,7 +1482,7 @@ async function confirmDeleteTicker(id) {
 function clearTickersCache() {
   window.tickersData = [];
   tickersData = [];
-  console.log('🗑️ מטמון הטיקרים נוקה');
+  window.Logger.info('🗑️ מטמון הטיקרים נוקה', { page: "tickers" });
 }
 
 /**
@@ -1663,12 +1663,12 @@ function updateTickersTable(tickers) {
       
       // לוגים לדיבוג
       if (ticker.symbol === 'AAPL') {
-        console.log(`🔍 Debug AAPL:`, {
+        window.Logger.info(`🔍 Debug AAPL:`, {
           current_price: ticker.current_price,
           change_percent: ticker.change_percent,
           volume: ticker.volume,
           yahoo_updated_at: ticker.yahoo_updated_at
-        });
+        }, { page: "tickers" });
       }
 
       // עיצוב שינוי אחוזים
@@ -1685,7 +1685,7 @@ function updateTickersTable(tickers) {
                 <tr>
                     <td title="${ticker.symbol || 'N/A'}">
                         <span class="ticker-symbol-link" 
-                              onclick="if (window.showEntityDetails) { window.showEntityDetails('ticker', ${ticker.id}); } else { console.error('פונקציה showEntityDetails לא קיימת'); }" 
+                              onclick="if (window.showEntityDetails) { window.showEntityDetails('ticker', ${ticker.id}); } else { window.Logger.error('פונקציה showEntityDetails לא קיימת', { page: "tickers" }); }" 
                               title="לחץ לצפייה בפרטי הטיקר">
                             <strong>${ticker.symbol || 'N/A'}</strong>
                         </span>
@@ -1770,7 +1770,7 @@ function updateTickersTable(tickers) {
       countElement.textContent = `${tickers.length} טיקרים`;
     }
     
-    console.log(`📊 טבלת טיקרים עודכנה עם ${tickers.length} פריטים`);
+    window.Logger.info(`📊 טבלת טיקרים עודכנה עם ${tickers.length} פריטים`, { page: "tickers" });
 
     // סידור ברירת מחדל לפי העמודה הראשונה (סמל) - רק אם אין סידור קיים
     if (typeof window.applyDefaultSort === 'function') {
@@ -1873,7 +1873,7 @@ async function loadColorsAndApplyToHeaders() {
     
     if (window.loadSpecificPreferences) {
       const specificPreferences = await window.loadSpecificPreferences(relevantPreferenceKeys, 1, null);
-      console.log('✅ Loaded specific preferences for tickers:', Object.keys(specificPreferences));
+      window.Logger.info('✅ Loaded specific preferences for tickers:', Object.keys(specificPreferences, { page: "tickers" }));
       
       // Apply only the loaded preferences
       if (window.loadAllColorsFromPreferences && specificPreferences) {
@@ -1882,7 +1882,7 @@ async function loadColorsAndApplyToHeaders() {
     } else if (window.loadPreferences) {
       // Fallback to loading all preferences
       await window.loadPreferences(1, null);
-      console.log('🔄 Loaded all preferences for tickers (fallback)');
+      window.Logger.info('🔄 Loaded all preferences for tickers (fallback, { page: "tickers" })');
       
       // Filter to only relevant preferences
       if (window.currentPreferences) {
@@ -1904,7 +1904,7 @@ async function loadColorsAndApplyToHeaders() {
       window.applyEntityColorsToHeaders('ticker');
     }
   } catch (error) {
-    console.error('שגיאה בטעינת צבעים:', error);
+    window.Logger.error('שגיאה בטעינת צבעים:', error, { page: "tickers" });
   }
 }
 
@@ -2004,7 +2004,7 @@ async function refreshYahooFinanceData() {
     }
 
   } catch (error) {
-    console.error('Error refreshing external data:', error);
+    window.Logger.error('Error refreshing external data:', error, { page: "tickers" });
   }
 }
 
@@ -2024,7 +2024,7 @@ async function refreshYahooFinanceDataSilently() {
     // שימוש בשירות האחיד לקבלת נתונים
     const externalDataService = window.ExternalDataService;
     if (!externalDataService) {
-      console.warn('External Data Service not available for silent refresh');
+      window.Logger.warn('External Data Service not available for silent refresh', { page: "tickers" });
       return;
     }
 
@@ -2034,19 +2034,19 @@ async function refreshYahooFinanceDataSilently() {
     if (externalData) {
       // עדכון הנתונים הגלובליים (ללא הודעות)
       window.tickersData = externalDataService.updateTickersWithExternalData(window.tickersData, externalData);
-      console.log('📈 External data updated silently:', externalData);
+      window.Logger.info('📈 External data updated silently:', externalData, { page: "tickers" });
     } else {
-      console.warn('📈 No external data received for silent refresh');
+      window.Logger.warn('📈 No external data received for silent refresh', { page: "tickers" });
     }
 
   } catch (error) {
-    console.warn('Silent external data refresh failed:', error.message);
+    window.Logger.warn('Silent external data refresh failed:', error.message, { page: "tickers" });
   }
 }
 
 // פונקציה לפילטר טיקרים לפי סוג (פילטר פשוט - סוג אחד בלבד)
 function filterTickersByType(type) {
-  console.log(`🔍 Filtering tickers by type: ${type}`);
+  window.Logger.info(`🔍 Filtering tickers by type: ${type}`, { page: "tickers" });
   
   // עדכון מצב הכפתורים - רק אחד פעיל בכל פעם
   const buttons = document.querySelectorAll('.ticker-type-filter [data-type]');
@@ -2107,7 +2107,7 @@ function filterTickersByType(type) {
     countElement.textContent = `${filteredData.length} טיקרים${type !== 'all' ? ` (${typeText})` : ''}`;
   }
 
-  console.log(`🔍 Filtered ${filteredData.length} tickers out of ${window.tickersData.length} for type: ${type}`);
+  window.Logger.info(`🔍 Filtered ${filteredData.length} tickers out of ${window.tickersData.length} for type: ${type}`, { page: "tickers" });
 }
 
 // פונקציה עזר לקבלת שם תצוגה לסוג
@@ -2131,7 +2131,7 @@ function toggleSection() {
     if (typeof window.toggleSection === 'function') {
         window.toggleSection();
     } else {
-        console.warn('toggleSection function not found');
+        window.Logger.warn('toggleSection function not found', { page: "tickers" });
     }
 }
 
@@ -2139,7 +2139,7 @@ function toggleTickersSection() {
     if (typeof window.toggleSection === 'function') {
         window.toggleSection('tickers');
     } else {
-        console.warn('toggleSection function not found');
+        window.Logger.warn('toggleSection function not found', { page: "tickers" });
     }
 }
 
@@ -2148,7 +2148,7 @@ function saveTicker() {
     if (typeof window.saveTicker === 'function') {
         window.saveTicker();
     } else {
-        console.warn('saveTicker function not found');
+        window.Logger.warn('saveTicker function not found', { page: "tickers" });
     }
 }
 
@@ -2156,7 +2156,7 @@ function updateTicker() {
     if (typeof window.updateTicker === 'function') {
         window.updateTicker();
     } else {
-        console.warn('updateTicker function not found');
+        window.Logger.warn('updateTicker function not found', { page: "tickers" });
     }
 }
 
@@ -2164,7 +2164,7 @@ function confirmDeleteTicker() {
     if (typeof window.confirmDeleteTicker === 'function') {
         window.confirmDeleteTicker();
     } else {
-        console.warn('confirmDeleteTicker function not found');
+        window.Logger.warn('confirmDeleteTicker function not found', { page: "tickers" });
     }
 }
 
@@ -2173,7 +2173,7 @@ function refreshYahooFinanceData() {
     if (typeof window.refreshYahooFinanceData === 'function') {
         window.refreshYahooFinanceData();
     } else {
-        console.warn('refreshYahooFinanceData function not found');
+        window.Logger.warn('refreshYahooFinanceData function not found', { page: "tickers" });
     }
 }
 
@@ -2294,11 +2294,11 @@ window.confirmDeleteTicker = confirmDeleteTicker;
 window.refreshYahooFinanceData = refreshYahooFinanceData;
 window.editTicker = editTicker;
 window.viewTickerDetails = viewTickerDetails;
-// window.copyDetailedLog export removed - using global version from system-management.js
+// window. export removed - using global version from system-management.js
 // window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 
-// Local copyDetailedLog function for tickers page
-async function copyDetailedLog() {
+// Local  function for tickers page
+async function  {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {
@@ -2316,7 +2316,7 @@ async function copyDetailedLog() {
             }
         }
     } catch (err) {
-        console.error('שגיאה בהעתקה:', err);
+        window.Logger.error('שגיאה בהעתקה:', err, { page: "tickers" });
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה בהעתקת הלוג');
         } else {

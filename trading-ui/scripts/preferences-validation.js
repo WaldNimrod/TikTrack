@@ -25,7 +25,7 @@
  * - ValidationReporter: Error reporting and feedback
  */
 
-console.log('📄 Loading preferences-validation.js v1.0.0...');
+window.Logger.info('📄 Loading preferences-validation.js v1.0.0...', { page: "preferences-validation" });
 
 // ============================================================================
 // VALIDATION ERROR CLASSES
@@ -113,7 +113,7 @@ class ExistenceChecker {
             }
             return false;
         } catch (error) {
-            console.error(`❌ Error checking preference existence for ${preferenceName}:`, error);
+            window.Logger.error(`❌ Error checking preference existence for ${preferenceName}:`, error, { page: "preferences-validation" });
             return false;
         }
     }
@@ -130,7 +130,7 @@ class ExistenceChecker {
             try {
                 results[name] = await this.checkExists(name);
             } catch (error) {
-                console.error(`❌ Error checking existence for ${name}:`, error);
+                window.Logger.error(`❌ Error checking existence for ${name}:`, error, { page: "preferences-validation" });
                 results[name] = false;
             }
         }
@@ -269,13 +269,13 @@ class FormatValidator {
     validate(preferenceName, value, dataType) {
         const validator = this.validators.get(dataType);
         if (!validator) {
-            console.warn(`⚠️ No validator for data type: ${dataType}`);
+            window.Logger.warn(`⚠️ No validator for data type: ${dataType}`, { page: "preferences-validation" });
             return true; // Allow unknown types
         }
         
         const isValid = validator(value);
         if (!isValid) {
-            console.warn(`⚠️ Format validation failed for ${preferenceName}: expected ${dataType}, got ${typeof value}`);
+            window.Logger.warn(`⚠️ Format validation failed for ${preferenceName}: expected ${dataType}, got ${typeof value}`, { page: "preferences-validation" });
         }
         
         return isValid;
@@ -386,12 +386,12 @@ class ConstraintValidator {
             if (typeof value !== 'number') return false;
             
             if (constraint.min !== undefined && value < constraint.min) {
-                console.warn(`⚠️ Constraint violation: ${preferenceName} = ${value} < ${constraint.min}`);
+                window.Logger.warn(`⚠️ Constraint violation: ${preferenceName} = ${value} < ${constraint.min}`, { page: "preferences-validation" });
                 return false;
             }
             
             if (constraint.max !== undefined && value > constraint.max) {
-                console.warn(`⚠️ Constraint violation: ${preferenceName} = ${value} > ${constraint.max}`);
+                window.Logger.warn(`⚠️ Constraint violation: ${preferenceName} = ${value} > ${constraint.max}`, { page: "preferences-validation" });
                 return false;
             }
         }
@@ -401,12 +401,12 @@ class ConstraintValidator {
             if (typeof value !== 'string') return false;
             
             if (constraint.minLength !== undefined && value.length < constraint.minLength) {
-                console.warn(`⚠️ Constraint violation: ${preferenceName} length ${value.length} < ${constraint.minLength}`);
+                window.Logger.warn(`⚠️ Constraint violation: ${preferenceName} length ${value.length} < ${constraint.minLength}`, { page: "preferences-validation" });
                 return false;
             }
             
             if (constraint.maxLength !== undefined && value.length > constraint.maxLength) {
-                console.warn(`⚠️ Constraint violation: ${preferenceName} length ${value.length} > ${constraint.maxLength}`);
+                window.Logger.warn(`⚠️ Constraint violation: ${preferenceName} length ${value.length} > ${constraint.maxLength}`, { page: "preferences-validation" });
                 return false;
             }
         }
@@ -531,7 +531,7 @@ class PreferenceValidator {
             }
             
         } catch (error) {
-            console.error(`❌ Validation error for ${preferenceName}:`, error);
+            window.Logger.error(`❌ Validation error for ${preferenceName}:`, error, { page: "preferences-validation" });
             result.errors.push(new ValidationError(`Validation failed: ${error.message}`, preferenceName));
             result.valid = false;
             this.validationStats.failed++;
@@ -548,7 +548,7 @@ class PreferenceValidator {
      * @returns {Promise<Object>} Validation results
      */
     async validatePreferences(preferences, dataTypes = {}) {
-        console.log(`🔍 Validating ${Object.keys(preferences).length} preferences...`);
+        window.Logger.info(`🔍 Validating ${Object.keys(preferences, { page: "preferences-validation" }).length} preferences...`);
         
         const results = {
             total: 0,
@@ -571,7 +571,7 @@ class PreferenceValidator {
             results.details[name] = result;
         }
         
-        console.log(`✅ Validation complete: ${results.valid}/${results.total} valid`);
+        window.Logger.info(`✅ Validation complete: ${results.valid}/${results.total} valid`, { page: "preferences-validation" });
         return results;
     }
     
@@ -659,10 +659,10 @@ window.clearValidationStats = function() {
 // Auto-initialize when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-        console.log('📄 Preferences validation system ready');
+        window.Logger.info('📄 Preferences validation system ready', { page: "preferences-validation" });
     });
 } else {
-    console.log('📄 Preferences validation system ready');
+    window.Logger.info('📄 Preferences validation system ready', { page: "preferences-validation" });
 }
 
-console.log('✅ preferences-validation.js loaded successfully');
+window.Logger.info('✅ preferences-validation.js loaded successfully', { page: "preferences-validation" });

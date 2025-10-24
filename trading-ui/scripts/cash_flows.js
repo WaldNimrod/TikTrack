@@ -258,14 +258,15 @@ function toggleCashFlowsSection() {
   }
 
   // שמירת המצב
+  window.unifiedCacheManager?.save('cashFlowsSectionState', isVisible ? 'closed' : 'open');
   localStorage.setItem('cashFlowsSectionState', isVisible ? 'closed' : 'open');
 }
 
 // פונקציות לשחזור מצב הסגירה
-function restoreCashFlowsSectionState() {
+async function restoreCashFlowsSectionState() {
   // restoreCashFlowsSectionState נקראה
 
-  const savedState = localStorage.getItem('cashFlowsSectionState');
+  const savedState = await window.unifiedCacheManager?.get('cashFlowsSectionState') || localStorage.getItem('cashFlowsSectionState');
   if (!savedState) {
     // אין מצב שמור לסקשן תזרימי מזומנים
     return;
@@ -1803,8 +1804,8 @@ function generateDetailedLog() {
     return log.join('\n');
 }
 
-// Local copyDetailedLog function for cash_flows page
-async function copyDetailedLog() {
+// Local  function for cash_flows page
+async function generateDetailedLogForCashFlows() {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {
@@ -1876,7 +1877,7 @@ window.confirmDeleteCashFlow = confirmDeleteCashFlow;
 
 // פונקציות לוג וניפוי שגיאות
 window.generateDetailedLog = generateDetailedLog;
-// window.copyDetailedLog export removed - using local function only
+// window. export removed - using local function only
 
 // פונקציות טיפול בשגיאות - משתמש במערכת הכללית error-handlers.js
 

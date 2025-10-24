@@ -393,7 +393,7 @@ window.filterTableData = filterTableData;
 // toggleSection export removed - use toggleSection('main') instead
 window.addRecord = addRecord;
 // window.sortTable export removed - using global version from tables.js
-// window.copyDetailedLog export removed - using global version from system-management.js
+// window. export removed - using global version from system-management.js
 
 // Initialize when DOM is loaded
 // document.addEventListener('DOMContentLoaded', function() {

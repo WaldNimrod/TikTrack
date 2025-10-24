@@ -68,10 +68,10 @@ class EntityDetailsModal {
             // הוספה לאובייקט הגלובלי
             window.entityDetailsModal = this;
             
-            console.info('EntityDetailsModal initialized successfully');
+            window.Logger.info('EntityDetailsModal initialized successfully', { page: "entity-details-modal" });
             
         } catch (error) {
-            console.error('Error initializing EntityDetailsModal:', error);
+            window.Logger.error('Error initializing EntityDetailsModal:', error, { page: "entity-details-modal" });
             if (window.showErrorNotification) {
                 window.showErrorNotification('שגיאה באתחול מערכת פרטי ישויות');
             }
@@ -150,7 +150,7 @@ class EntityDetailsModal {
             }
         });
 
-        console.debug('EntityDetailsModal event listeners set up');
+        window.Logger.debug('EntityDetailsModal event listeners set up', { page: "entity-details-modal" });
     }
 
     /**
@@ -203,7 +203,7 @@ class EntityDetailsModal {
             await this.loadEntityData(entityType, entityId, options);
 
         } catch (error) {
-            console.error('Error showing entity details modal:', error);
+            window.Logger.error('Error showing entity details modal:', error, { page: "entity-details-modal" });
             if (window.showErrorNotification) {
                 window.showErrorNotification(`שגיאה בהצגת פרטי ישות: ${error.message}`);
             }
@@ -230,7 +230,7 @@ class EntityDetailsModal {
                 }
             }
         } catch (error) {
-            console.error('Error hiding entity details modal:', error);
+            window.Logger.error('Error hiding entity details modal:', error, { page: "entity-details-modal" });
         }
     }
 
@@ -303,7 +303,7 @@ class EntityDetailsModal {
                     entityData = { ...entityData, ...externalData };
                 }
             } catch (error) {
-                console.debug('Could not load external data for ticker:', error);
+                window.Logger.debug('Could not load external data for ticker:', error, { page: "entity-details-modal" });
             }
         }
 
@@ -317,7 +317,7 @@ class EntityDetailsModal {
         this.showRenderedContent(renderedContent);
 
         } catch (error) {
-            console.error('Error loading entity data:', error);
+            window.Logger.error('Error loading entity data:', error, { page: "entity-details-modal" });
             this.showErrorState(error.message);
         }
     }
@@ -333,15 +333,15 @@ class EntityDetailsModal {
         const titleElement = document.getElementById(`${this.modalId}Label`);
         const headerElement = this.modal?.querySelector('.modal-header');
         
-        console.log('🎯 updateModalTitle called:', { entityType, entityData, titleElement, headerElement });
+        window.Logger.info('🎯 updateModalTitle called:', { entityType, entityData, titleElement, headerElement }, { page: "entity-details-modal" });
         
         if (!titleElement) {
-            console.warn('⚠️ Title element not found:', `${this.modalId}Label`);
+            window.Logger.warn('⚠️ Title element not found:', `${this.modalId}Label`, { page: "entity-details-modal" });
             return;
         }
         
         if (!headerElement) {
-            console.warn('⚠️ Header element not found');
+            window.Logger.warn('⚠️ Header element not found', { page: "entity-details-modal" });
             return;
         }
 
@@ -357,7 +357,7 @@ class EntityDetailsModal {
             title = `פרטי התראה: ${entityData.symbol}`;
         }
 
-        console.log('🎯 Setting title to:', title);
+        window.Logger.info('🎯 Setting title to:', title, { page: "entity-details-modal" });
         titleElement.textContent = title;
         
         // עדכון צבע כותרת המודל לפי סוג הישות
@@ -380,23 +380,23 @@ class EntityDetailsModal {
         // קבלת צבע הישות מהמערכת הגלובלית
         let entityColor = '#019193'; // ברירת מחדל
         
-        console.log('🎨 Modal header color debug:');
-        console.log('🔍 entityType:', entityType);
-        console.log('🔍 window.entityDetailsRenderer?.entityColors:', window.entityDetailsRenderer?.entityColors);
-        console.log('🔍 window.ENTITY_COLORS:', window.ENTITY_COLORS);
-        console.log('🔍 window.currentPreferences?.entityColors:', window.currentPreferences?.entityColors);
+        window.Logger.info('🎨 Modal header color debug:', { page: "entity-details-modal" });
+        window.Logger.info('🔍 entityType:', entityType, { page: "entity-details-modal" });
+        window.Logger.info('🔍 window.entityDetailsRenderer?.entityColors:', window.entityDetailsRenderer?.entityColors, { page: "entity-details-modal" });
+        window.Logger.info('🔍 window.ENTITY_COLORS:', window.ENTITY_COLORS, { page: "entity-details-modal" });
+        window.Logger.info('🔍 window.currentPreferences?.entityColors:', window.currentPreferences?.entityColors, { page: "entity-details-modal" });
         
         if (window.entityDetailsRenderer && window.entityDetailsRenderer.entityColors) {
             entityColor = window.entityDetailsRenderer.entityColors[entityType] || entityColor;
-            console.log('✅ Using entityDetailsRenderer color:', entityColor);
+            window.Logger.info('✅ Using entityDetailsRenderer color:', entityColor, { page: "entity-details-modal" });
         } else if (window.ENTITY_COLORS && window.ENTITY_COLORS[entityType]) {
             entityColor = window.ENTITY_COLORS[entityType];
-            console.log('✅ Using ENTITY_COLORS color:', entityColor);
+            window.Logger.info('✅ Using ENTITY_COLORS color:', entityColor, { page: "entity-details-modal" });
         } else if (window.currentPreferences && window.currentPreferences.entityColors && window.currentPreferences.entityColors[entityType]) {
             entityColor = window.currentPreferences.entityColors[entityType];
-            console.log('✅ Using currentPreferences color:', entityColor);
+            window.Logger.info('✅ Using currentPreferences color:', entityColor, { page: "entity-details-modal" });
         } else {
-            console.log('⚠️ Using default color:', entityColor);
+            window.Logger.info('⚠️ Using default color:', entityColor, { page: "entity-details-modal" });
         }
 
         // עדכון צבע הרקע של הכותרת
@@ -404,7 +404,7 @@ class EntityDetailsModal {
         headerElement.style.color = 'white';
         headerElement.style.borderBottom = `2px solid ${entityColor}`;
         
-        console.log('🎨 Applied color to modal header:', entityColor);
+        window.Logger.info('🎨 Applied color to modal header:', entityColor, { page: "entity-details-modal" });
     }
 
     /**
@@ -483,7 +483,7 @@ class EntityDetailsModal {
             const bsModal = new bootstrap.Modal(this.modal);
             bsModal.show();
         } catch (error) {
-            console.error('Error showing modal with Bootstrap:', error);
+            window.Logger.error('Error showing modal with Bootstrap:', error, { page: "entity-details-modal" });
             // fallback להצגה ישירה
             this.modal.style.display = 'block';
             this.modal.classList.add('show');
@@ -561,14 +561,14 @@ class EntityDetailsModal {
             if (editFunction && window[editFunction]) {
                 window[editFunction](entityId);
             } else {
-                console.warn(`Edit function not found for entity type: ${entityType}`);
+                window.Logger.warn(`Edit function not found for entity type: ${entityType}`, { page: "entity-details-modal" });
                 if (window.showWarningNotification) {
                     window.showWarningNotification(`פונקציית עריכה לא נמצאה עבור ${entityType}`);
                 }
             }
             
         } catch (error) {
-            console.error('Error editing entity:', error);
+            window.Logger.error('Error editing entity:', error, { page: "entity-details-modal" });
             if (window.showErrorNotification) {
                 window.showErrorNotification('שגיאה בפתיחת מודל עריכה');
             }
@@ -605,14 +605,14 @@ class EntityDetailsModal {
                     window.showInfoNotification(`נפתח דף ${entityType} בטאב חדש`);
                 }
             } else {
-                console.warn(`Page URL not found for entity type: ${entityType}`);
+                window.Logger.warn(`Page URL not found for entity type: ${entityType}`, { page: "entity-details-modal" });
                 if (window.showWarningNotification) {
                     window.showWarningNotification(`דף לא נמצא עבור סוג ישות זה`);
                 }
             }
             
         } catch (error) {
-            console.error('Error opening entity page:', error);
+            window.Logger.error('Error opening entity page:', error, { page: "entity-details-modal" });
             if (window.showErrorNotification) {
                 window.showErrorNotification('שגיאה בפתיחת דף הישות');
             }
@@ -644,20 +644,20 @@ class EntityDetailsModal {
                         }
                     })
                     .catch(error => {
-                        console.error('Error loading linked items:', error);
+                        window.Logger.error('Error loading linked items:', error, { page: "entity-details-modal" });
                         if (window.showErrorNotification) {
                             window.showErrorNotification('שגיאה בטעינת פריטים מקושרים');
                         }
                     });
             } else {
-                console.warn('Linked items system not available');
+                window.Logger.warn('Linked items system not available', { page: "entity-details-modal" });
                 if (window.showWarningNotification) {
                     window.showWarningNotification('מערכת הפריטים המקושרים לא זמינה');
                 }
             }
             
         } catch (error) {
-            console.error('Error showing linked items:', error);
+            window.Logger.error('Error showing linked items:', error, { page: "entity-details-modal" });
             if (window.showErrorNotification) {
                 window.showErrorNotification('שגיאה בהצגת פריטים מקושרים');
             }
@@ -714,7 +714,7 @@ class EntityDetailsModal {
             }
             
         } catch (error) {
-            console.error('Error exporting entity:', error);
+            window.Logger.error('Error exporting entity:', error, { page: "entity-details-modal" });
             if (window.showErrorNotification) {
                 window.showErrorNotification(`שגיאה בייצוא: ${error.message}`);
             }
@@ -741,13 +741,13 @@ function showEntityDetails(entityType, entityId, options = {}) {
         if (window.entityDetailsModal) {
             window.entityDetailsModal.show(entityType, entityId, options);
         } else {
-            console.error('EntityDetailsModal not initialized');
+            window.Logger.error('EntityDetailsModal not initialized', { page: "entity-details-modal" });
             if (window.showErrorNotification) {
                 window.showErrorNotification('מערכת פרטי ישויות לא מוכנה');
             }
         }
     } catch (error) {
-        console.error('Error in showEntityDetails:', error);
+        window.Logger.error('Error in showEntityDetails:', error, { page: "entity-details-modal" });
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה בהצגת פרטי ישות');
         }
@@ -765,7 +765,7 @@ function hideEntityDetails() {
             window.entityDetailsModal.hide();
         }
     } catch (error) {
-        console.error('Error in hideEntityDetails:', error);
+        window.Logger.error('Error in hideEntityDetails:', error, { page: "entity-details-modal" });
     }
 }
 
@@ -794,19 +794,19 @@ function showLinkedItems(entityType, entityId) {
                     }
                 })
                 .catch(error => {
-                    console.error('Error loading linked items:', error);
+                    window.Logger.error('Error loading linked items:', error, { page: "entity-details-modal" });
                     if (window.showErrorNotification) {
                         window.showErrorNotification('שגיאה בטעינת פריטים מקושרים');
                     }
                 });
         } else {
-            console.error('Linked items system not available');
+            window.Logger.error('Linked items system not available', { page: "entity-details-modal" });
             if (window.showErrorNotification) {
                 window.showErrorNotification('מערכת הפריטים המקושרים לא זמינה');
             }
         }
     } catch (error) {
-        console.error('Error in showLinkedItems:', error);
+        window.Logger.error('Error in showLinkedItems:', error, { page: "entity-details-modal" });
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה בהצגת פריטים מקושרים');
         }
@@ -821,7 +821,7 @@ function showLinkedItems(entityType, entityId) {
  */
 function editTicker(tickerId) {
     try {
-        console.log(`✏️ Editing ticker ${tickerId}`);
+        window.Logger.info(`✏️ Editing ticker ${tickerId}`, { page: "entity-details-modal" });
         
         // סגירת המודל הנוכחי
         if (window.entityDetailsModal) {
@@ -834,13 +834,13 @@ function editTicker(tickerId) {
         } else if (window.openEditTickerModal) {
             window.openEditTickerModal(tickerId);
         } else {
-            console.error('Edit ticker modal not available');
+            window.Logger.error('Edit ticker modal not available', { page: "entity-details-modal" });
             if (window.showErrorNotification) {
                 window.showErrorNotification('מודול עריכת טיקר לא זמין');
             }
         }
     } catch (error) {
-        console.error('Error in editTicker:', error);
+        window.Logger.error('Error in editTicker:', error, { page: "entity-details-modal" });
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה בפתיחת עריכת טיקר');
         }
@@ -857,10 +857,10 @@ function editTicker(tickerId) {
 //         // אתחול המחלקה הראשית
         new EntityDetailsModal();
         
-        console.info('Entity Details Modal system loaded and ready');
+        window.Logger.info('Entity Details Modal system loaded and ready', { page: "entity-details-modal" });
         
 //     } catch (error) {
-//         console.error('Error auto-initializing EntityDetailsModal:', error);
+//         window.Logger.error('Error auto-initializing EntityDetailsModal:', error, { page: "entity-details-modal" });
 //     }
 // });
 

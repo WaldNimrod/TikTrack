@@ -50,6 +50,8 @@ class CacheSyncManager {
         // Dependencies mapping
         this.dependencies = {
             'user-preferences': [],
+            'preference-data': ['user-preferences'],
+            'profile-data': ['user-preferences'],
             'accounts-data': ['user-preferences'],
             'trades-data': ['accounts-data'],
             'executions-data': ['accounts-data'],
@@ -61,6 +63,11 @@ class CacheSyncManager {
         
         // Cache invalidation patterns
         this.invalidationPatterns = {
+            'preference-updated': ['preference-data', 'user-preferences'],
+            'profile-switched': ['preference-data', 'profile-data', 'user-preferences'],
+            'profile-created': ['profile-data', 'user-preferences'],
+            'profile-updated': ['profile-data', 'user-preferences'],
+            'profile-deleted': ['profile-data', 'user-preferences'],
             'account-created': ['accounts-data', 'trades-data', 'executions-data'],
             'account-updated': ['accounts-data', 'trades-data', 'executions-data'],
             'account-deleted': ['accounts-data', 'trades-data', 'executions-data'],

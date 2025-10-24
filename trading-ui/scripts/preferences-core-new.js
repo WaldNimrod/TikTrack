@@ -390,7 +390,7 @@ class PreferencesCore {
         this.profileManager = new ProfileManager();
         
         this.currentUserId = 1; // Nimrod
-        this.currentProfileId = 3; // Default profile
+        this.currentProfileId = null; // Will be loaded from server
     }
     
     /**
@@ -592,6 +592,11 @@ class PreferencesCore {
             );
             
             if (success) {
+                // Invalidate backend cache via CacheSyncManager
+                if (window.CacheSyncManager) {
+                    await window.CacheSyncManager.invalidateByAction('preference-updated');
+                }
+                
                 // Invalidate cache via UnifiedCacheManager
                 const cacheKey = `preference_${preferenceName}_${userId || this.currentUserId}_${profileId || this.currentProfileId}`;
                 if (window.UnifiedCacheManager) {
@@ -694,12 +699,29 @@ class PreferencesCore {
         this.currentUserId = userId;
         this.currentProfileId = profileId;
         
-        // Clear all cache layers for the new profile via UnifiedCacheManager
-        if (window.clearAllUnifiedCacheQuick) {
-            await window.clearAllUnifiedCacheQuick();
-            console.log('🧹 All cache layers cleared for profile switch');
-        } else {
-            console.log('🧹 UnifiedCacheManager not available for cache clearing');
+        // Update PreferencesUI if available
+        if (window.PreferencesUI) {
+            window.PreferencesUI.currentProfileId = profileId;
+        }
+        
+        // Notify CacheSyncManager of profile switch
+        if (window.CacheSyncManager) {
+            await window.CacheSyncManager.invalidateByAction('profile-switched');
+        }
+        
+        // Clear preference-specific cache keys only
+        if (window.UnifiedCacheManager) {
+            const keys = await window.UnifiedCacheManager.getAllKeys();
+            const prefKeys = keys.filter(k => 
+                k.includes('preference_') || 
+                k.includes('all_preferences_') || 
+                k === 'user-preferences'
+            );
+            
+            for (const key of prefKeys) {
+                await window.UnifiedCacheManager.remove(key);
+            }
+            console.log(`🧹 Cleared ${prefKeys.length} preference cache keys`);
         }
     }
     

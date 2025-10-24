@@ -19,6 +19,7 @@
 
 // הגדרת פונקציה גלובלית לבדיקה מיידית - זמינה מיד
 console.log('🔧 ActionsMenuSystem: מגדיר את debugActionsMenu באופן גלובלי');
+console.log('🔧 ActionsMenuSystem: Script loaded at:', new Date().toISOString());
 
 // וידוא שהפונקציה מוגדרת מיד
 if (typeof window.debugActionsMenu === 'undefined') {
@@ -227,6 +228,10 @@ class ActionsMenuSystem {
     }
 
     init() {
+        console.log('🔧 ActionsMenuSystem: מתחיל אתחול');
+        console.log('🔧 ActionsMenuSystem: DOM ready state:', document.readyState);
+        console.log('🔧 ActionsMenuSystem: Available elements:', document.querySelectorAll('.actions-menu-wrapper').length);
+        
         if (window.consoleCleanup && typeof window.consoleCleanup.debug === 'function') {
             window.consoleCleanup.debug('✅ Actions Menu System initialized');
         } else {
@@ -295,7 +300,7 @@ class ActionsMenuSystem {
                 default: icon = '⚙️'; break;
             }
             
-            return `<button class="btn" data-variant="small" data-button-type="${buttonType}" data-onclick="${onclick}" title="${title}">${icon}</button>`;
+            return `<button class="btn actions-menu-item" data-variant="small" data-button-type="${buttonType}" data-onclick="${onclick}" title="${title}" style="margin-right: 4px;">${icon}</button>`;
         }).join('');
         
         return `
@@ -408,30 +413,44 @@ class ActionsMenuSystem {
     attachZIndexDebugLogger() {
         // הפונקציה debugActionsMenu כבר מוגדרת בתחילת הקובץ
         
-        // נוסיף event listener פשוט יותר - עם בדיקת בטיחות
+        // Add hover delay for better UX
+        this.attachHoverDelay();
+        
+        console.log('✅ Actions Menu Debug Logger הותקן. הרץ debugActionsMenu() כדי לבדוק');
+    }
+
+    /**
+     * Add hover delay for better UX
+     */
+    attachHoverDelay() {
+        let hoverTimeout;
+        
         document.addEventListener('mouseenter', (e) => {
-            if (e.target && typeof e.target.closest === 'function' && e.target.closest('.actions-menu-wrapper')) {
-                console.log('🎯 [Actions Menu Debug] Mouse entered actions menu');
+            if (e.target && typeof e.target.closest === 'function') {
                 const wrapper = e.target.closest('.actions-menu-wrapper');
-                const popup = wrapper.querySelector('.actions-menu-popup');
-                console.log('🔍 [Actions Menu Debug] Popup element:', popup);
-                console.log('🔍 [Actions Menu Debug] Popup styles:', {
-                    opacity: popup.style.opacity,
-                    visibility: popup.style.visibility,
-                    display: popup.style.display
-                });
-                console.log('🔍 [Actions Menu Debug] Wrapper HTML:', wrapper.innerHTML);
-                this.positionPopup(wrapper);
+                if (wrapper) {
+                    clearTimeout(hoverTimeout);
+                    const popup = wrapper.querySelector('.actions-menu-popup');
+                    if (popup) {
+                        popup.style.display = 'block';
+                    }
+                }
             }
         }, true);
         
         document.addEventListener('mouseleave', (e) => {
-            if (e.target && typeof e.target.closest === 'function' && e.target.closest('.actions-menu-wrapper')) {
-                console.log('🎯 [Actions Menu Debug] Mouse left actions menu');
+            if (e.target && typeof e.target.closest === 'function') {
+                const wrapper = e.target.closest('.actions-menu-wrapper');
+                if (wrapper) {
+                    hoverTimeout = setTimeout(() => {
+                        const popup = wrapper.querySelector('.actions-menu-popup');
+                        if (popup) {
+                            popup.style.display = 'none';
+                        }
+                    }, 200);
+                }
             }
         }, true);
-        
-        console.log('✅ Actions Menu Debug Logger הותקן. הרץ debugActionsMenu() כדי לבדוק');
         
         // קוד קונסולה לבדיקת z-index וחתיכה
         window.debugActionsMenuZIndex = () => {

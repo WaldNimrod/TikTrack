@@ -236,6 +236,12 @@ class LazyLoader {
     async initialize(userId = 1, profileId = 3) {
         console.log('🚀 Initializing lazy loading system...');
         
+        // Check if PreferencesCore is available
+        if (!window.PreferencesCore) {
+            console.warn('⚠️ PreferencesCore not available, skipping lazy loading initialization');
+            return;
+        }
+        
         // Load critical preferences immediately
         await this.loadCriticalPreferences(userId, profileId);
         
@@ -407,6 +413,12 @@ class LazyLoader {
         // Check if already loading
         if (this.loadingPromises.has(preferenceName)) {
             return await this.loadingPromises.get(preferenceName);
+        }
+        
+        // Check if PreferencesCore is available
+        if (!window.PreferencesCore) {
+            console.warn(`⚠️ PreferencesCore not available for ${preferenceName}`);
+            return null;
         }
         
         // Check if already loaded

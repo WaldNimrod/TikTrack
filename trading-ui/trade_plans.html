@@ -93,15 +93,21 @@
 <th class="col-status">
 <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(7, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }">סטטוס <span class="sort-icon">↕</span></button>
 </th>
-<th class="col-profit">
-<button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(8, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }">סיכוי/סיכון <span class="sort-icon">↕</span></button>
+<th class="col-reward">
+<button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(8, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }">סיכוי <span class="sort-icon">↕</span></button>
+</th>
+<th class="col-risk">
+<button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(9, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }">סיכון <span class="sort-icon">↕</span></button>
+</th>
+<th class="col-ratio">
+<button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(10, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }">יחס <span class="sort-icon">↕</span></button>
 </th>
 <th class="col-actions actions-cell actions-3-items"></th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td colspan="10" class="loading">טוען תכנונים...</td>
+        <td colspan="12" class="loading">טוען תכנונים...</td>
 </tr>
 </tbody>
 </table>
@@ -532,8 +538,11 @@
     <!-- מערכת העדפות משתמש -->
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 2.0.0 -->
-    <script src="scripts/preferences-core.js?v=1.0.0"></script> <!-- ליבת העדפות -->
-    <script src="scripts/preferences.js?v=1.0.0"></script> <!-- מערכת העדפות -->
+    <script src="scripts/preferences-core-new.js?v=1.0.0"></script> <!-- ליבת העדפות -->
+    <script src="scripts/preferences-colors.js?v=1.0.0"></script> <!-- מערכת צבעים -->
+    <script src="scripts/preferences-lazy-loader.js?v=1.0.0"></script> <!-- lazy loading -->
+    <script src="scripts/preferences-validation.js?v=1.0.0"></script> <!-- validation -->
+    <script src="scripts/preferences-ui.js?v=1.0.0"></script> <!-- ממשק משתמש -->
 
     <!-- ===== ENTITY DETAILS SYSTEMS (Depend on Header) ===== -->
     <script src="scripts/entity-details-api.js?v=1.0.0"></script>

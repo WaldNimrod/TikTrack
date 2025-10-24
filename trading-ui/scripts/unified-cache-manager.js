@@ -17,6 +17,38 @@
  * 3. IndexedDB - נתונים מורכבים (>1MB)
  * 4. Backend Cache - נתונים קריטיים עם TTL
  * 
+ * CACHE CLEARING HIERARCHY - תיעוד מלא
+ * ========================================
+ * 
+ * 1. clearAllCache(options) - ניקוי מלא של כל שכבות המטמון
+ *    - Memory Layer
+ *    - localStorage  
+ *    - sessionStorage
+ *    - IndexedDB (Cache only, preserves historical data)
+ *    - Backend Cache (via API)
+ *    - Browser Cache (via caches.delete)
+ *    
+ * 2. clearAllCacheQuick() - ניקוי מהיר לפיתוח
+ *    - קורא ל-clearAllCache()
+ *    - Auto-refresh after 1.5 seconds
+ *    - Shows notifications
+ *    
+ * 3. clearAllCacheDetailed() - ניקוי מפורט עם logging
+ *    - קורא ל-clearAllCache()  
+ *    - Detailed logging for each layer
+ *    - Shows progress notifications
+ *    
+ * 4. refreshUserPreferences() - ניקוי ממוקד להעדפות בלבד
+ *    - מוחק רק: preference_*, all_preferences_*, user-preferences
+ *    - טוען מחדש preferences מהשרת
+ *    - לא משפיע על שאר המטמון
+ *    
+ * USAGE:
+ * - Full system reset: clearAllCache()
+ * - Development refresh: clearAllCacheQuick()  
+ * - Profile switch: refreshUserPreferences()
+ * - Debug mode: clearAllCacheDetailed()
+ * 
  * מחבר: TikTrack Development Team
  * תאריך יצירה: 26 בינואר 2025
  * גרסה: 1.0.0

@@ -32,17 +32,9 @@ console.log('📄 Loading preferences-validation.js v1.0.0...');
 // ============================================================================
 
 /**
- * Validation Error
- * Custom error for validation failures
+ * ValidationError is already defined in preferences-core-new.js
+ * Using the existing ValidationError class
  */
-class ValidationError extends Error {
-    constructor(message, field = null, code = null) {
-        super(message);
-        this.name = 'ValidationError';
-        this.field = field;
-        this.code = code;
-    }
-}
 
 /**
  * Existence Error

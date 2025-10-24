@@ -123,7 +123,7 @@ class ColorManager {
             for (const batch of batches) {
                 const batchPromises = batch.map(async (colorName) => {
                     try {
-                        const response = await fetch(`/api/preferences/user/preference?name=${colorName}&user_id=${userId}&profile_id=${profileId}`);
+                        const response = await fetch(`/api/preferences/user/single?preference_name=${colorName}&user_id=${userId}&profile_id=${profileId}`);
                         if (response.ok) {
                             const result = await response.json();
                             return { name: colorName, value: result.data?.value || this.defaultColors[colorName] };
@@ -167,7 +167,7 @@ class ColorManager {
         const groupData = {};
         for (const colorName of groupColors) {
             try {
-                const response = await fetch(`/api/preferences/user/preference?name=${colorName}&user_id=${userId}&profile_id=${profileId}`);
+                const response = await fetch(`/api/preferences/user/single?preference_name=${colorName}&user_id=${userId}&profile_id=${profileId}`);
                 if (response.ok) {
                     const result = await response.json();
                     groupData[colorName] = result.data?.value || this.defaultColors[colorName];

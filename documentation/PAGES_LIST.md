@@ -20,7 +20,7 @@
 | **cash_flows.html** | תזרימי מזומן | `http://localhost:5000/cash_flows.html` | `/api/cash_flows/*` |
 | **notes.html** | מערכת הערות | `http://localhost:5000/notes.html` | `/api/notes/*` |
 | **research.html** | מחקר וניתוח | `http://localhost:5000/research.html` | `/api/research/*` |
-| **preferences.html** | הגדרות מערכת v2.0 | `http://localhost:5000/preferences.html` | `/api/preferences/*` |
+| **preferences.html** | הגדרות מערכת v3.0 | `http://localhost:8080/preferences.html` | `/api/preferences/*` |
 
 ### עמודים טכניים
 | עמוד | תיאור | גישה | API |
@@ -94,8 +94,8 @@
 
 ## 🏗️ **עדכון ארכיטקטורה - ינואר 2025**
 
-### מערכת העדפות v2.0
-עמוד `preferences.html` עבר לארכיטקטורה חדשה עם **5 קבצים ממוקדים**:
+### מערכת העדפות v3.0
+עמוד `preferences.html` עבר לשיכתוב מלא ונקי עם **6 קבצים ממוקדים**:
 
 #### 📁 מבנה הקבצים החדש:
 1. **`preferences-core-new.js`** - לוגיקה עסקית (ללא צבעים)
@@ -105,11 +105,14 @@
 5. **`preferences-ui.js`** - ממשק משתמש
 
 #### 🚀 תכונות חדשות:
+- **החלפת פרופיל**: בחירה מ-dropdown + לחצן "עדכון פרופיל פעיל"
+- **שמירת העדפות**: רק שינויים + ריענון אוטומטי אחרי 1.5 שניות
 - **Lazy Loading**: טעינה חכמה עם 4 רמות עדיפות
 - **Validation**: בדיקת קיום, פורמט וחוקי עסק
 - **מערכת צבעים**: ניהול ייעודי של 60+ העדפות צבע
 - **Cache חכם**: ביצועים מיטביים
 - **Migration Guide**: הוספת העדפות בקלות
+- **מדריך משתמש**: מדריך מפורט למשתמשי קצה
 
 #### 📊 ביצועים:
 - **טעינה מהירה יותר** (critical preferences בלבד)

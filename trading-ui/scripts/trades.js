@@ -299,7 +299,6 @@ async function loadTradesData() {
       created_at: trade.created_at,
       closed_at: trade.closed_at,
       cancelled_at: trade.cancelled_at,
-      total_pl: trade.total_pl,
       notes: trade.notes,
       // Position data from backend
       position: trade.position,
@@ -487,7 +486,6 @@ async function updateTradesTable(trades) {
         ${window.FieldRendererService ? window.FieldRendererService.renderSide(trade.side) : `<span class="side-badge ${trade.side === 'Long' ? 'side-long' : 'side-short'}">${trade.side || 'Long'}</span>`}
       </td>
       <td class="plan-cell">${trade.trade_plan_id ? `<a href="#" onclick="viewTradePlanDetails('${trade.trade_plan_id}')" class="plan-link" data-plan-id="${trade.trade_plan_id}">טוען...</a>` : '-'}</td>
-      <td class="pl-cell">${window.FieldRendererService ? window.FieldRendererService.renderNumericValue(trade.total_pl || 0, '$', true) : window.colorAmountByValue(trade.total_pl || 0, trade.total_pl ? `$${trade.total_pl.toFixed(2)}` : '$0.00')}</td>
       <td data-date="${trade.created_at}">${trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : 'לא מוגדר'}</td>
       <td>${trade.closed_at ? new Date(trade.closed_at).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : trade.cancelled_at ? new Date(trade.cancelled_at).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : ''}</td>
       <td><strong><a href="#" onclick="viewAccountDetails('${trade.account_id}')" class="account-link">${trade.account_name || trade.account_id || 'חשבון לא ידוע'}</a></strong></td>
@@ -2597,9 +2595,26 @@ function updateTableStats() {
   const closedTrades = tradesData.filter(trade => trade.status === 'closed').length;
   const cancelledTrades = tradesData.filter(trade => trade.status === 'cancelled').length;
 
-  const totalPL = tradesData.reduce((sum, trade) => sum + (trade.total_pl || 0), 0);
-  const positivePL = tradesData.filter(trade => (trade.total_pl || 0) > 0).length;
-  const negativePL = tradesData.filter(trade => (trade.total_pl || 0) < 0).length;
+  // חישוב P/L על בסיס נתוני פוזיציה
+  const totalPL = tradesData.reduce((sum, trade) => {
+    if (!trade.position || !trade.position.quantity) return sum;
+    
+    // נצטרך לטעון נתוני טיקר לחישוב P/L
+    // לעת עתה נחזיר 0 עד שנטען את הנתונים
+    return sum;
+  }, 0);
+  
+  const positivePL = tradesData.filter(trade => {
+    if (!trade.position || !trade.position.quantity) return false;
+    // נצטרך לטעון נתוני טיקר לחישוב P/L
+    return false;
+  }).length;
+  
+  const negativePL = tradesData.filter(trade => {
+    if (!trade.position || !trade.position.quantity) return false;
+    // נצטרך לטעון נתוני טיקר לחישוב P/L
+    return false;
+  }).length;
 
   // עדכון סטטיסטיקות סיכום
   const summaryStatsElement = document.getElementById('summaryStats');
@@ -2620,15 +2635,15 @@ function updateTableStats() {
         </div>
         <div class="stat-item">
           <span class="stat-label">רווח כולל:</span>
-          <span class="stat-value ${totalPL >= 0 ? 'positive' : 'negative'}">${window.formatCurrency ? window.formatCurrency(totalPL, 'USD') : `$${totalPL.toFixed(2)}`}</span>
+          <span class="stat-value">חישוב לפי פוזיציות</span>
         </div>
         <div class="stat-item">
-          <span class="stat-label">רווחיים:</span>
-          <span class="stat-value positive">${positivePL}</span>
+          <span class="stat-label">עם פוזיציות:</span>
+          <span class="stat-value">${tradesData.filter(trade => trade.position && trade.position.quantity !== 0).length}</span>
         </div>
         <div class="stat-item">
-          <span class="stat-label">מפסידים:</span>
-          <span class="stat-value negative">${negativePL}</span>
+          <span class="stat-label">ללא פוזיציות:</span>
+          <span class="stat-value">${tradesData.filter(trade => !trade.position || trade.position.quantity === 0).length}</span>
         </div>
       </div>
     `;
@@ -3458,7 +3473,6 @@ function generateDetailedLog() {
                     side: trade.side,
                     currentPrice: trade.current_price,
                     dailyChange: trade.daily_change,
-                    totalPL: trade.total_pl,
                     created: trade.created_at,
                     closed: trade.closed_at || trade.cancelled_at
                 })) : [],

@@ -21,13 +21,10 @@ button,.btn{
   justify-content: center;
   white-space: nowrap;
   width: auto;
-  min-width: fit-content;
+  min-width: 32px;
   margin-right: 0.5rem;
 }
 
-button:last-child,.btn:last-child,.button-row button:last-child,.button-row .btn:last-child,.filter-buttons-container button:last-child,.filter-buttons-container .btn:last-child{
-  margin-right: 0;
-}
 
 button:hover,.btn:hover{
   transform: translateY(-1px);

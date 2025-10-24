@@ -1683,7 +1683,23 @@ function updateTradePlansTable(trade_plans) {
             </span>
           </div>
         </td>
-        <td data-date="${design.created_at}">${window.renderDate ? window.renderDate(design.created_at, false) : `<span class="date-text">${dateDisplay}</span>`}</td>
+        <td data-date="${design.created_at}">${(() => {
+          if (design.created_at) {
+            try {
+              const dateObj = new Date(design.created_at);
+              if (!isNaN(dateObj.getTime())) {
+                // פורמט מקוצר: DD/MM/YY
+                const day = dateObj.getDate().toString().padStart(2, '0');
+                const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+                const year = dateObj.getFullYear().toString().slice(-2);
+                return `<span class="date-text">${day}/${month}/${year}</span>`;
+              }
+            } catch (e) {
+              console.warn('Error parsing date:', design.created_at, e);
+            }
+          }
+          return `<span class="date-text">-</span>`;
+        })()}</td>
         <td class="type-cell" data-type="${typeForFilter}">
           ${window.renderType ? window.renderType(design.investment_type) : `<span class="entity-trade-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">${typeDisplay}</span>`}
         </td>
@@ -1707,70 +1723,114 @@ function updateTradePlansTable(trade_plans) {
         </td>
         <td class="price-cell">
           <span class="target-text" style="color: ${window.getTableColors ? window.getTableColors().positive : '#28a745'};">
-            ${targetDisplay}
+            ${(() => {
+              const targetPrice = design.target_price || 0;
+              const formatted = targetPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+              return `$${formatted}`;
+            })()}
           </span>
         </td>
         <td class="investment-cell">
           ${(() => {
             const amount = design.planned_amount || 0;
             const formatted = amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            return `<span class="amount-display">${formatted} $</span>`;
+            return `<span class="amount-display">$${formatted}</span>`;
           })()}
         </td>
         <td class="status-cell" data-status="${statusForFilter}">
           ${window.renderStatus ? window.renderStatus(design.status, 'trade_plan') : `<span class="status-${design.status}-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">${statusDisplay}</span>`}
         </td>
-        <td class="profit-cell">
+        <td class="reward-cell">
           ${(() => {
-            // חישוב סיכוי וסיכון
+            // חישוב סיכוי (רווח פוטנציאלי)
+            const plannedAmount = design.planned_amount || 0;
+            const targetPrice = design.target_price || 0;
+            const currentPrice = design.current || 0;
+            
+            if (plannedAmount > 0 && targetPrice > 0) {
+              const quantity = plannedAmount / targetPrice;
+              const potentialProfit = quantity * (targetPrice - currentPrice);
+              const profitFormatted = Math.round(potentialProfit).toLocaleString('en-US');
+              return `<span class="numeric-value-positive" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">$${profitFormatted}</span>`;
+            } else {
+              return `<span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">-</span>`;
+            }
+          })()}
+        </td>
+        <td class="risk-cell">
+          ${(() => {
+            // חישוב סיכון (הפסד מקסימלי)
             const plannedAmount = design.planned_amount || 0;
             const targetPrice = design.target_price || 0;
             const stopPrice = design.stop_price || 0;
             const currentPrice = design.current || 0;
             
             if (plannedAmount > 0 && targetPrice > 0 && stopPrice > 0) {
-              // חישוב כמות
               const quantity = plannedAmount / targetPrice;
-              
-              // חישוב סיכוי (רווח פוטנציאלי)
-              const potentialProfit = quantity * (targetPrice - currentPrice);
-              
-              // חישוב סיכון (הפסד מקסימלי)
               const potentialLoss = quantity * (currentPrice - stopPrice);
-              
-              // פורמט התצוגה עם פסיקים
-              const profitFormatted = potentialProfit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-              const lossFormatted = Math.abs(potentialLoss).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-              
-              return `
-                <div class="risk-reward-display" style="font-size: 0.85em;">
-                  <div class="numeric-value-positive" style="margin-bottom: 2px;">
-                    $${profitFormatted}
-                  </div>
-                  <div class="numeric-value-negative">
-                    $${lossFormatted}
-                  </div>
-                </div>
-              `;
+              const lossFormatted = Math.round(Math.abs(potentialLoss)).toLocaleString('en-US');
+              return `<span class="numeric-value-negative" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">$${lossFormatted}</span>`;
             } else {
               return `<span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">-</span>`;
             }
           })()}
         </td>
+        <td class="ratio-cell">
+          ${(() => {
+            // חישוב יחס סיכוי/סיכון
+            const plannedAmount = design.planned_amount || 0;
+            const targetPrice = design.target_price || 0;
+            const stopPrice = design.stop_price || 0;
+            const currentPrice = design.current || 0;
+            
+            if (plannedAmount > 0 && targetPrice > 0 && stopPrice > 0) {
+              const quantity = plannedAmount / targetPrice;
+              const potentialProfit = quantity * (targetPrice - currentPrice);
+              const potentialLoss = quantity * (currentPrice - stopPrice);
+              
+              if (Math.abs(potentialLoss) > 0) {
+                const ratio = potentialProfit / Math.abs(potentialLoss);
+                const ratioFormatted = ratio.toFixed(2);
+                
+                // צביעה: סיכוי בירוק, סיכון באדום
+                return `
+                  <div style="font-size: 0.85em;">
+                    <span class="numeric-value-positive" style="margin-right: 4px;">${ratioFormatted}</span>
+                    <span class="numeric-value-negative">1</span>
+                  </div>
+                `;
+              }
+            }
+            return `<span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">-</span>`;
+          })()}
+        </td>
         <td class="actions-cell">
-          ${window.createActionsMenu ? window.createActionsMenu([
-            { type: 'VIEW', onclick: `window.showEntityDetails('trade_plan', ${design.id}, { mode: 'view' })`, title: 'צפה בפרטי תכנון' },
-            { type: 'LINK', onclick: `if (typeof window.viewLinkedItemsForTradePlan === 'function') { window.viewLinkedItemsForTradePlan(${design.id}); }`, title: 'קישור' },
-            { type: 'EDIT', onclick: `if (typeof window.openEditTradePlanModal === 'function') { window.openEditTradePlanModal(${design.id}); }`, title: 'ערוך' },
-            { type: 'CANCEL', onclick: `if (typeof window.cancelTradePlan === 'function') { window.cancelTradePlan(${design.id}); }`, title: 'בטל' },
-            { type: 'DELETE', onclick: `if (typeof window.openDeleteTradePlanModal === 'function') { window.openDeleteTradePlanModal(${design.id}); }`, title: 'מחק' }
-          ]) : `
-          <button data-button-type="VIEW" data-variant="small" data-onclick="window.showEntityDetails('trade_plan', ${design.id}, { mode: 'view' })" data-text="" title="צפה בפרטי תכנון"></button>
-          <button data-button-type="LINK" data-variant="small" data-onclick="if (typeof window.viewLinkedItemsForTradePlan === 'function') { window.viewLinkedItemsForTradePlan(${design.id}); }" data-text="" title="קישור"></button>
-          <button data-button-type="EDIT" data-variant="small" data-onclick="if (typeof window.openEditTradePlanModal === 'function') { window.openEditTradePlanModal(${design.id}); }" data-text="" title="ערוך"></button>
-          <button data-button-type="CANCEL" data-variant="small" data-onclick="if (typeof window.cancelTradePlan === 'function') { window.cancelTradePlan(${design.id}); }" data-text="" title="בטל"></button>
-          <button data-button-type="DELETE" data-variant="small" data-onclick="if (typeof window.openDeleteTradePlanModal === 'function') { window.openDeleteTradePlanModal(${design.id}); }" data-text="" title="מחק"></button>
-          `}
+          ${(() => {
+            if (!window.createActionsMenu) {
+              console.error('❌ createActionsMenu לא זמינה!');
+              return `<div class="alert alert-danger">שגיאה: מערכת התפריט לא זמינה</div>`;
+            }
+            
+            try {
+              const result = window.createActionsMenu([
+                { type: 'VIEW', onclick: `window.showEntityDetails('trade_plan', ${design.id}, { mode: 'view' })`, title: 'צפה בפרטי תכנון' },
+                { type: 'LINK', onclick: `if (typeof window.viewLinkedItemsForTradePlan === 'function') { window.viewLinkedItemsForTradePlan(${design.id}); }`, title: 'קישור' },
+                { type: 'EDIT', onclick: `if (typeof window.openEditTradePlanModal === 'function') { window.openEditTradePlanModal(${design.id}); }`, title: 'ערוך' },
+                { type: 'CANCEL', onclick: `if (typeof window.cancelTradePlan === 'function') { window.cancelTradePlan(${design.id}); }`, title: 'בטל' },
+                { type: 'DELETE', onclick: `if (typeof window.openDeleteTradePlanModal === 'function') { window.openDeleteTradePlanModal(${design.id}); }`, title: 'מחק' }
+              ]);
+              
+              if (!result || result.trim().length === 0) {
+                console.error('❌ createActionsMenu החזירה תוצאה ריקה!');
+                return `<div class="alert alert-warning">אזהרה: תפריט הפעולות לא נוצר</div>`;
+              }
+              
+              return result;
+            } catch (error) {
+              console.error('❌ שגיאה ביצירת תפריט פעולות:', error);
+              return `<div class="alert alert-danger">שגיאה: ${error.message}</div>`;
+            }
+          })()}
         </td>
       </tr>
     `;
@@ -3708,7 +3768,7 @@ function updateTickerInfo() {
 
     // Demo values - בעתיד יבואו מהשרת
     const currentPrice = 150.25;
-    priceDisplay.textContent = '$' + currentPrice.toFixed(2);
+    priceDisplay.textContent = `$${currentPrice.toFixed(2)}`;
     const dailyChangeValue = '+2.5%';
     changeDisplay.textContent = dailyChangeValue;
 

@@ -442,6 +442,13 @@ const PACKAGE_MANIFEST = {
         description: 'ממשק משתמש',
         required: true,
         loadOrder: 5
+      },
+      {
+        file: 'preferences-page.js',
+        globalCheck: 'window.copyDetailedLog',
+        description: 'פונקציות ספציפיות לעמוד העדפות',
+        required: false,
+        loadOrder: 6
       }
     ],
     estimatedSize: '~140KB',

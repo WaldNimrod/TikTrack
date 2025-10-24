@@ -29,6 +29,7 @@
     color: var(--color-action-delete);
     --current-button-color: var(--color-action-delete);
     --current-button-hover: var(--danger-hover, #a93226);
+    /* Ensure consistent sizing with other buttons */
 }
 .btn[data-button-type="DELETE"]:hover {
     background-color: var(--color-action-delete);
@@ -330,7 +331,6 @@
 
 /* כפתורים נגטיביים - רקע ספציפי שגובר על ברירת המחדל */
 .btn[data-button-type="REMOVE"],
-.btn[data-button-type="CANCEL"],
 .btn[data-button-type="CLOSE"] {
     background-color: #dc3545 !important; /* רקע אדום לכפתורים נגטיביים */
     color: white !important;
@@ -338,7 +338,6 @@
 }
 
 .btn[data-button-type="REMOVE"]:hover,
-.btn[data-button-type="CANCEL"]:hover,
 .btn[data-button-type="CLOSE"]:hover {
     background-color: #c82333 !important; /* רקע אדום כהה יותר ב-hover */
     border-color: #c82333 !important;

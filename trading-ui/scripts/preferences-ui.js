@@ -435,7 +435,42 @@ class PreferencesUI {
         this.loadingManager = new LoadingManager();
         
         this.currentUserId = 1; // Nimrod
-        this.currentProfileId = 3; // Default profile
+        this.currentProfileId = null; // Will be loaded from server
+    }
+    
+    /**
+     * Load active profile from server
+     * @returns {Promise<number>} Active profile ID
+     */
+    async loadActiveProfile() {
+        try {
+            console.log('🔍 Loading active profile from server...');
+            const response = await fetch('/api/preferences/profiles');
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const result = await response.json();
+            if (!result.success) {
+                throw new Error(result.error || 'Failed to load profiles');
+            }
+            
+            const activeProfile = result.data.profiles.find(p => p.active === true);
+            if (!activeProfile) {
+                throw new Error('No active profile found');
+            }
+            
+            this.currentProfileId = activeProfile.id;
+            console.log(`✅ Active profile loaded: ${activeProfile.name} (ID: ${activeProfile.id})`);
+            return activeProfile.id;
+            
+        } catch (error) {
+            console.error('❌ Error loading active profile:', error);
+            // Fallback to default profile
+            this.currentProfileId = 1;
+            console.log('⚠️ Using fallback profile ID: 1');
+            return 1;
+        }
     }
     
     /**
@@ -448,6 +483,15 @@ class PreferencesUI {
         
         try {
             this.loadingManager.startLoading(loaderId, 'טוען העדפות...');
+            
+            // Load active profile if not provided
+            if (!profileId) {
+                profileId = await this.loadActiveProfile();
+            }
+            
+            // Update currentProfileId to match the loaded profile
+            this.currentProfileId = profileId;
+            console.log(`✅ PreferencesUI currentProfileId updated to: ${profileId}`);
             
             // 🔍 Cache & Profile Debug Logging
             console.log(`🔍 CACHE DEBUG: Loading preferences for user ${userId || this.currentUserId}, profile ${profileId || this.currentProfileId}`);
@@ -936,6 +980,12 @@ window.loadProfilesToDropdown = async function() {
             console.log(`🔍 PROFILE DEBUG: Found active profile:`, activeProfile);
             
             if (activeProfile) {
+                // Update PreferencesUI currentProfileId
+                if (window.PreferencesUI) {
+                    window.PreferencesUI.currentProfileId = activeProfile.id;
+                    console.log(`✅ PreferencesUI currentProfileId updated to: ${activeProfile.id}`);
+                }
+                
                 // Select the active profile in dropdown
                 const activeOption = profileSelect.querySelector(`option[value="${activeProfile.name}"]`);
                 if (activeOption) {

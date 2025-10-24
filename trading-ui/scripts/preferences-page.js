@@ -112,6 +112,12 @@ async function switchActiveProfile() {
                 console.warn('⚠️ PreferencesCore not available');
             }
             
+            // Update PreferencesUI currentProfileId for synchronization
+            if (window.PreferencesUI) {
+                window.PreferencesUI.currentProfileId = defaultProfile.id;
+                console.log('✅ PreferencesUI currentProfileId synchronized');
+            }
+            
             // Show success notification
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('פרופיל הוחלף לברירת מחדל');
@@ -191,6 +197,14 @@ async function switchActiveProfile() {
                     window.showSuccessNotification('פרופיל הוחלף לברירת מחדל! כל הנתונים נטענו מחדש.');
                 }
                 
+                // Show confirmation dialog before reload
+                const shouldReload = confirm('הפרופיל הוחלף בהצלחה. האם לרענן את העמוד כדי לראות את השינויים?');
+                
+                if (shouldReload) {
+                    console.log('🔄 User requested page reload');
+                    window.location.reload();
+                }
+                
                 console.log('✅ Profile switch completed - all form data reloaded');
                 
             } catch (error) {
@@ -242,6 +256,12 @@ async function switchActiveProfile() {
             console.warn('⚠️ PreferencesCore not available');
         }
         
+        // Update PreferencesUI currentProfileId for synchronization
+        if (window.PreferencesUI) {
+            window.PreferencesUI.currentProfileId = profile.id;
+            console.log('✅ PreferencesUI currentProfileId synchronized');
+        }
+        
         // 7. Show success notification
         if (typeof window.showSuccessNotification === 'function') {
             window.showSuccessNotification(`פרופיל הוחלף ל: ${profile.name}`);
@@ -259,6 +279,13 @@ async function switchActiveProfile() {
         // Reload all preferences and form data for the new profile
         console.log('🔄 Reloading all form data for new profile...');
         try {
+            // First, reload the active profile from server to get the correct one
+            if (window.PreferencesUI && typeof window.PreferencesUI.loadActiveProfile === 'function') {
+                console.log('🔄 Reloading active profile from server...');
+                const activeProfileId = await window.PreferencesUI.loadActiveProfile();
+                console.log(`✅ Active profile reloaded: ${activeProfileId}`);
+            }
+            
             // Reload preferences using the UI system with cache-busting
             if (window.PreferencesUI && typeof window.PreferencesUI.loadAllPreferences === 'function') {
                 console.log('🔄 Reloading preferences with cache-busting...');
@@ -325,6 +352,14 @@ async function switchActiveProfile() {
             // Show success notification
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification(`פרופיל הוחלף ל: ${profile.name}! כל הנתונים נטענו מחדש.`);
+            }
+            
+            // Show confirmation dialog before reload
+            const shouldReload = confirm('הפרופיל הוחלף בהצלחה. האם לרענן את העמוד כדי לראות את השינויים?');
+            
+            if (shouldReload) {
+                console.log('🔄 User requested page reload');
+                window.location.reload();
             }
             
             console.log('✅ Profile switch completed - all form data reloaded');

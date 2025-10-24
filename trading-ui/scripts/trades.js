@@ -435,12 +435,14 @@ async function updateTradesTable(trades) {
           trade_plan_planned_amount: trade.trade_plan_planned_amount, 
           trade_plan_created_at: trade.trade_plan_created_at 
         });
-        return window.FieldRendererService.renderLinkedEntity('trade_plan', trade.trade_plan_id, trade.trade_plan_planned_amount || '', { 
+        const result = window.FieldRendererService.renderLinkedEntity('trade_plan', trade.trade_plan_id, trade.trade_plan_planned_amount || '', { 
           ticker: trade.ticker_symbol, 
           date: trade.trade_plan_created_at, 
           planned_amount: trade.trade_plan_planned_amount, 
           short: true 
         });
+        console.log('🔍 trades.js RESULT:', result);
+        return result;
       })() : `<span class="text-danger">❌ FieldRendererService לא זמין</span>`) : '-'}</td>
       <td><strong><a href="#" onclick="viewAccountDetails('${trade.account_id}')" class="account-link">${trade.account_name || trade.account_id || 'חשבון לא ידוע'}</a></strong></td>
       <td data-date="${trade.created_at}">${trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : 'לא מוגדר'}</td>
@@ -2569,7 +2571,8 @@ async function loadTradePlanDates() {
           if (data.status === 'success' && data.data) {
             const plan = data.data;
             const createdDate = plan.created_at ? new Date(plan.created_at).toLocaleDateString('he-IL') : 'תאריך לא ידוע';
-            link.textContent = createdDate;
+            const plannedAmount = plan.planned_amount ? `$${Number(plan.planned_amount).toLocaleString('en-US', { maximumFractionDigits: 0 })}` : '';
+            link.textContent = `${plannedAmount} ${createdDate}`.trim();
           } else {
             link.textContent = 'תוכנית קיימת';
           }

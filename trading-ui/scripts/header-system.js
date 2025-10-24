@@ -187,17 +187,20 @@ class HeaderSystem {
                     </li>
 
                     <li class="tiktrack-nav-item">
-                      <a href="#" class="tiktrack-nav-link" onclick="clearUnifiedCacheQuick(event)" 
-                         title="נקה מטמון פיתוח מהיר">
+                      <a href="#" class="tiktrack-nav-link" onclick="clearCacheQuick(event)" 
+                         title="נקה מטמון מהיר - זיכרון בלבד">
                         <span class="nav-text" style="color: #ff0000; font-size: 1.2rem;">🧹</span>
                       </a>
-                      <ul class="submenu" style="display: none; position: absolute; top: 100%; right: 0; background: white; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); min-width: 180px; z-index: 1000; padding: 0; margin: 0; list-style: none;">
-                        <li><a href="#" onclick="clearStaticFilesCache(event)" 
+                      <ul class="submenu" style="display: none; position: absolute; top: 100%; right: 0; background: white; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); min-width: 200px; z-index: 1000; padding: 0; margin: 0; list-style: none;">
+                        <li><a href="#" onclick="clearCacheLayer('localStorage', event)" 
                                style="display: block; padding: 8px 12px; color: #333; text-decoration: none; font-size: 14px; border-bottom: 1px solid #eee;"
-                               title="נקה מטמון קבצים סטטיים (אייקונים, CSS)">נקה קבצים סטטיים</a></li>
-                        <li><a href="#" onclick="clearUnifiedCacheDeep(event)" 
+                               title="נקה localStorage בלבד">נקה localStorage</a></li>
+                        <li><a href="#" onclick="clearAllCacheAdvanced(event)" 
+                               style="display: block; padding: 8px 12px; color: #333; text-decoration: none; font-size: 14px; border-bottom: 1px solid #eee;"
+                               title="נקה כל שכבות המטמון">נקה כל המטמון</a></li>
+                        <li><a href="#" onclick="clearCacheFull(event)" 
                                style="display: block; padding: 8px 12px; color: #333; text-decoration: none; font-size: 14px;"
-                               title="ניקוי זיכרון מלא ועמוק">ניקוי מלא ועמוק</a></li>
+                               title="נקה הכל + רענון עמוד">נקה הכל + רענון</a></li>
                       </ul>
                     </li>
                   </ul>
@@ -2022,128 +2025,10 @@ window.debugZIndexStatus = function() {
     console.log('✅ בדיקת Z-Index הושלמה');
 };
 
-// ===== CACHE CLEARING FUNCTIONS FOR DEVELOPMENT =====
-
-/**
- * ניקוי מהיר לצרכי פיתוח - כפתור ראשי
- */
-window.clearUnifiedCacheQuick = async function(event) {
-    if (event) {
-        event.preventDefault();
-    }
-    
-    console.log('🧹 ניקוי מהיר לצרכי פיתוח...');
-    
-    try {
-        // ניקוי מהיר של זיכרון בלבד - הכי מהיר לצרכי פיתוח
-        if (window.UnifiedCacheManager) {
-            await window.UnifiedCacheManager.clear('memory');
-            console.log('✅ ניקוי מהיר הושלם - זיכרון בלבד');
-            
-            if (typeof window.showNotification === 'function') {
-                window.showNotification('ניקוי מהיר הושלם - זיכרון בלבד', 'success', 'ניקוי מהיר', 3000, 'development');
-            }
-        } else {
-            // fallback לניקוי localStorage בלבד
-            localStorage.clear();
-            console.log('✅ ניקוי מהיר הושלם - localStorage בלבד');
-            
-            if (typeof window.showNotification === 'function') {
-                window.showNotification('ניקוי מהיר הושלם - localStorage בלבד', 'success', 'ניקוי מהיר', 3000, 'development');
-            }
-        }
-    } catch (error) {
-        console.error('❌ שגיאה בניקוי מהיר:', error);
-        if (typeof window.showNotification === 'function') {
-            window.showNotification('שגיאה בניקוי מהיר: ' + error.message, 'error', 'שגיאה', 5000, 'development');
-        }
-    }
-};
-
-/**
- * ניקוי קבצים סטטיים - תפריט משנה
- */
-window.clearStaticFilesCache = async function(event) {
-    if (event) {
-        event.preventDefault();
-    }
-    
-    console.log('🗂️ ניקוי קבצים סטטיים...');
-    
-    try {
-        // ניקוי cache של הדפדפן לקבצים סטטיים
-        if ('caches' in window) {
-            const cacheNames = await caches.keys();
-            await Promise.all(
-                cacheNames.map(cacheName => caches.delete(cacheName))
-            );
-            console.log('✅ ניקוי cache דפדפן הושלם');
-        }
-        
-        // רענון העמוד כדי לטעון קבצים סטטיים מחדש
-        setTimeout(() => {
-            window.location.reload(true);
-        }, 1000);
-        
-        if (typeof window.showNotification === 'function') {
-            window.showNotification('ניקוי קבצים סטטיים הושלם - העמוד ירענן', 'info', 'ניקוי קבצים', 3000, 'development');
-        }
-    } catch (error) {
-        console.error('❌ שגיאה בניקוי קבצים סטטיים:', error);
-        if (typeof window.showNotification === 'function') {
-            window.showNotification('שגיאה בניקוי קבצים סטטיים: ' + error.message, 'error', 'שגיאה', 5000, 'development');
-        }
-    }
-};
-
-/**
- * ניקוי זיכרון מלא ועמוק - תפריט משנה
- * משתמש באותו תהליך כמו בעמוד בדיקת המטמון אבל עם הודעה פשוטה וריענון אוטומטי
- */
-window.clearUnifiedCacheDeep = async function(event) {
-    if (event) {
-        event.preventDefault();
-    }
-    
-    console.log('🧠 ניקוי זיכרון מלא ועמוק...');
-    
-    try {
-        // השתמש בפונקציה המהירה של מערכת המטמון המאוחדת
-        if (typeof window.clearAllUnifiedCacheQuick === 'function') {
-            const result = await window.clearAllUnifiedCacheQuick();
-            
-            if (result.success) {
-                console.log('✅ ניקוי זיכרון מלא ועמוק הושלם בהצלחה - ריענון אוטומטי בעוד 1.5 שניות');
-            } else {
-                throw new Error(result.error || 'ניקוי מטמון נכשל');
-            }
-        } else {
-            // fallback לניקוי בסיסי אם הפונקציה לא זמינה
-            localStorage.clear();
-            sessionStorage.clear();
-            
-            if (typeof window.showNotification === 'function') {
-                window.showNotification(
-                    'ניקוי מטמון בסיסי הושלם',
-                    'success',
-                    'ניקוי מטמון',
-                    3000,
-                    'development'
-                );
-            }
-            
-            setTimeout(() => {
-                window.location.reload(true);
-            }, 1500);
-        }
-        
-    } catch (error) {
-        console.error('❌ שגיאה בניקוי זיכרון עמוק:', error);
-        if (typeof window.showNotification === 'function') {
-            window.showNotification('שגיאה בניקוי זיכרון עמוק: ' + error.message, 'error', 'שגיאה', 5000, 'development');
-        }
-    }
-};
+// ===== CACHE CLEARING FUNCTIONS MOVED TO UNIFIED CACHE MANAGER =====
+// All cache clearing functions are now part of the UnifiedCacheManager system
+// and are available as global functions: clearCacheQuick, clearCacheLayer, 
+// clearAllCacheAdvanced, clearCacheFull
 
 // ===== DEBUG FUNCTION FOR CACHE CLEARING =====
 
@@ -2154,9 +2039,11 @@ window.testCacheClearingFunctions = function() {
     console.log('🧪 בדיקת פונקציות ניקוי מטמון...');
     
     const functions = [
-        'clearUnifiedCacheQuick',
-        'clearStaticFilesCache', 
-        'clearUnifiedCacheDeep'
+        'clearCacheQuick',
+        'clearCacheLayer', 
+        'clearAllCacheAdvanced',
+        'clearCacheFull',
+        'clearCacheBeforeCRUD'
     ];
     
     functions.forEach(funcName => {
@@ -2169,8 +2056,8 @@ window.testCacheClearingFunctions = function() {
     console.log(`UnifiedCacheManager: ${unifiedCacheExists ? '✅ זמין' : '❌ לא זמין'}`);
     
     // בדיקת מערכת ההתראות
-    const notificationExists = typeof window.showNotification === 'function';
-    console.log(`showNotification: ${notificationExists ? '✅ זמין' : '❌ לא זמין'}`);
+    const notificationExists = typeof window.showSuccessNotification === 'function';
+    console.log(`showSuccessNotification: ${notificationExists ? '✅ זמין' : '❌ לא זמין'}`);
     
     console.log('🧪 בדיקת פונקציות ניקוי מטמון הושלמה');
 };

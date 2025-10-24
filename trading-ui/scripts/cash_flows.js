@@ -6,7 +6,7 @@
  */
 function loadCashFlowsData() {
   try {
-    console.log('📊 טוען נתוני תזרימי מזומנים...');
+    window.Logger.info('Loading cash flows data', { page: 'cash_flows' });
     
     // הצגת אינדיקטור טעינה
     if (typeof window.showNotification === 'function') {
@@ -27,7 +27,7 @@ function loadCashFlowsData() {
       return response.json();
     })
     .then(response => {
-      console.log('✅ נתוני תזרימי מזומנים נטענו:', response);
+      window.Logger.info('Cash flows data loaded successfully', { count: response.data?.length || 0, page: 'cash_flows' });
       
       // הנתונים מגיעים במבנה {data: [...]}
       const data = response.data || response;
@@ -50,7 +50,7 @@ function loadCashFlowsData() {
       }
     })
     .catch(error => {
-      console.error('שגיאה בטעינת נתוני תזרימי מזומנים:', error);
+      window.Logger.error('Error loading cash flows data', error, { page: 'cash_flows' });
       if (typeof window.showErrorNotification === 'function') {
         window.showErrorNotification('שגיאה בטעינת נתוני תזרימי מזומנים', error.message, 6000, 'system');
       } else if (typeof window.showNotification === 'function') {
@@ -59,7 +59,7 @@ function loadCashFlowsData() {
     });
     
   } catch (error) {
-    console.error('שגיאה בטעינת נתוני תזרימי מזומנים:', error);
+    window.Logger.error('Error loading cash flows data', error, { page: 'cash_flows' });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בטעינת נתוני תזרימי מזומנים', error.message);
     } else if (typeof window.showNotification === 'function') {
@@ -74,7 +74,7 @@ function loadCashFlowsData() {
  */
 function calculateBalance() {
   try {
-    console.log('🧮 מחשב יתרה...');
+    window.Logger.info('Calculating balance', { page: 'cash_flows' });
     
     if (!window.cashFlowsData || window.cashFlowsData.length === 0) {
       if (typeof window.showWarningNotification === 'function') {
@@ -130,7 +130,7 @@ function calculateBalance() {
     }
     
   } catch (error) {
-    console.error('שגיאה בחישוב יתרה:', error);
+    window.Logger.error('Error calculating balance', error, { page: 'cash_flows' });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בחישוב יתרה', error.message);
     } else if (typeof window.showNotification === 'function') {
@@ -611,8 +611,8 @@ async function loadAccountsForCashFlow(selectId, useDefaultFromPreferences = fal
     // לוגים רק למודול הוספה
     if (useDefaultFromPreferences) {
       const select = document.getElementById(selectId);
-      console.log('✅ אחרי טעינה - ערך נבחר:', select?.value);
-      console.log('✅ אחרי טעינה - טקסט נבחר:', select?.options[select?.selectedIndex]?.text);
+      window.Logger.debug('After loading - selected value', { value: select?.value, page: 'cash_flows' });
+      window.Logger.debug('After loading - selected text', { text: select?.options[select?.selectedIndex]?.text, page: 'cash_flows' });
     }
     
   } catch (error) {
@@ -933,12 +933,12 @@ window.updateCashFlowsTable = updateCashFlowsTable;
  * עדכון אוטומטי של נתוני תזרימי מזומנים
  */
 function startAutoRefresh() {
-  console.log('🔄 מתחיל עדכון אוטומטי של תזרימי מזומנים...');
+  window.Logger.info('Starting automatic cash flows update', { page: 'cash_flows' });
   
   // עדכון נתונים כל 30 שניות
   setInterval(async () => {
     try {
-      console.log('🔄 עדכון אוטומטי של נתוני תזרימי מזומנים...');
+      window.Logger.info('Automatic cash flows data update', { page: 'cash_flows' });
       await loadCashFlows();
       
       // עדכון סטטיסטיקות
@@ -946,13 +946,13 @@ function startAutoRefresh() {
         updatePageSummaryStats();
       }
       
-      console.log('✅ עדכון אוטומטי הושלם בהצלחה');
+      window.Logger.info('Automatic update completed successfully', { page: 'cash_flows' });
     } catch (error) {
-      console.error('❌ שגיאה בעדכון אוטומטי:', error);
+      window.Logger.error('Error in automatic update', error, { page: 'cash_flows' });
     }
   }, 30000); // 30 שניות
   
-  console.log('✅ עדכון אוטומטי הופעל - רענון כל 30 שניות');
+  window.Logger.info('Automatic update activated - refresh every 30 seconds', { page: 'cash_flows' });
 }
 
 /**
@@ -965,13 +965,13 @@ function startAutoRefresh() {
  */
 async function applyDynamicColors() {
   try {
-    console.log('🎨 מחיל מערכת צבעים דינמית...');
+    window.Logger.info('Applying dynamic color system', { page: 'cash_flows' });
     
     // טעינת צבעי ישויות מהמערכת הגלובלית
     if (typeof window.loadEntityColors === 'function') {
       const entityColors = await window.loadEntityColors();
       if (entityColors) {
-        console.log('✅ צבעי ישויות נטענו:', entityColors);
+        window.Logger.debug('Entity colors loaded', { entityColors, page: 'cash_flows' });
         
         // החלת צבעי תזרימי מזומנים
         if (entityColors.cash_flow) {
@@ -997,7 +997,7 @@ async function applyDynamicColors() {
     if (typeof window.loadStatusColors === 'function') {
       const statusColors = await window.loadStatusColors();
       if (statusColors) {
-        console.log('✅ צבעי סטטוס נטענו:', statusColors);
+        window.Logger.debug('Status colors loaded', { statusColors, page: 'cash_flows' });
         
         // החלת צבעי סטטוס לתזרימי מזומנים
         if (statusColors.income) {
@@ -1022,9 +1022,9 @@ async function applyDynamicColors() {
       await window.applyColorScheme();
     }
     
-    console.log('✅ מערכת צבעים דינמית הוחלה בהצלחה');
+    window.Logger.info('Dynamic color system applied successfully', { page: 'cash_flows' });
   } catch (error) {
-    console.error('❌ שגיאה בהחלת מערכת צבעים דינמית:', error);
+    window.Logger.error('Error applying dynamic color system', error, { page: 'cash_flows' });
   }
 }
 
@@ -1035,7 +1035,7 @@ function applyUserPreferences(preferences) {
   try {
     if (!preferences) return;
     
-    console.log('🎨 מחיל העדפות משתמש על העמוד...');
+    window.Logger.info('Applying user preferences to page', { page: 'cash_flows' });
     
     // החלת העדפת גודל עמוד (רק תצוגה, לא שמירה)
     const paginationSize = preferences.pagination_size_cash_flows || 25;
@@ -1072,9 +1072,9 @@ function applyUserPreferences(preferences) {
       document.body.classList.add('cash-flows-cards-mode');
     }
     
-    console.log('✅ העדפות משתמש הוחלו בהצלחה');
+    window.Logger.info('User preferences applied successfully', { page: 'cash_flows' });
   } catch (error) {
-    console.error('❌ שגיאה בהחלת העדפות משתמש:', error);
+    window.Logger.error('Error applying user preferences', error, { page: 'cash_flows' });
   }
 }
 
@@ -1082,7 +1082,7 @@ function applyUserPreferences(preferences) {
  * אתחול הדף
  */
 async function initializeCashFlowsPage() {
-  console.log('🚀 מאתחל עמוד תזרימי מזומנים...');
+  window.Logger.info('Initializing cash flows page', { page: 'cash_flows' });
 
   try {
     // טעינת העדפות משתמש
@@ -1120,9 +1120,9 @@ async function initializeCashFlowsPage() {
     // הפעלת עדכון אוטומטי
     startAutoRefresh();
     
-    console.log('✅ עמוד תזרימי מזומנים אותחל בהצלחה');
+    window.Logger.info('Cash flows page initialized successfully', { page: 'cash_flows' });
   } catch (error) {
-    console.error('❌ שגיאה באתחול עמוד תזרימי מזומנים:', error);
+    window.Logger.error('Error initializing cash flows page', error, { page: 'cash_flows' });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה באתחול העמוד', error.message);
     }
@@ -1451,13 +1451,13 @@ async function updateCashFlow() {
 
 // פונקציות מודל חסרות
 function showAddCashFlowModal() {
-    console.log('showAddCashFlowModal called');
+    window.Logger.debug('showAddCashFlowModal called', { page: 'cash_flows' });
     // קריאה לפונקציה האמיתית
     _showAddCashFlowModal();
 }
 
 function showEditCashFlowModal(cashFlowId) {
-    console.log('showEditCashFlowModal called with ID:', cashFlowId);
+    window.Logger.debug('showEditCashFlowModal called', { cashFlowId, page: 'cash_flows' });
     // קריאה לפונקציה האמיתית
     _showEditCashFlowModal(cashFlowId);
 }
@@ -1471,7 +1471,7 @@ function editCashFlow(id) {
     if (typeof window.editCashFlow === 'function') {
         window.editCashFlow(id);
     } else {
-        console.warn('editCashFlow function not found');
+        window.Logger.warn('editCashFlow function not found', { page: 'cash_flows' });
     }
 }
 
@@ -1515,7 +1515,7 @@ async function loadTradesForCashFlow(selectId) {
       });
     }
   } catch (error) {
-    console.error('Error loading trades for cash flow modal:', error);
+    window.Logger.error('Error loading trades for cash flow modal', error, { page: 'cash_flows' });
   }
 }
 
@@ -1557,7 +1557,7 @@ async function loadTradePlansForCashFlow(selectId) {
       });
     }
   } catch (error) {
-    console.error('Error loading trade plans for cash flow modal:', error);
+    window.Logger.error('Error loading trade plans for cash flow modal', error, { page: 'cash_flows' });
   }
 }
 
@@ -1819,7 +1819,7 @@ async function copyDetailedLog() {
             }
         }
     } catch (error) {
-        console.error('שגיאה בהעתקת הלוג המפורט:', error);
+        window.Logger.error('Error copying detailed log', error, { page: 'cash_flows' });
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה בהעתקת הלוג', error.message);
         } else {
@@ -1893,4 +1893,4 @@ window.setupSourceFieldListeners = setupSourceFieldListeners;
 window.initializeExternalIdFields = initializeExternalIdFields;
 window.manageExternalIdField = manageExternalIdField;
 
-console.log('✅ Cash Flows: All functions exported to global scope');
+window.Logger.info('Cash Flows: All functions exported to global scope', { page: 'cash_flows' });

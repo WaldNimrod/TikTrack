@@ -1208,10 +1208,23 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
         const clearedLayers = [];
         const errors = [];
         
-        // 1. Clear Unified Cache Manager (all layers)
+        // Check if specific layers are requested
+        const requestedLayers = options.layers || ['all'];
+        
+        // 1. Clear Unified Cache Manager (all layers or specific layers)
         try {
-            await this.clear('all');
-            clearedLayers.push('Unified Cache (all layers)');
+            if (requestedLayers.includes('all')) {
+                await this.clear('all');
+                clearedLayers.push('Unified Cache (all layers)');
+            } else {
+                // Clear specific layers
+                for (const layer of requestedLayers) {
+                    if (this.layers[layer] && this.layers[layer].clear) {
+                        await this.layers[layer].clear(options);
+                        clearedLayers.push(`Unified Cache (${layer} layer)`);
+                    }
+                }
+            }
             console.log('✅ Unified Cache cleared successfully');
         } catch (error) {
             console.error('❌ Error clearing Unified Cache:', error);
@@ -2228,6 +2241,130 @@ window.verifyCacheSystem = async function(options = {}) {
     } else {
         console.warn('⚠️ UnifiedCacheManager not initialized');
         return { success: false, error: 'UnifiedCacheManager not initialized' };
+    }
+};
+
+// ===== SMART CACHE CLEARING FUNCTIONS FOR HEADER BUTTONS =====
+// These functions provide convenient wrappers for the existing cache clearing methods
+
+/**
+ * ניקוי מהיר לצרכי פיתוח - כפתור ראשי
+ * Uses existing clearAllCacheQuick() method
+ */
+window.clearCacheQuick = async function(event) {
+    if (event) {
+        event.preventDefault();
+    }
+    
+    console.log('🧹 ניקוי מהיר לצרכי פיתוח...');
+    
+    try {
+        if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+            await window.UnifiedCacheManager.clearAllCacheQuick();
+        } else {
+            console.warn('⚠️ UnifiedCacheManager לא זמין');
+        }
+    } catch (error) {
+        console.error('❌ שגיאה בניקוי מהיר:', error);
+    }
+};
+
+/**
+ * ניקוי שכבה ספציפית - תפריט משנה
+ * Uses existing clearAllCache() method with layer filter
+ * @param {string} layer - שם השכבה (memory, localStorage, indexedDB, backend)
+ */
+window.clearCacheLayer = async function(layer, event) {
+    if (event) {
+        event.preventDefault();
+    }
+    
+    console.log(`🗂️ ניקוי שכבה: ${layer}...`);
+    
+    try {
+        if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+            await window.UnifiedCacheManager.clearAllCache({ layers: [layer] });
+        } else {
+            console.warn('⚠️ UnifiedCacheManager לא זמין');
+        }
+    } catch (error) {
+        console.error(`❌ שגיאה בניקוי ${layer}:`, error);
+    }
+};
+
+/**
+ * ניקוי כל שכבות המטמון (ללא רענון) - תפריט משנה
+ * Uses existing clearAllCacheDetailed() method
+ */
+window.clearAllCacheAdvanced = async function(event) {
+    if (event) {
+        event.preventDefault();
+    }
+    
+    console.log('🧠 ניקוי כל שכבות המטמון...');
+    
+    try {
+        if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+            await window.UnifiedCacheManager.clearAllCacheDetailed();
+        } else {
+            console.warn('⚠️ UnifiedCacheManager לא זמין');
+        }
+    } catch (error) {
+        console.error('❌ שגיאה בניקוי מלא:', error);
+    }
+};
+
+/**
+ * ניקוי מלא + רענון עמוד - תפריט משנה
+ * Uses existing clearAllCacheDetailed() method + page reload
+ */
+window.clearCacheFull = async function(event) {
+    if (event) {
+        event.preventDefault();
+    }
+    
+    console.log('🔄 ניקוי מלא + רענון עמוד...');
+    
+    try {
+        if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+            await window.UnifiedCacheManager.clearAllCacheDetailed();
+        } else {
+            console.warn('⚠️ UnifiedCacheManager לא זמין');
+        }
+        
+        // ריענון אוטומטי אחרי 1.5 שניות
+        setTimeout(() => {
+            window.location.reload();
+        }, 1500);
+        
+    } catch (error) {
+        console.error('❌ שגיאה בניקוי מלא:', error);
+    }
+};
+
+/**
+ * ניקוי מטמון לפני פעולות CRUD - פונקציה שמוזכרת במקומות רבים
+ * @param {string} entity - שם הישות (trades, alerts, trading_accounts, etc.)
+ * @param {string} operation - סוג הפעולה (add, edit, delete, cancel)
+ */
+window.clearCacheBeforeCRUD = async function(entity, operation) {
+    console.log(`🧹 ניקוי מטמון לפני ${operation} של ${entity}...`);
+    
+    try {
+        if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+            // ניקוי מהיר לפני פעולות CRUD
+            await window.UnifiedCacheManager.clearAllCacheQuick();
+        } else {
+            console.warn('⚠️ UnifiedCacheManager לא זמין - ניקוי בסיסי');
+            // fallback לניקוי בסיסי
+            localStorage.removeItem(`${entity}_cache`);
+            sessionStorage.removeItem(`${entity}_cache`);
+        }
+        
+        console.log(`✅ ניקוי מטמון לפני ${operation} של ${entity} הושלם`);
+        
+    } catch (error) {
+        console.error(`❌ שגיאה בניקוי מטמון לפני ${operation} של ${entity}:`, error);
     }
 };
 

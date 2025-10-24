@@ -1226,7 +1226,9 @@ async function loadLinkedItemsFromMultipleSources(executionId) {
           trade.id === execution.trade_id,
         );
       }
-    } catch { /* // console.warn('לא ניתן לטעון טריידים:', e); */ }
+    } catch (e) { 
+      console.warn('לא ניתן לטעון טריידים:', e); 
+    }
 
     // טעינת תכנונים
     try {
@@ -1238,7 +1240,9 @@ async function loadLinkedItemsFromMultipleSources(executionId) {
           plan.trade_id === execution.trade_id,
         );
       }
-    } catch { /* // console.warn('לא ניתן לטעון תכנונים:', e); */ }
+    } catch (e) { 
+      console.warn('לא ניתן לטעון תכנונים:', e); 
+    }
 
     // טעינת התראות
     try {
@@ -1251,7 +1255,9 @@ async function loadLinkedItemsFromMultipleSources(executionId) {
                     alert.status === 'open',
         );
       }
-    } catch { /* // console.warn('לא ניתן לטעון התראות:', e); */ }
+    } catch (e) { 
+      console.warn('לא ניתן לטעון התראות:', e); 
+    }
 
     // טעינת הערות
     try {
@@ -1263,7 +1269,9 @@ async function loadLinkedItemsFromMultipleSources(executionId) {
           note.related_type_id === 5 && note.related_id === executionId,
         );
       }
-    } catch { /* // console.warn('לא ניתן לטעון הערות:', e); */ }
+    } catch (e) { 
+      console.warn('לא ניתן לטעון הערות:', e); 
+    }
 
     displayLinkedItems(linkedItems);
 

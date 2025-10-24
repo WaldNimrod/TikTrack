@@ -180,6 +180,8 @@ const PAGE_CONFIGS = {
         requiredGlobals: [
             'NotificationSystem',
             'DataUtils',
+            'window.Logger',
+            'window.CacheSyncManager',
             'window.loadDashboardData'
         ],
         
@@ -238,6 +240,8 @@ const PAGE_CONFIGS = {
         requiredGlobals: [
             'NotificationSystem',
             'DataUtils',
+            'window.Logger',
+            'window.CacheSyncManager',
             'window.initializePreferences'
         ],
         
@@ -296,6 +300,8 @@ const PAGE_CONFIGS = {
         requiredGlobals: [
             'NotificationSystem',
             'DataUtils',
+            'window.Logger',
+            'window.CacheSyncManager',
             'window.loadTradesData'
         ],
         
@@ -355,6 +361,8 @@ const PAGE_CONFIGS = {
         requiredGlobals: [
             'NotificationSystem',
             'DataUtils',
+            'window.Logger',
+            'window.CacheSyncManager',
             'window.loadExecutionsData'
         ],
         

@@ -2613,48 +2613,8 @@ window.clearLogs = async function() {
     }
 };
 
-window.clearCache = async function() {
-    if (window.serverMonitor) {
-        // הוספת משוב ויזואלי
-        const button = event?.target || document.querySelector('button[onclick*="clearCache"]');
-        if (button) {
-            button.disabled = true;
-            button.innerHTML = '🗑️ מנקה...';
-        }
-        
-        try {
-            await window.serverMonitor.clearCache();
-            
-            // הודעת הצלחה
-            if (typeof window.showNotification === 'function') {
-                window.showNotification('Cache נוקה בהצלחה', 'success');
-            } else if (typeof window.showSuccessNotification === 'function') {
-                window.showSuccessNotification('Cache נוקה בהצלחה');
-            } else {
-                console.log('✅ Cache נוקה בהצלחה');
-            }
-        } catch (error) {
-            // הודעת שגיאה
-            if (typeof window.showNotification === 'function') {
-                window.showNotification('שגיאה בניקוי Cache', 'error');
-            } else if (typeof window.showErrorNotification === 'function') {
-                window.showErrorNotification('שגיאה בניקוי Cache');
-            } else {
-                console.error('❌ שגיאה בניקוי Cache');
-            }
-        } finally {
-            if (button) {
-                button.disabled = false;
-                button.innerHTML = '🗑️ נקה Cache';
-            }
-        }
-    } else {
-        console.error('❌ serverMonitor instance לא קיים');
-        if (window.showNotification) {
-            window.showNotification('serverMonitor לא אותחל', 'error');
-        }
-    }
-};
+// clearCache function moved to UnifiedCacheManager to avoid duplication
+// Use window.clearCacheQuick() or window.clearAllCacheAdvanced() instead
 
 window.checkApiHealth = async function() {
     if (window.serverMonitor) {

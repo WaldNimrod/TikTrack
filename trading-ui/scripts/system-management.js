@@ -431,7 +431,9 @@ class SystemManagement {
   static clearCache() {
     console.log('🗑️ Clearing cache...');
     // Use global cache clearing function
-    if (typeof window.clearAllCache === 'function') {
+    if (typeof window.clearAllCacheAdvanced === 'function') {
+      window.clearAllCacheAdvanced();
+    } else if (typeof window.clearAllCache === 'function') {
       window.clearAllCache();
     } else {
       // Fallback if global function not available

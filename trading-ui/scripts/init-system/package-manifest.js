@@ -143,46 +143,53 @@ const PACKAGE_MANIFEST = {
         loadOrder: 7
       },
       {
+        file: 'logger-service.js',
+        globalCheck: 'window.Logger',
+        description: 'שירות לוגים מתקדם',
+        required: false,
+        loadOrder: 8
+      },
+      {
         file: 'header-system.js',
         globalCheck: 'window.HeaderSystem',
         description: 'מערכת כותרת',
         required: true,
-        loadOrder: 8
+        loadOrder: 9
       },
       {
         file: 'page-utils.js',
         globalCheck: 'window.loadPageState',
         description: 'כלי עזר עמוד',
         required: true,
-        loadOrder: 9
+        loadOrder: 10
       },
       {
         file: 'translation-utils.js',
         globalCheck: 'window.translateStatus',
         description: 'תרגומים',
         required: true,
-        loadOrder: 10
+        loadOrder: 11
       },
       {
         file: 'button-icons.js',
         globalCheck: 'window.BUTTON_ICONS',
         description: 'מערכת איקונים וכפתורים',
         required: true,
-        loadOrder: 11
+        loadOrder: 12
       },
       {
         file: 'button-system-init.js',
         globalCheck: 'window.ButtonSystem',
         description: 'מערכת כפתורים',
         required: true,
-        loadOrder: 12
+        loadOrder: 13
       },
       {
         file: 'color-scheme-system.js',
         globalCheck: 'window.loadDynamicColors',
         description: 'מערכת צבעים דינמית',
         required: true,
-        loadOrder: 13
+        loadOrder: 14
       }
     ],
     estimatedSize: '~280KB',

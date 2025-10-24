@@ -94,19 +94,22 @@ class FieldRendererService {
      * 
      * @example
      * const html = FieldRendererService.renderNumericValue(5.2, '%', true);
-     * // Output: '<span class="profit-positive">+5.2%</span>'
+     * // Output RTL: '<span class="numeric-value-positive">+5.2%</span>'
      */
     static renderNumericValue(value, suffix = '', showPrefix = false) {
         if (value === null || value === undefined || value === '' || isNaN(value)) {
-            return '<span class="profit-neutral">-</span>';
+            return '<span class="numeric-value-zero">-</span>';
         }
         
         const numValue = typeof value === 'string' ? parseFloat(value) : value;
-        const cssClass = numValue > 0 ? 'profit-positive' : (numValue < 0 ? 'profit-negative' : 'profit-neutral');
-        const prefix = (numValue > 0 && showPrefix) ? '+' : '';
-        const displayValue = numValue.toFixed(2);
+        const cssClass = numValue > 0 ? 'numeric-value-positive' : (numValue < 0 ? 'numeric-value-negative' : 'numeric-value-zero');
+        const prefix = (numValue > 0 && showPrefix) ? '+' : (numValue < 0 ? '-' : '');
+        const displayValue = Math.abs(numValue).toFixed(2);
         
-        return `<span class="${cssClass}">${prefix}${displayValue}${suffix}</span>`;
+        // RTL: מספר קודם (ימין), אחר כך סיומת (שמאל), אחר כך סימן +/- (אם יש)
+        // עבור ערכים שליליים: מספר%-
+        // עבור ערכים חיוביים: מספר%+
+        return `<span class="${cssClass}">${displayValue}${suffix}${prefix}</span>`;
     }
 
     /**
@@ -173,19 +176,19 @@ class FieldRendererService {
      * @param {number} value - ערך מספרי
      * @param {string} currencySymbol - סמל מטבע ($, ₪, €)
      * @param {number} decimals - מספר ספרות אחרי נקודה (ברירת מחדל 2)
-     * @returns {string} - HTML מיושר RTL עם סימן בסוף (משמאל)
+     * @returns {string} - HTML עם סימן משמאל למספר (RTL)
      * 
      * @example
      * const html = FieldRendererService.renderAmount(1234.56, '$');
-     * // Output RTL: '1,234.56 $' (סימן משמאל)
+     * // Output RTL: '1,234.56$' (סימן משמאל למספר)
      */
-    static renderAmount(value, currencySymbol = '$', decimals = 2) {
+    static renderAmount(value, currencySymbol = '$', decimals = 0) {
         if (value === null || value === undefined) return '-';
-        const formatted = Number(value).toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
-        const colorClass = value >= 0 ? 'text-success' : 'text-danger';
-        const sign = value >= 0 ? '+' : '';
-        // RTL: number first (right), then symbol (left in LTR span)
-        return `<span class="amount-display ${colorClass}" dir="ltr">${sign}${formatted} ${currencySymbol}</span>`;
+        const formatted = Math.abs(Number(value)).toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+        const colorClass = value >= 0 ? 'numeric-value-positive' : 'numeric-value-negative';
+        const sign = value >= 0 ? '+' : '-';
+        // RTL: מספר קודם (ימין), אחר כך סימן מטבע (שמאל), אחר כך סימן +/- (אם יש)
+        return `<span class="${colorClass}">${formatted}${currencySymbol}${sign}</span>`;
     }
 
     /**
@@ -292,6 +295,9 @@ class FieldRendererService {
         const type = this._resolveEntityType(relatedType);
         const label = this._getEntityHebrewLabel(type);
         const text = (typeof displayName === 'string' && displayName) ? displayName : label;
+        
+        // Check if short format is requested
+        const isShort = meta && meta.short === true;
 
         // Select icon path by entity type (using existing icons set)
         const iconMap = {
@@ -341,6 +347,35 @@ class FieldRendererService {
                 : (metaObj && typeof metaObj.name === 'string' ? metaObj.name : '');
             tickerText = accountName || '';
             dateShort = '';
+        }
+        
+        // For trade_plan: use planned amount instead of ticker symbol
+        if (type === 'trade_plan') {
+            if (metaObj && metaObj.planned_amount) {
+                tickerText = `$${Number(metaObj.planned_amount).toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
+            } else if (typeof displayName === 'string' && displayName) {
+                tickerText = displayName;
+            }
+            // Show only day and month for trade plans
+            if (metaObj && metaObj.date) {
+                dateShort = (typeof FieldRendererService !== 'undefined' && FieldRendererService.renderDateShort)
+                    ? FieldRendererService.renderDateShort(metaObj.date)
+                    : FieldRendererService._formatDateDdMm(metaObj.date);
+            }
+        }
+        
+        // Short format: return simple text without full badge structure
+        if (isShort) {
+            if (type === 'trade_plan') {
+                console.log('🔍 renderLinkedEntity DEBUG:', { metaObj, planned_amount: metaObj?.planned_amount, date: metaObj?.date });
+                const amount = metaObj && metaObj.planned_amount ? `$${Number(metaObj.planned_amount).toLocaleString('en-US', { maximumFractionDigits: 0 })}` : '';
+                // Force DD/MM format for testing
+                const date = metaObj && metaObj.date ? FieldRendererService._formatDateDdMm(metaObj.date) : '';
+                console.log('🔍 renderLinkedEntity RESULT:', { amount, date, result: `${amount} ${date}`.trim() });
+                return `<a href="#" onclick="if (window.showEntityDetails) { showEntityDetails('trade_plan', ${relatedId}); } return false;" class="plan-link" data-plan-id="${relatedId}">${amount} ${date}</a>`.trim();
+            }
+            // For other types, return simple text
+            return `<a href="#" onclick="if (window.showEntityDetails) { showEntityDetails('${type}', ${relatedId}); } return false;" class="linked-entity-short">${text}</a>`;
         }
 
         // Status HTML if exists
@@ -520,6 +555,37 @@ class FieldRendererService {
     }
 
     /**
+     * רנדור פוזיציה עם יחידות (ללא ספרות אחרי נקודה)
+     * 
+     * @param {number} quantity - כמות הפוזיציה
+     * @param {number} averagePrice - מחיר ממוצע
+     * @param {string} currencySymbol - סמל מטבע (ברירת מחדל $)
+     * @returns {string} - HTML עם פורמט RTL: 8,000$(150#)
+     * 
+     * @example
+     * const html = FieldRendererService.renderPosition(150, 53.33);
+     * // Output RTL: '<span class="position-display">8,000$(150#)</span>'
+     */
+    static renderPosition(quantity, averagePrice, currencySymbol = '$') {
+        if (!quantity || quantity === 0) {
+            return '<span class="numeric-value-zero">אין ביצועים</span>';
+        }
+        
+        if (!averagePrice || averagePrice === 0) {
+            return '<span class="numeric-value-zero">-</span>';
+        }
+        
+        const totalValue = Math.abs(quantity * averagePrice);
+        const formattedValue = totalValue.toLocaleString('en-US', { maximumFractionDigits: 0 });
+        const formattedQuantity = Math.abs(quantity).toLocaleString('en-US', { maximumFractionDigits: 0 });
+        
+        const colorClass = quantity > 0 ? 'numeric-value-positive' : 'numeric-value-negative';
+        
+        // RTL: ערך קודם (ימין), אחר כך סימן מטבע (שמאל), ואז יחידות בסוגריים
+        return `<span class="position-display ${colorClass}">${formattedValue}${currencySymbol}(${formattedQuantity}#)</span>`;
+    }
+
+    /**
      * רנדור בוליאני (כן/לא) עם איקונים
      * 
      * @param {boolean|string|number} value - ערך בוליאני (true, false, 1, 0, 'yes', 'no', 'כן', 'לא')
@@ -680,6 +746,7 @@ window.renderAction = (action) => FieldRendererService.renderAction(action);
 window.renderPriority = (priority) => FieldRendererService.renderPriority(priority);
 window.renderDate = (date, includeTime) => FieldRendererService.renderDate(date, includeTime);
 window.renderShares = (shares, cssClass) => FieldRendererService.renderShares(shares, cssClass);
+window.renderPosition = (quantity, averagePrice, currencySymbol) => FieldRendererService.renderPosition(quantity, averagePrice, currencySymbol);
 window.renderBoolean = (value, size) => FieldRendererService.renderBoolean(value, size);
 window.renderTickerInfo = (ticker, cssClass) => FieldRendererService.renderTickerInfo(ticker, cssClass);
 window.renderVolume = (volume, showMillions) => FieldRendererService.renderVolume(volume, showMillions);

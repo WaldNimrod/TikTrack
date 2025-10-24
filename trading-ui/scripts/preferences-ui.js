@@ -507,30 +507,20 @@ class PreferencesUI {
                 const stats = window.LazyLoader.getLoadingStats();
                 console.log(`🔍 CACHE DEBUG: Lazy loading stats: ${stats.loaded}/${stats.total} (${stats.percentage}%)`);
                 
-                // Load critical preferences immediately
-                const criticalPrefs = window.LazyLoader.classifier.getPreferencesByClassification('critical');
-                const preferences = {};
+                // Load ALL preferences at once from API
+                const allPreferences = await window.PreferencesCore.getAllPreferences(userId || this.currentUserId, profileId || this.currentProfileId);
+                console.log(`✅ Loaded ${Object.keys(allPreferences).length} preferences from API`);
                 
-                for (const prefName of criticalPrefs) {
-                    try {
-                        const value = await window.PreferencesCore.getPreference(prefName, userId, profileId);
-                        preferences[prefName] = value;
-                        console.log(`🔍 CACHE DEBUG: Loaded ${prefName} = ${value}`);
-                    } catch (error) {
-                        console.warn(`⚠️ Failed to load critical preference ${prefName}:`, error);
-                    }
-                }
-                
-                // Populate form with critical preferences
-                this.formManager.populateForm(preferences);
+                // Populate form with ALL preferences
+                this.formManager.populateForm(allPreferences);
                 
                 // Update counters
-                await this.updateCounters(preferences);
+                await this.updateCounters(allPreferences);
                 
                 // Load profiles to dropdown
                 await window.loadProfilesToDropdown();
                 
-                this.loadingManager.stopLoading(loaderId, true, `נטענו ${Object.keys(preferences).length} העדפות קריטיות`);
+                this.loadingManager.stopLoading(loaderId, true, `נטענו ${Object.keys(allPreferences).length} העדפות`);
                 
             } else {
                 console.log('⚠️ LazyLoader not available, using standard loading');

@@ -146,108 +146,6 @@ function getInvestmentTypeColor(investmentType) {
   return typeColors[normalizedType] || '#6c757d'; // ברירת מחדל אפור
 }
 
-/**
- * הוספת סולם צבעים לעמודת סוג השקעה
- */
-function addInvestmentTypeColorLegend() {
-  const tableContainer = document.querySelector('#tradesTable').closest('.table-container') ||
-                        document.querySelector('#tradesTable').parentElement;
-
-  if (!tableContainer) {return;}
-
-  // בדיקה אם כבר קיים סולם צבעים
-  const existingLegend = tableContainer.querySelector('.investment-type-legend');
-  if (existingLegend) {
-    existingLegend.remove();
-  }
-
-  const legendContainer = document.createElement('div');
-  legendContainer.className = 'investment-type-legend';
-  legendContainer.style.cssText = `
-    margin: 10px 0;
-    padding: 8px 12px;
-    background: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 6px;
-    font-size: 0.85em;
-  `;
-
-  const legendTitle = document.createElement('div');
-  legendTitle.textContent = '🎨 סולם צבעים - סוגי השקעה:';
-  legendTitle.style.cssText = `
-    font-weight: bold;
-    margin-bottom: 8px;
-    color: #495057;
-  `;
-
-  const legendItems = document.createElement('div');
-  legendItems.style.cssText = `
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    align-items: center;
-  `;
-
-  // השתמש במערכת הצבעים הכללית אם היא זמינה
-  const typeLabels = window.INVESTMENT_TYPE_LABELS || {
-    'swing': 'סווינג',
-    'investment': 'השקעה',
-    'passive': 'פאסיבי',
-  };
-
-  // השתמש במערכת הצבעים הכללית אם היא זמינה
-  if (window.createInvestmentTypeLegend) {
-    const globalLegend = window.createInvestmentTypeLegend({
-      title: '🎨 סולם צבעים - סוגי השקעה:',
-      containerClass: 'investment-type-legend',
-      showDescriptions: false,
-      compact: false,
-    });
-
-    // החלף את התוכן הקיים
-    legendContainer.innerHTML = '';
-    legendContainer.appendChild(globalLegend);
-  } else {
-    // ברירת מחדל אם המערכת הכללית לא זמינה
-    Object.entries(typeLabels).forEach(([type, label]) => {
-      const color = getInvestmentTypeColor(type);
-      const legendItem = document.createElement('span');
-      legendItem.style.cssText = `
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        padding: 2px 6px;
-        border-radius: 4px;
-        background: white;
-        border: 1px solid #dee2e6;
-        font-size: 0.8em;
-      `;
-
-      const colorDot = document.createElement('span');
-      colorDot.style.cssText = `
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        background-color: ${color};
-        border: 1px solid #dee2e6;
-      `;
-
-      const labelText = document.createElement('span');
-      labelText.textContent = label;
-
-      legendItem.appendChild(colorDot);
-      legendItem.appendChild(labelText);
-      legendItems.appendChild(legendItem);
-    });
-  }
-
-  legendContainer.appendChild(legendTitle);
-  legendContainer.appendChild(legendItems);
-
-  // הוספה לפני הטבלה
-  const table = document.querySelector('#tradesTable');
-  tableContainer.insertBefore(legendContainer, table);
-}
 
 /**
  * טעינת נתוני טריידים מהשרת
@@ -293,6 +191,7 @@ async function loadTradesData() {
       ticker_symbol: trade.ticker_symbol,
       trade_plan_id: trade.trade_plan_id,
       trade_plan_created_at: trade.trade_plan_created_at, // תאריך יצירה של התוכנית
+      trade_plan_planned_amount: trade.trade_plan_planned_amount, // סכום מתוכנן של התוכנית
       status: trade.status,
       investment_type: trade.investment_type,
       side: trade.side,
@@ -456,7 +355,7 @@ async function updateTradesTable(trades) {
       <td class="price-cell">${(() => {
         const tickerData = tickerDataMap[trade.ticker_id];
         const currentPrice = tickerData?.current_price || trade.current_price;
-        return currentPrice ? (window.formatCurrency ? window.formatCurrency(parseFloat(currentPrice), 'USD') : `$${parseFloat(currentPrice).toFixed(2)}`) : '-';
+        return currentPrice ? (window.FieldRendererService ? window.FieldRendererService.renderAmount(parseFloat(currentPrice), '$', 2) : `$${parseFloat(currentPrice).toFixed(2)}`) : '-';
       })()}</td>
       <td class="change-cell">${(() => {
         const tickerData = tickerDataMap[trade.ticker_id];
@@ -476,36 +375,33 @@ async function updateTradesTable(trades) {
           dailyChange = mockChanges[tickerSymbol] || 0;
         }
         
-        return formatDailyChange(dailyChange);
+        return window.FieldRendererService ? window.FieldRendererService.renderNumericValue(dailyChange, '%', true) : formatDailyChange(dailyChange);
       })()}</td>
-      <td class="status-cell" data-status="${trade.status || ''}">${window.FieldRendererService ? window.FieldRendererService.renderStatus(trade.status, 'trade') : `<span class="status-badge status-${trade.status || 'open'}">${trade.status === 'closed' ? 'סגור' : trade.status === 'cancelled' ? 'מבוטל' : 'פתוח'}</span>`}</td>
-      <td class="type-cell" data-type="${typeForFilter}">
-        ${window.FieldRendererService ? window.FieldRendererService.renderType(trade.investment_type) : `<span class='investment-type-badge' style='background-color: ${getInvestmentTypeColor(trade.investment_type)}; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.85em; font-weight: 500;'>${window.translateTradeType ? window.translateTradeType(trade.investment_type) : trade.investment_type || '-'}</span>`}
-      </td>
-      <td class="side-cell" data-side="${trade.side || 'Long'}">
-        ${window.FieldRendererService ? window.FieldRendererService.renderSide(trade.side) : `<span class="side-badge ${trade.side === 'Long' ? 'side-long' : 'side-short'}">${trade.side || 'Long'}</span>`}
-      </td>
-      <td class="plan-cell">${trade.trade_plan_id ? `<a href="#" onclick="viewTradePlanDetails('${trade.trade_plan_id}')" class="plan-link" data-plan-id="${trade.trade_plan_id}">טוען...</a>` : '-'}</td>
-      <td data-date="${trade.created_at}">${trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : 'לא מוגדר'}</td>
-      <td>${trade.closed_at ? new Date(trade.closed_at).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : trade.cancelled_at ? new Date(trade.cancelled_at).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : ''}</td>
-      <td><strong><a href="#" onclick="viewAccountDetails('${trade.account_id}')" class="account-link">${trade.account_name || trade.account_id || 'חשבון לא ידוע'}</a></strong></td>
       <td class="position-quantity-cell">
         ${(() => {
           if (!trade.position || trade.position.quantity === 0) {
             return '<span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">אין ביצועים</span>';
           }
           const qty = trade.position.quantity;
-          const colorClass = qty > 0 ? 'numeric-value-positive' : 'numeric-value-negative';
-          return `<span class="${colorClass}" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">${Math.abs(qty).toFixed(2)}</span>`;
+          const avgPrice = trade.position.average_price || 0;
+          return window.FieldRendererService ? window.FieldRendererService.renderPosition(qty, avgPrice, '$') : `<span class="numeric-value-positive">${Math.abs(qty).toFixed(0)}</span>`;
         })()}
       </td>
-      <td class="position-avg-price-cell">
+      <td class="position-pl-percent-cell">
         ${(() => {
           if (!trade.position || !trade.position.average_price) {
             return '<span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">-</span>';
           }
+          const tickerData = tickerDataMap[trade.ticker_id];
+          const currentPrice = tickerData?.current_price || 0;
           const avgPrice = trade.position.average_price;
-          return window.formatCurrency ? window.formatCurrency(avgPrice, 'USD') : `$${avgPrice.toFixed(2)}`;
+          
+          if (currentPrice === 0 || avgPrice === 0) {
+            return '<span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">-</span>';
+          }
+          
+          const plPercent = ((currentPrice - avgPrice) / avgPrice) * 100;
+          return window.FieldRendererService ? window.FieldRendererService.renderNumericValue(plPercent, '%', true) : `<span class="numeric-value-positive">${plPercent >= 0 ? '+' : ''}${plPercent.toFixed(2)}%</span>`;
         })()}
       </td>
       <td class="position-pl-value-cell">
@@ -523,30 +419,32 @@ async function updateTradesTable(trades) {
           }
           
           const plValue = (currentPrice - avgPrice) * qty;
-          const formattedPL = window.formatCurrency ? window.formatCurrency(plValue, 'USD') : `$${plValue.toFixed(2)}`;
-          const colorClass = plValue >= 0 ? 'numeric-value-positive' : 'numeric-value-negative';
-          return `<span class="${colorClass}" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">${formattedPL}</span>`;
+          return window.FieldRendererService ? window.FieldRendererService.renderAmount(plValue, '$', 2) : `<span class="numeric-value-positive">$${plValue.toFixed(2)}</span>`;
         })()}
       </td>
-      <td class="position-pl-percent-cell">
-        ${(() => {
-          if (!trade.position || !trade.position.average_price) {
-            return '<span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">-</span>';
-          }
-          const tickerData = tickerDataMap[trade.ticker_id];
-          const currentPrice = tickerData?.current_price || 0;
-          const avgPrice = trade.position.average_price;
-          
-          if (currentPrice === 0 || avgPrice === 0) {
-            return '<span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">-</span>';
-          }
-          
-          const plPercent = ((currentPrice - avgPrice) / avgPrice) * 100;
-          const formattedPL = `${plPercent >= 0 ? '+' : ''}${plPercent.toFixed(2)}%`;
-          const colorClass = plPercent >= 0 ? 'numeric-value-positive' : 'numeric-value-negative';
-          return `<span class="${colorClass}" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">${formattedPL}</span>`;
-        })()}
+      <td class="status-cell" data-status="${trade.status || ''}">${window.FieldRendererService ? window.FieldRendererService.renderStatus(trade.status, 'trade') : `<span class="status-badge status-${trade.status || 'open'}">${trade.status === 'closed' ? 'סגור' : trade.status === 'cancelled' ? 'מבוטל' : 'פתוח'}</span>`}</td>
+      <td class="type-cell" data-type="${typeForFilter}">
+        ${window.FieldRendererService ? window.FieldRendererService.renderType(trade.investment_type) : `<span class='investment-type-badge' style='background-color: ${getInvestmentTypeColor(trade.investment_type)}; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.85em; font-weight: 500;'>${window.translateTradeType ? window.translateTradeType(trade.investment_type) : trade.investment_type || '-'}</span>`}
       </td>
+      <td class="side-cell" data-side="${trade.side || 'Long'}">
+        ${window.FieldRendererService ? window.FieldRendererService.renderSide(trade.side) : `<span class="side-badge ${trade.side === 'Long' ? 'side-long' : 'side-short'}">${trade.side || 'Long'}</span>`}
+      </td>
+      <td class="plan-cell">${trade.trade_plan_id ? (window.FieldRendererService ? (() => {
+        console.log('🔍 trades.js DEBUG:', { 
+          trade_plan_id: trade.trade_plan_id, 
+          trade_plan_planned_amount: trade.trade_plan_planned_amount, 
+          trade_plan_created_at: trade.trade_plan_created_at 
+        });
+        return window.FieldRendererService.renderLinkedEntity('trade_plan', trade.trade_plan_id, trade.trade_plan_planned_amount || '', { 
+          ticker: trade.ticker_symbol, 
+          date: trade.trade_plan_created_at, 
+          planned_amount: trade.trade_plan_planned_amount, 
+          short: true 
+        });
+      })() : `<span class="text-danger">❌ FieldRendererService לא זמין</span>`) : '-'}</td>
+      <td><strong><a href="#" onclick="viewAccountDetails('${trade.account_id}')" class="account-link">${trade.account_name || trade.account_id || 'חשבון לא ידוע'}</a></strong></td>
+      <td data-date="${trade.created_at}">${trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : 'לא מוגדר'}</td>
+      <td>${trade.closed_at ? new Date(trade.closed_at).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : trade.cancelled_at ? new Date(trade.cancelled_at).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : ''}</td>
       <td class="actions-cell">
         <div class="d-flex gap-1 justify-content-center align-items-center" style="flex-wrap: nowrap;">
           ${(() => {
@@ -580,9 +478,6 @@ async function updateTradesTable(trades) {
 
   // טעינת תאריכי יצירה של תוכניות
   loadTradePlanDates();
-
-  // הוספת סולם צבעים לעמודת סוג השקעה
-  addInvestmentTypeColorLegend();
 }
 
 // פונקציות נוספות

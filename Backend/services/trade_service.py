@@ -19,7 +19,8 @@ class TradeService:
         
         trades = db.query(Trade).options(
             joinedload(Trade.account),
-            joinedload(Trade.ticker)
+            joinedload(Trade.ticker),
+            joinedload(Trade.trade_plan)
         ).all()
         
         logger.info(f"Loaded {len(trades)} trades")

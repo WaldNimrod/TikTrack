@@ -262,116 +262,15 @@ async function switchActiveProfile() {
             console.log('✅ PreferencesUI currentProfileId synchronized');
         }
         
-        // 7. Show success notification
+        // Profile switch completed successfully
+        console.log('✅ Profile switch completed successfully');
+        
+        // Show success notification
         if (typeof window.showSuccessNotification === 'function') {
-            window.showSuccessNotification(`פרופיל הוחלף ל: ${profile.name}`);
+            window.showSuccessNotification(`פרופיל הוחלף ל: ${profile.name} בהצלחה!`);
         }
         
-        // 8. Reload all form data for the new profile
-        console.log('🔍 PROFILE DEBUG: Profile switch completed successfully');
-        console.log('🔍 CACHE DEBUG: Final cache state:', window.PreferencesCore?.cacheManager?.getAll?.() || 'Cache not available');
-        
-        // Show loading notification
-        if (typeof window.showInfoNotification === 'function') {
-            window.showInfoNotification(`טוען נתונים לפרופיל: ${profile.name}...`);
-        }
-        
-        // Reload all preferences and form data for the new profile
-        console.log('🔄 Reloading all form data for new profile...');
-        try {
-            // First, reload the active profile from server to get the correct one
-            if (window.PreferencesUI && typeof window.PreferencesUI.loadActiveProfile === 'function') {
-                console.log('🔄 Reloading active profile from server...');
-                const activeProfileId = await window.PreferencesUI.loadActiveProfile();
-                console.log(`✅ Active profile reloaded: ${activeProfileId}`);
-            }
-            
-            // Reload preferences using the UI system with cache-busting
-            if (window.PreferencesUI && typeof window.PreferencesUI.loadAllPreferences === 'function') {
-                console.log('🔄 Reloading preferences with cache-busting...');
-                console.log(`🔄 Using cache buster: ${window.cacheBuster || 'none'}`);
-                await window.PreferencesUI.loadAllPreferences(1, profile.id);
-                console.log('✅ Preferences reloaded for new profile');
-            }
-            
-            // Reload profiles dropdown to show current active profile
-            if (typeof window.loadProfilesToDropdown === 'function') {
-                console.log('🔄 Reloading profiles dropdown to show active profile...');
-                await window.loadProfilesToDropdown();
-                console.log('✅ Profiles dropdown reloaded');
-                
-                // Verify the dropdown shows the correct active profile
-                const profileSelectElement = document.getElementById('profileSelect');
-                if (profileSelectElement) {
-                    const selectedValue = profileSelectElement.value;
-                    console.log(`🔍 UI DEBUG: Dropdown now shows: ${selectedValue}`);
-                    console.log(`🔍 UI DEBUG: Expected profile: ${profile.name}`);
-                    
-                    // Force update the dropdown if it doesn't match
-                    if (selectedValue !== profile.name) {
-                        console.log(`⚠️ MISMATCH: Dropdown shows "${selectedValue}" but expected "${profile.name}"`);
-                        console.log(`🔄 Forcing dropdown update...`);
-                        
-                        // Find and select the correct option
-                        const correctOption = profileSelectElement.querySelector(`option[value="${profile.name}"]`);
-                        if (correctOption) {
-                            correctOption.selected = true;
-                            console.log(`✅ Forced selection of "${profile.name}" in dropdown`);
-                        } else {
-                            console.error(`❌ Option "${profile.name}" not found in dropdown!`);
-                            console.log(`🔍 Available options:`, Array.from(profileSelectElement.options).map(opt => opt.value));
-        }
-    } else {
-                        console.log(`✅ Dropdown correctly shows "${profile.name}"`);
-                    }
-                }
-            }
-            
-            // Update active profile info display in the new card format
-            const activeProfileName = document.getElementById('activeProfileName');
-            const activeProfileDescription = document.getElementById('activeProfileDescription');
-            
-            if (activeProfileName) {
-                activeProfileName.textContent = profile.name;
-            }
-            if (activeProfileDescription) {
-                activeProfileDescription.textContent = profile.description || 'פרופיל משתמש';
-            }
-            console.log(`🔍 UI DEBUG: Updated active profile card to: ${profile.name}`);
-            
-            // Check if this is the default profile and disable all preferences
-            const isDefaultProfile = profile.is_default || profile.default || profile.name === 'ברירת מחדל';
-            if (isDefaultProfile) {
-                console.log('🔒 Default profile active - disabling all preferences interface');
-                window.disableAllPreferencesInterface();
-            } else {
-                console.log('✅ User profile active - enabling all preferences interface');
-                window.enableAllPreferencesInterface();
-            }
-            
-            // Show success notification
-            if (typeof window.showSuccessNotification === 'function') {
-                window.showSuccessNotification(`פרופיל הוחלף ל: ${profile.name}! כל הנתונים נטענו מחדש.`);
-            }
-            
-            // Show confirmation dialog before reload
-            const shouldReload = confirm('הפרופיל הוחלף בהצלחה. האם לרענן את העמוד כדי לראות את השינויים?');
-            
-            if (shouldReload) {
-                console.log('🔄 User requested page reload');
-                window.location.reload();
-            }
-            
-            console.log('✅ Profile switch completed - all form data reloaded');
-            
-        } catch (error) {
-            console.error('❌ Error reloading form data:', error);
-            if (typeof window.showErrorNotification === 'function') {
-                window.showErrorNotification(`שגיאה בטעינת נתונים לפרופיל החדש: ${error.message}`);
-            }
-        }
-        
-            } catch (error) {
+    } catch (error) {
         console.error('❌ Error switching profile:', error);
         
         const errorMessage = error.message || error.toString() || 'Unknown error occurred';

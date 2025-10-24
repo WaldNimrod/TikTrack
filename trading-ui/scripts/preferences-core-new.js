@@ -144,7 +144,7 @@ class PreferencesAPIClient {
      */
     async getPreference(preferenceName, userId = null, profileId = null) {
         const params = {
-            name: preferenceName,
+            preference_name: preferenceName,
             user_id: userId || this.defaultUserId
         };
         
@@ -152,7 +152,7 @@ class PreferencesAPIClient {
             params.profile_id = profileId;
         }
         
-        const result = await this.get('/user/preference', params);
+        const result = await this.get('/user/single', params);
         return result.data?.value;
     }
     
@@ -448,21 +448,34 @@ class PreferencesCore {
             const isLoaded = window.LazyLoader.isLoaded(preferenceName);
             if (!isLoaded) {
                 console.log(`🎯 Loading ${preferenceName} on demand via lazy loader`);
-                // Load directly from API to avoid infinite loop
-                const value = await this.apiClient.getPreference(
-                    preferenceName, 
-                    userId || this.currentUserId, 
-                    profileId || this.currentProfileId
-                );
-                
-                // Save to UnifiedCacheManager
-                if (window.UnifiedCacheManager) {
-                    await window.UnifiedCacheManager.save(cacheKey, value, {
-                        layer: 'localStorage',
-                        ttl: 300000
-                    });
+                // Load all preferences at once from API
+                try {
+                    const response = await fetch(`/api/preferences/user?user_id=${userId || this.currentUserId}&profile_id=${profileId || this.currentProfileId}`);
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    const result = await response.json();
+                    if (!result.success) {
+                        throw new Error(result.error || 'Failed to load preferences');
+                    }
+                    
+                    const allPreferences = result.data.preferences;
+                    const value = allPreferences[preferenceName];
+                    
+                    // Save to UnifiedCacheManager
+                    if (window.UnifiedCacheManager) {
+                        await window.UnifiedCacheManager.save(cacheKey, value, {
+                            layer: 'localStorage',
+                            ttl: 300000
+                        });
+                    }
+                    
+                    return value;
+                } catch (error) {
+                    console.error(`❌ Error loading preferences:`, error);
+                    return null;
                 }
-                return value;
             }
         }
         
@@ -592,20 +605,8 @@ class PreferencesCore {
             );
             
             if (success) {
-                // Invalidate backend cache via CacheSyncManager
-                if (window.CacheSyncManager) {
-                    await window.CacheSyncManager.invalidateByAction('preference-updated');
-                }
-                
-                // Invalidate cache via UnifiedCacheManager
-                const cacheKey = `preference_${preferenceName}_${userId || this.currentUserId}_${profileId || this.currentProfileId}`;
-                if (window.UnifiedCacheManager) {
-                    await window.UnifiedCacheManager.remove(cacheKey);
-                    await window.UnifiedCacheManager.remove(`all_preferences_${userId || this.currentUserId}_${profileId || this.currentProfileId}`);
-                }
-                
                 console.log(`✅ Saved preference ${preferenceName}:`, value);
-                
+
                 return {
                     success: true,
                     validation: { valid: true, errors: [] }
@@ -709,20 +710,8 @@ class PreferencesCore {
             await window.CacheSyncManager.invalidateByAction('profile-switched');
         }
         
-        // Clear preference-specific cache keys only
-        if (window.UnifiedCacheManager) {
-            const keys = await window.UnifiedCacheManager.getAllKeys();
-            const prefKeys = keys.filter(k => 
-                k.includes('preference_') || 
-                k.includes('all_preferences_') || 
-                k === 'user-preferences'
-            );
-            
-            for (const key of prefKeys) {
-                await window.UnifiedCacheManager.remove(key);
-            }
-            console.log(`🧹 Cleared ${prefKeys.length} preference cache keys`);
-        }
+        // Profile switch completed - no cache clearing needed
+        console.log('✅ Profile switch completed successfully');
     }
     
     /**

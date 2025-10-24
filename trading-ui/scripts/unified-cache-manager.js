@@ -1230,21 +1230,37 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
             errors.push(`Preferences Cache Manager: ${error.message}`);
         }
         
-        // 2. Clear localStorage
+        // 2. Clear localStorage (only our keys)
         try {
-            localStorage.clear();
-            clearedLayers.push('localStorage');
-            console.log('✅ localStorage cleared successfully');
+            const keys = Object.keys(localStorage);
+            const ourKeys = keys.filter(key => 
+                key.startsWith('tiktrack_') || 
+                key.startsWith('preference_') || 
+                key.startsWith('all_preferences_') ||
+                key === 'user-preferences'
+            );
+            
+            ourKeys.forEach(key => localStorage.removeItem(key));
+            clearedLayers.push(`localStorage (${ourKeys.length} keys)`);
+            console.log(`✅ localStorage cleared successfully (${ourKeys.length} keys)`);
         } catch (error) {
             console.error('❌ Error clearing localStorage:', error);
             errors.push(`localStorage: ${error.message}`);
         }
         
-        // 3. Clear sessionStorage
+        // 3. Clear sessionStorage (only our keys)
         try {
-            sessionStorage.clear();
-            clearedLayers.push('sessionStorage');
-            console.log('✅ sessionStorage cleared successfully');
+            const keys = Object.keys(sessionStorage);
+            const ourKeys = keys.filter(key => 
+                key.startsWith('tiktrack_') || 
+                key.startsWith('preference_') || 
+                key.startsWith('all_preferences_') ||
+                key === 'user-preferences'
+            );
+            
+            ourKeys.forEach(key => sessionStorage.removeItem(key));
+            clearedLayers.push(`sessionStorage (${ourKeys.length} keys)`);
+            console.log(`✅ sessionStorage cleared successfully (${ourKeys.length} keys)`);
         } catch (error) {
             console.error('❌ Error clearing sessionStorage:', error);
             errors.push(`sessionStorage: ${error.message}`);

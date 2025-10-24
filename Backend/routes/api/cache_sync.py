@@ -16,12 +16,15 @@ Version: 1.0.0
 """
 
 from flask import Blueprint, request, jsonify
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 from services.advanced_cache_service import advanced_cache_service
 from utils.performance_monitor import monitor_performance
 import logging
 
 # Create blueprint
-cache_sync_bp = Blueprint('cache_sync', __name__, url_prefix='/api/cache')
+cache_sync_bp = Blueprint('cache_sync', __name__, url_prefix='/api/cache-sync')
 
 logger = logging.getLogger(__name__)
 

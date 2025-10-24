@@ -262,22 +262,52 @@ class LazyLoader {
         
         console.log(`🔥 Loading ${criticalPrefs.length} critical preferences...`);
         
-        const promises = criticalPrefs.map(async (prefName) => {
-            try {
-                const value = await this.loadSinglePreference(prefName, userId, profileId);
-                this.loadedPreferences.add(prefName);
-                this.loadingStats.critical.loaded++;
-                return { name: prefName, value, success: true };
-            } catch (error) {
-                console.warn(`⚠️ Failed to load critical preference ${prefName}:`, error);
-                return { name: prefName, value: null, success: false, error };
+        try {
+            // Load all preferences at once from API
+            const response = await fetch(`/api/preferences/user?user_id=${userId}&profile_id=${profileId}`);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
-        });
-        
-        const results = await Promise.all(promises);
-        const successCount = results.filter(r => r.success).length;
-        
-        console.log(`✅ Loaded ${successCount}/${criticalPrefs.length} critical preferences`);
+            
+            const result = await response.json();
+            if (!result.success) {
+                throw new Error(result.error || 'Failed to load preferences');
+            }
+            
+            const allPreferences = result.data.preferences;
+            let successCount = 0;
+            
+            // Mark critical preferences as loaded
+            for (const prefName of criticalPrefs) {
+                if (allPreferences.hasOwnProperty(prefName)) {
+                    this.loadedPreferences.add(prefName);
+                    this.loadingStats.critical.loaded++;
+                    successCount++;
+                }
+            }
+            
+            console.log(`✅ Loaded ${successCount}/${criticalPrefs.length} critical preferences`);
+            
+        } catch (error) {
+            console.error('❌ Error loading critical preferences:', error);
+            // Fallback to individual loading
+            const promises = criticalPrefs.map(async (prefName) => {
+                try {
+                    const value = await this.loadSinglePreference(prefName, userId, profileId);
+                    this.loadedPreferences.add(prefName);
+                    this.loadingStats.critical.loaded++;
+                    return { name: prefName, value, success: true };
+                } catch (error) {
+                    console.warn(`⚠️ Failed to load critical preference ${prefName}:`, error);
+                    return { name: prefName, value: null, success: false, error };
+                }
+            });
+            
+            const results = await Promise.all(promises);
+            const successCount = results.filter(r => r.success).length;
+            
+            console.log(`✅ Loaded ${successCount}/${criticalPrefs.length} critical preferences (fallback)`);
+        }
     }
     
     /**

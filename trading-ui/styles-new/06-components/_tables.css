@@ -56,9 +56,10 @@
     cursor: pointer;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 4px;
     width: 100%;
-    text-align: left;
+    text-align: center;
 }
 
 .sortable-header:hover {
@@ -135,14 +136,14 @@
 
 .data-table.executions-table .col-pnl,
 .data-table[data-table-type="executions"] .col-pnl {
-    width: 10%;
-    min-width: 90px;
+  width: 10%; 
+  min-width: 90px;
 }
 
 .data-table.executions-table .col-quantity,
 .data-table[data-table-type="executions"] .col-quantity {
-    width: 8%;
-    min-width: 70px;
+  width: 8%; 
+  min-width: 70px;
 }
 
 .data-table.executions-table .col-commission,
@@ -185,8 +186,8 @@
 
 .data-table.tickers-table .col-currency,
 .data-table[data-table-type="tickers"] .col-currency {
-    width: 8%;
-    min-width: 70px;
+  width: 8%; 
+  min-width: 70px;
 }
 
 .data-table.tickers-table .col-updated,
@@ -431,8 +432,8 @@
 /* ===== Actions Menu System ===== */
 .actions-cell {
     position: relative;
-    text-align: center;
-    vertical-align: middle;
+  text-align: center;
+  vertical-align: middle;
 }
 
 /* Actions Menu styles moved to _actions-menu.css */
@@ -487,8 +488,8 @@
   .col-current,
         .col-company,
         .col-currency {
-            display: none;
-        }
+    display: none; 
+  }
   
   /* מחלקות תפריט נפתח */
   .actions-2-items { width: var(--actions-2-items-width, 50px); min-width: var(--actions-2-items-width, 50px); max-width: var(--actions-2-items-width, 50px); }
@@ -540,8 +541,8 @@
   .col-current,
         .col-company,
         .col-currency {
-            display: none;
-        }
+    display: none; 
+  }
   
   /* מחלקות תפריט נפתח */
   .actions-2-items { width: var(--actions-2-items-width, 50px); min-width: var(--actions-2-items-width, 50px); max-width: var(--actions-2-items-width, 50px); }
@@ -560,4 +561,20 @@
     word-break: keep-all !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
+}
+
+/* ===== Badge Cells - יישור למרכז ===== */
+.status-cell,
+.type-cell,
+.side-cell {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.status-cell .status-badge,
+.type-cell .badge-type,
+.side-cell .badge-long,
+.side-cell .badge-short {
+    display: inline-block;
+    margin: 0 auto;
 }

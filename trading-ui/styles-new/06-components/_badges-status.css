@@ -47,6 +47,11 @@ color: var(--numeric-positive-medium) ;
     font-weight: 600;
 }
 
+.numeric-value-neutral {
+  color: var(--text-color, #333) ;
+  font-weight: 500;
+}
+
 /* Badge Base Styles - סטנדרט אחיד לכל ה-badges */
 .status-badge,
 .badge-long,
@@ -65,6 +70,8 @@ color: var(--numeric-positive-medium) ;
   border: 1px solid;
   position: relative;
   overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Status Categories */

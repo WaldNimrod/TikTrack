@@ -56,6 +56,23 @@ class Trade(BaseModel):
                 "total_pl": getattr(self, 'total_pl', 0)
             }
             
+            # Add trade plan data if available
+            logger.info(f"Trade {self.id}: Checking trade_plan relationship...")
+            logger.info(f"Trade {self.id}: hasattr(self, 'trade_plan'): {hasattr(self, 'trade_plan')}")
+            if hasattr(self, 'trade_plan'):
+                logger.info(f"Trade {self.id}: self.trade_plan: {self.trade_plan}")
+                if self.trade_plan:
+                    logger.info(f"Trade {self.id}: trade_plan is not None, adding data...")
+                    result.update({
+                        "trade_plan_created_at": self.trade_plan.created_at.strftime('%Y-%m-%d %H:%M:%S') if self.trade_plan.created_at else None,
+                        "trade_plan_planned_amount": self.trade_plan.planned_amount,
+                        "trade_plan_status": self.trade_plan.status
+                    })
+                else:
+                    logger.info(f"Trade {self.id}: trade_plan is None")
+            else:
+                logger.info(f"Trade {self.id}: No trade_plan attribute")
+            
             # Use loaded relationships if available
             if hasattr(self, 'account') and self.account:
                 result["account_name"] = self.account.name

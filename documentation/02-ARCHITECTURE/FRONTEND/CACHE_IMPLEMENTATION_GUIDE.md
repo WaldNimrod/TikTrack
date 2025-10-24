@@ -2,9 +2,9 @@
 # מדריך יישום מערכת המטמון המאוחדת
 
 **תאריך יצירה:** 26 בינואר 2025  
-**תאריך עדכון:** 6 בינואר 2025  
-**גרסה:** 2.0  
-**סטטוס:** ✅ מיגרציה הושלמה - 57 קריאות localStorage הומרו ל-UnifiedCacheManager  
+**תאריך עדכון:** 25 באוקטובר 2025  
+**גרסה:** 3.0  
+**סטטוס:** ✅ מיגרציה הושלמה + HTTP Cache Clearing + Cache Busting  
 **מטרה:** תיעוד מפורט לכל הפונקציות והרכיבים הנדרשים
 
 ---
@@ -19,6 +19,9 @@
 6. [Integration Steps - שלבי אינטגרציה](#integration-steps)
 7. [Migration Plan - תוכנית מיגרציה](#migration-plan)
 8. [Migration Results - תוצאות המיגרציה](#migration-results)
+9. [HTTP Cache Clearing - ניקוי HTTP Cache](#http-cache-clearing)
+10. [Cache Busting - עדכון Hash אוטומטי](#cache-busting)
+11. [User Interface - ממשק משתמש](#user-interface)
 
 ---
 
@@ -1048,6 +1051,135 @@ console.log('Cache Hit Rate:', stats.performance.hitRate + '%');
 console.log('Memory Entries:', stats.layers.memory.entries);
 console.log('LocalStorage Size:', stats.layers.localStorage.size);
 ```
+
+---
+
+## 🌐 **HTTP Cache Clearing - ניקוי HTTP Cache**
+
+### **תיאור:**
+פתרון לבעיית HTTP Cache של הדפדפן - ניקוי קבצי JS/CSS ישנים.
+
+### **הבעיה:**
+משתמשים רואים עדכונים ישנים למרות ניקוי מטמון בגלל HTTP Cache של הדפדפן.
+
+### **הפתרון:**
+```javascript
+// פונקציה חדשה: clearBrowserCache()
+UnifiedCacheManager.prototype.clearBrowserCache = async function() {
+    // Clear Service Worker caches
+    if ('caches' in window) {
+        const cacheNames = await caches.keys();
+        await Promise.all(cacheNames.map(cacheName => caches.delete(cacheName)));
+    }
+    
+    // Clear static file cache
+    const cache = await caches.open('tiktrack-static-cache');
+    await cache.keys().then(keys => {
+        return Promise.all(keys.map(key => cache.delete(key)));
+    });
+}
+```
+
+### **שילוב בתהליך הניקוי:**
+```javascript
+// ב-clearAllCache()
+await this.clearBrowserCache(); // חדש!
+await this.clearAllCache();
+window.location.reload(true); // hard reload
+```
+
+### **פונקציות חדשות למשתמש:**
+```javascript
+// ניקוי HTTP Cache בלבד
+window.clearBrowserCacheOnly()
+
+// ניקוי מלא + hard reload
+window.clearCacheFull()
+```
+
+---
+
+## 🔨 **Cache Busting - עדכון Hash אוטומטי**
+
+### **תיאור:**
+תהליך אוטומטי לעדכון hash של קבצי JS/CSS כדי לכפות טעינה מחדש.
+
+### **התהליך:**
+```bash
+# הרץ cache-buster.sh
+./build-tools/cache-buster.sh
+```
+
+### **מה שקורה:**
+1. **יצירת Hash:** Git commit + timestamp
+2. **עדכון קבצים:** כל 49 קבצי HTML
+3. **הוספת ?v=hash:** לכל JS/CSS
+4. **שמירת גרסה:** ב-.build-version
+
+### **דוגמה:**
+```html
+<!-- לפני: -->
+<script src="scripts/app.js"></script>
+
+<!-- אחרי: -->
+<script src="scripts/app.js?v=05b6de6f_20251025_005449"></script>
+```
+
+### **תוצאה:**
+- ✅ הדפדפן טוען קבצים חדשים
+- ✅ אין בעיות cache ישן
+- ✅ עדכונים נראים מיד
+
+---
+
+## 🎛️ **User Interface - ממשק משתמש**
+
+### **תפריט ניקוי מטמון:**
+```html
+<!-- בתפריט הראשי (header-system.js) -->
+<li class="tiktrack-nav-item">
+  <a href="#" class="tiktrack-nav-link" onclick="clearCacheQuick(event)">
+    <span class="nav-text">🧹</span>
+  </a>
+  <ul class="submenu">
+    <li><a href="#" onclick="clearCacheLayer('localStorage', event)">נקה localStorage</a></li>
+    <li><a href="#" onclick="clearAllCacheAdvanced(event)">נקה כל המטמון</a></li>
+    <li><a href="#" onclick="clearCacheFull(event)">נקה הכל + רענון</a></li>
+  </ul>
+</li>
+```
+
+### **פונקציות זמינות:**
+1. **clearCacheQuick()** - ניקוי מהיר + רענון
+2. **clearCacheLayer(layer)** - ניקוי שכבה ספציפית
+3. **clearAllCacheAdvanced()** - ניקוי מפורט
+4. **clearCacheFull()** - ניקוי מלא + hard reload
+5. **clearBrowserCacheOnly()** - ניקוי HTTP cache בלבד
+
+### **הודעות למשתמש:**
+```javascript
+// הודעות אוטומטיות
+window.showNotification(
+    'ניקוי מטמון הושלם בהצלחה - רענון עמוד...',
+    'success',
+    'ניקוי מטמון',
+    2000,
+    'development'
+);
+```
+
+### **תהליך אוטומטי:**
+1. **ניקוי מטמון** - כל השכבות
+2. **ניקוי HTTP Cache** - קבצים סטטיים
+3. **Hard Reload** - רענון מלא
+4. **הודעות** - משוב למשתמש
+
+---
+
+**מחבר:** TikTrack Development Team  
+**תאריך:** 26 בינואר 2025  
+**עדכון אחרון:** 25 באוקטובר 2025  
+**גרסה:** 3.0
 
 
 

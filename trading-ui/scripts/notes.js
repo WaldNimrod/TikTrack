@@ -1024,7 +1024,7 @@ async function populateEditSelectByType(relationType, selectedId) {
 }
 
 // ולידציה - משתמש במערכת הכללית window.validateEntityForm
-// function validateNoteForm(content, relationType, relatedId, attachment) {
+function validateNoteForm(content, relationType, relatedId, attachment) {
   let isValid = true;
 
   // ניקוי שגיאות קודמות
@@ -2199,7 +2199,7 @@ window.replaceCurrentAttachment = replaceCurrentAttachment;
 // window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 
 // Local  function for notes page
-async function  {
+async function generateDetailedLogForNotes() {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {

@@ -180,7 +180,7 @@ function generateDetailedLog() {
 // window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 
 // Local  function for research page
-async function  {
+async function generateDetailedLogForResearch() {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {

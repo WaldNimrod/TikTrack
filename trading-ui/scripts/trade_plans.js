@@ -4101,7 +4101,7 @@ function generateDetailedLog() {
 // window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 
 // Local  function for trade_plans page
-async function  {
+async function generateDetailedLogForTradePlans() {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {

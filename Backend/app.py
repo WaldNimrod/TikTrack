@@ -252,6 +252,26 @@ def debug_log():
         app.logger.info(f"DEBUG: {data['message']}")
     return jsonify({"status": "ok"})
 
+# Logger batch endpoint for frontend logs
+@app.route('/api/logs/batch', methods=['POST'])
+def logs_batch():
+    """Batch logging endpoint for frontend logs"""
+    try:
+        data = request.get_json()
+        if data and 'logs' in data:
+            logs = data['logs']
+            for log in logs:
+                if isinstance(log, dict) and 'message' in log:
+                    level = log.get('level', 'INFO')
+                    message = log.get('message', '')
+                    timestamp = log.get('timestamp', '')
+                    app.logger.info(f"FRONTEND [{level}]: {message}")
+            return jsonify({"status": "success", "processed": len(logs)})
+        return jsonify({"status": "error", "message": "No logs provided"}), 400
+    except Exception as e:
+        app.logger.error(f"Error processing batch logs: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
 # Register condition evaluation task
 try:
     from services.condition_evaluation_task import register_condition_evaluation_task
@@ -1861,7 +1881,7 @@ if __name__ == "__main__":
     # - Notification system works without WebSockets
     
     print("🚀 Starting TikTrack Server...")
-    print("📡 Server running on port 5001")
+    print("📡 Server running on port 8080")
     print("✅ All systems operational")
     
     # Run with standard Flask

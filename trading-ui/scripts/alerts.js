@@ -2759,7 +2759,7 @@ window.editAlert = editAlert;
 // window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 
 // Local  function for alerts page
-async function  {
+async function generateDetailedLogForAlerts() {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {

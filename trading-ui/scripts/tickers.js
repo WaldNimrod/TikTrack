@@ -2298,7 +2298,7 @@ window.viewTickerDetails = viewTickerDetails;
 // window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 
 // Local  function for tickers page
-async function  {
+async function generateDetailedLogForTickers() {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {

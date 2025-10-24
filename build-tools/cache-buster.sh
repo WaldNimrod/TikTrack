@@ -6,8 +6,8 @@
 # מטרה: יצירת hash מ-git commit ועדכון כל קבצי HTML
 # שימוש: ./build-tools/cache-buster.sh
 # 
-# תאריך: 13 ינואר 2025
-# גרסה: 1.0
+# תאריך: 24 אוקטובר 2025
+# גרסה: 2.0 - Fixed for current system
 # ============================================
 
 set -e  # Exit on error
@@ -20,7 +20,7 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 echo -e "${BLUE}============================================${NC}"
-echo -e "${BLUE}🔨 TikTrack Cache Busting Script${NC}"
+echo -e "${BLUE}🔨 TikTrack Cache Busting Script v2.0${NC}"
 echo -e "${BLUE}============================================${NC}"
 echo ""
 
@@ -47,7 +47,7 @@ echo ""
 
 # Count files to process
 echo -e "${BLUE}🔍 Scanning for HTML files...${NC}"
-HTML_COUNT=$(find trading-ui -name "*.html" -type f | wc -l | tr -d ' ')
+HTML_COUNT=$(find trading-ui -name "*.html" -type f 2>/dev/null | wc -l | tr -d ' ')
 echo -e "${GREEN}   ✅ Found ${HTML_COUNT} HTML files${NC}"
 echo ""
 
@@ -57,7 +57,7 @@ echo -e "${BLUE}🔄 Processing HTML files...${NC}"
 PROCESSED=0
 ERRORS=0
 
-find trading-ui -name "*.html" -type f | while read file; do
+find trading-ui -name "*.html" -type f 2>/dev/null | while read file; do
     echo -e "${BLUE}   Processing: ${file}${NC}"
     
     # Backup original file (with .bak extension)
@@ -109,3 +109,9 @@ echo -e "${YELLOW}   3. Verify: all JS/CSS load correctly${NC}"
 echo -e "${YELLOW}   4. Commit: git add . && git commit -m 'cache busting'${NC}"
 echo ""
 
+# Show current .build-version
+if [ -f .build-version ]; then
+    echo -e "${BLUE}📄 Current .build-version:${NC}"
+    cat .build-version
+    echo ""
+fi

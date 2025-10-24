@@ -3772,7 +3772,7 @@ function generateDetailedLog() {
 }
 
 // Local  function for executions page
-async function  {
+async function generateDetailedLogForExecutions() {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {

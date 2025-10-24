@@ -236,6 +236,17 @@ const defaultPolicies = {
         validate: true,
         optimize: false,
         syncToBackend: true
+    },
+    
+    // נתוני פוזיציה - Frontend Memory
+    'trade-positions': {
+        layer: 'memory',
+        ttl: 300000, // 5 דקות
+        maxSize: 500 * 1024, // 500KB
+        compress: false,
+        validate: true,
+        optimize: false,
+        syncToBackend: false
     }
 };
 ```
@@ -442,8 +453,15 @@ console.log('Cache hit rate:', stats.performance.hitRate);
 - **Layer:** localStorage
 - **TTL:** 300000ms (5 דקות)
 - **Key Format:** `preference_{name}_{userId}_{profileId}`
+- **Pattern Matching:** `preference_*`, `all_preferences_*`
 - **Validation:** true
 - **Sync to Backend:** false (manual save)
+
+### Pattern Matching for Cache Keys:
+המערכת תומכת ב-wildcards למפתחות מטמון:
+- `preference_*` - כל מפתחות העדפות בודדות
+- `all_preferences_*` - כל מפתחות העדפות מרוכזות
+- `user-preferences` - מפתח העדפות משתמש כללי
 
 ### תהליך שמירת העדפה:
 1. שמירה ל-backend

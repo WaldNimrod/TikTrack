@@ -54,6 +54,8 @@ class UnifiedCacheManager {
         // מדיניות מטמון ברירת מחדל
         this.defaultPolicies = {
             'user-preferences': { layer: 'localStorage', ttl: null, compress: false },
+            'preference_*': { layer: 'localStorage', ttl: 300000, compress: false }, // 5 דקות
+            'all_preferences_*': { layer: 'localStorage', ttl: 300000, compress: false }, // 5 דקות
             'ui-state': { layer: 'localStorage', ttl: 3600000, compress: false },
             'filter-state': { layer: 'localStorage', ttl: 3600000, compress: false },
             'notifications-history': { layer: 'indexedDB', ttl: 86400000, compress: true },
@@ -62,7 +64,8 @@ class UnifiedCacheManager {
             'js-analysis': { layer: 'indexedDB', ttl: 86400000, compress: true },
             'market-data': { layer: 'backend', ttl: 30000, compress: false },
             'trade-data': { layer: 'backend', ttl: 30000, compress: false },
-            'dashboard-data': { layer: 'backend', ttl: 300000, compress: false }
+            'dashboard-data': { layer: 'backend', ttl: 300000, compress: false },
+            'trade-positions': { layer: 'memory', ttl: 300000, compress: false, maxSize: 500 * 1024, validate: true, syncToBackend: false }
         };
         
         // ממשקי שכבות מטמון
@@ -510,6 +513,29 @@ class UnifiedCacheManager {
     }
 
     /**
+     * קבלת כל המפתחות מכל השכבות
+     * @returns {Promise<Array<string>>} רשימת כל המפתחות
+     */
+    async getAllKeys() {
+        const allKeys = new Set();
+        
+        try {
+            // איסוף מפתחות מכל השכבות
+            for (const [layerName, layer] of Object.entries(this.layers)) {
+                if (layer && layer.getAllKeys) {
+                    const layerKeys = await layer.getAllKeys();
+                    layerKeys.forEach(key => allKeys.add(key));
+                }
+            }
+            
+            return Array.from(allKeys);
+        } catch (error) {
+            console.warn('⚠️ Error getting all keys:', error);
+            return [];
+        }
+    }
+
+    /**
      * עדכון סטטיסטיקות ביצועים
      * @param {number} responseTime - זמן תגובה
      * @param {boolean} hit - האם פגיעה
@@ -615,6 +641,10 @@ class MemoryLayer {
             size: this.maxSize
         };
     }
+    
+    async getAllKeys() {
+        return Array.from(this.cache.keys());
+    }
 }
 
 /**
@@ -694,6 +724,15 @@ class LocalStorageLayer {
             return { entries, size };
         } catch (error) {
             return { entries: 0, size: 0 };
+        }
+    }
+    
+    async getAllKeys() {
+        try {
+            return Object.keys(localStorage).filter(key => key.startsWith(this.prefix));
+        } catch (error) {
+            console.warn('⚠️ Error getting localStorage keys:', error);
+            return [];
         }
     }
 }
@@ -825,6 +864,24 @@ class IndexedDBLayer {
             return { entries: 0, size: 0 };
         }
     }
+    
+    async getAllKeys() {
+        try {
+            if (this.db) {
+                const transaction = this.db.transaction(['unified-cache'], 'readonly');
+                const store = transaction.objectStore('unified-cache');
+                const request = store.getAllKeys();
+                return new Promise((resolve, reject) => {
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+            }
+            return [];
+        } catch (error) {
+            console.warn('⚠️ Error getting IndexedDB keys:', error);
+            return [];
+        }
+    }
 }
 
 /**
@@ -896,6 +953,10 @@ class BackendCacheLayer {
             entries: this.cache.size,
             size: 0 // לא ניתן לחשב בקליינט
         };
+    }
+    
+    async getAllKeys() {
+        return Array.from(this.cache.keys());
     }
 
 
@@ -1971,19 +2032,50 @@ UnifiedCacheManager.prototype.refreshMarketData = async function() {
 };
 
 /**
+ * Get policy for key, supporting wildcards
+ * @param {string} key - Cache key
+ * @returns {object} Policy configuration
+ */
+UnifiedCacheManager.prototype.getKeyPolicy = function(key) {
+    // Exact match
+    if (this.defaultPolicies[key]) {
+        return this.defaultPolicies[key];
+    }
+    
+    // Pattern matching
+    for (const [pattern, policy] of Object.entries(this.defaultPolicies)) {
+        if (pattern.includes('*')) {
+            const regex = new RegExp('^' + pattern.replace('*', '.*') + '$');
+            if (regex.test(key)) {
+                return policy;
+            }
+        }
+    }
+    
+    // Default fallback
+    return { layer: 'localStorage', ttl: 3600000, compress: false };
+};
+
+/**
  * Refresh user preferences from backend
  */
 UnifiedCacheManager.prototype.refreshUserPreferences = async function() {
     try {
-        // Clear preferences cache
+        // Clear all preferences cache keys
         const keys = await this.getAllKeys();
-        const prefKeys = keys.filter(k => k.includes('preference_') || k.includes('all_preferences_'));
+        const prefKeys = keys.filter(k => 
+            k.startsWith('preference_') || 
+            k.startsWith('all_preferences_') ||
+            k === 'user-preferences'
+        );
+        
+        console.log(`🔄 Refreshing user preferences - clearing ${prefKeys.length} keys`);
         
         for (const key of prefKeys) {
             await this.remove(key);
         }
         
-        // If preferences system is available, refresh it
+        // Reload preferences if PreferencesCore is available
         if (window.PreferencesCore) {
             await window.PreferencesCore.initializeWithLazyLoading(
                 window.PreferencesCore.currentUserId,
@@ -2066,6 +2158,16 @@ window.clearAllUnifiedCache = async function(options = {}) {
 window.clearAllUnifiedCacheQuick = async function(options = {}) {
     if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
         return await window.UnifiedCacheManager.clearAllCacheQuick(options);
+    } else {
+        console.warn('⚠️ UnifiedCacheManager not initialized');
+        return { success: false, error: 'UnifiedCacheManager not initialized' };
+    }
+};
+
+// Alias for compatibility with existing code
+window.clearAllCache = async function(options = {}) {
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+        return await window.UnifiedCacheManager.clearAllCacheDetailed(options);
     } else {
         console.warn('⚠️ UnifiedCacheManager not initialized');
         return { success: false, error: 'UnifiedCacheManager not initialized' };

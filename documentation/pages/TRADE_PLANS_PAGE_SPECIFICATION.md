@@ -1,7 +1,7 @@
 # אפיון עמוד Trade Plans
 **תאריך יצירה:** 18 אוקטובר 2025  
-**תאריך עדכון:** 19 אוקטובר 2025  
-**גרסה:** 3.0.0  
+**תאריך עדכון:** 24 ינואר 2025  
+**גרסה:** 3.1.0  
 **מפתח:** AI Assistant  
 
 ---
@@ -10,6 +10,8 @@
 עמוד Trade Plans הוא עמוד מרכזי במערכת TikTrack המאפשר ניהול תכנוני מסחר. העמוד מספק ממשק מקיף ליצירה, עריכה, מחיקה וניהול תכנוני מסחר עם אינטגרציה מלאה למערכות הכלליות של המערכת.
 
 **חדש בגרסה 3.0.0:** הוספת מערכת תנאים מתקדמת המאפשרת הגדרת תנאים מותאמים אישית לתכניות מסחר עם 6 שיטות מסחר שונות (ממוצעים נעים, נפח, תמיכה והתנגדות, קווי מגמה, מבנים טכניים, פיבונצי).
+
+**חדש בגרסה 3.1.0:** סטנדרטיזציה מלאה למערכות כלליות - שימוש ב-FieldRendererService, Actions Menu System, DataCollectionService, SelectPopulatorService, CRUDResponseHandler, Entity Details Modal, ו-Translation System.
 
 ---
 
@@ -48,6 +50,54 @@ trading-ui/
 </body>
 </html>
 ```
+
+---
+
+## מערכות כלליות בשימוש
+
+עמוד זה משתמש במערכות כלליות הבאות (מתועדות ב-`GENERAL_SYSTEMS_LIST.md` ו-`SERVICES_ARCHITECTURE.md`):
+
+### 1. FieldRendererService (כבר משולב)
+- **מיקום:** `trading-ui/scripts/services/field-renderer-service.js`
+- **שימוש:** רינדור status badges, type badges, side badges, ערכים מספריים, תאריכים
+- **פונקציות:** `renderStatus()`, `renderSide()`, `renderType()`, `renderNumericValue()`, `renderDate()`
+- **הפחתת קוד:** 138 מקומות עם HTML ידני → 1 מערכת מרכזית
+
+### 2. Actions Menu System (כבר משולב)
+- **מיקום:** `trading-ui/scripts/modules/actions-menu-system.js`
+- **שימוש:** תפריט פעולות נפתח בטבלה
+- **פונקציות:** `window.createActionsMenu()`
+- **יתרון:** UI אחיד, נגישות משופרת, קוד נקי
+
+### 3. DataCollectionService (כבר משולב)
+- **מיקום:** `trading-ui/scripts/services/data-collection-service.js`
+- **שימוש:** איסוף נתונים מטפסים עם המרות טיפוס
+- **פונקציות:** `collectFormData()`, `setFormData()`, `resetForm()`
+- **הפחתת קוד:** 445 קריאות `getElementById` → 0
+
+### 4. SelectPopulatorService (כבר משולב)
+- **מיקום:** `trading-ui/scripts/services/select-populator-service.js`
+- **שימוש:** מילוי select boxes מ-API
+- **פונקציות:** `populateTickersSelect()`, `populateAccountsSelect()`, `populateTradePlansSelect()`
+- **יתרון:** קוד פחות חוזר, טעינה מהירה יותר
+
+### 5. CRUDResponseHandler (כבר משולב)
+- **מיקום:** `trading-ui/scripts/services/crud-response-handler.js`
+- **שימוש:** טיפול בתגובות שרת עם רענון אוטומטי
+- **פונקציות:** `handleCreateResponse()`, `handleUpdateResponse()`, `handleDeleteResponse()`
+- **יתרון:** טיפול אחיד בתגובות, רענון אוטומטי
+
+### 6. Entity Details Modal (כבר משולב)
+- **מיקום:** `trading-ui/scripts/modules/entity-details-modal.js`
+- **שימוש:** הצגת פרטי ישות במודל
+- **פונקציות:** `window.showEntityDetails(entityType, entityId, options)`
+- **יתרון:** תצוגה אחידה לכל הישויות
+
+### 7. Translation System (כבר משולב)
+- **מיקום:** `trading-ui/scripts/translation-utils.js`
+- **שימוש:** תרגומים ופורמט מטבעות
+- **פונקציות:** `formatCurrency()`, `translateTradePlanStatus()`, וכו'
+- **יתרון:** תרגומים אחידים בכל המערכת
 
 ---
 

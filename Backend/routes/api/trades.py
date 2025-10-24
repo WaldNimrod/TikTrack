@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request, g
 from sqlalchemy.orm import Session
 from config.database import get_db
 from services.trade_service import TradeService
+from services.position_calculator_service import PositionCalculatorService
 from services.advanced_cache_service import cache_for, cache_with_deps, invalidate_cache
 import logging
 
@@ -16,6 +17,9 @@ trades_bp = Blueprint('trades', __name__, url_prefix='/api/trades')
 
 # Initialize base API
 base_api = BaseEntityAPI('trades', TradeService, 'trades')
+
+# Initialize position calculator
+position_calculator = PositionCalculatorService()
 
 @trades_bp.route('/', methods=['GET'])
 @api_endpoint(cache_ttl=30, dependencies=['trades'], rate_limit=60)
@@ -41,8 +45,13 @@ def get_trades():
         else:
             trades = TradeService.get_all(db)
         
-        # Convert trades to dict with market data
+        # Convert trades to dict with market data and position data
         trade_dicts = []
+        trade_ids = [trade.id for trade in trades]
+        
+        # Calculate positions for all trades in batch
+        positions = position_calculator.calculate_positions_batch(db, trade_ids)
+        
         for trade in trades:
             trade_dict = trade.to_dict()
             
@@ -66,6 +75,9 @@ def get_trades():
                 trade_dict['current_price'] = None
                 trade_dict['daily_change'] = None
                 trade_dict['change_amount'] = None
+            
+            # Add position data
+            trade_dict['position'] = positions.get(trade.id)
             
             trade_dicts.append(trade_dict)
         

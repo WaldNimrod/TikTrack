@@ -1,7 +1,7 @@
 # אפיון עמוד Trades
 **תאריך יצירה:** 18 אוקטובר 2025  
-**תאריך עדכון:** 19 אוקטובר 2025  
-**גרסה:** 3.0.0  
+**תאריך עדכון:** 24 אוקטובר 2025  
+**גרסה:** 3.2.0  
 **מפתח:** AI Assistant  
 
 ---
@@ -10,6 +10,10 @@
 עמוד Trades הוא עמוד מרכזי במערכת TikTrack המאפשר ניהול טריידים פעילים וסגורים. העמוד מספק ממשק מקיף ליצירה, עריכה, מחיקה וניהול טריידים עם אינטגרציה מלאה למערכות הכלליות של המערכת.
 
 **חדש בגרסה 3.0.0:** הוספת מערכת תנאים מתקדמת המאפשרת הגדרת תנאים מותאמים אישית לטריידים עם אפשרות לרשת תנאים מתכניות מסחר או ליצור תנאים ייחודיים לטרייד.
+
+**חדש בגרסה 3.1.0:** סטנדרטיזציה מלאה למערכות כלליות - שימוש ב-FieldRendererService, Actions Menu System, DataCollectionService, SelectPopulatorService, Entity Details Modal, ו-Translation System.
+
+**חדש בגרסה 3.2.0:** הוספת מערכת חישוב פוזיציות - הצגת נתוני פוזיציה נוכחית (כמות, מחיר ממוצע, P/L) עם אינטגרציה למערכת Position Calculator Service ו-Unified Cache Manager.
 
 ---
 
@@ -48,6 +52,100 @@ trading-ui/
 </body>
 </html>
 ```
+
+---
+
+## מערכות כלליות בשימוש
+
+עמוד זה משתמש במערכות כלליות הבאות (מתועדות ב-`GENERAL_SYSTEMS_LIST.md` ו-`SERVICES_ARCHITECTURE.md`):
+
+### 1. FieldRendererService
+- **מיקום:** `trading-ui/scripts/services/field-renderer-service.js`
+- **שימוש:** רינדור status badges, type badges, side badges, ערכים מספריים, תאריכים
+- **פונקציות:** `renderStatus()`, `renderSide()`, `renderType()`, `renderNumericValue()`, `renderDate()`
+- **הפחתת קוד:** 138 מקומות עם HTML ידני → 1 מערכת מרכזית
+
+### 2. Actions Menu System
+- **מיקום:** `trading-ui/scripts/modules/actions-menu-system.js`
+- **שימוש:** תפריט פעולות נפתח בטבלה
+- **פונקציות:** `window.createActionsMenu()`
+- **יתרון:** UI אחיד, נגישות משופרת, קוד נקי
+
+### 3. DataCollectionService
+- **מיקום:** `trading-ui/scripts/services/data-collection-service.js`
+- **שימוש:** איסוף נתונים מטפסים עם המרות טיפוס
+- **פונקציות:** `collectFormData()`, `setFormData()`, `resetForm()`
+- **הפחתת קוד:** 445 קריאות `getElementById` → 0
+
+### 4. Position Calculator Service
+- **מיקום:** `Backend/services/position_calculator_service.py`
+- **שימוש:** חישוב פוזיציות נוכחיות לטריידים על בסיס ביצועים
+- **פונקציות:** `calculate_position()`, `calculate_positions_batch()`
+- **אינטגרציה:** Backend API מחזיר position data, Frontend מציג עמודות פוזיציה
+
+### 4. SelectPopulatorService
+- **מיקום:** `trading-ui/scripts/services/select-populator-service.js`
+- **שימוש:** מילוי select boxes מ-API
+- **פונקציות:** `populateTickersSelect()`, `populateAccountsSelect()`, `populateTradePlansSelect()`
+- **יתרון:** קוד פחות חוזר, טעינה מהירה יותר
+
+### 5. Entity Details Modal
+- **מיקום:** `trading-ui/scripts/modules/entity-details-modal.js`
+- **שימוש:** הצגת פרטי ישות במודל
+- **פונקציות:** `window.showEntityDetails(entityType, entityId, options)`
+- **יתרון:** תצוגה אחידה לכל הישויות
+
+### 6. Translation System
+- **מיקום:** `trading-ui/scripts/translation-utils.js`
+- **שימוש:** תרגומים ופורמט מטבעות
+- **פונקציות:** `formatCurrency()`, `translateTradePlanStatus()`, וכו'
+- **יתרון:** תרגומים אחידים בכל המערכת
+
+---
+
+## Position Data Display
+
+### עמודות פוזיציה חדשות
+עמוד Trades מציג כעת 4 עמודות פוזיציה חדשות המבוססות על חישובי Position Calculator Service:
+
+#### 1. גודל פוזיציה (Position Quantity)
+- **מטרה:** הצגת הכמות הנוכחית של הטרייד
+- **חישוב:** `SUM(buy_quantity) - SUM(sell_quantity)`
+- **תצוגה:** מספר חיובי/שלילי עם צבעים דינמיים
+- **Fallback:** "אין ביצועים" אם אין executions
+
+#### 2. מחיר ממוצע (Average Price)
+- **מטרה:** הצגת המחיר הממוצע של הפוזיציה כולל עמלות
+- **חישוב:** `(SUM(quantity * price + fee WHERE action='buy')) / SUM(quantity WHERE action='buy')`
+- **תצוגה:** פורמט מטבע עם סימן $ לפני המספר
+- **Fallback:** "-" אם אין נתונים
+
+#### 3. P/L בערך (P/L Value)
+- **מטרה:** הצגת רווח/הפסד בדולרים
+- **חישוב:** `(current_price - average_price) * quantity`
+- **תצוגה:** פורמט מטבע עם צבעים חיוביים/שליליים
+- **Fallback:** "חסר מחיר" אם אין נתוני מחיר
+
+#### 4. P/L באחוזים (P/L Percentage)
+- **מטרה:** הצגת רווח/הפסד באחוזים
+- **חישוב:** `((current_price - average_price) / average_price) * 100`
+- **תצוגה:** אחוזים עם סימן + או - וצבעים דינמיים
+- **Fallback:** "-" אם אין נתונים
+
+### כפתור רענון פוזיציות
+- **מיקום:** בכותרת הטבלה ליד כפתור "הוסף טרייד"
+- **פונקציה:** `refreshPositions()`
+- **פעולה:** 
+  - Invalidate cache של position data
+  - טעינה מחדש של נתוני טריידים
+  - הצגת הודעות למשתמש
+- **Cache:** Unified Cache Manager (5 דקות TTL)
+
+### אינטגרציה עם מערכות כלליות
+- **Position Calculator Service:** Backend service לחישוב פוזיציות
+- **Unified Cache Manager:** Frontend cache לנתוני פוזיציה
+- **Notification System:** הודעות רענון והצלחה
+- **Field Renderer Service:** רינדור ערכים מספריים ומטבעות
 
 ---
 

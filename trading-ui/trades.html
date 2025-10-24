@@ -48,7 +48,7 @@
                             מעקב טריידים
                         </div>
                         <div class="table-actions">
-                            <button data-button-type="COPY" data-variant="full" data-onclick="copyDetailedLog()" data-text="העתק לוג מפורט" title="העתק לוג מפורט עם כל הנתונים והטריידים"></button>
+                            <button data-button-type="COPY" data-variant="full" data-onclick="copyDetailedLog()" data-text="העתק לוג מפורט" title="העתק לוג מפורט"></button>
                             <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר" title="הצג/הסתר אזור מעקב טריידים"></button>
                         </div>
                     </div>
@@ -80,8 +80,7 @@
                         <div class="table-count" id="tradesCount">טוען...</div>
                         <div class="table-actions">
                             <button data-button-type="ADD" data-entity-type="trade" data-variant="full" data-onclick="showAddTradeModal()" data-text="הוסף טרייד" title="הוסף טרייד חדש"></button>
-                            
-
+                            <button data-button-type="REFRESH" data-variant="small" data-onclick="refreshPositions()" data-text="רענן פוזיציות" title="רענן נתוני פוזיציה מהשרת"></button>
                             <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר" title="הצג/הסתר אזור הטריידים שלי"></button>
                         </div>
                     </div>
@@ -125,13 +124,25 @@
                                         <th class="col-account">
                                             <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(10); }">חשבון <span class="sort-icon">↕</span></button>
                                         </th>
+                                        <th class="col-position-quantity">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(11); }">גודל פוזיציה <span class="sort-icon">↕</span></button>
+                                        </th>
+                                        <th class="col-position-avg-price">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(12); }">מחיר ממוצע <span class="sort-icon">↕</span></button>
+                                        </th>
+                                        <th class="col-position-pl-value">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(13); }">P/L בערך <span class="sort-icon">↕</span></button>
+                                        </th>
+                                        <th class="col-position-pl-percent">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(14); }">P/L באחוזים <span class="sort-icon">↕</span></button>
+                                        </th>
                                         <th class="col-actions actions-cell actions-3-items">
                                         </th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td colspan="12" class="loading">טוען טריידים...</td>
+                                        <td colspan="15" class="loading">טוען טריידים...</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -445,8 +456,11 @@
     <!-- מערכת העדפות משתמש -->
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 2.0.0 -->
-    <script src="scripts/preferences-core.js?v=1.0.0"></script> <!-- ליבת העדפות -->
-    <script src="scripts/preferences.js?v=1.0.0"></script> <!-- מערכת העדפות -->
+    <script src="scripts/preferences-core-new.js?v=1.0.0"></script> <!-- ליבת העדפות -->
+    <script src="scripts/preferences-colors.js?v=1.0.0"></script> <!-- מערכת צבעים -->
+    <script src="scripts/preferences-lazy-loader.js?v=1.0.0"></script> <!-- lazy loading -->
+    <script src="scripts/preferences-validation.js?v=1.0.0"></script> <!-- validation -->
+    <script src="scripts/preferences-ui.js?v=1.0.0"></script> <!-- ממשק משתמש -->
 
     <!-- ===== ENTITY DETAILS SYSTEMS (Depend on Header) ===== -->
     <script src="scripts/entity-details-api.js?v=1.0.0"></script>
@@ -474,5 +488,6 @@
         // Make the local copyDetailedLog function available globally for this page only
         window.copyDetailedLog = copyDetailedLog;
     </script>
+    
 </body>
 </html>

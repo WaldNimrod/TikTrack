@@ -15,7 +15,7 @@ from datetime import datetime
 import hashlib
 import re
 
-class BaseImportConnector(ABC):
+class BaseConnector(ABC):
     """
     Abstract base class for all data import connectors.
     

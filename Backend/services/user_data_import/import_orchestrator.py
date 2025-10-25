@@ -22,7 +22,8 @@ from models.ticker import Ticker
 from .normalization_service import NormalizationService
 from .validation_service import ValidationService
 from .duplicate_detection_service import DuplicateDetectionService
-from ..connectors.user_data_import import IBKRConnector, DemoConnector
+from connectors.user_data_import.ibkr_connector import IBKRConnector
+from connectors.user_data_import.demo_connector import DemoConnector
 
 logger = logging.getLogger(__name__)
 
@@ -418,7 +419,7 @@ class ImportOrchestrator:
             Connector instance or None
         """
         for connector_name, connector in self.connectors.items():
-            if connector.detect_format(file_content):
+            if connector.identify_file(file_content, 'test.csv'):
                 return connector
         
         return None

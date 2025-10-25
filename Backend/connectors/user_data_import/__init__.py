@@ -14,12 +14,12 @@ Version: 1.0
 Last Updated: 2025-01-16
 """
 
-from .base_connector import BaseImportConnector
+from .base_connector import BaseConnector
 from .ibkr_connector import IBKRConnector
 from .demo_connector import DemoConnector
 
 __all__ = [
-    'BaseImportConnector',
+    'BaseConnector',
     'IBKRConnector', 
     'DemoConnector'
 ]

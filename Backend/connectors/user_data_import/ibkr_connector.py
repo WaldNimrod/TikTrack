@@ -20,9 +20,9 @@ import csv
 import io
 from typing import List, Dict, Any, Optional
 from datetime import datetime
-from .base_connector import BaseImportConnector
+from .base_connector import BaseConnector
 
-class IBKRConnector(BaseImportConnector):
+class IBKRConnector(BaseConnector):
     """
     IBKR connector for Interactive Brokers Activity Statement files.
     
@@ -30,6 +30,24 @@ class IBKRConnector(BaseImportConnector):
     trading data from the Trades section of the statement.
     """
     
+    def identify_file(self, file_content: str, file_name: str) -> bool:
+        """
+        Identifies if the given file content and name match the IBKR Activity Statement format.
+        Checks for specific keywords and section headers.
+        """
+        if not file_name.lower().endswith('.csv'):
+            return False
+
+        # Check for common IBKR statement indicators
+        if "Interactive Brokers" not in file_content and "Activity Statement" not in file_content:
+            return False
+
+        # Check for the "Trades" section header
+        if "Trades,Data,Order" not in file_content:
+            return False
+
+        return True
+
     def detect_format(self, file_content: str) -> bool:
         """
         Detect if the file content matches IBKR format.
@@ -156,6 +174,18 @@ class IBKRConnector(BaseImportConnector):
         except Exception as e:
             raise ValueError(f"Failed to normalize IBKR record: {str(e)}")
     
+    def get_supported_file_types(self) -> List[str]:
+        """
+        Returns a list of file extensions supported by this connector.
+        """
+        return ['.csv']
+
+    def get_connector_name(self) -> str:
+        """
+        Returns the human-readable name of the connector.
+        """
+        return 'Interactive Brokers CSV'
+
     def get_provider_name(self) -> str:
         """
         Get the provider name for this connector.

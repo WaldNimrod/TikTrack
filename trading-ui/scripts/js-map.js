@@ -1835,13 +1835,12 @@ JsMapSystem.prototype.getDetailedUIInfo = function() {
                     uiInfo += `    - כפתורי כותרת: ${headerButtons.length}\n`;
                 }
                     
-                    // Check for specific content
-                    if (body.textContent.trim() === '' || body.textContent.trim() === 'טוען...') {
-                        uiInfo += `    - תוכן: ריק או טוען\n`;
-                    } else {
-                        const contentLength = body.textContent.trim().length;
-                        uiInfo += `    - תוכן: ${contentLength} תווים\n`;
-                    }
+                // Check for specific content
+                if (body.textContent.trim() === '' || body.textContent.trim() === 'טוען...') {
+                    uiInfo += `    - תוכן: ריק או טוען\n`;
+                } else {
+                    const contentLength = body.textContent.trim().length;
+                    uiInfo += `    - תוכן: ${contentLength} תווים\n`;
                 }
             }
         });
@@ -2852,11 +2851,11 @@ window.initializeDevelopmentSections = initializeDevelopmentSections;
 window.toggleDevelopmentSection = toggleDevelopmentSection;
 
 // Export log and refresh functions
-window. = ;
+// window. export removed - using global version from system-management.js
 // // window. export removed - using global version from system-management.js
 
-// Local  function for js-map page
-async function  {
+// Local copyDetailedLog function for js-map page
+async function copyDetailedLogLocal() {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {

@@ -33,6 +33,60 @@ def allowed_file(filename: str) -> bool:
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+@user_data_import_bp.route('/upload-and-preview', methods=['POST'])
+def upload_and_preview():
+    """
+    Handles file upload, identifies connector, parses, normalizes, validates,
+    detects duplicates, and returns a preview of the data.
+    """
+    if 'file' not in request.files:
+        return jsonify({"error": "No file part in the request"}), 400
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+    
+    account_id = request.form.get('account_id')
+    if not account_id:
+        return jsonify({"error": "Missing trading account ID"}), 400
+    
+    try:
+        account_id = int(account_id)
+    except ValueError:
+        return jsonify({"error": "Invalid trading account ID"}), 400
+
+    file_content = file.read().decode('utf-8')
+    file_name = file.filename
+
+    try:
+        orchestrator = ImportOrchestrator(g.db_session)
+        
+        # Create import session first
+        session_data = orchestrator.create_import_session(account_id, file_name, file_content)
+        session_id = session_data['session_id']
+        
+        # Analyze the file
+        analysis_data = orchestrator.analyze_file(session_id)
+        
+        # Generate preview
+        preview_data = orchestrator.generate_preview(session_id)
+        
+        # Combine results
+        result = {
+            'session_id': session_id,
+            'file_name': file_name,
+            'analysis': analysis_data,
+            'preview': preview_data
+        }
+        
+        return jsonify(result), 200
+    except ValueError as e:
+        logger.error(f"Error during file preview: {e}")
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        logger.error(f"Unexpected error during file preview: {e}", exc_info=True)
+        return jsonify({"error": "An unexpected error occurred during file analysis."}), 500
+
 @user_data_import_bp.route('/upload', methods=['POST'])
 def upload_file():
     """

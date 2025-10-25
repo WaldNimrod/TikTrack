@@ -125,7 +125,7 @@ async function switchActiveProfile() {
             
             // Reload all form data for the new profile
             window.Logger.info('🔍 PROFILE DEBUG: Profile switch completed successfully', { page: "preferences-page" });
-            window.Logger.info('🔍 CACHE DEBUG: Final cache state:', window.PreferencesCore?.cacheManager?.getAll?.(, { page: "preferences-page" }) || 'Cache not available');
+            window.Logger.info('🔍 CACHE DEBUG: Final cache state:', window.PreferencesCore?.cacheManager?.getAll?.({ page: "preferences-page" }) || 'Cache not available');
             
             // Show loading notification
             if (typeof window.showInfoNotification === 'function') {
@@ -358,9 +358,9 @@ async function createNewProfile() {
 }
 
 /**
- * Local  function for preferences page
+ * Local copyDetailedLog function for preferences page
  */
-async function  {
+async function copyDetailedLogLocal() {
     try {
         const log = [];
         const timestamp = new Date().toLocaleString('he-IL');
@@ -445,7 +445,7 @@ function initializePreferencesPage() {
     // Make functions globally available
     window.switchActiveProfile = switchActiveProfile;
     window.createNewProfile = createNewProfile;
-    window. = ;
+    // window. export removed - using global version from system-management.js
     
     window.Logger.info('✅ Preferences page initialized', { page: "preferences-page" });
 }

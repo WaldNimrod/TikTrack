@@ -55,6 +55,9 @@ import time
 import sys # Added for sys.exit
 import psutil
 
+# Add Backend directory to Python path for imports
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 # Import configuration settings for cache modes
 from config.settings import DEVELOPMENT_MODE, CACHE_DISABLED, DEFAULT_CACHE_TTL, CACHE_ENABLED
 

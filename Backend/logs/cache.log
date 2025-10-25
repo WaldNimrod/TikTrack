@@ -22105,3 +22105,690 @@
 2025-10-25 04:30:10,746 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
 2025-10-25 04:30:10,746 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
 2025-10-25 04:30:10,746 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:30:10] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-25 04:30:35,744 - routes.api.base_entity.executions - INFO - Getting all executions records
+2025-10-25 04:30:35,744 - cache - INFO - Cache EXPIRED: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Age: 65.8s)
+2025-10-25 04:30:35,744 - cache - INFO - Cache EXPIRED: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Age: 65.8s)
+2025-10-25 04:30:35,744 - cache - INFO - Cache DELETE: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Was accessed 3 times)
+2025-10-25 04:30:35,744 - cache - INFO - Cache DELETE: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Was accessed 3 times)
+2025-10-25 04:30:35,746 - cache - INFO - Cache SET: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 26066 chars)
+2025-10-25 04:30:35,746 - cache - INFO - Cache SET: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 26066 chars)
+2025-10-25 04:30:35,747 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:30:35] "GET /api/executions/?_t=1761355835741 HTTP/1.1" 200 -
+2025-10-25 04:30:41,743 - root - INFO - FRONTEND [INFO]: 🔄 Auto-refreshing executions data...
+2025-10-25 04:30:41,743 - root - INFO - FRONTEND [INFO]: 🔄 Auto-refreshing executions data...
+2025-10-25 04:30:41,743 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
+2025-10-25 04:30:41,743 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
+2025-10-25 04:30:41,744 - root - INFO - FRONTEND [INFO]: Performance: Long task detected
+2025-10-25 04:30:41,744 - root - INFO - FRONTEND [INFO]: Performance: Long task detected
+2025-10-25 04:30:41,744 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:30:41] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-25 04:31:02,681 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-25T04:31:02.677162', 'error_type': 'MethodNotAllowed', 'error_message': '405 Method Not Allowed: The method is not allowed for the requested URL.', 'request_method': 'POST', 'request_url': 'http://127.0.0.1:8080/api/user-data-import/upload', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'general'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1458, in dispatch_request\n    self.raise_routing_exception(req)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1440, in raise_routing_exception\n    raise request.routing_exception  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/ctx.py", line 353, in match_request\n    result = self.url_adapter.match(return_rule=True)  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/routing/map.py", line 650, in match\n    raise MethodNotAllowed(valid_methods=list(e.have_match_for)) from None\nwerkzeug.exceptions.MethodNotAllowed: 405 Method Not Allowed: The method is not allowed for the requested URL.\n'}
+2025-10-25 04:31:02,682 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-25T04:31:02.677162', 'error_type': 'MethodNotAllowed', 'error_message': '405 Method Not Allowed: The method is not allowed for the requested URL.', 'request_method': 'POST', 'request_url': 'http://127.0.0.1:8080/api/user-data-import/upload', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'general'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1458, in dispatch_request\n    self.raise_routing_exception(req)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1440, in raise_routing_exception\n    raise request.routing_exception  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/ctx.py", line 353, in match_request\n    result = self.url_adapter.match(return_rule=True)  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/routing/map.py", line 650, in match\n    raise MethodNotAllowed(valid_methods=list(e.have_match_for)) from None\nwerkzeug.exceptions.MethodNotAllowed: 405 Method Not Allowed: The method is not allowed for the requested URL.\n'}
+2025-10-25 04:31:02,682 - utils.performance_monitor - INFO - Performance: handle_general_error - Duration: 0.006s - Success: True
+2025-10-25 04:31:02,683 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:31:02] "[35m[1mPOST /api/user-data-import/upload HTTP/1.1[0m" 500 -
+2025-10-25 04:31:05,019 - root - INFO - FRONTEND [INFO]: 🔔 showNotification called: "שגיאה בניתוח: An internal error occurred", type: error, category: system, options:
+2025-10-25 04:31:05,020 - root - INFO - FRONTEND [INFO]: 🔔 showNotification called: "שגיאה בניתוח: An internal error occurred", type: error, category: system, options:
+2025-10-25 04:31:05,020 - root - INFO - FRONTEND [INFO]: 🔍 Checking preference: notifications_system_enabled
+2025-10-25 04:31:05,021 - root - INFO - FRONTEND [INFO]: 🔍 Checking preference: notifications_system_enabled
+2025-10-25 04:31:05,021 - root - INFO - FRONTEND [INFO]: 🔍 CACHE DEBUG: Cache hit for notifications_system_enabled = true (key: preference_notifications_system_enabled_1_null, { page: "preferences-core-new" })
+2025-10-25 04:31:05,021 - root - INFO - FRONTEND [INFO]: 🔍 CACHE DEBUG: Cache hit for notifications_system_enabled = true (key: preference_notifications_system_enabled_1_null, { page: "preferences-core-new" })
+2025-10-25 04:31:05,022 - root - INFO - FRONTEND [INFO]: 🔔 ERROR: מערכת - שגיאה בניתוח: An internal error occurred
+2025-10-25 04:31:05,022 - root - INFO - FRONTEND [INFO]: 🔔 ERROR: מערכת - שגיאה בניתוח: An internal error occurred
+2025-10-25 04:31:05,023 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:31:05] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-25 04:31:05,035 - routes.api.base_entity.executions - INFO - Getting all executions records
+2025-10-25 04:31:05,036 - cache - INFO - Cache HIT: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Access count: 1)
+2025-10-25 04:31:05,036 - cache - INFO - Cache HIT: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Access count: 1)
+2025-10-25 04:31:05,036 - routes.api.base_entity.executions - INFO - Cache hit for executions get_all
+2025-10-25 04:31:05,038 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:31:05] "GET /api/executions/?_t=1761355865032 HTTP/1.1" 200 -
+2025-10-25 04:31:10,038 - root - INFO - FRONTEND [INFO]: 🔄 Auto-refreshing executions data...
+2025-10-25 04:31:10,039 - root - INFO - FRONTEND [INFO]: 🔄 Auto-refreshing executions data...
+2025-10-25 04:31:10,039 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
+2025-10-25 04:31:10,040 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
+2025-10-25 04:31:10,041 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:31:10] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-25 04:31:22,810 - cache - INFO - Cache DELETE: services.ticker_service.get_all:18aa035bec6acbdba4a2915cb30d69fc (Was accessed 0 times)
+2025-10-25 04:31:22,810 - cache - INFO - Cache DELETE: services.ticker_service.get_all:18aa035bec6acbdba4a2915cb30d69fc (Was accessed 0 times)
+2025-10-25 04:31:22,810 - cache - INFO - Cache DELETE: services.ticker_service.get_all:6f006cf4593fc47c777803a2f1392472 (Was accessed 0 times)
+2025-10-25 04:31:22,810 - cache - INFO - Cache DELETE: services.ticker_service.get_all:6f006cf4593fc47c777803a2f1392472 (Was accessed 0 times)
+2025-10-25 04:31:22,810 - cache - INFO - Cache DELETE: services.ticker_service.get_all:ff3716050da055fd0f2563e68c0bcad1 (Was accessed 0 times)
+2025-10-25 04:31:22,810 - cache - INFO - Cache DELETE: services.ticker_service.get_all:ff3716050da055fd0f2563e68c0bcad1 (Was accessed 0 times)
+2025-10-25 04:31:22,811 - cache - INFO - Cache DELETE: services.ticker_service.get_all:e50a7138326d4a82192afd2956948dd1 (Was accessed 0 times)
+2025-10-25 04:31:22,811 - cache - INFO - Cache DELETE: services.ticker_service.get_all:e50a7138326d4a82192afd2956948dd1 (Was accessed 0 times)
+2025-10-25 04:31:22,811 - cache - INFO - Cache DELETE: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Was accessed 1 times)
+2025-10-25 04:31:22,811 - cache - INFO - Cache DELETE: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Was accessed 1 times)
+2025-10-25 04:31:30,506 - services.background_tasks - INFO - Starting background task: collect_metrics
+2025-10-25 04:31:31,512 - utils.performance_monitor - INFO - Performance: collect_performance_metrics - Duration: 1.006s - Success: True
+2025-10-25 04:31:31,512 - utils.performance_monitor - WARNING - Slow operation detected: collect_performance_metrics - Duration: 1.006s
+2025-10-25 04:31:31,517 - utils.performance_monitor - INFO - Performance: collect_database_metrics - Duration: 0.005s - Success: True
+2025-10-25 04:31:31,518 - utils.performance_monitor - INFO - Performance: collect_business_metrics - Duration: 0.001s - Success: True
+2025-10-25 04:31:31,519 - utils.performance_monitor - INFO - Performance: collect_cache_metrics - Duration: 0.001s - Success: True
+2025-10-25 04:31:31,519 - services.background_tasks - INFO - Metrics collection completed
+2025-10-25 04:31:31,519 - utils.performance_monitor - INFO - Performance: collect_metrics - Duration: 1.013s - Success: True
+2025-10-25 04:31:31,519 - utils.performance_monitor - WARNING - Slow operation detected: collect_metrics - Duration: 1.013s
+2025-10-25 04:31:31,520 - services.background_tasks - INFO - Background task 'collect_metrics' completed successfully in 1013ms
+2025-10-25 04:31:35,744 - routes.api.base_entity.executions - INFO - Getting all executions records
+2025-10-25 04:31:35,745 - cache - INFO - Cache HIT: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Access count: 2)
+2025-10-25 04:31:35,745 - cache - INFO - Cache HIT: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Access count: 2)
+2025-10-25 04:31:35,745 - routes.api.base_entity.executions - INFO - Cache hit for executions get_all
+2025-10-25 04:31:35,746 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:31:35] "GET /api/executions/?_t=1761355895741 HTTP/1.1" 200 -
+2025-10-25 04:31:41,743 - root - INFO - FRONTEND [INFO]: 🔄 Auto-refreshing executions data...
+2025-10-25 04:31:41,744 - root - INFO - FRONTEND [INFO]: 🔄 Auto-refreshing executions data...
+2025-10-25 04:31:41,744 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
+2025-10-25 04:31:41,744 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
+2025-10-25 04:31:41,744 - root - INFO - FRONTEND [INFO]: Performance: Long task detected
+2025-10-25 04:31:41,744 - root - INFO - FRONTEND [INFO]: Performance: Long task detected
+2025-10-25 04:31:41,744 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:31:41] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-25 04:32:05,743 - routes.api.base_entity.executions - INFO - Getting all executions records
+2025-10-25 04:32:05,743 - cache - INFO - Cache EXPIRED: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Age: 90.0s)
+2025-10-25 04:32:05,743 - cache - INFO - Cache EXPIRED: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Age: 90.0s)
+2025-10-25 04:32:05,743 - cache - INFO - Cache DELETE: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Was accessed 2 times)
+2025-10-25 04:32:05,743 - cache - INFO - Cache DELETE: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Was accessed 2 times)
+2025-10-25 04:32:05,745 - cache - INFO - Cache SET: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 26066 chars)
+2025-10-25 04:32:05,745 - cache - INFO - Cache SET: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 26066 chars)
+2025-10-25 04:32:05,745 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:32:05] "GET /api/executions/?_t=1761355925741 HTTP/1.1" 200 -
+2025-10-25 04:32:11,742 - root - INFO - FRONTEND [INFO]: 🔄 Auto-refreshing executions data...
+2025-10-25 04:32:11,742 - root - INFO - FRONTEND [INFO]: 🔄 Auto-refreshing executions data...
+2025-10-25 04:32:11,742 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
+2025-10-25 04:32:11,742 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
+2025-10-25 04:32:11,743 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:32:11] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-25 04:32:18,464 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-25T04:32:18.464442', 'error_type': 'MethodNotAllowed', 'error_message': '405 Method Not Allowed: The method is not allowed for the requested URL.', 'request_method': 'POST', 'request_url': 'http://127.0.0.1:8080/api/user-data-import/upload-and-preview', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'general'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1458, in dispatch_request\n    self.raise_routing_exception(req)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1440, in raise_routing_exception\n    raise request.routing_exception  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/ctx.py", line 353, in match_request\n    result = self.url_adapter.match(return_rule=True)  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/routing/map.py", line 650, in match\n    raise MethodNotAllowed(valid_methods=list(e.have_match_for)) from None\nwerkzeug.exceptions.MethodNotAllowed: 405 Method Not Allowed: The method is not allowed for the requested URL.\n'}
+2025-10-25 04:32:18,464 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-25T04:32:18.464442', 'error_type': 'MethodNotAllowed', 'error_message': '405 Method Not Allowed: The method is not allowed for the requested URL.', 'request_method': 'POST', 'request_url': 'http://127.0.0.1:8080/api/user-data-import/upload-and-preview', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'general'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1458, in dispatch_request\n    self.raise_routing_exception(req)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1440, in raise_routing_exception\n    raise request.routing_exception  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/ctx.py", line 353, in match_request\n    result = self.url_adapter.match(return_rule=True)  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/routing/map.py", line 650, in match\n    raise MethodNotAllowed(valid_methods=list(e.have_match_for)) from None\nwerkzeug.exceptions.MethodNotAllowed: 405 Method Not Allowed: The method is not allowed for the requested URL.\n'}
+2025-10-25 04:32:18,464 - utils.performance_monitor - INFO - Performance: handle_general_error - Duration: 0.000s - Success: True
+2025-10-25 04:32:18,465 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:32:18] "[35m[1mPOST /api/user-data-import/upload-and-preview HTTP/1.1[0m" 500 -
+2025-10-25 04:32:35,743 - routes.api.base_entity.executions - INFO - Getting all executions records
+2025-10-25 04:32:35,743 - cache - INFO - Cache HIT: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Access count: 1)
+2025-10-25 04:32:35,743 - cache - INFO - Cache HIT: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Access count: 1)
+2025-10-25 04:32:35,743 - routes.api.base_entity.executions - INFO - Cache hit for executions get_all
+2025-10-25 04:32:35,743 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:32:35] "GET /api/executions/?_t=1761355955741 HTTP/1.1" 200 -
+2025-10-25 04:32:52,674 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-25T04:32:52.674350', 'error_type': 'MethodNotAllowed', 'error_message': '405 Method Not Allowed: The method is not allowed for the requested URL.', 'request_method': 'POST', 'request_url': 'http://127.0.0.1:8080/api/user-data-import/upload-and-preview', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'general'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1458, in dispatch_request\n    self.raise_routing_exception(req)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1440, in raise_routing_exception\n    raise request.routing_exception  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/ctx.py", line 353, in match_request\n    result = self.url_adapter.match(return_rule=True)  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/routing/map.py", line 650, in match\n    raise MethodNotAllowed(valid_methods=list(e.have_match_for)) from None\nwerkzeug.exceptions.MethodNotAllowed: 405 Method Not Allowed: The method is not allowed for the requested URL.\n'}
+2025-10-25 04:32:52,675 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-25T04:32:52.674350', 'error_type': 'MethodNotAllowed', 'error_message': '405 Method Not Allowed: The method is not allowed for the requested URL.', 'request_method': 'POST', 'request_url': 'http://127.0.0.1:8080/api/user-data-import/upload-and-preview', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'general'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1458, in dispatch_request\n    self.raise_routing_exception(req)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1440, in raise_routing_exception\n    raise request.routing_exception  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/ctx.py", line 353, in match_request\n    result = self.url_adapter.match(return_rule=True)  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/routing/map.py", line 650, in match\n    raise MethodNotAllowed(valid_methods=list(e.have_match_for)) from None\nwerkzeug.exceptions.MethodNotAllowed: 405 Method Not Allowed: The method is not allowed for the requested URL.\n'}
+2025-10-25 04:32:52,675 - utils.performance_monitor - INFO - Performance: handle_general_error - Duration: 0.001s - Success: True
+2025-10-25 04:32:52,675 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:32:52] "[35m[1mPOST /api/user-data-import/upload-and-preview HTTP/1.1[0m" 500 -
+2025-10-25 04:33:24,100 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-25T04:33:24.099971', 'error_type': 'MethodNotAllowed', 'error_message': '405 Method Not Allowed: The method is not allowed for the requested URL.', 'request_method': 'POST', 'request_url': 'http://127.0.0.1:8080/api/user-data-import/upload-and-preview', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'general'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1458, in dispatch_request\n    self.raise_routing_exception(req)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1440, in raise_routing_exception\n    raise request.routing_exception  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/ctx.py", line 353, in match_request\n    result = self.url_adapter.match(return_rule=True)  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/routing/map.py", line 650, in match\n    raise MethodNotAllowed(valid_methods=list(e.have_match_for)) from None\nwerkzeug.exceptions.MethodNotAllowed: 405 Method Not Allowed: The method is not allowed for the requested URL.\n'}
+2025-10-25 04:33:24,100 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-25T04:33:24.099971', 'error_type': 'MethodNotAllowed', 'error_message': '405 Method Not Allowed: The method is not allowed for the requested URL.', 'request_method': 'POST', 'request_url': 'http://127.0.0.1:8080/api/user-data-import/upload-and-preview', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'general'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1458, in dispatch_request\n    self.raise_routing_exception(req)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1440, in raise_routing_exception\n    raise request.routing_exception  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/ctx.py", line 353, in match_request\n    result = self.url_adapter.match(return_rule=True)  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/routing/map.py", line 650, in match\n    raise MethodNotAllowed(valid_methods=list(e.have_match_for)) from None\nwerkzeug.exceptions.MethodNotAllowed: 405 Method Not Allowed: The method is not allowed for the requested URL.\n'}
+2025-10-25 04:33:24,100 - utils.performance_monitor - INFO - Performance: handle_general_error - Duration: 0.000s - Success: True
+2025-10-25 04:33:24,100 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:33:24] "[35m[1mPOST /api/user-data-import/upload-and-preview HTTP/1.1[0m" 500 -
+2025-10-25 04:33:30,768 - root - INFO - FRONTEND [INFO]: 🔄 Auto-refreshing executions data...
+2025-10-25 04:33:30,769 - routes.api.base_entity.executions - INFO - Getting all executions records
+2025-10-25 04:33:30,770 - cache - INFO - Cache EXPIRED: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Age: 85.0s)
+2025-10-25 04:33:30,769 - root - INFO - FRONTEND [INFO]: 🔄 Auto-refreshing executions data...
+2025-10-25 04:33:30,770 - cache - INFO - Cache EXPIRED: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Age: 85.0s)
+2025-10-25 04:33:30,770 - cache - INFO - Cache DELETE: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Was accessed 1 times)
+2025-10-25 04:33:30,770 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
+2025-10-25 04:33:30,770 - cache - INFO - Cache DELETE: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Was accessed 1 times)
+2025-10-25 04:33:30,771 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
+2025-10-25 04:33:30,776 - cache - INFO - Cache SET: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 26066 chars)
+2025-10-25 04:33:30,773 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:33:30] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-25 04:33:30,776 - cache - INFO - Cache SET: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 26066 chars)
+2025-10-25 04:33:30,778 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:33:30] "GET /api/executions/?_t=1761356010766 HTTP/1.1" 200 -
+2025-10-25 04:33:31,869 - root - INFO - 🚀 Starting TikTrack server...
+2025-10-25 04:33:31,869 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend
+2025-10-25 04:33:31,869 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-10-25 04:33:31,869 - root - INFO - 📦 Flask version: 2.3.3
+2025-10-25 04:33:31,869 - root - INFO - 🗄️ Initializing database...
+2025-10-25 04:33:31,869 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-10-25 04:33:31,873 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.003s
+2025-10-25 04:33:31,873 - root - INFO - ✅ Database initialized successfully
+2025-10-25 04:33:32,878 - utils.performance_monitor - INFO - System metrics: CPU: 41.9%, Memory: 44.8%, Disk: 3.7%
+2025-10-25 04:33:32,878 - root - INFO - ✅ Database initialized successfully
+2025-10-25 04:33:32,879 - root - INFO - ✅ Server initialization completed
+2025-10-25 04:33:32,932 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
+2025-10-25 04:33:32,932 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
+2025-10-25 04:33:32,932 - root - INFO - ✅ Condition evaluation task registered successfully
+2025-10-25 04:33:32,932 - root - INFO - 🚀 Starting background task scheduler...
+2025-10-25 04:33:32,932 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-10-25 04:33:32,932 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-10-25 04:33:32,932 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-10-25 04:33:32,932 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-10-25 04:33:32,932 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-10-25 04:33:32,932 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-10-25 04:33:32,932 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-10-25 04:33:32,933 - services.background_tasks - INFO - Background task scheduler started
+2025-10-25 04:33:32,933 - root - INFO - ✅ Background task scheduler started successfully
+2025-10-25 04:33:32,933 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:ea76782d364c9b0fff1147eb36fad611
+2025-10-25 04:33:32,933 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:ea76782d364c9b0fff1147eb36fad611
+2025-10-25 04:33:32,959 - cache - INFO - Cache SET: services.system_settings_service.get_setting:ea76782d364c9b0fff1147eb36fad611 (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-25 04:33:32,959 - cache - INFO - Cache SET: services.system_settings_service.get_setting:ea76782d364c9b0fff1147eb36fad611 (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-25 04:33:32,959 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-10-25 04:33:32,960 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-10-25 04:33:32,960 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-10-25 04:33:36,741 - root - INFO - FRONTEND [INFO]: 🔄 Auto-refreshing executions data...
+2025-10-25 04:33:36,741 - root - INFO - FRONTEND [INFO]: 🔄 Auto-refreshing executions data...
+2025-10-25 04:33:36,741 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
+2025-10-25 04:33:36,742 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
+2025-10-25 04:33:36,742 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:33:36] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-25 04:33:41,086 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-25T04:33:41.086466', 'error_type': 'MethodNotAllowed', 'error_message': '405 Method Not Allowed: The method is not allowed for the requested URL.', 'request_method': 'POST', 'request_url': 'http://127.0.0.1:8080/api/user-data-import/upload-and-preview', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'general'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1458, in dispatch_request\n    self.raise_routing_exception(req)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1440, in raise_routing_exception\n    raise request.routing_exception  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/ctx.py", line 353, in match_request\n    result = self.url_adapter.match(return_rule=True)  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/routing/map.py", line 650, in match\n    raise MethodNotAllowed(valid_methods=list(e.have_match_for)) from None\nwerkzeug.exceptions.MethodNotAllowed: 405 Method Not Allowed: The method is not allowed for the requested URL.\n'}
+2025-10-25 04:33:41,087 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-25T04:33:41.086466', 'error_type': 'MethodNotAllowed', 'error_message': '405 Method Not Allowed: The method is not allowed for the requested URL.', 'request_method': 'POST', 'request_url': 'http://127.0.0.1:8080/api/user-data-import/upload-and-preview', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'general'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1458, in dispatch_request\n    self.raise_routing_exception(req)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1440, in raise_routing_exception\n    raise request.routing_exception  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/ctx.py", line 353, in match_request\n    result = self.url_adapter.match(return_rule=True)  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/routing/map.py", line 650, in match\n    raise MethodNotAllowed(valid_methods=list(e.have_match_for)) from None\nwerkzeug.exceptions.MethodNotAllowed: 405 Method Not Allowed: The method is not allowed for the requested URL.\n'}
+2025-10-25 04:33:41,087 - utils.performance_monitor - INFO - Performance: handle_general_error - Duration: 0.001s - Success: True
+2025-10-25 04:33:41,088 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:33:41] "[35m[1mPOST /api/user-data-import/upload-and-preview HTTP/1.1[0m" 500 -
+2025-10-25 04:33:54,594 - root - INFO - 🚀 Starting TikTrack server...
+2025-10-25 04:33:54,594 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend
+2025-10-25 04:33:54,594 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-10-25 04:33:54,594 - root - INFO - 📦 Flask version: 2.3.3
+2025-10-25 04:33:54,594 - root - INFO - 🗄️ Initializing database...
+2025-10-25 04:33:54,594 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-10-25 04:33:54,597 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.003s
+2025-10-25 04:33:54,597 - root - INFO - ✅ Database initialized successfully
+2025-10-25 04:33:55,603 - utils.performance_monitor - INFO - System metrics: CPU: 18.0%, Memory: 44.6%, Disk: 3.7%
+2025-10-25 04:33:55,603 - root - INFO - ✅ Database initialized successfully
+2025-10-25 04:33:55,603 - root - INFO - ✅ Server initialization completed
+2025-10-25 04:33:55,648 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
+2025-10-25 04:33:55,648 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
+2025-10-25 04:33:55,648 - root - INFO - ✅ Condition evaluation task registered successfully
+2025-10-25 04:33:55,648 - root - INFO - 🚀 Starting background task scheduler...
+2025-10-25 04:33:55,648 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-10-25 04:33:55,648 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-10-25 04:33:55,648 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-10-25 04:33:55,649 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-10-25 04:33:55,649 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-10-25 04:33:55,649 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-10-25 04:33:55,649 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-10-25 04:33:55,649 - services.background_tasks - INFO - Background task scheduler started
+2025-10-25 04:33:55,649 - root - INFO - ✅ Background task scheduler started successfully
+2025-10-25 04:33:55,649 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:816f8ef735e9d68b53c0bfa04c38c842
+2025-10-25 04:33:55,649 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:816f8ef735e9d68b53c0bfa04c38c842
+2025-10-25 04:33:55,675 - cache - INFO - Cache SET: services.system_settings_service.get_setting:816f8ef735e9d68b53c0bfa04c38c842 (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-25 04:33:55,675 - cache - INFO - Cache SET: services.system_settings_service.get_setting:816f8ef735e9d68b53c0bfa04c38c842 (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-25 04:33:55,675 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-10-25 04:33:55,676 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-10-25 04:33:55,677 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-10-25 04:34:01,625 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-25T04:34:01.625324', 'error_type': 'MethodNotAllowed', 'error_message': '405 Method Not Allowed: The method is not allowed for the requested URL.', 'request_method': 'POST', 'request_url': 'http://127.0.0.1:8080/api/user-data-import/upload-and-preview', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'general'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1458, in dispatch_request\n    self.raise_routing_exception(req)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1440, in raise_routing_exception\n    raise request.routing_exception  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/ctx.py", line 353, in match_request\n    result = self.url_adapter.match(return_rule=True)  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/routing/map.py", line 650, in match\n    raise MethodNotAllowed(valid_methods=list(e.have_match_for)) from None\nwerkzeug.exceptions.MethodNotAllowed: 405 Method Not Allowed: The method is not allowed for the requested URL.\n'}
+2025-10-25 04:34:01,625 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-25T04:34:01.625324', 'error_type': 'MethodNotAllowed', 'error_message': '405 Method Not Allowed: The method is not allowed for the requested URL.', 'request_method': 'POST', 'request_url': 'http://127.0.0.1:8080/api/user-data-import/upload-and-preview', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'general'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1458, in dispatch_request\n    self.raise_routing_exception(req)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1440, in raise_routing_exception\n    raise request.routing_exception  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/ctx.py", line 353, in match_request\n    result = self.url_adapter.match(return_rule=True)  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/routing/map.py", line 650, in match\n    raise MethodNotAllowed(valid_methods=list(e.have_match_for)) from None\nwerkzeug.exceptions.MethodNotAllowed: 405 Method Not Allowed: The method is not allowed for the requested URL.\n'}
+2025-10-25 04:34:01,625 - utils.performance_monitor - INFO - Performance: handle_general_error - Duration: 0.001s - Success: True
+2025-10-25 04:34:01,626 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:34:01] "[35m[1mPOST /api/user-data-import/upload-and-preview HTTP/1.1[0m" 500 -
+2025-10-25 04:34:30,788 - routes.api.base_entity.executions - INFO - Getting all executions records
+2025-10-25 04:34:30,789 - cache - INFO - Cache EXPIRED: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Age: 60.0s)
+2025-10-25 04:34:30,789 - cache - INFO - Cache EXPIRED: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Age: 60.0s)
+2025-10-25 04:34:30,789 - cache - INFO - Cache DELETE: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Was accessed 0 times)
+2025-10-25 04:34:30,789 - cache - INFO - Cache DELETE: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Was accessed 0 times)
+2025-10-25 04:34:30,793 - cache - INFO - Cache SET: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 26066 chars)
+2025-10-25 04:34:30,793 - cache - INFO - Cache SET: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 26066 chars)
+2025-10-25 04:34:30,795 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:34:30] "GET /api/executions/?_t=1761356070776 HTTP/1.1" 200 -
+2025-10-25 04:34:54,441 - root - INFO - 🚀 Starting TikTrack server...
+2025-10-25 04:34:54,442 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend
+2025-10-25 04:34:54,442 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-10-25 04:34:54,442 - root - INFO - 📦 Flask version: 2.3.3
+2025-10-25 04:34:54,442 - root - INFO - 🗄️ Initializing database...
+2025-10-25 04:34:54,442 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-10-25 04:34:54,445 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.003s
+2025-10-25 04:34:54,445 - root - INFO - ✅ Database initialized successfully
+2025-10-25 04:34:55,450 - utils.performance_monitor - INFO - System metrics: CPU: 12.4%, Memory: 46.1%, Disk: 3.7%
+2025-10-25 04:34:55,450 - root - INFO - ✅ Database initialized successfully
+2025-10-25 04:34:55,450 - root - INFO - ✅ Server initialization completed
+2025-10-25 04:35:01,520 - utils.rate_limiter - INFO - Rate limiter cleanup: removed 0 empty entries
+2025-10-25 04:35:01,520 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-25T04:35:01.520639', 'error_type': 'MethodNotAllowed', 'error_message': '405 Method Not Allowed: The method is not allowed for the requested URL.', 'request_method': 'POST', 'request_url': 'http://127.0.0.1:8080/api/user-data-import/upload-and-preview', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'general'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1458, in dispatch_request\n    self.raise_routing_exception(req)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1440, in raise_routing_exception\n    raise request.routing_exception  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/ctx.py", line 353, in match_request\n    result = self.url_adapter.match(return_rule=True)  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/routing/map.py", line 650, in match\n    raise MethodNotAllowed(valid_methods=list(e.have_match_for)) from None\nwerkzeug.exceptions.MethodNotAllowed: 405 Method Not Allowed: The method is not allowed for the requested URL.\n'}
+2025-10-25 04:35:01,520 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-25T04:35:01.520639', 'error_type': 'MethodNotAllowed', 'error_message': '405 Method Not Allowed: The method is not allowed for the requested URL.', 'request_method': 'POST', 'request_url': 'http://127.0.0.1:8080/api/user-data-import/upload-and-preview', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'general'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1458, in dispatch_request\n    self.raise_routing_exception(req)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1440, in raise_routing_exception\n    raise request.routing_exception  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/ctx.py", line 353, in match_request\n    result = self.url_adapter.match(return_rule=True)  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/routing/map.py", line 650, in match\n    raise MethodNotAllowed(valid_methods=list(e.have_match_for)) from None\nwerkzeug.exceptions.MethodNotAllowed: 405 Method Not Allowed: The method is not allowed for the requested URL.\n'}
+2025-10-25 04:35:01,521 - utils.performance_monitor - INFO - Performance: handle_general_error - Duration: 0.000s - Success: True
+2025-10-25 04:35:01,521 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:35:01] "[35m[1mPOST /api/user-data-import/upload-and-preview HTTP/1.1[0m" 500 -
+2025-10-25 04:35:14,067 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:35:14] "[32mGET /api/alerts HTTP/1.1[0m" 308 -
+2025-10-25 04:35:19,738 - root - INFO - 🚀 Starting TikTrack server...
+2025-10-25 04:35:19,738 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend
+2025-10-25 04:35:19,738 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-10-25 04:35:19,738 - root - INFO - 📦 Flask version: 2.3.3
+2025-10-25 04:35:19,738 - root - INFO - 🗄️ Initializing database...
+2025-10-25 04:35:19,738 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-10-25 04:35:19,741 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.003s
+2025-10-25 04:35:19,741 - root - INFO - ✅ Database initialized successfully
+2025-10-25 04:35:20,746 - utils.performance_monitor - INFO - System metrics: CPU: 13.1%, Memory: 44.2%, Disk: 3.7%
+2025-10-25 04:35:20,746 - root - INFO - ✅ Database initialized successfully
+2025-10-25 04:35:20,746 - root - INFO - ✅ Server initialization completed
+2025-10-25 04:35:20,792 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
+2025-10-25 04:35:20,792 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
+2025-10-25 04:35:20,792 - root - INFO - ✅ Condition evaluation task registered successfully
+2025-10-25 04:35:20,792 - root - INFO - 🚀 Starting background task scheduler...
+2025-10-25 04:35:20,792 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-10-25 04:35:20,792 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-10-25 04:35:20,792 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-10-25 04:35:20,792 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-10-25 04:35:20,792 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-10-25 04:35:20,792 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-10-25 04:35:20,793 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-10-25 04:35:20,793 - services.background_tasks - INFO - Background task scheduler started
+2025-10-25 04:35:20,793 - root - INFO - ✅ Background task scheduler started successfully
+2025-10-25 04:35:20,793 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:562c94f85a50bf5b5c9a6b2edb88084c
+2025-10-25 04:35:20,793 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:562c94f85a50bf5b5c9a6b2edb88084c
+2025-10-25 04:35:20,819 - cache - INFO - Cache SET: services.system_settings_service.get_setting:562c94f85a50bf5b5c9a6b2edb88084c (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-25 04:35:20,819 - cache - INFO - Cache SET: services.system_settings_service.get_setting:562c94f85a50bf5b5c9a6b2edb88084c (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-25 04:35:20,819 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-10-25 04:35:20,820 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-10-25 04:35:20,821 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-10-25 04:35:24,877 - utils.rate_limiter - INFO - Rate limiter cleanup: removed 0 empty entries
+2025-10-25 04:35:24,883 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.005s - Success: True
+2025-10-25 04:35:24,889 - cache - INFO - Cache SET: health_check_1761356124 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-25 04:35:24,889 - cache - INFO - Cache SET: health_check_1761356124 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-25 04:35:24,889 - cache - INFO - Cache HIT: health_check_1761356124 (Access count: 1)
+2025-10-25 04:35:24,889 - cache - INFO - Cache HIT: health_check_1761356124 (Access count: 1)
+2025-10-25 04:35:24,889 - cache - INFO - Cache DELETE: health_check_1761356124 (Was accessed 1 times)
+2025-10-25 04:35:24,889 - cache - INFO - Cache DELETE: health_check_1761356124 (Was accessed 1 times)
+2025-10-25 04:35:24,889 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.006s - Success: True
+2025-10-25 04:35:24,891 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.001s - Success: True
+2025-10-25 04:35:24,891 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-25 04:35:24,896 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:35:24] "GET /api/health HTTP/1.1" 200 -
+2025-10-25 04:35:27,171 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:35:27] "[32mGET /api/alerts HTTP/1.1[0m" 308 -
+2025-10-25 04:35:27,696 - root - INFO - 🚀 Starting TikTrack server...
+2025-10-25 04:35:27,696 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend
+2025-10-25 04:35:27,697 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-10-25 04:35:27,697 - root - INFO - 📦 Flask version: 2.3.3
+2025-10-25 04:35:27,697 - root - INFO - 🗄️ Initializing database...
+2025-10-25 04:35:27,697 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-10-25 04:35:27,700 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.003s
+2025-10-25 04:35:27,700 - root - INFO - ✅ Database initialized successfully
+2025-10-25 04:35:28,702 - utils.performance_monitor - INFO - System metrics: CPU: 12.8%, Memory: 44.3%, Disk: 3.7%
+2025-10-25 04:35:28,703 - root - INFO - ✅ Database initialized successfully
+2025-10-25 04:35:28,703 - root - INFO - ✅ Server initialization completed
+2025-10-25 04:35:28,752 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
+2025-10-25 04:35:28,752 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
+2025-10-25 04:35:28,752 - root - INFO - ✅ Condition evaluation task registered successfully
+2025-10-25 04:35:28,752 - root - INFO - 🚀 Starting background task scheduler...
+2025-10-25 04:35:28,753 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-10-25 04:35:28,753 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-10-25 04:35:28,753 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-10-25 04:35:28,753 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-10-25 04:35:28,753 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-10-25 04:35:28,753 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-10-25 04:35:28,753 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-10-25 04:35:28,753 - services.background_tasks - INFO - Background task scheduler started
+2025-10-25 04:35:28,753 - root - INFO - ✅ Background task scheduler started successfully
+2025-10-25 04:35:28,753 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:cfcd1e8d175ef387cf73b75c37688472
+2025-10-25 04:35:28,753 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:cfcd1e8d175ef387cf73b75c37688472
+2025-10-25 04:35:28,780 - cache - INFO - Cache SET: services.system_settings_service.get_setting:cfcd1e8d175ef387cf73b75c37688472 (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-25 04:35:28,780 - cache - INFO - Cache SET: services.system_settings_service.get_setting:cfcd1e8d175ef387cf73b75c37688472 (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-25 04:35:28,780 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-10-25 04:35:28,781 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-10-25 04:35:28,782 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-10-25 04:35:29,495 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:35:29] "[32mGET /api/alerts HTTP/1.1[0m" 308 -
+2025-10-25 04:35:30,779 - root - INFO - FRONTEND [INFO]: 🔄 Auto-refreshing executions data...
+2025-10-25 04:35:30,780 - routes.api.base_entity.executions - INFO - Getting all executions records
+2025-10-25 04:35:30,781 - cache - INFO - Cache HIT: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Access count: 1)
+2025-10-25 04:35:30,781 - cache - INFO - Cache HIT: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Access count: 1)
+2025-10-25 04:35:30,780 - root - INFO - FRONTEND [INFO]: 🔄 Auto-refreshing executions data...
+2025-10-25 04:35:30,782 - routes.api.base_entity.executions - INFO - Cache hit for executions get_all
+2025-10-25 04:35:30,783 - root - INFO - FRONTEND [INFO]: 🔄 Auto-refreshing executions data...
+2025-10-25 04:35:30,783 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
+2025-10-25 04:35:30,784 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:35:30] "GET /api/executions/?_t=1761356130774 HTTP/1.1" 200 -
+2025-10-25 04:35:30,785 - root - INFO - FRONTEND [INFO]: 🔄 Auto-refreshing executions data...
+2025-10-25 04:35:30,785 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
+2025-10-25 04:35:30,787 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:35:30] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-25 04:35:30,788 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:35:30] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-25 04:35:30,792 - cache - INFO - Cache MISS: services.ticker_service.get_all:1b473b5de2767b6f522e67c72b7166a6
+2025-10-25 04:35:30,791 - services.trade_service - INFO - Loading trades with joinedload for account and ticker
+2025-10-25 04:35:30,792 - cache - INFO - Cache MISS: services.ticker_service.get_all:1b473b5de2767b6f522e67c72b7166a6
+2025-10-25 04:35:30,796 - services.trade_service - INFO - Loaded 13 trades
+2025-10-25 04:35:30,796 - services.trade_service - INFO - First trade ID: 1
+2025-10-25 04:35:30,796 - services.trade_service - INFO - First trade trading_account_id: 1
+2025-10-25 04:35:30,797 - services.ticker_service - INFO - Found 19 tickers in database
+2025-10-25 04:35:30,797 - services.trade_service - INFO - First trade ticker_id: 1
+2025-10-25 04:35:30,798 - services.trade_service - INFO - First trade has account attribute: True
+2025-10-25 04:35:30,799 - services.trade_service - INFO - First trade account object: <TradingAccount(name='חשבון מעודכן', currency_id='1', status='open')>
+2025-10-25 04:35:30,799 - services.trade_service - INFO - First trade has ticker attribute: True
+2025-10-25 04:35:30,800 - services.trade_service - INFO - First trade ticker object: <Ticker(symbol='AAPL', name='Apple Inc. - UPDATED', type='stock')>
+2025-10-25 04:35:30,800 - services.trade_service - INFO - First trade account name: חשבון מעודכן
+2025-10-25 04:35:30,800 - services.trade_service - INFO - First trade ticker symbol: AAPL
+2025-10-25 04:35:30,801 - services.position_calculator_service - INFO - Calculated positions for 13 trades
+2025-10-25 04:35:30,801 - models.trade - INFO - Trade 1: Checking trade_plan relationship...
+2025-10-25 04:35:30,802 - models.trade - INFO - Trade 1: hasattr(self, 'trade_plan'): True
+2025-10-25 04:35:30,802 - models.trade - INFO - Trade 1: self.trade_plan: <TradePlan(id=4, type='swing')>
+2025-10-25 04:35:30,802 - models.trade - INFO - Trade 1: trade_plan is not None, adding data...
+2025-10-25 04:35:30,802 - models.trade - INFO - Trade 1: Using loaded account name: חשבון מעודכן
+2025-10-25 04:35:30,802 - models.trade - INFO - Trade 1: Using loaded ticker symbol: AAPL
+2025-10-25 04:35:30,802 - models.trade - INFO - Trade 1 to_dict result: {'id': 1, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'cancelled', 'investment_type': 'swing', 'side': 'Long', 'notes': 'קנייה של Apple', 'opened_at': '2025-08-15 03:51:43', 'closed_at': '2025-08-21 12:36:00', 'created_at': '2025-08-15 03:51:43', 'total_pl': 2500.0, 'trade_plan_created_at': '2025-08-14 06:52:13', 'trade_plan_planned_amount': 9892.0, 'trade_plan_status': 'closed', 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': '2025-08-31 14:28:23', 'cancel_reason': 'בוטל על ידי המשתמש'}
+2025-10-25 04:35:30,816 - models.trade - INFO - Trade 2: Checking trade_plan relationship...
+2025-10-25 04:35:30,816 - models.trade - INFO - Trade 2: hasattr(self, 'trade_plan'): True
+2025-10-25 04:35:30,816 - models.trade - INFO - Trade 2: self.trade_plan: <TradePlan(id=14, type='passive')>
+2025-10-25 04:35:30,817 - models.trade - INFO - Trade 2: trade_plan is not None, adding data...
+2025-10-25 04:35:30,817 - models.trade - INFO - Trade 2: Using loaded account name: חשבון טכנולוגיה
+2025-10-25 04:35:30,817 - models.trade - INFO - Trade 2: Using loaded ticker symbol: GOOGL
+2025-10-25 04:35:30,817 - models.trade - INFO - Trade 2 to_dict result: {'id': 2, 'trading_account_id': 2, 'ticker_id': 2, 'trade_plan_id': 14, 'status': 'closed', 'investment_type': 'investment', 'side': 'Long', 'notes': 'טרייד מוצלח ב-Google', 'opened_at': '2025-08-15 03:51:43', 'closed_at': '2025-08-10 06:51:43', 'created_at': '2025-08-15 03:51:43', 'total_pl': 1500.0, 'trade_plan_created_at': '2025-08-30 03:36:52', 'trade_plan_planned_amount': 300.5, 'trade_plan_status': 'open', 'account_name': 'חשבון טכנולוגיה', 'ticker_symbol': 'GOOGL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-25 04:35:30,838 - models.trade - INFO - Trade 3: Checking trade_plan relationship...
+2025-10-25 04:35:30,838 - models.trade - INFO - Trade 3: hasattr(self, 'trade_plan'): True
+2025-10-25 04:35:30,838 - models.trade - INFO - Trade 3: self.trade_plan: <TradePlan(id=2, type='swing')>
+2025-10-25 04:35:30,838 - models.trade - INFO - Trade 3: trade_plan is not None, adding data...
+2025-10-25 04:35:30,838 - models.trade - INFO - Trade 3: Using loaded account name: חשבון ETF
+2025-10-25 04:35:30,839 - models.trade - INFO - Trade 3: Using loaded ticker symbol: SPY
+2025-10-25 04:35:30,839 - models.trade - INFO - Trade 3 to_dict result: {'id': 3, 'trading_account_id': 3, 'ticker_id': 9, 'trade_plan_id': 2, 'status': 'cancelled', 'investment_type': 'passive', 'side': 'Long', 'notes': 'השקעה ב-ETF', 'opened_at': '2025-08-15 03:51:43', 'closed_at': None, 'created_at': '2025-08-15 03:51:43', 'total_pl': 800.0, 'trade_plan_created_at': '2025-08-15 03:51:43', 'trade_plan_planned_amount': 8000.0, 'trade_plan_status': 'open', 'account_name': 'חשבון ETF', 'ticker_symbol': 'SPY', 'cancelled_at': '2025-08-22 06:50:57', 'cancel_reason': 'בדיקת ביטול'}
+2025-10-25 04:35:30,845 - models.trade - INFO - Trade 4: Checking trade_plan relationship...
+2025-10-25 04:35:30,845 - models.trade - INFO - Trade 4: hasattr(self, 'trade_plan'): True
+2025-10-25 04:35:30,845 - models.trade - INFO - Trade 4: self.trade_plan: <TradePlan(id=4, type='swing')>
+2025-10-25 04:35:30,845 - models.trade - INFO - Trade 4: trade_plan is not None, adding data...
+2025-10-25 04:35:30,845 - models.trade - INFO - Trade 4: Using loaded account name: חשבון מעודכן
+2025-10-25 04:35:30,845 - models.trade - INFO - Trade 4: Using loaded ticker symbol: AAPL
+2025-10-25 04:35:30,845 - models.trade - INFO - Trade 4 to_dict result: {'id': 4, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'cancelled', 'investment_type': 'swing', 'side': 'Long', 'notes': None, 'opened_at': '2025-08-26 00:13:21', 'closed_at': None, 'created_at': '2025-08-26 00:13:21', 'total_pl': None, 'trade_plan_created_at': '2025-08-14 06:52:13', 'trade_plan_planned_amount': 9892.0, 'trade_plan_status': 'closed', 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': '2025-08-31 14:30:08', 'cancel_reason': 'בוטל על ידי המשתמש'}
+2025-10-25 04:35:30,855 - models.trade - INFO - Trade 5: Checking trade_plan relationship...
+2025-10-25 04:35:30,855 - models.trade - INFO - Trade 5: hasattr(self, 'trade_plan'): True
+2025-10-25 04:35:30,856 - models.trade - INFO - Trade 5: self.trade_plan: <TradePlan(id=4, type='swing')>
+2025-10-25 04:35:30,856 - models.trade - INFO - Trade 5: trade_plan is not None, adding data...
+2025-10-25 04:35:30,856 - models.trade - INFO - Trade 5: Using loaded account name: חשבון ETF
+2025-10-25 04:35:30,856 - models.trade - INFO - Trade 5: Using loaded ticker symbol: AAPL
+2025-10-25 04:35:30,856 - models.trade - INFO - Trade 5 to_dict result: {'id': 5, 'trading_account_id': 3, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': 'גכעגעג', 'opened_at': '2025-08-30 22:02:00', 'closed_at': None, 'created_at': '2025-08-30 22:02:00', 'total_pl': 0.0, 'trade_plan_created_at': '2025-08-14 06:52:13', 'trade_plan_planned_amount': 9892.0, 'trade_plan_status': 'closed', 'account_name': 'חשבון ETF', 'ticker_symbol': 'AAPL', 'cancelled_at': '2025-08-31 14:32:32', 'cancel_reason': 'test'}
+2025-10-25 04:35:30,865 - models.trade - INFO - Trade 6: Checking trade_plan relationship...
+2025-10-25 04:35:30,866 - models.trade - INFO - Trade 6: hasattr(self, 'trade_plan'): True
+2025-10-25 04:35:30,866 - models.trade - INFO - Trade 6: self.trade_plan: <TradePlan(id=1, type='passive')>
+2025-10-25 04:35:30,866 - models.trade - INFO - Trade 6: trade_plan is not None, adding data...
+2025-10-25 04:35:30,866 - models.trade - INFO - Trade 6: Using loaded account name: חשבון טכנולוגיה
+2025-10-25 04:35:30,866 - models.trade - INFO - Trade 6: Using loaded ticker symbol: GOOGL
+2025-10-25 04:35:30,866 - models.trade - INFO - Trade 6 to_dict result: {'id': 6, 'trading_account_id': 2, 'ticker_id': 2, 'trade_plan_id': 1, 'status': 'open', 'investment_type': 'investment', 'side': 'Long', 'notes': '', 'opened_at': '2025-08-31 16:57:00', 'closed_at': None, 'created_at': '2025-08-31 16:57:00', 'total_pl': 0.0, 'trade_plan_created_at': '2025-08-15 03:51:43', 'trade_plan_planned_amount': 10250.0, 'trade_plan_status': 'open', 'account_name': 'חשבון טכנולוגיה', 'ticker_symbol': 'GOOGL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-25 04:35:30,879 - models.trade - INFO - Trade 7: Checking trade_plan relationship...
+2025-10-25 04:35:30,879 - models.trade - INFO - Trade 7: hasattr(self, 'trade_plan'): True
+2025-10-25 04:35:30,879 - models.trade - INFO - Trade 7: self.trade_plan: <TradePlan(id=9, type='swing')>
+2025-10-25 04:35:30,879 - models.trade - INFO - Trade 7: trade_plan is not None, adding data...
+2025-10-25 04:35:30,879 - models.trade - INFO - Trade 7: Using loaded account name: חשבון טכנולוגיה
+2025-10-25 04:35:30,879 - models.trade - INFO - Trade 7: Using loaded ticker symbol: AMZN
+2025-10-25 04:35:30,879 - models.trade - INFO - Trade 7 to_dict result: {'id': 7, 'trading_account_id': 2, 'ticker_id': 6, 'trade_plan_id': 9, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': None, 'opened_at': '2025-08-31 17:38:00', 'closed_at': None, 'created_at': '2025-08-31 17:38:00', 'total_pl': 0.0, 'trade_plan_created_at': '2025-06-16 06:52:13', 'trade_plan_planned_amount': 9275.0, 'trade_plan_status': 'open', 'account_name': 'חשבון טכנולוגיה', 'ticker_symbol': 'AMZN', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-25 04:35:30,883 - cache - INFO - Cache SET: services.ticker_service.get_all:1b473b5de2767b6f522e67c72b7166a6 (TTL: 30s, Dependencies: ['tickers'], Data size: 1206 chars)
+2025-10-25 04:35:30,883 - cache - INFO - Cache SET: services.ticker_service.get_all:1b473b5de2767b6f522e67c72b7166a6 (TTL: 30s, Dependencies: ['tickers'], Data size: 1206 chars)
+2025-10-25 04:35:30,883 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:35:30] "GET /api/tickers/ HTTP/1.1" 200 -
+2025-10-25 04:35:30,891 - models.trade - INFO - Trade 8: Checking trade_plan relationship...
+2025-10-25 04:35:30,891 - models.trade - INFO - Trade 8: hasattr(self, 'trade_plan'): True
+2025-10-25 04:35:30,892 - models.trade - INFO - Trade 8: self.trade_plan: <TradePlan(id=4, type='swing')>
+2025-10-25 04:35:30,892 - models.trade - INFO - Trade 8: trade_plan is not None, adding data...
+2025-10-25 04:35:30,892 - models.trade - INFO - Trade 8: Using loaded account name: חשבון מעודכן
+2025-10-25 04:35:30,892 - models.trade - INFO - Trade 8: Using loaded ticker symbol: AAPL
+2025-10-25 04:35:30,892 - models.trade - INFO - Trade 8 to_dict result: {'id': 8, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'closed', 'investment_type': 'investment', 'side': 'Long', 'notes': None, 'opened_at': '2025-09-01 23:51:48', 'closed_at': '2025-09-02 00:36:20', 'created_at': '2025-09-01 23:51:48', 'total_pl': None, 'trade_plan_created_at': '2025-08-14 06:52:13', 'trade_plan_planned_amount': 9892.0, 'trade_plan_status': 'closed', 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-25 04:35:30,900 - models.trade - INFO - Trade 9: Checking trade_plan relationship...
+2025-10-25 04:35:30,900 - models.trade - INFO - Trade 9: hasattr(self, 'trade_plan'): True
+2025-10-25 04:35:30,900 - models.trade - INFO - Trade 9: self.trade_plan: <TradePlan(id=14, type='passive')>
+2025-10-25 04:35:30,900 - models.trade - INFO - Trade 9: trade_plan is not None, adding data...
+2025-10-25 04:35:30,900 - models.trade - INFO - Trade 9: Using loaded account name: חשבון מעודכן
+2025-10-25 04:35:30,900 - models.trade - INFO - Trade 9: Using loaded ticker symbol: GOOGL
+2025-10-25 04:35:30,900 - models.trade - INFO - Trade 9 to_dict result: {'id': 9, 'trading_account_id': 1, 'ticker_id': 2, 'trade_plan_id': 14, 'status': 'closed', 'investment_type': 'investment', 'side': 'Long', 'notes': None, 'opened_at': '2025-09-02 00:41:51', 'closed_at': '2025-09-02 00:42:08', 'created_at': '2025-09-02 00:41:51', 'total_pl': None, 'trade_plan_created_at': '2025-08-30 03:36:52', 'trade_plan_planned_amount': 300.5, 'trade_plan_status': 'open', 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'GOOGL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-25 04:35:30,912 - models.trade - INFO - Trade 10: Checking trade_plan relationship...
+2025-10-25 04:35:30,912 - models.trade - INFO - Trade 10: hasattr(self, 'trade_plan'): True
+2025-10-25 04:35:30,912 - models.trade - INFO - Trade 10: self.trade_plan: <TradePlan(id=1, type='passive')>
+2025-10-25 04:35:30,912 - models.trade - INFO - Trade 10: trade_plan is not None, adding data...
+2025-10-25 04:35:30,912 - models.trade - INFO - Trade 10: Using loaded account name: חשבון מעודכן
+2025-10-25 04:35:30,913 - models.trade - INFO - Trade 10: Using loaded ticker symbol: TSLA
+2025-10-25 04:35:30,913 - models.trade - INFO - Trade 10 to_dict result: {'id': 10, 'trading_account_id': 1, 'ticker_id': 4, 'trade_plan_id': 1, 'status': 'open', 'investment_type': 'investment', 'side': 'Long', 'notes': None, 'opened_at': '2025-09-02 00:56:03', 'closed_at': None, 'created_at': '2025-09-02 00:56:03', 'total_pl': None, 'trade_plan_created_at': '2025-08-15 03:51:43', 'trade_plan_planned_amount': 10250.0, 'trade_plan_status': 'open', 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'TSLA', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-25 04:35:30,924 - models.trade - INFO - Trade 11: Checking trade_plan relationship...
+2025-10-25 04:35:30,924 - models.trade - INFO - Trade 11: hasattr(self, 'trade_plan'): True
+2025-10-25 04:35:30,924 - models.trade - INFO - Trade 11: self.trade_plan: None
+2025-10-25 04:35:30,924 - models.trade - INFO - Trade 11: trade_plan is None
+2025-10-25 04:35:30,924 - models.trade - INFO - Trade 11: Using loaded account name: חשבון מעודכן
+2025-10-25 04:35:30,924 - models.trade - INFO - Trade 11: Using loaded ticker symbol: AAPL
+2025-10-25 04:35:30,924 - models.trade - INFO - Trade 11 to_dict result: {'id': 11, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': None, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': 'Test trade', 'opened_at': '2025-10-06 21:05:06', 'closed_at': None, 'created_at': '2025-10-06 21:05:06', 'total_pl': 0.0, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-25 04:35:30,932 - models.trade - INFO - Trade 18: Checking trade_plan relationship...
+2025-10-25 04:35:30,932 - models.trade - INFO - Trade 18: hasattr(self, 'trade_plan'): True
+2025-10-25 04:35:30,933 - models.trade - INFO - Trade 18: self.trade_plan: None
+2025-10-25 04:35:30,933 - models.trade - INFO - Trade 18: trade_plan is None
+2025-10-25 04:35:30,933 - models.trade - INFO - Trade 18: Using loaded account name: חשבון מעודכן
+2025-10-25 04:35:30,933 - models.trade - INFO - Trade 18: Using loaded ticker symbol: AAPL
+2025-10-25 04:35:30,933 - models.trade - INFO - Trade 18 to_dict result: {'id': 18, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': None, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': 'Test trade for CRUD testing', 'opened_at': '2025-10-07 16:13:43', 'closed_at': None, 'created_at': '2025-10-07 16:13:43', 'total_pl': 0.0, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-25 04:35:30,941 - models.trade - INFO - Trade 19: Checking trade_plan relationship...
+2025-10-25 04:35:30,941 - models.trade - INFO - Trade 19: hasattr(self, 'trade_plan'): True
+2025-10-25 04:35:30,941 - models.trade - INFO - Trade 19: self.trade_plan: None
+2025-10-25 04:35:30,941 - models.trade - INFO - Trade 19: trade_plan is None
+2025-10-25 04:35:30,941 - models.trade - INFO - Trade 19: Using loaded account name: חשבון מעודכן
+2025-10-25 04:35:30,941 - models.trade - INFO - Trade 19: Using loaded ticker symbol: AAPL
+2025-10-25 04:35:30,941 - models.trade - INFO - Trade 19 to_dict result: {'id': 19, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': None, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': None, 'opened_at': '2025-10-17 12:36:57', 'closed_at': None, 'created_at': '2025-10-17 12:36:57', 'total_pl': 0.0, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-25 04:35:30,949 - routes.api.trades - INFO - First trade data: {'id': 1, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'cancelled', 'investment_type': 'swing', 'side': 'Long', 'notes': 'קנייה של Apple', 'opened_at': '2025-08-15 03:51:43', 'closed_at': '2025-08-21 12:36:00', 'created_at': '2025-08-15 03:51:43', 'total_pl': 2500.0, 'trade_plan_created_at': '2025-08-14 06:52:13', 'trade_plan_planned_amount': 9892.0, 'trade_plan_status': 'closed', 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': '2025-08-31 14:28:23', 'cancel_reason': 'בוטל על ידי המשתמש', 'current_price': 262.82, 'daily_change': 1.2481701209646388, 'change_amount': 3.240000000000009, 'position': {'quantity': 825.0, 'average_price': 207.53677725118482, 'total_cost': 218951.3, 'total_fees': 25.76, 'side': 'long', 'last_updated': '2025-10-07 16:13:46.113000', 'total_bought': 1055.0, 'total_sold': 230.0}}
+2025-10-25 04:35:30,950 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:35:30] "GET /api/trades/ HTTP/1.1" 200 -
+2025-10-25 04:35:32,022 - routes.api.base_entity.alerts - INFO - Getting all alerts records
+2025-10-25 04:35:32,022 - cache - INFO - Cache MISS: get_all_alerts_99914b932bd37a50b983c5e7c90ae93b
+2025-10-25 04:35:32,022 - cache - INFO - Cache MISS: get_all_alerts_99914b932bd37a50b983c5e7c90ae93b
+2025-10-25 04:35:32,023 - services.alert_service - INFO - נטענו 15 התראות
+2025-10-25 04:35:32,023 - cache - INFO - Cache SET: get_all_alerts_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 6001 chars)
+2025-10-25 04:35:32,023 - cache - INFO - Cache SET: get_all_alerts_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 6001 chars)
+2025-10-25 04:35:32,024 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:35:32] "GET /api/alerts/ HTTP/1.1" 200 -
+2025-10-25 04:35:35,220 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-25T04:35:35.220046', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://localhost:8080/api/plan-conditions/evaluate-all', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-25 04:35:35,220 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-25T04:35:35.220046', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://localhost:8080/api/plan-conditions/evaluate-all', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-25 04:35:35,220 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:35:35] "[33mGET /api/plan-conditions/evaluate-all HTTP/1.1[0m" 404 -
+2025-10-25 04:35:35,556 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-25T04:35:35.555901', 'error_type': 'MethodNotAllowed', 'error_message': '405 Method Not Allowed: The method is not allowed for the requested URL.', 'request_method': 'POST', 'request_url': 'http://127.0.0.1:8080/api/user-data-import/upload-and-preview', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'general'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1458, in dispatch_request\n    self.raise_routing_exception(req)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1440, in raise_routing_exception\n    raise request.routing_exception  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/ctx.py", line 353, in match_request\n    result = self.url_adapter.match(return_rule=True)  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/routing/map.py", line 650, in match\n    raise MethodNotAllowed(valid_methods=list(e.have_match_for)) from None\nwerkzeug.exceptions.MethodNotAllowed: 405 Method Not Allowed: The method is not allowed for the requested URL.\n'}
+2025-10-25 04:35:35,556 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-25T04:35:35.555901', 'error_type': 'MethodNotAllowed', 'error_message': '405 Method Not Allowed: The method is not allowed for the requested URL.', 'request_method': 'POST', 'request_url': 'http://127.0.0.1:8080/api/user-data-import/upload-and-preview', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'general'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1458, in dispatch_request\n    self.raise_routing_exception(req)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1440, in raise_routing_exception\n    raise request.routing_exception  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/ctx.py", line 353, in match_request\n    result = self.url_adapter.match(return_rule=True)  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/routing/map.py", line 650, in match\n    raise MethodNotAllowed(valid_methods=list(e.have_match_for)) from None\nwerkzeug.exceptions.MethodNotAllowed: 405 Method Not Allowed: The method is not allowed for the requested URL.\n'}
+2025-10-25 04:35:35,556 - utils.performance_monitor - INFO - Performance: handle_general_error - Duration: 0.000s - Success: True
+2025-10-25 04:35:35,556 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:35:35] "[35m[1mPOST /api/user-data-import/upload-and-preview HTTP/1.1[0m" 500 -
+2025-10-25 04:35:36,741 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
+2025-10-25 04:35:36,741 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
+2025-10-25 04:35:36,742 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:35:36] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-25 04:35:37,401 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-25T04:35:37.400907', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://localhost:8080/api/plan-conditions', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-25 04:35:37,401 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-25T04:35:37.400907', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://localhost:8080/api/plan-conditions', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-25 04:35:37,401 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:35:37] "[33mGET /api/plan-conditions HTTP/1.1[0m" 404 -
+2025-10-25 04:35:39,891 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-25T04:35:39.891023', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://localhost:8080/api/', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-25 04:35:39,891 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-25T04:35:39.891023', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://localhost:8080/api/', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-25 04:35:39,891 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:35:39] "[33mGET /api/ HTTP/1.1[0m" 404 -
+2025-10-25 04:35:41,798 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.001s - Success: True
+2025-10-25 04:35:41,799 - cache - INFO - Cache SET: health_check_1761356141 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-25 04:35:41,799 - cache - INFO - Cache SET: health_check_1761356141 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-25 04:35:41,799 - cache - INFO - Cache HIT: health_check_1761356141 (Access count: 1)
+2025-10-25 04:35:41,799 - cache - INFO - Cache HIT: health_check_1761356141 (Access count: 1)
+2025-10-25 04:35:41,799 - cache - INFO - Cache DELETE: health_check_1761356141 (Was accessed 1 times)
+2025-10-25 04:35:41,799 - cache - INFO - Cache DELETE: health_check_1761356141 (Was accessed 1 times)
+2025-10-25 04:35:41,799 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.001s - Success: True
+2025-10-25 04:35:41,800 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-25 04:35:41,800 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-25 04:35:41,800 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:35:41] "GET /api/health HTTP/1.1" 200 -
+2025-10-25 04:35:44,112 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:35:44] "[32mGET /api/tickers HTTP/1.1[0m" 308 -
+2025-10-25 04:35:46,128 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:35:46] "[32mGET /api/tickers HTTP/1.1[0m" 308 -
+2025-10-25 04:35:48,313 - cache - INFO - Cache MISS: services.ticker_service.get_all:45428f59dc78d9855650c612821cd3be
+2025-10-25 04:35:48,313 - cache - INFO - Cache MISS: services.ticker_service.get_all:45428f59dc78d9855650c612821cd3be
+2025-10-25 04:35:48,314 - services.ticker_service - INFO - Found 19 tickers in database
+2025-10-25 04:35:48,369 - cache - INFO - Cache SET: services.ticker_service.get_all:45428f59dc78d9855650c612821cd3be (TTL: 30s, Dependencies: ['tickers'], Data size: 1206 chars)
+2025-10-25 04:35:48,369 - cache - INFO - Cache SET: services.ticker_service.get_all:45428f59dc78d9855650c612821cd3be (TTL: 30s, Dependencies: ['tickers'], Data size: 1206 chars)
+2025-10-25 04:35:48,370 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:35:48] "GET /api/tickers/ HTTP/1.1" 200 -
+2025-10-25 04:35:50,744 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-25T04:35:50.744299', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://localhost:8080/api/trade-plans/', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-25 04:35:50,744 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-25T04:35:50.744299', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://localhost:8080/api/trade-plans/', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-25 04:35:50,744 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:35:50] "[33mGET /api/trade-plans/ HTTP/1.1[0m" 404 -
+2025-10-25 04:35:55,816 - root - INFO - 🚀 Starting TikTrack server...
+2025-10-25 04:35:55,816 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend
+2025-10-25 04:35:55,816 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-10-25 04:35:55,816 - root - INFO - 📦 Flask version: 2.3.3
+2025-10-25 04:35:55,816 - root - INFO - 🗄️ Initializing database...
+2025-10-25 04:35:55,817 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-10-25 04:35:55,820 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.003s
+2025-10-25 04:35:55,820 - root - INFO - ✅ Database initialized successfully
+2025-10-25 04:35:56,825 - utils.performance_monitor - INFO - System metrics: CPU: 18.9%, Memory: 44.9%, Disk: 3.7%
+2025-10-25 04:35:56,825 - root - INFO - ✅ Database initialized successfully
+2025-10-25 04:35:56,825 - root - INFO - ✅ Server initialization completed
+2025-10-25 04:35:56,870 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
+2025-10-25 04:35:56,870 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
+2025-10-25 04:35:56,870 - root - INFO - ✅ Condition evaluation task registered successfully
+2025-10-25 04:35:56,871 - root - INFO - 🚀 Starting background task scheduler...
+2025-10-25 04:35:56,871 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-10-25 04:35:56,871 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-10-25 04:35:56,871 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-10-25 04:35:56,871 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-10-25 04:35:56,871 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-10-25 04:35:56,871 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-10-25 04:35:56,871 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-10-25 04:35:56,871 - services.background_tasks - INFO - Background task scheduler started
+2025-10-25 04:35:56,871 - root - INFO - ✅ Background task scheduler started successfully
+2025-10-25 04:35:56,871 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:c4c64a17808b02c9f1df69df2b63ff7a
+2025-10-25 04:35:56,871 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:c4c64a17808b02c9f1df69df2b63ff7a
+2025-10-25 04:35:56,898 - cache - INFO - Cache SET: services.system_settings_service.get_setting:c4c64a17808b02c9f1df69df2b63ff7a (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-25 04:35:56,898 - cache - INFO - Cache SET: services.system_settings_service.get_setting:c4c64a17808b02c9f1df69df2b63ff7a (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-25 04:35:56,898 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-10-25 04:35:56,899 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-10-25 04:35:56,900 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-10-25 04:36:03,417 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-25T04:36:03.416904', 'error_type': 'MethodNotAllowed', 'error_message': '405 Method Not Allowed: The method is not allowed for the requested URL.', 'request_method': 'POST', 'request_url': 'http://127.0.0.1:8080/api/user-data-import/upload-and-preview', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'general'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1458, in dispatch_request\n    self.raise_routing_exception(req)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1440, in raise_routing_exception\n    raise request.routing_exception  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/ctx.py", line 353, in match_request\n    result = self.url_adapter.match(return_rule=True)  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/routing/map.py", line 650, in match\n    raise MethodNotAllowed(valid_methods=list(e.have_match_for)) from None\nwerkzeug.exceptions.MethodNotAllowed: 405 Method Not Allowed: The method is not allowed for the requested URL.\n'}
+2025-10-25 04:36:03,417 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-25T04:36:03.416904', 'error_type': 'MethodNotAllowed', 'error_message': '405 Method Not Allowed: The method is not allowed for the requested URL.', 'request_method': 'POST', 'request_url': 'http://127.0.0.1:8080/api/user-data-import/upload-and-preview', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'general'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1458, in dispatch_request\n    self.raise_routing_exception(req)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1440, in raise_routing_exception\n    raise request.routing_exception  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/ctx.py", line 353, in match_request\n    result = self.url_adapter.match(return_rule=True)  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/routing/map.py", line 650, in match\n    raise MethodNotAllowed(valid_methods=list(e.have_match_for)) from None\nwerkzeug.exceptions.MethodNotAllowed: 405 Method Not Allowed: The method is not allowed for the requested URL.\n'}
+2025-10-25 04:36:03,417 - utils.performance_monitor - INFO - Performance: handle_general_error - Duration: 0.000s - Success: True
+2025-10-25 04:36:03,417 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:36:03] "[35m[1mPOST /api/user-data-import/upload-and-preview HTTP/1.1[0m" 500 -
+2025-10-25 04:36:22,813 - cache - INFO - Cache DELETE: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Was accessed 1 times)
+2025-10-25 04:36:22,813 - cache - INFO - Cache DELETE: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Was accessed 1 times)
+2025-10-25 04:36:22,814 - cache - INFO - Cache DELETE: services.ticker_service.get_all:1b473b5de2767b6f522e67c72b7166a6 (Was accessed 0 times)
+2025-10-25 04:36:22,814 - cache - INFO - Cache DELETE: services.ticker_service.get_all:1b473b5de2767b6f522e67c72b7166a6 (Was accessed 0 times)
+2025-10-25 04:36:22,814 - cache - INFO - Cache DELETE: services.ticker_service.get_all:45428f59dc78d9855650c612821cd3be (Was accessed 0 times)
+2025-10-25 04:36:22,814 - cache - INFO - Cache DELETE: services.ticker_service.get_all:45428f59dc78d9855650c612821cd3be (Was accessed 0 times)
+2025-10-25 04:36:30,773 - routes.api.base_entity.executions - INFO - Getting all executions records
+2025-10-25 04:36:30,773 - cache - INFO - Cache MISS: get_all_executions_99914b932bd37a50b983c5e7c90ae93b
+2025-10-25 04:36:30,773 - cache - INFO - Cache MISS: get_all_executions_99914b932bd37a50b983c5e7c90ae93b
+2025-10-25 04:36:30,776 - cache - INFO - Cache SET: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 26066 chars)
+2025-10-25 04:36:30,776 - cache - INFO - Cache SET: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 26066 chars)
+2025-10-25 04:36:30,778 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:36:30] "GET /api/executions/?_t=1761356190768 HTTP/1.1" 200 -
+2025-10-25 04:36:37,932 - root - INFO - 🚀 Starting TikTrack server...
+2025-10-25 04:36:37,932 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend
+2025-10-25 04:36:37,932 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-10-25 04:36:37,932 - root - INFO - 📦 Flask version: 2.3.3
+2025-10-25 04:36:37,932 - root - INFO - 🗄️ Initializing database...
+2025-10-25 04:36:37,932 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-10-25 04:36:37,935 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.003s
+2025-10-25 04:36:37,935 - root - INFO - ✅ Database initialized successfully
+2025-10-25 04:36:38,940 - utils.performance_monitor - INFO - System metrics: CPU: 30.8%, Memory: 45.2%, Disk: 3.7%
+2025-10-25 04:36:38,941 - root - INFO - ✅ Database initialized successfully
+2025-10-25 04:36:38,941 - root - INFO - ✅ Server initialization completed
+2025-10-25 04:36:39,110 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
+2025-10-25 04:36:39,110 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
+2025-10-25 04:36:39,110 - root - INFO - ✅ Condition evaluation task registered successfully
+2025-10-25 04:36:39,110 - root - INFO - 🚀 Starting background task scheduler...
+2025-10-25 04:36:39,110 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-10-25 04:36:39,111 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-10-25 04:36:39,111 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-10-25 04:36:39,111 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-10-25 04:36:39,111 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-10-25 04:36:39,111 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-10-25 04:36:39,111 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-10-25 04:36:39,111 - services.background_tasks - INFO - Background task scheduler started
+2025-10-25 04:36:39,111 - root - INFO - ✅ Background task scheduler started successfully
+2025-10-25 04:36:39,111 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:36cd3f8176d155bfd2c3bc457e694d65
+2025-10-25 04:36:39,111 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:36cd3f8176d155bfd2c3bc457e694d65
+2025-10-25 04:36:39,140 - cache - INFO - Cache SET: services.system_settings_service.get_setting:36cd3f8176d155bfd2c3bc457e694d65 (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-25 04:36:39,140 - cache - INFO - Cache SET: services.system_settings_service.get_setting:36cd3f8176d155bfd2c3bc457e694d65 (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-25 04:36:39,140 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-10-25 04:36:39,141 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-10-25 04:36:39,143 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-10-25 04:36:45,311 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-25T04:36:45.310390', 'error_type': 'MethodNotAllowed', 'error_message': '405 Method Not Allowed: The method is not allowed for the requested URL.', 'request_method': 'POST', 'request_url': 'http://127.0.0.1:8080/api/user-data-import/upload-and-preview', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'general'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1458, in dispatch_request\n    self.raise_routing_exception(req)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1440, in raise_routing_exception\n    raise request.routing_exception  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/ctx.py", line 353, in match_request\n    result = self.url_adapter.match(return_rule=True)  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/routing/map.py", line 650, in match\n    raise MethodNotAllowed(valid_methods=list(e.have_match_for)) from None\nwerkzeug.exceptions.MethodNotAllowed: 405 Method Not Allowed: The method is not allowed for the requested URL.\n'}
+2025-10-25 04:36:45,311 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-25T04:36:45.310390', 'error_type': 'MethodNotAllowed', 'error_message': '405 Method Not Allowed: The method is not allowed for the requested URL.', 'request_method': 'POST', 'request_url': 'http://127.0.0.1:8080/api/user-data-import/upload-and-preview', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'general'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1458, in dispatch_request\n    self.raise_routing_exception(req)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1440, in raise_routing_exception\n    raise request.routing_exception  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/ctx.py", line 353, in match_request\n    result = self.url_adapter.match(return_rule=True)  # type: ignore\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/routing/map.py", line 650, in match\n    raise MethodNotAllowed(valid_methods=list(e.have_match_for)) from None\nwerkzeug.exceptions.MethodNotAllowed: 405 Method Not Allowed: The method is not allowed for the requested URL.\n'}
+2025-10-25 04:36:45,312 - utils.performance_monitor - INFO - Performance: handle_general_error - Duration: 0.002s - Success: True
+2025-10-25 04:36:45,312 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:36:45] "[35m[1mPOST /api/user-data-import/upload-and-preview HTTP/1.1[0m" 500 -
+2025-10-25 04:37:05,418 - root - INFO - 🚀 Starting TikTrack server...
+2025-10-25 04:37:05,419 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend
+2025-10-25 04:37:05,419 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-10-25 04:37:05,419 - root - INFO - 📦 Flask version: 2.3.3
+2025-10-25 04:37:05,419 - root - INFO - 🗄️ Initializing database...
+2025-10-25 04:37:05,419 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-10-25 04:37:05,423 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.004s
+2025-10-25 04:37:05,423 - root - INFO - ✅ Database initialized successfully
+2025-10-25 04:37:06,426 - utils.performance_monitor - INFO - System metrics: CPU: 44.6%, Memory: 44.0%, Disk: 3.7%
+2025-10-25 04:37:06,426 - root - INFO - ✅ Database initialized successfully
+2025-10-25 04:37:06,426 - root - INFO - ✅ Server initialization completed
+2025-10-25 04:37:06,472 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
+2025-10-25 04:37:06,472 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
+2025-10-25 04:37:06,472 - root - INFO - ✅ Condition evaluation task registered successfully
+2025-10-25 04:37:06,473 - root - INFO - 🚀 Starting background task scheduler...
+2025-10-25 04:37:06,473 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-10-25 04:37:06,473 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-10-25 04:37:06,473 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-10-25 04:37:06,473 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-10-25 04:37:06,473 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-10-25 04:37:06,473 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-10-25 04:37:06,473 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-10-25 04:37:06,473 - services.background_tasks - INFO - Background task scheduler started
+2025-10-25 04:37:06,473 - root - INFO - ✅ Background task scheduler started successfully
+2025-10-25 04:37:06,473 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:5ec66232ade43a6961d6f567ad4217eb
+2025-10-25 04:37:06,473 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:5ec66232ade43a6961d6f567ad4217eb
+2025-10-25 04:37:06,501 - cache - INFO - Cache SET: services.system_settings_service.get_setting:5ec66232ade43a6961d6f567ad4217eb (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-25 04:37:06,501 - cache - INFO - Cache SET: services.system_settings_service.get_setting:5ec66232ade43a6961d6f567ad4217eb (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-25 04:37:06,501 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-10-25 04:37:06,502 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-10-25 04:37:06,502 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-10-25 04:37:06,528 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:8080
+2025-10-25 04:37:06,528 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-25 04:37:06,806 - root - INFO - 🚀 Starting TikTrack server...
+2025-10-25 04:37:06,806 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend
+2025-10-25 04:37:06,806 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-10-25 04:37:06,807 - root - INFO - 📦 Flask version: 2.3.3
+2025-10-25 04:37:06,807 - root - INFO - 🗄️ Initializing database...
+2025-10-25 04:37:06,807 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-10-25 04:37:06,809 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.003s
+2025-10-25 04:37:06,810 - root - INFO - ✅ Database initialized successfully
+2025-10-25 04:37:07,815 - utils.performance_monitor - INFO - System metrics: CPU: 12.4%, Memory: 44.2%, Disk: 3.7%
+2025-10-25 04:37:07,815 - root - INFO - ✅ Database initialized successfully
+2025-10-25 04:37:07,815 - root - INFO - ✅ Server initialization completed
+2025-10-25 04:37:07,863 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
+2025-10-25 04:37:07,863 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
+2025-10-25 04:37:07,863 - root - INFO - ✅ Condition evaluation task registered successfully
+2025-10-25 04:37:07,863 - root - INFO - 🚀 Starting background task scheduler...
+2025-10-25 04:37:07,864 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-10-25 04:37:07,864 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-10-25 04:37:07,864 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-10-25 04:37:07,864 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-10-25 04:37:07,864 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-10-25 04:37:07,864 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-10-25 04:37:07,864 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-10-25 04:37:07,864 - services.background_tasks - INFO - Background task scheduler started
+2025-10-25 04:37:07,864 - root - INFO - ✅ Background task scheduler started successfully
+2025-10-25 04:37:07,864 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:243a9b757cfd0f35ef29bbdd600a2983
+2025-10-25 04:37:07,864 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:243a9b757cfd0f35ef29bbdd600a2983
+2025-10-25 04:37:07,891 - cache - INFO - Cache SET: services.system_settings_service.get_setting:243a9b757cfd0f35ef29bbdd600a2983 (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-25 04:37:07,891 - cache - INFO - Cache SET: services.system_settings_service.get_setting:243a9b757cfd0f35ef29bbdd600a2983 (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-25 04:37:07,891 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-10-25 04:37:07,892 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-10-25 04:37:07,893 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-10-25 04:37:13,311 - routes.api.user_data_import - ERROR - Unexpected error during file preview: name 'g' is not defined
+Traceback (most recent call last):
+  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/api/user_data_import.py", line 62, in upload_and_preview
+    orchestrator = ImportOrchestrator(g.db_session)
+NameError: name 'g' is not defined
+2025-10-25 04:37:13,312 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:37:13] "[35m[1mPOST /api/user-data-import/upload-and-preview HTTP/1.1[0m" 500 -
+2025-10-25 04:37:14,339 - utils.performance_monitor - INFO - Performance: database_health_check - Duration: 0.002s - Success: True
+2025-10-25 04:37:14,339 - cache - INFO - Cache SET: health_check_1761356234 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-25 04:37:14,339 - cache - INFO - Cache SET: health_check_1761356234 (TTL: 10s, Dependencies: None, Data size: 59 chars)
+2025-10-25 04:37:14,339 - cache - INFO - Cache HIT: health_check_1761356234 (Access count: 1)
+2025-10-25 04:37:14,339 - cache - INFO - Cache HIT: health_check_1761356234 (Access count: 1)
+2025-10-25 04:37:14,339 - cache - INFO - Cache DELETE: health_check_1761356234 (Was accessed 1 times)
+2025-10-25 04:37:14,339 - cache - INFO - Cache DELETE: health_check_1761356234 (Was accessed 1 times)
+2025-10-25 04:37:14,339 - utils.performance_monitor - INFO - Performance: cache_health_check - Duration: 0.000s - Success: True
+2025-10-25 04:37:14,339 - utils.performance_monitor - INFO - Performance: system_health_check - Duration: 0.000s - Success: True
+2025-10-25 04:37:14,340 - utils.performance_monitor - INFO - Performance: api_health_check - Duration: 0.000s - Success: True
+2025-10-25 04:37:14,340 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:37:14] "GET /api/health HTTP/1.1" 200 -
+2025-10-25 04:37:17,338 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-25T04:37:17.334849', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://localhost:8080/api/plan-conditions/', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-25 04:37:17,338 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-25T04:37:17.334849', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://localhost:8080/api/plan-conditions/', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-25 04:37:17,338 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:37:17] "[33mGET /api/plan-conditions/ HTTP/1.1[0m" 404 -
+2025-10-25 04:37:19,686 - routes.api.base_entity.alerts - INFO - Getting all alerts records
+2025-10-25 04:37:19,686 - cache - INFO - Cache MISS: get_all_alerts_99914b932bd37a50b983c5e7c90ae93b
+2025-10-25 04:37:19,686 - cache - INFO - Cache MISS: get_all_alerts_99914b932bd37a50b983c5e7c90ae93b
+2025-10-25 04:37:19,688 - services.alert_service - INFO - נטענו 15 התראות
+2025-10-25 04:37:19,688 - cache - INFO - Cache SET: get_all_alerts_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 6001 chars)
+2025-10-25 04:37:19,688 - cache - INFO - Cache SET: get_all_alerts_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 6001 chars)
+2025-10-25 04:37:19,689 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:37:19] "GET /api/alerts/ HTTP/1.1" 200 -
+2025-10-25 04:37:28,543 - root - INFO - 🚀 Starting TikTrack server...
+2025-10-25 04:37:28,543 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend
+2025-10-25 04:37:28,543 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-10-25 04:37:28,543 - root - INFO - 📦 Flask version: 2.3.3
+2025-10-25 04:37:28,543 - root - INFO - 🗄️ Initializing database...
+2025-10-25 04:37:28,543 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-10-25 04:37:28,546 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.003s
+2025-10-25 04:37:28,546 - root - INFO - ✅ Database initialized successfully
+2025-10-25 04:37:29,551 - utils.performance_monitor - INFO - System metrics: CPU: 8.4%, Memory: 44.0%, Disk: 3.7%
+2025-10-25 04:37:29,552 - root - INFO - ✅ Database initialized successfully
+2025-10-25 04:37:29,552 - root - INFO - ✅ Server initialization completed
+2025-10-25 04:37:29,602 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
+2025-10-25 04:37:29,602 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
+2025-10-25 04:37:29,602 - root - INFO - ✅ Condition evaluation task registered successfully
+2025-10-25 04:37:29,603 - root - INFO - 🚀 Starting background task scheduler...
+2025-10-25 04:37:29,603 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-10-25 04:37:29,603 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-10-25 04:37:29,603 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-10-25 04:37:29,603 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-10-25 04:37:29,603 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-10-25 04:37:29,603 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-10-25 04:37:29,603 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-10-25 04:37:29,603 - services.background_tasks - INFO - Background task scheduler started
+2025-10-25 04:37:29,603 - root - INFO - ✅ Background task scheduler started successfully
+2025-10-25 04:37:29,603 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:b4afc93a5ff25377206e24d651e99211
+2025-10-25 04:37:29,603 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:b4afc93a5ff25377206e24d651e99211
+2025-10-25 04:37:29,628 - cache - INFO - Cache SET: services.system_settings_service.get_setting:b4afc93a5ff25377206e24d651e99211 (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-25 04:37:29,628 - cache - INFO - Cache SET: services.system_settings_service.get_setting:b4afc93a5ff25377206e24d651e99211 (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-25 04:37:29,628 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-10-25 04:37:29,629 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-10-25 04:37:29,629 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-10-25 04:37:30,789 - root - INFO - FRONTEND [INFO]: 🔄 Auto-refreshing executions data...
+2025-10-25 04:37:30,789 - root - INFO - FRONTEND [INFO]: 🔄 Auto-refreshing executions data...
+2025-10-25 04:37:30,789 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
+2025-10-25 04:37:30,789 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
+2025-10-25 04:37:30,790 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:37:30] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-25 04:37:30,792 - routes.api.base_entity.executions - INFO - Getting all executions records
+2025-10-25 04:37:30,792 - cache - INFO - Cache MISS: get_all_executions_99914b932bd37a50b983c5e7c90ae93b
+2025-10-25 04:37:30,792 - root - INFO - FRONTEND [INFO]: 🔄 Auto-refreshing executions data...
+2025-10-25 04:37:30,792 - cache - INFO - Cache MISS: get_all_executions_99914b932bd37a50b983c5e7c90ae93b
+2025-10-25 04:37:30,793 - root - INFO - FRONTEND [INFO]: 🔄 Auto-refreshing executions data...
+2025-10-25 04:37:30,794 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:37:30] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-25 04:37:30,795 - cache - INFO - Cache SET: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 26066 chars)
+2025-10-25 04:37:30,795 - cache - INFO - Cache SET: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 26066 chars)
+2025-10-25 04:37:30,796 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:37:30] "GET /api/executions/?_t=1761356250788 HTTP/1.1" 200 -

@@ -21,9 +21,9 @@ import csv
 import io
 from typing import List, Dict, Any, List
 from datetime import datetime
-from .base_connector import BaseImportConnector
+from .base_connector import BaseConnector
 
-class DemoConnector(BaseImportConnector):
+class DemoConnector(BaseConnector):
     """
     Demo connector for simple CSV files.
     
@@ -31,6 +31,18 @@ class DemoConnector(BaseImportConnector):
     It handles a simple CSV format with basic trading data.
     """
     
+    def identify_file(self, file_content: str, file_name: str) -> bool:
+        """
+        Identifies if the given file content and name match this connector's format.
+        """
+        if not file_name.lower().endswith('.csv'):
+            return False
+        
+        # Check for expected headers in the first line
+        first_line = file_content.splitlines()[0]
+        expected_headers = ["Ticker", "Date", "Action", "Quantity", "Price", "Fee"]
+        return all(header in first_line for header in expected_headers)
+
     def detect_format(self, file_content: str) -> bool:
         """
         Detect if the file content matches the demo CSV format.
@@ -69,7 +81,7 @@ class DemoConnector(BaseImportConnector):
         except Exception:
             return False
     
-    def parse_file(self, file_content: str) -> List[Dict[str, Any]]:
+    def parse_file(self, file_content: str, file_name: str) -> List[Dict[str, Any]]:
         """
         Parse the demo CSV file content.
         
@@ -141,6 +153,18 @@ class DemoConnector(BaseImportConnector):
         except Exception as e:
             raise ValueError(f"Failed to normalize demo record: {str(e)}")
     
+    def get_supported_file_types(self) -> List[str]:
+        """
+        Returns a list of file extensions supported by this connector.
+        """
+        return ['.csv']
+
+    def get_connector_name(self) -> str:
+        """
+        Returns the human-readable name of the connector.
+        """
+        return 'Demo CSV Connector'
+
     def get_provider_name(self) -> str:
         """
         Get the provider name for this connector.

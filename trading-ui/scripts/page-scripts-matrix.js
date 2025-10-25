@@ -2785,8 +2785,8 @@ class PageScriptsMatrixSystem {
     // window.toggleSection export removed - using global version from ui-utils.js
     // window. export removed - using global version from system-management.js
     
-    // Local  function for page-scripts-matrix page
-    async function  {
+    // Local copyDetailedLog function for page-scripts-matrix page
+    async function copyDetailedLogLocal() {
         try {
             const detailedLog = generateDetailedLog();
             if (detailedLog) {

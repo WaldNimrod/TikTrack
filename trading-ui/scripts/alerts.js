@@ -1547,7 +1547,7 @@ async function saveAlert() {
  * @param {number} alertId - מזהה ההתראה לעריכה
  */
 function editAlert(alertId) {
-  const alert = alertsData.find(a => a.id === alertId);
+  const alert = (window.alertsData || alertsData).find(a => a.id === alertId);
   if (!alert) {
     if (window.showErrorNotification) {
       window.showErrorNotification('התראה לא נמצאה', 'התראה לא נמצאה');
@@ -2202,10 +2202,10 @@ function filterAlertsByRelatedObjectTypeWrapper(type) {
   const targetTypeId = typeMapping[type];
 
   // פילטור הנתונים
-  let filteredAlerts = alertsData;
+  let filteredAlerts = window.alertsData || alertsData;
 
   if (type !== 'all') {
-    filteredAlerts = alertsData.filter(alert =>
+    filteredAlerts = (window.alertsData || alertsData).filter(alert =>
       alert.related_type_id === targetTypeId,
     );
   }
@@ -2425,7 +2425,7 @@ function toggleAlert(alertId) {
     window.Logger.info('🔄 מחליף מצב התראה:', alertId, { page: "alerts" });
     
     // חיפוש ההתראה בנתונים
-    const alert = alertsData.find(a => a.id === alertId);
+    const alert = (window.alertsData || alertsData).find(a => a.id === alertId);
     if (!alert) {
       throw new Error('התראה לא נמצאה');
     }

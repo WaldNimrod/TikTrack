@@ -1,128 +1,141 @@
 /**
- * Import User Data JavaScript
+ * Import User Data JavaScript - Modal Version
  * 
- * This script handles the complete user data import process including:
- * - File upload and validation
- * - Account selection
- * - File analysis and processing
+ * This script handles the complete user data import process in modal format:
+ * - 6-step wizard with progress indicators
+ * - File upload with drag & drop validation
+ * - Account selection with API integration
+ * - File analysis with visual progress
  * - Problem resolution (missing tickers, duplicates)
- * - Preview generation and confirmation
- * - Import execution
+ * - Preview generation with detailed tables
+ * - Import execution with confirmation
+ * 
+ * Can be used in any page by including the modal HTML and this script
  * 
  * Author: TikTrack Development Team
- * Version: 1.0
+ * Version: 2.0 - Modal Integration
  * Last Updated: 2025-01-16
  */
 
-// Global state
-let currentStep = 1;
-let selectedFile = null;
-let selectedAccount = null;
-let sessionId = null;
-let analysisResults = null;
-let previewData = null;
+// ===== IMPORT MODAL FUNCTIONS =====
 
-// DOM elements
-const fileInput = document.getElementById('file-input');
-const fileUploadArea = document.getElementById('file-upload-area');
-const fileInfo = document.getElementById('file-info');
-const accountSelect = document.getElementById('account-select');
-const analysisProgress = document.getElementById('analysis-progress');
-const analysisResults = document.getElementById('analysis-results');
-const previewModal = document.getElementById('preview-modal');
-
-// Initialize the page
-document.addEventListener('DOMContentLoaded', function() {
-    initializePage();
-    setupEventListeners();
-    loadTradingAccounts();
-});
+// Global state for import modal
+let importCurrentStep = 1;
+let importSelectedFile = null;
+let importSelectedAccount = null;
+let importSessionId = null;
+let importAnalysisResults = null;
+let importPreviewData = null;
 
 /**
- * Initialize the page
+ * Initialize import modal
  */
-function initializePage() {
-    console.log('Initializing Import User Data page');
+function initializeImportModal() {
+    importCurrentStep = 1;
+    importSelectedFile = null;
+    importSelectedAccount = null;
+    importSessionId = null;
+    importAnalysisResults = null;
+    importPreviewData = null;
     
-    // Set up file upload area
-    setupFileUpload();
-    
-    // Initialize step navigation
-    updateStepNavigation();
+    updateImportStepDisplay();
+    updateImportStepNavigation();
+    loadImportTradingAccounts();
+    setupImportEventListeners();
 }
 
 /**
- * Set up event listeners
+ * Reset import modal
  */
-function setupEventListeners() {
+function resetImportModal() {
+    importCurrentStep = 1;
+    importSelectedFile = null;
+    importSelectedAccount = null;
+    importSessionId = null;
+    importAnalysisResults = null;
+    importPreviewData = null;
+    
+    // Reset UI
+    clearImportFile();
+    document.getElementById('import-account-select').value = '';
+    document.getElementById('import-analysis-results').style.display = 'none';
+    document.getElementById('import-analysis-progress').style.display = 'none';
+    
+    updateImportStepDisplay();
+    updateImportStepNavigation();
+}
+
+/**
+ * Setup import event listeners
+ */
+function setupImportEventListeners() {
     // File input change
-    fileInput.addEventListener('change', handleFileSelect);
+    const fileInput = document.getElementById('import-file-input');
+    if (fileInput) {
+        fileInput.addEventListener('change', handleImportFileSelect);
+    }
     
     // Drag and drop
-    fileUploadArea.addEventListener('dragover', handleDragOver);
-    fileUploadArea.addEventListener('dragleave', handleDragLeave);
-    fileUploadArea.addEventListener('drop', handleFileDrop);
+    const uploadArea = document.getElementById('import-file-upload-area');
+    if (uploadArea) {
+        uploadArea.addEventListener('dragover', handleImportDragOver);
+        uploadArea.addEventListener('dragleave', handleImportDragLeave);
+        uploadArea.addEventListener('drop', handleImportFileDrop);
+        uploadArea.addEventListener('click', function() {
+            fileInput.click();
+        });
+    }
     
     // Account selection
-    accountSelect.addEventListener('change', handleAccountSelect);
-    
-    // Step navigation
-    document.getElementById('next-btn').addEventListener('click', nextStep);
-    document.getElementById('prev-btn').addEventListener('click', previousStep);
-}
-
-/**
- * Set up file upload area
- */
-function setupFileUpload() {
-    fileUploadArea.addEventListener('click', function() {
-        fileInput.click();
-    });
+    const accountSelect = document.getElementById('import-account-select');
+    if (accountSelect) {
+        accountSelect.addEventListener('change', handleImportAccountSelect);
+    }
 }
 
 /**
  * Handle file selection
  */
-function handleFileSelect(event) {
+function handleImportFileSelect(event) {
     const file = event.target.files[0];
     if (file) {
-        processSelectedFile(file);
+        processImportSelectedFile(file);
     }
 }
 
 /**
  * Handle drag over
  */
-function handleDragOver(event) {
+function handleImportDragOver(event) {
     event.preventDefault();
-    fileUploadArea.classList.add('dragover');
+    document.getElementById('import-file-upload-area').classList.add('dragover');
 }
 
 /**
  * Handle drag leave
  */
-function handleDragLeave(event) {
+function handleImportDragLeave(event) {
     event.preventDefault();
-    fileUploadArea.classList.remove('dragover');
+    document.getElementById('import-file-upload-area').classList.remove('dragover');
 }
 
 /**
  * Handle file drop
  */
-function handleFileDrop(event) {
+function handleImportFileDrop(event) {
     event.preventDefault();
-    fileUploadArea.classList.remove('dragover');
+    document.getElementById('import-file-upload-area').classList.remove('dragover');
     
     const files = event.dataTransfer.files;
     if (files.length > 0) {
-        processSelectedFile(files[0]);
+        processImportSelectedFile(files[0]);
     }
 }
 
 /**
  * Process selected file
  */
-function processSelectedFile(file) {
+function processImportSelectedFile(file) {
     // Validate file type
     if (!file.name.toLowerCase().endsWith('.csv')) {
         showNotification('רק קבצי CSV נתמכים', 'error');
@@ -135,16 +148,16 @@ function processSelectedFile(file) {
         return;
     }
     
-    selectedFile = file;
+    importSelectedFile = file;
     
     // Update UI
-    document.getElementById('file-name').textContent = file.name;
-    document.getElementById('file-size').textContent = formatFileSize(file.size);
-    fileInfo.style.display = 'block';
-    fileUploadArea.style.display = 'none';
+    document.getElementById('import-file-name').textContent = file.name;
+    document.getElementById('import-file-size').textContent = formatFileSize(file.size);
+    document.getElementById('import-file-info').style.display = 'block';
+    document.getElementById('import-file-upload-area').style.display = 'none';
     
     // Enable next step
-    updateStepNavigation();
+    updateImportStepNavigation();
     
     showNotification('קובץ נבחר בהצלחה', 'success');
 }
@@ -152,32 +165,32 @@ function processSelectedFile(file) {
 /**
  * Clear selected file
  */
-function clearFile() {
-    selectedFile = null;
-    fileInput.value = '';
-    fileInfo.style.display = 'none';
-    fileUploadArea.style.display = 'block';
-    updateStepNavigation();
+function clearImportFile() {
+    importSelectedFile = null;
+    document.getElementById('import-file-input').value = '';
+    document.getElementById('import-file-info').style.display = 'none';
+    document.getElementById('import-file-upload-area').style.display = 'block';
+    updateImportStepNavigation();
 }
 
 /**
  * Handle account selection
  */
-function handleAccountSelect(event) {
-    selectedAccount = event.target.value;
-    updateStepNavigation();
+function handleImportAccountSelect(event) {
+    importSelectedAccount = event.target.value;
+    updateImportStepNavigation();
 }
 
 /**
  * Load trading accounts
  */
-async function loadTradingAccounts() {
+async function loadImportTradingAccounts() {
     try {
         const response = await fetch('/api/user-data-import/accounts');
         const data = await response.json();
         
         if (data.status === 'success') {
-            const select = document.getElementById('account-select');
+            const select = document.getElementById('import-account-select');
             select.innerHTML = '<option value="">בחר חשבון מסחר</option>';
             
             data.accounts.forEach(account => {
@@ -198,48 +211,48 @@ async function loadTradingAccounts() {
 /**
  * Next step
  */
-function nextStep() {
-    if (currentStep < 6) {
+function nextImportStep() {
+    if (importCurrentStep < 6) {
         // Validate current step
-        if (!validateCurrentStep()) {
+        if (!validateImportCurrentStep()) {
             return;
         }
         
         // Process current step
-        processCurrentStep();
+        processImportCurrentStep();
         
         // Move to next step
-        currentStep++;
-        updateStepDisplay();
-        updateStepNavigation();
+        importCurrentStep++;
+        updateImportStepDisplay();
+        updateImportStepNavigation();
     }
 }
 
 /**
  * Previous step
  */
-function previousStep() {
-    if (currentStep > 1) {
-        currentStep--;
-        updateStepDisplay();
-        updateStepNavigation();
+function previousImportStep() {
+    if (importCurrentStep > 1) {
+        importCurrentStep--;
+        updateImportStepDisplay();
+        updateImportStepNavigation();
     }
 }
 
 /**
  * Validate current step
  */
-function validateCurrentStep() {
-    switch (currentStep) {
+function validateImportCurrentStep() {
+    switch (importCurrentStep) {
         case 1:
-            if (!selectedFile) {
+            if (!importSelectedFile) {
                 showNotification('אנא בחר קובץ לייבוא', 'error');
                 return false;
             }
             return true;
             
         case 2:
-            if (!selectedAccount) {
+            if (!importSelectedAccount) {
                 showNotification('אנא בחר חשבון מסחר', 'error');
                 return false;
             }
@@ -253,13 +266,13 @@ function validateCurrentStep() {
 /**
  * Process current step
  */
-async function processCurrentStep() {
-    switch (currentStep) {
+async function processImportCurrentStep() {
+    switch (importCurrentStep) {
         case 2:
-            await analyzeFile();
+            await analyzeImportFile();
             break;
         case 3:
-            await generatePreview();
+            await generateImportPreview();
             break;
         case 4:
             // Problem resolution - handled in UI
@@ -276,20 +289,20 @@ async function processCurrentStep() {
 /**
  * Analyze file
  */
-async function analyzeFile() {
-    if (!selectedFile || !selectedAccount) {
+async function analyzeImportFile() {
+    if (!importSelectedFile || !importSelectedAccount) {
         return;
     }
     
     try {
         // Show progress
-        analysisProgress.style.display = 'block';
-        updateProgress(0, 'מתחיל ניתוח...');
+        document.getElementById('import-analysis-progress').style.display = 'block';
+        updateImportProgress(0, 'מתחיל ניתוח...');
         
         // Upload file
         const formData = new FormData();
-        formData.append('file', selectedFile);
-        formData.append('account_id', selectedAccount);
+        formData.append('file', importSelectedFile);
+        formData.append('account_id', importSelectedAccount);
         
         const response = await fetch('/api/user-data-import/upload', {
             method: 'POST',
@@ -299,18 +312,18 @@ async function analyzeFile() {
         const data = await response.json();
         
         if (data.status === 'success') {
-            sessionId = data.session_id;
-            analysisResults = data.analysis_results;
+            importSessionId = data.session_id;
+            importAnalysisResults = data.analysis_results;
             
             // Update progress
-            updateProgress(100, 'ניתוח הושלם');
+            updateImportProgress(100, 'ניתוח הושלם');
             
             // Show results
-            displayAnalysisResults(analysisResults);
+            displayImportAnalysisResults(importAnalysisResults);
             
             // Hide progress
             setTimeout(() => {
-                analysisProgress.style.display = 'none';
+                document.getElementById('import-analysis-progress').style.display = 'none';
             }, 1000);
             
             showNotification('ניתוח הושלם בהצלחה', 'success');
@@ -326,18 +339,18 @@ async function analyzeFile() {
 /**
  * Generate preview
  */
-async function generatePreview() {
-    if (!sessionId) {
+async function generateImportPreview() {
+    if (!importSessionId) {
         return;
     }
     
     try {
-        const response = await fetch(`/api/user-data-import/session/${sessionId}/preview`);
+        const response = await fetch(`/api/user-data-import/session/${importSessionId}/preview`);
         const data = await response.json();
         
         if (data.status === 'success') {
-            previewData = data.preview_data;
-            displayPreviewSummary(previewData);
+            importPreviewData = data.preview_data;
+            displayImportPreviewSummary(importPreviewData);
             showNotification('תצוגה מקדימה הוכנה', 'success');
         } else {
             showNotification(`שגיאה בהכנת תצוגה מקדימה: ${data.message}`, 'error');
@@ -351,70 +364,70 @@ async function generatePreview() {
 /**
  * Display analysis results
  */
-function displayAnalysisResults(results) {
-    document.getElementById('valid-count').textContent = results.valid_records || 0;
-    document.getElementById('missing-tickers-count').textContent = results.missing_tickers || 0;
-    document.getElementById('duplicates-count').textContent = results.duplicate_records || 0;
-    document.getElementById('errors-count').textContent = results.invalid_records || 0;
+function displayImportAnalysisResults(results) {
+    document.getElementById('import-valid-count').textContent = results.valid_records || 0;
+    document.getElementById('import-missing-tickers-count').textContent = results.missing_tickers || 0;
+    document.getElementById('import-duplicates-count').textContent = results.duplicate_records || 0;
+    document.getElementById('import-errors-count').textContent = results.invalid_records || 0;
     
-    analysisResults.style.display = 'block';
+    document.getElementById('import-analysis-results').style.display = 'block';
 }
 
 /**
  * Display preview summary
  */
-function displayPreviewSummary(data) {
-    document.getElementById('preview-total').textContent = data.summary.total_records || 0;
-    document.getElementById('preview-import').textContent = data.summary.records_to_import || 0;
-    document.getElementById('preview-skip').textContent = data.summary.records_to_skip || 0;
+function displayImportPreviewSummary(data) {
+    document.getElementById('import-preview-total').textContent = data.summary.total_records || 0;
+    document.getElementById('import-preview-import').textContent = data.summary.records_to_import || 0;
+    document.getElementById('import-preview-skip').textContent = data.summary.records_to_skip || 0;
 }
 
 /**
  * Show preview modal
  */
-function showPreviewModal() {
-    if (!previewData) {
+function showImportPreviewModal() {
+    if (!importPreviewData) {
         showNotification('אין נתוני תצוגה מקדימה', 'error');
         return;
     }
     
     // Update tab counts
-    document.getElementById('import-tab-count').textContent = previewData.records_to_import.length;
-    document.getElementById('skip-tab-count').textContent = previewData.records_to_skip.length;
+    document.getElementById('import-import-tab-count').textContent = importPreviewData.records_to_import.length;
+    document.getElementById('import-skip-tab-count').textContent = importPreviewData.records_to_skip.length;
     
     // Populate tables
-    populatePreviewTable('import', previewData.records_to_import);
-    populatePreviewTable('skip', previewData.records_to_skip);
+    populateImportPreviewTable('import', importPreviewData.records_to_import);
+    populateImportPreviewTable('skip', importPreviewData.records_to_skip);
     
     // Show modal
-    previewModal.style.display = 'block';
+    document.getElementById('import-preview-modal').style.display = 'block';
 }
 
 /**
  * Close preview modal
  */
-function closePreviewModal() {
-    previewModal.style.display = 'none';
+function closeImportPreviewModal() {
+    document.getElementById('import-preview-modal').style.display = 'none';
 }
 
 /**
  * Show preview tab
  */
-function showPreviewTab(tabName) {
+function showImportPreviewTab(tabName) {
     // Update tab buttons
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('#import-preview-modal .tab-btn').forEach(btn => btn.classList.remove('active'));
     event.target.classList.add('active');
     
     // Update tab content
-    document.querySelectorAll('.preview-tab').forEach(tab => tab.classList.remove('active'));
-    document.getElementById(`preview-tab-${tabName}`).classList.add('active');
+    document.querySelectorAll('#import-preview-modal .preview-tab').forEach(tab => tab.classList.remove('active'));
+    document.getElementById(`import-preview-tab-${tabName}`).classList.add('active');
 }
 
 /**
  * Populate preview table
  */
-function populatePreviewTable(type, records) {
-    const tbody = document.getElementById(`preview-tbody-${type}`);
+function populateImportPreviewTable(type, records) {
+    const tbody = document.getElementById(`import-preview-tbody-${type}`);
     tbody.innerHTML = '';
     
     records.forEach(record => {
@@ -451,13 +464,13 @@ function populatePreviewTable(type, records) {
  * Execute import
  */
 async function executeImport() {
-    if (!sessionId) {
+    if (!importSessionId) {
         showNotification('אין סשן ייבוא פעיל', 'error');
         return;
     }
     
     try {
-        const response = await fetch(`/api/user-data-import/session/${sessionId}/execute`, {
+        const response = await fetch(`/api/user-data-import/session/${importSessionId}/execute`, {
             method: 'POST'
         });
         
@@ -466,8 +479,11 @@ async function executeImport() {
         if (data.status === 'success') {
             showNotification(`ייבוא הושלם: ${data.imported_count} רשומות יובאו`, 'success');
             
-            // Reset form
-            resetForm();
+            // Close modal and refresh data
+            closeImportUserDataModal();
+            if (typeof window.loadExecutionsData === 'function') {
+                window.loadExecutionsData();
+            }
         } else {
             showNotification(`שגיאה בייבוא: ${data.message}`, 'error');
         }
@@ -482,51 +498,30 @@ async function executeImport() {
  */
 function cancelImport() {
     if (confirm('האם אתה בטוח שברצונך לבטל את הייבוא?')) {
-        resetForm();
+        closeImportUserDataModal();
     }
-}
-
-/**
- * Reset form
- */
-function resetForm() {
-    currentStep = 1;
-    selectedFile = null;
-    selectedAccount = null;
-    sessionId = null;
-    analysisResults = null;
-    previewData = null;
-    
-    // Reset UI
-    clearFile();
-    accountSelect.value = '';
-    analysisResults.style.display = 'none';
-    analysisProgress.style.display = 'none';
-    
-    updateStepDisplay();
-    updateStepNavigation();
 }
 
 /**
  * Update step display
  */
-function updateStepDisplay() {
+function updateImportStepDisplay() {
     // Update step indicators
-    document.querySelectorAll('.step').forEach((step, index) => {
+    document.querySelectorAll('#import-user-data-modal .step').forEach((step, index) => {
         step.classList.remove('active', 'completed');
         
-        if (index + 1 === currentStep) {
+        if (index + 1 === importCurrentStep) {
             step.classList.add('active');
-        } else if (index + 1 < currentStep) {
+        } else if (index + 1 < importCurrentStep) {
             step.classList.add('completed');
         }
     });
     
     // Update step content
-    document.querySelectorAll('.step-content').forEach((content, index) => {
+    document.querySelectorAll('#import-user-data-modal .step-content').forEach((content, index) => {
         content.classList.remove('active');
         
-        if (index + 1 === currentStep) {
+        if (index + 1 === importCurrentStep) {
             content.classList.add('active');
         }
     });
@@ -535,21 +530,21 @@ function updateStepDisplay() {
 /**
  * Update step navigation
  */
-function updateStepNavigation() {
-    const prevBtn = document.getElementById('prev-btn');
-    const nextBtn = document.getElementById('next-btn');
+function updateImportStepNavigation() {
+    const prevBtn = document.getElementById('import-prev-btn');
+    const nextBtn = document.getElementById('import-next-btn');
     
     // Previous button
-    if (currentStep > 1) {
+    if (importCurrentStep > 1) {
         prevBtn.style.display = 'inline-block';
     } else {
         prevBtn.style.display = 'none';
     }
     
     // Next button
-    if (currentStep < 6) {
+    if (importCurrentStep < 6) {
         nextBtn.textContent = 'שלב הבא →';
-        nextBtn.disabled = !canProceedToNextStep();
+        nextBtn.disabled = !canProceedToNextImportStep();
     } else {
         nextBtn.textContent = 'סיום';
         nextBtn.disabled = false;
@@ -559,18 +554,18 @@ function updateStepNavigation() {
 /**
  * Check if can proceed to next step
  */
-function canProceedToNextStep() {
-    switch (currentStep) {
+function canProceedToNextImportStep() {
+    switch (importCurrentStep) {
         case 1:
-            return selectedFile !== null;
+            return importSelectedFile !== null;
         case 2:
-            return selectedAccount !== null;
+            return importSelectedAccount !== null;
         case 3:
-            return analysisResults !== null;
+            return importAnalysisResults !== null;
         case 4:
             return true; // Problem resolution
         case 5:
-            return previewData !== null;
+            return importPreviewData !== null;
         case 6:
             return true; // Confirmation
         default:
@@ -581,9 +576,9 @@ function canProceedToNextStep() {
 /**
  * Update progress
  */
-function updateProgress(percentage, text) {
-    document.getElementById('progress-fill').style.width = `${percentage}%`;
-    document.getElementById('progress-text').textContent = text;
+function updateImportProgress(percentage, text) {
+    document.getElementById('import-progress-fill').style.width = `${percentage}%`;
+    document.getElementById('import-progress-text').textContent = text;
 }
 
 /**
@@ -622,19 +617,6 @@ function getReasonText(reason) {
     };
     
     return reasons[reason] || reason;
-}
-
-/**
- * Show notification
- */
-function showNotification(message, type = 'info') {
-    // Use the global notification system if available
-    if (typeof showNotification === 'function') {
-        window.showNotification(message, type);
-    } else {
-        // Fallback to alert
-        alert(message);
-    }
 }
 
 /**

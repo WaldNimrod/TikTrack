@@ -126,8 +126,8 @@ function generateDetailedLog() {
     return log.join('\n');
 }
 
-// Local  function for db-extradata page
-async function  {
+// Local copyDetailedLog function for db-extradata page
+async function copyDetailedLogLocal() {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {

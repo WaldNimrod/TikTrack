@@ -693,7 +693,7 @@ function generateDetailedLog() {
 }
 
 // Local  function for db_display page
-async function  {
+async function copyDetailedLog() {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {

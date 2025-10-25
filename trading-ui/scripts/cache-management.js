@@ -1483,7 +1483,7 @@ async function generateDetailedLog() {
  * Copy detailed log to clipboard
  * העתקת לוג מפורט ללוח
  */
-async function  {
+async function copyDetailedLog() {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {

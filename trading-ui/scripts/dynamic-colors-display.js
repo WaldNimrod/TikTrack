@@ -729,8 +729,8 @@ function generateDetailedLog() {
 // window.toggleSection export removed - using global version from ui-utils.js
 // window. export removed - using global version from system-management.js
 
-// Local  function for dynamic-colors-display page
-async function  {
+// Local copyDetailedLog function for dynamic-colors-display page
+async function copyDetailedLogLocal() {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {

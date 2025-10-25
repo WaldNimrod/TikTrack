@@ -3484,7 +3484,7 @@ function toggleExecutionsSection() {
 }
 
 // Execution CRUD functions
-function saveExecution() {
+function saveExecutionWrapper() {
     if (typeof window.saveExecution === 'function') {
         window.saveExecution();
     } else {

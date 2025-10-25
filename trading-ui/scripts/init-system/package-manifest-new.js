@@ -655,28 +655,28 @@ class PackageManifest {
    */
   getAllPackages() {
     return Object.values(PACKAGE_MANIFEST);
-  },
+  }
 
   /**
    * Get package by ID
    */
   getPackage(packageId) {
     return PACKAGE_MANIFEST[packageId];
-  },
+  }
 
   /**
    * Get packages by load order
    */
   getPackagesByLoadOrder() {
     return this.getAllPackages().sort((a, b) => a.loadOrder - b.loadOrder);
-  },
+  }
 
   /**
    * Get critical packages only
    */
   getCriticalPackages() {
     return this.getAllPackages().filter(pkg => pkg.critical);
-  },
+  }
 
   /**
    * Get package dependencies (recursive)
@@ -700,7 +700,7 @@ class PackageManifest {
     
     collectDeps(packageId);
     return dependencies;
-  },
+  }
 
   /**
    * Get all scripts for packages
@@ -722,7 +722,7 @@ class PackageManifest {
     });
     
     return scripts;
-  },
+  }
 
   /**
    * Validate package configuration
@@ -753,7 +753,7 @@ class PackageManifest {
       valid: errors.length === 0,
       errors: errors
     };
-  },
+  }
 
   /**
    * Get package statistics
@@ -772,6 +772,7 @@ class PackageManifest {
       criticalPackages: critical,
       totalScripts: totalScripts,
       estimatedTotalSize: `${totalSize}KB`
+    };
   }
 };
 

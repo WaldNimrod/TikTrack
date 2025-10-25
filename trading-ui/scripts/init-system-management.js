@@ -2573,11 +2573,11 @@ function copyDetailedPageResults() {
         copyText += '\nMISMATCHES:\n';
         mismatches.forEach((mismatch, index) => {
             const script = mismatch.querySelector('strong')?.textContent || '';
-            const package = mismatch.querySelector('small')?.textContent || '';
+            const packageName = mismatch.querySelector('small')?.textContent || '';
             const global = mismatch.querySelector('code')?.textContent || '';
             
             copyText += `${index + 1}. ${script}\n`;
-            copyText += `   Package: ${package}\n`;
+            copyText += `   Package: ${packageName}\n`;
             copyText += `   Expected Global: ${global}\n`;
         });
     }

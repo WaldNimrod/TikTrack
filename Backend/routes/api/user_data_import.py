@@ -59,7 +59,14 @@ def upload_and_preview():
     file_name = file.filename
 
     try:
-        orchestrator = ImportOrchestrator(g.db_session)
+        # Create database session
+        from sqlalchemy import create_engine
+        from sqlalchemy.orm import sessionmaker
+        engine = create_engine('sqlite:///db/simpleTrade_new.db')
+        Session = sessionmaker(bind=engine)
+        db_session = Session()
+        
+        orchestrator = ImportOrchestrator(db_session)
         
         # Create import session first
         session_data = orchestrator.create_import_session(account_id, file_name, file_content)

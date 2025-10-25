@@ -632,8 +632,8 @@ function debugZIndexStatus() {
 // window. export removed - using global version from system-management.js
 // window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 
-// Local  function for index page
-async function  {
+// Local copyDetailedLog function for index page
+async function copyDetailedLogLocal() {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {

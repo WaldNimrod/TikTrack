@@ -2816,8 +2816,8 @@ function generateDetailedLog() {
 // ייצוא לגלובל scope
 // window. export removed - using global version from system-management.js
 
-// Local  function for external-data-dashboard page
-async function  {
+// Local copyDetailedLog function for external-data-dashboard page
+async function copyDetailedLogLocal() {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {

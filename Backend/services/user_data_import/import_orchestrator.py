@@ -139,7 +139,7 @@ class ImportOrchestrator:
                 return {'success': False, 'error': 'Connector not found'}
             
             # Parse file
-            raw_records = connector.parse_file(file_content)
+            raw_records = connector.parse_file(file_content, session.file_name)
             session.total_records = len(raw_records)
             
             # Normalize records

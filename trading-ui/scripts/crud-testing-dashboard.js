@@ -612,7 +612,7 @@ window.markPagePartial = markPagePartial;
 // window. export removed - using global version from system-management.js
 
 // Local  function for crud-testing-dashboard page
-async function  {
+async function copyDetailedLog() {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {

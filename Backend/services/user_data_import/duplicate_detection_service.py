@@ -278,7 +278,7 @@ class DuplicateDetectionService:
             executions = self.db_session.query(Execution).join(
                 Execution.trade
             ).filter(
-                Execution.trade.has(account_id=account_id)
+                Execution.trade.has(trading_account_id=account_id)
             ).all()
             
             return [execution.to_dict() for execution in executions]

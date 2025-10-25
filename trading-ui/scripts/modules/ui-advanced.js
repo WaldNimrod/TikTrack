@@ -597,7 +597,7 @@ function getInvestmentTypeColor(investmentType, intensity = 'medium') {
  * @param {string} investmentType - סוג ההשקעה
  * @returns {string} קוד הצבע
  */
-function getInvestmentTypeBackgroundColor(investmentType) {
+function getInvestmentTypeBackgroundColorWrapper2(investmentType) {
   return getInvestmentTypeColor(investmentType, 'light');
 }
 
@@ -630,7 +630,7 @@ function getInvestmentTypeBorderColor(investmentType) {
  * @param {string} investmentType - סוג ההשקעה
  * @returns {string} קוד הצבע
  */
-function getInvestmentTypeBackgroundColor(investmentType) {
+function getInvestmentTypeBackgroundColorWrapper2(investmentType) {
   if (!investmentType) {
     return 'rgba(108, 117, 125, 0.1)'; // אפור שקוף לנתונים חסרים
   }

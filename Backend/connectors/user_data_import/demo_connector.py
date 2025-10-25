@@ -122,12 +122,12 @@ class DemoConnector(BaseConnector):
         """
         try:
             # Extract and clean data
-            symbol = str(raw_record.get('symbol', '')).strip().upper()
-            action = str(raw_record.get('action', '')).strip().lower()
-            date_str = str(raw_record.get('date', '')).strip()
-            quantity = self._parse_float(raw_record.get('quantity', 0))
-            price = self._parse_float(raw_record.get('price', 0))
-            fee = self._parse_float(raw_record.get('fee', 0))
+            symbol = str(raw_record.get('Ticker', raw_record.get('symbol', ''))).strip().upper()
+            action = str(raw_record.get('Action', raw_record.get('action', ''))).strip().lower()
+            date_str = str(raw_record.get('Date', raw_record.get('date', ''))).strip()
+            quantity = self._parse_float(raw_record.get('Quantity', raw_record.get('quantity', 0)))
+            price = self._parse_float(raw_record.get('Price', raw_record.get('price', 0)))
+            fee = self._parse_float(raw_record.get('Fee', raw_record.get('fee', 0)))
             
             # Parse date
             date = self._parse_date(date_str)

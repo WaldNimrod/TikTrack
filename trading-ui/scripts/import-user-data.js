@@ -186,25 +186,63 @@ function handleImportAccountSelect(event) {
  */
 async function loadImportTradingAccounts() {
     try {
-        const response = await fetch('/api/user-data-import/accounts');
-        const data = await response.json();
-        
-        if (data.status === 'success') {
+        // Use SelectPopulatorService if available
+        if (typeof window.SelectPopulatorService !== 'undefined') {
+            await window.SelectPopulatorService.populateAccountsSelect('import-account-select', {
+                includeEmpty: true,
+                emptyText: 'בחר חשבון מסחר',
+                filterFn: (account) => account.status === 'open'
+            });
+        } else if (typeof window.loadTradingAccountsFromServer === 'function') {
+            // Fallback to direct loading
+            await window.loadTradingAccountsFromServer();
+            const accounts = window.trading_accountsData || [];
+            
             const select = document.getElementById('import-account-select');
             select.innerHTML = '<option value="">בחר חשבון מסחר</option>';
             
-            data.accounts.forEach(account => {
+            // Filter only open accounts
+            const openAccounts = accounts.filter(account => account.status === 'open');
+            
+            openAccounts.forEach(account => {
                 const option = document.createElement('option');
                 option.value = account.id;
-                option.textContent = `${account.name} (${account.currency_symbol})`;
+                option.textContent = `${account.name} (${account.currency?.symbol || 'USD'})`;
                 select.appendChild(option);
             });
+            
+            if (openAccounts.length === 0) {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'אין חשבונות פעילים';
+                option.disabled = true;
+                select.appendChild(option);
+            }
         } else {
-            showNotification('שגיאה בטעינת חשבונות', 'error');
+            // Fallback to direct API call
+            const response = await fetch('/api/trading-accounts/');
+            const data = await response.json();
+            const accounts = data.data || data;
+            
+            const select = document.getElementById('import-account-select');
+            select.innerHTML = '<option value="">בחר חשבון מסחר</option>';
+            
+            const openAccounts = accounts.filter(account => account.status === 'open');
+            
+            openAccounts.forEach(account => {
+                const option = document.createElement('option');
+                option.value = account.id;
+                option.textContent = `${account.name} (${account.currency?.symbol || 'USD'})`;
+                select.appendChild(option);
+            });
         }
     } catch (error) {
         console.error('Error loading accounts:', error);
         showNotification('שגיאה בטעינת חשבונות', 'error');
+        
+        // Show error in select
+        const select = document.getElementById('import-account-select');
+        select.innerHTML = '<option value="">שגיאה בטעינת חשבונות</option>';
     }
 }
 
